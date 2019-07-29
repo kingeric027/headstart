@@ -22,6 +22,9 @@ export class SpecFormComponent implements OnInit {
 
   ngOnInit() {
     const formObj = {};
+    this.specs = this.specs.sort(
+      (s1, s2) => s1.Options.length - s2.Options.length
+    );
     this.specs.forEach((spec) => {
       const value: any = [this.getDefaultOption(spec)];
       if (spec.Required) value.push(Validators.required);
