@@ -175,6 +175,11 @@ export class ProductDetailsComponent implements OnInit, AfterViewChecked {
     // If you remove the @ViewChild(QuantityInputComponent) this will be unecessary.
     this.changeDetectorRef.detectChanges();
   }
+
+  getImageUrls() {
+    const images = this.product.xp.Images || [];
+    return images.map((i) => i.Url);
+  }
 }
 
 export interface FullSpecOption extends SpecOption {

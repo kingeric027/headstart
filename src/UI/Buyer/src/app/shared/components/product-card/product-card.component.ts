@@ -11,7 +11,7 @@ import { QuantityInputComponent } from '@app-buyer/shared/components/quantity-in
 import { AddToCartEvent } from '@app-buyer/shared/models/add-to-cart-event.interface';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
-import { find as _find } from 'lodash';
+import { find as _find, get as _get } from 'lodash';
 
 @Component({
   selector: 'product-product-card',
@@ -55,5 +55,13 @@ export class ProductCardComponent implements OnInit {
 
   featuredProducts() {
     return this.router.url.indexOf('/home') > -1;
+  }
+
+  getImageUrl() {
+    return _get(
+      this.product,
+      'xp.Images[0].Url',
+      'http://placehold.it/300x300'
+    );
   }
 }

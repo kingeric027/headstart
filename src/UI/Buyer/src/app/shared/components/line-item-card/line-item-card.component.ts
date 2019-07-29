@@ -2,6 +2,7 @@ import { Component, Output, Input, EventEmitter } from '@angular/core';
 import { LineItem, BuyerProduct } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { CartService } from '@app-buyer/shared/services/cart/cart.service';
+import { get as _get } from 'lodash';
 
 @Component({
   selector: 'shared-line-item-card',
@@ -28,5 +29,13 @@ export class LineItemCardComponent {
   protected updateQuantity(qty: number) {
     this.lineitem.Quantity = qty;
     this.lineItemUpdated.emit(this.lineitem);
+  }
+
+  getImageUrl() {
+    return _get(
+      this.lineitem,
+      'Product.xp.Images[0].Url',
+      'http://placehold.it/300x300'
+    );
   }
 }
