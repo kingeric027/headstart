@@ -1,4 +1,4 @@
-<div *ngIf="lineItems$ | async; let lineItems">
+<div *ngIf="lineItems">
   <order-payment-list *ngIf="payments$ | async; let payments"
                       [payments]="payments"></order-payment-list>
   <div class="row">

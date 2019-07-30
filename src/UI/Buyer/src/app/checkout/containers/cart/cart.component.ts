@@ -66,12 +66,12 @@ export class CartComponent implements OnInit, OnDestroy {
       });
   }
 
-  deleteLineItem(li: LineItem) {
-    return this.cartService.removeItem(li.ID).subscribe();
+  async deleteLineItem(li: LineItem): Promise<void> {
+    await this.cartService.removeItem(li.ID);
   }
 
-  updateLineItem(li: LineItem) {
-    this.cartService.updateQuantity(li.ID, li.Quantity).subscribe();
+  async updateLineItem(li: LineItem): Promise<void> {
+    await this.cartService.updateQuantity(li.ID, li.Quantity);
   }
 
   ngOnDestroy() {

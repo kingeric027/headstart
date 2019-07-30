@@ -64,16 +64,16 @@ export class BaseResolveService {
       );
   }
 
-  private setLineItems(): Observable<ListLineItem> {
+  private async setLineItems(): Promise<ListLineItem> {
     const order = this.appStateService.orderSubject.value;
     if (order.DateCreated) {
-      return this.cartService.listAllItems(order.ID);
+      return await this.cartService.listAllItems(order.ID);
     }
     const lineitemlist = {
       Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
       Items: [],
     };
-    return of(lineitemlist);
+    return Promise.resolve(lineitemlist);
   }
 
   // Used by BaseResolve when app first loads, at login and at logout
@@ -111,9 +111,12 @@ export class BaseResolveService {
   }
 
   transferAnonymousCart(anonLineItems: ListLineItem): Observable<LineItem[]> {
-    const requests = anonLineItems.Items.map((li) =>
-      this.cartService.addToCart(li.xp.product, li.Quantity)
-    );
+    const requests = anonLineItems.Items.map((li) => {
+      this.cartService.addToCart({
+        ProductID: li.xp.product,
+        Quantity: li.Quantity,
+      });
+    });
 
     return forkJoin(requests);
   }

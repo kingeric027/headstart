@@ -1,7 +1,4 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs';
-import { takeWhile, tap } from 'rxjs/operators';
-
+import { Component, OnInit, Input } from '@angular/core';
 import { forEach as _forEach } from 'lodash';
 
 import {
@@ -10,17 +7,17 @@ import {
   AppReorderService,
 } from '@app-buyer/shared';
 import { OrderReorderResponse } from '@app-buyer/shared/services/reorder/reorder.interface';
+import { LineItem } from '@ordercloud/angular-sdk';
 
 @Component({
   selector: 'order-reorder',
   templateUrl: './order-reorder.component.html',
   styleUrls: ['./order-reorder.component.scss'],
 })
-export class OrderReorderComponent implements OnInit, OnDestroy {
+export class OrderReorderComponent implements OnInit {
   @Input() orderID: string;
-  reorderResponse$: Observable<OrderReorderResponse>;
+  reorderResponse: OrderReorderResponse;
   modalID = 'Order-Reorder';
-  alive = true;
   message = { string: null, classType: null };
 
   constructor(
@@ -29,13 +26,10 @@ export class OrderReorderComponent implements OnInit, OnDestroy {
     private cartService: CartService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     if (this.orderID) {
-      this.reorderResponse$ = this.appReorderService.order(this.orderID).pipe(
-        tap((response) => {
-          this.updateMessage(response);
-        })
-      );
+      this.reorderResponse = await this.appReorderService.order(this.orderID);
+      this.updateMessage(this.reorderResponse);
     } else {
       throw new Error('Needs Order ID');
     }
@@ -61,18 +55,11 @@ export class OrderReorderComponent implements OnInit, OnDestroy {
   }
 
   addToCart() {
-    this.reorderResponse$
-      .pipe(takeWhile(() => this.alive))
-      .subscribe((reorderResponse) => {
-        _forEach(reorderResponse.ValidLi, (li) => {
-          if (!li) return;
-          this.cartService.addToCart(li.Product.ID, li.Quantity).subscribe();
-        });
-        this.modalService.close(this.modalID);
-      });
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
+    _forEach(this.reorderResponse.ValidLi, async (li: LineItem) => {
+      if (!li) return;
+      li = { ProductID: li.Product.ID, Quantity: li.Quantity, Specs: li.Specs };
+      await this.cartService.addToCart(li);
+    });
+    this.modalService.close(this.modalID);
   }
 }

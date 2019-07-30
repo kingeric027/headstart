@@ -3,7 +3,7 @@
         (click)="orderReorder()">Reorder</button>
 <shared-modal id="Order-Reorder"
               modalTitle="Order Reorder">
-  <div *ngIf="reorderResponse$ | async as reorderResponse">
+  <div *ngIf="reorderResponse">
     <div class="alert"
          [ngClass]="{'alert-danger': message.classType == 'danger',
                   'alert-warning': message.classType == 'warning',

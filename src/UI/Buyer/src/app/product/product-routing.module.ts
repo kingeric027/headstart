@@ -4,11 +4,11 @@ import { RouterModule, Routes } from '@angular/router';
 
 // product components
 import { ProductListComponent } from '@app-buyer/product/containers/product-list/product-list.component';
-import { ProductDetailsComponent } from '@app-buyer/product/containers/product-details/product-details.component';
+import { ProductDetailWrapperComponent } from './containers/product-detail-wrapper/product-detail-wrapper.component';
 
 const routes: Routes = [
   { path: '', component: ProductListComponent },
-  { path: ':productID', component: ProductDetailsComponent },
+  { path: ':productID', component: ProductDetailWrapperComponent },
 ];
 
 @NgModule({

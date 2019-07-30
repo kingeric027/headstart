@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { MeUser, Order, ListLineItem } from '@ordercloud/angular-sdk';
-import { AddToCartEvent } from '@app-buyer/shared/models/add-to-cart-event.interface';
+import { MeUser, Order, ListLineItem, LineItem } from '@ordercloud/angular-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +13,7 @@ export class AppStateService {
   public isLoggedIn: BehaviorSubject<boolean>;
   public lineItemSubject: BehaviorSubject<ListLineItem>;
 
-  public addToCartSubject: Subject<AddToCartEvent>;
+  public addToCartSubject: Subject<LineItem>;
 
   constructor() {
     this.userSubject = new BehaviorSubject<MeUser>(null);
@@ -26,6 +25,6 @@ export class AppStateService {
       Items: [],
     });
 
-    this.addToCartSubject = new Subject<AddToCartEvent>();
+    this.addToCartSubject = new Subject<LineItem>();
   }
 }

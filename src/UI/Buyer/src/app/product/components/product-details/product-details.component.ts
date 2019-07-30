@@ -4,19 +4,20 @@ import {
   ViewChild,
   ChangeDetectorRef,
   AfterViewChecked,
+  Input,
+  Output,
+  EventEmitter,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, forkJoin, of } from 'rxjs';
-import { CartService, AppStateService } from '@app-buyer/shared';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import {
   BuyerProduct,
-  OcMeService,
   BuyerSpec,
   LineItemSpec,
   SpecOption,
+  LineItem,
 } from '@ordercloud/angular-sdk';
 import { QuantityInputComponent } from '@app-buyer/shared/components/quantity-input/quantity-input.component';
-import { AddToCartEvent } from '@app-buyer/shared/models/add-to-cart-event.interface';
 import { minBy as _minBy } from 'lodash';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
 import { find as _find, difference as _difference } from 'lodash';
@@ -27,73 +28,39 @@ import { SpecFormComponent } from '@app-buyer/product/components/spec-form/spec-
   styleUrls: ['./product-details.component.scss'],
 })
 export class ProductDetailsComponent implements OnInit, AfterViewChecked {
+  @Input() specs: BuyerSpec[] = [];
+  @Input() product: BuyerProduct;
+  @Output() addToCartEvent = new EventEmitter<LineItem>();
+
   @ViewChild(QuantityInputComponent, { static: false })
   quantityInputComponent: QuantityInputComponent;
   @ViewChild(SpecFormComponent, { static: false })
   specFormComponent: SpecFormComponent;
   quantityInputReady = false;
-  specs: BuyerSpec[] = [];
   specSelections: FullSpecOption[] = [];
-  product: BuyerProduct;
   relatedProducts$: Observable<BuyerProduct[]>;
   imageUrls: string[] = [];
 
   constructor(
-    private ocMeService: OcMeService,
-    private activatedRoute: ActivatedRoute,
-    private cartService: CartService,
-    private appStateService: AppStateService,
     private changeDetectorRef: ChangeDetectorRef,
     protected favoriteProductService: FavoriteProductsService, // used in template
     private router: Router
   ) {}
 
-  ngOnInit(): void {
-    this.activatedRoute.params.subscribe(async (params) => {
-      await this.getProductData(params.productID);
-    });
-  }
+  ngOnInit() {}
 
   routeToProductList(): void {
     this.router.navigate(['/products']);
   }
 
-  async getProductData(productID: string): Promise<void> {
-    if (!productID) return;
-    this.product = await this.ocMeService.GetProduct(productID).toPromise();
-    this.specs = await this.listSpecs(productID);
-    this.relatedProducts$ = this.getRelatedProducts(this.product);
-  }
-
-  async listSpecs(productID: string): Promise<BuyerSpec[]> {
-    const specs = await this.ocMeService.ListSpecs(productID).toPromise();
-    const details = specs.Items.map((spec) => {
-      return this.ocMeService.GetSpec(productID, spec.ID).toPromise();
-    });
-    return await Promise.all(details);
-  }
-
-  getRelatedProducts(product: BuyerProduct): Observable<BuyerProduct[]> {
-    if (!product.xp || !product.xp.RelatedProducts) {
-      return of([]);
-    }
-
-    const requests = product.xp.RelatedProducts.map((prodID) =>
-      this.ocMeService.GetProduct(prodID)
-    );
-
-    return forkJoin(requests);
-  }
-
-  addToCart(event: AddToCartEvent): void {
+  addToCart(li: LineItem): void {
     const specs: LineItemSpec[] = this.specSelections.map((o) => ({
       SpecID: o.SpecID,
       OptionID: o.ID,
       Value: o.Value,
     }));
-    this.cartService
-      .addToCart(event.product.ID, event.quantity, specs)
-      .subscribe(() => this.appStateService.addToCartSubject.next(event));
+    li.Specs = specs;
+    this.addToCartEvent.emit(li);
   }
 
   isOrderable(): boolean {

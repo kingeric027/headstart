@@ -7,10 +7,9 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { BuyerProduct } from '@ordercloud/angular-sdk';
+import { BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
 import { ProductQtyValidator } from '@app-buyer/shared/validators/product-quantity/product.quantity.validator';
 import { ToastrService } from 'ngx-toastr';
-import { AddToCartEvent } from '@app-buyer/shared/models/add-to-cart-event.interface';
 import { debounceTime, takeWhile } from 'rxjs/operators';
 import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
 
@@ -24,7 +23,7 @@ export class QuantityInputComponent implements OnInit, OnDestroy {
   @Input() product: BuyerProduct;
   @Input() existingQty;
   @Output() qtyChanged = new EventEmitter<number>();
-  @Output() addedToCart = new EventEmitter<AddToCartEvent>();
+  @Output() addedToCart = new EventEmitter<LineItem>();
   form: FormGroup;
 
   constructor(
@@ -85,8 +84,8 @@ export class QuantityInputComponent implements OnInit, OnDestroy {
       );
     }
     this.addedToCart.emit({
-      product: this.product,
-      quantity: this.form.value.quantity,
+      ProductID: this.product.ID,
+      Quantity: this.form.value.quantity,
     });
     // Reset form as indication of action
     this.form.setValue({ quantity: this.getDefaultQty() });

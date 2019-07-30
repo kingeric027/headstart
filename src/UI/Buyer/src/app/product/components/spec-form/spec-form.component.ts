@@ -7,7 +7,7 @@ import {
   pickBy as _pickBy,
   identity as _identity,
 } from 'lodash';
-import { FullSpecOption } from '@app-buyer/product/containers/product-details/product-details.component';
+import { FullSpecOption } from '../product-details/product-details.component';
 
 @Component({
   selector: 'product-spec-form',

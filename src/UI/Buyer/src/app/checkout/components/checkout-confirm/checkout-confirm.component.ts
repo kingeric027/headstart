@@ -25,7 +25,7 @@ export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent
   form: FormGroup;
   order: Order;
   payments$: Observable<ListPayment>;
-  lineItems$: Observable<ListLineItem>;
+  lineItems: ListLineItem;
   @Input() isSubmittingOrder: boolean;
 
   constructor(
@@ -39,7 +39,7 @@ export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent
     super();
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     if (!this.appConfig.anonymousShoppingEnabled) {
       this.form = this.formBuilder.group({ comments: '' });
     }
@@ -48,7 +48,7 @@ export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent
       'outgoing',
       this.order.ID
     );
-    this.lineItems$ = this.cartService.listAllItems(this.order.ID);
+    this.lineItems = await this.cartService.listAllItems(this.order.ID);
   }
 
   saveCommentsAndSubmitOrder() {

@@ -23,9 +23,8 @@ import {
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { AppStateService } from '@app-buyer/shared';
-import { Order, MeUser, ListCategory } from '@ordercloud/angular-sdk';
+import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
 import { takeWhile, tap, debounceTime, delay, filter } from 'rxjs/operators';
-import { AddToCartEvent } from '@app-buyer/shared/models/add-to-cart-event.interface';
 import { AppAuthService } from '@app-buyer/auth';
 import { SearchComponent } from '@app-buyer/shared/components/search/search.component';
 
@@ -78,9 +77,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   buildAddToCartListener() {
     this.appStateService.addToCartSubject
       .pipe(
-        tap((event: AddToCartEvent) => {
+        tap((li: LineItem) => {
           this.popover.close();
-          this.popover.ngbPopover = `${event.quantity} Item(s) Added to Cart`;
+          this.popover.ngbPopover = `${li.Quantity} Item(s) Added to Cart`;
         }),
         delay(300),
         tap(() => {

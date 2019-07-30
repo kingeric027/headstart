@@ -8,8 +8,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { QuantityInputComponent } from '@app-buyer/shared/components/quantity-input/quantity-input.component';
-import { AddToCartEvent } from '@app-buyer/shared/models/add-to-cart-event.interface';
-import { BuyerProduct } from '@ordercloud/angular-sdk';
+import { BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
 import { find as _find, get as _get } from 'lodash';
 
@@ -22,7 +21,7 @@ import { find as _find, get as _get } from 'lodash';
 export class ProductCardComponent implements OnInit {
   @Input() product: BuyerProduct;
   @Input() favorite: boolean;
-  @Output() addedToCart = new EventEmitter<AddToCartEvent>();
+  @Output() addedToCart = new EventEmitter<LineItem>();
   @Output() setFavorite = new EventEmitter<boolean>();
   @ViewChild(QuantityInputComponent, { static: false })
   quantityInputComponent: QuantityInputComponent;
@@ -33,8 +32,8 @@ export class ProductCardComponent implements OnInit {
 
   constructor(private router: Router) {}
 
-  addToCart(event: AddToCartEvent) {
-    this.addedToCart.emit(event);
+  addToCart(li: LineItem) {
+    this.addedToCart.emit(li);
   }
 
   hasSpecs(): boolean {

@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { OrderReorderResponse } from '@app-buyer/shared/services/reorder/reorder.interface';
-import { Observable, of, forkJoin } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
 import { OcMeService, BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
 import { forEach as _forEach, differenceBy as _differenceBy } from 'lodash';
 import { CartService } from '@app-buyer/shared/services/cart/cart.service';
@@ -15,44 +13,36 @@ export class AppReorderService {
     private meService: OcMeService
   ) {}
 
-  public order(orderID: string): Observable<OrderReorderResponse> {
+  public async order(orderID: string): Promise<OrderReorderResponse> {
     if (!orderID) throw new Error('Needs Order ID');
-    return this.cartService.listAllItems(orderID).pipe(
-      flatMap((list) => {
-        const lineItems = of(list.Items); // this sets var into an observable
-        const productIds = list.Items.map((item) => item.ProductID);
-        const validProducts = this.getValidProducts(productIds);
-        return forkJoin([validProducts, lineItems]);
-      }),
-      flatMap((results) => this.isProductInLiValid(results[0], results[1])),
-      flatMap((results) => this.hasInventory(results))
-    );
+    const lineItems = await this.cartService.listAllItems(orderID);
+    const productIds = lineItems.Items.map((item) => item.ProductID);
+    const validProducts = await this.getValidProducts(productIds);
+    const result = this.isProductInLiValid(validProducts, lineItems.Items);
+    return this.hasInventory(result);
   }
 
-  private getValidProducts(
+  private async getValidProducts(
     productIds: string[],
     validProducts: BuyerProduct[] = []
-  ): Observable<BuyerProduct[]> {
+  ): Promise<BuyerProduct[]> {
     validProducts = validProducts;
     const chunk = productIds.splice(0, 25);
-    return this.meService
+    const productList = await this.meService
       .ListProducts({ filters: { ID: chunk.join('|') } })
-      .pipe(
-        flatMap((productList) => {
-          validProducts = validProducts.concat(productList.Items);
-          if (productIds.length) {
-            return this.getValidProducts(productIds, validProducts);
-          } else {
-            return of(validProducts);
-          }
-        })
-      );
+      .toPromise();
+    validProducts = validProducts.concat(productList.Items);
+    if (productIds.length) {
+      return this.getValidProducts(productIds, validProducts);
+    } else {
+      return Promise.resolve(validProducts);
+    }
   }
 
   private isProductInLiValid(
     products: BuyerProduct[],
     lineItems: LineItem[]
-  ): Observable<OrderReorderResponse> {
+  ): OrderReorderResponse {
     const validProductIDs = products.map((p) => p.ID);
     const validLi: LineItem[] = [];
     const invalidLi: LineItem[] = [];
@@ -66,21 +56,17 @@ export class AppReorderService {
         invalidLi.push(li);
       }
     });
-    return of({ ValidLi: validLi, InvalidLi: invalidLi });
+    return { ValidLi: validLi, InvalidLi: invalidLi };
   }
 
-  private hasInventory(
-    response: OrderReorderResponse
-  ): Observable<OrderReorderResponse> {
+  private hasInventory(response: OrderReorderResponse): OrderReorderResponse {
     // compare new validLi with old validLi and push difference into the new invalid[] + old invalid array.
-    let newOrderResponse: OrderReorderResponse;
     const newValidLi = response.ValidLi.filter(isValidToOrder);
     let newInvalidLi = _differenceBy(response.ValidLi, newValidLi, 'ProductID');
 
     newInvalidLi = newInvalidLi.concat(response.InvalidLi);
-    newOrderResponse = { ValidLi: newValidLi, InvalidLi: newInvalidLi };
 
-    return of(newOrderResponse);
+    return { ValidLi: newValidLi, InvalidLi: newInvalidLi };
 
     function isValidToOrder(li) {
       const restrictedOrderQuantity =
