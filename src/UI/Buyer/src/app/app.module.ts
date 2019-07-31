@@ -11,7 +11,6 @@ import { CookieModule } from 'ngx-cookie';
 import { ToastrModule } from 'ngx-toastr';
 import { OrderCloudModule } from '@ordercloud/angular-sdk';
 import { OcSDKConfig } from '@app-buyer/config/ordercloud-sdk.config';
-import { NgxImageZoomModule } from 'ngx-image-zoom';
 
 // app modules
 import { SharedModule } from '@app-buyer/shared';
@@ -70,7 +69,6 @@ import { AppErrorHandler } from './config/error-handling.config';
     NgProgressHttpModule,
     OrderCloudModule.forRoot(OcSDKConfig),
     ToastrModule.forRoot(),
-    NgxImageZoomModule.forRoot(),
   ],
   providers: [
     {

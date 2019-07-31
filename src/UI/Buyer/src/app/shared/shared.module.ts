@@ -46,10 +46,6 @@ import {
   ShipperTrackingPipe,
   ShipperTrackingSupportedPipe,
 } from '@app-buyer/shared/pipes/shipperTracking/shipperTracking.pipe';
-import { QuantityInputComponent } from '@app-buyer/shared/components/quantity-input/quantity-input.component';
-import { ToggleFavoriteComponent } from '@app-buyer/shared/components/toggle-favorite/toggle-favorite.component';
-import { ProductCardComponent } from '@app-buyer/shared/components/product-card/product-card.component';
-import { ProductCarouselComponent } from '@app-buyer/shared/components/product-carousel/product-carousel.component';
 import { MapToIterablePipe } from '@app-buyer/shared/pipes/map-to-iterable/map-to-iterable.pipe';
 import { GenericBrowseComponent } from '@app-buyer/shared/components/generic-browse/generic-browse.component';
 import {
@@ -59,9 +55,11 @@ import {
 import { OrderPaymentListComponent } from '@app-buyer/shared/components/payment-list/order-payment-list.component';
 import { NoResultsComponent } from './components/no-results/no-results.component';
 import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
+import { OcmModule } from '@app-buyer/ocm/ocm.module';
 
 @NgModule({
   imports: [
+    OcmModule,
     SharedRoutingModule,
     // angular
     CommonModule,
@@ -124,10 +122,7 @@ import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
     AddressFormComponent,
-    QuantityInputComponent,
-    ToggleFavoriteComponent,
-    ProductCardComponent,
-    ProductCarouselComponent,
+
     GenericBrowseComponent,
     ModalComponent,
     OrderPaymentListComponent,
@@ -150,11 +145,7 @@ import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
     ShipperTrackingSupportedPipe,
     AddressFormComponent,
     LineItemListWrapperComponent,
-    QuantityInputComponent,
     MiniCartComponent,
-    ToggleFavoriteComponent,
-    ProductCardComponent,
-    ProductCarouselComponent,
     GenericBrowseComponent,
     ModalComponent,
     OrderPaymentListComponent,

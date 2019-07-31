@@ -12,12 +12,12 @@ import { find as _find, get as _get } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
-  selector: 'product-product-card',
+  selector: 'ocm-product-card',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class ProductCardComponent implements OnInit {
+export class OCMProductCard implements OnInit {
   @Input() product: BuyerProduct;
   @Input() isFavorite: boolean;
   @Input() quantityLimits: QuantityLimits;

@@ -10,11 +10,11 @@ import {
 import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interface';
 
 @Component({
-  selector: 'product-spec-form',
+  selector: 'ocm-spec-form',
   templateUrl: './spec-form.component.html',
   styleUrls: ['./spec-form.component.scss'],
 })
-export class SpecFormComponent implements OnInit {
+export class OCMSpecForm implements OnInit {
   @Input() specs: BuyerSpec[];
   @Output() formUpdated = new EventEmitter<FullSpecOption[]>();
   specForm: FormGroup;

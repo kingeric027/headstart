@@ -5,11 +5,11 @@ import { get as _get } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
-  selector: 'shared-quantity-input',
+  selector: 'ocm-quantity-input',
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
 })
-export class QuantityInputComponent implements OnInit {
+export class OCMQuantityInput implements OnInit {
   @Input() limits: QuantityLimits;
   @Input() existingQty: number;
   @Output() qtyChange = new EventEmitter<number>();

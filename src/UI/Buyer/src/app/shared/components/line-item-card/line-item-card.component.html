@@ -26,10 +26,10 @@
       </div>
       <div class="col-4 text-center">
         <span class="d-block d-sm-none">Qty</span>
-        <shared-quantity-input *ngIf="!readOnly"
-                               [limits]="quantityLimits"
-                               [existingQty]="lineitem.Quantity"
-                               (qtyChange)="updateQuantity($event)"></shared-quantity-input>
+        <ocm-quantity-input *ngIf="!readOnly"
+                            [limits]="quantityLimits"
+                            [existingQty]="lineitem.Quantity"
+                            (qtyChange)="updateQuantity($event)"></ocm-quantity-input>
         <span class="text-nowrap"
               *ngIf="readOnly">&times;{{ lineitem.Quantity | number }}</span>
       </div>

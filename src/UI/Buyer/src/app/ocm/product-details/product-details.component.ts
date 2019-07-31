@@ -19,11 +19,11 @@ import {
 import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interface';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 @Component({
-  selector: 'product-details',
+  selector: 'ocm-product-details',
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
 })
-export class ProductDetailsComponent implements OnInit, AfterViewChecked {
+export class OCMProductDetails implements OnInit, AfterViewChecked {
   @Input() specs: BuyerSpec[] = [];
   @Input() product: BuyerProduct;
   @Input() isFavorite: boolean;

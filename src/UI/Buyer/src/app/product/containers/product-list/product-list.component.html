@@ -24,7 +24,8 @@
         <label>Refine By</label>
         <button class="btn btn-block btn-default btn-outline-dark mb-2"
                 for="favorite">
-          <shared-toggle-favorite [favorite]="hasFavoriteProductsFilter"></shared-toggle-favorite> My Favorites
+          <ocm-toggle-favorite [favorite]="hasFavoriteProductsFilter">
+          </ocm-toggle-favorite> My Favorites
         </button>
       </div>
     </div>
@@ -49,7 +50,7 @@
                                 (facetListSelected)="changeFacets($event)"></product-facet-filter>
           <div (click)="refineByFavorites()">
             <span class="sr-only">Sort By Favorites</span>
-            <shared-toggle-favorite [favorite]="hasFavoriteProductsFilter"></shared-toggle-favorite>
+            <ocm-toggle-favorite [favorite]="hasFavoriteProductsFilter"></ocm-toggle-favorite>
             <label class="ml-2"
                    for="favorite"> My Favorites</label>
           </div>
@@ -88,14 +89,14 @@
       </div>
       <div *ngIf="productList.Items.length > 0">
         <div class="product-list-grid row align-items-stretch">
-          <product-product-card *ngFor="let product of productList.Items; let i = index"
-                                class="col-sm-6 col-md-4 col-xl-3 d-flex"
-                                [product]="product"
-                                [quantityLimits]="quantityLimits[i]"
-                                [isFavorite]="favoriteProductsService.isFavorite(product)"
-                                (setIsFavorite)="favoriteProductsService.setFavoriteValue($event, product)"
-                                (addedToCart)="addToCart($event)">
-          </product-product-card>
+          <ocm-product-card *ngFor="let product of productList.Items; let i = index"
+                            class="col-sm-6 col-md-4 col-xl-3 d-flex"
+                            [product]="product"
+                            [quantityLimits]="quantityLimits[i]"
+                            [isFavorite]="favoriteProductsService.isFavorite(product)"
+                            (setIsFavorite)="favoriteProductsService.setFavoriteValue($event, product)"
+                            (addedToCart)="addToCart($event)">
+          </ocm-product-card>
         </div>
         <ngb-pagination *ngIf="productList.Meta.TotalPages > 1"
                         maxSize="10"

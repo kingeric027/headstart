@@ -6,8 +6,9 @@
        *ngIf="!approvalVersion">
     <div>Favorites</div>
     <div class="mt-3 ml-3">
-      <shared-toggle-favorite [favorite]="hasFavoriteOrdersFilter"
-                              (favoriteChanged)="filterByFavorite($event)"></shared-toggle-favorite>
+      <ocm-toggle-favorite [favorite]="hasFavoriteOrdersFilter"
+                           (favoriteChanged)="filterByFavorite($event)">
+      </ocm-toggle-favorite>
     </div>
   </div>
   <div class="col-md-2 col-sm-6"

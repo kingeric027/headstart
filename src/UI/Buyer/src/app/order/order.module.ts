@@ -17,9 +17,10 @@ import { OrderComponent } from '@app-buyer/order/containers/order/order.componen
 import { OrderShipmentsComponent } from '@app-buyer/order/containers/order-shipments/order-shipments.component';
 import { OrderReorderComponent } from '@app-buyer/order/containers/order-reorder/order-reorder.component';
 import { OrderApprovalComponent } from '@app-buyer/order/containers/order-approval/order-approval.component';
+import { OcmModule } from '@app-buyer/ocm/ocm.module';
 
 @NgModule({
-  imports: [SharedModule, OrderRoutingModule],
+  imports: [SharedModule, OrderRoutingModule, OcmModule],
   declarations: [
     OrderHistoryComponent,
     StatusFilterComponent,

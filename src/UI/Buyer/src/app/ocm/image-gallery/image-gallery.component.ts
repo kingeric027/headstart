@@ -4,11 +4,11 @@ import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { fromEvent } from 'rxjs';
 
 @Component({
-  selector: 'product-additional-image-gallery',
-  templateUrl: './additional-image-gallery.component.html',
-  styleUrls: ['./additional-image-gallery.component.scss'],
+  selector: 'ocm-image-gallery',
+  templateUrl: './image-gallery.component.html',
+  styleUrls: ['./image-gallery.component.scss'],
 })
-export class AdditionalImageGalleryComponent implements OnInit, OnDestroy {
+export class OCMImageGallery implements OnInit, OnDestroy {
   // gallerySize can be changed and the component logic + behavior will all work. However, the UI may look wonky.
   private readonly gallerySize = 5;
   private alive = true;

@@ -49,9 +49,9 @@
           [routerLink]="[ order.ID ]">
         <td *ngIf="columns.indexOf('Favorite') > -1"
             (click)="$event.stopPropagation()">
-          <shared-toggle-favorite [favorite]="favoriteOrderService.isFavorite(order)"
-                                  (favoriteChanged)="favoriteOrderService.setFavoriteValue($event, order)">
-          </shared-toggle-favorite>
+          <ocm-toggle-favorite [favorite]="favoriteOrderService.isFavorite(order)"
+                               (favoriteChanged)="favoriteOrderService.setFavoriteValue($event, order)">
+          </ocm-toggle-favorite>
         </td>
         <td *ngIf="columns.indexOf('ID')> -1">{{order.ID}}</td>
         <td *ngIf="columns.indexOf('Status') > -1">

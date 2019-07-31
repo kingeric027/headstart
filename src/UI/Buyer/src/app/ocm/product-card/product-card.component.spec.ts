@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 import { AppStateService } from '@app-buyer/shared/services/app-state/app-state.service';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ProductCardComponent } from '@app-buyer/shared/components/product-card/product-card.component';
+import { ProductCardComponent } from '@app-buyer/ocm/product-card/product-card.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Router } from '@angular/router';

@@ -1,6 +1,6 @@
-<product-details [product]="product"
-                 [specs]="specs"
-                 [quantityLimits]="quantityLimits"
-                 [isFavorite]="favoriteProductService.isFavorite(product)"
-                 (addToCartEvent)="addToCart($event)"
-                 (setIsFavorite)="favoriteProductService.setFavoriteValue($event, product)"></product-details>
+<ocm-product-details [product]="product"
+                     [specs]="specs"
+                     [quantityLimits]="quantityLimits"
+                     [isFavorite]="favoriteProductService.isFavorite(product)"
+                     (addToCartEvent)="addToCart($event)"
+                     (setIsFavorite)="favoriteProductService.setFavoriteValue($event, product)"></ocm-product-details>

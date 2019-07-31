@@ -4,11 +4,11 @@ import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 
 @Component({
-  selector: 'product-carousel',
+  selector: 'ocm-product-carousel',
   templateUrl: './product-carousel.component.html',
   styleUrls: ['./product-carousel.component.scss'],
 })
-export class ProductCarouselComponent {
+export class OCMProductCarousel {
   @Input() products: BuyerProduct[];
   @Input() displayTitle: string;
 

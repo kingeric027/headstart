@@ -1,11 +1,11 @@
 <div class="card mb-5 w-100 border-hover">
   <div class="ribbon ribbon-top-right bg-light"
        *ngIf="!featuredProducts()">
-    <shared-toggle-favorite *ngIf="isSetFavoriteUsed"
-                            title="Favorite"
-                            (click)="$event.stopPropagation()"
-                            [favorite]="isFavorite"
-                            (favoriteChanged)="setIsFavorite.emit($event)"></shared-toggle-favorite>
+    <ocm-toggle-favorite *ngIf="isSetFavoriteUsed"
+                         title="Favorite"
+                         (click)="$event.stopPropagation()"
+                         [favorite]="isFavorite"
+                         (favoriteChanged)="setIsFavorite.emit($event)"></ocm-toggle-favorite>
   </div>
   <img class="card-img-top img-fluid flex-shrink-0"
        [routerLink]="['/products', product.ID]"
@@ -23,13 +23,13 @@
       </p>
       <label for="quantity"
              class="sr-only">Quantity</label>
-      <shared-quantity-input class="w-50"
-                             id="quantity"
-                             [limits]="quantityLimits"
-                             [existingQty]="null"
-                             (qtyChange)="quantity = $event"
-                             *ngIf="!featuredProducts()">
-      </shared-quantity-input>
+      <ocm-quantity-input class="w-50"
+                          id="quantity"
+                          [limits]="quantityLimits"
+                          [existingQty]="null"
+                          (qtyChange)="quantity = $event"
+                          *ngIf="!featuredProducts()">
+      </ocm-quantity-input>
     </div>
   </div>
   <div class="card-footer"

@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { Order } from '@ordercloud/angular-sdk';
 import { FavoriteOrdersService } from '@app-buyer/shared/services/favorites/favorites.service';
-import { ToggleFavoriteComponent } from '@app-buyer/shared/components/toggle-favorite/toggle-favorite.component';
+import { OCMToggleFavorite } from '@app-buyer/ocm/toggle-favorite/toggle-favorite.component';
 
 @Component({
   selector: 'order-order',
@@ -17,8 +17,8 @@ export class OrderComponent implements OnInit {
   faTruck = faTruck;
   approvalVersion: boolean;
   order$: Observable<Order>;
-  @ViewChild(ToggleFavoriteComponent, { static: false })
-  toggleFavorite: ToggleFavoriteComponent;
+  @ViewChild(OCMToggleFavorite, { static: false })
+  toggleFavorite: OCMToggleFavorite;
 
   constructor(
     private activatedRoute: ActivatedRoute,

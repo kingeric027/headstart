@@ -21,11 +21,11 @@
       <button *ngIf="!approvalVersion"
               class="btn btn-outline-secondary float-right"
               (click)="favorite()">Favorite
-        <shared-toggle-favorite title="Favorite"
-                                (click)="$event.stopPropagation()"
-                                [favorite]="favoriteOrdersService.isFavorite(order)"
-                                (favoriteChanged)="favoriteOrdersService.setFavoriteValue($event, order)">
-        </shared-toggle-favorite>
+        <ocm-toggle-favorite title="Favorite"
+                             (click)="$event.stopPropagation()"
+                             [favorite]="favoriteOrdersService.isFavorite(order)"
+                             (favoriteChanged)="favoriteOrdersService.setFavoriteValue($event, order)">
+        </ocm-toggle-favorite>
       </button>
       <order-reorder *ngIf="!approvalVersion"
                      class="float-right pb-2 mr-2 mb-2"
