@@ -7,6 +7,7 @@ import {
 } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
 import { CartService } from '@app-buyer/shared';
+import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
 
 @Component({
   selector: 'product-detail-wrapper',
@@ -20,7 +21,8 @@ export class ProductDetailWrapperComponent implements OnInit {
   constructor(
     private ocMeService: OcMeService,
     private activatedRoute: ActivatedRoute,
-    private cartService: CartService
+    private cartService: CartService,
+    protected favoriteProductService: FavoriteProductsService
   ) {}
 
   ngOnInit(): void {

@@ -1,3 +1,5 @@
 <product-details [product]="product"
                  [specs]="specs"
-                 (addToCartEvent)="addToCart($event)"></product-details>
+                 [isFavorite]="favoriteProductService.isFavorite(product)"
+                 (addToCartEvent)="addToCart($event)"
+                 (setIsFavorite)="favoriteProductService.setFavoriteValue($event, product)"></product-details>

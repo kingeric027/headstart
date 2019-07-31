@@ -20,9 +20,9 @@ import { find as _find, get as _get } from 'lodash';
 })
 export class ProductCardComponent implements OnInit {
   @Input() product: BuyerProduct;
-  @Input() favorite: boolean;
+  @Input() isFavorite: boolean;
   @Output() addedToCart = new EventEmitter<LineItem>();
-  @Output() setFavorite = new EventEmitter<boolean>();
+  @Output() setIsFavorite = new EventEmitter<boolean>();
   @ViewChild(QuantityInputComponent, { static: false })
   quantityInputComponent: QuantityInputComponent;
   shouldDisplayAddToCart: boolean;
@@ -45,7 +45,7 @@ export class ProductCardComponent implements OnInit {
      * this will be true if the parent component
      * is wired up to listen to the outputted event
      */
-    this.isSetFavoriteUsed = this.setFavorite.observers.length > 0;
+    this.isSetFavoriteUsed = this.setIsFavorite.observers.length > 0;
     const isAddedToCartUsed = this.addedToCart.observers.length > 0;
     this.isViewOnlyProduct = !this.product.PriceSchedule;
     this.shouldDisplayAddToCart =

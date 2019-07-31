@@ -16,6 +16,7 @@ abstract class FavoritesService<T extends { ID?: string }> {
   ) {}
 
   isFavorite(object: T): boolean {
+    if (!object || !object.ID) return false;
     const favorites = this.getFavorites();
     return favorites.includes(object.ID);
   }

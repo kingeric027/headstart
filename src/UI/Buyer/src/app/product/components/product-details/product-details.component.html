@@ -19,8 +19,8 @@
         <div class="mt-2 ml-3">
           <shared-toggle-favorite title="Favorite"
                                   (click)="$event.stopPropagation()"
-                                  [favorite]="favoriteProductService.isFavorite(product)"
-                                  (favoriteChanged)="favoriteProductService.setFavoriteValue($event, product)">
+                                  [favorite]="isFavorite"
+                                  (favoriteChanged)="setIsFavorite.emit($event)">
           </shared-toggle-favorite>
         </div>
         <div class="ml-auto"

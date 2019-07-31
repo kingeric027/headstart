@@ -90,8 +90,8 @@
           <product-product-card *ngFor="let product of productList.Items"
                                 class="col-sm-6 col-md-4 col-xl-3 d-flex"
                                 [product]="product"
-                                [favorite]="favoriteProductsService.isFavorite(product)"
-                                (setFavorite)="favoriteProductsService.setFavoriteValue($event, product)"
+                                [isFavorite]="favoriteProductsService.isFavorite(product)"
+                                (setIsFavorite)="favoriteProductsService.setFavoriteValue($event, product)"
                                 (addedToCart)="addToCart($event)">
           </product-product-card>
         </div>

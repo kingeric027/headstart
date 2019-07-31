@@ -14,12 +14,10 @@ import {
   BuyerProduct,
   BuyerSpec,
   LineItemSpec,
-  SpecOption,
   LineItem,
 } from '@ordercloud/angular-sdk';
 import { QuantityInputComponent } from '@app-buyer/shared/components/quantity-input/quantity-input.component';
 import { minBy as _minBy } from 'lodash';
-import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
 import { find as _find, difference as _difference } from 'lodash';
 import { SpecFormComponent } from '@app-buyer/product/components/spec-form/spec-form.component';
 import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interface';
@@ -31,7 +29,9 @@ import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interf
 export class ProductDetailsComponent implements OnInit, AfterViewChecked {
   @Input() specs: BuyerSpec[] = [];
   @Input() product: BuyerProduct;
+  @Input() isFavorite: boolean;
   @Output() addToCartEvent = new EventEmitter<LineItem>();
+  @Output() setIsFavorite = new EventEmitter<boolean>();
 
   @ViewChild(QuantityInputComponent, { static: false })
   quantityInputComponent: QuantityInputComponent;
@@ -44,7 +44,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewChecked {
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    protected favoriteProductService: FavoriteProductsService, // used in template
     private router: Router
   ) {}
 

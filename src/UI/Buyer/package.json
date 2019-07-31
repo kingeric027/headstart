@@ -33,6 +33,7 @@
     "@ngx-progressbar/http": "^5.2.1",
     "@ordercloud/angular-sdk": "0.0.1-26",
     "@types/lodash": "^4.14.91",
+    "@webcomponents/custom-elements": "^1.2.4",
     "angular-tree-component": "^7.2.0",
     "angular2-text-mask": "^9.0.0",
     "bootstrap": "^4.0.0",

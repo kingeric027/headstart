@@ -4,8 +4,8 @@
     <shared-toggle-favorite *ngIf="isSetFavoriteUsed"
                             title="Favorite"
                             (click)="$event.stopPropagation()"
-                            [favorite]="favorite"
-                            (favoriteChanged)="setFavorite.emit($event)"></shared-toggle-favorite>
+                            [favorite]="isFavorite"
+                            (favoriteChanged)="setIsFavorite.emit($event)"></shared-toggle-favorite>
   </div>
   <img class="card-img-top img-fluid flex-shrink-0"
        [routerLink]="['/products', product.ID]"
