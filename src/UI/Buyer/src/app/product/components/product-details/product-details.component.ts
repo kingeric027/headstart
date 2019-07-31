@@ -22,6 +22,7 @@ import { minBy as _minBy } from 'lodash';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
 import { find as _find, difference as _difference } from 'lodash';
 import { SpecFormComponent } from '@app-buyer/product/components/spec-form/spec-form.component';
+import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interface';
 @Component({
   selector: 'product-details',
   templateUrl: './product-details.component.html',
@@ -147,8 +148,4 @@ export class ProductDetailsComponent implements OnInit, AfterViewChecked {
     const images = this.product.xp.Images || [];
     return images.map((i) => i.Url);
   }
-}
-
-export interface FullSpecOption extends SpecOption {
-  SpecID: string;
 }

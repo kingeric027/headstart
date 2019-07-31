@@ -115,7 +115,6 @@ export class CartService {
     const existingLI = lineItems.Items.find((li) =>
       this.LineItemsMatch(li, newLI)
     );
-    debugger;
 
     newLI.Quantity += _get(existingLI, 'Quantity', 0);
     const request = existingLI
