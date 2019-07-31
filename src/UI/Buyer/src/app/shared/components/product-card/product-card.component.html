@@ -25,9 +25,9 @@
              class="sr-only">Quantity</label>
       <shared-quantity-input class="w-50"
                              id="quantity"
-                             [product]="product"
+                             [limits]="quantityLimits"
                              [existingQty]="null"
-                             (addedToCart)="addToCart($event)"
+                             (qtyChange)="quantity = $event"
                              *ngIf="!featuredProducts()">
       </shared-quantity-input>
     </div>

@@ -10,7 +10,6 @@
         <h6>
           <a [routerLink]="['/products', lineitem.Product.ID]"
              class="link-text">{{lineitem.Product.Name}} {{cartService.buildSpecList(lineitem)}}</a>
-
           <small class="text-muted d-block">{{lineitem.Product.ID}}</small>
         </h6>
         <a class="text-danger btn btn-link px-0 delete-lineitem"
@@ -28,9 +27,9 @@
       <div class="col-4 text-center">
         <span class="d-block d-sm-none">Qty</span>
         <shared-quantity-input *ngIf="!readOnly"
-                               [product]="productDetails"
+                               [limits]="quantityLimits"
                                [existingQty]="lineitem.Quantity"
-                               (qtyChanged)="updateQuantity($event)"></shared-quantity-input>
+                               (qtyChange)="updateQuantity($event)"></shared-quantity-input>
         <span class="text-nowrap"
               *ngIf="readOnly">&times;{{ lineitem.Quantity | number }}</span>
       </div>

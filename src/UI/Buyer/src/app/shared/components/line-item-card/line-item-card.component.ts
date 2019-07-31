@@ -3,6 +3,7 @@ import { LineItem, BuyerProduct } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { CartService } from '@app-buyer/shared/services/cart/cart.service';
 import { get as _get } from 'lodash';
+import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
   selector: 'shared-line-item-card',
@@ -15,6 +16,7 @@ export class LineItemCardComponent {
   @Input() lineitem: LineItem;
   @Input() productDetails: BuyerProduct;
   @Input() readOnly: boolean;
+  @Input() quantityLimits: QuantityLimits;
   @Output() deletedLineItem = new EventEmitter<LineItem>();
   @Output() lineItemUpdated = new EventEmitter<LineItem>();
 

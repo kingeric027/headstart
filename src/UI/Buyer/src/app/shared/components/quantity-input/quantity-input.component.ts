@@ -1,105 +1,66 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output,
-  EventEmitter,
-  OnDestroy,
-} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
-import { ProductQtyValidator } from '@app-buyer/shared/validators/product-quantity/product.quantity.validator';
-import { ToastrService } from 'ngx-toastr';
-import { debounceTime, takeWhile } from 'rxjs/operators';
-import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
+import { debounceTime } from 'rxjs/operators';
+import { get as _get } from 'lodash';
+import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
   selector: 'shared-quantity-input',
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
 })
-export class QuantityInputComponent implements OnInit, OnDestroy {
-  alive = true;
-  @Input() product: BuyerProduct;
-  @Input() existingQty;
-  @Output() qtyChanged = new EventEmitter<number>();
-  @Output() addedToCart = new EventEmitter<LineItem>();
+export class QuantityInputComponent implements OnInit {
+  @Input() limits: QuantityLimits;
+  @Input() existingQty: number;
+  @Output() qtyChange = new EventEmitter<number>();
+
   form: FormGroup;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private toastrService: ToastrService,
-    private formErrorService: AppFormErrorService
-  ) {}
+  constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
+    const value = this.existingQty || this.getDefaultQty();
     this.form = this.formBuilder.group({
-      quantity: [
-        this.existingQty || this.getDefaultQty(),
-        [Validators.required, ProductQtyValidator(this.product)],
-      ],
+      quantity: [value, [Validators.required]],
     });
     this.quantityChangeListener();
+    if (!this.existingQty) this.qtyChange.emit(value);
   }
 
-  isQuantityRestricted() {
-    // In OC RestrictedQuantity means you can only order quantities for which a price break exists.
-    return (
-      this.product &&
-      this.product.PriceSchedule &&
-      this.product.PriceSchedule.RestrictedQuantity
-    );
+  isQtyRestricted(): boolean {
+    return this.limits.restrictedQuantities.length !== 0;
   }
 
   getDefaultQty(): number {
-    return this.isQuantityRestricted()
-      ? this.product.PriceSchedule.PriceBreaks[0].Quantity
-      : 1;
+    if (this.isQtyRestricted()) {
+      return Math.min(...this.limits.restrictedQuantities);
+    }
+    return this.limits.minPerOrder;
   }
 
   quantityChangeListener(): void {
-    this.form.valueChanges
-      .pipe(
-        debounceTime(500),
-        takeWhile(() => this.alive)
-      )
-      .subscribe(() => {
-        if (this.form.valid && !isNaN(this.form.value.quantity)) {
-          this.qtyChanged.emit(this.form.value.quantity);
-        }
-      });
-  }
-
-  /**
-   *  this method is not tied to anything
-   *  use ViewChild to call this method
-   *  from parent component, see product-details component as example
-   */
-  addToCart(event) {
-    event.stopPropagation();
-    if (!this.form.valid || isNaN(this.form.value.quantity)) {
-      return this.toastrService.error(
-        this.getQuantityError() || 'Please enter a quantity',
-        'Error'
-      );
-    }
-    this.addedToCart.emit({
-      ProductID: this.product.ID,
-      Quantity: this.form.value.quantity,
+    this.form.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      if (this.form.valid && !isNaN(this.form.value.quantity)) {
+        this.qtyChange.emit(this.form.value.quantity);
+      }
     });
-    // Reset form as indication of action
-    this.form.setValue({ quantity: this.getDefaultQty() });
   }
 
-  getQuantityError(): string | void {
-    const error = this.formErrorService.getProductQuantityError(
-      'quantity',
-      this.form
-    );
-    return error ? error.message : null;
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
-  }
+  // if (inventory < min) {
+  //   error.ProductQuantityError.message = `Out of stock.`;
+  //   error.ProductQuantityError.outOfStock = true;
+  //   return error;
+  // }
+  // if (qty < min) {
+  //   error.ProductQuantityError.message = `At least ${min} must be ordered.`;
+  //   return error;
+  // }
+  // if (qty > inventory) {
+  //   error.ProductQuantityError.message = `Only ${inventory} available in inventory.`;
+  //   return error;
+  // }
+  // if (qty > max) {
+  //   error.ProductQuantityError.message = `At most ${max} allowed per order.`;
+  //   return error;
+  // }
 }

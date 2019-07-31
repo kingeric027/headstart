@@ -3,6 +3,7 @@ import {
   CartService,
   BaseResolveService,
   AppStateService,
+  BuildQtyLimits,
 } from '@app-buyer/shared';
 import {
   Order,
@@ -14,6 +15,7 @@ import {
 } from '@ordercloud/angular-sdk';
 import { Observable, forkJoin } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
+import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
   selector: 'checkout-cart',
@@ -24,6 +26,7 @@ export class CartComponent implements OnInit, OnDestroy {
   currentOrder$: Observable<Order>;
   products: BuyerProduct[];
   lineItems: ListLineItem;
+  quantityLimits: QuantityLimits[];
   productsSet = false;
   alive = true;
 
@@ -48,6 +51,7 @@ export class CartComponent implements OnInit, OnDestroy {
           );
           forkJoin(queue).subscribe((prods) => {
             this.products = prods;
+            this.quantityLimits = this.products.map((p) => BuildQtyLimits(p));
             this.productsSet = true;
           });
         }

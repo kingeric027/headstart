@@ -11,11 +11,17 @@ import {
   ListLineItem,
   LineItem,
 } from '@ordercloud/angular-sdk';
-import { CartService, AppStateService, ModalService } from '@app-buyer/shared';
+import {
+  CartService,
+  AppStateService,
+  ModalService,
+  BuildQtyLimits,
+} from '@app-buyer/shared';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
 import { ProductSortStrategy } from '@app-buyer/product/models/product-sort-strategy.enum';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
+import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
   selector: 'product-list',
@@ -34,6 +40,7 @@ export class ProductListComponent implements OnInit {
   createModalID = 'selectCategory';
   facets: ListFacet[];
   lineItems: ListLineItem;
+  quantityLimits: QuantityLimits[];
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -76,7 +83,14 @@ export class ProductListComponent implements OnInit {
               ...this.buildPriceFilter(queryParams),
             },
           })
-          .pipe(tap((productList) => (this.facets = productList.Meta.Facets)));
+          .pipe(
+            tap((productList) => {
+              this.facets = productList.Meta.Facets;
+              this.quantityLimits = productList.Items.map((p) =>
+                BuildQtyLimits(p)
+              );
+            })
+          );
       })
     );
   }

@@ -6,8 +6,9 @@ import {
   LineItem,
 } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
-import { CartService } from '@app-buyer/shared';
+import { CartService, BuildQtyLimits } from '@app-buyer/shared';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
+import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
   selector: 'product-detail-wrapper',
@@ -17,6 +18,7 @@ import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/fa
 export class ProductDetailWrapperComponent implements OnInit {
   specs: BuyerSpec[] = [];
   product: BuyerProduct;
+  quantityLimits: QuantityLimits;
 
   constructor(
     private ocMeService: OcMeService,
@@ -36,6 +38,7 @@ export class ProductDetailWrapperComponent implements OnInit {
     const product = this.ocMeService.GetProduct(productID).toPromise();
     const specs = this.listSpecs(productID);
     [this.product, this.specs] = await Promise.all([product, specs]);
+    this.quantityLimits = BuildQtyLimits(this.product);
   }
 
   async listSpecs(productID: string): Promise<BuyerSpec[]> {

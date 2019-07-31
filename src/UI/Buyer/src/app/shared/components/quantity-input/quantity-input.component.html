@@ -2,9 +2,8 @@
   <div class="form-group mb-0">
     <label for="quantity"
            class="sr-only">Product Quantity</label>
-    <input *ngIf="!isQuantityRestricted()"
+    <input *ngIf="!isQtyRestricted()"
            id="quantity"
-           title="Please enter a quantity greater than 0"
            type="number"
            formControlName="quantity"
            class="form-control text-center"
@@ -12,15 +11,14 @@
            style="min-width:65px"
            aria-label="Quantity Input Selector"
            aria-describedby="quantity">
-    <select *ngIf="isQuantityRestricted()"
+    <select *ngIf="isQtyRestricted()"
             class="form-control text-center"
-            title="Please enter a quantity greater than 0"
             style="min-width:65px"
             formControlName="quantity"
             id="quantity">
-      <option *ngFor="let priceBreak of product.PriceSchedule.PriceBreaks"
-              [value]="priceBreak.Quantity">
-        {{priceBreak.Quantity}}
+      <option *ngFor="let qty of limits.restrictedQuantities"
+              [value]="qty">
+        {{qty}}
       </option>
     </select>
   </div>
@@ -28,10 +26,5 @@
 <small *ngIf="form.controls['quantity'].getError('required')"
        class="alert alert-danger error-message c-error-message text-center">
   Please enter a quantity
-  <br>
-</small>
-<small *ngIf="getQuantityError() as error"
-       class="alert alert-danger error-message c-error-message text-center">
-  {{ error }}
   <br>
 </small>

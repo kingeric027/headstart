@@ -39,14 +39,6 @@ export class AppFormErrorService {
     );
   }
 
-  getProductQuantityError(
-    controlName: string,
-    form: FormGroup
-  ): { message: string; outOfStock: boolean } {
-    // don't check if dirty because outOfStock error message should show right away.
-    return form.get(controlName).getError('ProductQuantityError');
-  }
-
   hasStrongPasswordError(controlName: string, form: FormGroup) {
     return form.get(controlName).hasError('strongPassword');
   }

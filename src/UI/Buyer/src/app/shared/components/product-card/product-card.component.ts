@@ -1,16 +1,15 @@
 import {
   Component,
   Input,
-  ViewChild,
   EventEmitter,
   Output,
   OnInit,
   ViewEncapsulation,
 } from '@angular/core';
-import { QuantityInputComponent } from '@app-buyer/shared/components/quantity-input/quantity-input.component';
 import { BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
 import { find as _find, get as _get } from 'lodash';
+import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
   selector: 'product-product-card',
@@ -21,24 +20,16 @@ import { find as _find, get as _get } from 'lodash';
 export class ProductCardComponent implements OnInit {
   @Input() product: BuyerProduct;
   @Input() isFavorite: boolean;
+  @Input() quantityLimits: QuantityLimits;
   @Output() addedToCart = new EventEmitter<LineItem>();
   @Output() setIsFavorite = new EventEmitter<boolean>();
-  @ViewChild(QuantityInputComponent, { static: false })
-  quantityInputComponent: QuantityInputComponent;
+
+  quantity: number;
   shouldDisplayAddToCart: boolean;
   isViewOnlyProduct: boolean;
   isSetFavoriteUsed: boolean;
-  alive = true;
 
   constructor(private router: Router) {}
-
-  addToCart(li: LineItem) {
-    this.addedToCart.emit(li);
-  }
-
-  hasSpecs(): boolean {
-    return this.product.SpecCount > 0;
-  }
 
   ngOnInit() {
     /**
@@ -50,6 +41,14 @@ export class ProductCardComponent implements OnInit {
     this.isViewOnlyProduct = !this.product.PriceSchedule;
     this.shouldDisplayAddToCart =
       isAddedToCartUsed && !this.isViewOnlyProduct && !this.hasSpecs();
+  }
+
+  addToCart(li: LineItem) {
+    this.addedToCart.emit(li);
+  }
+
+  hasSpecs(): boolean {
+    return this.product.SpecCount > 0;
   }
 
   featuredProducts() {
