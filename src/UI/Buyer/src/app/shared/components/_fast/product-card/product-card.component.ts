@@ -14,12 +14,12 @@ import { Router } from '@angular/router';
 import { find as _find, get as _get } from 'lodash';
 
 @Component({
-  selector: 'product-product-card',
+  selector: 'product-product-card-fast',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class ProductCardComponent implements OnInit {
+export class FastProductCardComponent implements OnInit {
   @Input() product: BuyerProduct;
   @Input() favorite: boolean;
   @Output() addedToCart = new EventEmitter<AddToCartEvent>();
