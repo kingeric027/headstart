@@ -19,7 +19,7 @@ import {
 import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interface';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 @Component({
-  selector: 'ocm-product-details',
+  selector: 'product-details',
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
 })

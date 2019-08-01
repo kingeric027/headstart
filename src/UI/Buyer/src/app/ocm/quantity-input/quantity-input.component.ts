@@ -5,7 +5,7 @@ import { get as _get } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
-  selector: 'ocm-quantity-input',
+  selector: 'quantity-input',
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
 })

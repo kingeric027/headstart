@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SharedModule } from '@app-buyer/shared';
 import { TreeModule } from 'angular-tree-component';
 import { ProductsRoutingModule } from '@app-buyer/product/product-routing.module';
@@ -12,6 +12,7 @@ import { ProductDetailWrapperComponent } from './containers/product-detail-wrapp
 import { OcmModule } from '@app-buyer/ocm/ocm.module';
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [SharedModule, ProductsRoutingModule, TreeModule, OcmModule],
   declarations: [
     ProductListComponent,

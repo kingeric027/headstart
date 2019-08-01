@@ -1,5 +1,5 @@
 // angular
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -58,6 +58,7 @@ import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
 import { OcmModule } from '@app-buyer/ocm/ocm.module';
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     OcmModule,
     SharedRoutingModule,

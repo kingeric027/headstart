@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { HeaderComponent } from '@app-buyer/layout/header/header.component';
@@ -10,6 +10,7 @@ import { HomeComponent } from '@app-buyer/layout/home/home.component';
 import { OcmModule } from '@app-buyer/ocm/ocm.module';
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [RouterModule, SharedModule, OcmModule],
   exports: [HeaderComponent, MainComponent, FooterComponent, HomeComponent],
   declarations: [

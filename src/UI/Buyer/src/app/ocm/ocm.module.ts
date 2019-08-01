@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Injector, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OCMSpecForm } from './spec-form/spec-form.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -11,8 +11,10 @@ import { OCMProductCarousel } from './product-carousel/product-carousel.componen
 import { OCMProductDetails } from './product-details/product-details.component';
 import { OCMQuantityInput } from './quantity-input/quantity-input.component';
 import { OCMToggleFavorite } from './toggle-favorite/toggle-favorite.component';
+import { createCustomElement } from '@angular/elements';
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [
     OCMQuantityInput,
     OCMToggleFavorite,
@@ -22,12 +24,19 @@ import { OCMToggleFavorite } from './toggle-favorite/toggle-favorite.component';
     OCMSpecForm,
     OCMImageGallery,
   ],
-  exports: [
+  // exports: [
+  //   OCMQuantityInput,
+  //   OCMToggleFavorite,
+  //   OCMProductCard,
+  //   OCMProductCarousel,
+  //   OCMProductDetails,
+  // ],
+  entryComponents: [
     OCMQuantityInput,
     OCMToggleFavorite,
     OCMProductCard,
     OCMProductCarousel,
-    OCMProductDetails,
+    OCMProductDetails
   ],
   imports: [
     CommonModule,
@@ -37,4 +46,21 @@ import { OCMToggleFavorite } from './toggle-favorite/toggle-favorite.component';
     NgxImageZoomModule.forRoot(),
   ],
 })
-export class OcmModule {}
+export class OcmModule {
+  constructor(private injector: Injector) {
+    this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
+    this.buildWebComponent(OCMProductCard, 'ocm-product-card');
+    this.buildWebComponent(OCMProductCarousel, 'ocm-product-carousel');
+    this.buildWebComponent(OCMProductDetails, 'ocm-product-detials');
+    this.buildWebComponent(OCMProductCarousel, 'ocm-product-carousel');
+  }
+
+  buildWebComponent(angularComponent, htmlTagName: string) {
+    const component = createCustomElement(angularComponent, { injector: this.injector });
+    if (!customElements.get(htmlTagName)) {
+      customElements.define(htmlTagName, component);
+    }
+  }
+}
+
+

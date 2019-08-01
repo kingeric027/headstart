@@ -12,7 +12,7 @@ import { find as _find, get as _get } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
-  selector: 'ocm-product-card',
+  selector: 'product-card',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
   encapsulation: ViewEncapsulation.None,

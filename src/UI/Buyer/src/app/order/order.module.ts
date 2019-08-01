@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SharedModule } from '@app-buyer/shared';
 import { DatePipe } from '@angular/common';
 
@@ -20,6 +20,7 @@ import { OrderApprovalComponent } from '@app-buyer/order/containers/order-approv
 import { OcmModule } from '@app-buyer/ocm/ocm.module';
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [SharedModule, OrderRoutingModule, OcmModule],
   declarations: [
     OrderHistoryComponent,
