@@ -11,7 +11,6 @@ import { OCMProductCarousel } from './product-carousel/product-carousel.componen
 import { OCMProductDetails } from './product-details/product-details.component';
 import { OCMQuantityInput } from './quantity-input/quantity-input.component';
 import { OCMToggleFavorite } from './toggle-favorite/toggle-favorite.component';
-import { ElementZoneStrategyFactory } from 'elements-zone-strategy';
 import { createCustomElement } from '@angular/elements';
 
 @NgModule({
