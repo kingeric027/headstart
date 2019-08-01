@@ -1,5 +1,4 @@
-import { takeWhile } from 'rxjs/operators';
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { fromEvent } from 'rxjs';
 
@@ -8,12 +7,11 @@ import { fromEvent } from 'rxjs';
   templateUrl: './image-gallery.component.html',
   styleUrls: ['./image-gallery.component.scss'],
 })
-export class OCMImageGallery implements OnInit, OnDestroy {
+export class OCMImageGallery implements OnInit {
+  @Input() imgUrls: string[];
+
   // gallerySize can be changed and the component logic + behavior will all work. However, the UI may look wonky.
   private readonly gallerySize = 5;
-  private alive = true;
-
-  @Input() imgUrls: string[];
   selectedIndex = 0;
   startIndex = 0;
   endIndex = this.gallerySize - 1;
@@ -26,15 +24,7 @@ export class OCMImageGallery implements OnInit, OnDestroy {
   }
   ngOnInit() {
     this.imgUrls = this.imgUrls || [];
-    fromEvent(window, 'resize')
-      .pipe(
-        // only subscribe to event while directive
-        // is alive to prevent memory leak
-        takeWhile(() => this.alive)
-      )
-      .subscribe(() => {
-        this.onResize();
-      });
+    fromEvent(window, 'resize').subscribe(() => this.onResize());
   }
 
   onResize() {
@@ -61,11 +51,9 @@ export class OCMImageGallery implements OnInit, OnDestroy {
       this.endIndex++;
       if (this.selectedIndex === this.imgUrls.length) {
         // cycle to the beginning
-        [this.selectedIndex, this.startIndex, this.endIndex] = [
-          0,
-          0,
-          this.gallerySize - 1,
-        ];
+        this.selectedIndex = 0;
+        this.startIndex = 0;
+        this.endIndex = this.gallerySize - 1;
       }
     }
   }
@@ -83,9 +71,5 @@ export class OCMImageGallery implements OnInit, OnDestroy {
         this.startIndex = Math.max(this.imgUrls.length - this.gallerySize, 0);
       }
     }
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
   }
 }

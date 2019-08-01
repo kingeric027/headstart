@@ -28,8 +28,6 @@ import { OCMToggleFavorite } from './toggle-favorite/toggle-favorite.component';
     OCMProductCard,
     OCMProductCarousel,
     OCMProductDetails,
-    OCMSpecForm,
-    OCMImageGallery,
   ],
   imports: [
     CommonModule,

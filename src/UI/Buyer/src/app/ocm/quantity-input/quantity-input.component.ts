@@ -46,6 +46,8 @@ export class OCMQuantityInput implements OnInit {
     });
   }
 
+  // TODO - handle these error situations
+
   // if (inventory < min) {
   //   error.ProductQuantityError.message = `Out of stock.`;
   //   error.ProductQuantityError.outOfStock = true;
