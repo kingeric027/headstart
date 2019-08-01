@@ -11,6 +11,7 @@ import { OCMProductCarousel } from './product-carousel/product-carousel.componen
 import { OCMProductDetails } from './product-details/product-details.component';
 import { OCMQuantityInput } from './quantity-input/quantity-input.component';
 import { OCMToggleFavorite } from './toggle-favorite/toggle-favorite.component';
+import { ElementZoneStrategyFactory } from 'elements-zone-strategy';
 import { createCustomElement } from '@angular/elements';
 
 @NgModule({
@@ -24,19 +25,12 @@ import { createCustomElement } from '@angular/elements';
     OCMSpecForm,
     OCMImageGallery,
   ],
-  // exports: [
-  //   OCMQuantityInput,
-  //   OCMToggleFavorite,
-  //   OCMProductCard,
-  //   OCMProductCarousel,
-  //   OCMProductDetails,
-  // ],
   entryComponents: [
     OCMQuantityInput,
     OCMToggleFavorite,
     OCMProductCard,
     OCMProductCarousel,
-    OCMProductDetails
+    OCMProductDetails,
   ],
   imports: [
     CommonModule,
@@ -50,17 +44,17 @@ export class OcmModule {
   constructor(private injector: Injector) {
     this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
     this.buildWebComponent(OCMProductCard, 'ocm-product-card');
-    this.buildWebComponent(OCMProductCarousel, 'ocm-product-carousel');
+    this.buildWebComponent(OCMToggleFavorite, 'ocm-toggle-favorite');
     this.buildWebComponent(OCMProductDetails, 'ocm-product-detials');
     this.buildWebComponent(OCMProductCarousel, 'ocm-product-carousel');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
-    const component = createCustomElement(angularComponent, { injector: this.injector });
+    const component = createCustomElement(angularComponent, {
+      injector: this.injector,
+    });
     if (!customElements.get(htmlTagName)) {
       customElements.define(htmlTagName, component);
     }
   }
 }
-
-

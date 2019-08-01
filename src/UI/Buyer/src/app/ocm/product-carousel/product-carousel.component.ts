@@ -25,6 +25,7 @@ export class OCMProductCarousel {
   }
 
   getProducts(): BuyerProduct[] {
+    debugger;
     return this.products.slice(this.index, this.index + this.rowLength);
   }
 }

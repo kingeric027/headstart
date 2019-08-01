@@ -27,7 +27,7 @@
                           id="quantity"
                           [limits]="quantityLimits"
                           [existingQty]="null"
-                          (qtyChange)="quantity = $event"
+                          (qtyChange)="quantity = $event.detail"
                           *ngIf="!featuredProducts()">
       </ocm-quantity-input>
     </div>

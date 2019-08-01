@@ -99,9 +99,8 @@ export class OrderHistoryComponent implements AfterViewInit {
   ): string | undefined {
     this.hasFavoriteOrdersFilter =
       queryParamMap.get('favoriteOrders') === 'true';
+    if (!this.hasFavoriteOrdersFilter) return undefined;
     const favorites = this.favoriteOrdersService.getFavorites();
-    return this.hasFavoriteOrdersFilter && favorites && favorites.length
-      ? favorites.join('|')
-      : undefined;
+    return favorites.join('|');
   }
 }

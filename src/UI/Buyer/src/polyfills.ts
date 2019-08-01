@@ -15,8 +15,8 @@
  */
 
 /***************************************************************************************************
-* BROWSER POLYFILLS
-*/
+ * BROWSER POLYFILLS
+ */
 
 import 'core-js/es7/array';
 
@@ -65,3 +65,26 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
     });
   });
 })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
+// Needed for WebComponents. https://github.com/stackblitz/core/issues/475
+(function() {
+  'use strict';
+  (function() {
+    if (
+      // @ts-ignore
+      void 0 === window.Reflect ||
+      void 0 === window.customElements ||
+      // @ts-ignore:
+      window.customElements.polyfillWrapFlushCallback
+    )
+      return;
+    const a = HTMLElement;
+    // @ts-ignore:
+    (window.HTMLElement = function HTMLElement() {
+      return Reflect.construct(a, [], this.constructor);
+    }),
+      (HTMLElement.prototype = a.prototype),
+      (HTMLElement.prototype.constructor = HTMLElement),
+      Object.setPrototypeOf(HTMLElement, a);
+  })();
+})();

@@ -25,6 +25,7 @@
 
   <!-- Featured products can be managed in the seller application -->
   <div *ngIf="featuredProducts$ | async; let products">
+    hello : {{products.Items.length}}
     <ocm-product-carousel *ngIf="products.Items.length"
                           displayTitle="Featured Products"
                           [products]="products.Items">

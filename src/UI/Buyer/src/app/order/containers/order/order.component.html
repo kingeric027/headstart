@@ -20,11 +20,9 @@
     <div class="col-md-6">
       <button *ngIf="!approvalVersion"
               class="btn btn-outline-secondary float-right"
-              (click)="favorite()">Favorite
+              (click)="toggleFavorite(order)">Favorite
         <ocm-toggle-favorite title="Favorite"
-                             (click)="$event.stopPropagation()"
-                             [favorite]="favoriteOrdersService.isFavorite(order)"
-                             (favoriteChanged)="favoriteOrdersService.setFavoriteValue($event, order)">
+                             [favorite]="favoriteOrdersService.isFavorite(order)">
         </ocm-toggle-favorite>
       </button>
       <order-reorder *ngIf="!approvalVersion"

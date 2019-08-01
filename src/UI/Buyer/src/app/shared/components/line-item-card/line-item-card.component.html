@@ -29,7 +29,7 @@
         <ocm-quantity-input *ngIf="!readOnly"
                             [limits]="quantityLimits"
                             [existingQty]="lineitem.Quantity"
-                            (qtyChange)="updateQuantity($event)"></ocm-quantity-input>
+                            (qtyChange)="updateQuantity($event.detail)"></ocm-quantity-input>
         <span class="text-nowrap"
               *ngIf="readOnly">&times;{{ lineitem.Quantity | number }}</span>
       </div>
