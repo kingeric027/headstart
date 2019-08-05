@@ -15,29 +15,9 @@ import { createCustomElement } from '@angular/elements';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  declarations: [
-    OCMQuantityInput,
-    OCMToggleFavorite,
-    OCMProductCard,
-    OCMProductCarousel,
-    OCMProductDetails,
-    OCMSpecForm,
-    OCMImageGallery,
-  ],
-  entryComponents: [
-    OCMQuantityInput,
-    OCMToggleFavorite,
-    OCMProductCard,
-    OCMProductCarousel,
-    OCMProductDetails,
-  ],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FontAwesomeModule,
-    RouterModule,
-    NgxImageZoomModule.forRoot(),
-  ],
+  declarations: [OCMQuantityInput, OCMToggleFavorite, OCMProductCard, OCMProductCarousel, OCMProductDetails, OCMSpecForm, OCMImageGallery],
+  entryComponents: [OCMQuantityInput, OCMToggleFavorite, OCMProductCard, OCMProductCarousel, OCMProductDetails],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, RouterModule, NgxImageZoomModule.forRoot()],
 })
 export class OcmModule {
   constructor(private injector: Injector) {

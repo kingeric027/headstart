@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output,
-  EventEmitter,
-  OnChanges,
-} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { get as _get } from 'lodash';
@@ -44,7 +37,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.form = new FormGroup({
-      quantity: new FormControl('', [Validators.required]),
+      quantity: new FormControl(0, [Validators.required]),
     });
   }
 

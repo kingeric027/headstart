@@ -1,20 +1,7 @@
-import {
-  Component,
-  Input,
-  EventEmitter,
-  Output,
-  OnInit,
-  ViewEncapsulation,
-  OnChanges,
-} from '@angular/core';
+import { Component, Input, EventEmitter, Output, OnInit, ViewEncapsulation, OnChanges } from '@angular/core';
 import { BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
-import {
-  find as _find,
-  get as _get,
-  map as _map,
-  without as _without,
-} from 'lodash';
+import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 import { ocAppConfig } from '@app-buyer/config/app.config';
 
@@ -22,7 +9,7 @@ import { ocAppConfig } from '@app-buyer/config/app.config';
   selector: 'product-card',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
-  encapsulation: ViewEncapsulation.ShadowDom,
+  encapsulation: ViewEncapsulation.None,
 })
 export class OCMProductCard implements OnInit, OnChanges {
   @Input() product: BuyerProduct = {
@@ -53,8 +40,7 @@ export class OCMProductCard implements OnInit, OnChanges {
     const isAddedToCartUsed = this.addedToCart.observers.length > 0;
     this.isViewOnlyProduct = !this.product.PriceSchedule;
     this.hasSpecs = this.product.SpecCount > 0;
-    this.shouldDisplayAddToCart =
-      isAddedToCartUsed && !this.isViewOnlyProduct && !this.hasSpecs;
+    this.shouldDisplayAddToCart = isAddedToCartUsed && !this.isViewOnlyProduct && !this.hasSpecs;
     this.featuredProducts = this.router.url.indexOf('/home') > -1;
   }
   ngOnInit() {
