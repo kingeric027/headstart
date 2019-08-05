@@ -28,9 +28,13 @@ export class ProductDetailWrapperComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe(async (params) => {
-      await this.getProductData(params.productID);
-    });
+    console.log('wrapper');
+    this.product = this.activatedRoute.snapshot.data.product;
+    this.specs = this.activatedRoute.snapshot.data.specs || [];
+    this.quantityLimits = BuildQtyLimits(this.product);
+    // this.activatedRoute.params.subscribe(async (params) => {
+    //   await this.getProductData(params.productID);
+    // });
   }
 
   async getProductData(productID: string): Promise<void> {

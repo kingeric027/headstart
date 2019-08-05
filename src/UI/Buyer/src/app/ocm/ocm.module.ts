@@ -44,7 +44,7 @@ export class OcmModule {
     this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
     this.buildWebComponent(OCMProductCard, 'ocm-product-card');
     this.buildWebComponent(OCMToggleFavorite, 'ocm-toggle-favorite');
-    this.buildWebComponent(OCMProductDetails, 'ocm-product-detials');
+    this.buildWebComponent(OCMProductDetails, 'ocm-product-details');
     this.buildWebComponent(OCMProductCarousel, 'ocm-product-carousel');
   }
 

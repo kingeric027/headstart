@@ -10,6 +10,12 @@ import { FacetFilterComponent } from '@app-buyer/product/components/facet-filter
 import { FacetListComponent } from '@app-buyer/product/components/facet-list/facet-list.component';
 import { ProductDetailWrapperComponent } from './containers/product-detail-wrapper/product-detail-wrapper.component';
 import { OcmModule } from '@app-buyer/ocm/ocm.module';
+import {
+  ListProductResolver,
+  ProductResolver,
+  ListSpecsResolver,
+  SpecsResolver,
+} from './resolves/product.resolve';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -23,6 +29,12 @@ import { OcmModule } from '@app-buyer/ocm/ocm.module';
     FacetFilterComponent,
     FacetListComponent,
     ProductDetailWrapperComponent,
+  ],
+  providers: [
+    ListProductResolver,
+    ProductResolver,
+    ListSpecsResolver,
+    SpecsResolver,
   ],
 })
 export class ProductsModule {}

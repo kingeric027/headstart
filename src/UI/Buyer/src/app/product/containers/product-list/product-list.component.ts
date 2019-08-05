@@ -29,7 +29,8 @@ import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
   styleUrls: ['./product-list.component.scss'],
 })
 export class ProductListComponent implements OnInit {
-  productList$: Observable<ListBuyerProduct>;
+  //productList$: Observable<ListBuyerProduct>;
+  productList$: ListBuyerProduct;
   categories: ListCategory;
   categoryCrumbs: Category[] = [];
   searchTerm = null;
@@ -47,13 +48,17 @@ export class ProductListComponent implements OnInit {
     private ocMeService: OcMeService,
     private router: Router,
     private cartService: CartService,
-    private favoriteProductsService: FavoriteProductsService,
+    public favoriteProductsService: FavoriteProductsService,
     private appStateService: AppStateService,
     private modalService: ModalService
-  ) {}
+  ) {
+    this.productList$ = this.activatedRoute.snapshot.data.products;
+    this.facets = this.productList$.Meta.Facets;
+    this.quantityLimits = this.productList$.Items.map((p) => BuildQtyLimits(p));
+  }
 
   ngOnInit() {
-    this.productList$ = this.getProductData();
+    //this.productList$ = this.getProductData();
     this.getCategories();
     this.configureRouter();
     this.appStateService.lineItemSubject.subscribe(

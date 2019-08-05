@@ -18,7 +18,7 @@ import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
   encapsulation: ViewEncapsulation.None,
 })
 export class OCMProductCard implements OnInit {
-  @Input() product: BuyerProduct;
+  @Input() product: BuyerProduct = { Name: 'testing', ID: 'testingID' };
   @Input() isFavorite: boolean;
   @Input() quantityLimits: QuantityLimits;
   @Output() addedToCart = new EventEmitter<LineItem>();
@@ -29,18 +29,19 @@ export class OCMProductCard implements OnInit {
   isViewOnlyProduct: boolean;
   isSetFavoriteUsed: boolean;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    this.isSetFavoriteUsed = this.setIsFavorite.observers.length > 0;
+    const isAddedToCartUsed = this.addedToCart.observers.length > 0;
+    this.isViewOnlyProduct = !this.product.PriceSchedule;
+    this.shouldDisplayAddToCart =
+      isAddedToCartUsed && !this.isViewOnlyProduct && !this.hasSpecs();
+  }
 
   ngOnInit() {
     /**
      * this will be true if the parent component
      * is wired up to listen to the outputted event
      */
-    this.isSetFavoriteUsed = this.setIsFavorite.observers.length > 0;
-    const isAddedToCartUsed = this.addedToCart.observers.length > 0;
-    this.isViewOnlyProduct = !this.product.PriceSchedule;
-    this.shouldDisplayAddToCart =
-      isAddedToCartUsed && !this.isViewOnlyProduct && !this.hasSpecs();
   }
 
   addToCart(li: LineItem) {
