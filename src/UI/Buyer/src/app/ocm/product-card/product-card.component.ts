@@ -5,22 +5,37 @@ import {
   Output,
   OnInit,
   ViewEncapsulation,
+  OnChanges,
 } from '@angular/core';
 import { BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
-import { find as _find, get as _get } from 'lodash';
+import {
+  find as _find,
+  get as _get,
+  map as _map,
+  without as _without,
+} from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
+import { ocAppConfig } from '@app-buyer/config/app.config';
 
 @Component({
   selector: 'product-card',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.ShadowDom,
 })
-export class OCMProductCard implements OnInit {
-  @Input() product: BuyerProduct = { Name: 'testing', ID: 'testingID' };
+export class OCMProductCard implements OnInit, OnChanges {
+  @Input() product: BuyerProduct = {
+    PriceSchedule: {},
+    xp: { Images: [] },
+  };
   @Input() isFavorite: boolean;
-  @Input() quantityLimits: QuantityLimits;
+  @Input() quantityLimits: QuantityLimits = {
+    inventory: 0,
+    maxPerOrder: 0,
+    minPerOrder: 0,
+    restrictedQuantities: [],
+  };
   @Output() addedToCart = new EventEmitter<LineItem>();
   @Output() setIsFavorite = new EventEmitter<boolean>();
 
@@ -28,15 +43,20 @@ export class OCMProductCard implements OnInit {
   shouldDisplayAddToCart: boolean;
   isViewOnlyProduct: boolean;
   isSetFavoriteUsed: boolean;
+  hasSpecs: boolean;
+  featuredProducts: boolean;
 
-  constructor(private router: Router) {
+  constructor(private router: Router) {}
+
+  ngOnChanges() {
     this.isSetFavoriteUsed = this.setIsFavorite.observers.length > 0;
     const isAddedToCartUsed = this.addedToCart.observers.length > 0;
     this.isViewOnlyProduct = !this.product.PriceSchedule;
+    this.hasSpecs = this.product.SpecCount > 0;
     this.shouldDisplayAddToCart =
-      isAddedToCartUsed && !this.isViewOnlyProduct && !this.hasSpecs();
+      isAddedToCartUsed && !this.isViewOnlyProduct && !this.hasSpecs;
+    this.featuredProducts = this.router.url.indexOf('/home') > -1;
   }
-
   ngOnInit() {
     /**
      * this will be true if the parent component
@@ -48,19 +68,12 @@ export class OCMProductCard implements OnInit {
     this.addedToCart.emit(li);
   }
 
-  hasSpecs(): boolean {
-    return this.product.SpecCount > 0;
-  }
-
-  featuredProducts() {
-    return this.router.url.indexOf('/home') > -1;
-  }
-
   getImageUrl() {
-    return _get(
-      this.product,
-      'xp.Images[0].Url',
-      'http://placehold.it/300x300'
-    );
+    const images = this.product.xp.Images || [];
+    const result = _map(images, (img) => {
+      return img.Url.replace('{url}', ocAppConfig.cmsUrl);
+    });
+    const filtered = _without(result, undefined);
+    return filtered.length > 0 ? filtered[0] : 'http://placehold.it/300x300';
   }
 }

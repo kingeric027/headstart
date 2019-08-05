@@ -6,11 +6,12 @@ import {
   BuyerProduct,
   ListBuyerSpec,
   BuyerSpec,
+  ListCategory,
 } from '@ordercloud/angular-sdk';
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class ListProductResolver implements Resolve<ListBuyerProduct> {
+export class MeListProductResolver implements Resolve<ListBuyerProduct> {
   constructor(private service: OcMeService) {}
 
   resolve(): Observable<ListBuyerProduct> | Promise<ListBuyerProduct> | any {
@@ -19,7 +20,7 @@ export class ListProductResolver implements Resolve<ListBuyerProduct> {
 }
 
 @Injectable()
-export class ProductResolver implements Resolve<BuyerProduct> {
+export class MeProductResolver implements Resolve<BuyerProduct> {
   constructor(private service: OcMeService) {}
 
   resolve(
@@ -30,7 +31,7 @@ export class ProductResolver implements Resolve<BuyerProduct> {
 }
 
 @Injectable()
-export class ListSpecsResolver implements Resolve<ListBuyerSpec> {
+export class MeListSpecsResolver implements Resolve<ListBuyerSpec> {
   constructor(private service: OcMeService) {}
 
   resolve(
@@ -41,7 +42,7 @@ export class ListSpecsResolver implements Resolve<ListBuyerSpec> {
 }
 
 @Injectable()
-export class SpecsResolver implements Resolve<BuyerSpec> {
+export class MeSpecsResolver implements Resolve<BuyerSpec> {
   constructor(private service: OcMeService) {}
 
   resolve(
@@ -54,5 +55,14 @@ export class SpecsResolver implements Resolve<BuyerSpec> {
       calls.push(this.service.GetSpec(productID, item.ID).toPromise());
     });
     return Promise.all(calls);
+  }
+}
+
+@Injectable()
+export class MeListCategoriesResolver implements Resolve<ListCategory> {
+  constructor(private service: OcMeService) {}
+
+  resolve(): Observable<ListCategory> | Promise<ListCategory> | any {
+    return this.service.ListCategories({ depth: 'all' });
   }
 }

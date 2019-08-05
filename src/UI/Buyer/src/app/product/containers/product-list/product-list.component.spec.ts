@@ -129,7 +129,7 @@ describe('ProductListComponent', () => {
     });
     it('should set productList$', () => {
       expect(component.getProductData).toHaveBeenCalled();
-      expect(component.productList$).toEqual(<Observable<ListBuyerProduct>>(
+      expect(component.products).toEqual(<Observable<ListBuyerProduct>>(
         mockProductData
       ));
     });

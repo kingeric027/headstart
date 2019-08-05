@@ -6,31 +6,33 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProductListComponent } from '@app-buyer/product/containers/product-list/product-list.component';
 import { ProductDetailWrapperComponent } from './containers/product-detail-wrapper/product-detail-wrapper.component';
 import {
-  ListProductResolver,
-  ListSpecsResolver,
-  ProductResolver,
-} from './resolves/product.resolve';
+  MeListProductResolver,
+  MeListSpecsResolver,
+  MeProductResolver,
+  MeListCategoriesResolver,
+} from './resolves/me.resolve';
 
 const routes: Routes = [
   {
     path: '',
     component: ProductListComponent,
     resolve: {
-      products: ListProductResolver,
+      products: MeListProductResolver,
+      categories: MeListCategoriesResolver,
     },
   },
   {
     path: ':productID',
     resolve: {
-      product: ProductResolver,
-      specList: ListSpecsResolver,
+      product: MeProductResolver,
+      specList: MeListSpecsResolver,
     },
     children: [
       {
         path: '',
         component: ProductDetailWrapperComponent,
         resolve: {
-          specs: ListSpecsResolver,
+          specs: MeListSpecsResolver,
         },
       },
     ],

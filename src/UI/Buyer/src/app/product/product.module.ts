@@ -11,11 +11,12 @@ import { FacetListComponent } from '@app-buyer/product/components/facet-list/fac
 import { ProductDetailWrapperComponent } from './containers/product-detail-wrapper/product-detail-wrapper.component';
 import { OcmModule } from '@app-buyer/ocm/ocm.module';
 import {
-  ListProductResolver,
-  ProductResolver,
-  ListSpecsResolver,
-  SpecsResolver,
-} from './resolves/product.resolve';
+  MeListProductResolver,
+  MeProductResolver,
+  MeListSpecsResolver,
+  MeSpecsResolver,
+  MeListCategoriesResolver,
+} from './resolves/me.resolve';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -31,10 +32,11 @@ import {
     ProductDetailWrapperComponent,
   ],
   providers: [
-    ListProductResolver,
-    ProductResolver,
-    ListSpecsResolver,
-    SpecsResolver,
+    MeListProductResolver,
+    MeProductResolver,
+    MeListSpecsResolver,
+    MeSpecsResolver,
+    MeListCategoriesResolver,
   ],
 })
 export class ProductsModule {}

@@ -1,5 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+} from '@angular/core';
+import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { get as _get } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
@@ -9,33 +16,36 @@ import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
 })
-export class OCMQuantityInput implements OnInit {
-  @Input() limits: QuantityLimits;
+export class OCMQuantityInput implements OnInit, OnChanges {
+  @Input() limits: QuantityLimits = {
+    inventory: 0,
+    maxPerOrder: 0,
+    minPerOrder: 0,
+    restrictedQuantities: [],
+  };
   @Input() existingQty: number;
   @Output() qtyChange = new EventEmitter<number>();
 
   form: FormGroup;
+  value: number;
+  isQtyRestricted = false;
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor() {}
+
+  ngOnChanges() {
+    this.isQtyRestricted = this.limits.restrictedQuantities.length !== 0;
+    this.limits.minPerOrder = Math.min(...this.limits.restrictedQuantities);
+    this.value = this.existingQty || this.limits.minPerOrder;
+    this.quantityChangeListener();
+    if (!this.existingQty) {
+      this.qtyChange.emit(this.value);
+    }
+  }
 
   ngOnInit(): void {
-    const value = this.existingQty || this.getDefaultQty();
-    this.form = this.formBuilder.group({
-      quantity: [value, [Validators.required]],
+    this.form = new FormGroup({
+      quantity: new FormControl('', [Validators.required]),
     });
-    this.quantityChangeListener();
-    if (!this.existingQty) this.qtyChange.emit(value);
-  }
-
-  isQtyRestricted(): boolean {
-    return this.limits.restrictedQuantities.length !== 0;
-  }
-
-  getDefaultQty(): number {
-    if (this.isQtyRestricted()) {
-      return Math.min(...this.limits.restrictedQuantities);
-    }
-    return this.limits.minPerOrder;
   }
 
   quantityChangeListener(): void {

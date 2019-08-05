@@ -29,8 +29,7 @@ import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
   styleUrls: ['./product-list.component.scss'],
 })
 export class ProductListComponent implements OnInit {
-  //productList$: Observable<ListBuyerProduct>;
-  productList$: ListBuyerProduct;
+  products: ListBuyerProduct;
   categories: ListCategory;
   categoryCrumbs: Category[] = [];
   searchTerm = null;
@@ -42,6 +41,7 @@ export class ProductListComponent implements OnInit {
   facets: ListFacet[];
   lineItems: ListLineItem;
   quantityLimits: QuantityLimits[];
+  sortBy: any;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -51,15 +51,18 @@ export class ProductListComponent implements OnInit {
     public favoriteProductsService: FavoriteProductsService,
     private appStateService: AppStateService,
     private modalService: ModalService
-  ) {
-    this.productList$ = this.activatedRoute.snapshot.data.products;
-    this.facets = this.productList$.Meta.Facets;
-    this.quantityLimits = this.productList$.Items.map((p) => BuildQtyLimits(p));
-  }
+  ) {}
 
   ngOnInit() {
-    //this.productList$ = this.getProductData();
-    this.getCategories();
+    this.products = this.activatedRoute.snapshot.data.products;
+    this.facets = this.products.Meta.Facets;
+    this.categories = this.activatedRoute.snapshot.data.categories;
+    this.sortBy = this.activatedRoute.queryParams['sortBy'];
+
+    this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
+    this.categoryCrumbs = this.buildBreadCrumbs(
+      this.activatedRoute.snapshot.queryParams.category
+    );
     this.configureRouter();
     this.appStateService.lineItemSubject.subscribe(
       (lineItems) => (this.lineItems = lineItems)
