@@ -26,6 +26,7 @@ import {
   map as _map,
 } from 'lodash';
 import { SpecFormComponent } from '@app-buyer/product/components/spec-form/spec-form.component';
+import { ocAppConfig } from '@app-buyer/config/app.config';
 @Component({
   selector: 'product-details',
   templateUrl: './product-details.component.html',
@@ -184,12 +185,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewChecked {
   getImageUrls() {
     const images = this.product.xp.Images || [];
     const result = _map(images, (img) => {
-      if (img.Id === 'front') {
-        return img.Url.replace(
-          '{url}',
-          'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product'
-        );
-      }
+      return img.Url.replace('{url}', ocAppConfig.cdnUrl);
     });
     return _without(result, undefined);
   }

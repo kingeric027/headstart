@@ -8,6 +8,7 @@ export const ocAppConfig: AppConfig = {
   anonymousShoppingEnabled: false,
   premiumSearchEnabled: false,
   middlewareUrl: environment.middlewareUrl,
+  cdnUrl: environment.cdnUrl,
   scope: [
     'MeAddressAdmin',
     'MeAdmin',
@@ -53,7 +54,10 @@ export interface AppConfig {
    * base path to middleware
    */
   middlewareUrl: string;
-
+  /**
+   *  base path to cdn
+   */
+  cdnUrl: string;
   /**
    * An array of security roles that will be requested upon login.
    * These roles allow access to specific endpoints in the OrderCloud.io API.
