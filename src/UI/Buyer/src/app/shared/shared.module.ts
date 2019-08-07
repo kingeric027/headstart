@@ -1,7 +1,6 @@
 // angular
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { SharedRoutingModule } from '@app-buyer/shared/shared-routing.module';
@@ -59,14 +58,15 @@ import {
 import { OrderPaymentListComponent } from '@app-buyer/shared/components/payment-list/order-payment-list.component';
 import { NoResultsComponent } from './components/no-results/no-results.component';
 import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     SharedRoutingModule,
     // angular
     CommonModule,
-    HttpClientModule,
     ReactiveFormsModule,
+    TranslateModule,
 
     // 3rd party UI
     FontAwesomeModule,
@@ -77,21 +77,21 @@ import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
      * only those that are used by app
      * should be imported to reduce bundle size
      */
-    NgbDatepickerModule.forRoot(),
-    NgbCollapseModule.forRoot(),
-    NgbModalModule.forRoot(),
-    NgbTabsetModule.forRoot(),
-    NgbPaginationModule.forRoot(),
-    NgbPopoverModule.forRoot(),
-    NgbAccordionModule.forRoot(),
-    NgbCarouselModule.forRoot(),
-    NgbDropdownModule.forRoot(),
+    NgbDatepickerModule,
+    NgbCollapseModule,
+    NgbModalModule,
+    NgbTabsetModule,
+    NgbPaginationModule,
+    NgbPopoverModule,
+    NgbAccordionModule,
+    NgbCarouselModule,
+    NgbDropdownModule,
   ],
   exports: [
     // angular
     CommonModule,
-    HttpClientModule,
     ReactiveFormsModule,
+    TranslateModule,
 
     // 3rd party UI
     FontAwesomeModule,

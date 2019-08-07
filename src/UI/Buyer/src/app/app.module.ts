@@ -2,7 +2,7 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 
 // 3rd party
 import { NgProgressModule } from '@ngx-progressbar/core';
@@ -40,6 +40,8 @@ import { TermsAndConditionsComponent } from './static-pages/terms-and-conditions
 
 // error handler config
 import { AppErrorHandler } from './config/error-handling.config';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [
@@ -52,6 +54,13 @@ import { AppErrorHandler } from './config/error-handling.config';
     // angular core modules
     BrowserAnimationsModule,
     BrowserModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
 
     // app modules
     AppRoutingModule,
@@ -66,7 +75,7 @@ import { AppErrorHandler } from './config/error-handling.config';
      */
     SharedModule,
     CookieModule.forRoot(),
-    NgProgressModule.forRoot(),
+    NgProgressModule,
     NgProgressHttpModule,
     OrderCloudModule.forRoot(OcSDKConfig),
     ToastrModule.forRoot(),
@@ -94,3 +103,11 @@ import { AppErrorHandler } from './config/error-handling.config';
   bootstrap: [AppComponent],
 })
 export class AppModule {}
+
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(
+    http,
+    'https://netfxblob.blob.core.windows.net/translations/',
+    '.json'
+  );
+}
