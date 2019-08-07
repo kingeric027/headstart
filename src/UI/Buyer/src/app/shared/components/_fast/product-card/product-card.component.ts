@@ -39,7 +39,7 @@ export class FastProductCardComponent implements OnInit {
   }
 
   hasSpecs(): boolean {
-    return this.product.SpecCount > 0;
+    return true; // this.product.SpecCount > 0;
   }
 
   ngOnInit() {
