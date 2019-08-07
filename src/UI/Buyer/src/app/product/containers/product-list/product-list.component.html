@@ -1,4 +1,4 @@
-<section class="container mt-2" *ngIf="(productList$ | async); let productList">
+<section class="container mt-2">
   <div class="row">
     <div class="col-12">
       <nav class="breadcrumb" aria-label="breadcrumb">
@@ -25,7 +25,7 @@
       Select Category
     </button>
     <div class="col-xs-6">
-      <div (click)="refineByFavorites()">
+      <div (click)="changeFavorites()">
         <label>Refine By</label>
         <button
           class="btn btn-block btn-default btn-outline-dark mb-2"
@@ -61,11 +61,11 @@
             <product-price-filter (priceFilterChange)="changePrice($event)"></product-price-filter>
           -->
           <product-facet-filter
-            *ngIf="productList.Meta?.Facets?.length"
-            [facetList]="productList.Meta.Facets"
+            *ngIf="products.Meta?.Facets?.length"
+            [facetList]="products.Meta.Facets"
             (facetListSelected)="changeFacets($event)"
           ></product-facet-filter>
-          <div (click)="refineByFavorites()">
+          <div (click)="changeFavorites()">
             <shared-toggle-favorite
               [favorite]="hasFavoriteProductsFilter"
             ></shared-toggle-favorite>
@@ -83,13 +83,10 @@
       <div class="row flex-wrap-reverse">
         <div class="col-12 col-md-auto mr-auto ">
           <div class="m-0 mt-1 text-center">
-            <span *ngIf="productList.Meta.TotalPages > 1">
-              {{
-                (productList.Meta.Page - 1) * productList.Meta.PageSize + 1
-              }}
-              -
-              {{ productList.Meta.Page * productList.Meta.PageSize }} of </span
-            >{{ productList.Meta.TotalCount }} results
+            <span *ngIf="products.Meta.TotalPages > 1">
+              {{ (products.Meta.Page - 1) * products.Meta.PageSize + 1 }} -
+              {{ products.Meta.Page * products.Meta.PageSize }} of </span
+            >{{ products.Meta.TotalCount }} results
           </div>
         </div>
         <div class="col-12 d-md-none mb-2">
@@ -109,7 +106,7 @@
           ></product-sort-filter>
         </div>
       </div>
-      <div class="card" *ngIf="productList.Items.length === 0">
+      <div class="card" *ngIf="products.Items.length === 0">
         <shared-no-results
           message="No products found."
           [actionText]="
@@ -120,10 +117,10 @@
           (action)="hasQueryParams ? clearAllFilters() : routeHome()"
         ></shared-no-results>
       </div>
-      <div *ngIf="productList.Items.length > 0">
+      <div *ngIf="products.Items.length > 0">
         <div class="product-list-grid row align-items-stretch">
           <product-product-card
-            *ngFor="let product of productList.Items"
+            *ngFor="let product of products.Items"
             class="col-sm-6 col-md-4 col-xl-3 d-flex"
             [product]="product"
             [favorite]="favoriteProductsService.isFavorite(product)"
@@ -135,12 +132,12 @@
           </product-product-card>
         </div>
         <ngb-pagination
-          *ngIf="productList.Meta.TotalPages > 1"
+          *ngIf="products.Meta.TotalPages > 1"
           maxSize="10"
           class="d-flex justify-content-center"
-          [collectionSize]="productList.Meta.TotalCount"
-          [pageSize]="productList.Meta.PageSize"
-          [(page)]="productList.Meta.Page"
+          [collectionSize]="products.Meta.TotalCount"
+          [pageSize]="products.Meta.PageSize"
+          [(page)]="products.Meta.Page"
           (pageChange)="changePage($event)"
           [rotate]="true"
         ></ngb-pagination>

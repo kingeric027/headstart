@@ -12,6 +12,13 @@ import { FacetFilterComponent } from '@app-buyer/product/components/facet-filter
 import { FacetListComponent } from '@app-buyer/product/components/facet-list/facet-list.component';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
 import { SpecFormComponent } from './components/spec-form/spec-form.component';
+import {
+  MeListProductResolver,
+  MeProductResolver,
+  MeListSpecsResolver,
+  MeSpecsResolver,
+  MeListCategoriesResolver,
+} from './resolves/me.product.resolve';
 
 @NgModule({
   imports: [
@@ -30,6 +37,13 @@ import { SpecFormComponent } from './components/spec-form/spec-form.component';
     FacetFilterComponent,
     FacetListComponent,
     SpecFormComponent,
+  ],
+  providers: [
+    MeListProductResolver,
+    MeProductResolver,
+    MeListSpecsResolver,
+    MeSpecsResolver,
+    MeListCategoriesResolver,
   ],
 })
 export class ProductsModule {}
