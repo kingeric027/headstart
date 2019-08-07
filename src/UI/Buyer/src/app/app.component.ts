@@ -9,6 +9,7 @@ import {
 } from '@app-buyer/config/date-picker.config';
 import { AppStateService } from '@app-buyer/shared';
 import { Observable } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,11 @@ import { Observable } from 'rxjs';
 export class AppComponent {
   isLoggedIn$: Observable<boolean>;
 
-  constructor(private appStateService: AppStateService) {
+  constructor(
+    private appStateService: AppStateService,
+    public translate: TranslateService
+  ) {
     this.isLoggedIn$ = this.appStateService.isLoggedIn;
+    translate.setDefaultLang('en');
   }
 }

@@ -19,8 +19,14 @@ import { QuantityInputComponent } from '@app-buyer/shared/components/quantity-in
 import { AddToCartEvent } from '@app-buyer/shared/models/add-to-cart-event.interface';
 import { minBy as _minBy } from 'lodash';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
-import { find as _find, difference as _difference } from 'lodash';
+import {
+  find as _find,
+  difference as _difference,
+  without as _without,
+  map as _map,
+} from 'lodash';
 import { SpecFormComponent } from '@app-buyer/product/components/spec-form/spec-form.component';
+import { ocAppConfig } from '@app-buyer/config/app.config';
 @Component({
   selector: 'product-details',
   templateUrl: './product-details.component.html',
@@ -178,7 +184,10 @@ export class ProductDetailsComponent implements OnInit, AfterViewChecked {
 
   getImageUrls() {
     const images = this.product.xp.Images || [];
-    return images.map((i) => i.Url);
+    const result = _map(images, (img) => {
+      return img.Url.replace('{url}', ocAppConfig.cdnUrl);
+    });
+    return _without(result, undefined);
   }
 }
 

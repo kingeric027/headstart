@@ -12,14 +12,15 @@ import { AddToCartEvent } from '@app-buyer/shared/models/add-to-cart-event.inter
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
 import { find as _find, get as _get } from 'lodash';
+import { ocAppConfig } from '@app-buyer/config/app.config';
 
 @Component({
-  selector: 'product-product-card',
+  selector: 'product-product-card-fast',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class ProductCardComponent implements OnInit {
+export class FastProductCardComponent implements OnInit {
   @Input() product: BuyerProduct;
   @Input() favorite: boolean;
   @Output() addedToCart = new EventEmitter<AddToCartEvent>();
@@ -63,9 +64,6 @@ export class ProductCardComponent implements OnInit {
       'Images[0].Url',
       'http://placehold.it/300x300'
     );
-    return url.replace(
-      '{url}',
-      'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product'
-    );
+    return url.replace('{url}', ocAppConfig.cdnUrl);
   }
 }
