@@ -24,7 +24,8 @@ const routes: Routes = [
       { path: 'home', component: HomeComponent },
       {
         path: 'profile',
-        loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule),
+        loadChildren: () =>
+          import('./profile/profile.module').then((m) => m.ProfileModule),
         canActivate: [isProfiledUser],
       },
       {
@@ -41,16 +42,25 @@ const routes: Routes = [
       },
       {
         path: 'products',
-        loadChildren: () => import('./product/product.module').then(m => m.ProductsModule),
+        loadChildren: () =>
+          import('./product/product.module').then((m) => m.ProductsModule),
       },
-      { path: '', loadChildren: () => import('./checkout/checkout.module').then(m => m.CheckoutModule) },
+      {
+        path: '',
+        loadChildren: () =>
+          import('./checkout/checkout.module').then((m) => m.CheckoutModule),
+      },
       { path: 'impersonation', redirectTo: '/home' },
     ],
   },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [
+    RouterModule.forRoot(routes, {
+      onSameUrlNavigation: 'reload',
+    }),
+  ],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
