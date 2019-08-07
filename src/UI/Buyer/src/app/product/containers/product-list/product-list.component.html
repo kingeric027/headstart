@@ -119,13 +119,8 @@
       </div>
       <div *ngIf="products.Items.length > 0">
         <div class="product-list-grid row align-items-stretch">
-<<<<<<< HEAD
-          <product-product-card-fast
-            *ngFor="let product of productList.Items"
-=======
           <product-product-card
             *ngFor="let product of products.Items"
->>>>>>> 0c9954eac5173116e26ad1de86e282f13f7b3b8d
             class="col-sm-6 col-md-4 col-xl-3 d-flex"
             [product]="product"
             [favorite]="favoriteProductsService.isFavorite(product)"
@@ -134,7 +129,7 @@
             "
             (addedToCart)="addToCart($event)"
           >
-          </product-product-card-fast>
+          </product-product-card>
         </div>
         <ngb-pagination
           *ngIf="products.Meta.TotalPages > 1"
