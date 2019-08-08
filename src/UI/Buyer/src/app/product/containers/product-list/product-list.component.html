@@ -1,16 +1,14 @@
 <section class="container mt-2">
   <div class="row">
     <div class="col-12">
-      <nav class="breadcrumb" aria-label="breadcrumb">
-        <a class="breadcrumb-item link-text" [routerLink]="['/products']"
-          >All Products</a
-        >
-        <a
-          *ngFor="let cat of categoryCrumbs"
-          class="breadcrumb-item link-text"
-          [queryParams]="{ category: cat.ID }"
-          [routerLink]="['/products']"
-        >
+      <nav class="breadcrumb"
+           aria-label="breadcrumb">
+        <a class="breadcrumb-item link-text"
+           [routerLink]="['/products']">All Products</a>
+        <a *ngFor="let cat of categoryCrumbs"
+           class="breadcrumb-item link-text"
+           [queryParams]="{ category: cat.ID }"
+           [routerLink]="['/products']">
           {{ cat.Name }}
         </a>
       </nav>
@@ -18,23 +16,17 @@
   </div>
   <!-- Mobile section for selecting a category and filtering on favorites -->
   <div class="d-md-none mb-2">
-    <button
-      class="btn btn-block btn-default btn-outline-dark mb-2"
-      *ngIf="categories?.Items?.length"
-      (click)="openCategoryModal()"
-    >
+    <button class="btn btn-block btn-default btn-outline-dark mb-2"
+            *ngIf="categories?.Items?.length"
+            (click)="openCategoryModal()">
       Select Category
     </button>
     <div class="col-xs-6">
       <div (click)="refineByFavorites()">
         <label>Refine By</label>
-        <button
-          class="btn btn-block btn-default btn-outline-dark mb-2"
-          for="favorite"
-        >
-          <ocm-toggle-favorite
-            [favorite]="hasFavoriteProductsFilter"
-          ></ocm-toggle-favorite>
+        <button class="btn btn-block btn-default btn-outline-dark mb-2"
+                for="favorite">
+          <ocm-toggle-favorite [favorite]="hasFavoriteProductsFilter"></ocm-toggle-favorite>
           My Favorites
         </button>
       </div>
@@ -49,36 +41,29 @@
           </h5>
         </div>
         <div class="p-3">
-          <button
-            *ngIf="hasQueryParams"
-            class="btn btn-block btn-default mb-4"
-            type="button"
-            (click)="clearAllFilters()"
-          >
+          <button *ngIf="hasQueryParams"
+                  class="btn btn-block btn-default mb-4"
+                  type="button"
+                  (click)="clearAllFilters()">
             Clear All Filters
           </button>
           <!-- enable price filtering by uncommenting this line, see PriceFilterComponent for more details -->
           <!-- <product-price-filter (priceFilterChange)="changePrice($event)"></product-price-filter> -->
-          <product-facet-filter
-            *ngIf="products.Meta?.Facets?.length"
-            [facetList]="products.Meta.Facets"
-            (facetListSelected)="changeFacets($event)"
-          >
+          <product-facet-filter *ngIf="products.Meta?.Facets?.length"
+                                [facetList]="products.Meta.Facets"
+                                (facetListSelected)="changeFacets($event)">
           </product-facet-filter>
           <div (click)="refineByFavorites()">
             <span class="sr-only">Sort By Favorites</span>
-            <ocm-toggle-favorite
-              [favorite]="hasFavoriteProductsFilter"
-            ></ocm-toggle-favorite>
-            <label class="ml-2" for="favorite"> My Favorites</label>
+            <ocm-toggle-favorite [favorite]="hasFavoriteProductsFilter"></ocm-toggle-favorite>
+            <label class="ml-2"
+                   for="favorite"> My Favorites</label>
           </div>
         </div>
       </div>
-      <product-category-nav
-        *ngIf="categories?.Items?.length"
-        [categories]="categories"
-        (selection)="changeCategory($event)"
-      >
+      <product-category-nav *ngIf="categories?.Items?.length"
+                            [categories]="categories"
+                            (selection)="changeCategory($event)">
       </product-category-nav>
     </div>
     <div class="col-lg-9 col-md-8 ">
@@ -93,68 +78,59 @@
           </div>
         </div>
         <div class="col-12 d-md-none mb-2">
-          <button
-            *ngIf="hasQueryParams"
-            class="btn btn-block btn-default btn-outline-dark mb-2"
-            type="button"
-            (click)="clearAllFilters()"
-          >
+          <button *ngIf="hasQueryParams"
+                  class="btn btn-block btn-default btn-outline-dark mb-2"
+                  type="button"
+                  (click)="clearAllFilters()">
             Clear All Filters
           </button>
         </div>
         <div class="col-12 col-md-auto ">
-          <product-sort-filter
-            [sortStrategy]="sortBy"
-            (sortStrategyChange)="changeSortStrategy($event)"
-          ></product-sort-filter>
+          <product-sort-filter [sortStrategy]="sortBy"
+                               (sortStrategyChange)="changeSortStrategy($event)"></product-sort-filter>
         </div>
       </div>
-      <div class="card" *ngIf="products.Items.length === 0">
-        <shared-no-results
-          message="No products found."
-          [actionText]="
+      <div class="card"
+           *ngIf="products.Items.length === 0">
+        <shared-no-results message="No products found."
+                           [actionText]="
             hasQueryParams
               ? 'clear search criteria'
               : 'go back to the home page'
           "
-          (action)="hasQueryParams ? clearAllFilters() : routeHome()"
-        >
+                           (action)="hasQueryParams ? clearAllFilters() : routeHome()">
         </shared-no-results>
       </div>
       <div *ngIf="products.Items.length > 0">
         <div class="product-list-grid row align-items-stretch">
-          <ocm-product-card
-            *ngFor="let product of products.Items; let i = index"
-            class="col-sm-6 col-md-4 col-xl-3 d-flex"
-            [product]="product"
-            [quantityLimits]="quantityLimits[i]"
-            [isFavorite]="favoriteProductsService.isFavorite(product)"
-            (setIsFavorite)="
+          <ocm-product-card *ngFor="let product of products.Items; let i = index"
+                            class="col-sm-6 col-md-4 col-xl-3 d-flex"
+                            [product]="product"
+                            [quantityLimits]="quantityLimits[i]"
+                            [isFavorite]="favoriteProductsService.isFavorite(product)"
+                            (setIsFavorite)="
               favoriteProductsService.setFavoriteValue($event.detail, product)
             "
-            (addedToCart)="addToCart($event.detail)"
-          >
+                            (addedToCart)="addToCart($event.detail)"
+                            (toDetailsPage)="toDetailsPage($event)">
           </ocm-product-card>
         </div>
-        <ngb-pagination
-          *ngIf="products.Meta.TotalPages > 1"
-          maxSize="10"
-          class="d-flex justify-content-center"
-          [collectionSize]="products.Meta.TotalCount"
-          [pageSize]="products.Meta.PageSize"
-          [(page)]="products.Meta.Page"
-          (pageChange)="changePage($event)"
-          [rotate]="true"
-        >
+        <ngb-pagination *ngIf="products.Meta.TotalPages > 1"
+                        maxSize="10"
+                        class="d-flex justify-content-center"
+                        [collectionSize]="products.Meta.TotalCount"
+                        [pageSize]="products.Meta.PageSize"
+                        [(page)]="products.Meta.Page"
+                        (pageChange)="changePage($event)"
+                        [rotate]="true">
         </ngb-pagination>
       </div>
     </div>
   </div>
-  <shared-modal id="{{ createModalID }}" modalTitle="Select Category">
-    <product-category-nav
-      *ngIf="categories?.Items?.length"
-      [categories]="categories"
-      (selection)="changeCategory($event)"
-    ></product-category-nav>
+  <shared-modal id="{{ createModalID }}"
+                modalTitle="Select Category">
+    <product-category-nav *ngIf="categories?.Items?.length"
+                          [categories]="categories"
+                          (selection)="changeCategory($event)"></product-category-nav>
   </shared-modal>
 </section>

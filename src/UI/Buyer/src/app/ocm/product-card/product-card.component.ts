@@ -25,6 +25,7 @@ export class OCMProductCard implements OnInit, OnChanges {
   };
   @Output() addedToCart = new EventEmitter<LineItem>();
   @Output() setIsFavorite = new EventEmitter<boolean>();
+  @Output() toDetailsPage = new EventEmitter<string>();
 
   quantity: number;
   shouldDisplayAddToCart: boolean;
@@ -61,5 +62,9 @@ export class OCMProductCard implements OnInit, OnChanges {
     });
     const filtered = _without(result, undefined);
     return filtered.length > 0 ? filtered[0] : 'http://placehold.it/300x300';
+  }
+
+  toDetails() {
+    this.toDetailsPage.emit(this.product.ID);
   }
 }

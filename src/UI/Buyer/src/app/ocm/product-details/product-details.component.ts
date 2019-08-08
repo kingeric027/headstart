@@ -1,21 +1,8 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output,
-  EventEmitter,
-  ChangeDetectorRef,
-  AfterViewChecked,
-} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BuyerProduct, BuyerSpec, LineItem } from '@ordercloud/angular-sdk';
-import {
-  find as _find,
-  difference as _difference,
-  minBy as _minBy,
-  has as _has,
-} from 'lodash';
+import { find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
 import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interface';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 @Component({
@@ -37,15 +24,16 @@ export class OCMProductDetails implements OnInit, AfterViewChecked {
   relatedProducts$: Observable<BuyerProduct[]>;
   imageUrls: string[] = [];
 
-  constructor(
-    private router: Router,
-    private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  constructor(private router: Router, private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit() {}
 
   routeToProductList(): void {
     this.router.navigate(['/products']);
+  }
+
+  toDetailsPage(productId: string) {
+    this.router.navigate([`/products/${productId}`]);
   }
 
   addToCart(): void {
@@ -85,10 +73,7 @@ export class OCMProductDetails implements OnInit, AfterViewChecked {
     const startingBreak = _minBy(priceBreaks, 'Quantity');
 
     const selectedBreak = priceBreaks.reduce((current, candidate) => {
-      return candidate.Quantity > current.Quantity &&
-        candidate.Quantity <= this.quantity
-        ? candidate
-        : current;
+      return candidate.Quantity > current.Quantity && candidate.Quantity <= this.quantity ? candidate : current;
     }, startingBreak);
     const markup = this.totalSpecMarkup(selectedBreak.Price, this.quantity);
 
@@ -96,17 +81,11 @@ export class OCMProductDetails implements OnInit, AfterViewChecked {
   }
 
   totalSpecMarkup(unitPrice: number, quantity: number): number {
-    const markups = this.specSelections.map((s) =>
-      this.singleSpecMarkup(unitPrice, quantity, s)
-    );
+    const markups = this.specSelections.map((s) => this.singleSpecMarkup(unitPrice, quantity, s));
     return markups.reduce((x, acc) => x + acc, 0); //sum
   }
 
-  singleSpecMarkup(
-    unitPrice: number,
-    quantity: number,
-    spec: FullSpecOption
-  ): number {
+  singleSpecMarkup(unitPrice: number, quantity: number, spec: FullSpecOption): number {
     switch (spec.PriceMarkupType) {
       case 'NoMarkup':
         return 0;

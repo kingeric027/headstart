@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 
@@ -10,6 +10,7 @@ import { BuyerProduct } from '@ordercloud/angular-sdk';
 export class OCMProductCarousel {
   @Input() products: BuyerProduct[];
   @Input() displayTitle: string;
+  @Output() toProductDetails = new EventEmitter<string>();
 
   index = 0;
   rowLength = 4;
@@ -26,5 +27,9 @@ export class OCMProductCarousel {
 
   getProducts(): BuyerProduct[] {
     return this.products.slice(this.index, this.index + this.rowLength);
+  }
+
+  routeToProductDetails(productId: string) {
+    this.router.navigate([`/products/${productId}`]);
   }
 }

@@ -16,7 +16,8 @@ import {
   MeListSpecsResolver,
   MeSpecsResolver,
   MeListCategoriesResolver,
-} from './resolves/me.resolve';
+  MeListRelatedProductsResolver,
+} from './resolves/me.product.resolve';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -37,6 +38,7 @@ import {
     MeListSpecsResolver,
     MeSpecsResolver,
     MeListCategoriesResolver,
+    MeListRelatedProductsResolver,
   ],
 })
 export class ProductsModule {}

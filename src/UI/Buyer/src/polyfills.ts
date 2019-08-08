@@ -67,6 +67,9 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
 })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
 
 // Needed for WebComponents. https://github.com/stackblitz/core/issues/475
+import '@webcomponents/custom-elements/src/native-shim';
+import '@webcomponents/custom-elements/custom-elements.min';
+
 (function() {
   'use strict';
   (function() {
