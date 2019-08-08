@@ -27,7 +27,7 @@
         id="{{facet.Name}}facetCheckbox{{i}}"
       />
       <label for="{{facet.Name}}facetCheckbox{{i}}" class="custom-control-label"
-        >{{ value.Value | translate }}
+        >{{ facet.Name + '.' + value.Value | translate }}
         <small
           class="text-secondary font-weight-bold badge badge-pill badge-light"
           >({{ value.Count }})</small

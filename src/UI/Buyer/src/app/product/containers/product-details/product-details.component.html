@@ -1,15 +1,17 @@
-<div class="container mt-4"
-     *ngIf="!product">
-  <shared-no-results message="This product is no longer available"
-                     actionText="shop available products"
-                     (action)="routeToProductList()"></shared-no-results>
+<div class="container mt-4" *ngIf="!product">
+  <shared-no-results
+    message="This product is no longer available"
+    actionText="shop available products"
+    (action)="routeToProductList()"
+  ></shared-no-results>
 </div>
-<div class="container mt-4"
-     *ngIf="product">
+<div class="container mt-4" *ngIf="product">
   <div class="row mb-5">
     <div class="col-md-6">
       <div class="position-relative d-block">
-        <product-additional-image-gallery [imgUrls]="getImageUrls()"></product-additional-image-gallery>
+        <product-additional-image-gallery
+          [imgUrls]="getImageUrls()"
+        ></product-additional-image-gallery>
       </div>
     </div>
     <div class="col-md-6 bg-light">
@@ -17,44 +19,59 @@
       <div class="d-flex mt-2">
         <div class="mt-2 text-muted">ID: {{ product.ID }}</div>
         <div class="mt-2 ml-3">
-          <shared-toggle-favorite title="Favorite"
-                                  (click)="$event.stopPropagation()"
-                                  [favorite]="favoriteProductService.isFavorite(product)"
-                                  (favoriteChanged)="favoriteProductService.setFavoriteValue($event, product)">
+          <shared-toggle-favorite
+            title="Favorite"
+            (click)="$event.stopPropagation()"
+            [favorite]="favoriteProductService.isFavorite(product)"
+            (favoriteChanged)="
+              favoriteProductService.setFavoriteValue($event, product)
+            "
+          >
           </shared-toggle-favorite>
         </div>
-        <div class="ml-auto"
-             *ngIf="isOrderable()">
-          <shared-quantity-input class="d-inline-block"
-                                 style="max-width: 100px"
-                                 [product]="product"
-                                 [existingQty]="!matchingLi ? null : matchingLi.Quantity"
-                                 (addedToCart)="addToCart($event)">
+        <div class="ml-auto" *ngIf="isOrderable()">
+          <shared-quantity-input
+            class="d-inline-block"
+            style="max-width: 100px"
+            [product]="product"
+            [existingQty]="!matchingLi ? null : matchingLi.Quantity"
+            (addedToCart)="addToCart($event)"
+          >
           </shared-quantity-input>
-          <button [disabled]="missingRequiredSpec()"
-                  class="btn btn-primary ml-2"
-                  type="submit"
-                  (click)="quantityInputComponent.addToCart($event)">Add to Cart
-            <span class="badge badge-light ml-2">{{ getTotalPrice() | currency }}</span>
+          <button
+            [disabled]="missingRequiredSpec()"
+            class="btn btn-primary ml-2"
+            type="submit"
+            (click)="quantityInputComponent.addToCart($event)"
+          >
+            Add to Cart
+            <span class="badge badge-light ml-2">{{
+              getTotalPrice() | currency
+            }}</span>
           </button>
         </div>
       </div>
-      <hr>
-      <p class="mt-4"
-         [innerHTML]="product.Description || 'This product has no description.'"></p>
-      <product-spec-form *ngIf="isOrderable() && specs.length > 0"
-                         [specs]="specs"
-                         (formUpdated)="specsUpdated($event)"></product-spec-form>
-      <div *ngIf="!isOrderable()"
-           class="alert alert-info">
+      <hr />
+      <p
+        class="mt-4"
+        [innerHTML]="product.Description || 'This product has no description.'"
+      ></p>
+      <product-spec-form
+        *ngIf="isOrderable() && specs.length > 0"
+        [specs]="specs"
+        (formUpdated)="specsUpdated($event)"
+      ></product-spec-form>
+      <div *ngIf="!isOrderable()" class="alert alert-info">
         This is a view-only product and cannot be ordered
       </div>
     </div>
   </div>
-  <div *ngIf="relatedProducts$ | async; let relatedProducts">
-    <product-carousel *ngIf="relatedProducts.length > 0"
-                      displayTitle="Related Products"
-                      [products]="relatedProducts">
+  <div *ngIf="relatedProducts">
+    <product-carousel
+      *ngIf="relatedProducts.length > 0"
+      displayTitle="Related Products"
+      [products]="relatedProducts"
+    >
     </product-carousel>
   </div>
 </div>

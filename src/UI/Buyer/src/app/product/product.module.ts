@@ -18,6 +18,7 @@ import {
   MeListSpecsResolver,
   MeSpecsResolver,
   MeListCategoriesResolver,
+  MeListRelatedProductsResolver,
 } from './resolves/me.product.resolve';
 
 @NgModule({
@@ -44,6 +45,7 @@ import {
     MeListSpecsResolver,
     MeSpecsResolver,
     MeListCategoriesResolver,
+    MeListRelatedProductsResolver,
   ],
 })
 export class ProductsModule {}

@@ -10,6 +10,7 @@ import {
   MeListSpecsResolver,
   MeListProductResolver,
   MeListCategoriesResolver,
+  MeListRelatedProductsResolver,
 } from './resolves/me.product.resolve';
 
 const routes: Routes = [
@@ -34,6 +35,7 @@ const routes: Routes = [
         component: ProductDetailsComponent,
         resolve: {
           specs: MeListSpecsResolver,
+          relatedProducts: MeListRelatedProductsResolver,
         },
       },
     ],

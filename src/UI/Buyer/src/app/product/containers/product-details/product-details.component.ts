@@ -6,11 +6,9 @@ import {
   AfterViewChecked,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, forkJoin, of } from 'rxjs';
 import { CartService, AppStateService } from '@app-buyer/shared';
 import {
   BuyerProduct,
-  OcMeService,
   BuyerSpec,
   LineItemSpec,
   SpecOption,
@@ -34,18 +32,17 @@ import { ocAppConfig } from '@app-buyer/config/app.config';
 })
 export class ProductDetailsComponent implements OnInit, AfterViewChecked {
   @ViewChild(QuantityInputComponent, { static: false })
-  quantityInputComponent: QuantityInputComponent;
   @ViewChild(SpecFormComponent, { static: false })
+  quantityInputComponent: QuantityInputComponent;
   specFormComponent: SpecFormComponent;
-  quantityInputReady = false;
-  specs: BuyerSpec[] = [];
-  specSelections: FullSpecOption[] = [];
+  specs: BuyerSpec[];
   product: BuyerProduct;
-  relatedProducts$: Observable<BuyerProduct[]>;
+  relatedProducts: BuyerProduct[];
   imageUrls: string[] = [];
+  specSelections: FullSpecOption[] = [];
+  quantityInputReady = false;
 
   constructor(
-    private ocMeService: OcMeService,
     private activatedRoute: ActivatedRoute,
     private cartService: CartService,
     private appStateService: AppStateService,
@@ -55,40 +52,13 @@ export class ProductDetailsComponent implements OnInit, AfterViewChecked {
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe(async (params) => {
-      await this.getProductData(params.productID);
-    });
+    this.product = this.activatedRoute.snapshot.data.product;
+    this.specs = this.activatedRoute.snapshot.data.specs;
+    this.relatedProducts = this.activatedRoute.snapshot.data.relatedProducts;
   }
 
   routeToProductList(): void {
     this.router.navigate(['/products']);
-  }
-
-  async getProductData(productID: string): Promise<void> {
-    if (!productID) return;
-    this.product = await this.ocMeService.GetProduct(productID).toPromise();
-    this.specs = await this.listSpecs(productID);
-    this.relatedProducts$ = this.getRelatedProducts(this.product);
-  }
-
-  async listSpecs(productID: string): Promise<BuyerSpec[]> {
-    const specs = await this.ocMeService.ListSpecs(productID).toPromise();
-    const details = specs.Items.map((spec) => {
-      return this.ocMeService.GetSpec(productID, spec.ID).toPromise();
-    });
-    return await Promise.all(details);
-  }
-
-  getRelatedProducts(product: BuyerProduct): Observable<BuyerProduct[]> {
-    if (!product.xp || !product.xp.RelatedProducts) {
-      return of([]);
-    }
-
-    const requests = product.xp.RelatedProducts.map((prodID) =>
-      this.ocMeService.GetProduct(prodID)
-    );
-
-    return forkJoin(requests);
   }
 
   addToCart(event: AddToCartEvent): void {
