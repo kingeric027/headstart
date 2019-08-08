@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  ChangeDetectorRef,
-  AfterViewChecked,
-} from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CartService, AppStateService } from '@app-buyer/shared';
 import {
@@ -30,10 +24,8 @@ import { ocAppConfig } from '@app-buyer/config/app.config';
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
 })
-export class ProductDetailsComponent implements OnInit, AfterViewChecked {
-  @ViewChild(QuantityInputComponent, { static: false })
+export class ProductDetailsComponent implements OnInit {
   @ViewChild(SpecFormComponent, { static: false })
-  quantityInputComponent: QuantityInputComponent;
   specFormComponent: SpecFormComponent;
   specs: BuyerSpec[];
   product: BuyerProduct;
@@ -41,12 +33,12 @@ export class ProductDetailsComponent implements OnInit, AfterViewChecked {
   imageUrls: string[] = [];
   specSelections: FullSpecOption[] = [];
   quantityInputReady = false;
+  price: number;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private cartService: CartService,
     private appStateService: AppStateService,
-    private changeDetectorRef: ChangeDetectorRef,
     protected favoriteProductService: FavoriteProductsService, // used in template
     private router: Router
   ) {}
@@ -55,10 +47,31 @@ export class ProductDetailsComponent implements OnInit, AfterViewChecked {
     this.product = this.activatedRoute.snapshot.data.product;
     this.specs = this.activatedRoute.snapshot.data.specs;
     this.relatedProducts = this.activatedRoute.snapshot.data.relatedProducts;
+    this.qtyChanged(1);
   }
 
   routeToProductList(): void {
     this.router.navigate(['/products']);
+  }
+
+  qtyChanged(quantity: any): void {
+    // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
+    // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
+    // is the cost per item.
+    if (!this.hasPrice()) {
+      this.price = 0;
+    }
+    const priceBreaks = this.product.PriceSchedule.PriceBreaks;
+    const startingBreak = _minBy(priceBreaks, 'Quantity');
+
+    const selectedBreak = priceBreaks.reduce((current, candidate) => {
+      return candidate.Quantity > current.Quantity &&
+        candidate.Quantity <= quantity
+        ? candidate
+        : current;
+    }, startingBreak);
+    const markup = this.totalSpecMarkup(selectedBreak.Price, quantity);
+    this.price = (selectedBreak.Price + markup) * quantity;
   }
 
   addToCart(event: AddToCartEvent): void {
@@ -84,31 +97,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewChecked {
       this.product.PriceSchedule.PriceBreaks.length &&
       this.product.PriceSchedule.PriceBreaks[0].Price > 0
     );
-  }
-
-  getTotalPrice(): number {
-    // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
-    // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
-    // is the cost per item.
-    if (!this.quantityInputComponent || !this.quantityInputComponent.form) {
-      return null;
-    }
-    if (!this.hasPrice()) {
-      return 0;
-    }
-    const quantity = this.quantityInputComponent.form.value.quantity;
-    const priceBreaks = this.product.PriceSchedule.PriceBreaks;
-    const startingBreak = _minBy(priceBreaks, 'Quantity');
-
-    const selectedBreak = priceBreaks.reduce((current, candidate) => {
-      return candidate.Quantity > current.Quantity &&
-        candidate.Quantity <= quantity
-        ? candidate
-        : current;
-    }, startingBreak);
-    const markup = this.totalSpecMarkup(selectedBreak.Price, quantity);
-
-    return (selectedBreak.Price + markup) * quantity;
   }
 
   totalSpecMarkup(unitPrice: number, quantity: number): number {
@@ -143,13 +131,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewChecked {
       case 'Percentage':
         return spec.PriceMarkup * unitPrice * 0.01;
     }
-  }
-
-  ngAfterViewChecked() {
-    // This manually triggers angular's change detection cycle and avoids the imfamous
-    // "Expression has changed after it was checked" error.
-    // If you remove the @ViewChild(QuantityInputComponent) this will be unecessary.
-    this.changeDetectorRef.detectChanges();
   }
 
   getImageUrls() {

@@ -35,6 +35,7 @@
             style="max-width: 100px"
             [product]="product"
             [existingQty]="!matchingLi ? null : matchingLi.Quantity"
+            (qtyChanged)="qtyChanged($event)"
             (addedToCart)="addToCart($event)"
           >
           </shared-quantity-input>
@@ -45,9 +46,7 @@
             (click)="quantityInputComponent.addToCart($event)"
           >
             Add to Cart
-            <span class="badge badge-light ml-2">{{
-              getTotalPrice() | currency
-            }}</span>
+            <span class="badge badge-light ml-2">{{ price | currency }}</span>
           </button>
         </div>
       </div>
