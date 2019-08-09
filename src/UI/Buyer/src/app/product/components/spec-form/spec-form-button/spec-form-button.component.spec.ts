@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SpecFormComponent } from './spec-form.component';
+import { SpecFormButtonComponent } from './spec-form-button.component';
 
-describe('SpecFormComponent', () => {
-  let component: SpecFormComponent;
-  let fixture: ComponentFixture<SpecFormComponent>;
+describe('SpecFormButtonComponent', () => {
+  let component: SpecFormButtonComponent;
+  let fixture: ComponentFixture<SpecFormButtonComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SpecFormComponent ]
+      declarations: [ SpecFormButtonComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SpecFormComponent);
+    fixture = TestBed.createComponent(SpecFormButtonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SpecFormComponent } from './spec-form.component';
+import { SpecFormSelectComponent } from './spec-form-select.component';
 
-describe('SpecFormComponent', () => {
-  let component: SpecFormComponent;
-  let fixture: ComponentFixture<SpecFormComponent>;
+describe('SpecFormSelectComponent', () => {
+  let component: SpecFormSelectComponent;
+  let fixture: ComponentFixture<SpecFormSelectComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SpecFormComponent ]
+      declarations: [ SpecFormSelectComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SpecFormComponent);
+    fixture = TestBed.createComponent(SpecFormSelectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

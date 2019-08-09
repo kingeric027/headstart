@@ -1,52 +1,92 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { BuyerSpec } from '@ordercloud/angular-sdk';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {
-  find as _find,
-  keys as _keys,
-  pickBy as _pickBy,
-  identity as _identity,
-} from 'lodash';
-import { FullSpecOption } from '@app-buyer/product/containers/product-details/product-details.component';
+import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { FieldConfig } from './field-config.interface';
 
 @Component({
   selector: 'product-spec-form',
-  templateUrl: './spec-form.component.html',
+  template: `
+    <form [formGroup]="form" (submit)="handleSubmit($event)">
+      <ng-container
+        *ngFor="let field of config; let i = index"
+        class="my-1"
+        formArrayName="ctrls"
+        [config]="field"
+        [group]="form"
+        [index]="i"
+        ocSpecField
+      ></ng-container>
+    </form>
+  `,
   styleUrls: ['./spec-form.component.scss'],
 })
 export class SpecFormComponent implements OnInit {
-  @Input() specs: BuyerSpec[];
-  @Output() formUpdated = new EventEmitter<FullSpecOption[]>();
-  specForm: FormGroup;
-  constructor(private formBuilder: FormBuilder) {}
+  @Input() config: FieldConfig[] = [];
+  @Output() submit: EventEmitter<any> = new EventEmitter<any>();
+  @Output() change: EventEmitter<any> = new EventEmitter<any>();
+
+  form: FormGroup;
+
+  get controls() {
+    return this.config.filter(({ type }) => type !== 'button');
+  }
+  get changes() {
+    return this.form.valueChanges;
+  }
+  get valid() {
+    return this.form.valid;
+  }
+  get value() {
+    return this.form.value;
+  }
+
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
-    const formObj = {};
-    this.specs = this.specs.sort(
-      (s1, s2) => s1.Options.length - s2.Options.length
-    );
-    this.specs.forEach((spec) => {
-      const value: any = [this.getDefaultOption(spec)];
-      if (spec.Required) value.push(Validators.required);
-      formObj[spec.ID] = value;
+    this.form = this.createGroup();
+    this.form.valueChanges.subscribe((e: any) => {
+      this.change.emit({ event: 'OnChange', values: e });
     });
-    this.specForm = this.formBuilder.group(formObj);
-    this.onChange();
   }
 
-  getDefaultOption(spec: BuyerSpec) {
-    return spec.DefaultOptionID || (spec.Required ? spec.Options[0].ID : null);
+  createGroup() {
+    const group = this.fb.group({
+      ctrls: this.fb.array([]),
+    });
+    this.config.forEach((control) => {
+      const ctrl = this.createControl(control);
+      group.addControl(control.name, ctrl);
+      group.controls['ctrls']['push'](ctrl);
+    });
+    return group;
   }
 
-  onChange() {
-    const specIDs = _keys(_pickBy(this.specForm.value, _identity));
-    const selections: FullSpecOption[] = specIDs.map((specID) => {
-      const spec = this.specs.find((s) => s.ID === specID);
-      const optionID = this.specForm.value[specID];
-      const option: any = spec.Options.find((o) => o.ID === optionID);
-      option.SpecID = specID;
-      return option;
+  createControl(config: FieldConfig) {
+    const { disabled, validation, value } = config;
+    return this.fb.control({ disabled, value }, validation);
+  }
+
+  handleSubmit(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.submit.emit({ event: event, values: this.value });
+  }
+
+  setDisabled(name: string, disable: boolean) {
+    if (this.form.controls[name]) {
+      const method = disable ? 'disable' : 'enable';
+      this.form.controls[name][method]();
+      return;
+    }
+
+    this.config = this.config.map((item) => {
+      if (item.name === name) {
+        item.disabled = disable;
+      }
+      return item;
     });
-    this.formUpdated.emit(selections);
+  }
+
+  setValue(name: string, value: any) {
+    this.form.controls[name].setValue(value, { emitEvent: true });
   }
 }
