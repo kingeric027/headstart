@@ -55,7 +55,8 @@
       ></p>
       <product-spec-form
         *ngIf="specs.Items.length > 0"
-        [config]="specConfig"
+        [specs]="specs"
+        [product]="product"
         (change)="handleChange($event)"
         (submit)="addToCart($event)"
       ></product-spec-form>

@@ -1,6 +1,17 @@
 import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { map as _map, find as _find, minBy as _minBy } from 'lodash';
+
 import { FieldConfig } from './field-config.interface';
+import {
+  ListBuyerSpec,
+  BuyerProduct,
+  LineItemSpec,
+  BuyerSpec,
+  SpecOption,
+} from '@ordercloud/angular-sdk';
+import { ProductQtyValidator } from '@app-buyer/shared';
+import { SpecFormEvent } from '@app-buyer/product/models/spec-form-values.interface';
 
 @Component({
   selector: 'product-spec-form',
@@ -20,10 +31,12 @@ import { FieldConfig } from './field-config.interface';
   styleUrls: ['./spec-form.component.scss'],
 })
 export class SpecFormComponent implements OnInit {
-  @Input() config: FieldConfig[] = [];
+  @Input() specs: ListBuyerSpec;
+  @Input() product: BuyerProduct;
   @Output() submit: EventEmitter<any> = new EventEmitter<any>();
   @Output() change: EventEmitter<any> = new EventEmitter<any>();
 
+  config: FieldConfig[] = [];
   form: FormGroup;
 
   get controls() {
@@ -42,16 +55,51 @@ export class SpecFormComponent implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
+    this.config = this.createFieldConfig();
     this.form = this.createGroup();
-    this.form.valueChanges.subscribe((e: any) => {
-      const values: any = {};
-      for (const value in e) {
-        if (value !== 'ctrls') {
-          values[value] = e[value];
-        }
-      }
-      this.change.emit({ event: 'OnChange', values: values });
+    this.form.valueChanges.subscribe(() => {
+      this.handleChange();
     });
+  }
+
+  createFieldConfig(): FieldConfig[] {
+    const c: FieldConfig[] = [];
+    for (const spec of this.specs.Items) {
+      if (spec.Name === 'Direct To Garment') {
+        c.push({
+          type: 'checkbox',
+          label: spec.Name,
+          name: spec.Name.replace(/ /g, ''),
+          value: spec.DefaultOptionID,
+          options: _map(spec.Options, 'Value'),
+        });
+      } else if (spec.Options.length > 1) {
+        c.push({
+          type: 'select',
+          label: spec.Name,
+          name: spec.Name.replace(/ /g, ''),
+          value: spec.DefaultOptionID,
+          options: _map(spec.Options, 'Value'),
+        });
+      } else if (spec.AllowOpenText) {
+        c.push({
+          type: 'input',
+          label: spec.Name,
+          name: spec.Name.replace(/ /g, ''),
+          value: spec.DefaultValue,
+        });
+      }
+    }
+    c.push({
+      type: 'addtocart',
+      label: 'Add to Cart',
+      name: 'quantity',
+      min: 1,
+      step: 1,
+      validation: [Validators.required, ProductQtyValidator(this.product)],
+      options: _map(this.product.PriceSchedule.PriceBreaks, 'Quantity'),
+    });
+    return c;
   }
 
   createGroup() {
@@ -74,7 +122,119 @@ export class SpecFormComponent implements OnInit {
   handleSubmit(event: Event) {
     event.preventDefault();
     event.stopPropagation();
-    this.submit.emit({ event: event, values: this.value });
+    this.submit.emit({
+      type: 'Submit',
+      quantity: this.getQuantity(),
+      specs: this.getSpecs(),
+      valid: this.valid,
+      price: this.getPrice(),
+    });
+  }
+
+  handleChange() {
+    this.change.emit({
+      type: 'Change',
+      quantity: this.getQuantity(),
+      specs: this.getSpecs(),
+      valid: this.valid,
+      price: this.getPrice(),
+    });
+  }
+
+  getPrice(): number {
+    // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
+    // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
+    // is the cost per item.
+    if (
+      !this.product.PriceSchedule &&
+      !this.product.PriceSchedule.PriceBreaks.length &&
+      this.product.PriceSchedule.PriceBreaks[0].Price === 0
+    ) {
+      return 0;
+    }
+    const priceBreaks = this.product.PriceSchedule.PriceBreaks;
+    const startingBreak = _minBy(priceBreaks, 'Quantity');
+
+    const selectedBreak = priceBreaks.reduce((current, candidate) => {
+      return candidate.Quantity > current.Quantity &&
+        candidate.Quantity <= this.value.quantity
+        ? candidate
+        : current;
+    }, startingBreak);
+    const markup = this.totalSpecMarkup(selectedBreak.Price);
+    return (selectedBreak.Price + markup) * this.value.quantity;
+  }
+
+  totalSpecMarkup(unitPrice: number): number {
+    const markups: Array<number> = new Array<number>();
+    for (const value in this.value) {
+      if (this.value.hasOwnProperty(value)) {
+        const spec = this.getSpec(value);
+        if (!spec) continue;
+        const option = this.getOption(spec, this.value[value]);
+        if (option) {
+          markups.push(
+            this.singleSpecMarkup(unitPrice, this.value.quantity, option)
+          );
+        }
+      }
+    }
+    return markups.reduce((x, acc) => x + acc, 0); //sum
+  }
+
+  singleSpecMarkup(
+    unitPrice: number,
+    quantity: number,
+    option: SpecOption
+  ): number {
+    switch (option.PriceMarkupType) {
+      case 'NoMarkup':
+        return 0;
+      case 'AmountPerQuantity':
+        return option.PriceMarkup;
+      case 'AmountTotal':
+        return option.PriceMarkup / quantity;
+      case 'Percentage':
+        return option.PriceMarkup * unitPrice * 0.01;
+    }
+  }
+
+  getSpec(value: any): BuyerSpec {
+    return _find(
+      this.specs.Items,
+      (item) => item.Name.replace(/ /g, '') === value
+    ) as BuyerSpec;
+  }
+
+  getSpecs(): Array<LineItemSpec> {
+    const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
+    for (const value in this.value) {
+      if (this.value.hasOwnProperty(value)) {
+        const spec = this.getSpec(value);
+        if (!spec) continue;
+        const option = this.getOption(spec, this.value[value]);
+        if (option) {
+          specs.push({
+            SpecID: spec.ID,
+            OptionID: option.ID,
+            Value: option.Value,
+          });
+        }
+      }
+    }
+    return specs;
+  }
+
+  getOption(spec: BuyerSpec, value: any): SpecOption {
+    if (typeof value === 'boolean') {
+      return spec.Options[value ? 1 : 0] as SpecOption;
+    }
+
+    return _find(spec.Options, (o) => o.Value === value) as SpecOption;
+  }
+
+  getQuantity(): number {
+    return this.value.quantity || 0;
   }
 
   setDisabled(name: string, disable: boolean) {

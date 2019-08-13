@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Validators } from '@angular/forms';
 import {
   find as _find,
   difference as _difference,
@@ -9,21 +8,11 @@ import {
   minBy as _minBy,
 } from 'lodash';
 
-import {
-  BuyerProduct,
-  SpecOption,
-  ListBuyerSpec,
-  LineItemSpec,
-  BuyerSpec,
-} from '@ordercloud/angular-sdk';
+import { BuyerProduct, ListBuyerSpec } from '@ordercloud/angular-sdk';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
-import {
-  ProductQtyValidator,
-  CartService,
-  AppStateService,
-} from '@app-buyer/shared';
+import { CartService, AppStateService } from '@app-buyer/shared';
 import { ocAppConfig } from '@app-buyer/config/app.config';
-import { FieldConfig } from '@app-buyer/product/components/spec-form/field-config.interface';
+import { SpecFormEvent } from '@app-buyer/product/models/spec-form-values.interface';
 
 @Component({
   selector: 'product-details',
@@ -35,7 +24,6 @@ export class ProductDetailsComponent implements OnInit {
   product: BuyerProduct;
   relatedProducts: BuyerProduct[];
   imageUrls: string[] = [];
-  specConfig: FieldConfig[];
   price: number;
 
   constructor(
@@ -50,93 +38,21 @@ export class ProductDetailsComponent implements OnInit {
     this.product = this.activatedRoute.snapshot.data.product;
     this.specs = this.activatedRoute.snapshot.data.specs;
     this.relatedProducts = this.activatedRoute.snapshot.data.relatedProducts;
-    this.specConfig = this.createSpecForm(
-      this.activatedRoute.snapshot.data.specs
-    );
   }
 
   routeToProductList(): void {
     this.router.navigate(['/products']);
   }
 
-  createSpecForm(specs: ListBuyerSpec): FieldConfig[] {
-    const c: FieldConfig[] = [];
-    for (const spec of specs.Items) {
-      if (spec.Name === 'Direct To Garment') {
-        c.push({
-          type: 'checkbox',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          value: spec.DefaultOptionID,
-          options: _map(spec.Options, 'Value'),
-        });
-      } else if (spec.Options.length > 1) {
-        c.push({
-          type: 'select',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          value: spec.DefaultOptionID,
-          options: _map(spec.Options, 'Value'),
-        });
-      } else if (spec.AllowOpenText) {
-        c.push({
-          type: 'input',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          value: spec.DefaultValue,
-        });
-      }
+  handleChange(event: SpecFormEvent): void {
+    if (event.type === 'Change') {
+      this.price = event.price;
     }
-    c.push({
-      type: 'addtocart',
-      label: 'Add to Cart',
-      name: 'quantity',
-      min: 1,
-      step: 1,
-      validation: [Validators.required, ProductQtyValidator(this.product)],
-      options: _map(this.product.PriceSchedule.PriceBreaks, 'Quantity'),
-    });
-    return c;
-  }
-
-  handleChange(event: any): void {
-    if (event.event === 'OnChange') {
-      this.qtyChanged(event.values);
-    }
-  }
-
-  private selectedSpecs(values: any): Array<LineItemSpec> {
-    const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
-    for (const value in values) {
-      if (values.hasOwnProperty(value)) {
-        const spec = _find(
-          this.specs.Items,
-          (item) => item.Name.replace(/ /g, '') === value
-        ) as BuyerSpec;
-        if (!spec) continue;
-        const option = _find(
-          spec.Options,
-          (o) => o.Value === values[value]
-        ) as SpecOption;
-        if (option) {
-          specs.push({
-            SpecID: spec.ID,
-            OptionID: option.ID,
-            Value: option.Value,
-          });
-        }
-      }
-    }
-    return specs;
   }
 
   addToCart(event: any): void {
     this.cartService
-      .addToCart(
-        this.product.ID,
-        event.values.quantity,
-        this.selectedSpecs(event.values)
-      )
+      .addToCart(this.product.ID, event.values.quantity, event.values.specs)
       .subscribe(() => {
         this.appStateService.addToCartSubject.next({
           product: this.product,
@@ -161,48 +77,7 @@ export class ProductDetailsComponent implements OnInit {
         ? candidate
         : current;
     }, startingBreak);
-    const markup = this.totalSpecMarkup(selectedBreak.Price, values);
-    this.price = (selectedBreak.Price + markup) * values.quantity;
-  }
-
-  totalSpecMarkup(unitPrice: number, values: any): number {
-    const markups: Array<number> = new Array<number>();
-    for (const value in values) {
-      if (values.hasOwnProperty(value)) {
-        const spec = _find(
-          this.specs.Items,
-          (item) => item.Name.replace(/ /g, '') === value
-        ) as BuyerSpec;
-        if (!spec) continue;
-        const option = _find(
-          spec.Options,
-          (o) => o.Value === values[value] && o.PriceMarkupType !== 'NoMarkup'
-        ) as SpecOption;
-        if (option) {
-          markups.push(
-            this.singleSpecMarkup(unitPrice, values.quantity, option)
-          );
-        }
-      }
-    }
-    return markups.reduce((x, acc) => x + acc, 0); //sum
-  }
-
-  singleSpecMarkup(
-    unitPrice: number,
-    quantity: number,
-    option: SpecOption
-  ): number {
-    switch (option.PriceMarkupType) {
-      case 'NoMarkup':
-        return 0;
-      case 'AmountPerQuantity':
-        return option.PriceMarkup;
-      case 'AmountTotal':
-        return option.PriceMarkup / quantity;
-      case 'Percentage':
-        return option.PriceMarkup * unitPrice * 0.01;
-    }
+    this.price = selectedBreak.Price * values.quantity;
   }
 
   isOrderable(): boolean {
