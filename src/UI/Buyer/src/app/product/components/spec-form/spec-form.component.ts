@@ -1,5 +1,5 @@
 import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { map as _map, find as _find, minBy as _minBy } from 'lodash';
 
 import { FieldConfig } from './field-config.interface';
@@ -65,12 +65,14 @@ export class SpecFormComponent implements OnInit {
     const c: FieldConfig[] = [];
     for (const spec of this.specs.Items) {
       if (spec.Name === 'Direct To Garment') {
+        // TODO: change this to reflect on xp property for control type
         c.push({
           type: 'checkbox',
           label: spec.Name,
           name: spec.Name.replace(/ /g, ''),
           value: spec.DefaultOptionID,
           options: _map(spec.Options, 'Value'),
+          validation: [Validators.required],
         });
       } else if (spec.Options.length > 1) {
         c.push({
@@ -79,6 +81,7 @@ export class SpecFormComponent implements OnInit {
           name: spec.Name.replace(/ /g, ''),
           value: spec.DefaultOptionID,
           options: _map(spec.Options, 'Value'),
+          validation: [spec.Required ? Validators.required : null],
         });
       } else if (spec.AllowOpenText) {
         c.push({
@@ -86,6 +89,7 @@ export class SpecFormComponent implements OnInit {
           label: spec.Name,
           name: spec.Name.replace(/ /g, ''),
           value: spec.DefaultValue,
+          validation: [spec.Required ? Validators.required : null],
         });
       }
     }
@@ -114,24 +118,22 @@ export class SpecFormComponent implements OnInit {
     event.stopPropagation();
     this.submit.emit({
       type: 'Submit',
-      quantity: this.getQuantity(),
       specs: this.getSpecs(),
       valid: this.valid,
-      markup: this.getPrice(),
+      markup: this.getMarkup(),
     } as SpecFormEvent);
   }
 
   handleChange() {
     this.change.emit({
       type: 'Change',
-      quantity: this.getQuantity(),
       specs: this.getSpecs(),
       valid: this.valid,
-      markup: 5, // this.getPrice(),
+      markup: this.getMarkup(),
     } as SpecFormEvent);
   }
 
-  getPrice(): number {
+  getMarkup(): number {
     // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
     // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
     // is the cost per item.
@@ -221,10 +223,6 @@ export class SpecFormComponent implements OnInit {
     }
 
     return _find(spec.Options, (o) => o.Value === value) as SpecOption;
-  }
-
-  getQuantity(): number {
-    return this.value.quantity || 0;
   }
 
   setDisabled(name: string, disable: boolean) {
