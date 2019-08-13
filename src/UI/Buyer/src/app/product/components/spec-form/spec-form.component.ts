@@ -1,5 +1,5 @@
 import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { map as _map, find as _find, minBy as _minBy } from 'lodash';
 
 import { FieldConfig } from './field-config.interface';
@@ -10,7 +10,6 @@ import {
   BuyerSpec,
   SpecOption,
 } from '@ordercloud/angular-sdk';
-import { ProductQtyValidator } from '@app-buyer/shared';
 import { SpecFormEvent } from '@app-buyer/product/models/spec-form-values.interface';
 
 @Component({
@@ -90,15 +89,6 @@ export class SpecFormComponent implements OnInit {
         });
       }
     }
-    c.push({
-      type: 'addtocart',
-      label: 'Add to Cart',
-      name: 'quantity',
-      min: 1,
-      step: 1,
-      validation: [Validators.required, ProductQtyValidator(this.product)],
-      options: _map(this.product.PriceSchedule.PriceBreaks, 'Quantity'),
-    });
     return c;
   }
 
@@ -127,8 +117,8 @@ export class SpecFormComponent implements OnInit {
       quantity: this.getQuantity(),
       specs: this.getSpecs(),
       valid: this.valid,
-      price: this.getPrice(),
-    });
+      markup: this.getPrice(),
+    } as SpecFormEvent);
   }
 
   handleChange() {
@@ -137,8 +127,8 @@ export class SpecFormComponent implements OnInit {
       quantity: this.getQuantity(),
       specs: this.getSpecs(),
       valid: this.valid,
-      price: this.getPrice(),
-    });
+      markup: 5, // this.getPrice(),
+    } as SpecFormEvent);
   }
 
   getPrice(): number {

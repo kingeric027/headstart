@@ -29,23 +29,26 @@
           >
           </shared-toggle-favorite>
         </div>
-        <div class="ml-auto" *ngIf="isOrderable() && specs.Items.length === 0">
+        <div class="ml-auto" *ngIf="isOrderable()">
           <shared-quantity-input
             class="d-inline-block"
             style="max-width: 100px"
             [product]="product"
             [existingQty]="!matchingLi ? null : matchingLi.Quantity"
-            (qtyChanged)="qtyChanged($event)"
             (addedToCart)="addToCart($event)"
           >
           </shared-quantity-input>
-          <button class="btn btn-primary ml-2" type="submit">
+          <button
+            [disabled]="!specForm?.valid"
+            class="btn btn-primary ml-2"
+            type="submit"
+            (click)="quantityInputComponent.addToCart($event)"
+          >
             Add to Cart
-            <span class="badge badge-light ml-2">{{ price | currency }}</span>
+            <span class="badge badge-light ml-2">{{
+              getTotalPrice() | currency
+            }}</span>
           </button>
-        </div>
-        <div class="ml-auto" *ngIf="specs.Items.length > 0">
-          <h1 class="h1 my-0">{{ price | currency }}</h1>
         </div>
       </div>
       <hr />
