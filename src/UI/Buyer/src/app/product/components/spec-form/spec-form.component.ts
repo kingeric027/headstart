@@ -64,17 +64,7 @@ export class SpecFormComponent implements OnInit {
   createFieldConfig(): FieldConfig[] {
     const c: FieldConfig[] = [];
     for (const spec of this.specs.Items) {
-      if (spec.Name === 'Direct To Garment') {
-        // TODO: change this to reflect on xp property for control type
-        c.push({
-          type: 'checkbox',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          value: spec.DefaultOptionID,
-          options: _map(spec.Options, 'Value'),
-          validation: [Validators.required],
-        });
-      } else if (spec.Options.length > 1) {
+      if (spec.Options.length > 1) {
         c.push({
           type: 'select',
           label: spec.Name,
