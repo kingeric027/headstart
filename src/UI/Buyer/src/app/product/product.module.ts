@@ -27,6 +27,7 @@ import { SpecFormInputComponent } from './components/spec-form/spec-form-input/s
 import { SpecFormNumberComponent } from './components/spec-form/spec-form-number/spec-form-number.component';
 import { SpecFormSelectComponent } from './components/spec-form/spec-form-select/spec-form-select.component';
 import { SpecFormAddToCartComponent } from './components/spec-form/spec-form-add-to-cart/spec-form-add-to-cart.component';
+import { SpecFormCheckboxComponent } from './components/spec-form/spec-form-checkbox/spec-form-checkbox.component';
 
 @NgModule({
   imports: [
@@ -52,6 +53,7 @@ import { SpecFormAddToCartComponent } from './components/spec-form/spec-form-add
     SpecFormNumberComponent,
     SpecFormSelectComponent,
     SpecFormAddToCartComponent,
+    SpecFormCheckboxComponent,
   ],
   providers: [
     MeListProductResolver,
@@ -68,6 +70,7 @@ import { SpecFormAddToCartComponent } from './components/spec-form/spec-form-add
     SpecFormNumberComponent,
     SpecFormSelectComponent,
     SpecFormAddToCartComponent,
+    SpecFormCheckboxComponent,
   ],
 })
 export class ProductsModule {}

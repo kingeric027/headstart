@@ -44,7 +44,13 @@ export class SpecFormComponent implements OnInit {
   ngOnInit() {
     this.form = this.createGroup();
     this.form.valueChanges.subscribe((e: any) => {
-      this.change.emit({ event: 'OnChange', values: e });
+      const values: any = {};
+      for (const value in e) {
+        if (value !== 'ctrls') {
+          values[value] = e[value];
+        }
+      }
+      this.change.emit({ event: 'OnChange', values: values });
     });
   }
 

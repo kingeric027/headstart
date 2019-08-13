@@ -16,6 +16,7 @@ import { SpecFormTextAreaComponent } from './spec-form-textarea/spec-form-textar
 import { SpecFormAddToCartComponent } from './spec-form-add-to-cart/spec-form-add-to-cart.component';
 import { FieldConfig } from './field-config.interface';
 import { Field } from './field.interface';
+import { SpecFormCheckboxComponent } from './spec-form-checkbox/spec-form-checkbox.component';
 
 const components = {
   button: SpecFormButtonComponent,
@@ -23,6 +24,7 @@ const components = {
   number: SpecFormNumberComponent,
   select: SpecFormSelectComponent,
   textarea: SpecFormTextAreaComponent,
+  checkbox: SpecFormCheckboxComponent,
   addtocart: SpecFormAddToCartComponent,
 };
 

@@ -62,12 +62,20 @@ export class ProductDetailsComponent implements OnInit {
   createSpecForm(specs: ListBuyerSpec): FieldConfig[] {
     const c: FieldConfig[] = [];
     for (const spec of specs.Items) {
-      if (spec.Options.length > 1) {
+      if (spec.Name === 'Direct To Garment') {
+        c.push({
+          type: 'checkbox',
+          label: spec.Name,
+          name: spec.Name.replace(/ /g, ''),
+          value: spec.DefaultOptionID,
+          options: _map(spec.Options, 'Value'),
+        });
+      } else if (spec.Options.length > 1) {
         c.push({
           type: 'select',
           label: spec.Name,
           name: spec.Name.replace(/ /g, ''),
-          value: spec.Options[0].Value,
+          value: spec.DefaultOptionID,
           options: _map(spec.Options, 'Value'),
         });
       } else if (spec.AllowOpenText) {
@@ -100,8 +108,7 @@ export class ProductDetailsComponent implements OnInit {
   private selectedSpecs(values: any): Array<LineItemSpec> {
     const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
     for (const value in values) {
-      //if (event.hasOwnProperty(value) && value !== 'ctrls') {
-      if (value !== 'ctrls') {
+      if (values.hasOwnProperty(value)) {
         const spec = _find(
           this.specs.Items,
           (item) => item.Name.replace(/ /g, '') === value
@@ -161,7 +168,7 @@ export class ProductDetailsComponent implements OnInit {
   totalSpecMarkup(unitPrice: number, values: any): number {
     const markups: Array<number> = new Array<number>();
     for (const value in values) {
-      if (values.hasOwnProperty(value) && value !== 'ctrls') {
+      if (values.hasOwnProperty(value)) {
         const spec = _find(
           this.specs.Items,
           (item) => item.Name.replace(/ /g, '') === value
