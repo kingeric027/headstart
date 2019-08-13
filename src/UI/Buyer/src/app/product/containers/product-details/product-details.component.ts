@@ -14,6 +14,7 @@ import {
   SpecOption,
   ListBuyerSpec,
   LineItemSpec,
+  BuyerSpec,
 } from '@ordercloud/angular-sdk';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
 import {
@@ -96,25 +97,39 @@ export class ProductDetailsComponent implements OnInit {
     }
   }
 
-  addToCart(event: any): void {
+  private selectedSpecs(values: any): Array<LineItemSpec> {
     const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
-    for (const spec in event.values) {
-      if (event.values.hasOwnProperty(spec) && spec !== 'ctrls') {
-        this.specs.Items.forEach((s) => {
-          s.Options.forEach((option) => {
-            if (option.Value === event.values[spec]) {
-              specs.push({
-                SpecID: s.ID,
-                OptionID: option.ID,
-                Value: option.Value,
-              });
-            }
+    for (const value in values) {
+      //if (event.hasOwnProperty(value) && value !== 'ctrls') {
+      if (value !== 'ctrls') {
+        const spec = _find(
+          this.specs.Items,
+          (item) => item.Name.replace(/ /g, '') === value
+        ) as BuyerSpec;
+        if (!spec) continue;
+        const option = _find(
+          spec.Options,
+          (o) => o.Value === values[value]
+        ) as SpecOption;
+        if (option) {
+          specs.push({
+            SpecID: spec.ID,
+            OptionID: option.ID,
+            Value: option.Value,
           });
-        });
+        }
       }
     }
+    return specs;
+  }
+
+  addToCart(event: any): void {
     this.cartService
-      .addToCart(this.product.ID, event.values.quantity, specs)
+      .addToCart(
+        this.product.ID,
+        event.values.quantity,
+        this.selectedSpecs(event.values)
+      )
       .subscribe(() => {
         this.appStateService.addToCartSubject.next({
           product: this.product,
@@ -145,17 +160,22 @@ export class ProductDetailsComponent implements OnInit {
 
   totalSpecMarkup(unitPrice: number, values: any): number {
     const markups: Array<number> = new Array<number>();
-    for (const spec in values) {
-      if (values.hasOwnProperty(spec) && spec !== 'ctrls') {
-        this.specs.Items.forEach((s) => {
-          s.Options.forEach((option) => {
-            if (option.Value === values[spec]) {
-              markups.push(
-                this.singleSpecMarkup(unitPrice, values.quantity, option)
-              );
-            }
-          });
-        });
+    for (const value in values) {
+      if (values.hasOwnProperty(value) && value !== 'ctrls') {
+        const spec = _find(
+          this.specs.Items,
+          (item) => item.Name.replace(/ /g, '') === value
+        ) as BuyerSpec;
+        if (!spec) continue;
+        const option = _find(
+          spec.Options,
+          (o) => o.Value === values[value] && o.PriceMarkupType !== 'NoMarkup'
+        ) as SpecOption;
+        if (option) {
+          markups.push(
+            this.singleSpecMarkup(unitPrice, values.quantity, option)
+          );
+        }
       }
     }
     return markups.reduce((x, acc) => x + acc, 0); //sum
@@ -164,17 +184,17 @@ export class ProductDetailsComponent implements OnInit {
   singleSpecMarkup(
     unitPrice: number,
     quantity: number,
-    spec: SpecOption
+    option: SpecOption
   ): number {
-    switch (spec.PriceMarkupType) {
+    switch (option.PriceMarkupType) {
       case 'NoMarkup':
         return 0;
       case 'AmountPerQuantity':
-        return spec.PriceMarkup;
+        return option.PriceMarkup;
       case 'AmountTotal':
-        return spec.PriceMarkup / quantity;
+        return option.PriceMarkup / quantity;
       case 'Percentage':
-        return spec.PriceMarkup * unitPrice * 0.01;
+        return option.PriceMarkup * unitPrice * 0.01;
     }
   }
 
