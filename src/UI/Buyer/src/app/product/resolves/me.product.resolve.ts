@@ -9,8 +9,30 @@ import {
   ListCategory,
 } from '@ordercloud/angular-sdk';
 import { each as _each } from 'lodash';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
+
+@Injectable()
+export class MeListRelatedProductsResolver
+  implements Resolve<ListBuyerProduct> {
+  constructor(private service: OcMeService) {}
+
+  resolve(
+    route: ActivatedRouteSnapshot
+  ): Observable<Array<BuyerProduct>> | Promise<Array<BuyerProduct>> | any {
+    const product = route.parent.data.product as BuyerProduct;
+    if (!product.xp || !product.xp.RelatedProducts) {
+      return of([]);
+    }
+    const calls: Array<Promise<BuyerProduct>> = new Array<
+      Promise<BuyerProduct>
+    >();
+    product.xp.RelatedProducts.forEach((id: string) => {
+      calls.push(this.service.GetProduct(id).toPromise());
+    });
+    return Promise.all(calls);
+  }
+}
 
 @Injectable()
 export class MeListProductResolver implements Resolve<ListBuyerProduct> {

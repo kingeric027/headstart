@@ -79,7 +79,7 @@
     "triple-equals": [true, "allow-null-check"],
     "unified-signatures": true,
     "variable-name": false,
-    "directive-selector": [true, "attribute", "app", "camelCase"],
+    "directive-selector": [true, ["element", "attribute"], "oc", "camelCase"],
     "component-selector": [
       true,
       "element",
@@ -92,7 +92,8 @@
         "product",
         "order",
         "checkout",
-        "static"
+        "static",
+        "spec"
       ],
       "kebab-case"
     ],

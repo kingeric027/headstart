@@ -59,6 +59,7 @@ import { OrderPaymentListComponent } from '@app-buyer/shared/components/payment-
 import { NoResultsComponent } from './components/no-results/no-results.component';
 import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { FastProductCardComponent } from './components/_fast/product-card/product-card.component';
 
 @NgModule({
   imports: [
@@ -132,6 +133,7 @@ import { TranslateModule } from '@ngx-translate/core';
     ModalComponent,
     OrderPaymentListComponent,
     MiniCartComponent,
+    FastProductCardComponent,
   ],
   declarations: [
     OrderStatusDisplayPipe,
@@ -159,6 +161,7 @@ import { TranslateModule } from '@ngx-translate/core';
     ModalComponent,
     OrderPaymentListComponent,
     NoResultsComponent,
+    FastProductCardComponent,
   ],
 })
 export class SharedModule {}

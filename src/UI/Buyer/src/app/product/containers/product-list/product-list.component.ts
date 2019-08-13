@@ -96,10 +96,11 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   private addQueryParam(newParam: object): void {
-    this.router.navigate([], {
+    const queryParams = {
       ...this.activatedRoute.snapshot.queryParams,
       ...newParam,
-    });
+    };
+    this.router.navigate([], { queryParams });
   }
 
   buildBreadCrumbs(catID: string): Category[] {

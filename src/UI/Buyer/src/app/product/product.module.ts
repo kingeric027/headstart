@@ -18,7 +18,16 @@ import {
   MeListSpecsResolver,
   MeSpecsResolver,
   MeListCategoriesResolver,
+  MeListRelatedProductsResolver,
 } from './resolves/me.product.resolve';
+import { SpecFieldDirective } from './components/spec-form/spec-field.directive';
+import { SpecFormTextAreaComponent } from './components/spec-form/spec-form-textarea/spec-form-textarea.component';
+import { SpecFormButtonComponent } from './components/spec-form/spec-form-button/spec-form-button.component';
+import { SpecFormInputComponent } from './components/spec-form/spec-form-input/spec-form-input.component';
+import { SpecFormNumberComponent } from './components/spec-form/spec-form-number/spec-form-number.component';
+import { SpecFormSelectComponent } from './components/spec-form/spec-form-select/spec-form-select.component';
+import { SpecFormAddToCartComponent } from './components/spec-form/spec-form-add-to-cart/spec-form-add-to-cart.component';
+import { SpecFormCheckboxComponent } from './components/spec-form/spec-form-checkbox/spec-form-checkbox.component';
 
 @NgModule({
   imports: [
@@ -37,6 +46,14 @@ import {
     FacetFilterComponent,
     FacetListComponent,
     SpecFormComponent,
+    SpecFieldDirective,
+    SpecFormTextAreaComponent,
+    SpecFormButtonComponent,
+    SpecFormInputComponent,
+    SpecFormNumberComponent,
+    SpecFormSelectComponent,
+    SpecFormAddToCartComponent,
+    SpecFormCheckboxComponent,
   ],
   providers: [
     MeListProductResolver,
@@ -44,6 +61,16 @@ import {
     MeListSpecsResolver,
     MeSpecsResolver,
     MeListCategoriesResolver,
+    MeListRelatedProductsResolver,
+  ],
+  entryComponents: [
+    SpecFormTextAreaComponent,
+    SpecFormButtonComponent,
+    SpecFormInputComponent,
+    SpecFormNumberComponent,
+    SpecFormSelectComponent,
+    SpecFormAddToCartComponent,
+    SpecFormCheckboxComponent,
   ],
 })
 export class ProductsModule {}
