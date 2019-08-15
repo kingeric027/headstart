@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angu
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { get as _get } from 'lodash';
-import { QuantityLimits } from '../../models/quantity-limits';
+import { QuantityLimits } from '../../../models/quantity-limits';
 
 @Component({
   templateUrl: './quantity-input.component.html',

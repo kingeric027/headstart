@@ -1,7 +1,7 @@
 import { Component, Input, EventEmitter, Output, OnInit, ViewEncapsulation, OnChanges } from '@angular/core';
 import { BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
 import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
-import { QuantityLimits } from '../../models/quantity-limits';
+import { QuantityLimits } from '../../../models/quantity-limits';
 
 @Component({
   templateUrl: './product-card.component.html',

@@ -2,8 +2,8 @@ import { Component, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewChe
 import { Observable } from 'rxjs';
 import { BuyerProduct, BuyerSpec, LineItem } from '@ordercloud/angular-sdk';
 import { find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
-import { QuantityLimits } from '../../models/quantity-limits';
-import { FullSpecOption } from '../../models/full-spec-option.interface';
+import { QuantityLimits } from '../../../models/quantity-limits';
+import { FullSpecOption } from '../../../models/full-spec-option.interface';
 
 @Component({
   templateUrl: './product-details.component.html',
