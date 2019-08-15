@@ -17,5 +17,5 @@
     "paths": {
       "@app-buyer/*": ["src/app/*"]
     }
-  }
+  },
 }

@@ -24,7 +24,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.21",
     "@fortawesome/free-regular-svg-icons": "^5.10.1",
     "@fortawesome/free-solid-svg-icons": "^5.10.1",
-    "@ordercloud/angular-sdk": "^0.0.1-24",
+    "@ordercloud/angular-sdk": "0.0.1-26",
     "@webcomponents/webcomponentsjs": "^2.2.10",
     "bootstrap": "^4.3.1",
     "ngx-cookie": "^4.1.2",
