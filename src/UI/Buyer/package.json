@@ -9,7 +9,8 @@
     "test": "ng test --code-coverage",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "precommit": "lint-staged --config ./lint-staged.config.js"
+    "precommit": "lint-staged --config ./lint-staged.config.js",
+    "preinstall": "cd ../ocm-components && npm i && npm run build"
   },
   "private": true,
   "dependencies": {
