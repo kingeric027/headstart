@@ -35,7 +35,6 @@ import { TermsAndConditionsComponent } from './static-pages/terms-and-conditions
 
 // error handler config
 import { AppErrorHandler } from './config/error-handling.config';
-import '@polymer/paper-checkbox/paper-checkbox.js';
 import { OcmComponentsModule } from 'ocm-components';
 
 @NgModule({
