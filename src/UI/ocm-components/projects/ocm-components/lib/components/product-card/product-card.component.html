@@ -8,7 +8,7 @@
       (favoriteChanged)="setIsFavorite.emit($event)"
     ></ocm-toggle-favorite>
   </div>
-  <img class="card-img-top img-fluid flex-shrink-0" (click)="toDetails(product.ID)" [src]="getImageUrl()" alt="{{ product.ID }}" />
+  <img class="card-img-top img-fluid flex-shrink-0" (click)="toDetails()" [src]="getImageUrl()" alt="{{ product.ID }}" />
   <div class="card-body d-flex flex-column justify-content-between bg-light">
     <h5 class="card-title" title="{{ product.Name }}">{{ product.Name }}</h5>
     <p class="card-text text-muted" [innerHtml]="product.ID">
@@ -42,11 +42,11 @@
     <button *ngIf="shouldDisplayAddToCart" (click)="$event.stopPropagation()" class="btn btn-primary btn-block small" type="submit">
       Add <span class="d-md-none d-lg-inline"> to Cart</span>
     </button>
-    <button *ngIf="isViewOnlyProduct" (click)="toDetails(product.ID)" class="btn btn-default btn-block btn-outline-dark">
+    <button *ngIf="isViewOnlyProduct" (click)="toDetails()" class="btn btn-default btn-block btn-outline-dark">
       View
       <span class="d-sm-none d-lg-inline">Product</span>
     </button>
-    <button *ngIf="hasSpecs" (click)="toDetails(product.ID)" class="btn btn-primary btn-block small">
+    <button *ngIf="hasSpecs" (click)="toDetails()" class="btn btn-primary btn-block small">
       Select
       <span class="d-sm-none d-lg-inline">Specs</span>
     </button>

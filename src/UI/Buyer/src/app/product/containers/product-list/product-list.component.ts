@@ -2,21 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, Params } from '@angular/router';
 import { Observable } from 'rxjs';
 import { flatMap, tap } from 'rxjs/operators';
-import {
-  ListBuyerProduct,
-  OcMeService,
-  Category,
-  ListCategory,
-  ListFacet,
-  ListLineItem,
-  LineItem,
-} from '@ordercloud/angular-sdk';
-import {
-  CartService,
-  AppStateService,
-  ModalService,
-  BuildQtyLimits,
-} from '@app-buyer/shared';
+import { ListBuyerProduct, OcMeService, Category, ListCategory, ListFacet, ListLineItem, LineItem } from '@ordercloud/angular-sdk';
+import { CartService, AppStateService, ModalService, BuildQtyLimits } from '@app-buyer/shared';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
 import { ProductSortStrategy } from '@app-buyer/product/models/product-sort-strategy.enum';
@@ -60,21 +47,16 @@ export class ProductListComponent implements OnInit {
     this.sortBy = this.activatedRoute.queryParams['sortBy'];
 
     this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
-    this.categoryCrumbs = this.buildBreadCrumbs(
-      this.activatedRoute.snapshot.queryParams.category
-    );
+    this.categoryCrumbs = this.buildBreadCrumbs(this.activatedRoute.snapshot.queryParams.category);
     this.configureRouter();
-    this.appStateService.lineItemSubject.subscribe(
-      (lineItems) => (this.lineItems = lineItems)
-    );
+    this.appStateService.lineItemSubject.subscribe((lineItems) => (this.lineItems = lineItems));
   }
 
   getProductData(): Observable<ListBuyerProduct> {
     return this.activatedRoute.queryParams.pipe(
       tap((queryParams) => {
         this.hasQueryParams = !_isEmpty(queryParams);
-        this.hasFavoriteProductsFilter =
-          queryParams.favoriteProducts === 'true';
+        this.hasFavoriteProductsFilter = queryParams.favoriteProducts === 'true';
         this.categoryCrumbs = this.buildBreadCrumbs(queryParams.category);
         this.searchTerm = queryParams.search || null;
       }),
@@ -94,9 +76,7 @@ export class ProductListComponent implements OnInit {
           .pipe(
             tap((productList) => {
               this.facets = productList.Meta.Facets;
-              this.quantityLimits = productList.Items.map((p) =>
-                BuildQtyLimits(p)
-              );
+              this.quantityLimits = productList.Items.map((p) => BuildQtyLimits(p));
             })
           );
       })
@@ -111,9 +91,7 @@ export class ProductListComponent implements OnInit {
     }
     const result = {};
     _each(queryParams, (queryParamVal, queryParamName) => {
-      const facetDefinition = this.facets.find(
-        (facet) => facet.Name === queryParamName
-      );
+      const facetDefinition = this.facets.find((facet) => facet.Name === queryParamName);
       if (facetDefinition) {
         result[`xp.${facetDefinition.XpPath}`] = queryParamVal;
       }
@@ -124,10 +102,7 @@ export class ProductListComponent implements OnInit {
   private buildFavoritesFilter(queryParams: Params): Params {
     const filter = {};
     const favorites = this.favoriteProductsService.getFavorites();
-    filter['ID'] =
-      queryParams.favoriteProducts === 'true' && favorites
-        ? favorites.join('|')
-        : undefined;
+    filter['ID'] = queryParams.favoriteProducts === 'true' && favorites ? favorites.join('|') : undefined;
     return filter;
   }
 
@@ -140,26 +115,27 @@ export class ProductListComponent implements OnInit {
       filter['xp.Price'] = `<=${queryParams.maxPrice}`;
     }
     if (queryParams.minPrice && queryParams.maxPrice) {
-      filter['xp.Price'] = [
-        `>=${queryParams.minPrice}`,
-        `<=${queryParams.maxPrice}`,
-      ];
+      filter['xp.Price'] = [`>=${queryParams.minPrice}`, `<=${queryParams.maxPrice}`];
     }
     return filter;
   }
 
   getCategories(): void {
-    this.ocMeService
-      .ListCategories({ depth: 'all' })
-      .subscribe((categories) => {
-        this.categories = categories;
-        const categoryID = this.activatedRoute.snapshot.queryParams.category;
-        this.categoryCrumbs = this.buildBreadCrumbs(categoryID);
-      });
+    this.ocMeService.ListCategories({ depth: 'all' }).subscribe((categories) => {
+      this.categories = categories;
+      const categoryID = this.activatedRoute.snapshot.queryParams.category;
+      this.categoryCrumbs = this.buildBreadCrumbs(categoryID);
+    });
   }
 
   routeHome() {
     this.router.navigate(['/home']);
+  }
+
+  toDetails(productID: string) {
+    debugger;
+    if (!productID) return;
+    this.router.navigate([`/products/${productID}`]);
   }
 
   clearAllFilters() {
