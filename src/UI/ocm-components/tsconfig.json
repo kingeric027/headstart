@@ -17,7 +17,15 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ocm-components": [
+        "dist/ocm-components"
+      ],
+      "ocm-components/*": [
+        "dist/ocm-components/*"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

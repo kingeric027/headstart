@@ -42,25 +42,17 @@ import { LineItemCardComponent } from '@app-buyer/shared/components/line-item-ca
 import { LineItemListWrapperComponent } from '@app-buyer/shared/components/lineitem-list-wrapper/lineitem-list-wrapper.component';
 
 // containers
-import {
-  ShipperTrackingPipe,
-  ShipperTrackingSupportedPipe,
-} from '@app-buyer/shared/pipes/shipperTracking/shipperTracking.pipe';
+import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from '@app-buyer/shared/pipes/shipperTracking/shipperTracking.pipe';
 import { MapToIterablePipe } from '@app-buyer/shared/pipes/map-to-iterable/map-to-iterable.pipe';
 import { GenericBrowseComponent } from '@app-buyer/shared/components/generic-browse/generic-browse.component';
-import {
-  ModalComponent,
-  ResetDirective,
-} from '@app-buyer/shared/components/modal/modal.component';
+import { ModalComponent, ResetDirective } from '@app-buyer/shared/components/modal/modal.component';
 import { OrderPaymentListComponent } from '@app-buyer/shared/components/payment-list/order-payment-list.component';
 import { NoResultsComponent } from './components/no-results/no-results.component';
 import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
-import { OcmModule } from '@app-buyer/ocm/ocm.module';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
-    OcmModule,
     SharedRoutingModule,
     // angular
     CommonModule,

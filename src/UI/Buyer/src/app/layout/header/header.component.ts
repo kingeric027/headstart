@@ -1,25 +1,7 @@
-import {
-  Component,
-  OnInit,
-  Inject,
-  ViewChild,
-  OnDestroy,
-  ElementRef,
-} from '@angular/core';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-buyer/config/app.config';
+import { Component, OnInit, Inject, ViewChild, OnDestroy, ElementRef } from '@angular/core';
+import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { Router, ActivatedRoute } from '@angular/router';
-import {
-  faSearch,
-  faShoppingCart,
-  faPhone,
-  faQuestionCircle,
-  faUserCircle,
-  faSignOutAlt,
-  faHome,
-} from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faShoppingCart, faPhone, faQuestionCircle, faUserCircle, faSignOutAlt, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { AppStateService } from '@app-buyer/shared';
@@ -62,9 +44,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.appStateService.orderSubject
-      .pipe(takeWhile(() => this.alive))
-      .subscribe((order) => (this.currentOrder = order));
+    this.appStateService.orderSubject.pipe(takeWhile(() => this.alive)).subscribe((order) => (this.currentOrder = order));
 
     this.buildAddToCartListener();
     this.clearSearchOnNavigate();
@@ -125,12 +105,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   // TODO: we should move responsibility for 'showing' up to the parent component instead of hard-coding route-names.
   showHeader() {
-    const hiddenRoutes = [
-      '/login',
-      '/register',
-      '/forgot-password',
-      '/reset-password',
-    ];
+    const hiddenRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
     return !hiddenRoutes.some((el) => this.router.url.indexOf(el) > -1);
   }
 

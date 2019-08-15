@@ -7,17 +7,11 @@ import { FooterComponent } from '@app-buyer/layout/footer/footer.component';
 
 import { SharedModule } from '@app-buyer/shared';
 import { HomeComponent } from '@app-buyer/layout/home/home.component';
-import { OcmModule } from '@app-buyer/ocm/ocm.module';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [RouterModule, SharedModule, OcmModule],
+  imports: [RouterModule, SharedModule],
   exports: [HeaderComponent, MainComponent, FooterComponent, HomeComponent],
-  declarations: [
-    HeaderComponent,
-    MainComponent,
-    FooterComponent,
-    HomeComponent,
-  ],
+  declarations: [HeaderComponent, MainComponent, FooterComponent, HomeComponent],
 })
 export class LayoutModule {}

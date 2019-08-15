@@ -22,7 +22,6 @@ export class ProductDetailWrapperComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    debugger;
     this.product = this.activatedRoute.snapshot.data.product;
     this.specs = this.activatedRoute.snapshot.data.specs || [];
     this.quantityLimits = BuildQtyLimits(this.product);

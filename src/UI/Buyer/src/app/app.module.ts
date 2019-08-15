@@ -26,11 +26,7 @@ import { SupportComponent } from './static-pages/support/support.component';
 import { FaqComponent } from './static-pages/faq/faq.component';
 
 // interceptors
-import {
-  AutoAppendTokenInterceptor,
-  RefreshTokenInterceptor,
-  CacheInterceptor,
-} from '@app-buyer/auth';
+import { AutoAppendTokenInterceptor, RefreshTokenInterceptor, CacheInterceptor } from '@app-buyer/auth';
 
 // date picker config
 import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
@@ -39,14 +35,11 @@ import { TermsAndConditionsComponent } from './static-pages/terms-and-conditions
 
 // error handler config
 import { AppErrorHandler } from './config/error-handling.config';
+import '@polymer/paper-checkbox/paper-checkbox.js';
+import { OcmComponentsModule } from 'ocm-components';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    SupportComponent,
-    FaqComponent,
-    TermsAndConditionsComponent,
-  ],
+  declarations: [AppComponent, SupportComponent, FaqComponent, TermsAndConditionsComponent],
   imports: [
     // angular core modules
     BrowserAnimationsModule,
@@ -64,6 +57,7 @@ import { AppErrorHandler } from './config/error-handling.config';
      * can live in shared
      */
     SharedModule,
+    OcmComponentsModule,
     CookieModule.forRoot(),
     NgProgressModule,
     NgProgressHttpModule,
@@ -91,4 +85,4 @@ import { AppErrorHandler } from './config/error-handling.config';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

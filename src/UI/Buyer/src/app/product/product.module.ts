@@ -9,7 +9,6 @@ import { SortFilterComponent } from '@app-buyer/product/components/sort-filter/s
 import { FacetFilterComponent } from '@app-buyer/product/components/facet-filter/facet-filter.component';
 import { FacetListComponent } from '@app-buyer/product/components/facet-list/facet-list.component';
 import { ProductDetailWrapperComponent } from './containers/product-detail-wrapper/product-detail-wrapper.component';
-import { OcmModule } from '@app-buyer/ocm/ocm.module';
 import {
   MeListProductResolver,
   MeProductResolver,
@@ -18,10 +17,11 @@ import {
   MeListCategoriesResolver,
   MeListRelatedProductsResolver,
 } from './resolves/me.product.resolve';
+import { OcmComponentsModule } from 'ocm-components';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [SharedModule, ProductsRoutingModule, TreeModule, OcmModule],
+  imports: [SharedModule, ProductsRoutingModule, TreeModule, OcmComponentsModule],
   declarations: [
     ProductListComponent,
     ProductDetailWrapperComponent,
