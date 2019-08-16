@@ -1,80 +1,54 @@
 import { Injectable } from '@angular/core';
-import {
-  OcLineItemService,
-  ListLineItem,
-  LineItem,
-  OcOrderService,
-  Order,
-} from '@ordercloud/angular-sdk';
+import { OcLineItemService, ListLineItem, LineItem, OcOrderService, Order } from '@ordercloud/angular-sdk';
 import { AppStateService } from '@app-buyer/shared/services/app-state/app-state.service';
 import { flatMap } from 'rxjs/operators';
-import {
-  isUndefined as _isUndefined,
-  flatMap as _flatMap,
-  get as _get,
-  isEqual as _isEqual,
-  omitBy as _omitBy,
-} from 'lodash';
+import { isUndefined as _isUndefined, flatMap as _flatMap, get as _get, isEqual as _isEqual, omitBy as _omitBy } from 'lodash';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CartService {
   private initializingOrder = false;
-  private currentOrder: Order;
 
   constructor(
     private appStateService: AppStateService,
     private ocLineItemService: OcLineItemService,
     private ocOrderService: OcOrderService
-  ) {
-    this.appStateService.orderSubject.subscribe((order) => {
-      this.currentOrder = order;
-    });
-  }
+  ) {}
 
   async listAllItems(orderID: string): Promise<ListLineItem> {
     const options = {
       page: 1,
       pageSize: 100, // The maximum # of records an OC request can return.
     };
-    const list = await this.ocLineItemService
-      .List('outgoing', orderID, options)
-      .toPromise();
+    const list = await this.ocLineItemService.List('outgoing', orderID, options).toPromise();
     if (list.Meta.TotalPages <= 1) {
       return list;
     }
     // If more than 100 exist, request all the remaining pages.
     const requests = new Array(list.Meta.TotalPages - 1).map(() => {
       options.page++;
-      return this.ocLineItemService
-        .List('outgoing', orderID, options)
-        .toPromise();
+      return this.ocLineItemService.List('outgoing', orderID, options).toPromise();
     });
     const res: ListLineItem[] = await Promise.all(requests);
     const rest = _flatMap(res, (x) => x.Items);
     return { Items: list.Items.concat(rest), Meta: list.Meta };
   }
 
-  buildSpecList(lineItem: LineItem): string {
+  buildSpecDisplayList(lineItem: LineItem): string {
     if (lineItem.Specs.length === 0) return '';
     const list = lineItem.Specs.map((spec) => spec.Value).join(', ');
     return `(${list})`;
   }
 
   async removeItem(lineItemID: string): Promise<void> {
-    await this.ocLineItemService
-      .Delete('outgoing', this.currentOrder.ID, lineItemID)
-      .toPromise();
+    await this.ocLineItemService.Delete('outgoing', this.currentOrder().ID, lineItemID).toPromise();
     this.updateAppState();
   }
 
-  async updateQuantity(
-    lineItemID: string,
-    newQuantity: number
-  ): Promise<LineItem> {
+  async updateQuantity(lineItemID: string, newQuantity: number): Promise<LineItem> {
     const li = await this.ocLineItemService
-      .Patch('outgoing', this.currentOrder.ID, lineItemID, {
+      .Patch('outgoing', this.currentOrder().ID, lineItemID, {
         Quantity: newQuantity,
       })
       .toPromise();
@@ -82,48 +56,49 @@ export class CartService {
     return li;
   }
 
+  async addManyToCart(lineItem: LineItem[]): Promise<LineItem[]> {
+    const req = lineItem.map((li) => this.addToCart(li));
+    return Promise.all(req);
+  }
+
   async addToCart(lineItem: LineItem): Promise<LineItem> {
     // order is well defined, line item can be added
-    if (!_isUndefined(this.currentOrder.DateCreated)) {
-      return this.addLineItem(lineItem);
+    if (!_isUndefined(this.currentOrder().DateCreated)) {
+      return this.createLineItem(lineItem);
     }
     // this is the first line item call - initialize order first
     if (!this.initializingOrder) {
       this.initializingOrder = true;
-      const newOrder = await this.ocOrderService
-        .Create('outgoing', {})
-        .toPromise();
+      const newOrder = await this.ocOrderService.Create('outgoing', {}).toPromise();
       this.initializingOrder = false;
       this.appStateService.orderSubject.next(newOrder);
-      return this.addLineItem(lineItem);
+      return this.createLineItem(lineItem);
     }
     // initializing order - wait until its done
     return this.appStateService.orderSubject
       .pipe(
         flatMap((newOrder) => {
           if (newOrder.ID) {
-            return this.addLineItem(lineItem);
+            return this.createLineItem(lineItem);
           }
         })
       )
       .toPromise();
   }
 
-  private async addLineItem(newLI: LineItem): Promise<LineItem> {
+  private currentOrder(): Order {
+    return this.appStateService.orderSubject.value;
+  }
+
+  private async createLineItem(newLI: LineItem): Promise<LineItem> {
     const lineItems = this.appStateService.lineItemSubject.value;
     // if line item exists simply update quantity, else create
-    const existingLI = lineItems.Items.find((li) =>
-      this.LineItemsMatch(li, newLI)
-    );
+    const existingLI = lineItems.Items.find((li) => this.LineItemsMatch(li, newLI));
 
     newLI.Quantity += _get(existingLI, 'Quantity', 0);
     const request = existingLI
-      ? this.ocLineItemService
-          .Patch('outgoing', this.currentOrder.ID, existingLI.ID, newLI)
-          .toPromise()
-      : this.ocLineItemService
-          .Create('outgoing', this.currentOrder.ID, newLI)
-          .toPromise();
+      ? this.ocLineItemService.Patch('outgoing', this.currentOrder().ID, existingLI.ID, newLI).toPromise()
+      : this.ocLineItemService.Create('outgoing', this.currentOrder().ID, newLI).toPromise();
     const lineitem = await request;
     this.appStateService.addToCartSubject.next(newLI);
     this.updateAppState();
@@ -131,10 +106,8 @@ export class CartService {
   }
 
   private async updateAppState() {
-    const order = await this.ocOrderService
-      .Get('outgoing', this.currentOrder.ID)
-      .toPromise();
-    const lis = await this.listAllItems(this.currentOrder.ID);
+    const order = await this.ocOrderService.Get('outgoing', this.currentOrder().ID).toPromise();
+    const lis = await this.listAllItems(this.currentOrder().ID);
     this.appStateService.orderSubject.next(order);
     this.appStateService.lineItemSubject.next(lis);
   }

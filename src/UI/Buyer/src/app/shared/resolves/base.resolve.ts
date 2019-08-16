@@ -9,6 +9,6 @@ export class BaseResolve implements Resolve<any> {
   constructor(private baseResolveService: BaseResolveService) {}
 
   resolve() {
-    return this.baseResolveService.setUser();
+    return this.baseResolveService.setAppState();
   }
 }

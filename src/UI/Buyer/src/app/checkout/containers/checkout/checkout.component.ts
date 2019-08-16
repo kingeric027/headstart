@@ -66,10 +66,7 @@ export class CheckoutComponent implements OnInit {
   }
 
   toSection(id: string) {
-    const prevIdx = Math.max(
-      this.sections.findIndex((x) => x.id === id) - 1,
-      0
-    );
+    const prevIdx = Math.max(this.sections.findIndex((x) => x.id === id) - 1, 0);
     const prev = this.sections[prevIdx].id;
     this.setValidation(prev, true);
     this.accordian.toggle(id);
@@ -91,7 +88,7 @@ export class CheckoutComponent implements OnInit {
       .subscribe(
         () => {
           this.router.navigateByUrl(`order-confirmation/${orderID}`);
-          this.baseResolveService.resetUser();
+          this.baseResolveService.setCurrentOrder();
         },
         (ex) => {
           // order submit error occurred

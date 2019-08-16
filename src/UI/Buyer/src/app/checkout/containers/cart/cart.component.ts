@@ -1,18 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import {
-  CartService,
-  BaseResolveService,
-  AppStateService,
-  BuildQtyLimits,
-} from '@app-buyer/shared';
-import {
-  Order,
-  LineItem,
-  OcOrderService,
-  ListLineItem,
-  OcMeService,
-  BuyerProduct,
-} from '@ordercloud/angular-sdk';
+import { CartService, BaseResolveService, AppStateService, BuildQtyLimits } from '@app-buyer/shared';
+import { Order, LineItem, OcOrderService, ListLineItem, OcMeService, BuyerProduct } from '@ordercloud/angular-sdk';
 import { Observable, forkJoin } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
@@ -40,22 +28,18 @@ export class CartComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentOrder$ = this.appStateService.orderSubject;
-    this.appStateService.lineItemSubject
-      .pipe(takeWhile(() => this.alive))
-      .subscribe((lis) => {
-        this.lineItems = lis;
-        if (!this.productsSet) {
-          const queue = [];
-          lis.Items.forEach((li) =>
-            queue.push(this.ocMeService.GetProduct(li.ProductID))
-          );
-          forkJoin(queue).subscribe((prods) => {
-            this.products = prods;
-            this.quantityLimits = this.products.map((p) => BuildQtyLimits(p));
-            this.productsSet = true;
-          });
-        }
-      });
+    this.appStateService.lineItemSubject.pipe(takeWhile(() => this.alive)).subscribe((lis) => {
+      this.lineItems = lis;
+      if (!this.productsSet) {
+        const queue = [];
+        lis.Items.forEach((li) => queue.push(this.ocMeService.GetProduct(li.ProductID)));
+        forkJoin(queue).subscribe((prods) => {
+          this.products = prods;
+          this.quantityLimits = this.products.map((p) => BuildQtyLimits(p));
+          this.productsSet = true;
+        });
+      }
+    });
   }
 
   getProduct(li: LineItem): BuyerProduct {
@@ -63,11 +47,9 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   cancelOrder() {
-    this.ocOrderService
-      .Delete('outgoing', this.appStateService.orderSubject.value.ID)
-      .subscribe(() => {
-        this.baseResolveService.resetUser();
-      });
+    this.ocOrderService.Delete('outgoing', this.appStateService.orderSubject.value.ID).subscribe(() => {
+      this.baseResolveService.setCurrentOrder();
+    });
   }
 
   async deleteLineItem(li: LineItem): Promise<void> {

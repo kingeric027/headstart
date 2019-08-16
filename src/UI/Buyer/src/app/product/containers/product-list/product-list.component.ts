@@ -133,7 +133,6 @@ export class ProductListComponent implements OnInit {
   }
 
   toDetails(productID: string) {
-    debugger;
     if (!productID) return;
     this.router.navigate([`/products/${productID}`]);
   }
