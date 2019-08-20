@@ -31,12 +31,7 @@ function maxQty(product: BuyerProduct): number {
 }
 
 function getInventory(product: BuyerProduct): number {
-  if (
-    product.Inventory &&
-    product.Inventory.Enabled &&
-    !product.Inventory.OrderCanExceed &&
-    product.Inventory.QuantityAvailable != null
-  ) {
+  if (product.Inventory && product.Inventory.Enabled && !product.Inventory.OrderCanExceed && product.Inventory.QuantityAvailable != null) {
     return product.Inventory.QuantityAvailable;
   }
   return Infinity;

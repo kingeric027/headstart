@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { get as _get } from 'lodash';
@@ -9,36 +9,35 @@ import { QuantityLimits } from '../../../models/quantity-limits';
   styleUrls: ['./quantity-input.component.scss'],
 })
 export class OCMQuantityInput implements OnInit, OnChanges {
-  @Input() limits: QuantityLimits = {
-    inventory: 0,
-    maxPerOrder: 0,
-    minPerOrder: 0,
-    restrictedQuantities: [],
-  };
+  @Input() limits: QuantityLimits;
   @Input() existingQty: number;
   @Output() qtyChange = new EventEmitter<number>();
 
   form: FormGroup;
-  value: number;
+  isDefaultSet = false;
   isQtyRestricted = false;
 
   constructor() {}
 
-  ngOnChanges() {
+  ngOnInit() {
+    this.form = new FormGroup({
+      quantity: new FormControl(1, [Validators.required]),
+    });
+  }
+
+  ngOnChanges(): void {
     if (!this.limits) return;
     this.isQtyRestricted = this.limits.restrictedQuantities.length !== 0;
-    this.limits.minPerOrder = Math.min(...this.limits.restrictedQuantities);
-    this.value = this.existingQty || this.limits.minPerOrder;
+    if (!this.isDefaultSet) this.setDefault(); // capture default once inputs are set
     this.quantityChangeListener();
     if (!this.existingQty) {
-      this.qtyChange.emit(this.value);
+      this.qtyChange.emit(this.form.get('quantity').value);
     }
   }
 
-  ngOnInit(): void {
-    this.form = new FormGroup({
-      quantity: new FormControl(0, [Validators.required]),
-    });
+  setDefault() {
+    this.isDefaultSet = true;
+    this.form.setValue({ quantity: this.getDefaultQty() });
   }
 
   quantityChangeListener(): void {
@@ -47,6 +46,12 @@ export class OCMQuantityInput implements OnInit, OnChanges {
         this.qtyChange.emit(this.form.value.quantity);
       }
     });
+  }
+
+  getDefaultQty(): number {
+    if (this.existingQty) return this.existingQty;
+    if (this.limits.restrictedQuantities.length) return this.limits.restrictedQuantities[0];
+    return this.limits.minPerOrder;
   }
 
   // TODO - handle these error situations

@@ -1,4 +1,4 @@
-<form [formGroup]="form">
+<form *ngIf="limits" [formGroup]="form">
   <div class="form-group mb-0">
     <label for="quantity" class="sr-only">Product Quantity</label>
     <input
@@ -10,6 +10,7 @@
       placeholder="0"
       style="min-width:65px"
       aria-label="Quantity Input Selector"
+      min="1"
       aria-describedby="quantity"
     />
     <select
