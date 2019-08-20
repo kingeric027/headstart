@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, Params } from '@angular/router';
-import { Observable } from 'rxjs';
-import { flatMap, tap } from 'rxjs/operators';
 import { ListBuyerProduct, OcMeService, Category, ListCategory, ListFacet, ListLineItem, LineItem } from '@ordercloud/angular-sdk';
 import { CartService, AppStateService, ModalService, BuildQtyLimits } from '@app-buyer/shared';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -19,7 +17,6 @@ export class ProductListComponent implements OnInit {
   products: ListBuyerProduct;
   categories: ListCategory;
   categoryCrumbs: Category[] = [];
-  searchTerm = null;
   hasQueryParams = false;
   hasFavoriteProductsFilter = false;
   closeIcon = faTimes;
@@ -50,38 +47,29 @@ export class ProductListComponent implements OnInit {
     this.categoryCrumbs = this.buildBreadCrumbs(this.activatedRoute.snapshot.queryParams.category);
     this.configureRouter();
     this.appStateService.lineItemSubject.subscribe((lineItems) => (this.lineItems = lineItems));
+    this.activatedRoute.queryParams.subscribe(this.onQueryParamsChange);
   }
 
-  getProductData(): Observable<ListBuyerProduct> {
-    return this.activatedRoute.queryParams.pipe(
-      tap((queryParams) => {
-        this.hasQueryParams = !_isEmpty(queryParams);
-        this.hasFavoriteProductsFilter = queryParams.favoriteProducts === 'true';
-        this.categoryCrumbs = this.buildBreadCrumbs(queryParams.category);
-        this.searchTerm = queryParams.search || null;
-      }),
-      flatMap((queryParams) => {
-        return this.ocMeService
-          .ListProducts({
-            categoryID: queryParams.category,
-            page: queryParams.page,
-            search: queryParams.search,
-            sortBy: queryParams.sortBy,
-            filters: {
-              ...this.buildFacetFilters(queryParams),
-              ...this.buildFavoritesFilter(queryParams),
-              ...this.buildPriceFilter(queryParams),
-            },
-          })
-          .pipe(
-            tap((productList) => {
-              this.facets = productList.Meta.Facets;
-              this.quantityLimits = productList.Items.map((p) => BuildQtyLimits(p));
-            })
-          );
+  private onQueryParamsChange = async (queryParams: Params) => {
+    this.hasQueryParams = !_isEmpty(queryParams);
+    this.hasFavoriteProductsFilter = queryParams.favoriteProducts === 'true';
+    this.categoryCrumbs = this.buildBreadCrumbs(queryParams.category);
+    this.products = await this.ocMeService
+      .ListProducts({
+        categoryID: queryParams.category,
+        page: queryParams.page,
+        search: queryParams.search,
+        sortBy: queryParams.sortBy,
+        filters: {
+          ...this.buildFacetFilters(queryParams),
+          ...this.buildFavoritesFilter(queryParams),
+          ...this.buildPriceFilter(queryParams),
+        },
       })
-    );
-  }
+      .toPromise();
+    this.facets = this.products.Meta.Facets;
+    this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
+  };
 
   private buildFacetFilters(queryParams: Params): Params {
     if (!this.facets) {
