@@ -11,40 +11,31 @@ import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
   styleUrls: ['./cart.component.scss'],
 })
 export class CartComponent implements OnInit, OnDestroy {
-  currentOrder$: Observable<Order>;
-  products: BuyerProduct[];
+  order: Order;
   lineItems: ListLineItem;
   quantityLimits: QuantityLimits[];
-  productsSet = false;
   alive = true;
 
   constructor(
     private appStateService: AppStateService,
     private baseResolveService: BaseResolveService,
     private cartService: CartService,
-    private ocOrderService: OcOrderService,
-    private ocMeService: OcMeService
+    private ocOrderService: OcOrderService
   ) {}
 
   ngOnInit() {
-    this.currentOrder$ = this.appStateService.orderSubject;
-    this.appStateService.lineItemSubject.pipe(takeWhile(() => this.alive)).subscribe((lis) => {
-      this.lineItems = lis;
-      if (!this.productsSet) {
-        const queue = [];
-        lis.Items.forEach((li) => queue.push(this.ocMeService.GetProduct(li.ProductID)));
-        forkJoin(queue).subscribe((prods) => {
-          this.products = prods;
-          this.quantityLimits = this.products.map((p) => BuildQtyLimits(p));
-          this.productsSet = true;
-        });
-      }
-    });
+    this.order = this.appStateService.orderSubject.value;
+    this.appStateService.lineItemSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setLineItems);
   }
 
-  getProduct(li: LineItem): BuyerProduct {
-    return this.products.find((x) => x.ID === li.ProductID);
-  }
+  setLineItems = (items: ListLineItem): void => {
+    items.Items = items.Items.map((li) => {
+      li.Product.Name = `${li.Product.Name} ${this.cartService.buildSpecDisplayList(li)}`;
+      return li;
+    });
+    this.lineItems = items;
+    this.quantityLimits = this.lineItems.Items.map((li) => BuildQtyLimits(li.Product));
+  };
 
   cancelOrder() {
     this.ocOrderService.Delete('outgoing', this.appStateService.orderSubject.value.ID).subscribe(() => {

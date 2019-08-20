@@ -13,7 +13,6 @@
     <shared-lineitem-list-wrapper *ngIf="reorderResponse.InvalidLi.length">
       <shared-line-item-card *ngFor="let li of reorderResponse.InvalidLi"
                              [lineitem]="li"
-                             [productDetails]="li.Product"
                              readOnly="true">
       </shared-line-item-card>
     </shared-lineitem-list-wrapper>

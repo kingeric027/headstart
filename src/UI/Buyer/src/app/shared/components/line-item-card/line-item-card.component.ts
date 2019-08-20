@@ -1,7 +1,6 @@
 import { Component, Output, Input, EventEmitter } from '@angular/core';
-import { LineItem, BuyerProduct } from '@ordercloud/angular-sdk';
+import { LineItem } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { CartService } from '@app-buyer/shared/services/cart/cart.service';
 import { get as _get } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
@@ -14,15 +13,12 @@ export class LineItemCardComponent {
   closeIcon = faTimes;
 
   @Input() lineitem: LineItem;
-  @Input() productDetails: BuyerProduct;
   @Input() readOnly: boolean;
   @Input() quantityLimits: QuantityLimits;
   @Output() deletedLineItem = new EventEmitter<LineItem>();
   @Output() lineItemUpdated = new EventEmitter<LineItem>();
 
-  constructor(
-    protected cartService: CartService // used in template
-  ) {}
+  constructor() {}
 
   protected deleteLineItem() {
     this.deletedLineItem.emit(this.lineitem);
@@ -34,10 +30,6 @@ export class LineItemCardComponent {
   }
 
   getImageUrl() {
-    return _get(
-      this.lineitem,
-      'Product.xp.Images[0].Url',
-      'http://placehold.it/300x300'
-    );
+    return _get(this.lineitem, 'Product.xp.Images[0].Url', 'http://placehold.it/300x300');
   }
 }
