@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BuyerSpec, BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
+import { BuyerProduct, LineItem, ListSpec } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
 import { CartService, BuildQtyLimits } from '@app-buyer/shared';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
@@ -11,7 +11,7 @@ import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
   styleUrls: ['./product-detail-wrapper.component.scss'],
 })
 export class ProductDetailWrapperComponent implements OnInit {
-  specs: BuyerSpec[] = [];
+  specs: ListSpec;
   product: BuyerProduct;
   quantityLimits: QuantityLimits;
 

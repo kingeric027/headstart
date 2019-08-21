@@ -36,8 +36,8 @@
       <hr />
       <p class="mt-4"
          [innerHTML]="product.Description || 'This product has no description.'"></p>
-      <ocm-spec-form *ngIf="isOrderable && specs.length > 0"
-                     [specs]="specs"
+      <ocm-spec-form *ngIf="isOrderable && specs.Items.length > 0"
+                     [specs]="specs.Items"
                      (formUpdated)="specSelections = $event.detail"></ocm-spec-form>
       <div *ngIf="!isOrderable"
            class="alert alert-info">

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewChecked, OnChanges } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BuyerProduct, BuyerSpec, LineItem } from '@ordercloud/angular-sdk';
+import { BuyerProduct, BuyerSpec, LineItem, ListSpec } from '@ordercloud/angular-sdk';
 import { find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
 import { QuantityLimits } from '../../../models/quantity-limits';
 import { FullSpecOption } from '../../../models/full-spec-option.interface';
@@ -10,7 +10,7 @@ import { FullSpecOption } from '../../../models/full-spec-option.interface';
   styleUrls: ['./product-details.component.scss'],
 })
 export class OCMProductDetails implements OnChanges, AfterViewChecked {
-  @Input() specs: BuyerSpec[] = [];
+  @Input() specs: ListSpec;
   @Input() product: BuyerProduct;
   @Input() isFavorite: boolean;
   @Input() quantityLimits: QuantityLimits;

@@ -11,7 +11,7 @@ export class OCMCartComponent implements OnInit {
   @Input() order: Order;
   @Input() lineItems: ListLineItem;
   @Input() quantityLimits: QuantityLimits[];
-  @Output() cancelOrder = new EventEmitter<void>();
+  @Output() emptyCart = new EventEmitter<void>();
   @Output() deleteLineItem = new EventEmitter<{ lineItemID: string }>();
   @Output() updateQuantity = new EventEmitter<{ lineItemID: string; quantity: number }>();
 
