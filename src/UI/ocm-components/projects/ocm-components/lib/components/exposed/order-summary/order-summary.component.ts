@@ -3,11 +3,10 @@ import { Order } from '@ordercloud/angular-sdk';
 import { CurrencyPipe } from '@angular/common';
 
 @Component({
-  selector: 'checkout-order-summary',
   templateUrl: './order-summary.component.html',
   styleUrls: ['./order-summary.component.scss'],
 })
-export class OrderSummaryComponent {
+export class OCMOrderSummary {
   @Input() order: Order;
 
   constructor() {}

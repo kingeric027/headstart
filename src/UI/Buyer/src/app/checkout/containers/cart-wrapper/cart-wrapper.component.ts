@@ -23,16 +23,20 @@ export class CartWrapperComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.order = this.appStateService.orderSubject.value;
+    this.appStateService.orderSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrder);
     this.appStateService.lineItemSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setLineItems);
   }
+
+  setOrder = (order: Order): void => {
+    this.order = order;
+  };
 
   setLineItems = (items: ListLineItem): void => {
     this.lineItems = this.cartService.addSpecsToProductName(items);
     this.quantityLimits = this.lineItems.Items.map((li) => BuildQtyLimits(li.Product));
   };
 
-  async cancelOrder() {
+  async emptyCart() {
     await this.ocOrderService.Delete('outgoing', this.order.ID).toPromise();
     await this.baseResolveService.setCurrentOrder();
   }

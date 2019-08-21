@@ -11,6 +11,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommonModule } from '@angular/common';
+import { OCMOrderSummary } from './exposed/order-summary/order-summary.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -21,7 +22,8 @@ import { CommonModule } from '@angular/common';
     OCMProductCarousel,
     OCMProductDetails,
     OCMImageGallery,
-    OCMSpecForm
+    OCMSpecForm,
+    OCMOrderSummary
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -30,7 +32,8 @@ import { CommonModule } from '@angular/common';
     OCMProductCarousel,
     OCMProductDetails,
     OCMImageGallery,
-    OCMSpecForm
+    OCMSpecForm,
+    OCMOrderSummary
   ],
   imports: [
     CommonModule,
@@ -48,6 +51,7 @@ export class OcmComponentsModule {
     this.buildWebComponent(OCMProductCarousel, 'ocm-product-carousel');
     this.buildWebComponent(OCMImageGallery, 'ocm-image-gallery');
     this.buildWebComponent(OCMSpecForm, 'ocm-spec-form');
+    this.buildWebComponent(OCMOrderSummary, 'ocm-order-summary');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

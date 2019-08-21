@@ -36,13 +36,14 @@ export class CartService {
   }
 
   addSpecsToProductName(lineItems: ListLineItem): ListLineItem {
-    lineItems.Items = lineItems.Items.map((lineItem) => {
+    const lis: ListLineItem = JSON.parse(JSON.stringify(lineItems));
+    lis.Items = lis.Items.map((lineItem) => {
       if (lineItem.Specs.length === 0) return lineItem;
       const list = lineItem.Specs.map((spec) => spec.Value).join(', ');
       lineItem.Product.Name = `${lineItem.Product.Name} (${list})`;
       return lineItem;
     });
-    return lineItems;
+    return lis;
   }
 
   async removeItem(lineItemID: string): Promise<void> {

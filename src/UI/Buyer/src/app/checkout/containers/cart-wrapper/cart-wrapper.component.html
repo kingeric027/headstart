@@ -1,6 +1,6 @@
 <ocm-shopping-cart [order]="order"
                    [lineItems]="lineItems"
                    [quantityLimits]="quantityLimits"
-                   (cancelOrder)="cancelOrder()"
+                   (emptyCart)="emptyCart()"
                    (deleteLineItem)="deleteLineItem($event.lineItemID)"
                    (updateQuantity)="updateQuantity($event.lineItemID, $event.quantity)"></ocm-shopping-cart>

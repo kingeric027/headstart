@@ -1,12 +1,11 @@
 // core services
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 // checkout components
 import { CheckoutAddressComponent } from '@app-buyer/checkout/containers/checkout-address/checkout-address.component';
 import { CheckoutComponent } from '@app-buyer/checkout/containers/checkout/checkout.component';
 import { CheckoutSectionBaseComponent } from '@app-buyer/checkout/components/checkout-section-base/checkout-section-base.component';
-import { OrderSummaryComponent } from '@app-buyer/checkout/components/order-summary/order-summary.component';
 
 // shared module
 import { SharedModule } from '@app-buyer/shared';
@@ -22,13 +21,13 @@ import { CartWrapperComponent } from './containers/cart-wrapper/cart-wrapper.com
 import { OCMCartComponent } from './containers/cart/cart.component';
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [SharedModule, CheckoutRoutingModule, FormsModule],
   declarations: [
     OCMCartComponent,
     CheckoutAddressComponent,
     CheckoutComponent,
     CheckoutSectionBaseComponent,
-    OrderSummaryComponent,
     CheckoutPaymentComponent,
     PaymentPurchaseOrderComponent,
     PaymentSpendingAccountComponent,

@@ -15,7 +15,7 @@
       {{ product.ID }}
     </p>
     <div class="d-flex flex-wrap justify-content-between align-items-center">
-      <p class="card-text mb-0" *ngIf="product.PriceSchedule.PriceBreaks">
+      <p class="card-text mb-0" *ngIf="product.PriceSchedule?.PriceBreaks">
         {{ (product?.PriceSchedule?.PriceBreaks)[0]?.Price || 0 | currency }}
       </p>
       <label for="quantity" class="sr-only">Quantity</label>
