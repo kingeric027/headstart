@@ -35,10 +35,14 @@ export class CartService {
     return { Items: list.Items.concat(rest), Meta: list.Meta };
   }
 
-  buildSpecDisplayList(lineItem: LineItem): string {
-    if (lineItem.Specs.length === 0) return '';
-    const list = lineItem.Specs.map((spec) => spec.Value).join(', ');
-    return `(${list})`;
+  addSpecsToProductName(lineItems: ListLineItem): ListLineItem {
+    lineItems.Items = lineItems.Items.map((lineItem) => {
+      if (lineItem.Specs.length === 0) return lineItem;
+      const list = lineItem.Specs.map((spec) => spec.Value).join(', ');
+      lineItem.Product.Name = `${lineItem.Product.Name} (${list})`;
+      return lineItem;
+    });
+    return lineItems;
   }
 
   async removeItem(lineItemID: string): Promise<void> {

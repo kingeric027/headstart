@@ -23,6 +23,7 @@ export class MiniCartComponent implements OnInit {
 
   ngOnInit() {
     this.lineItems = this.appStateService.lineItemSubject.value;
+    this.lineItems = this.cartService.addSpecsToProductName(this.lineItems);
     this.order = this.appStateService.orderSubject.value;
   }
 

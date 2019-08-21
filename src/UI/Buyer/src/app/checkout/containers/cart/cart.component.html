@@ -24,8 +24,8 @@
                                [lineitem]="li"
                                [readOnly]="false"
                                [quantityLimits]="quantityLimits[i]"
-                               (deletedLineItem)="deleteLineItem($event)"
-                               (lineItemUpdated)="updateLineItem($event)"></shared-line-item-card>
+                               (deleteLineItem)="deleteLineItem.emit($event)"
+                               (updateQuantity)="updateQuantity.emit($event)"></shared-line-item-card>
       </shared-lineitem-list-wrapper>
     </div>
   </div>

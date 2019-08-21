@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 // checkout components
-import { CartComponent } from '@app-buyer/checkout/containers/cart/cart.component';
 import { CheckoutAddressComponent } from '@app-buyer/checkout/containers/checkout-address/checkout-address.component';
 import { CheckoutComponent } from '@app-buyer/checkout/containers/checkout/checkout.component';
 import { CheckoutSectionBaseComponent } from '@app-buyer/checkout/components/checkout-section-base/checkout-section-base.component';
@@ -19,11 +18,13 @@ import { PaymentPurchaseOrderComponent } from '@app-buyer/checkout/components/pa
 import { PaymentSpendingAccountComponent } from '@app-buyer/checkout/components/payment-spending-account/payment-spending-account.component';
 import { OrderConfirmationComponent } from '@app-buyer/checkout/containers/order-confirmation/order-confirmation.component';
 import { CheckoutConfirmComponent } from '@app-buyer/checkout/components/checkout-confirm/checkout-confirm.component';
+import { CartWrapperComponent } from './containers/cart-wrapper/cart-wrapper.component';
+import { OCMCartComponent } from './containers/cart/cart.component';
 
 @NgModule({
   imports: [SharedModule, CheckoutRoutingModule, FormsModule],
   declarations: [
-    CartComponent,
+    OCMCartComponent,
     CheckoutAddressComponent,
     CheckoutComponent,
     CheckoutSectionBaseComponent,
@@ -33,6 +34,7 @@ import { CheckoutConfirmComponent } from '@app-buyer/checkout/components/checkou
     PaymentSpendingAccountComponent,
     OrderConfirmationComponent,
     CheckoutConfirmComponent,
+    CartWrapperComponent,
   ],
 })
 export class CheckoutModule {}

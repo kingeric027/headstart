@@ -15,18 +15,18 @@ export class LineItemCardComponent {
   @Input() lineitem: LineItem;
   @Input() readOnly: boolean;
   @Input() quantityLimits: QuantityLimits;
-  @Output() deletedLineItem = new EventEmitter<LineItem>();
-  @Output() lineItemUpdated = new EventEmitter<LineItem>();
+  @Output() deleteLineItem = new EventEmitter<{ lineItemID: string }>();
+  @Output() updateQuantity = new EventEmitter<{ lineItemID: string; quantity: number }>();
 
   constructor() {}
 
-  protected deleteLineItem() {
-    this.deletedLineItem.emit(this.lineitem);
+  protected removeLineItem() {
+    this.deleteLineItem.emit({ lineItemID: this.lineitem.ID });
   }
 
-  protected updateQuantity(qty: number) {
+  protected changeQuantity(qty: number) {
     this.lineitem.Quantity = qty;
-    this.lineItemUpdated.emit(this.lineitem);
+    this.updateQuantity.emit({ lineItemID: this.lineitem.ID, quantity: qty });
   }
 
   getImageUrl() {
