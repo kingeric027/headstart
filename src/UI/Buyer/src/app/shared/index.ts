@@ -1,6 +1,3 @@
-// components
-export * from '@app-buyer/shared/components/page-title/page-title.component';
-
 // models
 export * from '@app-buyer/shared/models/decoded-token.interface';
 export * from '@app-buyer/shared/services/authorize-net/authorize-net.interface';

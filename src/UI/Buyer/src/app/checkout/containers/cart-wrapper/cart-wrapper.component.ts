@@ -58,4 +58,12 @@ export class CartWrapperComponent implements OnInit, OnDestroy {
   toProductDetails(productID: string) {
     this.router.navigateByUrl(`/products/${productID}`);
   }
+
+  toProductList() {
+    this.router.navigateByUrl('/products');
+  }
+
+  toCheckout() {
+    this.router.navigateByUrl('/checkout');
+  }
 }

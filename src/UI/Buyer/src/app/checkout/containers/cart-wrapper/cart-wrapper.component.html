@@ -1,7 +1,9 @@
-<ocm-shopping-cart [order]="order"
-                   [lineItems]="lineItems"
-                   [quantityLimits]="quantityLimits"
-                   (emptyCart)="emptyCart()"
-                   (deleteLineItem)="deleteLineItem($event.detail.lineItemID)"
-                   (updateQuantity)="updateQuantity($event.detail.lineItemID, $event.detail.quantity)"
-                   (navigateToProductDetails)="toProductDetails($event.detail.productID)"></ocm-shopping-cart>
+<ocm-cart [order]="order"
+          [lineItems]="lineItems"
+          [quantityLimits]="quantityLimits"
+          (emptyCart)="emptyCart()"
+          (deleteLineItem)="deleteLineItem($event.detail.lineItemID)"
+          (updateQuantity)="updateQuantity($event.detail.lineItemID, $event.detail.quantity)"
+          (navigateToProductList)="toProductList()"
+          (navigateToProductDetails)="toProductDetails($event.detail.productID)"
+          (navigateToCheckout)="toCheckout()"></ocm-cart>

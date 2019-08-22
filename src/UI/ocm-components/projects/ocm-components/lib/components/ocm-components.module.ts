@@ -2,7 +2,7 @@ import { NgModule, Injector, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { OCMProductCard } from './exposed/product-card/product-card.component';
 import { OCMToggleFavorite } from './exposed/toggle-favorite/toggle-favorite.component';
-import { OCMQuantityInput } from './exposed/quantity-input/quantity-input.component';
+import { OCMQuantityInput } from './internal/quantity-input/quantity-input.component';
 import { OCMProductCarousel } from './exposed/product-carousel/product-carousel.component';
 import { OCMProductDetails } from './exposed/product-details/product-details.component';
 import { OCMImageGallery } from './internal/image-gallery/image-gallery.component';
@@ -13,6 +13,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommonModule } from '@angular/common';
 import { OCMOrderSummary } from './exposed/order-summary/order-summary.component';
 import { OCMLineitemTable } from './exposed/lineitem-table/lineitem-table.component';
+import { OCMCart } from './exposed/cart/cart.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -25,7 +26,8 @@ import { OCMLineitemTable } from './exposed/lineitem-table/lineitem-table.compon
     OCMImageGallery,
     OCMSpecForm,
     OCMOrderSummary,
-    OCMLineitemTable
+    OCMLineitemTable,
+    OCMCart
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -36,7 +38,8 @@ import { OCMLineitemTable } from './exposed/lineitem-table/lineitem-table.compon
     OCMImageGallery,
     OCMSpecForm,
     OCMOrderSummary,
-    OCMLineitemTable
+    OCMLineitemTable,
+    OCMCart
   ],
   imports: [
     CommonModule,
@@ -56,6 +59,7 @@ export class OcmComponentsModule {
     this.buildWebComponent(OCMSpecForm, 'ocm-spec-form');
     this.buildWebComponent(OCMOrderSummary, 'ocm-order-summary');
     this.buildWebComponent(OCMLineitemTable, 'ocm-lineitem-table');
+    this.buildWebComponent(OCMCart, 'ocm-cart');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

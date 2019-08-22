@@ -35,7 +35,6 @@ import { AddressFormComponent } from '@app-buyer/shared/components/address-form/
 import { CreditCardFormComponent } from '@app-buyer/shared/components/credit-card-form/credit-card-form.component';
 import { CreditCardIconComponent } from '@app-buyer/shared/components/credit-card-icon/credit-card-icon.component';
 import { SearchComponent } from '@app-buyer/shared/components/search/search.component';
-import { PageTitleComponent } from '@app-buyer/shared/components/page-title/page-title.component';
 import { AddressDisplayComponent } from '@app-buyer/shared/components/address-display/address-display.component';
 import { CreditCardDisplayComponent } from '@app-buyer/shared/components/credit-card-display/credit-card-display.component';
 
@@ -98,7 +97,6 @@ import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
 
     NoResultsComponent,
     SearchComponent,
-    PageTitleComponent,
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
     MapToIterablePipe,
@@ -121,7 +119,6 @@ import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
     MapToIterablePipe,
-    PageTitleComponent,
     AddressDisplayComponent,
     CreditCardDisplayComponent,
     CreditCardFormComponent,

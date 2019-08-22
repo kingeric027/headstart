@@ -18,13 +18,11 @@ import { PaymentSpendingAccountComponent } from '@app-buyer/checkout/components/
 import { OrderConfirmationComponent } from '@app-buyer/checkout/containers/order-confirmation/order-confirmation.component';
 import { CheckoutConfirmComponent } from '@app-buyer/checkout/components/checkout-confirm/checkout-confirm.component';
 import { CartWrapperComponent } from './containers/cart-wrapper/cart-wrapper.component';
-import { OCMCartComponent } from './containers/cart/cart.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [SharedModule, CheckoutRoutingModule, FormsModule],
   declarations: [
-    OCMCartComponent,
     CheckoutAddressComponent,
     CheckoutComponent,
     CheckoutSectionBaseComponent,

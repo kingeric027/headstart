@@ -27,8 +27,11 @@
       </div>
     </div>
   </div>
+  <a (click)="log(lineItems)">click</a>
   <div class="flex-none">
-    <div *ngFor="let li of lineitems?.Items; let i = index">
+    {{ lineItems.Items.length }}
+    <div *ngFor="let li of lineItems.Items; let i = index">
+      {{i}}
       <div class="m-2 row align-items-center">
         <div class="col-sm-7">
           <div class="row align-items-sm-center">

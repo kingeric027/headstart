@@ -1,4 +1,4 @@
-import { Component, Output, Input, EventEmitter } from '@angular/core';
+import { Component, Output, Input, EventEmitter, OnInit, OnChanges } from '@angular/core';
 import { LineItem, ListLineItem } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { get as _get } from 'lodash';
@@ -11,8 +11,7 @@ import { QuantityLimits } from '../../../models/quantity-limits';
 })
 export class OCMLineitemTable {
   closeIcon = faTimes;
-
-  @Input() lineitems: ListLineItem;
+  @Input() lineItems: ListLineItem;
   @Input() readOnly: boolean;
   @Input() quantityLimits: QuantityLimits[];
   @Output() deleteLineItem = new EventEmitter<{ lineItemID: string }>();
@@ -20,6 +19,12 @@ export class OCMLineitemTable {
   @Output() navigateToProductDetails = new EventEmitter<{ productID: string }>();
 
   constructor() {}
+
+  log(object: any) {
+    debugger;
+    console.log(object);
+    console.log(this.lineItems);
+  }
 
   removeLineItem(lineItemID: string) {
     this.deleteLineItem.emit({ lineItemID });
@@ -35,6 +40,6 @@ export class OCMLineitemTable {
   }
 
   getLineItem(lineItemID: string): LineItem {
-    return this.lineitems.Items.find((li) => li.ID === lineItemID);
+    return this.lineItems.Items.find((li) => li.ID === lineItemID);
   }
 }
