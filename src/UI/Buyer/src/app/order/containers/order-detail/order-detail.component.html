@@ -37,10 +37,9 @@
         </ul>
       </div>
     </div>
-    <shared-lineitem-list-wrapper>
-      <shared-line-item-card *ngFor="let li of lineItems?.Items"
-                             [lineitem]="li"
-                             readOnly="true"></shared-line-item-card>
-    </shared-lineitem-list-wrapper>
+    <ocm-lineitem-table [lineitems]="lineItems"
+                        (navigateToProductDetails)="toProductDetails($event.detail.productID)"
+                        [readOnly]="true">
+    </ocm-lineitem-table>
   </div>
 </div>

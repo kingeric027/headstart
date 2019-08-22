@@ -19,14 +19,13 @@
               routerLink="/checkout">CHECKOUT</button>
     </div>
     <div class="col-lg-8">
-      <shared-lineitem-list-wrapper>
-        <shared-line-item-card *ngFor="let li of lineItems.Items; let i = index"
-                               [lineitem]="li"
-                               [readOnly]="false"
-                               [quantityLimits]="quantityLimits[i]"
-                               (deleteLineItem)="deleteLineItem.emit($event)"
-                               (updateQuantity)="updateQuantity.emit($event)"></shared-line-item-card>
-      </shared-lineitem-list-wrapper>
+      <ocm-lineitem-table [lineitems]="lineItems"
+                          [readOnly]="false"
+                          [quantityLimits]="quantityLimits"
+                          (deleteLineItem)="deleteLineItem.emit($event)"
+                          (updateQuantity)="updateQuantity.emit($event)"
+                          (navigateToProductDetails)="navigateToProductDetails.emit($event)">
+      </ocm-lineitem-table>
     </div>
   </div>
 </div>

@@ -3,6 +3,7 @@ import { Order, ListLineItem, OcOrderService } from '@ordercloud/angular-sdk';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 import { AppStateService, BaseResolveService, CartService, BuildQtyLimits } from '@app-buyer/shared';
 import { takeWhile } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'cart-wrapper',
@@ -19,7 +20,8 @@ export class CartWrapperComponent implements OnInit, OnDestroy {
     private appStateService: AppStateService,
     private baseResolveService: BaseResolveService,
     private cartService: CartService,
-    private ocOrderService: OcOrderService
+    private ocOrderService: OcOrderService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -51,5 +53,9 @@ export class CartWrapperComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.alive = false;
+  }
+
+  toProductDetails(productID: string) {
+    this.router.navigateByUrl(`/products/${productID}`);
   }
 }

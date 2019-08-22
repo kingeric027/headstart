@@ -3,10 +3,7 @@ import { CanActivate, Router } from '@angular/router';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import * as jwtDecode from 'jwt-decode';
 import { DecodedOrderCloudToken } from '@app-buyer/shared';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-buyer/config/app.config';
+import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { AppAuthService } from '@app-buyer/auth/services/app-auth.service';
 import { of, Observable } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
@@ -46,9 +43,7 @@ export class HasTokenGuard implements CanActivate {
     }
 
     const isAccessTokenValid = this.isTokenValid();
-    const refreshTokenExists =
-      this.ocTokenService.GetRefresh() &&
-      this.appAuthService.getRememberStatus();
+    const refreshTokenExists = this.ocTokenService.GetRefresh() && this.appAuthService.getRememberStatus();
     if (!isAccessTokenValid && refreshTokenExists) {
       return this.appAuthService.refresh().pipe(map(() => true));
     }

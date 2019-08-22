@@ -14,6 +14,7 @@ export class OCMCartComponent implements OnInit {
   @Output() emptyCart = new EventEmitter<void>();
   @Output() deleteLineItem = new EventEmitter<{ lineItemID: string }>();
   @Output() updateQuantity = new EventEmitter<{ lineItemID: string; quantity: number }>();
+  @Output() navigateToProductDetails = new EventEmitter<{ productID: string }>();
 
   ngOnInit() {}
 }

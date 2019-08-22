@@ -38,8 +38,6 @@ import { SearchComponent } from '@app-buyer/shared/components/search/search.comp
 import { PageTitleComponent } from '@app-buyer/shared/components/page-title/page-title.component';
 import { AddressDisplayComponent } from '@app-buyer/shared/components/address-display/address-display.component';
 import { CreditCardDisplayComponent } from '@app-buyer/shared/components/credit-card-display/credit-card-display.component';
-import { LineItemCardComponent } from '@app-buyer/shared/components/line-item-card/line-item-card.component';
-import { LineItemListWrapperComponent } from '@app-buyer/shared/components/lineitem-list-wrapper/lineitem-list-wrapper.component';
 
 // containers
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from '@app-buyer/shared/pipes/shipperTracking/shipperTracking.pipe';
@@ -108,10 +106,8 @@ import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
     AddressDisplayComponent,
     CreditCardDisplayComponent,
     CreditCardFormComponent,
-    LineItemListWrapperComponent,
     FallbackImageDirective,
     ResetDirective,
-    LineItemCardComponent,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
     AddressFormComponent,
@@ -133,11 +129,9 @@ import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
     ResetDirective,
     SearchComponent,
     CreditCardIconComponent,
-    LineItemCardComponent,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
     AddressFormComponent,
-    LineItemListWrapperComponent,
     MiniCartComponent,
     GenericBrowseComponent,
     ModalComponent,

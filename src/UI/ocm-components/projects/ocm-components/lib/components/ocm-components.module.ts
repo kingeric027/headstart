@@ -12,6 +12,7 @@ import { NgxImageZoomModule } from 'ngx-image-zoom';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommonModule } from '@angular/common';
 import { OCMOrderSummary } from './exposed/order-summary/order-summary.component';
+import { OCMLineitemTable } from './exposed/lineitem-table/lineitem-table.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -23,7 +24,8 @@ import { OCMOrderSummary } from './exposed/order-summary/order-summary.component
     OCMProductDetails,
     OCMImageGallery,
     OCMSpecForm,
-    OCMOrderSummary
+    OCMOrderSummary,
+    OCMLineitemTable
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -33,7 +35,8 @@ import { OCMOrderSummary } from './exposed/order-summary/order-summary.component
     OCMProductDetails,
     OCMImageGallery,
     OCMSpecForm,
-    OCMOrderSummary
+    OCMOrderSummary,
+    OCMLineitemTable
   ],
   imports: [
     CommonModule,
@@ -52,6 +55,7 @@ export class OcmComponentsModule {
     this.buildWebComponent(OCMImageGallery, 'ocm-image-gallery');
     this.buildWebComponent(OCMSpecForm, 'ocm-spec-form');
     this.buildWebComponent(OCMOrderSummary, 'ocm-order-summary');
+    this.buildWebComponent(OCMLineitemTable, 'ocm-lineitem-table');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

@@ -5,10 +5,7 @@ import { Router } from '@angular/router';
 
 // ordercloud
 import { OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-buyer/config/app.config';
+import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { AppAuthService } from '@app-buyer/auth/services/app-auth.service';
 import { AppStateService } from '@app-buyer/shared';
 
@@ -42,12 +39,7 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     return this.ocAuthService
-      .Login(
-        this.form.get('username').value,
-        this.form.get('password').value,
-        this.appConfig.clientID,
-        this.appConfig.scope
-      )
+      .Login(this.form.get('username').value, this.form.get('password').value, this.appConfig.clientID, this.appConfig.scope)
       .subscribe((response) => {
         const rememberMe = this.form.get('rememberMe').value;
         if (rememberMe && response.refresh_token) {

@@ -15,11 +15,10 @@
       </shared-address-display>
     </div>
   </div>
-  <shared-lineitem-list-wrapper>
-    <shared-line-item-card *ngFor="let li of lineItems.Items"
-                           [lineitem]="li"
-                           readOnly="true"></shared-line-item-card>
-  </shared-lineitem-list-wrapper>
+  <ocm-lineitem-table [lineitems]="lineItems"
+                      [readOnly]="true"
+                      (navigateToProductDetails)="toProductDetails($event.detail.productID)">
+  </ocm-lineitem-table>
   <form *ngIf="!appConfig.anonymousShoppingEnabled"
         novalidate
         [formGroup]="form">

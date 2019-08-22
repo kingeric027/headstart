@@ -2,5 +2,6 @@
                    [lineItems]="lineItems"
                    [quantityLimits]="quantityLimits"
                    (emptyCart)="emptyCart()"
-                   (deleteLineItem)="deleteLineItem($event.lineItemID)"
-                   (updateQuantity)="updateQuantity($event.lineItemID, $event.quantity)"></ocm-shopping-cart>
+                   (deleteLineItem)="deleteLineItem($event.detail.lineItemID)"
+                   (updateQuantity)="updateQuantity($event.detail.lineItemID, $event.detail.quantity)"
+                   (navigateToProductDetails)="toProductDetails($event.detail.productID)"></ocm-shopping-cart>

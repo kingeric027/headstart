@@ -10,12 +10,11 @@
                   'alert-success': message.classType == 'success'}">
       <p [innerHTML]='message.string'> </p>
     </div>
-    <shared-lineitem-list-wrapper *ngIf="reorderResponse.InvalidLi.length">
-      <shared-line-item-card *ngFor="let li of reorderResponse.InvalidLi"
-                             [lineitem]="li"
-                             readOnly="true">
-      </shared-line-item-card>
-    </shared-lineitem-list-wrapper>
+    <ocm-lineitem-table *ngIf="reorderResponse.InvalidLi.length"
+                        [lineitems]="reorderResponse.InvalidLi"
+                        (navigateToProductDetails)="toProductDetails($event.detail.productID)"
+                        [readOnly]="true">
+    </ocm-lineitem-table>
     <button type="button"
             class="btn btn-primary btn-lg btn-block"
             [disabled]="!reorderResponse.ValidLi.length || !orderID"

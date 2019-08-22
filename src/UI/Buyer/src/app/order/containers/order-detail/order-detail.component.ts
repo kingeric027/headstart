@@ -1,15 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import {
-  Order,
-  ListLineItem,
-  ListPromotion,
-  OcOrderService,
-  ListPayment,
-  OrderApproval,
-} from '@ordercloud/angular-sdk';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { Order, ListLineItem, ListPromotion, OcOrderService, ListPayment, OrderApproval } from '@ordercloud/angular-sdk';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AppPaymentService } from '@app-buyer/shared/services/app-payment-service/app-payment.service';
 import { uniqBy as _uniqBy } from 'lodash';
 
@@ -29,16 +22,13 @@ export class OrderDetailsComponent implements OnInit {
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected ocOrderService: OcOrderService,
-    protected appPaymentService: AppPaymentService
+    protected appPaymentService: AppPaymentService,
+    protected router: Router
   ) {}
 
   ngOnInit() {
-    this.order$ = this.activatedRoute.data.pipe(
-      map(({ orderResolve }) => orderResolve.order)
-    );
-    this.lineItems$ = this.activatedRoute.data.pipe(
-      map(({ orderResolve }) => orderResolve.lineItems)
-    );
+    this.order$ = this.activatedRoute.data.pipe(map(({ orderResolve }) => orderResolve.order));
+    this.lineItems$ = this.activatedRoute.data.pipe(map(({ orderResolve }) => orderResolve.lineItems));
     this.activatedRoute.paramMap.subscribe((params: ParamMap) => {
       this.orderID = params.get('orderID');
       this.promotions$ = this.getPromotions();
@@ -48,10 +38,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   protected getPromotions(): Observable<ListPromotion> {
-    return (this.promotions$ = this.ocOrderService.ListPromotions(
-      'outgoing',
-      this.orderID
-    ));
+    return (this.promotions$ = this.ocOrderService.ListPromotions('outgoing', this.orderID));
   }
 
   protected getPayments(): Observable<ListPayment> {
@@ -65,5 +52,9 @@ export class OrderDetailsComponent implements OnInit {
         return _uniqBy(list.Items, (x) => x.Comments);
       })
     );
+  }
+
+  protected toProductDetails(productID: string) {
+    this.router.navigateByUrl(`/products/${productID}`);
   }
 }
