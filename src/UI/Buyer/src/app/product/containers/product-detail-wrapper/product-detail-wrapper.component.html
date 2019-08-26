@@ -3,5 +3,5 @@
                      [quantityLimits]="quantityLimits"
                      [isFavorite]="favoriteProductService.isFavorite(product)"
                      (addToCartEvent)="addToCart($event.detail)"
-                     (setIsFavorite)="favoriteProductService.setFavoriteValue($event.detail, product)">
+                     (setIsFavorite)="favoriteProductService.setFavoriteValue($event.detail, product.ID)">
 </ocm-product-details>

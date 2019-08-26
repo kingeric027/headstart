@@ -35,7 +35,7 @@ import { TermsAndConditionsComponent } from './static-pages/terms-and-conditions
 
 // error handler config
 import { AppErrorHandler } from './config/error-handling.config';
-import { OcmComponentsModule } from 'ocm-components';
+import { OcmComponentsModule } from 'ocm-components/dist/ocm-components';
 
 @NgModule({
   declarations: [AppComponent, SupportComponent, FaqComponent, TermsAndConditionsComponent],

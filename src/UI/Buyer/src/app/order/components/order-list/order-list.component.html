@@ -50,7 +50,7 @@
         <td *ngIf="columns.indexOf('Favorite') > -1"
             (click)="$event.stopPropagation()">
           <ocm-toggle-favorite [favorite]="favoriteOrderService.isFavorite(order)"
-                               (favoriteChanged)="favoriteOrderService.setFavoriteValue($event.detail, order)">
+                               (favoriteChanged)="favoriteOrderService.setFavoriteValue($event.detail, order.ID)">
           </ocm-toggle-favorite>
         </td>
         <td *ngIf="columns.indexOf('ID')> -1">{{order.ID}}</td>

@@ -4,13 +4,10 @@ import { RouterModule, Routes } from '@angular/router';
 import { FaqComponent } from './static-pages/faq/faq.component';
 import { SupportComponent } from './static-pages/support/support.component';
 
-import {
-  BaseResolve,
-  IsProfiledUserGuard as isProfiledUser,
-  HasTokenGuard as HasToken,
-} from '@app-buyer/shared';
-import { HomeComponent } from '@app-buyer/layout/home/home.component';
+import { BaseResolve, IsProfiledUserGuard as isProfiledUser, HasTokenGuard as HasToken } from '@app-buyer/shared';
 import { TermsAndConditionsComponent } from '@app-buyer/static-pages/terms-and-conditions/terms-and-conditions.component';
+import { FeaturedProductsResolver } from './layout/resolves/features-products.resolve';
+import { HomePageWrapperComponent } from './layout/home-wrapper/home-wrapper.component';
 
 const routes: Routes = [
   {
@@ -21,10 +18,10 @@ const routes: Routes = [
     },
     children: [
       { path: '', redirectTo: '/home', pathMatch: 'full' },
-      { path: 'home', component: HomeComponent },
+      { path: 'home', resolve: { featuredProducts: FeaturedProductsResolver }, component: HomePageWrapperComponent },
       {
         path: 'profile',
-        loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule),
+        loadChildren: () => import('./profile/profile.module').then((m) => m.ProfileModule),
         canActivate: [isProfiledUser],
       },
       {
@@ -41,9 +38,9 @@ const routes: Routes = [
       },
       {
         path: 'products',
-        loadChildren: () => import('./product/product.module').then(m => m.ProductsModule),
+        loadChildren: () => import('./product/product.module').then((m) => m.ProductsModule),
       },
-      { path: '', loadChildren: () => import('./checkout/checkout.module').then(m => m.CheckoutModule) },
+      { path: '', loadChildren: () => import('./checkout/checkout.module').then((m) => m.CheckoutModule) },
       { path: 'impersonation', redirectTo: '/home' },
     ],
   },

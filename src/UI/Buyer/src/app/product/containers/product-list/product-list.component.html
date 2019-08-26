@@ -108,7 +108,7 @@
                             [product]="product"
                             [quantityLimits]="quantityLimits[i]"
                             [isFavorite]="favoriteProductsService.isFavorite(product)"
-                            (setIsFavorite)="favoriteProductsService.setFavoriteValue($event.detail, product)"
+                            (setIsFavorite)="favoriteProductsService.setFavoriteValue($event.detail, product.ID)"
                             (addedToCart)="addToCart($event.detail)"
                             (routeToProductDetails)="toDetails($event.detail)">
           </ocm-product-card>

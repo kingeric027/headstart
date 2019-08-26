@@ -9,11 +9,7 @@ abstract class FavoritesService<T extends { ID?: string }> {
   // All OrderCloud xp objects are limited to 8000 chars. With guid's of length ~24, 40 favorites is ~1000 chars.
   private readonly MaxFavorites: number = 40;
 
-  constructor(
-    private appStateService: AppStateService,
-    private ocMeService: OcMeService,
-    private toastrService: ToastrService
-  ) {}
+  constructor(private appStateService: AppStateService, private ocMeService: OcMeService, private toastrService: ToastrService) {}
 
   isFavorite(object: T): boolean {
     if (!object || !object.ID) return false;
@@ -21,19 +17,17 @@ abstract class FavoritesService<T extends { ID?: string }> {
     return favorites.includes(object.ID);
   }
 
-  setFavoriteValue(isFav: boolean, object: T): void {
+  setFavoriteValue(isFav: boolean, ID: string): void {
     const favorites = this.getFavorites();
     let updatedFavorites: string[];
     if (isFav && favorites.length >= this.MaxFavorites) {
-      this.toastrService.info(
-        `You have reached your limit of favorite ${this.TypeDisplayName}`
-      );
+      this.toastrService.info(`You have reached your limit of favorite ${this.TypeDisplayName}`);
       return;
     }
     if (isFav) {
-      updatedFavorites = [...favorites, object.ID];
+      updatedFavorites = [...favorites, ID];
     } else {
-      updatedFavorites = favorites.filter((x) => x !== object.ID);
+      updatedFavorites = favorites.filter((x) => x !== ID);
     }
     const request = { xp: {} };
     request.xp[this.XpFieldName] = updatedFavorites;
@@ -44,9 +38,7 @@ abstract class FavoritesService<T extends { ID?: string }> {
 
   getFavorites(): string[] {
     const me = this.appStateService.userSubject.value;
-    return me.xp && me.xp[this.XpFieldName] instanceof Array
-      ? me.xp[this.XpFieldName]
-      : [];
+    return me.xp && me.xp[this.XpFieldName] instanceof Array ? me.xp[this.XpFieldName] : [];
   }
 }
 

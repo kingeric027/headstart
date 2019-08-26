@@ -1,17 +1,15 @@
-<div class="container"
-     *ngIf="buyerOrg$ | async; let buyer">
-
-  <!-- Announcements can be managed in the seller application  -->
-  <div *ngIf="buyer?.xp?.Announcement"
+<div class="container">
+  <div *ngIf="annoucement"
        class="alert alert-info my-3"><b>
       <fa-icon class="pr-3"
                [icon]="faBullhorn"></fa-icon>
-    </b>{{ buyer?.xp?.Announcement }}</div>
-
-  <!-- Carousel slides can be managed in the seller application -->
-  <ngb-carousel *ngIf="buyer?.xp?.carouselSlides">
+    </b>{{ annoucement }}
+  </div>
+  <ngb-carousel *ngIf="carouselSlides"
+                [wrap]="true"
+                [interval]="5000">
     <ng-template ngbSlide
-                 *ngFor="let slide of buyer.xp.carouselSlides">
+                 *ngFor="let slide of carouselSlides">
       <img class="img-fluid"
            style="width:100%;"
            [src]="slide.URL"
@@ -22,12 +20,14 @@
       </div>
     </ng-template>
   </ngb-carousel>
-
   <!-- Featured products can be managed in the seller application -->
-  <div *ngIf="featuredProducts$ | async; let products">
-    <ocm-product-carousel *ngIf="products.Items.length"
-                          displayTitle="Featured Products"
-                          [products]="products.Items">
-    </ocm-product-carousel>
-  </div>
+  hello {{featuredProducts?.Items?.length}}
+  <ocm-product-carousel *ngIf="featuredProducts?.Items?.length"
+                        [displayTitle]="'Featured Products'"
+                        [products]="featuredProducts.Items"
+                        [quantityLimits]="quantityLimits"
+                        [favoriteProducts]="favoriteProducts"
+                        (setIsFavorite)="setIsFavorite.emit($event)"
+                        (navigateToProductDetails)="navigateToProductDetails.emit($event)">
+  </ocm-product-carousel>
 </div>

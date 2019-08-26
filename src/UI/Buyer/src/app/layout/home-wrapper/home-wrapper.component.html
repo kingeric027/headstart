@@ -1,0 +1,5 @@
+<ocm-home-page [featuredProducts]="featuredProducts.Items"
+               [favoriteProductIDs]="favoriteProductIDs"
+               [quantityLimits]="quantityLimits"
+               (setIsFavorite)="favoriteProducts.setFavoriteValue($event.detail.isFavorite, $event.detail.productID)"
+               (navigateToProductDetails)="toProductDetails($event.detail.productID)"></ocm-home-page>

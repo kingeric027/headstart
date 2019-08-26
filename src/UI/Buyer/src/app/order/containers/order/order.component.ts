@@ -25,13 +25,11 @@ export class OrderComponent implements OnInit {
 
   ngOnInit() {
     this.approvalVersion = this.router.url.includes('/approval');
-    this.order$ = this.activatedRoute.data.pipe(
-      map(({ orderResolve }) => orderResolve.order)
-    );
+    this.order$ = this.activatedRoute.data.pipe(map(({ orderResolve }) => orderResolve.order));
   }
 
   toggleFavorite(order: Order) {
     const newValue = !this.favoriteOrdersService.isFavorite(order);
-    this.favoriteOrdersService.setFavoriteValue(newValue, order);
+    this.favoriteOrdersService.setFavoriteValue(newValue, order.ID);
   }
 }

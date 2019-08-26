@@ -9,9 +9,9 @@
     "test": "ng test --code-coverage",
     "lint": "ng lint",
     "e2e": "ng e2e",
+    "prepare": "npm run build",
     "precommit": "lint-staged --config ./lint-staged.config.js",
-    "preinstall": "cd ../ocm-components && npm i && npm run build",
-    "build-components": "cd ../ocm-components && npm run build && cd ../Buyer && npm i ../ocm-components/dist/ocm-components/ocm-components-0.0.1.tgz"
+    "build-components": "cd ../../../../ocm-components && npm run build"
   },
   "private": true,
   "dependencies": {
@@ -49,7 +49,7 @@
     "ngx-image-zoom": "^0.4.1",
     "ngx-toastr": "^9.1.1",
     "node-sass": "^4.12.0",
-    "ocm-components": "file:../ocm-components/dist/ocm-components/ocm-components-0.0.1.tgz",
+    "ocm-components": "github:oliverheywood451/ocm-components#master",
     "popper.js": "^1.14.3",
     "rxjs": "^6.5.2",
     "tslib": "^1.9.0",
