@@ -17,7 +17,7 @@ import {
   MeListCategoriesResolver,
   MeListRelatedProductsResolver,
 } from './resolves/me.product.resolve';
-import { OcmComponentsModule } from 'ocm-components/dist/ocm-components';
+import { OcmComponentsModule } from 'ocm-components';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
