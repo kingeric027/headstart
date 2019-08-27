@@ -9,7 +9,6 @@
     "test": "ng test --code-coverage",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "prepare": "npm run build",
     "precommit": "lint-staged --config ./lint-staged.config.js",
     "build-components": "cd ../../../../ocm-components && npm run build"
   },
