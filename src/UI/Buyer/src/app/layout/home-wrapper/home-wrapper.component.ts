@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ListBuyerProduct } from '@ordercloud/angular-sdk';
-import { QuantityLimits } from 'ocm-components/dist/models/quantity-limits';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
 import { BuildQtyLimits } from '@app-buyer/shared';
+import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
   selector: 'home-page-wrapper',

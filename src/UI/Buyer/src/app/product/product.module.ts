@@ -18,10 +18,11 @@ import {
   MeListRelatedProductsResolver,
 } from './resolves/me.product.resolve';
 import { OcmComponentsModule } from 'ocm-components';
+import { OcmDefaultComponentsModule } from '@app-buyer/ocm-default-components/ocm-default-components.module';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [SharedModule, ProductsRoutingModule, TreeModule, OcmComponentsModule],
+  imports: [SharedModule, ProductsRoutingModule, TreeModule, OcmComponentsModule, OcmDefaultComponentsModule],
   declarations: [
     ProductListComponent,
     ProductDetailWrapperComponent,

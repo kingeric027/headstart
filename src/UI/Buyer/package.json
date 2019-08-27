@@ -2,6 +2,9 @@
   "name": "ngx-shopper",
   "version": "0.0.0",
   "license": "MIT",
+  "config": {
+    "custom_components_url": "github:oliverheywood451/ocm-components#master"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open",
@@ -10,7 +13,10 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "precommit": "lint-staged --config ./lint-staged.config.js",
-    "build-components": "cd ../../../../ocm-components && npm run build"
+    "install-default-components": "npm prune && npm install file:empty.tgz",
+    "install-custom-components": "npm prune && npm install $npm_package_config_custom_components_url",
+    "serve-default-components": "npm run install-default-components && ng serve",
+    "serve-custom-components": "npm run install-custom-components && ng serve"
   },
   "private": true,
   "dependencies": {
