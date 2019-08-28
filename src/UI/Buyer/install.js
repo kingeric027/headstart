@@ -1,5 +1,5 @@
 const { exec } = require('child_process');
-const package = process.env.npm_config_custom_component_package;
+const package = process.env.npm_config_custom_component_package; // from .npmrc
 const install = `npm install ${package}`;
 const program = exec(install);
 
