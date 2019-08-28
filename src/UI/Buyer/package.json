@@ -14,7 +14,7 @@
     "e2e": "ng e2e",
     "precommit": "lint-staged --config ./lint-staged.config.js",
     "install-default-components": "npm install file:empty.tgz",
-    "install-custom-components": "npm install %npm_package_config_custom_components_url%",
+    "install-custom-components": "node install.js",
     "serve-default-components": "npm run install-default-components && ng serve",
     "serve-custom-components": "npm run install-custom-components && ng serve"
   },
