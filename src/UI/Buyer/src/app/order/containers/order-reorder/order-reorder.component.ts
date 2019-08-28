@@ -1,11 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { forEach as _forEach } from 'lodash';
 
-import {
-  ModalService,
-  CartService,
-  AppReorderService,
-} from '@app-buyer/shared';
+import { ModalService, CartService, AppReorderService } from '@app-buyer/shared';
 import { OrderReorderResponse } from '@app-buyer/shared/services/reorder/reorder.interface';
 import { LineItem } from '@ordercloud/angular-sdk';
 
@@ -20,15 +16,11 @@ export class OrderReorderComponent implements OnInit {
   modalID = 'Order-Reorder';
   message = { string: null, classType: null };
 
-  constructor(
-    private appReorderService: AppReorderService,
-    private modalService: ModalService,
-    private cartService: CartService
-  ) {}
+  constructor(private appReorderService: AppReorderService, private modalService: ModalService, private cartService: CartService) {}
 
   async ngOnInit() {
     if (this.orderID) {
-      this.reorderResponse = await this.appReorderService.order(this.orderID);
+      this.reorderResponse = await this.appReorderService.validateReorder(this.orderID);
       this.updateMessage(this.reorderResponse);
     } else {
       throw new Error('Needs Order ID');
