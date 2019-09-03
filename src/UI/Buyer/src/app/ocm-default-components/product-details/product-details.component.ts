@@ -1,20 +1,20 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewChecked, OnChanges } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BuyerProduct, LineItem, ListSpec } from '@ordercloud/angular-sdk';
+import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interface';
+import { OCMComponent } from '../ocm-component';
 
 @Component({
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
 })
-export class OCMProductDetails implements OnChanges, AfterViewChecked {
+export class OCMProductDetails extends OCMComponent implements OnChanges, AfterViewChecked {
   @Input() specs: ListSpec;
   @Input() product: BuyerProduct;
   @Input() isFavorite: boolean;
   @Input() quantityLimits: QuantityLimits;
-  @Output() addToCartEvent = new EventEmitter<LineItem>();
   @Output() setIsFavorite = new EventEmitter<boolean>();
 
   quantity: number;
@@ -25,7 +25,9 @@ export class OCMProductDetails implements OnChanges, AfterViewChecked {
   isOrderable = false;
   hasPrice = false;
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+  constructor(private changeDetectorRef: ChangeDetectorRef) {
+    super();
+  }
 
   ngOnChanges() {
     if (!this.product) return;
@@ -42,7 +44,7 @@ export class OCMProductDetails implements OnChanges, AfterViewChecked {
       OptionID: o.ID,
       Value: o.Value,
     }));
-    this.addToCartEvent.emit({
+    this.cartActions.addToCart({
       ProductID: this.product.ID,
       Quantity: this.quantity,
       Specs,

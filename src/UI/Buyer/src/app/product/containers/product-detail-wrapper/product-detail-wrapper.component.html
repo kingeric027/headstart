@@ -2,6 +2,6 @@
                      [specs]="specs"
                      [quantityLimits]="quantityLimits"
                      [isFavorite]="favoriteProductService.isFavorite(product)"
-                     (addToCartEvent)="addToCart($event.detail)"
+                     [cartActions]="cartService"
                      (setIsFavorite)="favoriteProductService.setFavoriteValue($event.detail, product.ID)">
 </ocm-product-details>

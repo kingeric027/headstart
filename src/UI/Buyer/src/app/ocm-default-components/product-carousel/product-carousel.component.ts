@@ -40,8 +40,4 @@ export class OCMProductCarousel {
   setIsFavoriteEvent(isFavorite: boolean, productID: string): void {
     this.setIsFavorite.emit({ isFavorite, productID });
   }
-
-  toDetails(productID: string): void {
-    this.navigator.toProductDetails(productID);
-  }
 }

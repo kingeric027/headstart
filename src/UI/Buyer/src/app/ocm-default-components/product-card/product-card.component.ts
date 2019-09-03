@@ -2,14 +2,14 @@ import { Component, Input, EventEmitter, Output, OnInit, ViewEncapsulation, OnCh
 import { BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
 import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
-import { Navigator } from '@app-buyer/shared/services/navigator/navigator.service';
+import { OCMComponent } from '../ocm-component';
 
 @Component({
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class OCMProductCard implements OnInit, OnChanges {
+export class OCMProductCard extends OCMComponent implements OnInit, OnChanges {
   @Input() product: BuyerProduct = {
     PriceSchedule: {},
     xp: { Images: [] },
@@ -21,8 +21,6 @@ export class OCMProductCard implements OnInit, OnChanges {
     minPerOrder: 0,
     restrictedQuantities: [],
   };
-  @Input() navigator: Navigator;
-  @Output() addedToCart = new EventEmitter<LineItem>();
   @Output() setIsFavorite = new EventEmitter<boolean>();
 
   quantity: number;
@@ -33,7 +31,7 @@ export class OCMProductCard implements OnInit, OnChanges {
 
   ngOnChanges() {
     this.isSetFavoriteUsed = this.setIsFavorite.observers.length > 0;
-    const isAddedToCartUsed = this.addedToCart.observers.length > 0;
+    const isAddedToCartUsed = true;
     this.isViewOnlyProduct = !this.product.PriceSchedule;
     this.hasSpecs = this.product.SpecCount > 0;
     this.shouldDisplayAddToCart = isAddedToCartUsed && !this.isViewOnlyProduct && !this.hasSpecs;
@@ -46,7 +44,7 @@ export class OCMProductCard implements OnInit, OnChanges {
   }
 
   addToCart(li: LineItem) {
-    this.addedToCart.emit(li);
+    this.cartActions.addToCart(li);
   }
 
   getImageUrl() {

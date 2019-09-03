@@ -4,10 +4,18 @@ import { flatMap } from 'rxjs/operators';
 import { isUndefined as _isUndefined, flatMap as _flatMap, get as _get, isEqual as _isEqual, omitBy as _omitBy } from 'lodash';
 import { CurrentOrderService } from '../current-order/current-order.service';
 
+export interface CartActions {
+  addToCart: (lineItem: LineItem) => Promise<LineItem>;
+  removeLineItem: (lineItemID: string) => Promise<void>;
+  updateQuantity: (lineItemID: string, newQuantity: number) => Promise<LineItem>;
+  addManyToCart: (lineItem: LineItem[]) => Promise<LineItem[]>;
+  emptyCart: () => Promise<void>;
+}
+
 @Injectable({
   providedIn: 'root',
 })
-export class CartService {
+export class CartService implements CartActions {
   private initializingOrder = false;
 
   constructor(
@@ -15,37 +23,6 @@ export class CartService {
     private ocLineItemService: OcLineItemService,
     private ocOrderService: OcOrderService
   ) {}
-
-  addSpecsToProductName(lineItems: ListLineItem): ListLineItem {
-    const lis: ListLineItem = JSON.parse(JSON.stringify(lineItems));
-    lis.Items = lis.Items.map((lineItem) => {
-      if (lineItem.Specs.length === 0) return lineItem;
-      const list = lineItem.Specs.map((spec) => spec.Value).join(', ');
-      lineItem.Product.Name = `${lineItem.Product.Name} (${list})`;
-      return lineItem;
-    });
-    return lis;
-  }
-
-  async removeItem(lineItemID: string): Promise<void> {
-    await this.ocLineItemService.Delete('outgoing', this.currentOrder.order.ID, lineItemID).toPromise();
-    this.currentOrder.reset();
-  }
-
-  async updateQuantity(lineItemID: string, newQuantity: number): Promise<LineItem> {
-    const li = await this.ocLineItemService
-      .Patch('outgoing', this.currentOrder.order.ID, lineItemID, {
-        Quantity: newQuantity,
-      })
-      .toPromise();
-    this.currentOrder.reset();
-    return li;
-  }
-
-  async addManyToCart(lineItem: LineItem[]): Promise<LineItem[]> {
-    const req = lineItem.map((li) => this.addToCart(li));
-    return Promise.all(req);
-  }
 
   async addToCart(lineItem: LineItem): Promise<LineItem> {
     // order is well defined, line item can be added
@@ -70,6 +47,43 @@ export class CartService {
         })
       )
       .toPromise();
+  }
+
+  async removeLineItem(lineItemID: string): Promise<void> {
+    await this.ocLineItemService.Delete('outgoing', this.currentOrder.order.ID, lineItemID).toPromise();
+    this.currentOrder.reset();
+  }
+
+  async updateQuantity(lineItemID: string, newQuantity: number): Promise<LineItem> {
+    const li = await this.ocLineItemService
+      .Patch('outgoing', this.currentOrder.order.ID, lineItemID, {
+        Quantity: newQuantity,
+      })
+      .toPromise();
+    this.currentOrder.reset();
+    return li;
+  }
+
+  async addManyToCart(lineItem: LineItem[]): Promise<LineItem[]> {
+    const req = lineItem.map((li) => this.addToCart(li));
+    return Promise.all(req);
+  }
+
+  async emptyCart(): Promise<void> {
+    await this.ocOrderService.Delete('outgoing', this.currentOrder.order.ID).toPromise();
+    await this.currentOrder.reset();
+  }
+
+  // TODO - should be a display pipe
+  addSpecsToProductName(lineItems: ListLineItem): ListLineItem {
+    const lis: ListLineItem = JSON.parse(JSON.stringify(lineItems));
+    lis.Items = lis.Items.map((lineItem) => {
+      if (lineItem.Specs.length === 0) return lineItem;
+      const list = lineItem.Specs.map((spec) => spec.Value).join(', ');
+      lineItem.Product.Name = `${lineItem.Product.Name} (${list})`;
+      return lineItem;
+    });
+    return lis;
   }
 
   private async createLineItem(newLI: LineItem): Promise<LineItem> {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BuyerProduct, LineItem, ListSpec } from '@ordercloud/angular-sdk';
+import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
 import { CartService, BuildQtyLimits } from '@app-buyer/shared';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
@@ -17,7 +17,7 @@ export class ProductDetailWrapperComponent implements OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private cartService: CartService,
+    protected cartService: CartService, // used in template
     protected favoriteProductService: FavoriteProductsService
   ) {}
 
@@ -25,9 +25,5 @@ export class ProductDetailWrapperComponent implements OnInit {
     this.product = this.activatedRoute.snapshot.data.product;
     this.specs = this.activatedRoute.snapshot.data.specs || [];
     this.quantityLimits = BuildQtyLimits(this.product);
-  }
-
-  addToCart(li: LineItem) {
-    this.cartService.addToCart(li);
   }
 }

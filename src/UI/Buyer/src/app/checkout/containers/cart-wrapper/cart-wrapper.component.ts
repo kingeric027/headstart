@@ -1,9 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Order, ListLineItem, OcOrderService } from '@ordercloud/angular-sdk';
+import { Order, ListLineItem } from '@ordercloud/angular-sdk';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 import { CartService, BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
 import { takeWhile } from 'rxjs/operators';
-import { Router } from '@angular/router';
 import { NavigatorService } from '@app-buyer/shared/services/navigator/navigator.service';
 
 @Component({
@@ -19,10 +18,8 @@ export class CartWrapperComponent implements OnInit, OnDestroy {
 
   constructor(
     private cartService: CartService,
-    private ocOrderService: OcOrderService,
-    private router: Router,
     private currentOrder: CurrentOrderService,
-    protected navigator: NavigatorService // used in template
+    protected navigator: NavigatorService //used in template
   ) {}
 
   ngOnInit() {
@@ -39,32 +36,7 @@ export class CartWrapperComponent implements OnInit, OnDestroy {
     this.quantityLimits = this.lineItems.Items.map((li) => BuildQtyLimits(li.Product));
   };
 
-  async emptyCart() {
-    await this.ocOrderService.Delete('outgoing', this.order.ID).toPromise();
-    await this.currentOrder.reset();
-  }
-
-  async deleteLineItem(id: string): Promise<void> {
-    await this.cartService.removeItem(id);
-  }
-
-  async updateQuantity(id: string, quantity: number): Promise<void> {
-    await this.cartService.updateQuantity(id, quantity);
-  }
-
   ngOnDestroy() {
     this.alive = false;
-  }
-
-  toProductDetails(productID: string) {
-    this.router.navigateByUrl(`/products/${productID}`);
-  }
-
-  toProductList() {
-    this.router.navigateByUrl('/products');
-  }
-
-  toCheckout() {
-    this.router.navigateByUrl('/checkout');
   }
 }

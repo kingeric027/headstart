@@ -4,13 +4,13 @@ import { Router } from '@angular/router';
 export interface Navigator {
   toProductDetails: (productID: string) => void;
   toProductList: () => void;
-  toCheckout(): () => void;
+  toCheckout: () => void;
 }
 
 @Injectable({
   providedIn: 'root',
 })
-export class NavigatorService {
+export class NavigatorService implements Navigator {
   constructor(private router: Router) {}
 
   toProductDetails(productID: string): void {

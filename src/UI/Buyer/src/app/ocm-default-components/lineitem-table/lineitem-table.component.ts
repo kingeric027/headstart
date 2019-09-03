@@ -1,24 +1,20 @@
-import { Component, Output, Input, EventEmitter } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { LineItem, ListLineItem } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { get as _get } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
+import { OCMComponent } from '../ocm-component';
 
 @Component({
   selector: 'ocm-lineitem-table',
   templateUrl: './lineitem-table.component.html',
   styleUrls: ['./lineitem-table.component.scss'],
 })
-export class OCMLineitemTable {
+export class OCMLineitemTable extends OCMComponent {
   closeIcon = faTimes;
   @Input() lineItems: ListLineItem;
   @Input() readOnly: boolean;
   @Input() quantityLimits: QuantityLimits[];
-  @Input() navigator: Navigator;
-  @Output() deleteLineItem = new EventEmitter<{ lineItemID: string }>();
-  @Output() updateQuantity = new EventEmitter<{ lineItemID: string; quantity: number }>();
-
-  constructor() {}
 
   log(object: any) {
     console.log(object);
@@ -26,12 +22,16 @@ export class OCMLineitemTable {
   }
 
   removeLineItem(lineItemID: string) {
-    this.deleteLineItem.emit({ lineItemID });
+    this.cartActions.removeLineItem(lineItemID);
+  }
+
+  toProductDetails(productID: string) {
+    this.navigator.toProductDetails(productID);
   }
 
   changeQuantity(lineItemID: string, quantity: number) {
     this.getLineItem(lineItemID).Quantity = quantity;
-    this.updateQuantity.emit({ lineItemID, quantity });
+    this.cartActions.updateQuantity(lineItemID, quantity);
   }
 
   getImageUrl(lineItemID: string) {

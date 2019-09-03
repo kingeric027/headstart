@@ -12,7 +12,7 @@
     </div>
     <ocm-lineitem-table *ngIf="reorderResponse.InvalidLi.length"
                         [lineitems]="reorderResponse.InvalidLi"
-                        (navigateToProductDetails)="toProductDetails($event.detail.productID)"
+                        [navigator]="navigator"
                         [readOnly]="true">
     </ocm-lineitem-table>
     <button type="button"
