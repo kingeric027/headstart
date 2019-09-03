@@ -2,7 +2,7 @@ import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { ListOrder } from '@ordercloud/angular-sdk';
 import { OrderListColumn } from '@app-buyer/order/models/order-list-column';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
-import { FavoriteOrdersService } from '@app-buyer/shared/services/favorites/favorites.service';
+import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'order-list',
@@ -18,9 +18,7 @@ export class OrderListComponent {
   @Output() updatedSort = new EventEmitter<string>();
   @Output() changedPage = new EventEmitter<number>();
 
-  constructor(
-    protected favoriteOrderService: FavoriteOrdersService // used in template
-  ) {}
+  constructor(protected currentUser: CurrentUserService) {}
 
   protected updateSort(selectedSortBy) {
     let sortBy;
@@ -40,5 +38,13 @@ export class OrderListComponent {
 
   protected changePage(page: number): void {
     this.changedPage.emit(page);
+  }
+
+  isFavorite(orderID: string) {
+    return this.currentUser.favoriteOrderIDs.includes(orderID);
+  }
+
+  setIsFavorite(isFav: boolean, orderID: string) {
+    this.currentUser.setIsFavoriteOrder(isFav, orderID);
   }
 }

@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, Params } from '@angular/router';
-import { ListBuyerProduct, OcMeService, Category, ListCategory, ListFacet, ListLineItem, LineItem } from '@ordercloud/angular-sdk';
+import { ListBuyerProduct, OcMeService, Category, ListCategory, ListFacet, ListLineItem } from '@ordercloud/angular-sdk';
 import { CartService, ModalService, BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
 import { ProductSortStrategy } from '@app-buyer/product/models/product-sort-strategy.enum';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 import { NavigatorService } from '@app-buyer/shared/services/navigator/navigator.service';
+import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'product-list',
@@ -32,10 +32,10 @@ export class ProductListComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private ocMeService: OcMeService,
     private router: Router,
-    private cartService: CartService,
-    public favoriteProductsService: FavoriteProductsService,
+    protected cartService: CartService, // used in template
     private modalService: ModalService,
     private currentOrder: CurrentOrderService,
+    private currentUser: CurrentUserService,
     protected navigator: NavigatorService
   ) {}
 
@@ -91,7 +91,7 @@ export class ProductListComponent implements OnInit {
 
   private buildFavoritesFilter(queryParams: Params): Params {
     const filter = {};
-    const favorites = this.favoriteProductsService.getFavorites();
+    const favorites = this.currentUser.favoriteProductIDs;
     filter['ID'] = queryParams.favoriteProducts === 'true' && favorites ? favorites.join('|') : undefined;
     return filter;
   }
@@ -191,10 +191,6 @@ export class ProductListComponent implements OnInit {
     return recursiveBuild(catID);
   }
 
-  addToCart(li: LineItem) {
-    this.cartService.addToCart(li);
-  }
-
   openCategoryModal() {
     this.modalService.open('selectCategory');
     this.isModalOpen = true;
@@ -202,6 +198,14 @@ export class ProductListComponent implements OnInit {
   closeCategoryModal() {
     this.isModalOpen = false;
     this.modalService.close('selectCategory');
+  }
+
+  isFavorite(productID: string): boolean {
+    return this.currentUser.favoriteProductIDs.includes(productID);
+  }
+
+  setIsFavorite(isFav: boolean, productID: string) {
+    this.currentUser.setIsFavoriteProduct(isFav, productID);
   }
 
   configureRouter() {

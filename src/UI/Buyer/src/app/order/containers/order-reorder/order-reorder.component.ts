@@ -4,7 +4,7 @@ import { forEach as _forEach } from 'lodash';
 import { ModalService, CartService, AppReorderService } from '@app-buyer/shared';
 import { OrderReorderResponse } from '@app-buyer/shared/services/reorder/reorder.interface';
 import { LineItem } from '@ordercloud/angular-sdk';
-import { Navigator } from '@app-buyer/shared/services/navigator/navigator.service';
+import { NavigatorService } from '@app-buyer/shared/services/navigator/navigator.service';
 
 @Component({
   selector: 'order-reorder',
@@ -21,7 +21,7 @@ export class OrderReorderComponent implements OnInit {
     private appReorderService: AppReorderService,
     private modalService: ModalService,
     private cartService: CartService,
-    protected navigator: Navigator // used in template
+    protected navigator: NavigatorService // used in template
   ) {}
 
   async ngOnInit() {

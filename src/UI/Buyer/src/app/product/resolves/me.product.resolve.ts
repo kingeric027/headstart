@@ -3,7 +3,7 @@ import { Resolve, ActivatedRouteSnapshot, Params } from '@angular/router';
 import { OcMeService, ListBuyerProduct, BuyerProduct, ListBuyerSpec, BuyerSpec, ListCategory } from '@ordercloud/angular-sdk';
 import { each as _each } from 'lodash';
 import { Observable, of } from 'rxjs';
-import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
+import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 
 @Injectable()
 export class MeListRelatedProductsResolver implements Resolve<ListBuyerProduct> {
@@ -24,7 +24,7 @@ export class MeListRelatedProductsResolver implements Resolve<ListBuyerProduct> 
 
 @Injectable()
 export class MeListProductResolver implements Resolve<ListBuyerProduct> {
-  constructor(private service: OcMeService, private favoriteProductsService: FavoriteProductsService) {}
+  constructor(private service: OcMeService, private currentUser: CurrentUserService) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<ListBuyerProduct> | Promise<ListBuyerProduct> | any {
     return this.service.ListProducts({
@@ -52,7 +52,7 @@ export class MeListProductResolver implements Resolve<ListBuyerProduct> {
 
   private buildFavoriesFilter(params: Params): Params {
     const filter = {};
-    const favorites = this.favoriteProductsService.getFavorites();
+    const favorites = this.currentUser.favoriteProductIDs;
     filter['ID'] = params.favoriteProducts === 'true' && favorites ? favorites.join('|') : undefined;
     return filter;
   }

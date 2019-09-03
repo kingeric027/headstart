@@ -22,7 +22,7 @@
               class="btn btn-outline-secondary float-right"
               (click)="toggleFavorite(order)">Favorite
         <ocm-toggle-favorite title="Favorite"
-                             [favorite]="favoriteOrdersService.isFavorite(order)">
+                             [favorite]="isFavorite(order.ID)">
         </ocm-toggle-favorite>
       </button>
       <order-reorder *ngIf="!approvalVersion"

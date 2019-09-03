@@ -5,7 +5,7 @@ import { MeOrderListOptions } from '@app-buyer/order/models/me-order-list-option
 import { Observable } from 'rxjs';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { flatMap } from 'rxjs/operators';
-import { FavoriteOrdersService } from '@app-buyer/shared/services/favorites/favorites.service';
+import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'order-history',
@@ -24,7 +24,7 @@ export class OrderHistoryComponent implements AfterViewInit {
     private ocMeService: OcMeService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private favoriteOrdersService: FavoriteOrdersService
+    private currentUser: CurrentUserService
   ) {}
 
   ngAfterViewInit(): void {
@@ -82,25 +82,18 @@ export class OrderHistoryComponent implements AfterViewInit {
           page: parseInt(queryParamMap.get('page'), 10) || undefined,
           filters: {
             ID: this.buildFavoriteOrdersQuery(queryParamMap),
-            status:
-              queryParamMap.get('status') || `!${OrderStatus.Unsubmitted}`,
+            status: queryParamMap.get('status') || `!${OrderStatus.Unsubmitted}`,
             datesubmitted: queryParamMap.getAll('datesubmitted') || undefined,
           },
         };
-        return this.approvalVersion
-          ? this.ocMeService.ListApprovableOrders(listOptions)
-          : this.ocMeService.ListOrders(listOptions);
+        return this.approvalVersion ? this.ocMeService.ListApprovableOrders(listOptions) : this.ocMeService.ListOrders(listOptions);
       })
     );
   }
 
-  private buildFavoriteOrdersQuery(
-    queryParamMap: ParamMap
-  ): string | undefined {
-    this.hasFavoriteOrdersFilter =
-      queryParamMap.get('favoriteOrders') === 'true';
+  private buildFavoriteOrdersQuery(queryParamMap: ParamMap): string | undefined {
+    this.hasFavoriteOrdersFilter = queryParamMap.get('favoriteOrders') === 'true';
     if (!this.hasFavoriteOrdersFilter) return undefined;
-    const favorites = this.favoriteOrdersService.getFavorites();
-    return favorites.join('|');
+    return this.currentUser.favoriteOrderIDs.join('|');
   }
 }

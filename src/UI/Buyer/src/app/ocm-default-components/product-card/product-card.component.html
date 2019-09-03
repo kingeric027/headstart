@@ -4,7 +4,7 @@
                          title="Favorite"
                          (click)="$event.stopPropagation()"
                          [favorite]="isFavorite"
-                         (favoriteChanged)="setIsFavorite.emit($event)"></ocm-toggle-favorite>
+                         (favoriteChanged)="setIsFavorite.emit($event.detail)"></ocm-toggle-favorite>
   </div>
   <img class="card-img-top img-fluid flex-shrink-0"
        (click)="toDetails()"
