@@ -8,8 +8,8 @@ import { OcTokenService, OcAuthService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { CookieService } from 'ngx-cookie';
 import { AppErrorHandler } from '@app-buyer/config/error-handling.config';
-import { AppStateService } from '@app-buyer/shared/services/app-state/app-state.service';
-import { BaseResolveService } from '@app-buyer/shared/services/base-resolve/base-resolve.service';
+import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { CurrentOrderService } from '@app-buyer/shared/services/current-order/current-order.service';
 
 export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possible';
 @Injectable({
@@ -27,8 +27,8 @@ export class AppAuthService {
     private cookieService: CookieService,
     private router: Router,
     private appErrorHandler: AppErrorHandler,
-    private appStateService: AppStateService,
-    private baseResolveService: BaseResolveService,
+    private currentUser: CurrentUserService,
+    private currentOrder: CurrentOrderService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     this.refreshToken = new BehaviorSubject<string>('');
@@ -38,7 +38,7 @@ export class AppAuthService {
     this.fetchingRefreshToken = true;
     return this.fetchRefreshToken().pipe(
       tap((token) => {
-        this.appStateService.isLoggedIn.next(true);
+        this.currentUser.loggedIn = true;
         this.ocTokenService.SetAccess(token);
         this.refreshToken.next(token);
       }),
@@ -89,12 +89,13 @@ export class AppAuthService {
     return throwError(TokenRefreshAttemptNotPossible);
   }
 
-  logout(): void {
+  async logout(): Promise<void> {
     this.ocTokenService.RemoveAccess();
-    this.appStateService.isLoggedIn.next(false);
+    this.currentUser.loggedIn = false;
     if (this.appConfig.anonymousShoppingEnabled) {
       this.router.navigate(['/home']);
-      this.baseResolveService.setAppState();
+      await this.currentUser.reset();
+      this.currentOrder.reset();
     } else {
       this.router.navigate(['/login']);
     }

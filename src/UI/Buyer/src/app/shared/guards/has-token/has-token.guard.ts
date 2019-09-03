@@ -7,7 +7,7 @@ import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.confi
 import { AppAuthService } from '@app-buyer/auth/services/app-auth.service';
 import { of, Observable } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
-import { AppStateService } from '@app-buyer/shared/services/app-state/app-state.service';
+import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +17,7 @@ export class HasTokenGuard implements CanActivate {
     private ocTokenService: OcTokenService,
     private router: Router,
     private appAuthService: AppAuthService,
-    private appStateService: AppStateService,
+    private currentUser: CurrentUserService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
   canActivate(): Observable<boolean> {
@@ -35,7 +35,7 @@ export class HasTokenGuard implements CanActivate {
       const match = /token=([^&]*)/.exec(window.location.search);
       if (match) {
         this.ocTokenService.SetAccess(match[1]);
-        this.appStateService.isLoggedIn.next(true);
+        this.currentUser.loggedIn = true;
         return of(true);
       } else {
         alert(`Missing url query param 'token'`);
@@ -57,12 +57,12 @@ export class HasTokenGuard implements CanActivate {
     if (!isAccessTokenValid && this.appConfig.anonymousShoppingEnabled) {
       return this.appAuthService.authAnonymous().pipe(
         flatMap(() => {
-          this.appStateService.isLoggedIn.next(true);
+          this.currentUser.loggedIn = true;
           return of(true);
         })
       );
     }
-    this.appStateService.isLoggedIn.next(true);
+    this.currentUser.loggedIn = true;
     return of(isAccessTokenValid);
   }
 

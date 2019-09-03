@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 import { OrderReorderResponse } from '@app-buyer/shared/services/reorder/reorder.interface';
-import { OcMeService, BuyerProduct, LineItem, Inventory, PriceSchedule } from '@ordercloud/angular-sdk';
+import { OcMeService, BuyerProduct, LineItem, Inventory, PriceSchedule, OcLineItemService } from '@ordercloud/angular-sdk';
 import { partition as _partition } from 'lodash';
-import { CartService } from '@app-buyer/shared/services/cart/cart.service';
+import { listAll } from '@app-buyer/shared/functions/listAll';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppReorderService {
-  constructor(private cartService: CartService, private meService: OcMeService) {}
+  constructor(private ocLineItemService: OcLineItemService, private meService: OcMeService) {}
 
   public async validateReorder(orderID: string): Promise<OrderReorderResponse> {
     if (!orderID) throw new Error('Needs Order ID');
-    const lineItems = (await this.cartService.listAllItems(orderID)).Items;
+    const lineItems = (await listAll(this.ocLineItemService, 'outgoing', orderID)).Items;
     const products = await this.ListProducts(lineItems);
     const [ValidLi, InvalidLi] = _partition(lineItems, (item) => this.isLineItemValid(item, products));
     return { ValidLi, InvalidLi };

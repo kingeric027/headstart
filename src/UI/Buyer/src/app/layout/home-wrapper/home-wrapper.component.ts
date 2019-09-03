@@ -19,7 +19,6 @@ export class HomePageWrapperComponent implements OnInit {
 
   ngOnInit() {
     this.featuredProducts = this.activatedRoute.snapshot.data.featuredProducts;
-    debugger;
     this.favoriteProductIDs = this.favoriteProducts.getFavorites();
     this.quantityLimits = this.featuredProducts.Items.map((p) => BuildQtyLimits(p));
   }

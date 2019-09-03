@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
-import { BaseResolveService } from '@app-buyer/shared/services/base-resolve/base-resolve.service';
+import { CurrentOrderService } from '@app-buyer/shared/services/current-order/current-order.service';
+import { CurrentUserService } from '../services/current-user/current-user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BaseResolve implements Resolve<any> {
-  constructor(private baseResolveService: BaseResolveService) {}
+  constructor(private currentOrder: CurrentOrderService, private currentUser: CurrentUserService) {}
 
   resolve() {
-    return this.baseResolveService.setAppState();
+    this.currentUser.reset();
+    this.currentOrder.reset();
   }
 }

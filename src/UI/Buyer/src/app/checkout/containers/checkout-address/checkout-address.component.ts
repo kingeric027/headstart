@@ -1,16 +1,8 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { CheckoutSectionBaseComponent } from '@app-buyer/checkout/components/checkout-section-base/checkout-section-base.component';
 import { Observable } from 'rxjs';
-import {
-  OcMeService,
-  ListBuyerAddress,
-  OcOrderService,
-  Order,
-  BuyerAddress,
-  ListLineItem,
-  Address,
-} from '@ordercloud/angular-sdk';
-import { AppStateService, ModalService } from '@app-buyer/shared';
+import { OcMeService, ListBuyerAddress, OcOrderService, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
+import { ModalService, CurrentOrderService } from '@app-buyer/shared';
 import { filter } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { AddressFormComponent } from '@app-buyer/shared/components/address-form/address-form.component';
@@ -20,8 +12,7 @@ import { AddressFormComponent } from '@app-buyer/shared/components/address-form/
   templateUrl: './checkout-address.component.html',
   styleUrls: ['./checkout-address.component.scss'],
 })
-export class CheckoutAddressComponent extends CheckoutSectionBaseComponent
-  implements OnInit {
+export class CheckoutAddressComponent extends CheckoutSectionBaseComponent implements OnInit {
   @Input() isAnon: boolean;
   @Input() addressType: 'Shipping' | 'Billing';
   @ViewChild(AddressFormComponent, { static: false })
@@ -41,7 +32,7 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent
   constructor(
     private ocMeService: OcMeService,
     private ocOrderService: OcOrderService,
-    private appStateService: AppStateService,
+    private currentOrder: CurrentOrderService,
     private modalService: ModalService,
     private toastrService: ToastrService
   ) {
@@ -61,9 +52,7 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent
   clearFiltersOnModalClose() {
     this.modalService.onCloseSubject
       .pipe(filter((id) => id === this.modalID))
-      .subscribe(() =>
-        this.updateRequestOptions({ page: undefined, search: undefined })
-      );
+      .subscribe(() => this.updateRequestOptions({ page: undefined, search: undefined }));
   }
 
   updateRequestOptions(options: { page?: number; search?: string }) {
@@ -84,13 +73,10 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent
   }
 
   private setSelectedAddress() {
-    this.order = this.appStateService.orderSubject.value;
-    this.lineItems = this.appStateService.lineItemSubject.value;
+    this.order = this.currentOrder.order;
+    this.lineItems = this.currentOrder.lineItems;
 
-    this.selectedAddress =
-      this.addressType === 'Billing'
-        ? this.order.BillingAddress
-        : this.lineItems.Items[0].ShippingAddress; // shipping address is defined at the line item level
+    this.selectedAddress = this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress; // shipping address is defined at the line item level
   }
 
   existingAddressSelected(address: BuyerAddress) {
@@ -121,17 +107,15 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent
       (order) => {
         if (this.addressType === 'Shipping') {
           this.lineItems.Items[0].ShippingAddress = address;
-          this.appStateService.lineItemSubject.next(this.lineItems);
+          this.currentOrder.lineItems = this.lineItems;
         }
         this.order = order;
-        this.appStateService.orderSubject.next(this.order);
+        this.currentOrder.order = this.order;
         this.continue.emit();
       },
       (ex) => {
         if (ex.error.Errors[0].ErrorCode === 'NotFound') {
-          this.toastrService.error(
-            'You no longer have access to this saved address. Please enter or select a different one.'
-          );
+          this.toastrService.error('You no longer have access to this saved address. Please enter or select a different one.');
         }
       }
     );
@@ -141,11 +125,7 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     address.ID = null;
-    return this.ocOrderService[`Set${this.addressType}Address`](
-      'outgoing',
-      this.order.ID,
-      address
-    );
+    return this.ocOrderService[`Set${this.addressType}Address`]('outgoing', this.order.ID, address);
   }
 
   private setSavedAddress(address): Observable<Order> {

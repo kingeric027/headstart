@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Order, ListLineItem, OcOrderService } from '@ordercloud/angular-sdk';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
-import { AppStateService, BaseResolveService, CartService, BuildQtyLimits } from '@app-buyer/shared';
+import { CartService, BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
 import { takeWhile } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
@@ -17,16 +17,15 @@ export class CartWrapperComponent implements OnInit, OnDestroy {
   alive = true;
 
   constructor(
-    private appStateService: AppStateService,
-    private baseResolveService: BaseResolveService,
     private cartService: CartService,
     private ocOrderService: OcOrderService,
-    private router: Router
+    private router: Router,
+    private currentOrder: CurrentOrderService
   ) {}
 
   ngOnInit() {
-    this.appStateService.orderSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrder);
-    this.appStateService.lineItemSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setLineItems);
+    this.currentOrder.orderSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrder);
+    this.currentOrder.lineItemSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setLineItems);
   }
 
   setOrder = (order: Order): void => {
@@ -40,7 +39,7 @@ export class CartWrapperComponent implements OnInit, OnDestroy {
 
   async emptyCart() {
     await this.ocOrderService.Delete('outgoing', this.order.ID).toPromise();
-    await this.baseResolveService.setCurrentOrder();
+    await this.currentOrder.reset();
   }
 
   async deleteLineItem(id: string): Promise<void> {

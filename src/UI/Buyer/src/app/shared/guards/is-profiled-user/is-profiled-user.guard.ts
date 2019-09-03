@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { CanActivate } from '@angular/router';
-
-import { AppStateService } from '@app-buyer/shared/services/app-state/app-state.service';
+import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class IsProfiledUserGuard implements CanActivate {
-  constructor(private appStateService: AppStateService) {}
+  constructor(private currentUser: CurrentUserService) {}
 
   canActivate(): boolean {
-    return !this.appStateService.isAnonSubject.value;
+    return !this.currentUser.isAnon;
   }
 }

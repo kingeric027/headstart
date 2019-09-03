@@ -3,14 +3,11 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { OcMeService, MeUser, OcAuthService } from '@ordercloud/angular-sdk';
 import { flatMap } from 'rxjs/operators';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-buyer/config/app.config';
-import { AppStateService } from '@app-buyer/shared/services/app-state/app-state.service';
+import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
 import { ModalService } from '@app-buyer/shared/services/modal/modal.service';
 import { RegexService } from '@app-buyer/shared/services/regex/regex.service';
+import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'profile-meupdate',
@@ -24,7 +21,7 @@ export class MeUpdateComponent implements OnInit, OnDestroy {
   changePasswordModalId = 'forgotPasswordModal';
 
   constructor(
-    private appStateService: AppStateService,
+    private currentUser: CurrentUserService,
     private formBuilder: FormBuilder,
     private formErrorService: AppFormErrorService,
     private modalService: ModalService,
@@ -43,14 +40,8 @@ export class MeUpdateComponent implements OnInit, OnDestroy {
   private setForm() {
     this.form = this.formBuilder.group({
       Username: ['', Validators.required],
-      FirstName: [
-        '',
-        [Validators.required, Validators.pattern(this.regexService.HumanName)],
-      ],
-      LastName: [
-        '',
-        [Validators.required, Validators.pattern(this.regexService.HumanName)],
-      ],
+      FirstName: ['', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
+      LastName: ['', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
       Email: ['', [Validators.required, Validators.email]],
       Phone: ['', Validators.pattern(this.regexService.Phone)],
     });
@@ -58,12 +49,7 @@ export class MeUpdateComponent implements OnInit, OnDestroy {
 
   onChangePassword({ currentPassword, newPassword }) {
     return this.ocAuthService
-      .Login(
-        this.me.Username,
-        currentPassword,
-        this.appConfig.clientID,
-        this.appConfig.scope
-      )
+      .Login(this.me.Username, currentPassword, this.appConfig.clientID, this.appConfig.scope)
       .pipe(
         flatMap(() =>
           this.ocMeService.ResetPasswordByToken({
@@ -86,7 +72,7 @@ export class MeUpdateComponent implements OnInit, OnDestroy {
     me.Active = true;
 
     this.ocMeService.Patch(me).subscribe((res) => {
-      this.appStateService.userSubject.next(res);
+      this.currentUser.user = res;
       this.toastrService.success('Account Info Updated');
     });
   }
@@ -109,12 +95,8 @@ export class MeUpdateComponent implements OnInit, OnDestroy {
   }
 
   // control display of error messages
-  protected hasRequiredError = (controlName: string): boolean =>
-    this.formErrorService.hasRequiredError(controlName, this.form);
-  protected hasEmailError = (): boolean =>
-    this.formErrorService.hasInvalidEmailError(this.form.get('Email'));
-  protected hasPatternError = (controlName: string) =>
-    this.formErrorService.hasPatternError(controlName, this.form);
-  protected passwordMismatchError = (): boolean =>
-    this.formErrorService.hasPasswordMismatchError(this.form);
+  protected hasRequiredError = (controlName: string): boolean => this.formErrorService.hasRequiredError(controlName, this.form);
+  protected hasEmailError = (): boolean => this.formErrorService.hasInvalidEmailError(this.form.get('Email'));
+  protected hasPatternError = (controlName: string) => this.formErrorService.hasPatternError(controlName, this.form);
+  protected passwordMismatchError = (): boolean => this.formErrorService.hasPasswordMismatchError(this.form);
 }

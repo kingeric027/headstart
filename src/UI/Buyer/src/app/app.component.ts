@@ -1,14 +1,8 @@
 import { Component } from '@angular/core';
-import {
-  NgbDateAdapter,
-  NgbDateParserFormatter,
-} from '@ng-bootstrap/ng-bootstrap';
-import {
-  NgbDateNativeAdapter,
-  NgbDateCustomParserFormatter,
-} from '@app-buyer/config/date-picker.config';
-import { AppStateService } from '@app-buyer/shared';
+import { NgbDateAdapter, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateNativeAdapter, NgbDateCustomParserFormatter } from '@app-buyer/config/date-picker.config';
 import { Observable } from 'rxjs';
+import { CurrentUserService } from './shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +18,7 @@ import { Observable } from 'rxjs';
 export class AppComponent {
   isLoggedIn$: Observable<boolean>;
 
-  constructor(private appStateService: AppStateService) {
-    this.isLoggedIn$ = this.appStateService.isLoggedIn;
+  constructor(private currentUser: CurrentUserService) {
+    this.isLoggedIn$ = this.currentUser.loggedInSubject;
   }
 }

@@ -10,9 +10,8 @@ export * from '@app-buyer/shared/guards/has-token/has-token.guard';
 export * from '@app-buyer/shared/guards/is-profiled-user/is-profiled-user.guard';
 
 // services
-export * from '@app-buyer/shared/services/app-state/app-state.service';
 export * from '@app-buyer/shared/services/authorize-net/authorize-net.service';
-export * from '@app-buyer/shared/services/base-resolve/base-resolve.service';
+export * from '@app-buyer/shared/services/current-order/current-order.service';
 export * from '@app-buyer/shared/services/form-error/form-error.service';
 export * from '@app-buyer/shared/services/geography/geography.service';
 export * from '@app-buyer/shared/services/cart/cart.service';

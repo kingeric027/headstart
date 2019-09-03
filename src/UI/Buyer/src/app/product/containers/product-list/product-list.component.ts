@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, Params } from '@angular/router';
 import { ListBuyerProduct, OcMeService, Category, ListCategory, ListFacet, ListLineItem, LineItem } from '@ordercloud/angular-sdk';
-import { CartService, AppStateService, ModalService, BuildQtyLimits } from '@app-buyer/shared';
+import { CartService, ModalService, BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
 import { ProductSortStrategy } from '@app-buyer/product/models/product-sort-strategy.enum';
@@ -33,8 +33,8 @@ export class ProductListComponent implements OnInit {
     private router: Router,
     private cartService: CartService,
     public favoriteProductsService: FavoriteProductsService,
-    private appStateService: AppStateService,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private currentOrder: CurrentOrderService
   ) {}
 
   ngOnInit() {
@@ -46,7 +46,7 @@ export class ProductListComponent implements OnInit {
     this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
     this.categoryCrumbs = this.buildBreadCrumbs(this.activatedRoute.snapshot.queryParams.category);
     this.configureRouter();
-    this.appStateService.lineItemSubject.subscribe((lineItems) => (this.lineItems = lineItems));
+    this.currentOrder.lineItemSubject.subscribe((lineItems) => (this.lineItems = lineItems));
     this.activatedRoute.queryParams.subscribe(this.onQueryParamsChange);
   }
 

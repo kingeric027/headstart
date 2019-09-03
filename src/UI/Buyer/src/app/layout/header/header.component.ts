@@ -4,11 +4,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { faSearch, faShoppingCart, faPhone, faQuestionCircle, faUserCircle, faSignOutAlt, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
-import { AppStateService } from '@app-buyer/shared';
+import { CurrentOrderService } from '@app-buyer/shared';
 import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
 import { takeWhile, tap, debounceTime, delay, filter } from 'rxjs/operators';
 import { AppAuthService } from '@app-buyer/auth';
 import { SearchComponent } from '@app-buyer/shared/components/search/search.component';
+import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'layout-header',
@@ -18,9 +19,9 @@ import { SearchComponent } from '@app-buyer/shared/components/search/search.comp
 export class HeaderComponent implements OnInit, OnDestroy {
   categories$: Observable<ListCategory>;
   isCollapsed = true;
-  anonymous$: Observable<boolean> = this.appStateService.isAnonSubject;
-  user$: Observable<MeUser> = this.appStateService.userSubject;
-  currentOrder: Order;
+  anonymous$: Observable<boolean> = this.currentUser.isAnonSubject;
+  user$: Observable<MeUser> = this.currentUser.userSubject;
+  order: Order;
   alive = true;
   addToCartQuantity: number;
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
@@ -36,7 +37,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   faHome = faHome;
 
   constructor(
-    private appStateService: AppStateService,
+    private currentOrder: CurrentOrderService,
+    private currentUser: CurrentUserService,
     private appAuthService: AppAuthService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -44,7 +46,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.appStateService.orderSubject.pipe(takeWhile(() => this.alive)).subscribe((order) => (this.currentOrder = order));
+    this.currentOrder.orderSubject.pipe(takeWhile(() => this.alive)).subscribe((order) => (this.order = order));
 
     this.buildAddToCartListener();
     this.clearSearchOnNavigate();
@@ -55,7 +57,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   buildAddToCartListener() {
-    this.appStateService.addToCartSubject
+    this.currentOrder.addToCartSubject
       .pipe(
         tap((li: LineItem) => {
           this.popover.close();

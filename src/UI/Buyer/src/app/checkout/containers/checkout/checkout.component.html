@@ -6,7 +6,7 @@
   </div>
 </div>
 <div class="container">
-  <div *ngIf="currentOrder$ | async; let order">
+  <div *ngIf="order$ | async; let order">
     <div class="row flex-lg-row-reverse"
          *ngIf="order.LineItemCount">
       <div class="col-lg-3">

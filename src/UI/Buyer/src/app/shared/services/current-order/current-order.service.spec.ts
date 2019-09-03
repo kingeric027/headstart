@@ -1,7 +1,7 @@
 import { TestBed, async } from '@angular/core/testing';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 
-import { BaseResolveService } from '@app-buyer/shared/services/base-resolve/base-resolve.service';
+import { BaseResolveService } from '@app-buyer/shared/services/current-order/current-order.service';
 import { applicationConfiguration } from '@app-buyer/config/app.config';
 
 import { OcAuthService, Configuration } from '@ordercloud/angular-sdk';
@@ -37,22 +37,16 @@ describe('BaseResolveService', () => {
 
   describe('getOrderIDFromToken', () => {
     it('should call tokenService.GetAccess', () => {
-      spyOn(service.ocTokenService, 'GetAccess').and.returnValue(
-        tokenWithOrderId
-      );
+      spyOn(service.ocTokenService, 'GetAccess').and.returnValue(tokenWithOrderId);
       service.getOrderIDFromToken();
       expect(service.ocTokenService.GetAccess).toHaveBeenCalled();
     });
     it('should return the orderid if it exists', () => {
-      spyOn(service.ocTokenService, 'GetAccess').and.returnValue(
-        tokenWithOrderId
-      );
+      spyOn(service.ocTokenService, 'GetAccess').and.returnValue(tokenWithOrderId);
       expect(service.getOrderIDFromToken()).toBe('IYAJqNYUiEWrO-Kz-SjZjQ');
     });
     it('should return undefined if the orderID does not exist', () => {
-      spyOn(service.ocTokenService, 'GetAccess').and.returnValue(
-        tokenWithoutOrderID
-      );
+      spyOn(service.ocTokenService, 'GetAccess').and.returnValue(tokenWithoutOrderID);
       expect(service.getOrderIDFromToken()).toBe(undefined);
     });
   });
