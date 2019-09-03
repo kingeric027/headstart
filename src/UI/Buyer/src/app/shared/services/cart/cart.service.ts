@@ -3,7 +3,6 @@ import { OcLineItemService, ListLineItem, LineItem, OcOrderService } from '@orde
 import { flatMap } from 'rxjs/operators';
 import { isUndefined as _isUndefined, flatMap as _flatMap, get as _get, isEqual as _isEqual, omitBy as _omitBy } from 'lodash';
 import { CurrentOrderService } from '../current-order/current-order.service';
-import { listAll } from '@app-buyer/shared/functions/listAll';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +29,7 @@ export class CartService {
 
   async removeItem(lineItemID: string): Promise<void> {
     await this.ocLineItemService.Delete('outgoing', this.currentOrder.order.ID, lineItemID).toPromise();
-    this.updateAppState();
+    this.currentOrder.reset();
   }
 
   async updateQuantity(lineItemID: string, newQuantity: number): Promise<LineItem> {
@@ -39,7 +38,7 @@ export class CartService {
         Quantity: newQuantity,
       })
       .toPromise();
-    this.updateAppState();
+    this.currentOrder.reset();
     return li;
   }
 
@@ -74,9 +73,8 @@ export class CartService {
   }
 
   private async createLineItem(newLI: LineItem): Promise<LineItem> {
-    const lineItems = this.currentOrder.lineItems;
     // if line item exists simply update quantity, else create
-    const existingLI = lineItems.Items.find((li) => this.LineItemsMatch(li, newLI));
+    const existingLI = this.currentOrder.lineItems.Items.find((li) => this.LineItemsMatch(li, newLI));
 
     newLI.Quantity += _get(existingLI, 'Quantity', 0);
     const request = existingLI
@@ -84,13 +82,8 @@ export class CartService {
       : this.ocLineItemService.Create('outgoing', this.currentOrder.order.ID, newLI).toPromise();
     const lineitem = await request;
     this.currentOrder.addToCartSubject.next(newLI);
-    this.updateAppState();
+    this.currentOrder.reset();
     return lineitem;
-  }
-
-  private async updateAppState() {
-    this.currentOrder.order = await this.ocOrderService.Get('outgoing', this.currentOrder.order.ID).toPromise();
-    this.currentOrder.lineItems = await listAll(this.ocLineItemService, 'outgoing', this.currentOrder.order.ID);
   }
 
   // product ID and specs must be the same
