@@ -8,7 +8,7 @@
 <div class="container">
   <div class="my-3 d-flex justify-content-between">
     <button class="btn btn-outline-dark"
-            (click)="navigateToProductList.emit()">Continue Shopping</button>
+            (click)="navigator.toProductList()">Continue Shopping</button>
     <button class="btn btn-outline-danger"
             *ngIf="order?.LineItemCount"
             (click)="emptyCart.emit()">Empty Cart</button>
@@ -22,7 +22,7 @@
     <div class="col-lg-4">
       <ocm-order-summary [order]="order"></ocm-order-summary>
       <button class="btn btn-primary btn-block mb-4 font-weight-bold"
-              (click)="navigateToCheckout.emit()">CHECKOUT</button>
+              (click)="navigator.toCheckout()">CHECKOUT</button>
     </div>
     <div class="col-lg-8">
       {{ lineItems }}
@@ -30,9 +30,9 @@
       <ocm-lineitem-table [lineItems]="lineItems"
                           [readOnly]="false"
                           [quantityLimits]="quantityLimits"
+                          [navigator]="navigator"
                           (deleteLineItem)="deleteLineItem.emit($event)"
-                          (updateQuantity)="updateQuantity.emit($event)"
-                          (navigateToProductDetails)="navigateToProductDetails.emit($event)">
+                          (updateQuantity)="updateQuantity.emit($event)">
       </ocm-lineitem-table>
     </div>
   </div>

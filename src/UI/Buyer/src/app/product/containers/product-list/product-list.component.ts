@@ -7,6 +7,7 @@ import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/fa
 import { ProductSortStrategy } from '@app-buyer/product/models/product-sort-strategy.enum';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
+import { NavigatorService } from '@app-buyer/shared/services/navigator/navigator.service';
 
 @Component({
   selector: 'product-list',
@@ -34,7 +35,8 @@ export class ProductListComponent implements OnInit {
     private cartService: CartService,
     public favoriteProductsService: FavoriteProductsService,
     private modalService: ModalService,
-    private currentOrder: CurrentOrderService
+    private currentOrder: CurrentOrderService,
+    protected navigator: NavigatorService
   ) {}
 
   ngOnInit() {
@@ -118,11 +120,6 @@ export class ProductListComponent implements OnInit {
 
   routeHome() {
     this.router.navigate(['/home']);
-  }
-
-  toDetails(productID: string) {
-    if (!productID) return;
-    this.router.navigate([`/products/${productID}`]);
   }
 
   clearAllFilters() {

@@ -108,9 +108,9 @@
                             [product]="product"
                             [quantityLimits]="quantityLimits[i]"
                             [isFavorite]="favoriteProductsService.isFavorite(product)"
+                            [navigator]="navigator"
                             (setIsFavorite)="favoriteProductsService.setFavoriteValue($event.detail, product.ID)"
-                            (addedToCart)="addToCart($event.detail)"
-                            (routeToProductDetails)="toDetails($event.detail)">
+                            (addedToCart)="addToCart($event.detail)">
           </ocm-product-card>
         </div>
         <ngb-pagination *ngIf="products.Meta.TotalPages > 1"

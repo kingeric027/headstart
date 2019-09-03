@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Order, ListLineItem, ListPromotion, OcOrderService, ListPayment, OrderApproval } from '@ordercloud/angular-sdk';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { AppPaymentService } from '@app-buyer/shared/services/app-payment-service/app-payment.service';
 import { uniqBy as _uniqBy } from 'lodash';
+import { NavigatorService } from '@app-buyer/shared/services/navigator/navigator.service';
 
 @Component({
   selector: 'order-details',
@@ -23,7 +24,7 @@ export class OrderDetailsComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     protected ocOrderService: OcOrderService,
     protected appPaymentService: AppPaymentService,
-    protected router: Router
+    protected navigator: NavigatorService //used in template
   ) {}
 
   ngOnInit() {
@@ -52,9 +53,5 @@ export class OrderDetailsComponent implements OnInit {
         return _uniqBy(list.Items, (x) => x.Comments);
       })
     );
-  }
-
-  protected toProductDetails(productID: string) {
-    this.router.navigateByUrl(`/products/${productID}`);
   }
 }

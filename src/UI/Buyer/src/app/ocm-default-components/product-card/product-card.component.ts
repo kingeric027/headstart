@@ -2,6 +2,7 @@ import { Component, Input, EventEmitter, Output, OnInit, ViewEncapsulation, OnCh
 import { BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
 import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
+import { Navigator } from '@app-buyer/shared/services/navigator/navigator.service';
 
 @Component({
   templateUrl: './product-card.component.html',
@@ -20,9 +21,9 @@ export class OCMProductCard implements OnInit, OnChanges {
     minPerOrder: 0,
     restrictedQuantities: [],
   };
+  @Input() navigator: Navigator;
   @Output() addedToCart = new EventEmitter<LineItem>();
   @Output() setIsFavorite = new EventEmitter<boolean>();
-  @Output() routeToProductDetails = new EventEmitter<string>();
 
   quantity: number;
   shouldDisplayAddToCart: boolean;
@@ -59,6 +60,6 @@ export class OCMProductCard implements OnInit, OnChanges {
   }
 
   toDetails() {
-    this.routeToProductDetails.emit(this.product.ID);
+    this.navigator.toProductDetails(this.product.ID);
   }
 }

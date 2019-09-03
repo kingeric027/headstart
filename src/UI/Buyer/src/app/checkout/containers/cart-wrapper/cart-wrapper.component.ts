@@ -4,6 +4,7 @@ import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 import { CartService, BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
 import { takeWhile } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { NavigatorService } from '@app-buyer/shared/services/navigator/navigator.service';
 
 @Component({
   selector: 'cart-wrapper',
@@ -20,7 +21,8 @@ export class CartWrapperComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private ocOrderService: OcOrderService,
     private router: Router,
-    private currentOrder: CurrentOrderService
+    private currentOrder: CurrentOrderService,
+    protected navigator: NavigatorService // used in template
   ) {}
 
   ngOnInit() {

@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
+import { Navigator } from '@app-buyer/shared/services/navigator/navigator.service';
 
 @Component({
   templateUrl: './product-carousel.component.html',
@@ -12,8 +13,8 @@ export class OCMProductCarousel {
   @Input() displayTitle: string;
   @Input() quantityLimits: QuantityLimits[];
   @Input() favoriteProducts: string[];
+  @Input() navigator: Navigator;
   @Output() setIsFavorite = new EventEmitter<{ isFavorite: boolean; productID: string }>();
-  @Output() navigateToProductDetails = new EventEmitter<{ productID: string }>();
 
   index = 0;
   rowLength = 4;
@@ -41,6 +42,6 @@ export class OCMProductCarousel {
   }
 
   toDetails(productID: string): void {
-    this.navigateToProductDetails.emit({ productID });
+    this.navigator.toProductDetails(productID);
   }
 }

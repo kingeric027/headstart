@@ -11,8 +11,8 @@
                       [product]="product"
                       [quantityLimits]="quantityLimits[i]"
                       [isFavorite]="isFavorite(product.ID)"
-                      (setIsFavorite)="setIsFavoriteEvent($event.detail, product.ID)"
-                      (routeToProductDetails)="toDetails($event.detail)">
+                      [navigator]="navigator"
+                      (setIsFavorite)="setIsFavoriteEvent($event.detail, product.ID)">
     </ocm-product-card>
   </div>
   <div class="col-1 carousel-arrow">

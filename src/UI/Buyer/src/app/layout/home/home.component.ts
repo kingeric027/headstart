@@ -12,8 +12,8 @@ export class OCMHomePage {
   @Input() featuredProducts: ListBuyerProduct;
   @Input() quantityLimits: QuantityLimits[];
   @Input() favoriteProductIDs: string[];
+  @Input() navigator: Navigator;
   @Output() setIsFavorite = new EventEmitter<{ isfavorite: boolean; productID: string }>();
-  @Output() navigateToProductDetails = new EventEmitter<{ productID: string }>();
   faBullhorn = faBullhorn;
 
   // TODO - this content may need to be managed externally somehow.

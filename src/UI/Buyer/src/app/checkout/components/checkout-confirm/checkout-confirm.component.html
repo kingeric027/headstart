@@ -17,7 +17,7 @@
   </div>
   <ocm-lineitem-table [lineitems]="lineItems"
                       [readOnly]="true"
-                      (navigateToProductDetails)="toProductDetails($event.detail.productID)">
+                      [navigator]="navigator">
   </ocm-lineitem-table>
   <form *ngIf="!appConfig.anonymousShoppingEnabled"
         novalidate

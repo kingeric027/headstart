@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
 import { AppPaymentService } from '@app-buyer/shared/services/app-payment-service/app-payment.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
-import { Router } from '@angular/router';
 import { listAll } from '@app-buyer/shared/functions/listAll';
+import { NavigatorService } from '@app-buyer/shared/services/navigator/navigator.service';
 
 @Component({
   selector: 'checkout-confirm',
@@ -27,7 +27,7 @@ export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent imple
     private ocLineItemService: OcLineItemService,
     private formBuilder: FormBuilder,
     private ocOrderService: OcOrderService,
-    private router: Router,
+    protected navigator: NavigatorService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     super();
@@ -55,9 +55,5 @@ export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent imple
         this.currentOrder.order = order;
         this.continue.emit();
       });
-  }
-
-  toProductDetails(productID: string) {
-    this.router.navigateByUrl(`/products/${productID}`);
   }
 }

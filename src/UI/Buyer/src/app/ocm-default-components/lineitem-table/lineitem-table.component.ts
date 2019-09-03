@@ -14,9 +14,9 @@ export class OCMLineitemTable {
   @Input() lineItems: ListLineItem;
   @Input() readOnly: boolean;
   @Input() quantityLimits: QuantityLimits[];
+  @Input() navigator: Navigator;
   @Output() deleteLineItem = new EventEmitter<{ lineItemID: string }>();
   @Output() updateQuantity = new EventEmitter<{ lineItemID: string; quantity: number }>();
-  @Output() navigateToProductDetails = new EventEmitter<{ productID: string }>();
 
   constructor() {}
 

@@ -36,6 +36,6 @@
   </div>
   <ocm-lineitem-table [lineitems]="lineItems"
                       [readOnly]="true"
-                      (navigateToProductDetails)="toProductDetails($event.detail.productID)">
+                      [navigator]="navigator">
   </ocm-lineitem-table>
 </div>
