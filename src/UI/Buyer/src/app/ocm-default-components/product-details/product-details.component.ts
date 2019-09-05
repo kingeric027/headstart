@@ -1,10 +1,10 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, AfterViewChecked, OnChanges } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, AfterViewChecked, OnChanges } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interface';
-import { OCMComponent } from '../ocm-component';
+import { OCMComponent } from '../shopper-context';
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -13,15 +13,14 @@ import { OCMComponent } from '../ocm-component';
 export class OCMProductDetails extends OCMComponent implements OnChanges, AfterViewChecked {
   @Input() specs: ListSpec;
   @Input() product: BuyerProduct;
-  @Input() isFavorite: boolean;
   @Input() quantityLimits: QuantityLimits;
-  @Output() setIsFavorite = new EventEmitter<boolean>();
 
   quantity: number;
   quantityInputReady = false;
   specSelections: FullSpecOption[] = [];
   relatedProducts$: Observable<BuyerProduct[]>;
   imageUrls: string[] = [];
+  favoriteProducts: string[] = [];
   isOrderable = false;
   hasPrice = false;
 
@@ -36,6 +35,7 @@ export class OCMProductDetails extends OCMComponent implements OnChanges, AfterV
     // free products dont need to display a price.
     this.hasPrice = _has(this.product, 'PriceSchedule.PriceBreaks[0].Price');
     this.imageUrls = this.getImageUrls();
+    this.context.currentUser.onFavoriteProductsChange((productIDs) => (this.favoriteProducts = productIDs));
   }
 
   addToCart(): void {
@@ -44,7 +44,7 @@ export class OCMProductDetails extends OCMComponent implements OnChanges, AfterV
       OptionID: o.ID,
       Value: o.Value,
     }));
-    this.cartActions.addToCart({
+    this.context.cartActions.addToCart({
       ProductID: this.product.ID,
       Quantity: this.quantity,
       Specs,
@@ -101,5 +101,13 @@ export class OCMProductDetails extends OCMComponent implements OnChanges, AfterV
     // "Expression has changed after it was checked" error.
     // Caused by something in spec form
     this.changeDetectorRef.detectChanges();
+  }
+
+  isFavorite(): boolean {
+    return this.favoriteProducts.includes(this.product.ID);
+  }
+
+  setIsFavorite(isFav: boolean) {
+    this.context.currentUser.setIsFavoriteProduct(isFav, this.product.ID);
   }
 }

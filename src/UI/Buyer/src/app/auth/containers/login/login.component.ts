@@ -34,7 +34,7 @@ export class LoginComponent implements OnInit {
       password: '',
       rememberMe: false,
     });
-    this.isAnon = this.currentUser.isAnon;
+    this.isAnon = this.currentUser.isAnonymous;
   }
 
   onSubmit() {

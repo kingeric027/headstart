@@ -17,7 +17,7 @@
   </div>
   <ocm-lineitem-table [lineitems]="lineItems"
                       [readOnly]="true"
-                      [navigator]="navigator">
+                      [context]="context">
   </ocm-lineitem-table>
   <form *ngIf="!appConfig.anonymousShoppingEnabled"
         novalidate

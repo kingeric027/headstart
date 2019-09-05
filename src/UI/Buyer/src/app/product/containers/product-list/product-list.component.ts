@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, Params } from '@angular/router';
 import { ListBuyerProduct, OcMeService, Category, ListCategory, ListFacet, ListLineItem } from '@ordercloud/angular-sdk';
-import { CartService, ModalService, BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
+import { ModalService, BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ProductSortStrategy } from '@app-buyer/product/models/product-sort-strategy.enum';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
-import { NavigatorService } from '@app-buyer/shared/services/navigator/navigator.service';
 import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'product-list',
@@ -32,11 +32,10 @@ export class ProductListComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private ocMeService: OcMeService,
     private router: Router,
-    protected cartService: CartService, // used in template
     private modalService: ModalService,
     private currentOrder: CurrentOrderService,
     private currentUser: CurrentUserService,
-    protected navigator: NavigatorService
+    protected context: ShopperContextService // used in template
   ) {}
 
   ngOnInit() {
@@ -48,7 +47,7 @@ export class ProductListComponent implements OnInit {
     this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
     this.categoryCrumbs = this.buildBreadCrumbs(this.activatedRoute.snapshot.queryParams.category);
     this.configureRouter();
-    this.currentOrder.lineItemSubject.subscribe((lineItems) => (this.lineItems = lineItems));
+    this.currentOrder.onLineItemsChange((lineItems) => (this.lineItems = lineItems));
     this.activatedRoute.queryParams.subscribe(this.onQueryParamsChange);
   }
 

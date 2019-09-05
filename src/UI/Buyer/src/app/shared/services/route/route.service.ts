@@ -1,16 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-
-export interface Navigator {
-  toProductDetails: (productID: string) => void;
-  toProductList: () => void;
-  toCheckout: () => void;
-}
+import { RouteActions } from '@app-buyer/ocm-default-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
-export class NavigatorService implements Navigator {
+export class RouteService implements RouteActions {
   constructor(private router: Router) {}
 
   toProductDetails(productID: string): void {

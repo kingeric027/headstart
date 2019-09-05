@@ -1,6 +1,7 @@
 /**
  * A summary of the allowed order quantities for this product
  */
+// TODO - get rid of this interface and just use the Price Schedule fields directly. This abstraction is useless.
 export interface QuantityLimits {
   /**
    * The available inventory. If equals Infitity, no limit.

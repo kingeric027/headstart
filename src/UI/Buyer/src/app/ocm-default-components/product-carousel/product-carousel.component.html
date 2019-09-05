@@ -10,9 +10,7 @@
                       class="col-lg-3 col-md-4 col-sm-6 d-flex flex-grow-1 flex-shrink-1"
                       [product]="product"
                       [quantityLimits]="quantityLimits[i]"
-                      [isFavorite]="isFavorite(product.ID)"
-                      [navigator]="navigator"
-                      (setIsFavorite)="setIsFavoriteEvent($event.detail, product.ID)">
+                      [context]="context">
     </ocm-product-card>
   </div>
   <div class="col-1 carousel-arrow">

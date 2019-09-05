@@ -1,19 +1,16 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ListBuyerProduct } from '@ordercloud/angular-sdk';
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
+import { OCMComponent } from '../shopper-context';
+import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'ocm-home-page',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class OCMHomePage {
+export class OCMHomePage extends OCMComponent {
   @Input() featuredProducts: ListBuyerProduct;
   @Input() quantityLimits: QuantityLimits[];
-  @Input() favoriteProductIDs: string[];
-  @Input() navigator: Navigator;
-  @Output() setIsFavorite = new EventEmitter<{ isfavorite: boolean; productID: string }>();
   faBullhorn = faBullhorn;
 
   // TODO - this content may need to be managed externally somehow.

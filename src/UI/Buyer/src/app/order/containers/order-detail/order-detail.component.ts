@@ -5,7 +5,7 @@ import { Order, ListLineItem, ListPromotion, OcOrderService, ListPayment, OrderA
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { AppPaymentService } from '@app-buyer/shared/services/app-payment-service/app-payment.service';
 import { uniqBy as _uniqBy } from 'lodash';
-import { NavigatorService } from '@app-buyer/shared/services/navigator/navigator.service';
+import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'order-details',
@@ -24,7 +24,7 @@ export class OrderDetailsComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     protected ocOrderService: OcOrderService,
     protected appPaymentService: AppPaymentService,
-    protected navigator: NavigatorService //used in template
+    protected context: ShopperContextService //used in template
   ) {}
 
   ngOnInit() {

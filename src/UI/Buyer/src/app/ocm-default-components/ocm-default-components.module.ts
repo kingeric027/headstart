@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 import { OCMOrderSummary } from './order-summary/order-summary.component';
 import { OCMLineitemTable } from './lineitem-table/lineitem-table.component';
 import { OCMCart } from './cart/cart.component';
+import { OCMHomePage } from './home/home.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -28,6 +29,7 @@ import { OCMCart } from './cart/cart.component';
     OCMOrderSummary,
     OCMLineitemTable,
     OCMCart,
+    OCMHomePage,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -40,6 +42,7 @@ import { OCMCart } from './cart/cart.component';
     OCMOrderSummary,
     OCMLineitemTable,
     OCMCart,
+    OCMHomePage,
   ],
   imports: [CommonModule, NgxImageZoomModule, ReactiveFormsModule, FontAwesomeModule],
 })
@@ -48,13 +51,15 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
     this.buildWebComponent(OCMProductCard, 'ocm-product-card');
     this.buildWebComponent(OCMToggleFavorite, 'ocm-toggle-favorite');
-    this.buildWebComponent(OCMProductDetails, 'ocm-product-details');
     this.buildWebComponent(OCMProductCarousel, 'ocm-product-carousel');
     this.buildWebComponent(OCMImageGallery, 'ocm-image-gallery');
     this.buildWebComponent(OCMSpecForm, 'ocm-spec-form');
     this.buildWebComponent(OCMOrderSummary, 'ocm-order-summary');
     this.buildWebComponent(OCMLineitemTable, 'ocm-lineitem-table');
+
+    this.buildWebComponent(OCMProductDetails, 'ocm-product-details');
     this.buildWebComponent(OCMCart, 'ocm-cart');
+    this.buildWebComponent(OCMHomePage, 'ocm-home-page');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

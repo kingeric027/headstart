@@ -4,17 +4,19 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { get as _get, find as _find, keys as _keys, pickBy as _pickBy, identity as _identity } from 'lodash';
 import { __generator } from 'tslib';
 import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interface';
+import { OCMComponent } from '../shopper-context';
 
 @Component({
   templateUrl: './spec-form.component.html',
   styleUrls: ['./spec-form.component.scss'],
 })
-export class OCMSpecForm implements OnInit, OnChanges {
+export class OCMSpecForm extends OCMComponent implements OnInit, OnChanges {
   @Input() specs: BuyerSpec[] = [];
   @Output() formUpdated = new EventEmitter<FullSpecOption[]>();
   specForm: FormGroup;
 
   constructor() {
+    super();
     this.specForm = new FormGroup({});
   }
 

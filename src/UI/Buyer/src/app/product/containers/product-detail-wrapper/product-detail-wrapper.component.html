@@ -1,7 +1,5 @@
 <ocm-product-details [product]="product"
                      [specs]="specs"
                      [quantityLimits]="quantityLimits"
-                     [isFavorite]="isFavorite(product.ID)"
-                     [cartActions]="cartService"
-                     (setIsFavorite)="setIsFavoriteProduct($event.detail, product.ID)">
+                     [context]="context">
 </ocm-product-details>

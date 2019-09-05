@@ -3,12 +3,13 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { get as _get } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
+import { OCMComponent } from '../shopper-context';
 
 @Component({
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
 })
-export class OCMQuantityInput implements OnInit, OnChanges {
+export class OCMQuantityInput extends OCMComponent implements OnInit, OnChanges {
   @Input() limits: QuantityLimits;
   @Input() existingQty: number;
   @Output() qtyChange = new EventEmitter<number>();
@@ -16,8 +17,6 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   form: FormGroup;
   isDefaultSet = false;
   isQtyRestricted = false;
-
-  constructor() {}
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -41,7 +40,8 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   }
 
   quantityChangeListener(): void {
-    this.form.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+    // TODO - 200 might be too short for the cart page. But 500 was too long for product list.
+    this.form.valueChanges.pipe(debounceTime(200)).subscribe(() => {
       if (this.form.valid && !isNaN(this.form.value.quantity)) {
         this.qtyChange.emit(this.form.value.quantity);
       }

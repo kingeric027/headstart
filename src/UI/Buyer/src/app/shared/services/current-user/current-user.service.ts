@@ -4,46 +4,52 @@ import { MeUser, OcMeService, OcTokenService, User } from '@ordercloud/angular-s
 import * as jwtDecode from 'jwt-decode';
 import { isUndefined as _isUndefined } from 'lodash';
 import { ToastrService } from 'ngx-toastr';
+import { CurrentUser } from '@app-buyer/ocm-default-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CurrentUserService {
+export class CurrentUserService implements CurrentUser {
   private readonly MaxFavorites: number = 40;
-  private readonly favOrders = 'FavoriteOrders';
-  private readonly favProducts = 'FavoriteProducts';
+  private readonly favOrdersXP = 'FavoriteOrders';
+  private readonly favProductsXP = 'FavoriteProducts';
 
-  public userSubject: BehaviorSubject<MeUser> = new BehaviorSubject<MeUser>(null);
-  public isAnonSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  public loggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private userSubject: BehaviorSubject<MeUser> = new BehaviorSubject<MeUser>(null);
+  private isAnonSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  private loggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  // todo - this data is in user also. remove duplicate?
+  private favoriteOrdersSubject: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  private favoriteProductsSubject: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
 
   constructor(private ocMeService: OcMeService, private ocTokenService: OcTokenService, private toastrService: ToastrService) {}
 
   async reset(): Promise<void> {
-    const isAnon = !_isUndefined(this.getOrderIDFromToken());
-    this.isAnonSubject.next(isAnon);
-    const user = await this.ocMeService.Get().toPromise();
-    this.userSubject.next(user);
+    this.isAnonymous = !_isUndefined(this.getOrderIDFromToken());
+    this.user = await this.ocMeService.Get().toPromise();
   }
 
-  getOrderIDFromToken(): string | void {
-    return jwtDecode(this.ocTokenService.GetAccess()).orderid;
-  }
-
-  get loggedIn(): boolean {
+  get isLoggedIn(): boolean {
     return this.loggedInSubject.value;
   }
 
-  set loggedIn(value: boolean) {
+  set isLoggedIn(value: boolean) {
     this.loggedInSubject.next(value);
   }
 
-  get isAnon(): boolean {
+  onIsLoggedInChange(callback: (isLoggedIn: boolean) => void) {
+    this.loggedInSubject.subscribe(callback);
+  }
+
+  get isAnonymous(): boolean {
     return this.isAnonSubject.value;
   }
 
-  set isAnon(value: boolean) {
+  set isAnonymous(value: boolean) {
     this.isAnonSubject.next(value);
+  }
+
+  onIsAnonymousChange(callback: (isAnonymous: boolean) => void) {
+    this.isAnonSubject.subscribe(callback);
   }
 
   get user(): User {
@@ -51,40 +57,58 @@ export class CurrentUserService {
   }
 
   set user(value: User) {
+    this.favoriteOrdersSubject.next(this.getFavorites(value, this.favOrdersXP));
+    this.favoriteProductsSubject.next(this.getFavorites(value, this.favProductsXP));
     this.userSubject.next(value);
   }
 
-  get favoriteProductIDs(): string[] {
-    const me = this.userSubject.value;
-    return me && me.xp && me.xp[this.favProducts] instanceof Array ? me.xp[this.favProducts] : [];
+  onUserChange(callback: (user: User) => void) {
+    this.userSubject.subscribe(callback);
   }
 
-  get favoriteOrderIDs(): string[] {
-    const me = this.userSubject.value;
-    return me && me.xp && me.xp[this.favOrders] instanceof Array ? me.xp[this.favOrders] : [];
+  get favoriteProductIDs(): string[] {
+    return this.favoriteProductsSubject.value;
   }
 
   setIsFavoriteProduct(isFav: boolean, productID: string) {
-    this.setFavoriteValue(this.favProducts, isFav, productID);
+    this.setFavoriteValue(this.favProductsXP, isFav, productID);
+  }
+
+  onFavoriteProductsChange(callback: (productIDs: string[]) => void) {
+    this.favoriteProductsSubject.subscribe(callback);
+  }
+
+  get favoriteOrderIDs(): string[] {
+    return this.favoriteOrdersSubject.value;
   }
 
   setIsFavoriteOrder(isFav: boolean, orderID: string) {
-    this.setFavoriteValue(this.favOrders, isFav, orderID);
+    this.setFavoriteValue(this.favOrdersXP, isFav, orderID);
+  }
+
+  onFavoriteOrdersChange(callback: (orderIDs: string[]) => void) {
+    this.favoriteOrdersSubject.subscribe(callback);
+  }
+
+  private getFavorites(user: User, XpFieldName: string): string[] {
+    return user && user.xp && user.xp[XpFieldName] instanceof Array ? user.xp[XpFieldName] : [];
   }
 
   private async setFavoriteValue(XpFieldName: string, isFav: boolean, ID: string): Promise<void> {
-    const favorites = this.user.xp[XpFieldName];
-    let updatedFavorites: string[];
+    let favorites = this.user.xp[XpFieldName];
     if (isFav && favorites.length >= this.MaxFavorites) {
       this.toastrService.info(`You have reached your limit of ${XpFieldName}`);
       return;
     }
     if (isFav) {
-      updatedFavorites = [...favorites, ID];
+      favorites = [...favorites, ID];
     } else {
-      updatedFavorites = favorites.filter((x) => x !== ID);
+      favorites = favorites.filter((x) => x !== ID);
     }
-    const request = { xp: { [XpFieldName]: updatedFavorites } };
-    this.user = await this.ocMeService.Patch(request).toPromise();
+    this.user = await this.ocMeService.Patch({ xp: { [XpFieldName]: favorites } }).toPromise();
+  }
+
+  getOrderIDFromToken(): string | void {
+    return jwtDecode(this.ocTokenService.GetAccess()).orderid;
   }
 }

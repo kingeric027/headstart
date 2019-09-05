@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
-import { CartService, BuildQtyLimits } from '@app-buyer/shared';
+import { BuildQtyLimits } from '@app-buyer/shared';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'product-detail-wrapper',
@@ -17,7 +18,7 @@ export class ProductDetailWrapperComponent implements OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    protected cartService: CartService, // used in template
+    protected context: ShopperContextService, // used in template
     protected currentUser: CurrentUserService
   ) {}
 
@@ -25,13 +26,5 @@ export class ProductDetailWrapperComponent implements OnInit {
     this.product = this.activatedRoute.snapshot.data.product;
     this.specs = this.activatedRoute.snapshot.data.specs || [];
     this.quantityLimits = BuildQtyLimits(this.product);
-  }
-
-  isFavorite(productID: string): boolean {
-    return this.currentUser.favoriteProductIDs.includes(productID);
-  }
-
-  async setIsFavoriteProduct(isFav: boolean, productID: string) {
-    await this.currentUser.setIsFavoriteProduct(isFav, productID);
   }
 }

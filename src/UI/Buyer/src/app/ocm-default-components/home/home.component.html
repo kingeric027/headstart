@@ -26,8 +26,6 @@
                         [displayTitle]="'Featured Products'"
                         [products]="featuredProducts.Items"
                         [quantityLimits]="quantityLimits"
-                        [favoriteProducts]="favoriteProducts"
-                        [navigator]="navigator"
-                        (setIsFavorite)="setIsFavorite.emit($event)">
+                        [context]="context">
   </ocm-product-carousel>
 </div>

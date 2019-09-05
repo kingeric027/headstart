@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { OcMeService, MeUser, OcAuthService } from '@ordercloud/angular-sdk';
@@ -14,7 +14,7 @@ import { CurrentUserService } from '@app-buyer/shared/services/current-user/curr
   templateUrl: './me-update.component.html',
   styleUrls: ['./me-update.component.scss'],
 })
-export class MeUpdateComponent implements OnInit, OnDestroy {
+export class MeUpdateComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
   alive = true;
@@ -88,10 +88,6 @@ export class MeUpdateComponent implements OnInit, OnDestroy {
         Email: me.Email,
       });
     });
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
   }
 
   // control display of error messages

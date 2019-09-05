@@ -38,7 +38,7 @@ export class AppAuthService {
     this.fetchingRefreshToken = true;
     return this.fetchRefreshToken().pipe(
       tap((token) => {
-        this.currentUser.loggedIn = true;
+        this.currentUser.isLoggedIn = true;
         this.ocTokenService.SetAccess(token);
         this.refreshToken.next(token);
       }),
@@ -91,7 +91,7 @@ export class AppAuthService {
 
   async logout(): Promise<void> {
     this.ocTokenService.RemoveAccess();
-    this.currentUser.loggedIn = false;
+    this.currentUser.isLoggedIn = false;
     if (this.appConfig.anonymousShoppingEnabled) {
       this.router.navigate(['/home']);
       await this.currentUser.reset();

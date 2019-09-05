@@ -1,16 +1,8 @@
 import { Injectable } from '@angular/core';
 import { OcLineItemService, ListLineItem, LineItem, OcOrderService } from '@ordercloud/angular-sdk';
-import { flatMap } from 'rxjs/operators';
 import { isUndefined as _isUndefined, flatMap as _flatMap, get as _get, isEqual as _isEqual, omitBy as _omitBy } from 'lodash';
 import { CurrentOrderService } from '../current-order/current-order.service';
-
-export interface CartActions {
-  addToCart: (lineItem: LineItem) => Promise<LineItem>;
-  removeLineItem: (lineItemID: string) => Promise<void>;
-  updateQuantity: (lineItemID: string, newQuantity: number) => Promise<LineItem>;
-  addManyToCart: (lineItem: LineItem[]) => Promise<LineItem[]>;
-  emptyCart: () => Promise<void>;
-}
+import { CartActions } from '@app-buyer/ocm-default-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +21,7 @@ export class CartService implements CartActions {
     if (!_isUndefined(this.currentOrder.order.DateCreated)) {
       return this.createLineItem(lineItem);
     }
-    // this is the first line item call - initialize order first
+    // TODO - what to do if order is initializing
     if (!this.initializingOrder) {
       this.initializingOrder = true;
       const newOrder = await this.ocOrderService.Create('outgoing', {}).toPromise();
@@ -37,16 +29,6 @@ export class CartService implements CartActions {
       this.currentOrder.order = newOrder;
       return this.createLineItem(lineItem);
     }
-    // initializing order - wait until its done
-    return this.currentOrder.orderSubject
-      .pipe(
-        flatMap((newOrder) => {
-          if (newOrder.ID) {
-            return this.createLineItem(lineItem);
-          }
-        })
-      )
-      .toPromise();
   }
 
   async removeLineItem(lineItemID: string): Promise<void> {

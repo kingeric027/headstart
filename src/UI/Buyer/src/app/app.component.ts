@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { NgbDateAdapter, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDateNativeAdapter, NgbDateCustomParserFormatter } from '@app-buyer/config/date-picker.config';
-import { Observable } from 'rxjs';
 import { CurrentUserService } from './shared/services/current-user/current-user.service';
 
 @Component({
@@ -16,9 +15,9 @@ import { CurrentUserService } from './shared/services/current-user/current-user.
   ],
 })
 export class AppComponent {
-  isLoggedIn$: Observable<boolean>;
+  isLoggedIn: boolean;
 
   constructor(private currentUser: CurrentUserService) {
-    this.isLoggedIn$ = this.currentUser.loggedInSubject;
+    this.currentUser.onIsLoggedInChange((isLoggedIn) => (this.isLoggedIn = isLoggedIn));
   }
 }

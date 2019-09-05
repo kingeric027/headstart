@@ -19,8 +19,8 @@ import { CurrentUserService } from '@app-buyer/shared/services/current-user/curr
 export class HeaderComponent implements OnInit, OnDestroy {
   categories$: Observable<ListCategory>;
   isCollapsed = true;
-  anonymous$: Observable<boolean> = this.currentUser.isAnonSubject;
-  user$: Observable<MeUser> = this.currentUser.userSubject;
+  anonymous: boolean;
+  user: MeUser;
   order: Order;
   alive = true;
   addToCartQuantity: number;
@@ -46,7 +46,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.currentOrder.orderSubject.pipe(takeWhile(() => this.alive)).subscribe((order) => (this.order = order));
+    this.currentOrder.onOrderChange((order) => (this.order = order));
+    this.currentUser.onIsAnonymousChange((isAnon) => (this.anonymous = isAnon));
+    this.currentUser.onUserChange((user) => (this.user = user));
 
     this.buildAddToCartListener();
     this.clearSearchOnNavigate();

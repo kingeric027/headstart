@@ -1,10 +1,9 @@
 <div class="card mb-5 w-100 border-hover">
   <div class="ribbon ribbon-top-right bg-light">
-    <ocm-toggle-favorite *ngIf="isSetFavoriteUsed"
-                         title="Favorite"
+    <ocm-toggle-favorite title="Favorite"
                          (click)="$event.stopPropagation()"
-                         [favorite]="isFavorite"
-                         (favoriteChanged)="setIsFavorite.emit($event.detail)"></ocm-toggle-favorite>
+                         [favorite]="isFavorite()"
+                         (favoriteChanged)="setIsFavorite($event.detail)"></ocm-toggle-favorite>
   </div>
   <img class="card-img-top img-fluid flex-shrink-0"
        (click)="toDetails()"
@@ -28,22 +27,17 @@
                           id="quantity"
                           [limits]="quantityLimits"
                           [existingQty]="null"
-                          (qtyChange)="quantity = $event.detail">
+                          (qtyChange)="setQuantity($event.detail)"
+                          [context]="context">
       </ocm-quantity-input>
     </div>
   </div>
   <div class="card-footer">
-    <button *ngIf="shouldDisplayAddToCart"
+    <button *ngIf="!isViewOnlyProduct"
             (click)="$event.stopPropagation()"
             class="btn btn-primary btn-block small"
             type="submit"
-            (click)="addToCart($event)">
-      Add <span class="d-md-none d-lg-inline"> to Cart</span>
-    </button>
-    <button *ngIf="shouldDisplayAddToCart"
-            (click)="$event.stopPropagation()"
-            class="btn btn-primary btn-block small"
-            type="submit">
+            (click)="addToCart()">
       Add <span class="d-md-none d-lg-inline"> to Cart</span>
     </button>
     <button *ngIf="isViewOnlyProduct"
@@ -51,12 +45,6 @@
             class="btn btn-default btn-block btn-outline-dark">
       View
       <span class="d-sm-none d-lg-inline">Product</span>
-    </button>
-    <button *ngIf="hasSpecs"
-            (click)="toDetails()"
-            class="btn btn-primary btn-block small">
-      Select
-      <span class="d-sm-none d-lg-inline">Specs</span>
     </button>
   </div>
 </div>

@@ -1,8 +1,8 @@
-import { Component, Input, EventEmitter, Output, OnInit, ViewEncapsulation, OnChanges } from '@angular/core';
-import { BuyerProduct, LineItem } from '@ordercloud/angular-sdk';
+import { Component, Input, OnInit, ViewEncapsulation, OnChanges } from '@angular/core';
+import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
-import { OCMComponent } from '../ocm-component';
+import { OCMComponent } from '../shopper-context';
 
 @Component({
   templateUrl: './product-card.component.html',
@@ -14,37 +14,29 @@ export class OCMProductCard extends OCMComponent implements OnInit, OnChanges {
     PriceSchedule: {},
     xp: { Images: [] },
   };
-  @Input() isFavorite: boolean;
   @Input() quantityLimits: QuantityLimits = {
     inventory: 0,
     maxPerOrder: 0,
     minPerOrder: 0,
     restrictedQuantities: [],
   };
-  @Output() setIsFavorite = new EventEmitter<boolean>();
 
   quantity: number;
   shouldDisplayAddToCart: boolean;
   isViewOnlyProduct: boolean;
-  isSetFavoriteUsed: boolean;
   hasSpecs: boolean;
+  favoriteProducts: string[] = [];
 
   ngOnChanges() {
-    this.isSetFavoriteUsed = this.setIsFavorite.observers.length > 0;
-    const isAddedToCartUsed = true;
     this.isViewOnlyProduct = !this.product.PriceSchedule;
     this.hasSpecs = this.product.SpecCount > 0;
-    this.shouldDisplayAddToCart = isAddedToCartUsed && !this.isViewOnlyProduct && !this.hasSpecs;
-  }
-  ngOnInit() {
-    /**
-     * this will be true if the parent component
-     * is wired up to listen to the outputted event
-     */
+    this.context.currentUser.onFavoriteProductsChange((productIDs) => (this.favoriteProducts = productIDs));
   }
 
-  addToCart(li: LineItem) {
-    this.cartActions.addToCart(li);
+  ngOnInit() {}
+
+  addToCart() {
+    this.context.cartActions.addToCart({ ProductID: this.product.ID, Quantity: this.quantity });
   }
 
   getImageUrl() {
@@ -58,6 +50,18 @@ export class OCMProductCard extends OCMComponent implements OnInit, OnChanges {
   }
 
   toDetails() {
-    this.navigator.toProductDetails(this.product.ID);
+    this.context.routeActions.toProductDetails(this.product.ID);
+  }
+
+  isFavorite(): boolean {
+    return this.favoriteProducts.includes(this.product.ID);
+  }
+
+  setIsFavorite(isFavorite: boolean): void {
+    this.context.currentUser.setIsFavoriteProduct(isFavorite, this.product.ID);
+  }
+
+  setQuantity(qty: number) {
+    this.quantity = qty;
   }
 }

@@ -27,11 +27,8 @@
       </div>
     </div>
   </div>
-  <a (click)="log(lineItems)">click</a>
   <div class="flex-none">
-    {{ lineItems.Items.length }}
-    <div *ngFor="let li of lineItems.Items; let i = index">
-      {{i}}
+    <div *ngFor="let li of lineItems?.Items; let i = index">
       <div class="m-2 row align-items-center">
         <div class="col-sm-7">
           <div class="row align-items-sm-center">
@@ -63,7 +60,8 @@
               <ocm-quantity-input *ngIf="!readOnly"
                                   [limits]="quantityLimits[i]"
                                   [existingQty]="li.Quantity"
-                                  (qtyChange)="changeQuantity(li.ID, $event.detail)"></ocm-quantity-input>
+                                  (qtyChange)="changeQuantity(li.ID, $event.detail)"
+                                  [context]="context"></ocm-quantity-input>
               <span class="text-nowrap"
                     *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>
             </div>

@@ -7,17 +7,21 @@ import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.confi
 import { Subject, BehaviorSubject } from 'rxjs';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { listAll } from '@app-buyer/shared/functions/listAll';
+import { CurrentOrder } from '@app-buyer/ocm-default-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CurrentOrderService {
-  public addToCartSubject: Subject<LineItem> = new Subject<LineItem>();
-  public orderSubject: BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
-  public lineItemSubject: BehaviorSubject<ListLineItem> = new BehaviorSubject<ListLineItem>({
+export class CurrentOrderService implements CurrentOrder {
+  private readonly DefaultLineItems: ListLineItem = {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
-  });
+  };
+  // TODO - integrate this with addToCart() in CartSerivce
+  public addToCartSubject: Subject<LineItem> = new Subject<LineItem>();
+
+  private orderSubject: BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
+  private lineItemSubject: BehaviorSubject<ListLineItem> = new BehaviorSubject<ListLineItem>(this.DefaultLineItems);
 
   constructor(
     private ocLineItemsService: OcLineItemService,
@@ -35,6 +39,10 @@ export class CurrentOrderService {
     this.orderSubject.next(value);
   }
 
+  onOrderChange(callback: (order: Order) => void) {
+    this.orderSubject.subscribe(callback);
+  }
+
   get lineItems(): ListLineItem {
     return this.lineItemSubject.value;
   }
@@ -43,30 +51,21 @@ export class CurrentOrderService {
     this.lineItemSubject.next(value);
   }
 
-  async reset(): Promise<void> {
-    let order: Order;
-    const orders = await this.ocMeService.ListOrders({ sortBy: '!DateCreated', filters: { status: 'Unsubmitted' } }).toPromise();
-    if (orders.Items.length) {
-      order = orders.Items[0];
-    }
-    if (!order && this.appConfig.anonymousShoppingEnabled) {
-      order = <Order>{ ID: this.currentUser.getOrderIDFromToken() };
-    }
-    if (!order) {
-      order = await this.ocOrderService.Create('outgoing', {}).toPromise();
-    }
-    this.orderSubject.next(order);
-    this.setCurrentCart(order);
+  onLineItemsChange(callback: (lineItems: ListLineItem) => void) {
+    this.lineItemSubject.subscribe(callback);
   }
 
-  private async setCurrentCart(order: Order): Promise<void> {
-    let items: ListLineItem = {
-      Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
-      Items: [],
-    };
-    if (order.DateCreated) {
-      items = await listAll(this.ocLineItemsService, 'outgoing', order.ID);
+  async reset(): Promise<void> {
+    const orders = await this.ocMeService.ListOrders({ sortBy: '!DateCreated', filters: { status: 'Unsubmitted' } }).toPromise();
+    if (orders.Items.length) {
+      this.order = orders.Items[0];
+    } else if (this.appConfig.anonymousShoppingEnabled) {
+      this.order = <Order>{ ID: this.currentUser.getOrderIDFromToken() };
+    } else {
+      this.order = await this.ocOrderService.Create('outgoing', {}).toPromise();
     }
-    this.lineItemSubject.next(items);
+    if (this.order.DateCreated) {
+      this.lineItems = await listAll(this.ocLineItemsService, 'outgoing', this.order.ID);
+    }
   }
 }

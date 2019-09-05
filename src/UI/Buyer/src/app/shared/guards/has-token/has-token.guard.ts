@@ -35,7 +35,7 @@ export class HasTokenGuard implements CanActivate {
       const match = /token=([^&]*)/.exec(window.location.search);
       if (match) {
         this.ocTokenService.SetAccess(match[1]);
-        this.currentUser.loggedIn = true;
+        this.currentUser.isLoggedIn = true;
         return of(true);
       } else {
         alert(`Missing url query param 'token'`);
@@ -57,12 +57,12 @@ export class HasTokenGuard implements CanActivate {
     if (!isAccessTokenValid && this.appConfig.anonymousShoppingEnabled) {
       return this.appAuthService.authAnonymous().pipe(
         flatMap(() => {
-          this.currentUser.loggedIn = true;
+          this.currentUser.isLoggedIn = true;
           return of(true);
         })
       );
     }
-    this.currentUser.loggedIn = true;
+    this.currentUser.isLoggedIn = true;
     return of(isAccessTokenValid);
   }
 

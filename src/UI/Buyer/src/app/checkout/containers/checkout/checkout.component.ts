@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { Order, OcOrderService } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from '@app-buyer/shared';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
@@ -16,7 +16,7 @@ import { CurrentUserService } from '@app-buyer/shared/services/current-user/curr
 })
 export class CheckoutComponent implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
-  order$: Observable<Order> = this.currentOrder.orderSubject;
+  order: Order;
   isAnon: boolean;
   isSubmittingOrder = false;
   currentPanel: string;
@@ -53,7 +53,8 @@ export class CheckoutComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.isAnon = this.currentUser.isAnon;
+    this.currentOrder.onOrderChange((order) => (this.order = order));
+    this.isAnon = this.currentUser.isAnonymous;
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
     this.setValidation('login', !this.isAnon);
   }

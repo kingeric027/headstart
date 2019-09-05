@@ -1,12 +1,9 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { OcMeService, OcTokenService, MeUser } from '@ordercloud/angular-sdk';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-buyer/config/app.config';
+import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
 import { AppMatchFieldsValidator } from '@app-buyer/shared/validators/match-fields/match-fields.validator';
 import { RegexService } from '@app-buyer/shared/services/regex/regex.service';
@@ -16,10 +13,9 @@ import { RegexService } from '@app-buyer/shared/services/regex/regex.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
-export class RegisterComponent implements OnInit, OnDestroy {
+export class RegisterComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
-  alive = true;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -40,20 +36,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group(
       {
         Username: ['', Validators.required],
-        FirstName: [
-          '',
-          [
-            Validators.required,
-            Validators.pattern(this.regexService.HumanName),
-          ],
-        ],
-        LastName: [
-          '',
-          [
-            Validators.required,
-            Validators.pattern(this.regexService.HumanName),
-          ],
-        ],
+        FirstName: ['', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
+        LastName: ['', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
         Email: ['', [Validators.required, Validators.email]],
         Phone: ['', Validators.pattern(this.regexService.Phone)],
         Password: ['', [Validators.required, Validators.minLength(8)]],
@@ -73,25 +57,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
     const me = <MeUser>this.form.value;
     me.Active = true;
 
-    this.ocMeService
-      .Register(this.ocTokenService.GetAccess(), me)
-      .subscribe(() => {
-        this.toastrService.success('New User Created');
-        this.router.navigate(['/login']);
-      });
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
+    this.ocMeService.Register(this.ocTokenService.GetAccess(), me).subscribe(() => {
+      this.toastrService.success('New User Created');
+      this.router.navigate(['/login']);
+    });
   }
 
   // control display of error messages
-  protected hasRequiredError = (controlName: string): boolean =>
-    this.formErrorService.hasRequiredError(controlName, this.form);
-  protected hasEmailError = (): boolean =>
-    this.formErrorService.hasInvalidEmailError(this.form.get('Email'));
-  protected hasPatternError = (controlName: string) =>
-    this.formErrorService.hasPatternError(controlName, this.form);
-  protected passwordMismatchError = (): boolean =>
-    this.formErrorService.hasPasswordMismatchError(this.form);
+  protected hasRequiredError = (controlName: string): boolean => this.formErrorService.hasRequiredError(controlName, this.form);
+  protected hasEmailError = (): boolean => this.formErrorService.hasInvalidEmailError(this.form.get('Email'));
+  protected hasPatternError = (controlName: string) => this.formErrorService.hasPatternError(controlName, this.form);
+  protected passwordMismatchError = (): boolean => this.formErrorService.hasPasswordMismatchError(this.form);
 }

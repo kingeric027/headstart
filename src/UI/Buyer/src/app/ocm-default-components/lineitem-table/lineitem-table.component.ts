@@ -1,12 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { LineItem, ListLineItem } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { get as _get } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
-import { OCMComponent } from '../ocm-component';
+import { OCMComponent } from '../shopper-context';
 
 @Component({
-  selector: 'ocm-lineitem-table',
   templateUrl: './lineitem-table.component.html',
   styleUrls: ['./lineitem-table.component.scss'],
 })
@@ -16,22 +15,17 @@ export class OCMLineitemTable extends OCMComponent {
   @Input() readOnly: boolean;
   @Input() quantityLimits: QuantityLimits[];
 
-  log(object: any) {
-    console.log(object);
-    console.log(this.lineItems);
-  }
-
   removeLineItem(lineItemID: string) {
-    this.cartActions.removeLineItem(lineItemID);
+    this.context.cartActions.removeLineItem(lineItemID);
   }
 
   toProductDetails(productID: string) {
-    this.navigator.toProductDetails(productID);
+    this.context.routeActions.toProductDetails(productID);
   }
 
   changeQuantity(lineItemID: string, quantity: number) {
     this.getLineItem(lineItemID).Quantity = quantity;
-    this.cartActions.updateQuantity(lineItemID, quantity);
+    this.context.cartActions.updateQuantity(lineItemID, quantity);
   }
 
   getImageUrl(lineItemID: string) {

@@ -7,7 +7,7 @@ import { AppPaymentService } from '@app-buyer/shared/services/app-payment-servic
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { listAll } from '@app-buyer/shared/functions/listAll';
-import { NavigatorService } from '@app-buyer/shared/services/navigator/navigator.service';
+import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'checkout-confirm',
@@ -27,7 +27,7 @@ export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent imple
     private ocLineItemService: OcLineItemService,
     private formBuilder: FormBuilder,
     private ocOrderService: OcOrderService,
-    protected navigator: NavigatorService,
+    protected context: ShopperContextService, //used in template
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     super();

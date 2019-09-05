@@ -1,12 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { fromEvent } from 'rxjs';
+import { OCMComponent } from '../shopper-context';
 
 @Component({
   templateUrl: './image-gallery.component.html',
   styleUrls: ['./image-gallery.component.scss'],
 })
-export class OCMImageGallery implements OnInit {
+export class OCMImageGallery extends OCMComponent implements OnInit {
   @Input() imgUrls: string[] = [];
 
   // gallerySize can be changed and the component logic + behavior will all work. However, the UI may look wonky.
@@ -19,6 +20,7 @@ export class OCMImageGallery implements OnInit {
   isResponsiveView: boolean;
 
   constructor() {
+    super();
     this.isResponsiveView = window.innerWidth > 900;
   }
   ngOnInit() {
