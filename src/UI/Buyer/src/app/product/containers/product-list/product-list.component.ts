@@ -128,24 +128,8 @@ export class ProductListComponent implements OnInit {
     this.productListService.toPage(page);
   }
 
-  changeFacets(facetQueryParams: Params): void {
-    this.addQueryParam(facetQueryParams);
-  }
-
-  changePrice(priceQueryParams: Params): void {
-    this.addQueryParam(priceQueryParams);
-  }
-
   toggleFilterByFavorites() {
     this.productListService.filterByFavorites(!this.showingFavoritesOnly);
-  }
-
-  private addQueryParam(newParam: object): void {
-    const queryParams = {
-      ...this.activatedRoute.snapshot.queryParams,
-      ...newParam,
-    };
-    this.router.navigate([], { queryParams });
   }
 
   buildBreadCrumbs(catID: string): Category[] {
