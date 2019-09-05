@@ -22,11 +22,11 @@
       Select Category
     </button>
     <div class="col-xs-6">
-      <div (click)="refineByFavorites()">
+      <div (click)="toggleFilterByFavorites()">
         <label>Refine By</label>
         <button class="btn btn-block btn-default btn-outline-dark mb-2"
                 for="favorite">
-          <ocm-toggle-favorite [favorite]="hasFavoriteProductsFilter"></ocm-toggle-favorite>
+          <ocm-toggle-favorite [favorite]="showingFavoritesOnly"></ocm-toggle-favorite>
           My Favorites
         </button>
       </div>
@@ -53,17 +53,16 @@
                                 [facetList]="products.Meta.Facets"
                                 (facetListSelected)="changeFacets($event)">
           </product-facet-filter>
-          <div (click)="refineByFavorites()">
+          <div (click)="toggleFilterByFavorites()">
             <span class="sr-only">Sort By Favorites</span>
-            <ocm-toggle-favorite [favorite]="hasFavoriteProductsFilter"></ocm-toggle-favorite>
+            <ocm-toggle-favorite [favorite]="showingFavoritesOnly"></ocm-toggle-favorite>
             <label class="ml-2"
                    for="favorite"> My Favorites</label>
           </div>
         </div>
       </div>
       <product-category-nav *ngIf="categories?.Items?.length"
-                            [categories]="categories"
-                            (selection)="changeCategory($event)">
+                            [categories]="categories">
       </product-category-nav>
     </div>
     <div class="col-lg-9 col-md-8 ">
@@ -86,18 +85,13 @@
           </button>
         </div>
         <div class="col-12 col-md-auto ">
-          <product-sort-filter [sortStrategy]="sortBy"
-                               (sortStrategyChange)="changeSortStrategy($event)"></product-sort-filter>
+          <product-sort-filter [sortStrategy]="sortBy"></product-sort-filter>
         </div>
       </div>
       <div class="card"
            *ngIf="products.Items.length === 0">
         <shared-no-results message="No products found."
-                           [actionText]="
-            hasQueryParams
-              ? 'clear search criteria'
-              : 'go back to the home page'
-          "
+                           [actionText]="hasQueryParams ? 'clear search criteria' : 'go back to the home page'"
                            (action)="hasQueryParams ? clearAllFilters() : routeHome()">
         </shared-no-results>
       </div>
@@ -125,7 +119,6 @@
   <shared-modal id="{{ createModalID }}"
                 modalTitle="Select Category">
     <product-category-nav *ngIf="categories?.Items?.length"
-                          [categories]="categories"
-                          (selection)="changeCategory($event)"></product-category-nav>
+                          [categories]="categories"></product-category-nav>
   </shared-modal>
 </section>

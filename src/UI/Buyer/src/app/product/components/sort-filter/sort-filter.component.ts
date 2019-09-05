@@ -1,18 +1,9 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output,
-  EventEmitter,
-  Inject,
-} from '@angular/core';
+import { Component, OnInit, Input, Inject } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ProductSortStrategy } from '@app-buyer/product/models/product-sort-strategy.enum';
 import { each as _each } from 'lodash';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-buyer/config/app.config';
+import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
+import { ProductListService } from '@app-buyer/shared/services/product-list/product-list.service';
 
 @Component({
   selector: 'product-sort-filter',
@@ -23,10 +14,10 @@ export class SortFilterComponent implements OnInit {
   form: FormGroup;
   options: { label: string; value: string }[];
   @Input() sortStrategy?: string;
-  @Output() sortStrategyChange = new EventEmitter<ProductSortStrategy>();
 
   constructor(
     private formBuilder: FormBuilder,
+    private productListService: ProductListService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
@@ -64,6 +55,6 @@ export class SortFilterComponent implements OnInit {
 
   protected sortStrategyChanged() {
     const sortStrategy = this.form.get('strategy').value;
-    this.sortStrategyChange.emit(sortStrategy);
+    this.productListService.sortBy(sortStrategy);
   }
 }

@@ -1,8 +1,9 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ListCategory, Category } from '@ordercloud/angular-sdk';
 import { ITreeOptions } from 'angular-tree-component';
 import { CategoryTreeNode } from '@app-buyer/product/models/category-tree-node.class';
 import { ActivatedRoute } from '@angular/router';
+import { ProductListService } from '@app-buyer/shared/services/product-list/product-list.service';
 
 @Component({
   selector: 'product-category-nav',
@@ -11,59 +12,59 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class CategoryNavComponent implements OnInit {
   @Input() categories: ListCategory;
-  @Output() selection = new EventEmitter<CategoryTreeNode>();
   categoryTree: CategoryTreeNode[];
+  treeOptions: ITreeOptions = this.buildTreeOptions();
   private activeCategoryID: string;
-  options: ITreeOptions = {
-    nodeClass: (node: CategoryTreeNode) => {
-      return this.activeCategoryID === node.id ? 'font-weight-bold' : null;
-    },
-    actionMapping: {
-      mouse: {
-        click: (_tree, _node, _$event) => {
-          this.selection.emit(_node.id);
-        },
-      },
-    },
-    animateExpand: true,
-  };
 
-  constructor(private activatedRoute: ActivatedRoute) {}
+  constructor(private activatedRoute: ActivatedRoute, private productListService: ProductListService) {}
 
   ngOnInit() {
     this.categoryTree = this.buildCategoryTree(this.categories.Items);
     this.activatedRoute.queryParams.subscribe((queryParams) => {
-      this.activeCategoryID = queryParams.category;
+      this.activeCategoryID = queryParams.categoryID;
     });
   }
 
-  buildCategoryTree(ocCategories: Category[]): CategoryTreeNode[] {
-    const orderedIDs = ocCategories.map((x) => x.ID);
+  buildTreeOptions(): ITreeOptions {
+    return {
+      nodeClass: (node: CategoryTreeNode) => {
+        return this.activeCategoryID === node.id ? 'font-weight-bold' : null;
+      },
+      actionMapping: {
+        mouse: {
+          click: (_tree, _node, _$event) => {
+            this.productListService.filterByCategory(_node.id);
+          },
+        },
+      },
+      animateExpand: true,
+    };
+  }
+
+  buildCategoryTree(categories: Category[]): CategoryTreeNode[] {
     // key is ID, value is Node
-    const nodeDict = ocCategories.reduce((acc, x) => {
-      const node = new CategoryTreeNode();
-      node.id = x.ID;
-      node.name = x.Name;
-      node.category = x;
-      node.children = [];
-      acc[x.ID] = node;
-      return acc;
-    }, {});
-
-    orderedIDs.forEach((id) => {
-      if (
-        !nodeDict[id].category.ParentID ||
-        !nodeDict[nodeDict[id].category.ParentID]
-      ) {
-        // category is not a child node
-        return;
-      }
-
-      nodeDict[nodeDict[id].category.ParentID].children.push(nodeDict[id]);
-      nodeDict[id].parent = nodeDict[nodeDict[id].category.ParentID];
-    });
-
+    const nodeDictionary = this.buildNodeDictionary(categories);
+    categories.forEach((category) => this.setParentsAndChildren(nodeDictionary, category.ID));
     // Return all top-level nodes in order
-    return orderedIDs.map((x) => nodeDict[x]).filter((x) => !x.parent);
+    return categories.map((category) => nodeDictionary[category.ID]).filter((x) => !x.parent);
+  }
+
+  private setParentsAndChildren(nodeDictionary: any, categoryID: string) {
+    if (!nodeDictionary[categoryID].category.ParentID || !nodeDictionary[nodeDictionary[categoryID].category.ParentID]) {
+      // category is not a child node
+      return;
+    }
+
+    nodeDictionary[nodeDictionary[categoryID].category.ParentID].children.push(nodeDictionary[categoryID]);
+    nodeDictionary[categoryID].parent = nodeDictionary[nodeDictionary[categoryID].category.ParentID];
+  }
+
+  // returns an object with a key for each categoryID
+  private buildNodeDictionary(categories: Category[]): any {
+    const nodeDict = {};
+    categories.forEach((cat: Category) => {
+      nodeDict[cat.ID] = new CategoryTreeNode(cat);
+    });
+    return nodeDict;
   }
 }

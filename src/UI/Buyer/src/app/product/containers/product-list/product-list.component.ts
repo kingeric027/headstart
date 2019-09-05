@@ -3,11 +3,11 @@ import { Router, ActivatedRoute, NavigationEnd, Params } from '@angular/router';
 import { ListBuyerProduct, OcMeService, Category, ListCategory, ListFacet, ListLineItem } from '@ordercloud/angular-sdk';
 import { ModalService, BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { ProductSortStrategy } from '@app-buyer/product/models/product-sort-strategy.enum';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
+import { ProductListService } from '@app-buyer/shared/services/product-list/product-list.service';
 
 @Component({
   selector: 'product-list',
@@ -19,14 +19,13 @@ export class ProductListComponent implements OnInit {
   categories: ListCategory;
   categoryCrumbs: Category[] = [];
   hasQueryParams = false;
-  hasFavoriteProductsFilter = false;
+  showingFavoritesOnly = false;
   closeIcon = faTimes;
   isModalOpen = false;
   createModalID = 'selectCategory';
   facets: ListFacet[];
   lineItems: ListLineItem;
   quantityLimits: QuantityLimits[];
-  sortBy: any;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -35,6 +34,7 @@ export class ProductListComponent implements OnInit {
     private modalService: ModalService,
     private currentOrder: CurrentOrderService,
     private currentUser: CurrentUserService,
+    private productListService: ProductListService,
     protected context: ShopperContextService // used in template
   ) {}
 
@@ -42,10 +42,9 @@ export class ProductListComponent implements OnInit {
     this.products = this.activatedRoute.snapshot.data.products;
     this.facets = this.products.Meta.Facets;
     this.categories = this.activatedRoute.snapshot.data.categories;
-    this.sortBy = this.activatedRoute.queryParams['sortBy'];
 
     this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
-    this.categoryCrumbs = this.buildBreadCrumbs(this.activatedRoute.snapshot.queryParams.category);
+    this.categoryCrumbs = this.buildBreadCrumbs(this.activatedRoute.snapshot.queryParams.categoryID);
     this.configureRouter();
     this.currentOrder.onLineItemsChange((lineItems) => (this.lineItems = lineItems));
     this.activatedRoute.queryParams.subscribe(this.onQueryParamsChange);
@@ -53,11 +52,11 @@ export class ProductListComponent implements OnInit {
 
   private onQueryParamsChange = async (queryParams: Params) => {
     this.hasQueryParams = !_isEmpty(queryParams);
-    this.hasFavoriteProductsFilter = queryParams.favoriteProducts === 'true';
-    this.categoryCrumbs = this.buildBreadCrumbs(queryParams.category);
+    this.showingFavoritesOnly = queryParams.favorites === 'true';
+    this.categoryCrumbs = this.buildBreadCrumbs(queryParams.categoryID);
     this.products = await this.ocMeService
       .ListProducts({
-        categoryID: queryParams.category,
+        categoryID: queryParams.categoryID,
         page: queryParams.page,
         search: queryParams.search,
         sortBy: queryParams.sortBy,
@@ -91,7 +90,7 @@ export class ProductListComponent implements OnInit {
   private buildFavoritesFilter(queryParams: Params): Params {
     const filter = {};
     const favorites = this.currentUser.favoriteProductIDs;
-    filter['ID'] = queryParams.favoriteProducts === 'true' && favorites ? favorites.join('|') : undefined;
+    filter['ID'] = queryParams.favorites === 'true' && favorites ? favorites.join('|') : undefined;
     return filter;
   }
 
@@ -126,14 +125,7 @@ export class ProductListComponent implements OnInit {
   }
 
   changePage(page: number): void {
-    this.addQueryParam({ page });
-  }
-
-  changeCategory(category: string): void {
-    this.addQueryParam({ category });
-    if (this.isModalOpen) {
-      this.closeCategoryModal();
-    }
+    this.productListService.toPage(page);
   }
 
   changeFacets(facetQueryParams: Params): void {
@@ -144,19 +136,8 @@ export class ProductListComponent implements OnInit {
     this.addQueryParam(priceQueryParams);
   }
 
-  changeSortStrategy(sortBy: ProductSortStrategy): void {
-    this.addQueryParam({ sortBy });
-  }
-
-  refineByFavorites() {
-    const queryParams = this.activatedRoute.snapshot.queryParams;
-    if (queryParams.favoriteProducts === 'true') {
-      // favorite products was previously set to true so toggle off
-      // set to undefined so we dont pollute url with unnecessary query params
-      this.addQueryParam({ favoriteProducts: undefined });
-    } else {
-      this.addQueryParam({ favoriteProducts: true });
-    }
+  toggleFilterByFavorites() {
+    this.productListService.filterByFavorites(!this.showingFavoritesOnly);
   }
 
   private addQueryParam(newParam: object): void {
@@ -194,17 +175,11 @@ export class ProductListComponent implements OnInit {
     this.modalService.open('selectCategory');
     this.isModalOpen = true;
   }
+
+  // TODO - it may be that this function is never used, but it should be.
   closeCategoryModal() {
     this.isModalOpen = false;
     this.modalService.close('selectCategory');
-  }
-
-  isFavorite(productID: string): boolean {
-    return this.currentUser.favoriteProductIDs.includes(productID);
-  }
-
-  setIsFavorite(isFav: boolean, productID: string) {
-    this.currentUser.setIsFavoriteProduct(isFav, productID);
   }
 
   configureRouter() {

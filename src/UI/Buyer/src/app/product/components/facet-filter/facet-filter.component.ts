@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output,
-  OnDestroy,
-  EventEmitter,
-} from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { ListFacet } from '@ordercloud/angular-sdk';
 import { ActivatedRoute, Params } from '@angular/router';
 import { keys as _keys, intersection as _intersection } from 'lodash';
@@ -18,7 +11,6 @@ import { takeWhile } from 'rxjs/operators';
 })
 export class FacetFilterComponent implements OnInit, OnDestroy {
   @Input() facetList: ListFacet[];
-  @Output() facetListSelected = new EventEmitter<Params>();
   activeFacets: string[] = [];
   queryParams;
   alive = true;
@@ -30,12 +22,10 @@ export class FacetFilterComponent implements OnInit, OnDestroy {
   }
 
   private onQueryParamChange() {
-    this.activatedRoute.queryParams
-      .pipe(takeWhile(() => this.alive))
-      .subscribe((queryParams) => {
-        this.queryParams = queryParams;
-        this.activeFacets = this.findActiveFacets(queryParams);
-      });
+    this.activatedRoute.queryParams.pipe(takeWhile(() => this.alive)).subscribe((queryParams) => {
+      this.queryParams = queryParams;
+      this.activeFacets = this.findActiveFacets(queryParams);
+    });
   }
 
   private findActiveFacets(queryParams: Params): string[] {

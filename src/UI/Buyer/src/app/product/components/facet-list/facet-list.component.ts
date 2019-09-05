@@ -1,9 +1,10 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { ListFacet } from '@ordercloud/angular-sdk';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { each as _each } from 'lodash';
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
+import { ProductListService } from '@app-buyer/shared/services/product-list/product-list.service';
 
 @Component({
   selector: 'product-facet-list',
@@ -12,7 +13,6 @@ import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
 })
 export class FacetListComponent implements OnInit {
   @Input() facet: ListFacet;
-  @Output() selectedFacet = new EventEmitter<Params>();
   form: FormGroup;
   visibleFacetLength = 5;
   isCollapsed = false;
@@ -20,10 +20,7 @@ export class FacetListComponent implements OnInit {
   faPlusSquare = faPlusSquare;
   faMinusSquare = faMinusSquare;
 
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private formBuilder: FormBuilder
-  ) {}
+  constructor(private activatedRoute: ActivatedRoute, private formBuilder: FormBuilder, private productListService: ProductListService) {}
 
   ngOnInit() {
     this.setForm();
@@ -53,9 +50,7 @@ export class FacetListComponent implements OnInit {
           this.facet.Values.forEach((facet, index) => {
             const facetValuesInQueryparams = queryParamVal.split('|');
             if (facetValuesInQueryparams.includes(facet.Value)) {
-              (<FormArray>this.form.get('facetValues'))
-                .at(index)
-                .setValue(true);
+              (<FormArray>this.form.get('facetValues')).at(index).setValue(true);
             }
           });
         }
@@ -81,33 +76,32 @@ export class FacetListComponent implements OnInit {
 
     // build up query parameters to emit
     const queryParams = { ...this.queryParams };
-    const facetQueryParams = {};
+    let value;
     const facetFilterExists = !!queryParams[facetName];
 
     if (facetFilterExists) {
       if (isSelected) {
         // different values of the same facet are OR'd together (by convention)
-        facetQueryParams[facetName] = `${queryParams[facetName]}|${facetValue}`;
+        value = `${queryParams[facetName]}|${facetValue}`;
       } else {
         const facetValues = queryParams[facetName].split('|');
         if (facetValues.length > 1) {
           // remove the relevant facet from filter
-          facetQueryParams[facetName] = facetValues
-            .filter((fV) => fV !== facetValue)
-            .join('|');
+          value = facetValues.filter((fV) => fV !== facetValue).join('|');
         } else {
           // setting to undefined so sdk ignores parameter
-          facetQueryParams[facetName] = undefined;
+          value = null;
         }
       }
     } else {
       // facet filter did not exist previously
       if (isSelected) {
         // set facet value
-        facetQueryParams[facetName] = facetValue;
+        value = facetValue;
       }
     }
 
-    this.selectedFacet.emit(facetQueryParams);
+    debugger;
+    this.productListService.filterBy(facetName, value, true);
   }
 }
