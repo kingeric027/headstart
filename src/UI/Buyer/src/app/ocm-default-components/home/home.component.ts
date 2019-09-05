@@ -1,4 +1,4 @@
-import { ListBuyerProduct } from '@ordercloud/angular-sdk';
+import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 import { OCMComponent } from '../shopper-context';
@@ -9,7 +9,7 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./home.component.scss'],
 })
 export class OCMHomePage extends OCMComponent {
-  @Input() featuredProducts: ListBuyerProduct;
+  @Input() featuredProducts: BuyerProduct[];
   @Input() quantityLimits: QuantityLimits[];
   faBullhorn = faBullhorn;
 

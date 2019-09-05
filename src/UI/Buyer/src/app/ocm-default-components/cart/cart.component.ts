@@ -14,11 +14,6 @@ export class OCMCart extends OCMComponent implements OnInit {
 
   ngOnInit() {}
 
-  log(object: any) {
-    console.log(object);
-    console.log(this.lineItems);
-  }
-
   toProductList() {
     this.context.routeActions.toProductList();
   }

@@ -15,6 +15,7 @@ import { OCMOrderSummary } from './order-summary/order-summary.component';
 import { OCMLineitemTable } from './lineitem-table/lineitem-table.component';
 import { OCMCart } from './cart/cart.component';
 import { OCMHomePage } from './home/home.component';
+import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -44,7 +45,7 @@ import { OCMHomePage } from './home/home.component';
     OCMCart,
     OCMHomePage,
   ],
-  imports: [CommonModule, NgxImageZoomModule, ReactiveFormsModule, FontAwesomeModule],
+  imports: [CommonModule, NgxImageZoomModule, ReactiveFormsModule, FontAwesomeModule, NgbCarouselModule],
 })
 export class OcmDefaultComponentsModule {
   constructor(private injector: Injector) {

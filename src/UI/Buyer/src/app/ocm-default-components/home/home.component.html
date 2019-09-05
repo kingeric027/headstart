@@ -21,10 +21,9 @@
     </ng-template>
   </ngb-carousel>
   <!-- Featured products can be managed in the seller application -->
-  hello {{featuredProducts?.Items?.length}}
-  <ocm-product-carousel *ngIf="featuredProducts?.Items?.length"
+  <ocm-product-carousel *ngIf="featuredProducts?.length"
                         [displayTitle]="'Featured Products'"
-                        [products]="featuredProducts.Items"
+                        [products]="featuredProducts"
                         [quantityLimits]="quantityLimits"
                         [context]="context">
   </ocm-product-carousel>
