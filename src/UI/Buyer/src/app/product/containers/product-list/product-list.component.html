@@ -48,10 +48,9 @@
             Clear All Filters
           </button>
           <!-- enable price filtering by uncommenting this line, see PriceFilterComponent for more details -->
-          <!-- <product-price-filter (priceFilterChange)="changePrice($event)"></product-price-filter> -->
+          <!-- <product-price-filter (priceFilterChange)=""></product-price-filter> -->
           <product-facet-filter *ngIf="products.Meta?.Facets?.length"
-                                [facetList]="products.Meta.Facets"
-                                (facetListSelected)="changeFacets($event)">
+                                [facetList]="products.Meta.Facets">
           </product-facet-filter>
           <div (click)="toggleFilterByFavorites()">
             <span class="sr-only">Sort By Favorites</span>
