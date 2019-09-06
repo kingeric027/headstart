@@ -101,7 +101,6 @@ export class FacetListComponent implements OnInit {
       }
     }
 
-    debugger;
     this.productListService.filterBy(facetName, value, true);
   }
 }

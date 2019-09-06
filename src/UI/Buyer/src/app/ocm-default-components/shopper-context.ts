@@ -1,5 +1,6 @@
-import { LineItem, MeUser, Order, ListLineItem } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, User } from '@ordercloud/angular-sdk';
 import { Input } from '@angular/core';
+import { ProductListParams } from '@app-buyer/shared/services/product-list/product-list.service';
 
 export class OCMComponent {
   @Input() context: ShopperContext;
@@ -10,6 +11,7 @@ export interface ShopperContext {
   routeActions: RouteActions;
   currentUser: CurrentUser;
   currentOrder: CurrentOrder;
+  productListActions: ProductListActions;
 }
 
 export interface CartActions {
@@ -22,12 +24,14 @@ export interface CartActions {
 
 export interface RouteActions {
   toProductDetails: (productID: string) => void;
-  toProductList: () => void;
+  toProductList: (options?: ProductListParams) => void;
   toCheckout: () => void;
 }
 
 export interface CurrentUser {
   user: MeUser;
+  onUserChange: (callback: (user: User) => void) => void;
+  onIsAnonymousChange: (callback: (isAnonymous: boolean) => void) => void;
   onFavoriteProductsChange: (callback: (productIDs: string[]) => void) => void;
   setIsFavoriteProduct: (isFav: boolean, productID: string) => void;
   onFavoriteOrdersChange: (callback: (orderIDs: string[]) => void) => void;
@@ -39,4 +43,18 @@ export interface CurrentOrder {
   lineItems: ListLineItem;
   onOrderChange: (callback: (order: Order) => void) => void;
   onLineItemsChange: (callback: (lineItems: ListLineItem) => void) => void;
+}
+
+export interface ProductListActions {
+  toPage: (pageNumber: number) => void;
+  sortBy: (field: string) => void;
+  clearSort: () => void;
+  searchBy: (searchTerm: string) => void;
+  clearSearch: () => void;
+  filterBy: (field: string, value: string, isFacet?: boolean) => void;
+  removeFilter: (field: string) => void;
+  filterByCategory: (categoryID: string) => void;
+  clearCategoryFilter: () => void;
+  filterByFavorites: (showOnlyFavorites: boolean) => void;
+  clearAllFilters: () => void;
 }

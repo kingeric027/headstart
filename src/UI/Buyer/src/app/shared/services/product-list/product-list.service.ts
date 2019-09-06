@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Router } from '@angular/router';
+import { Router, Params } from '@angular/router';
 import { keyBy as _keyBy, mapValues as _mapValues } from 'lodash';
 
-interface ProductListParams {
+export interface ProductListParams {
   page?: number;
   sortBy?: string;
   search?: string;
@@ -31,11 +31,21 @@ export class ProductListService {
   constructor(private router: Router) {}
 
   private updateUrl() {
-    const { page, sortBy, search, filters } = this.paramsSubject.value;
-    const filterObject = _mapValues(_keyBy(filters, 'field'), 'value');
-    const queryParams = { page, sortBy, search, ...filterObject };
+    const queryParams = this.mapToUrlQueryParams(this.paramsSubject.value);
     this.router.navigate([], { queryParams });
   }
+
+  mapToUrlQueryParams(model: ProductListParams): Params {
+    const { page, sortBy, search, filters } = model;
+    const filterObject = _mapValues(_keyBy(filters, 'field'), 'value');
+    return { page, sortBy, search, ...filterObject };
+  }
+
+  // mapToOrderCloudParams(model: ProductListParams): any {
+  //   // TODO
+  // }
+
+  // TODO - all these functions are really only relevent if you're already on the product details page. How can we enforce/inidcate that?
 
   toPage(pageNumber: number) {
     this.paramsSubject.next({ ...this.paramsSubject.value, page: pageNumber });
@@ -94,6 +104,8 @@ export class ProductListService {
     this.paramsSubject.next(this.defaultParams);
     this.updateUrl();
   }
+
+  // TODO - All gets should be converted to onChanges()
 
   get activeSearchTerm(): string {
     return this.paramsSubject.value.search || null;

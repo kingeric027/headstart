@@ -4,12 +4,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { faSearch, faShoppingCart, faPhone, faQuestionCircle, faUserCircle, faSignOutAlt, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
-import { CurrentOrderService } from '@app-buyer/shared';
 import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
 import { takeWhile, tap, debounceTime, delay, filter } from 'rxjs/operators';
 import { AppAuthService } from '@app-buyer/auth';
 import { SearchComponent } from '@app-buyer/shared/components/search/search.component';
-import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { CurrentOrderService } from '@app-buyer/shared';
+import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'layout-header',
@@ -37,18 +37,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
   faHome = faHome;
 
   constructor(
-    private currentOrder: CurrentOrderService,
-    private currentUser: CurrentUserService,
     private appAuthService: AppAuthService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
+    private currentOrder: CurrentOrderService, // TODO- remove
+    private context: ShopperContextService,
     @Inject(applicationConfiguration) protected appConfig: AppConfig
   ) {}
 
   ngOnInit() {
-    this.currentOrder.onOrderChange((order) => (this.order = order));
-    this.currentUser.onIsAnonymousChange((isAnon) => (this.anonymous = isAnon));
-    this.currentUser.onUserChange((user) => (this.user = user));
+    this.context.currentOrder.onOrderChange((order) => (this.order = order));
+    this.context.currentUser.onIsAnonymousChange((isAnon) => (this.anonymous = isAnon));
+    this.context.currentUser.onUserChange((user) => (this.user = user));
 
     this.buildAddToCartListener();
     this.clearSearchOnNavigate();
@@ -77,7 +77,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   searchProducts(searchStr: string) {
-    this.router.navigate(['/products'], { queryParams: { search: searchStr } });
+    this.context.routeActions.toProductList({ search: searchStr, filters: [] }); // TODO - filters should not be needed.
   }
 
   logout() {

@@ -4,6 +4,7 @@ import { CartService } from '../cart/cart.service';
 import { Injectable } from '@angular/core';
 import { ShopperContext } from '@app-buyer/ocm-default-components/shopper-context';
 import { RouteService } from '../route/route.service';
+import { ProductListService } from '../product-list/product-list.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,7 @@ export class ShopperContextService implements ShopperContext {
     public currentOrder: CurrentOrderService,
     public currentUser: CurrentUserService,
     public cartActions: CartService,
-    public routeActions: RouteService
+    public routeActions: RouteService,
+    public productListActions: ProductListService
   ) {}
 }
