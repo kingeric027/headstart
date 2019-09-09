@@ -1,9 +1,9 @@
-import { Component, OnInit, Input, Inject } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ProductSortStrategy } from '@app-buyer/product/models/product-sort-strategy.enum';
 import { each as _each } from 'lodash';
 import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
-import { ProductListService } from '@app-buyer/shared/services/product-list/product-list.service';
+import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'product-sort-filter',
@@ -13,17 +13,19 @@ import { ProductListService } from '@app-buyer/shared/services/product-list/prod
 export class SortFilterComponent implements OnInit {
   form: FormGroup;
   options: { label: string; value: string }[];
-  @Input() sortStrategy?: string;
 
   constructor(
     private formBuilder: FormBuilder,
-    private productListService: ProductListService,
+    private context: ShopperContextService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
   ngOnInit() {
     this.options = this.getOptions();
-    this.setForm();
+    this.buildForm();
+    this.context.productFilterActions.onFiltersChange((filters) => {
+      this.setForm(filters.sortBy);
+    });
   }
 
   private getOptions(): { label: string; value: string }[] {
@@ -47,14 +49,17 @@ export class SortFilterComponent implements OnInit {
     return options;
   }
 
-  private setForm() {
-    this.form = this.formBuilder.group({
-      strategy: this.options.find((x) => x.value === this.sortStrategy),
-    });
+  private buildForm() {
+    this.form = this.formBuilder.group({ strategy: null });
+  }
+
+  private setForm(sortBy: string) {
+    sortBy = sortBy || null;
+    this.form.setValue({ strategy: sortBy });
   }
 
   protected sortStrategyChanged() {
     const sortStrategy = this.form.get('strategy').value;
-    this.productListService.sortBy(sortStrategy);
+    this.context.productFilterActions.sortBy(sortStrategy);
   }
 }

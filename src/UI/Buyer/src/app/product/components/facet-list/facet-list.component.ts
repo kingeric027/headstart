@@ -4,7 +4,7 @@ import { ListFacet } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
 import { each as _each } from 'lodash';
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
-import { ProductListService } from '@app-buyer/shared/services/product-list/product-list.service';
+import { ProductFilterService } from '@app-buyer/shared/services/product-filter/product-filter.service';
 
 @Component({
   selector: 'product-facet-list',
@@ -20,7 +20,11 @@ export class FacetListComponent implements OnInit {
   faPlusSquare = faPlusSquare;
   faMinusSquare = faMinusSquare;
 
-  constructor(private activatedRoute: ActivatedRoute, private formBuilder: FormBuilder, private productListService: ProductListService) {}
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private formBuilder: FormBuilder,
+    private productFilterService: ProductFilterService
+  ) {}
 
   ngOnInit() {
     this.setForm();
@@ -101,6 +105,6 @@ export class FacetListComponent implements OnInit {
       }
     }
 
-    this.productListService.filterBy(facetName, value, true);
+    this.productFilterService.filterByFacet(facetName, value);
   }
 }

@@ -7,12 +7,12 @@ import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.confi
 import { Subject, BehaviorSubject } from 'rxjs';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { listAll } from '@app-buyer/shared/functions/listAll';
-import { CurrentOrder } from '@app-buyer/ocm-default-components/shopper-context';
+import { ICurrentOrder } from '@app-buyer/ocm-default-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CurrentOrderService implements CurrentOrder {
+export class CurrentOrderService implements ICurrentOrder {
   private readonly DefaultLineItems: ListLineItem = {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],

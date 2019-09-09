@@ -2,19 +2,19 @@ import { CurrentOrderService } from '../current-order/current-order.service';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { CartService } from '../cart/cart.service';
 import { Injectable } from '@angular/core';
-import { ShopperContext } from '@app-buyer/ocm-default-components/shopper-context';
+import { IShopperContext } from '@app-buyer/ocm-default-components/shopper-context';
 import { RouteService } from '../route/route.service';
-import { ProductListService } from '../product-list/product-list.service';
+import { ProductFilterService } from '../product-filter/product-filter.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ShopperContextService implements ShopperContext {
+export class ShopperContextService implements IShopperContext {
   constructor(
     public currentOrder: CurrentOrderService,
     public currentUser: CurrentUserService,
     public cartActions: CartService,
     public routeActions: RouteService,
-    public productListActions: ProductListService
+    public productFilterActions: ProductFilterService
   ) {}
 }

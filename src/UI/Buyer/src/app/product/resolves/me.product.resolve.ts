@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot, Params } from '@angular/router';
+import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
 import { OcMeService, ListBuyerProduct, BuyerProduct, ListBuyerSpec, BuyerSpec, ListCategory } from '@ordercloud/angular-sdk';
 import { each as _each } from 'lodash';
 import { Observable, of } from 'rxjs';
-import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { ProductFilterService } from '@app-buyer/shared/services/product-filter/product-filter.service';
 
 @Injectable()
 export class MeListRelatedProductsResolver implements Resolve<ListBuyerProduct> {
@@ -24,51 +24,10 @@ export class MeListRelatedProductsResolver implements Resolve<ListBuyerProduct> 
 
 @Injectable()
 export class MeListProductResolver implements Resolve<ListBuyerProduct> {
-  constructor(private service: OcMeService, private currentUser: CurrentUserService) {}
+  constructor(private service: OcMeService, private productFilter: ProductFilterService) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<ListBuyerProduct> | Promise<ListBuyerProduct> | any {
-    return this.service.ListProducts({
-      categoryID: route.queryParams.category,
-      page: route.queryParams.page,
-      search: route.queryParams.search,
-      sortBy: route.queryParams.sortBy,
-      filters: {
-        ...this.buildFacets(route.queryParams),
-        ...this.buildFavoriesFilter(route.queryParams),
-        ...this.buildPriceFilter(route.queryParams),
-      },
-    });
-  }
-
-  private buildFacets(params: Params): Params {
-    const facets: Params = {};
-    _each(params, (value, key) => {
-      if (key !== 'page' && key !== 'search' && key !== 'sortBy' && key !== 'category' && key !== 'favoriteProducts') {
-        facets[`xp.Facets.${key.toLocaleLowerCase()}`] = value;
-      }
-    });
-    return facets;
-  }
-
-  private buildFavoriesFilter(params: Params): Params {
-    const filter = {};
-    const favorites = this.currentUser.favoriteProductIDs;
-    filter['ID'] = params.favoriteProducts === 'true' && favorites ? favorites.join('|') : undefined;
-    return filter;
-  }
-
-  private buildPriceFilter(params: Params): Params {
-    const filter = {};
-    if (params.minPrice && !params.maxPrice) {
-      filter['xp.Price'] = `>=${params.minPrice}`;
-    }
-    if (params.maxPrice && !params.minPrice) {
-      filter['xp.Price'] = `<=${params.maxPrice}`;
-    }
-    if (params.minPrice && params.maxPrice) {
-      filter['xp.Price'] = [`>=${params.minPrice}`, `<=${params.maxPrice}`];
-    }
-    return filter;
+  resolve(): Observable<ListBuyerProduct> | Promise<ListBuyerProduct> | any {
+    return this.service.ListProducts(this.productFilter.getOrderCloudParams());
   }
 }
 

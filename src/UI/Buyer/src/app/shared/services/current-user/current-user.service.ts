@@ -4,12 +4,12 @@ import { MeUser, OcMeService, OcTokenService, User } from '@ordercloud/angular-s
 import * as jwtDecode from 'jwt-decode';
 import { isUndefined as _isUndefined } from 'lodash';
 import { ToastrService } from 'ngx-toastr';
-import { CurrentUser } from '@app-buyer/ocm-default-components/shopper-context';
+import { ICurrentUser } from '@app-buyer/ocm-default-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CurrentUserService implements CurrentUser {
+export class CurrentUserService implements ICurrentUser {
   private readonly MaxFavorites: number = 40;
   private readonly favOrdersXP = 'FavoriteOrders';
   private readonly favProductsXP = 'FavoriteProducts';

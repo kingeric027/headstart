@@ -2,8 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ListCategory, Category } from '@ordercloud/angular-sdk';
 import { ITreeOptions } from 'angular-tree-component';
 import { CategoryTreeNode } from '@app-buyer/product/models/category-tree-node.class';
-import { ActivatedRoute } from '@angular/router';
-import { ProductListService } from '@app-buyer/shared/services/product-list/product-list.service';
+import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'product-category-nav',
@@ -16,12 +15,12 @@ export class CategoryNavComponent implements OnInit {
   treeOptions: ITreeOptions = this.buildTreeOptions();
   private activeCategoryID: string;
 
-  constructor(private activatedRoute: ActivatedRoute, private productListService: ProductListService) {}
+  constructor(private context: ShopperContextService) {}
 
   ngOnInit() {
     this.categoryTree = this.buildCategoryTree(this.categories.Items);
-    this.activatedRoute.queryParams.subscribe((queryParams) => {
-      this.activeCategoryID = queryParams.categoryID;
+    this.context.productFilterActions.onFiltersChange((filters) => {
+      this.activeCategoryID = filters.categoryID;
     });
   }
 
@@ -33,7 +32,7 @@ export class CategoryNavComponent implements OnInit {
       actionMapping: {
         mouse: {
           click: (_tree, _node, _$event) => {
-            this.productListService.filterByCategory(_node.id);
+            this.context.productFilterActions.filterByCategory(_node.id);
           },
         },
       },

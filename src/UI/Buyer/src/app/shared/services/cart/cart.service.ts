@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { OcLineItemService, ListLineItem, LineItem, OcOrderService } from '@ordercloud/angular-sdk';
 import { isUndefined as _isUndefined, flatMap as _flatMap, get as _get, isEqual as _isEqual, omitBy as _omitBy } from 'lodash';
 import { CurrentOrderService } from '../current-order/current-order.service';
-import { CartActions } from '@app-buyer/ocm-default-components/shopper-context';
+import { ICartActions } from '@app-buyer/ocm-default-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CartService implements CartActions {
+export class CartService implements ICartActions {
   private initializingOrder = false;
 
   constructor(

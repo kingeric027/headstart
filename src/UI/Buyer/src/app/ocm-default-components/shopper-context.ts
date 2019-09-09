@@ -1,20 +1,20 @@
 import { LineItem, MeUser, Order, ListLineItem, User } from '@ordercloud/angular-sdk';
 import { Input } from '@angular/core';
-import { ProductListParams } from '@app-buyer/shared/services/product-list/product-list.service';
+import { ProductFilters } from '@app-buyer/shared/services/product-filter/product-filter.service';
 
 export class OCMComponent {
-  @Input() context: ShopperContext;
+  @Input() context: IShopperContext;
 }
 
-export interface ShopperContext {
-  cartActions: CartActions;
-  routeActions: RouteActions;
-  currentUser: CurrentUser;
-  currentOrder: CurrentOrder;
-  productListActions: ProductListActions;
+export interface IShopperContext {
+  cartActions: ICartActions;
+  routeActions: IRouteActions;
+  currentUser: ICurrentUser;
+  currentOrder: ICurrentOrder;
+  productFilterActions: IProductFilterActions;
 }
 
-export interface CartActions {
+export interface ICartActions {
   addToCart: (lineItem: LineItem) => Promise<LineItem>;
   removeLineItem: (lineItemID: string) => Promise<void>;
   updateQuantity: (lineItemID: string, newQuantity: number) => Promise<LineItem>;
@@ -22,13 +22,13 @@ export interface CartActions {
   emptyCart: () => Promise<void>;
 }
 
-export interface RouteActions {
+export interface IRouteActions {
   toProductDetails: (productID: string) => void;
-  toProductList: (options?: ProductListParams) => void;
+  toProductList: (options?: ProductFilters) => void;
   toCheckout: () => void;
 }
 
-export interface CurrentUser {
+export interface ICurrentUser {
   user: MeUser;
   onUserChange: (callback: (user: User) => void) => void;
   onIsAnonymousChange: (callback: (isAnonymous: boolean) => void) => void;
@@ -38,23 +38,24 @@ export interface CurrentUser {
   setIsFavoriteOrder: (isFav: boolean, orderID: string) => void;
 }
 
-export interface CurrentOrder {
+export interface ICurrentOrder {
   order: Order;
   lineItems: ListLineItem;
   onOrderChange: (callback: (order: Order) => void) => void;
   onLineItemsChange: (callback: (lineItems: ListLineItem) => void) => void;
 }
 
-export interface ProductListActions {
+export interface IProductFilterActions {
   toPage: (pageNumber: number) => void;
   sortBy: (field: string) => void;
   clearSort: () => void;
   searchBy: (searchTerm: string) => void;
   clearSearch: () => void;
-  filterBy: (field: string, value: string, isFacet?: boolean) => void;
-  removeFilter: (field: string) => void;
+  filterByFacet: (field: string, value: string, isFacet?: boolean) => void;
+  clearFacetFilter: (field: string) => void;
   filterByCategory: (categoryID: string) => void;
   clearCategoryFilter: () => void;
   filterByFavorites: (showOnlyFavorites: boolean) => void;
   clearAllFilters: () => void;
+  onFiltersChange: (callback: (filters: ProductFilters) => void) => void;
 }

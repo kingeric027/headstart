@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, NavigationEnd, Params } from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { ListBuyerProduct, OcMeService, Category, ListCategory, ListFacet, ListLineItem } from '@ordercloud/angular-sdk';
 import { ModalService, BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
-import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
-import { ProductListService } from '@app-buyer/shared/services/product-list/product-list.service';
+import { ProductFilters } from '@app-buyer/shared/services/product-filter/product-filter.service';
 
 @Component({
   selector: 'product-list',
@@ -17,13 +16,14 @@ import { ProductListService } from '@app-buyer/shared/services/product-list/prod
 export class ProductListComponent implements OnInit {
   products: ListBuyerProduct;
   categories: ListCategory;
+  facets: ListFacet[];
+
   categoryCrumbs: Category[] = [];
   hasQueryParams = false;
   showingFavoritesOnly = false;
   closeIcon = faTimes;
   isModalOpen = false;
   createModalID = 'selectCategory';
-  facets: ListFacet[];
   lineItems: ListLineItem;
   quantityLimits: QuantityLimits[];
 
@@ -33,8 +33,6 @@ export class ProductListComponent implements OnInit {
     private router: Router,
     private modalService: ModalService,
     private currentOrder: CurrentOrderService,
-    private currentUser: CurrentUserService,
-    private productListService: ProductListService,
     protected context: ShopperContextService // used in template
   ) {}
 
@@ -47,66 +45,17 @@ export class ProductListComponent implements OnInit {
     this.categoryCrumbs = this.buildBreadCrumbs(this.activatedRoute.snapshot.queryParams.categoryID);
     this.configureRouter();
     this.currentOrder.onLineItemsChange((lineItems) => (this.lineItems = lineItems));
-    this.activatedRoute.queryParams.subscribe(this.onQueryParamsChange);
+    this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
   }
 
-  private onQueryParamsChange = async (queryParams: Params) => {
-    this.hasQueryParams = !_isEmpty(queryParams);
-    this.showingFavoritesOnly = queryParams.favorites === 'true';
-    this.categoryCrumbs = this.buildBreadCrumbs(queryParams.categoryID);
-    this.products = await this.ocMeService
-      .ListProducts({
-        categoryID: queryParams.categoryID,
-        page: queryParams.page,
-        search: queryParams.search,
-        sortBy: queryParams.sortBy,
-        filters: {
-          ...this.buildFacetFilters(queryParams),
-          ...this.buildFavoritesFilter(queryParams),
-          ...this.buildPriceFilter(queryParams),
-        },
-      })
-      .toPromise();
+  private handleFiltersChange = async (filters: ProductFilters) => {
+    this.hasQueryParams = true; // TODO - implement
+    this.showingFavoritesOnly = filters.showOnlyFavorites;
+    this.categoryCrumbs = this.buildBreadCrumbs(filters.categoryID);
+    this.products = await this.ocMeService.ListProducts(this.context.productFilterActions.getOrderCloudParams()).toPromise();
     this.facets = this.products.Meta.Facets;
     this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
   };
-
-  private buildFacetFilters(queryParams: Params): Params {
-    if (!this.facets) {
-      // either premium search is not enabled for this client
-      // or ProductFacets have not been defined
-      return {};
-    }
-    const result = {};
-    _each(queryParams, (queryParamVal, queryParamName) => {
-      const facetDefinition = this.facets.find((facet) => facet.Name === queryParamName);
-      if (facetDefinition) {
-        result[`xp.${facetDefinition.XpPath}`] = queryParamVal;
-      }
-    });
-    return result;
-  }
-
-  private buildFavoritesFilter(queryParams: Params): Params {
-    const filter = {};
-    const favorites = this.currentUser.favoriteProductIDs;
-    filter['ID'] = queryParams.favorites === 'true' && favorites ? favorites.join('|') : undefined;
-    return filter;
-  }
-
-  private buildPriceFilter(queryParams: Params): Params {
-    const filter = {};
-    if (queryParams.minPrice && !queryParams.maxPrice) {
-      filter['xp.Price'] = `>=${queryParams.minPrice}`;
-    }
-    if (queryParams.maxPrice && !queryParams.minPrice) {
-      filter['xp.Price'] = `<=${queryParams.maxPrice}`;
-    }
-    if (queryParams.minPrice && queryParams.maxPrice) {
-      filter['xp.Price'] = [`>=${queryParams.minPrice}`, `<=${queryParams.maxPrice}`];
-    }
-    return filter;
-  }
 
   getCategories(): void {
     this.ocMeService.ListCategories({ depth: 'all' }).subscribe((categories) => {
@@ -121,15 +70,15 @@ export class ProductListComponent implements OnInit {
   }
 
   clearAllFilters() {
-    this.router.navigate([]);
+    this.context.productFilterActions.clearAllFilters();
   }
 
   changePage(page: number): void {
-    this.productListService.toPage(page);
+    this.context.productFilterActions.toPage(page);
   }
 
   toggleFilterByFavorites() {
-    this.productListService.filterByFavorites(!this.showingFavoritesOnly);
+    this.context.productFilterActions.filterByFavorites(!this.showingFavoritesOnly);
   }
 
   buildBreadCrumbs(catID: string): Category[] {

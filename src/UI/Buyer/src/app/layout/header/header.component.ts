@@ -49,6 +49,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.context.currentOrder.onOrderChange((order) => (this.order = order));
     this.context.currentUser.onIsAnonymousChange((isAnon) => (this.anonymous = isAnon));
     this.context.currentUser.onUserChange((user) => (this.user = user));
+    this.context.productFilterActions.onFiltersChange((filters) => this.search.setWithoutEmit(filters.search));
 
     this.buildAddToCartListener();
     this.clearSearchOnNavigate();
@@ -77,7 +78,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   searchProducts(searchStr: string) {
-    this.context.routeActions.toProductList({ search: searchStr, filters: [] }); // TODO - filters should not be needed.
+    this.context.routeActions.toProductList({ search: searchStr });
   }
 
   logout() {
@@ -94,7 +95,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         if (this.search) {
-          this.search.clearWithoutEmit();
+          this.search.setWithoutEmit('');
         }
       });
   }

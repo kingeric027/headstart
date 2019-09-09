@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  Input,
-  EventEmitter,
-  Output,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { debounceTime, takeWhile, filter } from 'rxjs/operators';
@@ -63,8 +56,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.form.setValue({ search: '' });
   }
 
-  clearWithoutEmit(): void {
-    this.form.setValue({ search: '' });
+  setWithoutEmit(value: string): void {
+    value = value || '';
+    this.form.setValue({ search: value });
   }
 
   ngOnDestroy() {
