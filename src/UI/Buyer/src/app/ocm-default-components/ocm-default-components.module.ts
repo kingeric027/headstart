@@ -17,6 +17,8 @@ import { OCMCart } from './cart/cart.component';
 import { OCMHomePage } from './home/home.component';
 import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
 import { OCMProductSort } from './sort-products/sort-products.component';
+import { OCMCategoryTree } from './category-tree/category-tree.component';
+import { TreeModule } from 'angular-tree-component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -33,6 +35,7 @@ import { OCMProductSort } from './sort-products/sort-products.component';
     OCMCart,
     OCMHomePage,
     OCMProductSort,
+    OCMCategoryTree,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -47,8 +50,9 @@ import { OCMProductSort } from './sort-products/sort-products.component';
     OCMCart,
     OCMHomePage,
     OCMProductSort,
+    OCMCategoryTree,
   ],
-  imports: [CommonModule, NgxImageZoomModule, ReactiveFormsModule, FontAwesomeModule, NgbCarouselModule],
+  imports: [CommonModule, NgxImageZoomModule, ReactiveFormsModule, FontAwesomeModule, NgbCarouselModule, TreeModule],
 })
 export class OcmDefaultComponentsModule {
   constructor(private injector: Injector) {
@@ -65,6 +69,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
+    this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

@@ -1,12 +1,12 @@
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
+import { OCMComponent } from '../shopper-context';
 
 @Component({
   templateUrl: './sort-products.component.html',
   styleUrls: ['./sort-products.component.scss'],
 })
-export class OCMProductSort implements OnInit, OnChanges {
+export class OCMProductSort extends OCMComponent implements OnInit, OnChanges {
   form: FormGroup;
   options = [
     { value: 'ID', label: 'ID: A to Z' },
@@ -14,7 +14,6 @@ export class OCMProductSort implements OnInit, OnChanges {
     { value: 'Name', label: 'Name: A to Z' },
     { value: '!Name', label: 'Name: Z to A' },
   ];
-  @Input() context: ShopperContextService;
 
   ngOnInit() {
     this.form = new FormGroup({ sortBy: new FormControl(null) });

@@ -1,24 +1,22 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { ListCategory, Category } from '@ordercloud/angular-sdk';
 import { ITreeOptions } from 'angular-tree-component';
 import { CategoryTreeNode } from '@app-buyer/product/models/category-tree-node.class';
-import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
+import { OCMComponent } from '@app-buyer/ocm-default-components/shopper-context';
+import { transform as _transform } from 'lodash';
 
 @Component({
-  selector: 'product-category-nav',
-  templateUrl: './category-nav.component.html',
-  styleUrls: ['./category-nav.component.scss'],
+  templateUrl: './category-tree.component.html',
+  styleUrls: ['./category-tree.component.scss'],
 })
-export class CategoryNavComponent implements OnInit {
+export class OCMCategoryTree extends OCMComponent implements OnChanges {
   @Input() categories: ListCategory;
   categoryTree: CategoryTreeNode[];
   treeOptions: ITreeOptions = this.buildTreeOptions();
-  private activeCategoryID: string;
+  activeCategoryID: string;
 
-  constructor(private context: ShopperContextService) {}
-
-  ngOnInit() {
-    this.categoryTree = this.buildCategoryTree(this.categories.Items);
+  ngOnChanges() {
+    if (!this.categoryTree) this.categoryTree = this.buildCategoryTree(this.categories.Items);
     this.context.productFilterActions.onFiltersChange((filters) => {
       this.activeCategoryID = filters.categoryID;
     });
@@ -60,10 +58,6 @@ export class CategoryNavComponent implements OnInit {
 
   // returns an object with a key for each categoryID
   private buildNodeDictionary(categories: Category[]): any {
-    const nodeDict = {};
-    categories.forEach((cat: Category) => {
-      nodeDict[cat.ID] = new CategoryTreeNode(cat);
-    });
-    return nodeDict;
+    return _transform(categories, (toReturn, category) => (toReturn[category.ID] = new CategoryTreeNode(category)));
   }
 }

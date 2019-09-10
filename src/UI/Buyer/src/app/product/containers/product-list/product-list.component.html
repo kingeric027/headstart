@@ -60,9 +60,10 @@
           </div>
         </div>
       </div>
-      <product-category-nav *ngIf="categories?.Items?.length"
-                            [categories]="categories">
-      </product-category-nav>
+      <ocm-category-tree *ngIf="categories?.Items?.length"
+                         [categories]="categories"
+                         [context]="context">
+      </ocm-category-tree>
     </div>
     <div class="col-lg-9 col-md-8 ">
       <div class="row flex-wrap-reverse">
@@ -117,7 +118,7 @@
   </div>
   <shared-modal id="{{ createModalID }}"
                 modalTitle="Select Category">
-    <product-category-nav *ngIf="categories?.Items?.length"
-                          [categories]="categories"></product-category-nav>
+    <ocm-category-tree *ngIf="categories?.Items?.length"
+                       [context]="context"></ocm-category-tree>
   </shared-modal>
 </section>
