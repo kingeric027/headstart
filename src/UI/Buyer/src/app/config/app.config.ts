@@ -6,28 +6,13 @@ export const ocAppConfig: AppConfig = {
   appname: 'OrderCloud',
   clientID: environment.clientID,
   anonymousShoppingEnabled: false,
-  premiumSearchEnabled: false,
   middlewareUrl: environment.middlewareUrl,
   cmsUrl: environment.cmsUrl,
-  scope: [
-    'MeAddressAdmin',
-    'MeAdmin',
-    'MeCreditCardAdmin',
-    'MeXpAdmin',
-    'Shopper',
-    'BuyerReader',
-    'PasswordReset',
-  ],
-  availablePaymentMethods: [
-    PaymentMethod.PurchaseOrder,
-    PaymentMethod.SpendingAccount,
-  ],
+  scope: ['MeAddressAdmin', 'MeAdmin', 'MeCreditCardAdmin', 'MeXpAdmin', 'Shopper', 'BuyerReader', 'PasswordReset'],
+  availablePaymentMethods: [PaymentMethod.PurchaseOrder, PaymentMethod.SpendingAccount],
 };
 
-export const applicationConfiguration = new InjectionToken<AppConfig>(
-  'app.config',
-  { providedIn: 'root', factory: () => ocAppConfig }
-);
+export const applicationConfiguration = new InjectionToken<AppConfig>('app.config', { providedIn: 'root', factory: () => ocAppConfig });
 
 export interface AppConfig {
   /**
@@ -72,15 +57,4 @@ export interface AppConfig {
    * from to complete payment on an order
    */
   availablePaymentMethods: PaymentMethod[];
-
-  /**
-   * API feature (in beta - coming soon). If set to true, takes advantage of the API's premium search which is a
-   * more powerful natural language search that also supports faceted navigation
-   * and is powered by Elastisearch. This feature will be available to for the public
-   * sometime in the fall as an additional-charge feature. Please contact one of our
-   * representatives if you are interested
-   * more info here: https://ordercloud-api.github.io/release-notes/ordercloud-api-v1.0.81.html
-   *
-   */
-  premiumSearchEnabled: boolean;
 }

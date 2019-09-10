@@ -16,6 +16,7 @@ import { OCMLineitemTable } from './lineitem-table/lineitem-table.component';
 import { OCMCart } from './cart/cart.component';
 import { OCMHomePage } from './home/home.component';
 import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
+import { OCMProductSort } from './sort-products/sort-products.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -31,6 +32,7 @@ import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
     OCMLineitemTable,
     OCMCart,
     OCMHomePage,
+    OCMProductSort,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -44,6 +46,7 @@ import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
     OCMLineitemTable,
     OCMCart,
     OCMHomePage,
+    OCMProductSort,
   ],
   imports: [CommonModule, NgxImageZoomModule, ReactiveFormsModule, FontAwesomeModule, NgbCarouselModule],
 })
@@ -61,6 +64,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMProductDetails, 'ocm-product-details');
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
+    this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

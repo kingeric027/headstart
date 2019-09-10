@@ -36,7 +36,7 @@ export class CurrentUserService implements ICurrentUser {
     this.loggedInSubject.next(value);
   }
 
-  onIsLoggedInChange(callback: (isLoggedIn: boolean) => void) {
+  onIsLoggedInChange(callback: (isLoggedIn: boolean) => void): void {
     this.loggedInSubject.subscribe(callback);
   }
 
@@ -48,7 +48,7 @@ export class CurrentUserService implements ICurrentUser {
     this.isAnonSubject.next(value);
   }
 
-  onIsAnonymousChange(callback: (isAnonymous: boolean) => void) {
+  onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void {
     this.isAnonSubject.subscribe(callback);
   }
 

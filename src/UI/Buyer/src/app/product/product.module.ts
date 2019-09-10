@@ -5,7 +5,6 @@ import { ProductsRoutingModule } from '@app-buyer/product/product-routing.module
 import { ProductListComponent } from '@app-buyer/product/containers/product-list/product-list.component';
 import { PriceFilterComponent } from '@app-buyer/product/components/price-filter/price-filter.component';
 import { CategoryNavComponent } from '@app-buyer/product/components/category-nav/category-nav.component';
-import { SortFilterComponent } from '@app-buyer/product/components/sort-filter/sort-filter.component';
 import { FacetFilterComponent } from '@app-buyer/product/components/facet-filter/facet-filter.component';
 import { FacetListComponent } from '@app-buyer/product/components/facet-list/facet-list.component';
 import { ProductDetailWrapperComponent } from './containers/product-detail-wrapper/product-detail-wrapper.component';
@@ -28,7 +27,6 @@ import { OcmDefaultComponentsModule } from '@app-buyer/ocm-default-components/oc
     ProductDetailWrapperComponent,
     PriceFilterComponent,
     CategoryNavComponent,
-    SortFilterComponent,
     FacetFilterComponent,
     FacetListComponent,
     ProductDetailWrapperComponent,
