@@ -19,7 +19,7 @@ import { NgbCarouselModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap
 import { OCMProductSort } from './sort-products/sort-products.component';
 import { OCMCategoryTree } from './category-tree/category-tree.component';
 import { TreeModule } from 'angular-tree-component';
-import { OCMFacetMultiSelect } from './facet-mulitselect/facet-multiselect.component';
+import { OCMFacetMultiSelect } from './facet-multiselect/facet-multiselect.component';
 import { OCMProductFacetList } from './product-facet-list/product-facet-list.component';
 
 @NgModule({

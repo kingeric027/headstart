@@ -3,13 +3,12 @@
     <div class="col-12">
       <nav class="breadcrumb"
            aria-label="breadcrumb">
-        <a class="breadcrumb-item link-text"
-           [routerLink]="['/products']">All Products</a>
-        <a *ngFor="let cat of categoryCrumbs"
-           class="breadcrumb-item link-text"
-           [queryParams]="{ category: cat.ID }"
-           [routerLink]="['/products']">
-          {{ cat.Name }}
+        <a class="breadcrumb-item link text-primary"
+           (click)="clearAllFilters()">All Products</a>
+        <a *ngFor="let category of categoryCrumbs"
+           class="breadcrumb-item link text-primary"
+           (click)="setActiveCategory(category.ID)">
+          {{ category.Name }}
         </a>
       </nav>
     </div>
@@ -92,8 +91,8 @@
       <div class="card"
            *ngIf="products.Items.length === 0">
         <shared-no-results message="No products found."
-                           [actionText]="hasQueryParams ? 'clear search criteria' : 'go back to the home page'"
-                           (action)="hasQueryParams ? clearAllFilters() : routeHome()">
+                           actionText="clear search criteria"
+                           (action)="clearAllFilters()">
         </shared-no-results>
       </div>
       <div *ngIf="products.Items.length > 0">

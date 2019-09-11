@@ -3,8 +3,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 // product components
-import { ProductListComponent } from '@app-buyer/product/containers/product-list/product-list.component';
-import { ProductDetailWrapperComponent } from './containers/product-detail-wrapper/product-detail-wrapper.component';
 import {
   MeListProductResolver,
   MeListSpecsResolver,
@@ -12,11 +10,13 @@ import {
   MeListCategoriesResolver,
   MeListRelatedProductsResolver,
 } from './resolves/me.product.resolve';
+import { ProductListWrapperComponent } from './component-wrappers/product-list-wrapper/product-list-wrapper.component';
+import { ProductDetailWrapperComponent } from './component-wrappers/product-detail-wrapper/product-detail-wrapper.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: ProductListComponent,
+    component: ProductListWrapperComponent,
     resolve: {
       products: MeListProductResolver,
       categories: MeListCategoriesResolver,

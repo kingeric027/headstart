@@ -42,7 +42,6 @@ export class ProductFilterService implements IProductFilterActions {
     const { page, sortBy, search, categoryID } = params;
     const showOnlyFavorites = !!params.favorites;
     const activeFacets = _pickBy(params, (_value, _key) => !this.nonFacetQueryParams.includes(_key));
-    debugger;
     this.activeFiltersSubject.next({ page, sortBy, search, categoryID, showOnlyFavorites, activeFacets });
   };
 
