@@ -49,9 +49,10 @@
           </button>
           <!-- enable price filtering by uncommenting this line, see PriceFilterComponent for more details -->
           <!-- <product-price-filter (priceFilterChange)=""></product-price-filter> -->
-          <product-facet-filter *ngIf="products.Meta?.Facets?.length"
-                                [facetList]="products.Meta.Facets">
-          </product-facet-filter>
+          <ocm-product-facet-list *ngIf="products.Meta?.Facets?.length"
+                                  [facetList]="products.Meta.Facets"
+                                  [context]="context">
+          </ocm-product-facet-list>
           <div (click)="toggleFilterByFavorites()">
             <span class="sr-only">Sort By Favorites</span>
             <ocm-toggle-favorite [favorite]="showingFavoritesOnly"></ocm-toggle-favorite>

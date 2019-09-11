@@ -3,8 +3,6 @@ import { SharedModule } from '@app-buyer/shared';
 import { ProductsRoutingModule } from '@app-buyer/product/product-routing.module';
 import { ProductListComponent } from '@app-buyer/product/containers/product-list/product-list.component';
 import { PriceFilterComponent } from '@app-buyer/product/components/price-filter/price-filter.component';
-import { FacetFilterComponent } from '@app-buyer/product/components/facet-filter/facet-filter.component';
-import { FacetListComponent } from '@app-buyer/product/components/facet-list/facet-list.component';
 import { ProductDetailWrapperComponent } from './containers/product-detail-wrapper/product-detail-wrapper.component';
 import {
   MeListProductResolver,
@@ -16,6 +14,7 @@ import {
 } from './resolves/me.product.resolve';
 import { OcmComponentsModule } from 'ocm-components';
 import { OcmDefaultComponentsModule } from '@app-buyer/ocm-default-components/ocm-default-components.module';
+import { OCMProductFacetList } from './components/product-facet-list/product-facet-list.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -24,8 +23,7 @@ import { OcmDefaultComponentsModule } from '@app-buyer/ocm-default-components/oc
     ProductListComponent,
     ProductDetailWrapperComponent,
     PriceFilterComponent,
-    FacetFilterComponent,
-    FacetListComponent,
+    OCMProductFacetList,
     ProductDetailWrapperComponent,
   ],
   providers: [

@@ -7,7 +7,7 @@ import { OCMProductCarousel } from './product-carousel/product-carousel.componen
 import { OCMProductDetails } from './product-details/product-details.component';
 import { OCMImageGallery } from './image-gallery/image-gallery.component';
 import { OCMSpecForm } from './spec-form/spec-form.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommonModule } from '@angular/common';
@@ -15,10 +15,11 @@ import { OCMOrderSummary } from './order-summary/order-summary.component';
 import { OCMLineitemTable } from './lineitem-table/lineitem-table.component';
 import { OCMCart } from './cart/cart.component';
 import { OCMHomePage } from './home/home.component';
-import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { OCMProductSort } from './sort-products/sort-products.component';
 import { OCMCategoryTree } from './category-tree/category-tree.component';
 import { TreeModule } from 'angular-tree-component';
+import { OCMFacetMultiSelect } from './facet-mulitselect/facet-multiselect.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -36,6 +37,7 @@ import { TreeModule } from 'angular-tree-component';
     OCMHomePage,
     OCMProductSort,
     OCMCategoryTree,
+    OCMFacetMultiSelect,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -51,8 +53,18 @@ import { TreeModule } from 'angular-tree-component';
     OCMHomePage,
     OCMProductSort,
     OCMCategoryTree,
+    OCMFacetMultiSelect,
   ],
-  imports: [CommonModule, NgxImageZoomModule, ReactiveFormsModule, FontAwesomeModule, NgbCarouselModule, TreeModule],
+  imports: [
+    CommonModule,
+    NgxImageZoomModule,
+    ReactiveFormsModule,
+    FormsModule,
+    FontAwesomeModule,
+    NgbCarouselModule,
+    TreeModule,
+    NgbCollapseModule,
+  ],
 })
 export class OcmDefaultComponentsModule {
   constructor(private injector: Injector) {
@@ -70,6 +82,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
     this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
+    this.buildWebComponent(OCMFacetMultiSelect, 'ocm-facet-multiselect');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

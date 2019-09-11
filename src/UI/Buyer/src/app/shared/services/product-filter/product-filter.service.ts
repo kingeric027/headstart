@@ -77,25 +77,25 @@ export class ProductFilterService implements IProductFilterActions {
   }
 
   toPage(pageNumber: number) {
-    this.patchFilterState({ page: pageNumber });
+    this.patchFilterState({ page: pageNumber || undefined });
   }
 
   sortBy(field: string) {
-    this.patchFilterState({ sortBy: field, page: undefined });
+    this.patchFilterState({ sortBy: field || undefined, page: undefined });
   }
 
   searchBy(searchTerm: string) {
-    this.patchFilterState({ search: searchTerm, page: undefined });
+    this.patchFilterState({ search: searchTerm || undefined, page: undefined });
   }
 
   filterByFacet(field: string, value: string) {
     const activeFacets = this.activeFiltersSubject.value.activeFacets || {};
-    activeFacets[field] = value;
+    activeFacets[field] = value || undefined;
     this.patchFilterState({ activeFacets, page: undefined });
   }
 
   filterByCategory(categoryID: string) {
-    this.patchFilterState({ categoryID, page: undefined });
+    this.patchFilterState({ categoryID: categoryID || undefined, page: undefined });
   }
 
   filterByFavorites(showOnlyFavorites: boolean) {
