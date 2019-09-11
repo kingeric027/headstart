@@ -28,7 +28,7 @@ export class ProductFilterService implements IProductFilterActions {
     activeFacets: {},
   };
 
-  // TODO - how to allow custom app devs to filter by custom xp that is not a facet?
+  // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
   private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
 
   private activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(this.defaultParams);

@@ -15,12 +15,13 @@ import { OCMOrderSummary } from './order-summary/order-summary.component';
 import { OCMLineitemTable } from './lineitem-table/lineitem-table.component';
 import { OCMCart } from './cart/cart.component';
 import { OCMHomePage } from './home/home.component';
-import { NgbCarouselModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { OCMProductSort } from './sort-products/sort-products.component';
 import { OCMCategoryTree } from './category-tree/category-tree.component';
 import { TreeModule } from 'angular-tree-component';
 import { OCMFacetMultiSelect } from './facet-multiselect/facet-multiselect.component';
 import { OCMProductFacetList } from './product-facet-list/product-facet-list.component';
+import { OCMProductList } from './product-list/product-list.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -40,6 +41,7 @@ import { OCMProductFacetList } from './product-facet-list/product-facet-list.com
     OCMCategoryTree,
     OCMFacetMultiSelect,
     OCMProductFacetList,
+    OCMProductList,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -57,6 +59,7 @@ import { OCMProductFacetList } from './product-facet-list/product-facet-list.com
     OCMCategoryTree,
     OCMFacetMultiSelect,
     OCMProductFacetList,
+    OCMProductList,
   ],
   imports: [
     CommonModule,
@@ -67,6 +70,7 @@ import { OCMProductFacetList } from './product-facet-list/product-facet-list.com
     NgbCarouselModule,
     TreeModule,
     NgbCollapseModule,
+    NgbPaginationModule,
   ],
 })
 export class OcmDefaultComponentsModule {
@@ -87,6 +91,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
     this.buildWebComponent(OCMFacetMultiSelect, 'ocm-facet-multiselect');
     this.buildWebComponent(OCMProductFacetList, 'ocm-product-facet-list');
+    this.buildWebComponent(OCMProductList, 'ocm-product-list');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

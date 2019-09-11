@@ -40,15 +40,7 @@
           </h5>
         </div>
         <div class="p-3">
-          <button *ngIf="hasQueryParams"
-                  class="btn btn-block btn-default mb-4"
-                  type="button"
-                  (click)="clearAllFilters()">
-            Clear All Filters
-          </button>
-          <!-- enable price filtering by uncommenting this line, see PriceFilterComponent for more details -->
-          <!-- <product-price-filter (priceFilterChange)=""></product-price-filter> -->
-          <ocm-product-facet-list *ngIf="products.Meta?.Facets?.length"
+          <ocm-product-facet-list *ngIf="products?.Meta?.Facets?.length"
                                   [facetList]="products.Meta.Facets"
                                   [context]="context">
           </ocm-product-facet-list>
@@ -69,11 +61,11 @@
       <div class="row flex-wrap-reverse">
         <div class="col-12 col-md-auto mr-auto ">
           <div class="m-0 mt-1 text-center">
-            <span *ngIf="products.Meta.TotalPages > 1">
+            <span *ngIf="products && products.Meta.TotalPages > 1">
               {{ (products.Meta.Page - 1) * products.Meta.PageSize + 1 }}
               - {{ products.Meta.Page * products.Meta.PageSize }} of
             </span>
-            {{ products.Meta.TotalCount }} results
+            {{ products?.Meta.TotalCount }} results
           </div>
         </div>
         <div class="col-12 d-md-none mb-2">
@@ -89,13 +81,13 @@
         </div>
       </div>
       <div class="card"
-           *ngIf="products.Items.length === 0">
+           *ngIf="products && products.Items.length === 0">
         <shared-no-results message="No products found."
                            actionText="clear search criteria"
                            (action)="clearAllFilters()">
         </shared-no-results>
       </div>
-      <div *ngIf="products.Items.length > 0">
+      <div *ngIf="products && products.Items.length > 0">
         <div class="product-list-grid row align-items-stretch">
           <ocm-product-card *ngFor="let product of products.Items; let i = index"
                             class="col-sm-6 col-md-4 col-xl-3 d-flex"
@@ -104,7 +96,7 @@
                             [context]="context">
           </ocm-product-card>
         </div>
-        <ngb-pagination *ngIf="products.Meta.TotalPages > 1"
+        <ngb-pagination *ngIf="products && products.Meta.TotalPages > 1"
                         maxSize="10"
                         class="d-flex justify-content-center"
                         [collectionSize]="products.Meta.TotalCount"
@@ -116,9 +108,10 @@
       </div>
     </div>
   </div>
-  <shared-modal id="{{ createModalID }}"
+  <!-- Worry About Modals Later -->
+  <!-- <shared-modal id="{{ categoryModalID }}"
                 modalTitle="Select Category">
     <ocm-category-tree *ngIf="categories?.Items?.length"
                        [context]="context"></ocm-category-tree>
-  </shared-modal>
+  </shared-modal> -->
 </section>

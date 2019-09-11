@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { ListBuyerProduct, ListCategory, OcMeService } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
+import { BuildQtyLimits } from '@app-buyer/shared';
+import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
 
 @Component({
   selector: 'product-list-wrapper',
@@ -11,6 +13,7 @@ import { ShopperContextService } from '@app-buyer/shared/services/shopper-contex
 export class ProductListWrapperComponent implements OnInit {
   products: ListBuyerProduct;
   categories: ListCategory;
+  quantityLimits: QuantityLimits[];
 
   constructor(
     private router: Router,
@@ -22,12 +25,14 @@ export class ProductListWrapperComponent implements OnInit {
   ngOnInit() {
     this.products = this.activatedRoute.snapshot.data.products;
     this.categories = this.activatedRoute.snapshot.data.categories;
+    this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
     this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
   }
 
   private handleFiltersChange = async () => {
     const queryParams = this.context.productFilterActions.getOrderCloudParams();
     this.products = await this.ocMeService.ListProducts(queryParams).toPromise();
+    this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
   };
 
   configureRouter() {

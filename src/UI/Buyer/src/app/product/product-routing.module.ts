@@ -10,8 +10,8 @@ import {
   MeListCategoriesResolver,
   MeListRelatedProductsResolver,
 } from './resolves/me.product.resolve';
-import { ProductListWrapperComponent } from './component-wrappers/product-list-wrapper/product-list-wrapper.component';
-import { ProductDetailWrapperComponent } from './component-wrappers/product-detail-wrapper/product-detail-wrapper.component';
+import { ProductListWrapperComponent } from './components/product-list-wrapper/product-list-wrapper.component';
+import { ProductDetailWrapperComponent } from './components/product-detail-wrapper/product-detail-wrapper.component';
 
 const routes: Routes = [
   {

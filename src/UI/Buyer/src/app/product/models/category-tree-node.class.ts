@@ -10,7 +10,7 @@ export class CategoryTreeNode {
 
   parent: CategoryTreeNode;
   category: Category;
-  // id, name, and children are required by TreeComponent
+  // id, name, and children are required by TreeComponent library.
   id: string;
   name: string;
   children: CategoryTreeNode[] = [];

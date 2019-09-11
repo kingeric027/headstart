@@ -1,6 +1,5 @@
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { ListBuyerProduct, Category, ListCategory, ListFacet } from '@ordercloud/angular-sdk';
-import { ModalService, BuildQtyLimits } from '@app-buyer/shared';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
@@ -12,33 +11,24 @@ import { ProductFilters } from '@app-buyer/shared/services/product-filter/produc
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
-export class ProductListComponent extends OCMComponent implements OnInit, OnChanges {
+export class OCMProductList extends OCMComponent implements OnChanges {
   @Input() products: ListBuyerProduct;
   @Input() categories: ListCategory;
+  @Input() quantityLimits: QuantityLimits[];
   facets: ListFacet[];
   categoryCrumbs: Category[] = [];
   hasQueryParams = false;
   showingFavoritesOnly = false;
   closeIcon = faTimes;
   isModalOpen = false;
-  createModalID = 'selectCategory';
-  quantityLimits: QuantityLimits[];
-
-  constructor(private modalService: ModalService) {
-    super();
-  }
-
-  ngOnInit() {
-    this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
-  }
+  categoryModalID = 'selectCategory';
 
   ngOnChanges() {
     this.facets = this.products.Meta.Facets;
-    this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
+    this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
   }
 
   private handleFiltersChange = async (filters: ProductFilters) => {
-    this.hasQueryParams = true; // TODO - implement
     this.showingFavoritesOnly = filters.showOnlyFavorites;
     this.categoryCrumbs = this.buildBreadCrumbs(filters.categoryID);
   };
@@ -74,14 +64,9 @@ export class ProductListComponent extends OCMComponent implements OnInit, OnChan
     return this.categories.Items.find((cat) => cat.ID === categoryID);
   }
 
-  openCategoryModal() {
-    this.modalService.open('selectCategory');
-    this.isModalOpen = true;
-  }
-
-  // TODO - it may be that this function is never used, but it should be.
-  closeCategoryModal() {
-    this.isModalOpen = false;
-    this.modalService.close('selectCategory');
-  }
+  // Worry about Modals Later
+  // openCategoryModal() {
+  //   this.modalService.open(this.categoryModalID);
+  //   this.isModalOpen = true;
+  // }
 }
