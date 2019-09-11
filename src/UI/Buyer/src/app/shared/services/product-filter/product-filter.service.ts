@@ -42,6 +42,7 @@ export class ProductFilterService implements IProductFilterActions {
     const { page, sortBy, search, categoryID } = params;
     const showOnlyFavorites = !!params.favorites;
     const activeFacets = _pickBy(params, (_value, _key) => !this.nonFacetQueryParams.includes(_key));
+    debugger;
     this.activeFiltersSubject.next({ page, sortBy, search, categoryID, showOnlyFavorites, activeFacets });
   };
 
@@ -71,9 +72,9 @@ export class ProductFilterService implements IProductFilterActions {
   }
 
   private patchFilterState(patch: ProductFilters) {
-    this.activeFiltersSubject.next({ ...this.activeFiltersSubject.value, ...patch });
-    const queryParams = this.mapToUrlQueryParams(this.activeFiltersSubject.value);
-    this.router.navigate([], { queryParams }); // update url
+    const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
+    const queryParams = this.mapToUrlQueryParams(activeFilters);
+    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
   }
 
   toPage(pageNumber: number) {
@@ -123,21 +124,7 @@ export class ProductFilterService implements IProductFilterActions {
   }
 
   onFiltersChange(callback: (filters: ProductFilters) => void): void {
+    // todo - is there a way to prevent duplicate subscriptions?
     this.activeFiltersSubject.subscribe(callback);
   }
-
-  // Use this if you need price filters. If you uncomment this function, make it fit in with this service ;)
-  // private buildPriceFilter(params: Params): Params {
-  //   const filter = {};
-  //   if (params.minPrice && !params.maxPrice) {
-  //     filter['xp.Price'] = `>=${params.minPrice}`;
-  //   }
-  //   if (params.maxPrice && !params.minPrice) {
-  //     filter['xp.Price'] = `<=${params.maxPrice}`;
-  //   }
-  //   if (params.minPrice && params.maxPrice) {
-  //     filter['xp.Price'] = [`>=${params.minPrice}`, `<=${params.maxPrice}`];
-  //   }
-  //   return filter;
-  // }
 }

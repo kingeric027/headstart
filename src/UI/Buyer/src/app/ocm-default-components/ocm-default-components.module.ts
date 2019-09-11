@@ -20,6 +20,7 @@ import { OCMProductSort } from './sort-products/sort-products.component';
 import { OCMCategoryTree } from './category-tree/category-tree.component';
 import { TreeModule } from 'angular-tree-component';
 import { OCMFacetMultiSelect } from './facet-mulitselect/facet-multiselect.component';
+import { OCMProductFacetList } from './product-facet-list/product-facet-list.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -38,6 +39,7 @@ import { OCMFacetMultiSelect } from './facet-mulitselect/facet-multiselect.compo
     OCMProductSort,
     OCMCategoryTree,
     OCMFacetMultiSelect,
+    OCMProductFacetList,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -54,6 +56,7 @@ import { OCMFacetMultiSelect } from './facet-mulitselect/facet-multiselect.compo
     OCMProductSort,
     OCMCategoryTree,
     OCMFacetMultiSelect,
+    OCMProductFacetList,
   ],
   imports: [
     CommonModule,
@@ -83,6 +86,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
     this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
     this.buildWebComponent(OCMFacetMultiSelect, 'ocm-facet-multiselect');
+    this.buildWebComponent(OCMProductFacetList, 'ocm-product-facet-list');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

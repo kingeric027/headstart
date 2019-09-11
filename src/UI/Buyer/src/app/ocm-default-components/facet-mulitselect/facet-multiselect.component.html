@@ -1,30 +1,28 @@
-<div *ngIf="facet.Name">
-
+<div>
   <!-- Facet Name -->
   <h6 class="text-muted"
       (click)="toggleCollapsed()">
     <fa-icon class="text-muted"
              [icon]="isCollapsed ?  faPlusSquare : faMinusSquare"
              pull="right"></fa-icon>
-    {{ facet.Name }}
+    {{ facet?.Name }}
   </h6>
 
   <!-- Facet Values -->
-  <form [formGroup]="form"
-        id="facetValues"
+  <form id="facetValues"
         [ngbCollapse]="isCollapsed">
-    <div formArrayName="facetValues"
-         class="custom-control custom-checkbox"
-         *ngFor="let value of facet.Values | slice: 0: visibleFacetLength; let i = index">
-      <input (click)="handleCheckBoxClick(value.Value)"
+    <div class="custom-control custom-checkbox"
+         *ngFor="let checkbox of checkboxArray | slice: 0: visibleFacetLength; let i = index">
+      <input (click)="handleCheckBoxClick(checkbox.facet.Value)"
+             [ngModel]="checkbox.checked"
              type="checkbox"
              class="custom-control-input"
-             formControlName="{{i}}"
+             name="{{facet.Name}}facetCheckbox{{i}}"
              id="{{facet.Name}}facetCheckbox{{i}}">
       <label for="{{facet.Name}}facetCheckbox{{i}}"
-             class="custom-control-label">{{value.Value}}<small class="text-secondary font-weight-bold badge badge-pill badge-light">({{value.Count}})</small></label>
+             class="custom-control-label">{{checkbox.facet.Value}}<small class="text-secondary font-weight-bold badge badge-pill badge-light">({{checkbox.facet.Count}})</small></label>
     </div>
-    <a *ngIf="visibleFacetLength < facet.Values.length"
+    <a *ngIf="visibleFacetLength < checkboxArray.length"
        (click)="showAll()"
        class="pl-4 text-primary"><small>Show All</small> </a>
     <hr>

@@ -1,5 +1,4 @@
 <div class="component-background p-3">
-  <!-- <products-price-filter (selectedFacet)="selectFacetList($event)"></products-price-filter> -->
   <div *ngFor="let facet of facetList">
     <ocm-facet-multiselect [facet]="facet"
                            [context]="context"></ocm-facet-multiselect>

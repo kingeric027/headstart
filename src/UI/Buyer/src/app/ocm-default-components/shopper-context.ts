@@ -3,6 +3,8 @@ import { Input } from '@angular/core';
 import { ProductFilters } from '@app-buyer/shared/services/product-filter/product-filter.service';
 
 export class OCMComponent {
+  // todo: the issue is that ngOnInit fires befoer inputs are ready come up with a better way to do this.
+  observersSet: boolean;
   @Input() context: IShopperContext;
 }
 

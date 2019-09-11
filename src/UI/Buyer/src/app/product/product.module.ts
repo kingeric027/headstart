@@ -14,18 +14,11 @@ import {
 } from './resolves/me.product.resolve';
 import { OcmComponentsModule } from 'ocm-components';
 import { OcmDefaultComponentsModule } from '@app-buyer/ocm-default-components/ocm-default-components.module';
-import { OCMProductFacetList } from './components/product-facet-list/product-facet-list.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [SharedModule, ProductsRoutingModule, OcmComponentsModule, OcmDefaultComponentsModule],
-  declarations: [
-    ProductListComponent,
-    ProductDetailWrapperComponent,
-    PriceFilterComponent,
-    OCMProductFacetList,
-    ProductDetailWrapperComponent,
-  ],
+  declarations: [ProductListComponent, ProductDetailWrapperComponent, PriceFilterComponent, ProductDetailWrapperComponent],
   providers: [
     MeListProductResolver,
     MeProductResolver,
