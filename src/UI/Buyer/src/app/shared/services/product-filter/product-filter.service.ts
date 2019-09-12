@@ -3,16 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { IProductFilterActions } from '@app-buyer/ocm-default-components/shopper-context';
-
-export interface ProductFilters {
-  page?: number;
-  sortBy?: string;
-  search?: string;
-  categoryID?: string;
-  showOnlyFavorites?: boolean;
-  activeFacets?: any;
-}
+import { IProductFilterActions, ProductFilters } from '@app-buyer/ocm-default-components/shopper-context';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({

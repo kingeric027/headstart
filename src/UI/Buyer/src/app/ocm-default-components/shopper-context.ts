@@ -1,6 +1,5 @@
 import { LineItem, MeUser, Order, ListLineItem, User } from '@ordercloud/angular-sdk';
 import { Input } from '@angular/core';
-import { ProductFilters } from '@app-buyer/shared/services/product-filter/product-filter.service';
 
 export class OCMComponent {
   // todo: the issue is that ngOnInit fires befoer inputs are ready come up with a better way to do this.
@@ -60,4 +59,13 @@ export interface IProductFilterActions {
   filterByFavorites: (showOnlyFavorites: boolean) => void;
   clearAllFilters: () => void;
   onFiltersChange: (callback: (filters: ProductFilters) => void) => void;
+}
+
+export interface ProductFilters {
+  page?: number;
+  sortBy?: string;
+  search?: string;
+  categoryID?: string;
+  showOnlyFavorites?: boolean;
+  activeFacets?: any;
 }

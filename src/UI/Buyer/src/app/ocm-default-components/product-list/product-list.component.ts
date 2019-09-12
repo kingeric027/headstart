@@ -3,8 +3,7 @@ import { ListBuyerProduct, Category, ListCategory, ListFacet } from '@ordercloud
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
-import { OCMComponent } from '@app-buyer/ocm-default-components/shopper-context';
-import { ProductFilters } from '@app-buyer/shared/services/product-filter/product-filter.service';
+import { OCMComponent, ProductFilters } from '@app-buyer/ocm-default-components/shopper-context';
 
 @Component({
   selector: 'ocm-product-list',
