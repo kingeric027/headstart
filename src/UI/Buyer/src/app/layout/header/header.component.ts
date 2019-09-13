@@ -6,10 +6,10 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
 import { takeWhile, tap, debounceTime, delay, filter } from 'rxjs/operators';
-import { AppAuthService } from '@app-buyer/auth';
 import { SearchComponent } from '@app-buyer/shared/components/search/search.component';
 import { CurrentOrderService } from '@app-buyer/shared';
 import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
+import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
 
 @Component({
   selector: 'layout-header',
@@ -37,7 +37,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   faHome = faHome;
 
   constructor(
-    private appAuthService: AppAuthService,
+    private appAuthService: AuthService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private currentOrder: CurrentOrderService, // TODO- remove

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ProfileTab } from '@app-buyer/profile/models/profile-tabs.enum';
-import { AppAuthService } from '@app-buyer/auth';
+import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
 @Component({
   selector: 'profile-profile',
   templateUrl: './profile.component.html',
@@ -10,7 +10,7 @@ export class ProfileComponent implements OnInit {
   selectedTab: string;
   tabs: ProfileTab[];
 
-  constructor(private appAuthService: AppAuthService) {
+  constructor(private appAuthService: AuthService) {
     this.tabs = [
       { display: 'Details', route: ['/profile', 'details'] },
       { display: 'Addresses', route: ['/profile', 'addresses'] },

@@ -4,7 +4,7 @@ import { tap, catchError, finalize, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 // 3rd party
-import { OcTokenService, OcAuthService } from '@ordercloud/angular-sdk';
+import { OcTokenService, OcAuthService, AccessToken } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { CookieService } from 'ngx-cookie';
 import { AppErrorHandler } from '@app-buyer/config/error-handling.config';
@@ -15,7 +15,7 @@ export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possibl
 @Injectable({
   providedIn: 'root',
 })
-export class AppAuthService {
+export class AuthService {
   private rememberMeCookieName = `${this.appConfig.appname.replace(/ /g, '_').toLowerCase()}_rememberMe`;
   fetchingRefreshToken = false;
   failedRefreshAttempt = false;
@@ -87,6 +87,14 @@ export class AppAuthService {
     }
 
     return throwError(TokenRefreshAttemptNotPossible);
+  }
+
+  async login(userName: string, password: string): Promise<AccessToken> {
+    const creds = await this.ocAuthService.Login(userName, password, this.appConfig.clientID, this.appConfig.scope).toPromise();
+    if (!creds) return;
+    this.currentUser.isLoggedIn = true;
+    this.ocTokenService.SetAccess(creds.access_token);
+    return creds;
   }
 
   async logout(): Promise<void> {

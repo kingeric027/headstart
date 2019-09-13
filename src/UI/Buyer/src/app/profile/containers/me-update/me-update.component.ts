@@ -1,13 +1,13 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { OcMeService, MeUser, OcAuthService } from '@ordercloud/angular-sdk';
-import { flatMap } from 'rxjs/operators';
+import { OcMeService, MeUser } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
 import { RegexService } from '@app-buyer/shared/services/regex/regex.service';
 import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 import { IModalComponent } from '@app-buyer/shared/components/modal/modal.component';
+import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
 
 @Component({
   selector: 'profile-meupdate',
@@ -24,7 +24,7 @@ export class MeUpdateComponent implements OnInit {
     private currentUser: CurrentUserService,
     private formBuilder: FormBuilder,
     private formErrorService: AppFormErrorService,
-    private ocAuthService: OcAuthService,
+    private authService: AuthService,
     private ocMeService: OcMeService,
     private toastrService: ToastrService,
     private regexService: RegexService,
@@ -46,20 +46,13 @@ export class MeUpdateComponent implements OnInit {
     });
   }
 
-  onChangePassword({ currentPassword, newPassword }) {
-    return this.ocAuthService
-      .Login(this.me.Username, currentPassword, this.appConfig.clientID, this.appConfig.scope)
-      .pipe(
-        flatMap(() =>
-          this.ocMeService.ResetPasswordByToken({
-            NewPassword: newPassword,
-          })
-        )
-      )
-      .subscribe(() => {
-        this.toastrService.success('Account Info Updated', 'Success');
-        this.passwordModal.close();
-      });
+  async onChangePassword({ currentPassword, newPassword }) {
+    // todo - is this login check necessary?
+    const creds = await this.authService.login(this.me.Username, currentPassword);
+    if (!creds) return;
+    await this.ocMeService.ResetPasswordByToken({ NewPassword: newPassword }).toPromise();
+    this.toastrService.success('Account Info Updated', 'Success');
+    this.passwordModal.close();
   }
 
   openPasswordModal() {

@@ -4,9 +4,9 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
 // ordercloud
-import { OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';
+import { OcTokenService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
-import { AppAuthService } from '@app-buyer/auth/services/app-auth.service';
+import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
 import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 
 @Component({
@@ -19,8 +19,7 @@ export class LoginComponent implements OnInit {
   isAnon: boolean;
 
   constructor(
-    private ocAuthService: OcAuthService,
-    private appAuthService: AppAuthService,
+    private authService: AuthService,
     private ocTokenService: OcTokenService,
     private router: Router,
     private formBuilder: FormBuilder,
@@ -37,23 +36,21 @@ export class LoginComponent implements OnInit {
     this.isAnon = this.currentUser.isAnonymous;
   }
 
-  onSubmit() {
-    return this.ocAuthService
-      .Login(this.form.get('username').value, this.form.get('password').value, this.appConfig.clientID, this.appConfig.scope)
-      .subscribe((response) => {
-        const rememberMe = this.form.get('rememberMe').value;
-        if (rememberMe && response.refresh_token) {
-          /**
-           * set the token duration in the dashboard - https://developer.ordercloud.io/dashboard/settings
-           * refresh tokens are configured per clientID and initially set to 0
-           * a refresh token of 0 means no refresh token is returned in OAuth response
-           */
-          this.ocTokenService.SetRefresh(response.refresh_token);
-          this.appAuthService.setRememberStatus(true);
-        }
-        this.ocTokenService.SetAccess(response.access_token);
-        this.router.navigateByUrl('/home');
-      });
+  async onSubmit() {
+    const username = this.form.get('username').value;
+    const password = this.form.get('password').value;
+    const credentials = await this.authService.login(username, password);
+    const rememberMe = this.form.get('rememberMe').value;
+    if (rememberMe && credentials.refresh_token) {
+      /**
+       * set the token duration in the dashboard - https://developer.ordercloud.io/dashboard/settings
+       * refresh tokens are configured per clientID and initially set to 0
+       * a refresh token of 0 means no refresh token is returned in OAuth response
+       */
+      this.ocTokenService.SetRefresh(credentials.refresh_token);
+      this.authService.setRememberStatus(true);
+    }
+    this.router.navigateByUrl('/home');
   }
 
   showRegisterLink(): boolean {

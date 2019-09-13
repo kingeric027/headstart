@@ -1,34 +1,20 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { InjectionToken } from '@angular/core';
-import {
-  HttpClient,
-  HttpHandler,
-  HTTP_INTERCEPTORS,
-  HttpErrorResponse,
-} from '@angular/common/http';
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-  TestRequest,
-} from '@angular/common/http/testing';
+import { HttpClient, HttpHandler, HTTP_INTERCEPTORS, HttpErrorResponse } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController, TestRequest } from '@angular/common/http/testing';
 
 import { RefreshTokenInterceptor } from '@app-buyer/auth/interceptors/refresh-token/refresh-token.interceptor';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-buyer/config/app.config';
+import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
-import { AppAuthService } from '@app-buyer/auth/services/app-auth.service';
+import { AppAuthService } from '@app-buyer/shared/services/auth/auth.service';
 import { of, BehaviorSubject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 describe('RefreshTokenInterceptor', () => {
   const mockRefreshToken = 'RefreshABC123';
   const tokenService = {
-    GetAccess: jasmine
-      .createSpy('GetAccess')
-      .and.returnValue(of(mockRefreshToken)),
+    GetAccess: jasmine.createSpy('GetAccess').and.returnValue(of(mockRefreshToken)),
   };
   const refreshToken = new BehaviorSubject('');
   const appAuthService = {
@@ -60,12 +46,9 @@ describe('RefreshTokenInterceptor', () => {
     httpMock = TestBed.get(HttpTestingController);
   });
 
-  it('should be created', inject(
-    [RefreshTokenInterceptor],
-    (service: RefreshTokenInterceptor) => {
-      expect(service).toBeTruthy();
-    }
-  ));
+  it('should be created', inject([RefreshTokenInterceptor], (service: RefreshTokenInterceptor) => {
+    expect(service).toBeTruthy();
+  }));
 
   describe('making http calls', () => {
     let thrownError = '';
@@ -126,9 +109,7 @@ describe('RefreshTokenInterceptor', () => {
       it('should set refresh token on second call', () => {
         setupMockCalls();
         expect(firstRequest.request.headers.get('Authorization')).toBe(null);
-        expect(secondRequest.request.headers.get('Authorization')).toBe(
-          `Bearer ${mockRefreshToken}`
-        );
+        expect(secondRequest.request.headers.get('Authorization')).toBe(`Bearer ${mockRefreshToken}`);
         appAuthService.failedRefreshAttempt = true;
       });
       afterEach(() => {

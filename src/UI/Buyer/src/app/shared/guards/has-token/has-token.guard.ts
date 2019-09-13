@@ -4,10 +4,10 @@ import { OcTokenService } from '@ordercloud/angular-sdk';
 import * as jwtDecode from 'jwt-decode';
 import { DecodedOrderCloudToken } from '@app-buyer/shared';
 import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
-import { AppAuthService } from '@app-buyer/auth/services/app-auth.service';
 import { of, Observable } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
 import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +16,7 @@ export class HasTokenGuard implements CanActivate {
   constructor(
     private ocTokenService: OcTokenService,
     private router: Router,
-    private appAuthService: AppAuthService,
+    private appAuthService: AuthService,
     private currentUser: CurrentUserService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}

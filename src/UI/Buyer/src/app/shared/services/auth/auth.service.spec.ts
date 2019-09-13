@@ -1,19 +1,14 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { applicationConfiguration } from '@app-buyer/config/app.config';
 
-import {
-  Configuration,
-  OcAuthService,
-  OcTokenService,
-} from '@ordercloud/angular-sdk';
+import { Configuration, OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';
 import { CookieModule, CookieService } from 'ngx-cookie';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppErrorHandler } from '@app-buyer/config/error-handling.config';
-import { AppAuthService } from '@app-buyer/auth/services/app-auth.service';
+import { AppAuthService } from '@app-buyer/shared/services/auth/auth.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import { AppStateService, BaseResolveService } from '@app-buyer/shared';
 import { catchError, finalize } from 'rxjs/operators';
 
 describe('AppAuthService', () => {
@@ -43,11 +38,7 @@ describe('AppAuthService', () => {
   const baseResolveService = { resetUser: jasmine.createSpy('resetUser') };
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
-        CookieModule.forRoot(),
-      ],
+      imports: [RouterTestingModule, HttpClientTestingModule, CookieModule.forRoot()],
       providers: [
         { provide: Router, useValue: router },
         { provide: CookieService, useValue: cookieService },
@@ -64,19 +55,14 @@ describe('AppAuthService', () => {
     authService = TestBed.get(OcAuthService);
   });
 
-  it('should be created', inject(
-    [AppAuthService],
-    (service: AppAuthService) => {
-      expect(service).toBeTruthy();
-    }
-  ));
+  it('should be created', inject([AppAuthService], (service: AppAuthService) => {
+    expect(service).toBeTruthy();
+  }));
 
   describe('refresh', () => {
     describe('on success', () => {
       beforeEach(() => {
-        spyOn(appAuthService, 'fetchRefreshToken').and.returnValue(
-          of(mockToken)
-        );
+        spyOn(appAuthService, 'fetchRefreshToken').and.returnValue(of(mockToken));
         spyOn(appAuthService, 'logout').and.returnValue(of(null));
         spyOn(tokenService, 'SetAccess');
         appAuthService.refresh().subscribe();
@@ -94,9 +80,7 @@ describe('AppAuthService', () => {
     describe('on error', () => {
       beforeEach(() => {
         spyOn(tokenService, 'GetAccess').and.returnValue(mockToken);
-        spyOn(appAuthService, 'fetchRefreshToken').and.returnValue(
-          throwError('Token refresh attempt not possible')
-        );
+        spyOn(appAuthService, 'fetchRefreshToken').and.returnValue(throwError('Token refresh attempt not possible'));
         spyOn(appAuthService, 'logout');
         appAuthService.refresh().subscribe();
       });
@@ -131,14 +115,9 @@ describe('AppAuthService', () => {
         spyOn(tokenService, 'GetRefresh').and.returnValue(mockRefreshToken);
       });
       it('should call authService.RefreshToken', () => {
-        spyOn(authService, 'RefreshToken').and.returnValue(
-          of({ access_token: mockToken })
-        );
+        spyOn(authService, 'RefreshToken').and.returnValue(of({ access_token: mockToken }));
         appAuthService.fetchRefreshToken();
-        expect(authService.RefreshToken).toHaveBeenCalledWith(
-          mockRefreshToken,
-          mockClientID
-        );
+        expect(authService.RefreshToken).toHaveBeenCalledWith(mockRefreshToken, mockClientID);
       });
       it('should call auth anonymous if refresh failed and user is anonymous', () => {
         spyOn(authService, 'RefreshToken').and.returnValue(throwError(null));
@@ -193,13 +172,9 @@ describe('AppAuthService', () => {
         spyOn(appAuthService, 'logout').and.returnValue(of(null));
       });
       it('should call authService.Anonymous', () => {
-        spyOn(authService, 'Anonymous').and.returnValue(
-          of({ access_token: mockToken })
-        );
+        spyOn(authService, 'Anonymous').and.returnValue(of({ access_token: mockToken }));
         appAuthService.authAnonymous().subscribe();
-        expect(authService.Anonymous).toHaveBeenCalledWith(mockClientID, [
-          'FullAccess',
-        ]);
+        expect(authService.Anonymous).toHaveBeenCalledWith(mockClientID, ['FullAccess']);
       });
       it('should display error if authService.Anonymous fails', () => {
         spyOn(authService, 'Anonymous').and.returnValue(throwError('error'));
@@ -218,10 +193,7 @@ describe('AppAuthService', () => {
         appAuthService.setRememberStatus(statusTrue);
       });
       it('should store status in cookies', () => {
-        expect(cookieService.putObject).toHaveBeenCalledWith(
-          'mgr-test_rememberMe',
-          { status: statusTrue }
-        );
+        expect(cookieService.putObject).toHaveBeenCalledWith('mgr-test_rememberMe', { status: statusTrue });
       });
     });
     describe('getRememberStatus', () => {

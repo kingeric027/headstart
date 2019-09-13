@@ -1,14 +1,8 @@
 import { Injectable } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-  HttpErrorResponse,
-} from '@angular/common/http';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, flatMap } from 'rxjs/operators';
-import { AppAuthService } from '@app-buyer/auth/services/app-auth.service';
+import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
 
 /**
  * handle 401 unauthorized responses gracefully
@@ -18,11 +12,8 @@ import { AppAuthService } from '@app-buyer/auth/services/app-auth.service';
   providedIn: 'root',
 })
 export class RefreshTokenInterceptor implements HttpInterceptor {
-  constructor(private appAuthService: AppAuthService) {}
-  intercept(
-    request: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+  constructor(private appAuthService: AuthService) {}
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       catchError((error) => {
         // rethrow any non auth errors
@@ -64,10 +55,6 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
   }
 
   isAuthError(error: any): boolean {
-    return (
-      error instanceof HttpErrorResponse &&
-      error.url.indexOf('ordercloud.io') > -1 &&
-      error.status === 401
-    );
+    return error instanceof HttpErrorResponse && error.url.indexOf('ordercloud.io') > -1 && error.status === 401;
   }
 }
