@@ -1,22 +1,22 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, AfterViewInit } from '@angular/core';
 import { CheckoutSectionBaseComponent } from '@app-buyer/checkout/components/checkout-section-base/checkout-section-base.component';
 import { Observable } from 'rxjs';
 import { OcMeService, ListBuyerAddress, OcOrderService, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
-import { ModalService, CurrentOrderService } from '@app-buyer/shared';
-import { filter } from 'rxjs/operators';
+import { CurrentOrderService } from '@app-buyer/shared';
 import { ToastrService } from 'ngx-toastr';
 import { AddressFormComponent } from '@app-buyer/shared/components/address-form/address-form.component';
+import { IModalComponent } from '@app-buyer/shared/components/modal/modal.component';
 
 @Component({
   selector: 'checkout-address',
   templateUrl: './checkout-address.component.html',
   styleUrls: ['./checkout-address.component.scss'],
 })
-export class CheckoutAddressComponent extends CheckoutSectionBaseComponent implements OnInit {
+export class CheckoutAddressComponent extends CheckoutSectionBaseComponent implements OnInit, AfterViewInit {
   @Input() isAnon: boolean;
   @Input() addressType: 'Shipping' | 'Billing';
-  @ViewChild(AddressFormComponent, { static: false })
-  addressFormComponent: AddressFormComponent;
+  @ViewChild(AddressFormComponent, { static: false }) addressFormComponent: AddressFormComponent;
+  @ViewChild('addressModal', { static: false }) public addressModal: IModalComponent;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
   order: Order;
@@ -26,22 +26,18 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent imple
     page: undefined,
     search: undefined,
   };
-  modalID: string;
   usingShippingAsBilling = false;
 
   constructor(
     private ocMeService: OcMeService,
     private ocOrderService: OcOrderService,
     private currentOrder: CurrentOrderService,
-    public modalService: ModalService,
     private toastrService: ToastrService
   ) {
     super();
   }
 
   ngOnInit() {
-    this.modalID = `checkout-select-address-${this.addressType}`;
-    this.clearFiltersOnModalClose();
     if (!this.isAnon) {
       this.getSavedAddresses();
     }
@@ -49,10 +45,8 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent imple
     this.setSelectedAddress();
   }
 
-  clearFiltersOnModalClose() {
-    this.modalService.onCloseSubject
-      .pipe(filter((id) => id === this.modalID))
-      .subscribe(() => this.updateRequestOptions({ page: undefined, search: undefined }));
+  ngAfterViewInit() {
+    this.addressModal.onClose(() => this.updateRequestOptions({ page: undefined, search: undefined }));
   }
 
   updateRequestOptions(options: { page?: number; search?: string }) {
@@ -81,7 +75,7 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent imple
 
   existingAddressSelected(address: BuyerAddress) {
     this.selectedAddress = address;
-    this.modalService.close(this.modalID);
+    this.addressModal.close();
   }
 
   useShippingAsBilling() {

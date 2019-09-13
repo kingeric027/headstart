@@ -1,13 +1,13 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { OcMeService, MeUser, OcAuthService } from '@ordercloud/angular-sdk';
 import { flatMap } from 'rxjs/operators';
 import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
-import { ModalService } from '@app-buyer/shared/services/modal/modal.service';
 import { RegexService } from '@app-buyer/shared/services/regex/regex.service';
 import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { IModalComponent } from '@app-buyer/shared/components/modal/modal.component';
 
 @Component({
   selector: 'profile-meupdate',
@@ -18,13 +18,12 @@ export class MeUpdateComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
   alive = true;
-  changePasswordModalId = 'forgotPasswordModal';
+  @ViewChild('passwordModal', { static: false }) public passwordModal: IModalComponent;
 
   constructor(
     private currentUser: CurrentUserService,
     private formBuilder: FormBuilder,
     private formErrorService: AppFormErrorService,
-    public modalService: ModalService,
     private ocAuthService: OcAuthService,
     private ocMeService: OcMeService,
     private toastrService: ToastrService,
@@ -59,8 +58,12 @@ export class MeUpdateComponent implements OnInit {
       )
       .subscribe(() => {
         this.toastrService.success('Account Info Updated', 'Success');
-        this.modalService.close(this.changePasswordModalId);
+        this.passwordModal.close();
       });
+  }
+
+  openPasswordModal() {
+    this.passwordModal.open();
   }
 
   onSubmit() {

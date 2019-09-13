@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 import { OcMeService, ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
-import { ModalService } from '@app-buyer/shared';
+import { IModalComponent } from '@app-buyer/shared/components/modal/modal.component';
 
 @Component({
   selector: 'profile-address-list',
@@ -23,10 +23,10 @@ export class AddressListComponent implements OnInit {
     search: undefined,
   };
   resultsPerPage = 8;
-  addAddressModalID = 'add-profile-address';
-  areYouSureModalID = 'are-you-sure-address';
+  @ViewChild('areYouSureModal', { static: false }) public areYouSureModal: IModalComponent;
+  @ViewChild('addAddressModal', { static: false }) public addAddressModal: IModalComponent;
 
-  constructor(private ocMeService: OcMeService, private modalService: ModalService) {}
+  constructor(private ocMeService: OcMeService) {}
 
   ngOnInit() {
     this.reloadAddresses();
@@ -34,22 +34,22 @@ export class AddressListComponent implements OnInit {
 
   showAddAddress() {
     this.currentAddress = null;
-    this.modalService.open(this.addAddressModalID);
+    this.addAddressModal.open();
   }
 
   showEditAddress(address: BuyerAddress) {
     this.currentAddress = address;
-    this.modalService.open(this.addAddressModalID);
+    this.addAddressModal.open();
   }
 
   showAreYouSure(address: BuyerAddress) {
     this.currentAddress = address;
-    this.modalService.open(this.areYouSureModalID);
+    this.areYouSureModal.open();
   }
 
   closeAreYouSure() {
     this.currentAddress = null;
-    this.modalService.close(this.areYouSureModalID);
+    this.areYouSureModal.close();
   }
 
   protected refresh() {
@@ -58,7 +58,7 @@ export class AddressListComponent implements OnInit {
   }
 
   addressFormSubmitted(address: BuyerAddress) {
-    this.modalService.close(this.addAddressModalID);
+    this.addAddressModal.close();
     if (this.currentAddress) {
       this.updateAddress(address);
     } else {

@@ -4,7 +4,7 @@
     <div><strong>{{ selectedSpendingAccount.Name }}</strong></div>
     <div>Balance: <strong class="text-success">{{ selectedSpendingAccount.Balance | currency }}</strong></div>
   </div>
-  <shared-modal id="{{ modalID }}"
+  <shared-modal #spendingAccountModal
                 modalTitle="Select Spending Account">
     <shared-generic-browse [items]="spendingAccounts.Items"
                            [meta]="spendingAccounts.Meta"
@@ -29,5 +29,5 @@
   <button class="btn btn-primary mt-3"
           (click)="validateAndContinue()">Save and Continue</button>
   <button class="btn btn-secondary mt-3 float-right"
-          (click)="modalService.open(modalID)">Change Account</button>
+          (click)="spendingAccountModal.open()">Change Account</button>
 </div>

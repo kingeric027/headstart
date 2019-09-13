@@ -2,7 +2,7 @@
         (click)="openModal(true)">Approve</button>
 <button class="btn btn-danger ml-2"
         (click)="openModal(false)">Decline</button>
-<shared-modal [id]="modalID"
+<shared-modal #approveModal
               modalTitle="{{ approved ? 'Approve' : 'Decline' }} Order">
   <form novalidate
         [formGroup]="form">

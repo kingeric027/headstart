@@ -1,7 +1,7 @@
 <button type="button"
         class="btn  btn-secondary"
         (click)="orderReorder()">Reorder</button>
-<shared-modal id="Order-Reorder"
+<shared-modal #reorderModal
               modalTitle="Order Reorder">
   <div *ngIf="reorderResponse">
     <div class="alert"

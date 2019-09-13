@@ -15,7 +15,6 @@ export * from '@app-buyer/shared/services/current-order/current-order.service';
 export * from '@app-buyer/shared/services/form-error/form-error.service';
 export * from '@app-buyer/shared/services/geography/geography.service';
 export * from '@app-buyer/shared/services/cart/cart.service';
-export * from '@app-buyer/shared/services/modal/modal.service';
 export * from '@app-buyer/shared/services/reorder/reorder.service';
 export * from '@app-buyer/shared/services/regex/regex.service';
 
