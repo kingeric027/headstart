@@ -1,8 +1,7 @@
-import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { OcMeService, MeUser } from '@ordercloud/angular-sdk';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
 import { RegexService } from '@app-buyer/shared/services/regex/regex.service';
 import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
@@ -27,8 +26,7 @@ export class MeUpdateComponent implements OnInit {
     private authService: AuthService,
     private ocMeService: OcMeService,
     private toastrService: ToastrService,
-    private regexService: RegexService,
-    @Inject(applicationConfiguration) protected appConfig: AppConfig
+    private regexService: RegexService
   ) {}
 
   ngOnInit() {
