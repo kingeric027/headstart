@@ -21,7 +21,7 @@ const routes: Routes = [
       { path: 'home', resolve: { featuredProducts: FeaturedProductsResolver }, component: HomePageWrapperComponent },
       {
         path: 'profile',
-        loadChildren: () => import('./profile/profile.module').then((m) => m.ProfileModule),
+        loadChildren: './profile/profile.module#ProfileModule',
         canActivate: [isProfiledUser],
       },
       {
@@ -38,9 +38,12 @@ const routes: Routes = [
       },
       {
         path: 'products',
-        loadChildren: () => import('./product/product.module').then((m) => m.ProductsModule),
+        loadChildren: './product/product.module#ProductsModule',
       },
-      { path: '', loadChildren: () => import('./checkout/checkout.module').then((m) => m.CheckoutModule) },
+      {
+        path: '',
+        loadChildren: './checkout/checkout.module#CheckoutModule',
+      },
       { path: 'impersonation', redirectTo: '/home' },
     ],
   },

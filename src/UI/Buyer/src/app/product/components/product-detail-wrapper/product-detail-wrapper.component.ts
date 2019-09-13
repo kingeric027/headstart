@@ -18,7 +18,7 @@ export class ProductDetailWrapperComponent implements OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    protected context: ShopperContextService, // used in template
+    public context: ShopperContextService, // used in template
     protected currentUser: CurrentUserService
   ) {}
 

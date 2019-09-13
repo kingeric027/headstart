@@ -64,8 +64,8 @@ export class OCMProductList extends OCMComponent implements OnChanges {
   }
 
   // Worry about Modals Later
-  // openCategoryModal() {
-  //   this.modalService.open(this.categoryModalID);
-  //   this.isModalOpen = true;
-  // }
+  openCategoryModal() {
+    //   this.modalService.open(this.categoryModalID);
+    //   this.isModalOpen = true;
+  }
 }

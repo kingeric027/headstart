@@ -21,7 +21,7 @@ export class OrderReorderComponent implements OnInit {
     private appReorderService: AppReorderService,
     private modalService: ModalService,
     private cartService: CartService,
-    protected context: ShopperContextService // used in template
+    public context: ShopperContextService // used in template
   ) {}
 
   async ngOnInit() {

@@ -18,7 +18,7 @@ export class CartWrapperComponent implements OnInit {
   constructor(
     private cartService: CartService,
     private currentOrder: CurrentOrderService,
-    protected context: ShopperContextService //used in template
+    public context: ShopperContextService //used in template
   ) {}
 
   ngOnInit() {

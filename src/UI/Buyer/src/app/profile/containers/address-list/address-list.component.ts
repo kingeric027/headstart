@@ -2,11 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
-import {
-  OcMeService,
-  ListBuyerAddress,
-  BuyerAddress,
-} from '@ordercloud/angular-sdk';
+import { OcMeService, ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
 import { ModalService } from '@app-buyer/shared';
 
@@ -30,31 +26,28 @@ export class AddressListComponent implements OnInit {
   addAddressModalID = 'add-profile-address';
   areYouSureModalID = 'are-you-sure-address';
 
-  constructor(
-    private ocMeService: OcMeService,
-    private modalService: ModalService
-  ) {}
+  constructor(private ocMeService: OcMeService, private modalService: ModalService) {}
 
   ngOnInit() {
     this.reloadAddresses();
   }
 
-  protected showAddAddress() {
+  showAddAddress() {
     this.currentAddress = null;
     this.modalService.open(this.addAddressModalID);
   }
 
-  protected showEditAddress(address: BuyerAddress) {
+  showEditAddress(address: BuyerAddress) {
     this.currentAddress = address;
     this.modalService.open(this.addAddressModalID);
   }
 
-  protected showAreYouSure(address: BuyerAddress) {
+  showAreYouSure(address: BuyerAddress) {
     this.currentAddress = address;
     this.modalService.open(this.areYouSureModalID);
   }
 
-  protected closeAreYouSure() {
+  closeAreYouSure() {
     this.currentAddress = null;
     this.modalService.close(this.areYouSureModalID);
   }
@@ -64,7 +57,7 @@ export class AddressListComponent implements OnInit {
     this.reloadAddresses();
   }
 
-  protected addressFormSubmitted(address: BuyerAddress) {
+  addressFormSubmitted(address: BuyerAddress) {
     this.modalService.close(this.addAddressModalID);
     if (this.currentAddress) {
       this.updateAddress(address);
@@ -98,7 +91,7 @@ export class AddressListComponent implements OnInit {
     );
   }
 
-  protected deleteAddress(address: BuyerAddress) {
+  deleteAddress(address: BuyerAddress) {
     this.ocMeService.DeleteAddress(address.ID).subscribe(
       () => {
         this.closeAreYouSure();
@@ -110,17 +103,12 @@ export class AddressListComponent implements OnInit {
     );
   }
 
-  protected updateRequestOptions(newOptions: {
-    page?: number;
-    search?: string;
-  }) {
+  updateRequestOptions(newOptions: { page?: number; search?: string }) {
     this.requestOptions = Object.assign(this.requestOptions, newOptions);
     this.reloadAddresses();
   }
 
   private reloadAddresses() {
-    this.ocMeService
-      .ListAddresses({ ...this.requestOptions, pageSize: this.resultsPerPage })
-      .subscribe((res) => (this.addresses = res));
+    this.ocMeService.ListAddresses({ ...this.requestOptions, pageSize: this.resultsPerPage }).subscribe((res) => (this.addresses = res));
   }
 }

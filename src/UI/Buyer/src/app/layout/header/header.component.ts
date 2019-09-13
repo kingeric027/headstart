@@ -42,7 +42,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private router: Router,
     private currentOrder: CurrentOrderService, // TODO- remove
     private context: ShopperContextService,
-    @Inject(applicationConfiguration) protected appConfig: AppConfig
+    @Inject(applicationConfiguration) public appConfig: AppConfig
   ) {}
 
   ngOnInit() {

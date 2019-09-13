@@ -15,7 +15,7 @@ export class HomePageWrapperComponent implements OnInit {
   favoriteProductIDs: string[];
   quantityLimits: QuantityLimits[];
 
-  constructor(private activatedRoute: ActivatedRoute, protected context: ShopperContextService) {}
+  constructor(private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
 
   ngOnInit() {
     this.featuredProducts = this.activatedRoute.snapshot.data.featuredProducts;

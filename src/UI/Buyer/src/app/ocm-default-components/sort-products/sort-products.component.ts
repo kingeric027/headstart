@@ -30,7 +30,7 @@ export class OCMProductSort extends OCMComponent implements OnInit, OnChanges {
     this.form.setValue({ sortBy });
   }
 
-  protected sortStrategyChanged() {
+  sortStrategyChanged() {
     const sortValue = this.form.get('sortBy').value;
     this.context.productFilterActions.sortBy(sortValue);
   }

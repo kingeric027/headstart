@@ -1,12 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PaymentBaseComponent } from '@app-buyer/checkout/components/payment-base/payment-base.component';
 import { Observable } from 'rxjs';
-import {
-  SpendingAccount,
-  ListSpendingAccount,
-  OcMeService,
-  Payment,
-} from '@ordercloud/angular-sdk';
+import { SpendingAccount, ListSpendingAccount, OcMeService, Payment } from '@ordercloud/angular-sdk';
 import * as moment from 'moment';
 import { ModalService } from '@app-buyer/shared';
 
@@ -15,8 +10,7 @@ import { ModalService } from '@app-buyer/shared';
   templateUrl: './payment-spending-account.component.html',
   styleUrls: ['./payment-spending-account.component.scss'],
 })
-export class PaymentSpendingAccountComponent extends PaymentBaseComponent
-  implements OnInit {
+export class PaymentSpendingAccountComponent extends PaymentBaseComponent implements OnInit {
   spendingAccounts: ListSpendingAccount;
   selectedSpendingAccount: SpendingAccount = null;
   requestOptions: { page?: number; search?: string } = {
@@ -26,10 +20,7 @@ export class PaymentSpendingAccountComponent extends PaymentBaseComponent
   modalID = 'checkout-select-spending-account';
   resultsPerPage = 6;
 
-  constructor(
-    private ocMeService: OcMeService,
-    private modalService: ModalService
-  ) {
+  constructor(private ocMeService: OcMeService, public modalService: ModalService) {
     super();
   }
 
@@ -55,9 +46,7 @@ export class PaymentSpendingAccountComponent extends PaymentBaseComponent
 
   getSavedSpendingAccount(accounts: ListSpendingAccount): SpendingAccount {
     if (this.payment && this.payment.SpendingAccountID) {
-      const saved = accounts.Items.filter(
-        (x) => x.ID === this.payment.SpendingAccountID
-      );
+      const saved = accounts.Items.filter((x) => x.ID === this.payment.SpendingAccountID);
       if (saved.length > 0) {
         return saved[0];
       }

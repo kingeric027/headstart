@@ -7,15 +7,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 // ordercloud
-import {
-  AppMatchFieldsValidator,
-  ValidateStrongPassword,
-  AppFormErrorService,
-} from '@app-buyer/shared';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-buyer/config/app.config';
+import { AppMatchFieldsValidator, ValidateStrongPassword, AppFormErrorService } from '@app-buyer/shared';
+import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
 import { OcPasswordResetService, PasswordReset } from '@ordercloud/angular-sdk';
 
 @Component({
@@ -35,7 +28,7 @@ export class ResetPasswordComponent implements OnInit {
     private formBuilder: FormBuilder,
     private ocPasswordResetService: OcPasswordResetService,
     private formErrorService: AppFormErrorService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    @Inject(applicationConfiguration) public appConfig: AppConfig
   ) {}
 
   ngOnInit() {
@@ -69,19 +62,14 @@ export class ResetPasswordComponent implements OnInit {
       Username: this.username,
     };
 
-    this.ocPasswordResetService
-      .ResetPasswordByVerificationCode(this.resetCode, config)
-      .subscribe(() => {
-        this.toasterService.success('Password Reset', 'Success');
-        this.router.navigateByUrl('/login');
-      });
+    this.ocPasswordResetService.ResetPasswordByVerificationCode(this.resetCode, config).subscribe(() => {
+      this.toasterService.success('Password Reset', 'Success');
+      this.router.navigateByUrl('/login');
+    });
   }
 
   // control display of error messages
-  protected hasRequiredError = (controlName: string): boolean =>
-    this.formErrorService.hasRequiredError(controlName, this.form);
-  protected hasPasswordMismatchError = (): boolean =>
-    this.formErrorService.hasPasswordMismatchError(this.form);
-  protected hasStrongPasswordError = (controlName: string): boolean =>
-    this.formErrorService.hasStrongPasswordError(controlName, this.form);
+  hasRequiredError = (controlName: string): boolean => this.formErrorService.hasRequiredError(controlName, this.form);
+  hasPasswordMismatchError = (): boolean => this.formErrorService.hasPasswordMismatchError(this.form);
+  hasStrongPasswordError = (controlName: string): boolean => this.formErrorService.hasStrongPasswordError(controlName, this.form);
 }

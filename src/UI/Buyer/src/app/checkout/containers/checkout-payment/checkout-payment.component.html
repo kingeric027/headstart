@@ -11,11 +11,12 @@
           <select class="custom-select"
                   id="paymentMethodSelectId"
                   formControlName="selectedPaymentMethod"
-                  (change)="selectPaymentMethod()">
-                <option *ngFor="let method of availablePaymentMethods" [ngValue]="method">
-                  {{ method | paymentMethodDisplay }}
-                </option>
-            </select>
+                  (change)="selectPaymentMethod(null)">
+            <option *ngFor="let method of availablePaymentMethods"
+                    [ngValue]="method">
+              {{ method | paymentMethodDisplay }}
+            </option>
+          </select>
         </div>
       </div>
     </form>
@@ -26,11 +27,11 @@
                                  [order]="order"
                                  (paymentCreated)="createPayment($event)"
                                  (paymentPatched)="patchPayment($event)"
-                                 (continue)="onContinueClicked($event)">
+                                 (continue)="onContinueClicked()">
 </checkout-payment-purchase-order>
 <checkout-payment-spending-account *ngIf="selectedPaymentMethod === 'SpendingAccount'"
                                    [payment]="existingPayment"
                                    [order]="order"
                                    (paymentCreated)="createPayment($event)"
                                    (paymentPatched)="patchPayment($event)"
-                                   (continue)="onContinueClicked($event)">></checkout-payment-spending-account>
+                                   (continue)="onContinueClicked()">></checkout-payment-spending-account>

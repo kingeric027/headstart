@@ -44,34 +44,17 @@ export class AddressFormComponent implements OnInit {
 
   setForm() {
     this.addressForm = this.formBuilder.group({
-      FirstName: [
-        this._existingAddress.FirstName || '',
-        [Validators.required, Validators.pattern(this.regexService.HumanName)],
-      ],
-      LastName: [
-        this._existingAddress.LastName || '',
-        [Validators.required, Validators.pattern(this.regexService.HumanName)],
-      ],
+      FirstName: [this._existingAddress.FirstName || '', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
+      LastName: [this._existingAddress.LastName || '', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
       Street1: [this._existingAddress.Street1 || '', Validators.required],
       Street2: [this._existingAddress.Street2 || ''],
-      City: [
-        this._existingAddress.City || '',
-        [Validators.required, Validators.pattern(this.regexService.HumanName)],
-      ],
+      City: [this._existingAddress.City || '', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
       State: [this._existingAddress.State || null, Validators.required],
       Zip: [
         this._existingAddress.Zip || '',
-        [
-          Validators.required,
-          Validators.pattern(
-            this.regexService.getZip(this._existingAddress.Country)
-          ),
-        ],
+        [Validators.required, Validators.pattern(this.regexService.getZip(this._existingAddress.Country))],
       ],
-      Phone: [
-        this._existingAddress.Phone || '',
-        Validators.pattern(this.regexService.Phone),
-      ],
+      Phone: [this._existingAddress.Phone || '', Validators.pattern(this.regexService.Phone)],
       Country: [this._existingAddress.Country || 'US', Validators.required],
       ID: this._existingAddress.ID || '',
     });
@@ -80,21 +63,14 @@ export class AddressFormComponent implements OnInit {
 
   onCountryChange(event?) {
     const country = this.addressForm.value.Country;
-    this.stateOptions = this.geographyService
-      .getStates(country)
-      .map((s) => s.abbreviation);
-    this.addressForm
-      .get('Zip')
-      .setValidators([
-        Validators.required,
-        Validators.pattern(this.regexService.getZip(country)),
-      ]);
+    this.stateOptions = this.geographyService.getStates(country).map((s) => s.abbreviation);
+    this.addressForm.get('Zip').setValidators([Validators.required, Validators.pattern(this.regexService.getZip(country))]);
     if (event) {
       this.addressForm.patchValue({ State: null, Zip: '' });
     }
   }
 
-  protected onSubmit() {
+  onSubmit() {
     if (this.addressForm.status === 'INVALID') {
       return this.formErrorService.displayFormErrors(this.addressForm);
     }
@@ -105,8 +81,6 @@ export class AddressFormComponent implements OnInit {
   }
 
   // control display of error messages
-  protected hasRequiredError = (controlName: string) =>
-    this.formErrorService.hasRequiredError(controlName, this.addressForm);
-  protected hasPatternError = (controlName: string) =>
-    this.formErrorService.hasPatternError(controlName, this.addressForm);
+  hasRequiredError = (controlName: string) => this.formErrorService.hasRequiredError(controlName, this.addressForm);
+  hasPatternError = (controlName: string) => this.formErrorService.hasPatternError(controlName, this.addressForm);
 }

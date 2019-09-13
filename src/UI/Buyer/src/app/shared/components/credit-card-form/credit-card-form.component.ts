@@ -3,11 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { CreateCardDetails } from '@app-buyer/shared';
 import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import {
-  faCcVisa,
-  faCcMastercard,
-  faCcDiscover,
-} from '@fortawesome/free-brands-svg-icons';
+import { faCcVisa, faCcMastercard, faCcDiscover } from '@fortawesome/free-brands-svg-icons';
 
 @Component({
   selector: 'shared-credit-card-form',
@@ -15,10 +11,7 @@ import {
   styleUrls: ['./credit-card-form.component.scss'],
 })
 export class CreditCardFormComponent implements OnInit {
-  constructor(
-    private formBuilder: FormBuilder,
-    private formErrorService: AppFormErrorService
-  ) {}
+  constructor(private formBuilder: FormBuilder, private formErrorService: AppFormErrorService) {}
 
   @Output() formSubmitted = new EventEmitter<CreateCardDetails>();
   faCcVisa = faCcVisa;
@@ -53,9 +46,7 @@ export class CreditCardFormComponent implements OnInit {
       return;
     }
 
-    const date = `${this.cardForm.value.expMonth}${
-      this.cardForm.value.expYear
-    }`;
+    const date = `${this.cardForm.value.expMonth}${this.cardForm.value.expYear}`;
     const card = { ExpirationDate: date, ...this.cardForm.value };
     delete card.expMonth;
     delete card.expYear;
@@ -63,6 +54,5 @@ export class CreditCardFormComponent implements OnInit {
   }
 
   // control display of required error messages
-  protected hasRequiredError = (controlName: string) =>
-    this.formErrorService.hasRequiredError(controlName, this.cardForm);
+  hasRequiredError = (controlName: string) => this.formErrorService.hasRequiredError(controlName, this.cardForm);
 }

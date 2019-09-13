@@ -1,7 +1,1 @@
-export enum OrderListColumn {
-  ID = 'ID',
-  Status = 'Status',
-  DateSubmitted = 'DateSubmitted',
-  SubmittedBy = 'SubmittedBy',
-  Total = 'Total',
-}
+export type OrderListColumn = 'ID' | 'Status' | 'DateSubmitted' | 'SubmittedBy' | 'Total' | 'Favorite';

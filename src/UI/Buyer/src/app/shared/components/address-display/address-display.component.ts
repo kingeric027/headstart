@@ -14,7 +14,8 @@ export class AddressDisplayComponent implements OnInit {
     this.address['FullName'] = this.getFullName(this.address);
   }
 
-  protected getFullName(address: Address) {
+  // make into pipe?
+  getFullName(address: Address) {
     const fullName = `${address.FirstName || ''} ${address.LastName || ''}`;
     return fullName.trim();
   }

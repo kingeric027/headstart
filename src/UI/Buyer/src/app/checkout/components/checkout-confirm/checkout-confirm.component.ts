@@ -27,8 +27,8 @@ export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent imple
     private ocLineItemService: OcLineItemService,
     private formBuilder: FormBuilder,
     private ocOrderService: OcOrderService,
-    protected context: ShopperContextService, //used in template
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    public context: ShopperContextService, //used in template
+    @Inject(applicationConfiguration) public appConfig: AppConfig
   ) {
     super();
   }

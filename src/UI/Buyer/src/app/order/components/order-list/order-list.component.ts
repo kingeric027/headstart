@@ -20,7 +20,7 @@ export class OrderListComponent {
 
   constructor(protected currentUser: CurrentUserService) {}
 
-  protected updateSort(selectedSortBy) {
+  updateSort(selectedSortBy) {
     let sortBy;
     switch (this.sortBy) {
       case selectedSortBy:
@@ -36,7 +36,7 @@ export class OrderListComponent {
     this.updatedSort.emit(sortBy);
   }
 
-  protected changePage(page: number): void {
+  changePage(page: number): void {
     this.changedPage.emit(page);
   }
 

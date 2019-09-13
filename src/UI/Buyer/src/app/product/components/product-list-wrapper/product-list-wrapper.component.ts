@@ -18,7 +18,7 @@ export class ProductListWrapperComponent implements OnInit {
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    protected context: ShopperContextService,
+    public context: ShopperContextService,
     private ocMeService: OcMeService
   ) {}
 

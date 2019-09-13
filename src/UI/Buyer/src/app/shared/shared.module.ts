@@ -46,6 +46,8 @@ import { ModalComponent, ResetDirective } from '@app-buyer/shared/components/mod
 import { OrderPaymentListComponent } from '@app-buyer/shared/components/payment-list/order-payment-list.component';
 import { NoResultsComponent } from './components/no-results/no-results.component';
 import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
+import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
+import { PhoneInputDirective } from './directives/phone-input/phone-input.directive';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -109,7 +111,8 @@ import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
     AddressFormComponent,
-
+    PhoneFormatPipe,
+    PhoneInputDirective,
     GenericBrowseComponent,
     ModalComponent,
     OrderPaymentListComponent,
@@ -128,6 +131,8 @@ import { MiniCartComponent } from './components/mini-cart/mini-cart.component';
     CreditCardIconComponent,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
+    PhoneFormatPipe,
+    PhoneInputDirective,
     AddressFormComponent,
     MiniCartComponent,
     GenericBrowseComponent,

@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { AppErrorHandler } from '@app-buyer/config/error-handling.config';
 import { flatMap } from 'rxjs/operators';
 import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'checkout-checkout',
@@ -49,7 +50,8 @@ export class CheckoutComponent implements OnInit {
     private currentOrder: CurrentOrderService,
     private ocOrderService: OcOrderService,
     private router: Router,
-    private appErrorHandler: AppErrorHandler
+    private appErrorHandler: AppErrorHandler,
+    public context: ShopperContextService
   ) {}
 
   ngOnInit() {

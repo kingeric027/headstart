@@ -40,7 +40,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       });
   }
 
-  private search() {
+  search() {
     const searchTerm = this.form.controls.search.value;
     this.form.markAsPristine();
     // emit as undefined if empty string so sdk ignores parameter completely

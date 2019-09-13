@@ -24,7 +24,7 @@ export class MeUpdateComponent implements OnInit {
     private currentUser: CurrentUserService,
     private formBuilder: FormBuilder,
     private formErrorService: AppFormErrorService,
-    private modalService: ModalService,
+    public modalService: ModalService,
     private ocAuthService: OcAuthService,
     private ocMeService: OcMeService,
     private toastrService: ToastrService,
@@ -91,8 +91,8 @@ export class MeUpdateComponent implements OnInit {
   }
 
   // control display of error messages
-  protected hasRequiredError = (controlName: string): boolean => this.formErrorService.hasRequiredError(controlName, this.form);
-  protected hasEmailError = (): boolean => this.formErrorService.hasInvalidEmailError(this.form.get('Email'));
-  protected hasPatternError = (controlName: string) => this.formErrorService.hasPatternError(controlName, this.form);
-  protected passwordMismatchError = (): boolean => this.formErrorService.hasPasswordMismatchError(this.form);
+  hasRequiredError = (controlName: string): boolean => this.formErrorService.hasRequiredError(controlName, this.form);
+  hasEmailError = (): boolean => this.formErrorService.hasInvalidEmailError(this.form.get('Email'));
+  hasPatternError = (controlName: string) => this.formErrorService.hasPatternError(controlName, this.form);
+  passwordMismatchError = (): boolean => this.formErrorService.hasPasswordMismatchError(this.form);
 }

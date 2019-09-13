@@ -24,7 +24,7 @@ export class OrderDetailsComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     protected ocOrderService: OcOrderService,
     protected appPaymentService: AppPaymentService,
-    protected context: ShopperContextService //used in template
+    public context: ShopperContextService //used in template
   ) {}
 
   ngOnInit() {

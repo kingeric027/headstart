@@ -9,7 +9,7 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 })
 export class StatusFilterComponent implements OnInit {
   form: FormGroup;
-  protected statuses: OrderStatus[];
+  statuses: OrderStatus[];
   @Output() selectedStatus = new EventEmitter<OrderStatus>();
 
   constructor(private formBuilder: FormBuilder) {}
@@ -18,15 +18,10 @@ export class StatusFilterComponent implements OnInit {
     this.form = this.formBuilder.group({
       status: `!${OrderStatus.Unsubmitted}`,
     });
-    this.statuses = [
-      OrderStatus.Open,
-      OrderStatus.AwaitingApproval,
-      OrderStatus.Completed,
-      OrderStatus.Declined,
-    ];
+    this.statuses = [OrderStatus.Open, OrderStatus.AwaitingApproval, OrderStatus.Completed, OrderStatus.Declined];
   }
 
-  protected selectStatus(): void {
+  selectStatus(): void {
     const status = this.form.get('status').value;
     this.selectedStatus.emit(status);
   }

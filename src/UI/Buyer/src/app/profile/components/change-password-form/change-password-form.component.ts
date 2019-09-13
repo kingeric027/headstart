@@ -21,10 +21,7 @@ export class ChangePasswordFormComponent implements OnInit {
     newPassword: string;
   }>();
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private formErrorService: AppFormErrorService
-  ) {}
+  constructor(private formBuilder: FormBuilder, private formErrorService: AppFormErrorService) {}
 
   ngOnInit() {
     this.setForm();
@@ -59,10 +56,7 @@ export class ChangePasswordFormComponent implements OnInit {
   }
 
   // control display of error messages
-  protected hasRequiredError = (controlName: string): boolean =>
-    this.formErrorService.hasRequiredError(controlName, this.form);
-  protected hasPasswordMismatchError = (): boolean =>
-    this.formErrorService.hasPasswordMismatchError(this.form);
-  protected hasStrongPasswordError = (controlName: string): boolean =>
-    this.formErrorService.hasStrongPasswordError(controlName, this.form);
+  hasRequiredError = (controlName: string): boolean => this.formErrorService.hasRequiredError(controlName, this.form);
+  hasPasswordMismatchError = (): boolean => this.formErrorService.hasPasswordMismatchError(this.form);
+  hasStrongPasswordError = (controlName: string): boolean => this.formErrorService.hasStrongPasswordError(controlName, this.form);
 }

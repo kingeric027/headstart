@@ -1,23 +1,9 @@
-import {
-  Component,
-  OnInit,
-  Output,
-  EventEmitter,
-  OnDestroy,
-} from '@angular/core';
-import {
-  faPlusSquare,
-  faMinusSquare,
-} from '@fortawesome/free-regular-svg-icons';
+import { OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { faPlusSquare, faMinusSquare } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { tap, takeWhile } from 'rxjs/operators';
 
-@Component({
-  selector: 'product-price-filter',
-  templateUrl: './price-filter.component.html',
-  styleUrls: ['./price-filter.component.scss'],
-})
 /**
  * true filtering-by-price is not yet possible (coming soon) but we can
  * mock this in simple scenarios by setting price on xp
@@ -26,11 +12,14 @@ import { tap, takeWhile } from 'rxjs/operators';
  * note: this will not work for complex pricing scenarios
  * where there are multiple prices for a single product
  */
+// uncomment if you want use this component
+// @Component({
+//   selector: 'product-price-filter',
+//   templateUrl: './price-filter.component.html',
+//   styleUrls: ['./price-filter.component.scss'],
+// })
 export class PriceFilterComponent implements OnInit, OnDestroy {
-  constructor(
-    private formBuilder: FormBuilder,
-    private activatedRoute: ActivatedRoute
-  ) {}
+  constructor(private formBuilder: FormBuilder, private activatedRoute: ActivatedRoute) {}
 
   @Output() priceFilterChange = new EventEmitter<Params>();
 

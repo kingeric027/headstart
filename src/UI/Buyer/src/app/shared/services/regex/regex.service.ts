@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root',
 })
+// TODO - this will likely have to become a JSON config file or something.
 // These regular expressions are all used for form validation
 export class RegexService {
   constructor() {}

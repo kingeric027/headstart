@@ -33,7 +33,7 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent imple
     private ocMeService: OcMeService,
     private ocOrderService: OcOrderService,
     private currentOrder: CurrentOrderService,
-    private modalService: ModalService,
+    public modalService: ModalService,
     private toastrService: ToastrService
   ) {
     super();
