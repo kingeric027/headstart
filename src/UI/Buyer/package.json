@@ -7,7 +7,7 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --open",
+    "start": "ng serve --open --prod",
     "build": "ng build --configuration=production",
     "test": "ng test --code-coverage",
     "lint": "ng lint",
