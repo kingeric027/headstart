@@ -40,7 +40,6 @@ import { CreditCardDisplayComponent } from '@app-buyer/shared/components/credit-
 
 // containers
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from '@app-buyer/shared/pipes/shipperTracking/shipperTracking.pipe';
-import { MapToIterablePipe } from '@app-buyer/shared/pipes/map-to-iterable/map-to-iterable.pipe';
 import { GenericBrowseComponent } from '@app-buyer/shared/components/generic-browse/generic-browse.component';
 import { ModalComponent, ResetDirective } from '@app-buyer/shared/components/modal/modal.component';
 import { OrderPaymentListComponent } from '@app-buyer/shared/components/payment-list/order-payment-list.component';
@@ -101,7 +100,6 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     SearchComponent,
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
-    MapToIterablePipe,
     CreditCardIconComponent,
     AddressDisplayComponent,
     CreditCardDisplayComponent,
@@ -121,7 +119,6 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
   declarations: [
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
-    MapToIterablePipe,
     AddressDisplayComponent,
     CreditCardDisplayComponent,
     CreditCardFormComponent,
