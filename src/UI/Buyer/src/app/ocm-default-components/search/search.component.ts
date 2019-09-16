@@ -1,26 +1,36 @@
-import { Component, OnInit, OnDestroy, Input, EventEmitter, Output } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { Component, OnDestroy, Input, EventEmitter, Output, OnChanges, OnInit } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { debounceTime, takeWhile, filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'shared-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })
-export class SearchComponent implements OnInit, OnDestroy {
+export class OCMSearch implements OnInit, OnChanges, OnDestroy {
   alive = true;
   @Input() placeholderText?: string;
+  @Input() searchTermInput?: string;
   @Output() searched = new EventEmitter<string>();
   faSearch = faSearch;
   faTimes = faTimes;
   form: FormGroup;
   previousSearchTerm = '';
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor() {}
 
   ngOnInit() {
-    this.form = this.formBuilder.group({ search: '' });
+    this.buildForm();
+  }
+
+  ngOnChanges() {
+    if (this.searchTermInput !== null && this.searchTermInput !== undefined) {
+      this.form.setValue({ search: this.searchTermInput });
+    }
+  }
+
+  buildForm() {
+    this.form = new FormGroup({ search: new FormControl('') });
     this.onFormChanges();
   }
 
@@ -41,24 +51,22 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   search() {
-    const searchTerm = this.form.controls.search.value;
     this.form.markAsPristine();
     // emit as undefined if empty string so sdk ignores parameter completely
-    this.searched.emit(searchTerm || undefined);
+    this.searched.emit(this.getCurrentSearchTerm() || undefined);
+  }
+
+  getCurrentSearchTerm(): string {
+    return this.form.get('search').value;
   }
 
   showClear(): boolean {
-    return this.form.get('search').value !== '';
+    return this.getCurrentSearchTerm() !== '';
   }
 
   clear(): void {
     this.form.markAsDirty();
     this.form.setValue({ search: '' });
-  }
-
-  setWithoutEmit(value: string): void {
-    value = value || '';
-    this.form.setValue({ search: value });
   }
 
   ngOnDestroy() {

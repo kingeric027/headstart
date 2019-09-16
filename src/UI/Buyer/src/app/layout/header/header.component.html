@@ -78,9 +78,11 @@
 <nav class="navbar navbar-expand navbar-light bg-light"
      *ngIf="showHeader()">
   <div class="container">
-    <shared-search class="mr-3 w-100"
-                   placeholderText="Search Products..."
-                   (searched)="searchProducts($event)"></shared-search>
+    <ocm-search class="mr-3 w-100"
+                placeholderText="Search Products..."
+                [searchTermInput]="searchTermForProducts"
+                (searched)="searchProducts($event.detail)">
+    </ocm-search>
     <ul class="navbar-nav"
         #cartIcon
         (mouseleave)="closeMiniCart($event, popover)">

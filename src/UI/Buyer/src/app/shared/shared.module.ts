@@ -34,7 +34,6 @@ import { FallbackImageDirective } from './directives/fallback-image/fallback-ima
 import { AddressFormComponent } from '@app-buyer/shared/components/address-form/address-form.component';
 import { CreditCardFormComponent } from '@app-buyer/shared/components/credit-card-form/credit-card-form.component';
 import { CreditCardIconComponent } from '@app-buyer/shared/components/credit-card-icon/credit-card-icon.component';
-import { SearchComponent } from '@app-buyer/shared/components/search/search.component';
 import { AddressDisplayComponent } from '@app-buyer/shared/components/address-display/address-display.component';
 import { CreditCardDisplayComponent } from '@app-buyer/shared/components/credit-card-display/credit-card-display.component';
 
@@ -97,7 +96,6 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     NgbDropdownModule,
 
     NoResultsComponent,
-    SearchComponent,
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
     CreditCardIconComponent,
@@ -124,7 +122,6 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     CreditCardFormComponent,
     FallbackImageDirective,
     ResetDirective,
-    SearchComponent,
     CreditCardIconComponent,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,

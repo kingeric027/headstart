@@ -6,7 +6,6 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
 import { takeWhile, tap, debounceTime, delay, filter } from 'rxjs/operators';
-import { SearchComponent } from '@app-buyer/shared/components/search/search.component';
 import { CurrentOrderService } from '@app-buyer/shared';
 import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
@@ -24,9 +23,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   order: Order;
   alive = true;
   addToCartQuantity: number;
+  searchTermForProducts: string = null;
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
-  @ViewChild(SearchComponent, { static: false }) public search: SearchComponent;
 
   faSearch = faSearch;
   faShoppingCart = faShoppingCart;
@@ -49,7 +48,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.context.currentOrder.onOrderChange((order) => (this.order = order));
     this.context.currentUser.onIsAnonymousChange((isAnon) => (this.anonymous = isAnon));
     this.context.currentUser.onUserChange((user) => (this.user = user));
-    this.context.productFilterActions.onFiltersChange((filters) => this.search.setWithoutEmit(filters.search));
+    this.context.productFilterActions.onFiltersChange((filters) => (this.searchTermForProducts = filters.search));
 
     this.buildAddToCartListener();
     this.clearSearchOnNavigate();
@@ -78,6 +77,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   searchProducts(searchStr: string) {
+    this.searchTermForProducts = searchStr;
     this.context.routeActions.toProductList({ search: searchStr });
   }
 
@@ -94,9 +94,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         takeWhile(() => this.alive)
       )
       .subscribe(() => {
-        if (this.search) {
-          this.search.setWithoutEmit('');
-        }
+        this.searchTermForProducts = '';
       });
   }
 

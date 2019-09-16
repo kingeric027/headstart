@@ -22,6 +22,7 @@ import { TreeModule } from 'angular-tree-component';
 import { OCMFacetMultiSelect } from './facet-multiselect/facet-multiselect.component';
 import { OCMProductFacetList } from './product-facet-list/product-facet-list.component';
 import { OCMProductList } from './product-list/product-list.component';
+import { OCMSearch } from './search/search.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -42,6 +43,7 @@ import { OCMProductList } from './product-list/product-list.component';
     OCMFacetMultiSelect,
     OCMProductFacetList,
     OCMProductList,
+    OCMSearch,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -60,6 +62,7 @@ import { OCMProductList } from './product-list/product-list.component';
     OCMFacetMultiSelect,
     OCMProductFacetList,
     OCMProductList,
+    OCMSearch,
   ],
   imports: [
     CommonModule,
@@ -92,6 +95,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMFacetMultiSelect, 'ocm-facet-multiselect');
     this.buildWebComponent(OCMProductFacetList, 'ocm-product-facet-list');
     this.buildWebComponent(OCMProductList, 'ocm-product-list');
+    this.buildWebComponent(OCMSearch, 'ocm-search');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

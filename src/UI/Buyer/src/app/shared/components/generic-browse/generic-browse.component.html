@@ -1,6 +1,7 @@
-<shared-search class="mt-1"
-               placeholderText="Search {{ searchPlaceholder }}..."
-               (searched)="requestOptionsUpdated.emit({ search: $event, page: undefined })"></shared-search>
+<ocm-search class="mt-1"
+            placeholderText="Search {{ searchPlaceholder }}..."
+            (searched)="requestOptionsUpdated.emit({ search: $event.detail, page: undefined })">
+</ocm-search>
 <div *ngIf="meta?.TotalPages > 1"
      class="my-2 row">
   <div class="col-12">
