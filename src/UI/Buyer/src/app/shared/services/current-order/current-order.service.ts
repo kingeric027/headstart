@@ -2,9 +2,9 @@
 import { Injectable, Inject } from '@angular/core';
 
 // third party
-import { OcMeService, Order, OcOrderService, ListLineItem, LineItem, OcLineItemService } from '@ordercloud/angular-sdk';
+import { OcMeService, Order, OcOrderService, ListLineItem, OcLineItemService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
-import { Subject, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { listAll } from '@app-buyer/shared/functions/listAll';
 import { ICurrentOrder } from '@app-buyer/ocm-default-components/shopper-context';
@@ -17,8 +17,6 @@ export class CurrentOrderService implements ICurrentOrder {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
   };
-  // TODO - integrate this with addToCart() in CartSerivce
-  public addToCartSubject: Subject<LineItem> = new Subject<LineItem>();
 
   private orderSubject: BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
   private lineItemSubject: BehaviorSubject<ListLineItem> = new BehaviorSubject<ListLineItem>(this.DefaultLineItems);

@@ -1,20 +1,17 @@
-import { Component, OnInit, Inject, ViewChild, OnDestroy, ElementRef } from '@angular/core';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
 import { faSearch, faShoppingCart, faPhone, faQuestionCircle, faUserCircle, faSignOutAlt, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
-import { takeWhile, tap, debounceTime, delay, filter } from 'rxjs/operators';
-import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
-import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
+import { tap, debounceTime, delay } from 'rxjs/operators';
+import { ProductFilters, IShopperContext } from '@app-buyer/ocm-default-components/shopper-context';
 
 @Component({
-  selector: 'layout-header',
+  selector: 'ocm-app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class OCMAppHeader implements OnInit {
   categories$: Observable<ListCategory>;
   isCollapsed = true;
   anonymous: boolean;
@@ -23,6 +20,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   alive = true;
   addToCartQuantity: number;
   searchTermForProducts: string = null;
+  @Input() showHeader: boolean; // TODO - find a way to remove this
+  @Input() appName: string;
+  @Input() context: IShopperContext;
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
 
@@ -34,30 +34,27 @@ export class HeaderComponent implements OnInit, OnDestroy {
   faUserCircle = faUserCircle;
   faHome = faHome;
 
-  constructor(
-    private appAuthService: AuthService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private context: ShopperContextService,
-    @Inject(applicationConfiguration) public appConfig: AppConfig
-  ) {}
+  constructor() {}
 
   ngOnInit() {
     this.context.currentOrder.onOrderChange((order) => (this.order = order));
     this.context.currentUser.onIsAnonymousChange((isAnon) => (this.anonymous = isAnon));
     this.context.currentUser.onUserChange((user) => (this.user = user));
-    this.context.productFilterActions.onFiltersChange((filters) => (this.searchTermForProducts = filters.search));
+    this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
 
     this.buildAddToCartListener();
-    this.clearSearchOnNavigate();
   }
+
+  handleFiltersChange = (filters: ProductFilters) => {
+    this.searchTermForProducts = filters.search || '';
+  };
 
   isMobile(): boolean {
     return window.innerWidth < 768; // max width for bootstrap's sm breakpoint
   }
 
   buildAddToCartListener() {
-    this.context.currentOrder.addToCartSubject
+    this.context.cartActions.addToCartSubject
       .pipe(
         tap((li: LineItem) => {
           this.popover.close();
@@ -80,37 +77,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.appAuthService.logout();
-  }
-
-  clearSearchOnNavigate() {
-    this.activatedRoute.queryParams
-      .pipe(
-        filter((queryParams) => {
-          return typeof queryParams.search === 'undefined';
-        }),
-        takeWhile(() => this.alive)
-      )
-      .subscribe(() => {
-        this.searchTermForProducts = '';
-      });
+    this.context.authentication.logout();
   }
 
   closeMiniCart(event: MouseEvent, popover: NgbPopover) {
     const rect = this.cartIcon.nativeElement.getBoundingClientRect();
-    // do not close if leaving through the bottom
+    // do not close if leaving through the bottom. That is handled by minicart itself
     if (event.y < rect.top + rect.height) {
       popover.close();
     }
-  }
-
-  // TODO: we should move responsibility for 'showing' up to the parent component instead of hard-coding route-names.
-  showHeader() {
-    const hiddenRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
-    return !hiddenRoutes.some((el) => this.router.url.indexOf(el) > -1);
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
   }
 }

@@ -1,5 +1,6 @@
 import { LineItem, MeUser, Order, ListLineItem, User } from '@ordercloud/angular-sdk';
 import { Input } from '@angular/core';
+import { Observable } from 'rxjs';
 
 export class OCMComponent {
   // todo: the issue is that ngOnInit fires befoer inputs are ready come up with a better way to do this.
@@ -13,14 +14,17 @@ export interface IShopperContext {
   currentUser: ICurrentUser;
   currentOrder: ICurrentOrder;
   productFilterActions: IProductFilterActions;
+  authentication: IAuthActions;
 }
 
 export interface ICartActions {
+  addToCartSubject: Observable<LineItem>;
   addToCart: (lineItem: LineItem) => Promise<LineItem>;
   removeLineItem: (lineItemID: string) => Promise<void>;
   updateQuantity: (lineItemID: string, newQuantity: number) => Promise<LineItem>;
   addManyToCart: (lineItem: LineItem[]) => Promise<LineItem[]>;
   emptyCart: () => Promise<void>;
+  onAddToCart: (callback: (lineItem: LineItem) => void) => void;
 }
 
 export interface IRouteActions {
@@ -28,6 +32,13 @@ export interface IRouteActions {
   toProductList: (options?: ProductFilters) => void;
   toCheckout: () => void;
   toCart: () => void;
+  toLogin: () => void;
+  toRegister: () => void;
+  toMyProfile: () => void;
+  toMyAddresses: () => void;
+  toMyPaymentMethods: () => void;
+  toMyOrders: () => void;
+  toOrdersToApprove: () => void;
 }
 
 export interface ICurrentUser {
@@ -60,6 +71,11 @@ export interface IProductFilterActions {
   filterByFavorites: (showOnlyFavorites: boolean) => void;
   clearAllFilters: () => void;
   onFiltersChange: (callback: (filters: ProductFilters) => void) => void;
+}
+
+export interface IAuthActions {
+  login: (username: string, password: string) => void;
+  logout: () => void;
 }
 
 export interface ProductFilters {

@@ -10,12 +10,13 @@ import { CookieService } from 'ngx-cookie';
 import { AppErrorHandler } from '@app-buyer/config/error-handling.config';
 import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
 import { CurrentOrderService } from '@app-buyer/shared/services/current-order/current-order.service';
+import { IAuthActions } from '@app-buyer/ocm-default-components/shopper-context';
 
 export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possible';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService {
+export class AuthService implements IAuthActions {
   private rememberMeCookieName = `${this.appConfig.appname.replace(/ /g, '_').toLowerCase()}_rememberMe`;
   fetchingRefreshToken = false;
   failedRefreshAttempt = false;

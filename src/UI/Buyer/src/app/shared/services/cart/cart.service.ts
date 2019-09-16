@@ -3,12 +3,15 @@ import { OcLineItemService, LineItem, OcOrderService } from '@ordercloud/angular
 import { isUndefined as _isUndefined, flatMap as _flatMap, get as _get, isEqual as _isEqual, omitBy as _omitBy } from 'lodash';
 import { CurrentOrderService } from '../current-order/current-order.service';
 import { ICartActions } from '@app-buyer/ocm-default-components/shopper-context';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CartService implements ICartActions {
   private initializingOrder = false;
+
+  public addToCartSubject: Subject<LineItem> = new Subject<LineItem>(); // need to make available as observable
 
   constructor(
     private currentOrder: CurrentOrderService,
@@ -56,6 +59,10 @@ export class CartService implements ICartActions {
     await this.currentOrder.reset();
   }
 
+  onAddToCart(callback: (lineItem: LineItem) => void): void {
+    this.addToCartSubject.subscribe(callback);
+  }
+
   private async createLineItem(newLI: LineItem): Promise<LineItem> {
     // if line item exists simply update quantity, else create
     const existingLI = this.currentOrder.lineItems.Items.find((li) => this.LineItemsMatch(li, newLI));
@@ -65,7 +72,7 @@ export class CartService implements ICartActions {
       ? this.ocLineItemService.Patch('outgoing', this.currentOrder.order.ID, existingLI.ID, newLI).toPromise()
       : this.ocLineItemService.Create('outgoing', this.currentOrder.order.ID, newLI).toPromise();
     const lineitem = await request;
-    this.currentOrder.addToCartSubject.next(newLI);
+    this.addToCartSubject.next(newLI);
     this.currentOrder.reset();
     return lineitem;
   }

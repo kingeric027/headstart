@@ -1,11 +1,11 @@
 <!-- TOP NAV -->
 <nav class="navbar navbar-expand navbar-light bg-white"
-     *ngIf="showHeader()">
+     *ngIf="showHeader">
   <div class="container">
 
     <a class="navbar-brand"
        routerLink="/home">
-      <span class="d-none d-md-inline">{{appConfig.appname}}</span>
+      <span class="d-none d-md-inline">{{appName}}</span>
       <span class="d-md-none">OCS</span>
     </a>
 
@@ -56,13 +56,16 @@
              routerLink="/profile/details">My Profile</a>
           <a class="dropdown-item"
              routerLinkActive="active"
-             routerLink="/profile/orders">My Orders</a>
-          <a class="dropdown-item"
-             routerLinkActive="active"
              routerLink="/profile/addresses">Address Book</a>
           <a class="dropdown-item"
              routerLinkActive="active"
              routerLink="/profile/payment-methods">Payment Methods</a>
+          <a class="dropdown-item"
+             routerLinkActive="active"
+             routerLink="/profile/orders">My Orders</a>
+          <a class="dropdown-item"
+             routerLinkActive="active"
+             routerLink="/profile/orders/approval">Orders To Approve</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item"
              (click)="logout()"
@@ -76,7 +79,7 @@
   </div>
 </nav>
 <nav class="navbar navbar-expand navbar-light bg-light"
-     *ngIf="showHeader()">
+     *ngIf="showHeader">
   <div class="container">
     <ocm-search class="mr-3 w-100"
                 placeholderText="Search Products..."

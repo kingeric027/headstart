@@ -25,4 +25,32 @@ export class RouteService implements IRouteActions {
   toCart(): void {
     this.router.navigateByUrl('/cart');
   }
+
+  toLogin(): void {
+    this.router.navigateByUrl('/login');
+  }
+
+  toRegister(): void {
+    this.router.navigateByUrl('/register');
+  }
+
+  toMyProfile(): void {
+    this.router.navigateByUrl('/profile/details');
+  }
+
+  toMyAddresses(): void {
+    this.router.navigateByUrl('/profile/addresses');
+  }
+
+  toMyPaymentMethods(): void {
+    this.router.navigateByUrl('/profile/payment-methods');
+  }
+
+  toMyOrders(): void {
+    this.router.navigateByUrl('/profile/orders');
+  }
+
+  toOrdersToApprove(): void {
+    this.router.navigateByUrl('/profile/approval');
+  }
 }

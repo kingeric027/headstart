@@ -26,6 +26,7 @@ export class CurrentUserService implements ICurrentUser {
   async reset(): Promise<void> {
     this.isAnonymous = !_isUndefined(this.getOrderIDFromToken());
     this.user = await this.ocMeService.Get().toPromise();
+    this.isLoggedIn = this.user.Active;
   }
 
   get isLoggedIn(): boolean {
