@@ -27,6 +27,7 @@ export interface IRouteActions {
   toProductDetails: (productID: string) => void;
   toProductList: (options?: ProductFilters) => void;
   toCheckout: () => void;
+  toCart: () => void;
 }
 
 export interface ICurrentUser {

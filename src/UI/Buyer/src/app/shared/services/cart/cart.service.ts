@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { OcLineItemService, ListLineItem, LineItem, OcOrderService } from '@ordercloud/angular-sdk';
+import { OcLineItemService, LineItem, OcOrderService } from '@ordercloud/angular-sdk';
 import { isUndefined as _isUndefined, flatMap as _flatMap, get as _get, isEqual as _isEqual, omitBy as _omitBy } from 'lodash';
 import { CurrentOrderService } from '../current-order/current-order.service';
 import { ICartActions } from '@app-buyer/ocm-default-components/shopper-context';
@@ -21,7 +21,7 @@ export class CartService implements ICartActions {
     if (!_isUndefined(this.currentOrder.order.DateCreated)) {
       return this.createLineItem(lineItem);
     }
-    // TODO - what to do if order is initializing
+    // TODO - what to do if order is initializing?
     if (!this.initializingOrder) {
       this.initializingOrder = true;
       const newOrder = await this.ocOrderService.Create('outgoing', {}).toPromise();
@@ -54,18 +54,6 @@ export class CartService implements ICartActions {
   async emptyCart(): Promise<void> {
     await this.ocOrderService.Delete('outgoing', this.currentOrder.order.ID).toPromise();
     await this.currentOrder.reset();
-  }
-
-  // TODO - should be a display pipe
-  addSpecsToProductName(lineItems: ListLineItem): ListLineItem {
-    const lis: ListLineItem = JSON.parse(JSON.stringify(lineItems));
-    lis.Items = lis.Items.map((lineItem) => {
-      if (lineItem.Specs.length === 0) return lineItem;
-      const list = lineItem.Specs.map((spec) => spec.Value).join(', ');
-      lineItem.Product.Name = `${lineItem.Product.Name} (${list})`;
-      return lineItem;
-    });
-    return lis;
   }
 
   private async createLineItem(newLI: LineItem): Promise<LineItem> {

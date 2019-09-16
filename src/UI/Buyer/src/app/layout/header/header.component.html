@@ -94,7 +94,10 @@
           popoverClass="mini-cart-popover"
           [autoClose]="'outside'">
         <ng-template #CartHoverContent>
-          <checkout-mini-cart [popover]="popover"></checkout-mini-cart>
+          <ocm-mini-cart [context]="context"
+                         (mouseleave)="popover.close()"
+                         (navigate)="popover.close()">
+          </ocm-mini-cart>
         </ng-template>
         <a class="nav-link text-nowrap"
            routerLink="/cart"

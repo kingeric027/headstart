@@ -6,7 +6,6 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
 import { takeWhile, tap, debounceTime, delay, filter } from 'rxjs/operators';
-import { CurrentOrderService } from '@app-buyer/shared';
 import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
 
@@ -39,7 +38,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private appAuthService: AuthService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private currentOrder: CurrentOrderService, // TODO- remove
     private context: ShopperContextService,
     @Inject(applicationConfiguration) public appConfig: AppConfig
   ) {}
@@ -59,7 +57,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   buildAddToCartListener() {
-    this.currentOrder.addToCartSubject
+    this.context.currentOrder.addToCartSubject
       .pipe(
         tap((li: LineItem) => {
           this.popover.close();

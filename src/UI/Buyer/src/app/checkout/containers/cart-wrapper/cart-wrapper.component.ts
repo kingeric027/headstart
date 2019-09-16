@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Order, ListLineItem } from '@ordercloud/angular-sdk';
 import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
-import { CartService, BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
+import { BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
 import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
 
 @Component({
@@ -16,7 +16,6 @@ export class CartWrapperComponent implements OnInit {
   alive = true;
 
   constructor(
-    private cartService: CartService,
     private currentOrder: CurrentOrderService,
     public context: ShopperContextService //used in template
   ) {}
@@ -31,7 +30,7 @@ export class CartWrapperComponent implements OnInit {
   };
 
   setLineItems = (items: ListLineItem): void => {
-    this.lineItems = this.cartService.addSpecsToProductName(items);
+    this.lineItems = items;
     this.quantityLimits = this.lineItems.Items.map((li) => BuildQtyLimits(li.Product));
   };
 }

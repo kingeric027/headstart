@@ -21,4 +21,8 @@ export class RouteService implements IRouteActions {
   toCheckout(): void {
     this.router.navigateByUrl('/checkout');
   }
+
+  toCart(): void {
+    this.router.navigateByUrl('/cart');
+  }
 }
