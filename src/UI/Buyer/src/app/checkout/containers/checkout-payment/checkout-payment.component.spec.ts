@@ -3,7 +3,6 @@ import { CheckoutPaymentComponent } from 'src/app/checkout/containers/checkout-p
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OcPaymentService, Payment } from '@ordercloud/angular-sdk';
-import { AppStateService } from 'src/app/shared';
 import { of } from 'rxjs';
 import { applicationConfiguration } from 'src/app/config/app.config';
 import { PaymentMethod } from 'src/app/shared/models/payment-method.enum';
@@ -21,16 +20,10 @@ describe('CheckoutPaymentComponent', () => {
   };
   const appStateService = { orderSubject: { value: mockOrder } };
   const paymentService = {
-    List: jasmine
-      .createSpy('List')
-      .and.callFake(() => of({ Items: mockPayments })),
+    List: jasmine.createSpy('List').and.callFake(() => of({ Items: mockPayments })),
     Delete: jasmine.createSpy('Delete').and.returnValue(of(null)),
-    Create: jasmine
-      .createSpy('Create')
-      .and.callFake((...myArgs) => of(myArgs[2]).pipe(delay(0))),
-    Patch: jasmine
-      .createSpy('Patch')
-      .and.callFake((...myArgs) => of(myArgs[3]).pipe(delay(0))),
+    Create: jasmine.createSpy('Create').and.callFake((...myArgs) => of(myArgs[2]).pipe(delay(0))),
+    Patch: jasmine.createSpy('Patch').and.callFake((...myArgs) => of(myArgs[3]).pipe(delay(0))),
   };
   const appConfig = {
     availablePaymentMethods: ['PurchaseOrder', 'CreditCard'],
@@ -40,11 +33,7 @@ describe('CheckoutPaymentComponent', () => {
     TestBed.configureTestingModule({
       declarations: [CheckoutPaymentComponent, PaymentMethodDisplayPipe],
       imports: [FontAwesomeModule, ReactiveFormsModule],
-      providers: [
-        { provide: AppStateService, useValue: appStateService },
-        { provide: OcPaymentService, useValue: paymentService },
-        { provide: applicationConfiguration, useValue: appConfig },
-      ],
+      providers: [{ provide: OcPaymentService, useValue: paymentService }, { provide: applicationConfiguration, useValue: appConfig }],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
     }).compileComponents();
   }));
@@ -95,9 +84,7 @@ describe('CheckoutPaymentComponent', () => {
     it('should use first available payment method if no payment exists', () => {
       mockPayments = [];
       component.initializePaymentMethod();
-      expect(component.selectPaymentMethod).toHaveBeenCalledWith(
-        'PurchaseOrder'
-      );
+      expect(component.selectPaymentMethod).toHaveBeenCalledWith('PurchaseOrder');
     });
   });
 
@@ -108,9 +95,7 @@ describe('CheckoutPaymentComponent', () => {
       component.selectPaymentMethod(PaymentMethod.CreditCard);
     });
     it('should set form with method', () => {
-      expect(component.form.controls['selectedPaymentMethod'].value).toBe(
-        'CreditCard'
-      );
+      expect(component.form.controls['selectedPaymentMethod'].value).toBe('CreditCard');
     });
     it('should set selectedPaymentMethod with method', () => {
       expect(component.selectedPaymentMethod).toBe('CreditCard');
@@ -130,9 +115,7 @@ describe('CheckoutPaymentComponent', () => {
   describe('createPayment', () => {
     beforeEach(() => {
       mockPayments = [{}];
-      spyOn(component as any, 'deleteExistingPayments').and.returnValue(
-        of(null)
-      );
+      spyOn(component as any, 'deleteExistingPayments').and.returnValue(of(null));
       component.createPayment({ ID: 'MockPayment' });
     });
     it('should call deleteExistingPayments', () => {
@@ -148,26 +131,15 @@ describe('CheckoutPaymentComponent', () => {
   describe('deleteExistingPayments', () => {
     beforeEach(() => {
       paymentService.Delete.calls.reset();
-      mockPayments = [
-        { ID: 'CCPayment', Type: 'CreditCard' },
-        { ID: 'POPayment', Type: 'PurchaseOrder' },
-      ];
+      mockPayments = [{ ID: 'CCPayment', Type: 'CreditCard' }, { ID: 'POPayment', Type: 'PurchaseOrder' }];
       component['deleteExistingPayments']().subscribe();
     });
     it('should list payments', () => {
       expect(paymentService.List).toHaveBeenCalledWith('outgoing', '1');
     });
     it('should call delete for each payment', () => {
-      expect(paymentService.Delete).toHaveBeenCalledWith(
-        'outgoing',
-        '1',
-        'CCPayment'
-      );
-      expect(paymentService.Delete).toHaveBeenCalledWith(
-        'outgoing',
-        '1',
-        'POPayment'
-      );
+      expect(paymentService.Delete).toHaveBeenCalledWith('outgoing', '1', 'CCPayment');
+      expect(paymentService.Delete).toHaveBeenCalledWith('outgoing', '1', 'POPayment');
       expect(paymentService.Delete).toHaveBeenCalledTimes(2);
     });
   });
@@ -180,12 +152,7 @@ describe('CheckoutPaymentComponent', () => {
       });
     });
     it('should patch the payment', () => {
-      expect(paymentService.Patch).toHaveBeenCalledWith(
-        'outgoing',
-        '1',
-        'mockPOPaymentID',
-        { xp: { PONumber: 'new po number' } }
-      );
+      expect(paymentService.Patch).toHaveBeenCalledWith('outgoing', '1', 'mockPOPaymentID', { xp: { PONumber: 'new po number' } });
     });
   });
 });

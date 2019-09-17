@@ -5,7 +5,6 @@ import { of } from 'rxjs';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ModalService } from 'src/app/shared';
 import { OcOrderService } from '@ordercloud/angular-sdk';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
@@ -32,7 +31,6 @@ describe('OrderApprovalComponent', () => {
       imports: [ReactiveFormsModule],
       providers: [
         { provide: ToastrService, useValue: toasterService },
-        { provide: ModalService, useValue: modalService },
         { provide: OcOrderService, useValue: orderService },
         { provide: Router, useValue: router },
       ],
@@ -66,20 +64,18 @@ describe('OrderApprovalComponent', () => {
     it('Should call Approve if approve is true', () => {
       component.approved = true;
       component.submitReview();
-      expect(orderService.Approve).toHaveBeenCalledWith(
-        'outgoing',
-        mockOrderID,
-        { Comments: component.form.value.comments, AllowResubmit: false }
-      );
+      expect(orderService.Approve).toHaveBeenCalledWith('outgoing', mockOrderID, {
+        Comments: component.form.value.comments,
+        AllowResubmit: false,
+      });
     });
     it('Should call Decline if approve is false', () => {
       component.approved = false;
       component.submitReview();
-      expect(orderService.Approve).toHaveBeenCalledWith(
-        'outgoing',
-        mockOrderID,
-        { Comments: component.form.value.comments, AllowResubmit: false }
-      );
+      expect(orderService.Approve).toHaveBeenCalledWith('outgoing', mockOrderID, {
+        Comments: component.form.value.comments,
+        AllowResubmit: false,
+      });
     });
     it('Should do a bunch of things after submitting the review', () => {
       component.submitReview();

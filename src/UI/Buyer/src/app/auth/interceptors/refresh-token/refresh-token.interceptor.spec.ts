@@ -7,7 +7,7 @@ import { RefreshTokenInterceptor } from 'src/app/auth/interceptors/refresh-token
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
-import { AppAuthService } from 'src/app/shared/services/auth/auth.service';
+import { AuthService } from 'src/app/shared/services/auth/auth.service';
 import { of, BehaviorSubject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -29,7 +29,7 @@ describe('RefreshTokenInterceptor', () => {
     TestBed.configureTestingModule({
       imports: [CookieModule.forRoot(), HttpClientTestingModule],
       providers: [
-        { provide: AppAuthService, useValue: appAuthService },
+        { provide: AuthService, useValue: appAuthService },
         { provide: OcTokenService, useValue: tokenService },
         {
           provide: HTTP_INTERCEPTORS,

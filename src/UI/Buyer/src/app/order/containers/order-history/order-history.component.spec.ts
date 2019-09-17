@@ -9,8 +9,6 @@ import { OrderStatus } from 'src/app/order/models/order-status.model';
 import { of, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { AppStateService } from 'src/app/shared';
-import { FavoriteOrdersService } from 'src/app/shared/services/favorites/favorites.service';
 
 describe('OrderHistoryComponent', () => {
   let component: OrderHistoryComponent;
@@ -38,24 +36,17 @@ describe('OrderHistoryComponent', () => {
     queryParams: new Subject(),
   };
 
-  let favoriteOrdersService = {
-    getFavorites: () => {},
-  };
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [OrderHistoryComponent],
       imports: [ReactiveFormsModule, NgbPaginationModule, NgbModule],
       providers: [
-        { provide: AppStateService, useValue: {} },
         { provide: OcMeService, useValue: meService },
         { provide: Router, useValue: router },
         { provide: ActivatedRoute, useValue: activatedRoute },
-        { provide: FavoriteOrdersService, useValue: favoriteOrdersService },
       ],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
     }).compileComponents();
-    favoriteOrdersService = TestBed.get(FavoriteOrdersService);
   }));
 
   beforeEach(() => {
@@ -165,44 +156,32 @@ describe('OrderHistoryComponent', () => {
       meService.ListOrders.calls.reset();
     });
     it('should call meService.ListOrders with correct parameters', () => {
-      spyOn(component as any, 'buildFavoriteOrdersQuery').and.returnValue(
-        '1|2|3'
-      );
+      spyOn(component as any, 'buildFavoriteOrdersQuery').and.returnValue('1|2|3');
       component['listOrders']()
         .pipe(take(1))
         .subscribe(() => {
           expect(meService.ListOrders).toHaveBeenCalledWith(expected);
         });
-      queryParamMap.next(
-        convertToParamMap(activatedRoute.snapshot.queryParams)
-      );
+      queryParamMap.next(convertToParamMap(activatedRoute.snapshot.queryParams));
     });
   });
 
   describe('buildFavoriteOrdersQuery', () => {
     describe('hasFavoriteOrdersFilter', () => {
       it('should be true if favoriteOrders param is string "true"', () => {
-        component['buildFavoriteOrdersQuery'](
-          convertToParamMap({ favoriteOrders: 'true' })
-        );
+        component['buildFavoriteOrdersQuery'](convertToParamMap({ favoriteOrders: 'true' }));
         expect(component.hasFavoriteOrdersFilter).toBe(true);
       });
       it('should be false if favoriteOrders param is undefined', () => {
-        component['buildFavoriteOrdersQuery'](
-          convertToParamMap({ favoriteOrders: undefined })
-        );
+        component['buildFavoriteOrdersQuery'](convertToParamMap({ favoriteOrders: undefined }));
         expect(component.hasFavoriteOrdersFilter).toBe(false);
       });
       it('should be false if favoriteOrders param is null', () => {
-        component['buildFavoriteOrdersQuery'](
-          convertToParamMap({ favoriteOrders: null })
-        );
+        component['buildFavoriteOrdersQuery'](convertToParamMap({ favoriteOrders: null }));
         expect(component.hasFavoriteOrdersFilter).toBe(false);
       });
       it('should be false if favoriteOrders param does not exist', () => {
-        component['buildFavoriteOrdersQuery'](
-          convertToParamMap({ anotherParam: 'blah' })
-        );
+        component['buildFavoriteOrdersQuery'](convertToParamMap({ anotherParam: 'blah' }));
         expect(component.hasFavoriteOrdersFilter).toBe(false);
       });
     });
@@ -212,30 +191,6 @@ describe('OrderHistoryComponent', () => {
       });
       const queryParamWithoutFavorites = convertToParamMap({
         someParam: 'blah',
-      });
-      it('should be undefined if query param does not include "favoriteOrders"', () => {
-        spyOn(favoriteOrdersService, 'getFavorites').and.returnValue(['ID1']);
-        const result = component['buildFavoriteOrdersQuery'](
-          queryParamWithoutFavorites
-        );
-        expect(result).toBeUndefined();
-      });
-      it('should be undefined if favorites array has a length of 0', () => {
-        spyOn(favoriteOrdersService, 'getFavorites').and.returnValue([]);
-        const result = component['buildFavoriteOrdersQuery'](
-          queryParamWithFavorites
-        );
-        expect(result).toBeUndefined();
-      });
-      it('should be defined if "favoriteOrders" query param is "true" and favorites array has values', () => {
-        spyOn(favoriteOrdersService, 'getFavorites').and.returnValue([
-          'ID1',
-          'ID2',
-        ]);
-        const result = component['buildFavoriteOrdersQuery'](
-          queryParamWithFavorites
-        );
-        expect(result).toBe('ID1|ID2');
       });
     });
   });

@@ -5,7 +5,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { FavoriteOrdersService } from 'src/app/shared/services/favorites/favorites.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('OrderComponent', () => {
@@ -18,10 +17,7 @@ describe('OrderComponent', () => {
     TestBed.configureTestingModule({
       declarations: [FaIconComponent, OrderComponent],
       imports: [RouterTestingModule],
-      providers: [
-        { provide: ActivatedRoute, useValue: activatedRoute },
-        { provide: FavoriteOrdersService, useValue: {} },
-      ],
+      providers: [{ provide: ActivatedRoute, useValue: activatedRoute }],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
     }).compileComponents();
   }));

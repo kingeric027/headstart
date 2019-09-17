@@ -2,11 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { OrderReorderComponent } from 'src/app/order/containers/order-reorder/order-reorder.component';
-import {
-  ModalService,
-  AppReorderService,
-  CartService,
-} from 'src/app/shared';
+import { AppReorderService, CartService } from 'src/app/shared';
 import { of } from 'rxjs';
 
 describe('OrderReorderComponent', () => {
@@ -36,7 +32,6 @@ describe('OrderReorderComponent', () => {
     TestBed.configureTestingModule({
       declarations: [OrderReorderComponent],
       providers: [
-        { provide: ModalService, useValue: modalServiceTest },
         { provide: AppReorderService, useValue: AppReorderServiceTest },
         { provide: CartService, useValue: AppLineItemServiceTest },
       ],
@@ -90,7 +85,6 @@ describe('OrderReorderComponent', () => {
         })
       );
       fixture.detectChanges();
-      component.reorderResponse$ = AppReorderServiceTest.order();
       component.ngOnInit();
       component.addToCart();
       expect(AppLineItemServiceTest.addToCart).not.toHaveBeenCalled();

@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CheckoutConfirmComponent } from 'src/app/checkout/components/checkout-confirm/checkout-confirm.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
-import { AppStateService, CartService } from 'src/app/shared';
+import { CartService } from 'src/app/shared';
 import { AppPaymentService } from 'src/app/shared/services/app-payment-service/app-payment.service';
 import { FormBuilder } from '@angular/forms';
 import { OcOrderService } from '@ordercloud/angular-sdk';
@@ -22,9 +22,7 @@ describe('CheckoutConfirmComponent', () => {
     listAllItems: jasmine.createSpy('listAllItems').and.returnValue(of(null)),
   };
   const orderService = {
-    Patch: jasmine
-      .createSpy('Patch')
-      .and.returnValue(of({ ...mockOrder, Comments: 'comment' })),
+    Patch: jasmine.createSpy('Patch').and.returnValue(of({ ...mockOrder, Comments: 'comment' })),
   };
 
   beforeEach(async(() => {
@@ -33,7 +31,6 @@ describe('CheckoutConfirmComponent', () => {
       providers: [
         FormBuilder,
         { provide: OcOrderService, useValue: orderService },
-        { provide: AppStateService, useValue: appStateService },
         { provide: AppPaymentService, useValue: appPaymentService },
         { provide: CartService, useValue: ocLineItemService },
         { provide: applicationConfiguration, useValue: mockConfig },
@@ -58,10 +55,7 @@ describe('CheckoutConfirmComponent', () => {
     });
     it('should call the right services', () => {
       expect(component.form).toBeTruthy();
-      expect(appPaymentService.getPayments).toHaveBeenCalledWith(
-        'outgoing',
-        mockOrder.ID
-      );
+      expect(appPaymentService.getPayments).toHaveBeenCalledWith('outgoing', mockOrder.ID);
       expect(ocLineItemService.listAllItems).toHaveBeenCalledWith(mockOrder.ID);
     });
   });
@@ -72,11 +66,7 @@ describe('CheckoutConfirmComponent', () => {
       spyOn(component.continue, 'emit');
       component.form.setValue({ comments: 'comment' });
       component.saveCommentsAndSubmitOrder();
-      expect(orderService.Patch).toHaveBeenCalledWith(
-        'outgoing',
-        mockOrder.ID,
-        { Comments: 'comment' }
-      );
+      expect(orderService.Patch).toHaveBeenCalledWith('outgoing', mockOrder.ID, { Comments: 'comment' });
       expect(appStateService.orderSubject.next).toHaveBeenCalledWith({
         ...mockOrder,
         Comments: 'comment',
