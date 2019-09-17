@@ -3,7 +3,7 @@ import { Input } from '@angular/core';
 import { Observable } from 'rxjs';
 
 export class OCMComponent {
-  // todo: the issue is that ngOnInit fires befoer inputs are ready come up with a better way to do this.
+  // todo: the issue is that ngOnInit fires before inputs are ready. come up with a better way to do this.
   observersSet: boolean;
   @Input() context: IShopperContext;
 }
@@ -28,9 +28,11 @@ export interface ICartActions {
 }
 
 export interface IRouteActions {
+  onUrlChange: (callback: (path: string) => void) => void;
   toProductDetails: (productID: string) => void;
   toProductList: (options?: ProductFilters) => void;
   toCheckout: () => void;
+  toHome: () => void;
   toCart: () => void;
   toLogin: () => void;
   toRegister: () => void;

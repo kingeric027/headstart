@@ -2,12 +2,13 @@ import { Component, OnDestroy, Input, EventEmitter, Output, OnChanges, OnInit } 
 import { FormGroup, FormControl } from '@angular/forms';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { debounceTime, takeWhile, filter } from 'rxjs/operators';
+import { OCMComponent } from '@app-buyer/ocm-default-components/shopper-context';
 
 @Component({
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })
-export class OCMSearch implements OnInit, OnChanges, OnDestroy {
+export class OCMSearch extends OCMComponent implements OnInit, OnChanges, OnDestroy {
   alive = true;
   @Input() placeholderText?: string;
   @Input() searchTermInput?: string;
@@ -16,8 +17,6 @@ export class OCMSearch implements OnInit, OnChanges, OnDestroy {
   faTimes = faTimes;
   form: FormGroup;
   previousSearchTerm = '';
-
-  constructor() {}
 
   ngOnInit() {
     this.buildForm();

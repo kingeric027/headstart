@@ -15,7 +15,7 @@ import { OCMOrderSummary } from './components/order-summary/order-summary.compon
 import { OCMLineitemTable } from './components/lineitem-table/lineitem-table.component';
 import { OCMCart } from './components/cart/cart.component';
 import { OCMHomePage } from './components/home/home.component';
-import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { OCMProductSort } from './components/sort-products/sort-products.component';
 import { OCMCategoryTree } from './components/category-tree/category-tree.component';
 import { TreeModule } from 'angular-tree-component';
@@ -25,6 +25,7 @@ import { OCMProductList } from './components/product-list/product-list.component
 import { OCMSearch } from './components/search/search.component';
 import { OCMMiniCart } from './components/mini-cart/mini-cart.component';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs/product-name-with-specs.pipe';
+import { OCMAppHeader } from './components/app-header/app-header.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -48,6 +49,7 @@ import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs/produc
     OCMSearch,
     OCMMiniCart,
     ProductNameWithSpecsPipe,
+    OCMAppHeader,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -68,6 +70,7 @@ import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs/produc
     OCMProductList,
     OCMSearch,
     OCMMiniCart,
+    OCMAppHeader,
   ],
   imports: [
     CommonModule,
@@ -79,6 +82,7 @@ import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs/produc
     TreeModule,
     NgbCollapseModule,
     NgbPaginationModule,
+    NgbPopoverModule,
   ],
 })
 export class OcmDefaultComponentsModule {
@@ -102,6 +106,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMProductList, 'ocm-product-list');
     this.buildWebComponent(OCMSearch, 'ocm-search');
     this.buildWebComponent(OCMMiniCart, 'ocm-mini-cart');
+    this.buildWebComponent(OCMAppHeader, 'ocm-app-header');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

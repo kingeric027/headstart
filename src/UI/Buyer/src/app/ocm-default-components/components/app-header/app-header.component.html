@@ -2,26 +2,16 @@
 <nav class="navbar navbar-expand navbar-light bg-white"
      *ngIf="showHeader">
   <div class="container">
-
-    <a class="navbar-brand"
-       routerLink="/home">
+    <a class="navbar-brand clickable"
+       (click)="context.routeActions.toHome()">
       <span class="d-none d-md-inline">{{appName}}</span>
       <span class="d-md-none">OCS</span>
     </a>
-
     <ul class="navbar-nav mr-auto">
-
-      <li class="nav-item"
-          routerLinkActive="active">
+      <li class="nav-item clickable"
+          [ngClass]="{'active': activePath === '/products'}">
         <a class="nav-link"
-           routerLink="/home">
-          Home
-        </a>
-      </li>
-      <li class="nav-item"
-          routerLinkActive="active">
-        <a class="nav-link"
-           routerLink="/products">
+           (click)="context.routeActions.toProductList()">
           Shop
         </a>
       </li>
@@ -29,9 +19,9 @@
     <div class="form-inline"
          *ngIf="anonymous">
       <a class="btn btn-sm btn-outline-dark"
-         routerLink="/login">Login</a>
+         (click)="context.routeActions.toLogin()">Login</a>
       <a class="btn btn-sm btn-primary d-none d-sm-block ml-2"
-         routerLink="/register">Register</a>
+         (click)="context.routeActions.toRegister()">Register</a>
     </div>
     <ul class="navbar-nav"
         *ngIf="!anonymous">
@@ -40,7 +30,6 @@
           placement="bottom-right">
         <div class="nav-link dropdown-toggle text-nowrap"
              id="account-dropdown"
-             routerLinkActive="active"
              ngbDropdownToggle>
           <fa-icon [icon]="faUserCircle"></fa-icon>
           <span class="d-none d-md-inline">
@@ -52,20 +41,20 @@
              ngbDropdownMenu>
           <h6 class="dropdown-header">Hi, {{ user?.FirstName }}!</h6>
           <a class="dropdown-item"
-             routerLinkActive="active"
-             routerLink="/profile/details">My Profile</a>
+             [ngClass]="{'active': activePath === '/profile/details'}"
+             (click)="context.routeActions.toMyProfile()">My Profile</a>
           <a class="dropdown-item"
-             routerLinkActive="active"
-             routerLink="/profile/addresses">Address Book</a>
+             [ngClass]="{'active': activePath === '/profile/addresses'}"
+             (click)="context.routeActions.toMyAddresses()">Address Book</a>
           <a class="dropdown-item"
-             routerLinkActive="active"
-             routerLink="/profile/payment-methods">Payment Methods</a>
+             [ngClass]="{'active': activePath === '/profile/payment-methods'}"
+             (click)="context.routeActions.toMyPaymentMethods()">Payment Methods</a>
           <a class="dropdown-item"
-             routerLinkActive="active"
-             routerLink="/profile/orders">My Orders</a>
+             [ngClass]="{'active': activePath === '/profile/orders'}"
+             (click)="context.routeActions.toMyOrders()">My Orders</a>
           <a class="dropdown-item"
-             routerLinkActive="active"
-             routerLink="/profile/orders/approval">Orders To Approve</a>
+             [ngClass]="{'active': activePath === '/profile/orders/approval'}"
+             (click)="context.routeActions.toOrdersToApprove()">Orders To Approve</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item"
              (click)="logout()"
@@ -102,9 +91,9 @@
                          (navigate)="popover.close()">
           </ocm-mini-cart>
         </ng-template>
-        <a class="nav-link text-nowrap"
-           routerLink="/cart"
-           routerLinkActive="active"
+        <a class="nav-link text-nowrap clickable"
+           [ngClass]="{'active': activePath === '/cart'}"
+           (click)="context.routeActions.toCart()"
            ngbPopover="Item(s) Added to Cart"
            placement="bottom"
            triggers="manual"

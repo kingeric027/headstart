@@ -1,21 +1,37 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { IRouteActions, ProductFilters } from '@app-buyer/ocm-default-components/shopper-context';
 import { ProductFilterService } from '../product-filter/product-filter.service';
+import { filter, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RouteService implements IRouteActions {
+  currentPath: any;
+
   constructor(private router: Router, private productFilterService: ProductFilterService) {}
+
+  onUrlChange(callback: (path: string) => void): void {
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationEnd),
+        map((e) => (e as any).url)
+      )
+      .subscribe(callback);
+  }
 
   toProductDetails(productID: string): void {
     this.router.navigateByUrl(`/products/${productID}`);
   }
 
-  toProductList(options: ProductFilters = null): void {
+  toProductList(options: ProductFilters = {}): void {
     const queryParams = this.productFilterService.mapToUrlQueryParams(options);
     this.router.navigate(['/products'], { queryParams });
+  }
+
+  toHome() {
+    this.router.navigateByUrl('/home');
   }
 
   toCheckout(): void {
@@ -51,6 +67,6 @@ export class RouteService implements IRouteActions {
   }
 
   toOrdersToApprove(): void {
-    this.router.navigateByUrl('/profile/approval');
+    this.router.navigateByUrl('/profile/orders/approval');
   }
 }
