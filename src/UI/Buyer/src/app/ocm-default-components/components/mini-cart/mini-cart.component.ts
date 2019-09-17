@@ -7,8 +7,8 @@ import { OCMComponent } from '@app-buyer/ocm-default-components/shopper-context'
   templateUrl: './mini-cart.component.html',
 })
 export class OCMMiniCart extends OCMComponent implements OnChanges {
-  @Output() navigate = new EventEmitter();
-  @Input() lineItems: LineItem[] = [];
+  @Output() navigate = new EventEmitter(); // to do, use context on pathChange instead?
+  lineItems: LineItem[] = [];
   order: Order = {};
   maxLines = 5; // Limit the height for UI purposes
   faEllipsisH = faEllipsisH;
