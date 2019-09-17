@@ -44,7 +44,7 @@ import { OcmComponentsModule } from 'ocm-components';
   imports: [
     // angular core modules
     BrowserAnimationsModule,
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
 
     // app modules
     AppRoutingModule,
