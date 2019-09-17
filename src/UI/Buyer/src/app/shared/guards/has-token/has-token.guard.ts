@@ -2,12 +2,12 @@ import { Injectable, Inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import * as jwtDecode from 'jwt-decode';
-import { DecodedOrderCloudToken } from '@app-buyer/shared';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
+import { DecodedOrderCloudToken } from 'src/app/shared';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { of, Observable } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
-import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
-import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
+import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
+import { AuthService } from 'src/app/shared/services/auth/auth.service';
 
 @Injectable({
   providedIn: 'root',

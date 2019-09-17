@@ -1,12 +1,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-import { OrderReorderComponent } from '@app-buyer/order/containers/order-reorder/order-reorder.component';
+import { OrderReorderComponent } from 'src/app/order/containers/order-reorder/order-reorder.component';
 import {
   ModalService,
   AppReorderService,
   CartService,
-} from '@app-buyer/shared';
+} from 'src/app/shared';
 import { of } from 'rxjs';
 
 describe('OrderReorderComponent', () => {

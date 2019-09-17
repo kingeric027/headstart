@@ -2,7 +2,7 @@ import { Component, OnDestroy, Input, EventEmitter, Output, OnChanges, OnInit } 
 import { FormGroup, FormControl } from '@angular/forms';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { debounceTime, takeWhile, filter } from 'rxjs/operators';
-import { OCMComponent } from '@app-buyer/ocm-default-components/shopper-context';
+import { OCMComponent } from 'src/app/ocm-default-components/shopper-context';
 
 @Component({
   templateUrl: './search.component.html',

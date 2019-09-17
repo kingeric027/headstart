@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { PaymentBaseComponent } from '@app-buyer/checkout/components/payment-base/payment-base.component';
+import { PaymentBaseComponent } from 'src/app/checkout/components/payment-base/payment-base.component';
 import { Observable } from 'rxjs';
 import { SpendingAccount, ListSpendingAccount, OcMeService, Payment } from '@ordercloud/angular-sdk';
 import * as moment from 'moment';
-import { IModalComponent } from '@app-buyer/shared/components/modal/modal.component';
+import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'checkout-payment-spending-account',

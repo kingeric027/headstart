@@ -1,8 +1,8 @@
 import { TestBed, async } from '@angular/core/testing';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 
-import { BaseResolveService } from '@app-buyer/shared/services/current-order/current-order.service';
-import { applicationConfiguration } from '@app-buyer/config/app.config';
+import { BaseResolveService } from 'src/app/shared/services/current-order/current-order.service';
+import { applicationConfiguration } from 'src/app/config/app.config';
 
 import { OcAuthService, Configuration } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';

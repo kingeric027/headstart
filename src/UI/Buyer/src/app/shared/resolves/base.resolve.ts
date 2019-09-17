@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
-import { CurrentOrderService } from '@app-buyer/shared/services/current-order/current-order.service';
+import { CurrentOrderService } from 'src/app/shared/services/current-order/current-order.service';
 import { CurrentUserService } from '../services/current-user/current-user.service';
 
 @Injectable({

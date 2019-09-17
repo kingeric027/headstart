@@ -1,9 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreditCardFormComponent } from '@app-buyer/shared/components/credit-card-form/credit-card-form.component';
+import { CreditCardFormComponent } from 'src/app/shared/components/credit-card-form/credit-card-form.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { AppFormErrorService } from '@app-buyer/shared';
+import { AppFormErrorService } from 'src/app/shared';
 
 describe('CreditCardFormComponent', () => {
   let component: CreditCardFormComponent;

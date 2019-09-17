@@ -1,8 +1,8 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { ListOrder } from '@ordercloud/angular-sdk';
-import { OrderListColumn } from '@app-buyer/order/models/order-list-column';
+import { OrderListColumn } from 'src/app/order/models/order-list-column';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
-import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'order-list',

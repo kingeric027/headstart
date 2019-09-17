@@ -1,10 +1,10 @@
 import { NgModule, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { OrderDetailsComponent } from '@app-buyer/order/containers/order-detail/order-detail.component';
-import { OrderComponent } from '@app-buyer/order/containers/order/order.component';
-import { OrderShipmentsComponent } from '@app-buyer/order/containers/order-shipments/order-shipments.component';
-import { ShipmentsResolve } from '@app-buyer/order/shipments.resolve';
-import { OrderResolve } from '@app-buyer/order/order.resolve';
+import { OrderDetailsComponent } from 'src/app/order/containers/order-detail/order-detail.component';
+import { OrderComponent } from 'src/app/order/containers/order/order.component';
+import { OrderShipmentsComponent } from 'src/app/order/containers/order-shipments/order-shipments.component';
+import { ShipmentsResolve } from 'src/app/order/shipments.resolve';
+import { OrderResolve } from 'src/app/order/order.resolve';
 
 @Component({
   template: '<order-history [approvalVersion]="false"></order-history>',

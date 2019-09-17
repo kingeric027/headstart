@@ -3,11 +3,11 @@ import { Injectable, Inject } from '@angular/core';
 
 // third party
 import { OcMeService, Order, OcOrderService, ListLineItem, OcLineItemService } from '@ordercloud/angular-sdk';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { BehaviorSubject } from 'rxjs';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { listAll } from '@app-buyer/shared/functions/listAll';
-import { ICurrentOrder } from '@app-buyer/ocm-default-components/shopper-context';
+import { listAll } from 'src/app/shared/functions/listAll';
+import { ICurrentOrder } from 'src/app/ocm-default-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',

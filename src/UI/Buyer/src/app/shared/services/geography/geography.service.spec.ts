@@ -1,6 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
 
-import { AppGeographyService } from '@app-buyer/shared/services/geography/geography.service';
+import { AppGeographyService } from 'src/app/shared/services/geography/geography.service';
 
 describe('OcGeographyService', () => {
   beforeEach(() => {

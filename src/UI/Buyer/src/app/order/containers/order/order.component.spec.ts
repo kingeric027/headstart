@@ -1,11 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrderComponent } from '@app-buyer/order/containers/order/order.component';
+import { OrderComponent } from 'src/app/order/containers/order/order.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { FavoriteOrdersService } from '@app-buyer/shared/services/favorites/favorites.service';
+import { FavoriteOrdersService } from 'src/app/shared/services/favorites/favorites.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('OrderComponent', () => {

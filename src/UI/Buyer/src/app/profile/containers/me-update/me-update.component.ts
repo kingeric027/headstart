@@ -2,11 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { OcMeService, MeUser } from '@ordercloud/angular-sdk';
-import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
-import { RegexService } from '@app-buyer/shared/services/regex/regex.service';
-import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
-import { IModalComponent } from '@app-buyer/shared/components/modal/modal.component';
-import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
+import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
+import { RegexService } from 'src/app/shared/services/regex/regex.service';
+import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
+import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { AuthService } from 'src/app/shared/services/auth/auth.service';
 
 @Component({
   selector: 'profile-meupdate',

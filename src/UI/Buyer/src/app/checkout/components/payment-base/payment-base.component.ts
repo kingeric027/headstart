@@ -1,6 +1,6 @@
 import { Input, EventEmitter, Output } from '@angular/core';
 import { Payment, Order, PartialPayment } from '@ordercloud/angular-sdk';
-import { PaymentMethod } from '@app-buyer/shared/models/payment-method.enum';
+import { PaymentMethod } from 'src/app/shared/models/payment-method.enum';
 import { FormGroup } from '@angular/forms';
 
 export class PaymentBaseComponent {

@@ -5,12 +5,12 @@ import { Router } from '@angular/router';
 
 // 3rd party
 import { OcTokenService, OcAuthService, AccessToken } from '@ordercloud/angular-sdk';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { CookieService } from 'ngx-cookie';
-import { AppErrorHandler } from '@app-buyer/config/error-handling.config';
-import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
-import { CurrentOrderService } from '@app-buyer/shared/services/current-order/current-order.service';
-import { IAuthActions } from '@app-buyer/ocm-default-components/shopper-context';
+import { AppErrorHandler } from 'src/app/config/error-handling.config';
+import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
+import { CurrentOrderService } from 'src/app/shared/services/current-order/current-order.service';
+import { IAuthActions } from 'src/app/ocm-default-components/shopper-context';
 
 export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possible';
 @Injectable({

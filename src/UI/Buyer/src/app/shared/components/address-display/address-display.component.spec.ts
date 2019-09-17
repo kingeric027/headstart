@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddressDisplayComponent } from '@app-buyer/shared/components/address-display/address-display.component';
+import { AddressDisplayComponent } from 'src/app/shared/components/address-display/address-display.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('AddressDisplayComponent', () => {

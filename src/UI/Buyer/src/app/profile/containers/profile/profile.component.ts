@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ProfileTab } from '@app-buyer/profile/models/profile-tabs.enum';
-import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
+import { ProfileTab } from 'src/app/profile/models/profile-tabs.enum';
+import { AuthService } from 'src/app/shared/services/auth/auth.service';
 @Component({
   selector: 'profile-profile',
   templateUrl: './profile.component.html',

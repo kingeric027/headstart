@@ -4,7 +4,7 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { CacheInterceptor } from '@app-buyer/auth/interceptors/cache/cache-interceptor';
+import { CacheInterceptor } from 'src/app/auth/interceptors/cache/cache-interceptor';
 
 describe('CacheInterceptor', () => {
   let interceptor;

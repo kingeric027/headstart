@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { HasTokenGuard } from '@app-buyer/shared/guards/has-token/has-token.guard';
+import { HasTokenGuard } from 'src/app/shared/guards/has-token/has-token.guard';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
-import { AppAuthService } from '@app-buyer/auth';
+import { AppAuthService } from 'src/app/auth';
 import { of } from 'rxjs';
-import { applicationConfiguration } from '@app-buyer/config/app.config';
-import { AppStateService } from '@app-buyer/shared/services/app-state/app-state.service';
+import { applicationConfiguration } from 'src/app/config/app.config';
+import { AppStateService } from 'src/app/shared/services/app-state/app-state.service';
 
 describe('HasTokenGuard', () => {
   let guard: HasTokenGuard;

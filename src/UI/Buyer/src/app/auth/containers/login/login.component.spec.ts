@@ -5,16 +5,16 @@ import { InjectionToken } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { of, BehaviorSubject } from 'rxjs';
 
-import { LoginComponent } from '@app-buyer/auth/containers/login/login.component';
+import { LoginComponent } from 'src/app/auth/containers/login/login.component';
 import {
   applicationConfiguration,
   AppConfig,
-} from '@app-buyer/config/app.config';
+} from 'src/app/config/app.config';
 
 import { OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
-import { AppAuthService } from '@app-buyer/auth';
-import { AppStateService } from '@app-buyer/shared';
+import { AppAuthService } from 'src/app/auth';
+import { AppStateService } from 'src/app/shared';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;

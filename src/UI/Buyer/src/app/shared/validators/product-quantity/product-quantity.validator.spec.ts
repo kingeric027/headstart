@@ -1,4 +1,4 @@
-import { ProductQtyValidator } from '@app-buyer/shared/validators/product-quantity/product.quantity.validator';
+import { ProductQtyValidator } from 'src/app/shared/validators/product-quantity/product.quantity.validator';
 import { FormControl } from '@angular/forms';
 
 describe('ProductQtyValidator', () => {

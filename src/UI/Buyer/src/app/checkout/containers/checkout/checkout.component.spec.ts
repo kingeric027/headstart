@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CheckoutComponent } from '@app-buyer/checkout/containers/checkout/checkout.component';
-import { AppStateService, BaseResolveService } from '@app-buyer/shared';
+import { CheckoutComponent } from 'src/app/checkout/containers/checkout/checkout.component';
+import { AppStateService, BaseResolveService } from 'src/app/shared';
 import {
   NgbAccordion,
   NgbPanel,
@@ -12,7 +12,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { of, BehaviorSubject } from 'rxjs';
 import { OcOrderService, OcPaymentService } from '@ordercloud/angular-sdk';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { AppErrorHandler } from '@app-buyer/config/error-handling.config';
+import { AppErrorHandler } from 'src/app/config/error-handling.config';
 import { Router } from '@angular/router';
 
 describe('CheckoutComponent', () => {

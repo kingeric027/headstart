@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgbDateAdapter, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
-import { NgbDateNativeAdapter, NgbDateCustomParserFormatter } from '@app-buyer/config/date-picker.config';
+import { NgbDateNativeAdapter, NgbDateCustomParserFormatter } from 'src/app/config/date-picker.config';
 import { CurrentUserService } from './shared/services/current-user/current-user.service';
 
 @Component({

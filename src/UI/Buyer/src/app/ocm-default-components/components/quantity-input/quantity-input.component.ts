@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angu
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { get as _get } from 'lodash';
-import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
+import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
 import { OCMComponent } from '../../shopper-context';
 
 @Component({

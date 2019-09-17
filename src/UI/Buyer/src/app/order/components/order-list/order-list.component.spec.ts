@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrderListComponent } from '@app-buyer/order/components/order-list/order-list.component';
+import { OrderListComponent } from 'src/app/order/components/order-list/order-list.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   NgbPaginationModule,
@@ -10,9 +10,9 @@ import {
 import {
   NgbDateNativeAdapter,
   NgbDateCustomParserFormatter,
-} from '@app-buyer/config/date-picker.config';
+} from 'src/app/config/date-picker.config';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { FavoriteOrdersService } from '@app-buyer/shared/services/favorites/favorites.service';
+import { FavoriteOrdersService } from 'src/app/shared/services/favorites/favorites.service';
 
 describe('OrderListComponent', () => {
   let component: OrderListComponent;

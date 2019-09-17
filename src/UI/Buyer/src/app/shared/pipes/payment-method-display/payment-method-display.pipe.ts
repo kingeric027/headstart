@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import {
   PaymentMethod,
   PaymentMethodMap,
-} from '@app-buyer/shared/models/payment-method.enum';
+} from 'src/app/shared/models/payment-method.enum';
 
 @Pipe({
   name: 'paymentMethodDisplay',

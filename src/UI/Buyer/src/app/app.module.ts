@@ -10,27 +10,27 @@ import { NgProgressHttpModule } from '@ngx-progressbar/http';
 import { CookieModule } from 'ngx-cookie';
 import { ToastrModule } from 'ngx-toastr';
 import { OrderCloudModule } from '@ordercloud/angular-sdk';
-import { OcSDKConfig } from '@app-buyer/config/ordercloud-sdk.config';
+import { OcSDKConfig } from 'src/app/config/ordercloud-sdk.config';
 
 // app modules
-import { SharedModule } from '@app-buyer/shared';
-import { LayoutModule } from '@app-buyer/layout/layout.module';
-import { AuthModule } from '@app-buyer/auth/auth.module';
-import { AppRoutingModule } from '@app-buyer/app-routing.module';
+import { SharedModule } from 'src/app/shared';
+import { LayoutModule } from 'src/app/layout/layout.module';
+import { AuthModule } from 'src/app/auth/auth.module';
+import { AppRoutingModule } from 'src/app/app-routing.module';
 
 // app component
-import { AppComponent } from '@app-buyer/app.component';
+import { AppComponent } from 'src/app/app.component';
 
 // static pages
 import { SupportComponent } from './static-pages/support/support.component';
 import { FaqComponent } from './static-pages/faq/faq.component';
 
 // interceptors
-import { AutoAppendTokenInterceptor, RefreshTokenInterceptor, CacheInterceptor } from '@app-buyer/auth';
+import { AutoAppendTokenInterceptor, RefreshTokenInterceptor, CacheInterceptor } from 'src/app/auth';
 
 // date picker config
 import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
-import { NgbDateNativeAdapter } from '@app-buyer/config/date-picker.config';
+import { NgbDateNativeAdapter } from 'src/app/config/date-picker.config';
 import { TermsAndConditionsComponent } from './static-pages/terms-and-conditions/terms-and-conditions.component';
 
 // error handler config

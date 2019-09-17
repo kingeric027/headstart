@@ -1,13 +1,13 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
-import { CheckoutSectionBaseComponent } from '@app-buyer/checkout/components/checkout-section-base/checkout-section-base.component';
-import { CurrentOrderService } from '@app-buyer/shared';
+import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
+import { CurrentOrderService } from 'src/app/shared';
 import { Order, ListPayment, ListLineItem, OcOrderService, OcLineItemService } from '@ordercloud/angular-sdk';
 import { Observable } from 'rxjs';
-import { AppPaymentService } from '@app-buyer/shared/services/app-payment-service/app-payment.service';
+import { AppPaymentService } from 'src/app/shared/services/app-payment-service/app-payment.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
-import { listAll } from '@app-buyer/shared/functions/listAll';
-import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
+import { listAll } from 'src/app/shared/functions/listAll';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'checkout-confirm',

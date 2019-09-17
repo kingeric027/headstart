@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
-import { SearchComponent } from '@app-buyer/ocm-default-components/search/search.component';
+import { SearchComponent } from 'src/app/ocm-default-components/components/search/search.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { Subject } from 'rxjs';

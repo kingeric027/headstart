@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { ListBuyerProduct, ListCategory, OcMeService } from '@ordercloud/angular-sdk';
-import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
-import { BuildQtyLimits } from '@app-buyer/shared';
-import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { BuildQtyLimits } from 'src/app/shared';
+import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
 
 @Component({
   selector: 'product-list-wrapper',

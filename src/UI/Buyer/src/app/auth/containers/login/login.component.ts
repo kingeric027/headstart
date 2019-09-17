@@ -5,9 +5,9 @@ import { Router } from '@angular/router';
 
 // ordercloud
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
-import { AuthService } from '@app-buyer/shared/services/auth/auth.service';
-import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
+import { AuthService } from 'src/app/shared/services/auth/auth.service';
+import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'auth-login',

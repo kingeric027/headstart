@@ -1,6 +1,6 @@
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { get as _get } from 'lodash';
-import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
+import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
 
 export function BuildQtyLimits(product: BuyerProduct): QuantityLimits {
   const inventory = getInventory(product);

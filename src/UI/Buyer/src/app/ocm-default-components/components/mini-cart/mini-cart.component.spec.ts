@@ -1,9 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MiniCartComponent } from './mini-cart.component';
-import { AppStateService } from '@app-buyer/shared/services/app-state/app-state.service';
+import { AppStateService } from 'src/app/shared/services/app-state/app-state.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { CartService } from '@app-buyer/shared/services/cart/cart.service';
+import { CartService } from 'src/app/shared/services/cart/cart.service';
 import { of } from 'rxjs';
 
 describe('MiniCartComponent', () => {

@@ -1,10 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { AddressFormComponent } from '@app-buyer/shared/components/address-form/address-form.component';
+import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { AppGeographyService } from '@app-buyer/shared';
+import { AppGeographyService } from 'src/app/shared';
 import { of } from 'rxjs';
 import { OcMeService } from '@ordercloud/angular-sdk';
-import { AppFormErrorService } from '@app-buyer/shared';
+import { AppFormErrorService } from 'src/app/shared';
 
 describe('AddressFormComponent', () => {
   let component: AddressFormComponent;

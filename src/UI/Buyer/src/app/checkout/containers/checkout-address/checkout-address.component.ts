@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, ViewChild, AfterViewInit } from '@angular/core';
-import { CheckoutSectionBaseComponent } from '@app-buyer/checkout/components/checkout-section-base/checkout-section-base.component';
+import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
 import { Observable } from 'rxjs';
 import { OcMeService, ListBuyerAddress, OcOrderService, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
-import { CurrentOrderService } from '@app-buyer/shared';
+import { CurrentOrderService } from 'src/app/shared';
 import { ToastrService } from 'ngx-toastr';
-import { AddressFormComponent } from '@app-buyer/shared/components/address-form/address-form.component';
-import { IModalComponent } from '@app-buyer/shared/components/modal/modal.component';
+import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
+import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'checkout-address',

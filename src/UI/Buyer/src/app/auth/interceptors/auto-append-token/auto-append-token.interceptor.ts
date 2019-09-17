@@ -10,7 +10,7 @@ import { OcTokenService } from '@ordercloud/angular-sdk';
 import {
   applicationConfiguration,
   AppConfig,
-} from '@app-buyer/config/app.config';
+} from 'src/app/config/app.config';
 
 /**
  * automatically append token to the authorization header

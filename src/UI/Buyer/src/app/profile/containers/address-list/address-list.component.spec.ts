@@ -1,11 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddressListComponent } from '@app-buyer/profile/containers/address-list/address-list.component';
+import { AddressListComponent } from 'src/app/profile/containers/address-list/address-list.component';
 import {
   FaIconComponent,
   FontAwesomeModule,
 } from '@fortawesome/angular-fontawesome';
-import { ModalService } from '@app-buyer/shared';
+import { ModalService } from 'src/app/shared';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';

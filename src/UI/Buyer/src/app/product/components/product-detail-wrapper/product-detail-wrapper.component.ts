@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
-import { BuildQtyLimits } from '@app-buyer/shared';
-import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
-import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
-import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
+import { BuildQtyLimits } from 'src/app/shared';
+import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
+import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'product-detail-wrapper',

@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { forEach as _forEach } from 'lodash';
 
-import { CartService, AppReorderService } from '@app-buyer/shared';
-import { OrderReorderResponse } from '@app-buyer/shared/services/reorder/reorder.interface';
+import { CartService, AppReorderService } from 'src/app/shared';
+import { OrderReorderResponse } from 'src/app/shared/services/reorder/reorder.interface';
 import { LineItem } from '@ordercloud/angular-sdk';
-import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
-import { IModalComponent } from '@app-buyer/shared/components/modal/modal.component';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'order-reorder',

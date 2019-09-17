@@ -1,4 +1,4 @@
-import { ValidateStrongPassword } from '@app-buyer/shared/validators/strong-password/strong-password.validator';
+import { ValidateStrongPassword } from 'src/app/shared/validators/strong-password/strong-password.validator';
 import { FormControl } from '@angular/forms';
 
 describe('ValidateStrongPassword Validator', () => {

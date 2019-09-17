@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import {
   OrderStatus,
   OrderStatusMap,
-} from '@app-buyer/order/models/order-status.model';
+} from 'src/app/order/models/order-status.model';
 
 @Pipe({
   name: 'orderStatusDisplay',

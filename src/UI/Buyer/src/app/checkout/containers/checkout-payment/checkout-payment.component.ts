@@ -1,10 +1,10 @@
 import { Component, OnInit, Input, Inject } from '@angular/core';
-import { CheckoutSectionBaseComponent } from '@app-buyer/checkout/components/checkout-section-base/checkout-section-base.component';
+import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
 import { OcPaymentService, Payment, PartialPayment } from '@ordercloud/angular-sdk';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { CurrentOrderService } from '@app-buyer/shared';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
-import { PaymentMethod } from '@app-buyer/shared/models/payment-method.enum';
+import { CurrentOrderService } from 'src/app/shared';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
+import { PaymentMethod } from 'src/app/shared/models/payment-method.enum';
 import { flatMap, tap } from 'rxjs/operators';
 import { forkJoin, Observable, of } from 'rxjs';
 

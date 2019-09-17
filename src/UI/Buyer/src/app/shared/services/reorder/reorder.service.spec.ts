@@ -1,8 +1,8 @@
 import { async, TestBed } from '@angular/core/testing';
-import { AppReorderService } from '@app-buyer/shared/services/reorder/reorder.service';
+import { AppReorderService } from 'src/app/shared/services/reorder/reorder.service';
 import { OcMeService } from '@ordercloud/angular-sdk';
 import { of } from 'rxjs';
-import { CartService } from '@app-buyer/shared/services/cart/cart.service';
+import { CartService } from 'src/app/shared/services/cart/cart.service';
 
 describe('ReOrder Service', () => {
   const mockLineItems = {

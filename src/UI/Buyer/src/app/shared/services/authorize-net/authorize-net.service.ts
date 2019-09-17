@@ -3,14 +3,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
   AppConfig,
   applicationConfiguration,
-} from '@app-buyer/config/app.config';
+} from 'src/app/config/app.config';
 import { Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 import {
   CreateCardDetails,
   AuthorizeCardSuccess,
   CreateCardResponse,
-} from '@app-buyer/shared/services/authorize-net/authorize-net.interface';
+} from 'src/app/shared/services/authorize-net/authorize-net.interface';
 import {
   OcTokenService,
   Payment,

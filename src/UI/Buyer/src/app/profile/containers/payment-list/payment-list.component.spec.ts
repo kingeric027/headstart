@@ -1,11 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PaymentListComponent } from '@app-buyer/profile/containers/payment-list/payment-list.component';
+import { PaymentListComponent } from 'src/app/profile/containers/payment-list/payment-list.component';
 import { OcMeService } from '@ordercloud/angular-sdk';
-import { AuthorizeNetService, CreateCardDetails } from '@app-buyer/shared';
+import { AuthorizeNetService, CreateCardDetails } from 'src/app/shared';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of } from 'rxjs';
-import { CreditCardIconComponent } from '@app-buyer/shared/components/credit-card-icon/credit-card-icon.component';
+import { CreditCardIconComponent } from 'src/app/shared/components/credit-card-icon/credit-card-icon.component';
 
 describe('PaymentListComponent', () => {
   let component: PaymentListComponent;

@@ -6,7 +6,7 @@ import {
   tick,
 } from '@angular/core/testing';
 
-import { DateFilterComponent } from '@app-buyer/order/components/date-filter/date-filter.component';
+import { DateFilterComponent } from 'src/app/order/components/date-filter/date-filter.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
   NgbDateParserFormatter,
@@ -17,8 +17,8 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   NgbDateNativeAdapter,
   NgbDateCustomParserFormatter,
-} from '@app-buyer/config/date-picker.config';
-import { AppFormErrorService } from '@app-buyer/shared';
+} from 'src/app/config/date-picker.config';
+import { AppFormErrorService } from 'src/app/shared';
 import { DatePipe } from '@angular/common';
 
 describe('DateFilterComponent', () => {

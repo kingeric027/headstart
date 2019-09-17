@@ -1,15 +1,15 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { CheckoutPaymentComponent } from '@app-buyer/checkout/containers/checkout-payment/checkout-payment.component';
+import { CheckoutPaymentComponent } from 'src/app/checkout/containers/checkout-payment/checkout-payment.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OcPaymentService, Payment } from '@ordercloud/angular-sdk';
-import { AppStateService } from '@app-buyer/shared';
+import { AppStateService } from 'src/app/shared';
 import { of } from 'rxjs';
-import { applicationConfiguration } from '@app-buyer/config/app.config';
-import { PaymentMethod } from '@app-buyer/shared/models/payment-method.enum';
+import { applicationConfiguration } from 'src/app/config/app.config';
+import { PaymentMethod } from 'src/app/shared/models/payment-method.enum';
 import { delay } from 'rxjs/operators';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { PaymentMethodDisplayPipe } from '@app-buyer/shared/pipes/payment-method-display/payment-method-display.pipe';
+import { PaymentMethodDisplayPipe } from 'src/app/shared/pipes/payment-method-display/payment-method-display.pipe';
 
 describe('CheckoutPaymentComponent', () => {
   let component: CheckoutPaymentComponent;

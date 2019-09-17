@@ -3,7 +3,7 @@ import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
 import { OcOrderService, OcLineItemService } from '@ordercloud/angular-sdk';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { listAll } from '@app-buyer/shared/functions/listAll';
+import { listAll } from 'src/app/shared/functions/listAll';
 
 @Injectable({
   providedIn: 'root',

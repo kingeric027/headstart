@@ -1,17 +1,17 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CheckoutAddressComponent } from '@app-buyer/checkout/containers/checkout-address/checkout-address.component';
+import { CheckoutAddressComponent } from 'src/app/checkout/containers/checkout-address/checkout-address.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AddressFormComponent } from '@app-buyer/shared/components/address-form/address-form.component';
+import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
 import { of, BehaviorSubject, Subject } from 'rxjs';
 import { OcMeService, OcOrderService } from '@ordercloud/angular-sdk';
 import {
   AppStateService,
   AppFormErrorService,
   ModalService,
-} from '@app-buyer/shared';
+} from 'src/app/shared';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { CheckoutSectionBaseComponent } from '@app-buyer/checkout/components/checkout-section-base/checkout-section-base.component';
+import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
 import { ToastrService } from 'ngx-toastr';
 
 describe('CheckoutAddressComponent', () => {

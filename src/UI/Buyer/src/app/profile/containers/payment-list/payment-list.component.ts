@@ -7,7 +7,7 @@ import {
 } from '@ordercloud/angular-sdk';
 import { Observable } from 'rxjs';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { AuthorizeNetService, CreateCardDetails } from '@app-buyer/shared';
+import { AuthorizeNetService, CreateCardDetails } from 'src/app/shared';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
 import * as moment from 'moment';

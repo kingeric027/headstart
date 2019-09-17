@@ -5,7 +5,7 @@ import { of } from 'rxjs';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ModalService } from '@app-buyer/shared';
+import { ModalService } from 'src/app/shared';
 import { OcOrderService } from '@ordercloud/angular-sdk';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 

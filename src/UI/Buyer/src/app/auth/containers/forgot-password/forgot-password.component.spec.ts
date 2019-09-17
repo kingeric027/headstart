@@ -5,11 +5,11 @@ import { of } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 import { InjectionToken } from '@angular/core';
 
-import { ForgotPasswordComponent } from '@app-buyer/auth/containers/forgot-password/forgot-password.component';
+import { ForgotPasswordComponent } from 'src/app/auth/containers/forgot-password/forgot-password.component';
 import {
   applicationConfiguration,
   AppConfig,
-} from '@app-buyer/config/app.config';
+} from 'src/app/config/app.config';
 
 import { OcPasswordResetService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';

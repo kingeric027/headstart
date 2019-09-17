@@ -3,11 +3,11 @@ import { InjectionToken } from '@angular/core';
 import { HttpClient, HttpHandler, HTTP_INTERCEPTORS, HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController, TestRequest } from '@angular/common/http/testing';
 
-import { RefreshTokenInterceptor } from '@app-buyer/auth/interceptors/refresh-token/refresh-token.interceptor';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
+import { RefreshTokenInterceptor } from 'src/app/auth/interceptors/refresh-token/refresh-token.interceptor';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
-import { AppAuthService } from '@app-buyer/shared/services/auth/auth.service';
+import { AppAuthService } from 'src/app/shared/services/auth/auth.service';
 import { of, BehaviorSubject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 

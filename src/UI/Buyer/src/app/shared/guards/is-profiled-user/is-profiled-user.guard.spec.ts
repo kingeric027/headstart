@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { IsProfiledUserGuard } from './is-profiled-user.guard';
 import { BehaviorSubject } from 'rxjs';
-import { AppStateService } from '@app-buyer/shared/services/app-state/app-state.service';
+import { AppStateService } from 'src/app/shared/services/app-state/app-state.service';
 
 describe('IsProfiledUserGuard', () => {
   let service: IsProfiledUserGuard;

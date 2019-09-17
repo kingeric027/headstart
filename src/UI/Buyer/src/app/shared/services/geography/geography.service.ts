@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   StateDefinition,
   CountryDefinition,
-} from '@app-buyer/shared/services/geography/geography.models';
+} from 'src/app/shared/services/geography/geography.models';
 
 @Injectable({
   providedIn: 'root',

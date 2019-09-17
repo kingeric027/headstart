@@ -1,9 +1,9 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { FooterComponent } from '@app-buyer/layout/footer/footer.component';
+import { FooterComponent } from 'src/app/layout/footer/footer.component';
 
-import { SharedModule } from '@app-buyer/shared';
+import { SharedModule } from 'src/app/shared';
 import { HomePageWrapperComponent } from './home-wrapper/home-wrapper.component';
 import { FeaturedProductsResolver } from './resolves/features-products.resolve';
 import { HeaderWrapperComponent } from './header-wrapper/header-wrapper.component';

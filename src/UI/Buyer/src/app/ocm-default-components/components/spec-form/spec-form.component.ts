@@ -3,7 +3,7 @@ import { BuyerSpec } from '@ordercloud/angular-sdk';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { get as _get, find as _find, keys as _keys, pickBy as _pickBy, identity as _identity } from 'lodash';
 import { __generator } from 'tslib';
-import { FullSpecOption } from '@app-buyer/shared/models/full-spec-option.interface';
+import { FullSpecOption } from 'src/app/shared/models/full-spec-option.interface';
 import { OCMComponent } from '../../shopper-context';
 
 @Component({

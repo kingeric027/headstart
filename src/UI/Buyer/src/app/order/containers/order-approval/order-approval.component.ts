@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { OcOrderService } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { IModalComponent } from '@app-buyer/shared/components/modal/modal.component';
+import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'order-approval',

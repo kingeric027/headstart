@@ -4,7 +4,7 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
 import { tap, debounceTime, delay } from 'rxjs/operators';
-import { ProductFilters, OCMComponent } from '@app-buyer/ocm-default-components/shopper-context';
+import { ProductFilters, OCMComponent } from 'src/app/ocm-default-components/shopper-context';
 
 @Component({
   selector: 'ocm-app-header',

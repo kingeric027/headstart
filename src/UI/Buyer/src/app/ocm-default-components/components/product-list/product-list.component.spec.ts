@@ -1,12 +1,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProductListComponent } from '@app-buyer/product/containers/product-list/product-list.component';
+import { ProductListComponent } from 'src/app/product/containers/product-list/product-list.component';
 import {
   PageTitleComponent,
   CartService,
   AppStateService,
   ModalService,
-} from '@app-buyer/shared';
+} from 'src/app/shared';
 import {
   NgbPaginationModule,
   NgbCollapseModule,
@@ -16,22 +16,22 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { of, BehaviorSubject, Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { OcMeService, ListBuyerProduct } from '@ordercloud/angular-sdk';
-import { QuantityInputComponent } from '@app-buyer/ocm/quantity-input/quantity-input.component';
+import { QuantityInputComponent } from 'src/app/ocm/quantity-input/quantity-input.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { CategoryNavComponent } from '@app-buyer/product/components/category-nav/category-nav.component';
+import { CategoryNavComponent } from 'src/app/product/components/category-nav/category-nav.component';
 import { TreeModule } from 'angular-tree-component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ToggleFavoriteComponent } from '@app-buyer/ocm/toggle-favorite/toggle-favorite.component';
-import { ProductCardComponent } from '@app-buyer/ocm/product-card/product-card.component';
-import { MapToIterablePipe } from '@app-buyer/shared/pipes/map-to-iterable/map-to-iterable.pipe';
-import { FavoriteProductsService } from '@app-buyer/shared/services/favorites/favorites.service';
-import { SortFilterComponent } from '@app-buyer/product/components/sort-filter/sort-filter.component';
-import { ProductSortStrategy } from '@app-buyer/product/models/product-sort-strategy.enum';
+import { ToggleFavoriteComponent } from 'src/app/ocm/toggle-favorite/toggle-favorite.component';
+import { ProductCardComponent } from 'src/app/ocm/product-card/product-card.component';
+import { MapToIterablePipe } from 'src/app/shared/pipes/map-to-iterable/map-to-iterable.pipe';
+import { FavoriteProductsService } from 'src/app/shared/services/favorites/favorites.service';
+import { SortFilterComponent } from 'src/app/product/components/sort-filter/sort-filter.component';
+import { ProductSortStrategy } from 'src/app/product/models/product-sort-strategy.enum';
 import { NO_ERRORS_SCHEMA, InjectionToken } from '@angular/core';
 import {
   applicationConfiguration,
   AppConfig,
-} from '@app-buyer/config/app.config';
+} from 'src/app/config/app.config';
 
 describe('ProductListComponent', () => {
   const mockProductData = of({ Items: [], Meta: {} });

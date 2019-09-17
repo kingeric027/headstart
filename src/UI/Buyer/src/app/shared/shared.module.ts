@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 
-import { SharedRoutingModule } from '@app-buyer/shared/shared-routing.module';
+import { SharedRoutingModule } from 'src/app/shared/shared-routing.module';
 
 // 3rd party UI
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -24,24 +24,24 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 
 // pipes
-import { OrderStatusDisplayPipe } from '@app-buyer/shared/pipes/order-status-display/order-status-display.pipe';
-import { PaymentMethodDisplayPipe } from '@app-buyer/shared/pipes/payment-method-display/payment-method-display.pipe';
+import { OrderStatusDisplayPipe } from 'src/app/shared/pipes/order-status-display/order-status-display.pipe';
+import { PaymentMethodDisplayPipe } from 'src/app/shared/pipes/payment-method-display/payment-method-display.pipe';
 
 // directives
 import { FallbackImageDirective } from './directives/fallback-image/fallback-image.directive';
 
 // components
-import { AddressFormComponent } from '@app-buyer/shared/components/address-form/address-form.component';
-import { CreditCardFormComponent } from '@app-buyer/shared/components/credit-card-form/credit-card-form.component';
-import { CreditCardIconComponent } from '@app-buyer/shared/components/credit-card-icon/credit-card-icon.component';
-import { AddressDisplayComponent } from '@app-buyer/shared/components/address-display/address-display.component';
-import { CreditCardDisplayComponent } from '@app-buyer/shared/components/credit-card-display/credit-card-display.component';
+import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
+import { CreditCardFormComponent } from 'src/app/shared/components/credit-card-form/credit-card-form.component';
+import { CreditCardIconComponent } from 'src/app/shared/components/credit-card-icon/credit-card-icon.component';
+import { AddressDisplayComponent } from 'src/app/shared/components/address-display/address-display.component';
+import { CreditCardDisplayComponent } from 'src/app/shared/components/credit-card-display/credit-card-display.component';
 
 // containers
-import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from '@app-buyer/shared/pipes/shipperTracking/shipperTracking.pipe';
-import { GenericBrowseComponent } from '@app-buyer/shared/components/generic-browse/generic-browse.component';
-import { ModalComponent, ResetDirective } from '@app-buyer/shared/components/modal/modal.component';
-import { OrderPaymentListComponent } from '@app-buyer/shared/components/payment-list/order-payment-list.component';
+import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/shared/pipes/shipperTracking/shipperTracking.pipe';
+import { GenericBrowseComponent } from 'src/app/shared/components/generic-browse/generic-browse.component';
+import { ModalComponent, ResetDirective } from 'src/app/shared/components/modal/modal.component';
+import { OrderPaymentListComponent } from 'src/app/shared/components/payment-list/order-payment-list.component';
 import { NoResultsComponent } from './components/no-results/no-results.component';
 import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
 import { PhoneInputDirective } from './directives/phone-input/phone-input.directive';

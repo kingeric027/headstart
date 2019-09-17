@@ -1,13 +1,13 @@
 // containers
-export * from '@app-buyer/auth/containers/forgot-password/forgot-password.component';
-export * from '@app-buyer/auth/containers/login/login.component';
-export * from '@app-buyer/auth/containers/reset-password/reset-password.component';
+export * from 'src/app/auth/containers/forgot-password/forgot-password.component';
+export * from 'src/app/auth/containers/login/login.component';
+export * from 'src/app/auth/containers/reset-password/reset-password.component';
 
 // interceptors
-export * from '@app-buyer/auth/interceptors/refresh-token/refresh-token.interceptor';
-export * from '@app-buyer/auth/interceptors/auto-append-token/auto-append-token.interceptor';
-export * from '@app-buyer/auth/interceptors/cache/cache-interceptor';
+export * from 'src/app/auth/interceptors/refresh-token/refresh-token.interceptor';
+export * from 'src/app/auth/interceptors/auto-append-token/auto-append-token.interceptor';
+export * from 'src/app/auth/interceptors/cache/cache-interceptor';
 
 // modules
-export * from '@app-buyer/auth/auth.module';
-export * from '@app-buyer/auth/auth-routing.module';
+export * from 'src/app/auth/auth.module';
+export * from 'src/app/auth/auth-routing.module';

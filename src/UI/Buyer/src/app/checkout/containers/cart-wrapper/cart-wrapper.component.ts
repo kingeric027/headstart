@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Order, ListLineItem } from '@ordercloud/angular-sdk';
-import { QuantityLimits } from '@app-buyer/shared/models/quantity-limits';
-import { BuildQtyLimits, CurrentOrderService } from '@app-buyer/shared';
-import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
+import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
+import { BuildQtyLimits, CurrentOrderService } from 'src/app/shared';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'cart-wrapper',

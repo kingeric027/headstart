@@ -2,15 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, convertToParamMap } from '@angular/router';
 
-import { OrderHistoryComponent } from '@app-buyer/order/containers/order-history/order-history.component';
+import { OrderHistoryComponent } from 'src/app/order/containers/order-history/order-history.component';
 import { NgbPaginationModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { OcMeService } from '@ordercloud/angular-sdk';
-import { OrderStatus } from '@app-buyer/order/models/order-status.model';
+import { OrderStatus } from 'src/app/order/models/order-status.model';
 import { of, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { AppStateService } from '@app-buyer/shared';
-import { FavoriteOrdersService } from '@app-buyer/shared/services/favorites/favorites.service';
+import { AppStateService } from 'src/app/shared';
+import { FavoriteOrdersService } from 'src/app/shared/services/favorites/favorites.service';
 
 describe('OrderHistoryComponent', () => {
   let component: OrderHistoryComponent;

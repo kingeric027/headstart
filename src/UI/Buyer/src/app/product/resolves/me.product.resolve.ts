@@ -3,7 +3,7 @@ import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
 import { OcMeService, ListBuyerProduct, BuyerProduct, ListBuyerSpec, BuyerSpec, ListCategory } from '@ordercloud/angular-sdk';
 import { each as _each } from 'lodash';
 import { Observable, of } from 'rxjs';
-import { ProductFilterService } from '@app-buyer/shared/services/product-filter/product-filter.service';
+import { ProductFilterService } from 'src/app/shared/services/product-filter/product-filter.service';
 
 @Injectable()
 export class MeListRelatedProductsResolver implements Resolve<ListBuyerProduct> {

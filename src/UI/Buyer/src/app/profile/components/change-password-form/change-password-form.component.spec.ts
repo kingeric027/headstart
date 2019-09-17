@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ChangePasswordFormComponent } from './change-password-form.component';
-import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
+import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
 import { ReactiveFormsModule } from '@angular/forms';
 
 describe('ChangePasswordFormComponent', () => {

@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MeUpdateComponent } from '@app-buyer/profile/containers/me-update/me-update.component';
+import { MeUpdateComponent } from 'src/app/profile/containers/me-update/me-update.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
   OcMeService,
@@ -10,13 +10,13 @@ import { CookieModule } from 'ngx-cookie';
 import {
   applicationConfiguration,
   AppConfig,
-} from '@app-buyer/config/app.config';
+} from 'src/app/config/app.config';
 import { InjectionToken, NO_ERRORS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { AppStateService, AppFormErrorService } from '@app-buyer/shared';
+import { AppStateService, AppFormErrorService } from 'src/app/shared';
 import { of, Subject } from 'rxjs';
-import { ModalService } from '@app-buyer/shared/services/modal/modal.service';
+import { ModalService } from 'src/app/shared/services/modal/modal.service';
 
 describe('MeUpdateComponent', () => {
   let component: MeUpdateComponent;

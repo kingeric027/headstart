@@ -2,7 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { ListFacet, ListFacetValue } from '@ordercloud/angular-sdk';
 import { each as _each, get as _get, xor as _xor } from 'lodash';
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
-import { OCMComponent, ProductFilters } from '@app-buyer/ocm-default-components/shopper-context';
+import { OCMComponent, ProductFilters } from 'src/app/ocm-default-components/shopper-context';
 
 @Component({
   templateUrl: './facet-multiselect.component.html',

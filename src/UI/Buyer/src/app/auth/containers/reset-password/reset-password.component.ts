@@ -7,8 +7,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 // ordercloud
-import { AppMatchFieldsValidator, ValidateStrongPassword, AppFormErrorService } from '@app-buyer/shared';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
+import { AppMatchFieldsValidator, ValidateStrongPassword, AppFormErrorService } from 'src/app/shared';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { OcPasswordResetService, PasswordReset } from '@ordercloud/angular-sdk';
 
 @Component({

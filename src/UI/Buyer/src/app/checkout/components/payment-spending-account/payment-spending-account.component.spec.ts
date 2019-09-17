@@ -1,11 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PaymentSpendingAccountComponent } from '@app-buyer/checkout/components/payment-spending-account/payment-spending-account.component';
+import { PaymentSpendingAccountComponent } from 'src/app/checkout/components/payment-spending-account/payment-spending-account.component';
 import { of } from 'rxjs';
 import { OcMeService } from '@ordercloud/angular-sdk';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ModalService } from '@app-buyer/shared';
+import { ModalService } from 'src/app/shared';
 
 describe('PaymentSpendingAccountComponent', () => {
   let component: PaymentSpendingAccountComponent;

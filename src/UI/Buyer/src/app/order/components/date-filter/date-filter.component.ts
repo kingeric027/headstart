@@ -3,8 +3,8 @@ import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { debounceTime, takeWhile } from 'rxjs/operators';
-import { AppFormErrorService } from '@app-buyer/shared';
-import { DateValidator } from '@app-buyer/shared/validators/date-input/date-input.validator';
+import { AppFormErrorService } from 'src/app/shared';
+import { DateValidator } from 'src/app/shared/validators/date-input/date-input.validator';
 
 @Component({
   selector: 'order-date-filter',

@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FacetFilterComponent } from './facet-filter.component';
-import { FacetListComponent } from '@app-buyer/product/components/facet-list/facet-list.component';
+import { FacetListComponent } from 'src/app/product/components/facet-list/facet-list.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';

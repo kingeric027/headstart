@@ -3,9 +3,9 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Order, ListLineItem, ListPromotion, OcOrderService, ListPayment, OrderApproval } from '@ordercloud/angular-sdk';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { AppPaymentService } from '@app-buyer/shared/services/app-payment-service/app-payment.service';
+import { AppPaymentService } from 'src/app/shared/services/app-payment-service/app-payment.service';
 import { uniqBy as _uniqBy } from 'lodash';
-import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'order-details',

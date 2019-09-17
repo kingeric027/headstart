@@ -1,5 +1,5 @@
 import { TestBed, inject } from '@angular/core/testing';
-import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
+import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 
 describe('OcFormErrorService', () => {

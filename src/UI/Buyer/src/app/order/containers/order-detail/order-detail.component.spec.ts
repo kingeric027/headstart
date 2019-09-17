@@ -4,8 +4,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of, BehaviorSubject } from 'rxjs';
 import { OcOrderService } from '@ordercloud/angular-sdk';
 import { ParamMap, ActivatedRoute, convertToParamMap } from '@angular/router';
-import { AppPaymentService } from '@app-buyer/shared/services/app-payment-service/app-payment.service';
-import { OrderDetailsComponent } from '@app-buyer/order/containers/order-detail/order-detail.component';
+import { AppPaymentService } from 'src/app/shared/services/app-payment-service/app-payment.service';
+import { OrderDetailsComponent } from 'src/app/order/containers/order-detail/order-detail.component';
 
 describe('OrderDetailsComponent', () => {
   let component: OrderDetailsComponent;

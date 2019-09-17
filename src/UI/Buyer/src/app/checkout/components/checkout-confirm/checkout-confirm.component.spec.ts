@@ -1,12 +1,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { CheckoutConfirmComponent } from '@app-buyer/checkout/components/checkout-confirm/checkout-confirm.component';
+import { CheckoutConfirmComponent } from 'src/app/checkout/components/checkout-confirm/checkout-confirm.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
-import { AppStateService, CartService } from '@app-buyer/shared';
-import { AppPaymentService } from '@app-buyer/shared/services/app-payment-service/app-payment.service';
+import { AppStateService, CartService } from 'src/app/shared';
+import { AppPaymentService } from 'src/app/shared/services/app-payment-service/app-payment.service';
 import { FormBuilder } from '@angular/forms';
 import { OcOrderService } from '@ordercloud/angular-sdk';
-import { applicationConfiguration } from '@app-buyer/config/app.config';
+import { applicationConfiguration } from 'src/app/config/app.config';
 
 describe('CheckoutConfirmComponent', () => {
   let component: CheckoutConfirmComponent;

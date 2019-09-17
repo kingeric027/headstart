@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { OrderDetailsComponent } from '@app-buyer/order/containers/order-detail/order-detail.component';
+import { OrderDetailsComponent } from 'src/app/order/containers/order-detail/order-detail.component';
 
 @Component({
   selector: 'checkout-order-confirmation',

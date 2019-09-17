@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProfileComponent } from '@app-buyer/profile/containers/profile/profile.component';
-import { SharedModule } from '@app-buyer/shared';
+import { ProfileComponent } from 'src/app/profile/containers/profile/profile.component';
+import { SharedModule } from 'src/app/shared';
 import { NO_ERRORS_SCHEMA, InjectionToken } from '@angular/core';
 import {
   OcMeService,
@@ -12,8 +12,8 @@ import { CookieModule } from 'ngx-cookie';
 import {
   applicationConfiguration,
   AppConfig,
-} from '@app-buyer/config/app.config';
-import { AppAuthService } from '@app-buyer/auth';
+} from 'src/app/config/app.config';
+import { AppAuthService } from 'src/app/auth';
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;

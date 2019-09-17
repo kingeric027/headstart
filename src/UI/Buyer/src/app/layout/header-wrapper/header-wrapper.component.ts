@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { applicationConfiguration, AppConfig } from '@app-buyer/config/app.config';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { Router } from '@angular/router';
-import { ShopperContextService } from '@app-buyer/shared/services/shopper-context/shopper-context.service';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'app-header-wrapper',

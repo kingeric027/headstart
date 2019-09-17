@@ -15,7 +15,7 @@ import { OCMOrderSummary } from './components/order-summary/order-summary.compon
 import { OCMLineitemTable } from './components/lineitem-table/lineitem-table.component';
 import { OCMCart } from './components/cart/cart.component';
 import { OCMHomePage } from './components/home/home.component';
-import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { OCMProductSort } from './components/sort-products/sort-products.component';
 import { OCMCategoryTree } from './components/category-tree/category-tree.component';
 import { TreeModule } from 'angular-tree-component';
@@ -83,6 +83,7 @@ import { OCMAppHeader } from './components/app-header/app-header.component';
     NgbCollapseModule,
     NgbPaginationModule,
     NgbPopoverModule,
+    NgbDropdownModule,
   ],
 })
 export class OcmDefaultComponentsModule {

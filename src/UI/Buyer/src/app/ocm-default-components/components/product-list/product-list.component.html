@@ -111,6 +111,7 @@
   <shared-modal #categoryModal
                 modalTitle="Select Category">
     <ocm-category-tree *ngIf="categories?.Items?.length"
+                       [categories]="categories"
                        [context]="context"></ocm-category-tree>
   </shared-modal>
 </section>

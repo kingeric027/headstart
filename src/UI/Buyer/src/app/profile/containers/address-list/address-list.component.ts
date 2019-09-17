@@ -4,7 +4,7 @@ import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 import { OcMeService, ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
-import { IModalComponent } from '@app-buyer/shared/components/modal/modal.component';
+import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'profile-address-list',

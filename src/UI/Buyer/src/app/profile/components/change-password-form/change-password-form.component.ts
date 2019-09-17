@@ -1,10 +1,10 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AppMatchFieldsValidator } from '@app-buyer/shared/validators/match-fields/match-fields.validator';
-import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
+import { AppMatchFieldsValidator } from 'src/app/shared/validators/match-fields/match-fields.validator';
+import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
 import { MeUser } from '@ordercloud/angular-sdk';
-import { ValidateStrongPassword } from '@app-buyer/shared/validators/strong-password/strong-password.validator';
+import { ValidateStrongPassword } from 'src/app/shared/validators/strong-password/strong-password.validator';
 
 @Component({
   selector: 'profile-change-password-form',

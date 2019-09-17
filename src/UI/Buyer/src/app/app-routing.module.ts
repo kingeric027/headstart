@@ -4,8 +4,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { FaqComponent } from './static-pages/faq/faq.component';
 import { SupportComponent } from './static-pages/support/support.component';
 
-import { BaseResolve, IsProfiledUserGuard as isProfiledUser, HasTokenGuard as HasToken } from '@app-buyer/shared';
-import { TermsAndConditionsComponent } from '@app-buyer/static-pages/terms-and-conditions/terms-and-conditions.component';
+import { BaseResolve, IsProfiledUserGuard as isProfiledUser, HasTokenGuard as HasToken } from 'src/app/shared';
+import { TermsAndConditionsComponent } from 'src/app/static-pages/terms-and-conditions/terms-and-conditions.component';
 import { FeaturedProductsResolver } from './layout/resolves/features-products.resolve';
 import { HomePageWrapperComponent } from './layout/home-wrapper/home-wrapper.component';
 

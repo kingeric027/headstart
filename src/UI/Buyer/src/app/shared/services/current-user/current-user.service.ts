@@ -4,7 +4,7 @@ import { MeUser, OcMeService, OcTokenService, User } from '@ordercloud/angular-s
 import * as jwtDecode from 'jwt-decode';
 import { isUndefined as _isUndefined } from 'lodash';
 import { ToastrService } from 'ngx-toastr';
-import { ICurrentUser } from '@app-buyer/ocm-default-components/shopper-context';
+import { ICurrentUser } from 'src/app/ocm-default-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',

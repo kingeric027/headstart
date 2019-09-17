@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { Order } from '@ordercloud/angular-sdk';
-import { CurrentUserService } from '@app-buyer/shared/services/current-user/current-user.service';
+import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'order-order',

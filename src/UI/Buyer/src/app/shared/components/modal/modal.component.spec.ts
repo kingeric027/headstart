@@ -1,8 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalComponent } from '@app-buyer/shared/components/modal/modal.component';
+import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ModalService } from '@app-buyer/shared/services/modal/modal.service';
+import { ModalService } from 'src/app/shared/services/modal/modal.service';
 import { Subject } from 'rxjs';
 
 describe('SharedModalComponent', () => {

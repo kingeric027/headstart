@@ -4,9 +4,9 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 // 3rd party
 import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
 
-import { AppGeographyService } from '@app-buyer/shared/services/geography/geography.service';
-import { AppFormErrorService } from '@app-buyer/shared/services/form-error/form-error.service';
-import { RegexService } from '@app-buyer/shared/services/regex/regex.service';
+import { AppGeographyService } from 'src/app/shared/services/geography/geography.service';
+import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
+import { RegexService } from 'src/app/shared/services/regex/regex.service';
 
 @Component({
   selector: 'shared-address-form',
