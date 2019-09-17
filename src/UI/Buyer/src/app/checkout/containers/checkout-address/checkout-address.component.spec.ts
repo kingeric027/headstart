@@ -5,11 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
 import { of, BehaviorSubject, Subject } from 'rxjs';
 import { OcMeService, OcOrderService } from '@ordercloud/angular-sdk';
-import {
-  AppStateService,
-  AppFormErrorService,
-  ModalService,
-} from 'src/app/shared';
+import { AppFormErrorService } from 'src/app/shared';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
 import { ToastrService } from 'ngx-toastr';
@@ -20,10 +16,7 @@ describe('CheckoutAddressComponent', () => {
 
   const onCloseSubject = new Subject<string>();
   const mockAddresses = {
-    Items: [
-      { ID: 'address1', Name: 'AddressOne' },
-      { ID: 'address2', Name: 'AddressTwo' },
-    ],
+    Items: [{ ID: 'address1', Name: 'AddressOne' }, { ID: 'address2', Name: 'AddressTwo' }],
   };
   const mockOrder = {
     ID: 'orderid',
@@ -33,17 +26,11 @@ describe('CheckoutAddressComponent', () => {
   };
 
   const meService = {
-    ListAddresses: jasmine
-      .createSpy('ListAddresses')
-      .and.returnValue(of(mockAddresses)),
+    ListAddresses: jasmine.createSpy('ListAddresses').and.returnValue(of(mockAddresses)),
   };
   const orderService = {
-    SetBillingAddress: jasmine
-      .createSpy('SetBillingAddress')
-      .and.returnValue(of({})),
-    SetShippingAddress: jasmine
-      .createSpy('SetShippingAddress')
-      .and.returnValue(of({})),
+    SetBillingAddress: jasmine.createSpy('SetBillingAddress').and.returnValue(of({})),
+    SetShippingAddress: jasmine.createSpy('SetShippingAddress').and.returnValue(of({})),
     Patch: jasmine.createSpy('Patch').and.returnValue(of({})),
   };
   const mockLineItems = {
@@ -65,18 +52,12 @@ describe('CheckoutAddressComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CheckoutSectionBaseComponent,
-        CheckoutAddressComponent,
-        AddressFormComponent,
-      ],
+      declarations: [CheckoutSectionBaseComponent, CheckoutAddressComponent, AddressFormComponent],
       imports: [ReactiveFormsModule],
       providers: [
         AppFormErrorService,
-        { provide: ModalService, useValue: modalService },
         { provide: OcMeService, useValue: meService },
         { provide: OcOrderService, useValue: orderService },
-        { provide: AppStateService, useValue: appStateService },
         { provide: ToastrService, useValue: toastrService },
       ],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
@@ -151,20 +132,14 @@ describe('CheckoutAddressComponent', () => {
     it('should select address from first line item if addressType is Shipping', () => {
       component.addressType = 'Shipping';
       component['setSelectedAddress']();
-      expect(component.selectedAddress).toEqual(
-        component.lineItems.Items[0].ShippingAddress
-      );
+      expect(component.selectedAddress).toEqual(component.lineItems.Items[0].ShippingAddress);
     });
   });
 
   describe('saveAddress()', () => {
     beforeEach(() => {
-      spyOn(component as any, 'setOneTimeAddress').and.returnValue(
-        of({ ID: 'NewOrderWhoDis' })
-      );
-      spyOn(component as any, 'setSavedAddress').and.returnValue(
-        of({ ID: 'NewOrderWhoDis' })
-      );
+      spyOn(component as any, 'setOneTimeAddress').and.returnValue(of({ ID: 'NewOrderWhoDis' }));
+      spyOn(component as any, 'setSavedAddress').and.returnValue(of({ ID: 'NewOrderWhoDis' }));
     });
     it('should set one time address if user is anon', () => {
       component.isAnon = true;
@@ -219,20 +194,12 @@ describe('CheckoutAddressComponent', () => {
     it('should call orderService.SetBillingAddress if addressType is Shipping', () => {
       component.addressType = 'Billing';
       component['setOneTimeAddress']({ ID: 'MockOneTimeAddress' });
-      expect(orderService.SetBillingAddress).toHaveBeenCalledWith(
-        'outgoing',
-        component.order.ID,
-        { ID: null }
-      );
+      expect(orderService.SetBillingAddress).toHaveBeenCalledWith('outgoing', component.order.ID, { ID: null });
     });
     it('should call orderService.SetShippingAddress if addressType is Shipping', () => {
       component.addressType = 'Shipping';
       component['setOneTimeAddress']({ ID: 'MockOneTimeAddress' });
-      expect(orderService.SetShippingAddress).toHaveBeenCalledWith(
-        'outgoing',
-        component.order.ID,
-        { ID: null }
-      );
+      expect(orderService.SetShippingAddress).toHaveBeenCalledWith('outgoing', component.order.ID, { ID: null });
     });
   });
 
@@ -240,32 +207,17 @@ describe('CheckoutAddressComponent', () => {
     it('should patch order.ShippingAddressID if addressType is Shipping', () => {
       component.addressType = 'Shipping';
       component['setSavedAddress']({ ID: 'MockSavedAddress' });
-      expect(orderService.Patch).toHaveBeenCalledWith(
-        'outgoing',
-        component.order.ID,
-        { ShippingAddressID: 'MockSavedAddress' }
-      );
+      expect(orderService.Patch).toHaveBeenCalledWith('outgoing', component.order.ID, { ShippingAddressID: 'MockSavedAddress' });
     });
     it('should patch order.BillingAddressID if addressType is Billing', () => {
       component.addressType = 'Billing';
       component['setSavedAddress']({ ID: 'MockSavedAddress' });
-      expect(orderService.Patch).toHaveBeenCalledWith(
-        'outgoing',
-        component.order.ID,
-        { BillingAddressID: 'MockSavedAddress' }
-      );
+      expect(orderService.Patch).toHaveBeenCalledWith('outgoing', component.order.ID, { BillingAddressID: 'MockSavedAddress' });
     });
   });
   describe('clearFiltersOnModalClose', () => {
     beforeEach(() => {
       spyOn(component, 'updateRequestOptions');
-    });
-    it('should clear filters when the right modal id is emitted', () => {
-      onCloseSubject.next(component.modalID);
-      expect(component.updateRequestOptions).toHaveBeenCalledWith({
-        page: undefined,
-        search: undefined,
-      });
     });
     it('should do nothing when the wrong modal id is emitted', () => {
       onCloseSubject.next('wrong ID');
@@ -287,9 +239,7 @@ describe('CheckoutAddressComponent', () => {
       component.addressType = 'Billing';
       component.useShippingAsBilling();
       expect(component.usingShippingAsBilling).toEqual(true);
-      expect(component.selectedAddress).toEqual(
-        component.lineItems.Items[0].ShippingAddress
-      );
+      expect(component.selectedAddress).toEqual(component.lineItems.Items[0].ShippingAddress);
     });
   });
 });

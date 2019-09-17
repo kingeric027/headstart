@@ -3,14 +3,11 @@ import { RegisterComponent } from 'src/app/auth/containers/register/register.com
 import { ReactiveFormsModule } from '@angular/forms';
 import { OcMeService, OcTokenService, MeUser } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from 'src/app/config/app.config';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { InjectionToken, NO_ERRORS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { AppStateService, AppFormErrorService } from 'src/app/shared';
+import { AppFormErrorService } from 'src/app/shared';
 import { of, Subject } from 'rxjs';
 
 describe('RegisterComponent', () => {
@@ -44,7 +41,6 @@ describe('RegisterComponent', () => {
         { provide: Router, useValue: router },
         { provide: OcTokenService, useValue: tokenService },
         { provide: OcMeService, useValue: ocMeService },
-        { provide: AppStateService, useValue: appStateService },
         { provide: ToastrService, useValue: toastrService },
         {
           provide: applicationConfiguration,
@@ -100,9 +96,7 @@ describe('RegisterComponent', () => {
       component.form.controls.Username.setValue('crhistianr');
       component.form.controls.FirstName.setValue('Crhistian');
       component.form.controls.LastName.setValue('Ramirez');
-      component.form.controls.Email.setValue(
-        'crhistian-rawks@my-little-pony.com'
-      );
+      component.form.controls.Email.setValue('crhistian-rawks@my-little-pony.com');
       component.form.controls.Phone.setValue('555-555-5555');
       component.form.controls.Password.setValue('easyguess123');
       component.form.controls.ConfirmPassword.setValue('easyguess123');

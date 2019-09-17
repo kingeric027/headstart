@@ -2,7 +2,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ModalService } from 'src/app/shared/services/modal/modal.service';
 import { Subject } from 'rxjs';
 
 describe('SharedModalComponent', () => {
@@ -19,7 +18,6 @@ describe('SharedModalComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ModalComponent],
       imports: [FontAwesomeModule],
-      providers: [{ provide: ModalService, useValue: modalService }],
     }).compileComponents();
   }));
 
@@ -60,9 +58,7 @@ describe('SharedModalComponent', () => {
       component.close();
       expect(component.isOpen).toEqual(false);
       expect(document.body.classList).not.toContain('shared-modal--open');
-      expect(modalService.onCloseSubject.next).toHaveBeenCalledWith(
-        component.id
-      );
+      expect(modalService.onCloseSubject.next).toHaveBeenCalledWith(component.id);
     });
   });
   describe('ngOnDestroy', () => {

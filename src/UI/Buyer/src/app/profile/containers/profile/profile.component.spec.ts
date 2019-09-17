@@ -3,17 +3,10 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProfileComponent } from 'src/app/profile/containers/profile/profile.component';
 import { SharedModule } from 'src/app/shared';
 import { NO_ERRORS_SCHEMA, InjectionToken } from '@angular/core';
-import {
-  OcMeService,
-  OcTokenService,
-  Configuration,
-} from '@ordercloud/angular-sdk';
+import { OcMeService, OcTokenService, Configuration } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from 'src/app/config/app.config';
-import { AppAuthService } from 'src/app/auth';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
+import { AuthService } from 'src/app/shared/services/auth/auth.service';
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
@@ -25,7 +18,7 @@ describe('ProfileComponent', () => {
       declarations: [ProfileComponent],
       imports: [CookieModule.forRoot(), SharedModule],
       providers: [
-        { provide: AppAuthService, useValue: appAuthService },
+        { provide: AuthService, useValue: appAuthService },
         {
           provide: applicationConfiguration,
           useValue: new InjectionToken<AppConfig>('app.config'),

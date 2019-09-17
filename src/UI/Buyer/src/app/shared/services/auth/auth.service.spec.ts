@@ -5,11 +5,11 @@ import { Configuration, OcAuthService, OcTokenService } from '@ordercloud/angula
 import { CookieModule, CookieService } from 'ngx-cookie';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppErrorHandler } from 'src/app/config/error-handling.config';
-import { AppAuthService } from 'src/app/shared/services/auth/auth.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
 describe('AppAuthService', () => {
   const mockRefreshToken = 'mock refresh token';
@@ -22,7 +22,7 @@ describe('AppAuthService', () => {
     putObject: jasmine.createSpy('putObject'),
     remove: jasmine.createSpy('remove'),
   };
-  let appAuthService: AppAuthService;
+  let appAuthService: AuthService;
   let authService: OcAuthService;
   let tokenService: OcTokenService;
   let appConfig = {
@@ -45,17 +45,15 @@ describe('AppAuthService', () => {
         { provide: AppErrorHandler, useValue: appErrorHandler },
         { provide: Configuration, useValue: new Configuration() },
         { provide: applicationConfiguration, useValue: appConfig },
-        { provide: AppStateService, useValue: appStateService },
-        { provide: BaseResolveService, useValue: baseResolveService },
       ],
     });
     appConfig = TestBed.get(applicationConfiguration);
     tokenService = TestBed.get(OcTokenService);
-    appAuthService = TestBed.get(AppAuthService);
+    appAuthService = TestBed.get(AuthService);
     authService = TestBed.get(OcAuthService);
   });
 
-  it('should be created', inject([AppAuthService], (service: AppAuthService) => {
+  it('should be created', inject([AuthService], (service: AuthService) => {
     expect(service).toBeTruthy();
   }));
 

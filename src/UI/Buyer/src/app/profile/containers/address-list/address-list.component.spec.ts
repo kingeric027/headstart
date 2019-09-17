@@ -1,11 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AddressListComponent } from 'src/app/profile/containers/address-list/address-list.component';
-import {
-  FaIconComponent,
-  FontAwesomeModule,
-} from '@fortawesome/angular-fontawesome';
-import { ModalService } from 'src/app/shared';
+import { FaIconComponent, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
@@ -30,11 +26,7 @@ describe('AddressListComponent', () => {
     TestBed.configureTestingModule({
       declarations: [AddressListComponent],
       imports: [ReactiveFormsModule, FontAwesomeModule],
-      providers: [
-        { provide: ModalService, useValue: modalService },
-        { provide: OcMeService, useValue: meService },
-        { provide: ToastrService, useValue: toastrService },
-      ],
+      providers: [{ provide: OcMeService, useValue: meService }, { provide: ToastrService, useValue: toastrService }],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
     }).compileComponents();
   }));
@@ -64,11 +56,6 @@ describe('AddressListComponent', () => {
       component.currentAddress = { ID: 'mockBuyerAddress' };
       component['showAddAddress']();
     });
-    it('should display modal', () => {
-      expect(modalService.open).toHaveBeenCalledWith(
-        component.addAddressModalID
-      );
-    });
     it('should clear out current address', () => {
       expect(component.currentAddress).toBe(null);
     });
@@ -79,11 +66,6 @@ describe('AddressListComponent', () => {
     beforeEach(() => {
       component.currentAddress = null;
       component['showEditAddress'](mockEditAddress);
-    });
-    it('should display modal', () => {
-      expect(modalService.open).toHaveBeenCalledWith(
-        component.addAddressModalID
-      );
     });
     it('should show edit address', () => {
       expect(component.currentAddress).toBe(mockEditAddress);

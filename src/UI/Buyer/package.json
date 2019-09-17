@@ -16,7 +16,8 @@
     "install-default-components": "npm install file:empty.tgz",
     "install-custom-components": "node install.js",
     "serve-default-components": "npm run install-default-components && ng serve --prod",
-    "serve-custom-components": "npm run install-custom-components && ng serve -- prod"
+    "serve-custom-components": "npm run install-custom-components && ng serve -- prod",
+    "build:server": "ng run base-buyer:server && webpack --config webpack.server.config.js"
   },
   "private": true,
   "dependencies": {
@@ -37,6 +38,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.5.0",
     "@ng-bootstrap/ng-bootstrap": "4.0.0",
     "@nguniversal/express-engine": "^7.0.2",
+    "@nguniversal/module-map-ngfactory-loader": "^8.1.1",
     "@ngx-progressbar/core": "^5.2.1",
     "@ngx-progressbar/http": "^5.2.1",
     "@ordercloud/angular-sdk": "^1.0.0-2",
@@ -46,6 +48,7 @@
     "angular2-text-mask": "^9.0.0",
     "bootstrap": "^4.0.0",
     "core-js": "^2.5.7",
+    "express": "^4.17.1",
     "jquery": "3",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.4",
@@ -82,7 +85,9 @@
     "pretty-quick": "^1.6.0",
     "protractor": "^5.4.0",
     "ts-node": "~5.0.1",
+    "ts-loader": "^6.0.4",
     "tslint": "~5.9.1",
-    "typescript": "~3.4.5"
+    "typescript": "~3.4.5",
+    "webpack-cli": "^3.3.7"
   }
 }

@@ -1,22 +1,14 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MeUpdateComponent } from 'src/app/profile/containers/me-update/me-update.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import {
-  OcMeService,
-  OcTokenService,
-  OcAuthService,
-} from '@ordercloud/angular-sdk';
+import { OcMeService, OcTokenService, OcAuthService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from 'src/app/config/app.config';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { InjectionToken, NO_ERRORS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { AppStateService, AppFormErrorService } from 'src/app/shared';
+import { AppFormErrorService } from 'src/app/shared';
 import { of, Subject } from 'rxjs';
-import { ModalService } from 'src/app/shared/services/modal/modal.service';
 
 describe('MeUpdateComponent', () => {
   let component: MeUpdateComponent;
@@ -34,9 +26,7 @@ describe('MeUpdateComponent', () => {
     Get: jasmine.createSpy('Get').and.returnValue(of(me)),
     Patch: jasmine.createSpy('Patch').and.returnValue(of(me)),
     Register: jasmine.createSpy('Register').and.returnValue(of(null)),
-    ResetPasswordByToken: jasmine
-      .createSpy('ResetPasswordByToken')
-      .and.returnValue(of(null)),
+    ResetPasswordByToken: jasmine.createSpy('ResetPasswordByToken').and.returnValue(of(null)),
   };
   const toastrService = { success: jasmine.createSpy('success') };
   const tokenService = {
@@ -71,9 +61,7 @@ describe('MeUpdateComponent', () => {
         { provide: Router, useValue: router },
         { provide: OcTokenService, useValue: tokenService },
         { provide: OcMeService, useValue: ocMeService },
-        { provide: AppStateService, useValue: appStateService },
         { provide: ToastrService, useValue: toastrService },
-        { provide: ModalService, useValue: modalService },
         { provide: OcAuthService, useValue: ocAuthService },
         {
           provide: applicationConfiguration,
@@ -153,17 +141,6 @@ describe('MeUpdateComponent', () => {
         NewPassword: 'new-pw',
       });
     });
-    it('should close modal on successful change', () => {
-      component.changePasswordModalId = 'mockModalId';
-      spyOn(ocAuthService, 'Login').and.returnValue(of(null));
-      component.onChangePassword({
-        currentPassword: 'incorrect-pw',
-        newPassword: 'new-pw',
-      });
-      expect(component['modalService'].close).toHaveBeenCalledWith(
-        'mockModalId'
-      );
-    });
   });
 
   describe('onSubmit', () => {
@@ -178,9 +155,7 @@ describe('MeUpdateComponent', () => {
       component.form.controls.FirstName.setValue('Crhistian');
       component.form.controls.LastName.setValue('Ramirez');
       component.form.controls.Phone.setValue('5555555555');
-      component.form.controls.Email.setValue(
-        'crhistian-rawks@my-little-pony.com'
-      );
+      component.form.controls.Email.setValue('crhistian-rawks@my-little-pony.com');
       component['onSubmit']();
       expect(ocMeService.Patch).toHaveBeenCalledWith({
         Username: 'crhistianr',

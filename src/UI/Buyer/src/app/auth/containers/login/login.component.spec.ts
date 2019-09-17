@@ -6,15 +6,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { of, BehaviorSubject } from 'rxjs';
 
 import { LoginComponent } from 'src/app/auth/containers/login/login.component';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from 'src/app/config/app.config';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 
 import { OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
-import { AppAuthService } from 'src/app/auth';
-import { AppStateService } from 'src/app/shared';
+import { AuthService } from 'src/app/shared/services/auth/auth.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -39,8 +35,7 @@ describe('LoginComponent', () => {
       declarations: [LoginComponent],
       imports: [ReactiveFormsModule, CookieModule.forRoot(), HttpClientModule],
       providers: [
-        { provide: AppStateService, useValue: appStateService },
-        { provide: AppAuthService, useValue: appAuthService },
+        { provide: AuthService, useValue: appAuthService },
         { provide: Router, useValue: router },
         { provide: OcTokenService, useValue: ocTokenService },
         { provide: OcAuthService, useValue: ocAuthService },
@@ -80,15 +75,8 @@ describe('LoginComponent', () => {
     });
     it('should call the OcAuthService Login method, OcTokenService SetAccess method, and route to home', () => {
       component.onSubmit();
-      expect(ocAuthService.Login).toHaveBeenCalledWith(
-        '',
-        '',
-        'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-        ['testScope']
-      );
-      expect(ocTokenService.SetAccess).toHaveBeenCalledWith(
-        response.access_token
-      );
+      expect(ocAuthService.Login).toHaveBeenCalledWith('', '', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', ['testScope']);
+      expect(ocTokenService.SetAccess).toHaveBeenCalledWith(response.access_token);
       expect(router.navigateByUrl).toHaveBeenCalledWith('/home');
     });
 

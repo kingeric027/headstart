@@ -3,10 +3,9 @@ import { TestBed } from '@angular/core/testing';
 import { HasTokenGuard } from 'src/app/shared/guards/has-token/has-token.guard';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
-import { AppAuthService } from 'src/app/auth';
 import { of } from 'rxjs';
 import { applicationConfiguration } from 'src/app/config/app.config';
-import { AppStateService } from 'src/app/shared/services/app-state/app-state.service';
+import { AuthService } from '../../services/auth/auth.service';
 
 describe('HasTokenGuard', () => {
   let guard: HasTokenGuard;
@@ -19,19 +18,13 @@ describe('HasTokenGuard', () => {
 
   const appConfig = { anonymousShoppingEnabled: true };
   const tokenService = {
-    GetAccess: jasmine
-      .createSpy('GetAccess')
-      .and.callFake(() => mockAccessToken),
-    GetRefresh: jasmine
-      .createSpy('GetRefresh')
-      .and.returnValue(of(mockRefreshToken)),
+    GetAccess: jasmine.createSpy('GetAccess').and.callFake(() => mockAccessToken),
+    GetRefresh: jasmine.createSpy('GetRefresh').and.returnValue(of(mockRefreshToken)),
   };
   const router = { navigate: jasmine.createSpy('navigate') };
   const appAuthService = {
     authAnonymous: jasmine.createSpy('authAnonymous').and.returnValue(of(null)),
-    getRememberStatus: jasmine
-      .createSpy('getRememberStatus')
-      .and.callFake(() => rememberMe),
+    getRememberStatus: jasmine.createSpy('getRememberStatus').and.callFake(() => rememberMe),
     refresh: jasmine.createSpy('refresh').and.returnValue(of(null)),
   };
   const appStateService = {
@@ -43,10 +36,9 @@ describe('HasTokenGuard', () => {
       imports: [],
       providers: [
         { provide: applicationConfiguration, useValue: appConfig },
-        { provide: AppAuthService, useValue: appAuthService },
+        { provide: AuthService, useValue: appAuthService },
         { provide: Router, useValue: router },
         { provide: OcTokenService, useValue: tokenService },
-        { provide: AppStateService, useValue: appStateService },
       ],
     });
     guard = TestBed.get(HasTokenGuard);

@@ -5,15 +5,12 @@ import { of } from 'rxjs';
 import { OcMeService } from '@ordercloud/angular-sdk';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ModalService } from 'src/app/shared';
 
 describe('PaymentSpendingAccountComponent', () => {
   let component: PaymentSpendingAccountComponent;
   let fixture: ComponentFixture<PaymentSpendingAccountComponent>;
   const meService = {
-    ListSpendingAccounts: jasmine
-      .createSpy('ListSpendingAccounts')
-      .and.callFake(() => of({ Items: [] })),
+    ListSpendingAccounts: jasmine.createSpy('ListSpendingAccounts').and.callFake(() => of({ Items: [] })),
   };
   const modalService = {
     open: jasmine.createSpy('open'),
@@ -24,10 +21,7 @@ describe('PaymentSpendingAccountComponent', () => {
     TestBed.configureTestingModule({
       declarations: [PaymentSpendingAccountComponent],
       imports: [FontAwesomeModule],
-      providers: [
-        { provide: ModalService, useValue: modalService },
-        { provide: OcMeService, useValue: meService },
-      ],
+      providers: [{ provide: OcMeService, useValue: meService }],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
     }).compileComponents();
   }));
@@ -58,9 +52,7 @@ describe('PaymentSpendingAccountComponent', () => {
     });
     it('should return the correct spending account if saved properly', () => {
       component.payment = { ID: '1', SpendingAccountID: '1' };
-      expect(component.getSavedSpendingAccount(accounts)).toEqual(
-        accounts.Items[0]
-      );
+      expect(component.getSavedSpendingAccount(accounts)).toEqual(accounts.Items[0]);
     });
   });
 
@@ -86,16 +78,12 @@ describe('PaymentSpendingAccountComponent', () => {
     it('should throw error if no spending account was selected', () => {
       component.selectedSpendingAccount = null;
       fixture.detectChanges();
-      expect(() => component.validateAndContinue()).toThrow(
-        new Error('Please select a spending account')
-      );
+      expect(() => component.validateAndContinue()).toThrow(new Error('Please select a spending account'));
     });
     it('should throw error if not enough funds', () => {
       component.selectedSpendingAccount = { Balance: 0 };
       fixture.detectChanges();
-      expect(() => component.validateAndContinue()).toThrow(
-        new Error('This spending account has insuficient funds')
-      );
+      expect(() => component.validateAndContinue()).toThrow(new Error('This spending account has insuficient funds'));
     });
     it('should throw error if not allowed', () => {
       component.selectedSpendingAccount = {
@@ -103,9 +91,7 @@ describe('PaymentSpendingAccountComponent', () => {
         Balance: 100,
       };
       fixture.detectChanges();
-      expect(() => component.validateAndContinue()).toThrow(
-        new Error('This spending account is not an allowed payment method.')
-      );
+      expect(() => component.validateAndContinue()).toThrow(new Error('This spending account is not an allowed payment method.'));
     });
     it('should continue if no errors', () => {
       component.selectedSpendingAccount = {
