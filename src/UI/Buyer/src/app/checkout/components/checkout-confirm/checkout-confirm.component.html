@@ -19,7 +19,7 @@
                       [readOnly]="true"
                       [context]="context">
   </ocm-lineitem-table>
-  <form *ngIf="!appConfig.anonymousShoppingEnabled"
+  <form *ngIf="!anonEnabled"
         novalidate
         [formGroup]="form">
     <textarea type="text"

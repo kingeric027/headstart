@@ -1,12 +1,12 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { OcMeService, OcTokenService, MeUser } from '@ordercloud/angular-sdk';
-import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
 import { AppMatchFieldsValidator } from 'src/app/shared/validators/match-fields/match-fields.validator';
 import { RegexService } from 'src/app/shared/services/regex/regex.service';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'auth-register',
@@ -16,6 +16,7 @@ import { RegexService } from 'src/app/shared/services/regex/regex.service';
 export class RegisterComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
+  appName: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -25,10 +26,11 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private toastrService: ToastrService,
     private regexService: RegexService,
-    @Inject(applicationConfiguration) public appConfig: AppConfig
+    private context: ShopperContextService
   ) {}
 
   ngOnInit() {
+    this.appName = this.context.appSettings.appname;
     this.setForm();
   }
 

@@ -8,8 +8,8 @@ import { ToastrService } from 'ngx-toastr';
 
 // ordercloud
 import { OcPasswordResetService } from '@ordercloud/angular-sdk';
-import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { isPlatformBrowser } from '@angular/common';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'auth-forgot-password',
@@ -18,6 +18,7 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class ForgotPasswordComponent implements OnInit {
   resetEmailForm: FormGroup;
+  appName: string;
 
   constructor(
     private ocPasswordResetService: OcPasswordResetService,
@@ -25,10 +26,11 @@ export class ForgotPasswordComponent implements OnInit {
     private formBuilder: FormBuilder,
     private toasterService: ToastrService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    @Inject(applicationConfiguration) public appConfig: AppConfig
+    private context: ShopperContextService
   ) {}
 
   ngOnInit() {
+    this.appName = this.context.appSettings.appname;
     this.resetEmailForm = this.formBuilder.group({ email: '' });
   }
 
@@ -40,7 +42,7 @@ export class ForgotPasswordComponent implements OnInit {
     this.ocPasswordResetService
       .SendVerificationCode({
         Email: this.resetEmailForm.get('email').value,
-        ClientID: this.appConfig.clientID,
+        ClientID: this.context.appSettings.clientID,
         URL: hostUrl,
       })
       .subscribe(

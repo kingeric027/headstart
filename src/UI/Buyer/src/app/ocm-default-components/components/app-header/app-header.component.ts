@@ -21,8 +21,8 @@ export class OCMAppHeader extends OCMComponent implements OnChanges {
   addToCartQuantity: number;
   searchTermForProducts: string = null;
   activePath: string;
+  appName: string;
   @Input() showHeader: boolean; // TODO - find a way to remove this
-  @Input() appName: string;
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
 
@@ -35,6 +35,7 @@ export class OCMAppHeader extends OCMComponent implements OnChanges {
   faHome = faHome;
 
   ngOnChanges() {
+    this.appName = this.context.appSettings.appname;
     this.context.currentOrder.onOrderChange((order) => (this.order = order));
     this.context.currentUser.onIsAnonymousChange((isAnon) => (this.anonymous = isAnon));
     this.context.currentUser.onUserChange((user) => (this.user = user));

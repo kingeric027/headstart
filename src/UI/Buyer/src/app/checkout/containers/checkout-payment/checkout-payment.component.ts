@@ -1,10 +1,10 @@
-import { Component, OnInit, Input, Inject } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
 import { OcPaymentService, Payment, PartialPayment } from '@ordercloud/angular-sdk';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { CurrentOrderService } from 'src/app/shared';
-import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { PaymentMethod } from 'src/app/shared/models/payment-method.enum';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'checkout-payment',
@@ -16,7 +16,7 @@ export class CheckoutPaymentComponent extends CheckoutSectionBaseComponent imple
     private formBuilder: FormBuilder,
     private currentOrder: CurrentOrderService,
     private ocPaymentService: OcPaymentService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    private context: ShopperContextService
   ) {
     super();
   }
@@ -24,7 +24,7 @@ export class CheckoutPaymentComponent extends CheckoutSectionBaseComponent imple
   @Input() isAnon: boolean;
   readonly order = this.currentOrder.order;
   form: FormGroup;
-  availablePaymentMethods = this.appConfig.availablePaymentMethods;
+  availablePaymentMethods = this.context.appSettings.availablePaymentMethods;
   selectedPaymentMethod: PaymentMethod;
   existingPayment: Payment;
 

@@ -1,13 +1,12 @@
 // angular
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
 // ordercloud
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
-import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'auth-login',
@@ -23,8 +22,7 @@ export class LoginComponent implements OnInit {
     private ocTokenService: OcTokenService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private currentUser: CurrentUserService,
-    @Inject(applicationConfiguration) public appConfig: AppConfig
+    private context: ShopperContextService
   ) {}
 
   ngOnInit() {
@@ -33,7 +31,7 @@ export class LoginComponent implements OnInit {
       password: '',
       rememberMe: false,
     });
-    this.isAnon = this.currentUser.isAnonymous;
+    this.isAnon = this.context.currentUser.isAnonymous;
   }
 
   async onSubmit() {
@@ -54,6 +52,6 @@ export class LoginComponent implements OnInit {
   }
 
   showRegisterLink(): boolean {
-    return this.isAnon && this.appConfig.anonymousShoppingEnabled;
+    return this.isAnon && this.context.appSettings.anonymousShoppingEnabled;
   }
 }

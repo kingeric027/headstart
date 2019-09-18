@@ -1,6 +1,7 @@
 import { LineItem, MeUser, Order, ListLineItem, User } from '@ordercloud/angular-sdk';
 import { Input } from '@angular/core';
 import { Observable } from 'rxjs';
+import { AppConfig } from '../config/app.config';
 
 export class OCMComponent {
   // todo: the issue is that ngOnInit fires before inputs are ready. come up with a better way to do this.
@@ -15,6 +16,7 @@ export interface IShopperContext {
   currentOrder: ICurrentOrder;
   productFilterActions: IProductFilterActions;
   authentication: IAuthActions;
+  appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
 }
 
 export interface ICartActions {

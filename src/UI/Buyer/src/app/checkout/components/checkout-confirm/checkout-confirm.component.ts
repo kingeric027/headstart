@@ -1,11 +1,8 @@
-import { Component, OnInit, Inject, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
-import { CurrentOrderService } from 'src/app/shared';
-import { Order, ListPayment, ListLineItem, OcOrderService, OcLineItemService } from '@ordercloud/angular-sdk';
+import { Order, ListPayment, ListLineItem, OcOrderService } from '@ordercloud/angular-sdk';
 import { AppPaymentService } from 'src/app/shared/services/app-payment-service/app-payment.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
-import { listAll } from 'src/app/shared/functions/listAll';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
@@ -18,41 +15,36 @@ export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent imple
   order: Order;
   payments: ListPayment;
   lineItems: ListLineItem;
+  anonEnabled: boolean;
   @Input() isSubmittingOrder: boolean;
 
   constructor(
-    private currentOrder: CurrentOrderService,
     private appPaymentService: AppPaymentService,
-    private ocLineItemService: OcLineItemService,
     private formBuilder: FormBuilder,
     private ocOrderService: OcOrderService,
-    public context: ShopperContextService, //used in template
-    @Inject(applicationConfiguration) public appConfig: AppConfig
+    public context: ShopperContextService //used in template
   ) {
     super();
   }
 
   async ngOnInit() {
-    this.order = this.currentOrder.order;
-    if (!this.appConfig.anonymousShoppingEnabled) {
+    this.anonEnabled = this.context.appSettings.anonymousShoppingEnabled;
+    this.order = this.context.currentOrder.order;
+    this.lineItems = this.context.currentOrder.lineItems;
+    if (!this.anonEnabled) {
       this.form = this.formBuilder.group({ comments: '' });
     }
     this.payments = await this.appPaymentService.getPayments('outgoing', this.order.ID);
-    this.lineItems = await listAll(this.ocLineItemService, 'Outgoing', this.currentOrder.order.ID);
   }
 
-  saveCommentsAndSubmitOrder() {
+  async saveCommentsAndSubmitOrder() {
     if (this.isSubmittingOrder) {
       return;
     }
     this.isSubmittingOrder = true;
-    this.ocOrderService
-      .Patch('outgoing', this.order.ID, {
-        Comments: this.form.get('comments').value,
-      })
-      .subscribe((order) => {
-        this.currentOrder.order = order;
-        this.continue.emit();
-      });
+    const Comments = this.form.get('comments').value;
+    const order = await this.ocOrderService.Patch('outgoing', this.order.ID, { Comments }).toPromise();
+    this.context.currentOrder.order = order;
+    this.continue.emit();
   }
 }

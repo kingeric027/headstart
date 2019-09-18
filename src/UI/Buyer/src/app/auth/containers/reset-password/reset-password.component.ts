@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -8,8 +8,8 @@ import { ToastrService } from 'ngx-toastr';
 
 // ordercloud
 import { AppMatchFieldsValidator, ValidateStrongPassword, AppFormErrorService } from 'src/app/shared';
-import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { OcPasswordResetService, PasswordReset } from '@ordercloud/angular-sdk';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'auth-reset-password',
@@ -20,6 +20,7 @@ export class ResetPasswordComponent implements OnInit {
   form: FormGroup;
   username: string;
   resetCode: string;
+  appName: string;
 
   constructor(
     private router: Router,
@@ -28,10 +29,11 @@ export class ResetPasswordComponent implements OnInit {
     private formBuilder: FormBuilder,
     private ocPasswordResetService: OcPasswordResetService,
     private formErrorService: AppFormErrorService,
-    @Inject(applicationConfiguration) public appConfig: AppConfig
+    private context: ShopperContextService
   ) {}
 
   ngOnInit() {
+    this.appName = this.context.appSettings.appname;
     const urlParams = this.activatedRoute.snapshot.queryParams;
     this.username = urlParams['user'];
     this.resetCode = urlParams['code'];
@@ -57,7 +59,7 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     const config: PasswordReset = {
-      ClientID: this.appConfig.clientID,
+      ClientID: this.context.appSettings.clientID,
       Password: this.form.get('password').value,
       Username: this.username,
     };

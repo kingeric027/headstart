@@ -1,5 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
@@ -9,7 +8,7 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
   styleUrls: ['./header-wrapper.component.scss'],
 })
 export class HeaderWrapperComponent implements OnInit {
-  constructor(@Inject(applicationConfiguration) public config: AppConfig, private router: Router, public context: ShopperContextService) {}
+  constructor(private router: Router, public context: ShopperContextService) {}
 
   ngOnInit() {}
 
