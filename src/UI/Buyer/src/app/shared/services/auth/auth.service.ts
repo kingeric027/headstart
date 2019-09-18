@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 // 3rd party
 import { OcTokenService, OcAuthService, AccessToken } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
-import { CookieService } from 'ngx-cookie';
+import { CookieService } from '@gorniv/ngx-universal';
 import { AppErrorHandler } from 'src/app/config/error-handling.config';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { CurrentOrderService } from 'src/app/shared/services/current-order/current-order.service';

@@ -48,7 +48,10 @@ export class OCMAppHeader extends OCMComponent implements OnChanges {
   };
 
   isMobile(): boolean {
-    return window.innerWidth < 768; // max width for bootstrap's sm breakpoint
+    // if (isPlatformBrowser(this.platformId)) {
+    //   return window.innerWidth < 768; // max width for bootstrap's sm breakpoint
+    // }
+    return false;
   }
 
   buildAddToCartListener() {

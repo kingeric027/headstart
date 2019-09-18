@@ -4,7 +4,6 @@ import { ProfileComponent } from 'src/app/profile/containers/profile/profile.com
 import { SharedModule } from 'src/app/shared';
 import { NO_ERRORS_SCHEMA, InjectionToken } from '@angular/core';
 import { OcMeService, OcTokenService, Configuration } from '@ordercloud/angular-sdk';
-import { CookieModule } from 'ngx-cookie';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
 
@@ -16,7 +15,7 @@ describe('ProfileComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ProfileComponent],
-      imports: [CookieModule.forRoot(), SharedModule],
+      imports: [SharedModule],
       providers: [
         { provide: AuthService, useValue: appAuthService },
         {

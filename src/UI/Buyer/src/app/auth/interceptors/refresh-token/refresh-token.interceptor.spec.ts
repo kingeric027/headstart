@@ -6,7 +6,6 @@ import { HttpClientTestingModule, HttpTestingController, TestRequest } from '@an
 import { RefreshTokenInterceptor } from 'src/app/auth/interceptors/refresh-token/refresh-token.interceptor';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import { CookieModule } from 'ngx-cookie';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
 import { of, BehaviorSubject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -27,7 +26,7 @@ describe('RefreshTokenInterceptor', () => {
   let httpMock: HttpTestingController;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [CookieModule.forRoot(), HttpClientTestingModule],
+      imports: [HttpClientTestingModule],
       providers: [
         { provide: AuthService, useValue: appAuthService },
         { provide: OcTokenService, useValue: tokenService },

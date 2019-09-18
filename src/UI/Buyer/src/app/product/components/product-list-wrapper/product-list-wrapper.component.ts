@@ -39,7 +39,7 @@ export class ProductListWrapperComponent implements OnInit {
     this.router.events.subscribe((evt) => {
       if (evt instanceof NavigationEnd) {
         this.router.navigated = false; // TODO - what exactly does this line acomplish?
-        window.scrollTo(0, 0); // scroll to top of screen when new facets are selected.
+        //window.scrollTo(0, 0); // scroll to top of screen when new facets are selected.
       }
     });
   }

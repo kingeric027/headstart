@@ -7,7 +7,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 // 3rd party
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
-import { CookieModule } from 'ngx-cookie';
+import { CookieModule } from '@gorniv/ngx-universal';
 import { ToastrModule } from 'ngx-toastr';
 import { OrderCloudModule } from '@ordercloud/angular-sdk';
 import { OcSDKConfig } from 'src/app/config/ordercloud-sdk.config';

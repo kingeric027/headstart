@@ -1,11 +1,7 @@
-import { Injectable } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-} from '@angular/common/http';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 /**
  * append headers to disable IE11's aggressive caching of GET requests
@@ -20,12 +16,12 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class CacheInterceptor implements HttpInterceptor {
-  constructor() {}
-  intercept(
-    request: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
-    const hasIE11 = window.navigator.userAgent.includes('Trident/');
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const hasIE11 = false;
+    if (isPlatformBrowser(this.platformId)) {
+      window.navigator.userAgent.includes('Trident/');
+    }
     if (hasIE11 && request.method === 'GET') {
       request = request.clone({
         setHeaders: {

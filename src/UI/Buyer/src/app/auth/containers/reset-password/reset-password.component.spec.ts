@@ -6,13 +6,9 @@ import { of } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 
 import { ResetPasswordComponent } from 'src/app/auth/containers/reset-password/reset-password.component';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from 'src/app/config/app.config';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 
 import { OcPasswordResetService } from '@ordercloud/angular-sdk';
-import { CookieModule } from 'ngx-cookie';
 import { ToastrService } from 'ngx-toastr';
 import { AppFormErrorService } from 'src/app/shared';
 
@@ -22,9 +18,7 @@ describe('ResetPasswordComponent', () => {
 
   const router = { navigateByUrl: jasmine.createSpy('navigateByUrl') };
   const ocPasswordService = {
-    ResetPasswordByVerificationCode: jasmine
-      .createSpy('ResetPasswordByVerificationCode')
-      .and.returnValue(of(true)),
+    ResetPasswordByVerificationCode: jasmine.createSpy('ResetPasswordByVerificationCode').and.returnValue(of(true)),
   };
   const toastrService = { success: jasmine.createSpy('success') };
   const activatedRoute = {
@@ -39,7 +33,7 @@ describe('ResetPasswordComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ResetPasswordComponent],
-      imports: [ReactiveFormsModule, CookieModule.forRoot(), HttpClientModule],
+      imports: [ReactiveFormsModule, HttpClientModule],
       providers: [
         { provide: OcPasswordResetService, useValue: ocPasswordService },
         { provide: Router, useValue: router },
@@ -72,12 +66,8 @@ describe('ResetPasswordComponent', () => {
         password: '',
         passwordConfirm: '',
       });
-      expect(component.username).toEqual(
-        activatedRoute.snapshot.queryParams.user
-      );
-      expect(component.resetCode).toEqual(
-        activatedRoute.snapshot.queryParams.code
-      );
+      expect(component.username).toEqual(activatedRoute.snapshot.queryParams.user);
+      expect(component.resetCode).toEqual(activatedRoute.snapshot.queryParams.code);
     });
   });
   describe('onSubmit', () => {
@@ -87,19 +77,14 @@ describe('ResetPasswordComponent', () => {
       component.onSubmit();
     });
     it('should call ResetPasswordByVerificationCode', () => {
-      expect(
-        ocPasswordService.ResetPasswordByVerificationCode
-      ).toHaveBeenCalledWith('pwverificationcode', {
+      expect(ocPasswordService.ResetPasswordByVerificationCode).toHaveBeenCalledWith('pwverificationcode', {
         ClientID: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
         Password: component.form.value.password,
         Username: component.username,
       });
     });
     it('should call success toastr', () => {
-      expect(toastrService.success).toHaveBeenCalledWith(
-        'Password Reset',
-        'Success'
-      );
+      expect(toastrService.success).toHaveBeenCalledWith('Password Reset', 'Success');
     });
     it('should route user to login', () => {
       expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
@@ -116,10 +101,7 @@ describe('ResetPasswordComponent', () => {
       component['hasRequiredError']('password');
     });
     it('should call formErrorService.hasRequiredError', () => {
-      expect(formErrorService.hasRequiredError).toHaveBeenCalledWith(
-        'password',
-        component.form
-      );
+      expect(formErrorService.hasRequiredError).toHaveBeenCalledWith('password', component.form);
     });
   });
 
@@ -128,9 +110,7 @@ describe('ResetPasswordComponent', () => {
       component['hasPasswordMismatchError']();
     });
     it('should call formErrorService.hasRequiredError', () => {
-      expect(formErrorService.hasPasswordMismatchError).toHaveBeenCalledWith(
-        component.form
-      );
+      expect(formErrorService.hasPasswordMismatchError).toHaveBeenCalledWith(component.form);
     });
   });
 
@@ -139,10 +119,7 @@ describe('ResetPasswordComponent', () => {
       component['hasStrongPasswordError']('password');
     });
     it('should call formErrorService.hasStrongPasswordError', () => {
-      expect(formErrorService.hasStrongPasswordError).toHaveBeenCalledWith(
-        'password',
-        component.form
-      );
+      expect(formErrorService.hasStrongPasswordError).toHaveBeenCalledWith('password', component.form);
     });
   });
 });

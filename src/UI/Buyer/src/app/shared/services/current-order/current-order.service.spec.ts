@@ -4,7 +4,6 @@ import { HttpClient, HttpHandler } from '@angular/common/http';
 import { applicationConfiguration } from 'src/app/config/app.config';
 
 import { OcAuthService, Configuration } from '@ordercloud/angular-sdk';
-import { CookieModule } from 'ngx-cookie';
 import { RouterTestingModule } from '@angular/router/testing';
 
 describe('BaseResolveService', () => {
@@ -17,7 +16,7 @@ describe('BaseResolveService', () => {
     const authService = { isUserAnon: jasmine.createSpy('isUserAnon') };
     const appConfig = { appname: 'mgr-dev' };
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule, CookieModule.forRoot()],
+      imports: [RouterTestingModule],
       providers: [
         { provide: OcAuthService, useValue: authService },
         HttpClient,

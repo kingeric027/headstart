@@ -6,7 +6,6 @@
 // import { AppStateService } from 'src/app/shared';
 // import { OcLineItemService, OcOrderService, OcTokenService, Configuration } from '@ordercloud/angular-sdk';
 // import { HttpClient, HttpHandler } from '@angular/common/http';
-// import { CookieModule } from 'ngx-cookie';
 // import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 // import { InjectionToken } from '@angular/core';
 

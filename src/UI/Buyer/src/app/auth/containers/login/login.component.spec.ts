@@ -9,7 +9,6 @@ import { LoginComponent } from 'src/app/auth/containers/login/login.component';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 
 import { OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';
-import { CookieModule } from 'ngx-cookie';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
 
 describe('LoginComponent', () => {
@@ -33,7 +32,7 @@ describe('LoginComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      imports: [ReactiveFormsModule, CookieModule.forRoot(), HttpClientModule],
+      imports: [ReactiveFormsModule, HttpClientModule],
       providers: [
         { provide: AuthService, useValue: appAuthService },
         { provide: Router, useValue: router },

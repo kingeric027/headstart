@@ -2,7 +2,6 @@ import { TestBed, inject } from '@angular/core/testing';
 import { applicationConfiguration } from 'src/app/config/app.config';
 
 import { Configuration, OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';
-import { CookieModule, CookieService } from 'ngx-cookie';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppErrorHandler } from 'src/app/config/error-handling.config';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -38,10 +37,9 @@ describe('AppAuthService', () => {
   const baseResolveService = { resetUser: jasmine.createSpy('resetUser') };
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule, HttpClientTestingModule, CookieModule.forRoot()],
+      imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
         { provide: Router, useValue: router },
-        { provide: CookieService, useValue: cookieService },
         { provide: AppErrorHandler, useValue: appErrorHandler },
         { provide: Configuration, useValue: new Configuration() },
         { provide: applicationConfiguration, useValue: appConfig },

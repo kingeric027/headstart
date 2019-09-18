@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 // ordercloud
 import { OcPasswordResetService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'auth-forgot-password',
@@ -23,6 +24,7 @@ export class ForgotPasswordComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private toasterService: ToastrService,
+    @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(applicationConfiguration) public appConfig: AppConfig
   ) {}
 
@@ -31,11 +33,15 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   onSubmit() {
+    let hostUrl: string;
+    if (isPlatformBrowser(this.platformId)) {
+      hostUrl = window.location.origin;
+    }
     this.ocPasswordResetService
       .SendVerificationCode({
         Email: this.resetEmailForm.get('email').value,
         ClientID: this.appConfig.clientID,
-        URL: window.location.origin,
+        URL: hostUrl,
       })
       .subscribe(
         () => {

@@ -1,14 +1,10 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { AutoAppendTokenInterceptor } from 'src/app/auth/interceptors/auto-append-token/auto-append-token.interceptor';
 import { applicationConfiguration } from 'src/app/config/app.config';
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import { CookieModule } from 'ngx-cookie';
 
 describe('AutoAppendTokenInterceptor', () => {
   const mockToken = 'ABC123';
@@ -21,7 +17,7 @@ describe('AutoAppendTokenInterceptor', () => {
   let httpMock: HttpTestingController;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [CookieModule.forRoot(), HttpClientTestingModule],
+      imports: [HttpClientTestingModule],
       providers: [
         { provide: OcTokenService, useValue: tokenService },
         {
@@ -36,12 +32,9 @@ describe('AutoAppendTokenInterceptor', () => {
     httpMock = TestBed.get(HttpTestingController);
   });
 
-  it('should be created', inject(
-    [AutoAppendTokenInterceptor],
-    (service: AutoAppendTokenInterceptor) => {
-      expect(service).toBeTruthy();
-    }
-  ));
+  it('should be created', inject([AutoAppendTokenInterceptor], (service: AutoAppendTokenInterceptor) => {
+    expect(service).toBeTruthy();
+  }));
 
   describe('making http calls', () => {
     it('should add authorization headers to integration calls', () => {
@@ -49,9 +42,7 @@ describe('AutoAppendTokenInterceptor', () => {
         expect(response).toBeTruthy();
       });
       const req = httpMock.expectOne(`${mockMiddlewareUrl}/data`);
-      expect(req.request.headers.get('Authorization')).toEqual(
-        `Bearer ${mockToken}`
-      );
+      expect(req.request.headers.get('Authorization')).toEqual(`Bearer ${mockToken}`);
       req.flush({ hello: 'World' });
       httpMock.verify();
     });

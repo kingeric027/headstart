@@ -2,7 +2,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MeUpdateComponent } from 'src/app/profile/containers/me-update/me-update.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OcMeService, OcTokenService, OcAuthService } from '@ordercloud/angular-sdk';
-import { CookieModule } from 'ngx-cookie';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { InjectionToken, NO_ERRORS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
@@ -55,7 +54,7 @@ describe('MeUpdateComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [MeUpdateComponent],
-      imports: [ReactiveFormsModule, CookieModule.forRoot()],
+      imports: [ReactiveFormsModule],
       providers: [
         { provide: AppFormErrorService, useValue: formErrorService },
         { provide: Router, useValue: router },

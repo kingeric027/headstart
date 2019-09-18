@@ -21,14 +21,15 @@ export class OCMImageGallery extends OCMComponent implements OnInit {
 
   constructor() {
     super();
-    this.isResponsiveView = window.innerWidth > 900;
+    this.onResize();
   }
   ngOnInit() {
     fromEvent(window, 'resize').subscribe(() => this.onResize());
   }
 
   onResize() {
-    this.isResponsiveView = window.innerWidth > 900;
+    //this.isResponsiveView = window.innerWidth > 900;
+    this.isResponsiveView = true;
   }
 
   select(url: string): void {
