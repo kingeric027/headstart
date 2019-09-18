@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, User } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, User, AccessToken } from '@ordercloud/angular-sdk';
 import { Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppConfig } from '../config/app.config';
@@ -46,7 +46,8 @@ export interface IRouteActions {
 }
 
 export interface ICurrentUser {
-  user: MeUser;
+  get(): MeUser;
+  patch(user: MeUser): void;
   onUserChange(callback: (user: User) => void): void;
   onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void;
   onFavoriteProductsChange(callback: (productIDs: string[]) => void): void;
@@ -78,8 +79,9 @@ export interface IProductFilterActions {
 }
 
 export interface IAuthActions {
-  login(username: string, password: string): void;
+  login(username: string, password: string): Promise<AccessToken>;
   logout(): void;
+  changePassword(newPassword: string): Promise<void>;
 }
 
 export interface ProductFilters {

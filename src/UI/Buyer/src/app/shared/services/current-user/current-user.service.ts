@@ -37,10 +37,6 @@ export class CurrentUserService implements ICurrentUser {
     this.loggedInSubject.next(value);
   }
 
-  onIsLoggedInChange(callback: (isLoggedIn: boolean) => void): void {
-    this.loggedInSubject.subscribe(callback);
-  }
-
   get isAnonymous(): boolean {
     const anon = this.isAnonSubject.value;
     return anon === null ? this.isTokenAnonymous() : anon;
@@ -50,26 +46,42 @@ export class CurrentUserService implements ICurrentUser {
     this.isAnonSubject.next(value);
   }
 
-  onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void {
-    this.isAnonSubject.subscribe(callback);
+  get favoriteOrderIDs(): string[] {
+    return this.favoriteOrdersSubject.value;
   }
 
-  get user(): User {
+  get favoriteProductIDs(): string[] {
+    return this.favoriteProductsSubject.value;
+  }
+
+  private get user(): MeUser {
     return this.userSubject.value;
   }
 
-  set user(value: User) {
+  private set user(value: MeUser) {
     this.favoriteOrdersSubject.next(this.getFavorites(value, this.favOrdersXP));
     this.favoriteProductsSubject.next(this.getFavorites(value, this.favProductsXP));
     this.userSubject.next(value);
   }
 
-  onUserChange(callback: (user: User) => void) {
-    this.userSubject.subscribe(callback);
+  get(): MeUser {
+    return this.user;
   }
 
-  get favoriteProductIDs(): string[] {
-    return this.favoriteProductsSubject.value;
+  async patch(user: MeUser): Promise<void> {
+    this.user = await this.ocMeService.Patch(user).toPromise();
+  }
+
+  onIsLoggedInChange(callback: (isLoggedIn: boolean) => void): void {
+    this.loggedInSubject.subscribe(callback);
+  }
+
+  onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void {
+    this.isAnonSubject.subscribe(callback);
+  }
+
+  onUserChange(callback: (user: User) => void) {
+    this.userSubject.subscribe(callback);
   }
 
   setIsFavoriteProduct(isFav: boolean, productID: string) {
@@ -78,10 +90,6 @@ export class CurrentUserService implements ICurrentUser {
 
   onFavoriteProductsChange(callback: (productIDs: string[]) => void) {
     this.favoriteProductsSubject.subscribe(callback);
-  }
-
-  get favoriteOrderIDs(): string[] {
-    return this.favoriteOrdersSubject.value;
   }
 
   setIsFavoriteOrder(isFav: boolean, orderID: string) {
@@ -107,7 +115,7 @@ export class CurrentUserService implements ICurrentUser {
     } else {
       favorites = favorites.filter((x) => x !== ID);
     }
-    this.user = await this.ocMeService.Patch({ xp: { [XpFieldName]: favorites } }).toPromise();
+    this.patch({ xp: { [XpFieldName]: favorites } });
   }
 
   private isTokenAnonymous(): boolean {

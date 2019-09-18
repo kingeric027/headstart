@@ -5,8 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 import { OcMeService, OcTokenService, MeUser } from '@ordercloud/angular-sdk';
 import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
 import { AppMatchFieldsValidator } from 'src/app/shared/validators/match-fields/match-fields.validator';
-import { RegexService } from 'src/app/shared/services/regex/regex.service';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { HumanNamePattern, EmailPattern, PhonePattern } from 'src/app/ocm-default-components/validators/validators';
 
 @Component({
   selector: 'auth-register',
@@ -25,7 +25,6 @@ export class RegisterComponent implements OnInit {
     private ocTokenService: OcTokenService,
     private router: Router,
     private toastrService: ToastrService,
-    private regexService: RegexService,
     private context: ShopperContextService
   ) {}
 
@@ -38,10 +37,10 @@ export class RegisterComponent implements OnInit {
     this.form = this.formBuilder.group(
       {
         Username: ['', Validators.required],
-        FirstName: ['', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
-        LastName: ['', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
-        Email: ['', [Validators.required, Validators.email]],
-        Phone: ['', Validators.pattern(this.regexService.Phone)],
+        FirstName: ['', [Validators.required, HumanNamePattern]],
+        LastName: ['', [Validators.required, HumanNamePattern]],
+        Email: ['', [Validators.required, EmailPattern]],
+        Phone: ['', PhonePattern],
         Password: ['', [Validators.required, Validators.minLength(8)]],
         ConfirmPassword: ['', [Validators.required, Validators.minLength(8)]],
       },

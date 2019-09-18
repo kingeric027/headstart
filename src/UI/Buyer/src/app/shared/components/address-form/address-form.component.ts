@@ -6,7 +6,7 @@ import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
 
 import { AppGeographyService } from 'src/app/shared/services/geography/geography.service';
 import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
-import { RegexService } from 'src/app/shared/services/regex/regex.service';
+import { HumanNamePattern, USAZipPattern, PhonePattern } from 'src/app/ocm-default-components/validators/validators';
 
 @Component({
   selector: 'shared-address-form',
@@ -25,8 +25,7 @@ export class AddressFormComponent implements OnInit {
   constructor(
     private geographyService: AppGeographyService,
     private formBuilder: FormBuilder,
-    private formErrorService: AppFormErrorService,
-    private regexService: RegexService
+    private formErrorService: AppFormErrorService
   ) {
     this.countryOptions = this.geographyService.getCountries();
   }
@@ -44,17 +43,14 @@ export class AddressFormComponent implements OnInit {
 
   setForm() {
     this.addressForm = this.formBuilder.group({
-      FirstName: [this._existingAddress.FirstName || '', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
-      LastName: [this._existingAddress.LastName || '', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
+      FirstName: [this._existingAddress.FirstName || '', [Validators.required, HumanNamePattern]],
+      LastName: [this._existingAddress.LastName || '', [Validators.required, HumanNamePattern]],
       Street1: [this._existingAddress.Street1 || '', Validators.required],
       Street2: [this._existingAddress.Street2 || ''],
-      City: [this._existingAddress.City || '', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
+      City: [this._existingAddress.City || '', [Validators.required, HumanNamePattern]],
       State: [this._existingAddress.State || null, Validators.required],
-      Zip: [
-        this._existingAddress.Zip || '',
-        [Validators.required, Validators.pattern(this.regexService.getZip(this._existingAddress.Country))],
-      ],
-      Phone: [this._existingAddress.Phone || '', Validators.pattern(this.regexService.Phone)],
+      Zip: [this._existingAddress.Zip || '', [Validators.required, USAZipPattern]],
+      Phone: [this._existingAddress.Phone || '', PhonePattern],
       Country: [this._existingAddress.Country || 'US', Validators.required],
       ID: this._existingAddress.ID || '',
     });
@@ -64,7 +60,7 @@ export class AddressFormComponent implements OnInit {
   onCountryChange(event?) {
     const country = this.addressForm.value.Country;
     this.stateOptions = this.geographyService.getStates(country).map((s) => s.abbreviation);
-    this.addressForm.get('Zip').setValidators([Validators.required, Validators.pattern(this.regexService.getZip(country))]);
+    this.addressForm.get('Zip').setValidators([Validators.required, USAZipPattern]);
     if (event) {
       this.addressForm.patchValue({ State: null, Zip: '' });
     }

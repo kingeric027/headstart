@@ -44,26 +44,11 @@ const routes: Routes = [
         loadChildren: './profile/profile.module#ProfileModule',
         canActivate: [isProfiledUser],
       },
-      {
-        path: 'support',
-        component: SupportComponent,
-      },
-      {
-        path: 'faq',
-        component: FaqComponent,
-      },
-      {
-        path: 'terms-and-conditions',
-        component: TermsAndConditionsComponent,
-      },
-      {
-        path: 'products',
-        loadChildren: './product/product.module#ProductsModule',
-      },
-      {
-        path: '',
-        loadChildren: './checkout/checkout.module#CheckoutModule',
-      },
+      { path: 'support', component: SupportComponent },
+      { path: 'faq', component: FaqComponent },
+      { path: 'terms-and-conditions', component: TermsAndConditionsComponent },
+      { path: 'products', loadChildren: './product/product.module#ProductsModule' },
+      { path: '', loadChildren: './checkout/checkout.module#CheckoutModule' },
       { path: 'impersonation', redirectTo: '/home' },
     ],
   },

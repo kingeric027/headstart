@@ -16,7 +16,6 @@ export * from 'src/app/shared/services/form-error/form-error.service';
 export * from 'src/app/shared/services/geography/geography.service';
 export * from 'src/app/shared/services/cart/cart.service';
 export * from 'src/app/shared/services/reorder/reorder.service';
-export * from 'src/app/shared/services/regex/regex.service';
 
 // validators
 export * from 'src/app/shared/validators/match-fields/match-fields.validator';

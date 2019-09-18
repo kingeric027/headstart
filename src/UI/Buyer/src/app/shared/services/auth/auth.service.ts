@@ -4,7 +4,7 @@ import { tap, catchError, finalize, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 // 3rd party
-import { OcTokenService, OcAuthService, AccessToken } from '@ordercloud/angular-sdk';
+import { OcTokenService, OcAuthService, AccessToken, OcMeService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { CookieService } from '@gorniv/ngx-universal';
 import { AppErrorHandler } from 'src/app/config/error-handling.config';
@@ -30,9 +30,14 @@ export class AuthService implements IAuthActions {
     private appErrorHandler: AppErrorHandler,
     private currentUser: CurrentUserService,
     private currentOrder: CurrentOrderService,
+    private ocMeService: OcMeService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     this.refreshToken = new BehaviorSubject<string>('');
+  }
+
+  async changePassword(newPassword: string): Promise<void> {
+    await this.ocMeService.ResetPasswordByToken({ NewPassword: newPassword }).toPromise();
   }
 
   refresh(): Observable<void> {

@@ -1,12 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { OcMeService, MeUser } from '@ordercloud/angular-sdk';
+import { MeUser } from '@ordercloud/angular-sdk';
 import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
-import { RegexService } from 'src/app/shared/services/regex/regex.service';
-import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
-import { AuthService } from 'src/app/shared/services/auth/auth.service';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { HumanNamePattern, PhonePattern } from 'src/app/ocm-default-components/validators/validators';
 
 @Component({
   selector: 'profile-meupdate',
@@ -20,35 +19,46 @@ export class MeUpdateComponent implements OnInit {
   @ViewChild('passwordModal', { static: false }) public passwordModal: IModalComponent;
 
   constructor(
-    private currentUser: CurrentUserService,
     private formBuilder: FormBuilder,
     private formErrorService: AppFormErrorService,
-    private authService: AuthService,
-    private ocMeService: OcMeService,
     private toastrService: ToastrService,
-    private regexService: RegexService
+    private context: ShopperContextService
   ) {}
 
   ngOnInit() {
-    this.setForm();
-    this.getMeData();
+    this.buildForm();
+    this.context.currentUser.onUserChange(this.handleUserChange);
   }
 
-  private setForm() {
+  handleUserChange = (user: MeUser) => {
+    if (!user) return;
+    this.me = user;
+    this.form.setValue({
+      Username: this.me.Username,
+      FirstName: this.me.FirstName,
+      LastName: this.me.LastName,
+      Phone: this.me.Phone,
+      Email: this.me.Email,
+    });
+  };
+
+  private buildForm() {
     this.form = this.formBuilder.group({
       Username: ['', Validators.required],
-      FirstName: ['', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
-      LastName: ['', [Validators.required, Validators.pattern(this.regexService.HumanName)]],
+      FirstName: ['', [Validators.required, HumanNamePattern]],
+      LastName: ['', [Validators.required, HumanNamePattern]],
       Email: ['', [Validators.required, Validators.email]],
-      Phone: ['', Validators.pattern(this.regexService.Phone)],
+      Phone: ['', PhonePattern],
     });
   }
 
   async onChangePassword({ currentPassword, newPassword }) {
-    // todo - is this login check necessary?
-    const creds = await this.authService.login(this.me.Username, currentPassword);
-    if (!creds) return;
-    await this.ocMeService.ResetPasswordByToken({ NewPassword: newPassword }).toPromise();
+    try {
+      await this.context.authentication.login(this.me.Username, currentPassword);
+    } catch (ex) {
+      this.toastrService.error('Current Password is incorrect');
+    }
+    await this.context.authentication.changePassword(newPassword);
     this.toastrService.success('Account Info Updated', 'Success');
     this.passwordModal.close();
   }
@@ -57,31 +67,15 @@ export class MeUpdateComponent implements OnInit {
     this.passwordModal.open();
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.form.status === 'INVALID') {
       return this.formErrorService.displayFormErrors(this.form);
     }
 
-    const me = <MeUser>this.form.value;
+    const me: MeUser = this.form.value;
     me.Active = true;
-
-    this.ocMeService.Patch(me).subscribe((res) => {
-      this.currentUser.user = res;
-      this.toastrService.success('Account Info Updated');
-    });
-  }
-
-  private getMeData() {
-    this.ocMeService.Get().subscribe((me) => {
-      this.me = me;
-      this.form.setValue({
-        Username: me.Username,
-        FirstName: me.FirstName,
-        LastName: me.LastName,
-        Phone: me.Phone,
-        Email: me.Email,
-      });
-    });
+    await this.context.currentUser.patch(me);
+    this.toastrService.success('Account Info Updated');
   }
 
   // control display of error messages
