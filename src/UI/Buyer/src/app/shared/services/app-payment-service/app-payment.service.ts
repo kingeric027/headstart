@@ -1,49 +1,33 @@
 import { Injectable } from '@angular/core';
-import {
-  ListPayment,
-  OcPaymentService,
-  OcMeService,
-  Payment,
-} from '@ordercloud/angular-sdk';
-import { Observable, of, forkJoin } from 'rxjs';
-import { map, flatMap } from 'rxjs/operators';
+import { ListPayment, OcPaymentService, OcMeService, Payment } from '@ordercloud/angular-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppPaymentService {
-  constructor(
-    private ocPaymentService: OcPaymentService,
-    private ocMeService: OcMeService
-  ) {}
+  constructor(private ocPaymentService: OcPaymentService, private ocMeService: OcMeService) {}
 
-  getPayments(direction: string, orderID: string): Observable<ListPayment> {
-    return this.ocPaymentService.List(direction, orderID).pipe(
-      flatMap((paymentList) => {
-        const requests = paymentList.Items.map((payment) =>
-          this.getPaymentDetails(payment)
-        );
-        return forkJoin(requests).pipe(
-          map((res) => {
-            res.forEach((details, index) => {
-              // put details for each payment type on payment.Details
-              (paymentList.Items[index] as any).Details = details;
-            });
-            return paymentList;
-          })
-        );
-      })
-    );
+  async getPayments(direction: string, orderID: string): Promise<ListPayment> {
+    const payments = await this.ocPaymentService.List(direction, orderID).toPromise();
+    const withDetails = payments.Items.map((payment) => this.setPaymentDetails(payment));
+    const Items = await Promise.all(withDetails);
+    return { Items, Meta: payments.Meta };
   }
 
-  private getPaymentDetails(payment: Payment): Observable<any> {
+  private async setPaymentDetails(payment: Payment): Promise<Payment> {
+    const details = await this.getPaymentDetails(payment);
+    (payment as any).Details = details;
+    return payment;
+  }
+
+  private async getPaymentDetails(payment: Payment): Promise<any> {
     switch (payment.Type) {
       case 'CreditCard':
-        return this.ocMeService.GetCreditCard(payment.CreditCardID);
+        return this.ocMeService.GetCreditCard(payment.CreditCardID).toPromise();
       case 'SpendingAccount':
-        return this.ocMeService.GetSpendingAccount(payment.SpendingAccountID);
+        return this.ocMeService.GetSpendingAccount(payment.SpendingAccountID).toPromise();
       case 'PurchaseOrder':
-        return of({ PONumber: payment.xp.PONumber });
+        return Promise.resolve({ PONumber: payment.xp.PONumber });
     }
   }
 }

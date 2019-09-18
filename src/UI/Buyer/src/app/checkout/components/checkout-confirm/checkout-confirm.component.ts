@@ -2,7 +2,6 @@ import { Component, OnInit, Inject, Input } from '@angular/core';
 import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
 import { CurrentOrderService } from 'src/app/shared';
 import { Order, ListPayment, ListLineItem, OcOrderService, OcLineItemService } from '@ordercloud/angular-sdk';
-import { Observable } from 'rxjs';
 import { AppPaymentService } from 'src/app/shared/services/app-payment-service/app-payment.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
@@ -17,7 +16,7 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
 export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent implements OnInit {
   form: FormGroup;
   order: Order;
-  payments$: Observable<ListPayment>;
+  payments: ListPayment;
   lineItems: ListLineItem;
   @Input() isSubmittingOrder: boolean;
 
@@ -38,7 +37,7 @@ export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent imple
     if (!this.appConfig.anonymousShoppingEnabled) {
       this.form = this.formBuilder.group({ comments: '' });
     }
-    this.payments$ = this.appPaymentService.getPayments('outgoing', this.order.ID);
+    this.payments = await this.appPaymentService.getPayments('outgoing', this.order.ID);
     this.lineItems = await listAll(this.ocLineItemService, 'Outgoing', this.currentOrder.order.ID);
   }
 

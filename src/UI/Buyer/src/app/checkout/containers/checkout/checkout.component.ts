@@ -6,7 +6,6 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { AppErrorHandler } from 'src/app/config/error-handling.config';
-import { flatMap } from 'rxjs/operators';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
@@ -76,30 +75,21 @@ export class CheckoutComponent implements OnInit {
     this.accordian.toggle(id);
   }
 
-  submitOrder() {
+  async submitOrder() {
     this.isSubmittingOrder = true;
     const orderID = this.currentOrder.order.ID;
-    this.ocOrderService
-      .Get('outgoing', orderID)
-      .pipe(
-        flatMap((order) => {
-          if (order.IsSubmitted) {
-            return throwError({ message: 'Order has already been submitted' });
-          }
-          return this.ocOrderService.Submit('outgoing', orderID);
-        })
-      )
-      .subscribe(
-        () => {
-          this.router.navigateByUrl(`order-confirmation/${orderID}`);
-          this.currentOrder.reset();
-        },
-        (ex) => {
-          // order submit error occurred
-          this.isSubmittingOrder = false;
-          this.appErrorHandler.displayError(ex);
-        }
-      );
+    const order = await this.ocOrderService.Get('outgoing', orderID).toPromise();
+    if (order.IsSubmitted) {
+      return throwError({ message: 'Order has already been submitted' });
+    }
+    try {
+      await this.ocOrderService.Submit('outgoing', orderID).toPromise();
+    } catch (ex) {
+      this.isSubmittingOrder = false;
+      this.appErrorHandler.displayError(ex);
+    }
+    this.router.navigateByUrl(`order-confirmation/${orderID}`);
+    this.currentOrder.reset();
   }
 
   beforeChange($event) {

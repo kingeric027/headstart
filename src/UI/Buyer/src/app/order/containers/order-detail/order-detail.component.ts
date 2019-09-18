@@ -13,12 +13,11 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
   styleUrls: ['./order-detail.component.scss'],
 })
 export class OrderDetailsComponent implements OnInit {
-  orderID: string;
   order$: Observable<Order>;
   lineItems$: Observable<ListLineItem>;
-  promotions$: Observable<ListPromotion>;
-  payments$: Observable<ListPayment>;
-  approvals$: Observable<OrderApproval[]>;
+  promotions: ListPromotion;
+  payments: ListPayment;
+  approvals: OrderApproval[] = [];
 
   constructor(
     protected activatedRoute: ActivatedRoute,
@@ -30,28 +29,25 @@ export class OrderDetailsComponent implements OnInit {
   ngOnInit() {
     this.order$ = this.activatedRoute.data.pipe(map(({ orderResolve }) => orderResolve.order));
     this.lineItems$ = this.activatedRoute.data.pipe(map(({ orderResolve }) => orderResolve.lineItems));
-    this.activatedRoute.paramMap.subscribe((params: ParamMap) => {
-      this.orderID = params.get('orderID');
-      this.promotions$ = this.getPromotions();
-      this.payments$ = this.getPayments();
-      this.approvals$ = this.getApprovals();
+    this.activatedRoute.paramMap.subscribe(async (params: ParamMap) => {
+      const orderID = params.get('orderID');
+      this.promotions = await this.getPromotions(orderID);
+      this.payments = await this.getPayments(orderID);
+      this.approvals = await this.getApprovals(orderID);
     });
   }
 
-  protected getPromotions(): Observable<ListPromotion> {
-    return (this.promotions$ = this.ocOrderService.ListPromotions('outgoing', this.orderID));
+  protected async getPromotions(orderID: string): Promise<ListPromotion> {
+    return this.ocOrderService.ListPromotions('outgoing', orderID).toPromise();
   }
 
-  protected getPayments(): Observable<ListPayment> {
-    return this.appPaymentService.getPayments('outgoing', this.orderID);
+  protected async getPayments(orderID: string): Promise<ListPayment> {
+    return this.appPaymentService.getPayments('outgoing', orderID);
   }
 
-  protected getApprovals(): Observable<OrderApproval[]> {
-    return this.ocOrderService.ListApprovals('outgoing', this.orderID).pipe(
-      map((list) => {
-        list.Items = list.Items.filter((x) => x.Approver);
-        return _uniqBy(list.Items, (x) => x.Comments);
-      })
-    );
+  protected async getApprovals(orderID: string): Promise<OrderApproval[]> {
+    const approvals = await this.ocOrderService.ListApprovals('outgoing', orderID).toPromise();
+    approvals.Items = approvals.Items.filter((x) => x.Approver);
+    return _uniqBy(approvals.Items, (x) => x.Comments);
   }
 }

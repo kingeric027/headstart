@@ -5,8 +5,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { CurrentOrderService } from 'src/app/shared';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { PaymentMethod } from 'src/app/shared/models/payment-method.enum';
-import { flatMap, tap } from 'rxjs/operators';
-import { forkJoin, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'checkout-payment',
@@ -30,40 +28,39 @@ export class CheckoutPaymentComponent extends CheckoutSectionBaseComponent imple
   selectedPaymentMethod: PaymentMethod;
   existingPayment: Payment;
 
-  ngOnInit() {
+  async ngOnInit() {
     this.form = this.formBuilder.group({
       selectedPaymentMethod: [{ value: '', disabled: this.availablePaymentMethods.length === 1 }],
     });
-    this.initializePaymentMethod();
+    await this.initializePaymentMethod();
   }
 
-  initializePaymentMethod(): void {
+  async initializePaymentMethod(): Promise<void> {
     if (this.availablePaymentMethods.length === 1) {
       this.selectedPaymentMethod = this.availablePaymentMethods[0];
     }
-    this.ocPaymentService.List('outgoing', this.order.ID).subscribe((paymentList) => {
-      if (paymentList.Items && paymentList.Items.length > 0) {
-        this.existingPayment = paymentList.Items[0];
-      } else {
-        this.existingPayment = null;
-      }
+    const payments = await this.ocPaymentService.List('outgoing', this.order.ID).toPromise();
+    if (payments.Items && payments.Items.length > 0) {
+      this.existingPayment = payments.Items[0];
+    } else {
+      this.existingPayment = null;
+    }
 
-      if (this.existingPayment) {
-        this.selectPaymentMethod(this.existingPayment.Type as PaymentMethod);
-      } else {
-        this.selectPaymentMethod(this.availablePaymentMethods[0]);
-      }
-    });
+    if (this.existingPayment) {
+      await this.selectPaymentMethod(this.existingPayment.Type as PaymentMethod);
+    } else {
+      await this.selectPaymentMethod(this.availablePaymentMethods[0]);
+    }
   }
 
-  selectPaymentMethod(method: PaymentMethod): void {
+  async selectPaymentMethod(method: PaymentMethod): Promise<void> {
     if (method) {
       this.form.controls['selectedPaymentMethod'].setValue(method);
     }
     this.selectedPaymentMethod = this.form.get('selectedPaymentMethod').value;
     if (this.selectedPaymentMethod !== PaymentMethod.SpendingAccount && this.existingPayment && this.existingPayment.SpendingAccountID) {
       this.existingPayment = null;
-      this.deleteExistingPayments().subscribe();
+      await this.deleteExistingPayments();
     }
   }
 
@@ -71,36 +68,18 @@ export class CheckoutPaymentComponent extends CheckoutSectionBaseComponent imple
     this.continue.emit();
   }
 
-  createPayment(payment: Payment) {
-    return this.deleteExistingPayments()
-      .pipe(
-        flatMap(() => {
-          return this.ocPaymentService.Create('outgoing', this.order.ID, payment).pipe(
-            tap((paymentResult) => {
-              this.existingPayment = paymentResult;
-            })
-          );
-        })
-      )
-      .subscribe();
+  async createPayment(payment: Payment) {
+    await this.deleteExistingPayments();
+    this.existingPayment = await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
   }
 
-  private deleteExistingPayments(): Observable<any[]> {
-    return this.ocPaymentService.List('outgoing', this.order.ID).pipe(
-      flatMap((paymentList) => {
-        if (!paymentList.Items.length) {
-          return of([]);
-        }
-        const requests = paymentList.Items.map((payment) => this.ocPaymentService.Delete('outgoing', this.order.ID, payment.ID));
-
-        return forkJoin(requests);
-      })
-    );
+  private async deleteExistingPayments(): Promise<any[]> {
+    const payments = await this.ocPaymentService.List('outgoing', this.order.ID).toPromise();
+    const deleteAll = payments.Items.map((payment) => this.ocPaymentService.Delete('outgoing', this.order.ID, payment.ID).toPromise());
+    return Promise.all(deleteAll);
   }
 
-  patchPayment({ paymentID, payment }: { paymentID: string; payment: PartialPayment }) {
-    this.ocPaymentService.Patch('outgoing', this.order.ID, paymentID, payment).subscribe((paymentResult) => {
-      this.existingPayment = paymentResult;
-    });
+  async patchPayment({ paymentID, payment }: { paymentID: string; payment: PartialPayment }) {
+    this.existingPayment = await this.ocPaymentService.Patch('outgoing', this.order.ID, paymentID, payment).toPromise();
   }
 }
