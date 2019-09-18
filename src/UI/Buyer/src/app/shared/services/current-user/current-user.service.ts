@@ -15,7 +15,7 @@ export class CurrentUserService implements ICurrentUser {
   private readonly favProductsXP = 'FavoriteProducts';
 
   private userSubject: BehaviorSubject<MeUser> = new BehaviorSubject<MeUser>(null);
-  private isAnonSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  private isAnonSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
   private loggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   // todo - this data is in user also. remove duplicate?
   private favoriteOrdersSubject: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
@@ -24,7 +24,7 @@ export class CurrentUserService implements ICurrentUser {
   constructor(private ocMeService: OcMeService, private ocTokenService: OcTokenService, private toastrService: ToastrService) {}
 
   async reset(): Promise<void> {
-    this.isAnonymous = !_isUndefined(this.getOrderIDFromToken());
+    this.isAnonymous = this.isTokenAnonymous();
     this.user = await this.ocMeService.Get().toPromise();
     this.isLoggedIn = this.user.Active;
   }
@@ -42,7 +42,8 @@ export class CurrentUserService implements ICurrentUser {
   }
 
   get isAnonymous(): boolean {
-    return this.isAnonSubject.value;
+    const anon = this.isAnonSubject.value;
+    return anon === null ? this.isTokenAnonymous() : anon;
   }
 
   set isAnonymous(value: boolean) {
@@ -109,7 +110,13 @@ export class CurrentUserService implements ICurrentUser {
     this.user = await this.ocMeService.Patch({ xp: { [XpFieldName]: favorites } }).toPromise();
   }
 
+  private isTokenAnonymous(): boolean {
+    return !_isUndefined(this.getOrderIDFromToken());
+  }
+
   getOrderIDFromToken(): string | void {
-    return jwtDecode(this.ocTokenService.GetAccess()).orderid;
+    const jwt = this.ocTokenService.GetAccess();
+    if (!jwt) return null;
+    return jwtDecode(jwt).orderid;
   }
 }
