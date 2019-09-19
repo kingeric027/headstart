@@ -2,9 +2,8 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AppMatchFieldsValidator } from 'src/app/shared/validators/match-fields/match-fields.validator';
-import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
 import { MeUser } from '@ordercloud/angular-sdk';
-import { ValidateStrongPassword } from 'src/app/shared/validators/strong-password/strong-password.validator';
+import { ValidateStrongPassword } from 'src/app/ocm-default-components/validators/validators';
 
 @Component({
   selector: 'profile-change-password-form',
@@ -21,7 +20,7 @@ export class ChangePasswordFormComponent implements OnInit {
     newPassword: string;
   }>();
 
-  constructor(private formBuilder: FormBuilder, private formErrorService: AppFormErrorService) {}
+  constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit() {
     this.setForm();
@@ -48,15 +47,10 @@ export class ChangePasswordFormComponent implements OnInit {
 
   updatePassword() {
     if (this.form.status === 'INVALID') {
-      return this.formErrorService.displayFormErrors(this.form);
+      return;
     }
     const { currentPassword, newPassword } = this.form.value;
     this.changePassword.emit({ currentPassword, newPassword });
     this.form.reset();
   }
-
-  // control display of error messages
-  hasRequiredError = (controlName: string): boolean => this.formErrorService.hasRequiredError(controlName, this.form);
-  hasPasswordMismatchError = (): boolean => this.formErrorService.hasPasswordMismatchError(this.form);
-  hasStrongPasswordError = (controlName: string): boolean => this.formErrorService.hasStrongPasswordError(controlName, this.form);
 }

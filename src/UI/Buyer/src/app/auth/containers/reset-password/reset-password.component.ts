@@ -7,9 +7,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 // ordercloud
-import { AppMatchFieldsValidator, ValidateStrongPassword, AppFormErrorService } from 'src/app/shared';
+import { AppMatchFieldsValidator } from 'src/app/shared';
 import { OcPasswordResetService, PasswordReset } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { ValidateStrongPassword } from 'src/app/ocm-default-components/validators/validators';
 
 @Component({
   selector: 'auth-reset-password',
@@ -28,7 +29,6 @@ export class ResetPasswordComponent implements OnInit {
     private toasterService: ToastrService,
     private formBuilder: FormBuilder,
     private ocPasswordResetService: OcPasswordResetService,
-    private formErrorService: AppFormErrorService,
     private context: ShopperContextService
   ) {}
 
@@ -69,9 +69,4 @@ export class ResetPasswordComponent implements OnInit {
       this.router.navigateByUrl('/login');
     });
   }
-
-  // control display of error messages
-  hasRequiredError = (controlName: string): boolean => this.formErrorService.hasRequiredError(controlName, this.form);
-  hasPasswordMismatchError = (): boolean => this.formErrorService.hasPasswordMismatchError(this.form);
-  hasStrongPasswordError = (controlName: string): boolean => this.formErrorService.hasStrongPasswordError(controlName, this.form);
 }

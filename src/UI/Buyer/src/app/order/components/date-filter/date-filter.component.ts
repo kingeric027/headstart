@@ -3,8 +3,7 @@ import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { debounceTime, takeWhile } from 'rxjs/operators';
-import { AppFormErrorService } from 'src/app/shared';
-import { DateValidator } from 'src/app/shared/validators/date-input/date-input.validator';
+import { DateValidator } from 'src/app/ocm-default-components/validators/validators';
 
 @Component({
   selector: 'order-date-filter',
@@ -18,12 +17,12 @@ export class DateFilterComponent implements OnInit, OnDestroy {
   form: FormGroup;
   @Output() selectedDate = new EventEmitter<string[]>();
 
-  constructor(private formBuilder: FormBuilder, private datePipe: DatePipe, private formErrorService: AppFormErrorService) {}
+  constructor(private formBuilder: FormBuilder, private datePipe: DatePipe) {}
 
   ngOnInit() {
     this.form = this.formBuilder.group({
-      fromDate: [<Date>null, DateValidator()],
-      toDate: [<Date>null, DateValidator()],
+      fromDate: [<Date>null, DateValidator],
+      toDate: [<Date>null, DateValidator],
     });
     this.onFormChanges();
   }
@@ -73,6 +72,4 @@ export class DateFilterComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.alive = false;
   }
-
-  hasDateError = (controlName: string) => this.formErrorService.hasDateError(controlName, this.form);
 }

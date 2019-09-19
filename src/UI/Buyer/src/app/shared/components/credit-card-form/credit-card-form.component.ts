@@ -1,7 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { CreateCardDetails } from 'src/app/shared';
-import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faCcVisa, faCcMastercard, faCcDiscover } from '@fortawesome/free-brands-svg-icons';
 
@@ -11,7 +10,7 @@ import { faCcVisa, faCcMastercard, faCcDiscover } from '@fortawesome/free-brands
   styleUrls: ['./credit-card-form.component.scss'],
 })
 export class CreditCardFormComponent implements OnInit {
-  constructor(private formBuilder: FormBuilder, private formErrorService: AppFormErrorService) {}
+  constructor(private formBuilder: FormBuilder) {}
 
   @Output() formSubmitted = new EventEmitter<CreateCardDetails>();
   faCcVisa = faCcVisa;
@@ -42,7 +41,6 @@ export class CreditCardFormComponent implements OnInit {
 
   onSubmit() {
     if (this.cardForm.status === 'INVALID') {
-      this.formErrorService.displayFormErrors(this.cardForm);
       return;
     }
 
@@ -52,7 +50,4 @@ export class CreditCardFormComponent implements OnInit {
     delete card.expYear;
     this.formSubmitted.emit(card);
   }
-
-  // control display of required error messages
-  hasRequiredError = (controlName: string) => this.formErrorService.hasRequiredError(controlName, this.cardForm);
 }

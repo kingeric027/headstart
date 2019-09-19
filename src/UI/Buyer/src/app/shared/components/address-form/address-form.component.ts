@@ -5,8 +5,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
 
 import { AppGeographyService } from 'src/app/shared/services/geography/geography.service';
-import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
-import { HumanNamePattern, USAZipPattern, PhonePattern } from 'src/app/ocm-default-components/validators/validators';
+import { ValidateName, ValidateUSZip, ValidatePhone } from 'src/app/ocm-default-components/validators/validators';
 
 @Component({
   selector: 'shared-address-form',
@@ -22,11 +21,7 @@ export class AddressFormComponent implements OnInit {
   countryOptions: { label: string; abbreviation: string }[];
   addressForm: FormGroup;
 
-  constructor(
-    private geographyService: AppGeographyService,
-    private formBuilder: FormBuilder,
-    private formErrorService: AppFormErrorService
-  ) {
+  constructor(private geographyService: AppGeographyService, private formBuilder: FormBuilder) {
     this.countryOptions = this.geographyService.getCountries();
   }
 
@@ -43,14 +38,14 @@ export class AddressFormComponent implements OnInit {
 
   setForm() {
     this.addressForm = this.formBuilder.group({
-      FirstName: [this._existingAddress.FirstName || '', [Validators.required, HumanNamePattern]],
-      LastName: [this._existingAddress.LastName || '', [Validators.required, HumanNamePattern]],
+      FirstName: [this._existingAddress.FirstName || '', [Validators.required, ValidateName]],
+      LastName: [this._existingAddress.LastName || '', [Validators.required, ValidateName]],
       Street1: [this._existingAddress.Street1 || '', Validators.required],
       Street2: [this._existingAddress.Street2 || ''],
-      City: [this._existingAddress.City || '', [Validators.required, HumanNamePattern]],
+      City: [this._existingAddress.City || '', [Validators.required, ValidateName]],
       State: [this._existingAddress.State || null, Validators.required],
-      Zip: [this._existingAddress.Zip || '', [Validators.required, USAZipPattern]],
-      Phone: [this._existingAddress.Phone || '', PhonePattern],
+      Zip: [this._existingAddress.Zip || '', [Validators.required, ValidateUSZip]],
+      Phone: [this._existingAddress.Phone || '', ValidatePhone],
       Country: [this._existingAddress.Country || 'US', Validators.required],
       ID: this._existingAddress.ID || '',
     });
@@ -60,7 +55,7 @@ export class AddressFormComponent implements OnInit {
   onCountryChange(event?) {
     const country = this.addressForm.value.Country;
     this.stateOptions = this.geographyService.getStates(country).map((s) => s.abbreviation);
-    this.addressForm.get('Zip').setValidators([Validators.required, USAZipPattern]);
+    this.addressForm.get('Zip').setValidators([Validators.required, ValidateUSZip]);
     if (event) {
       this.addressForm.patchValue({ State: null, Zip: '' });
     }
@@ -68,15 +63,11 @@ export class AddressFormComponent implements OnInit {
 
   onSubmit() {
     if (this.addressForm.status === 'INVALID') {
-      return this.formErrorService.displayFormErrors(this.addressForm);
+      return;
     }
     this.formSubmitted.emit({
       address: this.addressForm.value,
       formDirty: this.addressForm.dirty,
     });
   }
-
-  // control display of error messages
-  hasRequiredError = (controlName: string) => this.formErrorService.hasRequiredError(controlName, this.addressForm);
-  hasPatternError = (controlName: string) => this.formErrorService.hasPatternError(controlName, this.addressForm);
 }

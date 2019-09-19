@@ -45,6 +45,7 @@ import { OrderPaymentListComponent } from 'src/app/shared/components/payment-lis
 import { NoResultsComponent } from './components/no-results/no-results.component';
 import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
 import { PhoneInputDirective } from './directives/phone-input/phone-input.directive';
+import { FormControlErrorDirective } from './directives/directives/form-control-errors.directive';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -111,6 +112,7 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     GenericBrowseComponent,
     ModalComponent,
     OrderPaymentListComponent,
+    FormControlErrorDirective,
   ],
   declarations: [
     OrderStatusDisplayPipe,
@@ -130,6 +132,7 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     ModalComponent,
     OrderPaymentListComponent,
     NoResultsComponent,
+    FormControlErrorDirective,
   ],
 })
 export class SharedModule {}

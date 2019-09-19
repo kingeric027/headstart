@@ -2,10 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MeUser } from '@ordercloud/angular-sdk';
-import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
 import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
-import { HumanNamePattern, PhonePattern } from 'src/app/ocm-default-components/validators/validators';
+import { ValidateName, ValidatePhone, ValidateEmail } from 'src/app/ocm-default-components/validators/validators';
 
 @Component({
   selector: 'profile-meupdate',
@@ -18,12 +17,7 @@ export class MeUpdateComponent implements OnInit {
   alive = true;
   @ViewChild('passwordModal', { static: false }) public passwordModal: IModalComponent;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private formErrorService: AppFormErrorService,
-    private toastrService: ToastrService,
-    private context: ShopperContextService
-  ) {}
+  constructor(private formBuilder: FormBuilder, private toastrService: ToastrService, private context: ShopperContextService) {}
 
   ngOnInit() {
     this.buildForm();
@@ -45,10 +39,10 @@ export class MeUpdateComponent implements OnInit {
   private buildForm() {
     this.form = this.formBuilder.group({
       Username: ['', Validators.required],
-      FirstName: ['', [Validators.required, HumanNamePattern]],
-      LastName: ['', [Validators.required, HumanNamePattern]],
-      Email: ['', [Validators.required, Validators.email]],
-      Phone: ['', PhonePattern],
+      FirstName: ['', [Validators.required, ValidateName]],
+      LastName: ['', [Validators.required, ValidateName]],
+      Email: ['', [Validators.required, ValidateEmail]],
+      Phone: ['', ValidatePhone],
     });
   }
 
@@ -69,7 +63,7 @@ export class MeUpdateComponent implements OnInit {
 
   async onSubmit() {
     if (this.form.status === 'INVALID') {
-      return this.formErrorService.displayFormErrors(this.form);
+      return;
     }
 
     const me: MeUser = this.form.value;
@@ -77,10 +71,4 @@ export class MeUpdateComponent implements OnInit {
     await this.context.currentUser.patch(me);
     this.toastrService.success('Account Info Updated');
   }
-
-  // control display of error messages
-  hasRequiredError = (controlName: string): boolean => this.formErrorService.hasRequiredError(controlName, this.form);
-  hasEmailError = (): boolean => this.formErrorService.hasInvalidEmailError(this.form.get('Email'));
-  hasPatternError = (controlName: string) => this.formErrorService.hasPatternError(controlName, this.form);
-  passwordMismatchError = (): boolean => this.formErrorService.hasPasswordMismatchError(this.form);
 }

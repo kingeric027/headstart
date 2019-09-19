@@ -21,9 +21,8 @@
                id="Username"
                placeholder="Username"
                autofocus="true"
-               autocomplete="off" />
-        <span *ngIf="hasRequiredError('Username')"
-              class="error-message">Username is required</span>
+               autocomplete="off"
+               showErrors />
       </div>
       <div class="form-group">
         <label class="sr-only"
@@ -33,11 +32,8 @@
                class="form-control"
                id="FirstName"
                placeholder="First Name"
-               autocomplete="off" />
-        <span *ngIf="hasRequiredError('FirstName')"
-              class="error-message">First Name is required</span>
-        <span *ngIf="hasPatternError('FirstName')"
-              class="error-message">Name can only contain characters Aa-Zz 0-9 - ' .</span>
+               autocomplete="off"
+               showErrors />
       </div>
       <div class="form-group">
         <label class="sr-only"
@@ -47,11 +43,8 @@
                class="form-control"
                id="LastName"
                placeholder="Last Name"
-               autocomplete="off" />
-        <span *ngIf="hasRequiredError('LastName')"
-              class="error-message">Last Name is required</span>
-        <span *ngIf="hasPatternError('LastName')"
-              class="error-message">Name can only contain characters Aa-Zz 0-9 - ' .</span>
+               autocomplete="off"
+               showErrors />
       </div>
       <div class="form-group">
         <label class="sr-only"
@@ -61,9 +54,8 @@
                class="form-control"
                id="Email"
                placeholder="Email"
-               autocomplete="off" />
-        <span *ngIf="hasEmailError()"
-              class="error-message">Please enter a valid email</span>
+               autocomplete="off"
+               showErrors />
       </div>
       <div class="form-group">
         <label class="sr-only"
@@ -73,9 +65,8 @@
                class="form-control"
                id="Phone"
                placeholder="Phone Number"
-               autocomplete="off" />
-        <span *ngIf="hasPatternError('Phone')"
-              class="error-message">Phone can only contain 20 numbers or "-" chars (no spaces)</span>
+               autocomplete="off"
+               showErrors />
       </div>
       <div class="form-group">
         <label class="sr-only"
@@ -85,9 +76,8 @@
                class="form-control"
                id="Password"
                placeholder="Password"
-               autocomplete="off" />
-        <span *ngIf="hasRequiredError('Password')"
-              class="error-message">Password is required</span>
+               autocomplete="off"
+               showErrors />
       </div>
       <div class="form-group">
         <label class="sr-only"
@@ -97,11 +87,8 @@
                class="form-control"
                id="ConfirmPassword"
                placeholder="Confirm Password"
-               autocomplete="off" />
-        <span *ngIf="hasRequiredError('ConfirmPassword')"
-              class="error-message">Confirm is required</span>
-        <span *ngIf="passwordMismatchError()"
-              class="error-message">Passwords must match</span>
+               autocomplete="off"
+               showErrors />
       </div>
       <button type="submit"
               class="btn btn-primary btn-lg btn-block mt-4">Register

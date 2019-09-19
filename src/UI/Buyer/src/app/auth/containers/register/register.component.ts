@@ -3,10 +3,9 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { OcMeService, OcTokenService, MeUser } from '@ordercloud/angular-sdk';
-import { AppFormErrorService } from 'src/app/shared/services/form-error/form-error.service';
 import { AppMatchFieldsValidator } from 'src/app/shared/validators/match-fields/match-fields.validator';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
-import { HumanNamePattern, EmailPattern, PhonePattern } from 'src/app/ocm-default-components/validators/validators';
+import { ValidateName, ValidatePhone, ValidateEmail, ValidateStrongPassword } from 'src/app/ocm-default-components/validators/validators';
 
 @Component({
   selector: 'auth-register',
@@ -20,7 +19,6 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private formErrorService: AppFormErrorService,
     private ocMeService: OcMeService,
     private ocTokenService: OcTokenService,
     private router: Router,
@@ -37,12 +35,12 @@ export class RegisterComponent implements OnInit {
     this.form = this.formBuilder.group(
       {
         Username: ['', Validators.required],
-        FirstName: ['', [Validators.required, HumanNamePattern]],
-        LastName: ['', [Validators.required, HumanNamePattern]],
-        Email: ['', [Validators.required, EmailPattern]],
-        Phone: ['', PhonePattern],
-        Password: ['', [Validators.required, Validators.minLength(8)]],
-        ConfirmPassword: ['', [Validators.required, Validators.minLength(8)]],
+        FirstName: ['', [Validators.required, ValidateName]],
+        LastName: ['', [Validators.required, ValidateName]],
+        Email: ['', [Validators.required, ValidateEmail]],
+        Phone: ['', ValidatePhone],
+        Password: ['', [Validators.required, ValidateStrongPassword]],
+        ConfirmPassword: ['', [Validators.required, ValidateStrongPassword]],
       },
       {
         validator: AppMatchFieldsValidator('Password', 'ConfirmPassword'),
@@ -52,7 +50,7 @@ export class RegisterComponent implements OnInit {
 
   onSubmit() {
     if (this.form.status === 'INVALID') {
-      return this.formErrorService.displayFormErrors(this.form);
+      return;
     }
 
     const me = <MeUser>this.form.value;
@@ -63,10 +61,4 @@ export class RegisterComponent implements OnInit {
       this.router.navigate(['/login']);
     });
   }
-
-  // control display of error messages
-  hasRequiredError = (controlName: string): boolean => this.formErrorService.hasRequiredError(controlName, this.form);
-  hasEmailError = (): boolean => this.formErrorService.hasInvalidEmailError(this.form.get('Email'));
-  hasPatternError = (controlName: string) => this.formErrorService.hasPatternError(controlName, this.form);
-  passwordMismatchError = (): boolean => this.formErrorService.hasPasswordMismatchError(this.form);
 }
