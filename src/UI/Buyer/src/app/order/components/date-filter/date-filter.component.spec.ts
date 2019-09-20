@@ -1,24 +1,10 @@
-import {
-  async,
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { DateFilterComponent } from 'src/app/order/components/date-filter/date-filter.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import {
-  NgbDateParserFormatter,
-  NgbDateAdapter,
-  NgbModule,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateParserFormatter, NgbDateAdapter, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import {
-  NgbDateNativeAdapter,
-  NgbDateCustomParserFormatter,
-} from 'src/app/config/date-picker.config';
-import { AppFormErrorService } from 'src/app/shared';
+import { NgbDateNativeAdapter, NgbDateCustomParserFormatter } from 'src/app/config/date-picker.config';
 import { DatePipe } from '@angular/common';
 
 describe('DateFilterComponent', () => {
@@ -38,7 +24,6 @@ describe('DateFilterComponent', () => {
           provide: NgbDateParserFormatter,
           useClass: NgbDateCustomParserFormatter,
         },
-        { provide: AppFormErrorService, useValue: formErrorService },
       ],
     }).compileComponents();
   }));
@@ -101,10 +86,7 @@ describe('DateFilterComponent', () => {
       component.form.controls['fromDate'].setValue(new Date(2018, 4, 20));
       component.form.controls['toDate'].setValue(new Date(2018, 4, 31));
       component['emitDate']();
-      expect(component.selectedDate.emit).toHaveBeenCalledWith([
-        '>5-20-18',
-        '<6-1-18',
-      ]);
+      expect(component.selectedDate.emit).toHaveBeenCalledWith(['>5-20-18', '<6-1-18']);
     });
     it('should emit array with fromDate if only fromDate is defined', () => {
       component.form.controls['fromDate'].setValue(new Date(2018, 4, 20));

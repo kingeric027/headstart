@@ -4,26 +4,26 @@
   <div class="col-6">
     <button (click)="showAdd()"
             *ngIf="!showCardForm"
-            class="btn btn-primary float-right"><fa-icon [icon]="faPlus"></fa-icon> Add a Card</button>
+            class="btn btn-primary float-right">
+      <fa-icon [icon]="faPlus"></fa-icon> Add a Card
+    </button>
   </div>
 </div>
 <div class="row mt-3">
-  <shared-credit-card-display [card]="card"
-                              class="col-12 my-2"
-                              *ngFor="let card of (cards$ | async)?.Items">
-    <div actions>
-      <fa-icon (click)="deleteCard(card.ID)"
-               title="Delete"
-               class="text-danger icon-button--hover-reactive"
-               [icon]="faTrashAlt"></fa-icon>
-    </div>
-  </shared-credit-card-display>
+  <ocm-credit-card-display [card]="card"
+                           class="col-12 my-2"
+                           *ngFor="let card of (cards$ | async)?.Items">
+    <fa-icon (click)="deleteCard(card.ID)"
+             title="Delete"
+             class="text-danger icon-button--hover-reactive"
+             [icon]="faTrashAlt"></fa-icon>
+  </ocm-credit-card-display>
 </div>
 <div class="row">
   <div class="col-12">
-    <shared-credit-card-form *ngIf="showCardForm"
-                             submitText="Add"
-                             (formSubmitted)="addCard($event)"></shared-credit-card-form>
+    <ocm-credit-card-form *ngIf="showCardForm"
+                          submitText="Add"
+                          (formSubmitted)="addCard($event.detail)"></ocm-credit-card-form>
   </div>
 </div>
 <div class="row mt-3">

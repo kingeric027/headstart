@@ -1,8 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AppConfig, applicationConfiguration } from 'src/app/config/app.config';
-import { Observable } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
 import { CreateCardDetails, AuthorizeCardSuccess, CreateCardResponse } from 'src/app/shared/services/authorize-net/authorize-net.interface';
 import { Payment, OcPaymentService, Order, OcOrderService, BuyerCreditCard } from '@ordercloud/angular-sdk';
 import { AuthService } from '../auth/auth.service';
@@ -41,11 +39,11 @@ export class AuthorizeNetService {
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
-  private post(body) {
-    return this.http.post<any>(this.url, body, this.options);
+  private post(body): Promise<any> {
+    return this.http.post<any>(this.url, body, this.options).toPromise();
   }
 
-  CreateCreditCard(card: CreateCardDetails): Observable<CreateCardResponse> {
+  CreateCreditCard(card: CreateCardDetails): Promise<CreateCardResponse> {
     return this.post({
       BuyerID: this.appConfig.appname,
       TransactionType: 'createCreditCard',
@@ -68,7 +66,7 @@ export class AuthorizeNetService {
     });
   }
 
-  private AuthorizeCardOnOrder(order: Order, card: CreateCardDetails): Observable<AuthorizeCardSuccess> {
+  private AuthorizeCardOnOrder(order: Order, card: CreateCardDetails): Promise<AuthorizeCardSuccess> {
     return this.post({
       BuyerID: this.appConfig.appname,
       OrderID: order.ID,
@@ -104,14 +102,11 @@ export class AuthorizeNetService {
     The OC API integration with Authorize.Net is still working through some bugs. One involves existing Payments.
     This function wraps AuthorizeCardOnOrder() with the calls needed to work around this bug.
   */
-  AuthorizeCard(order: Order, card: CreateCardDetails, existingPayment: Payment): Observable<AuthorizeCardSuccess> {
-    if (!existingPayment) {
-      return this.AuthorizeCardOnOrder(order, card);
+  async AuthorizeCard(order: Order, card: CreateCardDetails, existingPayment: Payment): Promise<AuthorizeCardSuccess> {
+    if (existingPayment) {
+      await this.ocPaymentService.Delete('outgoing', order.ID, existingPayment.ID).toPromise();
     }
-
-    return this.ocPaymentService
-      .Delete('outgoing', order.ID, existingPayment.ID)
-      .pipe(flatMap(() => this.AuthorizeCardOnOrder(order, card)));
+    return this.AuthorizeCardOnOrder(order, card);
   }
 
   /**
@@ -119,14 +114,10 @@ export class AuthorizeNetService {
     These cards' non-sensitive details are not saved to a user, because no user exists.
     Instead they must be saved on the order xp.
   */
-  AuthorizeAnonymousCard(order: Order, card: CreateCardDetails, existingPayment: Payment): Observable<Order> {
-    return this.AuthorizeCard(order, card, existingPayment).pipe(
-      flatMap(() =>
-        this.ocOrderService.Patch('outgoing', order.ID, {
-          xp: { cardDetails: this.mapToNonSensitive(card) },
-        })
-      )
-    );
+  async AuthorizeAnonymousCard(order: Order, card: CreateCardDetails, existingPayment: Payment): Promise<Order> {
+    await this.AuthorizeCard(order, card, existingPayment);
+    const patch = { xp: { cardDetails: this.mapToNonSensitive(card) } };
+    return this.ocOrderService.Patch('outgoing', order.ID, patch).toPromise();
   }
 
   getCardType(cardNumber: string): string {

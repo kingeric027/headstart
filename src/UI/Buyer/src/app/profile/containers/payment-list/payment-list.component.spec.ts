@@ -5,40 +5,24 @@ import { OcMeService } from '@ordercloud/angular-sdk';
 import { AuthorizeNetService, CreateCardDetails } from 'src/app/shared';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of } from 'rxjs';
-import { CreditCardIconComponent } from 'src/app/shared/components/credit-card-icon/credit-card-icon.component';
 
 describe('PaymentListComponent', () => {
   let component: PaymentListComponent;
   let fixture: ComponentFixture<PaymentListComponent>;
 
   const meService = {
-    ListCreditCards: jasmine
-      .createSpy('ListCreditCards')
-      .and.returnValue(of({})),
-    ListSpendingAccounts: jasmine
-      .createSpy('ListSpendingAccounts')
-      .and.returnValue(of({})),
+    ListCreditCards: jasmine.createSpy('ListCreditCards').and.returnValue(of({})),
+    ListSpendingAccounts: jasmine.createSpy('ListSpendingAccounts').and.returnValue(of({})),
   };
   const authorizeNetService = {
-    CreateCreditCard: jasmine
-      .createSpy('CreateCreditCard')
-      .and.returnValue(of({})),
-    DeleteCreditCard: jasmine
-      .createSpy('DeleteCreditCard')
-      .and.returnValue(of({})),
+    CreateCreditCard: jasmine.createSpy('CreateCreditCard').and.returnValue(of({})),
+    DeleteCreditCard: jasmine.createSpy('DeleteCreditCard').and.returnValue(of({})),
   };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CreditCardIconComponent,
-        PaymentListComponent,
-        CreditCardIconComponent,
-      ],
-      providers: [
-        { provide: OcMeService, useValue: meService },
-        { provide: AuthorizeNetService, useValue: authorizeNetService },
-      ],
+      declarations: [PaymentListComponent],
+      providers: [{ provide: OcMeService, useValue: meService }, { provide: AuthorizeNetService, useValue: authorizeNetService }],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
     }).compileComponents();
   }));

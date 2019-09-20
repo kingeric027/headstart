@@ -65,17 +65,15 @@ describe('HasTokenGuard', () => {
       });
       it('should return true if token is valid', () => {
         mockAccessToken = validToken;
-        guard.canActivate().subscribe((isTokenValid) => {
-          expect(isTokenValid).toBe(true);
-        });
+        const isTokenValid = guard.canActivate();
+        expect(isTokenValid).toBe(true);
       });
       it('should get new token and then return true if token is invalid', () => {
         mockAccessToken = null;
-        guard.canActivate().subscribe((isTokenValid) => {
-          expect(appAuthService.authAnonymous).toHaveBeenCalled();
-          expect(appStateService.isLoggedIn.next).toHaveBeenCalledWith(true);
-          expect(isTokenValid).toBe(true);
-        });
+        const isTokenValid = guard.canActivate();
+        expect(appAuthService.authAnonymous).toHaveBeenCalled();
+        expect(appStateService.isLoggedIn.next).toHaveBeenCalledWith(true);
+        expect(isTokenValid).toBe(true);
       });
     });
     describe('user is logged in', () => {
@@ -84,28 +82,25 @@ describe('HasTokenGuard', () => {
       });
       it('should return true if token is valid', () => {
         mockAccessToken = validToken;
-        guard.canActivate().subscribe((isTokenValid) => {
-          expect(appAuthService.authAnonymous).not.toHaveBeenCalled();
-          expect(appStateService.isLoggedIn.next).toHaveBeenCalledWith(true);
-          expect(isTokenValid).toBe(true);
-        });
+        const isTokenValid = guard.canActivate();
+        expect(appAuthService.authAnonymous).not.toHaveBeenCalled();
+        expect(appStateService.isLoggedIn.next).toHaveBeenCalledWith(true);
+        expect(isTokenValid).toBe(true);
       });
       it('should return false if token is invalid', () => {
         mockAccessToken = null;
-        guard.canActivate().subscribe((isTokenValid) => {
-          expect(appAuthService.authAnonymous).not.toHaveBeenCalled();
-          expect(isTokenValid).toBe(false);
-        });
+        const isTokenValid = guard.canActivate();
+        expect(appAuthService.authAnonymous).not.toHaveBeenCalled();
+        expect(isTokenValid).toBe(false);
       });
     });
     describe('access token timed out but user has refresh token', () => {
       it('should call refresh', () => {
         mockAccessToken = null;
         rememberMe = true;
-        guard.canActivate().subscribe((isTokenValid) => {
-          expect(appAuthService.refresh).toHaveBeenCalled();
-          expect(isTokenValid).toBe(true);
-        });
+        const isTokenValid = guard.canActivate();
+        expect(appAuthService.refresh).toHaveBeenCalled();
+        expect(isTokenValid).toBe(true);
       });
     });
   });

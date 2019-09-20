@@ -3,7 +3,7 @@ import { PaymentBaseComponent } from 'src/app/checkout/components/payment-base/p
 import { Observable } from 'rxjs';
 import { SpendingAccount, ListSpendingAccount, OcMeService, Payment } from '@ordercloud/angular-sdk';
 import * as moment from 'moment';
-import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'checkout-payment-spending-account',
@@ -18,7 +18,7 @@ export class PaymentSpendingAccountComponent extends PaymentBaseComponent implem
     search: undefined,
   };
   resultsPerPage = 6;
-  @ViewChild('spendingAccountModal', { static: false }) public spendingAccountModal: IModalComponent;
+  @ViewChild('spendingAccountModal', { static: false }) public spendingAccountModal: ModalComponent;
 
   constructor(private ocMeService: OcMeService) {
     super();

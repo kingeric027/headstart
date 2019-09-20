@@ -82,10 +82,14 @@
       </div>
       <div class="card"
            *ngIf="products && products.Items.length === 0">
-        <shared-no-results message="No products found."
-                           actionText="clear search criteria"
-                           (action)="clearAllFilters()">
-        </shared-no-results>
+        <div class="card">
+          <p class="card-body text-center">
+            No Products found.
+            <br>
+            <a class="link"
+               (click)="clearAllFilters()">Clear all Filters</a>
+          </p>
+        </div>
       </div>
       <div *ngIf="products && products.Items.length > 0">
         <div class="product-list-grid row align-items-stretch">

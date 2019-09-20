@@ -16,6 +16,7 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
 export class LoginComponent implements OnInit {
   form: FormGroup;
   isAnon: boolean;
+  appName: string;
 
   constructor(
     private authService: AuthService,
@@ -26,6 +27,7 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.appName = this.context.appSettings.appname;
     this.form = this.formBuilder.group({
       username: '',
       password: '',

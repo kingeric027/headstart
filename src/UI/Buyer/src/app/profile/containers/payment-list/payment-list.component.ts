@@ -1,10 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  OcMeService,
-  ListBuyerCreditCard,
-  BuyerCreditCard,
-  ListSpendingAccount,
-} from '@ordercloud/angular-sdk';
+import { OcMeService, ListBuyerCreditCard, BuyerCreditCard, ListSpendingAccount } from '@ordercloud/angular-sdk';
 import { Observable } from 'rxjs';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { AuthorizeNetService, CreateCardDetails } from 'src/app/shared';
@@ -28,10 +23,7 @@ export class PaymentListComponent implements OnInit {
   accounts$: Observable<ListSpendingAccount>;
   currentCard: BuyerCreditCard = null;
 
-  constructor(
-    private ocMeService: OcMeService,
-    private authorizeNetSerivce: AuthorizeNetService
-  ) {}
+  constructor(private ocMeService: OcMeService, private authorizeNetSerivce: AuthorizeNetService) {}
 
   ngOnInit() {
     this.getCards();
@@ -60,26 +52,18 @@ export class PaymentListComponent implements OnInit {
     this.currentCard = null;
   }
 
-  addCard(card: CreateCardDetails) {
-    this.authorizeNetSerivce.CreateCreditCard(card).subscribe(
-      () => {
-        this.showCardForm = false;
-        this.getCards();
-      },
-      (error) => {
-        throw error;
-      }
-    );
+  async addCard(card: CreateCardDetails) {
+    const response = await this.authorizeNetSerivce.CreateCreditCard(card);
+    if (response.ResponseHttpStatusCode >= 400) {
+      throw new Error((response.ResponseBody as any).ExceptionMessage);
+    } else {
+      this.showCardForm = false;
+      this.getCards();
+    }
   }
 
-  deleteCard(cardId: string) {
-    this.authorizeNetSerivce.DeleteCreditCard(cardId).subscribe(
-      () => {
-        this.getCards();
-      },
-      (error) => {
-        throw error;
-      }
-    );
+  async deleteCard(cardId: string) {
+    await this.authorizeNetSerivce.DeleteCreditCard(cardId);
+    this.getCards();
   }
 }

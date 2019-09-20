@@ -1,57 +1,24 @@
-import {
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-  OnDestroy,
-  ContentChildren,
-  Directive,
-  QueryList,
-  ViewContainerRef,
-  PLATFORM_ID,
-  Inject,
-} from '@angular/core';
+import { Component, ElementRef, Input, OnInit, OnDestroy, Inject } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { isPlatformBrowser } from '@angular/common';
-
-// Put this on a custom component within the <shared-model> tags if you want to reset it when the modal closes.
-@Directive({ selector: '[ResetOnModalClose]' })
-export class ResetDirective {
-  constructor(private view: ViewContainerRef) {}
-
-  get component() {
-    return this.view['_data'].componentView.component;
-  }
-}
-
-export interface IModalComponent {
-  isOpen: boolean;
-  open: () => void;
-  close: () => void;
-  onClose: (callback: () => void) => void;
-}
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'shared-modal',
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
 })
-export class ModalComponent implements OnInit, OnDestroy, IModalComponent {
+export class ModalComponent implements OnInit, OnDestroy {
   id: string;
   @Input() modalTitle: string;
-  @ContentChildren(ResetDirective, { descendants: true })
-  children: QueryList<ResetDirective>;
   isOpen = false;
   faTimes = faTimes;
   private onCloseCallback = () => {};
 
-  constructor(private elementRef: ElementRef, @Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(private elementRef: ElementRef, @Inject(DOCUMENT) private document: any) {}
 
   ngOnInit(): void {
     // move element to bottom of page (just before </body>) so it can be displayed above everything else
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.appendChild(this.elementRef.nativeElement);
-    }
+    this.document.body.appendChild(this.elementRef.nativeElement);
   }
 
   // remove self when directive is destroyed
@@ -64,20 +31,15 @@ export class ModalComponent implements OnInit, OnDestroy, IModalComponent {
   open(): void {
     this.isOpen = true;
     this.elementRef.nativeElement.style.display = 'block';
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.classList.add('shared-modal--open');
-    }
+    this.document.body.classList.add('shared-modal--open');
   }
 
   // close modal
   close(): void {
     this.isOpen = false;
     // Only applies to components with the ResetDirective
-    this.children.forEach((child) => child.component.ngOnInit());
     this.elementRef.nativeElement.style.display = 'none';
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.classList.remove('shared-modal--open');
-    }
+    this.document.body.classList.remove('shared-modal--open');
     this.onCloseCallback();
   }
 

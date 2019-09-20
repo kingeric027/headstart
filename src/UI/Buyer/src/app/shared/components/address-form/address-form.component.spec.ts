@@ -1,10 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { AppGeographyService } from 'src/app/shared';
 import { of } from 'rxjs';
 import { OcMeService } from '@ordercloud/angular-sdk';
-import { AppFormErrorService } from 'src/app/shared';
 
 describe('AddressFormComponent', () => {
   let component: AddressFormComponent;
@@ -23,11 +21,7 @@ describe('AddressFormComponent', () => {
     TestBed.configureTestingModule({
       declarations: [AddressFormComponent],
       imports: [ReactiveFormsModule],
-      providers: [
-        FormBuilder,
-        { provide: AppFormErrorService, useValue: formErrorService },
-        { provide: OcMeService, useValue: meService },
-      ],
+      providers: [FormBuilder, { provide: OcMeService, useValue: meService }],
     }).compileComponents();
   }));
 
@@ -108,10 +102,7 @@ describe('AddressFormComponent', () => {
       component['hasRequiredError']('FirstName');
     });
     it('should call formErrorService.hasRequiredError', () => {
-      expect(formErrorService.hasRequiredError).toHaveBeenCalledWith(
-        'FirstName',
-        component.addressForm
-      );
+      expect(formErrorService.hasRequiredError).toHaveBeenCalledWith('FirstName', component.addressForm);
     });
   });
 });

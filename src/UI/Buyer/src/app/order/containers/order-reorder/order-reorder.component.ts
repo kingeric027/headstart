@@ -5,7 +5,7 @@ import { CartService, AppReorderService } from 'src/app/shared';
 import { OrderReorderResponse } from 'src/app/shared/services/reorder/reorder.interface';
 import { LineItem } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
-import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'order-reorder',
@@ -14,7 +14,7 @@ import { IModalComponent } from 'src/app/shared/components/modal/modal.component
 })
 export class OrderReorderComponent implements OnInit {
   @Input() orderID: string;
-  @ViewChild('reorderModal', { static: false }) reorderModal: IModalComponent;
+  @ViewChild('reorderModal', { static: false }) reorderModal: ModalComponent;
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
 

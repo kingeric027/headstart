@@ -5,7 +5,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
 import { of, BehaviorSubject, Subject } from 'rxjs';
 import { OcMeService, OcOrderService } from '@ordercloud/angular-sdk';
-import { AppFormErrorService } from 'src/app/shared';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
 import { ToastrService } from 'ngx-toastr';
@@ -55,7 +54,6 @@ describe('CheckoutAddressComponent', () => {
       declarations: [CheckoutSectionBaseComponent, CheckoutAddressComponent, AddressFormComponent],
       imports: [ReactiveFormsModule],
       providers: [
-        AppFormErrorService,
         { provide: OcMeService, useValue: meService },
         { provide: OcOrderService, useValue: orderService },
         { provide: ToastrService, useValue: toastrService },

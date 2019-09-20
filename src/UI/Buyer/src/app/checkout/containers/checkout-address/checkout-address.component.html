@@ -14,12 +14,10 @@
                          searchPlaceholder="addresses"
                          (requestOptionsUpdated)="updateRequestOptions($event)">
     <ng-template let-address="item">
-      <shared-address-display [address]="address">
-        <div actions>
-          <a href="javascript:void(0)"
-             (click)="existingAddressSelected(address)">Select</a>
-        </div>
-      </shared-address-display>
+      <ocm-address-card [address]="address">
+        <a href="javascript:void(0)"
+           (click)="existingAddressSelected(address)">Select</a>
+      </ocm-address-card>
     </ng-template>
   </shared-generic-browse>
 </shared-modal>

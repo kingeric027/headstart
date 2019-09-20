@@ -6,7 +6,6 @@ import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { InjectionToken, NO_ERRORS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { AppFormErrorService } from 'src/app/shared';
 import { of, Subject } from 'rxjs';
 
 describe('RegisterComponent', () => {
@@ -36,7 +35,6 @@ describe('RegisterComponent', () => {
       declarations: [RegisterComponent],
       imports: [ReactiveFormsModule],
       providers: [
-        { provide: AppFormErrorService, useValue: formErrorService },
         { provide: Router, useValue: router },
         { provide: OcTokenService, useValue: tokenService },
         { provide: OcMeService, useValue: ocMeService },

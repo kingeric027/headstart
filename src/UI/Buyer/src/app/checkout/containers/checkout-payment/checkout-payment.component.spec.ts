@@ -132,7 +132,7 @@ describe('CheckoutPaymentComponent', () => {
     beforeEach(() => {
       paymentService.Delete.calls.reset();
       mockPayments = [{ ID: 'CCPayment', Type: 'CreditCard' }, { ID: 'POPayment', Type: 'PurchaseOrder' }];
-      component['deleteExistingPayments']().subscribe();
+      component['deleteExistingPayments']();
     });
     it('should list payments', () => {
       expect(paymentService.List).toHaveBeenCalledWith('outgoing', '1');

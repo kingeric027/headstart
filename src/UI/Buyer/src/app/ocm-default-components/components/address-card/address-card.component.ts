@@ -1,16 +1,16 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { Address } from '@ordercloud/angular-sdk';
+import { OCMComponent } from '../../shopper-context';
 
 @Component({
-  selector: 'shared-address-display',
-  templateUrl: './address-display.component.html',
-  styleUrls: ['./address-display.component.scss'],
+  templateUrl: './address-card.component.html',
+  styleUrls: ['./address-card.component.scss'],
 })
-export class AddressDisplayComponent implements OnInit {
-  @Input() address: Address;
+export class OCMAddressCard extends OCMComponent implements OnChanges {
+  @Input() address: Address = {};
   @Input() addressTitle?: string;
 
-  ngOnInit() {
+  ngOnChanges() {
     this.address['FullName'] = this.getFullName(this.address);
   }
 

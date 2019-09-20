@@ -1,17 +1,17 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 import { OcMeService, ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
-import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'profile-address-list',
   templateUrl: './address-list.component.html',
   styleUrls: ['./address-list.component.scss'],
 })
-export class AddressListComponent implements OnInit {
+export class AddressListComponent implements OnInit, AfterViewInit {
   faPlus = faPlus;
   faArrowLeft = faArrowLeft;
   faTrashAlt = faTrashAlt;
@@ -23,13 +23,17 @@ export class AddressListComponent implements OnInit {
     search: undefined,
   };
   resultsPerPage = 8;
-  @ViewChild('areYouSureModal', { static: false }) public areYouSureModal: IModalComponent;
-  @ViewChild('addAddressModal', { static: false }) public addAddressModal: IModalComponent;
+  @ViewChild('areYouSureModal', { static: false }) public areYouSureModal: ModalComponent;
+  @ViewChild('addAddressModal', { static: false }) public addAddressModal: ModalComponent;
 
   constructor(private ocMeService: OcMeService) {}
 
   ngOnInit() {
     this.reloadAddresses();
+  }
+
+  ngAfterViewInit() {
+    this.addAddressModal.onClose(() => (this.currentAddress = {}));
   }
 
   showAddAddress() {

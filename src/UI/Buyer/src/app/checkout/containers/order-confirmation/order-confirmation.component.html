@@ -18,18 +18,18 @@
       <hr>
       <div class="text-right lead"><b class="float-left">Total:</b><span class="order-total">{{order.Total | currency}}</span></div>
       <hr>
-      <order-payment-list *ngIf="payments"
-                          [payments]="payments"></order-payment-list>
+      <ocm-payment-list *ngIf="payments"
+                        [payments]="payments"></ocm-payment-list>
     </div>
     <div class="col-lg-6">
       <div class="row">
         <div class="col-md-6">
-          <shared-address-display [address]="lineItems.Items[0].ShippingAddress"
-                                  addressTitle="Delivery Address"></shared-address-display>
+          <ocm-address-card [address]="lineItems.Items[0].ShippingAddress"
+                            addressTitle="Delivery Address"></ocm-address-card>
         </div>
         <div class="col-md-6">
-          <shared-address-display [address]="order.BillingAddress"
-                                  addressTitle="Billing Address"></shared-address-display>
+          <ocm-address-card [address]="order.BillingAddress"
+                            addressTitle="Billing Address"></ocm-address-card>
         </div>
       </div>
     </div>

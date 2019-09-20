@@ -10,7 +10,6 @@ import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 
 import { OcPasswordResetService } from '@ordercloud/angular-sdk';
 import { ToastrService } from 'ngx-toastr';
-import { AppFormErrorService } from 'src/app/shared';
 
 describe('ResetPasswordComponent', () => {
   let component: ResetPasswordComponent;
@@ -39,7 +38,6 @@ describe('ResetPasswordComponent', () => {
         { provide: Router, useValue: router },
         { provide: ActivatedRoute, useValue: activatedRoute },
         { provide: ToastrService, useValue: toastrService },
-        { provide: AppFormErrorService, useValue: formErrorService },
         {
           provide: applicationConfiguration,
           useValue: new InjectionToken<AppConfig>('app.config'),

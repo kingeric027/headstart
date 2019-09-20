@@ -1,0 +1,16 @@
+<div class="border border-radius shadow-sm p-3 row no-gutters"
+     *ngIf="card">
+  <ocm-credit-card-icon class="col-md-1"
+                        [cardType]="card.CardType"
+                        size="2x"></ocm-credit-card-icon>
+  <div class="col-md-7">
+    <div><b>XXXX-XXXX-XXXX-{{ card?.PartialAccountNumber }}</b></div>
+    <div>{{ card?.CardholderName }}</div>
+    <div><small>Expires: {{ card?.ExpirationDate | date:'MM/yy':'UTC' }}</small></div>
+  </div>
+  <div class="col-md-4">
+    <div class="float-right">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

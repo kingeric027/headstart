@@ -2,15 +2,14 @@
   <div *ngIf="lineItems$ | async; let lineItems">
     <div class="row mb-5">
       <div class="col-6">
-        <shared-address-display *ngIf="lineItems.Items[0].ShippingAddress"
-                                [address]="lineItems.Items[0].ShippingAddress"
-                                addressTitle="Shipping Address">
-        </shared-address-display>
-
-        <shared-address-display [address]="order.BillingAddress"
-                                addressTitle="Billing Address"
-                                *ngIf="order?.BillingAddress">
-        </shared-address-display>
+        <ocm-address-card *ngIf="lineItems.Items[0].ShippingAddress"
+                          [address]="lineItems.Items[0].ShippingAddress"
+                          addressTitle="Shipping Address">
+        </ocm-address-card>
+        <ocm-address-card [address]="order.BillingAddress"
+                          addressTitle="Billing Address"
+                          *ngIf="order?.BillingAddress">
+        </ocm-address-card>
       </div>
       <div class="col-6">
         <div *ngIf="order.Comments"
@@ -26,8 +25,8 @@
         <hr>
         <div class="text-right lead"><b class="float-left">Total:</b><span class="order-total">{{order.Total | currency}}</span></div>
         <hr>
-        <order-payment-list *ngIf="payments"
-                            [payments]="payments"></order-payment-list>
+        <ocm-payment-list *ngIf="payments"
+                          [payments]="payments"></ocm-payment-list>
         <hr>
         <ul>
           <li *ngFor="let approval of approvals">

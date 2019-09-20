@@ -1,10 +1,10 @@
 <div class="accepted-cards mb-2">
-  <fa-icon [icon]="faCcVisa"
-           size="2x"></fa-icon>
-  <fa-icon [icon]="faCcMastercard"
-           size="2x"></fa-icon>
-  <fa-icon [icon]="faCcDiscover"
-           size="2x"></fa-icon>
+  <ocm-credit-card-icon [cardType]="'visa'"
+                        size="2x"></ocm-credit-card-icon>
+  <ocm-credit-card-icon [cardType]="'mastercard'"
+                        size="2x"></ocm-credit-card-icon>
+  <ocm-credit-card-icon [cardType]="'discover'"
+                        size="2x"></ocm-credit-card-icon>
 </div>
 <form (ngSubmit)="onSubmit()"
       novalidate

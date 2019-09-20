@@ -1,41 +1,32 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { CreateCardDetails } from 'src/app/shared';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { faCcVisa, faCcMastercard, faCcDiscover } from '@fortawesome/free-brands-svg-icons';
+import { OCMComponent } from '../../shopper-context';
 
 @Component({
-  selector: 'shared-credit-card-form',
   templateUrl: './credit-card-form.component.html',
   styleUrls: ['./credit-card-form.component.scss'],
 })
-export class CreditCardFormComponent implements OnInit {
-  constructor(private formBuilder: FormBuilder) {}
-
+export class OCMCreditCardForm extends OCMComponent implements OnInit {
   @Output() formSubmitted = new EventEmitter<CreateCardDetails>();
-  faCcVisa = faCcVisa;
-  faCcMastercard = faCcMastercard;
-  faCcDiscover = faCcDiscover;
   cardForm: FormGroup;
   faPlus = faPlus;
   yearOptions: string[];
-  monthOptions: string[];
+  monthOptions = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 
   ngOnInit() {
     const start = new Date().getFullYear();
     this.yearOptions = Array(20)
       .fill(0)
       .map((_x, i) => `${i + start}`);
-    this.monthOptions = Array(12)
-      .fill(0)
-      .map((_x, i) => `0${i + 1}`.slice(-2));
 
-    this.cardForm = this.formBuilder.group({
-      CardNumber: ['', Validators.required],
-      CardholderName: ['', Validators.required],
-      expMonth: [this.monthOptions[0], Validators.required],
-      expYear: [this.yearOptions[0].slice(-2), Validators.required],
-      CardCode: ['', Validators.required],
+    this.cardForm = new FormGroup({
+      CardNumber: new FormControl('', Validators.required),
+      CardholderName: new FormControl('', Validators.required),
+      expMonth: new FormControl(this.monthOptions[0], Validators.required),
+      expYear: new FormControl(this.yearOptions[0].slice(-2), Validators.required),
+      CardCode: new FormControl('', Validators.required),
     });
   }
 

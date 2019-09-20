@@ -4,7 +4,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of, BehaviorSubject } from 'rxjs';
 import { OcOrderService } from '@ordercloud/angular-sdk';
 import { ParamMap, ActivatedRoute, convertToParamMap } from '@angular/router';
-import { AppPaymentService } from 'src/app/shared/services/app-payment-service/app-payment.service';
+import { AppPaymentService } from 'src/app/shared/services/app-payment/app-payment.service';
 import { OrderDetailsComponent } from 'src/app/order/containers/order-detail/order-detail.component';
 
 describe('OrderDetailsComponent', () => {
@@ -14,20 +14,14 @@ describe('OrderDetailsComponent', () => {
   const mockOrderID = 'MockGetOrder123';
   const orderService = {
     Get: jasmine.createSpy('Get').and.returnValue(of(null)),
-    ListPromotions: jasmine
-      .createSpy('ListPromotions')
-      .and.returnValue(of(null)),
-    ListApprovals: jasmine
-      .createSpy('ListApprovals')
-      .and.returnValue(of({ Items: [{ Comments: [] }] })),
+    ListPromotions: jasmine.createSpy('ListPromotions').and.returnValue(of(null)),
+    ListApprovals: jasmine.createSpy('ListApprovals').and.returnValue(of({ Items: [{ Comments: [] }] })),
   };
   const appPaymentService = {
     getPayments: jasmine.createSpy('getPayments').and.returnValue(of(null)),
   };
 
-  const paramMap = new BehaviorSubject<ParamMap>(
-    convertToParamMap({ orderID: mockOrderID })
-  );
+  const paramMap = new BehaviorSubject<ParamMap>(convertToParamMap({ orderID: mockOrderID }));
 
   const activatedRoute = {
     data: of({ orderResolve: { order: { ID: 'mockOrder' } } }),
@@ -68,28 +62,22 @@ describe('OrderDetailsComponent', () => {
 
   describe('getPromotions', () => {
     it('should call OrderService.ListPromotions with order id param', () => {
-      component['getPromotions']().subscribe(() => {
-        expect(orderService.ListPromotions).toHaveBeenCalledWith(
-          'outgoing',
-          mockOrderID
-        );
-      });
+      component['getPromotions']('id');
+      expect(orderService.ListPromotions).toHaveBeenCalledWith('outgoing', mockOrderID);
     });
   });
 
   describe('getPayments', () => {
     it('should call AppPaymentService', () => {
-      component['getPayments']().subscribe(() => {
-        expect(appPaymentService.getPayments).toHaveBeenCalled();
-      });
+      component['getPayments']('id');
+      expect(appPaymentService.getPayments).toHaveBeenCalled();
     });
   });
 
   describe('getApprovals', () => {
     it('should call OrderService.ListApprovals', () => {
-      component['getApprovals']().subscribe(() => {
-        expect(orderService.ListApprovals).toHaveBeenCalled();
-      });
+      component['getApprovals']('id');
+      expect(orderService.ListApprovals).toHaveBeenCalled();
     });
   });
 });

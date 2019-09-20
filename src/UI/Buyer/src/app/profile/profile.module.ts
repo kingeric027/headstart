@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SharedModule } from 'src/app/shared';
 import { ProfileRoutingModule } from 'src/app/profile/profile-routing.module';
 
@@ -9,13 +9,8 @@ import { MeUpdateComponent } from './containers/me-update/me-update.component';
 import { ChangePasswordFormComponent } from './components/change-password-form/change-password-form.component';
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [SharedModule, ProfileRoutingModule],
-  declarations: [
-    ProfileComponent,
-    AddressListComponent,
-    PaymentListComponent,
-    MeUpdateComponent,
-    ChangePasswordFormComponent,
-  ],
+  declarations: [ProfileComponent, AddressListComponent, PaymentListComponent, MeUpdateComponent, ChangePasswordFormComponent],
 })
 export class ProfileModule {}

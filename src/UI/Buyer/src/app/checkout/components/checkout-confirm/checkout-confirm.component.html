@@ -1,18 +1,18 @@
 <div *ngIf="lineItems">
-  <order-payment-list *ngIf="payments"
-                      [payments]="payments"></order-payment-list>
+  <ocm-payment-list *ngIf="payments"
+                    [payments]="payments"></ocm-payment-list>
   <div class="row">
     <div class="col-6">
-      <shared-address-display *ngIf="lineItems.Items[0].ShippingAddress"
-                              [address]="lineItems.Items[0].ShippingAddress"
-                              addressTitle="Shipping Address">
-      </shared-address-display>
+      <ocm-address-card *ngIf="lineItems.Items[0].ShippingAddress"
+                        [address]="lineItems.Items[0].ShippingAddress"
+                        addressTitle="Shipping Address">
+      </ocm-address-card>
     </div>
     <div class="col-6">
-      <shared-address-display [address]="order.BillingAddress"
-                              addressTitle="Billing Address"
-                              *ngIf="order?.BillingAddress">
-      </shared-address-display>
+      <ocm-address-card [address]="order.BillingAddress"
+                        addressTitle="Billing Address"
+                        *ngIf="order?.BillingAddress">
+      </ocm-address-card>
     </div>
   </div>
   <ocm-lineitem-table [lineitems]="lineItems"

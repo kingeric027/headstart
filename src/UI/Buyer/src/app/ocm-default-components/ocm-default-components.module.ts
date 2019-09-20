@@ -26,6 +26,11 @@ import { OCMSearch } from './components/search/search.component';
 import { OCMMiniCart } from './components/mini-cart/mini-cart.component';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs/product-name-with-specs.pipe';
 import { OCMAppHeader } from './components/app-header/app-header.component';
+import { OCMPaymentList } from './components/payment-list/payment-list.component';
+import { OCMAddressCard } from './components/address-card/address-card.component';
+import { OCMCreditCardIcon } from './components/credit-card-icon/credit-card-icon.component';
+import { OCMCreditCardDisplay } from './components/credit-card-display/credit-card-display.component';
+import { OCMCreditCardForm } from './components/credit-card-form/credit-card-form.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -50,6 +55,11 @@ import { OCMAppHeader } from './components/app-header/app-header.component';
     OCMMiniCart,
     ProductNameWithSpecsPipe,
     OCMAppHeader,
+    OCMPaymentList,
+    OCMAddressCard,
+    OCMCreditCardIcon,
+    OCMCreditCardDisplay,
+    OCMCreditCardForm,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -71,6 +81,11 @@ import { OCMAppHeader } from './components/app-header/app-header.component';
     OCMSearch,
     OCMMiniCart,
     OCMAppHeader,
+    OCMPaymentList,
+    OCMAddressCard,
+    OCMCreditCardIcon,
+    OCMCreditCardDisplay,
+    OCMCreditCardForm,
   ],
   imports: [
     CommonModule,
@@ -108,6 +123,12 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMSearch, 'ocm-search');
     this.buildWebComponent(OCMMiniCart, 'ocm-mini-cart');
     this.buildWebComponent(OCMAppHeader, 'ocm-app-header');
+
+    this.buildWebComponent(OCMPaymentList, 'ocm-payment-list');
+    this.buildWebComponent(OCMAddressCard, 'ocm-address-card');
+    this.buildWebComponent(OCMCreditCardIcon, 'ocm-credit-card-icon');
+    this.buildWebComponent(OCMCreditCardDisplay, 'ocm-credit-card-display');
+    this.buildWebComponent(OCMCreditCardForm, 'ocm-credit-card-form');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

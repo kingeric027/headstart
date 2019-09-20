@@ -5,7 +5,7 @@ import { OcMeService, ListBuyerAddress, OcOrderService, Order, BuyerAddress, Lis
 import { CurrentOrderService } from 'src/app/shared';
 import { ToastrService } from 'ngx-toastr';
 import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
-import { IModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'checkout-address',
@@ -16,7 +16,7 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent imple
   @Input() isAnon: boolean;
   @Input() addressType: 'Shipping' | 'Billing';
   @ViewChild(AddressFormComponent, { static: false }) addressFormComponent: AddressFormComponent;
-  @ViewChild('addressModal', { static: false }) public addressModal: IModalComponent;
+  @ViewChild('addressModal', { static: false }) public addressModal: ModalComponent;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
   order: Order;

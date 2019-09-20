@@ -29,8 +29,7 @@ export class AddressFormComponent implements OnInit {
     this.setForm();
   }
 
-  @Input()
-  set existingAddress(address: BuyerAddress) {
+  @Input() set existingAddress(address: BuyerAddress) {
     this._existingAddress = address || {};
     this.setForm();
     this.addressForm.markAsPristine();

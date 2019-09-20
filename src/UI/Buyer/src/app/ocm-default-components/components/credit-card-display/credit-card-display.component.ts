@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { BuyerCreditCard } from '@ordercloud/angular-sdk';
+import { OCMComponent } from '../../shopper-context';
 
 @Component({
-  selector: 'shared-credit-card-display',
   templateUrl: './credit-card-display.component.html',
   styleUrls: ['./credit-card-display.component.scss'],
 })
-export class CreditCardDisplayComponent {
+export class OCMCreditCardDisplay extends OCMComponent {
   @Input() card: BuyerCreditCard;
 }
