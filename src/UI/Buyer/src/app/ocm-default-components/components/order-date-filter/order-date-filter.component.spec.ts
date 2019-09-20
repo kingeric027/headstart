@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
-import { DateFilterComponent } from 'src/app/order/components/date-filter/date-filter.component';
+import { DateFilterComponent } from 'src/app/ocm-default-components/components/order-date-filter/order-date-filter.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgbDateParserFormatter, NgbDateAdapter, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';

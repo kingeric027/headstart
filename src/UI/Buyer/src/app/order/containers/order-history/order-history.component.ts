@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { flatMap } from 'rxjs/operators';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'order-history',
@@ -24,7 +25,8 @@ export class OrderHistoryComponent implements AfterViewInit {
     private ocMeService: OcMeService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private currentUser: CurrentUserService
+    private currentUser: CurrentUserService,
+    public context: ShopperContextService
   ) {}
 
   ngAfterViewInit(): void {

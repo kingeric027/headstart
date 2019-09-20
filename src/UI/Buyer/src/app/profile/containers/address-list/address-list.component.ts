@@ -1,17 +1,14 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-
 import { OcMeService, ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'profile-address-list',
   templateUrl: './address-list.component.html',
   styleUrls: ['./address-list.component.scss'],
 })
-export class AddressListComponent implements OnInit, AfterViewInit {
+export class AddressListComponent implements OnInit {
   faPlus = faPlus;
   faArrowLeft = faArrowLeft;
   faTrashAlt = faTrashAlt;
@@ -23,8 +20,8 @@ export class AddressListComponent implements OnInit, AfterViewInit {
     search: undefined,
   };
   resultsPerPage = 8;
-  @ViewChild('areYouSureModal', { static: false }) public areYouSureModal: ModalComponent;
-  @ViewChild('addAddressModal', { static: false }) public addAddressModal: ModalComponent;
+  areYouSureModalOpen = false;
+  addAddressModalOpen = false;
 
   constructor(private ocMeService: OcMeService) {}
 
@@ -32,28 +29,28 @@ export class AddressListComponent implements OnInit, AfterViewInit {
     this.reloadAddresses();
   }
 
-  ngAfterViewInit() {
-    this.addAddressModal.onClose(() => (this.currentAddress = {}));
+  reset() {
+    this.currentAddress = {};
   }
 
   showAddAddress() {
     this.currentAddress = null;
-    this.addAddressModal.open();
+    this.addAddressModalOpen = true;
   }
 
   showEditAddress(address: BuyerAddress) {
     this.currentAddress = address;
-    this.addAddressModal.open();
+    this.addAddressModalOpen = true;
   }
 
   showAreYouSure(address: BuyerAddress) {
     this.currentAddress = address;
-    this.areYouSureModal.open();
+    this.areYouSureModalOpen = true;
   }
 
   closeAreYouSure() {
     this.currentAddress = null;
-    this.areYouSureModal.close();
+    this.areYouSureModalOpen = false;
   }
 
   protected refresh() {
@@ -62,7 +59,7 @@ export class AddressListComponent implements OnInit, AfterViewInit {
   }
 
   addressFormSubmitted(address: BuyerAddress) {
-    this.addAddressModal.close();
+    this.addAddressModalOpen = false;
     if (this.currentAddress) {
       this.updateAddress(address);
     } else {

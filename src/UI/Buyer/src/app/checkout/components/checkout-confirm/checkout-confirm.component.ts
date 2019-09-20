@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
 import { Order, ListPayment, ListLineItem, OcOrderService } from '@ordercloud/angular-sdk';
-import { AppPaymentService } from 'src/app/shared/services/app-payment-service/app-payment.service';
+import { AppPaymentService } from 'src/app/shared/services/app-payment/app-payment.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 

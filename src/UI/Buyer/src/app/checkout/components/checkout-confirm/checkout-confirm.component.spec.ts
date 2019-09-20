@@ -3,7 +3,7 @@ import { CheckoutConfirmComponent } from 'src/app/checkout/components/checkout-c
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { CartService } from 'src/app/shared';
-import { AppPaymentService } from 'src/app/shared/services/app-payment-service/app-payment.service';
+import { AppPaymentService } from 'src/app/shared/services/app-payment/app-payment.service';
 import { FormBuilder } from '@angular/forms';
 import { OcOrderService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration } from 'src/app/config/app.config';

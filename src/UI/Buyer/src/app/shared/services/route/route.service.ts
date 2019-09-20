@@ -62,8 +62,12 @@ export class RouteService implements IRouteActions {
     this.router.navigateByUrl('/profile/payment-methods');
   }
 
+  toOrderDetails(orderID: string): void {
+    this.router.navigateByUrl(`/profile/orders/${orderID}`);
+  }
+
   toMyOrders(): void {
-    this.router.navigateByUrl('/profile/orders');
+    this.router.navigateByUrl(`/profile/orders`);
   }
 
   toOrdersToApprove(): void {

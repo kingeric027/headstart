@@ -1,22 +1,21 @@
-import { Component, OnInit, Input, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
 import { Observable } from 'rxjs';
 import { OcMeService, ListBuyerAddress, OcOrderService, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from 'src/app/shared';
 import { ToastrService } from 'ngx-toastr';
 import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'checkout-address',
   templateUrl: './checkout-address.component.html',
   styleUrls: ['./checkout-address.component.scss'],
 })
-export class CheckoutAddressComponent extends CheckoutSectionBaseComponent implements OnInit, AfterViewInit {
+export class CheckoutAddressComponent extends CheckoutSectionBaseComponent implements OnInit {
   @Input() isAnon: boolean;
   @Input() addressType: 'Shipping' | 'Billing';
   @ViewChild(AddressFormComponent, { static: false }) addressFormComponent: AddressFormComponent;
-  @ViewChild('addressModal', { static: false }) public addressModal: ModalComponent;
+  addressModalOpen = false;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
   order: Order;
@@ -45,8 +44,8 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent imple
     this.setSelectedAddress();
   }
 
-  ngAfterViewInit() {
-    this.addressModal.onClose(() => this.updateRequestOptions({ page: undefined, search: undefined }));
+  clearRequestOptions() {
+    this.updateRequestOptions({ page: undefined, search: undefined });
   }
 
   updateRequestOptions(options: { page?: number; search?: string }) {
@@ -75,7 +74,7 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent imple
 
   existingAddressSelected(address: BuyerAddress) {
     this.selectedAddress = address;
-    this.addressModal.close();
+    this.addressModalOpen = false;
   }
 
   useShippingAsBilling() {

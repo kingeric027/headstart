@@ -1,9 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PaymentBaseComponent } from 'src/app/checkout/components/payment-base/payment-base.component';
 import { Observable } from 'rxjs';
 import { SpendingAccount, ListSpendingAccount, OcMeService, Payment } from '@ordercloud/angular-sdk';
 import * as moment from 'moment';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'checkout-payment-spending-account',
@@ -18,7 +17,7 @@ export class PaymentSpendingAccountComponent extends PaymentBaseComponent implem
     search: undefined,
   };
   resultsPerPage = 6;
-  @ViewChild('spendingAccountModal', { static: false }) public spendingAccountModal: ModalComponent;
+  spendingAccountModalOpen = false;
 
   constructor(private ocMeService: OcMeService) {
     super();
@@ -29,7 +28,7 @@ export class PaymentSpendingAccountComponent extends PaymentBaseComponent implem
       this.spendingAccounts = accounts;
       this.selectedSpendingAccount = this.getSavedSpendingAccount(accounts);
       if (!this.selectedSpendingAccount) {
-        this.spendingAccountModal.open();
+        this.spendingAccountModalOpen = true;
       }
     });
   }
@@ -55,7 +54,7 @@ export class PaymentSpendingAccountComponent extends PaymentBaseComponent implem
   }
 
   accountSelected(account: SpendingAccount): void {
-    this.spendingAccountModal.close();
+    this.spendingAccountModalOpen = false;
     this.selectedSpendingAccount = account;
     const payment: Payment = {
       Type: 'SpendingAccount',

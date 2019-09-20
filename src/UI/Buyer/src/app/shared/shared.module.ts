@@ -24,7 +24,6 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 
 // pipes
-import { OrderStatusDisplayPipe } from 'src/app/shared/pipes/order-status-display/order-status-display.pipe';
 import { PaymentMethodDisplayPipe } from 'src/app/shared/pipes/payment-method-display/payment-method-display.pipe';
 
 // directives
@@ -36,7 +35,6 @@ import { AddressFormComponent } from 'src/app/shared/components/address-form/add
 // containers
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/shared/pipes/shipperTracking/shipperTracking.pipe';
 import { GenericBrowseComponent } from 'src/app/shared/components/generic-browse/generic-browse.component';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
 import { PhoneInputDirective } from './directives/phone-input/phone-input.directive';
 import { FormControlErrorDirective } from './directives/directives/form-control-errors.directive';
@@ -88,7 +86,6 @@ import { FormControlErrorDirective } from './directives/directives/form-control-
     NgbAccordionModule,
     NgbCarouselModule,
     NgbDropdownModule,
-    OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
     FallbackImageDirective,
     ShipperTrackingPipe,
@@ -97,11 +94,9 @@ import { FormControlErrorDirective } from './directives/directives/form-control-
     PhoneFormatPipe,
     PhoneInputDirective,
     GenericBrowseComponent,
-    ModalComponent,
     FormControlErrorDirective,
   ],
   declarations: [
-    OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
     FallbackImageDirective,
     ShipperTrackingPipe,
@@ -110,7 +105,6 @@ import { FormControlErrorDirective } from './directives/directives/form-control-
     PhoneInputDirective,
     AddressFormComponent,
     GenericBrowseComponent,
-    ModalComponent,
     FormControlErrorDirective,
   ],
 })

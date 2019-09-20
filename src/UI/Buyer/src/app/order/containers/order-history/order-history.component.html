@@ -13,16 +13,17 @@
   </div>
   <div class="col-md-2 col-sm-6"
        *ngIf="!approvalVersion">
-    <order-status-filter (selectedStatus)="filterByStatus($event)"></order-status-filter>
+    <ocm-order-status-filter (selectedStatus)="filterByStatus($event.detail)"></ocm-order-status-filter>
   </div>
   <div class="col">
-    <order-date-filter (selectedDate)="filterByDate($event)"></order-date-filter>
+    <ocm-order-date-filter (selectedDate)="filterByDate($event.detail)"></ocm-order-date-filter>
   </div>
 </div>
-<order-list *ngIf="orders$ | async; let orders"
-            [orders]="orders"
-            [columns]="columns"
-            [sortBy]="sortBy"
-            (updatedSort)="sortOrders($event)"
-            (changedPage)="changePage($event)">
-</order-list>
+<ocm-order-list *ngIf="orders$ | async; let orders"
+                [context]="context"
+                [orders]="orders"
+                [columns]="columns"
+                [sortBy]="sortBy"
+                (updatedSort)="sortOrders($event.detail)"
+                (changedPage)="changePage($event.detail)">
+</ocm-order-list>

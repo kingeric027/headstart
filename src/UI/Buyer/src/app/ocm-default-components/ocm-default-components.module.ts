@@ -10,12 +10,19 @@ import { OCMSpecForm } from './components/spec-form/spec-form.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser, DatePipe } from '@angular/common';
 import { OCMOrderSummary } from './components/order-summary/order-summary.component';
 import { OCMLineitemTable } from './components/lineitem-table/lineitem-table.component';
 import { OCMCart } from './components/cart/cart.component';
 import { OCMHomePage } from './components/home/home.component';
-import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbCarouselModule,
+  NgbCollapseModule,
+  NgbPaginationModule,
+  NgbPopoverModule,
+  NgbDropdownModule,
+  NgbDatepickerModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import { OCMProductSort } from './components/sort-products/sort-products.component';
 //import { OCMCategoryTree } from './components/category-tree/category-tree.component';
 //import { TreeModule } from 'angular-tree-component';
@@ -31,6 +38,12 @@ import { OCMAddressCard } from './components/address-card/address-card.component
 import { OCMCreditCardIcon } from './components/credit-card-icon/credit-card-icon.component';
 import { OCMCreditCardDisplay } from './components/credit-card-display/credit-card-display.component';
 import { OCMCreditCardForm } from './components/credit-card-form/credit-card-form.component';
+import { OCMModal } from './components/modal/modal.component';
+import { OCMOrderStatusIcon } from './components/order-status-icon/order-status-icon.component';
+import { OCMOrderStatusFilter } from './components/order-status-filter/order-status-filter.component';
+import { OrderStatusDisplayPipe } from './pipes/order-status-display/order-status-display.pipe';
+import { OCMOrderDateFilter } from './components/order-date-filter/order-date-filter.component';
+import { OCMOrderList } from './components/order-list/order-list.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -54,12 +67,18 @@ import { OCMCreditCardForm } from './components/credit-card-form/credit-card-for
     OCMSearch,
     OCMMiniCart,
     ProductNameWithSpecsPipe,
+    OrderStatusDisplayPipe,
     OCMAppHeader,
     OCMPaymentList,
     OCMAddressCard,
     OCMCreditCardIcon,
     OCMCreditCardDisplay,
     OCMCreditCardForm,
+    OCMModal,
+    OCMOrderStatusIcon,
+    OCMOrderStatusFilter,
+    OCMOrderDateFilter,
+    OCMOrderList,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -86,6 +105,11 @@ import { OCMCreditCardForm } from './components/credit-card-form/credit-card-for
     OCMCreditCardIcon,
     OCMCreditCardDisplay,
     OCMCreditCardForm,
+    OCMModal,
+    OCMOrderStatusIcon,
+    OCMOrderStatusFilter,
+    OCMOrderDateFilter,
+    OCMOrderList,
   ],
   imports: [
     CommonModule,
@@ -99,6 +123,10 @@ import { OCMCreditCardForm } from './components/credit-card-form/credit-card-for
     NgbPaginationModule,
     NgbPopoverModule,
     NgbDropdownModule,
+    NgbDatepickerModule,
+  ],
+  providers: [
+    DatePipe, // allows us to use in class as injectable (date filter component)
   ],
 })
 export class OcmDefaultComponentsModule {
@@ -129,6 +157,11 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMCreditCardIcon, 'ocm-credit-card-icon');
     this.buildWebComponent(OCMCreditCardDisplay, 'ocm-credit-card-display');
     this.buildWebComponent(OCMCreditCardForm, 'ocm-credit-card-form');
+    this.buildWebComponent(OCMModal, 'ocm-modal');
+    this.buildWebComponent(OCMOrderStatusIcon, 'ocm-order-status-icon');
+    this.buildWebComponent(OCMOrderStatusFilter, 'ocm-order-status-filter');
+    this.buildWebComponent(OCMOrderDateFilter, 'ocm-order-date-filter');
+    this.buildWebComponent(OCMOrderList, 'ocm-order-list');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

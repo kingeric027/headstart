@@ -1,28 +1,30 @@
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { debounceTime, takeWhile } from 'rxjs/operators';
 import { DateValidator } from 'src/app/ocm-default-components/validators/validators';
+import { OCMComponent } from '../../shopper-context';
 
 @Component({
-  selector: 'order-date-filter',
-  templateUrl: './date-filter.component.html',
-  styleUrls: ['./date-filter.component.scss'],
+  templateUrl: './order-date-filter.component.html',
+  styleUrls: ['./order-date-filter.component.scss'],
 })
-export class DateFilterComponent implements OnInit, OnDestroy {
+export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestroy {
   private alive = true;
   faCalendar = faCalendar;
   faTimes = faTimes;
   form: FormGroup;
   @Output() selectedDate = new EventEmitter<string[]>();
 
-  constructor(private formBuilder: FormBuilder, private datePipe: DatePipe) {}
+  constructor(private datePipe: DatePipe) {
+    super();
+  }
 
   ngOnInit() {
-    this.form = this.formBuilder.group({
-      fromDate: [<Date>null, DateValidator],
-      toDate: [<Date>null, DateValidator],
+    this.form = new FormGroup({
+      fromDate: new FormControl(<Date>null, DateValidator),
+      toDate: new FormControl(<Date>null, DateValidator),
     });
     this.onFormChanges();
   }
@@ -38,22 +40,25 @@ export class DateFilterComponent implements OnInit, OnDestroy {
       });
   }
 
+  format(date: Date): string {
+    return this.datePipe.transform(date, 'shortDate').replace(/\//g, '-');
+  }
+
   private emitDate() {
     if (this.form.get('fromDate').invalid || this.form.get('toDate').invalid) {
       return;
     }
-    const format = (date) => this.datePipe.transform(date, 'shortDate').replace(/\//g, '-');
+
     const fromDate = <Date>this.form.get('fromDate').value;
     const toDate = <Date>this.form.get('toDate').value;
     const dateSubmitted: string[] = [];
-
     if (fromDate) {
-      dateSubmitted.push(`>${format(fromDate)}`);
+      dateSubmitted.push(`>${this.format(fromDate)}`);
     }
     if (toDate) {
       // Add one day so the filter will be inclusive of the date selected
       toDate.setDate(toDate.getDate() + 1);
-      dateSubmitted.push(`<${format(toDate)}`);
+      dateSubmitted.push(`<${this.format(toDate)}`);
     }
 
     this.selectedDate.emit(dateSubmitted);

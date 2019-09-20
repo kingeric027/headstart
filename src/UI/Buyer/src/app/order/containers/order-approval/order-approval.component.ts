@@ -1,9 +1,8 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { OcOrderService } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'order-approval',
@@ -15,7 +14,7 @@ export class OrderApprovalComponent implements OnInit {
   form: FormGroup;
   modalID = 'order-approval-comments';
   @Input() orderID: string;
-  @ViewChild('approveModal', { static: false }) public approveModal: ModalComponent;
+  approveModalOpen = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -30,7 +29,7 @@ export class OrderApprovalComponent implements OnInit {
 
   openModal(approved: boolean) {
     this.approved = approved;
-    this.approveModal.open();
+    this.approveModalOpen = true;
   }
 
   submitReview() {
@@ -47,7 +46,7 @@ export class OrderApprovalComponent implements OnInit {
 
     request.subscribe(() => {
       this.toasterService.success(`Order ${this.orderID} was ${this.approved ? 'Approved' : 'Declined'}`);
-      this.approveModal.close();
+      this.approveModalOpen = false;
       this.router.navigateByUrl('/profile/orders/approval');
     });
   }

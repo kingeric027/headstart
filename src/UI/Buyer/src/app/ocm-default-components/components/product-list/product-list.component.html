@@ -112,10 +112,10 @@
       </div>
     </div>
   </div>
-  <shared-modal #categoryModal
-                modalTitle="Select Category">
+  <ocm-modal [(isOpen)]="categoryModalOpen"
+             modalTitle="Select Category">
     <!-- <ocm-category-tree *ngIf="categories?.Items?.length"
                        [categories]="categories"
                        [context]="context"></ocm-category-tree> -->
-  </shared-modal>
+  </ocm-modal>
 </section>

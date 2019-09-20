@@ -68,7 +68,7 @@
 </div>
 
 <!--  Change Password Modal Content -->
-<shared-modal #passwordModal
-              modalTitle="Change Password">
+<ocm-modal [(isOpen)]="passwordModalOpen"
+           modalTitle="Change Password">
   <profile-change-password-form (changePassword)="onChangePassword($event)"></profile-change-password-form>
-</shared-modal>
+</ocm-modal>

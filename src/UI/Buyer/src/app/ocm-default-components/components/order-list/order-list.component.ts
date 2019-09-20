@@ -2,23 +2,22 @@ import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { ListOrder } from '@ordercloud/angular-sdk';
 import { OrderListColumn } from 'src/app/order/models/order-list-column';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
-import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
+import { OCMComponent } from 'src/app/ocm-default-components/shopper-context';
 
 @Component({
-  selector: 'order-list',
   templateUrl: './order-list.component.html',
   styleUrls: ['./order-list.component.scss'],
 })
-export class OrderListComponent {
+export class OCMOrderList extends OCMComponent {
   @Input() orders: ListOrder;
   @Input() columns: OrderListColumn[];
-  @Input() sortBy: string;
   faCaretDown = faCaretDown;
   faCaretUp = faCaretUp;
+
+  // todo - should this be in some kinda service?
+  @Input() sortBy: string;
   @Output() updatedSort = new EventEmitter<string>();
   @Output() changedPage = new EventEmitter<number>();
-
-  constructor(protected currentUser: CurrentUserService) {}
 
   updateSort(selectedSortBy) {
     let sortBy;
@@ -41,10 +40,14 @@ export class OrderListComponent {
   }
 
   isFavorite(orderID: string) {
-    return this.currentUser.favoriteOrderIDs.includes(orderID);
+    return this.context.currentUser.favoriteOrderIDs.includes(orderID);
   }
 
   setIsFavorite(isFav: boolean, orderID: string) {
-    this.currentUser.setIsFavoriteOrder(isFav, orderID);
+    this.context.currentUser.setIsFavoriteOrder(isFav, orderID);
+  }
+
+  toOrderDetails(orderID: string) {
+    this.context.routeActions.toOrderDetails(orderID);
   }
 }

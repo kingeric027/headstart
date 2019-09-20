@@ -1,11 +1,10 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { forEach as _forEach } from 'lodash';
 
 import { CartService, AppReorderService } from 'src/app/shared';
 import { OrderReorderResponse } from 'src/app/shared/services/reorder/reorder.interface';
 import { LineItem } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'order-reorder',
@@ -14,7 +13,7 @@ import { ModalComponent } from 'src/app/shared/components/modal/modal.component'
 })
 export class OrderReorderComponent implements OnInit {
   @Input() orderID: string;
-  @ViewChild('reorderModal', { static: false }) reorderModal: ModalComponent;
+  reorderModalOpen = false;
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
 
@@ -49,7 +48,7 @@ export class OrderReorderComponent implements OnInit {
   }
 
   orderReorder() {
-    this.reorderModal.open();
+    this.reorderModalOpen = true;
   }
 
   addToCart() {
@@ -58,6 +57,6 @@ export class OrderReorderComponent implements OnInit {
       li = { ProductID: li.Product.ID, Quantity: li.Quantity, Specs: li.Specs };
       await this.cartService.addToCart(li);
     });
-    this.reorderModal.close();
+    this.reorderModalOpen = false;
   }
 }

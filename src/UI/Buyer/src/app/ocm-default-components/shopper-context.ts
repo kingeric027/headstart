@@ -43,9 +43,12 @@ export interface IRouteActions {
   toMyPaymentMethods(): void;
   toMyOrders(): void;
   toOrdersToApprove(): void;
+  toOrderDetails(orderID: string): void;
 }
 
 export interface ICurrentUser {
+  favoriteProductIDs: string[];
+  favoriteOrderIDs: string[];
   get(): MeUser;
   patch(user: MeUser): void;
   onUserChange(callback: (user: User) => void): void;

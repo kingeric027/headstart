@@ -1,10 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MeUser } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 import { ValidateName, ValidatePhone, ValidateEmail } from 'src/app/ocm-default-components/validators/validators';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'profile-meupdate',
@@ -15,7 +14,7 @@ export class MeUpdateComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
   alive = true;
-  @ViewChild('passwordModal', { static: false }) public passwordModal: ModalComponent;
+  passwordModalOpen = false;
 
   constructor(private formBuilder: FormBuilder, private toastrService: ToastrService, private context: ShopperContextService) {}
 
@@ -54,11 +53,11 @@ export class MeUpdateComponent implements OnInit {
     }
     await this.context.authentication.changePassword(newPassword);
     this.toastrService.success('Account Info Updated', 'Success');
-    this.passwordModal.close();
+    this.passwordModalOpen = false;
   }
 
   openPasswordModal() {
-    this.passwordModal.open();
+    this.passwordModalOpen = true;
   }
 
   async onSubmit() {

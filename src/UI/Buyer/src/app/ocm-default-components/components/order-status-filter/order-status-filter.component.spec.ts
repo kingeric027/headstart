@@ -1,9 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { StatusFilterComponent } from 'src/app/order/components/status-filter/status-filter.component';
+import { StatusFilterComponent } from 'src/app/order/components/status-filter/order-status-filter.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OrderStatus } from 'src/app/order/models/order-status.model';
-import { OrderStatusDisplayPipe } from 'src/app/shared/pipes/order-status-display/order-status-display.pipe';
+import { OrderStatusDisplayPipe } from 'src/app/ocm-default-components/pipes/order-status-display/order-status-display.pipe';
 
 describe('StatusFilterComponent', () => {
   let component: StatusFilterComponent;
@@ -36,12 +36,7 @@ describe('StatusFilterComponent', () => {
       });
     });
     it('should set statuses correctly', () => {
-      expect(component['statuses']).toEqual([
-        OrderStatus.Open,
-        OrderStatus.AwaitingApproval,
-        OrderStatus.Completed,
-        OrderStatus.Declined,
-      ]);
+      expect(component['statuses']).toEqual([OrderStatus.Open, OrderStatus.AwaitingApproval, OrderStatus.Completed, OrderStatus.Declined]);
     });
   });
 

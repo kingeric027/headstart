@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { faCircle, faClock, faBan } from '@fortawesome/free-solid-svg-icons';
 import { OrderStatus } from 'src/app/order/models/order-status.model';
+import { OCMComponent } from '../../shopper-context';
 
 @Component({
-  selector: 'order-status-icon',
-  templateUrl: './status-icon.component.html',
-  styleUrls: ['./status-icon.component.scss'],
+  templateUrl: './order-status-icon.component.html',
+  styleUrls: ['./order-status-icon.component.scss'],
 })
-export class StatusIconComponent {
+export class OCMOrderStatusIcon extends OCMComponent {
   @Input() status: OrderStatus;
   faCircle = faCircle;
   faClock = faClock;
@@ -16,6 +16,7 @@ export class StatusIconComponent {
     [OrderStatus.Completed]: this.faCircle,
     [OrderStatus.AwaitingApproval]: this.faClock,
     [OrderStatus.Open]: this.faCircle,
-    [OrderStatus.Declined]: this.faBan,
+    [OrderStatus.Declined]: this.faCircle,
+    [OrderStatus.Canceled]: this.faBan,
   };
 }

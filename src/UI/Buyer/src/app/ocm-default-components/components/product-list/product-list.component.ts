@@ -1,10 +1,9 @@
-import { Component, Input, OnChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { ListBuyerProduct, Category, ListCategory, ListFacet } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
 import { OCMComponent, ProductFilters } from 'src/app/ocm-default-components/shopper-context';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'ocm-product-list',
@@ -15,7 +14,7 @@ export class OCMProductList extends OCMComponent implements OnChanges {
   @Input() products: ListBuyerProduct;
   @Input() categories: ListCategory;
   @Input() quantityLimits: QuantityLimits[];
-  @ViewChild('categoryModal', { static: false }) public categoryModal: ModalComponent;
+  categoryModalOpen = false;
   facets: ListFacet[];
   categoryCrumbs: Category[] = [];
   hasQueryParams = false;
@@ -64,6 +63,6 @@ export class OCMProductList extends OCMComponent implements OnChanges {
   }
 
   openCategoryModal() {
-    this.categoryModal.open();
+    this.categoryModalOpen = true;
   }
 }

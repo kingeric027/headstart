@@ -1,8 +1,8 @@
 <button type="button"
         class="btn  btn-secondary"
         (click)="orderReorder()">Reorder</button>
-<shared-modal #reorderModal
-              modalTitle="Order Reorder">
+<ocm-modal [(isOpen)]="reorderModalOpen"
+           modalTitle="Order Reorder">
   <div *ngIf="reorderResponse">
     <div class="alert"
          [ngClass]="{'alert-danger': message.classType == 'danger',
@@ -20,4 +20,4 @@
             [disabled]="!reorderResponse.ValidLi.length || !orderID"
             (click)="addToCart()">Add to Cart</button>
   </div>
-</shared-modal>
+</ocm-modal>

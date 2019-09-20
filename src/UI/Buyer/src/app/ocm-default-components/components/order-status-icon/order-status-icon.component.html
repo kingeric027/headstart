@@ -2,6 +2,6 @@
   'text-success': status === 'Completed',
   'text-warning': status === 'AwaitingApproval',
   'text-info': status === 'Open',
-  'text-danger': status === 'Declined'
+  'text-danger': status === 'Declined' || status === 'Canceled' 
 }"
          [icon]="statusIconMapping[status]"></fa-icon>
