@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { OcMeService, OcTokenService, MeUser } from '@ordercloud/angular-sdk';
+import { OcMeService, MeUser } from '@ordercloud/angular-sdk';
 import { AppMatchFieldsValidator } from 'src/app/shared/validators/match-fields/match-fields.validator';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 import { ValidateName, ValidatePhone, ValidateEmail, ValidateStrongPassword } from 'src/app/ocm-default-components/validators/validators';
@@ -20,7 +20,6 @@ export class RegisterComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private ocMeService: OcMeService,
-    private ocTokenService: OcTokenService,
     private router: Router,
     private toastrService: ToastrService,
     private context: ShopperContextService
@@ -55,8 +54,8 @@ export class RegisterComponent implements OnInit {
 
     const me = <MeUser>this.form.value;
     me.Active = true;
-
-    this.ocMeService.Register(this.ocTokenService.GetAccess(), me).subscribe(() => {
+    const token = this.context.authentication.getOrderCloudToken();
+    this.ocMeService.Register(token, me).subscribe(() => {
       this.toastrService.success('New User Created');
       this.router.navigate(['/login']);
     });

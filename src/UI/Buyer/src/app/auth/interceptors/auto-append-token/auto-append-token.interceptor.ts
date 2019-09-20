@@ -1,16 +1,8 @@
 import { Injectable, Inject } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-} from '@angular/common/http';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { OcTokenService } from '@ordercloud/angular-sdk';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from 'src/app/config/app.config';
+import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
+import { AuthService } from 'src/app/shared/services/auth/auth.service';
 
 /**
  * automatically append token to the authorization header
@@ -20,18 +12,12 @@ import {
   providedIn: 'root',
 })
 export class AutoAppendTokenInterceptor implements HttpInterceptor {
-  constructor(
-    private ocTokenService: OcTokenService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
-  intercept(
-    request: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+  constructor(private authService: AuthService, @Inject(applicationConfiguration) private appConfig: AppConfig) {}
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (request.url.includes(this.appConfig.middlewareUrl)) {
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+          Authorization: `Bearer ${this.authService.getOrderCloudToken()}`,
         },
       });
     }

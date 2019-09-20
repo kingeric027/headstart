@@ -48,7 +48,7 @@ export class MeUpdateComponent implements OnInit {
 
   async onChangePassword({ currentPassword, newPassword }) {
     try {
-      await this.context.authentication.login(this.me.Username, currentPassword);
+      await this.context.authentication.profiledLogin(this.me.Username, currentPassword);
     } catch (ex) {
       this.toastrService.error('Current Password is incorrect');
     }

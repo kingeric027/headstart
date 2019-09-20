@@ -1,18 +1,16 @@
 import { Injectable, Inject } from '@angular/core';
-import { Observable, throwError, of, BehaviorSubject } from 'rxjs';
-import { tap, catchError, finalize, map } from 'rxjs/operators';
+import { Observable, of, BehaviorSubject, from } from 'rxjs';
+import { tap, catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 // 3rd party
 import { OcTokenService, OcAuthService, AccessToken, OcMeService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { CookieService } from '@gorniv/ngx-universal';
-import { AppErrorHandler } from 'src/app/config/error-handling.config';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { CurrentOrderService } from 'src/app/shared/services/current-order/current-order.service';
 import { IAuthActions } from 'src/app/ocm-default-components/shopper-context';
 
-export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possible';
 @Injectable({
   providedIn: 'root',
 })
@@ -27,7 +25,6 @@ export class AuthService implements IAuthActions {
     private ocAuthService: OcAuthService,
     private cookieService: CookieService,
     private router: Router,
-    private appErrorHandler: AppErrorHandler,
     private currentUser: CurrentUserService,
     private currentOrder: CurrentOrderService,
     private ocMeService: OcMeService,
@@ -36,17 +33,11 @@ export class AuthService implements IAuthActions {
     this.refreshToken = new BehaviorSubject<string>('');
   }
 
-  async changePassword(newPassword: string): Promise<void> {
-    await this.ocMeService.ResetPasswordByToken({ NewPassword: newPassword }).toPromise();
-  }
-
   refresh(): Observable<void> {
     this.fetchingRefreshToken = true;
-    return this.fetchRefreshToken().pipe(
+    return from(this.refreshTokenLogin()).pipe(
       tap((token) => {
-        this.currentUser.isLoggedIn = true;
-        this.ocTokenService.SetAccess(token);
-        this.refreshToken.next(token);
+        this.refreshToken.next(token.access_token);
       }),
       catchError(() => {
         // ignore new refresh attempts if a refresh
@@ -64,43 +55,42 @@ export class AuthService implements IAuthActions {
     );
   }
 
-  fetchToken(): Observable<string> {
-    const accessToken = this.ocTokenService.GetAccess();
-    if (accessToken) {
-      return of(accessToken);
+  private async refreshTokenLogin(): Promise<AccessToken> {
+    try {
+      const refreshToken = this.ocTokenService.GetRefresh();
+      const creds = await this.ocAuthService.RefreshToken(refreshToken, this.appConfig.clientID).toPromise();
+      this.setToken(creds.access_token);
+      return creds;
+    } catch (err) {
+      if (this.appConfig.anonymousShoppingEnabled) {
+        return this.anonymousLogin();
+      } else {
+        throw new Error(err);
+      }
     }
-    return this.fetchRefreshToken();
   }
 
-  fetchRefreshToken(): Observable<string> {
-    const refreshToken = this.ocTokenService.GetRefresh();
-    if (refreshToken) {
-      return this.ocAuthService.RefreshToken(refreshToken, this.appConfig.clientID).pipe(
-        map((authResponse) => authResponse.access_token),
-        tap((token) => this.ocTokenService.SetAccess(token)),
-        catchError((error) => {
-          if (this.appConfig.anonymousShoppingEnabled) {
-            return this.authAnonymous();
-          } else {
-            throwError(error);
-          }
-        })
-      );
-    }
-
-    if (this.appConfig.anonymousShoppingEnabled) {
-      return this.authAnonymous();
-    }
-
-    return throwError(TokenRefreshAttemptNotPossible);
-  }
-
-  async login(userName: string, password: string): Promise<AccessToken> {
-    const creds = await this.ocAuthService.Login(userName, password, this.appConfig.clientID, this.appConfig.scope).toPromise();
-    if (!creds) return;
+  setToken(token: string) {
+    if (!token) return;
+    this.ocTokenService.SetAccess(token);
     this.currentUser.isLoggedIn = true;
-    this.ocTokenService.SetAccess(creds.access_token);
+  }
+
+  async profiledLogin(userName: string, password: string): Promise<AccessToken> {
+    const creds = await this.ocAuthService.Login(userName, password, this.appConfig.clientID, this.appConfig.scope).toPromise();
+    this.setToken(creds.access_token);
     return creds;
+  }
+
+  async anonymousLogin(): Promise<AccessToken> {
+    try {
+      const creds = await this.ocAuthService.Anonymous(this.appConfig.clientID, this.appConfig.scope).toPromise();
+      this.setToken(creds.access_token);
+      return creds;
+    } catch (err) {
+      this.logout();
+      throw new Error(err);
+    }
   }
 
   async logout(): Promise<void> {
@@ -115,16 +105,12 @@ export class AuthService implements IAuthActions {
     }
   }
 
-  authAnonymous(): Observable<string> {
-    return this.ocAuthService.Anonymous(this.appConfig.clientID, this.appConfig.scope).pipe(
-      map((authResponse) => authResponse.access_token),
-      tap((token) => this.ocTokenService.SetAccess(token)),
-      catchError((ex) => {
-        this.appErrorHandler.displayError(ex);
-        this.logout();
-        return of(null);
-      })
-    );
+  async changePassword(newPassword: string): Promise<void> {
+    await this.ocMeService.ResetPasswordByToken({ NewPassword: newPassword }).toPromise();
+  }
+
+  getOrderCloudToken(): string {
+    return this.ocTokenService.GetAccess();
   }
 
   setRememberStatus(status: boolean): void {

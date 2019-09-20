@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
   async onSubmit() {
     const username = this.form.get('username').value;
     const password = this.form.get('password').value;
-    const credentials = await this.authService.login(username, password);
+    const credentials = await this.authService.profiledLogin(username, password);
     const rememberMe = this.form.get('rememberMe').value;
     if (rememberMe && credentials.refresh_token) {
       /**

@@ -5,7 +5,6 @@ import { CurrentOrderService } from 'src/app/shared';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
-import { AppErrorHandler } from 'src/app/config/error-handling.config';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
@@ -49,7 +48,6 @@ export class CheckoutComponent implements OnInit {
     private currentOrder: CurrentOrderService,
     private ocOrderService: OcOrderService,
     private router: Router,
-    private appErrorHandler: AppErrorHandler,
     public context: ShopperContextService
   ) {}
 
@@ -86,7 +84,7 @@ export class CheckoutComponent implements OnInit {
       await this.ocOrderService.Submit('outgoing', orderID).toPromise();
     } catch (ex) {
       this.isSubmittingOrder = false;
-      this.appErrorHandler.displayError(ex);
+      throw new Error(ex);
     }
     this.router.navigateByUrl(`order-confirmation/${orderID}`);
     this.currentOrder.reset();

@@ -79,9 +79,11 @@ export interface IProductFilterActions {
 }
 
 export interface IAuthActions {
-  login(username: string, password: string): Promise<AccessToken>;
-  logout(): void;
+  profiledLogin(username: string, password: string): Promise<AccessToken>;
+  logout(): Promise<void>;
   changePassword(newPassword: string): Promise<void>;
+  anonymousLogin(): Promise<AccessToken>;
+  getOrderCloudToken(): string;
 }
 
 export interface ProductFilters {

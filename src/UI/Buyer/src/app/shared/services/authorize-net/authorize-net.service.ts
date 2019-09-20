@@ -1,24 +1,11 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {
-  AppConfig,
-  applicationConfiguration,
-} from 'src/app/config/app.config';
+import { AppConfig, applicationConfiguration } from 'src/app/config/app.config';
 import { Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
-import {
-  CreateCardDetails,
-  AuthorizeCardSuccess,
-  CreateCardResponse,
-} from 'src/app/shared/services/authorize-net/authorize-net.interface';
-import {
-  OcTokenService,
-  Payment,
-  OcPaymentService,
-  Order,
-  OcOrderService,
-  BuyerCreditCard,
-} from '@ordercloud/angular-sdk';
+import { CreateCardDetails, AuthorizeCardSuccess, CreateCardResponse } from 'src/app/shared/services/authorize-net/authorize-net.interface';
+import { Payment, OcPaymentService, Order, OcOrderService, BuyerCreditCard } from '@ordercloud/angular-sdk';
+import { AuthService } from '../auth/auth.service';
 
 /**
  *  OrderCloud does not store full credit card details or process finacial transactions.
@@ -37,7 +24,7 @@ export class AuthorizeNetService {
   readonly options = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.tokenSerivce.GetAccess()}`,
+      Authorization: `Bearer ${this.authService.getOrderCloudToken()}`,
     }),
   };
   readonly acceptedCards = {
@@ -48,7 +35,7 @@ export class AuthorizeNetService {
 
   constructor(
     private http: HttpClient,
-    private tokenSerivce: OcTokenService,
+    private authService: AuthService,
     private ocPaymentService: OcPaymentService,
     private ocOrderService: OcOrderService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
@@ -81,10 +68,7 @@ export class AuthorizeNetService {
     });
   }
 
-  private AuthorizeCardOnOrder(
-    order: Order,
-    card: CreateCardDetails
-  ): Observable<AuthorizeCardSuccess> {
+  private AuthorizeCardOnOrder(order: Order, card: CreateCardDetails): Observable<AuthorizeCardSuccess> {
     return this.post({
       BuyerID: this.appConfig.appname,
       OrderID: order.ID,
@@ -120,11 +104,7 @@ export class AuthorizeNetService {
     The OC API integration with Authorize.Net is still working through some bugs. One involves existing Payments.
     This function wraps AuthorizeCardOnOrder() with the calls needed to work around this bug.
   */
-  AuthorizeCard(
-    order: Order,
-    card: CreateCardDetails,
-    existingPayment: Payment
-  ): Observable<AuthorizeCardSuccess> {
+  AuthorizeCard(order: Order, card: CreateCardDetails, existingPayment: Payment): Observable<AuthorizeCardSuccess> {
     if (!existingPayment) {
       return this.AuthorizeCardOnOrder(order, card);
     }
@@ -139,11 +119,7 @@ export class AuthorizeNetService {
     These cards' non-sensitive details are not saved to a user, because no user exists.
     Instead they must be saved on the order xp.
   */
-  AuthorizeAnonymousCard(
-    order: Order,
-    card: CreateCardDetails,
-    existingPayment: Payment
-  ): Observable<Order> {
+  AuthorizeAnonymousCard(order: Order, card: CreateCardDetails, existingPayment: Payment): Observable<Order> {
     return this.AuthorizeCard(order, card, existingPayment).pipe(
       flatMap(() =>
         this.ocOrderService.Patch('outgoing', order.ID, {

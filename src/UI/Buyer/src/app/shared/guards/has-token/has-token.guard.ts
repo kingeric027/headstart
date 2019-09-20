@@ -4,8 +4,6 @@ import { OcTokenService } from '@ordercloud/angular-sdk';
 import * as jwtDecode from 'jwt-decode';
 import { DecodedOrderCloudToken } from 'src/app/shared';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
-import { of, Observable } from 'rxjs';
-import { flatMap, map } from 'rxjs/operators';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
 import { isPlatformServer } from '@angular/common';
@@ -23,7 +21,7 @@ export class HasTokenGuard implements CanActivate {
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
-  canActivate(): Observable<boolean> {
+  async canActivate(): Promise<boolean> {
     /**
      * very simple test to make sure a token exists,
      * can be parsed and has a valid expiration time.
@@ -44,9 +42,8 @@ export class HasTokenGuard implements CanActivate {
     if (isImpersonating) {
       const match = /token=([^&]*)/.exec(window.location.search);
       if (match) {
-        this.ocTokenService.SetAccess(match[1]);
-        this.currentUser.isLoggedIn = true;
-        return of(true);
+        this.appAuthService.setToken(match[1]);
+        return true;
       } else {
         alert(`Missing url query param 'token'`);
       }
@@ -55,29 +52,26 @@ export class HasTokenGuard implements CanActivate {
     const isAccessTokenValid = this.isTokenValid();
     const refreshTokenExists = this.ocTokenService.GetRefresh() && this.appAuthService.getRememberStatus();
     if (!isAccessTokenValid && refreshTokenExists) {
-      return this.appAuthService.refresh().pipe(map(() => true));
+      await this.appAuthService.refresh().toPromise();
+      return true;
     }
 
     // send profiled users to login to get new token
     if (!isAccessTokenValid && !this.appConfig.anonymousShoppingEnabled) {
       this.router.navigate(['/login']);
-      return of(false);
+      return false;
     }
     // get new anonymous token and then let them continue
     if (!isAccessTokenValid && this.appConfig.anonymousShoppingEnabled) {
-      return this.appAuthService.authAnonymous().pipe(
-        flatMap(() => {
-          this.currentUser.isLoggedIn = true;
-          return of(true);
-        })
-      );
+      await this.appAuthService.anonymousLogin();
+      return true;
     }
     this.currentUser.isLoggedIn = true;
-    return of(isAccessTokenValid);
+    return isAccessTokenValid;
   }
 
   private isTokenValid(): boolean {
-    const token = this.ocTokenService.GetAccess();
+    const token = this.appAuthService.getOrderCloudToken();
 
     if (!token) {
       return false;
