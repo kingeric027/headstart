@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 // angular libs
@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 
 // ordercloud
 import { OcPasswordResetService } from '@ordercloud/angular-sdk';
-import { isPlatformBrowser } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
@@ -23,7 +23,7 @@ export class ForgotPasswordComponent implements OnInit {
     private ocPasswordResetService: OcPasswordResetService,
     private formBuilder: FormBuilder,
     private toasterService: ToastrService,
-    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(DOCUMENT) private document: any,
     private context: ShopperContextService
   ) {}
 
@@ -32,25 +32,13 @@ export class ForgotPasswordComponent implements OnInit {
     this.resetEmailForm = this.formBuilder.group({ email: '' });
   }
 
-  onSubmit() {
-    let hostUrl: string;
-    if (isPlatformBrowser(this.platformId)) {
-      hostUrl = window.location.origin;
-    }
-    this.ocPasswordResetService
-      .SendVerificationCode({
-        Email: this.resetEmailForm.get('email').value,
-        ClientID: this.context.appSettings.clientID,
-        URL: hostUrl,
-      })
-      .subscribe(
-        () => {
-          this.toasterService.success('Password Reset Email Sent!', 'Success');
-          this.context.routeActions.toLogin();
-        },
-        (error) => {
-          throw error;
-        }
-      );
+  async onSubmit() {
+    const URL = this.document.location.host;
+    const Email = this.resetEmailForm.get('email').value;
+    const ClientID = this.context.appSettings.clientID;
+
+    await this.ocPasswordResetService.SendVerificationCode({ Email, ClientID, URL }).toPromise();
+    this.toasterService.success('Password Reset Email Sent!', 'Success');
+    this.context.routeActions.toLogin();
   }
 }

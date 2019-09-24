@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { OcOrderService } from '@ordercloud/angular-sdk';
+import { OcOrderService, Order } from '@ordercloud/angular-sdk';
 import { ToastrService } from 'ngx-toastr';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
@@ -32,22 +32,34 @@ export class OrderApprovalComponent implements OnInit {
     this.approveModalOpen = true;
   }
 
-  submitReview() {
-    const comments = this.form.value.comments;
-    const request = this.approved
-      ? this.ocOrderService.Approve('outgoing', this.orderID, {
-          Comments: comments,
-          AllowResubmit: false,
-        })
-      : this.ocOrderService.Decline('outgoing', this.orderID, {
-          Comments: comments,
-          AllowResubmit: false,
-        });
+  async approveOrder(orderID: string, comments: string): Promise<Order> {
+    return await this.ocOrderService
+      .Approve('outgoing', orderID, {
+        Comments: comments,
+        AllowResubmit: false,
+      })
+      .toPromise();
+  }
 
-    request.subscribe(() => {
-      this.toasterService.success(`Order ${this.orderID} was ${this.approved ? 'Approved' : 'Declined'}`);
-      this.approveModalOpen = false;
-      this.context.routeActions.toOrdersToApprove();
-    });
+  async declineOrder(orderID: string, comments: string): Promise<Order> {
+    return await this.ocOrderService
+      .Decline('outgoing', orderID, {
+        Comments: comments,
+        AllowResubmit: false,
+      })
+      .toPromise();
+  }
+
+  async submitReview() {
+    const comments = this.form.value.comments;
+    if (this.approved) {
+      await this.approveOrder(this.orderID, comments);
+    } else {
+      await this.declineOrder(this.orderID, comments);
+    }
+
+    this.toasterService.success(`Order ${this.orderID} was ${this.approved ? 'Approved' : 'Declined'}`);
+    this.approveModalOpen = false;
+    this.context.routeActions.toOrdersToApprove();
   }
 }

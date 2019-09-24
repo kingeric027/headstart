@@ -1,4 +1,4 @@
-import { Injectable, Inject, PLATFORM_ID, Injector } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import * as jwtDecode from 'jwt-decode';
@@ -6,7 +6,7 @@ import { DecodedOrderCloudToken } from 'src/app/shared';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
-import { isPlatformServer } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
@@ -17,8 +17,7 @@ export class HasTokenGuard implements CanActivate {
     private router: Router,
     private appAuthService: AuthService,
     private currentUser: CurrentUserService,
-    private injector: Injector,
-    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(DOCUMENT) private document: any,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
   async canActivate(): Promise<boolean> {
@@ -32,15 +31,10 @@ export class HasTokenGuard implements CanActivate {
      */
 
     // check for impersonation superseeds existing tokens to allow impersonating buyers sequentially.
-    let isImpersonating: boolean;
-    if (isPlatformServer(this.platformId)) {
-      const req = this.injector.get('request');
-      isImpersonating = req.path === '/impersonation';
-    } else {
-      isImpersonating = window.location.pathname === '/impersonation';
-    }
+
+    const isImpersonating = this.document.location.pathname === '/impersonation';
     if (isImpersonating) {
-      const match = /token=([^&]*)/.exec(window.location.search);
+      const match = /token=([^&]*)/.exec(this.document.location.search);
       if (match) {
         this.appAuthService.setToken(match[1]);
         return true;

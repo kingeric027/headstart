@@ -48,13 +48,6 @@ export class OCMAppHeader extends OCMComponent implements OnChanges {
     this.searchTermForProducts = filters.search || '';
   };
 
-  isMobile(): boolean {
-    // if (isPlatformBrowser(this.platformId)) {
-    //   return window.innerWidth < 768; // max width for bootstrap's sm breakpoint
-    // }
-    return false;
-  }
-
   buildAddToCartListener() {
     this.context.cartActions.addToCartSubject
       .pipe(
