@@ -1,7 +1,6 @@
 // angular
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
 
 // ordercloud
 import { OcTokenService } from '@ordercloud/angular-sdk';
@@ -21,7 +20,6 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private ocTokenService: OcTokenService,
-    private router: Router,
     private formBuilder: FormBuilder,
     private context: ShopperContextService
   ) {}
@@ -50,7 +48,7 @@ export class LoginComponent implements OnInit {
       this.ocTokenService.SetRefresh(credentials.refresh_token);
       this.authService.setRememberStatus(true);
     }
-    this.router.navigateByUrl('/home');
+    this.context.routeActions.toHome();
   }
 
   showRegisterLink(): boolean {

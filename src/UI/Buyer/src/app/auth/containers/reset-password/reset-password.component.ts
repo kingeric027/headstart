@@ -1,7 +1,7 @@
 // angular
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 // angular libs
 import { ToastrService } from 'ngx-toastr';
@@ -24,7 +24,6 @@ export class ResetPasswordComponent implements OnInit {
   appName: string;
 
   constructor(
-    private router: Router,
     private activatedRoute: ActivatedRoute,
     private toasterService: ToastrService,
     private formBuilder: FormBuilder,
@@ -66,7 +65,7 @@ export class ResetPasswordComponent implements OnInit {
 
     this.ocPasswordResetService.ResetPasswordByVerificationCode(this.resetCode, config).subscribe(() => {
       this.toasterService.success('Password Reset', 'Success');
-      this.router.navigateByUrl('/login');
+      this.context.routeActions.toLogin();
     });
   }
 }

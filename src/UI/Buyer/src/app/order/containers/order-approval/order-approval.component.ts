@@ -1,8 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { OcOrderService } from '@ordercloud/angular-sdk';
-import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'order-approval',
@@ -19,8 +19,8 @@ export class OrderApprovalComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private ocOrderService: OcOrderService,
-    private router: Router,
-    private toasterService: ToastrService
+    private toasterService: ToastrService,
+    private context: ShopperContextService
   ) {}
 
   ngOnInit() {
@@ -47,7 +47,7 @@ export class OrderApprovalComponent implements OnInit {
     request.subscribe(() => {
       this.toasterService.success(`Order ${this.orderID} was ${this.approved ? 'Approved' : 'Declined'}`);
       this.approveModalOpen = false;
-      this.router.navigateByUrl('/profile/orders/approval');
+      this.context.routeActions.toOrdersToApprove();
     });
   }
 }

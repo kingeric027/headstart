@@ -1,7 +1,6 @@
 // angular
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
 
 // angular libs
 import { ToastrService } from 'ngx-toastr';
@@ -22,7 +21,6 @@ export class ForgotPasswordComponent implements OnInit {
 
   constructor(
     private ocPasswordResetService: OcPasswordResetService,
-    private router: Router,
     private formBuilder: FormBuilder,
     private toasterService: ToastrService,
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -48,7 +46,7 @@ export class ForgotPasswordComponent implements OnInit {
       .subscribe(
         () => {
           this.toasterService.success('Password Reset Email Sent!', 'Success');
-          this.router.navigateByUrl('/login');
+          this.context.routeActions.toLogin();
         },
         (error) => {
           throw error;

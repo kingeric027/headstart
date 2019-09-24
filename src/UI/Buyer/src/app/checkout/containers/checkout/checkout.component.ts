@@ -4,7 +4,6 @@ import { Order, OcOrderService } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from 'src/app/shared';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
-import { Router } from '@angular/router';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
@@ -47,7 +46,6 @@ export class CheckoutComponent implements OnInit {
     private currentUser: CurrentUserService,
     private currentOrder: CurrentOrderService,
     private ocOrderService: OcOrderService,
-    private router: Router,
     public context: ShopperContextService
   ) {}
 
@@ -86,7 +84,7 @@ export class CheckoutComponent implements OnInit {
       this.isSubmittingOrder = false;
       throw new Error(ex);
     }
-    this.router.navigateByUrl(`order-confirmation/${orderID}`);
+    this.context.routeActions.toOrderConfirmation(orderID);
     this.currentOrder.reset();
   }
 

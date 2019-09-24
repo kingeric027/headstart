@@ -44,6 +44,7 @@ export interface IRouteActions {
   toMyOrders(): void;
   toOrdersToApprove(): void;
   toOrderDetails(orderID: string): void;
+  toOrderConfirmation(orderID: string): void;
 }
 
 export interface ICurrentUser {
