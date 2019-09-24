@@ -1,22 +1,28 @@
-import { Component, OnChanges, SimpleChanges } from '@angular/core';
-import { PaymentBaseComponent } from 'src/app/checkout/components/payment-base/payment-base.component';
+import { Component, OnChanges, SimpleChanges, Output, EventEmitter, Input } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { get as _get } from 'lodash';
-import { Payment } from '@ordercloud/angular-sdk';
+import { Payment, PartialPayment, Order } from '@ordercloud/angular-sdk';
 
 @Component({
   selector: 'checkout-payment-purchase-order',
   templateUrl: './payment-purchase-order.component.html',
   styleUrls: ['./payment-purchase-order.component.scss'],
 })
-export class PaymentPurchaseOrderComponent extends PaymentBaseComponent
-  implements OnChanges {
+export class PaymentPurchaseOrderComponent implements OnChanges {
+  @Input() order: Order;
+  @Input() payment: Payment;
+  @Output() paymentCreated = new EventEmitter<Payment>();
+  @Output() continue = new EventEmitter();
+  @Output()
+  paymentPatched = new EventEmitter<{
+    paymentID: string;
+    payment: PartialPayment;
+  }>();
+
   form: FormGroup = this.formBuilder.group({
     PONumber: _get(this.payment, 'xp.PONumber'),
   });
-  constructor(private formBuilder: FormBuilder) {
-    super();
-  }
+  constructor(private formBuilder: FormBuilder) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.payment) {
@@ -28,9 +34,7 @@ export class PaymentPurchaseOrderComponent extends PaymentBaseComponent
     if (changes.payment || changes.order) {
       // set form
       if (changes.payment.firstChange) {
-        this.form.controls['PONumber'].setValue(
-          _get(this.payment, 'xp.PONumber')
-        );
+        this.form.controls['PONumber'].setValue(_get(this.payment, 'xp.PONumber'));
       }
 
       // validate payment
@@ -64,8 +68,12 @@ export class PaymentPurchaseOrderComponent extends PaymentBaseComponent
   }
 
   validateAndContinue() {
-    if (this.paymentValid) {
+    if (this.paymentValid()) {
       this.continue.emit();
     }
+  }
+
+  paymentValid(): boolean {
+    return !!this.payment && this.payment.Amount === this.order.Total;
   }
 }

@@ -1,5 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { OcPaymentService, Payment, PartialPayment } from '@ordercloud/angular-sdk';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { CurrentOrderService } from 'src/app/shared';
@@ -11,17 +10,17 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
   templateUrl: './checkout-payment.component.html',
   styleUrls: ['./checkout-payment.component.scss'],
 })
-export class CheckoutPaymentComponent extends CheckoutSectionBaseComponent implements OnInit {
+export class CheckoutPaymentComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private currentOrder: CurrentOrderService,
     private ocPaymentService: OcPaymentService,
     private context: ShopperContextService
-  ) {
-    super();
-  }
+  ) {}
 
   @Input() isAnon: boolean;
+  @Output() continue = new EventEmitter();
+
   readonly order = this.currentOrder.order;
   form: FormGroup;
   availablePaymentMethods = this.context.appSettings.availablePaymentMethods;

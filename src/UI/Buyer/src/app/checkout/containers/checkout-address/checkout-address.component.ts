@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
+import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OcMeService, ListBuyerAddress, OcOrderService, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from 'src/app/shared';
@@ -11,10 +10,11 @@ import { AddressFormComponent } from 'src/app/shared/components/address-form/add
   templateUrl: './checkout-address.component.html',
   styleUrls: ['./checkout-address.component.scss'],
 })
-export class CheckoutAddressComponent extends CheckoutSectionBaseComponent implements OnInit {
+export class CheckoutAddressComponent implements OnInit {
   @Input() isAnon: boolean;
   @Input() addressType: 'Shipping' | 'Billing';
   @ViewChild(AddressFormComponent, { static: false }) addressFormComponent: AddressFormComponent;
+  @Output() continue = new EventEmitter();
   addressModalOpen = false;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
@@ -32,9 +32,7 @@ export class CheckoutAddressComponent extends CheckoutSectionBaseComponent imple
     private ocOrderService: OcOrderService,
     private currentOrder: CurrentOrderService,
     private toastrService: ToastrService
-  ) {
-    super();
-  }
+  ) {}
 
   ngOnInit() {
     if (!this.isAnon) {

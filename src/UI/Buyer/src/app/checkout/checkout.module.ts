@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 // checkout components
 import { CheckoutAddressComponent } from 'src/app/checkout/containers/checkout-address/checkout-address.component';
 import { CheckoutComponent } from 'src/app/checkout/containers/checkout/checkout.component';
-import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
 
 // shared module
 import { SharedModule } from 'src/app/shared';
@@ -25,7 +24,6 @@ import { CartWrapperComponent } from './containers/cart-wrapper/cart-wrapper.com
   declarations: [
     CheckoutAddressComponent,
     CheckoutComponent,
-    CheckoutSectionBaseComponent,
     CheckoutPaymentComponent,
     PaymentPurchaseOrderComponent,
     PaymentSpendingAccountComponent,

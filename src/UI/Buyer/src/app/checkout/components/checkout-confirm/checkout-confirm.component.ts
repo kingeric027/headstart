@@ -1,5 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { CheckoutSectionBaseComponent } from 'src/app/checkout/components/checkout-section-base/checkout-section-base.component';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Order, ListPayment, ListLineItem, OcOrderService } from '@ordercloud/angular-sdk';
 import { AppPaymentService } from 'src/app/shared/services/app-payment/app-payment.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
@@ -10,22 +9,21 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
   templateUrl: './checkout-confirm.component.html',
   styleUrls: ['./checkout-confirm.component.scss'],
 })
-export class CheckoutConfirmComponent extends CheckoutSectionBaseComponent implements OnInit {
+export class CheckoutConfirmComponent implements OnInit {
   form: FormGroup;
   order: Order;
   payments: ListPayment;
   lineItems: ListLineItem;
   anonEnabled: boolean;
   @Input() isSubmittingOrder: boolean;
+  @Output() continue = new EventEmitter();
 
   constructor(
     private appPaymentService: AppPaymentService,
     private formBuilder: FormBuilder,
     private ocOrderService: OcOrderService,
     public context: ShopperContextService //used in template
-  ) {
-    super();
-  }
+  ) {}
 
   async ngOnInit() {
     this.anonEnabled = this.context.appSettings.anonymousShoppingEnabled;

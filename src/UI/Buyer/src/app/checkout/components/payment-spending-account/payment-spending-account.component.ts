@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { PaymentBaseComponent } from 'src/app/checkout/components/payment-base/payment-base.component';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SpendingAccount, ListSpendingAccount, OcMeService, Payment } from '@ordercloud/angular-sdk';
+import { SpendingAccount, ListSpendingAccount, OcMeService, Payment, Order } from '@ordercloud/angular-sdk';
 import * as moment from 'moment';
 
 @Component({
@@ -9,7 +8,11 @@ import * as moment from 'moment';
   templateUrl: './payment-spending-account.component.html',
   styleUrls: ['./payment-spending-account.component.scss'],
 })
-export class PaymentSpendingAccountComponent extends PaymentBaseComponent implements OnInit {
+export class PaymentSpendingAccountComponent implements OnInit {
+  @Input() order: Order;
+  @Input() payment: Payment;
+  @Output() paymentCreated = new EventEmitter<Payment>();
+  @Output() continue = new EventEmitter();
   spendingAccounts: ListSpendingAccount;
   selectedSpendingAccount: SpendingAccount = null;
   requestOptions: { page?: number; search?: string } = {
@@ -19,9 +22,7 @@ export class PaymentSpendingAccountComponent extends PaymentBaseComponent implem
   resultsPerPage = 6;
   spendingAccountModalOpen = false;
 
-  constructor(private ocMeService: OcMeService) {
-    super();
-  }
+  constructor(private ocMeService: OcMeService) {}
 
   ngOnInit() {
     this.listSpendingAccounts().subscribe((accounts) => {
