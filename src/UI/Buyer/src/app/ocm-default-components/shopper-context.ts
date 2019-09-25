@@ -90,6 +90,7 @@ export interface IAuthActions {
   changePassword(newPassword: string): Promise<void>;
   anonymousLogin(): Promise<AccessToken>;
   getOrderCloudToken(): string;
+  forgotPasssword(email: string): Promise<any>;
 }
 
 export interface ProductFilters {

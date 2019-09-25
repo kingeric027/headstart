@@ -19,12 +19,11 @@ export class OCMForgotPassword extends OCMComponent implements OnInit, OnChanges
   }
 
   ngOnChanges() {
-    if (!this.context) return;
     this.appName = this.context.appSettings.appname;
   }
 
   async onSubmit() {
     const email = this.form.get('email').value;
-    this.forgotEvent.emit({ email });
+    await this.context.authentication.forgotPasssword(email);
   }
 }

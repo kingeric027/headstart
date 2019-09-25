@@ -4,7 +4,7 @@ import { tap, catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 // 3rd party
-import { OcTokenService, OcAuthService, AccessToken, OcMeService } from '@ordercloud/angular-sdk';
+import { OcTokenService, OcAuthService, AccessToken, OcMeService, OcPasswordResetService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { CookieService } from '@gorniv/ngx-universal';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
@@ -28,6 +28,7 @@ export class AuthService implements IAuthActions {
     private currentUser: CurrentUserService,
     private currentOrder: CurrentOrderService,
     private ocMeService: OcMeService,
+    private ocPasswordResetService: OcPasswordResetService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     this.refreshToken = new BehaviorSubject<string>('');
@@ -74,6 +75,15 @@ export class AuthService implements IAuthActions {
     if (!token) return;
     this.ocTokenService.SetAccess(token);
     this.currentUser.isLoggedIn = true;
+  }
+
+  async forgotPasssword(email: string): Promise<any> {
+    console.log('forgot', email);
+    const reset = await this.ocPasswordResetService
+      .SendVerificationCode({ Email: email, ClientID: this.appConfig.clientID, URL: this.appConfig.baseUrl })
+      .toPromise();
+    this.router.navigateByUrl('/login');
+    return reset;
   }
 
   async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
