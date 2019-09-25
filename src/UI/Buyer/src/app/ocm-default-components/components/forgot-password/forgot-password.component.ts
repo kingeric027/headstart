@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, OnChanges, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 
 // ordercloud
@@ -12,7 +12,6 @@ import { OCMComponent } from '../../shopper-context';
 export class OCMForgotPassword extends OCMComponent implements OnInit, OnChanges {
   form: FormGroup;
   appName: string;
-  @Output() forgotEvent = new EventEmitter<{ email: string }>();
 
   ngOnInit() {
     this.form = new FormGroup({ email: new FormControl('') });

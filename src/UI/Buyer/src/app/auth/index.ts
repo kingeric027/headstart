@@ -1,6 +1,3 @@
-// containers
-export * from 'src/app/auth/containers/reset-password/reset-password.component';
-
 // interceptors
 export * from 'src/app/auth/interceptors/refresh-token/refresh-token.interceptor';
 export * from 'src/app/auth/interceptors/auto-append-token/auto-append-token.interceptor';

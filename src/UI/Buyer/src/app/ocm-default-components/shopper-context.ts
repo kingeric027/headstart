@@ -91,6 +91,7 @@ export interface IAuthActions {
   anonymousLogin(): Promise<AccessToken>;
   getOrderCloudToken(): string;
   forgotPasssword(email: string): Promise<any>;
+  register(me: MeUser): Promise<any>;
 }
 
 export interface ProductFilters {

@@ -1,34 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
-import { OcMeService, MeUser } from '@ordercloud/angular-sdk';
 import { AppMatchFieldsValidator } from 'src/app/shared/validators/match-fields/match-fields.validator';
-import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 import { ValidateName, ValidatePhone, ValidateEmail, ValidateStrongPassword } from 'src/app/ocm-default-components/validators/validators';
+import { OCMComponent } from '../../shopper-context';
+import { MeUser } from '@ordercloud/angular-sdk';
 
 @Component({
-  selector: 'auth-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
-export class RegisterComponent implements OnInit {
+export class OCMRegisterComponent extends OCMComponent implements OnInit, OnChanges {
   form: FormGroup;
-  me: MeUser;
   appName: string;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private ocMeService: OcMeService,
-    private toastrService: ToastrService,
-    private context: ShopperContextService
-  ) {}
-
-  ngOnInit() {
-    this.appName = this.context.appSettings.appname;
-    this.setForm();
+  constructor(private formBuilder: FormBuilder) {
+    super();
   }
 
-  private setForm() {
+  // TODO: validation isn't working
+  ngOnInit() {
     this.form = this.formBuilder.group(
       {
         Username: ['', Validators.required],
@@ -45,16 +35,15 @@ export class RegisterComponent implements OnInit {
     );
   }
 
-  async onSubmit() {
-    if (this.form.status === 'INVALID') {
-      return;
-    }
+  ngOnChanges() {
+    this.appName = this.context.appSettings.appname;
+  }
 
+  // TODO: requires anonymous token, but not checked for here
+  async onSubmit() {
     const me = <MeUser>this.form.value;
     me.Active = true;
-    const token = this.context.authentication.getOrderCloudToken();
-    await this.ocMeService.Register(token, me).toPromise();
-    this.toastrService.success('New User Created');
+    await this.context.authentication.register(me);
     this.context.routeActions.toLogin();
   }
 }

@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { RegisterComponent } from 'src/app/auth/containers/register/register.component';
+import { RegisterComponent } from 'src/app/ocm-default-components/components/register/register.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OcMeService, OcTokenService, MeUser } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
