@@ -1,6 +1,6 @@
 import { OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-regular-svg-icons';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { tap, takeWhile } from 'rxjs/operators';
 
@@ -19,7 +19,7 @@ import { tap, takeWhile } from 'rxjs/operators';
 //   styleUrls: ['./price-filter.component.scss'],
 // })
 export class PriceFilterComponent implements OnInit, OnDestroy {
-  constructor(private formBuilder: FormBuilder, private activatedRoute: ActivatedRoute) {}
+  constructor(private activatedRoute: ActivatedRoute) {}
 
   @Output() priceFilterChange = new EventEmitter<Params>();
 
@@ -43,9 +43,9 @@ export class PriceFilterComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe((queryParams) => {
-        this.form = this.formBuilder.group({
-          min: queryParams.minPrice,
-          max: queryParams.maxPrice,
+        this.form = new FormGroup({
+          min: new FormControl(queryParams.minPrice),
+          max: new FormControl(queryParams.maxPrice),
         });
       });
   }

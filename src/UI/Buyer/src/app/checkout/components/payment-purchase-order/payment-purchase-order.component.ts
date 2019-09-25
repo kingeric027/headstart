@@ -1,5 +1,5 @@
 import { Component, OnChanges, SimpleChanges, Output, EventEmitter, Input } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { get as _get } from 'lodash';
 import { Payment, PartialPayment, Order } from '@ordercloud/angular-sdk';
 
@@ -19,10 +19,10 @@ export class PaymentPurchaseOrderComponent implements OnChanges {
     payment: PartialPayment;
   }>();
 
-  form: FormGroup = this.formBuilder.group({
-    PONumber: _get(this.payment, 'xp.PONumber'),
+  form = new FormGroup({
+    PONumber: new FormControl(_get(this.payment, 'xp.PONumber')),
   });
-  constructor(private formBuilder: FormBuilder) {}
+  constructor() {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.payment) {

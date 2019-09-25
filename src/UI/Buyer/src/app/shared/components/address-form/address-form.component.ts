@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, Validators, FormControl } from '@angular/forms';
 
 // 3rd party
 import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
@@ -21,7 +21,7 @@ export class AddressFormComponent implements OnInit {
   countryOptions: { label: string; abbreviation: string }[];
   addressForm: FormGroup;
 
-  constructor(private geographyService: AppGeographyService, private formBuilder: FormBuilder) {
+  constructor(private geographyService: AppGeographyService) {
     this.countryOptions = this.geographyService.getCountries();
   }
 
@@ -36,17 +36,17 @@ export class AddressFormComponent implements OnInit {
   }
 
   setForm() {
-    this.addressForm = this.formBuilder.group({
-      FirstName: [this._existingAddress.FirstName || '', [Validators.required, ValidateName]],
-      LastName: [this._existingAddress.LastName || '', [Validators.required, ValidateName]],
-      Street1: [this._existingAddress.Street1 || '', Validators.required],
-      Street2: [this._existingAddress.Street2 || ''],
-      City: [this._existingAddress.City || '', [Validators.required, ValidateName]],
-      State: [this._existingAddress.State || null, Validators.required],
-      Zip: [this._existingAddress.Zip || '', [Validators.required, ValidateUSZip]],
-      Phone: [this._existingAddress.Phone || '', ValidatePhone],
-      Country: [this._existingAddress.Country || 'US', Validators.required],
-      ID: this._existingAddress.ID || '',
+    this.addressForm = new FormGroup({
+      FirstName: new FormControl(this._existingAddress.FirstName || '', [Validators.required, ValidateName]),
+      LastName: new FormControl(this._existingAddress.LastName || '', [Validators.required, ValidateName]),
+      Street1: new FormControl(this._existingAddress.Street1 || '', Validators.required),
+      Street2: new FormControl(this._existingAddress.Street2 || ''),
+      City: new FormControl(this._existingAddress.City || '', [Validators.required, ValidateName]),
+      State: new FormControl(this._existingAddress.State || null, Validators.required),
+      Zip: new FormControl(this._existingAddress.Zip || '', [Validators.required, ValidateUSZip]),
+      Phone: new FormControl(this._existingAddress.Phone || '', ValidatePhone),
+      Country: new FormControl(this._existingAddress.Country || 'US', Validators.required),
+      ID: new FormControl(this._existingAddress.ID || ''),
     });
     this.onCountryChange();
   }

@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Order, ListPayment, ListLineItem, OcOrderService } from '@ordercloud/angular-sdk';
 import { AppPaymentService } from 'src/app/shared/services/app-payment/app-payment.service';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
@@ -20,7 +20,6 @@ export class CheckoutConfirmComponent implements OnInit {
 
   constructor(
     private appPaymentService: AppPaymentService,
-    private formBuilder: FormBuilder,
     private ocOrderService: OcOrderService,
     public context: ShopperContextService //used in template
   ) {}
@@ -30,7 +29,7 @@ export class CheckoutConfirmComponent implements OnInit {
     this.order = this.context.currentOrder.order;
     this.lineItems = this.context.currentOrder.lineItems;
     if (!this.anonEnabled) {
-      this.form = this.formBuilder.group({ comments: '' });
+      this.form = new FormGroup({ comments: new FormControl('') });
     }
     this.payments = await this.appPaymentService.getPayments('outgoing', this.order.ID);
   }

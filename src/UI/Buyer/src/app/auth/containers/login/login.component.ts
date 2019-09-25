@@ -1,6 +1,6 @@
 // angular
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 
 // ordercloud
 import { OcTokenService } from '@ordercloud/angular-sdk';
@@ -17,21 +17,16 @@ export class LoginComponent implements OnInit {
   isAnon: boolean;
   appName: string;
 
-  constructor(
-    private authService: AuthService,
-    private ocTokenService: OcTokenService,
-    private formBuilder: FormBuilder,
-    private context: ShopperContextService
-  ) {}
+  constructor(private authService: AuthService, private ocTokenService: OcTokenService, private context: ShopperContextService) {}
 
   ngOnInit() {
     this.appName = this.context.appSettings.appname;
-    this.form = this.formBuilder.group({
-      username: '',
-      password: '',
-      rememberMe: false,
-    });
     this.isAnon = this.context.currentUser.isAnonymous;
+    this.form = new FormGroup({
+      username: new FormControl(''),
+      password: new FormControl(''),
+      rememberMe: new FormControl(false),
+    });
   }
 
   async onSubmit() {

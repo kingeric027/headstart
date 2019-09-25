@@ -45,7 +45,7 @@ export class RegisterComponent implements OnInit {
     );
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.form.status === 'INVALID') {
       return;
     }
@@ -53,9 +53,8 @@ export class RegisterComponent implements OnInit {
     const me = <MeUser>this.form.value;
     me.Active = true;
     const token = this.context.authentication.getOrderCloudToken();
-    this.ocMeService.Register(token, me).subscribe(() => {
-      this.toastrService.success('New User Created');
-      this.context.routeActions.toLogin();
-    });
+    await this.ocMeService.Register(token, me).toPromise();
+    this.toastrService.success('New User Created');
+    this.context.routeActions.toLogin();
   }
 }

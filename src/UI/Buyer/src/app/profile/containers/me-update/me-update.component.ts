@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MeUser } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
@@ -16,7 +16,7 @@ export class MeUpdateComponent implements OnInit {
   alive = true;
   passwordModalOpen = false;
 
-  constructor(private formBuilder: FormBuilder, private toastrService: ToastrService, private context: ShopperContextService) {}
+  constructor(private toastrService: ToastrService, private context: ShopperContextService) {}
 
   ngOnInit() {
     this.buildForm();
@@ -36,12 +36,12 @@ export class MeUpdateComponent implements OnInit {
   };
 
   private buildForm() {
-    this.form = this.formBuilder.group({
-      Username: ['', Validators.required],
-      FirstName: ['', [Validators.required, ValidateName]],
-      LastName: ['', [Validators.required, ValidateName]],
-      Email: ['', [Validators.required, ValidateEmail]],
-      Phone: ['', ValidatePhone],
+    this.form = new FormGroup({
+      Username: new FormControl('', Validators.required),
+      FirstName: new FormControl('', [Validators.required, ValidateName]),
+      LastName: new FormControl('', [Validators.required, ValidateName]),
+      Email: new FormControl('', [Validators.required, ValidateEmail]),
+      Phone: new FormControl('', ValidatePhone),
     });
   }
 

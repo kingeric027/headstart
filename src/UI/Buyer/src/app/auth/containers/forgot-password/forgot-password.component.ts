@@ -1,6 +1,6 @@
 // angular
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 
 // angular libs
 import { ToastrService } from 'ngx-toastr';
@@ -21,7 +21,6 @@ export class ForgotPasswordComponent implements OnInit {
 
   constructor(
     private ocPasswordResetService: OcPasswordResetService,
-    private formBuilder: FormBuilder,
     private toasterService: ToastrService,
     @Inject(DOCUMENT) private document: any,
     private context: ShopperContextService
@@ -29,7 +28,7 @@ export class ForgotPasswordComponent implements OnInit {
 
   ngOnInit() {
     this.appName = this.context.appSettings.appname;
-    this.resetEmailForm = this.formBuilder.group({ email: '' });
+    this.resetEmailForm = new FormGroup({ email: new FormControl('') });
   }
 
   async onSubmit() {

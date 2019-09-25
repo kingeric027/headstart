@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { OcPaymentService, Payment, PartialPayment } from '@ordercloud/angular-sdk';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { CurrentOrderService } from 'src/app/shared';
 import { PaymentMethod } from 'src/app/shared/models/payment-method.enum';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
@@ -12,7 +12,6 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
 })
 export class CheckoutPaymentComponent implements OnInit {
   constructor(
-    private formBuilder: FormBuilder,
     private currentOrder: CurrentOrderService,
     private ocPaymentService: OcPaymentService,
     private context: ShopperContextService
@@ -28,8 +27,8 @@ export class CheckoutPaymentComponent implements OnInit {
   existingPayment: Payment;
 
   async ngOnInit() {
-    this.form = this.formBuilder.group({
-      selectedPaymentMethod: [{ value: '', disabled: this.availablePaymentMethods.length === 1 }],
+    this.form = new FormGroup({
+      selectedPaymentMethod: new FormControl({ value: '', disabled: this.availablePaymentMethods.length === 1 }),
     });
     await this.initializePaymentMethod();
   }

@@ -52,7 +52,7 @@ export class ResetPasswordComponent implements OnInit {
     );
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.form.status === 'INVALID') {
       return;
     }
@@ -63,9 +63,8 @@ export class ResetPasswordComponent implements OnInit {
       Username: this.username,
     };
 
-    this.ocPasswordResetService.ResetPasswordByVerificationCode(this.resetCode, config).subscribe(() => {
-      this.toasterService.success('Password Reset', 'Success');
-      this.context.routeActions.toLogin();
-    });
+    await this.ocPasswordResetService.ResetPasswordByVerificationCode(this.resetCode, config).toPromise();
+    this.toasterService.success('Password Reset', 'Success');
+    this.context.routeActions.toLogin();
   }
 }

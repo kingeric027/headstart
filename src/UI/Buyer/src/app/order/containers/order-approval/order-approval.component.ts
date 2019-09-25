@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { OcOrderService, Order } from '@ordercloud/angular-sdk';
 import { ToastrService } from 'ngx-toastr';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
@@ -16,15 +16,10 @@ export class OrderApprovalComponent implements OnInit {
   @Input() orderID: string;
   approveModalOpen = false;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private ocOrderService: OcOrderService,
-    private toasterService: ToastrService,
-    private context: ShopperContextService
-  ) {}
+  constructor(private ocOrderService: OcOrderService, private toasterService: ToastrService, private context: ShopperContextService) {}
 
   ngOnInit() {
-    this.form = this.formBuilder.group({ comments: '' });
+    this.form = new FormGroup({ comments: new FormControl('') });
   }
 
   openModal(approved: boolean) {
