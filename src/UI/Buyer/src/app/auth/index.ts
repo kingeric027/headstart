@@ -1,6 +1,5 @@
 // containers
 export * from 'src/app/auth/containers/forgot-password/forgot-password.component';
-export * from 'src/app/auth/containers/login/login.component';
 export * from 'src/app/auth/containers/reset-password/reset-password.component';
 
 // interceptors

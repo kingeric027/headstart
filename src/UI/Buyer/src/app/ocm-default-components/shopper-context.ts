@@ -50,6 +50,7 @@ export interface IRouteActions {
 export interface ICurrentUser {
   favoriteProductIDs: string[];
   favoriteOrderIDs: string[];
+  isAnonymous: boolean;
   get(): MeUser;
   patch(user: MeUser): void;
   onUserChange(callback: (user: User) => void): void;
