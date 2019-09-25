@@ -76,9 +76,19 @@ export class AuthService implements IAuthActions {
     this.currentUser.isLoggedIn = true;
   }
 
-  async profiledLogin(userName: string, password: string): Promise<AccessToken> {
+  async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
     const creds = await this.ocAuthService.Login(userName, password, this.appConfig.clientID, this.appConfig.scope).toPromise();
     this.setToken(creds.access_token);
+    if (rememberMe && creds.refresh_token) {
+      /**
+       * set the token duration in the dashboard - https://developer.ordercloud.io/dashboard/settings
+       * refresh tokens are configured per clientID and initially set to 0
+       * a refresh token of 0 means no refresh token is returned in OAuth response
+       */
+      this.ocTokenService.SetRefresh(creds.refresh_token);
+      this.setRememberMeStatus(true);
+    }
+    this.router.navigateByUrl('/home');
     return creds;
   }
 
@@ -113,7 +123,7 @@ export class AuthService implements IAuthActions {
     return this.ocTokenService.GetAccess();
   }
 
-  setRememberStatus(status: boolean): void {
+  setRememberMeStatus(status: boolean): void {
     this.cookieService.putObject(this.rememberMeCookieName, { status: status });
   }
 

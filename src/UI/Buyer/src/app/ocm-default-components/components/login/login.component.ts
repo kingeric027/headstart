@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 
 // ordercloud
@@ -13,8 +13,6 @@ export class OCMLogin extends OCMComponent implements OnInit, OnChanges {
   form: FormGroup;
   isAnon: boolean;
   appName: string;
-
-  @Output() loginEvent = new EventEmitter<{ username: string; password: string; rememberMe: boolean }>();
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -33,7 +31,7 @@ export class OCMLogin extends OCMComponent implements OnInit, OnChanges {
     const username = this.form.get('username').value;
     const password = this.form.get('password').value;
     const rememberMe = this.form.get('rememberMe').value;
-    this.loginEvent.emit({ username, password, rememberMe });
+    await this.context.authentication.profiledLogin(username, password, rememberMe);
   }
 
   showRegisterLink(): boolean {
