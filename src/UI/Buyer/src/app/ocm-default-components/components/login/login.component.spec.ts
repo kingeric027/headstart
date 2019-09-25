@@ -5,7 +5,7 @@ import { InjectionToken } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { of, BehaviorSubject } from 'rxjs';
 
-import { LoginComponent } from 'src/app/auth/containers/login/login.component';
+import { LoginComponent } from 'src/app/ocm-default-components/components/login/login.component';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 
 import { OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';

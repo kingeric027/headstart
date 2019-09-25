@@ -1,7 +1,7 @@
 <button type="button"
         class="btn  btn-secondary"
         (click)="orderReorder()">Reorder</button>
-<ocm-modal [(isOpen)]="reorderModalOpen"
+<ocm-modal [state]="reorderModal"
            modalTitle="Order Reorder">
   <div *ngIf="reorderResponse">
     <div class="alert"

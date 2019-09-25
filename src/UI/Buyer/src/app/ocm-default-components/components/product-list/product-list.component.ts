@@ -4,6 +4,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
 import { OCMComponent, ProductFilters } from 'src/app/ocm-default-components/shopper-context';
+import { ModalState } from '../../models/modal-state.class';
 
 @Component({
   selector: 'ocm-product-list',
@@ -14,7 +15,7 @@ export class OCMProductList extends OCMComponent implements OnChanges {
   @Input() products: ListBuyerProduct;
   @Input() categories: ListCategory;
   @Input() quantityLimits: QuantityLimits[];
-  categoryModalOpen = false;
+  categoryModal = ModalState.Closed;
   facets: ListFacet[];
   categoryCrumbs: Category[] = [];
   hasQueryParams = false;
@@ -63,6 +64,6 @@ export class OCMProductList extends OCMComponent implements OnChanges {
   }
 
   openCategoryModal() {
-    this.categoryModalOpen = true;
+    this.categoryModal = ModalState.Open;
   }
 }

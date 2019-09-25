@@ -4,6 +4,7 @@ import { OcMeService, ListBuyerAddress, OcOrderService, Order, BuyerAddress, Lis
 import { CurrentOrderService } from 'src/app/shared';
 import { ToastrService } from 'ngx-toastr';
 import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
+import { ModalState } from 'src/app/ocm-default-components/models/modal-state.class';
 
 @Component({
   selector: 'checkout-address',
@@ -15,7 +16,7 @@ export class CheckoutAddressComponent implements OnInit {
   @Input() addressType: 'Shipping' | 'Billing';
   @ViewChild(AddressFormComponent, { static: false }) addressFormComponent: AddressFormComponent;
   @Output() continue = new EventEmitter();
-  addressModalOpen = false;
+  addressModal = ModalState.Closed;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
   order: Order;
@@ -46,6 +47,10 @@ export class CheckoutAddressComponent implements OnInit {
     this.updateRequestOptions({ page: undefined, search: undefined });
   }
 
+  openAddressModal() {
+    this.addressModal = ModalState.Open;
+  }
+
   updateRequestOptions(options: { page?: number; search?: string }) {
     this.requestOptions = options;
     this.getSavedAddresses();
@@ -72,7 +77,7 @@ export class CheckoutAddressComponent implements OnInit {
 
   existingAddressSelected(address: BuyerAddress) {
     this.selectedAddress = address;
-    this.addressModalOpen = false;
+    this.addressModal = ModalState.Open;
   }
 
   useShippingAsBilling() {

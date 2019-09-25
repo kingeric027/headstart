@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { OcMeService, ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
+import { ModalState } from 'src/app/ocm-default-components/models/modal-state.class';
 
 @Component({
   selector: 'profile-address-list',
@@ -20,8 +21,8 @@ export class AddressListComponent implements OnInit {
     search: undefined,
   };
   resultsPerPage = 8;
-  areYouSureModalOpen = false;
-  addAddressModalOpen = false;
+  areYouSureModal = ModalState.Closed;
+  addAddressModal = ModalState.Closed;
 
   constructor(private ocMeService: OcMeService) {}
 
@@ -35,22 +36,22 @@ export class AddressListComponent implements OnInit {
 
   showAddAddress() {
     this.currentAddress = null;
-    this.addAddressModalOpen = true;
+    this.addAddressModal = ModalState.Open;
   }
 
   showEditAddress(address: BuyerAddress) {
     this.currentAddress = address;
-    this.addAddressModalOpen = true;
+    this.addAddressModal = ModalState.Open;
   }
 
   showAreYouSure(address: BuyerAddress) {
     this.currentAddress = address;
-    this.areYouSureModalOpen = true;
+    this.areYouSureModal = ModalState.Open;
   }
 
   closeAreYouSure() {
     this.currentAddress = null;
-    this.areYouSureModalOpen = false;
+    this.areYouSureModal = ModalState.Closed;
   }
 
   protected refresh() {
@@ -59,7 +60,7 @@ export class AddressListComponent implements OnInit {
   }
 
   addressFormSubmitted(address: BuyerAddress) {
-    this.addAddressModalOpen = false;
+    this.addAddressModal = ModalState.Closed;
     if (this.currentAddress) {
       this.updateAddress(address);
     } else {

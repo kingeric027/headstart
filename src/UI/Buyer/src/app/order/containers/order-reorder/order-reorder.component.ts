@@ -5,6 +5,7 @@ import { CartService, AppReorderService } from 'src/app/shared';
 import { OrderReorderResponse } from 'src/app/shared/services/reorder/reorder.interface';
 import { LineItem } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { ModalState } from 'src/app/ocm-default-components/models/modal-state.class';
 
 @Component({
   selector: 'order-reorder',
@@ -13,7 +14,7 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
 })
 export class OrderReorderComponent implements OnInit {
   @Input() orderID: string;
-  reorderModalOpen = false;
+  reorderModal = ModalState.Closed;
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
 
@@ -48,7 +49,7 @@ export class OrderReorderComponent implements OnInit {
   }
 
   orderReorder() {
-    this.reorderModalOpen = true;
+    this.reorderModal = ModalState.Open;
   }
 
   addToCart() {
@@ -57,6 +58,6 @@ export class OrderReorderComponent implements OnInit {
       li = { ProductID: li.Product.ID, Quantity: li.Quantity, Specs: li.Specs };
       await this.cartService.addToCart(li);
     });
-    this.reorderModalOpen = false;
+    this.reorderModal = ModalState.Closed;
   }
 }
