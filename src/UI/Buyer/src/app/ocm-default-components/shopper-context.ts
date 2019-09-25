@@ -84,7 +84,7 @@ export interface IProductFilterActions {
 }
 
 export interface IAuthActions {
-  profiledLogin(username: string, password: string): Promise<AccessToken>;
+  profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
   logout(): Promise<void>;
   changePassword(newPassword: string): Promise<void>;
   anonymousLogin(): Promise<AccessToken>;
