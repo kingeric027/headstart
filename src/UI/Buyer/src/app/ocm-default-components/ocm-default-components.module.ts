@@ -46,7 +46,8 @@ import { OCMOrderDateFilter } from './components/order-date-filter/order-date-fi
 import { OCMOrderList } from './components/order-list/order-list.component';
 import { OCMLogin } from './components/login/login.component';
 import { OCMForgotPassword } from './components/forgot-password/forgot-password.component';
-import { OCMRegisterComponent } from './components/register/register.component';
+import { OCMRegister } from './components/register/register.component';
+import { OCMResetPassword } from './components/reset-password/reset-password.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -84,7 +85,8 @@ import { OCMRegisterComponent } from './components/register/register.component';
     OCMOrderList,
     OCMLogin,
     OCMForgotPassword,
-    OCMRegisterComponent,
+    OCMRegister,
+    OCMResetPassword,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -118,7 +120,8 @@ import { OCMRegisterComponent } from './components/register/register.component';
     OCMOrderList,
     OCMLogin,
     OCMForgotPassword,
-    OCMRegisterComponent,
+    OCMRegister,
+    OCMResetPassword,
   ],
   imports: [
     CommonModule,
@@ -173,7 +176,8 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMOrderList, 'ocm-order-list');
     this.buildWebComponent(OCMLogin, 'ocm-login');
     this.buildWebComponent(OCMForgotPassword, 'ocm-forgot-password');
-    this.buildWebComponent(OCMRegisterComponent, 'ocm-register');
+    this.buildWebComponent(OCMRegister, 'ocm-register');
+    this.buildWebComponent(OCMResetPassword, 'ocm-reset-password');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

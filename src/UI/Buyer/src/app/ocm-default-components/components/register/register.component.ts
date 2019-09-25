@@ -9,7 +9,7 @@ import { MeUser } from '@ordercloud/angular-sdk';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
-export class OCMRegisterComponent extends OCMComponent implements OnInit, OnChanges {
+export class OCMRegister extends OCMComponent implements OnInit, OnChanges {
   form: FormGroup;
   appName: string;
 

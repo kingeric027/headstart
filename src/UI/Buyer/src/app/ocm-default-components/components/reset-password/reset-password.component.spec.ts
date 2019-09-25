@@ -5,7 +5,7 @@ import { InjectionToken } from '@angular/core';
 import { of } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 
-import { ResetPasswordComponent } from 'src/app/auth/containers/reset-password/reset-password.component';
+import { ResetPasswordComponent } from 'src/app/ocm-default-components/components/reset-password/reset-password.component';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 
 import { OcPasswordResetService } from '@ordercloud/angular-sdk';

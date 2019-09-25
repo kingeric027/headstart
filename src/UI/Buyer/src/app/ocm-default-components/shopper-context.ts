@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, User, AccessToken } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, User, AccessToken, PasswordReset } from '@ordercloud/angular-sdk';
 import { Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppConfig } from '../config/app.config';
@@ -92,6 +92,7 @@ export interface IAuthActions {
   getOrderCloudToken(): string;
   forgotPasssword(email: string): Promise<any>;
   register(me: MeUser): Promise<any>;
+  resetPassword(code: string, config: PasswordReset): Promise<any>;
 }
 
 export interface ProductFilters {

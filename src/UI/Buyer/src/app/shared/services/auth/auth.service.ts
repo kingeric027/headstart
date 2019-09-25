@@ -4,7 +4,15 @@ import { tap, catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 // 3rd party
-import { OcTokenService, OcAuthService, AccessToken, OcMeService, OcPasswordResetService, MeUser } from '@ordercloud/angular-sdk';
+import {
+  OcTokenService,
+  OcAuthService,
+  AccessToken,
+  OcMeService,
+  OcPasswordResetService,
+  MeUser,
+  PasswordReset,
+} from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 import { CookieService } from '@gorniv/ngx-universal';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
@@ -86,8 +94,13 @@ export class AuthService implements IAuthActions {
     return reset;
   }
 
+  async resetPassword(code: string, config: PasswordReset): Promise<any> {
+    console.log('reset', code);
+    const reset = await this.ocPasswordResetService.ResetPasswordByVerificationCode(code, config).toPromise();
+    return reset;
+  }
+
   async register(me: MeUser<any>): Promise<any> {
-    console.log('register');
     const token = this.getOrderCloudToken();
     const result = await this.ocMeService.Register(token, me).toPromise();
     return result;
