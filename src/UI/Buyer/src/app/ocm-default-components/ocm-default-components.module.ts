@@ -45,6 +45,7 @@ import { OrderStatusDisplayPipe } from './pipes/order-status-display/order-statu
 import { OCMOrderDateFilter } from './components/order-date-filter/order-date-filter.component';
 import { OCMOrderList } from './components/order-list/order-list.component';
 import { OCMLogin } from './components/login/login.component';
+import { OCMForgotPassword } from './components/forgot-password/forgot-password.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -81,6 +82,7 @@ import { OCMLogin } from './components/login/login.component';
     OCMOrderDateFilter,
     OCMOrderList,
     OCMLogin,
+    OCMForgotPassword,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -113,6 +115,7 @@ import { OCMLogin } from './components/login/login.component';
     OCMOrderDateFilter,
     OCMOrderList,
     OCMLogin,
+    OCMForgotPassword,
   ],
   imports: [
     CommonModule,
@@ -166,6 +169,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMOrderDateFilter, 'ocm-order-date-filter');
     this.buildWebComponent(OCMOrderList, 'ocm-order-list');
     this.buildWebComponent(OCMLogin, 'ocm-login');
+    this.buildWebComponent(OCMForgotPassword, 'ocm-forgot-password');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

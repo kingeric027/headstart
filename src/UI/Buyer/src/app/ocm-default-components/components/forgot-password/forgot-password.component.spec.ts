@@ -5,7 +5,7 @@ import { of } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 import { InjectionToken } from '@angular/core';
 
-import { ForgotPasswordComponent } from 'src/app/auth/containers/forgot-password/forgot-password.component';
+import { ForgotPasswordComponent } from 'src/app/ocm-default-components/components/forgot-password/forgot-password.component';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
 
 import { OcPasswordResetService } from '@ordercloud/angular-sdk';

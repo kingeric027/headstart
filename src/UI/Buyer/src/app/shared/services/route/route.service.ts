@@ -46,6 +46,10 @@ export class RouteService implements IRouteActions {
     this.router.navigateByUrl('/login');
   }
 
+  toForgotPassword(): void {
+    this.router.navigateByUrl('/forgot-password');
+  }
+
   toRegister(): void {
     this.router.navigateByUrl('/register');
   }

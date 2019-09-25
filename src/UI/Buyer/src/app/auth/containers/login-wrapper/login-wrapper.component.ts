@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthService } from 'src/app/shared/services/auth/auth.service';
-import { OcTokenService } from '@ordercloud/angular-sdk';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { AuthService } from 'src/app/shared/services/auth/auth.service';
+import { OcTokenService } from '@ordercloud/angular-sdk';
 
 @Component({
-  selector: 'app-login-wrapper',
+  selector: 'auth-login-wrapper',
   templateUrl: './login-wrapper.component.html',
   styleUrls: ['./login-wrapper.component.scss'],
 })

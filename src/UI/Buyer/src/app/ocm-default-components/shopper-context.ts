@@ -38,6 +38,7 @@ export interface IRouteActions {
   toCart(): void;
   toLogin(): void;
   toRegister(): void;
+  toForgotPassword(): void;
   toMyProfile(): void;
   toMyAddresses(): void;
   toMyPaymentMethods(): void;
