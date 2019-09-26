@@ -1,5 +1,4 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MeUpdateComponent } from 'src/app/profile/containers/me-update/me-update.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OcMeService, OcTokenService, OcAuthService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
@@ -7,10 +6,11 @@ import { InjectionToken, NO_ERRORS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { of, Subject } from 'rxjs';
+import { OCMMeUpdateComponent } from './me-update.component';
 
 describe('MeUpdateComponent', () => {
-  let component: MeUpdateComponent;
-  let fixture: ComponentFixture<MeUpdateComponent>;
+  let component: OCMMeUpdateComponent;
+  let fixture: ComponentFixture<OCMMeUpdateComponent>;
 
   const appStateService = { userSubject: new Subject<any>() };
   const me = {
@@ -52,7 +52,7 @@ describe('MeUpdateComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [MeUpdateComponent],
+      declarations: [OCMMeUpdateComponent],
       imports: [ReactiveFormsModule],
       providers: [
         { provide: Router, useValue: router },
@@ -71,7 +71,7 @@ describe('MeUpdateComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MeUpdateComponent);
+    fixture = TestBed.createComponent(OCMMeUpdateComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

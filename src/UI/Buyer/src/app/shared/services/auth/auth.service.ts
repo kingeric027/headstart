@@ -94,12 +94,6 @@ export class AuthService implements IAuthActions {
     return reset;
   }
 
-  async resetPassword(code: string, config: PasswordReset): Promise<any> {
-    console.log('reset', code);
-    const reset = await this.ocPasswordResetService.ResetPasswordByVerificationCode(code, config).toPromise();
-    return reset;
-  }
-
   async register(me: MeUser<any>): Promise<any> {
     const token = this.getOrderCloudToken();
     const result = await this.ocMeService.Register(token, me).toPromise();
@@ -147,6 +141,11 @@ export class AuthService implements IAuthActions {
 
   async changePassword(newPassword: string): Promise<void> {
     await this.ocMeService.ResetPasswordByToken({ NewPassword: newPassword }).toPromise();
+  }
+
+  async resetPassword(code: string, config: PasswordReset): Promise<any> {
+    const reset = await this.ocPasswordResetService.ResetPasswordByVerificationCode(code, config).toPromise();
+    return reset;
   }
 
   getOrderCloudToken(): string {

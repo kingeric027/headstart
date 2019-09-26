@@ -1,25 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
 import { MeUser } from '@ordercloud/angular-sdk';
-import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 import { ValidateName, ValidatePhone, ValidateEmail } from 'src/app/ocm-default-components/validators/validators';
+import { OCMComponent } from '../../shopper-context';
 
 @Component({
-  selector: 'profile-meupdate',
   templateUrl: './me-update.component.html',
   styleUrls: ['./me-update.component.scss'],
 })
-export class MeUpdateComponent implements OnInit {
+export class OCMMeUpdateComponent extends OCMComponent implements OnInit, OnChanges {
   form: FormGroup;
   me: MeUser;
   alive = true;
   passwordModalOpen = false;
 
-  constructor(private toastrService: ToastrService, private context: ShopperContextService) {}
-
   ngOnInit() {
     this.buildForm();
+  }
+
+  ngOnChanges(): void {
     this.context.currentUser.onUserChange(this.handleUserChange);
   }
 
@@ -46,13 +45,8 @@ export class MeUpdateComponent implements OnInit {
   }
 
   async onChangePassword({ currentPassword, newPassword }) {
-    try {
-      await this.context.authentication.profiledLogin(this.me.Username, currentPassword);
-    } catch (ex) {
-      this.toastrService.error('Current Password is incorrect');
-    }
+    await this.context.authentication.profiledLogin(this.me.Username, currentPassword, false);
     await this.context.authentication.changePassword(newPassword);
-    this.toastrService.success('Account Info Updated', 'Success');
     this.passwordModalOpen = false;
   }
 
@@ -61,13 +55,8 @@ export class MeUpdateComponent implements OnInit {
   }
 
   async onSubmit() {
-    if (this.form.status === 'INVALID') {
-      return;
-    }
-
     const me: MeUser = this.form.value;
     me.Active = true;
     await this.context.currentUser.patch(me);
-    this.toastrService.success('Account Info Updated');
   }
 }

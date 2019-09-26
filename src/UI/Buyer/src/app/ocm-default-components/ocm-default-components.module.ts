@@ -48,6 +48,8 @@ import { OCMLogin } from './components/login/login.component';
 import { OCMForgotPassword } from './components/forgot-password/forgot-password.component';
 import { OCMRegister } from './components/register/register.component';
 import { OCMResetPassword } from './components/reset-password/reset-password.component';
+import { OCMMeUpdateComponent } from './components/me-update/me-update.component';
+import { OCMChangePasswordFormComponent } from './components/change-password-form/change-password-form.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -87,6 +89,8 @@ import { OCMResetPassword } from './components/reset-password/reset-password.com
     OCMForgotPassword,
     OCMRegister,
     OCMResetPassword,
+    OCMMeUpdateComponent,
+    OCMChangePasswordFormComponent,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -122,6 +126,8 @@ import { OCMResetPassword } from './components/reset-password/reset-password.com
     OCMForgotPassword,
     OCMRegister,
     OCMResetPassword,
+    OCMMeUpdateComponent,
+    OCMChangePasswordFormComponent,
   ],
   imports: [
     CommonModule,
@@ -178,6 +184,8 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMForgotPassword, 'ocm-forgot-password');
     this.buildWebComponent(OCMRegister, 'ocm-register');
     this.buildWebComponent(OCMResetPassword, 'ocm-reset-password');
+    this.buildWebComponent(OCMMeUpdateComponent, 'ocm-profile-me-update');
+    this.buildWebComponent(OCMChangePasswordFormComponent, 'ocm-change-password');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

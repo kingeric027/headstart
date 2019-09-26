@@ -13,6 +13,7 @@ export class ProfileComponent implements OnInit {
   constructor(private appAuthService: AuthService) {
     this.tabs = [
       { display: 'Details', route: ['/profile', 'details'] },
+      { display: 'Change Password', route: ['/profile', 'change-password'] },
       { display: 'Addresses', route: ['/profile', 'addresses'] },
       { display: 'Payment Methods', route: ['/profile', 'payment-methods'] },
       { display: 'My Orders', route: ['/profile', 'orders'] },

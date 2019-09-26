@@ -4,23 +4,21 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AppMatchFieldsValidator } from 'src/app/shared/validators/match-fields/match-fields.validator';
 import { MeUser } from '@ordercloud/angular-sdk';
 import { ValidateStrongPassword } from 'src/app/ocm-default-components/validators/validators';
+import { OCMComponent } from '../../shopper-context';
 
 @Component({
   selector: 'profile-change-password-form',
   templateUrl: './change-password-form.component.html',
   styleUrls: ['./change-password-form.component.scss'],
 })
-export class ChangePasswordFormComponent implements OnInit {
+export class OCMChangePasswordFormComponent extends OCMComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
   faTimes = faTimes;
-  @Output()
-  changePassword = new EventEmitter<{
-    currentPassword: string;
-    newPassword: string;
-  }>();
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder) {
+    super();
+  }
 
   ngOnInit() {
     this.setForm();
@@ -45,12 +43,9 @@ export class ChangePasswordFormComponent implements OnInit {
     );
   }
 
-  updatePassword() {
-    if (this.form.status === 'INVALID') {
-      return;
-    }
+  async updatePassword() {
     const { currentPassword, newPassword } = this.form.value;
-    this.changePassword.emit({ currentPassword, newPassword });
-    this.form.reset();
+    // TODO: how is this valid? changing password without validating current on the server?
+    await this.context.authentication.changePassword(newPassword);
   }
 }
