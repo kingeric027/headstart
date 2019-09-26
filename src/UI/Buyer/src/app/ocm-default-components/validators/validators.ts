@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 export const ErrorDictionary = {
   name: "Name can only contain characters Aa-Zz 0-9 - ' .",
@@ -65,8 +65,9 @@ export function ValidateUSZip(control: AbstractControl): ValidationErrors | null
   return { zip: true };
 }
 
+// password must include one number, one letter and have min length of 8
 export function ValidateStrongPassword(control: AbstractControl): ValidationErrors | null {
-  const hasNumber = /[0-9]/.test(control.value); // TODO - boil this into one regex
+  const hasNumber = /[0-9]/.test(control.value); // TODO - boil these 3 checks into one regex
   const hasLetter = /[a-zA-Z]/.test(control.value);
   const hasMinLength = control.value && control.value.length >= 8;
   if (!control.value) {
@@ -76,6 +77,21 @@ export function ValidateStrongPassword(control: AbstractControl): ValidationErro
     return null;
   }
   return { strongPassword: true };
+}
+
+export function ValidateFieldMatches(fieldToMatch: string): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.parent) return null;
+    const passwordControl = control.parent.controls[fieldToMatch];
+    // only validate if both fields have been touched
+    if (passwordControl.pristine || control.pristine) {
+      return null;
+    }
+    if (passwordControl.value === control.value) {
+      return null;
+    }
+    return { ocMatchFields: true };
+  };
 }
 
 /**

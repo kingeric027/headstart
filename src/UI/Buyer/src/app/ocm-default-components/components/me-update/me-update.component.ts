@@ -12,7 +12,6 @@ export class OCMMeUpdateComponent extends OCMComponent implements OnInit, OnChan
   form: FormGroup;
   me: MeUser;
   alive = true;
-  passwordModalOpen = false;
 
   ngOnInit() {
     this.buildForm();
@@ -47,11 +46,6 @@ export class OCMMeUpdateComponent extends OCMComponent implements OnInit, OnChan
   async onChangePassword({ currentPassword, newPassword }) {
     await this.context.authentication.profiledLogin(this.me.Username, currentPassword, false);
     await this.context.authentication.changePassword(newPassword);
-    this.passwordModalOpen = false;
-  }
-
-  openPasswordModal() {
-    this.passwordModalOpen = true;
   }
 
   async onSubmit() {

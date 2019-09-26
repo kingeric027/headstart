@@ -1,5 +1,5 @@
 <button class="btn btn-secondary mb-3"
-        (click)="addressModal.open()"
+        (click)="openAddressModal()"
         *ngIf="!isAnon && existingAddresses && existingAddresses.Items.length > 0">Select a saved address</button>
 <button *ngIf="addressType === 'Billing'"
         class="btn btn-secondary mb-3 ml-2"
@@ -7,7 +7,7 @@
 <shared-address-form [existingAddress]="selectedAddress"
                      (formSubmitted)="saveAddress($event.address, $event.formDirty)"
                      btnText="Save and Continue"></shared-address-form>
-<ocm-modal [(isOpen)]="addressModalOpen"
+<ocm-modal [state]="addressModal"
            (close)="clearReqeustOptions"
            modalTitle="Select Address">
   <shared-generic-browse [items]="existingAddresses?.Items"

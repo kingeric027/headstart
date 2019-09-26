@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SpendingAccount, ListSpendingAccount, OcMeService, Payment, Order } from '@ordercloud/angular-sdk';
 import * as moment from 'moment';
+import { ModalState } from 'src/app/ocm-default-components/models/modal-state.class';
 
 @Component({
   selector: 'checkout-payment-spending-account',
@@ -20,7 +21,7 @@ export class PaymentSpendingAccountComponent implements OnInit {
     search: undefined,
   };
   resultsPerPage = 6;
-  spendingAccountModalOpen = false;
+  spendingAccountModal = ModalState.Closed;
 
   constructor(private ocMeService: OcMeService) {}
 
@@ -29,7 +30,7 @@ export class PaymentSpendingAccountComponent implements OnInit {
       this.spendingAccounts = accounts;
       this.selectedSpendingAccount = this.getSavedSpendingAccount(accounts);
       if (!this.selectedSpendingAccount) {
-        this.spendingAccountModalOpen = true;
+        this.spendingAccountModal = ModalState.Open;
       }
     });
   }
@@ -55,7 +56,7 @@ export class PaymentSpendingAccountComponent implements OnInit {
   }
 
   accountSelected(account: SpendingAccount): void {
-    this.spendingAccountModalOpen = false;
+    this.spendingAccountModal = ModalState.Closed;
     this.selectedSpendingAccount = account;
     const payment: Payment = {
       Type: 'SpendingAccount',

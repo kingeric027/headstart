@@ -50,10 +50,13 @@ import { OCMRegister } from './components/register/register.component';
 import { OCMResetPassword } from './components/reset-password/reset-password.component';
 import { OCMMeUpdateComponent } from './components/me-update/me-update.component';
 import { OCMChangePasswordFormComponent } from './components/change-password-form/change-password-form.component';
+import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [
+    FormControlErrorDirective,
+
     OCMProductCard,
     OCMToggleFavorite,
     OCMQuantityInput,

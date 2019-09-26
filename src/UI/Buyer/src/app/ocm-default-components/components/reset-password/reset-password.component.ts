@@ -1,15 +1,14 @@
 // angular
 import { Component, OnInit, OnChanges } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 // angular libs
 import { ToastrService } from 'ngx-toastr';
 
 // ordercloud
-import { AppMatchFieldsValidator } from 'src/app/shared';
 import { PasswordReset } from '@ordercloud/angular-sdk';
-import { ValidateStrongPassword } from 'src/app/ocm-default-components/validators/validators';
+import { ValidateStrongPassword, ValidateFieldMatches } from 'src/app/ocm-default-components/validators/validators';
 import { OCMComponent } from '../../shopper-context';
 
 @Component({
@@ -22,7 +21,7 @@ export class OCMResetPassword extends OCMComponent implements OnInit, OnChanges 
   resetCode: string;
   appName: string;
 
-  constructor(private activatedRoute: ActivatedRoute, private toasterService: ToastrService, private formBuilder: FormBuilder) {
+  constructor(private activatedRoute: ActivatedRoute, private toasterService: ToastrService) {
     super();
   }
 
@@ -30,20 +29,10 @@ export class OCMResetPassword extends OCMComponent implements OnInit, OnChanges 
     const urlParams = this.activatedRoute.snapshot.queryParams;
     this.username = urlParams['user'];
     this.resetCode = urlParams['code'];
-
-    this.form = this.formBuilder.group(
-      {
-        password: [
-          '',
-          [
-            Validators.required,
-            ValidateStrongPassword, // password must include one number, one letter and have min length of 8
-          ],
-        ],
-        passwordConfirm: ['', Validators.required],
-      },
-      { validator: AppMatchFieldsValidator('password', 'passwordConfirm') }
-    );
+    this.form = new FormGroup({
+      password: new FormControl('', [Validators.required, ValidateStrongPassword]),
+      passwordConfirm: new FormControl('', [Validators.required, ValidateFieldMatches('password')]),
+    });
   }
 
   ngOnChanges() {
@@ -51,6 +40,10 @@ export class OCMResetPassword extends OCMComponent implements OnInit, OnChanges 
   }
 
   async onSubmit() {
+    if (this.form.status === 'INVALID') {
+      return;
+    }
+
     const config: PasswordReset = {
       ClientID: this.context.appSettings.clientID,
       Password: this.form.get('password').value,

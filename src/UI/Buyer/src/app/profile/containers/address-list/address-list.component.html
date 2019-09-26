@@ -22,14 +22,14 @@
     </ocm-address-card>
   </ng-template>
 </shared-generic-browse>
-<ocm-modal [(isOpen)]="addAddressModalOpen"
+<ocm-modal [state]="addAddressModal"
            (close)="reset()"
            modalTitle="{{ currentAddress ? 'Edit' : 'Add'}} Address">
   <shared-address-form (formSubmitted)="addressFormSubmitted($event.address)"
                        [existingAddress]="currentAddress"
                        [btnText]="currentAddress ? 'Save Changes' : 'Create Address'"></shared-address-form>
 </ocm-modal>
-<ocm-modal [(isOpen)]="areYouSureModalOpen"
+<ocm-modal [state]="areYouSureModal"
            modalTitle="Delete this Address?">
   <ocm-address-card *ngIf="currentAddress"
                     [address]="currentAddress"> </ocm-address-card>
@@ -37,5 +37,4 @@
           (click)="deleteAddress(currentAddress)">Delete</button>
   <button class="btn float-right"
           (click)="closeAreYouSure()">Cancel</button>
-
 </ocm-modal>

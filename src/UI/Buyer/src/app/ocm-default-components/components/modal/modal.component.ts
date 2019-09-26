@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, OnDestroy, Inject, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, OnDestroy, Inject, Output, EventEmitter } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { DOCUMENT } from '@angular/common';
 
@@ -6,26 +6,26 @@ import { DOCUMENT } from '@angular/common';
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
 })
-export class OCMModal implements OnInit, OnChanges, OnDestroy {
+export class OCMModal implements OnInit, OnDestroy {
   @Input() modalTitle: string;
-  @Input() isOpen = false;
+
   @Output() close = new EventEmitter();
+  isOpen = false;
   faTimes = faTimes;
-  wasOpen = false;
+
+  @Input() set state(value: { isOpen: boolean }) {
+    if (value.isOpen && !this.isOpen) {
+      this.openModal();
+    } else if (!value.isOpen && this.isOpen) {
+      this.closeModal();
+    }
+  }
 
   constructor(private elementRef: ElementRef, @Inject(DOCUMENT) private document: any) {}
 
   ngOnInit(): void {
     // move element to bottom of page (just before </body>) so it can be displayed above everything else
     this.document.body.appendChild(this.elementRef.nativeElement);
-  }
-
-  ngOnChanges() {
-    if (this.isOpen) {
-      this.openModal();
-    } else if (!this.isOpen) {
-      this.closeModal();
-    }
   }
 
   // remove self when directive is destroyed
@@ -35,14 +35,15 @@ export class OCMModal implements OnInit, OnChanges, OnDestroy {
   }
 
   openModal(): void {
+    this.isOpen = true;
     this.elementRef.nativeElement.style.display = 'block';
     this.document.body.classList.add('shared-modal--open');
   }
 
   closeModal(): void {
+    this.isOpen = false;
     this.elementRef.nativeElement.style.display = 'none';
     this.document.body.classList.remove('shared-modal--open');
     this.close.emit();
-    this.isOpen = false;
   }
 }

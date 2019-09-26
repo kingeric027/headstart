@@ -112,7 +112,7 @@
       </div>
     </div>
   </div>
-  <ocm-modal [(isOpen)]="categoryModalOpen"
+  <ocm-modal [state]="categoryModal"
              modalTitle="Select Category">
     <!-- <ocm-category-tree *ngIf="categories?.Items?.length"
                        [categories]="categories"

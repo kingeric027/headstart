@@ -37,7 +37,6 @@ import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/share
 import { GenericBrowseComponent } from 'src/app/shared/components/generic-browse/generic-browse.component';
 import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
 import { PhoneInputDirective } from './directives/phone-input/phone-input.directive';
-import { FormControlErrorDirective } from './directives/directives/form-control-errors.directive';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -94,7 +93,6 @@ import { FormControlErrorDirective } from './directives/directives/form-control-
     PhoneFormatPipe,
     PhoneInputDirective,
     GenericBrowseComponent,
-    FormControlErrorDirective,
   ],
   declarations: [
     PaymentMethodDisplayPipe,
@@ -105,7 +103,6 @@ import { FormControlErrorDirective } from './directives/directives/form-control-
     PhoneInputDirective,
     AddressFormComponent,
     GenericBrowseComponent,
-    FormControlErrorDirective,
   ],
 })
 export class SharedModule {}

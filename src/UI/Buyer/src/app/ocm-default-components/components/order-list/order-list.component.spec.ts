@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrderListComponent } from 'src/app/order/components/order-list/order-list.component';
+import { OrderListComponent } from 'src/app/ocm-default-components/components/order-list/order-list.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { NgbPaginationModule, NgbDateAdapter, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDateNativeAdapter, NgbDateCustomParserFormatter } from 'src/app/config/date-picker.config';

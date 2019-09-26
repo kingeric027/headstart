@@ -1,7 +1,7 @@
 import { Directive, Self, ElementRef, OnInit, Renderer } from '@angular/core';
 import { NgControl } from '@angular/forms';
-import { ErrorDictionary } from 'src/app/ocm-default-components/validators/validators';
 import { fromEvent } from 'rxjs';
+import { ErrorDictionary } from '../validators/validators';
 
 @Directive({
   selector: '[showErrors]',

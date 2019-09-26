@@ -65,12 +65,8 @@ export class OrderHistoryComponent implements AfterViewInit {
   }
 
   filterByFavorite(favoriteOrders: boolean): void {
-    if (favoriteOrders) {
-      this.addQueryParam({ favoriteOrders: true });
-    } else {
-      // set to undefined so we dont pollute url with unnecessary query params
-      this.addQueryParam({ favoriteOrders: undefined });
-    }
+    // set to undefined so we dont pollute url with unnecessary query params
+    this.addQueryParam({ favoriteOrders: favoriteOrders || undefined });
   }
 
   protected listOrders(): Observable<ListOrder> {

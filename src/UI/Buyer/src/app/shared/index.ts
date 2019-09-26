@@ -16,8 +16,6 @@ export * from 'src/app/shared/services/geography/geography.service';
 export * from 'src/app/shared/services/cart/cart.service';
 export * from 'src/app/shared/services/reorder/reorder.service';
 
-// validators
-export * from 'src/app/shared/validators/match-fields/match-fields.validator';
 export * from 'src/app/shared/validators/product-quantity/product.quantity.validator';
 
 // modules

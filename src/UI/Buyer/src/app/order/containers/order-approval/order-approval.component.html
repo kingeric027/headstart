@@ -2,7 +2,7 @@
         (click)="openModal(true)">Approve</button>
 <button class="btn btn-danger ml-2"
         (click)="openModal(false)">Decline</button>
-<ocm-modal [(isOpen)]="approveModalOpen"
+<ocm-modal [state]="approveModal"
            modalTitle="{{ approved ? 'Approve' : 'Decline' }} Order">
   <form novalidate
         [formGroup]="form">
