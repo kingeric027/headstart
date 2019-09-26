@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { FormGroup, Validators, FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MeUser } from '@ordercloud/angular-sdk';
 import { ValidateStrongPassword, ValidateFieldMatches } from 'src/app/ocm-default-components/validators/validators';
 import { OCMComponent } from '../../shopper-context';
@@ -14,10 +14,6 @@ export class OCMChangePasswordFormComponent extends OCMComponent implements OnIn
   form: FormGroup;
   me: MeUser;
   faTimes = faTimes;
-
-  constructor(private formBuilder: FormBuilder) {
-    super();
-  }
 
   ngOnInit() {
     this.setForm();
