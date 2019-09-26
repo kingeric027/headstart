@@ -48,10 +48,13 @@ import { OCMLogin } from './components/login/login.component';
 import { OCMForgotPassword } from './components/forgot-password/forgot-password.component';
 import { OCMRegister } from './components/register/register.component';
 import { OCMResetPassword } from './components/reset-password/reset-password.component';
+import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [
+    FormControlErrorDirective,
+
     OCMProductCard,
     OCMToggleFavorite,
     OCMQuantityInput,

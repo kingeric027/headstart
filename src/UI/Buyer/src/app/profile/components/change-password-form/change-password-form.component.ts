@@ -1,9 +1,8 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AppMatchFieldsValidator } from 'src/app/shared/validators/match-fields/match-fields.validator';
+import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MeUser } from '@ordercloud/angular-sdk';
-import { ValidateStrongPassword } from 'src/app/ocm-default-components/validators/validators';
+import { ValidateStrongPassword, ValidateFieldMatches } from 'src/app/ocm-default-components/validators/validators';
 
 @Component({
   selector: 'profile-change-password-form',
@@ -20,29 +19,16 @@ export class ChangePasswordFormComponent implements OnInit {
     newPassword: string;
   }>();
 
-  constructor(private formBuilder: FormBuilder) {}
-
   ngOnInit() {
     this.setForm();
   }
 
   setForm() {
-    this.form = this.formBuilder.group(
-      {
-        currentPassword: ['', Validators.required],
-        newPassword: [
-          '',
-          [
-            Validators.required,
-            ValidateStrongPassword, // password must include one number, one letter and have min length of 8
-          ],
-        ],
-        confirmNewPassword: [''],
-      },
-      {
-        validator: AppMatchFieldsValidator('newPassword', 'confirmNewPassword'),
-      }
-    );
+    this.form = new FormGroup({
+      currentPassword: new FormControl('', Validators.required),
+      newPassword: new FormControl('', [Validators.required, ValidateStrongPassword]),
+      confirmNewPassword: new FormControl('', ValidateFieldMatches('newPassword')),
+    });
   }
 
   updatePassword() {
