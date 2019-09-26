@@ -28,7 +28,7 @@ export class OCMChangePasswordFormComponent extends OCMComponent implements OnIn
   }
 
   async updatePassword() {
-    const { currentPassword, newPassword } = this.form.value;
+    const { newPassword } = this.form.value;
     // TODO: how is this valid? changing password without validating current on the server?
     await this.context.authentication.changePassword(newPassword);
   }
