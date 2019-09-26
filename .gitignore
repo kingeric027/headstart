@@ -294,3 +294,4 @@ tests/TestData/output/*
 # compiled output
 src/UI/Buyer/dist
 src/UI/Buyer/src/environments/environment.ts
+*.code-workspace
