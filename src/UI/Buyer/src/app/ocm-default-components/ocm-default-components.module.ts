@@ -24,8 +24,6 @@ import {
   NgbDatepickerModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { OCMProductSort } from './components/sort-products/sort-products.component';
-//import { OCMCategoryTree } from './components/category-tree/category-tree.component';
-//import { TreeModule } from 'angular-tree-component';
 import { OCMFacetMultiSelect } from './components/facet-multiselect/facet-multiselect.component';
 import { OCMProductFacetList } from './components/product-facet-list/product-facet-list.component';
 import { OCMProductList } from './components/product-list/product-list.component';
@@ -51,6 +49,8 @@ import { OCMResetPassword } from './components/reset-password/reset-password.com
 import { OCMMeUpdateComponent } from './components/me-update/me-update.component';
 import { OCMChangePasswordFormComponent } from './components/change-password-form/change-password-form.component';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
+import { TreeModule } from 'angular-tree-component';
+import { OCMCategoryTree } from './components/category-tree/category-tree.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -69,7 +69,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
     OCMCart,
     OCMHomePage,
     OCMProductSort,
-    //OCMCategoryTree,
+    OCMCategoryTree,
     OCMFacetMultiSelect,
     OCMProductFacetList,
     OCMProductList,
@@ -108,7 +108,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
     OCMCart,
     OCMHomePage,
     OCMProductSort,
-    //OCMCategoryTree,
+    OCMCategoryTree,
     OCMFacetMultiSelect,
     OCMProductFacetList,
     OCMProductList,
@@ -139,7 +139,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
     FormsModule,
     FontAwesomeModule,
     NgbCarouselModule,
-    //TreeModule,
+    TreeModule,
     NgbCollapseModule,
     NgbPaginationModule,
     NgbPopoverModule,
@@ -165,7 +165,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
-    //this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
+    this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
     this.buildWebComponent(OCMFacetMultiSelect, 'ocm-facet-multiselect');
     this.buildWebComponent(OCMProductFacetList, 'ocm-product-facet-list');
     this.buildWebComponent(OCMProductList, 'ocm-product-list');
