@@ -1,8 +1,8 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { ListOrder } from '@ordercloud/angular-sdk';
-import { OrderListColumn } from 'src/app/order/models/order-list-column';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
-import { OCMComponent } from 'src/app/ocm-default-components/shopper-context';
+import { OCMComponent } from '../base-component';
+import { OrderListColumn } from '../../models/order-list-column';
 
 @Component({
   templateUrl: './order-list.component.html',

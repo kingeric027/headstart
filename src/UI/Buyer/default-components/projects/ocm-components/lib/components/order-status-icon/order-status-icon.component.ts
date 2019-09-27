@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { faCircle, faClock, faBan } from '@fortawesome/free-solid-svg-icons';
-import { OrderStatus } from 'src/app/order/models/order-status.model';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent } from '../base-component';
+import { OrderStatus } from '../../models/order-status.model';
 
 @Component({
   templateUrl: './order-status-icon.component.html',

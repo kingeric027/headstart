@@ -1,15 +1,14 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { CreateCardDetails } from 'src/app/shared';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent, CreateCard } from '../../shopper-context';
 
 @Component({
   templateUrl: './credit-card-form.component.html',
   styleUrls: ['./credit-card-form.component.scss'],
 })
 export class OCMCreditCardForm extends OCMComponent implements OnInit {
-  @Output() formSubmitted = new EventEmitter<CreateCardDetails>();
+  @Output() formSubmitted = new EventEmitter<CreateCard>();
   cardForm: FormGroup;
   faPlus = faPlus;
   yearOptions: string[];

@@ -8,8 +8,7 @@ import { DOCUMENT } from '@angular/common';
 })
 export class OCMModal implements OnInit, OnDestroy {
   @Input() modalTitle: string;
-
-  @Output() close = new EventEmitter();
+  @Output() closeEvent = new EventEmitter();
   isOpen = false;
   faTimes = faTimes;
 
@@ -44,6 +43,6 @@ export class OCMModal implements OnInit, OnDestroy {
     this.isOpen = false;
     this.elementRef.nativeElement.style.display = 'none';
     this.document.body.classList.remove('shared-modal--open');
-    this.close.emit();
+    this.closeEvent.emit();
   }
 }

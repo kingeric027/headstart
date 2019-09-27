@@ -2,8 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
-import { ModalState } from 'src/app/ocm-default-components/models/modal-state.class';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent } from '../base-component';
+import { ModalState } from '../../models/modal-state.class';
 
 @Component({
   templateUrl: './address-list.component.html',

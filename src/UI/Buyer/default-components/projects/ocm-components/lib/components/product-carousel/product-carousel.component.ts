@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
-import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
-import { OCMComponent } from '../../shopper-context';
+import { QuantityLimits } from '../../models/quantity-limits';
+import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './product-carousel.component.html',

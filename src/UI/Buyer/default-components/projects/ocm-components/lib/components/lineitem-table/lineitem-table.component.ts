@@ -2,8 +2,8 @@ import { Component, Input } from '@angular/core';
 import { LineItem, ListLineItem } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { get as _get } from 'lodash';
-import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
-import { OCMComponent } from '../../shopper-context';
+import { QuantityLimits } from '../../models/quantity-limits';
+import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './lineitem-table.component.html',

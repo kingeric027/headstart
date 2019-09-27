@@ -2,9 +2,9 @@ import { Component, Input, ChangeDetectorRef, AfterViewChecked, OnChanges } from
 import { Observable } from 'rxjs';
 import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
-import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
-import { FullSpecOption } from 'src/app/shared/models/full-spec-option.interface';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent } from '../base-component';
+import { QuantityLimits } from '../../models/quantity-limits';
+import { FullSpecOption } from '../../models/full-spec-option.interface';
 
 @Component({
   templateUrl: './product-details.component.html',

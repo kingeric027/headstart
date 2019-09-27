@@ -103,6 +103,15 @@ export interface ProductFilters {
   activeFacets?: any;
 }
 
+// TODO - use for param in create card method
+export interface CreateCard {
+  CardholderName: string;
+  CardNumber: string;
+  ExpirationDate: string;
+  SecurityCode: string;
+  ID?: string;
+}
+
 export interface AppConfig {
   /**
    * A short name for your app. It will be used as a

@@ -1,13 +1,5 @@
 import { LineItem, MeUser, Order, ListLineItem, User, AccessToken, PasswordReset } from '@ordercloud/angular-sdk';
-import { Input } from '@angular/core';
 import { Observable } from 'rxjs';
-import { PaymentMethod } from '../shared/models/payment-method.enum';
-
-export class OCMComponent {
-  // todo: the issue is that ngOnInit fires before inputs are ready. come up with a better way to do this.
-  observersSet: boolean;
-  @Input() context: IShopperContext;
-}
 
 export interface IShopperContext {
   cartActions: ICartActions;
@@ -104,6 +96,14 @@ export interface ProductFilters {
   activeFacets?: any;
 }
 
+export interface CreateCard {
+  CardholderName: string;
+  CardNumber: string;
+  ExpirationDate: string;
+  SecurityCode: string;
+  ID?: string;
+}
+
 export interface AppConfig {
   /**
    * A short name for your app. It will be used as a
@@ -139,9 +139,4 @@ export interface AppConfig {
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
   scope: string[];
-  /**
-   * this defines the types of payment methods a user can select
-   * from to complete payment on an order
-   */
-  availablePaymentMethods: PaymentMethod[];
 }

@@ -1,13 +1,12 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faCcVisa, faCcMastercard, faCcDiscover } from '@fortawesome/free-brands-svg-icons';
+import { faCcVisa, faCcMastercard, faCcDiscover, IconDefinition } from '@fortawesome/free-brands-svg-icons';
+import { OCMComponent } from '../base-component';
 
 @Component({
-  selector: 'shared-credit-card-icon',
   templateUrl: './credit-card-icon.component.html',
   styleUrls: ['./credit-card-icon.component.scss'],
 })
-export class OCMCreditCardIcon implements OnChanges {
+export class OCMCreditCardIcon extends OCMComponent implements OnChanges {
   cardIcon: IconDefinition;
   @Input() cardType: string;
   @Input() size: string;

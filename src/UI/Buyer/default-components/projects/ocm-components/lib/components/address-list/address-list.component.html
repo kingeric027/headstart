@@ -23,7 +23,7 @@
   </ng-template>
 </shared-generic-browse>
 <ocm-modal [state]="addAddressModal"
-           (close)="reset()"
+           (closeEvent)="reset()"
            modalTitle="{{ currentAddress ? 'Edit' : 'Add'}} Address">
   <shared-address-form (formSubmitted)="addressFormSubmitted($event.address)"
                        [existingAddress]="currentAddress"

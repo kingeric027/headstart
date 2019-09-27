@@ -1,9 +1,7 @@
 // angular
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-
-// ordercloud
-import { OCMComponent } from 'src/app/ocm-default-components/shopper-context';
+import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './login.component.html',

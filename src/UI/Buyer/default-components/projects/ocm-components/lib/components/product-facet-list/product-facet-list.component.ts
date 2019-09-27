@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { ListFacet } from '@ordercloud/angular-sdk';
-import { OCMComponent } from 'src/app/ocm-default-components/shopper-context';
+import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './product-facet-list.component.html',

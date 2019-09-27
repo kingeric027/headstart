@@ -1,15 +1,14 @@
 // angular
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 
 // angular libs
-import { ToastrService } from 'ngx-toastr';
 
 // ordercloud
 import { PasswordReset } from '@ordercloud/angular-sdk';
-import { ValidateStrongPassword, ValidateFieldMatches } from 'src/app/ocm-default-components/validators/validators';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent } from '../base-component';
+import { ValidateStrongPassword, ValidateFieldMatches } from '../../validators/validators';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   templateUrl: './reset-password.component.html',
@@ -21,14 +20,15 @@ export class OCMResetPassword extends OCMComponent implements OnInit, OnChanges 
   resetCode: string;
   appName: string;
 
-  constructor(private activatedRoute: ActivatedRoute, private toasterService: ToastrService) {
+  constructor(private toasterService: ToastrService) {
     super();
   }
 
   ngOnInit() {
-    const urlParams = this.activatedRoute.snapshot.queryParams;
-    this.username = urlParams['user'];
-    this.resetCode = urlParams['code'];
+    // TODO - figure out how to access url.
+    // const urlParams = this.activatedRoute.snapshot.queryParams;
+    // this.username = urlParams['user'];
+    // this.resetCode = urlParams['code'];
     this.form = new FormGroup({
       password: new FormControl('', [Validators.required, ValidateStrongPassword]),
       passwordConfirm: new FormControl('', [Validators.required, ValidateFieldMatches('password')]),

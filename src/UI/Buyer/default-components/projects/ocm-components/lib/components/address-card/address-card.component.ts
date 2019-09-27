@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { Address } from '@ordercloud/angular-sdk';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './address-card.component.html',

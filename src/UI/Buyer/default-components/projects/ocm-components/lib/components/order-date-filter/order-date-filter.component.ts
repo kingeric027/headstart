@@ -3,8 +3,8 @@ import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormControl } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { debounceTime, takeWhile } from 'rxjs/operators';
-import { DateValidator } from 'src/app/ocm-default-components/validators/validators';
-import { OCMComponent } from '../../shopper-context';
+import { DateValidator } from '../../validators/validators';
+import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './order-date-filter.component.html',
@@ -23,8 +23,8 @@ export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestro
 
   ngOnInit() {
     this.form = new FormGroup({
-      fromDate: new FormControl(<Date>null, DateValidator),
-      toDate: new FormControl(<Date>null, DateValidator),
+      fromDate: new FormControl(null as Date, DateValidator),
+      toDate: new FormControl(null as Date, DateValidator),
     });
     this.onFormChanges();
   }
@@ -49,8 +49,8 @@ export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestro
       return;
     }
 
-    const fromDate = <Date>this.form.get('fromDate').value;
-    const toDate = <Date>this.form.get('toDate').value;
+    const fromDate: Date = this.form.get('fromDate').value;
+    const toDate: Date = this.form.get('toDate').value;
     const dateSubmitted: string[] = [];
     if (fromDate) {
       dateSubmitted.push(`>${this.format(fromDate)}`);

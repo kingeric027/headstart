@@ -2,12 +2,12 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { ListBuyerProduct, Category, ListCategory, ListFacet } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
-import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
-import { OCMComponent, ProductFilters } from 'src/app/ocm-default-components/shopper-context';
 import { ModalState } from '../../models/modal-state.class';
+import { OCMComponent } from '../base-component';
+import { QuantityLimits } from '../../models/quantity-limits';
+import { ProductFilters } from '../../shopper-context';
 
 @Component({
-  selector: 'ocm-product-list',
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })

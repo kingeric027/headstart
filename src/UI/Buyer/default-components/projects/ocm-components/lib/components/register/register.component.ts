@@ -1,14 +1,8 @@
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import {
-  ValidateName,
-  ValidatePhone,
-  ValidateEmail,
-  ValidateStrongPassword,
-  ValidateFieldMatches,
-} from 'src/app/ocm-default-components/validators/validators';
-import { OCMComponent } from '../../shopper-context';
 import { MeUser } from '@ordercloud/angular-sdk';
+import { OCMComponent } from '../base-component';
+import { ValidateName, ValidateEmail, ValidatePhone, ValidateStrongPassword, ValidateFieldMatches } from '../../validators/validators';
 
 @Component({
   templateUrl: './register.component.html',
@@ -37,7 +31,7 @@ export class OCMRegister extends OCMComponent implements OnInit, OnChanges {
 
   // TODO: requires anonymous token, but not checked for here
   async onSubmit() {
-    const me = <MeUser>this.form.value;
+    const me: MeUser = this.form.value;
     me.Active = true;
     await this.context.authentication.register(me);
     this.context.routeActions.toLogin();

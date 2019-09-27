@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MeUser } from '@ordercloud/angular-sdk';
-import { ValidateStrongPassword, ValidateFieldMatches } from 'src/app/ocm-default-components/validators/validators';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent } from '../base-component';
+import { ValidateStrongPassword, ValidateFieldMatches } from '../../validators/validators';
 
 @Component({
   selector: 'profile-change-password-form',

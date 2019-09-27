@@ -1,9 +1,9 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { ListCategory, Category } from '@ordercloud/angular-sdk';
 import { ITreeOptions } from 'angular-tree-component';
-import { CategoryTreeNode } from 'src/app/product/models/category-tree-node.class';
-import { OCMComponent } from 'src/app/ocm-default-components/shopper-context';
+import { OCMComponent } from '../base-component';
 import { transform as _transform } from 'lodash';
+import { CategoryTreeNode } from '../../models/category-tree-node.class';
 
 @Component({
   templateUrl: './category-tree.component.html',

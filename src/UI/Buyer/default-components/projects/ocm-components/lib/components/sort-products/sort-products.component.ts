@@ -1,6 +1,6 @@
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './sort-products.component.html',

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Order, ListLineItem } from '@ordercloud/angular-sdk';
-import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent } from '../base-component';
+import { QuantityLimits } from '../../models/quantity-limits';
 
 @Component({
   templateUrl: './cart.component.html',

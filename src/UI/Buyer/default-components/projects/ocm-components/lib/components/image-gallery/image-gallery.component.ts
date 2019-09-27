@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { fromEvent } from 'rxjs';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './image-gallery.component.html',
@@ -28,7 +28,7 @@ export class OCMImageGallery extends OCMComponent implements OnInit {
   }
 
   onResize() {
-    //this.isResponsiveView = window.innerWidth > 900;
+    // this.isResponsiveView = window.innerWidth > 900;
     this.isResponsiveView = true;
   }
 

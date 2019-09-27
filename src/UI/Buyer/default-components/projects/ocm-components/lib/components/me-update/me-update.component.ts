@@ -1,8 +1,8 @@
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MeUser } from '@ordercloud/angular-sdk';
-import { ValidateName, ValidatePhone, ValidateEmail } from 'src/app/ocm-default-components/validators/validators';
-import { OCMComponent } from '../../shopper-context';
+import { OCMComponent } from '../base-component';
+import { ValidateName, ValidateEmail, ValidatePhone } from '../../validators/validators';
 
 @Component({
   templateUrl: './me-update.component.html',

@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, OnChanges } from '@angular/core';
 import { Order, LineItem } from '@ordercloud/angular-sdk';
 import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
-import { OCMComponent } from 'src/app/ocm-default-components/shopper-context';
+import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './mini-cart.component.html',

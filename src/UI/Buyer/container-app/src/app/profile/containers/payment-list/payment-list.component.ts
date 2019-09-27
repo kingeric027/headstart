@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { OcMeService, ListBuyerCreditCard, BuyerCreditCard, ListSpendingAccount } from '@ordercloud/angular-sdk';
 import { Observable } from 'rxjs';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { AuthorizeNetService, CreateCardDetails } from 'src/app/shared';
+import { AuthorizeNetService } from 'src/app/shared';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
 import * as moment from 'moment';
+import { CreateCard } from 'src/app/ocm-default-components/shopper-context';
 
 @Component({
   selector: 'profile-payment-list',
@@ -52,7 +53,7 @@ export class PaymentListComponent implements OnInit {
     this.currentCard = null;
   }
 
-  async addCard(card: CreateCardDetails) {
+  async addCard(card: CreateCard) {
     const response = await this.authorizeNetSerivce.CreateCreditCard(card);
     if (response.ResponseHttpStatusCode >= 400) {
       throw new Error((response.ResponseBody as any).ExceptionMessage);

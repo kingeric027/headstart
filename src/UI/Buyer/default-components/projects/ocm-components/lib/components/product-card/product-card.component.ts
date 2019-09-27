@@ -1,8 +1,8 @@
 import { Component, Input, OnInit, ViewEncapsulation, OnChanges } from '@angular/core';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
-import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
-import { OCMComponent } from '../../shopper-context';
+import { QuantityLimits } from '../../models/quantity-limits';
+import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './product-card.component.html',

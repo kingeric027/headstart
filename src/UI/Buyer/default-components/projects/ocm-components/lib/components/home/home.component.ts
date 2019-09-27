@@ -1,8 +1,8 @@
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
-import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
-import { OCMComponent } from '../../shopper-context';
 import { Component, Input } from '@angular/core';
+import { OCMComponent } from '../base-component';
+import { QuantityLimits } from '../../models/quantity-limits';
 
 @Component({
   templateUrl: './home.component.html',

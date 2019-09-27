@@ -1,9 +1,8 @@
 // angular
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
+import { OCMComponent } from '../base-component';
 
-// ordercloud
-import { OCMComponent } from '../../shopper-context';
 
 @Component({
   templateUrl: './forgot-password.component.html',
