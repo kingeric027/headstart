@@ -47,8 +47,9 @@ import { OCMForgotPassword } from './components/forgot-password/forgot-password.
 import { OCMRegister } from './components/register/register.component';
 import { OCMResetPassword } from './components/reset-password/reset-password.component';
 import { OCMMeUpdateComponent } from './components/me-update/me-update.component';
-import { OCMChangePasswordFormComponent } from './components/change-password-form/change-password-form.component';
+import { OCMChangePasswordForm } from './components/change-password-form/change-password-form.component';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
+import { OCMAddressList } from './components/address-list/address-list.component';
 import { TreeModule } from 'angular-tree-component';
 import { OCMCategoryTree } from './components/category-tree/category-tree.component';
 
@@ -93,7 +94,8 @@ import { OCMCategoryTree } from './components/category-tree/category-tree.compon
     OCMRegister,
     OCMResetPassword,
     OCMMeUpdateComponent,
-    OCMChangePasswordFormComponent,
+    OCMChangePasswordForm,
+    OCMAddressList,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -130,7 +132,8 @@ import { OCMCategoryTree } from './components/category-tree/category-tree.compon
     OCMRegister,
     OCMResetPassword,
     OCMMeUpdateComponent,
-    OCMChangePasswordFormComponent,
+    OCMChangePasswordForm,
+    OCMAddressList,
   ],
   imports: [
     CommonModule,
@@ -188,7 +191,8 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMRegister, 'ocm-register');
     this.buildWebComponent(OCMResetPassword, 'ocm-reset-password');
     this.buildWebComponent(OCMMeUpdateComponent, 'ocm-profile-me-update');
-    this.buildWebComponent(OCMChangePasswordFormComponent, 'ocm-change-password');
+    this.buildWebComponent(OCMChangePasswordForm, 'ocm-change-password');
+    this.buildWebComponent(OCMAddressList, 'ocm-address-list');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
