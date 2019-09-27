@@ -1,20 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { OcMeService, ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
+import { ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
 import { ModalState } from 'src/app/ocm-default-components/models/modal-state.class';
+import { OCMComponent } from '../../shopper-context';
 
 @Component({
-  selector: 'profile-address-list',
   templateUrl: './address-list.component.html',
   styleUrls: ['./address-list.component.scss'],
 })
-export class AddressListComponent implements OnInit {
+export class OCMAddressList extends OCMComponent implements OnInit {
+  @Input() addresses: ListBuyerAddress;
   faPlus = faPlus;
   faArrowLeft = faArrowLeft;
   faTrashAlt = faTrashAlt;
   faEdit = faEdit;
-  addresses: ListBuyerAddress;
   currentAddress: BuyerAddress;
   requestOptions: { page?: number; search?: string } = {
     page: undefined,
@@ -23,8 +23,6 @@ export class AddressListComponent implements OnInit {
   resultsPerPage = 8;
   areYouSureModal = ModalState.Closed;
   addAddressModal = ModalState.Closed;
-
-  constructor(private ocMeService: OcMeService) {}
 
   ngOnInit() {
     this.reloadAddresses();
@@ -35,6 +33,7 @@ export class AddressListComponent implements OnInit {
   }
 
   showAddAddress() {
+    console.log('show');
     this.currentAddress = null;
     this.addAddressModal = ModalState.Open;
   }
@@ -71,38 +70,39 @@ export class AddressListComponent implements OnInit {
   private addAddress(address: BuyerAddress) {
     address.Shipping = true;
     address.Billing = true;
-    this.ocMeService.CreateAddress(address).subscribe(
-      () => {
-        this.refresh();
-      },
-      (error) => {
-        throw error;
-      }
-    );
+    // this.ocMeService.CreateAddress(address).subscribe(
+    //   () => {
+    //     this.refresh();
+    //   },
+    //   (error) => {
+    //     throw error;
+    //   }
+    // );
   }
 
   private updateAddress(address: BuyerAddress) {
     address.ID = this.currentAddress.ID;
-    this.ocMeService.PatchAddress(address.ID, address).subscribe(
-      () => {
-        this.refresh();
-      },
-      (error) => {
-        throw error;
-      }
-    );
+    // this.ocMeService.PatchAddress(address.ID, address).subscribe(
+    //   () => {
+    //     this.refresh();
+    //   },
+    //   (error) => {
+    //     throw error;
+    //   }
+    // );
   }
 
   deleteAddress(address: BuyerAddress) {
-    this.ocMeService.DeleteAddress(address.ID).subscribe(
-      () => {
-        this.closeAreYouSure();
-        this.reloadAddresses();
-      },
-      (error) => {
-        throw error;
-      }
-    );
+    console.log(address);
+    // this.ocMeService.DeleteAddress(address.ID).subscribe(
+    //   () => {
+    //     this.closeAreYouSure();
+    //     this.reloadAddresses();
+    //   },
+    //   (error) => {
+    //     throw error;
+    //   }
+    // );
   }
 
   updateRequestOptions(newOptions: { page?: number; search?: string }) {
@@ -111,6 +111,6 @@ export class AddressListComponent implements OnInit {
   }
 
   private reloadAddresses() {
-    this.ocMeService.ListAddresses({ ...this.requestOptions, pageSize: this.resultsPerPage }).subscribe((res) => (this.addresses = res));
+    // this.ocMeService.ListAddresses({ ...this.requestOptions, pageSize: this.resultsPerPage }).subscribe((res) => (this.addresses = res));
   }
 }
