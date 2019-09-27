@@ -3,7 +3,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { OcOrderService, Order } from '@ordercloud/angular-sdk';
 import { ToastrService } from 'ngx-toastr';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
-import { ModalState } from 'src/app/ocm-default-components/models/modal-state.class';
+import { ModalState } from 'src/app/shared/models/modal-state.class';
 
 @Component({
   selector: 'order-approval',

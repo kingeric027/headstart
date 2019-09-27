@@ -7,7 +7,7 @@ import { applicationConfiguration } from 'src/app/config/app.config';
 import { BehaviorSubject } from 'rxjs';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { listAll } from 'src/app/shared/functions/listAll';
-import { ICurrentOrder, AppConfig } from 'src/app/ocm-default-components/shopper-context';
+import { ICurrentOrder, AppConfig } from 'shopper-context-interface';
 
 @Injectable({
   providedIn: 'root',

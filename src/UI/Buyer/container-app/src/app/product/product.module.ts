@@ -9,14 +9,13 @@ import {
   MeListCategoriesResolver,
   MeListRelatedProductsResolver,
 } from './resolves/me.product.resolve';
-import { OcmComponentsModule } from 'ocm-components';
-import { OcmDefaultComponentsModule } from 'src/app/ocm-default-components/ocm-default-components.module';
 import { ProductDetailWrapperComponent } from './components/product-detail-wrapper/product-detail-wrapper.component';
 import { ProductListWrapperComponent } from './components/product-list-wrapper/product-list-wrapper.component';
+import { OcmDefaultComponentsModule } from 'ocm-components';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [SharedModule, ProductsRoutingModule, OcmComponentsModule, OcmDefaultComponentsModule],
+  imports: [SharedModule, ProductsRoutingModule, OcmDefaultComponentsModule],
   declarations: [ProductDetailWrapperComponent, ProductListWrapperComponent],
   providers: [
     MeListProductResolver,

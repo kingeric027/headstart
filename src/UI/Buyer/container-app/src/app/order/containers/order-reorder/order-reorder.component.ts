@@ -5,7 +5,7 @@ import { CartService, AppReorderService } from 'src/app/shared';
 import { OrderReorderResponse } from 'src/app/shared/services/reorder/reorder.interface';
 import { LineItem } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
-import { ModalState } from 'src/app/ocm-default-components/models/modal-state.class';
+import { ModalState } from 'src/app/shared/models/modal-state.class';
 
 @Component({
   selector: 'order-reorder',

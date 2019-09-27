@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { OcLineItemService, LineItem, OcOrderService } from '@ordercloud/angular-sdk';
 import { isUndefined as _isUndefined, flatMap as _flatMap, get as _get, isEqual as _isEqual, omitBy as _omitBy } from 'lodash';
 import { CurrentOrderService } from '../current-order/current-order.service';
-import { ICartActions } from 'src/app/ocm-default-components/shopper-context';
 import { Subject } from 'rxjs';
+import { ICartActions } from 'shopper-context-interface';
 
 @Injectable({
   providedIn: 'root',

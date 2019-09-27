@@ -6,7 +6,7 @@ import { AuthorizeNetService } from 'src/app/shared';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
 import * as moment from 'moment';
-import { CreateCard } from 'src/app/ocm-default-components/shopper-context';
+import { CreateCard } from 'shopper-context-interface';
 
 @Component({
   selector: 'profile-payment-list',

@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { AppConfig } from '../ocm-default-components/shopper-context';
+import { AppConfig } from 'shopper-context-interface';
 
 export const ocAppConfig: AppConfig = {
   appname: 'OrderCloud',

@@ -1,5 +1,5 @@
 import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User } from '@ordercloud/angular-sdk';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 export interface IShopperContext {
   cartActions: ICartActions;
@@ -12,7 +12,7 @@ export interface IShopperContext {
 }
 
 export interface ICartActions {
-  addToCartSubject: Observable<LineItem>;
+  addToCartSubject: Subject<LineItem>;
   addToCart(lineItem: LineItem): Promise<LineItem>;
   removeLineItem(lineItemID: string): Promise<void>;
   updateQuantity(lineItemID: string, newQuantity: number): Promise<LineItem>;

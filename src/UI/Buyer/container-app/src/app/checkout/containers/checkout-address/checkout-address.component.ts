@@ -4,7 +4,7 @@ import { OcMeService, ListBuyerAddress, OcOrderService, Order, BuyerAddress, Lis
 import { CurrentOrderService } from 'src/app/shared';
 import { ToastrService } from 'ngx-toastr';
 import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
-import { ModalState } from 'src/app/ocm-default-components/models/modal-state.class';
+import { ModalState } from 'src/app/shared/models/modal-state.class';
 
 @Component({
   selector: 'checkout-address',

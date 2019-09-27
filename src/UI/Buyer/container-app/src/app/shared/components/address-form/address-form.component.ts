@@ -5,7 +5,7 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
 
 import { AppGeographyService } from 'src/app/shared/services/geography/geography.service';
-import { ValidateName, ValidateUSZip, ValidatePhone } from 'src/app/ocm-default-components/validators/validators';
+import { ValidateName, ValidateUSZip, ValidatePhone } from '../../validators/validators';
 
 @Component({
   selector: 'shared-address-form',

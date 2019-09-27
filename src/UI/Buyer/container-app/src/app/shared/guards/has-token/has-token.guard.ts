@@ -7,7 +7,7 @@ import { applicationConfiguration } from 'src/app/config/app.config';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
 import { DOCUMENT } from '@angular/common';
-import { AppConfig } from 'src/app/ocm-default-components/shopper-context';
+import { AppConfig } from 'shopper-context-interface';
 
 @Injectable({
   providedIn: 'root',

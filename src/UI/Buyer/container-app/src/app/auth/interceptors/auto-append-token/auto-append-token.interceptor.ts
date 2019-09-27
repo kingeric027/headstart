@@ -3,7 +3,7 @@ import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/c
 import { Observable } from 'rxjs';
 import { applicationConfiguration } from 'src/app/config/app.config';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
-import { AppConfig } from 'src/app/ocm-default-components/shopper-context';
+import { AppConfig } from 'shopper-context-interface';
 
 /**
  * automatically append token to the authorization header

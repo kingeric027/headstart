@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SpendingAccount, ListSpendingAccount, OcMeService, Payment, Order } from '@ordercloud/angular-sdk';
 import * as moment from 'moment';
-import { ModalState } from 'src/app/ocm-default-components/models/modal-state.class';
+import { ModalState } from 'src/app/shared/models/modal-state.class';
 
 @Component({
   selector: 'checkout-payment-spending-account',
