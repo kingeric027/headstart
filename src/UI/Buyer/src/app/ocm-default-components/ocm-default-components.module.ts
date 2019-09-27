@@ -49,7 +49,6 @@ import { OCMResetPassword } from './components/reset-password/reset-password.com
 import { OCMMeUpdateComponent } from './components/me-update/me-update.component';
 import { OCMChangePasswordForm } from './components/change-password-form/change-password-form.component';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
-import { TreeModule } from 'angular-tree-component';
 import { OCMAddressList } from './components/address-list/address-list.component';
 
 @NgModule({
