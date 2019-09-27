@@ -1,0 +1,103 @@
+<div class="text-center mt-3">
+  <p>Already have an account? <button type="button"
+            class="btn btn-link"
+            routerLink="/login">Login</button></p>
+  <h1 class="display-4">{{appName}}</h1>
+</div>
+<div class="row">
+  <div class="col-lg-6 mx-auto"
+       style="max-width:400px">
+    <h3 class="text-center headline-text mb-3">Sign Up</h3>
+    <form (ngSubmit)="onSubmit()"
+          novalidate
+          [formGroup]="form"
+          name="RegisterForm">
+      <div class="form-group">
+        <label class="sr-only"
+               for="Username">Username</label>
+        <input type="text"
+               formControlName="Username"
+               class="form-control"
+               id="Username"
+               placeholder="Username"
+               autofocus="true"
+               autocomplete="off"
+               showErrors />
+      </div>
+      <div class="form-group">
+        <label class="sr-only"
+               for="FirstName">First Name</label>
+        <input type="text"
+               formControlName="FirstName"
+               class="form-control"
+               id="FirstName"
+               placeholder="First Name"
+               autocomplete="off"
+               showErrors />
+      </div>
+      <div class="form-group">
+        <label class="sr-only"
+               for="LastName">Last Name</label>
+        <input type="text"
+               formControlName="LastName"
+               class="form-control"
+               id="LastName"
+               placeholder="Last Name"
+               autocomplete="off"
+               showErrors />
+      </div>
+      <div class="form-group">
+        <label class="sr-only"
+               for="Email">Email</label>
+        <input type="email"
+               formControlName="Email"
+               class="form-control"
+               id="Email"
+               placeholder="Email"
+               autocomplete="off"
+               showErrors />
+      </div>
+      <div class="form-group">
+        <label class="sr-only"
+               for="Phone">Phone Number</label>
+        <input type="text"
+               formControlName="Phone"
+               class="form-control"
+               id="Phone"
+               placeholder="Phone Number"
+               autocomplete="off"
+               showErrors />
+      </div>
+      <div class="form-group">
+        <label class="sr-only"
+               for="Password">Password</label>
+        <input type="password"
+               formControlName="Password"
+               class="form-control"
+               id="Password"
+               placeholder="Password"
+               autocomplete="off"
+               showErrors />
+      </div>
+      <div class="form-group">
+        <label class="sr-only"
+               for="ConfirmPassword">Confirm Password</label>
+        <input type="password"
+               formControlName="ConfirmPassword"
+               class="form-control"
+               id="ConfirmPassword"
+               placeholder="Confirm Password"
+               autocomplete="off"
+               showErrors />
+      </div>
+      <button type="submit"
+              class="btn btn-primary btn-lg btn-block mt-4">Register
+      </button>
+    </form>
+    <button type="button"
+            class="btn btn-link btn-block"
+            routerLink="/forgot-password">Forgot
+      Password
+    </button>
+  </div>
+</div>

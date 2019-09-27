@@ -1,9 +1,10 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AppConfig, applicationConfiguration } from 'src/app/config/app.config';
+import { applicationConfiguration } from 'src/app/config/app.config';
 import { CreateCardDetails, AuthorizeCardSuccess, CreateCardResponse } from 'src/app/shared/services/authorize-net/authorize-net.interface';
 import { Payment, OcPaymentService, Order, OcOrderService, BuyerCreditCard } from '@ordercloud/angular-sdk';
 import { AuthService } from '../auth/auth.service';
+import { AppConfig } from 'src/app/ocm-default-components/shopper-context';
 
 /**
  *  OrderCloud does not store full credit card details or process finacial transactions.

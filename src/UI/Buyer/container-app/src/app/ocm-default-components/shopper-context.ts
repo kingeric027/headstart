@@ -1,7 +1,6 @@
 import { LineItem, MeUser, Order, ListLineItem, User, AccessToken, PasswordReset } from '@ordercloud/angular-sdk';
 import { Input } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppConfig } from '../config/app.config';
 
 export class OCMComponent {
   // todo: the issue is that ngOnInit fires before inputs are ready. come up with a better way to do this.
@@ -102,4 +101,41 @@ export interface ProductFilters {
   categoryID?: string;
   showOnlyFavorites?: boolean;
   activeFacets?: any;
+}
+
+export interface AppConfig {
+  /**
+   * A short name for your app. It will be used as a
+   * cookie prefix as well as general display throughout the app.
+   */
+  appname: string;
+  /**
+   * The identifier for the seller, buyer network or buyer application that
+   * will be used for authentication. You can view client ids for apps
+   * you own or are a contributor to on the [dashboard](https://developer.ordercloud.io/dashboard)
+   */
+  clientID: string;
+  /**
+   * If set to true users can browse and submit orders without profiling themselves. This requires
+   * additional set up in the dashboard. Click here to
+   * [learn more](https://developer.ordercloud.io/documentation/platform-guides/authentication/anonymous-shopping)
+   */
+  anonymousShoppingEnabled: boolean;
+
+  baseUrl: string;
+  /**
+   * base path to middleware
+   */
+  middlewareUrl: string;
+  /**
+   * base path to CMS resources
+   */
+  cmsUrl: string;
+  /**
+   * An array of security roles that will be requested upon login.
+   * These roles allow access to specific endpoints in the OrderCloud.io API.
+   * To learn more about these roles and the security profiles that comprise them
+   * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
+   */
+  scope: string[];
 }

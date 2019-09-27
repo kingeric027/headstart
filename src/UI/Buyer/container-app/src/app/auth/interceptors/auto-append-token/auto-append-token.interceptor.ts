@@ -1,8 +1,9 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
+import { applicationConfiguration } from 'src/app/config/app.config';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
+import { AppConfig } from 'src/app/ocm-default-components/shopper-context';
 
 /**
  * automatically append token to the authorization header

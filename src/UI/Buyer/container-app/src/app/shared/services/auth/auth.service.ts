@@ -13,11 +13,11 @@ import {
   MeUser,
   PasswordReset,
 } from '@ordercloud/angular-sdk';
-import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
+import { applicationConfiguration } from 'src/app/config/app.config';
 import { CookieService } from '@gorniv/ngx-universal';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { CurrentOrderService } from 'src/app/shared/services/current-order/current-order.service';
-import { IAuthActions } from 'src/app/ocm-default-components/shopper-context';
+import { IAuthActions, AppConfig } from 'src/app/ocm-default-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',

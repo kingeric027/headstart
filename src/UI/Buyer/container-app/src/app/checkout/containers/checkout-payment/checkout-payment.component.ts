@@ -2,8 +2,6 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { OcPaymentService, Payment, PartialPayment } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
 import { CurrentOrderService } from 'src/app/shared';
-import { PaymentMethod } from 'src/app/shared/models/payment-method.enum';
-import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'checkout-payment',
@@ -11,19 +9,15 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
   styleUrls: ['./checkout-payment.component.scss'],
 })
 export class CheckoutPaymentComponent implements OnInit {
-  constructor(
-    private currentOrder: CurrentOrderService,
-    private ocPaymentService: OcPaymentService,
-    private context: ShopperContextService
-  ) {}
+  constructor(private currentOrder: CurrentOrderService, private ocPaymentService: OcPaymentService) {}
 
   @Input() isAnon: boolean;
   @Output() continue = new EventEmitter();
 
   readonly order = this.currentOrder.order;
   form: FormGroup;
-  availablePaymentMethods = this.context.appSettings.availablePaymentMethods;
-  selectedPaymentMethod: PaymentMethod;
+  availablePaymentMethods = ['PurchaseOrder', 'SpendingAccount', 'CreditCard'];
+  selectedPaymentMethod: string;
   existingPayment: Payment;
 
   async ngOnInit() {
@@ -45,18 +39,18 @@ export class CheckoutPaymentComponent implements OnInit {
     }
 
     if (this.existingPayment) {
-      await this.selectPaymentMethod(this.existingPayment.Type as PaymentMethod);
+      await this.selectPaymentMethod(this.existingPayment.Type);
     } else {
       await this.selectPaymentMethod(this.availablePaymentMethods[0]);
     }
   }
 
-  async selectPaymentMethod(method: PaymentMethod): Promise<void> {
+  async selectPaymentMethod(method: string): Promise<void> {
     if (method) {
       this.form.controls['selectedPaymentMethod'].setValue(method);
     }
     this.selectedPaymentMethod = this.form.get('selectedPaymentMethod').value;
-    if (this.selectedPaymentMethod !== PaymentMethod.SpendingAccount && this.existingPayment && this.existingPayment.SpendingAccountID) {
+    if (this.selectedPaymentMethod !== 'SpendingAccount' && this.existingPayment && this.existingPayment.SpendingAccountID) {
       this.existingPayment = null;
       await this.deleteExistingPayments();
     }
