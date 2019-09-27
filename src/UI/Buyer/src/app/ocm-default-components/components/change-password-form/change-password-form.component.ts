@@ -10,7 +10,7 @@ import { OCMComponent } from '../../shopper-context';
   templateUrl: './change-password-form.component.html',
   styleUrls: ['./change-password-form.component.scss'],
 })
-export class OCMChangePasswordFormComponent extends OCMComponent implements OnInit {
+export class OCMChangePasswordForm extends OCMComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
   faTimes = faTimes;

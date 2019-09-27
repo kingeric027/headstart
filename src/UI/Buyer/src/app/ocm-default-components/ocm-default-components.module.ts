@@ -24,8 +24,6 @@ import {
   NgbDatepickerModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { OCMProductSort } from './components/sort-products/sort-products.component';
-//import { OCMCategoryTree } from './components/category-tree/category-tree.component';
-//import { TreeModule } from 'angular-tree-component';
 import { OCMFacetMultiSelect } from './components/facet-multiselect/facet-multiselect.component';
 import { OCMProductFacetList } from './components/product-facet-list/product-facet-list.component';
 import { OCMProductList } from './components/product-list/product-list.component';
@@ -49,9 +47,10 @@ import { OCMForgotPassword } from './components/forgot-password/forgot-password.
 import { OCMRegister } from './components/register/register.component';
 import { OCMResetPassword } from './components/reset-password/reset-password.component';
 import { OCMMeUpdateComponent } from './components/me-update/me-update.component';
-import { OCMChangePasswordFormComponent } from './components/change-password-form/change-password-form.component';
+import { OCMChangePasswordForm } from './components/change-password-form/change-password-form.component';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
-import { OCMAddressListComponent } from './components/address-list/address-list.component';
+import { TreeModule } from 'angular-tree-component';
+import { OCMAddressList } from './components/address-list/address-list.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -70,7 +69,6 @@ import { OCMAddressListComponent } from './components/address-list/address-list.
     OCMCart,
     OCMHomePage,
     OCMProductSort,
-    //OCMCategoryTree,
     OCMFacetMultiSelect,
     OCMProductFacetList,
     OCMProductList,
@@ -94,8 +92,8 @@ import { OCMAddressListComponent } from './components/address-list/address-list.
     OCMRegister,
     OCMResetPassword,
     OCMMeUpdateComponent,
-    OCMChangePasswordFormComponent,
-    OCMAddressListComponent,
+    OCMChangePasswordForm,
+    OCMAddressList,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -110,7 +108,6 @@ import { OCMAddressListComponent } from './components/address-list/address-list.
     OCMCart,
     OCMHomePage,
     OCMProductSort,
-    //OCMCategoryTree,
     OCMFacetMultiSelect,
     OCMProductFacetList,
     OCMProductList,
@@ -132,8 +129,8 @@ import { OCMAddressListComponent } from './components/address-list/address-list.
     OCMRegister,
     OCMResetPassword,
     OCMMeUpdateComponent,
-    OCMChangePasswordFormComponent,
-    OCMAddressListComponent,
+    OCMChangePasswordForm,
+    OCMAddressList,
   ],
   imports: [
     CommonModule,
@@ -142,7 +139,6 @@ import { OCMAddressListComponent } from './components/address-list/address-list.
     FormsModule,
     FontAwesomeModule,
     NgbCarouselModule,
-    //TreeModule,
     NgbCollapseModule,
     NgbPaginationModule,
     NgbPopoverModule,
@@ -168,7 +164,6 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
-    //this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
     this.buildWebComponent(OCMFacetMultiSelect, 'ocm-facet-multiselect');
     this.buildWebComponent(OCMProductFacetList, 'ocm-product-facet-list');
     this.buildWebComponent(OCMProductList, 'ocm-product-list');
@@ -191,8 +186,8 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMRegister, 'ocm-register');
     this.buildWebComponent(OCMResetPassword, 'ocm-reset-password');
     this.buildWebComponent(OCMMeUpdateComponent, 'ocm-profile-me-update');
-    this.buildWebComponent(OCMChangePasswordFormComponent, 'ocm-change-password');
-    this.buildWebComponent(OCMAddressListComponent, 'ocm-address-list');
+    this.buildWebComponent(OCMChangePasswordForm, 'ocm-change-password');
+    this.buildWebComponent(OCMAddressList, 'ocm-address-list');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

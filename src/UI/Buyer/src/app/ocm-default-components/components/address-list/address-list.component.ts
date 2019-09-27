@@ -9,7 +9,7 @@ import { OCMComponent } from '../../shopper-context';
   templateUrl: './address-list.component.html',
   styleUrls: ['./address-list.component.scss'],
 })
-export class OCMAddressListComponent extends OCMComponent implements OnInit {
+export class OCMAddressList extends OCMComponent implements OnInit {
   @Input() addresses: ListBuyerAddress;
   faPlus = faPlus;
   faArrowLeft = faArrowLeft;
