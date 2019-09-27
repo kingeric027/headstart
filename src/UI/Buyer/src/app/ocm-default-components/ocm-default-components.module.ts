@@ -50,6 +50,8 @@ import { OCMMeUpdateComponent } from './components/me-update/me-update.component
 import { OCMChangePasswordForm } from './components/change-password-form/change-password-form.component';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 import { OCMAddressList } from './components/address-list/address-list.component';
+import { TreeModule } from 'angular-tree-component';
+import { OCMCategoryTree } from './components/category-tree/category-tree.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -68,6 +70,7 @@ import { OCMAddressList } from './components/address-list/address-list.component
     OCMCart,
     OCMHomePage,
     OCMProductSort,
+    OCMCategoryTree,
     OCMFacetMultiSelect,
     OCMProductFacetList,
     OCMProductList,
@@ -107,6 +110,7 @@ import { OCMAddressList } from './components/address-list/address-list.component
     OCMCart,
     OCMHomePage,
     OCMProductSort,
+    OCMCategoryTree,
     OCMFacetMultiSelect,
     OCMProductFacetList,
     OCMProductList,
@@ -138,6 +142,7 @@ import { OCMAddressList } from './components/address-list/address-list.component
     FormsModule,
     FontAwesomeModule,
     NgbCarouselModule,
+    TreeModule,
     NgbCollapseModule,
     NgbPaginationModule,
     NgbPopoverModule,
@@ -163,6 +168,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
+    this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
     this.buildWebComponent(OCMFacetMultiSelect, 'ocm-facet-multiselect');
     this.buildWebComponent(OCMProductFacetList, 'ocm-product-facet-list');
     this.buildWebComponent(OCMProductList, 'ocm-product-list');

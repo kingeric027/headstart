@@ -1,7 +1,6 @@
 // angular
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { SharedRoutingModule } from 'src/app/shared/shared-routing.module';
@@ -44,7 +43,6 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     SharedRoutingModule,
     // angular
     CommonModule,
-    HttpClientModule,
     ReactiveFormsModule,
 
     // 3rd party UI
@@ -56,20 +54,19 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
      * only those that are used by app
      * should be imported to reduce bundle size
      */
-    NgbDatepickerModule.forRoot(),
-    NgbCollapseModule.forRoot(),
-    NgbModalModule.forRoot(),
-    NgbTabsetModule.forRoot(),
-    NgbPaginationModule.forRoot(),
-    NgbPopoverModule.forRoot(),
-    NgbAccordionModule.forRoot(),
-    NgbCarouselModule.forRoot(),
-    NgbDropdownModule.forRoot(),
+    NgbDatepickerModule,
+    NgbCollapseModule,
+    NgbModalModule,
+    NgbTabsetModule,
+    NgbPaginationModule,
+    NgbPopoverModule,
+    NgbAccordionModule,
+    NgbCarouselModule,
+    NgbDropdownModule,
   ],
   exports: [
     // angular
     CommonModule,
-    HttpClientModule,
     ReactiveFormsModule,
 
     // 3rd party UI
