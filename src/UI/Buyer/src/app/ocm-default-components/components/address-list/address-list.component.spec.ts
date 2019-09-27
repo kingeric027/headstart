@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddressListComponent } from 'src/app/profile/containers/address-list/address-list.component';
+import { OCMAddressListComponent } from 'src/app/ocm-default-components/components/address-list/address-list.component';
 import { FaIconComponent, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -9,8 +9,8 @@ import { OcMeService } from '@ordercloud/angular-sdk';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('AddressListComponent', () => {
-  let component: AddressListComponent;
-  let fixture: ComponentFixture<AddressListComponent>;
+  let component: OCMAddressListComponent;
+  let fixture: ComponentFixture<OCMAddressListComponent>;
   const toastrService = { success: jasmine.createSpy('success') };
   const meService = {
     DeleteAddress: jasmine.createSpy('DeleteAddress').and.returnValue(of(null)),
@@ -24,7 +24,7 @@ describe('AddressListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [AddressListComponent],
+      declarations: [OCMAddressListComponent],
       imports: [ReactiveFormsModule, FontAwesomeModule],
       providers: [{ provide: OcMeService, useValue: meService }, { provide: ToastrService, useValue: toastrService }],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
@@ -32,7 +32,7 @@ describe('AddressListComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AddressListComponent);
+    fixture = TestBed.createComponent(OCMAddressListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -51,6 +51,7 @@ import { OCMResetPassword } from './components/reset-password/reset-password.com
 import { OCMMeUpdateComponent } from './components/me-update/me-update.component';
 import { OCMChangePasswordFormComponent } from './components/change-password-form/change-password-form.component';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
+import { OCMAddressListComponent } from './components/address-list/address-list.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -94,6 +95,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
     OCMResetPassword,
     OCMMeUpdateComponent,
     OCMChangePasswordFormComponent,
+    OCMAddressListComponent,
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -131,6 +133,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
     OCMResetPassword,
     OCMMeUpdateComponent,
     OCMChangePasswordFormComponent,
+    OCMAddressListComponent,
   ],
   imports: [
     CommonModule,
@@ -189,6 +192,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMResetPassword, 'ocm-reset-password');
     this.buildWebComponent(OCMMeUpdateComponent, 'ocm-profile-me-update');
     this.buildWebComponent(OCMChangePasswordFormComponent, 'ocm-change-password');
+    this.buildWebComponent(OCMAddressListComponent, 'ocm-address-list');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
