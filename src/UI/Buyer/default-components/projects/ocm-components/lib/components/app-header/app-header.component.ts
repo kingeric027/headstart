@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
 import { tap, debounceTime, delay } from 'rxjs/operators';
 import { OCMComponent } from '../base-component';
-import { ProductFilters } from '../../shopper-context';
+import { ProductFilters } from 'shopper-context-interface';
 
 @Component({
   selector: 'ocm-app-header',

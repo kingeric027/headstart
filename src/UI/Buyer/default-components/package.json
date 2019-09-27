@@ -44,7 +44,8 @@
     "ngx-cookie": "^4.1.2",
     "ngx-image-zoom": "^0.4.1",
     "ngx-toastr": "^11.0.0",
-    "rxjs": "~6.4.0",
+    "rxjs": "^6.5.3",
+    "shopper-context-interface": "file:../shopper-context-interface",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"
   },

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import { IRouteActions, ProductFilters } from 'src/app/ocm-default-components/shopper-context';
 import { ProductFilterService } from '../product-filter/product-filter.service';
 import { filter, map } from 'rxjs/operators';
+import { IRouteActions, ProductFilters } from 'ocm-components/shopper-context';
 
 @Injectable({
   providedIn: 'root',

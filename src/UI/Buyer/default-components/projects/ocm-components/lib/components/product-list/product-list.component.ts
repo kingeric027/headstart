@@ -5,7 +5,7 @@ import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { ModalState } from '../../models/modal-state.class';
 import { OCMComponent } from '../base-component';
 import { QuantityLimits } from '../../models/quantity-limits';
-import { ProductFilters } from '../../shopper-context';
+import { ProductFilters } from 'shopper-context-interface';
 
 @Component({
   templateUrl: './product-list.component.html',

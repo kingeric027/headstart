@@ -35,9 +35,7 @@ import { TermsAndConditionsComponent } from './static-pages/terms-and-conditions
 
 // error handler config
 import { AppErrorHandler } from './config/error-handling.config';
-import { OcmDefaultComponentsModule } from './ocm-default-components/ocm-default-components.module';
-
-import { OcmComponentsModule } from 'ocm-components';
+import { OcmDefaultComponentsModule } from 'ocm-components';
 
 @NgModule({
   declarations: [AppComponent, SupportComponent, FaqComponent, TermsAndConditionsComponent],
@@ -58,7 +56,6 @@ import { OcmComponentsModule } from 'ocm-components';
      * can live in shared
      */
     SharedModule,
-    OcmComponentsModule,
     OcmDefaultComponentsModule,
     CookieModule.forRoot(),
     NgProgressModule,

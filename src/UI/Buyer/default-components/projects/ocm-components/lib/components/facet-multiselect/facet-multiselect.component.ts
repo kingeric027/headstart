@@ -3,7 +3,7 @@ import { ListFacet, ListFacetValue } from '@ordercloud/angular-sdk';
 import { each as _each, get as _get, xor as _xor } from 'lodash';
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
 import { OCMComponent } from '../base-component';
-import { ProductFilters } from '../../shopper-context';
+import { ProductFilters } from 'shopper-context-interface';
 
 @Component({
   templateUrl: './facet-multiselect.component.html',

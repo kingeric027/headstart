@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { OCMComponent } from '../base-component';
-import { CreateCard } from '../../shopper-context';
+import { CreateCard } from 'shopper-context-interface';
 
 @Component({
   templateUrl: './credit-card-form.component.html',
