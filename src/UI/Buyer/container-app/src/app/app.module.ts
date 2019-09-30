@@ -7,7 +7,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 // 3rd party
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
-import { CookieModule } from '@gorniv/ngx-universal';
+//import { CookieModule } from '@gorniv/ngx-universal';
 import { ToastrModule } from 'ngx-toastr';
 import { OrderCloudModule } from '@ordercloud/angular-sdk';
 import { OcSDKConfig } from 'src/app/config/ordercloud-sdk.config';
@@ -36,6 +36,7 @@ import { TermsAndConditionsComponent } from './static-pages/terms-and-conditions
 // error handler config
 import { AppErrorHandler } from './config/error-handling.config';
 import { OcmDefaultComponentsModule } from 'ocm-components';
+import { CookieModule } from 'ngx-cookie';
 
 @NgModule({
   declarations: [AppComponent, SupportComponent, FaqComponent, TermsAndConditionsComponent],

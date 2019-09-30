@@ -14,10 +14,11 @@ import {
   PasswordReset,
 } from '@ordercloud/angular-sdk';
 import { applicationConfiguration } from 'src/app/config/app.config';
-import { CookieService } from '@gorniv/ngx-universal';
+//import { CookieService } from '@gorniv/ngx-universal';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { CurrentOrderService } from 'src/app/shared/services/current-order/current-order.service';
 import { IAuthActions, AppConfig } from 'shopper-context-interface';
+import { CookieService } from 'ngx-cookie';
 
 @Injectable({
   providedIn: 'root',
