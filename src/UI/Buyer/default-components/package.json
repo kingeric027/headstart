@@ -13,12 +13,12 @@
   ],
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "prepare": "npm run build"
+    "bundle": "npm install && npm run build",
+    "preinstall": "cd ../shopper-context-interface && npm install"
   },
   "private": true,
   "dependencies": {
