@@ -8,7 +8,7 @@
                      (formSubmitted)="saveAddress($event.address, $event.formDirty)"
                      btnText="Save and Continue"></shared-address-form>
 <ocm-modal [state]="addressModal"
-           (closeEvent)="clearReqeustOptions"
+           (closeEvent)="requestOptions = {}"
            modalTitle="Select Address">
   <shared-generic-browse [items]="existingAddresses?.Items"
                          [meta]="existingAddresses?.Meta"

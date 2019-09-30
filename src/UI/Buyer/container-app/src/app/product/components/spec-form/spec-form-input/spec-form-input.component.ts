@@ -10,19 +10,8 @@ import { spec_errors } from '../errors';
     <div class="col-md-12" [formGroup]="group">
       <div class="form-input">
         <label>{{ config.label }}</label>
-        <input
-          type="text"
-          class="form-control"
-          [attr.placeholder]="config.placeholder"
-          [formControlName]="config.name"
-        />
-        <div
-          *ngIf="
-            byIndex(index).invalid &&
-            (byIndex(index).dirty || byIndex(index).touched)
-          "
-          alert="alert alert-danger"
-        >
+        <input type="text" class="form-control" [attr.placeholder]="config.placeholder" [formControlName]="config.name" />
+        <div *ngIf="byIndex(index).invalid && (byIndex(index).dirty || byIndex(index).touched)" alert="alert alert-danger">
           <div
             *ngIf="
               byIndex(index).errors['required'] ||

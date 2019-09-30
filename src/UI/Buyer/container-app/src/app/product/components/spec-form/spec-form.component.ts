@@ -21,7 +21,6 @@ import { SpecFormEvent } from '../../models/spec-form-values.interface';
       ></ng-container>
     </form>
   `,
-  styleUrls: ['./spec-form.component.scss'],
 })
 export class SpecFormComponent implements OnInit {
   @Input() specs: ListBuyerSpec;
