@@ -42,7 +42,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   protected async getPayments(orderID: string): Promise<ListPayment> {
-    return this.appPaymentService.getPayments('outgoing', orderID);
+    return this.appPaymentService.ListPaymentsOnOrder(orderID);
   }
 
   protected async getApprovals(orderID: string): Promise<OrderApproval[]> {

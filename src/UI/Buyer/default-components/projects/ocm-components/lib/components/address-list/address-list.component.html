@@ -5,11 +5,11 @@
     <fa-icon [icon]="faPlus"></fa-icon> Add an Address
   </button>
 </div>
-<shared-generic-browse [items]="addresses?.Items"
-                       [meta]="addresses?.Meta"
-                       searchPlaceholder="addresses"
+<ocm-generic-list [meta]="addresses?.Meta"
+                       [searchPlaceholder]="'addresses'"
                        (requestOptionsUpdated)="updateRequestOptions($event)">
-  <ng-template let-address="item">
+  <div class="col-sm-12 col-lg-12 col-md-12 d-flex" 
+       *ngFor="let address of addresses?.Items">
     <ocm-address-card [address]="address">
       <div *ngIf="address.Editable">
         <fa-icon class="text-danger ml-3 icon-button--hover-reactive"
@@ -20,8 +20,8 @@
                  [icon]="faEdit"></fa-icon>
       </div>
     </ocm-address-card>
-  </ng-template>
-</shared-generic-browse>
+  </div>
+</ocm-generic-list>
 <ocm-modal [state]="addAddressModal"
            (closeEvent)="reset()"
            modalTitle="{{ currentAddress ? 'Edit' : 'Add'}} Address">

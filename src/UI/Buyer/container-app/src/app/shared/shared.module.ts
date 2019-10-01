@@ -33,7 +33,6 @@ import { AddressFormComponent } from 'src/app/shared/components/address-form/add
 
 // containers
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/shared/pipes/shipperTracking/shipperTracking.pipe';
-import { GenericBrowseComponent } from 'src/app/shared/components/generic-browse/generic-browse.component';
 import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
 import { PhoneInputDirective } from './directives/phone-input/phone-input.directive';
 
@@ -89,7 +88,6 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     AddressFormComponent,
     PhoneFormatPipe,
     PhoneInputDirective,
-    GenericBrowseComponent,
   ],
   declarations: [
     PaymentMethodDisplayPipe,
@@ -99,7 +97,6 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     PhoneFormatPipe,
     PhoneInputDirective,
     AddressFormComponent,
-    GenericBrowseComponent,
   ],
 })
 export class SharedModule {}

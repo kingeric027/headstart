@@ -31,7 +31,7 @@ export class CheckoutConfirmComponent implements OnInit {
     if (!this.anonEnabled) {
       this.form = new FormGroup({ comments: new FormControl('') });
     }
-    this.payments = await this.appPaymentService.getPayments('outgoing', this.order.ID);
+    this.payments = await this.appPaymentService.ListPaymentsOnOrder(this.order.ID);
   }
 
   async saveCommentsAndSubmitOrder() {

@@ -6,12 +6,11 @@
   </div>
   <ocm-modal [state]="spendingAccountModal"
              modalTitle="Select Spending Account">
-    <shared-generic-browse [items]="spendingAccounts.Items"
-                           [meta]="spendingAccounts.Meta"
-                           [numColumns]="1"
-                           searchPlaceholder="accounts"
-                           (requestOptionsUpdated)="updateRequestOptions($event)">
-      <ng-template let-account="item">
+    <ocm-generic-list [meta]="spendingAccounts.Meta"
+                      [searchPlaceholder]="'accounts'"
+                      (requestOptionsUpdated)="updateRequestOptions($event)">
+      <div *ngFor="let account of spendingAccounts.Items"
+           class="col-sm-12 col-lg-12 col-md-12 d-flex">
         <div class="border p-2 m-2 w-100 row">
           <div class="col-8">
             <div><strong>{{ account.Name }}</strong></div>
@@ -23,8 +22,8 @@
                (click)="accountSelected(account)">Select</a>
           </div>
         </div>
-      </ng-template>
-    </shared-generic-browse>
+      </div>
+    </ocm-generic-list>
   </ocm-modal>
   <button class="btn btn-primary mt-3"
           (click)="validateAndContinue()">Save and Continue</button>

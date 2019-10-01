@@ -10,15 +10,15 @@
 <ocm-modal [state]="addressModal"
            (closeEvent)="requestOptions = {}"
            modalTitle="Select Address">
-  <shared-generic-browse [items]="existingAddresses?.Items"
-                         [meta]="existingAddresses?.Meta"
-                         searchPlaceholder="addresses"
-                         (requestOptionsUpdated)="updateRequestOptions($event)">
-    <ng-template let-address="item">
+  <ocm-generic-list [meta]="existingAddresses?.Meta"
+                    [searchPlaceholder]="'addresses'"
+                    (requestOptionsUpdated)="updateRequestOptions($event)">
+    <div class="col-sm-12 col-lg-12 col-md-12 d-flex"
+         *ngFor="let address of existingAddresses?.Items">
       <ocm-address-card [address]="address">
         <a href="javascript:void(0)"
            (click)="existingAddressSelected(address)">Select</a>
       </ocm-address-card>
-    </ng-template>
-  </shared-generic-browse>
+    </div>
+  </ocm-generic-list>
 </ocm-modal>

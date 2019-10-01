@@ -1,6 +1,7 @@
-<ocm-search class="mt-1"
+<ocm-search *ngIf="meta && meta.TotalCount > 0"
+            class="mt-1"
             placeholderText="Search {{ searchPlaceholder }}..."
-            (searched)="requestOptionsUpdated.emit({ search: $event.detail, page: undefined })">
+            (searched)="requestOptionsUpdated.emit({ search: $event.detail || undefined, page: undefined })">
 </ocm-search>
 <div *ngIf="meta?.TotalPages > 1"
      class="my-2 row">
@@ -11,15 +12,11 @@
   </div>
 </div>
 <div class="my-3 row">
-  <div *ngFor="let item of items"
-       class="col-sm-12 d-flex"
-       [ngClass]="{'col-lg-6 col-md-6': numColumns === 2, 'col-lg-12 col-md-12': numColumns === 1 }">
-    <ng-template [ngTemplateOutlet]="itemTemplate"
-                 [ngTemplateOutletContext]="{ item: item }">
-    </ng-template>
+  <div *ngIf="meta && meta.TotalCount > 0">
+    <ng-content></ng-content>
   </div>
   <div class="card bg-light p-3 mx-4 w-100 text-center"
-       *ngIf="items && items.length === 0">
+       *ngIf="meta && meta.TotalCount === 0">
     <p class="mb-0">No {{ searchPlaceholder }} found</p>
   </div>
 </div>

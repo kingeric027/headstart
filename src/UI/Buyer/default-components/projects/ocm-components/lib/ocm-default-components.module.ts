@@ -52,6 +52,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
 import { OCMAddressList } from './components/address-list/address-list.component';
 import { TreeModule } from 'angular-tree-component';
 import { OCMCategoryTree } from './components/category-tree/category-tree.component';
+import { OCMGenericList } from './components/generic-list/generic-list.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -96,6 +97,7 @@ import { OCMCategoryTree } from './components/category-tree/category-tree.compon
     OCMMeUpdateComponent,
     OCMChangePasswordForm,
     OCMAddressList,
+    OCMGenericList
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -134,6 +136,7 @@ import { OCMCategoryTree } from './components/category-tree/category-tree.compon
     OCMMeUpdateComponent,
     OCMChangePasswordForm,
     OCMAddressList,
+    OCMGenericList
   ],
   imports: [
     CommonModule,
@@ -193,6 +196,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMMeUpdateComponent, 'ocm-profile-me-update');
     this.buildWebComponent(OCMChangePasswordForm, 'ocm-change-password');
     this.buildWebComponent(OCMAddressList, 'ocm-address-list');
+    this.buildWebComponent(OCMGenericList, 'ocm-generic-list');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
