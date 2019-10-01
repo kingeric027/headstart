@@ -4,16 +4,16 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 // 3rd party
 import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
 
-import { AppGeographyService } from 'src/app/shared/services/geography/geography.service';
 import { ValidateName, ValidateUSZip, ValidatePhone } from '../../validators/validators';
+import { OCMComponent } from '../base-component';
+import { GeographyConfig } from '../../config/geography.class';
 
 @Component({
-  selector: 'shared-address-form',
   templateUrl: './address-form.component.html',
   styleUrls: ['./address-form.component.scss'],
 })
-export class AddressFormComponent implements OnInit {
-  private _existingAddress: BuyerAddress;
+export class OMCAddressForm extends OCMComponent implements OnInit {
+  private ExistingAddress: BuyerAddress = {};
   @Input() btnText: string;
   @Output()
   formSubmitted = new EventEmitter<{ address: Address; formDirty: boolean }>();
@@ -21,8 +21,9 @@ export class AddressFormComponent implements OnInit {
   countryOptions: { label: string; abbreviation: string }[];
   addressForm: FormGroup;
 
-  constructor(private geographyService: AppGeographyService) {
-    this.countryOptions = this.geographyService.getCountries();
+  constructor() {
+    super();
+    this.countryOptions = GeographyConfig.getCountries();
   }
 
   ngOnInit() {
@@ -30,30 +31,30 @@ export class AddressFormComponent implements OnInit {
   }
 
   @Input() set existingAddress(address: BuyerAddress) {
-    this._existingAddress = address || {};
+    this.ExistingAddress = address || {};
     this.setForm();
     this.addressForm.markAsPristine();
   }
 
   setForm() {
     this.addressForm = new FormGroup({
-      FirstName: new FormControl(this._existingAddress.FirstName || '', [Validators.required, ValidateName]),
-      LastName: new FormControl(this._existingAddress.LastName || '', [Validators.required, ValidateName]),
-      Street1: new FormControl(this._existingAddress.Street1 || '', Validators.required),
-      Street2: new FormControl(this._existingAddress.Street2 || ''),
-      City: new FormControl(this._existingAddress.City || '', [Validators.required, ValidateName]),
-      State: new FormControl(this._existingAddress.State || null, Validators.required),
-      Zip: new FormControl(this._existingAddress.Zip || '', [Validators.required, ValidateUSZip]),
-      Phone: new FormControl(this._existingAddress.Phone || '', ValidatePhone),
-      Country: new FormControl(this._existingAddress.Country || 'US', Validators.required),
-      ID: new FormControl(this._existingAddress.ID || ''),
+      FirstName: new FormControl(this.ExistingAddress.FirstName || '', [Validators.required, ValidateName]),
+      LastName: new FormControl(this.ExistingAddress.LastName || '', [Validators.required, ValidateName]),
+      Street1: new FormControl(this.ExistingAddress.Street1 || '', Validators.required),
+      Street2: new FormControl(this.ExistingAddress.Street2 || ''),
+      City: new FormControl(this.ExistingAddress.City || '', [Validators.required, ValidateName]),
+      State: new FormControl(this.ExistingAddress.State || null, Validators.required),
+      Zip: new FormControl(this.ExistingAddress.Zip || '', [Validators.required, ValidateUSZip]),
+      Phone: new FormControl(this.ExistingAddress.Phone || '', ValidatePhone),
+      Country: new FormControl(this.ExistingAddress.Country || 'US', Validators.required),
+      ID: new FormControl(this.ExistingAddress.ID || ''),
     });
     this.onCountryChange();
   }
 
   onCountryChange(event?) {
     const country = this.addressForm.value.Country;
-    this.stateOptions = this.geographyService.getStates(country).map((s) => s.abbreviation);
+    this.stateOptions = GeographyConfig.getStates(country).map((s) => s.abbreviation);
     this.addressForm.get('Zip').setValidators([Validators.required, ValidateUSZip]);
     if (event) {
       this.addressForm.patchValue({ State: null, Zip: '' });

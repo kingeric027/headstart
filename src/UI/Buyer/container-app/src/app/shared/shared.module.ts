@@ -28,9 +28,6 @@ import { PaymentMethodDisplayPipe } from 'src/app/shared/pipes/payment-method-di
 // directives
 import { FallbackImageDirective } from './directives/fallback-image/fallback-image.directive';
 
-// components
-import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
-
 // containers
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/shared/pipes/shipperTracking/shipperTracking.pipe';
 import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
@@ -85,7 +82,6 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     FallbackImageDirective,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
-    AddressFormComponent,
     PhoneFormatPipe,
     PhoneInputDirective,
   ],
@@ -96,7 +92,6 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     ShipperTrackingSupportedPipe,
     PhoneFormatPipe,
     PhoneInputDirective,
-    AddressFormComponent,
   ],
 })
 export class SharedModule {}

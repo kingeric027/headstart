@@ -1,9 +1,8 @@
-import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OcMeService, ListBuyerAddress, OcOrderService, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from 'src/app/shared';
 import { ToastrService } from 'ngx-toastr';
-import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
 import { ModalState } from 'src/app/shared/models/modal-state.class';
 
 @Component({
@@ -14,7 +13,6 @@ import { ModalState } from 'src/app/shared/models/modal-state.class';
 export class CheckoutAddressComponent implements OnInit {
   @Input() isAnon: boolean;
   @Input() addressType: 'Shipping' | 'Billing';
-  @ViewChild(AddressFormComponent, { static: false }) addressFormComponent: AddressFormComponent;
   @Output() continue = new EventEmitter();
   addressModal = ModalState.Closed;
   existingAddresses: ListBuyerAddress;

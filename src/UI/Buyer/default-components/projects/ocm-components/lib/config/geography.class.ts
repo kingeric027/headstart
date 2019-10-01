@@ -1,11 +1,17 @@
-import { Injectable } from '@angular/core';
-import { StateDefinition, CountryDefinition } from 'src/app/shared/services/geography/geography.models';
+export interface CountryDefinition {
+  label: string;
+  abbreviation: string;
+}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AppGeographyService {
-  private states: StateDefinition[] = [
+export interface StateDefinition {
+  label: string;
+  abbreviation: string;
+  country: string;
+}
+
+// @dynamic
+export class GeographyConfig {
+  static states: StateDefinition[] = [
     { label: 'Alabama', abbreviation: 'AL', country: 'US' },
     { label: 'Alaska', abbreviation: 'AK', country: 'US' },
     { label: 'Arizona', abbreviation: 'AZ', country: 'US' },
@@ -95,11 +101,11 @@ export class AppGeographyService {
     { label: 'Yukon', abbreviation: 'YT', country: 'CA' },
   ];
 
-  getStates(countryCode): StateDefinition[] {
+  static getStates(countryCode): StateDefinition[] {
     return this.states.filter((state) => state.country === countryCode);
   }
 
-  getCountries(): CountryDefinition[] {
+  static getCountries(): CountryDefinition[] {
     return [{ label: 'United States of America', abbreviation: 'US' }, { label: 'Canada', abbreviation: 'CA' }];
   }
 }
