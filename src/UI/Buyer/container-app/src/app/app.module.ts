@@ -61,7 +61,7 @@ import { CookieModule } from 'ngx-cookie';
     CookieModule.forRoot(),
     NgProgressModule,
     NgProgressHttpModule,
-    OrderCloudModule.forRoot(OcSDKConfig),
+    OrderCloudModule.forRoot(() => OcSDKConfig),
     ToastrModule.forRoot(),
   ],
   providers: [
@@ -85,4 +85,6 @@ import { CookieModule } from 'ngx-cookie';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {}
+}

@@ -8,12 +8,8 @@ import { Field } from '../field.interface';
   template: `
     <div class="col-md-12">
       <div class="form-group" [formGroup]="group">
-        <label for="{{config.name}}">{{ config.label }}</label>
-        <select
-          [formControlName]="config.name"
-          class="form-control"
-          value="{{config.value}}"
-        >
+        <label for="{{ config.name }}">{{ config.label }}</label>
+        <select [formControlName]="config.name" class="form-control" value="{{ config.value }}">
           <option value=""></option>
           <option *ngFor="let option of config.options"> {{ option }} </option>
         </select>

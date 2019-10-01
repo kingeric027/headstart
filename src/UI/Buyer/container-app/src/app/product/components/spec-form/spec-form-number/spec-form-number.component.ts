@@ -18,20 +18,8 @@ import { spec_errors } from '../errors';
           [attr.placeholder]="config.placeholder"
           [formControlName]="config.name"
         />
-        <div
-          *ngIf="
-            byIndex(index).invalid &&
-            (byIndex(index).dirty || byIndex(index).touched)
-          "
-          alert="alert alert-danger"
-        >
-          <div
-            *ngIf="
-              byIndex(index).errors['required'] ||
-              byIndex(index).errors['min'] ||
-              byIndex(index).errors['max']
-            "
-          >
+        <div *ngIf="byIndex(index).invalid && (byIndex(index).dirty || byIndex(index).touched)" alert="alert alert-danger">
+          <div *ngIf="byIndex(index).errors['required'] || byIndex(index).errors['min'] || byIndex(index).errors['max']">
             {{ errorMsgs.id }}
           </div>
         </div>

@@ -9,30 +9,16 @@ import { Field } from '../field.interface';
     <div class="col-md-12" [formGroup]="group">
       <div class="form-input row">
         <div class="col-md-6" *ngIf="config.options.length === 1">
-          <input
-            type="number"
-            [attr.min]="config.min"
-            [attr.step]="config.step"
-            [formControlName]="config.name"
-            class="form-control"
-          />
+          <input type="number" [attr.min]="config.min" [attr.step]="config.step" [formControlName]="config.name" class="form-control" />
         </div>
         <div class="col-md-6" *ngIf="config.options.length > 1">
-          <select
-            [formControlName]="config.name"
-            class="form-control"
-            value="{{config.value}}"
-          >
+          <select [formControlName]="config.name" class="form-control" value="{{ config.value }}">
             <option value=""></option>
             <option *ngFor="let option of config.options">{{ option }}</option>
           </select>
         </div>
         <div class="col-md-6">
-          <button
-            type="submit"
-            class="btn btn-block btn-info"
-            [disabled]="!group.valid"
-          >
+          <button type="submit" class="btn btn-block btn-info" [disabled]="!group.valid">
             {{ config.label }}
           </button>
         </div>

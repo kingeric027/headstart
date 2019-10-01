@@ -83,4 +83,8 @@ export class PaymentSpendingAccountComponent implements OnInit {
     Object.assign(this.requestOptions, options);
     this.listSpendingAccounts().subscribe((x) => (this.spendingAccounts = x));
   }
+
+  openModal() {
+    this.spendingAccountModal = ModalState.Open;
+  }
 }

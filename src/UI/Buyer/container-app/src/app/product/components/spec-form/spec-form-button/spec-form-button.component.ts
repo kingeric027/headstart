@@ -8,11 +8,7 @@ import { Field } from '../field.interface';
   template: `
     <div class="form-group" [formGroup]="group">
       <div class="col-md-12">
-        <button
-          type="submit"
-          class="btn btn-block btn-info"
-          [disabled]="!group.valid"
-        >
+        <button type="submit" class="btn btn-block btn-info" [disabled]="!group.valid">
           <fa-icon [icon]="['fas', 'save']" size="md"></fa-icon>
           {{ config.label }}
         </button>
