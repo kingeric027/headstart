@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
-import { SpendingAccount, ListSpendingAccount, OcMeService, Payment, Order } from '@ordercloud/angular-sdk';
+import { SpendingAccount, ListSpendingAccount, Payment, Order } from '@ordercloud/angular-sdk';
 import * as moment from 'moment';
 import { ModalState } from 'src/app/shared/models/modal-state.class';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'checkout-payment-spending-account',
@@ -23,26 +23,21 @@ export class PaymentSpendingAccountComponent implements OnInit {
   resultsPerPage = 6;
   spendingAccountModal = ModalState.Closed;
 
-  constructor(private ocMeService: OcMeService) {}
+  constructor(private context: ShopperContextService) {}
 
-  ngOnInit() {
-    this.listSpendingAccounts().subscribe((accounts) => {
-      this.spendingAccounts = accounts;
-      this.selectedSpendingAccount = this.getSavedSpendingAccount(accounts);
-      if (!this.selectedSpendingAccount) {
-        this.spendingAccountModal = ModalState.Open;
-      }
-    });
+  async ngOnInit() {
+    this.spendingAccounts = await this.listSpendingAccounts();
+    this.selectedSpendingAccount = this.getSavedSpendingAccount(this.spendingAccounts);
+    if (!this.selectedSpendingAccount) {
+      this.spendingAccountModal = ModalState.Open;
+    }
   }
 
-  listSpendingAccounts(): Observable<ListSpendingAccount> {
+  async listSpendingAccounts(): Promise<ListSpendingAccount> {
     const now = moment().format('YYYY-MM-DD');
     const filters = { StartDate: `<${now}|!*`, EndDate: `>${now}|!*` };
-    return this.ocMeService.ListSpendingAccounts({
-      filters,
-      ...this.requestOptions,
-      pageSize: this.resultsPerPage,
-    });
+    const options = { filters, ...this.requestOptions, pageSize: this.resultsPerPage };
+    return await this.context.myResources.ListSpendingAccounts(options).toPromise();
   }
 
   getSavedSpendingAccount(accounts: ListSpendingAccount): SpendingAccount {
@@ -79,9 +74,9 @@ export class PaymentSpendingAccountComponent implements OnInit {
     this.continue.emit();
   }
 
-  updateRequestOptions(options: { search?: string; page?: number }) {
+  async updateRequestOptions(options: { search?: string; page?: number }) {
     Object.assign(this.requestOptions, options);
-    this.listSpendingAccounts().subscribe((x) => (this.spendingAccounts = x));
+    this.spendingAccounts = await this.listSpendingAccounts();
   }
 
   openModal() {

@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, OcMeService } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export interface IShopperContext {
@@ -8,6 +8,7 @@ export interface IShopperContext {
   currentOrder: ICurrentOrder;
   productFilterActions: IProductFilterActions;
   authentication: IAuthActions;
+  myResources: OcMeService;
   appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
 }
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { OcMeService, ListBuyerCreditCard, BuyerCreditCard, ListSpendingAccount } from '@ordercloud/angular-sdk';
+import { ListBuyerCreditCard, BuyerCreditCard, ListSpendingAccount } from '@ordercloud/angular-sdk';
 import { Observable } from 'rxjs';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { AuthorizeNetService } from 'src/app/shared';
@@ -7,6 +7,7 @@ import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
 import * as moment from 'moment';
 import { CreateCard } from 'shopper-context-interface';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'profile-payment-list',
@@ -24,7 +25,7 @@ export class PaymentListComponent implements OnInit {
   accounts$: Observable<ListSpendingAccount>;
   currentCard: BuyerCreditCard = null;
 
-  constructor(private ocMeService: OcMeService, private authorizeNetSerivce: AuthorizeNetService) {}
+  constructor(private context: ShopperContextService, private authorizeNetSerivce: AuthorizeNetService) {}
 
   ngOnInit() {
     this.getCards();
@@ -32,13 +33,13 @@ export class PaymentListComponent implements OnInit {
   }
 
   getCards() {
-    this.cards$ = this.ocMeService.ListCreditCards();
+    this.cards$ = this.context.myResources.ListCreditCards();
   }
 
   getAccounts() {
     const now = moment().format('YYYY-MM-DD');
     const dateFilter = { StartDate: `>${now}|!*`, EndDate: `<${now}|!*` };
-    this.accounts$ = this.ocMeService.ListSpendingAccounts({
+    this.accounts$ = this.context.myResources.ListSpendingAccounts({
       filters: dateFilter,
     });
   }

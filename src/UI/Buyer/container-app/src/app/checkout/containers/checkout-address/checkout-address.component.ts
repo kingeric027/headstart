@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { OcMeService, ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
+import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
 import { ModalState } from 'src/app/shared/models/modal-state.class';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
@@ -24,7 +24,7 @@ export class CheckoutAddressComponent implements OnInit {
   };
   usingShippingAsBilling = false;
 
-  constructor(private ocMeService: OcMeService, private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService) {}
 
   ngOnInit() {
     this.isAnon = this.context.currentUser.isAnonymous;
@@ -48,16 +48,11 @@ export class CheckoutAddressComponent implements OnInit {
     this.getSavedAddresses();
   }
 
-  private getSavedAddresses() {
+  private async getSavedAddresses() {
     const filters = {};
     filters[this.addressType] = true;
-    this.ocMeService
-      .ListAddresses({
-        filters,
-        ...this.requestOptions,
-        pageSize: this.resultsPerPage,
-      })
-      .subscribe((addressList) => (this.existingAddresses = addressList));
+    const options = { filters, ...this.requestOptions, pageSize: this.resultsPerPage };
+    this.existingAddresses = await this.context.myResources.ListAddresses(options).toPromise();
   }
 
   private setSelectedAddress() {

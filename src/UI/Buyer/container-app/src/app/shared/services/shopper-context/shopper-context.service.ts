@@ -7,6 +7,7 @@ import { RouteService } from '../route/route.service';
 import { ProductFilterService } from '../product-filter/product-filter.service';
 import { AuthService } from '../auth/auth.service';
 import { applicationConfiguration } from 'src/app/config/app.config';
+import { OcMeService } from '@ordercloud/angular-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,7 @@ export class ShopperContextService implements IShopperContext {
     public routeActions: RouteService,
     public productFilterActions: ProductFilterService,
     public authentication: AuthService,
+    public myResources: OcMeService,
     @Inject(applicationConfiguration) public appSettings: AppConfig
   ) {}
 }
