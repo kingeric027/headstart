@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export interface IShopperContext {
@@ -45,7 +45,7 @@ export interface ICurrentUser {
   favoriteOrderIDs: string[];
   isAnonymous: boolean;
   get(): MeUser;
-  patch(user: MeUser): void;
+  patch(user: MeUser): Promise<MeUser>;
   onUserChange(callback: (user: User) => void): void;
   onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void;
   onFavoriteProductsChange(callback: (productIDs: string[]) => void): void;
@@ -55,8 +55,14 @@ export interface ICurrentUser {
 }
 
 export interface ICurrentOrder {
-  order: Order;
   lineItems: ListLineItem;
+  get(): Order;
+  patch(order: Order): Promise<Order>; 
+  submit(): Promise<void>;
+  setBillingAddress(address: Address): Promise<Order>;
+  setShippingAddress(address: Address): Promise<Order>;
+  setBillingAddressByID(addressID: string): Promise<Order>;
+  setShippingAddressByID(addressID: string): Promise<Order>;
   onOrderChange(callback: (order: Order) => void): void;
   onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
 }

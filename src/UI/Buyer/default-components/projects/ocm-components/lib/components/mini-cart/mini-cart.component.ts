@@ -14,7 +14,7 @@ export class OCMMiniCart extends OCMComponent implements OnChanges {
   faEllipsisH = faEllipsisH;
 
   ngOnChanges() {
-    this.order = this.context.currentOrder.order;
+    this.order = this.context.currentOrder.get();
     this.lineItems = this.context.currentOrder.lineItems.Items;
   }
 

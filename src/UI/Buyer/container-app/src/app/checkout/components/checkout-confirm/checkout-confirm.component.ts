@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Order, ListPayment, ListLineItem, OcOrderService } from '@ordercloud/angular-sdk';
+import { Order, ListPayment, ListLineItem } from '@ordercloud/angular-sdk';
 import { AppPaymentService } from 'src/app/shared/services/app-payment/app-payment.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
@@ -20,13 +20,12 @@ export class CheckoutConfirmComponent implements OnInit {
 
   constructor(
     private appPaymentService: AppPaymentService,
-    private ocOrderService: OcOrderService,
     public context: ShopperContextService //used in template
   ) {}
 
   async ngOnInit() {
     this.anonEnabled = this.context.appSettings.anonymousShoppingEnabled;
-    this.order = this.context.currentOrder.order;
+    this.order = this.context.currentOrder.get();
     this.lineItems = this.context.currentOrder.lineItems;
     if (!this.anonEnabled) {
       this.form = new FormGroup({ comments: new FormControl('') });
@@ -40,8 +39,7 @@ export class CheckoutConfirmComponent implements OnInit {
     }
     this.isSubmittingOrder = true;
     const Comments = this.form.get('comments').value;
-    const order = await this.ocOrderService.Patch('outgoing', this.order.ID, { Comments }).toPromise();
-    this.context.currentOrder.order = order;
+    await this.context.currentOrder.patch({ Comments });
     this.continue.emit();
   }
 }

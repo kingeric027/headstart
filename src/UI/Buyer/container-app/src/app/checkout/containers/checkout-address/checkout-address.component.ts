@@ -1,8 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
-import { OcMeService, ListBuyerAddress, OcOrderService, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
+import { OcMeService, ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from 'src/app/shared';
-import { ToastrService } from 'ngx-toastr';
 import { ModalState } from 'src/app/shared/models/modal-state.class';
 
 @Component({
@@ -26,12 +24,7 @@ export class CheckoutAddressComponent implements OnInit {
   };
   usingShippingAsBilling = false;
 
-  constructor(
-    private ocMeService: OcMeService,
-    private ocOrderService: OcOrderService,
-    private currentOrder: CurrentOrderService,
-    private toastrService: ToastrService
-  ) {}
+  constructor(private ocMeService: OcMeService, private currentOrder: CurrentOrderService) {}
 
   ngOnInit() {
     if (!this.isAnon) {
@@ -67,7 +60,7 @@ export class CheckoutAddressComponent implements OnInit {
   }
 
   private setSelectedAddress() {
-    this.order = this.currentOrder.order;
+    this.order = this.currentOrder.get();
     this.lineItems = this.currentOrder.lineItems;
 
     this.selectedAddress = this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress; // shipping address is defined at the line item level
@@ -87,45 +80,38 @@ export class CheckoutAddressComponent implements OnInit {
     this.selectedAddress = this.lineItems.Items[0].ShippingAddress;
   }
 
-  saveAddress(address: Address, formDirty: boolean) {
-    let request = this.setSavedAddress(address);
-    if (
-      this.isAnon ||
-      formDirty ||
-      (this.usingShippingAsBilling && !this.order.ShippingAddressID) ||
-      (!address.ID || address.ID === '') //If this is not a saved address. Fix for issue 287
-    ) {
-      request = this.setOneTimeAddress(address);
+  async saveAddress(address: Address, formDirty: boolean) {
+    // TODO: make bellow line better
+    const setSavedAddress =
+      this.isAnon || formDirty || (this.usingShippingAsBilling && !this.order.ShippingAddressID) || (!address.ID || address.ID === '');
+    if (setSavedAddress) {
+      this.order = await this.setSavedAddress(address.ID);
+    } else {
+      this.order = await this.setOneTimeAddress(address);
     }
-    request.subscribe(
-      (order) => {
-        if (this.addressType === 'Shipping') {
-          this.lineItems.Items[0].ShippingAddress = address;
-          this.currentOrder.lineItems = this.lineItems;
-        }
-        this.order = order;
-        this.currentOrder.order = this.order;
-        this.continue.emit();
-      },
-      (ex) => {
-        if (ex.error.Errors[0].ErrorCode === 'NotFound') {
-          this.toastrService.error('You no longer have access to this saved address. Please enter or select a different one.');
-        }
-      }
-    );
+    if (this.addressType === 'Shipping') {
+      this.lineItems.Items[0].ShippingAddress = address;
+      this.currentOrder.lineItems = this.lineItems;
+    }
+    this.continue.emit();
   }
 
-  private setOneTimeAddress(address: BuyerAddress): Observable<Order> {
+  private async setOneTimeAddress(address: BuyerAddress): Promise<Order> {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     address.ID = null;
-    return this.ocOrderService[`Set${this.addressType}Address`]('outgoing', this.order.ID, address);
+    if (this.addressType === 'Shipping') {
+      return await this.currentOrder.setShippingAddress(address);
+    } else if (this.addressType === 'Billing') {
+      return await this.currentOrder.setBillingAddress(address);
+    }
   }
 
-  private setSavedAddress(address): Observable<Order> {
-    const addressKey = `${this.addressType}AddressID`;
-    const partialOrder = {};
-    partialOrder[addressKey] = address.ID;
-    return this.ocOrderService.Patch('outgoing', this.order.ID, partialOrder);
+  private async setSavedAddress(addressID: string): Promise<Order> {
+    if (this.addressType === 'Shipping') {
+      return await this.currentOrder.setShippingAddressByID(addressID);
+    } else if (this.addressType === 'Billing') {
+      return await this.currentOrder.setBillingAddressByID(addressID);
+    }
   }
 }

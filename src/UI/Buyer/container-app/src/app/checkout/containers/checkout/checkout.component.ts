@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { throwError } from 'rxjs';
-import { Order, OcOrderService } from '@ordercloud/angular-sdk';
+import { Order } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from 'src/app/shared';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
@@ -42,12 +41,7 @@ export class CheckoutComponent implements OnInit {
     },
   ];
 
-  constructor(
-    private currentUser: CurrentUserService,
-    private currentOrder: CurrentOrderService,
-    private ocOrderService: OcOrderService,
-    public context: ShopperContextService
-  ) {}
+  constructor(private currentUser: CurrentUserService, private currentOrder: CurrentOrderService, public context: ShopperContextService) {}
 
   ngOnInit() {
     this.currentOrder.onOrderChange((order) => (this.order = order));
@@ -73,19 +67,14 @@ export class CheckoutComponent implements OnInit {
 
   async submitOrder() {
     this.isSubmittingOrder = true;
-    const orderID = this.currentOrder.order.ID;
-    const order = await this.ocOrderService.Get('outgoing', orderID).toPromise();
-    if (order.IsSubmitted) {
-      return throwError({ message: 'Order has already been submitted' });
-    }
+    const orderID = this.currentOrder.get().ID;
     try {
-      await this.ocOrderService.Submit('outgoing', orderID).toPromise();
+      await this.context.currentOrder.submit();
     } catch (ex) {
       this.isSubmittingOrder = false;
       throw new Error(ex);
     }
     this.context.routeActions.toOrderConfirmation(orderID);
-    this.currentOrder.reset();
   }
 
   beforeChange($event) {

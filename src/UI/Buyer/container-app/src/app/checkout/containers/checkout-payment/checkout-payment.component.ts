@@ -14,7 +14,7 @@ export class CheckoutPaymentComponent implements OnInit {
   @Input() isAnon: boolean;
   @Output() continue = new EventEmitter();
 
-  readonly order = this.currentOrder.order;
+  readonly order = this.currentOrder.get();
   form: FormGroup;
   availablePaymentMethods = ['PurchaseOrder', 'SpendingAccount', 'CreditCard'];
   selectedPaymentMethod: string;
