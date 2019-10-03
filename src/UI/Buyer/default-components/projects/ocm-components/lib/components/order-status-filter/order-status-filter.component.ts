@@ -7,7 +7,7 @@ import { OrderStatus } from '../../models/order-status.model';
   templateUrl: './order-status-filter.component.html',
   styleUrls: ['./order-status-filter.component.scss'],
 })
-export class OCMOrderStatusFilter extends OCMComponent implements OnInit {
+export class OCMOrderStatusFilter implements OnInit {
   form: FormGroup;
   statuses: OrderStatus[];
   @Output() selectedStatus = new EventEmitter<OrderStatus>();

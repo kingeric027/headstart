@@ -2,13 +2,14 @@
 import { Injectable, Inject } from '@angular/core';
 
 // third party
-import { OcMeService, Order, OcOrderService, ListLineItem, OcLineItemService, Address } from '@ordercloud/angular-sdk';
+import { OcMeService, Order, OcOrderService, ListLineItem, OcLineItemService, Address, ListPayment } from '@ordercloud/angular-sdk';
 import { applicationConfiguration } from 'src/app/config/app.config';
 import { BehaviorSubject } from 'rxjs';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { listAll } from 'src/app/shared/functions/listAll';
 import { ICurrentOrder, AppConfig } from 'shopper-context-interface';
 import { ToastrService } from 'ngx-toastr';
+import { AppPaymentService } from '../app-payment/app-payment.service';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +29,7 @@ export class CurrentOrderService implements ICurrentOrder {
     private ocMeService: OcMeService,
     private currentUser: CurrentUserService,
     private toastrService: ToastrService,
+    private appPaymentService: AppPaymentService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
@@ -94,6 +96,10 @@ export class CurrentOrderService implements ICurrentOrder {
         this.toastrService.error('You no longer have access to this saved address. Please enter or select a different one.');
       }
     }
+  }
+
+  async listPayments(): Promise<ListPayment> {
+    return await this.appPaymentService.ListPaymentsOnOrder(this.order.ID);
   }
 
   async reset(): Promise<void> {

@@ -11,7 +11,7 @@ import { ProductFilters } from 'shopper-context-interface';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
-export class OCMProductList extends OCMComponent implements OnChanges {
+export class OCMProductList extends OCMComponent {
   @Input() products: ListBuyerProduct;
   @Input() categories: ListCategory;
   @Input() quantityLimits: QuantityLimits[];
@@ -22,7 +22,7 @@ export class OCMProductList extends OCMComponent implements OnChanges {
   showingFavoritesOnly = false;
   closeIcon = faTimes;
 
-  ngOnChanges() {
+  ngOnContextSet() {
     this.facets = this.products.Meta.Facets;
     this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
   }
@@ -30,7 +30,7 @@ export class OCMProductList extends OCMComponent implements OnChanges {
   private handleFiltersChange = async (filters: ProductFilters) => {
     this.showingFavoritesOnly = filters.showOnlyFavorites;
     this.categoryCrumbs = this.buildBreadCrumbs(filters.categoryID);
-  };
+  }
 
   clearAllFilters() {
     this.context.productFilterActions.clearAllFilters();

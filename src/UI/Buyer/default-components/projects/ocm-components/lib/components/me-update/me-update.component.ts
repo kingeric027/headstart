@@ -8,7 +8,7 @@ import { ValidateName, ValidateEmail, ValidatePhone } from '../../validators/val
   templateUrl: './me-update.component.html',
   styleUrls: ['./me-update.component.scss'],
 })
-export class OCMMeUpdateComponent extends OCMComponent implements OnInit, OnChanges {
+export class OCMMeUpdateComponent extends OCMComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
   alive = true;
@@ -17,7 +17,7 @@ export class OCMMeUpdateComponent extends OCMComponent implements OnInit, OnChan
     this.buildForm();
   }
 
-  ngOnChanges(): void {
+  ngOnContextSet(): void {
     this.context.currentUser.onUserChange(this.handleUserChange);
   }
 
@@ -31,7 +31,7 @@ export class OCMMeUpdateComponent extends OCMComponent implements OnInit, OnChan
       Phone: this.me.Phone,
       Email: this.me.Email,
     });
-  };
+  }
 
   private buildForm() {
     this.form = new FormGroup({

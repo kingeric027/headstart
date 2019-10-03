@@ -9,13 +9,13 @@ import { CategoryTreeNode } from '../../models/category-tree-node.class';
   templateUrl: './category-tree.component.html',
   styleUrls: ['./category-tree.component.scss'],
 })
-export class OCMCategoryTree extends OCMComponent implements OnChanges {
+export class OCMCategoryTree extends OCMComponent {
   @Input() categories: ListCategory;
   categoryTree: CategoryTreeNode[];
   treeOptions: ITreeOptions = this.buildTreeOptions();
   activeCategoryID: string;
 
-  ngOnChanges() {
+  ngOnContextSet() {
     if (!this.categoryTree) this.categoryTree = this.buildCategoryTree(this.categories.Items);
     this.context.productFilterActions.onFiltersChange((filters) => {
       this.activeCategoryID = filters.categoryID;

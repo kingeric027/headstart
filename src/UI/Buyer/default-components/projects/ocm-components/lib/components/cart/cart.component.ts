@@ -7,12 +7,12 @@ import { QuantityLimits } from '../../models/quantity-limits';
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss'],
 })
-export class OCMCart extends OCMComponent implements OnInit {
+export class OCMCart extends OCMComponent {
   @Input() quantityLimits: QuantityLimits[];
   @Input() order: Order;
   @Input() lineItems: ListLineItem;
 
-  ngOnInit() {}
+  ngOnContextSet() {}
 
   toProductList() {
     this.context.routeActions.toProductList();

@@ -28,6 +28,8 @@ export class OCMAddressList extends OCMComponent implements OnInit {
     this.reloadAddresses();
   }
 
+  ngOnContextSet() {}
+
   reset() {
     this.currentAddress = {};
   }

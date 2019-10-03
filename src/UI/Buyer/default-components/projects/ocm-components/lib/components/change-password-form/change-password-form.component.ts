@@ -19,6 +19,8 @@ export class OCMChangePasswordForm extends OCMComponent implements OnInit {
     this.setForm();
   }
 
+  ngOnContextSet() {}
+
   setForm() {
     this.form = new FormGroup({
       currentPassword: new FormControl('', Validators.required),

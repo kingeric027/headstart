@@ -10,17 +10,14 @@ import { FullSpecOption } from '../../models/full-spec-option.interface';
   templateUrl: './spec-form.component.html',
   styleUrls: ['./spec-form.component.scss'],
 })
-export class OCMSpecForm extends OCMComponent implements OnInit, OnChanges {
+export class OCMSpecForm implements OnChanges {
   @Input() specs: BuyerSpec[] = [];
   @Output() formUpdated = new EventEmitter<FullSpecOption[]>();
   specForm: FormGroup;
 
   constructor() {
-    super();
     this.specForm = new FormGroup({});
   }
-
-  ngOnInit() {}
 
   ngOnChanges() {
     if (!this.specs) return;

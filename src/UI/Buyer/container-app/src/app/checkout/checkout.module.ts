@@ -15,7 +15,6 @@ import { CheckoutPaymentComponent } from 'src/app/checkout/containers/checkout-p
 import { PaymentPurchaseOrderComponent } from 'src/app/checkout/components/payment-purchase-order/payment-purchase-order.component';
 import { PaymentSpendingAccountComponent } from 'src/app/checkout/components/payment-spending-account/payment-spending-account.component';
 import { OrderConfirmationComponent } from 'src/app/checkout/containers/order-confirmation/order-confirmation.component';
-import { CheckoutConfirmComponent } from 'src/app/checkout/components/checkout-confirm/checkout-confirm.component';
 import { CartWrapperComponent } from './containers/cart-wrapper/cart-wrapper.component';
 
 @NgModule({
@@ -28,7 +27,6 @@ import { CartWrapperComponent } from './containers/cart-wrapper/cart-wrapper.com
     PaymentPurchaseOrderComponent,
     PaymentSpendingAccountComponent,
     OrderConfirmationComponent,
-    CheckoutConfirmComponent,
     CartWrapperComponent,
   ],
 })

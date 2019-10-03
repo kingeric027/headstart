@@ -7,7 +7,7 @@ import { OrderStatus } from '../../models/order-status.model';
   templateUrl: './order-status-icon.component.html',
   styleUrls: ['./order-status-icon.component.scss'],
 })
-export class OCMOrderStatusIcon extends OCMComponent {
+export class OCMOrderStatusIcon {
   @Input() status: OrderStatus;
   faCircle = faCircle;
   faClock = faClock;

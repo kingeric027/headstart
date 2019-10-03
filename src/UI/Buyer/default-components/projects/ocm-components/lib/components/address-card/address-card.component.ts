@@ -1,12 +1,11 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { Address } from '@ordercloud/angular-sdk';
-import { OCMComponent } from '../base-component';
 
 @Component({
   templateUrl: './address-card.component.html',
   styleUrls: ['./address-card.component.scss'],
 })
-export class OCMAddressCard extends OCMComponent implements OnChanges {
+export class OCMAddressCard implements OnChanges {
   @Input() address: Address = {};
   @Input() addressTitle?: string;
 

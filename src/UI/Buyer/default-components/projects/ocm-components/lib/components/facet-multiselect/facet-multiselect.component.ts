@@ -9,7 +9,7 @@ import { ProductFilters } from 'shopper-context-interface';
   templateUrl: './facet-multiselect.component.html',
   styleUrls: ['./facet-multiselect.component.scss'],
 })
-export class OCMFacetMultiSelect extends OCMComponent implements OnChanges {
+export class OCMFacetMultiSelect extends OCMComponent {
   @Input() facet: ListFacet;
   checkboxArray: { facet: ListFacetValue; checked: boolean }[] = [];
   private activeFacetValues: string[] = [];
@@ -18,11 +18,8 @@ export class OCMFacetMultiSelect extends OCMComponent implements OnChanges {
   faPlusSquare = faPlusSquare;
   faMinusSquare = faMinusSquare;
 
-  ngOnChanges() {
-    if (!this.observersSet) {
-      this.observersSet = true;
+  ngOnContextSet() {
       this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
-    }
   }
 
   toggleCollapsed() {

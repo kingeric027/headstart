@@ -51,8 +51,7 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <checkout-address [isAnon]="isAnon"
-                                addressType="Shipping"
+              <checkout-address addressType="Shipping"
                                 (continue)="toSection('billingAddress')"></checkout-address>
             </ng-template>
           </ngb-panel>
@@ -64,8 +63,7 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <checkout-address [isAnon]="isAnon"
-                                addressType="Billing"
+              <checkout-address addressType="Billing"
                                 (continue)="toSection('payment')"></checkout-address>
             </ng-template>
           </ngb-panel>
@@ -77,8 +75,7 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <checkout-payment [isAnon]="isAnon"
-                                (continue)="toSection('confirm')"></checkout-payment>
+              <checkout-payment (continue)="toSection('confirm')"></checkout-payment>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="confirm">
@@ -86,8 +83,7 @@
               <a class="link-text"> Confirm </a>
             </ng-template>
             <ng-template ngbPanelContent>
-              <checkout-confirm (continue)="submitOrder()"
-                                [isSubmittingOrder]="isSubmittingOrder"></checkout-confirm>
+              <ocm-checkout-confirm [context]="context"></ocm-checkout-confirm>
             </ng-template>
           </ngb-panel>
         </ngb-accordion>

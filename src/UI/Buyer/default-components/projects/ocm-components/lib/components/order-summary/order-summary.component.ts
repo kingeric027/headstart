@@ -7,12 +7,8 @@ import { OCMComponent } from '../base-component';
   templateUrl: './order-summary.component.html',
   styleUrls: ['./order-summary.component.scss'],
 })
-export class OCMOrderSummary extends OCMComponent {
+export class OCMOrderSummary {
   @Input() order: Order;
-
-  constructor() {
-    super();
-  }
 
   display(field) {
     if (!(this.order.xp && this.order.xp.AddOnsCalculated)) {

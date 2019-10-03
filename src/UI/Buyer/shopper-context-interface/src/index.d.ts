@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export interface IShopperContext {
@@ -59,6 +59,7 @@ export interface ICurrentOrder {
   get(): Order;
   patch(order: Order): Promise<Order>; 
   submit(): Promise<void>;
+  listPayments(): Promise<ListPayment>; 
   setBillingAddress(address: Address): Promise<Order>;
   setShippingAddress(address: Address): Promise<Order>;
   setBillingAddressByID(addressID: string): Promise<Order>;

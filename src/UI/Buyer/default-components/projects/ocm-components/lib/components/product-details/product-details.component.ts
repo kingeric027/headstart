@@ -10,7 +10,7 @@ import { FullSpecOption } from '../../models/full-spec-option.interface';
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
 })
-export class OCMProductDetails extends OCMComponent implements OnChanges, AfterViewChecked {
+export class OCMProductDetails extends OCMComponent implements AfterViewChecked {
   @Input() specs: ListSpec;
   @Input() product: BuyerProduct;
   @Input() quantityLimits: QuantityLimits;
@@ -28,8 +28,7 @@ export class OCMProductDetails extends OCMComponent implements OnChanges, AfterV
     super();
   }
 
-  ngOnChanges() {
-    if (!this.product) return;
+  ngOnContextSet() {
     // products without a price schedule are view-only.
     this.isOrderable = !!this.product.PriceSchedule;
     // free products dont need to display a price.

@@ -6,6 +6,6 @@ import { OCMComponent } from '../base-component';
   templateUrl: './payment-list.component.html',
   styleUrls: ['./payment-list.component.scss'],
 })
-export class OCMPaymentList extends OCMComponent {
+export class OCMPaymentList {
   @Input() payments: ListPayment;
 }

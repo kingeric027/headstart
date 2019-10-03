@@ -1,7 +1,7 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { OcPaymentService, Payment, PartialPayment } from '@ordercloud/angular-sdk';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { OcPaymentService, Payment, PartialPayment, Order } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
-import { CurrentOrderService } from 'src/app/shared';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'checkout-payment',
@@ -9,18 +9,19 @@ import { CurrentOrderService } from 'src/app/shared';
   styleUrls: ['./checkout-payment.component.scss'],
 })
 export class CheckoutPaymentComponent implements OnInit {
-  constructor(private currentOrder: CurrentOrderService, private ocPaymentService: OcPaymentService) {}
-
-  @Input() isAnon: boolean;
+  constructor(private ocPaymentService: OcPaymentService, private context: ShopperContextService) {}
   @Output() continue = new EventEmitter();
 
-  readonly order = this.currentOrder.get();
+  order: Order;
+  isAnon: boolean;
   form: FormGroup;
   availablePaymentMethods = ['PurchaseOrder', 'SpendingAccount', 'CreditCard'];
   selectedPaymentMethod: string;
   existingPayment: Payment;
 
   async ngOnInit() {
+    this.order = this.context.currentOrder.get();
+    this.isAnon = this.context.currentUser.isAnonymous;
     this.form = new FormGroup({
       selectedPaymentMethod: new FormControl({ value: '', disabled: this.availablePaymentMethods.length === 1 }),
     });

@@ -7,7 +7,7 @@ import { OCMComponent } from '../base-component';
   templateUrl: './image-gallery.component.html',
   styleUrls: ['./image-gallery.component.scss'],
 })
-export class OCMImageGallery extends OCMComponent implements OnInit {
+export class OCMImageGallery implements OnInit {
   @Input() imgUrls: string[] = [];
 
   // gallerySize can be changed and the component logic + behavior will all work. However, the UI may look wonky.
@@ -20,9 +20,9 @@ export class OCMImageGallery extends OCMComponent implements OnInit {
   isResponsiveView: boolean;
 
   constructor() {
-    super();
     this.onResize();
   }
+
   ngOnInit() {
     fromEvent(window, 'resize').subscribe(() => this.onResize());
   }

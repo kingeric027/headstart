@@ -8,7 +8,7 @@ import { OCMComponent } from '../base-component';
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })
-export class OCMSearch extends OCMComponent implements OnInit, OnChanges, OnDestroy {
+export class OCMSearch implements OnInit, OnChanges, OnDestroy {
   alive = true;
   @Input() placeholderText?: string;
   @Input() searchTermInput?: string;

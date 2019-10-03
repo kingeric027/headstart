@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { OcMeService, ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
-import { CurrentOrderService } from 'src/app/shared';
 import { ModalState } from 'src/app/shared/models/modal-state.class';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'checkout-address',
@@ -9,9 +9,9 @@ import { ModalState } from 'src/app/shared/models/modal-state.class';
   styleUrls: ['./checkout-address.component.scss'],
 })
 export class CheckoutAddressComponent implements OnInit {
-  @Input() isAnon: boolean;
   @Input() addressType: 'Shipping' | 'Billing';
   @Output() continue = new EventEmitter();
+  isAnon: boolean;
   addressModal = ModalState.Closed;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
@@ -24,9 +24,10 @@ export class CheckoutAddressComponent implements OnInit {
   };
   usingShippingAsBilling = false;
 
-  constructor(private ocMeService: OcMeService, private currentOrder: CurrentOrderService) {}
+  constructor(private ocMeService: OcMeService, private context: ShopperContextService) {}
 
   ngOnInit() {
+    this.isAnon = this.context.currentUser.isAnonymous;
     if (!this.isAnon) {
       this.getSavedAddresses();
     }
@@ -60,8 +61,8 @@ export class CheckoutAddressComponent implements OnInit {
   }
 
   private setSelectedAddress() {
-    this.order = this.currentOrder.get();
-    this.lineItems = this.currentOrder.lineItems;
+    this.order = this.context.currentOrder.get();
+    this.lineItems = this.context.currentOrder.lineItems;
 
     this.selectedAddress = this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress; // shipping address is defined at the line item level
   }
@@ -82,16 +83,16 @@ export class CheckoutAddressComponent implements OnInit {
 
   async saveAddress(address: Address, formDirty: boolean) {
     // TODO: make bellow line better
-    const setSavedAddress =
-      this.isAnon || formDirty || (this.usingShippingAsBilling && !this.order.ShippingAddressID) || (!address.ID || address.ID === '');
-    if (setSavedAddress) {
-      this.order = await this.setSavedAddress(address.ID);
-    } else {
+    const setOneTimeAddress =
+      this.isAnon || formDirty || (this.usingShippingAsBilling && !this.order.ShippingAddressID) || !address.ID || address.ID === '';
+    if (setOneTimeAddress) {
       this.order = await this.setOneTimeAddress(address);
+    } else {
+      this.order = await this.setSavedAddress(address.ID);
     }
     if (this.addressType === 'Shipping') {
       this.lineItems.Items[0].ShippingAddress = address;
-      this.currentOrder.lineItems = this.lineItems;
+      this.context.currentOrder.lineItems = this.lineItems;
     }
     this.continue.emit();
   }
@@ -101,17 +102,17 @@ export class CheckoutAddressComponent implements OnInit {
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     address.ID = null;
     if (this.addressType === 'Shipping') {
-      return await this.currentOrder.setShippingAddress(address);
+      return await this.context.currentOrder.setShippingAddress(address);
     } else if (this.addressType === 'Billing') {
-      return await this.currentOrder.setBillingAddress(address);
+      return await this.context.currentOrder.setBillingAddress(address);
     }
   }
 
   private async setSavedAddress(addressID: string): Promise<Order> {
     if (this.addressType === 'Shipping') {
-      return await this.currentOrder.setShippingAddressByID(addressID);
+      return await this.context.currentOrder.setShippingAddressByID(addressID);
     } else if (this.addressType === 'Billing') {
-      return await this.currentOrder.setBillingAddressByID(addressID);
+      return await this.context.currentOrder.setBillingAddressByID(addressID);
     }
   }
 }

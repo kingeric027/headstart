@@ -15,7 +15,6 @@ export class CheckoutComponent implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
   order: Order;
   isAnon: boolean;
-  isSubmittingOrder = false;
   currentPanel: string;
   faCheck = faCheck;
   sections: any = [
@@ -63,18 +62,6 @@ export class CheckoutComponent implements OnInit {
     const prev = this.sections[prevIdx].id;
     this.setValidation(prev, true);
     this.accordian.toggle(id);
-  }
-
-  async submitOrder() {
-    this.isSubmittingOrder = true;
-    const orderID = this.currentOrder.get().ID;
-    try {
-      await this.context.currentOrder.submit();
-    } catch (ex) {
-      this.isSubmittingOrder = false;
-      throw new Error(ex);
-    }
-    this.context.routeActions.toOrderConfirmation(orderID);
   }
 
   beforeChange($event) {

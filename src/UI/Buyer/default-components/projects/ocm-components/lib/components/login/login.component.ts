@@ -7,7 +7,7 @@ import { OCMComponent } from '../base-component';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class OCMLogin extends OCMComponent implements OnInit, OnChanges {
+export class OCMLogin extends OCMComponent implements OnInit {
   form: FormGroup;
   isAnon: boolean;
   appName: string;
@@ -20,7 +20,7 @@ export class OCMLogin extends OCMComponent implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges() {
+  ngOnContextSet() {
     this.appName = this.context.appSettings.appname;
     this.isAnon = this.context.currentUser.isAnonymous;
   }

@@ -8,7 +8,7 @@ import { OCMComponent } from '../base-component';
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
 })
-export class OCMForgotPassword extends OCMComponent implements OnInit, OnChanges {
+export class OCMForgotPassword extends OCMComponent implements OnInit {
   form: FormGroup;
   appName: string;
 
@@ -16,7 +16,7 @@ export class OCMForgotPassword extends OCMComponent implements OnInit, OnChanges
     this.form = new FormGroup({ email: new FormControl('') });
   }
 
-  ngOnChanges() {
+  ngOnContextSet() {
     this.appName = this.context.appSettings.appname;
   }
 

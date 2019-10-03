@@ -5,14 +5,13 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
 
 import { ValidateName, ValidateUSZip, ValidatePhone } from '../../validators/validators';
-import { OCMComponent } from '../base-component';
 import { GeographyConfig } from '../../config/geography.class';
 
 @Component({
   templateUrl: './address-form.component.html',
   styleUrls: ['./address-form.component.scss'],
 })
-export class OMCAddressForm extends OCMComponent implements OnInit {
+export class OMCAddressForm implements OnInit {
   private ExistingAddress: BuyerAddress = {};
   @Input() btnText: string;
   @Output()
@@ -22,7 +21,6 @@ export class OMCAddressForm extends OCMComponent implements OnInit {
   addressForm: FormGroup;
 
   constructor() {
-    super();
     this.countryOptions = GeographyConfig.getCountries();
   }
 
