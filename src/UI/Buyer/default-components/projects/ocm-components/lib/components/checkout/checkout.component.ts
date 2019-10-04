@@ -1,17 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Order } from '@ordercloud/angular-sdk';
-import { CurrentOrderService } from 'src/app/shared';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
-import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
-import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { OCMComponent } from '../base-component';
 
 @Component({
-  selector: 'ocm-checkout',
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],
 })
-export class OCMCheckout implements OnInit {
+export class OCMCheckout extends OCMComponent {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
   order: Order;
   isAnon: boolean;
@@ -40,11 +37,9 @@ export class OCMCheckout implements OnInit {
     },
   ];
 
-  constructor(private currentUser: CurrentUserService, private currentOrder: CurrentOrderService, public context: ShopperContextService) {}
-
-  ngOnInit() {
-    this.currentOrder.onOrderChange((order) => (this.order = order));
-    this.isAnon = this.currentUser.isAnonymous;
+  ngOnContextSet() {
+    this.context.currentOrder.onOrderChange((order) => (this.order = order));
+    this.isAnon = this.context.currentUser.isAnonymous;
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
     this.setValidation('login', !this.isAnon);
   }

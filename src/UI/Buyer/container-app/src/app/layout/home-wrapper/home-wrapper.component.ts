@@ -6,9 +6,9 @@ import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
-  selector: 'home-page-wrapper',
-  templateUrl: './home-wrapper.component.html',
-  styleUrls: ['./home-wrapper.component.scss'],
+  template: `
+    <ocm-home-page [featuredProducts]="featuredProducts.Items" [quantityLimits]="quantityLimits" [context]="context"></ocm-home-page>
+  `,
 })
 export class HomePageWrapperComponent implements OnInit {
   featuredProducts: ListBuyerProduct;

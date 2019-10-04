@@ -35,23 +35,13 @@ export class OCMPaymentPurchaseOrder extends OCMComponent implements OnInit, OnC
       if (changes.payment.firstChange) {
         this.form.setValue( { PONumber: this.getPONumber(this.payment) });
       }
-
-      // validate payment
-      if (!this.paymentValid()) {
-        this.createNewPayment();
-      }
     }
   }
 
-  createNewPayment() {
-    const PONumber = this.getPONumber(this.payment);
-    this.payment = { Type: 'PurchaseOrder', xp: { PONumber } };
-    this.context.currentOrder.createPayment(this.payment);
-  }
-
-  updatePONumber() {}
-
-  validateAndContinue() {
+  async saveAndContinue() {
+    const PONumber = this.form.value.PONumber;
+    this.payment = { Type: 'PurchaseOrder', Amount: this.order.Total, xp: { PONumber } };
+    await this.context.currentOrder.createPayment(this.payment);
     if (this.paymentValid()) {
       this.continue.emit();
     }

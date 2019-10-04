@@ -6,9 +6,14 @@ import { BuildQtyLimits } from 'src/app/shared';
 import { QuantityLimits } from 'src/app/shared/models/quantity-limits';
 
 @Component({
-  selector: 'product-list-wrapper',
-  templateUrl: './product-list-wrapper.component.html',
-  styleUrls: ['./product-list-wrapper.component.scss'],
+  template: `
+    <ocm-product-list
+      [products]="products"
+      [categories]="categories"
+      [quantityLimits]="quantityLimits"
+      [context]="context"
+    ></ocm-product-list>
+  `,
 })
 export class ProductListWrapperComponent implements OnInit {
   products: ListBuyerProduct;

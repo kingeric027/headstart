@@ -4,9 +4,9 @@ import { ListAddress } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'profile-address-list-wrapper',
-  templateUrl: './address-list-wrapper.component.html',
-  styleUrls: ['./address-list-wrapper.component.scss'],
+  template: `
+    <ocm-address-list [addresses]="addresses" [context]="context"></ocm-address-list>
+  `,
 })
 export class MeAddressListWrapperComponent implements OnInit {
   addresses: ListAddress;

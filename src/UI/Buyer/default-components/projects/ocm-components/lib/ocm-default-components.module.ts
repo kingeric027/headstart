@@ -22,6 +22,7 @@ import {
   NgbPopoverModule,
   NgbDropdownModule,
   NgbDatepickerModule,
+  NgbAccordionModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { OCMProductSort } from './components/sort-products/sort-products.component';
 import { OCMFacetMultiSelect } from './components/facet-multiselect/facet-multiselect.component';
@@ -60,6 +61,7 @@ import { OCMPaymentPurchaseOrder } from './components/payment-purchase-order/pay
 import { OCMCheckoutAddress } from './components/checkout-address/checkout-address.component';
 import { OCMCheckoutPayment } from './components/checkout-payment/checkout-payment.component';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
+import { OCMCheckout } from './components/checkout/checkout.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -111,7 +113,8 @@ import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
     OCMPaymentPurchaseOrder,
     OCMPaymentSpendingAccount,
     OCMCheckoutAddress,
-    OCMCheckoutPayment
+    OCMCheckoutPayment,
+    OCMCheckout
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -156,7 +159,8 @@ import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
     OCMPaymentPurchaseOrder,
     OCMPaymentSpendingAccount,
     OCMCheckoutAddress,
-    OCMCheckoutPayment
+    OCMCheckoutPayment,
+    OCMCheckout
   ],
   imports: [
     CommonModule,
@@ -171,6 +175,7 @@ import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
     NgbPopoverModule,
     NgbDropdownModule,
     NgbDatepickerModule,
+    NgbAccordionModule,
   ],
   providers: [
     DatePipe, // allows us to use in class as injectable (date filter component)
@@ -225,6 +230,7 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMPaymentPurchaseOrder, 'ocm-payment-purchase-order');
     this.buildWebComponent(OCMCheckoutAddress, 'ocm-checkout-address');
     this.buildWebComponent(OCMCheckoutPayment, 'ocm-checkout-payment');
+    this.buildWebComponent(OCMCheckout, 'ocm-checkout');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

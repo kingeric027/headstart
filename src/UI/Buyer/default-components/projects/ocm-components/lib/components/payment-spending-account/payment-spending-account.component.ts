@@ -24,7 +24,6 @@ export class OCMPaymentSpendingAccount extends OCMComponent {
 
   async ngOnContextSet() {
     this.order = this.context.currentOrder.get();
-    debugger;
     this.spendingAccounts = await this.listSpendingAccounts();
     this.selectedSpendingAccount = this.getSavedSpendingAccount(this.spendingAccounts);
     if (!this.selectedSpendingAccount) {
