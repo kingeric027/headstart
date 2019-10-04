@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
 import { OCMComponent } from '../base-component';
 import { ModalState } from '../../models/modal-state.class';
@@ -7,7 +7,7 @@ import { ModalState } from '../../models/modal-state.class';
   templateUrl: './checkout-address.component.html',
   styleUrls: ['./checkout-address.component.scss'],
 })
-export class OCMCheckoutAddress extends OCMComponent {
+export class OCMCheckoutAddress extends OCMComponent implements OnChanges {
   @Input() addressType: 'Shipping' | 'Billing';
   @Output() continue = new EventEmitter();
   isAnon: boolean;
@@ -25,11 +25,17 @@ export class OCMCheckoutAddress extends OCMComponent {
 
   ngOnContextSet() {
     this.isAnon = this.context.currentUser.isAnonymous;
+    this.order = this.context.currentOrder.get();
+    this.lineItems = this.context.currentOrder.lineItems;
+
+  }
+
+  ngOnChanges() {
     if (!this.isAnon) {
       this.getSavedAddresses();
     }
-
-    this.setSelectedAddress();
+    // shipping address is defined at the line item level
+    this.selectedAddress = this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress;
   }
 
   clearRequestOptions() {
@@ -50,13 +56,6 @@ export class OCMCheckoutAddress extends OCMComponent {
     filters[this.addressType] = true;
     const options = { filters, ...this.requestOptions, pageSize: this.resultsPerPage };
     this.existingAddresses = await this.context.myResources.ListAddresses(options).toPromise();
-  }
-
-  private setSelectedAddress() {
-    this.order = this.context.currentOrder.get();
-    this.lineItems = this.context.currentOrder.lineItems;
-    // shipping address is defined at the line item level
-    this.selectedAddress = this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress; 
   }
 
   existingAddressSelected(address: BuyerAddress) {

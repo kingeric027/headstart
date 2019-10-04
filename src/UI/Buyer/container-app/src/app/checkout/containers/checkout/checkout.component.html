@@ -52,7 +52,7 @@
             </ng-template>
             <ng-template ngbPanelContent>
               <ocm-checkout-address [context]="context"
-                                    addressType="Shipping"
+                                    [addressType]="'Shipping'"
                                     (continue)="toSection('billingAddress')"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
@@ -65,7 +65,7 @@
             </ng-template>
             <ng-template ngbPanelContent>
               <ocm-checkout-address [context]="context"
-                                    addressType="Billing"
+                                    [addressType]="'Billing'"
                                     (continue)="toSection('payment')"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>

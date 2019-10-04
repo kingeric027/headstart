@@ -10,6 +10,7 @@ export class BaseResolve implements Resolve<any> {
   constructor(private currentOrder: CurrentOrderService, private currentUser: CurrentUserService) {}
 
   resolve() {
+    debugger;
     this.currentUser.reset();
     this.currentOrder.reset();
   }
