@@ -51,8 +51,9 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <checkout-address addressType="Shipping"
-                                (continue)="toSection('billingAddress')"></checkout-address>
+              <ocm-checkout-address [context]="context"
+                                    addressType="Shipping"
+                                    (continue)="toSection('billingAddress')"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="billingAddress">
@@ -63,8 +64,9 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <checkout-address addressType="Billing"
-                                (continue)="toSection('payment')"></checkout-address>
+              <ocm-checkout-address [context]="context"
+                                    addressType="Billing"
+                                    (continue)="toSection('payment')"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="payment">
@@ -75,7 +77,8 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <checkout-payment (continue)="toSection('confirm')"></checkout-payment>
+              <ocm-checkout-payment [context]="context"
+                                    (continue)="toSection('confirm')"></ocm-checkout-payment>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="confirm">

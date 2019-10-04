@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, OcMeService } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, OcMeService, Payment } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export interface IShopperContext {
@@ -8,7 +8,7 @@ export interface IShopperContext {
   currentOrder: ICurrentOrder;
   productFilterActions: IProductFilterActions;
   authentication: IAuthActions;
-  myResources: OcMeService;
+  myResources: OcMeService; // TODO - create our own, more limited interface here. Me.Patch(), for example, should not be allowed since it should always go through the current user service.
   appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
 }
 
@@ -61,6 +61,7 @@ export interface ICurrentOrder {
   patch(order: Order): Promise<Order>; 
   submit(): Promise<void>;
   listPayments(): Promise<ListPayment>; 
+  createPayment(payment: Payment): Promise<Payment>;
   setBillingAddress(address: Address): Promise<Order>;
   setShippingAddress(address: Address): Promise<Order>;
   setBillingAddressByID(addressID: string): Promise<Order>;

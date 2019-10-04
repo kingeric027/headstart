@@ -1,14 +1,13 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
-import { ModalState } from 'src/app/shared/models/modal-state.class';
-import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { OCMComponent } from '../base-component';
+import { ModalState } from '../../models/modal-state.class';
 
 @Component({
-  selector: 'checkout-address',
   templateUrl: './checkout-address.component.html',
   styleUrls: ['./checkout-address.component.scss'],
 })
-export class CheckoutAddressComponent implements OnInit {
+export class OCMCheckoutAddress extends OCMComponent {
   @Input() addressType: 'Shipping' | 'Billing';
   @Output() continue = new EventEmitter();
   isAnon: boolean;
@@ -24,9 +23,7 @@ export class CheckoutAddressComponent implements OnInit {
   };
   usingShippingAsBilling = false;
 
-  constructor(private context: ShopperContextService) {}
-
-  ngOnInit() {
+  ngOnContextSet() {
     this.isAnon = this.context.currentUser.isAnonymous;
     if (!this.isAnon) {
       this.getSavedAddresses();
@@ -58,8 +55,8 @@ export class CheckoutAddressComponent implements OnInit {
   private setSelectedAddress() {
     this.order = this.context.currentOrder.get();
     this.lineItems = this.context.currentOrder.lineItems;
-
-    this.selectedAddress = this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress; // shipping address is defined at the line item level
+    // shipping address is defined at the line item level
+    this.selectedAddress = this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress; 
   }
 
   existingAddressSelected(address: BuyerAddress) {

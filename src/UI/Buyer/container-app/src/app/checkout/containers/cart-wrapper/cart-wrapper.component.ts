@@ -5,9 +5,9 @@ import { BuildQtyLimits, CurrentOrderService } from 'src/app/shared';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
-  selector: 'cart-wrapper',
-  templateUrl: './cart-wrapper.component.html',
-  styleUrls: ['./cart-wrapper.component.scss'],
+  template: `
+    <ocm-cart [order]="order" [lineItems]="lineItems" [context]="context" [quantityLimits]="quantityLimits"></ocm-cart>
+  `,
 })
 export class CartWrapperComponent implements OnInit {
   order: Order;

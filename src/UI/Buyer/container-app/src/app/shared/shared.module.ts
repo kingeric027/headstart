@@ -22,12 +22,6 @@ import {
   NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
-// pipes
-import { PaymentMethodDisplayPipe } from 'src/app/shared/pipes/payment-method-display/payment-method-display.pipe';
-
-// directives
-import { FallbackImageDirective } from './directives/fallback-image/fallback-image.directive';
-
 // containers
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/shared/pipes/shipperTracking/shipperTracking.pipe';
 import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
@@ -78,20 +72,11 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     NgbAccordionModule,
     NgbCarouselModule,
     NgbDropdownModule,
-    PaymentMethodDisplayPipe,
-    FallbackImageDirective,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
     PhoneFormatPipe,
     PhoneInputDirective,
   ],
-  declarations: [
-    PaymentMethodDisplayPipe,
-    FallbackImageDirective,
-    ShipperTrackingPipe,
-    ShipperTrackingSupportedPipe,
-    PhoneFormatPipe,
-    PhoneInputDirective,
-  ],
+  declarations: [ShipperTrackingPipe, ShipperTrackingSupportedPipe, PhoneFormatPipe, PhoneInputDirective],
 })
 export class SharedModule {}

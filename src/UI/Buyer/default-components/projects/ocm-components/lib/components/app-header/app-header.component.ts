@@ -8,7 +8,6 @@ import { OCMComponent } from '../base-component';
 import { ProductFilters } from 'shopper-context-interface';
 
 @Component({
-  selector: 'ocm-app-header',
   templateUrl: './app-header.component.html',
   styleUrls: ['./app-header.component.scss'],
 })

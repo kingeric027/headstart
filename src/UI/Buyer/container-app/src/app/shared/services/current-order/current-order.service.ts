@@ -2,7 +2,17 @@
 import { Injectable, Inject } from '@angular/core';
 
 // third party
-import { OcMeService, Order, OcOrderService, ListLineItem, OcLineItemService, Address, ListPayment } from '@ordercloud/angular-sdk';
+import {
+  OcMeService,
+  Order,
+  OcOrderService,
+  ListLineItem,
+  OcLineItemService,
+  Address,
+  ListPayment,
+  Payment,
+  OcPaymentService,
+} from '@ordercloud/angular-sdk';
 import { applicationConfiguration } from 'src/app/config/app.config';
 import { BehaviorSubject } from 'rxjs';
 import { CurrentUserService } from '../current-user/current-user.service';
@@ -28,6 +38,7 @@ export class CurrentOrderService implements ICurrentOrder {
     private ocOrderService: OcOrderService,
     private ocMeService: OcMeService,
     private currentUser: CurrentUserService,
+    private ocPaymentService: OcPaymentService,
     private toastrService: ToastrService,
     private appPaymentService: AppPaymentService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
@@ -100,6 +111,17 @@ export class CurrentOrderService implements ICurrentOrder {
 
   async listPayments(): Promise<ListPayment> {
     return await this.appPaymentService.ListPaymentsOnOrder(this.order.ID);
+  }
+
+  async createPayment(payment: Payment): Promise<Payment> {
+    await this.deleteExistingPayments(); // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
+    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
+  }
+
+  private async deleteExistingPayments(): Promise<any[]> {
+    const payments = await this.ocPaymentService.List('outgoing', this.order.ID).toPromise();
+    const deleteAll = payments.Items.map((payment) => this.ocPaymentService.Delete('outgoing', this.order.ID, payment.ID).toPromise());
+    return Promise.all(deleteAll);
   }
 
   async reset(): Promise<void> {

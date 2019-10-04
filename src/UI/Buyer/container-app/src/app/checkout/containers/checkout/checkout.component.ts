@@ -7,11 +7,11 @@ import { CurrentUserService } from 'src/app/shared/services/current-user/current
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
-  selector: 'checkout-checkout',
+  selector: 'ocm-checkout',
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],
 })
-export class CheckoutComponent implements OnInit {
+export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
   order: Order;
   isAnon: boolean;

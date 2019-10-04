@@ -1,18 +1,17 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { SpendingAccount, ListSpendingAccount, Payment, Order } from '@ordercloud/angular-sdk';
-import * as moment from 'moment';
-import { ModalState } from 'src/app/shared/models/modal-state.class';
-import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import * as moment_ from 'moment';
+const moment = moment_;
+import { ModalState } from '../../models/modal-state.class';
+import { OCMComponent } from '../base-component';
 
 @Component({
-  selector: 'checkout-payment-spending-account',
   templateUrl: './payment-spending-account.component.html',
   styleUrls: ['./payment-spending-account.component.scss'],
 })
-export class PaymentSpendingAccountComponent implements OnInit {
-  @Input() order: Order;
+export class OCMPaymentSpendingAccount extends OCMComponent {
+  order: Order;
   @Input() payment: Payment;
-  @Output() paymentCreated = new EventEmitter<Payment>();
   @Output() continue = new EventEmitter();
   spendingAccounts: ListSpendingAccount;
   selectedSpendingAccount: SpendingAccount = null;
@@ -23,9 +22,9 @@ export class PaymentSpendingAccountComponent implements OnInit {
   resultsPerPage = 6;
   spendingAccountModal = ModalState.Closed;
 
-  constructor(private context: ShopperContextService) {}
-
-  async ngOnInit() {
+  async ngOnContextSet() {
+    this.order = this.context.currentOrder.get();
+    debugger;
     this.spendingAccounts = await this.listSpendingAccounts();
     this.selectedSpendingAccount = this.getSavedSpendingAccount(this.spendingAccounts);
     if (!this.selectedSpendingAccount) {
@@ -53,12 +52,12 @@ export class PaymentSpendingAccountComponent implements OnInit {
   accountSelected(account: SpendingAccount): void {
     this.spendingAccountModal = ModalState.Closed;
     this.selectedSpendingAccount = account;
-    const payment: Payment = {
+    this.payment = {
       Type: 'SpendingAccount',
       SpendingAccountID: account.ID,
       Accepted: true,
     };
-    this.paymentCreated.emit(payment);
+    this.context.currentOrder.createPayment(this.payment);
   }
 
   validateAndContinue() {
