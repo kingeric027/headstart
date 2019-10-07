@@ -1,53 +1,29 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Order, ListLineItem, ListPromotion, OcOrderService, ListPayment, OrderApproval } from '@ordercloud/angular-sdk';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { AppPaymentService } from 'src/app/shared/services/app-payment/app-payment.service';
-import { uniqBy as _uniqBy } from 'lodash';
-import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { Component, OnInit, Input } from '@angular/core';
+import { Order, OrderApproval, LineItem, Promotion, ListPayment } from '@ordercloud/angular-sdk';
+import { DetailedOrder, IShopperContext } from 'shopper-context-interface';
 
 @Component({
-  selector: 'order-details',
+  selector: 'ocm-order-details',
   templateUrl: './order-detail.component.html',
   styleUrls: ['./order-detail.component.scss'],
 })
 export class OrderDetailsComponent implements OnInit {
-  order$: Observable<Order>;
-  lineItems$: Observable<ListLineItem>;
-  promotions: ListPromotion;
+  @Input() orderID: string;
+  @Input() context: IShopperContext;
+
+  order: Order;
+  lineItems: LineItem[] = [];
+  promotions: Promotion[] = [];
   payments: ListPayment;
   approvals: OrderApproval[] = [];
+  detailedOrder: DetailedOrder;
 
-  constructor(
-    protected activatedRoute: ActivatedRoute,
-    protected ocOrderService: OcOrderService,
-    protected appPaymentService: AppPaymentService,
-    public context: ShopperContextService //used in template
-  ) {}
-
-  ngOnInit() {
-    this.order$ = this.activatedRoute.data.pipe(map(({ orderResolve }) => orderResolve.order));
-    this.lineItems$ = this.activatedRoute.data.pipe(map(({ orderResolve }) => orderResolve.lineItems));
-    this.activatedRoute.paramMap.subscribe(async (params: ParamMap) => {
-      const orderID = params.get('orderID');
-      this.promotions = await this.getPromotions(orderID);
-      this.payments = await this.getPayments(orderID);
-      this.approvals = await this.getApprovals(orderID);
-    });
-  }
-
-  protected async getPromotions(orderID: string): Promise<ListPromotion> {
-    return this.ocOrderService.ListPromotions('outgoing', orderID).toPromise();
-  }
-
-  protected async getPayments(orderID: string): Promise<ListPayment> {
-    return this.appPaymentService.ListPaymentsOnOrder(orderID);
-  }
-
-  protected async getApprovals(orderID: string): Promise<OrderApproval[]> {
-    const approvals = await this.ocOrderService.ListApprovals('outgoing', orderID).toPromise();
-    approvals.Items = approvals.Items.filter((x) => x.Approver);
-    return _uniqBy(approvals.Items, (x) => x.Comments);
+  async ngOnInit() {
+    this.detailedOrder = await this.context.orderHistory.getDetailedOrder(this.orderID);
+    this.order = this.detailedOrder.order;
+    this.lineItems = this.detailedOrder.lineItems.Items;
+    this.promotions = this.detailedOrder.promotions.Items;
+    this.payments = this.detailedOrder.payments;
+    this.approvals = this.detailedOrder.approvals;
   }
 }

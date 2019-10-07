@@ -1,14 +1,14 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { CreateCard } from 'shopper-context-interface';
+import { AuthNetCreditCard } from 'shopper-context-interface';
 
 @Component({
   templateUrl: './credit-card-form.component.html',
   styleUrls: ['./credit-card-form.component.scss'],
 })
 export class OCMCreditCardForm implements OnInit {
-  @Output() formSubmitted = new EventEmitter<CreateCard>();
+  @Output() formSubmitted = new EventEmitter<AuthNetCreditCard>();
   cardForm: FormGroup;
   faPlus = faPlus;
   yearOptions: string[];

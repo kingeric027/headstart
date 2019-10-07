@@ -6,8 +6,8 @@ import { AuthorizeNetService } from 'src/app/shared';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
 import * as moment from 'moment';
-import { CreateCard } from 'shopper-context-interface';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import { AuthNetCreditCard } from 'shopper-context-interface';
 
 @Component({
   selector: 'profile-payment-list',
@@ -54,7 +54,7 @@ export class PaymentListComponent implements OnInit {
     this.currentCard = null;
   }
 
-  async addCard(card: CreateCard) {
+  async addCard(card: AuthNetCreditCard) {
     const response = await this.authorizeNetSerivce.CreateCreditCard(card);
     if (response.ResponseHttpStatusCode >= 400) {
       throw new Error((response.ResponseBody as any).ExceptionMessage);

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
+  selector: 'app-header-wrapper',
   template: `
     <ocm-app-header [context]="context" [showHeader]="showHeader()"></ocm-app-header>
   `,

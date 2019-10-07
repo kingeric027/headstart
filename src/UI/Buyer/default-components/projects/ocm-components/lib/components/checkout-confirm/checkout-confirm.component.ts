@@ -36,6 +36,8 @@ export class OCMCheckoutConfirm extends OCMComponent implements OnInit {
     } catch (ex) {
       throw new Error(ex);
     }
-    this.context.routeActions.toOrderConfirmation(orderID);
+
+    // todo: "Order Submitted Successfully" message 
+    this.context.routeActions.toOrderDetails(orderID);
   }
 }

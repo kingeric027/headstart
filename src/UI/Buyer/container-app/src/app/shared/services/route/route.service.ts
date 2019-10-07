@@ -77,8 +77,4 @@ export class RouteService implements IRouteActions {
   toOrdersToApprove(): void {
     this.router.navigateByUrl('/profile/orders/approval');
   }
-
-  toOrderConfirmation(orderID: string): void {
-    this.router.navigateByUrl(`order-confirmation/${orderID}`);
-  }
 }

@@ -1,11 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { forEach as _forEach } from 'lodash';
 
-import { CartService, AppReorderService } from 'src/app/shared';
-import { OrderReorderResponse } from 'src/app/shared/services/reorder/reorder.interface';
 import { LineItem } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 import { ModalState } from 'src/app/shared/models/modal-state.class';
+import { OrderReorderResponse } from 'shopper-context-interface';
 
 @Component({
   selector: 'order-reorder',
@@ -19,14 +18,12 @@ export class OrderReorderComponent implements OnInit {
   message = { string: null, classType: null };
 
   constructor(
-    private appReorderService: AppReorderService,
-    private cartService: CartService,
     public context: ShopperContextService // used in template
   ) {}
 
   async ngOnInit() {
     if (this.orderID) {
-      this.reorderResponse = await this.appReorderService.validateReorder(this.orderID);
+      this.reorderResponse = await this.context.orderHistory.validateReorder(this.orderID);
       this.updateMessage(this.reorderResponse);
     } else {
       throw new Error('Needs Order ID');
@@ -56,7 +53,7 @@ export class OrderReorderComponent implements OnInit {
     _forEach(this.reorderResponse.ValidLi, async (li: LineItem) => {
       if (!li) return;
       li = { ProductID: li.Product.ID, Quantity: li.Quantity, Specs: li.Specs };
-      await this.cartService.addToCart(li);
+      await this.context.cartActions.addToCart(li);
     });
     this.reorderModal = ModalState.Closed;
   }

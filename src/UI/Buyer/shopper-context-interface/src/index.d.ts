@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, OcMeService, Payment } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, OcMeService, Payment, ListPromotion, OrderApproval, Promotion } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export interface IShopperContext {
@@ -8,6 +8,7 @@ export interface IShopperContext {
   currentOrder: ICurrentOrder;
   productFilterActions: IProductFilterActions;
   authentication: IAuthActions;
+  orderHistory: IOrderHistory;
   myResources: OcMeService; // TODO - create our own, more limited interface here. Me.Patch(), for example, should not be allowed since it should always go through the current user service.
   appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
 }
@@ -20,6 +21,13 @@ export interface ICartActions {
   addManyToCart(lineItem: LineItem[]): Promise<LineItem[]>;
   emptyCart(): Promise<void>;
   onAddToCart(callback: (lineItem: LineItem) => void): void;
+}
+
+export interface IOrderHistory {
+  approveOrder(orderID: string, Comments: string, AllowResubmit?: boolean): Promise<Order>;
+  declineOrder(orderID: string, Comments: string, AllowResubmit?: boolean): Promise<Order>;
+  validateReorder(orderID: string): Promise<OrderReorderResponse>;
+  getDetailedOrder(orderID: string): Promise<DetailedOrder>;
 }
 
 export interface IRouteActions {
@@ -38,7 +46,6 @@ export interface IRouteActions {
   toMyOrders(): void;
   toOrdersToApprove(): void;
   toOrderDetails(orderID: string): void;
-  toOrderConfirmation(orderID: string): void;
 }
 
 export interface ICurrentUser {
@@ -105,12 +112,25 @@ export interface ProductFilters {
   activeFacets?: any;
 }
 
-export interface CreateCard {
+export interface AuthNetCreditCard {
   CardholderName: string;
   CardNumber: string;
   ExpirationDate: string;
   SecurityCode: string;
   ID?: string;
+}
+
+export interface OrderReorderResponse {
+  ValidLi: Array<LineItem>;
+  InvalidLi: Array<LineItem>;
+}
+
+export interface DetailedOrder {
+  order: Order;
+  lineItems: ListLineItem;
+  promotions: ListPromotion;
+  payments: ListPayment;
+  approvals: OrderApproval[];
 }
 
 export interface AppConfig {

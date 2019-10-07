@@ -8,6 +8,7 @@ import { OrderComponent } from 'src/app/order/containers/order/order.component';
 import { OrderShipmentsComponent } from 'src/app/order/containers/order-shipments/order-shipments.component';
 import { OrderReorderComponent } from 'src/app/order/containers/order-reorder/order-reorder.component';
 import { OrderApprovalComponent } from 'src/app/order/containers/order-approval/order-approval.component';
+import { OrderDetailWrapperComponent } from './components/order-detail-wrapper.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -21,6 +22,7 @@ import { OrderApprovalComponent } from 'src/app/order/containers/order-approval/
     MyOrdersComponent,
     OrdersToApproveComponent,
     OrderApprovalComponent,
+    OrderDetailWrapperComponent,
   ],
 })
 export class OrderModule {}

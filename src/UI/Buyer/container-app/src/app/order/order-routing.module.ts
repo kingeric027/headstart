@@ -1,10 +1,10 @@
 import { NgModule, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { OrderDetailsComponent } from 'src/app/order/containers/order-detail/order-detail.component';
 import { OrderComponent } from 'src/app/order/containers/order/order.component';
 import { OrderShipmentsComponent } from 'src/app/order/containers/order-shipments/order-shipments.component';
 import { ShipmentsResolve } from 'src/app/order/shipments.resolve';
 import { OrderResolve } from 'src/app/order/order.resolve';
+import { OrderDetailWrapperComponent } from './components/order-detail-wrapper.component';
 
 @Component({
   template: '<order-history [approvalVersion]="false"></order-history>',
@@ -24,7 +24,7 @@ const routes: Routes = [
     component: OrderComponent,
     resolve: { orderResolve: OrderResolve },
     children: [
-      { path: '', component: OrderDetailsComponent },
+      { path: '', component: OrderDetailWrapperComponent },
       {
         path: 'shipments',
         component: OrderShipmentsComponent,
@@ -37,7 +37,7 @@ const routes: Routes = [
     component: OrderComponent,
     resolve: { orderResolve: OrderResolve },
     children: [
-      { path: '', component: OrderDetailsComponent },
+      { path: '', component: OrderDetailWrapperComponent },
       {
         path: 'shipments',
         component: OrderShipmentsComponent,
