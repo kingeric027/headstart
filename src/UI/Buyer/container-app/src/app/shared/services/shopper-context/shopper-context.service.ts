@@ -1,6 +1,5 @@
 import { CurrentOrderService } from '../current-order/current-order.service';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { CartService } from '../cart/cart.service';
 import { Injectable, Inject } from '@angular/core';
 import { IShopperContext, AppConfig } from 'shopper-context-interface';
 import { RouteService } from '../route/route.service';
@@ -17,9 +16,8 @@ export class ShopperContextService implements IShopperContext {
   constructor(
     public currentOrder: CurrentOrderService,
     public currentUser: CurrentUserService,
-    public cartActions: CartService,
-    public routeActions: RouteService,
-    public productFilterActions: ProductFilterService,
+    public router: RouteService,
+    public productFilters: ProductFilterService,
     public authentication: AuthService,
     public myResources: OcMeService,
     public orderHistory: OrderHistoryService,

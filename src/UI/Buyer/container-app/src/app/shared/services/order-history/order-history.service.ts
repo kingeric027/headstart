@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLineItemService } from '@ordercloud/angular-sdk';
 import { uniqBy as _uniqBy } from 'lodash';
 import { AppPaymentService } from '../app-payment/app-payment.service';
-import { OrderReorderResponse, IOrderHistory, DetailedOrder } from 'shopper-context-interface';
+import { OrderReorderResponse, IOrderHistory, OrderDetails } from 'shopper-context-interface';
 import { AppReorderService } from '../reorder/reorder.service';
 
 @Injectable({
@@ -28,7 +28,7 @@ export class OrderHistoryService implements IOrderHistory {
     return this.appReorderService.validateReorder(orderID);
   }
 
-  async getDetailedOrder(orderID: string): Promise<DetailedOrder> {
+  async getOrderDetails(orderID: string): Promise<OrderDetails> {
     const res = await Promise.all([
       this.ocOrderService.Get('outgoing', orderID).toPromise(),
       this.ocLineItemService.List('outgoing', orderID).toPromise(),

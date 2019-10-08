@@ -35,7 +35,7 @@ export class OCMProductCard extends OCMComponent {
 
 
   addToCart() {
-    this.context.cartActions.addToCart({ ProductID: this.product.ID, Quantity: this.quantity });
+    this.context.currentOrder.addToCart({ ProductID: this.product.ID, Quantity: this.quantity });
   }
 
   getImageUrl() {
@@ -49,7 +49,7 @@ export class OCMProductCard extends OCMComponent {
   }
 
   toDetails() {
-    this.context.routeActions.toProductDetails(this.product.ID);
+    this.context.router.toProductDetails(this.product.ID);
   }
 
   isFavorite(): boolean {

@@ -34,6 +34,6 @@ export class OCMRegister extends OCMComponent implements OnInit {
     const me: MeUser = this.form.value;
     me.Active = true;
     await this.context.authentication.register(me);
-    this.context.routeActions.toLogin();
+    this.context.router.toLogin();
   }
 }

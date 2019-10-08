@@ -2,35 +2,29 @@ import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User
 import { Observable, Subject } from 'rxjs';
 
 export interface IShopperContext {
-  cartActions: ICartActions;
-  routeActions: IRouteActions;
+  router: IRouter;
   currentUser: ICurrentUser;
   currentOrder: ICurrentOrder;
-  productFilterActions: IProductFilterActions;
-  authentication: IAuthActions;
+  productFilters: IProductFilters;
+  authentication: IAuthentication;
   orderHistory: IOrderHistory;
   myResources: OcMeService; // TODO - create our own, more limited interface here. Me.Patch(), for example, should not be allowed since it should always go through the current user service.
   appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
 }
 
-export interface ICartActions {
-  addToCartSubject: Subject<LineItem>;
-  addToCart(lineItem: LineItem): Promise<LineItem>;
-  removeLineItem(lineItemID: string): Promise<void>;
-  updateQuantity(lineItemID: string, newQuantity: number): Promise<LineItem>;
-  addManyToCart(lineItem: LineItem[]): Promise<LineItem[]>;
-  emptyCart(): Promise<void>;
-  onAddToCart(callback: (lineItem: LineItem) => void): void;
+export interface ICreditCards {
+
 }
+
 
 export interface IOrderHistory {
   approveOrder(orderID: string, Comments: string, AllowResubmit?: boolean): Promise<Order>;
   declineOrder(orderID: string, Comments: string, AllowResubmit?: boolean): Promise<Order>;
   validateReorder(orderID: string): Promise<OrderReorderResponse>;
-  getDetailedOrder(orderID: string): Promise<DetailedOrder>;
+  getOrderDetails(orderID: string): Promise<OrderDetails>;
 }
 
-export interface IRouteActions {
+export interface IRouter {
   onUrlChange(callback: (path: string) => void): void;
   toProductDetails(productID: string): void;
   toProductList(options?: ProductFilters): void;
@@ -63,10 +57,18 @@ export interface ICurrentUser {
 }
 
 export interface ICurrentOrder {
-  lineItems: ListLineItem;
+  addToCartSubject: Subject<LineItem>;
   get(): Order;
   patch(order: Order): Promise<Order>; 
+  getLineItems(): ListLineItem;
   submit(): Promise<void>;
+
+  addToCart(lineItem: LineItem): Promise<LineItem>;
+  addManyToCart(lineItem: LineItem[]): Promise<LineItem[]>;
+  setQuantityInCart(lineItemID: string, newQuantity: number): Promise<LineItem>;
+  removeFromCart(lineItemID: string): Promise<void>;
+  emptyCart(): Promise<void>;
+
   listPayments(): Promise<ListPayment>; 
   createPayment(payment: Payment): Promise<Payment>;
   setBillingAddress(address: Address): Promise<Order>;
@@ -77,7 +79,7 @@ export interface ICurrentOrder {
   onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
 }
 
-export interface IProductFilterActions {
+export interface IProductFilters {
   toPage(pageNumber: number): void;
   sortBy(field: string): void;
   clearSort(): void;
@@ -92,7 +94,7 @@ export interface IProductFilterActions {
   onFiltersChange(callback: (filters: ProductFilters) => void): void;
 }
 
-export interface IAuthActions {
+export interface IAuthentication {
   profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
   logout(): Promise<void>;
   changePassword(newPassword: string): Promise<void>;
@@ -125,7 +127,7 @@ export interface OrderReorderResponse {
   InvalidLi: Array<LineItem>;
 }
 
-export interface DetailedOrder {
+export interface OrderDetails {
   order: Order;
   lineItems: ListLineItem;
   promotions: ListPromotion;

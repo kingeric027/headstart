@@ -19,7 +19,7 @@ export class OCMFacetMultiSelect extends OCMComponent {
   faMinusSquare = faMinusSquare;
 
   ngOnContextSet() {
-      this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
+      this.context.productFilters.onFiltersChange(this.handleFiltersChange);
   }
 
   toggleCollapsed() {
@@ -55,6 +55,6 @@ export class OCMFacetMultiSelect extends OCMComponent {
     // TODO - maybe all this joining and spliting should be done in the service?
     // Abstract out the way the filters work under the hood?
     const values = activeFacetValues.join('|');
-    this.context.productFilterActions.filterByFacet(this.facet.Name, values);
+    this.context.productFilters.filterByFacet(this.facet.Name, values);
   }
 }

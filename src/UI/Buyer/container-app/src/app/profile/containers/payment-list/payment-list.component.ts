@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ListBuyerCreditCard, BuyerCreditCard, ListSpendingAccount } from '@ordercloud/angular-sdk';
 import { Observable } from 'rxjs';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { AuthorizeNetService } from 'src/app/shared';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
 import * as moment from 'moment';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 import { AuthNetCreditCard } from 'shopper-context-interface';
+import { AuthNetCreditCardService } from 'src/app/shared';
 
 @Component({
   selector: 'profile-payment-list',
@@ -25,7 +25,7 @@ export class PaymentListComponent implements OnInit {
   accounts$: Observable<ListSpendingAccount>;
   currentCard: BuyerCreditCard = null;
 
-  constructor(private context: ShopperContextService, private authorizeNetSerivce: AuthorizeNetService) {}
+  constructor(private context: ShopperContextService, private creditCardService: AuthNetCreditCardService) {}
 
   ngOnInit() {
     this.getCards();
@@ -55,7 +55,7 @@ export class PaymentListComponent implements OnInit {
   }
 
   async addCard(card: AuthNetCreditCard) {
-    const response = await this.authorizeNetSerivce.CreateCreditCard(card);
+    const response = await this.creditCardService.CreateSavedCard(card);
     if (response.ResponseHttpStatusCode >= 400) {
       throw new Error((response.ResponseBody as any).ExceptionMessage);
     } else {
@@ -65,7 +65,7 @@ export class PaymentListComponent implements OnInit {
   }
 
   async deleteCard(cardId: string) {
-    await this.authorizeNetSerivce.DeleteCreditCard(cardId);
+    await this.creditCardService.DeleteSavedCard(cardId);
     this.getCards();
   }
 }

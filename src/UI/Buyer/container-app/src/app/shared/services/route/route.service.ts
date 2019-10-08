@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { ProductFilterService } from '../product-filter/product-filter.service';
 import { filter, map } from 'rxjs/operators';
-import { IRouteActions, ProductFilters } from 'shopper-context-interface';
+import { IRouter, ProductFilters } from 'shopper-context-interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class RouteService implements IRouteActions {
+export class RouteService implements IRouter {
   currentPath: any;
 
   constructor(private router: Router, private productFilterService: ProductFilterService) {}

@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { applicationConfiguration } from 'src/app/config/app.config';
-import { AuthorizeCardSuccess, CreateCardResponse } from 'src/app/shared/services/authorize-net/authorize-net.interface';
-import { Payment, OcPaymentService, Order, OcOrderService, BuyerCreditCard } from '@ordercloud/angular-sdk';
+import { CreateCardResponse } from 'src/app/shared/services/authorize-net/authorize-net.interface';
+import { BuyerCreditCard } from '@ordercloud/angular-sdk';
 import { AuthService } from '../auth/auth.service';
 import { AppConfig, AuthNetCreditCard } from 'shopper-context-interface';
 
@@ -18,7 +18,7 @@ import { AppConfig, AuthNetCreditCard } from 'shopper-context-interface';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthorizeNetService {
+export class AuthNetCreditCardService {
   readonly url = 'https://api.ordercloud.io/v1/integrationproxy/authorizenet';
   readonly options = {
     headers: new HttpHeaders({
@@ -32,19 +32,13 @@ export class AuthorizeNetService {
     Discover: RegExp('^6(?:011|5[0-9]{2})[0-9]{12}$'), // e.g. 6011000000000000
   };
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-    private ocPaymentService: OcPaymentService,
-    private ocOrderService: OcOrderService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  constructor(private http: HttpClient, private authService: AuthService, @Inject(applicationConfiguration) private appConfig: AppConfig) {}
 
   private post(body): Promise<any> {
     return this.http.post<any>(this.url, body, this.options).toPromise();
   }
 
-  CreateCreditCard(card: AuthNetCreditCard): Promise<CreateCardResponse> {
+  CreateSavedCard(card: AuthNetCreditCard): Promise<CreateCardResponse> {
     return this.post({
       BuyerID: this.appConfig.appname,
       TransactionType: 'createCreditCard',
@@ -56,7 +50,7 @@ export class AuthorizeNetService {
     });
   }
 
-  DeleteCreditCard(cardID: string) {
+  DeleteSavedCard(cardID: string) {
     return this.post({
       BuyerID: this.appConfig.appname,
       TransactionType: 'deleteCreditCard',
@@ -67,19 +61,19 @@ export class AuthorizeNetService {
     });
   }
 
-  private AuthorizeCardOnOrder(order: Order, card: AuthNetCreditCard): Promise<AuthorizeCardSuccess> {
-    return this.post({
-      BuyerID: this.appConfig.appname,
-      OrderID: order.ID,
-      OrderDirection: 'outgoing',
-      Amount: order.Total,
-      TransactionType: 'authOnlyTransaction',
-      CardDetails: {
-        ...card,
-        Shared: false,
-      },
-    });
-  }
+  // private AuthorizeCardOnOrder(order: Order, card: AuthNetCreditCard): Promise<AuthorizeCardSuccess> {
+  //   return this.post({
+  //     BuyerID: this.appConfig.appname,
+  //     OrderID: order.ID,
+  //     OrderDirection: 'outgoing',
+  //     Amount: order.Total,
+  //     TransactionType: 'authOnlyTransaction',
+  //     CardDetails: {
+  //       ...card,
+  //       Shared: false,
+  //     },
+  //   });
+  // }
 
   /**
    * The CaptureTransaction() method should remain commented out until Jeff confirms that the OC Auth.net integration is production-ready.
@@ -102,24 +96,26 @@ export class AuthorizeNetService {
   /**
     The OC API integration with Authorize.Net is still working through some bugs. One involves existing Payments.
     This function wraps AuthorizeCardOnOrder() with the calls needed to work around this bug.
+    TODO - existingPayment should not be a parameter to this function
   */
-  async AuthorizeCard(order: Order, card: AuthNetCreditCard, existingPayment: Payment): Promise<AuthorizeCardSuccess> {
-    if (existingPayment) {
-      await this.ocPaymentService.Delete('outgoing', order.ID, existingPayment.ID).toPromise();
-    }
-    return this.AuthorizeCardOnOrder(order, card);
-  }
+  // async AuthorizeCard(order: Order, card: AuthNetCreditCard, existingPayment: Payment): Promise<AuthorizeCardSuccess> {
+  //   if (existingPayment) {
+  //     await this.ocPaymentService.Delete('outgoing', order.ID, existingPayment.ID).toPromise();
+  //   }
+  //   return this.AuthorizeCardOnOrder(order, card);
+  // }
 
   /**
     Use AuthorizeAnonymousCard() for anonymous shoppers.
     These cards' non-sensitive details are not saved to a user, because no user exists.
     Instead they must be saved on the order xp.
+    TODO - I think this should be saved to payment xp?
   */
-  async AuthorizeAnonymousCard(order: Order, card: AuthNetCreditCard, existingPayment: Payment): Promise<Order> {
-    await this.AuthorizeCard(order, card, existingPayment);
-    const patch = { xp: { cardDetails: this.mapToNonSensitive(card) } };
-    return this.ocOrderService.Patch('outgoing', order.ID, patch).toPromise();
-  }
+  // async AuthorizeAnonymousCard(order: Order, card: AuthNetCreditCard, existingPayment: Payment): Promise<Order> {
+  //   await this.AuthorizeCard(order, card, existingPayment);
+  //   const patch = { xp: { cardDetails: this.mapToNonSensitive(card) } };
+  //   return this.ocOrderService.Patch('outgoing', order.ID, patch).toPromise();
+  // }
 
   getCardType(cardNumber: string): string {
     if (!cardNumber) {

@@ -15,14 +15,14 @@ export class OCMCart extends OCMComponent {
   ngOnContextSet() {}
 
   toProductList() {
-    this.context.routeActions.toProductList();
+    this.context.router.toProductList();
   }
 
   toCheckout() {
-    this.context.routeActions.toCheckout();
+    this.context.router.toCheckout();
   }
 
   emptyCart() {
-    this.context.cartActions.emptyCart();
+    this.context.currentOrder.emptyCart();
   }
 }

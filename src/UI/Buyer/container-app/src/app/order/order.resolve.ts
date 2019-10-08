@@ -10,6 +10,6 @@ export class OrderResolve implements Resolve<any> {
 
   resolve(route: ActivatedRouteSnapshot) {
     const orderID = route.paramMap.get('orderID');
-    return this.orderHistory.getDetailedOrder(orderID);
+    return this.orderHistory.getOrderDetails(orderID);
   }
 }

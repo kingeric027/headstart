@@ -17,13 +17,13 @@ import { applicationConfiguration } from 'src/app/config/app.config';
 //import { CookieService } from '@gorniv/ngx-universal';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { CurrentOrderService } from 'src/app/shared/services/current-order/current-order.service';
-import { IAuthActions, AppConfig } from 'shopper-context-interface';
+import { AppConfig, IAuthentication } from 'shopper-context-interface';
 import { CookieService } from 'ngx-cookie';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService implements IAuthActions {
+export class AuthService implements IAuthentication {
   private rememberMeCookieName = `${this.appConfig.appname.replace(/ /g, '_').toLowerCase()}_rememberMe`;
   fetchingRefreshToken = false;
   failedRefreshAttempt = false;

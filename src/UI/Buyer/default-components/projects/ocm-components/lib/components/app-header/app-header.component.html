@@ -3,7 +3,7 @@
      *ngIf="showHeader">
   <div class="container">
     <a class="navbar-brand clickable"
-       (click)="context.routeActions.toHome()">
+       (click)="context.router.toHome()">
       <span class="d-none d-md-inline">{{appName}}</span>
       <span class="d-md-none">OCS</span>
     </a>
@@ -11,7 +11,7 @@
       <li class="nav-item clickable"
           [ngClass]="{'active': activePath === '/products'}">
         <a class="nav-link"
-           (click)="context.routeActions.toProductList()">
+           (click)="context.router.toProductList()">
           Shop
         </a>
       </li>
@@ -19,9 +19,9 @@
     <div class="form-inline"
          *ngIf="anonymous">
       <a class="btn btn-sm btn-outline-dark"
-         (click)="context.routeActions.toLogin()">Login</a>
+         (click)="context.router.toLogin()">Login</a>
       <a class="btn btn-sm btn-primary d-none d-sm-block ml-2"
-         (click)="context.routeActions.toRegister()">Register</a>
+         (click)="context.router.toRegister()">Register</a>
     </div>
     <ul class="navbar-nav"
         *ngIf="!anonymous">
@@ -42,19 +42,19 @@
           <h6 class="dropdown-header">Hi, {{ user?.FirstName }}!</h6>
           <a class="dropdown-item"
              [ngClass]="{'active': activePath === '/profile/details'}"
-             (click)="context.routeActions.toMyProfile()">My Profile</a>
+             (click)="context.router.toMyProfile()">My Profile</a>
           <a class="dropdown-item"
              [ngClass]="{'active': activePath === '/profile/addresses'}"
-             (click)="context.routeActions.toMyAddresses()">Address Book</a>
+             (click)="context.router.toMyAddresses()">Address Book</a>
           <a class="dropdown-item"
              [ngClass]="{'active': activePath === '/profile/payment-methods'}"
-             (click)="context.routeActions.toMyPaymentMethods()">Payment Methods</a>
+             (click)="context.router.toMyPaymentMethods()">Payment Methods</a>
           <a class="dropdown-item"
              [ngClass]="{'active': activePath === '/profile/orders'}"
-             (click)="context.routeActions.toMyOrders()">My Orders</a>
+             (click)="context.router.toMyOrders()">My Orders</a>
           <a class="dropdown-item"
              [ngClass]="{'active': activePath === '/profile/orders/approval'}"
-             (click)="context.routeActions.toOrdersToApprove()">Orders To Approve</a>
+             (click)="context.router.toOrdersToApprove()">Orders To Approve</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item"
              (click)="logout()"
@@ -93,7 +93,7 @@
         </ng-template>
         <a class="nav-link text-nowrap clickable"
            [ngClass]="{'active': activePath === '/cart'}"
-           (click)="context.routeActions.toCart()"
+           (click)="context.router.toCart()"
            ngbPopover="Item(s) Added to Cart"
            placement="bottom"
            triggers="manual"
@@ -103,7 +103,7 @@
             <fa-icon [icon]="faShoppingCart"></fa-icon>
             <fa-layers-counter *ngIf="order && order.LineItemCount"
                                class="badge__counter--large"
-                               [content]="order.LineItemCount"></fa-layers-counter>
+                               [content]="12">{{order.LineItemCount}}</fa-layers-counter>
           </fa-layers>
         </a>
       </li>

@@ -51,6 +51,6 @@ export class OCMResetPassword extends OCMComponent implements OnInit {
     };
     await this.context.authentication.resetPassword(this.resetCode, config);
     this.toasterService.success('Password Reset', 'Success');
-    this.context.routeActions.toLogin();
+    this.context.router.toLogin();
   }
 }

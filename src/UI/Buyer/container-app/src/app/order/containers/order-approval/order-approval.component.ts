@@ -37,6 +37,6 @@ export class OrderApprovalComponent implements OnInit {
 
     this.toasterService.success(`Order ${this.orderID} was ${this.approved ? 'Approved' : 'Declined'}`);
     this.approveModal = ModalState.Closed;
-    this.context.routeActions.toOrdersToApprove();
+    this.context.router.toOrdersToApprove();
   }
 }

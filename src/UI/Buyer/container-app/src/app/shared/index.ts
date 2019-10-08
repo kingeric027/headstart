@@ -12,7 +12,6 @@ export * from 'src/app/shared/guards/is-profiled-user/is-profiled-user.guard';
 // services
 export * from 'src/app/shared/services/authorize-net/authorize-net.service';
 export * from 'src/app/shared/services/current-order/current-order.service';
-export * from 'src/app/shared/services/cart/cart.service';
 export * from 'src/app/shared/services/reorder/reorder.service';
 
 export * from 'src/app/shared/validators/product-quantity/product.quantity.validator';

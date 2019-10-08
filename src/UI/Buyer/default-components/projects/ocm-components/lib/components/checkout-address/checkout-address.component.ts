@@ -26,8 +26,7 @@ export class OCMCheckoutAddress extends OCMComponent implements OnChanges {
   ngOnContextSet() {
     this.isAnon = this.context.currentUser.isAnonymous;
     this.order = this.context.currentOrder.get();
-    this.lineItems = this.context.currentOrder.lineItems;
-
+    this.lineItems = this.context.currentOrder.getLineItems();
   }
 
   ngOnChanges() {
@@ -83,7 +82,8 @@ export class OCMCheckoutAddress extends OCMComponent implements OnChanges {
     }
     if (this.addressType === 'Shipping') {
       this.lineItems.Items[0].ShippingAddress = address;
-      this.context.currentOrder.lineItems = this.lineItems;
+      // TODO - handle this.
+      // this.context.currentOrder.lineItems = this.lineItems;
     }
     this.continue.emit();
   }

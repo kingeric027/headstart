@@ -15,21 +15,21 @@ export class OCMMiniCart extends OCMComponent {
 
   ngOnContextSet() {
     this.order = this.context.currentOrder.get();
-    this.lineItems = this.context.currentOrder.lineItems.Items;
+    this.lineItems = this.context.currentOrder.getLineItems().Items;
   }
 
   toFullCart() {
-    this.context.routeActions.toCart();
+    this.context.router.toCart();
     this.navigate.emit();
   }
 
   toProductDetails(productID: string) {
-    this.context.routeActions.toProductDetails(productID);
+    this.context.router.toProductDetails(productID);
     this.navigate.emit();
   }
 
   toCheckout() {
-    this.context.routeActions.toCheckout();
+    this.context.router.toCheckout();
     this.navigate.emit();
   }
 }

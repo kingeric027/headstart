@@ -24,7 +24,7 @@ export class OCMProductList extends OCMComponent {
 
   ngOnContextSet() {
     this.facets = this.products.Meta.Facets;
-    this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
+    this.context.productFilters.onFiltersChange(this.handleFiltersChange);
   }
 
   private handleFiltersChange = async (filters: ProductFilters) => {
@@ -33,19 +33,19 @@ export class OCMProductList extends OCMComponent {
   }
 
   clearAllFilters() {
-    this.context.productFilterActions.clearAllFilters();
+    this.context.productFilters.clearAllFilters();
   }
 
   changePage(page: number): void {
-    this.context.productFilterActions.toPage(page);
+    this.context.productFilters.toPage(page);
   }
 
   setActiveCategory(categoryID: string): void {
-    this.context.productFilterActions.filterByCategory(categoryID);
+    this.context.productFilters.filterByCategory(categoryID);
   }
 
   toggleFilterByFavorites() {
-    this.context.productFilterActions.filterByFavorites(!this.showingFavoritesOnly);
+    this.context.productFilters.filterByFavorites(!this.showingFavoritesOnly);
   }
 
   buildBreadCrumbs(activeCategoryID: string, progress = []): Category[] {

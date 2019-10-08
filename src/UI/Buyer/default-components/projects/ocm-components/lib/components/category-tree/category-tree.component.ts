@@ -17,7 +17,7 @@ export class OCMCategoryTree extends OCMComponent {
 
   ngOnContextSet() {
     if (!this.categoryTree) this.categoryTree = this.buildCategoryTree(this.categories.Items);
-    this.context.productFilterActions.onFiltersChange((filters) => {
+    this.context.productFilters.onFiltersChange((filters) => {
       this.activeCategoryID = filters.categoryID;
     });
   }
@@ -30,7 +30,7 @@ export class OCMCategoryTree extends OCMComponent {
       actionMapping: {
         mouse: {
           click: (_tree, _node, _$event) => {
-            this.context.productFilterActions.filterByCategory(_node.id);
+            this.context.productFilters.filterByCategory(_node.id);
           },
         },
       },
