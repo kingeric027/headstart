@@ -1,10 +1,10 @@
 // core services
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LoginWrapperComponent } from './containers/login-wrapper.component';
-import { RegisterWrapperComponent } from './containers/register-wrapper.component';
-import { ForgotPasswordWrapperComponent } from './containers/forgot-password-wrapper.component';
-import { ResetPasswordWrapperComponent } from './containers/reset-password-wrapper.component';
+import { LoginWrapperComponent } from './components/login-wrapper.component';
+import { RegisterWrapperComponent } from './components/register-wrapper.component';
+import { ForgotPasswordWrapperComponent } from './components/forgot-password-wrapper.component';
+import { ResetPasswordWrapperComponent } from './components/reset-password-wrapper.component';
 
 // auth components
 

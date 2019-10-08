@@ -7,8 +7,8 @@ import { SharedModule } from 'src/app/shared';
 
 // checkout routing
 import { CheckoutRoutingModule } from 'src/app/checkout/checkout-routing.module';
-import { CartWrapperComponent } from './containers/cart-wrapper/cart-wrapper.component';
-import { CheckoutWrapperComponent } from './containers/checkout-wrapper/checkout-wrapper.component';
+import { CartWrapperComponent } from './components/cart-wrapper.component';
+import { CheckoutWrapperComponent } from './components/checkout-wrapper.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

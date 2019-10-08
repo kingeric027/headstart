@@ -4,10 +4,10 @@ import { SharedModule } from 'src/app/shared';
 
 // routing
 import { AuthRoutingModule } from 'src/app/auth/auth-routing.module';
-import { ResetPasswordWrapperComponent } from './containers/reset-password-wrapper.component';
-import { LoginWrapperComponent } from './containers/login-wrapper.component';
-import { ForgotPasswordWrapperComponent } from './containers/forgot-password-wrapper.component';
-import { RegisterWrapperComponent } from './containers/register-wrapper.component';
+import { ResetPasswordWrapperComponent } from './components/reset-password-wrapper.component';
+import { LoginWrapperComponent } from './components/login-wrapper.component';
+import { ForgotPasswordWrapperComponent } from './components/forgot-password-wrapper.component';
+import { RegisterWrapperComponent } from './components/register-wrapper.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
