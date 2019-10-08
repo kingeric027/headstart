@@ -4,8 +4,9 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
 
 @Component({
   selector: 'app-header-wrapper',
-  templateUrl: './header-wrapper.component.html',
-  styleUrls: ['./header-wrapper.component.scss'],
+  template: `
+    <ocm-app-header [context]="context" [showHeader]="showHeader()"></ocm-app-header>
+  `,
 })
 export class HeaderWrapperComponent implements OnInit {
   constructor(private router: Router, public context: ShopperContextService) {}

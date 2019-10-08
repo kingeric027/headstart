@@ -8,4 +8,6 @@ import { OCMComponent } from '../base-component';
 })
 export class OCMProductFacetList extends OCMComponent {
   @Input() facetList: ListFacet[];
+
+  ngOnContextSet() {}
 }

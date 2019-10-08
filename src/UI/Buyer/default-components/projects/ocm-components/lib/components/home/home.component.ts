@@ -27,4 +27,7 @@ export class OCMHomePage extends OCMComponent {
       bodyText: 'This is the third image',
     },
   ];
+
+  ngOnContextSet() {}
+
 }

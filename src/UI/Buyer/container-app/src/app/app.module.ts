@@ -25,9 +25,6 @@ import { AppComponent } from 'src/app/app.component';
 import { SupportComponent } from './static-pages/support/support.component';
 import { FaqComponent } from './static-pages/faq/faq.component';
 
-// interceptors
-import { AutoAppendTokenInterceptor, RefreshTokenInterceptor, CacheInterceptor } from 'src/app/auth';
-
 // date picker config
 import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDateNativeAdapter } from 'src/app/config/date-picker.config';
@@ -37,6 +34,9 @@ import { TermsAndConditionsComponent } from './static-pages/terms-and-conditions
 import { AppErrorHandler } from './config/error-handling.config';
 import { OcmDefaultComponentsModule } from 'ocm-components';
 import { CookieModule } from 'ngx-cookie';
+import { AutoAppendTokenInterceptor } from './shared/interceptors/auto-append-token/auto-append-token.interceptor';
+import { RefreshTokenInterceptor } from './shared/interceptors/refresh-token/refresh-token.interceptor';
+import { CacheInterceptor } from './shared/interceptors/cache/cache-interceptor';
 
 @NgModule({
   declarations: [AppComponent, SupportComponent, FaqComponent, TermsAndConditionsComponent],

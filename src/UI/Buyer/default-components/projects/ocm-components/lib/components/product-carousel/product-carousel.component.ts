@@ -18,6 +18,8 @@ export class OCMProductCarousel extends OCMComponent {
   faAngleLeft = faAngleLeft;
   faAngleRight = faAngleRight;
 
+  ngOnContextSet() {}
+
   left(): void {
     this.index -= this.rowLength;
   }

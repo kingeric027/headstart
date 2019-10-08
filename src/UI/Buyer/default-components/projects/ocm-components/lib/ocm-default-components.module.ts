@@ -22,6 +22,7 @@ import {
   NgbPopoverModule,
   NgbDropdownModule,
   NgbDatepickerModule,
+  NgbAccordionModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { OCMProductSort } from './components/sort-products/sort-products.component';
 import { OCMFacetMultiSelect } from './components/facet-multiselect/facet-multiselect.component';
@@ -29,7 +30,7 @@ import { OCMProductFacetList } from './components/product-facet-list/product-fac
 import { OCMProductList } from './components/product-list/product-list.component';
 import { OCMSearch } from './components/search/search.component';
 import { OCMMiniCart } from './components/mini-cart/mini-cart.component';
-import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs/product-name-with-specs.pipe';
+import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OCMAppHeader } from './components/app-header/app-header.component';
 import { OCMPaymentList } from './components/payment-list/payment-list.component';
 import { OCMAddressCard } from './components/address-card/address-card.component';
@@ -39,7 +40,7 @@ import { OCMCreditCardForm } from './components/credit-card-form/credit-card-for
 import { OCMModal } from './components/modal/modal.component';
 import { OCMOrderStatusIcon } from './components/order-status-icon/order-status-icon.component';
 import { OCMOrderStatusFilter } from './components/order-status-filter/order-status-filter.component';
-import { OrderStatusDisplayPipe } from './pipes/order-status-display/order-status-display.pipe';
+import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
 import { OCMOrderDateFilter } from './components/order-date-filter/order-date-filter.component';
 import { OCMOrderList } from './components/order-list/order-list.component';
 import { OCMLogin } from './components/login/login.component';
@@ -52,6 +53,15 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
 import { OCMAddressList } from './components/address-list/address-list.component';
 import { TreeModule } from 'angular-tree-component';
 import { OCMCategoryTree } from './components/category-tree/category-tree.component';
+import { OCMGenericList } from './components/generic-list/generic-list.component';
+import { OMCAddressForm } from './components/address-form/address-form.component';
+import { OCMCheckoutConfirm } from './components/checkout-confirm/checkout-confirm.component';
+import { OCMPaymentSpendingAccount } from './components/payment-spending-account/payment-spending-account.component';
+import { OCMPaymentPurchaseOrder } from './components/payment-purchase-order/payment-purchase-order.component';
+import { OCMCheckoutAddress } from './components/checkout-address/checkout-address.component';
+import { OCMCheckoutPayment } from './components/checkout-payment/checkout-payment.component';
+import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
+import { OCMCheckout } from './components/checkout/checkout.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -78,6 +88,7 @@ import { OCMCategoryTree } from './components/category-tree/category-tree.compon
     OCMMiniCart,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
+    PaymentMethodDisplayPipe,
     OCMAppHeader,
     OCMPaymentList,
     OCMAddressCard,
@@ -96,6 +107,14 @@ import { OCMCategoryTree } from './components/category-tree/category-tree.compon
     OCMMeUpdateComponent,
     OCMChangePasswordForm,
     OCMAddressList,
+    OCMGenericList,
+    OMCAddressForm,
+    OCMCheckoutConfirm,
+    OCMPaymentPurchaseOrder,
+    OCMPaymentSpendingAccount,
+    OCMCheckoutAddress,
+    OCMCheckoutPayment,
+    OCMCheckout
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -134,6 +153,14 @@ import { OCMCategoryTree } from './components/category-tree/category-tree.compon
     OCMMeUpdateComponent,
     OCMChangePasswordForm,
     OCMAddressList,
+    OCMGenericList,
+    OMCAddressForm,
+    OCMCheckoutConfirm,
+    OCMPaymentPurchaseOrder,
+    OCMPaymentSpendingAccount,
+    OCMCheckoutAddress,
+    OCMCheckoutPayment,
+    OCMCheckout
   ],
   imports: [
     CommonModule,
@@ -148,6 +175,7 @@ import { OCMCategoryTree } from './components/category-tree/category-tree.compon
     NgbPopoverModule,
     NgbDropdownModule,
     NgbDatepickerModule,
+    NgbAccordionModule,
   ],
   providers: [
     DatePipe, // allows us to use in class as injectable (date filter component)
@@ -193,6 +221,16 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMMeUpdateComponent, 'ocm-profile-me-update');
     this.buildWebComponent(OCMChangePasswordForm, 'ocm-change-password');
     this.buildWebComponent(OCMAddressList, 'ocm-address-list');
+    this.buildWebComponent(OCMGenericList, 'ocm-generic-list');
+    this.buildWebComponent(OMCAddressForm, 'ocm-address-form');
+
+    // Alot of these checkout components will be completely re-done
+    this.buildWebComponent(OCMCheckoutConfirm, 'ocm-checkout-confirm');
+    this.buildWebComponent(OCMPaymentSpendingAccount, 'ocm-payment-spending-account');
+    this.buildWebComponent(OCMPaymentPurchaseOrder, 'ocm-payment-purchase-order');
+    this.buildWebComponent(OCMCheckoutAddress, 'ocm-checkout-address');
+    this.buildWebComponent(OCMCheckoutPayment, 'ocm-checkout-payment');
+    this.buildWebComponent(OCMCheckout, 'ocm-checkout');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

@@ -9,7 +9,7 @@ import { OCMComponent } from '../base-component';
   styleUrls: ['./product-card.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class OCMProductCard extends OCMComponent implements OnInit, OnChanges {
+export class OCMProductCard extends OCMComponent {
   @Input() product: BuyerProduct = {
     PriceSchedule: {},
     xp: { Images: [] },
@@ -27,13 +27,12 @@ export class OCMProductCard extends OCMComponent implements OnInit, OnChanges {
   hasSpecs: boolean;
   favoriteProducts: string[] = [];
 
-  ngOnChanges() {
+  ngOnContextSet() {
     this.isViewOnlyProduct = !this.product.PriceSchedule;
     this.hasSpecs = this.product.SpecCount > 0;
     this.context.currentUser.onFavoriteProductsChange((productIDs) => (this.favoriteProducts = productIDs));
   }
 
-  ngOnInit() {}
 
   addToCart() {
     this.context.cartActions.addToCart({ ProductID: this.product.ID, Quantity: this.quantity });

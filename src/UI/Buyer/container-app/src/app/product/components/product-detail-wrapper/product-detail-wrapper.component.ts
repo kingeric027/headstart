@@ -7,9 +7,9 @@ import { CurrentUserService } from 'src/app/shared/services/current-user/current
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
-  selector: 'product-detail-wrapper',
-  templateUrl: './product-detail-wrapper.component.html',
-  styleUrls: ['./product-detail-wrapper.component.scss'],
+  template: `
+    <ocm-product-details [product]="product" [specs]="specs" [quantityLimits]="quantityLimits" [context]="context"> </ocm-product-details>
+  `,
 })
 export class ProductDetailWrapperComponent implements OnInit {
   specs: ListSpec;

@@ -8,7 +8,7 @@ import { ValidateName, ValidateEmail, ValidatePhone, ValidateStrongPassword, Val
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
-export class OCMRegister extends OCMComponent implements OnInit, OnChanges {
+export class OCMRegister extends OCMComponent implements OnInit {
   form: FormGroup;
   appName: string;
 
@@ -25,7 +25,7 @@ export class OCMRegister extends OCMComponent implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges() {
+  ngOnContextSet() {
     this.appName = this.context.appSettings.appname;
   }
 

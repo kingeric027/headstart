@@ -22,18 +22,8 @@ import {
   NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
-// pipes
-import { PaymentMethodDisplayPipe } from 'src/app/shared/pipes/payment-method-display/payment-method-display.pipe';
-
-// directives
-import { FallbackImageDirective } from './directives/fallback-image/fallback-image.directive';
-
-// components
-import { AddressFormComponent } from 'src/app/shared/components/address-form/address-form.component';
-
 // containers
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/shared/pipes/shipperTracking/shipperTracking.pipe';
-import { GenericBrowseComponent } from 'src/app/shared/components/generic-browse/generic-browse.component';
 import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
 import { PhoneInputDirective } from './directives/phone-input/phone-input.directive';
 
@@ -82,24 +72,11 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     NgbAccordionModule,
     NgbCarouselModule,
     NgbDropdownModule,
-    PaymentMethodDisplayPipe,
-    FallbackImageDirective,
-    ShipperTrackingPipe,
-    ShipperTrackingSupportedPipe,
-    AddressFormComponent,
-    PhoneFormatPipe,
-    PhoneInputDirective,
-    GenericBrowseComponent,
-  ],
-  declarations: [
-    PaymentMethodDisplayPipe,
-    FallbackImageDirective,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
     PhoneFormatPipe,
     PhoneInputDirective,
-    AddressFormComponent,
-    GenericBrowseComponent,
   ],
+  declarations: [ShipperTrackingPipe, ShipperTrackingSupportedPipe, PhoneFormatPipe, PhoneInputDirective],
 })
 export class SharedModule {}

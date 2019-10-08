@@ -9,13 +9,12 @@ import { QuantityLimits } from '../../models/quantity-limits';
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
 })
-export class OCMQuantityInput extends OCMComponent implements OnInit, OnChanges {
+export class OCMQuantityInput extends OCMComponent implements OnInit {
   @Input() limits: QuantityLimits;
   @Input() existingQty: number;
   @Output() qtyChange = new EventEmitter<number>();
 
   form: FormGroup;
-  isDefaultSet = false;
   isQtyRestricted = false;
 
   ngOnInit() {
@@ -24,19 +23,13 @@ export class OCMQuantityInput extends OCMComponent implements OnInit, OnChanges 
     });
   }
 
-  ngOnChanges(): void {
-    if (!this.limits) return;
+  ngOnContextSet(): void {
     this.isQtyRestricted = this.limits.restrictedQuantities.length !== 0;
-    if (!this.isDefaultSet) this.setDefault(); // capture default once inputs are set
+    this.form.setValue({ quantity: this.getDefaultQty() }); // capture default once inputs are set
     this.quantityChangeListener();
     if (!this.existingQty) {
       this.qtyChange.emit(this.form.get('quantity').value);
     }
-  }
-
-  setDefault() {
-    this.isDefaultSet = true;
-    this.form.setValue({ quantity: this.getDefaultQty() });
   }
 
   quantityChangeListener(): void {

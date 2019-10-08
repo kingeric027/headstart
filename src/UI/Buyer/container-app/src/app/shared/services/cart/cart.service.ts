@@ -10,7 +10,6 @@ import { ICartActions } from 'shopper-context-interface';
 })
 export class CartService implements ICartActions {
   private initializingOrder = false;
-
   public addToCartSubject: Subject<LineItem> = new Subject<LineItem>(); // need to make available as observable
 
   constructor(
@@ -21,27 +20,26 @@ export class CartService implements ICartActions {
 
   async addToCart(lineItem: LineItem): Promise<LineItem> {
     // order is well defined, line item can be added
-    if (!_isUndefined(this.currentOrder.order.DateCreated)) {
+    if (!_isUndefined(this.currentOrder.get().DateCreated)) {
       return this.createLineItem(lineItem);
     }
-    // TODO - what to do if order is initializing?
+    // TODO - review if initializingOrder check is necesary.
     if (!this.initializingOrder) {
       this.initializingOrder = true;
-      const newOrder = await this.ocOrderService.Create('outgoing', {}).toPromise();
+      this.currentOrder.reset();
       this.initializingOrder = false;
-      this.currentOrder.order = newOrder;
       return this.createLineItem(lineItem);
     }
   }
 
   async removeLineItem(lineItemID: string): Promise<void> {
-    await this.ocLineItemService.Delete('outgoing', this.currentOrder.order.ID, lineItemID).toPromise();
+    await this.ocLineItemService.Delete('outgoing', this.currentOrder.get().ID, lineItemID).toPromise();
     this.currentOrder.reset();
   }
 
   async updateQuantity(lineItemID: string, newQuantity: number): Promise<LineItem> {
     const li = await this.ocLineItemService
-      .Patch('outgoing', this.currentOrder.order.ID, lineItemID, {
+      .Patch('outgoing', this.currentOrder.get().ID, lineItemID, {
         Quantity: newQuantity,
       })
       .toPromise();
@@ -55,7 +53,7 @@ export class CartService implements ICartActions {
   }
 
   async emptyCart(): Promise<void> {
-    await this.ocOrderService.Delete('outgoing', this.currentOrder.order.ID).toPromise();
+    await this.ocOrderService.Delete('outgoing', this.currentOrder.get().ID).toPromise();
     await this.currentOrder.reset();
   }
 
@@ -69,8 +67,8 @@ export class CartService implements ICartActions {
 
     newLI.Quantity += _get(existingLI, 'Quantity', 0);
     const request = existingLI
-      ? this.ocLineItemService.Patch('outgoing', this.currentOrder.order.ID, existingLI.ID, newLI).toPromise()
-      : this.ocLineItemService.Create('outgoing', this.currentOrder.order.ID, newLI).toPromise();
+      ? this.ocLineItemService.Patch('outgoing', this.currentOrder.get().ID, existingLI.ID, newLI).toPromise()
+      : this.ocLineItemService.Create('outgoing', this.currentOrder.get().ID, newLI).toPromise();
     const lineitem = await request;
     this.addToCartSubject.next(newLI);
     this.currentOrder.reset();

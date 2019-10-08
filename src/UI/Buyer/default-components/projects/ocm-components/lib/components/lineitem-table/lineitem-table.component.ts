@@ -15,6 +15,8 @@ export class OCMLineitemTable extends OCMComponent {
   @Input() readOnly: boolean;
   @Input() quantityLimits: QuantityLimits[];
 
+  ngOnContextSet() {}
+
   removeLineItem(lineItemID: string) {
     this.context.cartActions.removeLineItem(lineItemID);
   }

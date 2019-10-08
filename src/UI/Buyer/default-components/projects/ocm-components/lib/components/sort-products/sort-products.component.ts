@@ -6,7 +6,7 @@ import { OCMComponent } from '../base-component';
   templateUrl: './sort-products.component.html',
   styleUrls: ['./sort-products.component.scss'],
 })
-export class OCMProductSort extends OCMComponent implements OnInit, OnChanges {
+export class OCMProductSort extends OCMComponent implements OnInit {
   form: FormGroup;
   options = [
     { value: 'ID', label: 'ID: A to Z' },
@@ -19,7 +19,7 @@ export class OCMProductSort extends OCMComponent implements OnInit, OnChanges {
     this.form = new FormGroup({ sortBy: new FormControl(null) });
   }
 
-  ngOnChanges() {
+  ngOnContextSet() {
     this.context.productFilterActions.onFiltersChange((filters) => {
       this.setForm(filters.sortBy);
     });

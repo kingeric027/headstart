@@ -10,16 +10,14 @@ import { OCMComponent } from '../base-component';
   templateUrl: './order-date-filter.component.html',
   styleUrls: ['./order-date-filter.component.scss'],
 })
-export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestroy {
+export class OCMOrderDateFilter implements OnInit, OnDestroy {
   private alive = true;
   faCalendar = faCalendar;
   faTimes = faTimes;
   form: FormGroup;
   @Output() selectedDate = new EventEmitter<string[]>();
 
-  constructor(private datePipe: DatePipe) {
-    super();
-  }
+  constructor(private datePipe: DatePipe) {}
 
   ngOnInit() {
     this.form = new FormGroup({

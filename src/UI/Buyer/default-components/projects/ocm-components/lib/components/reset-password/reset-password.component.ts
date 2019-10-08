@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss'],
 })
-export class OCMResetPassword extends OCMComponent implements OnInit, OnChanges {
+export class OCMResetPassword extends OCMComponent implements OnInit {
   form: FormGroup;
   username: string;
   resetCode: string;
@@ -35,7 +35,7 @@ export class OCMResetPassword extends OCMComponent implements OnInit, OnChanges 
     });
   }
 
-  ngOnChanges() {
+  ngOnContextSet() {
     this.appName = this.context.appSettings.appname;
   }
 

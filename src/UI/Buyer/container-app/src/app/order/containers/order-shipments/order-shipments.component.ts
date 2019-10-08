@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { OcMeService, ListShipment, Shipment, ListShipmentItem, ListLineItem } from '@ordercloud/angular-sdk';
+import { ListShipment, Shipment, ListShipmentItem, ListLineItem } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { find as _find } from 'lodash';
+import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   selector: 'order-shipments',
@@ -16,7 +17,7 @@ export class OrderShipmentsComponent implements OnInit {
   shipmentItems$: Observable<ListShipmentItem>;
   lineItems: ListLineItem;
 
-  constructor(private activatedRoute: ActivatedRoute, private ocMeService: OcMeService) {}
+  constructor(private activatedRoute: ActivatedRoute, private context: ShopperContextService) {}
 
   ngOnInit() {
     combineLatest(this.activatedRoute.parent.data, this.activatedRoute.data)
@@ -32,7 +33,9 @@ export class OrderShipmentsComponent implements OnInit {
 
   selectShipment(shipment: Shipment): void {
     this.selectedShipment = { ...shipment };
-    this.shipmentItems$ = this.ocMeService.ListShipmentItems(shipment.ID).pipe(map((shipmentItems) => this.setLineItem(shipmentItems)));
+    this.shipmentItems$ = this.context.myResources
+      .ListShipmentItems(shipment.ID)
+      .pipe(map((shipmentItems) => this.setLineItem(shipmentItems)));
   }
 
   private setLineItem(shipmentItems: ListShipmentItem) {

@@ -6,7 +6,6 @@ import { OCMComponent } from '../base-component';
 import { ValidateStrongPassword, ValidateFieldMatches } from '../../validators/validators';
 
 @Component({
-  selector: 'profile-change-password-form',
   templateUrl: './change-password-form.component.html',
   styleUrls: ['./change-password-form.component.scss'],
 })
@@ -18,6 +17,8 @@ export class OCMChangePasswordForm extends OCMComponent implements OnInit {
   ngOnInit() {
     this.setForm();
   }
+
+  ngOnContextSet() {}
 
   setForm() {
     this.form = new FormGroup({

@@ -6,7 +6,7 @@ import { OCMComponent } from '../base-component';
   templateUrl: './credit-card-icon.component.html',
   styleUrls: ['./credit-card-icon.component.scss'],
 })
-export class OCMCreditCardIcon extends OCMComponent implements OnChanges {
+export class OCMCreditCardIcon implements OnChanges {
   cardIcon: IconDefinition;
   @Input() cardType: string;
   @Input() size: string;

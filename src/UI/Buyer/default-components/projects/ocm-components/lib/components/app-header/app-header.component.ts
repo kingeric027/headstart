@@ -8,11 +8,10 @@ import { OCMComponent } from '../base-component';
 import { ProductFilters } from 'shopper-context-interface';
 
 @Component({
-  selector: 'ocm-app-header',
   templateUrl: './app-header.component.html',
   styleUrls: ['./app-header.component.scss'],
 })
-export class OCMAppHeader extends OCMComponent implements OnChanges {
+export class OCMAppHeader extends OCMComponent {
   categories$: Observable<ListCategory>;
   isCollapsed = true;
   anonymous: boolean;
@@ -35,7 +34,7 @@ export class OCMAppHeader extends OCMComponent implements OnChanges {
   faUserCircle = faUserCircle;
   faHome = faHome;
 
-  ngOnChanges() {
+  ngOnContextSet() {
     this.appName = this.context.appSettings.appname;
     this.context.currentOrder.onOrderChange((order) => (this.order = order));
     this.context.currentUser.onIsAnonymousChange((isAnon) => (this.anonymous = isAnon));
@@ -47,7 +46,7 @@ export class OCMAppHeader extends OCMComponent implements OnChanges {
 
   handleFiltersChange = (filters: ProductFilters) => {
     this.searchTermForProducts = filters.search || '';
-  };
+  }
 
   buildAddToCartListener() {
     this.context.cartActions.addToCartSubject

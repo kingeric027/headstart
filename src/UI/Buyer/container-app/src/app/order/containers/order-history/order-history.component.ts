@@ -1,11 +1,10 @@
 import { Component, AfterViewInit, Input } from '@angular/core';
 import { OrderStatus } from 'src/app/order/models/order-status.model';
-import { OcMeService, ListOrder } from '@ordercloud/angular-sdk';
+import { ListOrder } from '@ordercloud/angular-sdk';
 import { MeOrderListOptions } from 'src/app/order/models/me-order-list-options';
 import { Observable } from 'rxjs';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { flatMap } from 'rxjs/operators';
-import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
@@ -21,13 +20,7 @@ export class OrderHistoryComponent implements AfterViewInit {
   sortBy: string;
   @Input() approvalVersion: boolean;
 
-  constructor(
-    private ocMeService: OcMeService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private currentUser: CurrentUserService,
-    public context: ShopperContextService
-  ) {}
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
 
   ngAfterViewInit(): void {
     if (!this.approvalVersion) {
@@ -84,7 +77,9 @@ export class OrderHistoryComponent implements AfterViewInit {
             datesubmitted: queryParamMap.getAll('datesubmitted') || undefined,
           },
         };
-        return this.approvalVersion ? this.ocMeService.ListApprovableOrders(listOptions) : this.ocMeService.ListOrders(listOptions);
+        return this.approvalVersion
+          ? this.context.myResources.ListApprovableOrders(listOptions)
+          : this.context.myResources.ListOrders(listOptions);
       })
     );
   }
@@ -92,6 +87,6 @@ export class OrderHistoryComponent implements AfterViewInit {
   private buildFavoriteOrdersQuery(queryParamMap: ParamMap): string | undefined {
     this.hasFavoriteOrdersFilter = queryParamMap.get('favoriteOrders') === 'true';
     if (!this.hasFavoriteOrdersFilter) return undefined;
-    return this.currentUser.favoriteOrderIDs.join('|');
+    return this.context.currentUser.favoriteOrderIDs.join('|');
   }
 }

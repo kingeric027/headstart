@@ -7,7 +7,7 @@ import { OCMComponent } from '../base-component';
   templateUrl: './toggle-favorite.component.html',
   styleUrls: ['./toggle-favorite.component.scss'],
 })
-export class OCMToggleFavorite extends OCMComponent {
+export class OCMToggleFavorite {
   faHeartFilled = _faHeartFilled;
   faHeartOutline = _faHeartOutline;
   @Input() favorite: boolean;

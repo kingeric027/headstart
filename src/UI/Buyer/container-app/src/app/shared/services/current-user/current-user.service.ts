@@ -68,8 +68,8 @@ export class CurrentUserService implements ICurrentUser {
     return this.user;
   }
 
-  async patch(user: MeUser): Promise<void> {
-    this.user = await this.ocMeService.Patch(user).toPromise();
+  async patch(user: MeUser): Promise<MeUser> {
+    return (this.user = await this.ocMeService.Patch(user).toPromise());
   }
 
   onIsLoggedInChange(callback: (isLoggedIn: boolean) => void): void {

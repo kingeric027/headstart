@@ -7,8 +7,8 @@ import { ListPayment, OcPaymentService, OcMeService, Payment } from '@ordercloud
 export class AppPaymentService {
   constructor(private ocPaymentService: OcPaymentService, private ocMeService: OcMeService) {}
 
-  async getPayments(direction: string, orderID: string): Promise<ListPayment> {
-    const payments = await this.ocPaymentService.List(direction, orderID).toPromise();
+  async ListPaymentsOnOrder(orderID: string): Promise<ListPayment> {
+    const payments = await this.ocPaymentService.List('outgoing', orderID).toPromise();
     const withDetails = payments.Items.map((payment) => this.setPaymentDetails(payment));
     const Items = await Promise.all(withDetails);
     return { Items, Meta: payments.Meta };

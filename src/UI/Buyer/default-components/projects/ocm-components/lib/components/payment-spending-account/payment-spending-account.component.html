@@ -1,0 +1,32 @@
+<div *ngIf="spendingAccounts">
+  <div *ngIf="selectedSpendingAccount"
+       class="border p-2 m-2">
+    <div><strong>{{ selectedSpendingAccount.Name }}</strong></div>
+    <div>Balance: <strong class="text-success">{{ selectedSpendingAccount.Balance | currency }}</strong></div>
+  </div>
+  <ocm-modal [state]="spendingAccountModal"
+             modalTitle="Select Spending Account">
+    <ocm-generic-list [meta]="spendingAccounts.Meta"
+                      [searchPlaceholder]="'accounts'"
+                      (requestOptionsUpdated)="updateRequestOptions($event)">
+      <div *ngFor="let account of spendingAccounts.Items"
+           class="col-sm-12 col-lg-12 col-md-12 d-flex">
+        <div class="border p-2 m-2 w-100 row">
+          <div class="col-8">
+            <div><strong>{{ account.Name }}</strong></div>
+            <div>Balance: <strong class="text-success">{{ account.Balance | currency }}</strong></div>
+          </div>
+          <div class="col-4">
+            <a href="javascript:void(0)"
+               class="float-right"
+               (click)="accountSelected(account)">Select</a>
+          </div>
+        </div>
+      </div>
+    </ocm-generic-list>
+  </ocm-modal>
+  <button class="btn btn-primary mt-3"
+          (click)="validateAndContinue()">Save and Continue</button>
+  <button class="btn btn-secondary mt-3 float-right"
+          (click)="openModal()">Change Account</button>
+</div>

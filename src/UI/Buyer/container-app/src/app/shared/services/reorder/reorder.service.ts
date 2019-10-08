@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { OrderReorderResponse } from 'src/app/shared/services/reorder/reorder.interface';
 import { OcMeService, BuyerProduct, LineItem, Inventory, PriceSchedule, OcLineItemService } from '@ordercloud/angular-sdk';
 import { partition as _partition } from 'lodash';
 import { listAll } from 'src/app/shared/functions/listAll';
+import { OrderReorderResponse } from 'shopper-context-interface';
 
 @Injectable({
   providedIn: 'root',

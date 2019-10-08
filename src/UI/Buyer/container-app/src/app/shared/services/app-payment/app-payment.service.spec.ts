@@ -37,19 +37,19 @@ describe('AppPaymentService', () => {
   }));
 
   it('should call paymentService.list', inject([AppPaymentService], (service: AppPaymentService) => {
-    service.getPayments('outgoing', 'ID');
+    service.ListPaymentsOnOrder('outgoing', 'ID');
     expect(paymentService.List).toHaveBeenCalled();
   }));
   it('should call meService.GetCredit card for each cc payment', inject([AppPaymentService], (service: AppPaymentService) => {
     meService.GetCreditCard.calls.reset();
-    service.getPayments('outgoing', 'ID');
+    service.ListPaymentsOnOrder('outgoing', 'ID');
     expect(meService.GetCreditCard).toHaveBeenCalledWith('CreditCardOne');
     expect(meService.GetCreditCard).toHaveBeenCalledWith('CreditCardTwo');
     expect(meService.GetCreditCard.calls.count()).toBe(2);
   }));
   it('should call meService.GetSpendingAccount', inject([AppPaymentService], (service: AppPaymentService) => {
     meService.GetSpendingAccount.calls.reset();
-    service.getPayments('outgoing', 'ID');
+    service.ListPaymentsOnOrder('outgoing', 'ID');
     expect(meService.GetSpendingAccount).toHaveBeenCalledWith('SpendingAccountOne');
     expect(meService.GetSpendingAccount).toHaveBeenCalledWith('SpendingAccountTwo');
     expect(meService.GetSpendingAccount.calls.count()).toBe(2);

@@ -1,9 +1,9 @@
-<div *ngIf="order$ | async; let order">
-  <div *ngIf="lineItems$ | async; let lineItems">
+<div *ngIf="order">
+  <div *ngIf="lineItems">
     <div class="row mb-5">
       <div class="col-6">
-        <ocm-address-card *ngIf="lineItems.Items[0].ShippingAddress"
-                          [address]="lineItems.Items[0].ShippingAddress"
+        <ocm-address-card *ngIf="lineItems[0].ShippingAddress"
+                          [address]="lineItems[0].ShippingAddress"
                           addressTitle="Shipping Address">
         </ocm-address-card>
         <ocm-address-card [address]="order.BillingAddress"

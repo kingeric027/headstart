@@ -19,6 +19,8 @@ export class OCMOrderList extends OCMComponent {
   @Output() updatedSort = new EventEmitter<string>();
   @Output() changedPage = new EventEmitter<number>();
 
+  ngOnContextSet() {}
+
   updateSort(selectedSortBy) {
     let sortBy;
     switch (this.sortBy) {
