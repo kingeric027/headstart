@@ -1,47 +1,40 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ListBuyerCreditCard, BuyerCreditCard, ListSpendingAccount } from '@ordercloud/angular-sdk';
-import { Observable } from 'rxjs';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
-
-import * as moment from 'moment';
-import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
+import * as moment_ from 'moment';
+const moment = moment_;
 import { AuthNetCreditCard } from 'shopper-context-interface';
-import { AuthNetCreditCardService } from 'src/app/shared';
+import { OCMComponent } from '../base-component';
 
 @Component({
-  selector: 'profile-payment-list',
-  templateUrl: './payment-list.component.html',
-  styleUrls: ['./payment-list.component.scss'],
+  templateUrl: './payment-method-management.component.html',
+  styleUrls: ['./payment-method-management.component.scss'],
 })
-export class PaymentListComponent implements OnInit {
+export class OCMPaymentMethodManagement extends OCMComponent {
   alive = true;
   showCardForm = false;
   faPlus = faPlus;
   faArrowLeft = faArrowLeft;
   faTrashAlt = faTrashAlt;
 
-  cards$: Observable<ListBuyerCreditCard>;
-  accounts$: Observable<ListSpendingAccount>;
+  cards: ListBuyerCreditCard;
+  accounts: ListSpendingAccount;
   currentCard: BuyerCreditCard = null;
 
-  constructor(private context: ShopperContextService, private creditCardService: AuthNetCreditCardService) {}
-
-  ngOnInit() {
+  ngOnContextSet() {
     this.getCards();
     this.getAccounts();
   }
 
-  getCards() {
-    this.cards$ = this.context.myResources.ListCreditCards();
+  async getCards() {
+    this.cards = await this.context.myResources.ListCreditCards().toPromise();
   }
 
-  getAccounts() {
+  async getAccounts() {
     const now = moment().format('YYYY-MM-DD');
     const dateFilter = { StartDate: `>${now}|!*`, EndDate: `<${now}|!*` };
-    this.accounts$ = this.context.myResources.ListSpendingAccounts({
-      filters: dateFilter,
-    });
+    this.accounts = await this.context.myResources.ListSpendingAccounts({ filters: dateFilter }).toPromise();
   }
 
   showEdit(card: BuyerCreditCard) {
@@ -55,7 +48,7 @@ export class PaymentListComponent implements OnInit {
   }
 
   async addCard(card: AuthNetCreditCard) {
-    const response = await this.creditCardService.CreateSavedCard(card);
+    const response = await this.context.creditCards.CreateSavedCard(card);
     if (response.ResponseHttpStatusCode >= 400) {
       throw new Error((response.ResponseBody as any).ExceptionMessage);
     } else {
@@ -65,7 +58,7 @@ export class PaymentListComponent implements OnInit {
   }
 
   async deleteCard(cardId: string) {
-    await this.creditCardService.DeleteSavedCard(cardId);
+    await this.context.creditCards.DeleteSavedCard(cardId);
     this.getCards();
   }
 }

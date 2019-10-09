@@ -55,7 +55,7 @@ export class RouteService implements IRouter {
   }
 
   toMyProfile(): void {
-    this.router.navigateByUrl('/profile/details');
+    this.router.navigateByUrl('/profile');
   }
 
   toMyAddresses(): void {
@@ -76,5 +76,9 @@ export class RouteService implements IRouter {
 
   toOrdersToApprove(): void {
     this.router.navigateByUrl('/profile/orders/approval');
+  }
+
+  toChangePassword(): void {
+    this.router.navigateByUrl('/profile/change-password');
   }
 }

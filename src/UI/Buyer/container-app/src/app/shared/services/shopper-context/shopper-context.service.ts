@@ -8,6 +8,7 @@ import { AuthService } from '../auth/auth.service';
 import { applicationConfiguration } from 'src/app/config/app.config';
 import { OcMeService } from '@ordercloud/angular-sdk';
 import { OrderHistoryService } from '../order-history/order-history.service';
+import { AuthNetCreditCardService } from '../authorize-net/authorize-net.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +22,7 @@ export class ShopperContextService implements IShopperContext {
     public authentication: AuthService,
     public myResources: OcMeService,
     public orderHistory: OrderHistoryService,
+    public creditCards: AuthNetCreditCardService,
     @Inject(applicationConfiguration) public appSettings: AppConfig
   ) {}
 }

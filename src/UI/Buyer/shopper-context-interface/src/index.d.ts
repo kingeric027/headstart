@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, OcMeService, Payment, ListPromotion, OrderApproval, Promotion } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export interface IShopperContext {
@@ -8,14 +8,15 @@ export interface IShopperContext {
   productFilters: IProductFilters;
   authentication: IAuthentication;
   orderHistory: IOrderHistory;
+  creditCards: ICreditCards;
   myResources: OcMeService; // TODO - create our own, more limited interface here. Me.Patch(), for example, should not be allowed since it should always go through the current user service.
   appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
 }
 
 export interface ICreditCards {
-
+  CreateSavedCard(card: AuthNetCreditCard): Promise<CreateCardResponse>;
+  DeleteSavedCard(cardID: string): Promise<void>;
 }
-
 
 export interface IOrderHistory {
   approveOrder(orderID: string, Comments: string, AllowResubmit?: boolean): Promise<Order>;
@@ -40,6 +41,7 @@ export interface IRouter {
   toMyOrders(): void;
   toOrdersToApprove(): void;
   toOrderDetails(orderID: string): void;
+  toChangePassword(): void;
 }
 
 export interface ICurrentUser {
@@ -48,7 +50,7 @@ export interface ICurrentUser {
   isAnonymous: boolean;
   get(): MeUser;
   patch(user: MeUser): Promise<MeUser>;
-  onUserChange(callback: (user: User) => void): void;
+  onUserChange(callback: (user: User) => void): void; // TODO - replace all these onChange functions with real Observables. More powerful
   onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void;
   onFavoriteProductsChange(callback: (productIDs: string[]) => void): void;
   setIsFavoriteProduct(isFav: boolean, productID: string): void;
@@ -99,7 +101,8 @@ export interface IAuthentication {
   logout(): Promise<void>;
   changePassword(newPassword: string): Promise<void>;
   anonymousLogin(): Promise<AccessToken>;
-  getOrderCloudToken(): string;
+  getOCToken(): string;
+  getDecodedOCToken(): DecodedOCToken;
   forgotPasssword(email: string): Promise<any>;
   register(me: MeUser): Promise<any>;
   resetPassword(code: string, config: PasswordReset): Promise<any>;
@@ -120,6 +123,11 @@ export interface AuthNetCreditCard {
   ExpirationDate: string;
   SecurityCode: string;
   ID?: string;
+}
+
+export interface CreateCardResponse {
+  ResponseBody: BuyerCreditCard;
+  ResponseHttpStatusCode: number;
 }
 
 export interface OrderReorderResponse {
@@ -171,3 +179,58 @@ export interface AppConfig {
    */
   scope: string[];
 }
+
+export interface DecodedOCToken {
+  /**
+   * the ordercloud username
+   */
+  usr: string;
+
+  /**
+   * the client id used when making token request
+   */
+  cid: string;
+
+  /**
+   * helpful for identifying user types in an app
+   * that may have both types
+   */
+  usrtype: 'admin' | 'buyer';
+
+  /**
+   * list of security profile roles that this user
+   * has access to, read more about security profile roles
+   * [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
+   */
+  role: string[]; // TODO: add security profile roles to the sdk
+
+  /**
+   * the issuer of the token - should always be https://auth.ordercloud.io
+   */
+  iss: string;
+
+  /**
+   * the audience - who should be consuming this token
+   * this should always be https://api.ordercloud.io (the ordercloud api)
+   */
+  aud: string;
+
+  /**
+   * expiration of the token (in seconds) since the
+   * UNIX epoch (January 1, 1970 00:00:00 UTC)
+   */
+  exp: number;
+
+  /**
+   * point at which token was issued (in seconds) since the
+   * UNIX epoch (January 1, 1970 00:00:00 UTC)
+   */
+  nbf: number;
+
+  /**
+   * the order id assigned to the anonymous user,
+   * this value will *only* exist for anonymous users
+   */
+  orderid?: string;
+}
+

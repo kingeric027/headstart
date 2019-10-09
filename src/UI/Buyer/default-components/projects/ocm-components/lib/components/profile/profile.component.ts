@@ -1,14 +1,13 @@
-import { Component, OnInit, OnChanges } from '@angular/core';
-import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { MeUser } from '@ordercloud/angular-sdk';
+import { Component, OnInit } from '@angular/core';
 import { OCMComponent } from '../base-component';
-import { ValidateName, ValidateEmail, ValidatePhone } from '../../validators/validators';
-
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { MeUser } from '@ordercloud/angular-sdk';
+import { ValidatePhone, ValidateName, ValidateEmail } from '../../validators/validators';
 @Component({
-  templateUrl: './me-update.component.html',
-  styleUrls: ['./me-update.component.scss'],
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.scss'],
 })
-export class OCMMeUpdateComponent extends OCMComponent implements OnInit {
+export class OCMProfile extends OCMComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
   alive = true;

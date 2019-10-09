@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
@@ -6,8 +6,6 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
     <ocm-change-password [context]="context"></ocm-change-password>
   `,
 })
-export class MeChangePasswordWrapperComponent implements OnInit {
+export class MeChangePasswordWrapperComponent {
   constructor(public context: ShopperContextService) {}
-
-  ngOnInit() {}
 }

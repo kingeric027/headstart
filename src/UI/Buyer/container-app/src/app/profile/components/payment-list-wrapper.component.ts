@@ -1,13 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ShopperContextService } from 'src/app/shared/services/shopper-context/shopper-context.service';
 
 @Component({
   template: `
-    <ocm-profile-me-update [context]="context"></ocm-profile-me-update>
+    <ocm-payment-method-management [context]="context"></ocm-payment-method-management>
   `,
 })
-export class MeUpdateWrapperComponent implements OnInit {
+export class PaymentListWrapperComponent {
   constructor(public context: ShopperContextService) {}
-
-  ngOnInit() {}
 }

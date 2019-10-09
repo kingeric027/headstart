@@ -17,7 +17,6 @@ export class CurrentUserService implements ICurrentUser {
   private userSubject: BehaviorSubject<MeUser> = new BehaviorSubject<MeUser>(null);
   private isAnonSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
   private loggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  // todo - this data is in user also. remove duplicate?
   private favoriteOrdersSubject: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
   private favoriteProductsSubject: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
 

@@ -1,0 +1,48 @@
+<div class="container mt-3">
+  <div class="row">
+    <ocm-profile-nav [context]="context" class="col-md-3  d-none d-md-flex"></ocm-profile-nav>
+    <div class="col-md-9 col-sm-12">
+      <h1 class="page-heading border-bottom pb-3">Payment Methods</h1>
+      <div class="row mt-3">
+        <h2 class="col-6 h3 text-secondary">Personal Credit Cards</h2>
+        <div class="col-6">
+          <button (click)="showAdd()"
+                  *ngIf="!showCardForm"
+                  class="btn btn-primary float-right">
+            <fa-icon [icon]="faPlus"></fa-icon> Add a Card
+          </button>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <ocm-credit-card-display [card]="card"
+                                class="col-12 my-2"
+                                *ngFor="let card of cards?.Items">
+          <fa-icon (click)="deleteCard(card.ID)"
+                  title="Delete"
+                  class="text-danger icon-button--hover-reactive"
+                  [icon]="faTrashAlt"></fa-icon>
+        </ocm-credit-card-display>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <ocm-credit-card-form *ngIf="showCardForm"
+                                submitText="Add"
+                                (formSubmitted)="addCard($event.detail)"></ocm-credit-card-form>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <h2 class="col-6 h3 text-secondary">Assigned Spending Accounts</h2>
+        <div class="col-6">
+          <!-- Insert buttons here -->
+        </div>
+        <div class="col-12 mt-3"
+            *ngFor="let account of accounts?.Items">
+          <div class="border border-radius shadow-sm p-4">
+            <div><strong>{{ account.Name }}</strong></div>
+            <div>Balance: <b class="text-success">{{ account.Balance | currency }}</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

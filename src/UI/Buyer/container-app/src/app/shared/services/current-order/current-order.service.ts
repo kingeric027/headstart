@@ -46,7 +46,6 @@ export class CurrentOrderService implements ICurrentOrder {
     private ocPaymentService: OcPaymentService,
     private toastrService: ToastrService,
     private appPaymentService: AppPaymentService,
-
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
@@ -155,6 +154,7 @@ export class CurrentOrderService implements ICurrentOrder {
     }
   }
 
+  // TODO - get rid of the progress spinner for all Cart functions. Just makes it look slower.
   async addToCart(lineItem: LineItem): Promise<LineItem> {
     // order is well defined, line item can be added
     if (!_isUndefined(this.order.DateCreated)) {
@@ -171,14 +171,20 @@ export class CurrentOrderService implements ICurrentOrder {
   async removeFromCart(lineItemID: string): Promise<void> {
     this.lineItems.Items = this.lineItems.Items.filter((li) => li.ID !== lineItemID);
     Object.assign(this.order, this.calculateOrder());
-    await this.ocLineItemService.Delete('outgoing', this.order.ID, lineItemID).toPromise();
-    this.reset();
+    try {
+      await this.ocLineItemService.Delete('outgoing', this.order.ID, lineItemID).toPromise();
+    } finally {
+      this.reset();
+    }
   }
 
   async setQuantityInCart(lineItemID: string, newQuantity: number): Promise<LineItem> {
-    const li = await this.patchLineItem(lineItemID, { Quantity: newQuantity });
-    this.reset();
-    return li;
+    try {
+      const li = await this.patchLineItem(lineItemID, { Quantity: newQuantity });
+      return li;
+    } finally {
+      this.reset();
+    }
   }
 
   async addManyToCart(lineItem: LineItem[]): Promise<LineItem[]> {
@@ -190,8 +196,11 @@ export class CurrentOrderService implements ICurrentOrder {
     const ID = this.order.ID;
     this.lineItems = this.DefaultLineItems;
     Object.assign(this.order, this.calculateOrder());
-    await this.ocOrderService.Delete('outgoing', ID).toPromise();
-    this.reset();
+    try {
+      await this.ocOrderService.Delete('outgoing', ID).toPromise();
+    } finally {
+      this.reset();
+    }
   }
 
   private async createLineItem(lineItem: LineItem): Promise<LineItem> {
@@ -199,22 +208,25 @@ export class CurrentOrderService implements ICurrentOrder {
     const existingLI = this.lineItems.Items.find((li) => this.LineItemsMatch(li, lineItem));
 
     this.addToCartSubject.next(lineItem);
-    if (existingLI) {
-      lineItem = await this.setQuantityInCart(existingLI.ID, lineItem.Quantity + existingLI.Quantity);
-    } else {
-      this.lineItems.Items.push(lineItem);
-      Object.assign(this.order, this.calculateOrder());
-      lineItem = await this.ocLineItemService.Create('outgoing', this.order.ID, lineItem).toPromise();
+    try {
+      if (existingLI) {
+        lineItem = await this.setQuantityInCart(existingLI.ID, lineItem.Quantity + existingLI.Quantity);
+      } else {
+        this.lineItems.Items.push(lineItem);
+        Object.assign(this.order, this.calculateOrder());
+        lineItem = await this.ocLineItemService.Create('outgoing', this.order.ID, lineItem).toPromise();
+      }
+      return lineItem;
+    } finally {
+      this.reset();
     }
-
-    this.reset();
-    return lineItem;
   }
 
   private calculateOrder(): Order {
     const LineItemCount = this.lineItems.Items.length;
     this.lineItems.Items.forEach((li) => {
       li.LineTotal = li.Quantity * li.UnitPrice;
+      if (isNaN(li.LineTotal)) li.LineTotal = undefined;
     });
     const Subtotal = this.lineItems.Items.reduce((sum, li) => sum + li.LineTotal, 0);
     const Total = Subtotal + this.order.TaxCost + this.order.ShippingCost;

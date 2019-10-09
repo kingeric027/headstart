@@ -1,5 +1,4 @@
 // models
-export * from 'src/app/shared/models/decoded-token.interface';
 export * from 'src/app/shared/services/authorize-net/authorize-net.interface';
 
 // resolves

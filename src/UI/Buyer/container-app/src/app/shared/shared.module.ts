@@ -25,7 +25,6 @@ import {
 // containers
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/shared/pipes/shipperTracking/shipperTracking.pipe';
 import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
-import { PhoneInputDirective } from './directives/phone-input/phone-input.directive';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -75,8 +74,7 @@ import { PhoneInputDirective } from './directives/phone-input/phone-input.direct
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
     PhoneFormatPipe,
-    PhoneInputDirective,
   ],
-  declarations: [ShipperTrackingPipe, ShipperTrackingSupportedPipe, PhoneFormatPipe, PhoneInputDirective],
+  declarations: [ShipperTrackingPipe, ShipperTrackingSupportedPipe, PhoneFormatPipe],
 })
 export class SharedModule {}

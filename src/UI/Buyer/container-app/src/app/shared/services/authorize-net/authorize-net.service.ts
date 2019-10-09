@@ -1,10 +1,9 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { applicationConfiguration } from 'src/app/config/app.config';
-import { CreateCardResponse } from 'src/app/shared/services/authorize-net/authorize-net.interface';
 import { BuyerCreditCard } from '@ordercloud/angular-sdk';
 import { AuthService } from '../auth/auth.service';
-import { AppConfig, AuthNetCreditCard } from 'shopper-context-interface';
+import { AppConfig, AuthNetCreditCard, ICreditCards, CreateCardResponse } from 'shopper-context-interface';
 
 /**
  *  OrderCloud does not store full credit card details or process finacial transactions.
@@ -18,12 +17,12 @@ import { AppConfig, AuthNetCreditCard } from 'shopper-context-interface';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthNetCreditCardService {
+export class AuthNetCreditCardService implements ICreditCards {
   readonly url = 'https://api.ordercloud.io/v1/integrationproxy/authorizenet';
   readonly options = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.authService.getOrderCloudToken()}`,
+      Authorization: `Bearer ${this.authService.getOCToken()}`,
     }),
   };
   readonly acceptedCards = {
@@ -50,7 +49,7 @@ export class AuthNetCreditCardService {
     });
   }
 
-  DeleteSavedCard(cardID: string) {
+  DeleteSavedCard(cardID: string): Promise<void> {
     return this.post({
       BuyerID: this.appConfig.appname,
       TransactionType: 'deleteCreditCard',

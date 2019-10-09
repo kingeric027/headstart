@@ -17,7 +17,8 @@ import { applicationConfiguration } from 'src/app/config/app.config';
 //import { CookieService } from '@gorniv/ngx-universal';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { CurrentOrderService } from 'src/app/shared/services/current-order/current-order.service';
-import { AppConfig, IAuthentication } from 'shopper-context-interface';
+import { AppConfig, IAuthentication, DecodedOCToken } from 'shopper-context-interface';
+import * as jwtDecode from 'jwt-decode';
 import { CookieService } from 'ngx-cookie';
 
 @Injectable({
@@ -96,7 +97,7 @@ export class AuthService implements IAuthentication {
   }
 
   async register(me: MeUser<any>): Promise<any> {
-    const token = this.getOrderCloudToken();
+    const token = this.getOCToken();
     const result = await this.ocMeService.Register(token, me).toPromise();
     return result;
   }
@@ -149,8 +150,16 @@ export class AuthService implements IAuthentication {
     return reset;
   }
 
-  getOrderCloudToken(): string {
+  getOCToken(): string {
     return this.ocTokenService.GetAccess();
+  }
+
+  getDecodedOCToken(): DecodedOCToken {
+    try {
+      return jwtDecode(this.getOCToken());
+    } catch (e) {
+      return null;
+    }
   }
 
   setRememberMeStatus(status: boolean): void {

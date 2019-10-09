@@ -18,7 +18,7 @@ export class AutoAppendTokenInterceptor implements HttpInterceptor {
     if (request.url.includes(this.appConfig.middlewareUrl)) {
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${this.authService.getOrderCloudToken()}`,
+          Authorization: `Bearer ${this.authService.getOCToken()}`,
         },
       });
     }
