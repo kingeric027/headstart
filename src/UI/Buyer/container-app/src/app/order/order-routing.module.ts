@@ -1,9 +1,5 @@
 import { NgModule, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { OrderComponent } from 'src/app/order/containers/order/order.component';
-import { OrderShipmentsComponent } from 'src/app/order/containers/order-shipments/order-shipments.component';
-import { ShipmentsResolve } from 'src/app/order/shipments.resolve';
-import { OrderResolve } from 'src/app/order/order.resolve';
 import { OrderDetailWrapperComponent } from './components/order-detail-wrapper.component';
 
 @Component({
@@ -21,29 +17,11 @@ const routes: Routes = [
   { path: 'approval', component: OrdersToApproveComponent },
   {
     path: ':orderID',
-    component: OrderComponent,
-    resolve: { orderResolve: OrderResolve },
-    children: [
-      { path: '', component: OrderDetailWrapperComponent },
-      {
-        path: 'shipments',
-        component: OrderShipmentsComponent,
-        resolve: { shipmentsResolve: ShipmentsResolve },
-      },
-    ],
+    component: OrderDetailWrapperComponent,
   },
   {
     path: 'approval/:orderID',
-    component: OrderComponent,
-    resolve: { orderResolve: OrderResolve },
-    children: [
-      { path: '', component: OrderDetailWrapperComponent },
-      {
-        path: 'shipments',
-        component: OrderShipmentsComponent,
-        resolve: { shipmentsResolve: ShipmentsResolve },
-      },
-    ],
+    component: OrderDetailWrapperComponent,
   },
 ];
 

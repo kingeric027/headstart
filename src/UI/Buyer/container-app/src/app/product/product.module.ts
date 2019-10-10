@@ -2,7 +2,6 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SharedModule } from 'src/app/shared';
 import { ProductsRoutingModule } from 'src/app/product/product-routing.module';
 import {
-  MeListProductResolver,
   MeProductResolver,
   MeListSpecsResolver,
   MeSpecsResolver,
@@ -38,13 +37,6 @@ import { ProductListWrapperComponent } from './components/product-list-wrapper/p
     SpecFieldDirective,
     SpecFormComponent,
   ],
-  providers: [
-    MeListProductResolver,
-    MeProductResolver,
-    MeListSpecsResolver,
-    MeSpecsResolver,
-    MeListCategoriesResolver,
-    MeListRelatedProductsResolver,
-  ],
+  providers: [MeProductResolver, MeListSpecsResolver, MeSpecsResolver, MeListCategoriesResolver, MeListRelatedProductsResolver],
 })
 export class ProductsModule {}

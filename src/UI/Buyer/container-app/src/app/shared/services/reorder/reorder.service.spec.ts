@@ -2,7 +2,7 @@ import { async, TestBed } from '@angular/core/testing';
 import { AppReorderService } from 'src/app/shared/services/reorder/reorder.service';
 import { OcMeService } from '@ordercloud/angular-sdk';
 import { of } from 'rxjs';
-import { CartService } from 'src/app/shared/services/cart/cart.service';
+import { CartService } from 'src/app/shared/services/cart-helper/cart-helper.service';
 
 describe('ReOrder Service', () => {
   const mockLineItems = {
@@ -43,10 +43,7 @@ describe('ReOrder Service', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      providers: [
-        { provide: CartService, useValue: appLineItemService },
-        { provide: OcMeService, useValue: meService },
-      ],
+      providers: [{ provide: CartService, useValue: appLineItemService }, { provide: OcMeService, useValue: meService }],
     });
     service = TestBed.get(AppReorderService);
     appLineItemService = TestBed.get(CartService);
@@ -59,13 +56,9 @@ describe('ReOrder Service', () => {
 
   describe('Order', () => {
     beforeEach(() => {
-      spyOn(appLineItemService, 'listAllItems').and.returnValue(
-        of(mockLineItems)
-      );
+      spyOn(appLineItemService, 'listAllItems').and.returnValue(of(mockLineItems));
       spyOn(service, 'getValidProducts').and.returnValue(of(mockBuyerProducts));
-      spyOn(service, 'isProductInLiValid').and.returnValue(
-        of(mockReOrderResponse)
-      );
+      spyOn(service, 'isProductInLiValid').and.returnValue(of(mockReOrderResponse));
       spyOn(service, 'hasInventory').and.returnValue(of(mockReOrderResponse));
     });
 
@@ -80,10 +73,7 @@ describe('ReOrder Service', () => {
 
     it('should call isProductInLiValid', () => {
       service.order('orderID').subscribe();
-      expect(service.isProductInLiValid).toHaveBeenCalledWith(
-        mockBuyerProducts,
-        mockLineItems.Items
-      );
+      expect(service.isProductInLiValid).toHaveBeenCalledWith(mockBuyerProducts, mockLineItems.Items);
     });
 
     it('should call hasInventory', () => {
@@ -108,10 +98,7 @@ describe('ReOrder Service', () => {
   describe('isProductInLiValid functionality', () => {
     beforeEach(() => {
       spyOn(service, 'isProductInLiValid').and.callThrough();
-      response = service['isProductInLiValid'](
-        mockBuyerProducts,
-        mockLineItems.Items
-      ).subscribe;
+      response = service['isProductInLiValid'](mockBuyerProducts, mockLineItems.Items).subscribe;
     });
 
     it('should return orderReorderResponse', () => {

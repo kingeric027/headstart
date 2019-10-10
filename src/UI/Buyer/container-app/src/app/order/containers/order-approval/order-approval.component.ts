@@ -5,7 +5,7 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
 import { ModalState } from 'src/app/shared/models/modal-state.class';
 
 @Component({
-  selector: 'order-approval',
+  selector: 'ocm-order-approval',
   templateUrl: './order-approval.component.html',
   styleUrls: ['./order-approval.component.scss'],
 })

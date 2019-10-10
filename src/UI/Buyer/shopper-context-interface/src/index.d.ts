@@ -19,10 +19,11 @@ export interface ICreditCards {
 }
 
 export interface IOrderHistory {
-  approveOrder(orderID: string, Comments: string, AllowResubmit?: boolean): Promise<Order>;
-  declineOrder(orderID: string, Comments: string, AllowResubmit?: boolean): Promise<Order>;
-  validateReorder(orderID: string): Promise<OrderReorderResponse>;
-  getOrderDetails(orderID: string): Promise<OrderDetails>;
+  activeOrderID: string;
+  approveOrder(orderID?: string, Comments?: string,  AllowResubmit?: boolean): Promise<Order>;
+  declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<Order>;
+  validateReorder(orderID?: string): Promise<OrderReorderResponse>;
+  getOrderDetails(orderID?: string): Promise<OrderDetails>;
 }
 
 export interface IRouter {

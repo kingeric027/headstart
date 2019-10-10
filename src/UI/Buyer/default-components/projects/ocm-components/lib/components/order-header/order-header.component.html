@@ -1,10 +1,9 @@
-<div class="container"
-     *ngIf="order$ | async; let order">
+<div *ngIf="order">
   <nav class="breadcrumb"
        aria-label="breadcrumb">
-    <a class="breadcrumb-item link-text"
-       [routerLink]="['..']">All Orders</a>
-    <a class="breadcrumb-item link-text"
+    <a class="breadcrumb-item link text-primary"
+       (click)="context.router.toMyOrders()">All Orders</a>
+    <a class="breadcrumb-item link text-primary"
        aria-current="page">{{order.ID}}</a>
   </nav>
   <div class="pb-2 mt-4 mb-2">
@@ -25,30 +24,26 @@
                              [favorite]="isFavorite(order.ID)">
         </ocm-toggle-favorite>
       </button>
-      <order-reorder *ngIf="!approvalVersion"
+      <!-- <order-reorder *ngIf="!approvalVersion"
                      class="float-right pb-2 mr-2 mb-2"
                      [orderID]='order.ID'></order-reorder>
       <order-approval *ngIf="approvalVersion"
                       class="float-right"
-                      [orderID]='order.ID'></order-approval>
-
+                      [orderID]='order.ID'></order-approval> -->
     </div>
   </div>
   <ul class="nav nav-tabs mb-3">
     <li class="nav-item">
-      <button class="btn btn-link nav-link"
-              [routerLink]="['/profile', 'orders', order.ID]">
+      <button class="btn btn-link nav-link">
         <fa-icon [icon]="faCube"></fa-icon>
         Details
       </button>
     </li>
     <li class="nav-item">
-      <button class="btn btn-link nav-link"
-              [routerLink]="['/profile', 'orders', order.ID, 'shipments']">
+      <button class="btn btn-link nav-link">
         <fa-icon [icon]="faTruck"></fa-icon>
         Shipments
       </button>
     </li>
   </ul>
 </div>
-<router-outlet></router-outlet>

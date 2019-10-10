@@ -23,8 +23,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 
 // containers
-import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/shared/pipes/shipperTracking/shipperTracking.pipe';
-import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
+import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/shared/pipes/shipperTracking.pipe';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -73,8 +72,7 @@ import { PhoneFormatPipe } from './pipes/phone-format/phone-format.pipe';
     NgbDropdownModule,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
-    PhoneFormatPipe,
   ],
-  declarations: [ShipperTrackingPipe, ShipperTrackingSupportedPipe, PhoneFormatPipe],
+  declarations: [ShipperTrackingPipe, ShipperTrackingSupportedPipe],
 })
 export class SharedModule {}

@@ -64,6 +64,8 @@ import { OCMCheckout } from './components/checkout/checkout.component';
 import { OCMPaymentMethodManagement } from './components/payment-method-management/payment-method-management.component';
 import { OCMProfile } from './components/profile/profile.component';
 import { OCMProfileNav } from './components/profile-nav/profile-nav.component';
+import { OCMOrderDetails } from './components/order-detail/order-detail.component';
+import { OCMOrderHeader } from './components/order-header/order-header.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -118,7 +120,9 @@ import { OCMProfileNav } from './components/profile-nav/profile-nav.component';
     OCMCheckout,
     OCMPaymentMethodManagement,
     OCMProfile,
-    OCMProfileNav
+    OCMProfileNav,
+    OCMOrderDetails,
+    OCMOrderHeader
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -166,7 +170,9 @@ import { OCMProfileNav } from './components/profile-nav/profile-nav.component';
     OCMCheckout,
     OCMPaymentMethodManagement,
     OCMProfile,
-    OCMProfileNav
+    OCMProfileNav,
+    OCMOrderDetails,
+    OCMOrderHeader
   ],
   imports: [
     CommonModule,
@@ -189,6 +195,7 @@ import { OCMProfileNav } from './components/profile-nav/profile-nav.component';
 })
 export class OcmDefaultComponentsModule {
   constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: Object) {
+    this.buildWebComponent(OCMProfileNav, 'ocm-profile-nav');
     this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
     this.buildWebComponent(OCMProductCard, 'ocm-product-card');
     this.buildWebComponent(OCMToggleFavorite, 'ocm-toggle-favorite');
@@ -238,7 +245,9 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMCheckout, 'ocm-checkout');
     this.buildWebComponent(OCMPaymentMethodManagement, 'ocm-payment-method-management');
     this.buildWebComponent(OCMProfile, 'ocm-profile');
-    this.buildWebComponent(OCMProfileNav, 'ocm-profile-nav');
+
+    this.buildWebComponent(OCMOrderDetails, 'ocm-order-details');
+    this.buildWebComponent(OCMOrderHeader, 'ocm-order-header');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
