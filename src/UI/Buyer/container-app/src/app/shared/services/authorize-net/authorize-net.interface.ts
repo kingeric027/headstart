@@ -1,10 +1,3 @@
-import { BuyerCreditCard } from '@ordercloud/angular-sdk';
-
-export interface CreateCardResponse {
-  ResponseBody: BuyerCreditCard;
-  ResponseHttpStatusCode: number;
-}
-
 export interface AuthorizeCardSuccess {
   ResponseBody: AuthorizeCardResponseBody;
 }

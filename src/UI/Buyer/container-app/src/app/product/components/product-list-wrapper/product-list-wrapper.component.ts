@@ -31,11 +31,11 @@ export class ProductListWrapperComponent implements OnInit {
     this.products = this.activatedRoute.snapshot.data.products;
     this.categories = this.activatedRoute.snapshot.data.categories;
     this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
-    this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
+    this.context.productFilters.onFiltersChange(this.handleFiltersChange);
   }
 
   private handleFiltersChange = async () => {
-    const queryParams = this.context.productFilterActions.getOrderCloudParams();
+    const queryParams = this.context.productFilters.getOrderCloudParams();
     this.products = await this.ocMeService.ListProducts(queryParams).toPromise();
     this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
   };

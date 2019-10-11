@@ -39,8 +39,8 @@ export class OCMAppHeader extends OCMComponent {
     this.context.currentOrder.onOrderChange((order) => (this.order = order));
     this.context.currentUser.onIsAnonymousChange((isAnon) => (this.anonymous = isAnon));
     this.context.currentUser.onUserChange((user) => (this.user = user));
-    this.context.productFilterActions.onFiltersChange(this.handleFiltersChange);
-    this.context.routeActions.onUrlChange((path) => (this.activePath = path));
+    this.context.productFilters.onFiltersChange(this.handleFiltersChange);
+    this.context.router.onUrlChange((path) => (this.activePath = path));
     this.buildAddToCartListener();
   }
 
@@ -49,7 +49,7 @@ export class OCMAppHeader extends OCMComponent {
   }
 
   buildAddToCartListener() {
-    this.context.cartActions.addToCartSubject
+    this.context.currentOrder.addToCartSubject
       .pipe(
         tap((li: LineItem) => {
           this.popover.close();
@@ -68,7 +68,7 @@ export class OCMAppHeader extends OCMComponent {
 
   searchProducts(searchStr: string) {
     this.searchTermForProducts = searchStr;
-    this.context.routeActions.toProductList({ search: searchStr });
+    this.context.router.toProductList({ search: searchStr });
   }
 
   logout() {

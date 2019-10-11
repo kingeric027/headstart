@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { OCMComponent } from '../base-component';
 
@@ -20,7 +20,7 @@ export class OCMProductSort extends OCMComponent implements OnInit {
   }
 
   ngOnContextSet() {
-    this.context.productFilterActions.onFiltersChange((filters) => {
+    this.context.productFilters.onFiltersChange((filters) => {
       this.setForm(filters.sortBy);
     });
   }
@@ -32,6 +32,6 @@ export class OCMProductSort extends OCMComponent implements OnInit {
 
   sortStrategyChanged() {
     const sortValue = this.form.get('sortBy').value;
-    this.context.productFilterActions.sortBy(sortValue);
+    this.context.productFilters.sortBy(sortValue);
   }
 }

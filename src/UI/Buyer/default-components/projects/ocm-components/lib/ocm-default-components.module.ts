@@ -47,7 +47,6 @@ import { OCMLogin } from './components/login/login.component';
 import { OCMForgotPassword } from './components/forgot-password/forgot-password.component';
 import { OCMRegister } from './components/register/register.component';
 import { OCMResetPassword } from './components/reset-password/reset-password.component';
-import { OCMMeUpdateComponent } from './components/me-update/me-update.component';
 import { OCMChangePasswordForm } from './components/change-password-form/change-password-form.component';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 import { OCMAddressList } from './components/address-list/address-list.component';
@@ -62,6 +61,11 @@ import { OCMCheckoutAddress } from './components/checkout-address/checkout-addre
 import { OCMCheckoutPayment } from './components/checkout-payment/checkout-payment.component';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
 import { OCMCheckout } from './components/checkout/checkout.component';
+import { OCMPaymentMethodManagement } from './components/payment-method-management/payment-method-management.component';
+import { OCMProfile } from './components/profile/profile.component';
+import { OCMProfileNav } from './components/profile-nav/profile-nav.component';
+import { OCMOrderDetails } from './components/order-detail/order-detail.component';
+import { OCMOrderHeader } from './components/order-header/order-header.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -104,7 +108,6 @@ import { OCMCheckout } from './components/checkout/checkout.component';
     OCMForgotPassword,
     OCMRegister,
     OCMResetPassword,
-    OCMMeUpdateComponent,
     OCMChangePasswordForm,
     OCMAddressList,
     OCMGenericList,
@@ -114,7 +117,12 @@ import { OCMCheckout } from './components/checkout/checkout.component';
     OCMPaymentSpendingAccount,
     OCMCheckoutAddress,
     OCMCheckoutPayment,
-    OCMCheckout
+    OCMCheckout,
+    OCMPaymentMethodManagement,
+    OCMProfile,
+    OCMProfileNav,
+    OCMOrderDetails,
+    OCMOrderHeader
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -150,7 +158,6 @@ import { OCMCheckout } from './components/checkout/checkout.component';
     OCMForgotPassword,
     OCMRegister,
     OCMResetPassword,
-    OCMMeUpdateComponent,
     OCMChangePasswordForm,
     OCMAddressList,
     OCMGenericList,
@@ -160,7 +167,12 @@ import { OCMCheckout } from './components/checkout/checkout.component';
     OCMPaymentSpendingAccount,
     OCMCheckoutAddress,
     OCMCheckoutPayment,
-    OCMCheckout
+    OCMCheckout,
+    OCMPaymentMethodManagement,
+    OCMProfile,
+    OCMProfileNav,
+    OCMOrderDetails,
+    OCMOrderHeader
   ],
   imports: [
     CommonModule,
@@ -183,6 +195,7 @@ import { OCMCheckout } from './components/checkout/checkout.component';
 })
 export class OcmDefaultComponentsModule {
   constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: Object) {
+    this.buildWebComponent(OCMProfileNav, 'ocm-profile-nav');
     this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
     this.buildWebComponent(OCMProductCard, 'ocm-product-card');
     this.buildWebComponent(OCMToggleFavorite, 'ocm-toggle-favorite');
@@ -218,7 +231,6 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMForgotPassword, 'ocm-forgot-password');
     this.buildWebComponent(OCMRegister, 'ocm-register');
     this.buildWebComponent(OCMResetPassword, 'ocm-reset-password');
-    this.buildWebComponent(OCMMeUpdateComponent, 'ocm-profile-me-update');
     this.buildWebComponent(OCMChangePasswordForm, 'ocm-change-password');
     this.buildWebComponent(OCMAddressList, 'ocm-address-list');
     this.buildWebComponent(OCMGenericList, 'ocm-generic-list');
@@ -231,6 +243,11 @@ export class OcmDefaultComponentsModule {
     this.buildWebComponent(OCMCheckoutAddress, 'ocm-checkout-address');
     this.buildWebComponent(OCMCheckoutPayment, 'ocm-checkout-payment');
     this.buildWebComponent(OCMCheckout, 'ocm-checkout');
+    this.buildWebComponent(OCMPaymentMethodManagement, 'ocm-payment-method-management');
+    this.buildWebComponent(OCMProfile, 'ocm-profile');
+
+    this.buildWebComponent(OCMOrderDetails, 'ocm-order-details');
+    this.buildWebComponent(OCMOrderHeader, 'ocm-order-header');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

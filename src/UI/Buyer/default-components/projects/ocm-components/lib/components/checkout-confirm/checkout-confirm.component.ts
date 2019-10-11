@@ -22,7 +22,7 @@ export class OCMCheckoutConfirm extends OCMComponent implements OnInit {
   async ngOnContextSet() {
     this.anonEnabled = this.context.appSettings.anonymousShoppingEnabled;
     this.order = this.context.currentOrder.get();
-    this.lineItems = this.context.currentOrder.lineItems;
+    this.lineItems = this.context.currentOrder.getLineItems();
     this.payments = await this.context.currentOrder.listPayments();
   }
 
@@ -38,6 +38,6 @@ export class OCMCheckoutConfirm extends OCMComponent implements OnInit {
     }
 
     // todo: "Order Submitted Successfully" message 
-    this.context.routeActions.toOrderDetails(orderID);
+    this.context.router.toOrderDetails(orderID);
   }
 }

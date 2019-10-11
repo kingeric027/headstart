@@ -18,16 +18,16 @@ export class OCMLineitemTable extends OCMComponent {
   ngOnContextSet() {}
 
   removeLineItem(lineItemID: string) {
-    this.context.cartActions.removeLineItem(lineItemID);
+    this.context.currentOrder.removeFromCart(lineItemID);
   }
 
   toProductDetails(productID: string) {
-    this.context.routeActions.toProductDetails(productID);
+    this.context.router.toProductDetails(productID);
   }
 
   changeQuantity(lineItemID: string, quantity: number) {
     this.getLineItem(lineItemID).Quantity = quantity;
-    this.context.cartActions.updateQuantity(lineItemID, quantity);
+    this.context.currentOrder.setQuantityInCart(lineItemID, quantity);
   }
 
   getImageUrl(lineItemID: string) {

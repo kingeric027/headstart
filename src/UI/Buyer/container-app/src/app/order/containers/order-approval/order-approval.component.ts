@@ -5,7 +5,7 @@ import { ShopperContextService } from 'src/app/shared/services/shopper-context/s
 import { ModalState } from 'src/app/shared/models/modal-state.class';
 
 @Component({
-  selector: 'order-approval',
+  selector: 'ocm-order-approval',
   templateUrl: './order-approval.component.html',
   styleUrls: ['./order-approval.component.scss'],
 })
@@ -37,6 +37,6 @@ export class OrderApprovalComponent implements OnInit {
 
     this.toasterService.success(`Order ${this.orderID} was ${this.approved ? 'Approved' : 'Declined'}`);
     this.approveModal = ModalState.Closed;
-    this.context.routeActions.toOrdersToApprove();
+    this.context.router.toOrdersToApprove();
   }
 }

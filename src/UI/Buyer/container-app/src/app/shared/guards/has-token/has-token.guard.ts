@@ -1,8 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import * as jwtDecode from 'jwt-decode';
-import { DecodedOrderCloudToken } from 'src/app/shared';
 import { applicationConfiguration } from 'src/app/config/app.config';
 import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
@@ -66,18 +64,14 @@ export class HasTokenGuard implements CanActivate {
   }
 
   private isTokenValid(): boolean {
-    const token = this.appAuthService.getOrderCloudToken();
+    const token = this.appAuthService.getOCToken();
 
     if (!token) {
       return false;
     }
 
-    let decodedToken: DecodedOrderCloudToken;
-    try {
-      decodedToken = jwtDecode(token);
-    } catch (e) {
-      decodedToken = null;
-    }
+    const decodedToken = this.appAuthService.getDecodedOCToken();
+
     if (!decodedToken) {
       return false;
     }

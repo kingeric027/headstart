@@ -4,10 +4,7 @@ import { OrderShipmentsComponent } from 'src/app/order/containers/order-shipment
 import { of, Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { OcMeService } from '@ordercloud/angular-sdk';
-import {
-  ShipperTrackingPipe,
-  ShipperTrackingSupportedPipe,
-} from 'src/app/shared/pipes/shipperTracking/shipperTracking.pipe';
+import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from 'src/app/shared/pipes/shipperTracking.pipe';
 
 describe('OrderShipmentsComponent', () => {
   let component: OrderShipmentsComponent;
@@ -17,10 +14,7 @@ describe('OrderShipmentsComponent', () => {
   const parentDataSubject = new Subject<any>();
   const shipmentsResolve = { Items: [{ ID: 'ShipmentOne' }] };
   const lineItemListResolve = {
-    Items: [
-      { ID: 'LineItemOne', Product: {} },
-      { ID: 'LineItemTwo', Product: {} },
-    ],
+    Items: [{ ID: 'LineItemOne', Product: {} }, { ID: 'LineItemTwo', Product: {} }],
   };
   const shipmentItems = {
     Items: [{ LineItemID: 'LineItemTwo' }, { LineItemID: 'LineItemOne' }],
@@ -36,21 +30,12 @@ describe('OrderShipmentsComponent', () => {
     },
   };
   const meService = {
-    ListShipmentItems: jasmine
-      .createSpy('ListShipmentItems')
-      .and.returnValue(of(shipmentItems)),
+    ListShipmentItems: jasmine.createSpy('ListShipmentItems').and.returnValue(of(shipmentItems)),
   };
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ShipperTrackingPipe,
-        ShipperTrackingSupportedPipe,
-        OrderShipmentsComponent,
-      ],
-      providers: [
-        { provide: ActivatedRoute, useValue: activatedRoute },
-        { provide: OcMeService, useValue: meService },
-      ],
+      declarations: [ShipperTrackingPipe, ShipperTrackingSupportedPipe, OrderShipmentsComponent],
+      providers: [{ provide: ActivatedRoute, useValue: activatedRoute }, { provide: OcMeService, useValue: meService }],
     }).compileComponents();
   }));
 
@@ -71,14 +56,10 @@ describe('OrderShipmentsComponent', () => {
       component.ngOnInit();
     });
     it('should call setShipmentCount', () => {
-      expect(component['setShipmentCount']).toHaveBeenCalledWith(
-        shipmentsResolve
-      );
+      expect(component['setShipmentCount']).toHaveBeenCalledWith(shipmentsResolve);
     });
     it('should call selectShipment', () => {
-      expect(component['selectShipment']).toHaveBeenCalledWith(
-        shipmentsResolve.Items[0]
-      );
+      expect(component['selectShipment']).toHaveBeenCalledWith(shipmentsResolve.Items[0]);
     });
     it('should set line items', () => {
       expect(component.lineItems).toEqual(lineItemListResolve);
@@ -87,9 +68,7 @@ describe('OrderShipmentsComponent', () => {
 
   describe('setShipmentCount', () => {
     it('should set a count property on each shipment', () => {
-      const shipmentsAfterCount = component['setShipmentCount'](
-        shipmentsResolve
-      );
+      const shipmentsAfterCount = component['setShipmentCount'](shipmentsResolve);
       expect(shipmentsAfterCount.Items[0]['count']).toBe(1);
     });
   });
@@ -103,9 +82,7 @@ describe('OrderShipmentsComponent', () => {
       expect(component.selectedShipment).toEqual(shipmentsResolve.Items[0]);
     });
     it('should list shipment items', () => {
-      expect(meService.ListShipmentItems).toHaveBeenCalledWith(
-        shipmentsResolve.Items[0].ID
-      );
+      expect(meService.ListShipmentItems).toHaveBeenCalledWith(shipmentsResolve.Items[0].ID);
     });
     it('should call set line items', () => {
       component.shipmentItems$.subscribe();

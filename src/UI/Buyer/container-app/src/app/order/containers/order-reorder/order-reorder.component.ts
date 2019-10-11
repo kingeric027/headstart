@@ -53,7 +53,7 @@ export class OrderReorderComponent implements OnInit {
     _forEach(this.reorderResponse.ValidLi, async (li: LineItem) => {
       if (!li) return;
       li = { ProductID: li.Product.ID, Quantity: li.Quantity, Specs: li.Specs };
-      await this.context.cartActions.addToCart(li);
+      await this.context.currentOrder.addToCart(li);
     });
     this.reorderModal = ModalState.Closed;
   }

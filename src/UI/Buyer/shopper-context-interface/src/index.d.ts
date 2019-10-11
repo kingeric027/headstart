@@ -1,36 +1,32 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, OcMeService, Payment, ListPromotion, OrderApproval, Promotion } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export interface IShopperContext {
-  cartActions: ICartActions;
-  routeActions: IRouteActions;
+  router: IRouter;
   currentUser: ICurrentUser;
   currentOrder: ICurrentOrder;
-  productFilterActions: IProductFilterActions;
-  authentication: IAuthActions;
+  productFilters: IProductFilters;
+  authentication: IAuthentication;
   orderHistory: IOrderHistory;
+  creditCards: ICreditCards;
   myResources: OcMeService; // TODO - create our own, more limited interface here. Me.Patch(), for example, should not be allowed since it should always go through the current user service.
   appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
 }
 
-export interface ICartActions {
-  addToCartSubject: Subject<LineItem>;
-  addToCart(lineItem: LineItem): Promise<LineItem>;
-  removeLineItem(lineItemID: string): Promise<void>;
-  updateQuantity(lineItemID: string, newQuantity: number): Promise<LineItem>;
-  addManyToCart(lineItem: LineItem[]): Promise<LineItem[]>;
-  emptyCart(): Promise<void>;
-  onAddToCart(callback: (lineItem: LineItem) => void): void;
+export interface ICreditCards {
+  CreateSavedCard(card: AuthNetCreditCard): Promise<CreateCardResponse>;
+  DeleteSavedCard(cardID: string): Promise<void>;
 }
 
 export interface IOrderHistory {
-  approveOrder(orderID: string, Comments: string, AllowResubmit?: boolean): Promise<Order>;
-  declineOrder(orderID: string, Comments: string, AllowResubmit?: boolean): Promise<Order>;
-  validateReorder(orderID: string): Promise<OrderReorderResponse>;
-  getDetailedOrder(orderID: string): Promise<DetailedOrder>;
+  activeOrderID: string;
+  approveOrder(orderID?: string, Comments?: string,  AllowResubmit?: boolean): Promise<Order>;
+  declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<Order>;
+  validateReorder(orderID?: string): Promise<OrderReorderResponse>;
+  getOrderDetails(orderID?: string): Promise<OrderDetails>;
 }
 
-export interface IRouteActions {
+export interface IRouter {
   onUrlChange(callback: (path: string) => void): void;
   toProductDetails(productID: string): void;
   toProductList(options?: ProductFilters): void;
@@ -46,6 +42,7 @@ export interface IRouteActions {
   toMyOrders(): void;
   toOrdersToApprove(): void;
   toOrderDetails(orderID: string): void;
+  toChangePassword(): void;
 }
 
 export interface ICurrentUser {
@@ -54,7 +51,7 @@ export interface ICurrentUser {
   isAnonymous: boolean;
   get(): MeUser;
   patch(user: MeUser): Promise<MeUser>;
-  onUserChange(callback: (user: User) => void): void;
+  onUserChange(callback: (user: User) => void): void; // TODO - replace all these onChange functions with real Observables. More powerful
   onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void;
   onFavoriteProductsChange(callback: (productIDs: string[]) => void): void;
   setIsFavoriteProduct(isFav: boolean, productID: string): void;
@@ -63,10 +60,18 @@ export interface ICurrentUser {
 }
 
 export interface ICurrentOrder {
-  lineItems: ListLineItem;
+  addToCartSubject: Subject<LineItem>;
   get(): Order;
   patch(order: Order): Promise<Order>; 
+  getLineItems(): ListLineItem;
   submit(): Promise<void>;
+
+  addToCart(lineItem: LineItem): Promise<LineItem>;
+  addManyToCart(lineItem: LineItem[]): Promise<LineItem[]>;
+  setQuantityInCart(lineItemID: string, newQuantity: number): Promise<LineItem>;
+  removeFromCart(lineItemID: string): Promise<void>;
+  emptyCart(): Promise<void>;
+
   listPayments(): Promise<ListPayment>; 
   createPayment(payment: Payment): Promise<Payment>;
   setBillingAddress(address: Address): Promise<Order>;
@@ -77,7 +82,7 @@ export interface ICurrentOrder {
   onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
 }
 
-export interface IProductFilterActions {
+export interface IProductFilters {
   toPage(pageNumber: number): void;
   sortBy(field: string): void;
   clearSort(): void;
@@ -92,12 +97,13 @@ export interface IProductFilterActions {
   onFiltersChange(callback: (filters: ProductFilters) => void): void;
 }
 
-export interface IAuthActions {
+export interface IAuthentication {
   profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
   logout(): Promise<void>;
   changePassword(newPassword: string): Promise<void>;
   anonymousLogin(): Promise<AccessToken>;
-  getOrderCloudToken(): string;
+  getOCToken(): string;
+  getDecodedOCToken(): DecodedOCToken;
   forgotPasssword(email: string): Promise<any>;
   register(me: MeUser): Promise<any>;
   resetPassword(code: string, config: PasswordReset): Promise<any>;
@@ -120,12 +126,17 @@ export interface AuthNetCreditCard {
   ID?: string;
 }
 
+export interface CreateCardResponse {
+  ResponseBody: BuyerCreditCard;
+  ResponseHttpStatusCode: number;
+}
+
 export interface OrderReorderResponse {
   ValidLi: Array<LineItem>;
   InvalidLi: Array<LineItem>;
 }
 
-export interface DetailedOrder {
+export interface OrderDetails {
   order: Order;
   lineItems: ListLineItem;
   promotions: ListPromotion;
@@ -169,3 +180,58 @@ export interface AppConfig {
    */
   scope: string[];
 }
+
+export interface DecodedOCToken {
+  /**
+   * the ordercloud username
+   */
+  usr: string;
+
+  /**
+   * the client id used when making token request
+   */
+  cid: string;
+
+  /**
+   * helpful for identifying user types in an app
+   * that may have both types
+   */
+  usrtype: 'admin' | 'buyer';
+
+  /**
+   * list of security profile roles that this user
+   * has access to, read more about security profile roles
+   * [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
+   */
+  role: string[]; // TODO: add security profile roles to the sdk
+
+  /**
+   * the issuer of the token - should always be https://auth.ordercloud.io
+   */
+  iss: string;
+
+  /**
+   * the audience - who should be consuming this token
+   * this should always be https://api.ordercloud.io (the ordercloud api)
+   */
+  aud: string;
+
+  /**
+   * expiration of the token (in seconds) since the
+   * UNIX epoch (January 1, 1970 00:00:00 UTC)
+   */
+  exp: number;
+
+  /**
+   * point at which token was issued (in seconds) since the
+   * UNIX epoch (January 1, 1970 00:00:00 UTC)
+   */
+  nbf: number;
+
+  /**
+   * the order id assigned to the anonymous user,
+   * this value will *only* exist for anonymous users
+   */
+  orderid?: string;
+}
+

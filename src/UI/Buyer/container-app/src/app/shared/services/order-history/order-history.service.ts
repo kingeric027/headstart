@@ -2,13 +2,15 @@ import { Injectable } from '@angular/core';
 import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLineItemService } from '@ordercloud/angular-sdk';
 import { uniqBy as _uniqBy } from 'lodash';
 import { AppPaymentService } from '../app-payment/app-payment.service';
-import { OrderReorderResponse, IOrderHistory, DetailedOrder } from 'shopper-context-interface';
+import { OrderReorderResponse, IOrderHistory, OrderDetails } from 'shopper-context-interface';
 import { AppReorderService } from '../reorder/reorder.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderHistoryService implements IOrderHistory {
+  activeOrderID: string;
+
   constructor(
     private ocOrderService: OcOrderService,
     private appPaymentService: AppPaymentService,
@@ -16,19 +18,19 @@ export class OrderHistoryService implements IOrderHistory {
     private ocLineItemService: OcLineItemService
   ) {}
 
-  async approveOrder(orderID: string, Comments: string, AllowResubmit: boolean = false): Promise<Order> {
+  async approveOrder(orderID: string = this.activeOrderID, Comments: string = '', AllowResubmit: boolean = false): Promise<Order> {
     return await this.ocOrderService.Approve('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 
-  async declineOrder(orderID: string, Comments: string, AllowResubmit: boolean = false): Promise<Order> {
+  async declineOrder(orderID: string = this.activeOrderID, Comments: string = '', AllowResubmit: boolean = false): Promise<Order> {
     return await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 
-  async validateReorder(orderID: string): Promise<OrderReorderResponse> {
+  async validateReorder(orderID: string = this.activeOrderID): Promise<OrderReorderResponse> {
     return this.appReorderService.validateReorder(orderID);
   }
 
-  async getDetailedOrder(orderID: string): Promise<DetailedOrder> {
+  async getOrderDetails(orderID: string = this.activeOrderID): Promise<OrderDetails> {
     const res = await Promise.all([
       this.ocOrderService.Get('outgoing', orderID).toPromise(),
       this.ocLineItemService.List('outgoing', orderID).toPromise(),

@@ -43,7 +43,7 @@ export class OCMProductDetails extends OCMComponent implements AfterViewChecked 
       OptionID: o.ID,
       Value: o.Value,
     }));
-    this.context.cartActions.addToCart({
+    this.context.currentOrder.addToCart({
       ProductID: this.product.ID,
       Quantity: this.quantity,
       Specs,

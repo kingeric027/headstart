@@ -4,7 +4,6 @@ import { RouterModule, Routes } from '@angular/router';
 
 // product components
 import {
-  MeListProductResolver,
   MeListSpecsResolver,
   MeProductResolver,
   MeListCategoriesResolver,
@@ -18,7 +17,6 @@ const routes: Routes = [
     path: '',
     component: ProductListWrapperComponent,
     resolve: {
-      products: MeListProductResolver,
       categories: MeListCategoriesResolver,
     },
   },
