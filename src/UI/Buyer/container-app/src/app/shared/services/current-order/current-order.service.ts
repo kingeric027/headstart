@@ -16,12 +16,12 @@ import {
 } from '@ordercloud/angular-sdk';
 import { applicationConfiguration } from 'src/app/config/app.config';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { CurrentUserService } from '../current-user/current-user.service';
 import { listAll } from 'src/app/shared/functions/listAll';
 import { ICurrentOrder, AppConfig } from 'shopper-context-interface';
 import { ToastrService } from 'ngx-toastr';
-import { AppPaymentService } from '../app-payment/app-payment.service';
 import { isUndefined as _isUndefined, get as _get } from 'lodash';
+import { TokenHelperService } from '../token-helper/token-helper.service';
+import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 
 @Injectable({
   providedIn: 'root',
@@ -33,19 +33,17 @@ export class CurrentOrderService implements ICurrentOrder {
   };
   private initializingOrder = false;
   public addToCartSubject: Subject<LineItem> = new Subject<LineItem>(); // need to make available as observable
-
   private orderSubject: BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
   private lineItemSubject: BehaviorSubject<ListLineItem> = new BehaviorSubject<ListLineItem>(this.DefaultLineItems);
 
   constructor(
-    private ocLineItemsService: OcLineItemService,
     private ocOrderService: OcOrderService,
     private ocLineItemService: OcLineItemService,
     private ocMeService: OcMeService,
-    private currentUser: CurrentUserService,
+    private tokenHelper: TokenHelperService,
     private ocPaymentService: OcPaymentService,
     private toastrService: ToastrService,
-    private appPaymentService: AppPaymentService,
+    private paymentHelper: PaymentHelperService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
@@ -126,7 +124,7 @@ export class CurrentOrderService implements ICurrentOrder {
   }
 
   async listPayments(): Promise<ListPayment> {
-    return await this.appPaymentService.ListPaymentsOnOrder(this.order.ID);
+    return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);
   }
 
   async createPayment(payment: Payment): Promise<Payment> {
@@ -145,12 +143,12 @@ export class CurrentOrderService implements ICurrentOrder {
     if (orders.Items.length) {
       this.order = orders.Items[0];
     } else if (this.appConfig.anonymousShoppingEnabled) {
-      this.order = <Order>{ ID: this.currentUser.getOrderIDFromToken() };
+      this.order = <Order>{ ID: this.tokenHelper.getAnonmousOrderID() };
     } else {
       this.order = await this.ocOrderService.Create('outgoing', {}).toPromise();
     }
     if (this.order.DateCreated) {
-      this.lineItems = await listAll(this.ocLineItemsService, 'outgoing', this.order.ID);
+      this.lineItems = await listAll(this.ocLineItemService, 'outgoing', this.order.ID);
     }
   }
 

@@ -9,13 +9,14 @@ import { OCMComponent } from '../base-component';
 })
 export class OCMOrderHeader extends OCMComponent {
   @Input() order: Order;
-  @Input() approvalVersion: boolean;
+  approvalVersion: boolean;
   faCube = faCube;
   faTruck = faTruck;
 
-  // this.approvalVersion = this.router.url.includes('/approval');
-
-  ngOnContextSet() {}
+  ngOnContextSet() {
+    const url = this.context.router.getActiveUrl();
+    this.approvalVersion = url.includes('/approval');
+  }
 
   isFavorite(orderID: string): boolean {
     return this.context.currentUser.favoriteOrderIDs.includes(orderID);

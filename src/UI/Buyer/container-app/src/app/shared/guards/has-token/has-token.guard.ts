@@ -1,21 +1,21 @@
 import { Injectable, Inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { OcTokenService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration } from 'src/app/config/app.config';
-import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { AuthService } from 'src/app/shared/services/auth/auth.service';
 import { DOCUMENT } from '@angular/common';
 import { AppConfig } from 'shopper-context-interface';
+import { TokenHelperService } from '../../services/token-helper/token-helper.service';
+import { OcTokenService } from '@ordercloud/angular-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HasTokenGuard implements CanActivate {
   constructor(
-    private ocTokenService: OcTokenService,
     private router: Router,
-    private appAuthService: AuthService,
-    private currentUser: CurrentUserService,
+    private auth: AuthService,
+    private tokenHelper: TokenHelperService,
+    private ocTokenService: OcTokenService,
     @Inject(DOCUMENT) private document: any,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
@@ -35,7 +35,7 @@ export class HasTokenGuard implements CanActivate {
     if (isImpersonating) {
       const match = /token=([^&]*)/.exec(this.document.location.search);
       if (match) {
-        this.appAuthService.setToken(match[1]);
+        this.auth.setToken(match[1]);
         return true;
       } else {
         alert(`Missing url query param 'token'`);
@@ -43,9 +43,9 @@ export class HasTokenGuard implements CanActivate {
     }
 
     const isAccessTokenValid = this.isTokenValid();
-    const refreshTokenExists = this.ocTokenService.GetRefresh() && this.appAuthService.getRememberStatus();
+    const refreshTokenExists = this.ocTokenService.GetRefresh() && this.auth.getRememberStatus();
     if (!isAccessTokenValid && refreshTokenExists) {
-      await this.appAuthService.refresh().toPromise();
+      await this.auth.refresh().toPromise();
       return true;
     }
 
@@ -56,21 +56,15 @@ export class HasTokenGuard implements CanActivate {
     }
     // get new anonymous token and then let them continue
     if (!isAccessTokenValid && this.appConfig.anonymousShoppingEnabled) {
-      await this.appAuthService.anonymousLogin();
+      await this.auth.anonymousLogin();
       return true;
     }
-    this.currentUser.isLoggedIn = true;
+    this.auth.isLoggedIn = true;
     return isAccessTokenValid;
   }
 
   private isTokenValid(): boolean {
-    const token = this.appAuthService.getOCToken();
-
-    if (!token) {
-      return false;
-    }
-
-    const decodedToken = this.appAuthService.getDecodedOCToken();
+    const decodedToken = this.tokenHelper.getDecodedOCToken();
 
     if (!decodedToken) {
       return false;

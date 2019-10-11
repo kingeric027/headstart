@@ -27,6 +27,7 @@ export interface IOrderHistory {
 }
 
 export interface IRouter {
+  getActiveUrl(): string;
   onUrlChange(callback: (path: string) => void): void;
   toProductDetails(productID: string): void;
   toProductList(options?: ProductFilters): void;
@@ -102,8 +103,6 @@ export interface IAuthentication {
   logout(): Promise<void>;
   changePassword(newPassword: string): Promise<void>;
   anonymousLogin(): Promise<AccessToken>;
-  getOCToken(): string;
-  getDecodedOCToken(): DecodedOCToken;
   forgotPasssword(email: string): Promise<any>;
   register(me: MeUser): Promise<any>;
   resetPassword(code: string, config: PasswordReset): Promise<any>;

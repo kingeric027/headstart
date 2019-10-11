@@ -8,9 +8,11 @@ import { IRouter, ProductFilters } from 'shopper-context-interface';
   providedIn: 'root',
 })
 export class RouteService implements IRouter {
-  currentPath: any;
-
   constructor(private router: Router, private productFilterService: ProductFilterService) {}
+
+  getActiveUrl(): string {
+    return this.router.url;
+  }
 
   onUrlChange(callback: (path: string) => void): void {
     this.router.events

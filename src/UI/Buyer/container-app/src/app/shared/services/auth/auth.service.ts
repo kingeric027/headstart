@@ -15,11 +15,10 @@ import {
 } from '@ordercloud/angular-sdk';
 import { applicationConfiguration } from 'src/app/config/app.config';
 //import { CookieService } from '@gorniv/ngx-universal';
-import { CurrentUserService } from 'src/app/shared/services/current-user/current-user.service';
 import { CurrentOrderService } from 'src/app/shared/services/current-order/current-order.service';
-import { AppConfig, IAuthentication, DecodedOCToken } from 'shopper-context-interface';
-import * as jwtDecode from 'jwt-decode';
+import { AppConfig, IAuthentication } from 'shopper-context-interface';
 import { CookieService } from 'ngx-cookie';
+import { CurrentUserService } from '../current-user/current-user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -28,22 +27,37 @@ export class AuthService implements IAuthentication {
   private rememberMeCookieName = `${this.appConfig.appname.replace(/ /g, '_').toLowerCase()}_rememberMe`;
   fetchingRefreshToken = false;
   failedRefreshAttempt = false;
-  refreshToken: BehaviorSubject<string>;
+  refreshToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  private loggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(
     private ocTokenService: OcTokenService,
     private ocAuthService: OcAuthService,
     private cookieService: CookieService,
     private router: Router,
-    private currentUser: CurrentUserService,
     private currentOrder: CurrentOrderService,
+    private currentUser: CurrentUserService,
     private ocMeService: OcMeService,
     private ocPasswordResetService: OcPasswordResetService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {
-    this.refreshToken = new BehaviorSubject<string>('');
+  ) {}
+
+  // All this isLoggedIn stuff is only used in the header wrapper component
+  // remove once its no longer needed.
+
+  get isLoggedIn(): boolean {
+    return this.loggedInSubject.value;
   }
 
+  set isLoggedIn(value: boolean) {
+    this.loggedInSubject.next(value);
+  }
+
+  onIsLoggedInChange(callback: (isLoggedIn: boolean) => void): void {
+    this.loggedInSubject.subscribe(callback);
+  }
+
+  // change all this unreadable observable stuff
   refresh(): Observable<void> {
     this.fetchingRefreshToken = true;
     return from(this.refreshTokenLogin()).pipe(
@@ -84,7 +98,7 @@ export class AuthService implements IAuthentication {
   setToken(token: string) {
     if (!token) return;
     this.ocTokenService.SetAccess(token);
-    this.currentUser.isLoggedIn = true;
+    this.isLoggedIn = true;
   }
 
   async forgotPasssword(email: string): Promise<any> {
@@ -97,7 +111,7 @@ export class AuthService implements IAuthentication {
   }
 
   async register(me: MeUser<any>): Promise<any> {
-    const token = this.getOCToken();
+    const token = this.ocTokenService.GetAccess();
     const result = await this.ocMeService.Register(token, me).toPromise();
     return result;
   }
@@ -131,11 +145,11 @@ export class AuthService implements IAuthentication {
 
   async logout(): Promise<void> {
     this.ocTokenService.RemoveAccess();
-    this.currentUser.isLoggedIn = false;
+    this.isLoggedIn = false;
     if (this.appConfig.anonymousShoppingEnabled) {
       this.router.navigate(['/home']);
       await this.currentUser.reset();
-      this.currentOrder.reset();
+      this.currentOrder.reset(); // TODO - can we get rid of Auth's dependency on current Order and User?
     } else {
       this.router.navigate(['/login']);
     }
@@ -148,18 +162,6 @@ export class AuthService implements IAuthentication {
   async resetPassword(code: string, config: PasswordReset): Promise<any> {
     const reset = await this.ocPasswordResetService.ResetPasswordByVerificationCode(code, config).toPromise();
     return reset;
-  }
-
-  getOCToken(): string {
-    return this.ocTokenService.GetAccess();
-  }
-
-  getDecodedOCToken(): DecodedOCToken {
-    try {
-      return jwtDecode(this.getOCToken());
-    } catch (e) {
-      return null;
-    }
   }
 
   setRememberMeStatus(status: boolean): void {

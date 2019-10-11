@@ -1,8 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { applicationConfiguration } from 'src/app/config/app.config';
-import { BuyerCreditCard } from '@ordercloud/angular-sdk';
-import { AuthService } from '../auth/auth.service';
+import { BuyerCreditCard, OcTokenService } from '@ordercloud/angular-sdk';
 import { AppConfig, AuthNetCreditCard, ICreditCards, CreateCardResponse } from 'shopper-context-interface';
 
 /**
@@ -22,7 +21,7 @@ export class AuthNetCreditCardService implements ICreditCards {
   readonly options = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.authService.getOCToken()}`,
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
     }),
   };
   readonly acceptedCards = {
@@ -31,7 +30,11 @@ export class AuthNetCreditCardService implements ICreditCards {
     Discover: RegExp('^6(?:011|5[0-9]{2})[0-9]{12}$'), // e.g. 6011000000000000
   };
 
-  constructor(private http: HttpClient, private authService: AuthService, @Inject(applicationConfiguration) private appConfig: AppConfig) {}
+  constructor(
+    private http: HttpClient,
+    private ocTokenService: OcTokenService,
+    @Inject(applicationConfiguration) private appConfig: AppConfig
+  ) {}
 
   private post(body): Promise<any> {
     return this.http.post<any>(this.url, body, this.options).toPromise();

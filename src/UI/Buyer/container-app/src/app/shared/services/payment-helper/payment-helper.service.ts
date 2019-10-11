@@ -4,7 +4,7 @@ import { ListPayment, OcPaymentService, OcMeService, Payment } from '@ordercloud
 @Injectable({
   providedIn: 'root',
 })
-export class AppPaymentService {
+export class PaymentHelperService {
   constructor(private ocPaymentService: OcPaymentService, private ocMeService: OcMeService) {}
 
   async ListPaymentsOnOrder(orderID: string): Promise<ListPayment> {

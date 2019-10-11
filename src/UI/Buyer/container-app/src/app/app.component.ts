@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgbDateAdapter, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDateNativeAdapter, NgbDateCustomParserFormatter } from 'src/app/config/date-picker.config';
-import { CurrentUserService } from './shared/services/current-user/current-user.service';
+import { AuthService } from './shared/services/auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +17,7 @@ import { CurrentUserService } from './shared/services/current-user/current-user.
 export class AppComponent {
   isLoggedIn: boolean;
 
-  constructor(private currentUser: CurrentUserService) {
-    this.currentUser.onIsLoggedInChange((isLoggedIn) => (this.isLoggedIn = isLoggedIn));
+  constructor(private auth: AuthService) {
+    this.auth.onIsLoggedInChange((isLoggedIn) => (this.isLoggedIn = isLoggedIn));
   }
 }

@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLineItemService } from '@ordercloud/angular-sdk';
 import { uniqBy as _uniqBy } from 'lodash';
-import { AppPaymentService } from '../app-payment/app-payment.service';
 import { OrderReorderResponse, IOrderHistory, OrderDetails } from 'shopper-context-interface';
 import { AppReorderService } from '../reorder/reorder.service';
+import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderHistoryService implements IOrderHistory {
-  activeOrderID: string;
+  activeOrderID: string; // make this read-only
 
   constructor(
     private ocOrderService: OcOrderService,
-    private appPaymentService: AppPaymentService,
+    private paymentHelper: PaymentHelperService,
     private appReorderService: AppReorderService,
     private ocLineItemService: OcLineItemService
   ) {}
@@ -46,7 +46,7 @@ export class OrderHistoryService implements IOrderHistory {
   }
 
   private async getPayments(orderID: string): Promise<ListPayment> {
-    return this.appPaymentService.ListPaymentsOnOrder(orderID);
+    return this.paymentHelper.ListPaymentsOnOrder(orderID);
   }
 
   private async getApprovals(orderID: string): Promise<OrderApproval[]> {
