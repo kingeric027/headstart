@@ -44,6 +44,7 @@ export interface IRouter {
   toOrdersToApprove(): void;
   toOrderDetails(orderID: string): void;
   toChangePassword(): void;
+  toRoute(path: string): void;
 }
 
 export interface ICurrentUser {

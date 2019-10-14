@@ -66,6 +66,7 @@ import { OCMProfile } from './components/profile/profile.component';
 import { OCMProfileNav } from './components/profile-nav/profile-nav.component';
 import { OCMOrderDetails } from './components/order-detail/order-detail.component';
 import { OCMOrderHeader } from './components/order-header/order-header.component';
+import { OCMAppFooter } from './components/app-footer/app-footer.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -122,7 +123,8 @@ import { OCMOrderHeader } from './components/order-header/order-header.component
     OCMProfile,
     OCMProfileNav,
     OCMOrderDetails,
-    OCMOrderHeader
+    OCMOrderHeader,
+    OCMAppFooter
   ],
   entryComponents: [
     OCMToggleFavorite,
@@ -172,7 +174,8 @@ import { OCMOrderHeader } from './components/order-header/order-header.component
     OCMProfile,
     OCMProfileNav,
     OCMOrderDetails,
-    OCMOrderHeader
+    OCMOrderHeader,
+    OCMAppFooter
   ],
   imports: [
     CommonModule,
@@ -248,6 +251,7 @@ export class OcmDefaultComponentsModule {
 
     this.buildWebComponent(OCMOrderDetails, 'ocm-order-details');
     this.buildWebComponent(OCMOrderHeader, 'ocm-order-header');
+    this.buildWebComponent(OCMAppFooter, 'ocm-app-footer');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

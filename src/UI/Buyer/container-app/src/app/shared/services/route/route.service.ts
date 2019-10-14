@@ -33,27 +33,27 @@ export class RouteService implements IRouter {
   }
 
   toHome() {
-    this.router.navigateByUrl('/home');
+    this.toRoute('/home');
   }
 
   toCheckout(): void {
-    this.router.navigateByUrl('/checkout');
+    this.toRoute('/checkout');
   }
 
   toCart(): void {
-    this.router.navigateByUrl('/cart');
+    this.toRoute('/cart');
   }
 
   toLogin(): void {
-    this.router.navigateByUrl('/login');
+    this.toRoute('/login');
   }
 
   toForgotPassword(): void {
-    this.router.navigateByUrl('/forgot-password');
+    this.toRoute('/forgot-password');
   }
 
   toRegister(): void {
-    this.router.navigateByUrl('/register');
+    this.toRoute('/register');
   }
 
   toMyProfile(): void {
@@ -61,26 +61,30 @@ export class RouteService implements IRouter {
   }
 
   toMyAddresses(): void {
-    this.router.navigateByUrl('/profile/addresses');
+    this.toRoute('/profile/addresses');
   }
 
   toMyPaymentMethods(): void {
-    this.router.navigateByUrl('/profile/payment-methods');
+    this.toRoute('/profile/payment-methods');
   }
 
   toOrderDetails(orderID: string): void {
-    this.router.navigateByUrl(`/profile/orders/${orderID}`);
+    this.toRoute(`/profile/orders/${orderID}`);
   }
 
   toMyOrders(): void {
-    this.router.navigateByUrl(`/profile/orders`);
+    this.toRoute(`/profile/orders`);
   }
 
   toOrdersToApprove(): void {
-    this.router.navigateByUrl('/profile/orders/approval');
+    this.toRoute('/profile/orders/approval');
   }
 
   toChangePassword(): void {
-    this.router.navigateByUrl('/profile/change-password');
+    this.toRoute('/profile/change-password');
+  }
+
+  toRoute(path: string): void {
+    this.router.navigateByUrl(path);
   }
 }

@@ -7,11 +7,11 @@ import { SupportComponent } from './static-pages/support/support.component';
 import { BaseResolve, IsProfiledUserGuard as isProfiledUser, HasTokenGuard as HasToken } from 'src/app/shared';
 import { TermsAndConditionsComponent } from 'src/app/static-pages/terms-and-conditions/terms-and-conditions.component';
 import { FeaturedProductsResolver } from './layout/resolves/features-products.resolve';
-import { HomePageWrapperComponent } from './layout/home-wrapper/home-wrapper.component';
 import { ProductsModule } from './product/product.module';
 import { ProfileModule } from './profile/profile.module';
 import { CheckoutModule } from './checkout/checkout.module';
 import { OrderModule } from './order/order.module';
+import { HomePageWrapperComponent } from './layout/components/home-wrapper.component';
 
 export function loadProductsModule() {
   return ProductsModule;
