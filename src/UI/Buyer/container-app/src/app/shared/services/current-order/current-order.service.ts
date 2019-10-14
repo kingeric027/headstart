@@ -143,7 +143,7 @@ export class CurrentOrderService implements ICurrentOrder {
     if (orders.Items.length) {
       this.order = orders.Items[0];
     } else if (this.appConfig.anonymousShoppingEnabled) {
-      this.order = <Order>{ ID: this.tokenHelper.getAnonmousOrderID() };
+      this.order = <Order>{ ID: this.tokenHelper.getAnonymousOrderID() };
     } else {
       this.order = await this.ocOrderService.Create('outgoing', {}).toPromise();
     }

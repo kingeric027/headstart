@@ -19,10 +19,11 @@ export class TokenHelperService {
   }
 
   isTokenAnonymous(): boolean {
-    return !_isUndefined(this.getAnonmousOrderID());
+    return !_isUndefined(this.getAnonymousOrderID());
   }
 
-  getAnonmousOrderID(): string | null {
-    return this.getDecodedOCToken().orderid;
+  getAnonymousOrderID(): string | null {
+    const token = this.getDecodedOCToken();
+    return token ? token.orderid : null;
   }
 }

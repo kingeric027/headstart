@@ -1,6 +1,6 @@
 import { async, TestBed, inject } from '@angular/core/testing';
 
-import { AppPaymentService } from 'src/app/shared/services/payment-helper/payment-helper.service';
+import { AppPaymentService } from './node_modules/src/app/shared/services/app-payment/payment-helper.service';
 import { of } from 'rxjs';
 import { OcMeService, OcPaymentService } from '@ordercloud/angular-sdk';
 
