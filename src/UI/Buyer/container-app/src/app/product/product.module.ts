@@ -7,6 +7,7 @@ import {
   MeSpecsResolver,
   MeListCategoriesResolver,
   MeListRelatedProductsResolver,
+  MeListProductResolver,
 } from './resolves/me.product.resolve';
 import { OcmDefaultComponentsModule } from 'ocm-components';
 import { SpecFormAddToCartComponent } from './components/spec-form/spec-form-add-to-cart/spec-form-add-to-cart.component';
@@ -37,6 +38,13 @@ import { ProductListWrapperComponent } from './components/product-list-wrapper/p
     SpecFieldDirective,
     SpecFormComponent,
   ],
-  providers: [MeProductResolver, MeListSpecsResolver, MeSpecsResolver, MeListCategoriesResolver, MeListRelatedProductsResolver],
+  providers: [
+    MeProductResolver,
+    MeListProductResolver,
+    MeListSpecsResolver,
+    MeSpecsResolver,
+    MeListCategoriesResolver,
+    MeListRelatedProductsResolver,
+  ],
 })
 export class ProductsModule {}

@@ -8,6 +8,7 @@ import {
   MeProductResolver,
   MeListCategoriesResolver,
   MeListRelatedProductsResolver,
+  MeListProductResolver,
 } from './resolves/me.product.resolve';
 import { ProductListWrapperComponent } from './components/product-list-wrapper/product-list-wrapper.component';
 import { ProductDetailWrapperComponent } from './components/product-detail-wrapper/product-detail-wrapper.component';
@@ -17,6 +18,7 @@ const routes: Routes = [
     path: '',
     component: ProductListWrapperComponent,
     resolve: {
+      products: MeListProductResolver,
       categories: MeListCategoriesResolver,
     },
   },
