@@ -3,14 +3,11 @@ import { ShopperContextService } from 'marketplace';
 
 @Component({
   selector: 'app-root',
-  // template: `
-  //           <ocm-app-header class="fixed-top" [showHeader]="showHeader"></ocm-app-header>
-  //           <router-outlet></router-outlet>
-  //           <ocm-app-footer [showFooter]="showHeader"></ocm-app-footer>
-  //           <ng-progress></ng-progress><router-outlet></router-outlet>
-  //           `,
   template: `
+            <ocm-app-header class="fixed-top" [context]="context" [showHeader]="showHeader"></ocm-app-header>
             <router-outlet></router-outlet>
+            <ocm-app-footer [showFooter]="showHeader" [context]="context"></ocm-app-footer>
+            <ng-progress></ng-progress>
             `,
 })
 export class AppComponent implements OnInit {
