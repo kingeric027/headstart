@@ -1,12 +1,10 @@
 // core services
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { MarketplaceRoutingModule } from './marketplace-routing.module';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
+import { MarketplaceRoutingModule, MyOrdersComponent, OrdersToApproveComponent } from './marketplace-routing.module';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
-import { FooterWrapperComponent } from './wrapper-components/footer-wrapper.component';
 import { ForgotPasswordWrapperComponent } from './wrapper-components/forgot-password-wrapper.component';
-import { HeaderWrapperComponent } from './wrapper-components/header-wrapper.component';
 import { HomeWrapperComponent } from './wrapper-components/home-wrapper.component';
 import { LoginWrapperComponent } from './wrapper-components/login-wrapper.component';
 import { MeChangePasswordWrapperComponent } from './wrapper-components/me-change-password-wrapper.component';
@@ -31,27 +29,25 @@ import { RouteService } from './services/route/route.service';
 import { TokenHelperService } from './services/token-helper/token-helper.service';
 import { ShopperContextService } from './services/shopper-context/shopper-context.service';
 import { ToastrModule } from 'ngx-toastr';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { OrderHistoryComponent } from './order/containers/order-history/order-history.component';
+import { OrderShipmentsComponent } from './order/containers/order-shipments/order-shipments.component';
+import { OrderReorderComponent } from './order/containers/order-reorder/order-reorder.component';
+import { OrderApprovalComponent } from './order/containers/order-approval/order-approval.component';
+import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './order/containers/shipperTracking.pipe';
+import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
 
-// const ngModule = OrderCloudModule.forRoot(OcSDKConfig).ngModule;
-// const providers = OrderCloudModule.forRoot(OcSDKConfig).providers;
-// console.log(providers.length);
-
-// // @NgModule({})
-// // export class A {}
-
-// export const moduleWithProviders = {
-//     ngModule: OrderCloudModule,
-//     providers: [
-//       ...providers
-//       // { provide: Configuration, useValue: OCConfig}
-//     ]
-// };
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     MarketplaceRoutingModule,
-    ToastrModule
+    ToastrModule,
+
+    // TODO - remove
+    CommonModule,
+    ReactiveFormsModule
   ],
   providers: [
     FeaturedProductsResolver,
@@ -78,9 +74,7 @@ import { ToastrModule } from 'ngx-toastr';
     CartWrapperComponent,
     CheckoutWrapperComponent,
     AddressListWrapperComponent,
-    FooterWrapperComponent,
     ForgotPasswordWrapperComponent,
-    HeaderWrapperComponent,
     HomeWrapperComponent,
     LoginWrapperComponent,
     MeChangePasswordWrapperComponent,
@@ -89,7 +83,20 @@ import { ToastrModule } from 'ngx-toastr';
     ProductListWrapperComponent,
     ProfileWrapperComponent,
     RegisterWrapperComponent,
-    ResetPasswordWrapperComponent
+    ResetPasswordWrapperComponent,
+    OrderDetailWrapperComponent,
+
+    // TODO - remove
+    OrderHistoryComponent,
+    OrderShipmentsComponent,
+    OrderReorderComponent,
+    MyOrdersComponent,
+    OrdersToApproveComponent,
+    OrderApprovalComponent,
+    ShipperTrackingPipe,
+    ShipperTrackingSupportedPipe,
   ],
 })
 export class MarketplaceModule {}
+
+

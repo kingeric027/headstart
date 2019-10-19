@@ -1,5 +1,5 @@
 // core services
-import { NgModule } from '@angular/core';
+import { NgModule, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
@@ -21,8 +21,20 @@ import { MeListProductResolver, MeListCategoriesResolver,
   MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
 import { ProductDetailWrapperComponent } from './wrapper-components/product-detail-wrapper.component';
 import { LoginWrapperComponent } from './wrapper-components/login-wrapper.component';
+import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
 
 // auth components
+
+// TODO - move or remove these
+@Component({
+  template: '<order-history [approvalVersion]="false"></order-history>',
+})
+export class MyOrdersComponent {}
+
+@Component({
+  template: '<order-history [approvalVersion]="true"></order-history>',
+})
+export class OrdersToApproveComponent {}
 
 export const MarketplaceRoutes: Routes = [
   { path: 'login', component: LoginWrapperComponent },
@@ -55,7 +67,18 @@ export const MarketplaceRoutes: Routes = [
         },
       },
       { path: 'profile/payment-methods', component: PaymentListWrapperComponent,  canActivate: [IsProfiledUserGuard] },
-      // { path: 'profile/orders', loadChildren: '../order/order.module#OrderModule',  canActivate: [IsProfiledUserGuard], },
+      { path: 'profile/orders', component: MyOrdersComponent, canActivate: [IsProfiledUserGuard] },
+      { path: 'profile/orders/approval', component: OrdersToApproveComponent, canActivate: [IsProfiledUserGuard] },
+      {
+        path: 'profile/orders/:orderID',
+        component: OrderDetailWrapperComponent,
+        canActivate: [IsProfiledUserGuard]
+      },
+      {
+        path: 'approvalapproval/:orderID',
+        component: OrderDetailWrapperComponent,
+        canActivate: [IsProfiledUserGuard]
+      },
       {
         path: 'products',
         component: ProductListWrapperComponent,
