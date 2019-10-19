@@ -1,0 +1,112 @@
+<!-- TOP NAV -->
+<nav class="navbar navbar-expand navbar-light bg-white"
+     *ngIf="showHeader">
+  <div class="container">
+    <a class="navbar-brand clickable"
+       (click)="context.router.toHome()">
+      <span class="d-none d-md-inline">{{appName}}</span>
+      <span class="d-md-none">OCS</span>
+    </a>
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item clickable"
+          [ngClass]="{'active': activePath === '/products'}">
+        <a class="nav-link"
+           (click)="context.router.toProductList()">
+          Shop
+        </a>
+      </li>
+    </ul>
+    <div class="form-inline"
+         *ngIf="anonymous">
+      <a class="btn btn-sm btn-outline-dark"
+         (click)="context.router.toLogin()">Login</a>
+      <a class="btn btn-sm btn-primary d-none d-sm-block ml-2"
+         (click)="context.router.toRegister()">Register</a>
+    </div>
+    <ul class="navbar-nav"
+        *ngIf="!anonymous">
+      <li class="nav-item dropdown"
+          ngbDropdown
+          placement="bottom-right">
+        <div class="nav-link dropdown-toggle text-nowrap"
+             id="account-dropdown"
+             ngbDropdownToggle>
+          <fa-icon [icon]="faUserCircle"></fa-icon>
+          <span class="d-none d-md-inline">
+            Account
+          </span>
+        </div>
+        <div class="dropdown-menu"
+             aria-labelledby="account-dropdown"
+             ngbDropdownMenu>
+          <h6 class="dropdown-header">Hi, {{ user?.FirstName }}!</h6>
+          <a class="dropdown-item"
+             [ngClass]="{'active': activePath === '/profile/details'}"
+             (click)="context.router.toMyProfile()">My Profile</a>
+          <a class="dropdown-item"
+             [ngClass]="{'active': activePath === '/profile/addresses'}"
+             (click)="context.router.toMyAddresses()">Address Book</a>
+          <a class="dropdown-item"
+             [ngClass]="{'active': activePath === '/profile/payment-methods'}"
+             (click)="context.router.toMyPaymentMethods()">Payment Methods</a>
+          <a class="dropdown-item"
+             [ngClass]="{'active': activePath === '/profile/orders'}"
+             (click)="context.router.toMyOrders()">My Orders</a>
+          <a class="dropdown-item"
+             [ngClass]="{'active': activePath === '/profile/orders/approval'}"
+             (click)="context.router.toOrdersToApprove()">Orders To Approve</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item"
+             (click)="logout()"
+             href="/login">
+            <fa-icon [icon]="faSignOutAlt"></fa-icon> Logout
+          </a>
+        </div>
+      </li>
+    </ul>
+
+  </div>
+</nav>
+<nav class="navbar navbar-expand navbar-light bg-light"
+     *ngIf="showHeader">
+  <div class="container">
+    <ocm-search class="mr-3 w-100"
+                placeholderText="Search Products..."
+                [searchTermInput]="searchTermForProducts"
+                (searched)="searchProducts($event.detail)">
+    </ocm-search>
+    <ul class="navbar-nav"
+        #cartIcon
+        (mouseleave)="closeMiniCart($event, popover)">
+      <li class="nav-item"
+          [ngbPopover]="CartHoverContent"
+          #popover="ngbPopover"
+          triggers="mouseenter:click"
+          placement="bottom-right"
+          popoverClass="mini-cart-popover"
+          [autoClose]="'outside'">
+        <ng-template #CartHoverContent>
+          <ocm-mini-cart [context]="context"
+                         (mouseleave)="popover.close()"
+                         (navigate)="popover.close()">
+          </ocm-mini-cart>
+        </ng-template>
+        <a class="nav-link text-nowrap clickable"
+           [ngClass]="{'active': activePath === '/cart'}"
+           (click)="context.router.toCart()"
+           ngbPopover="Item(s) Added to Cart"
+           placement="bottom"
+           triggers="manual"
+           #addtocartPopover="ngbPopover">
+          <span class="d-none d-lg-inline">Cart </span>
+          <fa-layers class="fa-fw">
+            <fa-icon [icon]="faShoppingCart"></fa-icon>
+            <fa-layers-counter *ngIf="order && order.LineItemCount"
+                               class="badge__counter--large"
+                               [content]="12">{{order.LineItemCount}}</fa-layers-counter>
+          </fa-layers>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>

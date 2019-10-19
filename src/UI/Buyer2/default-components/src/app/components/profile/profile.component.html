@@ -1,0 +1,63 @@
+<ocm-profile-nav [context]="context">
+  <h1 class="page-heading border-bottom pb-3">Account Details</h1>
+  <div class="row">
+    <div class="col-lg-6">
+      <form (ngSubmit)="onSubmit()" novalidate [formGroup]="form" name="RegisterForm">
+        <div class="form-group">
+          <label for="Username">Username</label>
+          <input
+            type="text"
+            formControlName="Username"
+            class="form-control"
+            id="Username"
+            placeholder="Username"
+            autofocus="true"
+            autocomplete="off"
+            showErrors
+          />
+        </div>
+        <div class="form-group">
+          <label for="FirstName">First Name</label>
+          <input
+            type="text"
+            formControlName="FirstName"
+            class="form-control"
+            id="FirstName"
+            placeholder="First Name"
+            autocomplete="off"
+            showErrors
+          />
+        </div>
+        <div class="form-group">
+          <label for="LastName">Last Name</label>
+          <input
+            type="text"
+            formControlName="LastName"
+            class="form-control"
+            id="LastName"
+            placeholder="Last Name"
+            autocomplete="off"
+            showErrors
+          />
+        </div>
+        <div class="form-group">
+          <label for="Email">Email</label>
+          <input type="email" formControlName="Email" class="form-control" id="Email" placeholder="Email" autocomplete="off" showErrors />
+        </div>
+        <div class="form-group">
+          <label for="Phone">Phone Number</label>
+          <input
+            type="text"
+            formControlName="Phone"
+            class="form-control"
+            id="Phone"
+            placeholder="Phone Number"
+            autocomplete="off"
+            showErrors
+          />
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block mt-4">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</ocm-profile-nav>
