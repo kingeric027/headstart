@@ -11,6 +11,6 @@ export class BaseResolve implements Resolve<any> {
 
   resolve() {
     this.currentUser.reset();
-    // this.currentOrder.reset();
+    this.currentOrder.reset();
   }
 }
