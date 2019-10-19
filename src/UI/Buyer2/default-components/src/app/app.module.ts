@@ -9,6 +9,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
 import { OrderCloudModule } from '@ordercloud/angular-sdk';
 import { ToastrModule } from 'ngx-toastr';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { OCMProductCard } from './components/product-card/product-card.component';
 import { OCMToggleFavorite } from './components/toggle-favorite/toggle-favorite.component';
 import { OCMQuantityInput } from './components/quantity-input/quantity-input.component';
@@ -72,6 +73,8 @@ import { OcSDKConfig } from './config/ordercloud-sdk.config';
 import { ComponentNgElementStrategyFactory } from 'src/lib/component-factory-strategy';
 import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
+import { NgProgressModule } from '@ngx-progressbar/core';
+import { NgProgressHttpModule } from '@ngx-progressbar/http';
 
 const components = [ OCMProductCard,
   OCMToggleFavorite,
@@ -154,10 +157,13 @@ const components = [ OCMProductCard,
     NgbDropdownModule,
     NgbDatepickerModule,
     NgbAccordionModule,
+    NgProgressModule,
+    NgProgressHttpModule,
+    BrowserAnimationsModule
   ],
   providers: [
-    // { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
-    //{ provide: ErrorHandler, useClass: AppErrorHandler },
+    { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
+    { provide: ErrorHandler, useClass: AppErrorHandler },
   ],
   entryComponents: components,
   bootstrap: [AppComponent]
