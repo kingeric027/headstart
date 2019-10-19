@@ -69,6 +69,7 @@ import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
 import { HttpClientModule } from '@angular/common/http';
 import { OcSDKConfig } from './config/ordercloud-sdk.config';
+import { ComponentNgElementStrategyFactory } from 'src/lib/component-factory-strategy';
 
 const components = [ OCMProductCard,
   OCMToggleFavorite,
@@ -214,8 +215,15 @@ export class AppModule {
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
+    
     const component = createCustomElement(angularComponent, {
       injector: this.injector,
+      // See this issue for why this Factory, copied from Angular/elements source code is included. 
+      // https://github.com/angular/angular/issues/29606
+      strategyFactory: new ComponentNgElementStrategyFactory(
+        angularComponent,
+        this.injector
+      )
     });
     if (isPlatformBrowser(this.platformId)) {
       if (!window.customElements.get(htmlTagName)) {
