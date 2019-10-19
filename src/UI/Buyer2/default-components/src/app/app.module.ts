@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, Injector, Inject, PLATFORM_ID, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, Injector, Inject, PLATFORM_ID, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -62,7 +62,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TreeModule } from 'angular-tree-component';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
-import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule, NgbDropdownModule, NgbDatepickerModule, NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule, NgbDropdownModule, NgbDatepickerModule, NgbAccordionModule, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
@@ -70,6 +70,8 @@ import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
 import { HttpClientModule } from '@angular/common/http';
 import { OcSDKConfig } from './config/ordercloud-sdk.config';
 import { ComponentNgElementStrategyFactory } from 'src/lib/component-factory-strategy';
+import { NgbDateNativeAdapter } from './config/date-picker.config';
+import { AppErrorHandler } from './config/error-handling.config';
 
 const components = [ OCMProductCard,
   OCMToggleFavorite,
@@ -152,6 +154,10 @@ const components = [ OCMProductCard,
     NgbDropdownModule,
     NgbDatepickerModule,
     NgbAccordionModule,
+  ],
+  providers: [
+    // { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
+    //{ provide: ErrorHandler, useClass: AppErrorHandler },
   ],
   entryComponents: components,
   bootstrap: [AppComponent]
