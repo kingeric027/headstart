@@ -1,6 +1,5 @@
 <!-- TOP NAV -->
-<nav class="navbar navbar-expand navbar-light bg-white"
-     *ngIf="showHeader">
+<nav class="navbar navbar-expand navbar-light bg-white">
   <div class="container">
     <a class="navbar-brand clickable"
        (click)="context.router.toHome()">
@@ -64,11 +63,9 @@
         </div>
       </li>
     </ul>
-
   </div>
 </nav>
-<nav class="navbar navbar-expand navbar-light bg-light"
-     *ngIf="showHeader">
+<nav class="navbar navbar-expand navbar-light bg-light">
   <div class="container">
     <ocm-search class="mr-3 w-100"
                 placeholderText="Search Products..."

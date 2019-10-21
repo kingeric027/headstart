@@ -10,7 +10,6 @@ export class OCMAppFooter extends OCMComponent {
   faPhone = faPhone;
   faQuestionCircle = faQuestionCircle;
   faFileAlt = faFileAlt;
-  @Input() showFooter: boolean; // TODO - find a way to remove this
 
   ngOnContextSet() {}
 

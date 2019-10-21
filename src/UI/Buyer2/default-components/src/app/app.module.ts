@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MarketplaceModule } from 'marketplace';
 import { createCustomElement } from '@angular/elements';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
 import { OrderCloudModule } from '@ordercloud/angular-sdk';
 import { ToastrModule } from 'ngx-toastr';
@@ -164,6 +164,7 @@ const components = [ OCMProductCard,
   providers: [
     { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
     { provide: ErrorHandler, useClass: AppErrorHandler },
+      DatePipe, // allows us to use in class as injectable (date filter component)
   ],
   entryComponents: components,
   bootstrap: [AppComponent]
@@ -227,10 +228,9 @@ export class AppModule {
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
-    
     const component = createCustomElement(angularComponent, {
       injector: this.injector,
-      // See this issue for why this Factory, copied from Angular/elements source code is included. 
+      // See this issue for why this Factory, copied from Angular/elements source code is included.
       // https://github.com/angular/angular/issues/29606
       strategyFactory: new ComponentNgElementStrategyFactory(
         angularComponent,

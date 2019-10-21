@@ -22,7 +22,6 @@ export class OCMAppHeader extends OCMComponent {
   searchTermForProducts: string = null;
   activePath: string;
   appName: string;
-  @Input() showHeader: boolean; // TODO - find a way to remove this
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
 
