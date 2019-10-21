@@ -1,0 +1,60 @@
+<div class="container mt-3">
+    <div class="row">
+        <div class="row d-md-none flex-grow-1 mx-1">
+            <div class="col-sm-12">
+                <div ngbDropdown>
+                    <button class="btn btn-block btn-default btn-outline-dark mb-2"
+                            id="dropdownBasic1"
+                            ngbDropdownToggle>Account Selections</button>
+                    <div ngbDropdownMenu
+                        aria-labelledby="dropdownBasic1"
+                        class="w-100 text-center">
+                        <button class="dropdown-item"
+                                (click)="context.router.toMyProfile()">Profile</button>
+                        <button class="dropdown-item"
+                                (click)="context.router.toChangePassword()">Change Password</button>
+                        <button class="dropdown-item"
+                                (click)="context.router.toMyAddresses()">Addresses</button>
+                        <button class="dropdown-item"
+                                (click)="context.router.toMyPaymentMethods()">Payment Methods</button>
+                        <button class="dropdown-item"
+                                (click)="context.router.toMyOrders()">My Orders</button>
+                        <button class="dropdown-item"
+                                (click)="context.router.toOrdersToApprove()">Orders To Approve</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3  d-none d-md-flex">
+            <ul class="nav flex-column">
+                <li class="nav-item side-nav-button mb-3">
+                <a class="link text-primary"
+                    (click)="context.router.toMyProfile()">Profile</a>
+                </li>
+                <li class="nav-item side-nav-button mb-3">
+                    <a class="link text-primary"
+                    (click)="context.router.toChangePassword()">Change Password</a>
+                </li>
+                <li class="nav-item side-nav-button mb-3">
+                    <a class="link text-primary"
+                    (click)="context.router.toMyAddresses()">Addresses</a>
+                </li>
+                <li class="nav-item side-nav-button mb-3">
+                    <a class="link text-primary"
+                    (click)="context.router.toMyPaymentMethods()">Payment Methods</a>
+                </li>
+                <li class="nav-item side-nav-button mb-3">
+                    <a class="link text-primary"
+                    (click)="context.router.toMyOrders()">My Orders</a>
+                </li>
+                <li class="nav-item side-nav-button mb-3">
+                    <a class="link text-primary"
+                    (click)="context.router.toOrdersToApprove()">Orders To Approve</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-9 col-sm-12">  
+            <slot></slot>           
+        </div>
+    </div>
+</div>
