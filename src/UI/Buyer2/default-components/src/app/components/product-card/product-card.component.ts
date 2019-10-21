@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, OnChanges, ChangeDetectorRef } from '@angular/core';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
 import { QuantityLimits } from '../../models/quantity-limits';
@@ -20,19 +20,25 @@ export class OCMProductCard extends OCMComponent {
     minPerOrder: 0,
     restrictedQuantities: [],
   };
+  @Input() set isFavorite(value: boolean) {
+    this.isFav = value;
+    this.cdr.detectChanges();
+  }
 
+  isFav = false;
   quantity: number;
   shouldDisplayAddToCart: boolean;
   isViewOnlyProduct: boolean;
   hasSpecs: boolean;
-  favoriteProducts: string[] = [];
+
+  constructor(private cdr: ChangeDetectorRef) {
+    super();
+  }
 
   ngOnContextSet() {
     this.isViewOnlyProduct = !this.product.PriceSchedule;
     this.hasSpecs = this.product.SpecCount > 0;
-    this.context.currentUser.onFavoriteProductsChange((productIDs) => (this.favoriteProducts = productIDs));
   }
-
 
   addToCart() {
     this.context.currentOrder.addToCart({ ProductID: this.product.ID, Quantity: this.quantity });
@@ -50,10 +56,6 @@ export class OCMProductCard extends OCMComponent {
 
   toDetails() {
     this.context.router.toProductDetails(this.product.ID);
-  }
-
-  isFavorite(): boolean {
-    return this.favoriteProducts.includes(this.product.ID);
   }
 
   setIsFavorite(isFavorite: boolean): void {

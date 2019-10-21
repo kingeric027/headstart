@@ -2,7 +2,7 @@
   <div class="ribbon ribbon-top-right bg-light">
     <ocm-toggle-favorite title="Favorite"
                          (click)="$event.stopPropagation()"
-                         [favorite]="isFavorite()"
+                         [favorite]="isFav"
                          (favoriteChanged)="setIsFavorite($event.detail)"></ocm-toggle-favorite>
   </div>
   <img class="card-img-top img-fluid flex-shrink-0"

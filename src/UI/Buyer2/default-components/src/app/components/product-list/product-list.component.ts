@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, ChangeDetectorRef } from '@angular/core';
 import { ListBuyerProduct, Category, ListCategory, ListFacet } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
@@ -17,6 +17,7 @@ export class OCMProductList extends OCMComponent {
   @Input() quantityLimits: QuantityLimits[];
   categoryModal = ModalState.Closed;
   facets: ListFacet[];
+  favoriteProducts: string[] = [];
   categoryCrumbs: Category[] = [];
   hasQueryParams = false;
   showingFavoritesOnly = false;
@@ -25,6 +26,7 @@ export class OCMProductList extends OCMComponent {
   ngOnContextSet() {
     this.facets = this.products.Meta.Facets;
     this.context.productFilters.onFiltersChange(this.handleFiltersChange);
+    this.context.currentUser.onFavoriteProductsChange((productIDs) => this.favoriteProducts = productIDs);
   }
 
   private handleFiltersChange = async (filters: ProductFilters) => {
@@ -65,5 +67,9 @@ export class OCMProductList extends OCMComponent {
 
   openCategoryModal() {
     this.categoryModal = ModalState.Open;
+  }
+
+  isFavorite(productID: string): boolean {
+    return this.favoriteProducts.includes(productID);
   }
 }

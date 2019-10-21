@@ -97,7 +97,8 @@
                             class="col-sm-6 col-md-4 col-xl-3 d-flex"
                             [product]="product"
                             [quantityLimits]="quantityLimits[i]"
-                            [context]="context">
+                            [context]="context"
+                            [isFavorite]="isFavorite(product.ID)">
           </ocm-product-card>
         </div>
         <ngb-pagination *ngIf="products && products.Meta.TotalPages > 1"
