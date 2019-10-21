@@ -11,7 +11,7 @@ import { ShopperContextService } from 'marketplace';
             `,
 })
 export class AppComponent implements OnInit {
-  constructor(private context: ShopperContextService) {}
+  constructor(public context: ShopperContextService) {}
 
   showHeader = false;
   hiddenRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
