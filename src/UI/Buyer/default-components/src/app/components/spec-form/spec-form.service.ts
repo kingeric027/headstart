@@ -12,16 +12,23 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class SpecFormService {
+  event: SpecFormEvent;
 
-  constructor() { }
+  constructor() {
+    this.event = {
+      valid: false,
+      type: '',
+      form: null
+    };
+   }
 
-  public getSpecMarkup(event: SpecFormEvent, specs: ListBuyerSpec, selectedBreak: PriceBreak, qty: number): number {
+  public getSpecMarkup(specs: ListBuyerSpec, selectedBreak: PriceBreak, qty: number): number {
     const markups: Array<number> = new Array<number>();
-    for (const value in event.form) {
-      if (event.form.hasOwnProperty(value)) {
+    for (const value in this.event.form) {
+      if (this.event.form.hasOwnProperty(value)) {
         const spec = this.getSpec(specs, value);
         if (!spec) continue;
-        const option = this.getOption(spec, event.form[value]);
+        const option = this.getOption(spec, this.event.form[value]);
         if (option) {
           markups.push(this.singleSpecMarkup(selectedBreak.Price, qty, option));
         }
@@ -30,13 +37,13 @@ export class SpecFormService {
     return (selectedBreak.Price + markups.reduce((x, acc) => x + acc, 0)) * qty;
   }
 
-  public getLineItemSpecs(event: SpecFormEvent, buyerSpecs: ListBuyerSpec): Array<LineItemSpec> {
+  public getLineItemSpecs(buyerSpecs: ListBuyerSpec): Array<LineItemSpec> {
     const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
-    for (const value in event.form) {
-      if (event.form.hasOwnProperty(value)) {
+    for (const value in this.event.form) {
+      if (this.event.form.hasOwnProperty(value)) {
         const spec = this.getSpec(buyerSpecs, value);
         if (!spec) continue;
-        const option = this.getOption(spec, event.form[value]);
+        const option = this.getOption(spec, this.event.form[value]);
         if (option) {
           specs.push({
             SpecID: spec.ID,

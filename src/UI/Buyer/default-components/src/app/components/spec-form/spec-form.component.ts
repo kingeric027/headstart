@@ -17,7 +17,6 @@ import { OCMComponent } from '../base-component';
   template: `
     <form *ngIf="form" [formGroup]="form">
       <ng-container *ngFor="let field of config; let i = index"
-        class="my-1"
         formArrayName="ctrls"
         [config]="field"
         [group]="form"
@@ -157,24 +156,5 @@ export class OCMSpecForm extends OCMComponent implements OnInit {
       valid: this.form.valid,
       form: this.form.value
     } as SpecFormEvent);
-  }
-
-  setDisabled(name: string, disable: boolean) {
-    if (this.form.controls[name]) {
-      const method = disable ? 'disable' : 'enable';
-      this.form.controls[name][method]();
-      return;
-    }
-
-    this.config = this.config.map((item) => {
-      if (item.name === name) {
-        item.disabled = disable;
-      }
-      return item;
-    });
-  }
-
-  setValue(name: string, value: any) {
-    this.form.controls[name].setValue(value, { emitEvent: true });
   }
 }

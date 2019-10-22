@@ -28,7 +28,7 @@
           </ocm-quantity-input>
           <button class="btn btn-primary ml-2"
                   type="submit"
-                  [disabled]="!specFormEvent?.valid"
+                  [disabled]="!specFormService.event?.valid"
                   (click)="addToCart($event)">
             Add to Cart
             <span class="badge badge-light ml-2">{{ price | currency }}</span>

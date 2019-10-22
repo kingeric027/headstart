@@ -5,7 +5,6 @@ import { map as _map, without as _without, uniqBy as _uniq, some as _some,
   find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
 import { OCMComponent } from '../base-component';
 import { QuantityLimits } from '../../models/quantity-limits';
-import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { SpecFormService } from '../spec-form/spec-form.service';
 
 @Component({
@@ -17,7 +16,6 @@ export class OCMProductDetails extends OCMComponent implements AfterViewChecked 
   @Input() product: BuyerProduct;
   @Input() quantityLimits: QuantityLimits;
 
-  specFormEvent: SpecFormEvent;
   specFormService: SpecFormService;
   isOrderable = false;
   quantity: number;
@@ -35,17 +33,12 @@ export class OCMProductDetails extends OCMComponent implements AfterViewChecked 
     this.isOrderable = !!this.product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
     this.context.currentUser.onFavoriteProductsChange((productIDs) => (this.favoriteProducts = productIDs));
-    this.specFormEvent = {
-      valid: this.specs.Items.length === 0,
-      type: '',
-      form: null,
-      specs: null
-    };
+    this.specFormService.event.valid = this.specs.Items.length === 0;
   }
 
   onSpecFormChange(event): void {
     if (event.detail.type === 'Change') {
-      this.specFormEvent = event.detail;
+      this.specFormService.event = event.detail;
       this.getTotalPrice();
     }
   }
@@ -59,7 +52,7 @@ export class OCMProductDetails extends OCMComponent implements AfterViewChecked 
     this.context.currentOrder.addToCart({
       ProductID: this.product.ID,
       Quantity: this.quantity,
-      Specs: this.specFormService.getLineItemSpecs(this.specFormEvent, this.specs)
+      Specs: this.specFormService.getLineItemSpecs(this.specs)
     });
   }
 
@@ -81,8 +74,8 @@ export class OCMProductDetails extends OCMComponent implements AfterViewChecked 
         ? candidate
         : current;
     }, startingBreak);
-    this.price = this.specFormEvent.valid
-      ? this.specFormService.getSpecMarkup(this.specFormEvent, this.specs, selectedBreak, this.quantity || startingBreak.Quantity)
+    this.price = this.specFormService.event.valid
+      ? this.specFormService.getSpecMarkup(this.specs, selectedBreak, this.quantity || startingBreak.Quantity)
       : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
   }
 
