@@ -1,50 +1,184 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
-import { BuyerSpec } from '@ordercloud/angular-sdk';
-import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { get as _get, find as _find, keys as _keys, pickBy as _pickBy, identity as _identity } from 'lodash';
-import { __generator } from 'tslib';
+import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
+import { FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators } from '@angular/forms';
+import {
+  map as _map,
+  find as _find,
+  minBy as _minBy,
+  sortBy as _sortBy,
+} from 'lodash';
+
+import { FieldConfig } from './field-config.interface';
+import {
+  ListBuyerSpec,
+  BuyerProduct,
+  SpecOption
+} from '@ordercloud/angular-sdk';
+import { SpecFormEvent } from './spec-form-values.interface';
 import { OCMComponent } from '../base-component';
-import { FullSpecOption } from '../../models/full-spec-option.interface';
 
 @Component({
-  templateUrl: './spec-form.component.html',
+  template: `
+  Spec Form
+    <form *ngIf="form" [formGroup]="form">
+      <ng-container
+        *ngFor="let field of config; let i = index"
+        class="my-1"
+        formArrayName="ctrls"
+        [config]="field"
+        [group]="form"
+        [index]="i"
+        ocSpecField
+      ></ng-container>
+    </form>
+    `,
   styleUrls: ['./spec-form.component.scss'],
 })
-export class OCMSpecForm implements OnChanges {
-  @Input() specs: BuyerSpec[] = [];
-  @Output() formUpdated = new EventEmitter<FullSpecOption[]>();
-  specForm: FormGroup;
+export class OCMSpecForm extends OCMComponent implements OnInit {
+  @Input() specs: ListBuyerSpec;
+  @Input() product: BuyerProduct;
+  @Input() qty: number;
+  @Output() specFormChange: EventEmitter<any> = new EventEmitter<any>();
 
-  constructor() {
-    this.specForm = new FormGroup({});
+  config: FieldConfig[] = [];
+  form: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    super();
   }
 
-  ngOnChanges() {
-    if (!this.specs) return;
-    this.specs = this.specs.sort((s1, s2) => s1.Options.length - s2.Options.length);
-    this.specs.forEach((spec) => {
-      const defaultOption = this.getDefaultOptionID(spec);
-      const input = new FormControl(defaultOption, spec.Required ? [Validators.required] : []);
-      this.specForm.addControl(spec.ID, input);
+  ngOnInit() { }
+
+  ngOnContextSet() {
+    this.config = this.createFieldConfig();
+    this.form = this.createGroup();
+    this.form.valueChanges.subscribe(() => {
+      this.handleChange();
     });
-    this.onChange();
   }
 
-  getDefaultOptionID(spec: BuyerSpec): string {
-    if (spec.DefaultOptionID) return spec.DefaultOptionID;
-    if (!spec.Required) return null;
-    return _get(spec, 'Options[0].ID', null);
-  }
-
-  onChange() {
-    const specIDs = _keys(_pickBy(this.specForm.value, _identity));
-    const selections: FullSpecOption[] = specIDs.map((specID) => {
-      const spec = this.specs.find((s) => s.ID === specID);
-      const optionID = this.specForm.value[specID];
-      const option: any = spec.Options.find((o) => o.ID === optionID);
-      option.SpecID = specID;
-      return option;
+  createGroup() {
+    const group = this.fb.group({
+      ctrls: this.fb.array([])
     });
-    this.formUpdated.emit(selections);
+    this.config.forEach((control) => {
+      const ctrl = this.createControl(control);
+      group.addControl(control.name, ctrl);
+      // tslint:disable-next-line:no-string-literal
+      group.controls['ctrls']['push'](ctrl);
+    });
+    return group;
+  }
+
+  createFieldConfig(): FieldConfig[] {
+    const c: FieldConfig[] = [];
+    if (!this.specs || !this.specs.Items) return c;
+    for (const spec of this.specs.Items) {
+      if (spec.xp.control === 'checkbox') {
+        c.push({
+          type: 'checkbox',
+          label: spec.Name,
+          name: spec.Name.replace(/ /g, ''),
+          value: spec.DefaultOptionID,
+          options: _map(spec.Options, 'Value'),
+          validation: [Validators.nullValidator],
+        });
+      } else if (spec.xp.control === 'range') {
+        c.push({
+          type: 'range',
+          label: spec.Name,
+          name: spec.Name.replace(/ /g, ''),
+          value: spec.DefaultValue,
+          min: Math.min.apply(
+            Math,
+            _map(spec.Options, (option: SpecOption) => +option.Value)
+          ),
+          max: Math.max.apply(
+            Math,
+            _map(spec.Options, (option: SpecOption) => +option.Value)
+          ),
+          validation: [
+            spec.Required ? Validators.required : Validators.nullValidator,
+            Validators.min(
+              Math.min.apply(
+                Math,
+                _map(spec.Options, (option: SpecOption) => +option.Value)
+              )
+            ),
+            Validators.max(
+              Math.max.apply(
+                Math,
+                _map(spec.Options, (option: SpecOption) => +option.Value)
+              )
+            ),
+          ],
+        });
+      } else if (spec.Options.length === 1) {
+        c.unshift({
+          type: 'label',
+          label: spec.Name,
+          name: spec.Name.replace(/ /g, ''),
+          options: _map(spec.Options, 'Value'),
+        });
+      } else if (spec.Options.length > 1) {
+        c.push({
+          type: 'select',
+          label: spec.Name,
+          name: spec.Name.replace(/ /g, ''),
+          value: spec.DefaultOptionID
+            ? _find(spec.Options, (option) => {
+                return option.ID === spec.DefaultOptionID;
+              }).Value
+            : null,
+          options: _map(spec.Options, 'Value'),
+          validation: [
+            spec.Required ? Validators.required : Validators.nullValidator,
+          ],
+        });
+      } else if (spec.AllowOpenText) {
+        c.push({
+          type: 'input',
+          label: spec.Name,
+          name: spec.Name.replace(/ /g, ''),
+          value: spec.DefaultValue,
+          validation: [
+            spec.Required ? Validators.required : Validators.nullValidator,
+          ],
+        });
+      }
+    }
+    return c;
+  }
+
+  createControl(config: FieldConfig): FormControl {
+    const { disabled, validation, value } = config;
+    return new FormControl({ disabled, value }, validation);
+  }
+
+  handleChange() {
+    this.specFormChange.emit({
+      type: 'Change',
+      valid: this.form.valid,
+      form: this.form.value
+    } as SpecFormEvent);
+  }
+
+  setDisabled(name: string, disable: boolean) {
+    if (this.form.controls[name]) {
+      const method = disable ? 'disable' : 'enable';
+      this.form.controls[name][method]();
+      return;
+    }
+
+    this.config = this.config.map((item) => {
+      if (item.name === name) {
+        item.disabled = disable;
+      }
+      return item;
+    });
+  }
+
+  setValue(name: string, value: any) {
+    this.form.controls[name].setValue(value, { emitEvent: true });
   }
 }

@@ -63,7 +63,8 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TreeModule } from 'angular-tree-component';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
-import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule, NgbDropdownModule, NgbDatepickerModule, NgbAccordionModule, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule,
+  NgbDropdownModule, NgbDatepickerModule, NgbAccordionModule, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
@@ -75,6 +76,7 @@ import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
+import { NO_ERRORS_SCHEMA } from '@angular/compiler/src/core';
 
 const components = [ OCMProductCard,
   OCMToggleFavorite,
@@ -128,7 +130,7 @@ const components = [ OCMProductCard,
 ];
 
 @NgModule({
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   declarations: [
     AppComponent,
     FormControlErrorDirective,

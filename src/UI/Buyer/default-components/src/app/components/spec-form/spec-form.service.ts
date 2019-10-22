@@ -1,0 +1,101 @@
+import {
+  map as _map,
+  find as _find,
+  minBy as _minBy,
+  sortBy as _sortBy,
+} from 'lodash';
+import { SpecFormEvent } from './spec-form-values.interface';
+import { PriceBreak, SpecOption, BuyerSpec, ListBuyerSpec, LineItemSpec } from '@ordercloud/angular-sdk';
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SpecFormService {
+
+  constructor() { }
+
+  public getSpecMarkup(event: SpecFormEvent, specs: ListBuyerSpec, selectedBreak: PriceBreak, qty: number): number {
+    const markups: Array<number> = new Array<number>();
+    for (const value in event.form) {
+      if (event.form.hasOwnProperty(value)) {
+        const spec = this.getSpec(specs, value);
+        if (!spec) continue;
+        const option = this.getOption(spec, event.form[value]);
+        if (option) {
+          markups.push(this.singleSpecMarkup(selectedBreak.Price, qty, option));
+        }
+      }
+    }
+    return (selectedBreak.Price + markups.reduce((x, acc) => x + acc, 0)) * qty;
+  }
+
+  public getLineItemSpecs(event: SpecFormEvent, buyerSpecs: ListBuyerSpec): Array<LineItemSpec> {
+    const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
+    for (const value in event.form) {
+      if (event.form.hasOwnProperty(value)) {
+        const spec = this.getSpec(buyerSpecs, value);
+        if (!spec) continue;
+        const option = this.getOption(spec, event.form[value]);
+        if (option) {
+          specs.push({
+            SpecID: spec.ID,
+            OptionID: option.ID,
+            Value: option.Value,
+          });
+        }
+      }
+    }
+    return specs;
+  }
+
+  private singleSpecMarkup(
+    unitPrice: number,
+    quantity: number,
+    option: SpecOption
+  ): number {
+    switch (option.PriceMarkupType) {
+      case 'NoMarkup':
+        return 0;
+      case 'AmountPerQuantity':
+        return option.PriceMarkup;
+      case 'AmountTotal':
+        return option.PriceMarkup / quantity;
+      case 'Percentage':
+        return option.PriceMarkup * unitPrice * 0.01;
+    }
+  }
+
+  private getSpec(specs: ListBuyerSpec, value: any): BuyerSpec {
+    return _find(
+      specs.Items,
+      (item) => item.Name.replace(/ /g, '') === value
+    ) as BuyerSpec;
+  }
+
+  private getOption(spec: BuyerSpec, value: any): SpecOption {
+    if (value === undefined || value === null) {
+      return null;
+    }
+    if (typeof value === 'boolean') {
+      return spec.Options[value ? 1 : 0] as SpecOption;
+    }
+
+    if (spec.xp.control === 'range') {
+      const sorted = _sortBy(spec.Options, (v: SpecOption) => +v.Value);
+      const o = _find(sorted, (option: SpecOption, index: number) => {
+        if (sorted.length - 1 === index) {
+          return sorted[index];
+        } else if (
+          +value === +option.Value ||
+          (+value > +option.Value && +value < +sorted[index + 1].Value)
+        ) {
+          return sorted[index + 1];
+        }
+      });
+      return o as SpecOption;
+    }
+
+    return _find(spec.Options, (o) => o.Value === value) as SpecOption;
+  }
+}
