@@ -32,12 +32,11 @@ export class OCMProductDetails extends OCMComponent implements AfterViewChecked 
   }
 
   ngOnContextSet() {
-    console.log('details', this.specs);
     this.isOrderable = !!this.product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
     this.context.currentUser.onFavoriteProductsChange((productIDs) => (this.favoriteProducts = productIDs));
     this.specFormEvent = {
-      valid: false,
+      valid: this.specs.Items.length === 0,
       type: '',
       form: null,
       specs: null

@@ -50,6 +50,5 @@ export class SpecFieldDirective implements Field, OnChanges, OnInit {
     this.component.instance.config = this.config;
     this.component.instance.group = this.group;
     this.component.instance.index = this.index;
-    console.log('directive', this.component);
   }
 }

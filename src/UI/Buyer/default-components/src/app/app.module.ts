@@ -148,10 +148,10 @@ const components = [ OCMProductCard,
   declarations: [
     AppComponent,
     FormControlErrorDirective,
+    SpecFieldDirective,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
-    SpecFieldDirective,
    ...components
   ],
   imports: [
