@@ -1,4 +1,4 @@
-import { Component, Input, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { map as _map, without as _without, uniqBy as _uniq, some as _some,
@@ -11,7 +11,7 @@ import { SpecFormService } from '../spec-form/spec-form.service';
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
 })
-export class OCMProductDetails extends OCMComponent implements AfterViewChecked {
+export class OCMProductDetails extends OCMComponent {
   @Input() specs: ListSpec;
   @Input() product: BuyerProduct;
   @Input() quantityLimits: QuantityLimits;
@@ -96,12 +96,5 @@ export class OCMProductDetails extends OCMComponent implements AfterViewChecked 
 
   setIsFavorite(isFav: boolean) {
     this.context.currentUser.setIsFavoriteProduct(isFav, this.product.ID);
-  }
-
-  ngAfterViewChecked() {
-    // This manually triggers angular's change detection cycle and avoids the imfamous
-    // "Expression has changed after it was checked" error.
-    // Caused by something in spec form
-    this.changeDetectorRef.detectChanges();
   }
 }
