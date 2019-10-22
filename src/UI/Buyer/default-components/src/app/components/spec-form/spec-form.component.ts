@@ -9,27 +9,23 @@ import {
 } from 'lodash';
 
 import { FieldConfig } from './field-config.interface';
-import {
-  ListBuyerSpec,
-  BuyerProduct,
-  SpecOption
-} from '@ordercloud/angular-sdk';
+import { ListBuyerSpec, BuyerProduct } from '@ordercloud/angular-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
 import { OCMComponent } from '../base-component';
 
 @Component({
   template: `
-  Spec Form
     <form *ngIf="form" [formGroup]="form">
-      <ng-container
-        *ngFor="let field of config; let i = index"
-        class="my-1"
-        formArrayName="ctrls"
-        [config]="field"
-        [group]="form"
-        [index]="i"
-        ocSpecField
-      ></ng-container>
+      <div *ngFor="let field of config; let i = index">
+        <ng-container
+          class="my-1"
+          formArrayName="ctrls"
+          [config]="field"
+          [group]="form"
+          [index]="i"
+          ocSpecField
+        ></ng-container>
+      </div>
     </form>
     `,
   styleUrls: ['./spec-form.component.scss'],
@@ -74,46 +70,46 @@ export class OCMSpecForm extends OCMComponent implements OnInit {
     const c: FieldConfig[] = [];
     if (!this.specs || !this.specs.Items) return c;
     for (const spec of this.specs.Items) {
-      if (spec.xp.control === 'checkbox') {
-        c.push({
-          type: 'checkbox',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          value: spec.DefaultOptionID,
-          options: _map(spec.Options, 'Value'),
-          validation: [Validators.nullValidator],
-        });
-      } else if (spec.xp.control === 'range') {
-        c.push({
-          type: 'range',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          value: spec.DefaultValue,
-          min: Math.min.apply(
-            Math,
-            _map(spec.Options, (option: SpecOption) => +option.Value)
-          ),
-          max: Math.max.apply(
-            Math,
-            _map(spec.Options, (option: SpecOption) => +option.Value)
-          ),
-          validation: [
-            spec.Required ? Validators.required : Validators.nullValidator,
-            Validators.min(
-              Math.min.apply(
-                Math,
-                _map(spec.Options, (option: SpecOption) => +option.Value)
-              )
-            ),
-            Validators.max(
-              Math.max.apply(
-                Math,
-                _map(spec.Options, (option: SpecOption) => +option.Value)
-              )
-            ),
-          ],
-        });
-      } else if (spec.Options.length === 1) {
+      // if (spec.xp.control === 'checkbox') {
+      //   c.push({
+      //     type: 'checkbox',
+      //     label: spec.Name,
+      //     name: spec.Name.replace(/ /g, ''),
+      //     value: spec.DefaultOptionID,
+      //     options: _map(spec.Options, 'Value'),
+      //     validation: [Validators.nullValidator],
+      //   });
+      // } else if (spec.xp.control === 'range') {
+      //   c.push({
+      //     type: 'range',
+      //     label: spec.Name,
+      //     name: spec.Name.replace(/ /g, ''),
+      //     value: spec.DefaultValue,
+      //     min: Math.min.apply(
+      //       Math,
+      //       _map(spec.Options, (option: SpecOption) => +option.Value)
+      //     ),
+      //     max: Math.max.apply(
+      //       Math,
+      //       _map(spec.Options, (option: SpecOption) => +option.Value)
+      //     ),
+      //     validation: [
+      //       spec.Required ? Validators.required : Validators.nullValidator,
+      //       Validators.min(
+      //         Math.min.apply(
+      //           Math,
+      //           _map(spec.Options, (option: SpecOption) => +option.Value)
+      //         )
+      //       ),
+      //       Validators.max(
+      //         Math.max.apply(
+      //           Math,
+      //           _map(spec.Options, (option: SpecOption) => +option.Value)
+      //         )
+      //       ),
+      //     ],
+      //   });
+      if (spec.Options.length === 1) {
         c.unshift({
           type: 'label',
           label: spec.Name,

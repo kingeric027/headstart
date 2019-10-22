@@ -1,11 +1,10 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BuyerProduct, ListSpec, BuyerSpec } from '@ordercloud/angular-sdk';
+import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { map as _map, without as _without, uniqBy as _uniq, some as _some,
   find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
 import { OCMComponent } from '../base-component';
 import { QuantityLimits } from '../../models/quantity-limits';
-import { FullSpecOption } from '../../models/full-spec-option.interface';
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { SpecFormService } from '../spec-form/spec-form.service';
 
@@ -13,14 +12,13 @@ import { SpecFormService } from '../spec-form/spec-form.service';
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
 })
-export class OCMProductDetails extends OCMComponent {
+export class OCMProductDetails extends OCMComponent implements AfterViewChecked {
   @Input() specs: ListSpec;
   @Input() product: BuyerProduct;
   @Input() quantityLimits: QuantityLimits;
 
   specFormEvent: SpecFormEvent;
   specFormService: SpecFormService;
-  specSelections: FullSpecOption[] = [];
   isOrderable = false;
   quantity: number;
   price: number;
@@ -28,12 +26,13 @@ export class OCMProductDetails extends OCMComponent {
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
 
-  constructor(private formService: SpecFormService) {
+  constructor(private changeDetectorRef: ChangeDetectorRef, private formService: SpecFormService) {
     super();
     this.specFormService = formService;
   }
 
   ngOnContextSet() {
+    console.log('details', this.specs);
     this.isOrderable = !!this.product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
     this.context.currentUser.onFavoriteProductsChange((productIDs) => (this.favoriteProducts = productIDs));
@@ -105,5 +104,12 @@ export class OCMProductDetails extends OCMComponent {
 
   setIsFavorite(isFav: boolean) {
     this.context.currentUser.setIsFavoriteProduct(isFav, this.product.ID);
+  }
+
+  ngAfterViewChecked() {
+    // This manually triggers angular's change detection cycle and avoids the imfamous
+    // "Expression has changed after it was checked" error.
+    // Caused by something in spec form
+    this.changeDetectorRef.detectChanges();
   }
 }

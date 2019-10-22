@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, Injector, Inject, PLATFORM_ID, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
+import { NgModule, Injector, Inject, PLATFORM_ID, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, ErrorHandler } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -76,7 +76,14 @@ import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
-import { NO_ERRORS_SCHEMA } from '@angular/compiler/src/core';
+import { SpecFieldDirective } from './components/spec-form/spec-field.directive';
+import { SpecFormCheckboxComponent } from './components/spec-form/spec-form-checkbox/spec-form-checkbox.component';
+import { SpecFormInputComponent } from './components/spec-form/spec-form-input/spec-form-input.component';
+import { SpecFormLabelComponent } from './components/spec-form/spec-form-label/spec-form-label.component';
+import { SpecFormNumberComponent } from './components/spec-form/spec-form-number/spec-form-number.component';
+import { SpecFormRangeComponent } from './components/spec-form/spec-form-range/spec-form-range.component';
+import { SpecFormSelectComponent } from './components/spec-form/spec-form-select/spec-form-select.component';
+import { SpecFormTextAreaComponent } from './components/spec-form/spec-form-textarea/spec-form-textarea.component';
 
 const components = [ OCMProductCard,
   OCMToggleFavorite,
@@ -126,7 +133,14 @@ const components = [ OCMProductCard,
   OCMProfileNav,
   OCMOrderDetails,
   OCMOrderHeader,
-  OCMAppFooter
+  OCMAppFooter,
+  SpecFormCheckboxComponent,
+  SpecFormInputComponent,
+  SpecFormLabelComponent,
+  SpecFormNumberComponent,
+  SpecFormRangeComponent,
+  SpecFormSelectComponent,
+  SpecFormTextAreaComponent
 ];
 
 @NgModule({
@@ -137,6 +151,7 @@ const components = [ OCMProductCard,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
+    SpecFieldDirective,
    ...components
   ],
   imports: [
