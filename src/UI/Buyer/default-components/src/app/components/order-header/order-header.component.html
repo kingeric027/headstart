@@ -24,9 +24,9 @@
                              [favorite]="isFavorite(order.ID)">
         </ocm-toggle-favorite>
       </button>
-      <order-reorder *ngIf="!approvalVersion"
+      <ocm-reorder *ngIf="!approvalVersion"
                      class="float-right pb-2 mr-2 mb-2"
-                     [orderID]='order.ID'></order-reorder>
+                     [orderID]='order.ID'></ocm-reorder>
       <order-approval *ngIf="approvalVersion"
                       class="float-right"
                       [orderID]='order.ID'></order-approval>

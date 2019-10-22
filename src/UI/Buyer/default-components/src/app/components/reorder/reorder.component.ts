@@ -2,27 +2,21 @@ import { Component, OnInit, Input } from '@angular/core';
 import { forEach as _forEach } from 'lodash';
 
 import { LineItem } from '@ordercloud/angular-sdk';
-import { OrderReorderResponse } from '../../../shopper-context';
-import { ModalState } from '../../../models/modal-state.class';
-import { ShopperContextService } from '../../../services/shopper-context/shopper-context.service';
-
+import { OrderReorderResponse } from 'marketplace';
+import { ModalState } from 'src/app/models/modal-state.class';
+import { OCMComponent } from '../base-component';
 
 @Component({
-  selector: 'order-reorder',
-  templateUrl: './order-reorder.component.html',
-  styleUrls: ['./order-reorder.component.scss'],
+  templateUrl: './reorder.component.html',
+  styleUrls: ['./reorder.component.scss'],
 })
-export class OrderReorderComponent implements OnInit {
+export class OCMReorder extends OCMComponent {
   @Input() orderID: string;
   reorderModal = ModalState.Closed;
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
 
-  constructor(
-    public context: ShopperContextService // used in template
-  ) {}
-
-  async ngOnInit() {
+  async ngOnContextSet() {
     if (this.orderID) {
       this.reorderResponse = await this.context.orderHistory.validateReorder(this.orderID);
       this.updateMessage(this.reorderResponse);

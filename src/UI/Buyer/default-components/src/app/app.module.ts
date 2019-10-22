@@ -75,6 +75,7 @@ import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
+import { OCMReorder } from './components/reorder/reorder.component';
 
 const components = [ OCMProductCard,
   OCMToggleFavorite,
@@ -124,7 +125,8 @@ const components = [ OCMProductCard,
   OCMProfileNav,
   OCMOrderDetails,
   OCMOrderHeader,
-  OCMAppFooter
+  OCMAppFooter,
+  OCMReorder
 ];
 
 @NgModule({
@@ -225,6 +227,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderDetails, 'ocm-order-details');
     this.buildWebComponent(OCMOrderHeader, 'ocm-order-header');
     this.buildWebComponent(OCMAppFooter, 'ocm-app-footer');
+    this.buildWebComponent(OCMReorder, 'ocm-reorder');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
