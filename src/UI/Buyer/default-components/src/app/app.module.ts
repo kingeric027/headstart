@@ -76,6 +76,7 @@ import { AppErrorHandler } from './config/error-handling.config';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
 import { OCMReorder } from './components/reorder/reorder.component';
+import { OCMOrderApproval } from './components/order-approval/order-approval.component';
 
 const components = [ OCMProductCard,
   OCMToggleFavorite,
@@ -126,7 +127,8 @@ const components = [ OCMProductCard,
   OCMOrderDetails,
   OCMOrderHeader,
   OCMAppFooter,
-  OCMReorder
+  OCMReorder,
+  OCMOrderApproval
 ];
 
 @NgModule({
@@ -161,7 +163,7 @@ const components = [ OCMProductCard,
     NgbAccordionModule,
     NgProgressModule,
     NgProgressHttpModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
   providers: [
     { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
@@ -228,6 +230,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderHeader, 'ocm-order-header');
     this.buildWebComponent(OCMAppFooter, 'ocm-app-footer');
     this.buildWebComponent(OCMReorder, 'ocm-reorder');
+    this.buildWebComponent(OCMOrderApproval, 'ocm-order-approval');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

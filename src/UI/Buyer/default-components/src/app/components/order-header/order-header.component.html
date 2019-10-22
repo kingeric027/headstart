@@ -26,10 +26,12 @@
       </button>
       <ocm-reorder *ngIf="!approvalVersion"
                      class="float-right pb-2 mr-2 mb-2"
-                     [orderID]='order.ID'></ocm-reorder>
-      <order-approval *ngIf="approvalVersion"
+                     [orderID]='order.ID'
+                     [context]="context"></ocm-reorder>
+      <ocm-order-approval *ngIf="approvalVersion"
                       class="float-right"
-                      [orderID]='order.ID'></order-approval>
+                      [orderID]='order.ID'
+                      [context]="context"></ocm-order-approval>
     </div>
   </div>
   <ul class="nav nav-tabs mb-3">

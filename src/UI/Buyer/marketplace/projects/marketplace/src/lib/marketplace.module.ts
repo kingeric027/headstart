@@ -33,7 +33,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OrderHistoryComponent } from './order/containers/order-history/order-history.component';
 import { OrderShipmentsComponent } from './order/containers/order-shipments/order-shipments.component';
-import { OrderApprovalComponent } from './order/containers/order-approval/order-approval.component';
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './order/containers/shipperTracking.pipe';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
 
@@ -90,7 +89,6 @@ import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-w
     OrderShipmentsComponent,
     MyOrdersComponent,
     OrdersToApproveComponent,
-    OrderApprovalComponent,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
   ],
