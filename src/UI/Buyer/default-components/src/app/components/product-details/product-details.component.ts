@@ -1,10 +1,11 @@
-import { Component, Input, ChangeDetectorRef, AfterViewChecked, OnChanges } from '@angular/core';
+import { Component, Input, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
-import { find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
+import { map as _map, without as _without, uniqBy as _uniq, some as _some,
+  find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
 import { OCMComponent } from '../base-component';
 import { QuantityLimits } from '../../models/quantity-limits';
-import { FullSpecOption } from '../../models/full-spec-option.interface';
+import { SpecFormService } from '../spec-form/spec-form.service';
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -15,91 +16,78 @@ export class OCMProductDetails extends OCMComponent implements AfterViewChecked 
   @Input() product: BuyerProduct;
   @Input() quantityLimits: QuantityLimits;
 
+  specFormService: SpecFormService;
+  isOrderable = false;
   quantity: number;
-  quantityInputReady = false;
-  specSelections: FullSpecOption[] = [];
+  price: number;
   relatedProducts$: Observable<BuyerProduct[]>;
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
-  isOrderable = false;
-  hasPrice = false;
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private changeDetectorRef: ChangeDetectorRef, private formService: SpecFormService) {
     super();
+    this.specFormService = formService;
   }
 
   ngOnContextSet() {
-    // products without a price schedule are view-only.
     this.isOrderable = !!this.product.PriceSchedule;
-    // free products dont need to display a price.
-    this.hasPrice = _has(this.product, 'PriceSchedule.PriceBreaks[0].Price');
     this.imageUrls = this.getImageUrls();
     this.context.currentUser.onFavoriteProductsChange((productIDs) => (this.favoriteProducts = productIDs));
+    this.specFormService.event.valid = this.specs.Items.length === 0;
   }
 
-  addToCart(): void {
-    const Specs = this.specSelections.map((o) => ({
-      SpecID: o.SpecID,
-      OptionID: o.ID,
-      Value: o.Value,
-    }));
+  onSpecFormChange(event): void {
+    if (event.detail.type === 'Change') {
+      this.specFormService.event = event.detail;
+      this.getTotalPrice();
+    }
+  }
+
+  qtyChange(event): void {
+    this.quantity = event.detail;
+    this.getTotalPrice();
+  }
+
+  addToCart(event: any): void {
     this.context.currentOrder.addToCart({
       ProductID: this.product.ID,
       Quantity: this.quantity,
-      Specs,
+      Specs: this.specFormService.getLineItemSpecs(this.specs)
     });
   }
 
-  getTotalPrice(): number {
+  getTotalPrice() {
     // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
     // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
     // is the cost per item.
-    if (!this.quantity) {
-      return null;
-    }
-    if (!this.hasPrice) {
+    if (
+      !this.product.PriceSchedule &&
+      !this.product.PriceSchedule.PriceBreaks.length
+    ) {
       return 0;
     }
     const priceBreaks = this.product.PriceSchedule.PriceBreaks;
     const startingBreak = _minBy(priceBreaks, 'Quantity');
 
     const selectedBreak = priceBreaks.reduce((current, candidate) => {
-      return candidate.Quantity > current.Quantity && candidate.Quantity <= this.quantity ? candidate : current;
+      return candidate.Quantity > current.Quantity && candidate.Quantity <= this.quantity
+        ? candidate
+        : current;
     }, startingBreak);
-    const markup = this.totalSpecMarkup(selectedBreak.Price, this.quantity);
-
-    return (selectedBreak.Price + markup) * this.quantity;
+    this.price = this.specFormService.event.valid
+      ? this.specFormService.getSpecMarkup(this.specs, selectedBreak, this.quantity || startingBreak.Quantity)
+      : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
   }
 
-  totalSpecMarkup(unitPrice: number, quantity: number): number {
-    const markups = this.specSelections.map((s) => this.singleSpecMarkup(unitPrice, quantity, s));
-    return markups.reduce((x, acc) => x + acc, 0); // sum
-  }
-
-  singleSpecMarkup(unitPrice: number, quantity: number, spec: FullSpecOption): number {
-    switch (spec.PriceMarkupType) {
-      case 'NoMarkup':
-        return 0;
-      case 'AmountPerQuantity':
-        return spec.PriceMarkup;
-      case 'AmountTotal':
-        return spec.PriceMarkup / quantity;
-      case 'Percentage':
-        return spec.PriceMarkup * unitPrice * 0.01;
-    }
-  }
-
-  getImageUrls() {
-    const host = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
-    const images = this.product.xp.Images || [];
-    return images.map((i) => i.Url.replace('{url}', host));
-  }
-
-  ngAfterViewChecked() {
-    // This manually triggers angular's change detection cycle and avoids the imfamous
-    // "Expression has changed after it was checked" error.
-    // Caused by something in spec form
-    this.changeDetectorRef.detectChanges();
+  getImageUrls(): string[] {
+    const images =
+      _uniq(this.product.xp.Images, (img: any) => {
+        return img.Url;
+      }) || [];
+    const result = _map(images, (img) => {
+      return img.Url.replace('{url}', this.context.appSettings.cmsUrl);
+    });
+    return _without(result, undefined) as string[];
   }
 
   isFavorite(): boolean {
@@ -108,5 +96,12 @@ export class OCMProductDetails extends OCMComponent implements AfterViewChecked 
 
   setIsFavorite(isFav: boolean) {
     this.context.currentUser.setIsFavoriteProduct(isFav, this.product.ID);
+  }
+
+  ngAfterViewChecked() {
+    // This manually triggers angular's change detection cycle and avoids the imfamous
+    // "Expression has changed after it was checked" error.
+    // Caused by something in spec form
+    this.changeDetectorRef.detectChanges();
   }
 }
