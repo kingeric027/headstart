@@ -1,14 +1,13 @@
 import { InjectionToken } from '@angular/core';
-import { environment } from './environment';
 import { AppConfig } from '../shopper-context';
 
-export const ocAppConfig: AppConfig = {
+const ocAppConfig: AppConfig = {
   appname: 'OrderCloud',
-  clientID: environment.clientID,
-  baseUrl: environment.baseUrl,
   anonymousShoppingEnabled: false,
-  middlewareUrl: environment.middlewareUrl,
-  cmsUrl: environment.cmsUrl,
+  clientID: '97BBF2CC-59D1-449A-B67C-AE9262ADD284',
+  baseUrl: 'http://localhost:33333',
+  middlewareUrl: 'my-middleware-url.com/api',
+  cmsUrl: 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product',
   scope: ['MeAddressAdmin', 'MeAdmin', 'MeCreditCardAdmin', 'MeXpAdmin', 'Shopper', 'BuyerReader', 'PasswordReset'],
 };
 

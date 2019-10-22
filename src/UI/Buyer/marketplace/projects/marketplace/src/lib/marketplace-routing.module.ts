@@ -56,29 +56,6 @@ export const MarketplaceRoutes: Routes = [
 
       { path: 'checkout', component: CheckoutWrapperComponent },
       { path: 'cart', component: CartWrapperComponent },
-      { path: 'profile', component: ProfileWrapperComponent, canActivate: [IsProfiledUserGuard], },
-      { path: 'profile/change-password', component: MeChangePasswordWrapperComponent,  canActivate: [IsProfiledUserGuard] },
-      {
-        path: 'profile/addresses',
-        canActivate: [IsProfiledUserGuard],
-        component: AddressListWrapperComponent,
-        resolve: {
-          addresses: MeListBuyerAddressResolver,
-        },
-      },
-      { path: 'profile/payment-methods', component: PaymentListWrapperComponent,  canActivate: [IsProfiledUserGuard] },
-      { path: 'profile/orders', component: MyOrdersComponent, canActivate: [IsProfiledUserGuard] },
-      { path: 'profile/orders/approval', component: OrdersToApproveComponent, canActivate: [IsProfiledUserGuard] },
-      {
-        path: 'profile/orders/:orderID',
-        component: OrderDetailWrapperComponent,
-        canActivate: [IsProfiledUserGuard]
-      },
-      {
-        path: 'approvalapproval/:orderID',
-        component: OrderDetailWrapperComponent,
-        canActivate: [IsProfiledUserGuard]
-      },
       {
         path: 'products',
         component: ProductListWrapperComponent,
@@ -103,7 +80,30 @@ export const MarketplaceRoutes: Routes = [
             },
           },
         ],
-      }]
+      },
+      { path: 'profile' , canActivate: [IsProfiledUserGuard], children: [
+        { path: '', component: ProfileWrapperComponent,  },
+        { path: 'change-password', component: MeChangePasswordWrapperComponent },
+        {
+          path: 'addresses',
+          component: AddressListWrapperComponent,
+          resolve: {
+            addresses: MeListBuyerAddressResolver,
+          },
+        },
+        { path: 'payment-methods', component: PaymentListWrapperComponent },
+        { path: 'orders', component: MyOrdersComponent },
+        { path: 'orders/approval', component: OrdersToApproveComponent },
+        {
+          path: 'orders/:orderID',
+          component: OrderDetailWrapperComponent,
+        },
+        {
+          path: 'orders/approval/:orderID',
+          component: OrderDetailWrapperComponent
+        }
+      ], }
+    ]
   }
 ];
 

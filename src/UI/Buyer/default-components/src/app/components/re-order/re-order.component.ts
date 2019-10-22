@@ -7,8 +7,8 @@ import { ModalState } from 'src/app/models/modal-state.class';
 import { OCMComponent } from '../base-component';
 
 @Component({
-  templateUrl: './reorder.component.html',
-  styleUrls: ['./reorder.component.scss'],
+  templateUrl: './re-order.component.html',
+  styleUrls: ['./re-order.component.scss'],
 })
 export class OCMReorder extends OCMComponent {
   @Input() orderID: string;

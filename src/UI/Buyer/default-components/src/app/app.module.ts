@@ -75,7 +75,7 @@ import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
-import { OCMReorder } from './components/reorder/reorder.component';
+import { OCMReorder } from './components/re-order/re-order.component';
 import { OCMOrderApproval } from './components/order-approval/order-approval.component';
 
 const components = [ OCMProductCard,
