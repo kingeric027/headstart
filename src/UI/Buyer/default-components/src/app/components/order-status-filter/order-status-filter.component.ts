@@ -1,6 +1,5 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { OCMComponent } from '../base-component';
 import { OrderStatus } from 'marketplace';
 
 @Component({
@@ -14,9 +13,9 @@ export class OCMOrderStatusFilter implements OnInit {
 
   ngOnInit(): void {
     this.form = new FormGroup({
-      status: new FormControl(`!${OrderStatus.Unsubmitted}`),
+      status: new FormControl(OrderStatus.AllSubmitted),
     });
-    this.statuses = [OrderStatus.Open, OrderStatus.AwaitingApproval, OrderStatus.Completed, OrderStatus.Declined, OrderStatus.Canceled];
+    this.statuses = [OrderStatus.AllSubmitted, OrderStatus.Open, OrderStatus.AwaitingApproval, OrderStatus.Completed, OrderStatus.Declined, OrderStatus.Canceled];
   }
 
   selectStatus(): void {

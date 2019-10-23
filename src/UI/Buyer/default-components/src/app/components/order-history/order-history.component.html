@@ -1,3 +1,4 @@
+hello
 <div class="container mt-3">
   <div class="row">
     <ocm-profile-nav [context]="context"
@@ -24,7 +25,7 @@
           <ocm-order-date-filter (selectedDate)="filterByDate($event.detail)"></ocm-order-date-filter>
         </div>
       </div>
-      <ocm-order-list *ngIf="orders$ | async; let orders"
+      <ocm-order-list *ngIf="orders"
                       [context]="context"
                       [orders]="orders"
                       [columns]="columns"

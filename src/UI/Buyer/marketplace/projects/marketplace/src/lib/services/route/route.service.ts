@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { ProductFilterService } from '../product-filter/product-filter.service';
 import { filter, map } from 'rxjs/operators';
-import { IRouter, ProductFilters } from '../../shopper-context';
+import { IRouter, ProductFilters, OrderFilters } from '../../shopper-context';
+import { OrderFilterService } from '../order-history/order-filter.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RouteService implements IRouter {
-  constructor(private router: Router, private productFilterService: ProductFilterService) {}
+  constructor(private router: Router, private productFilterService: ProductFilterService, private orderFilterService: OrderFilterService) {}
 
   getActiveUrl(): string {
     return this.router.url;
@@ -68,16 +69,18 @@ export class RouteService implements IRouter {
     this.toRoute('/profile/payment-methods');
   }
 
-  toMyOrders(): void {
-    this.toRoute(`/profile/orders`);
+  toMyOrders(options: OrderFilters = {}): void {
+    const queryParams = this.orderFilterService.mapToUrlQueryParams(options);
+    this.router.navigate([`/profile/orders`], { queryParams });
   }
 
   toMyOrderDetails(orderID: string): void {
     this.toRoute(`/profile/orders/${orderID}`);
   }
 
-  toOrdersToApprove(): void {
-    this.toRoute('/profile/orders/approval');
+  toOrdersToApprove(options: OrderFilters = {}): void {
+    const queryParams = this.orderFilterService.mapToUrlQueryParams(options);
+    this.router.navigate([`/profile/orders/approval`], { queryParams });
   }
 
   toOrderToAppoveDetails(orderID: string): void {

@@ -79,6 +79,7 @@ import { OCMOrderApproval } from './components/order-approval/order-approval.com
 import { OCMOrderShipments } from './components/order-shipments/order-shipments.component';
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
 import { OCMOrderHistorical } from './components/order-historical/order-historical.component';
+import { OCMOrderHistory } from './components/order-history/order-history.component';
 
 const components = [ OCMProductCard,
   OCMToggleFavorite,
@@ -131,7 +132,8 @@ const components = [ OCMProductCard,
   OCMReorder,
   OCMOrderApproval,
   OCMOrderShipments,
-  OCMOrderHistorical
+  OCMOrderHistorical,
+  OCMOrderHistory
 ];
 
 @NgModule({
@@ -237,6 +239,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderApproval, 'ocm-order-approval');
     this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
+    this.buildWebComponent(OCMOrderHistorical, 'ocm-order-history');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

@@ -1,5 +1,5 @@
 // core services
-import { NgModule, Component } from '@angular/core';
+import { NgModule, Component, OnInit } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
@@ -22,19 +22,48 @@ import { MeListProductResolver, MeListCategoriesResolver,
 import { ProductDetailWrapperComponent } from './wrapper-components/product-detail-wrapper.component';
 import { LoginWrapperComponent } from './wrapper-components/login-wrapper.component';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
+import { ShopperContextService } from './services/shopper-context/shopper-context.service';
+import { OrderFilterService } from './services/order-history/order-filter.service';
+import { ListOrder } from '@ordercloud/angular-sdk';
 
 // auth components
 
 // TODO - move or remove these
 @Component({
-  template: '<order-history [approvalVersion]="false"></order-history>',
+  template: '<ocm-order-history [context]="context" [orders]="orders" [approvalVersion]="false"></ocm-order-history>',
 })
-export class MyOrdersComponent {}
+export class MyOrdersWrapperComponent implements OnInit {
+  orders: ListOrder;
+
+  constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
+
+  async ngOnInit() {
+    this.setOrders();
+    this.orderFilters.onFiltersChange(this.setOrders);
+  }
+
+  setOrders = async () => {
+    this.orders = await this.orderFilters.listOrders();
+  }
+}
 
 @Component({
-  template: '<order-history [approvalVersion]="true"></order-history>',
+  template: '<ocm-order-history [context]="context" [orders]="orders" [approvalVersion]="true"></ocm-order-history>',
 })
-export class OrdersToApproveComponent {}
+export class OrdersToApproveWrapperComponent implements OnInit {
+  orders: ListOrder;
+
+  constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
+
+  async ngOnInit() {
+    this.setOrders();
+    this.orderFilters.onFiltersChange(this.setOrders);
+  }
+
+  setOrders = async () => {
+    this.orders = await this.orderFilters.listOrders();
+  }
+}
 
 export const MarketplaceRoutes: Routes = [
   { path: 'login', component: LoginWrapperComponent },
@@ -90,8 +119,8 @@ export const MarketplaceRoutes: Routes = [
           },
         },
         { path: 'payment-methods', component: PaymentListWrapperComponent },
-        { path: 'orders', component: MyOrdersComponent },
-        { path: 'orders/approval', component: OrdersToApproveComponent },
+        { path: 'orders', component: MyOrdersWrapperComponent },
+        { path: 'orders/approval', component: OrdersToApproveWrapperComponent },
         { path: 'orders/:orderID', component: OrderDetailWrapperComponent },
         { path: 'orders/approval/:orderID', component: OrderDetailWrapperComponent },
       ], }

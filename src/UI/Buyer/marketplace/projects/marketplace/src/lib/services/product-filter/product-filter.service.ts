@@ -4,6 +4,7 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { IProductFilters, ProductFilters } from '../../shopper-context';
+import { OcMeService, ListProduct } from '@ordercloud/angular-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -24,7 +25,12 @@ export class ProductFilterService implements IProductFilters {
 
   private activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(this.defaultParams);
 
-  constructor(private router: Router, private currentUser: CurrentUserService, private activatedRoute: ActivatedRoute) {
+  constructor(
+    private router: Router,
+    private ocMeService: OcMeService,
+    private currentUser: CurrentUserService,
+    private activatedRoute: ActivatedRoute
+  ) {
     this.activatedRoute.queryParams.subscribe(this.readFromUrlQueryParams);
   }
 
@@ -44,12 +50,11 @@ export class ProductFilterService implements IProductFilters {
     return { page, sortBy, search, ...activeFacets };
   }
 
-  // Used in requests to the OC API
-  getOrderCloudParams(): any {
+  async listProducts(): Promise<ListProduct> {
     const { page, sortBy, search, categoryID, showOnlyFavorites, activeFacets = {} } = this.activeFiltersSubject.value;
     const facets = _transform(activeFacets, (result, value, key: any) => (result[`xp.Facets.${key.toLocaleLowerCase()}`] = value), {});
     const favorites = this.currentUser.favoriteProductIDs.join('|') || undefined;
-    return {
+    return await this.ocMeService.ListProducts({
       categoryID,
       page,
       search,
@@ -58,7 +63,7 @@ export class ProductFilterService implements IProductFilters {
         ...facets,
         ID: showOnlyFavorites ? favorites : undefined,
       },
-    };
+    }).toPromise();
   }
 
   private patchFilterState(patch: ProductFilters) {

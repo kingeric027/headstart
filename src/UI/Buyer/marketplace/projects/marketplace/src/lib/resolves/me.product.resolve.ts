@@ -24,10 +24,10 @@ export class MeListRelatedProductsResolver implements Resolve<ListBuyerProduct> 
 
 @Injectable()
 export class MeListProductResolver implements Resolve<ListBuyerProduct> {
-  constructor(private service: OcMeService, private productFilter: ProductFilterService) {}
+  constructor(private productFilter: ProductFilterService) {}
 
   resolve(): Observable<ListBuyerProduct> | Promise<ListBuyerProduct> | any {
-    return this.service.ListProducts(this.productFilter.getOrderCloudParams());
+    return this.productFilter.listProducts();
   }
 }
 

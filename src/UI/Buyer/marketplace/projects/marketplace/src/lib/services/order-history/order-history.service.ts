@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLineItemService, ListShipment, OcMeService, ShipmentItem } from '@ordercloud/angular-sdk';
+import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
 import { uniqBy as _uniqBy } from 'lodash';
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
-import { IOrderHistory, OrderReorderResponse, OrderDetails, MyShipment, MyShipmentItem } from '../../shopper-context';
+import { IOrderHistory, OrderReorderResponse, OrderDetails, MyShipment, MyShipmentItem} from '../../shopper-context';
 
 @Injectable({
   providedIn: 'root',

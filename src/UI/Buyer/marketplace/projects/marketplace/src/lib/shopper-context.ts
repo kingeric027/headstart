@@ -22,21 +22,12 @@ export interface ICreditCards {
 
 export interface IOrderHistory {
   activeOrderID: string;
+
   approveOrder(orderID?: string, Comments?: string,  AllowResubmit?: boolean): Promise<Order>;
   declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<Order>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
   listShipments(orderID?: string): Promise<MyShipment[]>;
-
-  // toPage(pageNumber: number): void;
-  // sortBy(field: string): void;
-  // clearSort(): void;
-  // searchBy(searchTerm: string): void;
-  // clearSearch(): void;
-  // filterByFavorites(showOnlyFavorites: boolean): void;
-  // clearAllFilters(): void;
-  // onFiltersChange(callback: (filters: ProductFilters) => void): void;
-
 }
 
 export interface IRouter {
@@ -113,6 +104,19 @@ export interface IProductFilters {
   clearAllFilters(): void;
   onFiltersChange(callback: (filters: ProductFilters) => void): void;
 }
+export interface IOrderFilters {
+  toPage(pageNumber: number): void;
+  sortBy(field: string): void;
+  clearSort(): void;
+  searchBy(searchTerm: string): void;
+  clearSearch(): void;
+  filterByFavorites(showOnlyFavorites: boolean): void;
+  filterByStatus(status: OrderStatus): void;
+  filterByFromDate(fromDate: Date): void;
+  filterByToDate(toDate: Date): void;
+  clearAllFilters(): void;
+  onFiltersChange(callback: (filters: ProductFilters) => void): void;
+}
 
 export interface IAuthentication {
   profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
@@ -138,12 +142,13 @@ export interface OrderFilters {
   sortBy?: string;
   search?: string;
   showOnlyFavorites?: boolean;
-  status: OrderStatus;
-  fromDate: Date;
-  toDate: Date;
+  status?: OrderStatus;
+  fromDate?: Date;
+  toDate?: Date;
 }
 
 export enum OrderStatus {
+  AllSubmitted = '!Unsubmitted',
   Unsubmitted = 'Unsubmitted',
   AwaitingApproval = 'AwaitingApproval',
   Declined = 'Declined',

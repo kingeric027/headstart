@@ -6,6 +6,7 @@ import { OrderStatus } from 'marketplace';
 })
 export class OrderStatusDisplayPipe implements PipeTransform {
   OrderStatusMap = {
+    [OrderStatus.AllSubmitted]: 'All',
     [OrderStatus.Unsubmitted]: 'Unsubmitted',
     [OrderStatus.AwaitingApproval]: 'Awaiting Approval',
     [OrderStatus.Declined]: 'Declined',

@@ -25,7 +25,6 @@ export class ProductListWrapperComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     public context: ShopperContextService,
-    private ocMeService: OcMeService
   ) {}
 
   ngOnInit() {
@@ -36,8 +35,7 @@ export class ProductListWrapperComponent implements OnInit {
   }
 
   private handleFiltersChange = async () => {
-    const queryParams = this.context.productFilters.getOrderCloudParams();
-    this.products = await this.ocMeService.ListProducts(queryParams).toPromise();
+    this.products = await this.context.productFilters.listProducts();
     this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
   }
 

@@ -1,6 +1,6 @@
 // core services
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
-import { MarketplaceRoutingModule, MyOrdersComponent, OrdersToApproveComponent } from './marketplace-routing.module';
+import { MarketplaceRoutingModule, MyOrdersWrapperComponent, OrdersToApproveWrapperComponent } from './marketplace-routing.module';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
@@ -31,7 +31,6 @@ import { ShopperContextService } from './services/shopper-context/shopper-contex
 import { ToastrModule } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { OrderHistoryComponent } from './order/containers/order-history/order-history.component';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
 import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipments-wrapper.component';
 
@@ -83,11 +82,8 @@ import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipm
     ResetPasswordWrapperComponent,
     OrderDetailWrapperComponent,
     OrderShipmentsWrapperComponent,
-
-    // TODO - remove
-    OrderHistoryComponent,
-    MyOrdersComponent,
-    OrdersToApproveComponent,
+    MyOrdersWrapperComponent,
+    OrdersToApproveWrapperComponent,
   ],
 })
 export class MarketplaceModule {}
