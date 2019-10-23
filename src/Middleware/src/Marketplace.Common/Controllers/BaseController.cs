@@ -43,16 +43,9 @@ namespace Marketplace.Common.Controllers
 
         public string UsrType
         {
-            get
-            {
-                return _token.Payload.FirstOrDefault(t => t.Key == "usrtype").Value?.ToString();
-            }
+            get { return _token.Payload.FirstOrDefault(t => t.Key == "usrtype").Value?.ToString(); }
         }
-
-        public string AnonOrderID
-        {
-            get { return _c.Claims.FirstOrDefault(c => c.Type == "anonorderid")?.Value; }
-        }
+        
         public string UserID
         {
             get { return _c.Claims.First(c => c.Type == "userid").Value; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Marketplace.Common.Controllers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Exceptions;
@@ -8,7 +9,6 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Services;
 using Action = Marketplace.Common.Models.Action;
-using ApiRole = OrderCloud.SDK.ApiRole;
 using ErrorCodes = Marketplace.Common.Exceptions.ErrorCodes;
 
 namespace Marketplace.Common.Commands
@@ -21,8 +21,7 @@ namespace Marketplace.Common.Commands
         Task<JObject> CalculateDiff(WorkItem wi);
         Task<JObject> GetQueuedItem(string path);
         Task<JObject> GetCachedItem(string path);
-        Task<T> SaveToQueue<T>(T obj, string supplierId) where T : IOrchestrationObject;
-        Task<OrchestrationSupplier> GetSupplier(string path);
+        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user) where T : Models.IOrchestrationObject;
     }
 
     public class OrchestrationCommand : IOrchestrationCommand
@@ -46,11 +45,13 @@ namespace Marketplace.Common.Commands
             return supplier;
         }
 
-        public async Task<T> SaveToQueue<T>(T obj, string supplierId) where T : IOrchestrationObject
+        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user) where T : Models.IOrchestrationObject
         {
             try
             {
-                await _blob.Save(_settings.BlobSettings.QueueName, obj.BuildPath(supplierId),
+                obj.Token = user.AccessToken;
+                obj.ClientId = user.ClientID;
+                await _blob.Save(_settings.BlobSettings.QueueName, obj.BuildPath(user.SupplierID),
                     JsonConvert.SerializeObject(obj));
                 return await Task.FromResult(obj);
             }
@@ -63,7 +64,7 @@ namespace Marketplace.Common.Commands
                 await _log.Upsert(new OrchestrationLog()
                 {
                     Level = LogLevel.Error,
-                    Message = $"Failed to save blob to queue from API: {supplierId} - {typeof(T)}",
+                    Message = $"Failed to save blob to queue from API: {user.SupplierID} - {typeof(T)}",
                     Current = JObject.FromObject(obj)
                 });
                 throw new ApiErrorException(ErrorCodes.All["WriteFailure"], obj);
@@ -112,7 +113,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        public async Task<JObject> GetCachedItem(string path)
+        public async Task<Newtonsoft.Json.Linq.JObject> GetCachedItem(string path)
         {
             try
             {
@@ -124,7 +125,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        public async Task<JObject> CalculateDiff(WorkItem wi)
+        public async Task<Newtonsoft.Json.Linq.JObject> CalculateDiff(WorkItem wi)
         {
             try
             {
@@ -161,7 +162,7 @@ namespace Marketplace.Common.Commands
                 {
                     // cache exists, we want to force a PUT when xp has deleted properties because 
                     // it's the only way to delete the properties
-                    if (wi.Cache.HasDeletedXp(wi.Current))
+                    if (wi.Cache.HasDeletedXp(wi.Current.To<JObject>()))
                         return await Task.FromResult(Action.Update);
                     // otherwise we want to PATCH the existing object
                     return await Task.FromResult(Action.Patch);

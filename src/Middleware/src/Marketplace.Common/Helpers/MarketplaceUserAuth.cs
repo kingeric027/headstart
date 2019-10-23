@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Marketplace.Common.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
@@ -58,20 +59,14 @@ namespace Marketplace.Common.Helpers
                 if (!user.Active)
                     return AuthenticateResult.Fail("Authentication failure");
 
-                //TODO: evaluate supplier aspect for broader Marketplace auth
-                var supplier = await _supplier.GetByUserID(user.ID);
-                if (supplier == null)
-                    return AuthenticateResult.Fail("Authentication failure. Stored credentials not found");
-
                 var cid = new ClaimsIdentity("MarketplaceUser");
+                cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
                 cid.AddClaim(new Claim("username", user.Username));
                 cid.AddClaim(new Claim("userid", user.ID));
                 cid.AddClaim(new Claim("email", user.Email));
                 cid.AddClaim(new Claim("buyer", user.Buyer?.ID ?? ""));
-                cid.AddClaim(new Claim("clientid", supplier?.ClientID));
-                cid.AddClaim(new Claim("supplier", supplier?.id));
-                cid.AddClaim(new Claim("secret", supplier?.ClientSecret));
+                cid.AddClaim(new Claim("supplier", user.Supplier?.ID ?? ""));
                 cid.AddClaims(user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)));
 
                 var ticket = new AuthenticationTicket(new ClaimsPrincipal(cid), "MarketplaceUser");

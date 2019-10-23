@@ -5,10 +5,8 @@ using System.Text;
 
 namespace Marketplace.Common.Models
 {
-    public class OrchestrationProduct : IOrchestrationObject
+    public class OrchestrationProduct : OrchestrationObject
     {
-        [Required, MaxLength(100, ErrorMessage = "Must be a minimum of 1 and maximum of 100 characters")]
-        public string ID { get; set; }
         [Required]
         public string DefaultSupplierID { get; set; }
         public string DefaultPriceScheduleID { get; set; }
@@ -22,15 +20,13 @@ namespace Marketplace.Common.Models
         public decimal? ShipHeight { get; set; }
         public decimal? ShipWidth { get; set; }
         public decimal? ShipLength { get; set; }
-        public bool? Active { get; set; }
+        public bool? Active { get; set; } = true;
         public string ShipFromAddressID { get; set; }
         public OrchestrationProductXp xp { get; set; } = new OrchestrationProductXp();
     }
 
     public class OrchestrationProductXp
     {
-        [Required]
-        public string SupplierId { get; set; }
         public dynamic Data { get; set; }
         public IEnumerable<ImageRef> Images { get; set; } = new List<ImageRef>();
         public Dictionary<string, string> Facets = new Dictionary<string, string>();

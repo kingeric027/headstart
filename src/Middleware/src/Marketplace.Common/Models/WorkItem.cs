@@ -50,7 +50,9 @@ namespace Marketplace.Common.Models
         public JObject Cache { get; set; } // not used for create
         public JObject Diff { get; set; } // only for update
         //[JsonIgnore]
-        public OrchestrationSupplier Supplier { get; set; }
+        //public OrchestrationSupplier Supplier { get; set; }
+        public string Token { get; set; }
+        public string ClientId { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

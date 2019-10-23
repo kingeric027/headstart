@@ -51,10 +51,7 @@ namespace Marketplace.Common.Commands
             {
                 ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                 AuthUrl = _settings.OrderCloudSettings.AuthUrl,
-                ClientSecret = wi.Supplier.ClientSecret,
-                ClientId = wi.Supplier.ClientID,
-                GrantType = GrantType.ClientCredentials,
-                Roles = new ApiRole[] { ApiRole.FullAccess }
+                ClientId = wi.ClientId
             });
 
             var type = Type.GetType($"{ASSEMBLY}{wi.RecordType}SyncCommand", true);

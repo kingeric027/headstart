@@ -25,7 +25,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 obj.ID = wi.RecordId;
-                var response = await _oc.Products.CreateAsync(obj);
+                var response = await _oc.Products.CreateAsync(obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
@@ -53,7 +53,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
-                var response = await _oc.Products.SaveAsync<Product>(wi.RecordId, obj);
+                var response = await _oc.Products.SaveAsync<Product>(wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -71,7 +71,7 @@ namespace Marketplace.Common.Commands
             var obj = JObject.FromObject(wi.Diff).ToObject<PartialProduct<OrchestrationProductXp>>();
             try
             {
-                var response = await _oc.Products.PatchAsync(wi.RecordId, obj);
+                var response = await _oc.Products.PatchAsync(wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -93,7 +93,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Products.GetAsync(wi.RecordId);
+                var response = await _oc.Products.GetAsync(wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
