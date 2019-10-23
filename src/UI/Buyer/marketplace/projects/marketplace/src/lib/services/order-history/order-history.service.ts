@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core';
-import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLineItemService } from '@ordercloud/angular-sdk';
+import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLineItemService, ListShipment, OcMeService, ShipmentItem } from '@ordercloud/angular-sdk';
 import { uniqBy as _uniqBy } from 'lodash';
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
-import { IOrderHistory, OrderReorderResponse, OrderDetails } from '../../shopper-context';
+import { IOrderHistory, OrderReorderResponse, OrderDetails, MyShipment, MyShipmentItem } from '../../shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderHistoryService implements IOrderHistory {
-  activeOrderID: string; // make this read-only
+  activeOrderID: string; // TODO - make this read-only in components
+  activeOrderDetails: OrderDetails;
 
   constructor(
     private ocOrderService: OcOrderService,
+    private ocMeService: OcMeService,
     private paymentHelper: PaymentHelperService,
     private reorderHelper: ReorderHelperService,
     private ocLineItemService: OcLineItemService
@@ -53,5 +55,23 @@ export class OrderHistoryService implements IOrderHistory {
     const approvals = await this.ocOrderService.ListApprovals('outgoing', orderID).toPromise();
     approvals.Items = approvals.Items.filter((x) => x.Approver);
     return _uniqBy(approvals.Items, (x) => x.Comments);
+  }
+
+  async listShipments(orderID: string = this.activeOrderID): Promise<MyShipment[]> {
+    const [lineItems, shipments] = await Promise.all([
+      this.ocLineItemService.List('outgoing', orderID).toPromise(),
+      this.ocMeService.ListShipments({ orderID }).toPromise()
+    ]);
+    const getShipmentItems = shipments.Items.map(shipment => this.ocMeService.ListShipmentItems(shipment.ID).toPromise());
+    const shipmentItems = (await Promise.all(getShipmentItems)).map(si => si.Items) as MyShipmentItem[][];
+    shipments.Items.map((shipment: MyShipment, index) => {
+      shipment.ShipmentItems = shipmentItems[index];
+      shipment.ShipmentItems.map((shipmentItem: MyShipmentItem) => {
+        shipmentItem.LineItem = lineItems.Items.find(li => li.ID === shipmentItem.LineItemID);
+        return shipmentItem;
+      });
+      return shipment;
+    });
+    return shipments.Items as MyShipment[];
   }
 }

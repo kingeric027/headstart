@@ -84,9 +84,7 @@ export const MarketplaceRoutes: Routes = [
       { path: 'profile' , canActivate: [IsProfiledUserGuard], children: [
         { path: '', component: ProfileWrapperComponent,  },
         { path: 'change-password', component: MeChangePasswordWrapperComponent },
-        {
-          path: 'addresses',
-          component: AddressListWrapperComponent,
+        { path: 'addresses', component: AddressListWrapperComponent,
           resolve: {
             addresses: MeListBuyerAddressResolver,
           },
@@ -94,14 +92,8 @@ export const MarketplaceRoutes: Routes = [
         { path: 'payment-methods', component: PaymentListWrapperComponent },
         { path: 'orders', component: MyOrdersComponent },
         { path: 'orders/approval', component: OrdersToApproveComponent },
-        {
-          path: 'orders/:orderID',
-          component: OrderDetailWrapperComponent,
-        },
-        {
-          path: 'orders/approval/:orderID',
-          component: OrderDetailWrapperComponent
-        }
+        { path: 'orders/:orderID', component: OrderDetailWrapperComponent },
+        { path: 'orders/approval/:orderID', component: OrderDetailWrapperComponent },
       ], }
     ]
   }

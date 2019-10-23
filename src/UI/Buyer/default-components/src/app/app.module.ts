@@ -57,7 +57,6 @@ import { OCMPaymentMethodManagement } from './components/payment-method-manageme
 import { OCMProfile } from './components/profile/profile.component';
 import { OCMProfileNav } from './components/profile-nav/profile-nav.component';
 import { OCMOrderDetails } from './components/order-detail/order-detail.component';
-import { OCMOrderHeader } from './components/order-header/order-header.component';
 import { OCMAppFooter } from './components/app-footer/app-footer.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -77,6 +76,9 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
 import { OCMReorder } from './components/re-order/re-order.component';
 import { OCMOrderApproval } from './components/order-approval/order-approval.component';
+import { OCMOrderShipments } from './components/order-shipments/order-shipments.component';
+import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
+import { OCMOrderHistorical } from './components/order-historical/order-historical.component';
 
 const components = [ OCMProductCard,
   OCMToggleFavorite,
@@ -125,10 +127,11 @@ const components = [ OCMProductCard,
   OCMProfile,
   OCMProfileNav,
   OCMOrderDetails,
-  OCMOrderHeader,
   OCMAppFooter,
   OCMReorder,
-  OCMOrderApproval
+  OCMOrderApproval,
+  OCMOrderShipments,
+  OCMOrderHistorical
 ];
 
 @NgModule({
@@ -139,6 +142,8 @@ const components = [ OCMProductCard,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
+    ShipperTrackingPipe,
+    ShipperTrackingSupportedPipe,
    ...components
   ],
   imports: [
@@ -227,10 +232,11 @@ export class AppModule {
     this.buildWebComponent(OCMProfile, 'ocm-profile');
 
     this.buildWebComponent(OCMOrderDetails, 'ocm-order-details');
-    this.buildWebComponent(OCMOrderHeader, 'ocm-order-header');
     this.buildWebComponent(OCMAppFooter, 'ocm-app-footer');
     this.buildWebComponent(OCMReorder, 'ocm-reorder');
     this.buildWebComponent(OCMOrderApproval, 'ocm-order-approval');
+    this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
+    this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

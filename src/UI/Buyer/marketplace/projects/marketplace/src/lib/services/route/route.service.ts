@@ -68,17 +68,22 @@ export class RouteService implements IRouter {
     this.toRoute('/profile/payment-methods');
   }
 
-  toOrderDetails(orderID: string): void {
-    this.toRoute(`/profile/orders/${orderID}`);
-  }
-
   toMyOrders(): void {
     this.toRoute(`/profile/orders`);
+  }
+
+  toMyOrderDetails(orderID: string): void {
+    this.toRoute(`/profile/orders/${orderID}`);
   }
 
   toOrdersToApprove(): void {
     this.toRoute('/profile/orders/approval');
   }
+
+  toOrderToAppoveDetails(orderID: string): void {
+    this.toRoute(`/profile/orders/approval/${orderID}`);
+  }
+
 
   toChangePassword(): void {
     this.toRoute('/profile/change-password');

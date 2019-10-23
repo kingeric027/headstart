@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion, ListShipment, Shipment, ShipmentItem } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export * from '@ordercloud/angular-sdk';
@@ -26,6 +26,7 @@ export interface IOrderHistory {
   declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<Order>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
+  listShipments(orderID?: string): Promise<MyShipment[]>;
 }
 
 export interface IRouter {
@@ -43,8 +44,9 @@ export interface IRouter {
   toMyAddresses(): void;
   toMyPaymentMethods(): void;
   toMyOrders(): void;
+  toMyOrderDetails(orderID: string): void;
   toOrdersToApprove(): void;
-  toOrderDetails(orderID: string): void;
+  toOrderToAppoveDetails(orderID: string): void;
   toChangePassword(): void;
   toRoute(path: string): void;
 }
@@ -82,6 +84,7 @@ export interface ICurrentOrder {
   setShippingAddress(address: Address): Promise<Order>;
   setBillingAddressByID(addressID: string): Promise<Order>;
   setShippingAddressByID(addressID: string): Promise<Order>;
+
   onOrderChange(callback: (order: Order) => void): void;
   onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
 }
@@ -144,6 +147,14 @@ export interface OrderDetails {
   promotions: ListPromotion;
   payments: ListPayment;
   approvals: OrderApproval[];
+}
+
+export interface MyShipment extends Shipment {
+  ShipmentItems: MyShipmentItem[];
+}
+
+export interface MyShipmentItem extends ShipmentItem {
+  LineItem: LineItem;
 }
 
 export interface AppConfig {
