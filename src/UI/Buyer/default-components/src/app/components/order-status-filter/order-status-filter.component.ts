@@ -1,7 +1,7 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { OCMComponent } from '../base-component';
-import { OrderStatus } from '../../models/order-status.model';
+import { OrderStatus } from 'marketplace';
 
 @Component({
   templateUrl: './order-status-filter.component.html',

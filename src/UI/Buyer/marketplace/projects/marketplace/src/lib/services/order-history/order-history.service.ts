@@ -10,7 +10,6 @@ import { IOrderHistory, OrderReorderResponse, OrderDetails, MyShipment, MyShipme
 })
 export class OrderHistoryService implements IOrderHistory {
   activeOrderID: string; // TODO - make this read-only in components
-  activeOrderDetails: OrderDetails;
 
   constructor(
     private ocOrderService: OcOrderService,

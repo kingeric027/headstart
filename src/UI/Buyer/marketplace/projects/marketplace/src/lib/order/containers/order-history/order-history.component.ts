@@ -4,8 +4,7 @@ import { Observable } from 'rxjs';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { flatMap } from 'rxjs/operators';
 import { ShopperContextService } from '../../../services/shopper-context/shopper-context.service';
-import { OrderStatus } from '../../models/order-status.model';
-import { MeOrderListOptions } from '../../models/me-order-list-options';
+import { OrderStatus } from '../../../shopper-context';
 
 @Component({
   selector: 'order-history',
@@ -67,7 +66,7 @@ export class OrderHistoryComponent implements AfterViewInit {
       flatMap((queryParamMap) => {
         this.sortBy = queryParamMap.get('sortBy');
         // we set param values to undefined so the sdk ignores them (dont show in headers)
-        const listOptions: MeOrderListOptions = {
+        const listOptions = {
           sortBy: this.sortBy || undefined,
           search: queryParamMap.get('search') || undefined,
           page: parseInt(queryParamMap.get('page'), 10) || undefined,

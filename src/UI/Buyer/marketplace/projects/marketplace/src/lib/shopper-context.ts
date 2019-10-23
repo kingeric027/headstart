@@ -27,6 +27,16 @@ export interface IOrderHistory {
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
   listShipments(orderID?: string): Promise<MyShipment[]>;
+
+  // toPage(pageNumber: number): void;
+  // sortBy(field: string): void;
+  // clearSort(): void;
+  // searchBy(searchTerm: string): void;
+  // clearSearch(): void;
+  // filterByFavorites(showOnlyFavorites: boolean): void;
+  // clearAllFilters(): void;
+  // onFiltersChange(callback: (filters: ProductFilters) => void): void;
+
 }
 
 export interface IRouter {
@@ -118,9 +128,28 @@ export interface ProductFilters {
   page?: number;
   sortBy?: string;
   search?: string;
-  categoryID?: string;
   showOnlyFavorites?: boolean;
+  categoryID?: string;
   activeFacets?: any;
+}
+
+export interface OrderFilters {
+  page?: number;
+  sortBy?: string;
+  search?: string;
+  showOnlyFavorites?: boolean;
+  status: OrderStatus;
+  fromDate: Date;
+  toDate: Date;
+}
+
+export enum OrderStatus {
+  Unsubmitted = 'Unsubmitted',
+  AwaitingApproval = 'AwaitingApproval',
+  Declined = 'Declined',
+  Open = 'Open',
+  Completed = 'Completed',
+  Canceled = 'Canceled',
 }
 
 export interface AuthNetCreditCard {
