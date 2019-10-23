@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using Orchestration.Common.Commands;
-using Orchestration.Common.Exceptions;
-using Orchestration.Common.Models;
-using Orchestration.Common.Queries;
-using Action = Orchestration.Common.Models.Action;
+using Marketplace.Common.Commands;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Models;
+using Marketplace.Common.Queries;
+using Action = Marketplace.Common.Models.Action;
 using ApiRole = OrderCloud.SDK.ApiRole;
 
 namespace Orchestration.ProductOrchestration

@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Orchestration.Common;
-using Orchestration.Common.Extensions;
+using Marketplace.Common;
+using Marketplace.Common.Extensions;
 using Orchestration.ProductOrchestration;
 
 [assembly: FunctionsStartup(typeof(Startup))]

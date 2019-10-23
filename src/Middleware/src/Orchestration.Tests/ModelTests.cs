@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Orchestration.Common.Helpers;
-using Orchestration.Common.Models;
+using Marketplace.Common.Helpers;
+using Marketplace.Common.Models;
 using OrderCloud.SDK;
 
 namespace Orchestration.Tests

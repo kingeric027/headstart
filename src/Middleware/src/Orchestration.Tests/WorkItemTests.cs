@@ -4,13 +4,13 @@ using Cosmonaut;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Orchestration.Common;
-using Orchestration.Common.Commands;
-using Orchestration.Common.Exceptions;
-using Orchestration.Common.Models;
-using Orchestration.Common.Queries;
-using Orchestration.Common.Services;
-using WorkItem = Orchestration.Common.Models.WorkItem;
+using Marketplace.Common;
+using Marketplace.Common.Commands;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Models;
+using Marketplace.Common.Queries;
+using Marketplace.Common.Services;
+using WorkItem = Marketplace.Common.Models.WorkItem;
 
 namespace Orchestration.Tests
 {

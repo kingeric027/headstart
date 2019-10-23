@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Orchestration.Common.Extensions;
-using Orchestration.Common.Helpers;
-using Orchestration.Common.Models;
+using Marketplace.Common.Extensions;
+using Marketplace.Common.Helpers;
+using Marketplace.Common.Models;
 using OrderCloud.SDK;
 
 namespace Orchestration.Tests
