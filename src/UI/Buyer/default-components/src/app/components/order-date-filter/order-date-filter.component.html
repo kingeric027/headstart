@@ -8,6 +8,7 @@
         <div class="input-group">
           <input formControlName="fromDate"
                  class="form-control border-right-0"
+                 (change)="handleFromDateChange()"
                  placeholder="mm-dd-yyyy"
                  ngbDatepicker
                  #dFrom="ngbDatepicker"
@@ -35,6 +36,7 @@
         <div class="input-group">
           <input formControlName="toDate"
                  class="form-control border-right-0"
+                 (change)="handleToDateChange()"
                  placeholder="mm-dd-yyyy"
                  ngbDatepicker
                  minDate="today"

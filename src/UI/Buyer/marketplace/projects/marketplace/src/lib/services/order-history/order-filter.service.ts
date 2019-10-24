@@ -4,6 +4,7 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { OrderStatus, OrderFilters, IOrderFilters } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { OcMeService, ListOrder } from '@ordercloud/angular-sdk';
+import { DatePipe } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +27,7 @@ export class OrderFilterService implements IOrderFilters {
     private ocMeService: OcMeService,
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {
     this.activatedRoute.queryParams.subscribe(this.readFromUrlQueryParams);
   }
@@ -37,7 +38,6 @@ export class OrderFilterService implements IOrderFilters {
 
   sortBy(field: string): void {
     this.patchFilterState({ sortBy: field || undefined, page: undefined });
-
   }
 
   clearSort(): void {
@@ -60,12 +60,12 @@ export class OrderFilterService implements IOrderFilters {
     this.patchFilterState({ status: status || undefined, page: undefined });
   }
 
-  filterByFromDate(fromDate: Date): void {
-
+  filterByFromDate(fromDate: string): void {
+    this.patchFilterState({ fromDate: fromDate || undefined, page: undefined });
   }
 
-  filterByToDate(toDate: Date): void {
-
+  filterByToDate(toDate: string): void {
+    this.patchFilterState({ toDate: toDate || undefined, page: undefined });
   }
 
   clearAllFilters(): void {
@@ -78,28 +78,30 @@ export class OrderFilterService implements IOrderFilters {
   }
 
   private readFromUrlQueryParams = (params: Params): void => {
-    const { page, sortBy, search, status, fromDate, toDate  } = params;
+    const { page, sortBy, search, fromDate, toDate } = params;
+    const status = params.status || OrderStatus.AllSubmitted;
     const showOnlyFavorites = !!params.favorites;
-    this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, fromDate, toDate, status });
+    this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate });
   }
 
   // Used to update the URL
   mapToUrlQueryParams(model: OrderFilters): Params {
-    const { page, sortBy, search, showOnlyFavorites } = model;
-    const favorites = showOnlyFavorites ? 'true' : undefined;
-    return { page, sortBy, search, favorites };
+    const { page, sortBy, search, status, fromDate, toDate } = model;
+    const favorites = model.showOnlyFavorites ? 'true' : undefined;
+    return { page, sortBy, search, status, favorites, fromDate, toDate };
   }
 
   // Used in requests to the OC API
   async listOrders(): Promise<ListOrder> {
-    const { page, sortBy, search, showOnlyFavorites, fromDate, toDate } = this.activeFiltersSubject.value;
+    const { page, sortBy, search, showOnlyFavorites, status, fromDate, toDate } = this.activeFiltersSubject.value;
+    const from = fromDate ? `>${fromDate}` : undefined;
+    const to = toDate ? `<${toDate}` : undefined;
     const favorites = this.currentUser.favoriteOrderIDs.join('|') || undefined;
-    return await this.ocMeService.ListOrders({
-      page,
-      search,
-      sortBy,
+    return await this.ocMeService.ListOrders({ page, search, sortBy,
       filters: {
         ID: showOnlyFavorites ? favorites : undefined,
+        Status: status,
+        // DateSubmitted: [from, to]
       },
     }).toPromise();
   }

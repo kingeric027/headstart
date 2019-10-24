@@ -23,6 +23,7 @@ export interface ICreditCards {
 export interface IOrderHistory {
   activeOrderID: string;
 
+  filters: IOrderFilters;
   approveOrder(orderID?: string, Comments?: string,  AllowResubmit?: boolean): Promise<Order>;
   declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<Order>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
@@ -104,6 +105,7 @@ export interface IProductFilters {
   clearAllFilters(): void;
   onFiltersChange(callback: (filters: ProductFilters) => void): void;
 }
+
 export interface IOrderFilters {
   toPage(pageNumber: number): void;
   sortBy(field: string): void;
@@ -112,8 +114,8 @@ export interface IOrderFilters {
   clearSearch(): void;
   filterByFavorites(showOnlyFavorites: boolean): void;
   filterByStatus(status: OrderStatus): void;
-  filterByFromDate(fromDate: Date): void;
-  filterByToDate(toDate: Date): void;
+  filterByFromDate(fromDate: string): void;
+  filterByToDate(toDate: string): void;
   clearAllFilters(): void;
   onFiltersChange(callback: (filters: ProductFilters) => void): void;
 }
@@ -143,8 +145,14 @@ export interface OrderFilters {
   search?: string;
   showOnlyFavorites?: boolean;
   status?: OrderStatus;
-  fromDate?: Date;
-  toDate?: Date;
+  /**
+   * mm-dd-yyyy
+   */
+  fromDate?: string;
+  /**
+   * mm-dd-yyyy
+   */
+  toDate?: string ;
 }
 
 export enum OrderStatus {

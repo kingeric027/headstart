@@ -4,6 +4,7 @@ import { uniqBy as _uniqBy } from 'lodash';
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { IOrderHistory, OrderReorderResponse, OrderDetails, MyShipment, MyShipmentItem} from '../../shopper-context';
+import { OrderFilterService } from './order-filter.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,7 @@ export class OrderHistoryService implements IOrderHistory {
   activeOrderID: string; // TODO - make this read-only in components
 
   constructor(
+    public filters: OrderFilterService,
     private ocOrderService: OcOrderService,
     private ocMeService: OcMeService,
     private paymentHelper: PaymentHelperService,

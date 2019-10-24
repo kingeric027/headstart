@@ -175,7 +175,7 @@ const components = [ OCMProductCard,
   providers: [
     { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
     { provide: ErrorHandler, useClass: AppErrorHandler },
-      DatePipe, // allows us to use in class as injectable (date filter component)
+    DatePipe, // allows us to use in class as injectable (date filter component)
   ],
   entryComponents: components,
   bootstrap: [AppComponent]
@@ -239,7 +239,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderApproval, 'ocm-order-approval');
     this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
-    this.buildWebComponent(OCMOrderHistorical, 'ocm-order-history');
+    this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

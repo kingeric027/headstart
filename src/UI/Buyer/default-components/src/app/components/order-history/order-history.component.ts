@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, Input } from '@angular/core';
 import { ListOrder } from '@ordercloud/angular-sdk';
 import { OCMComponent } from '../base-component';
-import { OrderStatus } from 'marketplace';
+import { OrderStatus, OrderFilters } from 'marketplace';
 
 @Component({
   templateUrl: './order-history.component.html',
@@ -10,11 +10,20 @@ import { OrderStatus } from 'marketplace';
 export class OCMOrderHistory extends OCMComponent implements AfterViewInit {
   columns: string[] = ['ID', 'Status', 'DateSubmitted', 'Total'];
   @Input() orders: ListOrder;
-  hasFavoriteOrdersFilter = false;
-  sortBy: string;
   @Input() approvalVersion: boolean;
+  showOnlyFavorites = false;
+  sortBy: string;
+  searchTerm: string;
 
-  ngOnContextSet() {}
+  ngOnContextSet() {
+    this.context.orderHistory.filters.onFiltersChange(this.handleFiltersChange);
+  }
+
+  handleFiltersChange = (filters: OrderFilters) => {
+    this.sortBy = filters.sortBy;
+    this.showOnlyFavorites = filters.showOnlyFavorites;
+    this.searchTerm = filters.search;
+  }
 
   async ngAfterViewInit() {
     if (!this.approvalVersion) {
@@ -23,27 +32,23 @@ export class OCMOrderHistory extends OCMComponent implements AfterViewInit {
   }
 
   sortOrders(sortBy: string): void {
-
+    this.context.orderHistory.filters.sortBy(sortBy);
   }
 
   changePage(page: number): void {
-
+    this.context.orderHistory.filters.toPage(page);
   }
 
   filterBySearch(search: string): void {
-
+    this.context.orderHistory.filters.searchBy(search);
   }
 
   filterByStatus(status: OrderStatus): void {
-
+    this.context.orderHistory.filters.filterByStatus(status);
   }
 
-  filterByDate(datesubmitted: string[]): void {
-
-  }
-
-  filterByFavorite(favoriteOrders: boolean): void {
-
+  filterByFavorite(showOnlyFavorites: boolean): void {
+    this.context.orderHistory.filters.filterByFavorites(showOnlyFavorites);
   }
 
 }
