@@ -5,9 +5,8 @@
             (change)="selectStatus()"
             class="form-control"
             formControlName="status">
-          <option value="!Unsubmitted">All</option>
           <option *ngFor="let status of statuses" [ngValue]="status">
-            {{status | orderStatusDisplay}}
+            {{ status | orderStatusDisplay }}
           </option>
       </select>
   </div>

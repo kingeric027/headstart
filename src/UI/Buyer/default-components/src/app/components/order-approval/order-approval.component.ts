@@ -1,26 +1,29 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ShopperContextService } from '../../../services/shopper-context/shopper-context.service';
-import { ModalState } from '../../../models/modal-state.class';
+import { ModalState } from 'src/app/models/modal-state.class';
+import { OCMComponent } from '../base-component';
 
 @Component({
-  selector: 'ocm-order-approval',
   templateUrl: './order-approval.component.html',
   styleUrls: ['./order-approval.component.scss'],
 })
-export class OrderApprovalComponent implements OnInit {
+export class OCMOrderApproval extends OCMComponent implements OnInit {
   approved: boolean;
   form: FormGroup;
   modalID = 'order-approval-comments';
   @Input() orderID: string;
   approveModal = ModalState.Closed;
 
-  constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
+  constructor(private toasterService: ToastrService) {
+    super();
+  }
 
   ngOnInit() {
     this.form = new FormGroup({ comments: new FormControl('') });
   }
+
+  ngOnContextSet() {}
 
   openModal(approved: boolean) {
     this.approved = approved;

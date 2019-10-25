@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { ListBuyerProduct, ListCategory, OcMeService } from '@ordercloud/angular-sdk';
-import { QuantityLimits } from '../models/quantity-limits';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { BuildQtyLimits } from '../functions/product.quantity.validator';
 
@@ -11,7 +10,6 @@ import { BuildQtyLimits } from '../functions/product.quantity.validator';
     <ocm-product-list
       [products]="products"
       [categories]="categories"
-      [quantityLimits]="quantityLimits"
       [context]="context"
     ></ocm-product-list>
   `,
@@ -19,26 +17,21 @@ import { BuildQtyLimits } from '../functions/product.quantity.validator';
 export class ProductListWrapperComponent implements OnInit {
   products: ListBuyerProduct;
   categories: ListCategory;
-  quantityLimits: QuantityLimits[];
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     public context: ShopperContextService,
-    private ocMeService: OcMeService
   ) {}
 
   ngOnInit() {
     this.products = this.activatedRoute.snapshot.data.products;
     this.categories = this.activatedRoute.snapshot.data.categories;
-    this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
     this.context.productFilters.onFiltersChange(this.handleFiltersChange);
   }
 
   private handleFiltersChange = async () => {
-    const queryParams = this.context.productFilters.getOrderCloudParams();
-    this.products = await this.ocMeService.ListProducts(queryParams).toPromise();
-    this.quantityLimits = this.products.Items.map((p) => BuildQtyLimits(p));
+    this.products = await this.context.productFilters.listProducts();
   }
 
   configureRouter() {

@@ -1,5 +1,5 @@
 // core services
-import { NgModule, Component } from '@angular/core';
+import { NgModule, Component, OnInit } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
@@ -22,19 +22,48 @@ import { MeListProductResolver, MeListCategoriesResolver,
 import { ProductDetailWrapperComponent } from './wrapper-components/product-detail-wrapper.component';
 import { LoginWrapperComponent } from './wrapper-components/login-wrapper.component';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
+import { ShopperContextService } from './services/shopper-context/shopper-context.service';
+import { OrderFilterService } from './services/order-history/order-filter.service';
+import { ListOrder } from '@ordercloud/angular-sdk';
 
 // auth components
 
 // TODO - move or remove these
 @Component({
-  template: '<order-history [approvalVersion]="false"></order-history>',
+  template: '<ocm-order-history [context]="context" [orders]="orders" [approvalVersion]="false"></ocm-order-history>',
 })
-export class MyOrdersComponent {}
+export class MyOrdersWrapperComponent implements OnInit {
+  orders: ListOrder;
+
+  constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
+
+  async ngOnInit() {
+    this.setOrders();
+    this.orderFilters.onFiltersChange(this.setOrders);
+  }
+
+  setOrders = async () => {
+    this.orders = await this.orderFilters.listOrders();
+  }
+}
 
 @Component({
-  template: '<order-history [approvalVersion]="true"></order-history>',
+  template: '<ocm-order-history [context]="context" [orders]="orders" [approvalVersion]="true"></ocm-order-history>',
 })
-export class OrdersToApproveComponent {}
+export class OrdersToApproveWrapperComponent implements OnInit {
+  orders: ListOrder;
+
+  constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
+
+  async ngOnInit() {
+    this.setOrders();
+    this.orderFilters.onFiltersChange(this.setOrders);
+  }
+
+  setOrders = async () => {
+    this.orders = await this.orderFilters.listOrders();
+  }
+}
 
 export const MarketplaceRoutes: Routes = [
   { path: 'login', component: LoginWrapperComponent },
@@ -56,29 +85,6 @@ export const MarketplaceRoutes: Routes = [
 
       { path: 'checkout', component: CheckoutWrapperComponent },
       { path: 'cart', component: CartWrapperComponent },
-      { path: 'profile', component: ProfileWrapperComponent, canActivate: [IsProfiledUserGuard], },
-      { path: 'profile/change-password', component: MeChangePasswordWrapperComponent,  canActivate: [IsProfiledUserGuard] },
-      {
-        path: 'profile/addresses',
-        canActivate: [IsProfiledUserGuard],
-        component: AddressListWrapperComponent,
-        resolve: {
-          addresses: MeListBuyerAddressResolver,
-        },
-      },
-      { path: 'profile/payment-methods', component: PaymentListWrapperComponent,  canActivate: [IsProfiledUserGuard] },
-      { path: 'profile/orders', component: MyOrdersComponent, canActivate: [IsProfiledUserGuard] },
-      { path: 'profile/orders/approval', component: OrdersToApproveComponent, canActivate: [IsProfiledUserGuard] },
-      {
-        path: 'profile/orders/:orderID',
-        component: OrderDetailWrapperComponent,
-        canActivate: [IsProfiledUserGuard]
-      },
-      {
-        path: 'approvalapproval/:orderID',
-        component: OrderDetailWrapperComponent,
-        canActivate: [IsProfiledUserGuard]
-      },
       {
         path: 'products',
         component: ProductListWrapperComponent,
@@ -103,7 +109,22 @@ export const MarketplaceRoutes: Routes = [
             },
           },
         ],
-      }]
+      },
+      { path: 'profile' , canActivate: [IsProfiledUserGuard], children: [
+        { path: '', component: ProfileWrapperComponent,  },
+        { path: 'change-password', component: MeChangePasswordWrapperComponent },
+        { path: 'addresses', component: AddressListWrapperComponent,
+          resolve: {
+            addresses: MeListBuyerAddressResolver,
+          },
+        },
+        { path: 'payment-methods', component: PaymentListWrapperComponent },
+        { path: 'orders', component: MyOrdersWrapperComponent },
+        { path: 'orders/approval', component: OrdersToApproveWrapperComponent },
+        { path: 'orders/:orderID', component: OrderDetailWrapperComponent },
+        { path: 'orders/approval/:orderID', component: OrderDetailWrapperComponent },
+      ], }
+    ]
   }
 ];
 

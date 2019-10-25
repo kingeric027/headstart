@@ -9,8 +9,9 @@ import { CurrentOrderService } from '../services/current-order/current-order.ser
 export class BaseResolve implements Resolve<any> {
   constructor(private currentOrder: CurrentOrderService, private currentUser: CurrentUserService) {}
 
-  resolve() {
-    this.currentUser.reset();
-    this.currentOrder.reset();
+  async resolve() {
+    const user = this.currentUser.reset();
+    const order = this.currentOrder.reset();
+    await Promise.all([user, order]);
   }
 }

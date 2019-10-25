@@ -96,7 +96,6 @@
           <ocm-product-card *ngFor="let product of products.Items; let i = index"
                             class="col-sm-6 col-md-4 col-xl-3 d-flex"
                             [product]="product"
-                            [quantityLimits]="quantityLimits[i]"
                             [context]="context"
                             [isFavorite]="isFavorite(product.ID)">
           </ocm-product-card>

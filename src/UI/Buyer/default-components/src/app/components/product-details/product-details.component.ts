@@ -4,7 +4,6 @@ import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { map as _map, without as _without, uniqBy as _uniq, some as _some,
   find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
 import { OCMComponent } from '../base-component';
-import { QuantityLimits } from '../../models/quantity-limits';
 import { SpecFormService } from '../spec-form/spec-form.service';
 
 @Component({
@@ -14,7 +13,6 @@ import { SpecFormService } from '../spec-form/spec-form.service';
 export class OCMProductDetails extends OCMComponent {
   @Input() specs: ListSpec;
   @Input() product: BuyerProduct;
-  @Input() quantityLimits: QuantityLimits;
 
   specFormService: SpecFormService;
   isOrderable = false;
@@ -24,7 +22,7 @@ export class OCMProductDetails extends OCMComponent {
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
 
-  constructor(private changeDetectorRef: ChangeDetectorRef, private formService: SpecFormService) {
+  constructor(private formService: SpecFormService) {
     super();
     this.specFormService = formService;
   }

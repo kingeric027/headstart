@@ -22,7 +22,6 @@
              *ngIf="isOrderable">
           <ocm-quantity-input class="d-inline-block"
                               style="max-width: 100px"
-                              [limits]="quantityLimits"
                               (qtyChange)="qtyChange($event)"
                               [context]="context">
           </ocm-quantity-input>

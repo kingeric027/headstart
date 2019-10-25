@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { Order, OrderApproval, LineItem, Promotion, ListPayment } from '@ordercloud/angular-sdk';
+import { Order } from '@ordercloud/angular-sdk';
+import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { OCMComponent } from '../base-component';
 import { OrderDetails } from 'marketplace';
 
@@ -9,18 +10,41 @@ import { OrderDetails } from 'marketplace';
 })
 export class OCMOrderDetails extends OCMComponent {
   order: Order;
-  lineItems: LineItem[] = [];
-  promotions: Promotion[] = [];
-  payments: ListPayment;
-  approvals: OrderApproval[] = [];
-  detailedOrder: OrderDetails;
+  orderDetails: OrderDetails;
+  approvalVersion: boolean;
+  faCube = faCube;
+  faTruck = faTruck;
+  subView: 'details' | 'shipments' = 'details';
 
   async ngOnContextSet() {
-    this.detailedOrder = await this.context.orderHistory.getOrderDetails();
-    this.order = this.detailedOrder.order;
-    this.lineItems = this.detailedOrder.lineItems.Items;
-    this.promotions = this.detailedOrder.promotions.Items;
-    this.payments = this.detailedOrder.payments;
-    this.approvals = this.detailedOrder.approvals;
+    this.orderDetails = await this.context.orderHistory.getOrderDetails();
+    this.order = this.orderDetails.order;
+    const url = this.context.router.getActiveUrl();
+    this.approvalVersion = url.includes('/approval');
+  }
+
+  isFavorite(orderID: string): boolean {
+    return this.context.currentUser.favoriteOrderIDs.includes(orderID);
+  }
+
+  toggleFavorite(order: Order) {
+    const newValue = !this.isFavorite(order.ID);
+    this.context.currentUser.setIsFavoriteOrder(newValue, order.ID);
+  }
+
+  toShipments() {
+    this.subView = 'shipments';
+  }
+
+  toDetails() {
+    this.subView = 'details';
+  }
+
+  showShipments(): boolean {
+    return this.subView === 'shipments';
+  }
+
+  showDetails(): boolean {
+    return this.subView === 'details';
   }
 }
