@@ -5,6 +5,7 @@ import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { IProductFilters, ProductFilters } from '../../shopper-context';
 import { OcMeService, ListProduct } from '@ordercloud/angular-sdk';
+import { filter } from 'rxjs/operators';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -31,11 +32,17 @@ export class ProductFilterService implements IProductFilters {
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute
   ) {
-    this.activatedRoute.queryParams.subscribe(this.readFromUrlQueryParams);
+    this.activatedRoute.queryParams.subscribe(params => {
+      if (this.router.url.startsWith('/products')) {
+        this.readFromUrlQueryParams(params);
+      } else {
+        this.activeFiltersSubject.next(this.defaultParams);
+      }
+    });
   }
 
   // Handle URL updates
-  private readFromUrlQueryParams = (params: Params): void => {
+  private readFromUrlQueryParams(params: Params): void {
     const { page, sortBy, search, categoryID } = params;
     const showOnlyFavorites = !!params.favorites;
     const activeFacets = _pickBy(params, (_value, _key) => !this.nonFacetQueryParams.includes(_key));
@@ -50,7 +57,7 @@ export class ProductFilterService implements IProductFilters {
     return { page, sortBy, search, ...activeFacets };
   }
 
-  async listProducts(): Promise<ListProduct> {
+  async listProducts(): Promise < ListProduct > {
     const { page, sortBy, search, categoryID, showOnlyFavorites, activeFacets = {} } = this.activeFiltersSubject.value;
     const facets = _transform(activeFacets, (result, value, key: any) => (result[`xp.Facets.${key.toLocaleLowerCase()}`] = value), {});
     const favorites = this.currentUser.favoriteProductIDs.join('|') || undefined;

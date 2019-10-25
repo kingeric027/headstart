@@ -109,7 +109,6 @@ export interface IProductFilters {
 export interface IOrderFilters {
   toPage(pageNumber: number): void;
   sortBy(field: string): void;
-  clearSort(): void;
   searchBy(searchTerm: string): void;
   clearSearch(): void;
   filterByFavorites(showOnlyFavorites: boolean): void;

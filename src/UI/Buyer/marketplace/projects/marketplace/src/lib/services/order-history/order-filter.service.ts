@@ -4,6 +4,7 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { OrderStatus, OrderFilters, IOrderFilters } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { OcMeService, ListOrder } from '@ordercloud/angular-sdk';
+import { filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +29,9 @@ export class OrderFilterService implements IOrderFilters {
     private activatedRoute: ActivatedRoute,
     private router: Router,
   ) {
-    this.activatedRoute.queryParams.subscribe(this.readFromUrlQueryParams);
+    this.activatedRoute.queryParams
+      .pipe(filter(() => this.router.url.startsWith('/profile/orders')))
+      .subscribe(this.readFromUrlQueryParams);
   }
 
   toPage(pageNumber: number): void {
@@ -37,10 +40,6 @@ export class OrderFilterService implements IOrderFilters {
 
   sortBy(field: string): void {
     this.patchFilterState({ sortBy: field || undefined, page: undefined });
-  }
-
-  clearSort(): void {
-    this.sortBy(undefined);
   }
 
   searchBy(searchTerm: string): void {
