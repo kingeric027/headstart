@@ -1,38 +1,32 @@
-<div class="container mt-3">
-  <div class="row">
-    <ocm-profile-nav [context]="context"
-                     class="col-md-3  d-none d-md-flex"></ocm-profile-nav>
-    <div class="col-md-9 col-sm-12">
-      <h1 class="page-heading border-bottom pb-3">{{ approvalVersion ? 'Orders To Appprove' : 'My Orders' }}</h1>
-      <ocm-search placeholderText="Search Orders"
-                  [searchTermInput]="searchTerm"
-                  (searched)="filterBySearch($event.detail)"></ocm-search>
-      <div class="row mt-3">
-        <div class="col-md-2 col-sm-6"
-             *ngIf="!approvalVersion">
-          <div>Favorites</div>
-          <div class="mt-3 ml-3">
-            <ocm-toggle-favorite [favorite]="showOnlyFavorites"
-                                 (favoriteChanged)="filterByFavorite($event.detail)">
-            </ocm-toggle-favorite>
-          </div>
-        </div>
-        <div class="col-md-2 col-sm-6"
-             *ngIf="!approvalVersion">
-          <ocm-order-status-filter [context]="context"></ocm-order-status-filter>
-        </div>
-        <div class="col">
-          <ocm-order-date-filter [context]="context"></ocm-order-date-filter>
-        </div>
+<ocm-profile-nav [context]="context">
+  <h1 class="page-heading border-bottom pb-3">{{ approvalVersion ? 'Orders To Appprove' : 'My Orders' }}</h1>
+  <ocm-search placeholderText="Search Orders"
+              [searchTermInput]="searchTerm"
+              (searched)="filterBySearch($event.detail)"></ocm-search>
+  <div class="row mt-3">
+    <div class="col-md-2 col-sm-6"
+          *ngIf="!approvalVersion">
+      <div>Favorites</div>
+      <div class="mt-3 ml-3">
+        <ocm-toggle-favorite [favorite]="showOnlyFavorites"
+                              (favoriteChanged)="filterByFavorite($event.detail)">
+        </ocm-toggle-favorite>
       </div>
-      <ocm-order-list *ngIf="orders"
-                      [context]="context"
-                      [orders]="orders"
-                      [columns]="columns"
-                      [sortBy]="sortBy"
-                      (updatedSort)="sortOrders($event.detail)"
-                      (changedPage)="changePage($event.detail)">
-      </ocm-order-list>
+    </div>
+    <div class="col-md-2 col-sm-6"
+          *ngIf="!approvalVersion">
+      <ocm-order-status-filter [context]="context"></ocm-order-status-filter>
+    </div>
+    <div class="col">
+      <ocm-order-date-filter [context]="context"></ocm-order-date-filter>
     </div>
   </div>
-</div>
+  <ocm-order-list *ngIf="orders"
+                  [context]="context"
+                  [orders]="orders"
+                  [columns]="columns"
+                  [sortBy]="sortBy"
+                  (updatedSort)="sortOrders($event.detail)"
+                  (changedPage)="changePage($event.detail)">
+  </ocm-order-list>
+</ocm-profile-nav>
