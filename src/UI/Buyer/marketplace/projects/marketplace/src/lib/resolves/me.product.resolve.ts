@@ -3,7 +3,6 @@ import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
 import { OcMeService, ListBuyerProduct, BuyerProduct, ListBuyerSpec, BuyerSpec, ListCategory } from '@ordercloud/angular-sdk';
 import { each as _each } from 'lodash';
 import { Observable, of } from 'rxjs';
-import { ProductFilterService } from '../services/product-filter/product-filter.service';
 
 @Injectable()
 export class MeListRelatedProductsResolver implements Resolve<ListBuyerProduct> {
@@ -19,15 +18,6 @@ export class MeListRelatedProductsResolver implements Resolve<ListBuyerProduct> 
       calls.push(this.service.GetProduct(id).toPromise());
     });
     return Promise.all(calls);
-  }
-}
-
-@Injectable()
-export class MeListProductResolver implements Resolve<ListBuyerProduct> {
-  constructor(private productFilter: ProductFilterService) {}
-
-  resolve(): Observable<ListBuyerProduct> | Promise<ListBuyerProduct> | any {
-    return this.productFilter.listProducts();
   }
 }
 

@@ -89,7 +89,6 @@ export const MarketplaceRoutes: Routes = [
         path: 'products',
         component: ProductListWrapperComponent,
         resolve: {
-          products: MeListProductResolver,
           categories: MeListCategoriesResolver,
         },
       },

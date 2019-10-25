@@ -11,7 +11,7 @@
       <p [innerHTML]='message.string'> </p>
     </div>
     <ocm-lineitem-table *ngIf="reorderResponse.InvalidLi.length"
-                        [lineitems]="reorderResponse.InvalidLi"
+                        [lineItems]="{ Items: reorderResponse.InvalidLi }"
                         [context]="context"
                         [readOnly]="true">
     </ocm-lineitem-table>
