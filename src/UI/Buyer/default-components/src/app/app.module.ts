@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, Injector, Inject, PLATFORM_ID, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
+import { NgModule, Injector, Inject, PLATFORM_ID, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, ErrorHandler } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -62,7 +62,8 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TreeModule } from 'angular-tree-component';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
-import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule, NgbDropdownModule, NgbDatepickerModule, NgbAccordionModule, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule,
+  NgbDropdownModule, NgbDatepickerModule, NgbAccordionModule, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
@@ -80,6 +81,15 @@ import { OCMOrderShipments } from './components/order-shipments/order-shipments.
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
 import { OCMOrderHistorical } from './components/order-historical/order-historical.component';
 import { OCMOrderHistory } from './components/order-history/order-history.component';
+
+import { SpecFieldDirective } from './components/spec-form/spec-field.directive';
+import { SpecFormCheckboxComponent } from './components/spec-form/spec-form-checkbox/spec-form-checkbox.component';
+import { SpecFormInputComponent } from './components/spec-form/spec-form-input/spec-form-input.component';
+import { SpecFormLabelComponent } from './components/spec-form/spec-form-label/spec-form-label.component';
+import { SpecFormNumberComponent } from './components/spec-form/spec-form-number/spec-form-number.component';
+import { SpecFormRangeComponent } from './components/spec-form/spec-form-range/spec-form-range.component';
+import { SpecFormSelectComponent } from './components/spec-form/spec-form-select/spec-form-select.component';
+import { SpecFormTextAreaComponent } from './components/spec-form/spec-form-textarea/spec-form-textarea.component';
 
 const components = [ OCMProductCard,
   OCMToggleFavorite,
@@ -133,14 +143,23 @@ const components = [ OCMProductCard,
   OCMOrderApproval,
   OCMOrderShipments,
   OCMOrderHistorical,
-  OCMOrderHistory
+  OCMOrderHistory,
+  OCMAppFooter,
+  SpecFormCheckboxComponent,
+  SpecFormInputComponent,
+  SpecFormLabelComponent,
+  SpecFormNumberComponent,
+  SpecFormRangeComponent,
+  SpecFormSelectComponent,
+  SpecFormTextAreaComponent
 ];
 
 @NgModule({
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   declarations: [
     AppComponent,
     FormControlErrorDirective,
+    SpecFieldDirective,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
