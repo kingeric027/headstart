@@ -3,7 +3,6 @@ import { Observable } from 'rxjs';
 import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
 import { OCMComponent } from '../base-component';
-import { QuantityLimits } from '../../models/quantity-limits';
 import { FullSpecOption } from '../../models/full-spec-option.interface';
 
 @Component({
@@ -13,7 +12,6 @@ import { FullSpecOption } from '../../models/full-spec-option.interface';
 export class OCMProductDetails extends OCMComponent implements AfterViewChecked {
   @Input() specs: ListSpec;
   @Input() product: BuyerProduct;
-  @Input() quantityLimits: QuantityLimits;
 
   quantity: number;
   quantityInputReady = false;

@@ -1,8 +1,7 @@
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { get as _get } from 'lodash';
-import { QuantityLimits } from '../models/quantity-limits';
 
-export function BuildQtyLimits(product: BuyerProduct): QuantityLimits {
+export function BuildQtyLimits(product: BuyerProduct) {
   const inventory = getInventory(product);
   const minPerOrder = minQty(product);
   const maxPerOrder = maxQty(product);
