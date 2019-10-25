@@ -4,7 +4,7 @@ import { AppConfig } from '../shopper-context';
 const ocAppConfig: AppConfig = {
   appname: 'OrderCloud',
   anonymousShoppingEnabled: false,
-  clientID: '97BBF2CC-59D1-449A-B67C-AE9262ADD284',
+  clientID: '78F16865-A4C3-4D28-832D-A0371A93F1EA',
   baseUrl: 'http://localhost:33333',
   middlewareUrl: 'my-middleware-url.com/api',
   cmsUrl: 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product',
