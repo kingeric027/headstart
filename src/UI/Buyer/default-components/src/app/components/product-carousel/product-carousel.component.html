@@ -9,7 +9,6 @@
     <ocm-product-card *ngFor="let product of getProducts(); let i = index"
                       class="col-lg-3 col-md-4 col-sm-6 d-flex flex-grow-1 flex-shrink-1"
                       [product]="product"
-                      [quantityLimits]="quantityLimits[i]"
                       [context]="context">
     </ocm-product-card>
   </div>

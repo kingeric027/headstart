@@ -114,8 +114,7 @@ export interface IOrderFilters {
   clearSearch(): void;
   filterByFavorites(showOnlyFavorites: boolean): void;
   filterByStatus(status: OrderStatus): void;
-  filterByFromDate(fromDate: string): void;
-  filterByToDate(toDate: string): void;
+  filterByDateSubmitted(fromDate: string, toDate: string): void;
   clearAllFilters(): void;
   onFiltersChange(callback: (filters: ProductFilters) => void): void;
 }

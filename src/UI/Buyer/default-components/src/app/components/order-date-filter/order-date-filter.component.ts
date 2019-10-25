@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormControl } from '@angular/forms';
 import { debounceTime, takeWhile } from 'rxjs/operators';
@@ -34,10 +34,9 @@ export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestro
   }
 
   handlefiltersChange = (filters: OrderFilters) => {
-    this.form.setValue({
-      fromDate: this.inverseFormatDate(filters.fromDate),
-      toDate: this.inverseFormatDate(filters.toDate)
-    });
+    const fromDate = this.inverseFormatDate(filters.fromDate);
+    const toDate = this.inverseFormatDate(filters.toDate);
+    this.form.setValue({ fromDate, toDate });
   }
 
   private onFormChanges() {
@@ -47,31 +46,27 @@ export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestro
         takeWhile(() => this.alive)
       )
       .subscribe(() => {
-        this.emitDate();
+        this.doFilter();
       });
   }
 
-  private emitDate() {
+  private doFilter() {
     if (this.form.get('fromDate').invalid || this.form.get('toDate').invalid) {
       return;
     }
     const fromDate: Date = this.form.get('fromDate').value;
     const toDate: Date = this.form.get('toDate').value;
-    if (fromDate) {
-      this.context.orderHistory.filters.filterByFromDate(this.formatDate(fromDate));
-    }
-    if (toDate) {
-      toDate.setDate(toDate.getDate() + 1);
-      this.context.orderHistory.filters.filterByToDate(this.formatDate(toDate));
-    }
+    this.context.orderHistory.filters.filterByDateSubmitted(this.formatDate(fromDate), this.formatDate(toDate));
   }
 
   clearToDate() {
-    this.context.orderHistory.filters.filterByToDate(undefined);
+    this.form.get('toDate').setValue(null);
+    this.doFilter();
   }
 
   clearFromDate() {
-    this.context.orderHistory.filters.filterByFromDate(undefined);
+    this.form.get('fromDate').setValue(null);
+    this.doFilter();
   }
 
   ngOnDestroy() {
@@ -79,10 +74,10 @@ export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestro
   }
 
   private formatDate(date: Date): string {
-    return this.datePipe.transform(date, 'shortDate').replace(/\//g, '-');
+    return date ? this.datePipe.transform(date, 'shortDate').replace(/\//g, '-') : null;
   }
 
   private inverseFormatDate(date: string): Date {
-    return date ? new Date(date.substr(1)) : null;
+    return date ? new Date(date) : null;
   }
 }

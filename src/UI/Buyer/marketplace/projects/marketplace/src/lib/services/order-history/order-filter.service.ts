@@ -4,7 +4,6 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { OrderStatus, OrderFilters, IOrderFilters } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { OcMeService, ListOrder } from '@ordercloud/angular-sdk';
-import { DatePipe } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
@@ -60,12 +59,12 @@ export class OrderFilterService implements IOrderFilters {
     this.patchFilterState({ status: status || undefined, page: undefined });
   }
 
-  filterByFromDate(fromDate: string): void {
-    this.patchFilterState({ fromDate: fromDate || undefined, page: undefined });
-  }
-
-  filterByToDate(toDate: string): void {
-    this.patchFilterState({ toDate: toDate || undefined, page: undefined });
+  filterByDateSubmitted(fromDate: string, toDate: string): void {
+    this.patchFilterState({
+      fromDate: fromDate || undefined,
+      toDate: toDate || undefined,
+      page: undefined
+    });
   }
 
   clearAllFilters(): void {
@@ -101,7 +100,7 @@ export class OrderFilterService implements IOrderFilters {
       filters: {
         ID: showOnlyFavorites ? favorites : undefined,
         Status: status,
-        // DateSubmitted: [from, to]
+        DateSubmitted: [from, to].filter(x => x)
       },
     }).toPromise();
   }
