@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion, ListShipment, Shipment, ShipmentItem } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion, ListShipment, Shipment, ShipmentItem, BuyerProduct } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export * from '@ordercloud/angular-sdk';
@@ -195,6 +195,14 @@ export interface MyShipment extends Shipment {
 
 export interface MyShipmentItem extends ShipmentItem {
   LineItem: LineItem;
+}
+
+export interface MyLineItem extends LineItem {
+  Product?: BuyerProduct;
+}
+
+export interface MyListLineItem extends ListLineItem {
+  Items: Array<MyLineItem>;
 }
 
 export interface AppConfig {

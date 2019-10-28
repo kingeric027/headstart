@@ -3,6 +3,7 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { get as _get } from 'lodash';
 import { OCMComponent } from '../base-component';
+import { BuyerProduct } from '@ordercloud/angular-sdk';
 
 @Component({
   templateUrl: './quantity-input.component.html',
@@ -10,9 +11,9 @@ import { OCMComponent } from '../base-component';
 })
 export class OCMQuantityInput extends OCMComponent implements OnInit {
   @Input() existingQty: number;
+  @Input() product: BuyerProduct;
   @Output() qtyChange = new EventEmitter<number>();
   // TODO - replace with real product info
-  limits = { restrictedQuantities : [] , minPerOrder: 1 };
 
   form: FormGroup;
   isQtyRestricted = false;
@@ -24,7 +25,7 @@ export class OCMQuantityInput extends OCMComponent implements OnInit {
   }
 
   ngOnContextSet(): void {
-    this.isQtyRestricted = this.limits.restrictedQuantities.length !== 0;
+    this.isQtyRestricted = this.product.PriceSchedule.RestrictedQuantity;
     this.form.setValue({ quantity: this.getDefaultQty() }); // capture default once inputs are set
     this.quantityChangeListener();
     if (!this.existingQty) {
@@ -43,8 +44,8 @@ export class OCMQuantityInput extends OCMComponent implements OnInit {
 
   getDefaultQty(): number {
     if (this.existingQty) return this.existingQty;
-    if (this.limits.restrictedQuantities.length) return this.limits.restrictedQuantities[0];
-    return this.limits.minPerOrder;
+    if (this.product.PriceSchedule.RestrictedQuantity) return this.product.PriceSchedule.PriceBreaks[0].Quantity;
+    return this.product.PriceSchedule.MinQuantity;
   }
 
   // TODO - handle these error situations

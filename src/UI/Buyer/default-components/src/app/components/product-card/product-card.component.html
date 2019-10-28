@@ -26,6 +26,7 @@
       <ocm-quantity-input class="w-50"
                           id="quantity"
                           [existingQty]="null"
+                          [product]="product"
                           (qtyChange)="setQuantity($event.detail)"
                           [context]="context">
       </ocm-quantity-input>

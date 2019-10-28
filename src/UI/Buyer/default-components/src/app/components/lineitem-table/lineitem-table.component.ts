@@ -3,6 +3,7 @@ import { LineItem, ListLineItem } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { get as _get, map as _map, without as _without } from 'lodash';
 import { OCMComponent } from '../base-component';
+import { MyListLineItem } from 'marketplace';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
@@ -10,7 +11,7 @@ import { OCMComponent } from '../base-component';
 })
 export class OCMLineitemTable extends OCMComponent {
   closeIcon = faTimes;
-  @Input() lineItems: ListLineItem;
+  @Input() lineItems: ListLineItem | MyListLineItem; // MyListLineItem has the full product details. It is used in the cart page only.
   @Input() readOnly: boolean;
 
   ngOnContextSet() {}
