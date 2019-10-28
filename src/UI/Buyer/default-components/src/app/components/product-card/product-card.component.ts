@@ -15,7 +15,7 @@ export class OCMProductCard extends OCMComponent {
   };
   @Input() set isFavorite(value: boolean) {
     this.isFav = value;
-    this.cdr.detectChanges();
+    this.cdr.detectChanges(); // TODO - remove. Solve another way.
   }
 
   isFav = false;

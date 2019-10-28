@@ -22,13 +22,13 @@
              *ngIf="isOrderable">
           <ocm-quantity-input class="d-inline-block"
                               style="max-width: 100px"
-                              (qtyChange)="qtyChange($event)"
+                              (qtyChange)="qtyChange($event.detail)"
                               [product]="product"
                               [context]="context">
           </ocm-quantity-input>
           <button class="btn btn-primary ml-2"
                   type="submit"
-                  [disabled]="!specFormService.event?.valid"
+                  [disabled]="!specFormService.event?.valid || !oliver"
                   (click)="addToCart($event)">
             Add to Cart
             <span class="badge badge-light ml-2">{{ price | currency }}</span>

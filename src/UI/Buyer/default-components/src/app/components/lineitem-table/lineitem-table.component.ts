@@ -24,9 +24,11 @@ export class OCMLineitemTable extends OCMComponent {
     this.context.router.toProductDetails(productID);
   }
 
-  changeQuantity(lineItemID: string, quantity: number) {
-    this.getLineItem(lineItemID).Quantity = quantity;
-    this.context.currentOrder.setQuantityInCart(lineItemID, quantity);
+  changeQuantity(lineItemID: string, event: { qty: number, valid: boolean }) {
+    if (event.valid) {
+      this.getLineItem(lineItemID).Quantity = event.qty;
+      this.context.currentOrder.setQuantityInCart(lineItemID, event.qty);
+    }
   }
 
   // TODO - we need a unified getImageUrl() function
