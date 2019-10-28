@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Order, ListLineItem, Product, OcProductService, OcMeService } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from '../services/current-order/current-order.service';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { MyListLineItem, MyLineItem } from '../shopper-context';
+import { ListLineItemWithProduct, LineItemWithProduct } from '../shopper-context';
 
 @Component({
   template: `
@@ -11,7 +11,7 @@ import { MyListLineItem, MyLineItem } from '../shopper-context';
 })
 export class CartWrapperComponent implements OnInit {
   order: Order;
-  lineItems: MyListLineItem;
+  lineItems: ListLineItemWithProduct;
   productCache: Product[] = []; // TODO - move to cart service?
 
   constructor(
@@ -42,7 +42,7 @@ export class CartWrapperComponent implements OnInit {
     this.productCache = [...this.productCache, ... await this.requestProducts(toAdd)];
   }
 
-  mapToLineItemsWithProduct(lis: ListLineItem): MyListLineItem {
+  mapToLineItemsWithProduct(lis: ListLineItem): ListLineItemWithProduct {
     const Items = lis.Items.map(li => {
       const product = this.getCachedProduct(li.ProductID);
       li.Product = product;

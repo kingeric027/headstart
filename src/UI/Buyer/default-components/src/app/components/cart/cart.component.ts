@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Order, ListLineItem } from '@ordercloud/angular-sdk';
 import { OCMComponent } from '../base-component';
-import { MyListLineItem } from 'marketplace';
+import { ListLineItemWithProduct } from 'marketplace';
 
 @Component({
   templateUrl: './cart.component.html',
@@ -9,7 +9,7 @@ import { MyListLineItem } from 'marketplace';
 })
 export class OCMCart extends OCMComponent {
   @Input() order: Order;
-  @Input() lineItems: MyListLineItem;
+  @Input() lineItems: ListLineItemWithProduct;
 
   ngOnContextSet() {}
 

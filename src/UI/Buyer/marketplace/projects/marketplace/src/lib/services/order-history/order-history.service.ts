@@ -3,7 +3,7 @@ import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLin
 import { uniqBy as _uniqBy } from 'lodash';
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
-import { IOrderHistory, OrderReorderResponse, OrderDetails, MyShipment, MyShipmentItem} from '../../shopper-context';
+import { IOrderHistory, OrderReorderResponse, OrderDetails, ShipmentWithItems, ShipmentItemWithLineItem} from '../../shopper-context';
 import { OrderFilterService } from './order-filter.service';
 
 @Injectable({
@@ -58,21 +58,21 @@ export class OrderHistoryService implements IOrderHistory {
     return _uniqBy(approvals.Items, (x) => x.Comments);
   }
 
-  async listShipments(orderID: string = this.activeOrderID): Promise<MyShipment[]> {
+  async listShipments(orderID: string = this.activeOrderID): Promise<ShipmentWithItems[]> {
     const [lineItems, shipments] = await Promise.all([
       this.ocLineItemService.List('outgoing', orderID).toPromise(),
       this.ocMeService.ListShipments({ orderID }).toPromise()
     ]);
     const getShipmentItems = shipments.Items.map(shipment => this.ocMeService.ListShipmentItems(shipment.ID).toPromise());
-    const shipmentItems = (await Promise.all(getShipmentItems)).map(si => si.Items) as MyShipmentItem[][];
-    shipments.Items.map((shipment: MyShipment, index) => {
+    const shipmentItems = (await Promise.all(getShipmentItems)).map(si => si.Items) as ShipmentItemWithLineItem[][];
+    shipments.Items.map((shipment: ShipmentWithItems, index) => {
       shipment.ShipmentItems = shipmentItems[index];
-      shipment.ShipmentItems.map((shipmentItem: MyShipmentItem) => {
+      shipment.ShipmentItems.map((shipmentItem: ShipmentItemWithLineItem) => {
         shipmentItem.LineItem = lineItems.Items.find(li => li.ID === shipmentItem.LineItemID);
         return shipmentItem;
       });
       return shipment;
     });
-    return shipments.Items as MyShipment[];
+    return shipments.Items as ShipmentWithItems[];
   }
 }
