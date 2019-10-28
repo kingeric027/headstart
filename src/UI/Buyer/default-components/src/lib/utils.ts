@@ -6,14 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
- // https://github.com/angular/angular/blob/master/packages/elements/src/utils.ts
+// https://github.com/angular/angular/blob/master/packages/elements/src/utils.ts
 
-import {ComponentFactoryResolver, Injector, Type} from '@angular/core';
+import { ComponentFactoryResolver, Injector, Type } from '@angular/core';
 
 const matches = (() => {
   const elProto = Element.prototype as any;
-  return elProto.matches || elProto.matchesSelector || elProto.mozMatchesSelector ||
-      elProto.msMatchesSelector || elProto.oMatchesSelector || elProto.webkitMatchesSelector;
+  return (
+    elProto.matches ||
+    elProto.matchesSelector ||
+    elProto.mozMatchesSelector ||
+    elProto.msMatchesSelector ||
+    elProto.oMatchesSelector ||
+    elProto.webkitMatchesSelector
+  );
 })();
 
 /**
@@ -25,8 +31,10 @@ export const scheduler = {
    *
    * Returns a function that when executed will cancel the scheduled function.
    */
-  schedule(taskFn: () => void, delay: number): () =>
-      void {const id = setTimeout(taskFn, delay); return () => clearTimeout(id); },
+  schedule(taskFn: () => void, delay: number): () => void {
+    const id = setTimeout(taskFn, delay);
+    return () => clearTimeout(id);
+  },
 
   /**
    * Schedule a callback to be called before the next render.
@@ -73,7 +81,7 @@ export function createCustomEvent(doc: Document, name: string, detail: any): Cus
     return event;
   }
 
-  return new CustomEvent(name, {bubbles, cancelable, detail});
+  return new CustomEvent(name, { bubbles, cancelable, detail });
 }
 
 /**
@@ -112,10 +120,9 @@ export function strictEquals(value1: any, value2: any): boolean {
 }
 
 /** Gets a map of default set of attributes to observe and the properties they affect. */
-export function getDefaultAttributeToPropertyInputs(
-    inputs: {propName: string, templateName: string}[]) {
-  const attributeToPropertyInputs: {[key: string]: string} = {};
-  inputs.forEach(({propName, templateName}) => {
+export function getDefaultAttributeToPropertyInputs(inputs: { propName: string; templateName: string }[]) {
+  const attributeToPropertyInputs: { [key: string]: string } = {};
+  inputs.forEach(({ propName, templateName }) => {
     attributeToPropertyInputs[camelToDashCase(templateName)] = propName;
   });
 
@@ -127,7 +134,9 @@ export function getDefaultAttributeToPropertyInputs(
  * are defined.
  */
 export function getComponentInputs(
-    component: Type<any>, injector: Injector): {propName: string, templateName: string}[] {
+  component: Type<any>,
+  injector: Injector
+): { propName: string; templateName: string }[] {
   const componentFactoryResolver: ComponentFactoryResolver = injector.get(ComponentFactoryResolver);
   const componentFactory = componentFactoryResolver.resolveComponentFactory(component);
   return componentFactory.inputs;

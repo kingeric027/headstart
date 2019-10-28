@@ -8,9 +8,8 @@ describe('SpecFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ OCMSpecForm ]
-    })
-    .compileComponents();
+      declarations: [OCMSpecForm],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

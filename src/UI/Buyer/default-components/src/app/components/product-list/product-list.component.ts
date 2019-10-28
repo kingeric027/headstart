@@ -26,13 +26,13 @@ export class OCMProductList extends OCMComponent {
   ngOnContextSet() {
     this.facets = this.products.Meta.Facets;
     this.context.productFilters.onFiltersChange(this.handleFiltersChange);
-    this.context.currentUser.onFavoriteProductsChange((productIDs) => this.favoriteProducts = productIDs);
+    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
   }
 
   private handleFiltersChange = async (filters: ProductFilters) => {
     this.showingFavoritesOnly = filters.showOnlyFavorites;
     this.categoryCrumbs = this.buildBreadCrumbs(filters.categoryID);
-  }
+  };
 
   clearAllFilters() {
     this.context.productFilters.clearAllFilters();
@@ -62,7 +62,7 @@ export class OCMProductList extends OCMComponent {
   }
 
   getCategory(categoryID: string): Category {
-    return this.categories.Items.find((cat) => cat.ID === categoryID);
+    return this.categories.Items.find(cat => cat.ID === categoryID);
   }
 
   openCategoryModal() {

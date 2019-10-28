@@ -36,7 +36,12 @@ describe('StatusFilterComponent', () => {
       });
     });
     it('should set statuses correctly', () => {
-      expect(component['statuses']).toEqual([OrderStatus.Open, OrderStatus.AwaitingApproval, OrderStatus.Completed, OrderStatus.Declined]);
+      expect(component['statuses']).toEqual([
+        OrderStatus.Open,
+        OrderStatus.AwaitingApproval,
+        OrderStatus.Completed,
+        OrderStatus.Declined,
+      ]);
     });
   });
 

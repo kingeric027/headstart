@@ -25,7 +25,7 @@ export class FormControlErrorDirective implements OnInit {
   getErrorMsg(control: NgControl) {
     if (!control.errors) return '';
     let controlErrors = Object.keys(control.errors);
-    if (control.value) controlErrors = controlErrors.filter((x) => x !== 'required');
+    if (control.value) controlErrors = controlErrors.filter(x => x !== 'required');
     if (controlErrors.length === 0) return '';
     return ErrorDictionary[controlErrors[0]];
   }

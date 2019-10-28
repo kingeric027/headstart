@@ -37,7 +37,7 @@ describe('OrderComponent', () => {
       component.ngOnInit();
     });
     it('should set order to data from resolve', () => {
-      component.order$.subscribe((order) => {
+      component.order$.subscribe(order => {
         expect(order).toEqual({ ID: 'mockOrderID' });
       });
       dataSubject.next({ orderResolve: { order: { ID: 'mockOrderID' } } });

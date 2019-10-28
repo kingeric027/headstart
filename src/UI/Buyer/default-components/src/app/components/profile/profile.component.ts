@@ -30,7 +30,7 @@ export class OCMProfile extends OCMComponent implements OnInit {
       Phone: this.me.Phone,
       Email: this.me.Email,
     });
-  }
+  };
 
   private buildForm() {
     this.form = new FormGroup({

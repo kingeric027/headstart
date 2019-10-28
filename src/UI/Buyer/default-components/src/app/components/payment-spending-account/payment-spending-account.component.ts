@@ -40,7 +40,7 @@ export class OCMPaymentSpendingAccount extends OCMComponent {
 
   getSavedSpendingAccount(accounts: ListSpendingAccount): SpendingAccount {
     if (this.payment && this.payment.SpendingAccountID) {
-      const saved = accounts.Items.filter((x) => x.ID === this.payment.SpendingAccountID);
+      const saved = accounts.Items.filter(x => x.ID === this.payment.SpendingAccountID);
       if (saved.length > 0) {
         return saved[0];
       }

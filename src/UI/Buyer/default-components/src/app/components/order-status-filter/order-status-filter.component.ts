@@ -16,7 +16,13 @@ export class OCMOrderStatusFilter implements OnInit {
     this.form = new FormGroup({
       status: new FormControl(`!${OrderStatus.Unsubmitted}`),
     });
-    this.statuses = [OrderStatus.Open, OrderStatus.AwaitingApproval, OrderStatus.Completed, OrderStatus.Declined, OrderStatus.Canceled];
+    this.statuses = [
+      OrderStatus.Open,
+      OrderStatus.AwaitingApproval,
+      OrderStatus.Completed,
+      OrderStatus.Declined,
+      OrderStatus.Canceled,
+    ];
   }
 
   selectStatus(): void {

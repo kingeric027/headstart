@@ -38,22 +38,22 @@ export class OCMCheckout extends OCMComponent {
   ];
 
   ngOnContextSet() {
-    this.context.currentOrder.onOrderChange((order) => (this.order = order));
+    this.context.currentOrder.onOrderChange(order => (this.order = order));
     this.isAnon = this.context.currentUser.isAnonymous;
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
     this.setValidation('login', !this.isAnon);
   }
 
   getValidation(id: string) {
-    return this.sections.find((x) => x.id === id).valid;
+    return this.sections.find(x => x.id === id).valid;
   }
 
   setValidation(id: string, value: boolean) {
-    this.sections.find((x) => x.id === id).valid = value;
+    this.sections.find(x => x.id === id).valid = value;
   }
 
   toSection(id: string) {
-    const prevIdx = Math.max(this.sections.findIndex((x) => x.id === id) - 1, 0);
+    const prevIdx = Math.max(this.sections.findIndex(x => x.id === id) - 1, 0);
     const prev = this.sections[prevIdx].id;
     this.setValidation(prev, true);
     this.accordian.toggle(id);

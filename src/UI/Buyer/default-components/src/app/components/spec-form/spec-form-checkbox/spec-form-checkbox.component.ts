@@ -8,11 +8,7 @@ import { Field } from '../field.interface';
   template: `
     <div class="col-md-12">
       <div class="form-group" [formGroup]="group">
-        <input
-          type="checkbox"
-          class="form-control"
-          [formControlName]="config.name"
-        />{{ config.label }}
+        <input type="checkbox" class="form-control" [formControlName]="config.name" />{{ config.label }}
       </div>
     </div>
   `,

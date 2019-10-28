@@ -4,7 +4,7 @@ import { Address } from '@ordercloud/angular-sdk';
 @Component({
   templateUrl: './address-card.component.html',
   styleUrls: ['./address-card.component.scss'],
-  encapsulation: ViewEncapsulation.ShadowDom
+  encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class OCMAddressCard implements OnChanges {
   @Input() address: Address = {};

@@ -1,12 +1,7 @@
 import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
-import {
-  map as _map,
-  find as _find,
-  minBy as _minBy,
-  sortBy as _sortBy,
-} from 'lodash';
+import { map as _map, find as _find, minBy as _minBy, sortBy as _sortBy } from 'lodash';
 
 import { FieldConfig } from './field-config.interface';
 import { ListBuyerSpec, BuyerProduct, SpecOption } from '@ordercloud/angular-sdk';
@@ -16,7 +11,8 @@ import { OCMComponent } from '../base-component';
 @Component({
   template: `
     <form *ngIf="form" [formGroup]="form">
-      <ng-container *ngFor="let field of config; let i = index"
+      <ng-container
+        *ngFor="let field of config; let i = index"
         formArrayName="ctrls"
         [config]="field"
         [group]="form"
@@ -24,7 +20,7 @@ import { OCMComponent } from '../base-component';
         ocSpecField
       ></ng-container>
     </form>
-    `,
+  `,
   styleUrls: ['./spec-form.component.scss'],
 })
 export class OCMSpecForm extends OCMComponent implements OnInit {
@@ -40,7 +36,7 @@ export class OCMSpecForm extends OCMComponent implements OnInit {
     super();
   }
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   ngOnContextSet() {
     this.config = this.createFieldConfig();
@@ -54,9 +50,9 @@ export class OCMSpecForm extends OCMComponent implements OnInit {
 
   createGroup() {
     const group = this.fb.group({
-      ctrls: this.fb.array([])
+      ctrls: this.fb.array([]),
     });
-    this.config.forEach((control) => {
+    this.config.forEach(control => {
       const ctrl = this.createControl(control);
       group.addControl(control.name, ctrl);
       // tslint:disable-next-line:no-string-literal
@@ -84,28 +80,12 @@ export class OCMSpecForm extends OCMComponent implements OnInit {
           label: spec.Name,
           name: spec.Name.replace(/ /g, ''),
           value: spec.DefaultValue,
-          min: Math.min.apply(
-            Math,
-            _map(spec.Options, (option: SpecOption) => +option.Value)
-          ),
-          max: Math.max.apply(
-            Math,
-            _map(spec.Options, (option: SpecOption) => +option.Value)
-          ),
+          min: Math.min.apply(Math, _map(spec.Options, (option: SpecOption) => +option.Value)),
+          max: Math.max.apply(Math, _map(spec.Options, (option: SpecOption) => +option.Value)),
           validation: [
             spec.Required ? Validators.required : Validators.nullValidator,
-            Validators.min(
-              Math.min.apply(
-                Math,
-                _map(spec.Options, (option: SpecOption) => +option.Value)
-              )
-            ),
-            Validators.max(
-              Math.max.apply(
-                Math,
-                _map(spec.Options, (option: SpecOption) => +option.Value)
-              )
-            ),
+            Validators.min(Math.min.apply(Math, _map(spec.Options, (option: SpecOption) => +option.Value))),
+            Validators.max(Math.max.apply(Math, _map(spec.Options, (option: SpecOption) => +option.Value))),
           ],
         });
       } else if (spec.Options.length === 1) {
@@ -121,14 +101,12 @@ export class OCMSpecForm extends OCMComponent implements OnInit {
           label: spec.Name,
           name: spec.Name.replace(/ /g, ''),
           value: spec.DefaultOptionID
-            ? _find(spec.Options, (option) => {
+            ? _find(spec.Options, option => {
                 return option.ID === spec.DefaultOptionID;
               }).Value
             : null,
           options: _map(spec.Options, 'Value'),
-          validation: [
-            spec.Required ? Validators.required : Validators.nullValidator,
-          ],
+          validation: [spec.Required ? Validators.required : Validators.nullValidator],
         });
       } else if (spec.AllowOpenText) {
         c.push({
@@ -136,9 +114,7 @@ export class OCMSpecForm extends OCMComponent implements OnInit {
           label: spec.Name,
           name: spec.Name.replace(/ /g, ''),
           value: spec.DefaultValue,
-          validation: [
-            spec.Required ? Validators.required : Validators.nullValidator,
-          ],
+          validation: [spec.Required ? Validators.required : Validators.nullValidator],
         });
       }
     }
@@ -154,7 +130,7 @@ export class OCMSpecForm extends OCMComponent implements OnInit {
     this.specFormChange.emit({
       type: 'Change',
       valid: this.form.valid,
-      form: this.form.value
+      form: this.form.value,
     } as SpecFormEvent);
   }
 }

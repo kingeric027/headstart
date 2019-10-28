@@ -1,13 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GenericBrowseComponent } from 'src/app/shared/components/generic-browse/generic-browse.component';
-import {
-  Directive,
-  Input,
-  Output,
-  EventEmitter,
-  NO_ERRORS_SCHEMA,
-} from '@angular/core';
+import { Directive, Input, Output, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
 describe('GenericBrowseComponent', () => {
@@ -36,11 +30,7 @@ describe('GenericBrowseComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        GenericBrowseComponent,
-        MockSearchDirective,
-        MockPaginationDirective,
-      ],
+      declarations: [GenericBrowseComponent, MockSearchDirective, MockPaginationDirective],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
     }).compileComponents();
   }));
@@ -63,12 +53,8 @@ describe('GenericBrowseComponent', () => {
     });
 
     it('should re-emit the search term', () => {
-      const mocksearchEl = fixture.debugElement.query(
-        By.directive(MockSearchDirective)
-      );
-      const mockSearchDir = mocksearchEl.injector.get(
-        MockSearchDirective
-      ) as MockSearchDirective;
+      const mocksearchEl = fixture.debugElement.query(By.directive(MockSearchDirective));
+      const mockSearchDir = mocksearchEl.injector.get(MockSearchDirective) as MockSearchDirective;
 
       mockSearchDir.searched.emit('searchTerm');
 
@@ -79,12 +65,8 @@ describe('GenericBrowseComponent', () => {
     });
 
     it('should re-emit the page number', () => {
-      const mockPageEl = fixture.debugElement.query(
-        By.directive(MockPaginationDirective)
-      );
-      const mockPageDir = mockPageEl.injector.get(
-        MockPaginationDirective
-      ) as MockPaginationDirective;
+      const mockPageEl = fixture.debugElement.query(By.directive(MockPaginationDirective));
+      const mockPageDir = mockPageEl.injector.get(MockPaginationDirective) as MockPaginationDirective;
 
       mockPageDir.pageChange.emit(5);
 

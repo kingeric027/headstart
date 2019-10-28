@@ -1,5 +1,13 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, Injector, Inject, PLATFORM_ID, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, ErrorHandler } from '@angular/core';
+import {
+  NgModule,
+  Injector,
+  Inject,
+  PLATFORM_ID,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NO_ERRORS_SCHEMA,
+  ErrorHandler,
+} from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -63,8 +71,16 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TreeModule } from 'angular-tree-component';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
-import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule,
-  NgbDropdownModule, NgbDatepickerModule, NgbAccordionModule, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbCarouselModule,
+  NgbCollapseModule,
+  NgbPaginationModule,
+  NgbPopoverModule,
+  NgbDropdownModule,
+  NgbDatepickerModule,
+  NgbAccordionModule,
+  NgbDateAdapter,
+} from '@ng-bootstrap/ng-bootstrap';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
@@ -85,7 +101,8 @@ import { SpecFormRangeComponent } from './components/spec-form/spec-form-range/s
 import { SpecFormSelectComponent } from './components/spec-form/spec-form-select/spec-form-select.component';
 import { SpecFormTextAreaComponent } from './components/spec-form/spec-form-textarea/spec-form-textarea.component';
 
-const components = [ OCMProductCard,
+const components = [
+  OCMProductCard,
   OCMToggleFavorite,
   OCMQuantityInput,
   OCMProductCarousel,
@@ -140,7 +157,7 @@ const components = [ OCMProductCard,
   SpecFormNumberComponent,
   SpecFormRangeComponent,
   SpecFormSelectComponent,
-  SpecFormTextAreaComponent
+  SpecFormTextAreaComponent,
 ];
 
 @NgModule({
@@ -152,7 +169,7 @@ const components = [ OCMProductCard,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
-   ...components
+    ...components,
   ],
   imports: [
     BrowserModule,
@@ -176,15 +193,15 @@ const components = [ OCMProductCard,
     NgbAccordionModule,
     NgProgressModule,
     NgProgressHttpModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
   providers: [
     { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
     { provide: ErrorHandler, useClass: AppErrorHandler },
-      DatePipe, // allows us to use in class as injectable (date filter component)
+    DatePipe, // allows us to use in class as injectable (date filter component)
   ],
   entryComponents: components,
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {
   constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: Object) {
@@ -249,10 +266,7 @@ export class AppModule {
       injector: this.injector,
       // See this issue for why this Factory, copied from Angular/elements source code is included.
       // https://github.com/angular/angular/issues/29606
-      strategyFactory: new ComponentNgElementStrategyFactory(
-        angularComponent,
-        this.injector
-      )
+      strategyFactory: new ComponentNgElementStrategyFactory(angularComponent, this.injector),
     });
     if (isPlatformBrowser(this.platformId)) {
       if (!window.customElements.get(htmlTagName)) {
