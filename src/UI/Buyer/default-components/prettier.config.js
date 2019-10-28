@@ -6,13 +6,11 @@
  * https://prettier.io/docs/en/options.html
  */
 module.exports = {
-    printWidth: 80,
-    tabWidth: 2,
-    useTabs: false,
-    semi: true,
-    singleQuote: true, // default: false
-    trailingComma: 'es5', // default: 'none'
-    bracketSpacing: true,
-    arrowParens: 'always',
-  };
-  
+  printWidth: 120,
+  tabWidth: 2,
+  useTabs: false,
+  semi: true,
+  singleQuote: true, // default: false
+  trailingComma: 'es5', // default: 'none'
+  bracketSpacing: true,
+};
