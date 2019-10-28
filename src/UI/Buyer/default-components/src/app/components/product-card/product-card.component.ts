@@ -37,6 +37,7 @@ export class OCMProductCard extends OCMComponent {
     this.context.currentOrder.addToCart({ ProductID: this.product.ID, Quantity: this.quantity });
   }
 
+  // TODO - we need a unified getImageUrl() function
   getImageUrl() {
     const host = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
     const images = this.product.xp.Images || [];

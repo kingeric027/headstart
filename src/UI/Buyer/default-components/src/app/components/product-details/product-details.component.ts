@@ -77,7 +77,7 @@ export class OCMProductDetails extends OCMComponent {
       : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
   }
 
-  // TODO - we need a unified getImage() function
+  // TODO - we need a unified getImageUrl() function
   getImageUrls(): string[] {
     const images =
       _uniq(this.product.xp.Images, (img: any) => {

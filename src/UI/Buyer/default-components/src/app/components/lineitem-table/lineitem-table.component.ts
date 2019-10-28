@@ -28,7 +28,7 @@ export class OCMLineitemTable extends OCMComponent {
     this.context.currentOrder.setQuantityInCart(lineItemID, quantity);
   }
 
-  // TODO - we need a unified getImage() function
+  // TODO - we need a unified getImageUrl() function
   getImageUrl(lineItemID: string) {
     const li = this.getLineItem(lineItemID);
     const host = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
