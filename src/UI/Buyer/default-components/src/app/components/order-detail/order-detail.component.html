@@ -1,6 +1,9 @@
-<div class="container" *ngIf="order">
+<div class="container"
+     *ngIf="order">
   <div *ngIf="lineItems">
-    <ocm-order-header [context]="context" [order]="order" [approvalVersion]="true"></ocm-order-header>
+    <ocm-order-header [context]="context"
+                      [order]="order"
+                      [approvalVersion]="true"></ocm-order-header>
     <div class="row mb-5">
       <div class="col-6">
         <ocm-address-card *ngIf="lineItems[0].ShippingAddress"
