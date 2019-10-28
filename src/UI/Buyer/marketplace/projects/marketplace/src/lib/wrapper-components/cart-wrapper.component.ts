@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Order, ListLineItem, Product, OcProductService, OcMeService } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from '../services/current-order/current-order.service';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { BuildQtyLimits } from '../functions/product.quantity.validator';
 import { MyListLineItem, MyLineItem } from '../shopper-context';
 
 @Component({
