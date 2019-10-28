@@ -1,9 +1,21 @@
 .add-card-form {
     display: inline-block;
-    width:100%;
-
-    .form-group {
-        float:left;
-        margin-right: 16px;
-    }
-}
+    width: 100%;
+  }
+  
+  .cards-light {
+    color: grey;
+  }
+  
+  .card-name,
+  .card-number {
+    width: 100%;
+  }
+  
+  .card-submit {
+    display: block;
+  }
+  
+  #cvv {
+    -webkit-text-security: disc;
+  }
