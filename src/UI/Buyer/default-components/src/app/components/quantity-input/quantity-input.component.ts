@@ -3,16 +3,16 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { get as _get } from 'lodash';
 import { OCMComponent } from '../base-component';
-import { QuantityLimits } from '../../models/quantity-limits';
 
 @Component({
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
 })
 export class OCMQuantityInput extends OCMComponent implements OnInit {
-  @Input() limits: QuantityLimits;
   @Input() existingQty: number;
   @Output() qtyChange = new EventEmitter<number>();
+  // TODO - replace with real product info
+  limits = { restrictedQuantities : [] , minPerOrder: 1 };
 
   form: FormGroup;
   isQtyRestricted = false;

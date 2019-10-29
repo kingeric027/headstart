@@ -25,7 +25,6 @@
              class="sr-only">Quantity</label>
       <ocm-quantity-input class="w-50"
                           id="quantity"
-                          [limits]="quantityLimits"
                           [existingQty]="null"
                           (qtyChange)="setQuantity($event.detail)"
                           [context]="context">

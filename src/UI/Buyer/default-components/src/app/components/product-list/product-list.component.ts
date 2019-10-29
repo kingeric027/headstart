@@ -4,7 +4,6 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { ModalState } from '../../models/modal-state.class';
 import { OCMComponent } from '../base-component';
-import { QuantityLimits } from '../../models/quantity-limits';
 import { ProductFilters } from 'marketplace';
 
 @Component({
@@ -14,7 +13,6 @@ import { ProductFilters } from 'marketplace';
 export class OCMProductList extends OCMComponent {
   @Input() products: ListBuyerProduct;
   @Input() categories: ListCategory;
-  @Input() quantityLimits: QuantityLimits[];
   categoryModal = ModalState.Closed;
   facets: ListFacet[];
   favoriteProducts: string[] = [];

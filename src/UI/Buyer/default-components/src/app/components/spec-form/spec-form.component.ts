@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find, minBy as _minBy, sortBy as _sortBy } from 'lodash';
@@ -23,7 +23,7 @@ import { OCMComponent } from '../base-component';
   `,
   styleUrls: ['./spec-form.component.scss'],
 })
-export class OCMSpecForm extends OCMComponent implements OnInit {
+export class OCMSpecForm extends OCMComponent {
   @Input() specs: ListBuyerSpec;
   @Input() product: BuyerProduct;
   @Input() qty: number;
@@ -35,8 +35,6 @@ export class OCMSpecForm extends OCMComponent implements OnInit {
   constructor(private fb: FormBuilder) {
     super();
   }
-
-  ngOnInit() {}
 
   ngOnContextSet() {
     this.config = this.createFieldConfig();

@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
-import { QuantityLimits } from '../../models/quantity-limits';
 import { OCMComponent } from '../base-component';
 
 @Component({
@@ -11,7 +10,6 @@ import { OCMComponent } from '../base-component';
 export class OCMProductCarousel extends OCMComponent {
   @Input() products: BuyerProduct[] = [];
   @Input() displayTitle: string;
-  @Input() quantityLimits: QuantityLimits[];
 
   index = 0;
   rowLength = 4;

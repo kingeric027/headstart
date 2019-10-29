@@ -1,7 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation, OnChanges, ChangeDetectorRef } from '@angular/core';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
-import { QuantityLimits } from '../../models/quantity-limits';
 import { OCMComponent } from '../base-component';
 
 @Component({
@@ -13,12 +12,6 @@ export class OCMProductCard extends OCMComponent {
   @Input() product: BuyerProduct = {
     PriceSchedule: {},
     xp: { Images: [] },
-  };
-  @Input() quantityLimits: QuantityLimits = {
-    inventory: 0,
-    maxPerOrder: 0,
-    minPerOrder: 0,
-    restrictedQuantities: [],
   };
   @Input() set isFavorite(value: boolean) {
     this.isFav = value;

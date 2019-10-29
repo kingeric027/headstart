@@ -65,7 +65,6 @@ import { OCMPaymentMethodManagement } from './components/payment-method-manageme
 import { OCMProfile } from './components/profile/profile.component';
 import { OCMProfileNav } from './components/profile-nav/profile-nav.component';
 import { OCMOrderDetails } from './components/order-detail/order-detail.component';
-import { OCMOrderHeader } from './components/order-header/order-header.component';
 import { OCMAppFooter } from './components/app-footer/app-footer.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -92,6 +91,13 @@ import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
+import { OCMReorder } from './components/re-order/re-order.component';
+import { OCMOrderApproval } from './components/order-approval/order-approval.component';
+import { OCMOrderShipments } from './components/order-shipments/order-shipments.component';
+import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
+import { OCMOrderHistorical } from './components/order-historical/order-historical.component';
+import { OCMOrderHistory } from './components/order-history/order-history.component';
+
 import { SpecFieldDirective } from './components/spec-form/spec-field.directive';
 import { SpecFormCheckboxComponent } from './components/spec-form/spec-form-checkbox/spec-form-checkbox.component';
 import { SpecFormInputComponent } from './components/spec-form/spec-form-input/spec-form-input.component';
@@ -149,7 +155,12 @@ const components = [
   OCMProfile,
   OCMProfileNav,
   OCMOrderDetails,
-  OCMOrderHeader,
+  OCMAppFooter,
+  OCMReorder,
+  OCMOrderApproval,
+  OCMOrderShipments,
+  OCMOrderHistorical,
+  OCMOrderHistory,
   OCMAppFooter,
   SpecFormCheckboxComponent,
   SpecFormInputComponent,
@@ -169,6 +180,8 @@ const components = [
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
     PaymentMethodDisplayPipe,
+    ShipperTrackingPipe,
+    ShipperTrackingSupportedPipe,
     ...components,
   ],
   imports: [
@@ -257,8 +270,12 @@ export class AppModule {
     this.buildWebComponent(OCMProfile, 'ocm-profile');
 
     this.buildWebComponent(OCMOrderDetails, 'ocm-order-details');
-    this.buildWebComponent(OCMOrderHeader, 'ocm-order-header');
     this.buildWebComponent(OCMAppFooter, 'ocm-app-footer');
+    this.buildWebComponent(OCMReorder, 'ocm-reorder');
+    this.buildWebComponent(OCMOrderApproval, 'ocm-order-approval');
+    this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
+    this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
+    this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

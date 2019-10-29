@@ -1,23 +1,25 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormControl } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { debounceTime, takeWhile } from 'rxjs/operators';
 import { DateValidator } from '../../validators/validators';
 import { OCMComponent } from '../base-component';
+import { OrderFilters } from 'marketplace';
+import { DatePipe } from '@angular/common';
 
 @Component({
   templateUrl: './order-date-filter.component.html',
   styleUrls: ['./order-date-filter.component.scss'],
 })
-export class OCMOrderDateFilter implements OnInit, OnDestroy {
+export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestroy {
   private alive = true;
   faCalendar = faCalendar;
   faTimes = faTimes;
   form: FormGroup;
-  @Output() selectedDate = new EventEmitter<string[]>();
 
-  constructor(private datePipe: DatePipe) {}
+  constructor(private datePipe: DatePipe) {
+    super();
+  }
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -27,6 +29,16 @@ export class OCMOrderDateFilter implements OnInit, OnDestroy {
     this.onFormChanges();
   }
 
+  ngOnContextSet() {
+    this.context.orderHistory.filters.onFiltersChange(this.handlefiltersChange);
+  }
+
+  handlefiltersChange = (filters: OrderFilters) => {
+    const fromDate = this.inverseFormatDate(filters.fromDate);
+    const toDate = this.inverseFormatDate(filters.toDate);
+    this.form.setValue({ fromDate, toDate });
+  }
+
   private onFormChanges() {
     this.form.valueChanges
       .pipe(
@@ -34,45 +46,38 @@ export class OCMOrderDateFilter implements OnInit, OnDestroy {
         takeWhile(() => this.alive)
       )
       .subscribe(() => {
-        this.emitDate();
+        this.doFilter();
       });
   }
 
-  format(date: Date): string {
-    return this.datePipe.transform(date, 'shortDate').replace(/\//g, '-');
-  }
-
-  private emitDate() {
+  private doFilter() {
     if (this.form.get('fromDate').invalid || this.form.get('toDate').invalid) {
       return;
     }
-
     const fromDate: Date = this.form.get('fromDate').value;
     const toDate: Date = this.form.get('toDate').value;
-    const dateSubmitted: string[] = [];
-    if (fromDate) {
-      dateSubmitted.push(`>${this.format(fromDate)}`);
-    }
-    if (toDate) {
-      // Add one day so the filter will be inclusive of the date selected
-      toDate.setDate(toDate.getDate() + 1);
-      dateSubmitted.push(`<${this.format(toDate)}`);
-    }
-
-    this.selectedDate.emit(dateSubmitted);
+    this.context.orderHistory.filters.filterByDateSubmitted(this.formatDate(fromDate), this.formatDate(toDate));
   }
 
   clearToDate() {
-    this.form.patchValue({ toDate: null });
-    this.emitDate();
+    this.form.get('toDate').setValue(null);
+    this.doFilter();
   }
 
   clearFromDate() {
-    this.form.patchValue({ fromDate: null });
-    this.emitDate();
+    this.form.get('fromDate').setValue(null);
+    this.doFilter();
   }
 
   ngOnDestroy() {
     this.alive = false;
+  }
+
+  private formatDate(date: Date): string {
+    return date ? this.datePipe.transform(date, 'shortDate').replace(/\//g, '-') : null;
+  }
+
+  private inverseFormatDate(date: string): Date {
+    return date ? new Date(date) : null;
   }
 }

@@ -1,20 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { Order, ListLineItem } from '@ordercloud/angular-sdk';
-import { QuantityLimits } from '../models/quantity-limits';
 import { CurrentOrderService } from '../services/current-order/current-order.service';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { BuildQtyLimits } from '../functions/product.quantity.validator';
 
 @Component({
   template: `
-    <ocm-cart [order]="order" [lineItems]="lineItems" [context]="context" [quantityLimits]="quantityLimits"></ocm-cart>
+    <ocm-cart [order]="order" [lineItems]="lineItems" [context]="context"></ocm-cart>
   `,
 })
 export class CartWrapperComponent implements OnInit {
   order: Order;
   lineItems: ListLineItem;
-  quantityLimits: QuantityLimits[];
-  alive = true;
 
   constructor(
     private currentOrder: CurrentOrderService,
@@ -32,6 +29,5 @@ export class CartWrapperComponent implements OnInit {
 
   setLineItems = (items: ListLineItem): void => {
     this.lineItems = items;
-    this.quantityLimits = this.lineItems.Items.map((li) => BuildQtyLimits(li.Product));
   }
 }

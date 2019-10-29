@@ -1,6 +1,6 @@
 // core services
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
-import { MarketplaceRoutingModule, MyOrdersComponent, OrdersToApproveComponent } from './marketplace-routing.module';
+import { MarketplaceRoutingModule, MyOrdersWrapperComponent, OrdersToApproveWrapperComponent } from './marketplace-routing.module';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
@@ -29,14 +29,10 @@ import { RouteService } from './services/route/route.service';
 import { TokenHelperService } from './services/token-helper/token-helper.service';
 import { ShopperContextService } from './services/shopper-context/shopper-context.service';
 import { ToastrModule } from 'ngx-toastr';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { OrderHistoryComponent } from './order/containers/order-history/order-history.component';
-import { OrderShipmentsComponent } from './order/containers/order-shipments/order-shipments.component';
-import { OrderReorderComponent } from './order/containers/order-reorder/order-reorder.component';
-import { OrderApprovalComponent } from './order/containers/order-approval/order-approval.component';
-import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './order/containers/shipperTracking.pipe';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
+import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipments-wrapper.component';
 
 
 @NgModule({
@@ -85,16 +81,9 @@ import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-w
     RegisterWrapperComponent,
     ResetPasswordWrapperComponent,
     OrderDetailWrapperComponent,
-
-    // TODO - remove
-    OrderHistoryComponent,
-    OrderShipmentsComponent,
-    OrderReorderComponent,
-    MyOrdersComponent,
-    OrdersToApproveComponent,
-    OrderApprovalComponent,
-    ShipperTrackingPipe,
-    ShipperTrackingSupportedPipe,
+    OrderShipmentsWrapperComponent,
+    MyOrdersWrapperComponent,
+    OrdersToApproveWrapperComponent,
   ],
 })
 export class MarketplaceModule {}
