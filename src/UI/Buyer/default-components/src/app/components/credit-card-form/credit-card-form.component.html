@@ -12,6 +12,7 @@
                  formControlName="CardholderName"
                  class="form-control"
                  id="name"
+                 showErrors
                  placeholder="Name on Card"
                  autocomplete="off" />
         </div>
@@ -24,6 +25,7 @@
                  id="cardNumber"
                  placeholder="Card Number"
                  autofocus="true"
+                 showErrors
                  appCreditCardInput
                  (keyup)="handleCardNumberKeyup($event)"
                  autocomplete="off" />
@@ -101,6 +103,7 @@
                  class="form-control"
                  id="cvv"
                  placeholder="CVV"
+                 showErrors
                  maxlength="4"
                  appCreditCardCVV
                  autocomplete="off" />
