@@ -33,6 +33,6 @@ export class OCMLineitemTable extends OCMComponent {
   }
 
   getLineItem(lineItemID: string): LineItem {
-    return this.lineItems.Items.find((li) => li.ID === lineItemID);
+    return this.lineItems.Items.find(li => li.ID === lineItemID);
   }
 }

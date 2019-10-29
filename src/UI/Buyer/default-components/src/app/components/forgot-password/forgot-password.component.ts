@@ -3,7 +3,6 @@ import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { OCMComponent } from '../base-component';
 
-
 @Component({
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],

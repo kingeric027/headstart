@@ -12,12 +12,12 @@
   </div>
   <div class="row mt-3">
     <ocm-credit-card-display [card]="card"
-                            class="col-12 my-2"
-                            *ngFor="let card of cards?.Items">
+                             class="col-12 my-2"
+                             *ngFor="let card of cards?.Items">
       <fa-icon (click)="deleteCard(card.ID)"
-              title="Delete"
-              class="text-danger icon-button--hover-reactive"
-              [icon]="faTrashAlt"></fa-icon>
+               title="Delete"
+               class="text-danger icon-button--hover-reactive"
+               [icon]="faTrashAlt"></fa-icon>
     </ocm-credit-card-display>
   </div>
   <div class="row">
@@ -33,7 +33,7 @@
       <!-- Insert buttons here -->
     </div>
     <div class="col-12 mt-3"
-        *ngFor="let account of accounts?.Items">
+         *ngFor="let account of accounts?.Items">
       <div class="border border-radius shadow-sm p-4">
         <div><strong>{{ account.Name }}</strong></div>
         <div>Balance: <b class="text-success">{{ account.Balance | currency }}</b></div>

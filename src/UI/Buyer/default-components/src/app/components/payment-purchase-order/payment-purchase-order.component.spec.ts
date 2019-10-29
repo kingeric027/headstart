@@ -62,9 +62,7 @@ describe('PaymentPurchaseOrderComponent', () => {
         paymentID: 'MockPaymentID',
         payment: { xp: { PONumber: 'NewPoNumber' } },
       };
-      expect(component.paymentPatched.emit).toHaveBeenCalledWith(
-        expectedResult
-      );
+      expect(component.paymentPatched.emit).toHaveBeenCalledWith(expectedResult);
     });
   });
 });

@@ -38,11 +38,11 @@
       <p class="mt-4"
          [innerHTML]="product.Description || 'This product has no description.'"></p>
       <ocm-spec-form *ngIf="isOrderable && specs.Items.length > 0"
-        [specs]="specs"
-        [product]="product"
-        [qty]="0"
-        (specFormChange)="onSpecFormChange($event)"
-        [context]="context"></ocm-spec-form>
+                     [specs]="specs"
+                     [product]="product"
+                     [qty]="0"
+                     (specFormChange)="onSpecFormChange($event)"
+                     [context]="context"></ocm-spec-form>
       <div *ngIf="!isOrderable"
            class="alert alert-info">
         This is a view-only product and cannot be ordered

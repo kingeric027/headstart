@@ -111,7 +111,7 @@ describe('CheckoutComponent', () => {
       ];
     });
     it('should get validation for section', () => {
-      component.sections.forEach((section) => {
+      component.sections.forEach(section => {
         expect(component.getValidation(section.id)).toBe(section.valid);
       });
     });
@@ -120,11 +120,11 @@ describe('CheckoutComponent', () => {
   describe('setValidation()', () => {
     it('should get validation for section', () => {
       component.setValidation('login', true);
-      expect(component.sections.find((x) => x.id === 'login').valid).toEqual(true);
+      expect(component.sections.find(x => x.id === 'login').valid).toEqual(true);
       component.setValidation('shippingAddress', false);
-      expect(component.sections.find((x) => x.id === 'shippingAddress').valid).toEqual(false);
+      expect(component.sections.find(x => x.id === 'shippingAddress').valid).toEqual(false);
       component.setValidation('payment', false);
-      expect(component.sections.find((x) => x.id === 'payment').valid).toEqual(false);
+      expect(component.sections.find(x => x.id === 'payment').valid).toEqual(false);
     });
   });
 

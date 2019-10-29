@@ -205,12 +205,16 @@ describe('CheckoutAddressComponent', () => {
     it('should patch order.ShippingAddressID if addressType is Shipping', () => {
       component.addressType = 'Shipping';
       component['setSavedAddress']({ ID: 'MockSavedAddress' });
-      expect(orderService.Patch).toHaveBeenCalledWith('outgoing', component.order.ID, { ShippingAddressID: 'MockSavedAddress' });
+      expect(orderService.Patch).toHaveBeenCalledWith('outgoing', component.order.ID, {
+        ShippingAddressID: 'MockSavedAddress',
+      });
     });
     it('should patch order.BillingAddressID if addressType is Billing', () => {
       component.addressType = 'Billing';
       component['setSavedAddress']({ ID: 'MockSavedAddress' });
-      expect(orderService.Patch).toHaveBeenCalledWith('outgoing', component.order.ID, { BillingAddressID: 'MockSavedAddress' });
+      expect(orderService.Patch).toHaveBeenCalledWith('outgoing', component.order.ID, {
+        BillingAddressID: 'MockSavedAddress',
+      });
     });
   });
   describe('clearFiltersOnModalClose', () => {

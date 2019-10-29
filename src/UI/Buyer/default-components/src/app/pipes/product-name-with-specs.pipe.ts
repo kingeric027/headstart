@@ -9,7 +9,7 @@ export class ProductNameWithSpecsPipe implements PipeTransform {
     const productName = lineItem.Product.Name;
     const specs = lineItem.Specs;
     if (specs.length === 0) return productName;
-    const list = specs.map((spec) => spec.Value).join(', ');
+    const list = specs.map(spec => spec.Value).join(', ');
     return `${productName}(${list})`;
   }
 }

@@ -34,7 +34,8 @@ export class OCMCheckoutAddress extends OCMComponent implements OnChanges {
       this.getSavedAddresses();
     }
     // shipping address is defined at the line item level
-    this.selectedAddress = this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress;
+    this.selectedAddress =
+      this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress;
   }
 
   clearRequestOptions() {
@@ -74,7 +75,11 @@ export class OCMCheckoutAddress extends OCMComponent implements OnChanges {
   async saveAddress(address: Address, formDirty: boolean) {
     // TODO: make bellow line better
     const setOneTimeAddress =
-      this.isAnon || formDirty || (this.usingShippingAsBilling && !this.order.ShippingAddressID) || !address.ID || address.ID === '';
+      this.isAnon ||
+      formDirty ||
+      (this.usingShippingAsBilling && !this.order.ShippingAddressID) ||
+      !address.ID ||
+      address.ID === '';
     if (setOneTimeAddress) {
       this.order = await this.setOneTimeAddress(address);
     } else {

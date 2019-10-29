@@ -40,7 +40,7 @@ export class OCMProductCard extends OCMComponent {
   getImageUrl() {
     const host = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
     const images = this.product.xp.Images || [];
-    const result = _map(images, (img) => {
+    const result = _map(images, img => {
       return img.Url.replace('{url}', host);
     });
     const filtered = _without(result, undefined);

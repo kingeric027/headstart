@@ -22,7 +22,10 @@ describe('PaymentListComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [PaymentListComponent],
-      providers: [{ provide: OcMeService, useValue: meService }, { provide: AuthorizeNetService, useValue: authorizeNetService }],
+      providers: [
+        { provide: OcMeService, useValue: meService },
+        { provide: AuthorizeNetService, useValue: authorizeNetService },
+      ],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
     }).compileComponents();
   }));

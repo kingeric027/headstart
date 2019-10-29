@@ -15,7 +15,7 @@ export class OCMOrderStatusFilter extends OCMComponent implements OnInit {
     OrderStatus.AwaitingApproval,
     OrderStatus.Completed,
     OrderStatus.Declined,
-    OrderStatus.Canceled
+    OrderStatus.Canceled,
   ];
 
   ngOnInit(): void {

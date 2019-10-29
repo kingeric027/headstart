@@ -2,7 +2,13 @@ import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MeUser } from '@ordercloud/angular-sdk';
 import { OCMComponent } from '../base-component';
-import { ValidateName, ValidateEmail, ValidatePhone, ValidateStrongPassword, ValidateFieldMatches } from '../../validators/validators';
+import {
+  ValidateName,
+  ValidateEmail,
+  ValidatePhone,
+  ValidateStrongPassword,
+  ValidateFieldMatches,
+} from '../../validators/validators';
 
 @Component({
   templateUrl: './register.component.html',
