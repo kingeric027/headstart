@@ -93,7 +93,7 @@ export class CurrentUserService implements ICurrentUser {
   }
 
   private async setFavoriteValue(XpFieldName: string, isFav: boolean, ID: string): Promise<void> {
-    let favorites = this.user.xp[XpFieldName];
+    let favorites = this.user.xp[XpFieldName] || [];
     if (isFav && favorites.length >= this.MaxFavorites) {
       this.toastrService.info(`You have reached your limit of ${XpFieldName}`);
       return;
