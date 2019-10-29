@@ -21,15 +21,6 @@ export const GetCardType = (cardNumber: string): string => {
   return null;
 };
 
-export const MapToNonSensitive = (card: AuthNetCreditCard): BuyerCreditCard => {
-  return {
-    CardType: this.getCardType(card.CardNumber),
-    PartialAccountNumber: card.CardNumber.slice(-4),
-    CardholderName: card.CardholderName,
-    ExpirationDate: card.ExpirationDate,
-  };
-};
-
 // this function will weed out made up numbers with the luhn algorithm. this does not guarantee that a number exists
 export const IsValidPerLuhnAlgorithm = (cardNumber: string) => {
   const map: number[] = [
