@@ -4,6 +4,7 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MeUser } from '@ordercloud/angular-sdk';
 import { OCMComponent } from '../base-component';
 import { ValidateStrongPassword, ValidateFieldMatches } from '../../validators/validators';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   templateUrl: './change-password-form.component.html',
@@ -13,6 +14,10 @@ export class OCMChangePasswordForm extends OCMComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
   faTimes = faTimes;
+
+  constructor(private toasterService: ToastrService) {
+    super();
+  }
 
   ngOnInit() {
     this.setForm();
@@ -28,9 +33,16 @@ export class OCMChangePasswordForm extends OCMComponent implements OnInit {
     });
   }
 
+  resetFormValues() {
+    this.form.controls.currentPassword.setValue('');
+    this.form.controls.newPassword.setValue('');
+    this.form.controls.confirmNewPassword.setValue('');
+  }
+
   async updatePassword() {
-    const { newPassword } = this.form.value;
-    // TODO: how is this valid? changing password without validating current on the server?
-    await this.context.authentication.changePassword(newPassword);
+    const { newPassword, currentPassword } = this.form.value;
+    await this.context.authentication.validateCurrentPasswordAndChangePassword(newPassword, currentPassword);
+    this.toasterService.success(`Password Changed`);
+    this.resetFormValues();
   }
 }
