@@ -22,9 +22,11 @@
   </div>
   <div class="row">
     <div class="col-12">
-      <ocm-credit-card-form *ngIf="showCardForm"
-                            submitText="Add"
-                            (formSubmitted)="addCard($event.detail)"></ocm-credit-card-form>
+      <div *ngIf="showCardForm"
+           class="border border-radius shadow-sm p-3 row no-gutters">
+        <ocm-credit-card-form [submitText]="'Add'"
+                              (formSubmitted)="addCard($event.detail)"></ocm-credit-card-form>
+      </div>
     </div>
   </div>
   <div class="row mt-3">

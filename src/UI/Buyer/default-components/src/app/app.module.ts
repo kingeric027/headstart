@@ -81,8 +81,10 @@ import {
   NgbDateAdapter,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
+import { CreditCardInputDirective } from './directives/credit-card-input.directive';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
+import { CreditCardFormatPipe } from './pipes/credit-card-format.pipe';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
 import { HttpClientModule } from '@angular/common/http';
 import { OcSDKConfig } from './config/ordercloud-sdk.config';
@@ -176,9 +178,11 @@ const components = [
   declarations: [
     AppComponent,
     FormControlErrorDirective,
+    CreditCardInputDirective,
     SpecFieldDirective,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
+    CreditCardFormatPipe,
     PaymentMethodDisplayPipe,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
@@ -212,6 +216,7 @@ const components = [
     { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
     { provide: ErrorHandler, useClass: AppErrorHandler },
     DatePipe, // allows us to use in class as injectable (date filter component)
+    CreditCardFormatPipe,
   ],
   entryComponents: components,
   bootstrap: [AppComponent],
