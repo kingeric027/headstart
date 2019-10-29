@@ -214,10 +214,7 @@ const components = [
     { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
     { provide: ErrorHandler, useClass: AppErrorHandler },
     DatePipe, // allows us to use in class as injectable (date filter component)
-<<<<<<< dev
-=======
     CreditCardFormatPipe,
->>>>>>> credit card component update start
   ],
   entryComponents: components,
   bootstrap: [AppComponent],
