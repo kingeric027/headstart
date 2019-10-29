@@ -1,6 +1,8 @@
 import { BuyerCreditCard } from '@ordercloud/angular-sdk';
 import { AuthNetCreditCard } from 'marketplace';
 
+// TODO - investigate merging with AuthNetCreditCardService
+
 export const acceptedPartialCards = {
   Visa: RegExp('^4'), // e.g. 4000000000000000
   MasterCard: RegExp('^5[1-5]|^2[1-7]'), // e.g. 5100000000000000
@@ -23,33 +25,10 @@ export const GetCardType = (cardNumber: string): string => {
 
 // this function will weed out made up numbers with the luhn algorithm. this does not guarantee that a number exists
 export const IsValidPerLuhnAlgorithm = (cardNumber: string) => {
-  const map: number[] = [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    0,
-    2,
-    4,
-    6,
-    8,
-    1,
-    3,
-    5,
-    7,
-    9,
-  ];
+  const map: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 2, 4, 6, 8, 1, 3, 5, 7, 9];
   let sum = 0;
   const cardNumberArrayString: string[] = cardNumber.split('');
-  const cardNumberArray: number[] = cardNumberArrayString.map((num) =>
-    parseInt(num, 10)
-  );
+  const cardNumberArray: number[] = cardNumberArrayString.map(num => parseInt(num, 10));
   const numberLength: number = cardNumber.split('').length - 1;
   for (let i = 0; i <= numberLength; i++) {
     sum += map[cardNumberArray[numberLength - i] + (i & 1) * 10];
@@ -79,11 +58,7 @@ export const IsValidCardType = (cardNumber: string) => {
 
 export const IsValidLength = (cardNumber: string) => {
   // ensures that the card is of valid length for Visa, Discover, or MasterCard
-  return (
-    cardNumber.length === 13 ||
-    cardNumber.length === 16 ||
-    cardNumber.length === 19
-  );
+  return cardNumber.length === 13 || cardNumber.length === 16 || cardNumber.length === 19;
 };
 
 export const RemoveSpacesFrom = (cardNumber: string) => {
