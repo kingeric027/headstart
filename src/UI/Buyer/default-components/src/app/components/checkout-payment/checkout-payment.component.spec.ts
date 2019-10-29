@@ -33,7 +33,10 @@ describe('CheckoutPaymentComponent', () => {
     TestBed.configureTestingModule({
       declarations: [CheckoutPaymentComponent, PaymentMethodDisplayPipe],
       imports: [FontAwesomeModule, ReactiveFormsModule],
-      providers: [{ provide: OcPaymentService, useValue: paymentService }, { provide: applicationConfiguration, useValue: appConfig }],
+      providers: [
+        { provide: OcPaymentService, useValue: paymentService },
+        { provide: applicationConfiguration, useValue: appConfig },
+      ],
       schemas: [NO_ERRORS_SCHEMA], // Ignore template errors: remove if tests are added to test template
     }).compileComponents();
   }));
@@ -152,7 +155,9 @@ describe('CheckoutPaymentComponent', () => {
       });
     });
     it('should patch the payment', () => {
-      expect(paymentService.Patch).toHaveBeenCalledWith('outgoing', '1', 'mockPOPaymentID', { xp: { PONumber: 'new po number' } });
+      expect(paymentService.Patch).toHaveBeenCalledWith('outgoing', '1', 'mockPOPaymentID', {
+        xp: { PONumber: 'new po number' },
+      });
     });
   });
 });

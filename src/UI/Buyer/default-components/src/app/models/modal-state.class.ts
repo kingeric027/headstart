@@ -1,4 +1,4 @@
 export class ModalState {
   static Open = { isOpen: true };
-  static Closed =  { isOpen: false };
+  static Closed = { isOpen: false };
 }

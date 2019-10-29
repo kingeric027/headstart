@@ -17,7 +17,7 @@ export class OCMCategoryTree extends OCMComponent {
 
   ngOnContextSet() {
     if (!this.categoryTree) this.categoryTree = this.buildCategoryTree(this.categories.Items);
-    this.context.productFilters.onFiltersChange((filters) => {
+    this.context.productFilters.onFiltersChange(filters => {
       this.activeCategoryID = filters.categoryID;
     });
   }
@@ -41,13 +41,16 @@ export class OCMCategoryTree extends OCMComponent {
   buildCategoryTree(categories: Category[]): CategoryTreeNode[] {
     // key is ID, value is Node
     const nodeDictionary = this.buildNodeDictionary(categories);
-    categories.forEach((category) => this.setParentsAndChildren(nodeDictionary, category.ID));
+    categories.forEach(category => this.setParentsAndChildren(nodeDictionary, category.ID));
     // Return all top-level nodes in order
-    return categories.map((category) => nodeDictionary[category.ID]).filter((x) => !x.parent);
+    return categories.map(category => nodeDictionary[category.ID]).filter(x => !x.parent);
   }
 
   private setParentsAndChildren(nodeDictionary: any, categoryID: string) {
-    if (!nodeDictionary[categoryID].category.ParentID || !nodeDictionary[nodeDictionary[categoryID].category.ParentID]) {
+    if (
+      !nodeDictionary[categoryID].category.ParentID ||
+      !nodeDictionary[nodeDictionary[categoryID].category.ParentID]
+    ) {
       // category is not a child node
       return;
     }

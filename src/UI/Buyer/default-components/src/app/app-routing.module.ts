@@ -4,6 +4,6 @@ import { MarketplaceRoutes } from 'marketplace';
 
 @NgModule({
   imports: [RouterModule.forRoot(MarketplaceRoutes as Routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

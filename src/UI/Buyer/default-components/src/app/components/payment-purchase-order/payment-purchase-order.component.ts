@@ -19,7 +19,7 @@ export class OCMPaymentPurchaseOrder extends OCMComponent implements OnInit, OnC
   }
 
   ngOnContextSet() {
-    this.form.setValue( { PONumber: this.getPONumber(this.payment) });
+    this.form.setValue({ PONumber: this.getPONumber(this.payment) });
     this.order = this.context.currentOrder.get();
   }
 
@@ -33,7 +33,7 @@ export class OCMPaymentPurchaseOrder extends OCMComponent implements OnInit, OnC
       this.payment = changes.payment.currentValue;
       // set form
       if (changes.payment.firstChange) {
-        this.form.setValue( { PONumber: this.getPONumber(this.payment) });
+        this.form.setValue({ PONumber: this.getPONumber(this.payment) });
       }
     }
   }

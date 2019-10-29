@@ -20,7 +20,7 @@ export class OCMProductSort extends OCMComponent implements OnInit {
   }
 
   ngOnContextSet() {
-    this.context.productFilters.onFiltersChange((filters) => {
+    this.context.productFilters.onFiltersChange(filters => {
       this.setForm(filters.sortBy);
     });
   }

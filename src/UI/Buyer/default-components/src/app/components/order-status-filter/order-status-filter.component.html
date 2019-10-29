@@ -5,9 +5,10 @@
             (change)="selectStatus()"
             class="form-control"
             formControlName="status">
-          <option *ngFor="let status of statuses" [ngValue]="status">
-            {{ status | orderStatusDisplay }}
-          </option>
-      </select>
+      <option *ngFor="let status of statuses"
+              [ngValue]="status">
+        {{ status | orderStatusDisplay }}
+      </option>
+    </select>
   </div>
 </form>

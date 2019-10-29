@@ -6,13 +6,24 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
- // https://github.com/angular/angular/blob/master/packages/elements/src/component-factory-strategy.ts
+// https://github.com/angular/angular/blob/master/packages/elements/src/component-factory-strategy.ts
 
-import {ApplicationRef, ComponentFactory, ComponentFactoryResolver, ComponentRef, EventEmitter, Injector, OnChanges, SimpleChange, SimpleChanges, Type} from '@angular/core';
-import {Observable, merge} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {
+  ApplicationRef,
+  ComponentFactory,
+  ComponentFactoryResolver,
+  ComponentRef,
+  EventEmitter,
+  Injector,
+  OnChanges,
+  SimpleChange,
+  SimpleChanges,
+  Type,
+} from '@angular/core';
+import { Observable, merge } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import {isFunction, scheduler, strictEquals, isElement, matchesSelector } from './utils';
+import { isFunction, scheduler, strictEquals, isElement, matchesSelector } from './utils';
 
 /** Time in milliseconds to wait before destroying the component ref when disconnected. */
 const DESTROY_DELAY = 10;
@@ -27,8 +38,7 @@ export class ComponentNgElementStrategyFactory implements NgElementStrategyFacto
   componentFactory: ComponentFactory<any>;
 
   constructor(private component: Type<any>, private injector: Injector) {
-    this.componentFactory =
-        injector.get(ComponentFactoryResolver).resolveComponentFactory(component);
+    this.componentFactory = injector.get(ComponentFactoryResolver).resolveComponentFactory(component);
   }
 
   create(injector: Injector) {
@@ -45,23 +55,23 @@ export class ComponentNgElementStrategyFactory implements NgElementStrategyFacto
 export class ComponentNgElementStrategy implements NgElementStrategy {
   /** Merged stream of the component's output events. */
   // TODO(issue/24571): remove '!'.
-  events !: Observable<NgElementStrategyEvent>;
+  events!: Observable<NgElementStrategyEvent>;
 
   /** Reference to the component that was created on connect. */
   // TODO(issue/24571): remove '!'.
-  private componentRef !: ComponentRef<any>| null;
+  private componentRef!: ComponentRef<any> | null;
 
   /** Changes that have been made to the component ref since the last time onChanges was called. */
-  private inputChanges: SimpleChanges|null = null;
+  private inputChanges: SimpleChanges | null = null;
 
   /** Whether the created component implements the onChanges function. */
   private implementsOnChanges = false;
 
   /** Whether a change detection has been scheduled to run on the component. */
-  private scheduledChangeDetectionFn: (() => void)|null = null;
+  private scheduledChangeDetectionFn: (() => void) | null = null;
 
   /** Callback function that when called will cancel a scheduled destruction on the component. */
-  private scheduledDestroyFn: (() => void)|null = null;
+  private scheduledDestroyFn: (() => void) | null = null;
 
   /** Initial input values that were set before the component was created. */
   private readonly initialInputValues = new Map<string, any>();
@@ -102,7 +112,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
     // moved elsewhere in the DOM
     this.scheduledDestroyFn = scheduler.schedule(() => {
       if (this.componentRef) {
-        this.componentRef !.destroy();
+        this.componentRef!.destroy();
         this.componentRef = null;
       }
     }, DESTROY_DELAY);
@@ -145,13 +155,11 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
    * sets up its initial inputs, listens for outputs changes, and runs an initial change detection.
    */
   protected initializeComponent(element: HTMLElement) {
-    const childInjector = Injector.create({providers: [], parent: this.injector});
-    const projectableNodes =
-        extractProjectableNodes(element, this.componentFactory.ngContentSelectors);
+    const childInjector = Injector.create({ providers: [], parent: this.injector });
+    const projectableNodes = extractProjectableNodes(element, this.componentFactory.ngContentSelectors);
     this.componentRef = this.componentFactory.create(childInjector, projectableNodes, element);
 
-    this.implementsOnChanges =
-        isFunction((this.componentRef.instance as any as OnChanges).ngOnChanges);
+    this.implementsOnChanges = isFunction(((this.componentRef.instance as any) as OnChanges).ngOnChanges);
 
     this.initializeInputs();
     this.initializeOutputs();
@@ -164,7 +172,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
 
   /** Set any stored initial inputs on the component's properties. */
   protected initializeInputs(): void {
-    this.componentFactory.inputs.forEach(({propName}) => {
+    this.componentFactory.inputs.forEach(({ propName }) => {
       if (this.initialInputValues.has(propName)) {
         this.setInputValue(propName, this.initialInputValues.get(propName));
       } else {
@@ -179,9 +187,9 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
 
   /** Sets up listeners for the component's outputs so that the events stream emits the events. */
   protected initializeOutputs(): void {
-    const eventEmitters = this.componentFactory.outputs.map(({propName, templateName}) => {
-      const emitter = (this.componentRef !.instance as any)[propName] as EventEmitter<any>;
-      return emitter.pipe(map((value: any) => ({name: templateName, value})));
+    const eventEmitters = this.componentFactory.outputs.map(({ propName, templateName }) => {
+      const emitter = (this.componentRef!.instance as any)[propName] as EventEmitter<any>;
+      return emitter.pipe(map((value: any) => ({ name: templateName, value })));
     });
 
     this.events = merge(...eventEmitters);
@@ -197,7 +205,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
     // during ngOnChanges.
     const inputChanges = this.inputChanges;
     this.inputChanges = null;
-    (this.componentRef !.instance as any as OnChanges).ngOnChanges(inputChanges);
+    ((this.componentRef!.instance as any) as OnChanges).ngOnChanges(inputChanges);
   }
 
   /**
@@ -250,7 +258,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
     }
 
     this.callNgOnChanges();
-    this.componentRef !.changeDetectorRef.detectChanges();
+    this.componentRef!.changeDetectorRef.detectChanges();
   }
 }
 
@@ -319,7 +327,7 @@ function findMatchingIndex(node: Node, selectors: string[], defaultIndex: number
 
   if (isElement(node)) {
     selectors.some((selector, i) => {
-      if ((selector !== '*') && matchesSelector(node, selector)) {
+      if (selector !== '*' && matchesSelector(node, selector)) {
         matchingIndex = i;
         return true;
       }
