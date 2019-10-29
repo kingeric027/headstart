@@ -1,21 +1,37 @@
 .add-card-form {
-    display: inline-block;
-    width: 100%;
-  }
-  
-  .cards-light {
-    color: grey;
-  }
-  
-  .card-name,
-  .card-number {
-    width: 100%;
-  }
-  
-  .card-submit {
-    display: block;
-  }
-  
-  #cvv {
-    -webkit-text-security: disc;
-  }
+  display: inline-block;
+  width: 570px;
+}
+
+.cards-light {
+  color: grey;
+}
+
+.card-name,
+.card-number {
+  width: 100%;
+}
+
+.card-submit {
+  display: block;
+}
+
+#cvv {
+  -webkit-text-security: disc;
+}
+
+.visa {
+  color: #1a1f71;
+}
+
+.mastercard {
+  color: #cc0000;
+}
+
+.discover {
+  color: #ff6000;
+}
+
+.credit-card-submit-button {
+  width: 100%;
+}

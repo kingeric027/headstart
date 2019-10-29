@@ -81,6 +81,7 @@ import {
   NgbDateAdapter,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
+import { CreditCardInputDirective } from './directives/credit-card-input.directive';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
 import { CreditCardFormatPipe } from './pipes/credit-card-format.pipe';
@@ -177,6 +178,7 @@ const components = [
   declarations: [
     AppComponent,
     FormControlErrorDirective,
+    CreditCardInputDirective,
     SpecFieldDirective,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,

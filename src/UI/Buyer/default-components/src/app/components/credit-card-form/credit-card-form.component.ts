@@ -1,20 +1,8 @@
-import {
-  Component,
-  OnInit,
-  Output,
-  EventEmitter,
-  Input,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 // import { AppFormErrorService } from '@app/shared/services/form-error/form-error.service';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import {
-  faCcVisa,
-  faCcMastercard,
-  faCcDiscover,
-  faCcPaypal,
-} from '@fortawesome/free-brands-svg-icons';
+import { faCcVisa, faCcMastercard, faCcDiscover, faCcPaypal } from '@fortawesome/free-brands-svg-icons';
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 // import { AuthorizeNetService } from 'src/app/app.module';
 import { AuthNetCreditCard } from 'marketplace';
@@ -33,14 +21,12 @@ import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe';
   styleUrls: ['./credit-card-form.component.scss'],
 })
 export class OCMCreditCardForm implements OnInit {
-  constructor(
-    private formBuilder: FormBuilder,
-    private creditCardFormatPipe: CreditCardFormatPipe
-  ) {}
+  constructor(private formBuilder: FormBuilder, private creditCardFormatPipe: CreditCardFormatPipe) {}
 
   @Output() formSubmitted = new EventEmitter<AuthNetCreditCard>();
   @Input() card: AuthNetCreditCard;
   @Input() amount;
+  @Input() submitText: string;
   cdr: ChangeDetectorRef;
   faCcVisa = faCcVisa;
   faCcMastercard = faCcMastercard;
@@ -60,6 +46,7 @@ export class OCMCreditCardForm implements OnInit {
   ngOnInit() {
     this.setAvailableCardOptions();
     this.setCardForm();
+    console.log(this);
   }
 
   handleCardNumberKeyup($event) {
@@ -123,10 +110,9 @@ export class OCMCreditCardForm implements OnInit {
   }
 
   private setCardNumberVariables(cardNumber: string) {
-    this.notAcceptedCardType =
-      !IsValidCardType(cardNumber) && cardNumber.length > 5;
-    this.cardNumberValid =
-      IsValidPerLuhnAlgorithm(cardNumber) && IsValidLength(cardNumber);
+    this.notAcceptedCardType = !IsValidCardType(cardNumber) && cardNumber.length > 5;
+    this.cardNumberValid = IsValidPerLuhnAlgorithm(cardNumber) && IsValidLength(cardNumber);
+    const cardType = GetCardType(cardNumber);
     this.cardType = GetCardType(cardNumber);
   }
 
@@ -143,12 +129,8 @@ export class OCMCreditCardForm implements OnInit {
     this.yearOptions = Array(20)
       .fill(0)
       .map((x, i) => `${i + currentYear}`);
-    const currentlySelectedYear = this.card
-      ? parseInt(this.card.ExpirationDate.substring(2, 4), 10)
-      : currentYear + 1; // sets the default year to one after the current year if there is none provided by the checkout state
-    this.monthOptions = this.getArrayOfFutureMonthsForYear(
-      currentlySelectedYear
-    );
+    const currentlySelectedYear = this.card ? parseInt(this.card.ExpirationDate.substring(2, 4), 10) : currentYear + 1; // sets the default year to one after the current year if there is none provided by the checkout state
+    this.monthOptions = this.getArrayOfFutureMonthsForYear(currentlySelectedYear);
   }
 
   private setCardForm() {
