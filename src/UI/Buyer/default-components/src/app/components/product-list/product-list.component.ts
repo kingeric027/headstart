@@ -30,7 +30,7 @@ export class OCMProductList extends OCMComponent {
   private handleFiltersChange = async (filters: ProductFilters) => {
     this.showingFavoritesOnly = filters.showOnlyFavorites;
     this.categoryCrumbs = this.buildBreadCrumbs(filters.categoryID);
-  };
+  }
 
   clearAllFilters() {
     this.context.productFilters.clearAllFilters();

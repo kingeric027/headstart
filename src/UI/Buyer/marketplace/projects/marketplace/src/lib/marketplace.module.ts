@@ -28,9 +28,7 @@ import { ReorderHelperService } from './services/reorder/reorder.service';
 import { RouteService } from './services/route/route.service';
 import { TokenHelperService } from './services/token-helper/token-helper.service';
 import { ShopperContextService } from './services/shopper-context/shopper-context.service';
-import { ToastrModule } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
 import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipments-wrapper.component';
 
@@ -39,11 +37,7 @@ import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipm
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     MarketplaceRoutingModule,
-    ToastrModule,
-
-    // TODO - remove
     CommonModule,
-    ReactiveFormsModule
   ],
   providers: [
     FeaturedProductsResolver,

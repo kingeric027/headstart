@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MeUser, OcMeService, User } from '@ordercloud/angular-sdk';
-import { ToastrService } from 'ngx-toastr';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { ICurrentUser } from '../../shopper-context';
 
@@ -21,7 +20,6 @@ export class CurrentUserService implements ICurrentUser {
   constructor(
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
-    private toastrService: ToastrService
   ) {}
 
   async reset(): Promise<void> {
@@ -95,8 +93,7 @@ export class CurrentUserService implements ICurrentUser {
   private async setFavoriteValue(XpFieldName: string, isFav: boolean, ID: string): Promise<void> {
     let favorites = this.user.xp[XpFieldName] || [];
     if (isFav && favorites.length >= this.MaxFavorites) {
-      this.toastrService.info(`You have reached your limit of ${XpFieldName}`);
-      return;
+      throw Error(`You have reached your limit of ${XpFieldName}`);
     }
     if (isFav) {
       favorites = [...favorites, ID];

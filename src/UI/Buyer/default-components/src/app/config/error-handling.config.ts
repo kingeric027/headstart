@@ -25,7 +25,9 @@ export class AppErrorHandler extends ErrorHandler {
    */
   public displayError(ex: any): void {
     let message = '';
-    if (ex && ex.error && ex.error.Errors && ex.error.Errors.length) {
+    if (ex.promise && ex.rejection && ex.rejection.message) {
+      message = ex.rejection.message;
+    } else if (ex && ex.error && ex.error.Errors && ex.error.Errors.length) {
       const e = ex.error.Errors[0];
       if (e.Data && e.Data.WebhookName) {
         // webhook error
@@ -35,8 +37,8 @@ export class AppErrorHandler extends ErrorHandler {
       } else {
         message = e.Message;
       }
-    } else if (ex && ex.error && ex.error['error_description']) {
-      message = ex.error['error_description'];
+    } else if (ex && ex.error && ex.error.error_description) {
+      message = ex.error.error_description;
     } else if (ex.error) {
       message = ex.error;
     } else if (ex.message) {
