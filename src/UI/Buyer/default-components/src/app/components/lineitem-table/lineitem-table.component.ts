@@ -24,7 +24,7 @@ export class OCMLineitemTable extends OCMComponent {
     this.context.router.toProductDetails(productID);
   }
 
-  changeQuantity(lineItemID: string, event: { qty: number, valid: boolean }) {
+  changeQuantity(lineItemID: string, event: { qty: number; valid: boolean }) {
     if (event.valid) {
       this.getLineItem(lineItemID).Quantity = event.qty;
       this.context.currentOrder.setQuantityInCart(lineItemID, event.qty);
@@ -36,7 +36,7 @@ export class OCMLineitemTable extends OCMComponent {
     const li = this.getLineItem(lineItemID);
     const host = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
     const images = li.Product.xp.Images || [];
-    const result = _map(images, (img) => {
+    const result = _map(images, img => {
       return img.Url.replace('{url}', host);
     });
     const filtered = _without(result, undefined);

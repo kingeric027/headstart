@@ -33,7 +33,8 @@
       </ocm-quantity-input>
     </div>
   </div>
-  <div class="card-footer" *ngIf="!isViewOnlyProduct && !hasSpecs">
+  <div class="card-footer"
+       *ngIf="!isViewOnlyProduct && !hasSpecs">
     <button (click)="$event.stopPropagation()"
             class="btn btn-primary btn-block small"
             type="submit"

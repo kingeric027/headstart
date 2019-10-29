@@ -12,7 +12,7 @@ import { BuyerProduct } from '@ordercloud/angular-sdk';
 export class OCMQuantityInput extends OCMComponent implements OnInit {
   @Input() existingQty: number;
   @Input() product: BuyerProduct;
-  @Output() qtyChange = new EventEmitter<{ qty: number, valid: boolean }>();
+  @Output() qtyChange = new EventEmitter<{ qty: number; valid: boolean }>();
   // TODO - replace with real product info
 
   form: FormGroup;
@@ -98,7 +98,12 @@ export class OCMQuantityInput extends OCMComponent implements OnInit {
   }
 
   getInventory(product: BuyerProduct): number {
-    if (product.Inventory && product.Inventory.Enabled && !product.Inventory.OrderCanExceed && product.Inventory.QuantityAvailable != null) {
+    if (
+      product.Inventory &&
+      product.Inventory.Enabled &&
+      !product.Inventory.OrderCanExceed &&
+      product.Inventory.QuantityAvailable != null
+    ) {
       return product.Inventory.QuantityAvailable;
     }
     return Infinity;
