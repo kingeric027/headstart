@@ -1,8 +1,10 @@
 .badge__counter--large {
-    .fa-layers-counter { ///deep/ TODO - style is probably not working without deep
-       height: 1.5em;
-       top: -10px;
-       right: -12px;
-       font-size: 45px;
+  ::ng-deep {
+    .fa-layers-counter {
+      height: 1.5em;
+      top: -10px;
+      right: -12px;
+      font-size: 45px;
     }
+  }
 }
