@@ -31,3 +31,6 @@
                               [context]="context"
                               [payment]="existingPayment"
                               (continue)="onContinueClicked()">></ocm-payment-spending-account>
+<ocm-credit-card-form *ngIf="selectedPaymentMethod === 'CreditCard'"
+                      [submitText]="'Use'"
+                      (formSubmitted)="addCard($event.detail)"></ocm-credit-card-form>
