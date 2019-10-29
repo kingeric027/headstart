@@ -3,7 +3,6 @@ import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { CurrentUserService } from '../services/current-user/current-user.service';
-import { BuildQtyLimits } from '../functions/product.quantity.validator';
 
 @Component({
   template: `

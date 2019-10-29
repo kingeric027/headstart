@@ -22,7 +22,7 @@ export class OCMProductList extends OCMComponent {
   closeIcon = faTimes;
 
   ngOnContextSet() {
-    this.facets = this.products.Meta.Facets;
+    if (this.products) this.facets = this.products.Meta.Facets;
     this.context.productFilters.onFiltersChange(this.handleFiltersChange);
     this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
   }

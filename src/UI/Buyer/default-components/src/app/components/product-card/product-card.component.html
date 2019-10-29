@@ -23,27 +23,23 @@
       </p>
       <label for="quantity"
              class="sr-only">Quantity</label>
-      <ocm-quantity-input class="w-50"
+      <ocm-quantity-input *ngIf="!isViewOnlyProduct && !hasSpecs"
+                          class="w-50"
                           id="quantity"
                           [existingQty]="null"
+                          [product]="product"
                           (qtyChange)="setQuantity($event.detail)"
                           [context]="context">
       </ocm-quantity-input>
     </div>
   </div>
-  <div class="card-footer">
-    <button *ngIf="!isViewOnlyProduct"
-            (click)="$event.stopPropagation()"
+  <div class="card-footer"
+       *ngIf="!isViewOnlyProduct && !hasSpecs">
+    <button (click)="$event.stopPropagation()"
             class="btn btn-primary btn-block small"
             type="submit"
             (click)="addToCart()">
       Add <span class="d-md-none d-lg-inline"> to Cart</span>
-    </button>
-    <button *ngIf="isViewOnlyProduct"
-            (click)="toDetails()"
-            class="btn btn-default btn-block btn-outline-dark">
-      View
-      <span class="d-sm-none d-lg-inline">Product</span>
     </button>
   </div>
 </div>

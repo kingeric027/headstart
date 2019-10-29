@@ -1,7 +1,7 @@
 <div class="row mb-5" *ngIf="order">
     <div class="col-6">
-        <ocm-address-card *ngIf="lineItems[0].ShippingAddress"
-                        [address]="lineItems[0].ShippingAddress"
+        <ocm-address-card *ngIf="lineItems.Items[0].ShippingAddress"
+                        [address]="lineItems.Items[0].ShippingAddress"
                         addressTitle="Shipping Address">
         </ocm-address-card>
         <ocm-address-card [address]="order.BillingAddress"
@@ -34,7 +34,7 @@
         </ul>
     </div>
 </div>
-<ocm-lineitem-table [lineitems]="lineItems"
+<ocm-lineitem-table [lineItems]="lineItems"
                     [context]="context"
                     [readOnly]="true">
 </ocm-lineitem-table>

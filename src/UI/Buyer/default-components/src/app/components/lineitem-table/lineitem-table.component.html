@@ -58,6 +58,7 @@
               <span class="d-block d-sm-none">Qty</span>
               <ocm-quantity-input *ngIf="!readOnly"
                                   [existingQty]="li.Quantity"
+                                  [product]="li.Product"
                                   (qtyChange)="changeQuantity(li.ID, $event.detail)"
                                   [context]="context"></ocm-quantity-input>
               <span class="text-nowrap"

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ListBuyerProduct } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { BuildQtyLimits } from '../functions/product.quantity.validator';
 
 @Component({
   template: `

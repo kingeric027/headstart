@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import {
@@ -29,6 +29,7 @@ export class OCMProductDetails extends OCMComponent {
   relatedProducts$: Observable<BuyerProduct[]>;
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
+  qtyValid = true;
 
   constructor(private formService: SpecFormService) {
     super();
@@ -49,9 +50,12 @@ export class OCMProductDetails extends OCMComponent {
     }
   }
 
-  qtyChange(event): void {
-    this.quantity = event.detail;
-    this.getTotalPrice();
+  qtyChange(event: { qty: number, valid: boolean }): void {
+    this.qtyValid = event.valid;
+    if (this.qtyValid) {
+      this.quantity = event.qty;
+      this.getTotalPrice();
+    }
   }
 
   addToCart(event: any): void {
@@ -80,6 +84,7 @@ export class OCMProductDetails extends OCMComponent {
       : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
   }
 
+  // TODO - we need a unified getImageUrl() function
   getImageUrls(): string[] {
     const images =
       _uniq(this.product.xp.Images, (img: any) => {

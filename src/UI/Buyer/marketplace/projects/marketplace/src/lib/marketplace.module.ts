@@ -16,7 +16,7 @@ import { RegisterWrapperComponent } from './wrapper-components/register-wrapper.
 import { ResetPasswordWrapperComponent } from './wrapper-components/reset-password-wrapper.component';
 import { FeaturedProductsResolver } from './resolves/features-products.resolve';
 import { MeListBuyerAddressResolver } from './resolves/me.resolve';
-import { MeListProductResolver, MeListCategoriesResolver, MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
+import { MeListCategoriesResolver, MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
 import { AuthNetCreditCardService } from './services/authorize-net/authorize-net.service';
 import { AuthService } from './services/auth/auth.service';
 import { CurrentOrderService } from './services/current-order/current-order.service';
@@ -29,7 +29,7 @@ import { RouteService } from './services/route/route.service';
 import { TokenHelperService } from './services/token-helper/token-helper.service';
 import { ShopperContextService } from './services/shopper-context/shopper-context.service';
 import { ToastrModule } from 'ngx-toastr';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
 import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipments-wrapper.component';
@@ -48,7 +48,6 @@ import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipm
   providers: [
     FeaturedProductsResolver,
     MeListBuyerAddressResolver,
-    MeListProductResolver,
     MeListCategoriesResolver,
     MeProductResolver,
     MeListSpecsResolver,

@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion, ListShipment, Shipment, ShipmentItem } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion, ListShipment, Shipment, ShipmentItem, BuyerProduct } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export * from '@ordercloud/angular-sdk';
@@ -28,7 +28,7 @@ export interface IOrderHistory {
   declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<Order>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
-  listShipments(orderID?: string): Promise<MyShipment[]>;
+  listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
 }
 
 export interface IRouter {
@@ -189,12 +189,26 @@ export interface OrderDetails {
   approvals: OrderApproval[];
 }
 
-export interface MyShipment extends Shipment {
-  ShipmentItems: MyShipmentItem[];
+export interface ShipmentWithItems extends Shipment {
+  ShipmentItems: ShipmentItemWithLineItem[];
 }
 
-export interface MyShipmentItem extends ShipmentItem {
+export interface ShipmentItemWithLineItem extends ShipmentItem {
   LineItem: LineItem;
+}
+
+/**
+ * LineItem with the full product details. Currently used in the cart page only.
+ */
+export interface LineItemWithProduct extends LineItem {
+  Product?: BuyerProduct;
+}
+
+/**
+ * List of lineItems with full product details. Currently used in the cart page only.
+ */
+export interface ListLineItemWithProduct extends ListLineItem {
+  Items: Array<LineItemWithProduct>;
 }
 
 export interface AppConfig {
