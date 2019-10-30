@@ -121,7 +121,7 @@ export interface IOrderFilters {
 export interface IAuthentication {
   profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
   logout(): Promise<void>;
-  changePassword(newPassword: string): Promise<void>;
+  validateCurrentPasswordAndChangePassword(newPassword: string, currentPassword: string): Promise<void>;
   anonymousLogin(): Promise<AccessToken>;
   forgotPasssword(email: string): Promise<any>;
   register(me: MeUser): Promise<any>;

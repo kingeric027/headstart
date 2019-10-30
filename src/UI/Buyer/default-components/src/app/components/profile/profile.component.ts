@@ -42,11 +42,6 @@ export class OCMProfile extends OCMComponent implements OnInit {
     });
   }
 
-  async onChangePassword({ currentPassword, newPassword }) {
-    await this.context.authentication.profiledLogin(this.me.Username, currentPassword, false);
-    await this.context.authentication.changePassword(newPassword);
-  }
-
   async onSubmit() {
     const me: MeUser = this.form.value;
     me.Active = true;
