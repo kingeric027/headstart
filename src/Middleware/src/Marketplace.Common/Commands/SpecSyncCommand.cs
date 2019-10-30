@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Exceptions;
+using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
@@ -24,7 +25,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 obj.ID = wi.RecordId;
-                var response = await _oc.Specs.CreateAsync(obj);
+                var response = await _oc.Specs.CreateAsync(obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
@@ -32,7 +33,8 @@ namespace Marketplace.Common.Commands
                 // handle 409 errors by refreshing cache
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.CreateExistsError
+                    ErrorType = OrchestrationErrorType.CreateExistsError,
+                    Message = exId.Message
                 });
                 return await GetAsync(wi);
             }
@@ -40,9 +42,19 @@ namespace Marketplace.Common.Commands
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.CreateGeneralError
+                    ErrorType = OrchestrationErrorType.CreateGeneralError,
+                    Message = ex.Message
                 });
                 throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), ex);
+            }
+            catch (Exception e)
+            {
+                await _log.Upsert(new OrchestrationLog(wi)
+                {
+                    ErrorType = OrchestrationErrorType.CreateGeneralError,
+                    Message = e.Message
+                });
+                throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), e);
             }
         }
 

@@ -3,10 +3,10 @@
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 
 export const environment = {
-  production: true,
-  clientID: 'D89E2196-CC75-4312-A4A9-67E4CC4BEDFB',
+  production: false,
+  clientID: '24C96ECF-C39E-4D76-98BC-CD5AEB064FE4',
   buyerID: 'A',
-  buyerClientID: '97BBF2CC-59D1-449A-B67C-AE9262ADD284',
+  buyerClientID: '46AF2D29-71A7-4EA0-BDE2-BA9FCDDD8B04',
   buyerUrl: 'localhost:1000',
   middlewareUrl: 'my-middleware-url.com/api',
 };

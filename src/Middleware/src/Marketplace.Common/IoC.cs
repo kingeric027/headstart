@@ -54,8 +54,6 @@ namespace Marketplace.Common
 
             services.AddSingleton(typeof(LogQuery), typeof(LogQuery));
             services.AddCosmosStore<OrchestrationLog>(cosmosSettings);
-            services.AddSingleton(typeof(SupplierQuery), typeof(SupplierQuery));
-            services.AddCosmosStore<OrchestrationSupplier>(cosmosSettings);
         }
 
         public static ServiceProvider RegisterApiServices(this IServiceCollection services, IAppSettings settings)
@@ -75,8 +73,6 @@ namespace Marketplace.Common
 
             services.AddSingleton(typeof(LogQuery), typeof(LogQuery));
             services.AddCosmosStore<OrchestrationLog>(cosmosSettings);
-            services.AddSingleton(typeof(SupplierQuery), typeof(SupplierQuery));
-            services.AddCosmosStore<OrchestrationSupplier>(cosmosSettings);
 
             return services.BuildServiceProvider();
         }

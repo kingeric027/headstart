@@ -23,25 +23,36 @@ namespace Marketplace.Common.Commands
             var obj = wi.Current.ToObject<SpecProductAssignment>();
             try
             {
-                await _oc.Specs.SaveProductAssignmentAsync(obj);
+                await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
             {
-                // this should never occur
+                // handle 409 errors by refreshing cache
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.CreateExistsError
+                    ErrorType = OrchestrationErrorType.CreateExistsError,
+                    Message = exId.Message
                 });
-                return JObject.FromObject(obj);
+                return await GetAsync(wi);
             }
             catch (OrderCloudException ex)
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.CreateGeneralError
+                    ErrorType = OrchestrationErrorType.CreateGeneralError,
+                    Message = ex.Message
                 });
                 throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), ex);
+            }
+            catch (Exception e)
+            {
+                await _log.Upsert(new OrchestrationLog(wi)
+                {
+                    ErrorType = OrchestrationErrorType.CreateGeneralError,
+                    Message = e.Message
+                });
+                throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), e);
             }
         }
 

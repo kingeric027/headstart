@@ -29,20 +29,12 @@ namespace Marketplace.Common.Commands
         private readonly IBlobService _blob;
         private readonly IAppSettings _settings;
         private readonly LogQuery _log;
-        private readonly SupplierQuery _supplier;
 
-        public OrchestrationCommand(IAppSettings settings, IBlobService blob, LogQuery log, SupplierQuery supplier)
+        public OrchestrationCommand(IAppSettings settings, IBlobService blob, LogQuery log)
         {
             _settings = settings;
             _blob = blob;
             _log = log;
-            _supplier = supplier;
-        }
-
-        public async Task<OrchestrationSupplier> GetSupplier(string path)
-        {
-            var supplier = await _supplier.Get(path.Split("/")[0]);
-            return supplier;
         }
 
         public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user) where T : Models.IOrchestrationObject

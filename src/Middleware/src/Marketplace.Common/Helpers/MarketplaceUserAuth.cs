@@ -30,14 +30,12 @@ namespace Marketplace.Common.Helpers
     public class MarketplaceUserAuthHandler : AuthenticationHandler<MarketplaceUserAuthOptions>
     {
         private readonly IOrderCloudClient _oc;
-        private readonly SupplierQuery _supplier;
 
         public MarketplaceUserAuthHandler(IOptionsMonitor<MarketplaceUserAuthOptions> options, ILoggerFactory logger,
-            UrlEncoder encoder, ISystemClock clock, IOrderCloudClient oc, SupplierQuery supplier)
+            UrlEncoder encoder, ISystemClock clock, IOrderCloudClient oc)
             : base(options, logger, encoder, clock)
         {
             _oc = oc;
-            _supplier = supplier;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
