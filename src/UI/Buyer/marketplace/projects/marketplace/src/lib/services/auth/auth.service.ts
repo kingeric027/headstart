@@ -155,9 +155,12 @@ export class AuthService implements IAuthentication {
     }
   }
 
-  async changePassword(newPassword: string): Promise<void> {
+  async validateCurrentPasswordAndChangePassword(newPassword: string, currentPassword: string): Promise<void> {
+    // reset password route does not require old password, so we are handling that here through a login
+    await this.ocAuthService.Login(this.currentUser.get().Username, currentPassword, this.appConfig.clientID, this.appConfig.scope).toPromise();
     await this.ocMeService.ResetPasswordByToken({ NewPassword: newPassword }).toPromise();
   }
+
 
   async resetPassword(code: string, config: PasswordReset): Promise<any> {
     const reset = await this.ocPasswordResetService.ResetPasswordByVerificationCode(code, config).toPromise();
