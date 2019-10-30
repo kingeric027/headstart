@@ -15,7 +15,6 @@ import {
   LineItem,
 } from '@ordercloud/angular-sdk';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
 import { isUndefined as _isUndefined, get as _get } from 'lodash';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
@@ -42,7 +41,6 @@ export class CurrentOrderService implements ICurrentOrder {
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
     private ocPaymentService: OcPaymentService,
-    private toastrService: ToastrService,
     private paymentHelper: PaymentHelperService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
@@ -108,7 +106,7 @@ export class CurrentOrderService implements ICurrentOrder {
       return await this.patch({ BillingAddressID: addressID });
     } catch (ex) {
       if (ex.error.Errors[0].ErrorCode === 'NotFound') {
-        this.toastrService.error('You no longer have access to this saved address. Please enter or select a different one.');
+        throw Error('You no longer have access to this saved address. Please enter or select a different one.');
       }
     }
   }
@@ -118,7 +116,7 @@ export class CurrentOrderService implements ICurrentOrder {
       return await this.patch({ ShippingAddressID: addressID });
     } catch (ex) {
       if (ex.error.Errors[0].ErrorCode === 'NotFound') {
-        this.toastrService.error('You no longer have access to this saved address. Please enter or select a different one.');
+        throw Error('You no longer have access to this saved address. Please enter or select a different one.');
       }
     }
   }
