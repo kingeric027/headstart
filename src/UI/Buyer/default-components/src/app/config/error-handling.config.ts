@@ -25,7 +25,7 @@ export class AppErrorHandler extends ErrorHandler {
    */
   public displayError(ex: any): void {
     let message = '';
-    if (ex.promise && ex.rejection && ex.rejection.error) {
+    if (ex.promise && ex.rejection) {
       ex = ex.rejection;
     } 
     if (ex && ex.error && ex.error.Errors && ex.error.Errors.length) {
