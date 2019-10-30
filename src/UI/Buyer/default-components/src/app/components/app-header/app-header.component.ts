@@ -56,13 +56,16 @@ export class OCMAppHeader extends OCMComponent {
   };
 
   buildAddToCartListener() {
+    let closePopoverTimeout;
     this.context.currentOrder.addToCartSubject.subscribe((li: LineItem) => {
-      this.popover.close();
+      clearTimeout(closePopoverTimeout);
       if (li) {
         this.popover.ngbPopover = `Added ${li.Quantity} items to Cart`;
         setTimeout(() => {
-          this.popover.open();
-          setTimeout(() => {
+          if(!this.popover.isOpen()) {
+            this.popover.open();
+          }
+          closePopoverTimeout = setTimeout(() => {
             this.popover.close();
           }, 3000);
         }, 300);
