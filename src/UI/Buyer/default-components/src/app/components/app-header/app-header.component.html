@@ -100,7 +100,7 @@
             <fa-icon [icon]="faShoppingCart"></fa-icon>
             <fa-layers-counter *ngIf="order && order.LineItemCount"
                                class="badge__counter--large"
-                               [content]="12">{{order.LineItemCount}}</fa-layers-counter>
+                               [content]="order.LineItemCount"></fa-layers-counter>
           </fa-layers>
         </a>
       </li>
