@@ -26,7 +26,8 @@
             "preserveSymlinks": true,
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/web.config"
             ],
             "styles": [
               "src/styles/main.scss"
@@ -67,7 +68,11 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "default-components:build"
+            "browserTarget": "default-components:build",
+            "sourceMap": {
+              "scripts": true,
+              "vendor": true
+            }
           },
           "configurations": {
             "production": {
@@ -90,7 +95,8 @@
             "karmaConfig": "karma.conf.js",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/web.config"
             ],
             "styles": [
               "src/styles.scss"
