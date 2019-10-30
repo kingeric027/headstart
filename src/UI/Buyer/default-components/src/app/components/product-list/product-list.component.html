@@ -101,7 +101,7 @@
           </ocm-product-card>
         </div>
         <ngb-pagination *ngIf="products && products.Meta.TotalPages > 1"
-                        maxSize="10"
+                        [maxSize]="numberOfItemsInPagination"
                         class="d-flex justify-content-center"
                         [collectionSize]="products.Meta.TotalCount"
                         [pageSize]="products.Meta.PageSize"

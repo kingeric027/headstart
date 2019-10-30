@@ -5,12 +5,13 @@ import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { ModalState } from '../../models/modal-state.class';
 import { OCMComponent } from '../base-component';
 import { ProductFilters } from 'marketplace';
+import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 
 @Component({
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
-export class OCMProductList extends OCMComponent {
+export class OCMProductList extends OCMComponent implements OnInit {
   @Input() products: ListBuyerProduct;
   @Input() categories: ListCategory;
   categoryModal = ModalState.Closed;
@@ -20,11 +21,20 @@ export class OCMProductList extends OCMComponent {
   hasQueryParams = false;
   showingFavoritesOnly = false;
   closeIcon = faTimes;
+  numberOfItemsInPagination = 10;
 
   ngOnContextSet() {
     if (this.products) this.facets = this.products.Meta.Facets;
     this.context.productFilters.onFiltersChange(this.handleFiltersChange);
     this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
+  }
+
+  ngOnInit() {
+    if (getScreenSizeBreakPoint() === 'xs') {
+      this.numberOfItemsInPagination = 3;
+    } else if (getScreenSizeBreakPoint()) {
+      this.numberOfItemsInPagination = 4;
+    }
   }
 
   private handleFiltersChange = async (filters: ProductFilters) => {
