@@ -3,6 +3,7 @@ import { OCMComponent } from '../base-component';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MeUser } from '@ordercloud/angular-sdk';
 import { ValidatePhone, ValidateName, ValidateEmail } from '../../validators/validators';
+import { ToastrService } from 'ngx-toastr';
 @Component({
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
@@ -11,6 +12,10 @@ export class OCMProfile extends OCMComponent implements OnInit {
   form: FormGroup;
   me: MeUser;
   alive = true;
+
+  constructor(private toasterService: ToastrService) {
+    super();
+  }
 
   ngOnInit() {
     this.buildForm();
@@ -46,5 +51,6 @@ export class OCMProfile extends OCMComponent implements OnInit {
     const me: MeUser = this.form.value;
     me.Active = true;
     await this.context.currentUser.patch(me);
+    this.toasterService.success(`Profile Updated`);
   }
 }
