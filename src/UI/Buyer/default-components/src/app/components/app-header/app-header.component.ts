@@ -56,21 +56,18 @@ export class OCMAppHeader extends OCMComponent {
   };
 
   buildAddToCartListener() {
-    // this.context.currentOrder.addToCartSubject
-    //   .pipe(
-    //     tap((li: LineItem) => {
-    //       this.popover.close();
-    //       this.popover.ngbPopover = `Added! ${li.Quantity} in Cart`;
-    //     }),
-    //     delay(300),
-    //     tap(() => {
-    //       this.popover.open();
-    //     }),
-    //     debounceTime(3000)
-    //   )
-    //   .subscribe(() => {
-    //     this.popover.close();
-    //   });
+    this.context.currentOrder.addToCartSubject.subscribe((li: LineItem) => {
+      this.popover.close();
+      if (li) {
+        this.popover.ngbPopover = `Added ${li.Quantity} items to Cart`;
+        setTimeout(() => {
+          this.popover.open();
+          setTimeout(() => {
+            this.popover.close();
+          }, 3000);
+        }, 300);
+      }
+    });
   }
 
   searchProducts(searchStr: string) {
