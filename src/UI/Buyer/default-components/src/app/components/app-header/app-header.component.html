@@ -1,13 +1,13 @@
 <!-- TOP NAV -->
 <nav class="navbar navbar-expand navbar-light bg-white">
   <div class="container">
-    <a class="navbar-brand clickable"
+    <a class="navbar-brand clickable cursor-pointer"
        (click)="context.router.toHome()">
       <span class="d-none d-md-inline">{{appName}}</span>
       <span class="d-md-none">OCS</span>
     </a>
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item clickable"
+      <li class="nav-item clickable cursor-pointer"
           [ngClass]="{'active': activePath === '/products'}">
         <a class="nav-link"
            (click)="context.router.toProductList()">
@@ -24,7 +24,7 @@
     </div>
     <ul class="navbar-nav"
         *ngIf="!anonymous">
-      <li class="nav-item dropdown"
+      <li class="nav-item dropdown cursor-pointer"
           ngbDropdown
           placement="bottom-right">
         <div class="nav-link dropdown-toggle text-nowrap"
@@ -39,23 +39,23 @@
              aria-labelledby="account-dropdown"
              ngbDropdownMenu>
           <h6 class="dropdown-header">Hi, {{ user?.FirstName }}!</h6>
-          <a class="dropdown-item"
+          <a class="dropdown-item cursor-pointer"
              [ngClass]="{'active': activePath === '/profile/details'}"
              (click)="context.router.toMyProfile()">My Profile</a>
-          <a class="dropdown-item"
+          <a class="dropdown-item cursor-pointer"
              [ngClass]="{'active': activePath === '/profile/addresses'}"
              (click)="context.router.toMyAddresses()">Address Book</a>
-          <a class="dropdown-item"
+          <a class="dropdown-item cursor-pointer"
              [ngClass]="{'active': activePath === '/profile/payment-methods'}"
              (click)="context.router.toMyPaymentMethods()">Payment Methods</a>
-          <a class="dropdown-item"
+          <a class="dropdown-item cursor-pointer"
              [ngClass]="{'active': activePath === '/profile/orders'}"
              (click)="context.router.toMyOrders()">My Orders</a>
-          <a class="dropdown-item"
+          <a class="dropdown-item cursor-pointer"
              [ngClass]="{'active': activePath === '/profile/orders/approval'}"
              (click)="context.router.toOrdersToApprove()">Orders To Approve</a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item"
+          <a class="dropdown-item cursor-pointer"
              (click)="logout()"
              href="/login">
             <fa-icon [icon]="faSignOutAlt"></fa-icon> Logout
@@ -75,7 +75,7 @@
     <ul class="navbar-nav"
         #cartIcon
         (mouseleave)="closeMiniCart($event, popover)">
-      <li class="nav-item"
+      <li class="nav-item cursor-pointer"
           [ngbPopover]="CartHoverContent"
           #popover="ngbPopover"
           triggers="mouseenter:click"
