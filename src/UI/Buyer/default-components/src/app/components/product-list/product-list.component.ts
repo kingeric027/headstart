@@ -32,7 +32,7 @@ export class OCMProductList extends OCMComponent implements OnInit {
   ngOnInit() {
     if (getScreenSizeBreakPoint() === 'xs') {
       this.numberOfItemsInPagination = 3;
-    } else if (getScreenSizeBreakPoint()) {
+    } else if (getScreenSizeBreakPoint() === 'sm') {
       this.numberOfItemsInPagination = 4;
     }
   }
@@ -40,7 +40,7 @@ export class OCMProductList extends OCMComponent implements OnInit {
   private handleFiltersChange = async (filters: ProductFilters) => {
     this.showingFavoritesOnly = filters.showOnlyFavorites;
     this.categoryCrumbs = this.buildBreadCrumbs(filters.categoryID);
-  }
+  };
 
   clearAllFilters() {
     this.context.productFilters.clearAllFilters();
