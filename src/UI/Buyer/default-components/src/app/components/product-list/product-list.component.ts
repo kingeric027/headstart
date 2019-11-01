@@ -18,7 +18,7 @@ export class OCMProductList extends OCMComponent implements OnInit {
   facets: ListFacet[];
   favoriteProducts: string[] = [];
   categoryCrumbs: Category[] = [];
-  hasQueryParams = false;
+  hasFilters = false;
   showingFavoritesOnly = false;
   closeIcon = faTimes;
   numberOfItemsInPagination = 10;
@@ -40,7 +40,8 @@ export class OCMProductList extends OCMComponent implements OnInit {
   private handleFiltersChange = async (filters: ProductFilters) => {
     this.showingFavoritesOnly = filters.showOnlyFavorites;
     this.categoryCrumbs = this.buildBreadCrumbs(filters.categoryID);
-  };
+    this.hasFilters = this.context.productFilters.hasFilters();
+  }
 
   clearAllFilters() {
     this.context.productFilters.clearAllFilters();
