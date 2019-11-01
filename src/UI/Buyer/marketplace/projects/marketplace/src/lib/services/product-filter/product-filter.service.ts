@@ -125,6 +125,17 @@ export class ProductFilterService implements IProductFilters {
     this.patchFilterState(this.defaultParams);
   }
 
+  hasFilters(): boolean {
+    const filters = this.activeFiltersSubject.value;
+    return Object.entries(filters).some(([key, value]) => {
+      if (key === 'activeFacets') {
+        return Object.keys(value).length;
+      } else {
+        return !!value;
+      }
+    });
+  }
+
   onFiltersChange(callback: (filters: ProductFilters) => void): void {
     // todo - is there a way to prevent duplicate subscriptions?
     this.activeFiltersSubject.subscribe(callback);

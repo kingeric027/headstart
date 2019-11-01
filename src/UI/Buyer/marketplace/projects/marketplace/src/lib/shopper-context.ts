@@ -103,6 +103,7 @@ export interface IProductFilters {
   clearCategoryFilter(): void;
   filterByFavorites(showOnlyFavorites: boolean): void;
   clearAllFilters(): void;
+  hasFilters(): boolean;
   onFiltersChange(callback: (filters: ProductFilters) => void): void;
 }
 
