@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Orchestration.Common\Orchestration.Common.csproj" />
+    <ProjectReference Include="..\Marketplace.Common\Marketplace.Common.csproj" />
   </ItemGroup>
 
 </Project>

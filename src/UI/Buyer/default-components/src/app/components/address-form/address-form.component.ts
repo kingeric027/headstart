@@ -52,7 +52,7 @@ export class OMCAddressForm implements OnInit {
 
   onCountryChange(event?) {
     const country = this.addressForm.value.Country;
-    this.stateOptions = GeographyConfig.getStates(country).map((s) => s.abbreviation);
+    this.stateOptions = GeographyConfig.getStates(country).map(s => s.abbreviation);
     this.addressForm.get('Zip').setValidators([Validators.required, ValidateUSZip]);
     if (event) {
       this.addressForm.patchValue({ State: null, Zip: '' });

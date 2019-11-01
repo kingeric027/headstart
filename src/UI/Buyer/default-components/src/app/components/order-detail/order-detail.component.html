@@ -1,45 +1,62 @@
-<div class="container" *ngIf="order">
-  <div *ngIf="lineItems">
-    <ocm-order-header [context]="context" [order]="order" [approvalVersion]="true"></ocm-order-header>
-    <div class="row mb-5">
-      <div class="col-6">
-        <ocm-address-card *ngIf="lineItems[0].ShippingAddress"
-                          [address]="lineItems[0].ShippingAddress"
-                          addressTitle="Shipping Address">
-        </ocm-address-card>
-        <ocm-address-card [address]="order.BillingAddress"
-                          addressTitle="Billing Address"
-                          *ngIf="order?.BillingAddress">
-        </ocm-address-card>
+<div class="container">
+  <ocm-profile-nav [context]="context">
+    <div *ngIf="order">
+      <nav class="breadcrumb"
+           aria-label="breadcrumb">
+        <a class="breadcrumb-item link text-primary"
+           (click)="context.router.toMyOrders()">All Orders</a>
+        <a class="breadcrumb-item link text-primary"
+           aria-current="page">{{order.ID}}</a>
+      </nav>
+      <div class="pb-2 mt-4 mb-2">
+        <h2> <span class="text-muted">Order #:</span> {{order.ID}}</h2>
       </div>
-      <div class="col-6">
-        <div *ngIf="order.Comments"
-             class="alert alert-secondary small">
-          <strong>Comments: </strong> {{order.Comments}}
+      <div class="row">
+        <div class="col-md-6">
+          <div>Status:
+            <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{order.Status}}
+          </div>
+          <small class="float-left">Submitted on {{order.DateSubmitted | date: 'short'}}</small>
         </div>
-        <strong>Subtotal</strong> <span class="float-right">{{order.Subtotal | currency}}</span><br>
-        <strong>Shipping</strong> <span class="float-right">{{order.ShippingCost | currency}}</span><br>
-        <strong>Tax</strong> <span class="float-right">{{order.TaxCost | currency}}</span><br>
-        <div *ngIf="order.PromotionDiscount">
-          <strong class="text-danger">Promo Discount</strong> <span class="float-right text-danger">-{{order.PromotionDiscount | currency}}</span>
+        <div class="col-md-6">
+          <button *ngIf="!approvalVersion"
+                  class="btn btn-outline-secondary float-right"
+                  (click)="toggleFavorite(order)">Favorite
+            <ocm-toggle-favorite title="Favorite"
+                                 [favorite]="isFavorite(order.ID)">
+            </ocm-toggle-favorite>
+          </button>
+          <ocm-reorder *ngIf="!approvalVersion"
+                       class="float-right pb-2 mr-2 mb-2"
+                       [orderID]='order.ID'
+                       [context]="context"></ocm-reorder>
+          <ocm-order-approval *ngIf="approvalVersion"
+                              class="float-right"
+                              [orderID]='order.ID'
+                              [context]="context"></ocm-order-approval>
         </div>
-        <hr>
-        <div class="text-right lead"><b class="float-left">Total:</b><span class="order-total">{{order.Total | currency}}</span></div>
-        <hr>
-        <ocm-payment-list *ngIf="payments"
-                          [payments]="payments"></ocm-payment-list>
-        <hr>
-        <ul>
-          <li *ngFor="let approval of approvals">
-            {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} on {{ approval.DateCreated | date: 'short' }}
-            <div><small *ngIf="approval.Comments">"{{ approval.Comments }}"</small></div>
-          </li>
-        </ul>
       </div>
+      <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+          <button class="btn btn-link nav-link"
+                  (click)="toDetails()">
+            <fa-icon [icon]="faCube"></fa-icon>
+            Details
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="btn btn-link nav-link"
+                  (click)="toShipments()">
+            <fa-icon [icon]="faTruck"></fa-icon>
+            Shipments
+          </button>
+        </li>
+      </ul>
     </div>
-    <ocm-lineitem-table [lineitems]="lineItems"
-                        [context]="context"
-                        [readOnly]="true">
-    </ocm-lineitem-table>
-  </div>
+    <ocm-order-historical *ngIf="orderDetails && showDetails()"
+                          [context]="context"
+                          [orderDetails]="orderDetails"></ocm-order-historical>
+    <ocm-order-shipments *ngIf="showShipments()"
+                         [context]="context"></ocm-order-shipments>
+  </ocm-profile-nav>
 </div>

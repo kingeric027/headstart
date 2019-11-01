@@ -19,7 +19,7 @@ export class OCMFacetMultiSelect extends OCMComponent {
   faMinusSquare = faMinusSquare;
 
   ngOnContextSet() {
-      this.context.productFilters.onFiltersChange(this.handleFiltersChange);
+    this.context.productFilters.onFiltersChange(this.handleFiltersChange);
   }
 
   toggleCollapsed() {
@@ -41,11 +41,11 @@ export class OCMFacetMultiSelect extends OCMComponent {
     const activeFacet = _get(filters.activeFacets, this.facet.Name, null);
     this.activeFacetValues = activeFacet ? activeFacet.split('|') : [];
     this.updateCheckBoxes(this.activeFacetValues);
-  }
+  };
 
   // TODO - there is this little flash when a checkbox is click. get rid of it.
   private updateCheckBoxes(activeFacetValues: string[]) {
-    this.checkboxArray = this.facet.Values.map((facet) => {
+    this.checkboxArray = this.facet.Values.map(facet => {
       const checked = activeFacetValues.includes(facet.Value);
       return { facet, checked };
     });

@@ -63,7 +63,7 @@ describe('ProfileComponent', () => {
 
   describe('selectTab', () => {
     it('should set selectedTab to tab.display', () => {
-      component['tabs'].forEach((tab) => {
+      component['tabs'].forEach(tab => {
         component.selectTab(tab);
         expect(component.selectedTab).toBe(tab.display);
       });

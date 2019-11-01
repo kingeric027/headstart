@@ -1,15 +1,10 @@
-import {
-  map as _map,
-  find as _find,
-  minBy as _minBy,
-  sortBy as _sortBy,
-} from 'lodash';
+import { map as _map, find as _find, minBy as _minBy, sortBy as _sortBy } from 'lodash';
 import { SpecFormEvent } from './spec-form-values.interface';
 import { PriceBreak, SpecOption, BuyerSpec, ListBuyerSpec, LineItemSpec } from '@ordercloud/angular-sdk';
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SpecFormService {
   event: SpecFormEvent;
@@ -18,9 +13,9 @@ export class SpecFormService {
     this.event = {
       valid: false,
       type: '',
-      form: null
+      form: null,
     };
-   }
+  }
 
   public getSpecMarkup(specs: ListBuyerSpec, selectedBreak: PriceBreak, qty: number): number {
     const markups: Array<number> = new Array<number>();
@@ -56,11 +51,7 @@ export class SpecFormService {
     return specs;
   }
 
-  private singleSpecMarkup(
-    unitPrice: number,
-    quantity: number,
-    option: SpecOption
-  ): number {
+  private singleSpecMarkup(unitPrice: number, quantity: number, option: SpecOption): number {
     switch (option.PriceMarkupType) {
       case 'NoMarkup':
         return 0;
@@ -74,10 +65,7 @@ export class SpecFormService {
   }
 
   private getSpec(specs: ListBuyerSpec, value: any): BuyerSpec {
-    return _find(
-      specs.Items,
-      (item) => item.Name.replace(/ /g, '') === value
-    ) as BuyerSpec;
+    return _find(specs.Items, item => item.Name.replace(/ /g, '') === value) as BuyerSpec;
   }
 
   private getOption(spec: BuyerSpec, value: any): SpecOption {
@@ -93,16 +81,13 @@ export class SpecFormService {
       const o = _find(sorted, (option: SpecOption, index: number) => {
         if (sorted.length - 1 === index) {
           return sorted[index];
-        } else if (
-          +value === +option.Value ||
-          (+value > +option.Value && +value < +sorted[index + 1].Value)
-        ) {
+        } else if (+value === +option.Value || (+value > +option.Value && +value < +sorted[index + 1].Value)) {
           return sorted[index + 1];
         }
       });
       return o as SpecOption;
     }
 
-    return _find(spec.Options, (o) => o.Value === value) as SpecOption;
+    return _find(spec.Options, o => o.Value === value) as SpecOption;
   }
 }

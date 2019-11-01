@@ -8,9 +8,8 @@ describe('SpecFormTextAreaComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SpecFormTextAreaComponent ]
-    })
-    .compileComponents();
+      declarations: [SpecFormTextAreaComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

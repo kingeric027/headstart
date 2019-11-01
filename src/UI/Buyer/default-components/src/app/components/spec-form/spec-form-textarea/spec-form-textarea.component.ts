@@ -18,10 +18,7 @@ import { specErrors } from '../errors';
           [attr.maxlength]="config.max"
         ></textarea>
         <div
-          *ngIf="
-            byIndex(index).invalid &&
-            (byIndex(index).dirty || byIndex(index).touched)
-          "
+          *ngIf="byIndex(index).invalid && (byIndex(index).dirty || byIndex(index).touched)"
           alert="alert alert-danger"
         >
           <div *ngIf="byIndex(index).errors['required']">

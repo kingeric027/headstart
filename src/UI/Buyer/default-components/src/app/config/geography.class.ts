@@ -102,7 +102,7 @@ export class GeographyConfig {
   ];
 
   static getStates(countryCode): StateDefinition[] {
-    return this.states.filter((state) => state.country === countryCode);
+    return this.states.filter(state => state.country === countryCode);
   }
 
   static getCountries(): CountryDefinition[] {

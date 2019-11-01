@@ -3,12 +3,11 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using Orchestration.Common.Commands;
-using Orchestration.Common.Exceptions;
-using Orchestration.Common.Models;
-using Orchestration.Common.Queries;
-using Action = Orchestration.Common.Models.Action;
-using ApiRole = OrderCloud.SDK.ApiRole;
+using Marketplace.Common.Commands;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Models;
+using Marketplace.Common.Queries;
+using Action = Marketplace.Common.Models.Action;
 
 namespace Orchestration.ProductOrchestration
 {
@@ -17,14 +16,12 @@ namespace Orchestration.ProductOrchestration
         private readonly IOrchestrationCommand _orch;
         private readonly ISyncCommand _sync;
         private readonly LogQuery _log;
-        private readonly SupplierQuery _supplier;
 
-        public ProductOrchestrationWorkflow(IOrchestrationCommand orch, ISyncCommand sync, LogQuery log, SupplierQuery supplier)
+        public ProductOrchestrationWorkflow(IOrchestrationCommand orch, ISyncCommand sync, LogQuery log)
         {
             _orch = orch;
             _sync = sync;
             _log = log;
-            _supplier = supplier;
         }
 
         [FunctionName("ProductOrchestrationWorkflow")]
@@ -36,10 +33,11 @@ namespace Orchestration.ProductOrchestration
 
                 var wi = new WorkItem(path)
                 {
-                    Supplier = await context.CallActivityAsync<OrchestrationSupplier>("GetSupplier", path),
                     Cache = await context.CallActivityAsync<JObject>("GetCachedItem", path),
                     Current = await context.CallActivityAsync<JObject>("GetQueuedItem", path)
                 };
+                wi.Token = wi.Current["Token"].ToString();
+                wi.ClientId = wi.Current["ClientId"].ToString();
                 wi.Diff = await context.CallActivityAsync<JObject>("CalculateDiff", wi);
                 wi.Action = await context.CallActivityAsync<Action>("DetermineAction", wi);
 
@@ -63,7 +61,7 @@ namespace Orchestration.ProductOrchestration
                 await context.CallActivityAsync("UpdateCache", wi);
 
                 log.LogInformation($"{wi.RecordId}: {wi.Action.ToString()} successfully");
-                await context.CallActivityAsync<JObject>("LogEvent", new OrchestrationLog(wi));
+                await context.CallActivityAsync<Newtonsoft.Json.Linq.JObject>("LogEvent", new OrchestrationLog(wi));
             }
             catch (OrchestrationException oex)
             {
@@ -87,10 +85,7 @@ namespace Orchestration.ProductOrchestration
         public async Task LogEvent([ActivityTrigger] OrchestrationLog log) => await _log.Upsert(log);
 
         [FunctionName("RefreshCache")]
-        public async Task<JObject> RefreshCache([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
-
-        [FunctionName("GetSupplier")]
-        public async Task<OrchestrationSupplier> GetSupplier([ActivityTrigger] string path) => await _orch.GetSupplier(path);
+        public async Task<Newtonsoft.Json.Linq.JObject> RefreshCache([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
 
         [FunctionName("CleanupQueue")]
         public async Task CleanupQueue([ActivityTrigger] string path) => await _orch.CleanupQueue(path);
@@ -99,18 +94,18 @@ namespace Orchestration.ProductOrchestration
         public async Task UpdateCache([ActivityTrigger] WorkItem wi) => await _orch.SaveToCache(wi);
 
         [FunctionName("OrderCloudAction")]
-        public async Task<JObject> OrderCloudAction([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
+        public async Task<Newtonsoft.Json.Linq.JObject> OrderCloudAction([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
 
         [FunctionName("DetermineAction")]
         public async Task<Action> DetermineAction([ActivityTrigger] WorkItem wi) => await _orch.DetermineAction(wi);
 
         [FunctionName("CalculateDiff")]
-        public async Task<JObject> CalculateDiff([ActivityTrigger] WorkItem wi) => await _orch.CalculateDiff(wi);
+        public async Task<Newtonsoft.Json.Linq.JObject> CalculateDiff([ActivityTrigger] WorkItem wi) => await _orch.CalculateDiff(wi);
 
         [FunctionName("GetQueuedItem")]
-        public async Task<JObject> GetQueuedItem([ActivityTrigger] string path) => await _orch.GetQueuedItem(path);
+        public async Task<Newtonsoft.Json.Linq.JObject> GetQueuedItem([ActivityTrigger] string path) => await _orch.GetQueuedItem(path);
 
         [FunctionName("GetCachedItem")]
-        public async Task<JObject> GetCachedItem([ActivityTrigger] string path) => await _orch.GetCachedItem(path);
+        public async Task<Newtonsoft.Json.Linq.JObject> GetCachedItem([ActivityTrigger] string path) => await _orch.GetCachedItem(path);
     }
 }

@@ -1,5 +1,13 @@
 import { Component, ViewChild, ElementRef, Input, OnChanges } from '@angular/core';
-import { faSearch, faShoppingCart, faPhone, faQuestionCircle, faUserCircle, faSignOutAlt, faHome } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSearch,
+  faShoppingCart,
+  faPhone,
+  faQuestionCircle,
+  faUserCircle,
+  faSignOutAlt,
+  faHome,
+} from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
@@ -35,34 +43,34 @@ export class OCMAppHeader extends OCMComponent {
 
   ngOnContextSet() {
     this.appName = this.context.appSettings.appname;
-    this.context.currentOrder.onOrderChange((order) => (this.order = order));
-    this.context.currentUser.onIsAnonymousChange((isAnon) => (this.anonymous = isAnon));
-    this.context.currentUser.onUserChange((user) => (this.user = user));
+    this.context.currentOrder.onOrderChange(order => (this.order = order));
+    this.context.currentUser.onIsAnonymousChange(isAnon => (this.anonymous = isAnon));
+    this.context.currentUser.onUserChange(user => (this.user = user));
     this.context.productFilters.onFiltersChange(this.handleFiltersChange);
-    this.context.router.onUrlChange((path) => (this.activePath = path));
+    this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
   }
 
   handleFiltersChange = (filters: ProductFilters) => {
     this.searchTermForProducts = filters.search || '';
-  }
+  };
 
   buildAddToCartListener() {
-    // this.context.currentOrder.addToCartSubject
-    //   .pipe(
-    //     tap((li: LineItem) => {
-    //       this.popover.close();
-    //       this.popover.ngbPopover = `Added! ${li.Quantity} in Cart`;
-    //     }),
-    //     delay(300),
-    //     tap(() => {
-    //       this.popover.open();
-    //     }),
-    //     debounceTime(3000)
-    //   )
-    //   .subscribe(() => {
-    //     this.popover.close();
-    //   });
+    let closePopoverTimeout;
+    this.context.currentOrder.addToCartSubject.subscribe((li: LineItem) => {
+      clearTimeout(closePopoverTimeout);
+      if (li) {
+        this.popover.ngbPopover = `Added ${li.Quantity} items to Cart`;
+        setTimeout(() => {
+          if(!this.popover.isOpen()) {
+            this.popover.open();
+          }
+          closePopoverTimeout = setTimeout(() => {
+            this.popover.close();
+          }, 3000);
+        }, 300);
+      }
+    });
   }
 
   searchProducts(searchStr: string) {

@@ -48,7 +48,11 @@ export class OCMCheckoutPayment extends OCMComponent {
       this.form.controls.selectedPaymentMethod.setValue(method);
     }
     this.selectedPaymentMethod = this.form.get('selectedPaymentMethod').value;
-    if (this.selectedPaymentMethod !== 'SpendingAccount' && this.existingPayment && this.existingPayment.SpendingAccountID) {
+    if (
+      this.selectedPaymentMethod !== 'SpendingAccount' &&
+      this.existingPayment &&
+      this.existingPayment.SpendingAccountID
+    ) {
       this.existingPayment = null;
     }
   }

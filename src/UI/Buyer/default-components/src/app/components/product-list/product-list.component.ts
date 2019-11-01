@@ -1,20 +1,19 @@
-import { Component, Input, OnChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnChanges, ChangeDetectorRef, OnInit } from '@angular/core';
 import { ListBuyerProduct, Category, ListCategory, ListFacet } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { ModalState } from '../../models/modal-state.class';
 import { OCMComponent } from '../base-component';
-import { QuantityLimits } from '../../models/quantity-limits';
 import { ProductFilters } from 'marketplace';
+import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 
 @Component({
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
-export class OCMProductList extends OCMComponent {
+export class OCMProductList extends OCMComponent implements OnInit {
   @Input() products: ListBuyerProduct;
   @Input() categories: ListCategory;
-  @Input() quantityLimits: QuantityLimits[];
   categoryModal = ModalState.Closed;
   facets: ListFacet[];
   favoriteProducts: string[] = [];
@@ -22,17 +21,26 @@ export class OCMProductList extends OCMComponent {
   hasQueryParams = false;
   showingFavoritesOnly = false;
   closeIcon = faTimes;
+  numberOfItemsInPagination = 10;
 
   ngOnContextSet() {
-    this.facets = this.products.Meta.Facets;
+    if (this.products) this.facets = this.products.Meta.Facets;
     this.context.productFilters.onFiltersChange(this.handleFiltersChange);
-    this.context.currentUser.onFavoriteProductsChange((productIDs) => this.favoriteProducts = productIDs);
+    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
+  }
+
+  ngOnInit() {
+    if (getScreenSizeBreakPoint() === 'xs') {
+      this.numberOfItemsInPagination = 3;
+    } else if (getScreenSizeBreakPoint() === 'sm') {
+      this.numberOfItemsInPagination = 4;
+    }
   }
 
   private handleFiltersChange = async (filters: ProductFilters) => {
     this.showingFavoritesOnly = filters.showOnlyFavorites;
     this.categoryCrumbs = this.buildBreadCrumbs(filters.categoryID);
-  }
+  };
 
   clearAllFilters() {
     this.context.productFilters.clearAllFilters();
@@ -62,7 +70,7 @@ export class OCMProductList extends OCMComponent {
   }
 
   getCategory(categoryID: string): Category {
-    return this.categories.Items.find((cat) => cat.ID === categoryID);
+    return this.categories.Items.find(cat => cat.ID === categoryID);
   }
 
   openCategoryModal() {

@@ -8,13 +8,14 @@
            formControlName="quantity"
            class="form-control text-center"
            placeholder="0"
+           [attr.disabled]="disabled ? '' : null"
            style="min-width:65px"
            aria-label="Quantity Input Selector"
-           min="1"
            aria-describedby="quantity" />
     <select *ngIf="isQtyRestricted"
             class="form-control text-center"
             style="min-width:65px"
+            [attr.disabled]="disabled ? '' : null"
             formControlName="quantity"
             id="quantity">
       <option *ngFor="let qty of limits.restrictedQuantities"
@@ -24,8 +25,8 @@
     </select>
   </div>
 </form>
-<small *ngIf="form.controls['quantity'].getError('required')"
+<small *ngIf="errorMsg !== ''"
        class="alert alert-danger error-message c-error-message text-center">
-  Please enter a quantity
+  {{ errorMsg }}
   <br />
 </small>

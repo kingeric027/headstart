@@ -8,9 +8,8 @@ describe('SpecFormInputComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SpecFormNumberComponent ]
-    })
-    .compileComponents();
+      declarations: [SpecFormNumberComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

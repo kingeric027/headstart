@@ -25,6 +25,9 @@ export class AppErrorHandler extends ErrorHandler {
    */
   public displayError(ex: any): void {
     let message = '';
+    if (ex.promise && ex.rejection) {
+      ex = ex.rejection;
+    } 
     if (ex && ex.error && ex.error.Errors && ex.error.Errors.length) {
       const e = ex.error.Errors[0];
       if (e.Data && e.Data.WebhookName) {
@@ -35,8 +38,8 @@ export class AppErrorHandler extends ErrorHandler {
       } else {
         message = e.Message;
       }
-    } else if (ex && ex.error && ex.error['error_description']) {
-      message = ex.error['error_description'];
+    } else if (ex && ex.error && ex.error.error_description) {
+      message = ex.error.error_description;
     } else if (ex.error) {
       message = ex.error;
     } else if (ex.message) {
@@ -47,10 +50,7 @@ export class AppErrorHandler extends ErrorHandler {
     if (typeof message === 'object') {
       message = JSON.stringify(message);
     }
-    if (
-      message === 'Token refresh attempt not possible' ||
-      message === 'Access token is invalid or expired.'
-    ) {
+    if (message === 'Token refresh attempt not possible' || message === 'Access token is invalid or expired.') {
       // display user friendly error
       message = 'Your session has expired. Please log in.';
     }

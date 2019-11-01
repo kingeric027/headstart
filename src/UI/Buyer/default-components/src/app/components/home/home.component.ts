@@ -2,7 +2,6 @@ import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
 import { Component, Input } from '@angular/core';
 import { OCMComponent } from '../base-component';
-import { QuantityLimits } from '../../models/quantity-limits';
 
 @Component({
   templateUrl: './home.component.html',
@@ -10,7 +9,6 @@ import { QuantityLimits } from '../../models/quantity-limits';
 })
 export class OCMHomePage extends OCMComponent {
   @Input() featuredProducts: BuyerProduct[];
-  @Input() quantityLimits: QuantityLimits[];
   faBullhorn = faBullhorn;
 
   // TODO - this content may need to be managed externally somehow.
@@ -29,5 +27,4 @@ export class OCMHomePage extends OCMComponent {
   ];
 
   ngOnContextSet() {}
-
 }

@@ -22,10 +22,7 @@ export class SpecFieldDirective implements Field, OnChanges, OnInit {
   component: ComponentRef<Field>;
   components = specFormComponents;
 
-  constructor(
-    private resolver: ComponentFactoryResolver,
-    private container: ViewContainerRef
-  ) { }
+  constructor(private resolver: ComponentFactoryResolver, private container: ViewContainerRef) {}
 
   ngOnChanges() {
     if (this.component) {
@@ -43,9 +40,7 @@ export class SpecFieldDirective implements Field, OnChanges, OnInit {
         Supported types: ${supportedTypes}`
       );
     }
-    const component = this.resolver.resolveComponentFactory<Field>(
-      this.components[this.config.type]
-    );
+    const component = this.resolver.resolveComponentFactory<Field>(this.components[this.config.type]);
     this.component = this.container.createComponent(component);
     this.component.instance.config = this.config;
     this.component.instance.group = this.group;

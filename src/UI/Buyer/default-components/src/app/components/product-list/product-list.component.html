@@ -96,13 +96,12 @@
           <ocm-product-card *ngFor="let product of products.Items; let i = index"
                             class="col-sm-6 col-md-4 col-xl-3 d-flex"
                             [product]="product"
-                            [quantityLimits]="quantityLimits[i]"
                             [context]="context"
                             [isFavorite]="isFavorite(product.ID)">
           </ocm-product-card>
         </div>
         <ngb-pagination *ngIf="products && products.Meta.TotalPages > 1"
-                        maxSize="10"
+                        [maxSize]="numberOfItemsInPagination"
                         class="d-flex justify-content-center"
                         [collectionSize]="products.Meta.TotalCount"
                         [pageSize]="products.Meta.PageSize"

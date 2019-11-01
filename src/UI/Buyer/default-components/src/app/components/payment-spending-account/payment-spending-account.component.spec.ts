@@ -91,7 +91,9 @@ describe('PaymentSpendingAccountComponent', () => {
         Balance: 100,
       };
       fixture.detectChanges();
-      expect(() => component.validateAndContinue()).toThrow(new Error('This spending account is not an allowed payment method.'));
+      expect(() => component.validateAndContinue()).toThrow(
+        new Error('This spending account is not an allowed payment method.')
+      );
     });
     it('should continue if no errors', () => {
       component.selectedSpendingAccount = {

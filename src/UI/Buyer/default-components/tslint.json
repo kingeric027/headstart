@@ -6,7 +6,7 @@
     "deprecation": {
       "severity": "warning"
     },
-    "component-class-suffix": true,
+    "component-class-suffix": false,
     "contextual-lifecycle": true,
     "directive-class-suffix": true,
     "directive-selector": [
@@ -63,10 +63,13 @@
     "no-switch-case-fall-through": true,
     "no-use-before-declare": true,
     "no-var-requires": false,
+    "no-bitwise": false,
+    "no-trailing-whitespace": false,
     "object-literal-key-quotes": [
       true,
       "as-needed"
     ],
+    "align": false,
     "object-literal-sort-keys": false,
     "ordered-imports": false,
     "quotemark": [

@@ -1,7 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation, OnChanges, ChangeDetectorRef } from '@angular/core';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
-import { QuantityLimits } from '../../models/quantity-limits';
 import { OCMComponent } from '../base-component';
 
 @Component({
@@ -14,15 +13,9 @@ export class OCMProductCard extends OCMComponent {
     PriceSchedule: {},
     xp: { Images: [] },
   };
-  @Input() quantityLimits: QuantityLimits = {
-    inventory: 0,
-    maxPerOrder: 0,
-    minPerOrder: 0,
-    restrictedQuantities: [],
-  };
   @Input() set isFavorite(value: boolean) {
     this.isFav = value;
-    this.cdr.detectChanges();
+    this.cdr.detectChanges(); // TODO - remove. Solve another way.
   }
 
   isFav = false;
@@ -44,10 +37,11 @@ export class OCMProductCard extends OCMComponent {
     this.context.currentOrder.addToCart({ ProductID: this.product.ID, Quantity: this.quantity });
   }
 
+  // TODO - we need a unified getImageUrl() function
   getImageUrl() {
     const host = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
     const images = this.product.xp.Images || [];
-    const result = _map(images, (img) => {
+    const result = _map(images, img => {
       return img.Url.replace('{url}', host);
     });
     const filtered = _without(result, undefined);

@@ -1,18 +1,21 @@
 import { Injectable } from '@angular/core';
-import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLineItemService } from '@ordercloud/angular-sdk';
+import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
 import { uniqBy as _uniqBy } from 'lodash';
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
-import { IOrderHistory, OrderReorderResponse, OrderDetails } from '../../shopper-context';
+import { IOrderHistory, OrderReorderResponse, OrderDetails, ShipmentWithItems, ShipmentItemWithLineItem} from '../../shopper-context';
+import { OrderFilterService } from './order-filter.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderHistoryService implements IOrderHistory {
-  activeOrderID: string; // make this read-only
+  activeOrderID: string; // TODO - make this read-only in components
 
   constructor(
+    public filters: OrderFilterService,
     private ocOrderService: OcOrderService,
+    private ocMeService: OcMeService,
     private paymentHelper: PaymentHelperService,
     private reorderHelper: ReorderHelperService,
     private ocLineItemService: OcLineItemService
@@ -53,5 +56,23 @@ export class OrderHistoryService implements IOrderHistory {
     const approvals = await this.ocOrderService.ListApprovals('outgoing', orderID).toPromise();
     approvals.Items = approvals.Items.filter((x) => x.Approver);
     return _uniqBy(approvals.Items, (x) => x.Comments);
+  }
+
+  async listShipments(orderID: string = this.activeOrderID): Promise<ShipmentWithItems[]> {
+    const [lineItems, shipments] = await Promise.all([
+      this.ocLineItemService.List('outgoing', orderID).toPromise(),
+      this.ocMeService.ListShipments({ orderID }).toPromise()
+    ]);
+    const getShipmentItems = shipments.Items.map(shipment => this.ocMeService.ListShipmentItems(shipment.ID).toPromise());
+    const shipmentItems = (await Promise.all(getShipmentItems)).map(si => si.Items) as ShipmentItemWithLineItem[][];
+    shipments.Items.map((shipment: ShipmentWithItems, index) => {
+      shipment.ShipmentItems = shipmentItems[index];
+      shipment.ShipmentItems.map((shipmentItem: ShipmentItemWithLineItem) => {
+        shipmentItem.LineItem = lineItems.Items.find(li => li.ID === shipmentItem.LineItemID);
+        return shipmentItem;
+      });
+      return shipment;
+    });
+    return shipments.Items as ShipmentWithItems[];
   }
 }

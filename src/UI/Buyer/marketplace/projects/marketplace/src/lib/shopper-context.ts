@@ -1,4 +1,4 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion } from '@ordercloud/angular-sdk';
+import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion, ListShipment, Shipment, ShipmentItem, BuyerProduct } from '@ordercloud/angular-sdk';
 import { Observable, Subject } from 'rxjs';
 
 export * from '@ordercloud/angular-sdk';
@@ -22,10 +22,13 @@ export interface ICreditCards {
 
 export interface IOrderHistory {
   activeOrderID: string;
+
+  filters: IOrderFilters;
   approveOrder(orderID?: string, Comments?: string,  AllowResubmit?: boolean): Promise<Order>;
   declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<Order>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
+  listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
 }
 
 export interface IRouter {
@@ -43,8 +46,9 @@ export interface IRouter {
   toMyAddresses(): void;
   toMyPaymentMethods(): void;
   toMyOrders(): void;
+  toMyOrderDetails(orderID: string): void;
   toOrdersToApprove(): void;
-  toOrderDetails(orderID: string): void;
+  toOrderToAppoveDetails(orderID: string): void;
   toChangePassword(): void;
   toRoute(path: string): void;
 }
@@ -82,6 +86,7 @@ export interface ICurrentOrder {
   setShippingAddress(address: Address): Promise<Order>;
   setBillingAddressByID(addressID: string): Promise<Order>;
   setShippingAddressByID(addressID: string): Promise<Order>;
+
   onOrderChange(callback: (order: Order) => void): void;
   onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
 }
@@ -101,10 +106,22 @@ export interface IProductFilters {
   onFiltersChange(callback: (filters: ProductFilters) => void): void;
 }
 
+export interface IOrderFilters {
+  toPage(pageNumber: number): void;
+  sortBy(field: string): void;
+  searchBy(searchTerm: string): void;
+  clearSearch(): void;
+  filterByFavorites(showOnlyFavorites: boolean): void;
+  filterByStatus(status: OrderStatus): void;
+  filterByDateSubmitted(fromDate: string, toDate: string): void;
+  clearAllFilters(): void;
+  onFiltersChange(callback: (filters: ProductFilters) => void): void;
+}
+
 export interface IAuthentication {
   profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
   logout(): Promise<void>;
-  changePassword(newPassword: string): Promise<void>;
+  validateCurrentPasswordAndChangePassword(newPassword: string, currentPassword: string): Promise<void>;
   anonymousLogin(): Promise<AccessToken>;
   forgotPasssword(email: string): Promise<any>;
   register(me: MeUser): Promise<any>;
@@ -115,9 +132,35 @@ export interface ProductFilters {
   page?: number;
   sortBy?: string;
   search?: string;
-  categoryID?: string;
   showOnlyFavorites?: boolean;
+  categoryID?: string;
   activeFacets?: any;
+}
+
+export interface OrderFilters {
+  page?: number;
+  sortBy?: string;
+  search?: string;
+  showOnlyFavorites?: boolean;
+  status?: OrderStatus;
+  /**
+   * mm-dd-yyyy
+   */
+  fromDate?: string;
+  /**
+   * mm-dd-yyyy
+   */
+  toDate?: string ;
+}
+
+export enum OrderStatus {
+  AllSubmitted = '!Unsubmitted',
+  Unsubmitted = 'Unsubmitted',
+  AwaitingApproval = 'AwaitingApproval',
+  Declined = 'Declined',
+  Open = 'Open',
+  Completed = 'Completed',
+  Canceled = 'Canceled',
 }
 
 export interface AuthNetCreditCard {
@@ -144,6 +187,28 @@ export interface OrderDetails {
   promotions: ListPromotion;
   payments: ListPayment;
   approvals: OrderApproval[];
+}
+
+export interface ShipmentWithItems extends Shipment {
+  ShipmentItems: ShipmentItemWithLineItem[];
+}
+
+export interface ShipmentItemWithLineItem extends ShipmentItem {
+  LineItem: LineItem;
+}
+
+/**
+ * LineItem with the full product details. Currently used in the cart page only.
+ */
+export interface LineItemWithProduct extends LineItem {
+  Product?: BuyerProduct;
+}
+
+/**
+ * List of lineItems with full product details. Currently used in the cart page only.
+ */
+export interface ListLineItemWithProduct extends ListLineItem {
+  Items: Array<LineItemWithProduct>;
 }
 
 export interface AppConfig {

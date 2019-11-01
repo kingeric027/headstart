@@ -1,5 +1,13 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, Injector, Inject, PLATFORM_ID, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, ErrorHandler } from '@angular/core';
+import {
+  NgModule,
+  Injector,
+  Inject,
+  PLATFORM_ID,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NO_ERRORS_SCHEMA,
+  ErrorHandler,
+} from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -57,17 +65,26 @@ import { OCMPaymentMethodManagement } from './components/payment-method-manageme
 import { OCMProfile } from './components/profile/profile.component';
 import { OCMProfileNav } from './components/profile-nav/profile-nav.component';
 import { OCMOrderDetails } from './components/order-detail/order-detail.component';
-import { OCMOrderHeader } from './components/order-header/order-header.component';
 import { OCMAppFooter } from './components/app-footer/app-footer.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TreeModule } from 'angular-tree-component';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
-import { NgbCarouselModule, NgbCollapseModule, NgbPaginationModule, NgbPopoverModule,
-  NgbDropdownModule, NgbDatepickerModule, NgbAccordionModule, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbCarouselModule,
+  NgbCollapseModule,
+  NgbPaginationModule,
+  NgbPopoverModule,
+  NgbDropdownModule,
+  NgbDatepickerModule,
+  NgbAccordionModule,
+  NgbDateAdapter,
+} from '@ng-bootstrap/ng-bootstrap';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
+import { CreditCardInputDirective } from './directives/credit-card-input.directive';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
+import { CreditCardFormatPipe } from './pipes/credit-card-format.pipe';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
 import { HttpClientModule } from '@angular/common/http';
 import { OcSDKConfig } from './config/ordercloud-sdk.config';
@@ -76,6 +93,13 @@ import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
+import { OCMReorder } from './components/re-order/re-order.component';
+import { OCMOrderApproval } from './components/order-approval/order-approval.component';
+import { OCMOrderShipments } from './components/order-shipments/order-shipments.component';
+import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
+import { OCMOrderHistorical } from './components/order-historical/order-historical.component';
+import { OCMOrderHistory } from './components/order-history/order-history.component';
+
 import { SpecFieldDirective } from './components/spec-form/spec-field.directive';
 import { SpecFormCheckboxComponent } from './components/spec-form/spec-form-checkbox/spec-form-checkbox.component';
 import { SpecFormInputComponent } from './components/spec-form/spec-form-input/spec-form-input.component';
@@ -85,7 +109,8 @@ import { SpecFormRangeComponent } from './components/spec-form/spec-form-range/s
 import { SpecFormSelectComponent } from './components/spec-form/spec-form-select/spec-form-select.component';
 import { SpecFormTextAreaComponent } from './components/spec-form/spec-form-textarea/spec-form-textarea.component';
 
-const components = [ OCMProductCard,
+const components = [
+  OCMProductCard,
   OCMToggleFavorite,
   OCMQuantityInput,
   OCMProductCarousel,
@@ -132,7 +157,12 @@ const components = [ OCMProductCard,
   OCMProfile,
   OCMProfileNav,
   OCMOrderDetails,
-  OCMOrderHeader,
+  OCMAppFooter,
+  OCMReorder,
+  OCMOrderApproval,
+  OCMOrderShipments,
+  OCMOrderHistorical,
+  OCMOrderHistory,
   OCMAppFooter,
   SpecFormCheckboxComponent,
   SpecFormInputComponent,
@@ -140,7 +170,7 @@ const components = [ OCMProductCard,
   SpecFormNumberComponent,
   SpecFormRangeComponent,
   SpecFormSelectComponent,
-  SpecFormTextAreaComponent
+  SpecFormTextAreaComponent,
 ];
 
 @NgModule({
@@ -148,11 +178,15 @@ const components = [ OCMProductCard,
   declarations: [
     AppComponent,
     FormControlErrorDirective,
+    CreditCardInputDirective,
     SpecFieldDirective,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
+    CreditCardFormatPipe,
     PaymentMethodDisplayPipe,
-   ...components
+    ShipperTrackingPipe,
+    ShipperTrackingSupportedPipe,
+    ...components,
   ],
   imports: [
     BrowserModule,
@@ -176,15 +210,16 @@ const components = [ OCMProductCard,
     NgbAccordionModule,
     NgProgressModule,
     NgProgressHttpModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
   providers: [
     { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
     { provide: ErrorHandler, useClass: AppErrorHandler },
-      DatePipe, // allows us to use in class as injectable (date filter component)
+    DatePipe, // allows us to use in class as injectable (date filter component)
+    CreditCardFormatPipe,
   ],
   entryComponents: components,
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {
   constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: Object) {
@@ -240,8 +275,12 @@ export class AppModule {
     this.buildWebComponent(OCMProfile, 'ocm-profile');
 
     this.buildWebComponent(OCMOrderDetails, 'ocm-order-details');
-    this.buildWebComponent(OCMOrderHeader, 'ocm-order-header');
     this.buildWebComponent(OCMAppFooter, 'ocm-app-footer');
+    this.buildWebComponent(OCMReorder, 'ocm-reorder');
+    this.buildWebComponent(OCMOrderApproval, 'ocm-order-approval');
+    this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
+    this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
+    this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
@@ -249,10 +288,7 @@ export class AppModule {
       injector: this.injector,
       // See this issue for why this Factory, copied from Angular/elements source code is included.
       // https://github.com/angular/angular/issues/29606
-      strategyFactory: new ComponentNgElementStrategyFactory(
-        angularComponent,
-        this.injector
-      )
+      strategyFactory: new ComponentNgElementStrategyFactory(angularComponent, this.injector),
     });
     if (isPlatformBrowser(this.platformId)) {
       if (!window.customElements.get(htmlTagName)) {

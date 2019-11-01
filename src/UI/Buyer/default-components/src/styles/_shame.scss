@@ -44,7 +44,9 @@ body {
   border-left-color: $ribbon-shadow-color;
 }
 
-.cursor-pointer {
+.cursor-pointer,
+.link,
+.btn {
   cursor: $custom-range-track-cursor;
 }
 
@@ -64,7 +66,7 @@ shared-address-display {
 
 // Bootstrap IE issue with the last panel of ng-accordian
 .card-body#confirm {
-  flex:none;
+  flex: none;
 }
 .mini-cart-popover {
   .popover-body {

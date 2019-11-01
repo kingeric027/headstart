@@ -19,18 +19,11 @@ import { specErrors } from '../errors';
           [formControlName]="config.name"
         />
         <div
-          *ngIf="
-            byIndex(index).invalid &&
-            (byIndex(index).dirty || byIndex(index).touched)
-          "
+          *ngIf="byIndex(index).invalid && (byIndex(index).dirty || byIndex(index).touched)"
           alert="alert alert-danger"
         >
           <div
-            *ngIf="
-              byIndex(index).errors['required'] ||
-              byIndex(index).errors['min'] ||
-              byIndex(index).errors['max']
-            "
+            *ngIf="byIndex(index).errors['required'] || byIndex(index).errors['min'] || byIndex(index).errors['max']"
           >
             <div *ngIf="byIndex(index).errors['required']">
               {{ errorMsgs.required }}

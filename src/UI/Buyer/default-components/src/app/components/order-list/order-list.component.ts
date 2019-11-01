@@ -50,6 +50,6 @@ export class OCMOrderList extends OCMComponent {
   }
 
   toOrderDetails(orderID: string) {
-    this.context.router.toOrderDetails(orderID);
+    this.context.router.toMyOrderDetails(orderID);
   }
 }

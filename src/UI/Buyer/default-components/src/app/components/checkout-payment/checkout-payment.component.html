@@ -28,6 +28,9 @@
                             (continue)="onContinueClicked()">
 </ocm-payment-purchase-order>
 <ocm-payment-spending-account *ngIf="selectedPaymentMethod === 'SpendingAccount'"
-                              [context]="context" 
+                              [context]="context"
                               [payment]="existingPayment"
                               (continue)="onContinueClicked()">></ocm-payment-spending-account>
+<ocm-credit-card-form *ngIf="selectedPaymentMethod === 'CreditCard'"
+                      [submitText]="'Use'"
+                      (formSubmitted)="addCard($event.detail)"></ocm-credit-card-form>

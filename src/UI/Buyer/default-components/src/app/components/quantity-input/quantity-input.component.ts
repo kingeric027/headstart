@@ -3,19 +3,25 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { get as _get } from 'lodash';
 import { OCMComponent } from '../base-component';
-import { QuantityLimits } from '../../models/quantity-limits';
+import { BuyerProduct } from '@ordercloud/angular-sdk';
 
 @Component({
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
 })
 export class OCMQuantityInput extends OCMComponent implements OnInit {
-  @Input() limits: QuantityLimits;
   @Input() existingQty: number;
-  @Output() qtyChange = new EventEmitter<number>();
+  @Input() product: BuyerProduct;
+  @Output() qtyChange = new EventEmitter<{ qty: number; valid: boolean }>();
+  // TODO - replace with real product info
 
   form: FormGroup;
   isQtyRestricted = false;
+  errorMsg = '';
+  inventory: number;
+  min: number;
+  max: number;
+  disabled = false;
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -24,46 +30,82 @@ export class OCMQuantityInput extends OCMComponent implements OnInit {
   }
 
   ngOnContextSet(): void {
-    this.isQtyRestricted = this.limits.restrictedQuantities.length !== 0;
-    this.form.setValue({ quantity: this.getDefaultQty() }); // capture default once inputs are set
+    this.isQtyRestricted = this.product.PriceSchedule.RestrictedQuantity;
+    this.inventory = this.getInventory(this.product);
+    this.min = this.minQty(this.product);
+    this.max = this.maxQty(this.product);
+    if (this.inventory < this.min) {
+      this.errorMsg = 'Out of stock.';
+      this.disabled = true;
+    }
+    this.form.setValue({ quantity: this.getDefaultQty() });
     this.quantityChangeListener();
     if (!this.existingQty) {
-      this.qtyChange.emit(this.form.get('quantity').value);
+      this.emit(this.form.get('quantity').value);
     }
   }
 
   quantityChangeListener(): void {
     // TODO - 200 might be too short for the cart page. But 500 was too long for product list.
     this.form.valueChanges.pipe(debounceTime(200)).subscribe(() => {
-      if (this.form.valid && !isNaN(this.form.value.quantity)) {
-        this.qtyChange.emit(this.form.value.quantity);
-      }
+      this.emit(this.form.value.quantity);
     });
+  }
+
+  emit(qty: number) {
+    this.qtyChange.emit({ qty, valid: this.validateQty(qty) });
+  }
+
+  validateQty(qty: number): boolean {
+    if (isNaN(qty)) {
+      this.errorMsg = 'Please Enter a Quantity';
+      return false;
+    }
+    if (qty < this.min) {
+      this.errorMsg = `At least ${this.min} must be ordered.`;
+      return false;
+    }
+    if (qty > this.inventory) {
+      this.errorMsg = `Only ${this.inventory} available in inventory.`;
+      return false;
+    }
+    if (qty > this.max) {
+      this.errorMsg = `At most ${this.max} allowed per order.`;
+      return false;
+    }
+    this.errorMsg = '';
+    return true;
   }
 
   getDefaultQty(): number {
     if (this.existingQty) return this.existingQty;
-    if (this.limits.restrictedQuantities.length) return this.limits.restrictedQuantities[0];
-    return this.limits.minPerOrder;
+    if (this.product.PriceSchedule.RestrictedQuantity) return this.product.PriceSchedule.PriceBreaks[0].Quantity;
+    return this.product.PriceSchedule.MinQuantity;
   }
 
-  // TODO - handle these error situations
+  minQty(product: BuyerProduct): number {
+    if (product.PriceSchedule && product.PriceSchedule.MinQuantity) {
+      return product.PriceSchedule.MinQuantity;
+    }
+    return 1;
+  }
 
-  // if (inventory < min) {
-  //   error.ProductQuantityError.message = `Out of stock.`;
-  //   error.ProductQuantityError.outOfStock = true;
-  //   return error;
-  // }
-  // if (qty < min) {
-  //   error.ProductQuantityError.message = `At least ${min} must be ordered.`;
-  //   return error;
-  // }
-  // if (qty > inventory) {
-  //   error.ProductQuantityError.message = `Only ${inventory} available in inventory.`;
-  //   return error;
-  // }
-  // if (qty > max) {
-  //   error.ProductQuantityError.message = `At most ${max} allowed per order.`;
-  //   return error;
-  // }
+  maxQty(product: BuyerProduct): number {
+    if (product.PriceSchedule && product.PriceSchedule.MaxQuantity != null) {
+      return product.PriceSchedule.MaxQuantity;
+    }
+    return Infinity;
+  }
+
+  getInventory(product: BuyerProduct): number {
+    if (
+      product.Inventory &&
+      product.Inventory.Enabled &&
+      !product.Inventory.OrderCanExceed &&
+      product.Inventory.QuantityAvailable != null
+    ) {
+      return product.Inventory.QuantityAvailable;
+    }
+    return Infinity;
+  }
 }

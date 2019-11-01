@@ -1,10 +1,17 @@
-import { Component, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
-import { map as _map, without as _without, uniqBy as _uniq, some as _some,
-  find as _find, difference as _difference, minBy as _minBy, has as _has } from 'lodash';
+import {
+  map as _map,
+  without as _without,
+  uniqBy as _uniq,
+  some as _some,
+  find as _find,
+  difference as _difference,
+  minBy as _minBy,
+  has as _has,
+} from 'lodash';
 import { OCMComponent } from '../base-component';
-import { QuantityLimits } from '../../models/quantity-limits';
 import { SpecFormService } from '../spec-form/spec-form.service';
 
 @Component({
@@ -14,7 +21,6 @@ import { SpecFormService } from '../spec-form/spec-form.service';
 export class OCMProductDetails extends OCMComponent {
   @Input() specs: ListSpec;
   @Input() product: BuyerProduct;
-  @Input() quantityLimits: QuantityLimits;
 
   specFormService: SpecFormService;
   isOrderable = false;
@@ -23,8 +29,9 @@ export class OCMProductDetails extends OCMComponent {
   relatedProducts$: Observable<BuyerProduct[]>;
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
+  qtyValid = true;
 
-  constructor(private changeDetectorRef: ChangeDetectorRef, private formService: SpecFormService) {
+  constructor(private formService: SpecFormService) {
     super();
     this.specFormService = formService;
   }
@@ -32,7 +39,7 @@ export class OCMProductDetails extends OCMComponent {
   ngOnContextSet() {
     this.isOrderable = !!this.product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
-    this.context.currentUser.onFavoriteProductsChange((productIDs) => (this.favoriteProducts = productIDs));
+    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
     this.specFormService.event.valid = this.specs.Items.length === 0;
   }
 
@@ -43,16 +50,19 @@ export class OCMProductDetails extends OCMComponent {
     }
   }
 
-  qtyChange(event): void {
-    this.quantity = event.detail;
-    this.getTotalPrice();
+  qtyChange(event: { qty: number, valid: boolean }): void {
+    this.qtyValid = event.valid;
+    if (this.qtyValid) {
+      this.quantity = event.qty;
+      this.getTotalPrice();
+    }
   }
 
   addToCart(event: any): void {
     this.context.currentOrder.addToCart({
       ProductID: this.product.ID,
       Quantity: this.quantity,
-      Specs: this.specFormService.getLineItemSpecs(this.specs)
+      Specs: this.specFormService.getLineItemSpecs(this.specs),
     });
   }
 
@@ -60,31 +70,27 @@ export class OCMProductDetails extends OCMComponent {
     // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
     // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
     // is the cost per item.
-    if (
-      !this.product.PriceSchedule &&
-      !this.product.PriceSchedule.PriceBreaks.length
-    ) {
+    if (!this.product.PriceSchedule && !this.product.PriceSchedule.PriceBreaks.length) {
       return 0;
     }
     const priceBreaks = this.product.PriceSchedule.PriceBreaks;
     const startingBreak = _minBy(priceBreaks, 'Quantity');
 
     const selectedBreak = priceBreaks.reduce((current, candidate) => {
-      return candidate.Quantity > current.Quantity && candidate.Quantity <= this.quantity
-        ? candidate
-        : current;
+      return candidate.Quantity > current.Quantity && candidate.Quantity <= this.quantity ? candidate : current;
     }, startingBreak);
     this.price = this.specFormService.event.valid
       ? this.specFormService.getSpecMarkup(this.specs, selectedBreak, this.quantity || startingBreak.Quantity)
       : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
   }
 
+  // TODO - we need a unified getImageUrl() function
   getImageUrls(): string[] {
     const images =
       _uniq(this.product.xp.Images, (img: any) => {
         return img.Url;
       }) || [];
-    const result = _map(images, (img) => {
+    const result = _map(images, img => {
       return img.Url.replace('{url}', this.context.appSettings.cmsUrl);
     });
     return _without(result, undefined) as string[];
