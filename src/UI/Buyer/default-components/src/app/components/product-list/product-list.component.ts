@@ -40,7 +40,7 @@ export class OCMProductList extends OCMComponent implements OnInit {
   private handleFiltersChange = async (filters: ProductFilters) => {
     this.showingFavoritesOnly = filters.showOnlyFavorites;
     this.categoryCrumbs = this.buildBreadCrumbs(filters.categoryID);
-    this.hasFilters = this.checkIfFiltersAreApplied(filters);
+    this.hasFilters = this.context.productFilters.hasFilters();
   }
 
   clearAllFilters() {
@@ -80,18 +80,5 @@ export class OCMProductList extends OCMComponent implements OnInit {
 
   isFavorite(productID: string): boolean {
     return this.favoriteProducts.includes(productID);
-  }
-
-  checkIfFiltersAreApplied(filters: ProductFilters): boolean {
-    console.log(filters);
-    return Object.entries(filters).some(([key, value]) => {
-      console.log(key);
-      console.log(!!value);
-      if (key === 'activeFacets' && Object.keys(value).length) {
-        return true;
-      } else {
-        return !!value;
-      }
-    });
   }
 }
