@@ -75,7 +75,6 @@ export class OrderFilterService implements IOrderFilters {
 
   private getDefaultParms() {
     // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
-    console.log('using new function')
     return {
       page: undefined,
       sortBy: undefined,

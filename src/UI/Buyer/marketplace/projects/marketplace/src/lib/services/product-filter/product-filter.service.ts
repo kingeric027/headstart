@@ -28,7 +28,6 @@ export class ProductFilterService implements IProductFilters {
       if (this.router.url.startsWith('/products')) {
         this.readFromUrlQueryParams(params);
       } else {
-        // making deep copy of object to avoid pass by reference bugs
         this.activeFiltersSubject.next(this.getDefaultParms());
       }
     });
@@ -73,8 +72,6 @@ export class ProductFilterService implements IProductFilters {
   }
 
   private getDefaultParms() {
-    console.log('using new function')
-
     // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
     return {
       page: undefined,
