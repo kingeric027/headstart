@@ -12,16 +12,7 @@ import { filter } from 'rxjs/operators';
 export class OrderFilterService implements IOrderFilters {
   activeOrderID: string; // TODO - make this read-only in components
 
-  private readonly defaultParams = {
-    page: undefined,
-    sortBy: undefined,
-    search: undefined,
-    status: OrderStatus.AllSubmitted,
-    showOnlyFavorites: false,
-    fromDate: undefined,
-    toDate: undefined,
-  };
-  private activeFiltersSubject: BehaviorSubject<OrderFilters> = new BehaviorSubject<OrderFilters>(this.defaultParams);
+  private activeFiltersSubject: BehaviorSubject<OrderFilters> = new BehaviorSubject<OrderFilters>(this.getDefaultParms());
 
   constructor(
     private ocMeService: OcMeService,
@@ -67,7 +58,7 @@ export class OrderFilterService implements IOrderFilters {
   }
 
   clearAllFilters(): void {
-    this.patchFilterState(this.defaultParams);
+    this.patchFilterState(this.getDefaultParms());
   }
 
   onFiltersChange(callback: (filters: OrderFilters) => void): void {
@@ -80,6 +71,20 @@ export class OrderFilterService implements IOrderFilters {
     const status = params.status || OrderStatus.AllSubmitted;
     const showOnlyFavorites = !!params.favorites;
     this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate });
+  }
+
+  private getDefaultParms() {
+    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
+    console.log('using new function')
+    return {
+      page: undefined,
+      sortBy: undefined,
+      search: undefined,
+      status: OrderStatus.AllSubmitted,
+      showOnlyFavorites: false,
+      fromDate: undefined,
+      toDate: undefined,
+    };
   }
 
   // Used to update the URL

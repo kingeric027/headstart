@@ -13,20 +13,10 @@ import { cloneDeep as _cloneDeep } from 'lodash';
   providedIn: 'root',
 })
 export class ProductFilterService implements IProductFilters {
-  private readonly defaultParams = {
-    page: undefined,
-    sortBy: undefined,
-    search: undefined,
-    categoryID: undefined,
-    showOnlyFavorites: false,
-    activeFacets: {},
-  };
-
   // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
   private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
 
-  // making deep copy of object to avoid pass by reference bugs
-  private activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(_cloneDeep(this.defaultParams));
+  private activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(this.getDefaultParms());
 
   constructor(
     private router: Router,
@@ -39,7 +29,7 @@ export class ProductFilterService implements IProductFilters {
         this.readFromUrlQueryParams(params);
       } else {
         // making deep copy of object to avoid pass by reference bugs
-        this.activeFiltersSubject.next(_cloneDeep(this.defaultParams));
+        this.activeFiltersSubject.next(this.getDefaultParms());
       }
     });
   }
@@ -80,6 +70,20 @@ export class ProductFilterService implements IProductFilters {
     const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
     const queryParams = this.mapToUrlQueryParams(activeFilters);
     this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
+  }
+
+  private getDefaultParms() {
+    console.log('using new function')
+
+    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
+    return {
+      page: undefined,
+      sortBy: undefined,
+      search: undefined,
+      categoryID: undefined,
+      showOnlyFavorites: false,
+      activeFacets: {},
+    };
   }
 
   toPage(pageNumber: number) {
@@ -125,8 +129,7 @@ export class ProductFilterService implements IProductFilters {
   }
 
   clearAllFilters() {
-    // making deep copy of object to avoid pass by reference bugs
-    this.patchFilterState(_cloneDeep(this.defaultParams));
+    this.patchFilterState(this.getDefaultParms());
   }
 
   hasFilters(): boolean {
