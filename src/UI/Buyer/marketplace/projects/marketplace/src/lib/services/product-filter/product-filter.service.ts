@@ -6,6 +6,7 @@ import { CurrentUserService } from '../current-user/current-user.service';
 import { IProductFilters, ProductFilters } from '../../shopper-context';
 import { OcMeService, ListProduct } from '@ordercloud/angular-sdk';
 import { filter } from 'rxjs/operators';
+import { cloneDeep as _cloneDeep } from 'lodash';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -24,7 +25,7 @@ export class ProductFilterService implements IProductFilters {
   // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
   private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
 
-  private activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(this.defaultParams);
+  private activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(_cloneDeep(this.defaultParams));
 
   constructor(
     private router: Router,
@@ -36,7 +37,7 @@ export class ProductFilterService implements IProductFilters {
       if (this.router.url.startsWith('/products')) {
         this.readFromUrlQueryParams(params);
       } else {
-        this.activeFiltersSubject.next(this.defaultParams);
+        this.activeFiltersSubject.next(_cloneDeep(this.defaultParams));
       }
     });
   }
@@ -122,7 +123,7 @@ export class ProductFilterService implements IProductFilters {
   }
 
   clearAllFilters() {
-    this.patchFilterState(this.defaultParams);
+    this.patchFilterState(_cloneDeep(this.defaultParams));
   }
 
   hasFilters(): boolean {
