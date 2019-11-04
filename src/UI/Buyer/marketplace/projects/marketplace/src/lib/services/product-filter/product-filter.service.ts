@@ -25,6 +25,7 @@ export class ProductFilterService implements IProductFilters {
   // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
   private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
 
+  // making deep copy of object to avoid pass by reference bugs
   private activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(_cloneDeep(this.defaultParams));
 
   constructor(
@@ -37,6 +38,7 @@ export class ProductFilterService implements IProductFilters {
       if (this.router.url.startsWith('/products')) {
         this.readFromUrlQueryParams(params);
       } else {
+        // making deep copy of object to avoid pass by reference bugs
         this.activeFiltersSubject.next(_cloneDeep(this.defaultParams));
       }
     });
@@ -123,6 +125,7 @@ export class ProductFilterService implements IProductFilters {
   }
 
   clearAllFilters() {
+    // making deep copy of object to avoid pass by reference bugs
     this.patchFilterState(_cloneDeep(this.defaultParams));
   }
 
