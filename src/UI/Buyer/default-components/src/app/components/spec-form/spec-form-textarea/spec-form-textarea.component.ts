@@ -7,13 +7,13 @@ import { specErrors } from '../errors';
 @Component({
   selector: 'spec-form-textarea',
   template: `
-    <div class="col-md-12" [formGroup]="group">
+    <div [formGroup]="group">
       <div class="form-input">
         <label>{{ config.label }}</label>
         <textarea
           type="text"
           [formControlName]="config.name"
-          class="form-control text-area"
+          class="form-control form-control-sm text-area"
           [attr.rows]="config.rows"
           [attr.maxlength]="config.max"
         ></textarea>
