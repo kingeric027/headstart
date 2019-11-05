@@ -6,25 +6,17 @@ import { CurrentUserService } from '../current-user/current-user.service';
 import { IProductFilters, ProductFilters } from '../../shopper-context';
 import { OcMeService, ListProduct } from '@ordercloud/angular-sdk';
 import { filter } from 'rxjs/operators';
+import { cloneDeep as _cloneDeep } from 'lodash';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',
 })
 export class ProductFilterService implements IProductFilters {
-  private readonly defaultParams = {
-    page: undefined,
-    sortBy: undefined,
-    search: undefined,
-    categoryID: undefined,
-    showOnlyFavorites: false,
-    activeFacets: {},
-  };
-
   // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
   private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
 
-  private activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(this.defaultParams);
+  private activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(this.getDefaultParms());
 
   constructor(
     private router: Router,
@@ -36,7 +28,7 @@ export class ProductFilterService implements IProductFilters {
       if (this.router.url.startsWith('/products')) {
         this.readFromUrlQueryParams(params);
       } else {
-        this.activeFiltersSubject.next(this.defaultParams);
+        this.activeFiltersSubject.next(this.getDefaultParms());
       }
     });
   }
@@ -77,6 +69,18 @@ export class ProductFilterService implements IProductFilters {
     const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
     const queryParams = this.mapToUrlQueryParams(activeFilters);
     this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
+  }
+
+  private getDefaultParms() {
+    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
+    return {
+      page: undefined,
+      sortBy: undefined,
+      search: undefined,
+      categoryID: undefined,
+      showOnlyFavorites: false,
+      activeFacets: {},
+    };
   }
 
   toPage(pageNumber: number) {
@@ -122,7 +126,7 @@ export class ProductFilterService implements IProductFilters {
   }
 
   clearAllFilters() {
-    this.patchFilterState(this.defaultParams);
+    this.patchFilterState(this.getDefaultParms());
   }
 
   hasFilters(): boolean {

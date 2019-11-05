@@ -61,16 +61,12 @@ export class OCMQuantityInput extends OCMComponent implements OnInit {
       this.errorMsg = 'Please Enter a Quantity';
       return false;
     }
-    if (qty < this.min) {
-      this.errorMsg = `At least ${this.min} must be ordered.`;
+    if (qty < this.min || qty > this.max) {
+      this.errorMsg = `Please order a quantity between ${this.min}-${this.max}.`;
       return false;
     }
     if (qty > this.inventory) {
       this.errorMsg = `Only ${this.inventory} available in inventory.`;
-      return false;
-    }
-    if (qty > this.max) {
-      this.errorMsg = `At most ${this.max} allowed per order.`;
       return false;
     }
     this.errorMsg = '';
