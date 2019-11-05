@@ -29,7 +29,7 @@ export class OCMChangePasswordForm extends OCMComponent implements OnInit {
     this.form = new FormGroup({
       currentPassword: new FormControl('', Validators.required),
       newPassword: new FormControl('', [Validators.required, ValidateStrongPassword]),
-      confirmNewPassword: new FormControl('', ValidateFieldMatches('newPassword')),
+      confirmNewPassword: new FormControl('', [ValidateFieldMatches('newPassword'), Validators.required]),
     });
   }
 
