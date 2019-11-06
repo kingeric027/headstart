@@ -15,6 +15,7 @@ import {
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
 import { AppStateService } from '@app-seller/shared';
+import { MarketMangagerHeaderConfig } from './header.config';
 
 @Component({
   selector: 'layout-header',
@@ -31,6 +32,8 @@ export class HeaderComponent implements OnInit {
   faSitemap = faSitemap;
   faUserCircle = faUserCircle;
 
+  headerConfig: HeaderNav[];
+
   constructor(
     private ocTokenService: OcTokenService,
     private router: Router,
@@ -38,11 +41,23 @@ export class HeaderComponent implements OnInit {
     @Inject(applicationConfiguration) protected appConfig: AppConfig
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.headerConfig = MarketMangagerHeaderConfig;
+  }
 
   logout() {
     this.ocTokenService.RemoveAccess();
     this.appStateService.isLoggedIn.next(false);
     this.router.navigate(['/login']);
   }
+}
+
+export interface Route {
+  title: string;
+  route: string;
+}
+
+export interface HeaderNav {
+  title: string;
+  routes: Route[];
 }

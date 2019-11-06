@@ -39,81 +39,13 @@
 </nav>
 <div class="bg-secondary">
   <div class="d-flex">
-    <div class="dropdown text-center flex-fill py-2">
-      <a class="text-white"
-         routerLink="/products">Products
+    <div class="dropdown text-center flex-fill py-2"
+         *ngFor="let nav of headerConfig">
+      <a class="text-white">{{ nav.title }}
       </a>
       <div class="dropdown-content mt-2">
-        <a href="#">All Products</a>
-        <a href="#">Live Products</a>
-        <a href="#">Pending Products</a>
-        <a href="#">Promotions</a>
-        <a href="#">Categories</a>
-      </div>
-    </div>
-    <div class="dropdown text-center flex-fill py-2">
-      <a class="text-white"
-         routerLink="/products">Orders
-      </a>
-      <div class="dropdown-content mt-2">
-        <a href="#">All Orders</a>
-        <a href="#">Open Orders</a>
-        <a href="#">Awaiting Approval</a>
-        <a href="#">Shipped Orders</a>
-        <a href="#">Canceled Orders</a>
-      </div>
-    </div>
-    <div class="dropdown text-center flex-fill py-2">
-      <a class="text-white"
-         routerLink="/products">Buyer Orgs
-      </a>
-      <div class="dropdown-content mt-2">
-        <a href="#">Users</a>
-        <a href="#">User Groups</a>
-        <a href="#">Addresses</a>
-        <a href="#">Payment Methods</a>
-        <a href="#">Approval Rules</a>
-      </div>
-    </div>
-    <div class="dropdown text-center flex-fill py-2">
-      <a class="text-white"
-         routerLink="/products">Seller Orgs
-      </a>
-      <div class="dropdown-content mt-2">
-        <a href="#">Users</a>
-        <a href="#">User Groups</a>
-        <a href="#">Addresses</a>
-        <a href="#">Tax Profile</a>
-        <a href="#">Notification Management</a>
-      </div>
-    </div>
-    <div class="dropdown text-center flex-fill py-2">
-      <a class="text-white"
-         routerLink="/products">Suppliers
-      </a>
-      <div class="dropdown-content mt-2">
-        <a href="#">Users</a>
-        <a href="#">User Groups</a>
-        <a href="#">Addresses</a>
-      </div>
-    </div>
-    <div class="dropdown text-center flex-fill py-2">
-      <a class="text-white"
-         routerLink="/products">Reporting
-      </a>
-      <div class="dropdown-content mt-2">
-        <a href="#">Product Reports</a>
-        <a href="#">Order Reports</a>
-        <a href="#">Buyer User Reports</a>
-        <a href="#">Ect...</a>
-      </div>
-    </div>
-    <div class="dropdown text-center flex-fill py-2">
-      <a class="text-white"
-         routerLink="/products">Marketplaces
-      </a>
-      <div class="dropdown-content mt-2">
-        <a href="#">+ Add a Storefront</a>
+        <a [routerLink]="route.route"
+           *ngFor="let route of nav.routes">{{ route.title }}</a>
       </div>
     </div>
   </div>
