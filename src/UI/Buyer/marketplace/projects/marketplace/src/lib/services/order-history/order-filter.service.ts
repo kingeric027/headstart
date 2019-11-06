@@ -90,17 +90,25 @@ export class OrderFilterService implements IOrderFilters {
 
   // Used in requests to the OC API
   async listOrders(): Promise<ListOrder> {
+    return await this.ocMeService.ListOrders(this.createListOptions()).toPromise();
+  }
+
+  async listApprovableOrders(): Promise<ListOrder> {
+    return await this.ocMeService.ListApprovableOrders(this.createListOptions()).toPromise();
+  }
+
+  private createListOptions() {
     const { page, sortBy, search, showOnlyFavorites, status, fromDate, toDate } = this.activeFiltersSubject.value;
     const from = fromDate ? `>${fromDate}` : undefined;
     const to = toDate ? `<${toDate}` : undefined;
     const favorites = this.currentUser.favoriteOrderIDs.join('|') || undefined;
-    return await this.ocMeService.ListOrders({ page, search, sortBy,
+    return { page, search, sortBy,
       filters: {
         ID: showOnlyFavorites ? favorites : undefined,
         Status: status,
         DateSubmitted: [from, to].filter(x => x)
       },
-    }).toPromise();
+    };
   }
 
   private patchFilterState(patch: OrderFilters) {

@@ -67,7 +67,7 @@ export class OrdersToApproveWrapperComponent implements OnInit, OnDestroy {
   }
 
   setOrders = async () => {
-    this.orders = await this.orderFilters.listOrders();
+    this.orders = await this.orderFilters.listApprovableOrders();
   }
 
   ngOnDestroy() {
