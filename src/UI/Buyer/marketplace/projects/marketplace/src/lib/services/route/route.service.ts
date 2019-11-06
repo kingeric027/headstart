@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { ProductFilterService } from '../product-filter/product-filter.service';
 import { filter, map } from 'rxjs/operators';
-import { IRouter, ProductFilters, OrderFilters } from '../../shopper-context';
+import { IRouter, ProductFilters, OrderFilters, OrderStatus } from '../../shopper-context';
 import { OrderFilterService } from '../order-history/order-filter.service';
 
 @Injectable({
@@ -70,6 +70,10 @@ export class RouteService implements IRouter {
   }
 
   toMyOrders(options: OrderFilters = {}): void {
+    // routing directly to unsubmitted orders
+    if (!options.status) {
+      options.status = OrderStatus.AllSubmitted;
+    }
     const queryParams = this.orderFilterService.mapToUrlQueryParams(options);
     this.router.navigate([`/profile/orders`], { queryParams });
   }
