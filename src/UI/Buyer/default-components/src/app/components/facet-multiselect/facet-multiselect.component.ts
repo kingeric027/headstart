@@ -4,6 +4,7 @@ import { each as _each, get as _get, xor as _xor } from 'lodash';
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
 import { OCMComponent } from '../base-component';
 import { ProductFilters } from 'marketplace';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   templateUrl: './facet-multiselect.component.html',
@@ -19,7 +20,7 @@ export class OCMFacetMultiSelect extends OCMComponent {
   faMinusSquare = faMinusSquare;
 
   ngOnContextSet() {
-    this.context.productFilters.onFiltersChange(this.handleFiltersChange);
+    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
   }
 
   toggleCollapsed() {

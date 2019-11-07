@@ -12,7 +12,6 @@ import { DatePipe } from '@angular/common';
   styleUrls: ['./order-date-filter.component.scss'],
 })
 export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestroy {
-  private alive = true;
   faCalendar = faCalendar;
   faTimes = faTimes;
   form: FormGroup;
@@ -30,7 +29,7 @@ export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestro
   }
 
   ngOnContextSet() {
-    this.context.orderHistory.filters.onFiltersChange(this.handlefiltersChange);
+    this.context.orderHistory.filters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handlefiltersChange);
   }
 
   handlefiltersChange = (filters: OrderFilters) => {
@@ -67,10 +66,6 @@ export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestro
   clearFromDate() {
     this.form.get('fromDate').setValue(null);
     this.doFilter();
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
   }
 
   private formatDate(date: Date): string {

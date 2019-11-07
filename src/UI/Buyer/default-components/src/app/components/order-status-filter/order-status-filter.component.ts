@@ -2,6 +2,7 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { OrderStatus, OrderFilters } from 'marketplace';
 import { OCMComponent } from '../base-component';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   templateUrl: './order-status-filter.component.html',
@@ -25,7 +26,7 @@ export class OCMOrderStatusFilter extends OCMComponent implements OnInit {
   }
 
   ngOnContextSet() {
-    this.context.orderHistory.filters.onFiltersChange((filters: OrderFilters) => {
+    this.context.orderHistory.filters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe((filters: OrderFilters) => {
       this.form.setValue({ status: filters.status });
     });
   }
