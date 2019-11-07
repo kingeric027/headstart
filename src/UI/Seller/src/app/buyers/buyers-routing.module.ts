@@ -24,19 +24,19 @@ const routes: Routes = [
   { path: ':buyerID/users', component: BuyerUserListComponent },
   { path: ':buyerID/users/new', component: BuyerUserCreateComponent },
   { path: ':buyerID/users/:userID', component: BuyerUserDetailsComponent },
-  { path: ':buyerID/locations/', component: BuyerLocationListComponent },
+  { path: ':buyerID/locations', component: BuyerLocationListComponent },
   { path: ':buyerID/locations/new', component: BuyerLocationCreateComponent },
   {
     path: ':buyerID/locations/:locationID',
     component: BuyerLocationDetailsComponent,
   },
-  { path: ':buyerID/payments/', component: BuyerPaymentListComponent },
+  { path: ':buyerID/payments', component: BuyerPaymentListComponent },
   { path: ':buyerID/payments/new', component: BuyerPaymentCreateComponent },
   {
     path: ':buyerID/payments/:paymentID',
     component: BuyerPaymentDetailsComponent,
   },
-  { path: ':buyerID/approvals/', component: BuyerApprovalListComponent },
+  { path: ':buyerID/approvals', component: BuyerApprovalListComponent },
   { path: ':buyerID/approvals/new', component: BuyerApprovalCreateComponent },
   {
     path: ':buyerID/approvals/:approvalID',

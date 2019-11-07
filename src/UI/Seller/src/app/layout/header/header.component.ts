@@ -1,8 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config';
+import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 import {
   faBoxOpen,
   faSignOutAlt,
@@ -15,7 +12,7 @@ import {
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
 import { AppStateService } from '@app-seller/shared';
-import { MarketMangagerHeaderConfig } from './header.config';
+import { MarketMangagerHeaderConfig, SellerHeaderConfig, SupplierHeaderConfig } from './header.config';
 
 @Component({
   selector: 'layout-header',
@@ -42,7 +39,7 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.headerConfig = MarketMangagerHeaderConfig;
+    this.headerConfig = SupplierHeaderConfig;
   }
 
   logout() {

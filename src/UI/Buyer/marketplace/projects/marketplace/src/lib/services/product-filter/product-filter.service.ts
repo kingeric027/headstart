@@ -142,6 +142,8 @@ export class ProductFilterService implements IProductFilters {
 
   onFiltersChange(callback: (filters: ProductFilters) => void): void {
     // todo - is there a way to prevent duplicate subscriptions?
+    debugger;
+    let test = callback.toString();
     this.activeFiltersSubject.subscribe(callback);
   }
 }

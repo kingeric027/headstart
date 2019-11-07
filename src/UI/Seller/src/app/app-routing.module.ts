@@ -16,16 +16,28 @@ const routes: Routes = [
         loadChildren: () => import('./products/products.module').then((m) => m.ProductsModule),
       },
       {
+        path: 'orders',
+        loadChildren: () => import('./orders/orders.module').then((m) => m.OrdersModule),
+      },
+      {
         path: 'buyers',
         loadChildren: () => import('./buyers/buyers.module').then((m) => m.BuyersModule),
+      },
+      {
+        path: 'sellers',
+        loadChildren: () => import('./sellers/sellers.module').then((m) => m.SellersModule),
       },
       {
         path: 'suppliers',
         loadChildren: () => import('./suppliers/suppliers.module').then((m) => m.SuppliersModule),
       },
       {
-        path: 'sellers',
-        loadChildren: () => import('./sellers/sellers.module').then((m) => m.SellersModule),
+        path: 'reports',
+        loadChildren: () => import('./reports/reports.module').then((m) => m.ReportsModule),
+      },
+      {
+        path: 'storefronts',
+        loadChildren: () => import('./storefronts/storefronts.module').then((m) => m.StorefrontsModule),
       },
     ],
   },
