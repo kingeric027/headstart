@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { OCMComponent } from '../base-component';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   templateUrl: './sort-products.component.html',
@@ -20,7 +21,7 @@ export class OCMProductSort extends OCMComponent implements OnInit {
   }
 
   ngOnContextSet() {
-    this.context.productFilters.onFiltersChange(filters => {
+    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(filters => {
       this.setForm(filters.sortBy);
     });
   }

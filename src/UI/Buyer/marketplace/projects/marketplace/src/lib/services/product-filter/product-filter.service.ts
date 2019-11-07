@@ -16,7 +16,7 @@ export class ProductFilterService implements IProductFilters {
   // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
   private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
 
-  private activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(this.getDefaultParms());
+  public activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(this.getDefaultParms());
 
   constructor(
     private router: Router,
@@ -138,10 +138,5 @@ export class ProductFilterService implements IProductFilters {
         return !!value;
       }
     });
-  }
-
-  onFiltersChange(callback: (filters: ProductFilters) => void): void {
-    // todo - is there a way to prevent duplicate subscriptions?
-    this.activeFiltersSubject.subscribe(callback);
   }
 }

@@ -2,6 +2,7 @@ import { Component, AfterViewInit, Input } from '@angular/core';
 import { ListOrder } from '@ordercloud/angular-sdk';
 import { OCMComponent } from '../base-component';
 import { OrderStatus, OrderFilters } from 'marketplace';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   templateUrl: './order-history.component.html',
@@ -16,7 +17,7 @@ export class OCMOrderHistory extends OCMComponent implements AfterViewInit {
   searchTerm: string;
 
   ngOnContextSet() {
-    this.context.orderHistory.filters.onFiltersChange(this.handleFiltersChange);
+    this.context.orderHistory.filters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
   }
 
   handleFiltersChange = (filters: OrderFilters) => {

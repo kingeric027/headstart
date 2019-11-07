@@ -11,7 +11,7 @@ import {
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
-import { tap, debounceTime, delay } from 'rxjs/operators';
+import { tap, debounceTime, delay, takeWhile } from 'rxjs/operators';
 import { OCMComponent } from '../base-component';
 import { ProductFilters } from 'marketplace';
 
@@ -46,7 +46,7 @@ export class OCMAppHeader extends OCMComponent {
     this.context.currentOrder.onOrderChange(order => (this.order = order));
     this.context.currentUser.onIsAnonymousChange(isAnon => (this.anonymous = isAnon));
     this.context.currentUser.onUserChange(user => (this.user = user));
-    this.context.productFilters.onFiltersChange(this.handleFiltersChange);
+    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
     this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
   }

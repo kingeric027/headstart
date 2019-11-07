@@ -12,7 +12,7 @@ import { filter } from 'rxjs/operators';
 export class OrderFilterService implements IOrderFilters {
   activeOrderID: string; // TODO - make this read-only in components
 
-  private activeFiltersSubject: BehaviorSubject<OrderFilters> = new BehaviorSubject<OrderFilters>(this.getDefaultParms());
+  public activeFiltersSubject: BehaviorSubject<OrderFilters> = new BehaviorSubject<OrderFilters>(this.getDefaultParms());
 
   constructor(
     private ocMeService: OcMeService,
@@ -59,11 +59,6 @@ export class OrderFilterService implements IOrderFilters {
 
   clearAllFilters(): void {
     this.patchFilterState(this.getDefaultParms());
-  }
-
-  onFiltersChange(callback: (filters: OrderFilters) => void): void {
-    // todo - is there a way to prevent duplicate subscriptions?
-    this.activeFiltersSubject.subscribe(callback);
   }
 
   private readFromUrlQueryParams = (params: Params): void => {
