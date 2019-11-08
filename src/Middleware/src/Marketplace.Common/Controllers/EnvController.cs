@@ -17,7 +17,8 @@ namespace Marketplace.Common.Controllers
         [HttpGet]
         public async Task<object> Get()
         {
-            return await Task.FromResult(new { env = Settings.Env.ToString(), cosmosdb = Settings.CosmosSettings.DatabaseName });
+            var publicSettings = new { env = Settings.Env.ToString(), cosmosdb = Settings.CosmosSettings.DatabaseName };
+            return await Task.FromResult(publicSettings);
         }
     }
 }
