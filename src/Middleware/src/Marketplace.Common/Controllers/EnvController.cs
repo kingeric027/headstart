@@ -15,9 +15,10 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet]
-        public async Task<IAppSettings> Get()
+        public async Task<object> Get()
         {
-            return await Task.FromResult(Settings);
+            var publicSettings = new { env = Settings.Env.ToString(), cosmosdb = Settings.CosmosSettings.DatabaseName };
+            return await Task.FromResult(publicSettings);
         }
     }
 }
