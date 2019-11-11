@@ -63,7 +63,7 @@ export class OrderFilterService implements IOrderFilters {
 
   private readFromUrlQueryParams = (params: Params): void => {
     const { page, sortBy, search, fromDate, toDate } = params;
-    const status = params.status || OrderStatus.AllSubmitted;
+    const status = params.status;
     const showOnlyFavorites = !!params.favorites;
     this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate });
   }
@@ -74,7 +74,7 @@ export class OrderFilterService implements IOrderFilters {
       page: undefined,
       sortBy: undefined,
       search: undefined,
-      status: OrderStatus.AllSubmitted,
+      status: undefined,
       showOnlyFavorites: false,
       fromDate: undefined,
       toDate: undefined,
