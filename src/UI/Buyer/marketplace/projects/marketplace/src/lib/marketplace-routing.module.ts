@@ -39,7 +39,6 @@ export class MyOrdersWrapperComponent implements OnInit, OnDestroy {
   constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
 
   async ngOnInit() {
-    this.setOrders();
     this.orderFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrders);
   }
 
@@ -62,8 +61,12 @@ export class OrdersToApproveWrapperComponent implements OnInit, OnDestroy {
   constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
 
   async ngOnInit() {
+<<<<<<< HEAD
     this.setOrders();
     this.orderFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrders);
+=======
+    this.orderFilters.onFiltersChange(this.setOrders);
+>>>>>>> 4f88426... remove set orders call on init of orders component
   }
 
   setOrders = async () => {
