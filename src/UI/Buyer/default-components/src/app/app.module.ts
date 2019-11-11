@@ -108,6 +108,7 @@ import { SpecFormNumberComponent } from './components/spec-form/spec-form-number
 import { SpecFormRangeComponent } from './components/spec-form/spec-form-range/spec-form-range.component';
 import { SpecFormSelectComponent } from './components/spec-form/spec-form-select/spec-form-select.component';
 import { SpecFormTextAreaComponent } from './components/spec-form/spec-form-textarea/spec-form-textarea.component';
+import { OCMSupplierList } from './components/supplier-list/supplier-list.component';
 
 const components = [
   OCMProductCard,
@@ -171,6 +172,7 @@ const components = [
   SpecFormRangeComponent,
   SpecFormSelectComponent,
   SpecFormTextAreaComponent,
+  OCMSupplierList
 ];
 
 @NgModule({
@@ -281,6 +283,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
     this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
+    this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
