@@ -26,6 +26,7 @@ import { ShopperContextService } from './services/shopper-context/shopper-contex
 import { OrderFilterService } from './services/order-history/order-filter.service';
 import { ListOrder } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
+import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
 
 // auth components
 
@@ -95,6 +96,7 @@ export const MarketplaceRoutes: Routes = [
 
       { path: 'checkout', component: CheckoutWrapperComponent },
       { path: 'cart', component: CartWrapperComponent },
+      { path: 'suppliers', component: SupplierListWrapperComponent },
       {
         path: 'products',
         component: ProductListWrapperComponent,
@@ -102,6 +104,7 @@ export const MarketplaceRoutes: Routes = [
           categories: MeListCategoriesResolver,
         },
       },
+
       {
         path: 'products/:productID',
         resolve: {

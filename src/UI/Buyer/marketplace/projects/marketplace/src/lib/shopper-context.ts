@@ -22,7 +22,6 @@ export interface ICreditCards {
 
 export interface IOrderHistory {
   activeOrderID: string;
-
   filters: IOrderFilters;
   approveOrder(orderID?: string, Comments?: string,  AllowResubmit?: boolean): Promise<Order>;
   declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<Order>;
@@ -36,6 +35,7 @@ export interface IRouter {
   onUrlChange(callback: (path: string) => void): void;
   toProductDetails(productID: string): void;
   toProductList(options?: ProductFilters): void;
+  toSupplierList(options?: SupplierFilters): void;
   toCheckout(): void;
   toHome(): void;
   toCart(): void;
@@ -117,6 +117,24 @@ export interface IOrderFilters {
   filterByStatus(status: OrderStatus): void;
   filterByDateSubmitted(fromDate: string, toDate: string): void;
   clearAllFilters(): void;
+}
+
+export interface ISupplierFilters {
+  activeFiltersSubject: BehaviorSubject<OrderFilters>;
+  toPage(pageNumber: number): void;
+  sortBy(field: string): void;
+  searchBy(searchTerm: string): void;
+  clearSearch(): void;
+  toSupplier(supplierID: string): void;
+  clearAllFilters(): void;
+  hasFilters(): boolean;
+}
+
+export interface SupplierFilters {
+  supplierID?: string;
+  page?: number;
+  sortBy?: string;
+  search?: string;
 }
 
 export interface IAuthentication {

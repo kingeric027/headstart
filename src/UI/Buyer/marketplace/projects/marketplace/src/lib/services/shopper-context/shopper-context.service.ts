@@ -9,6 +9,7 @@ import { OrderHistoryService } from '../order-history/order-history.service';
 import { AuthNetCreditCardService } from '../authorize-net/authorize-net.service';
 import { applicationConfiguration } from '../../config/app.config';
 import { IShopperContext, AppConfig } from '../../shopper-context';
+import { SupplierFilterService } from '../supplier-filter/supplier-filter.service';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,7 @@ export class ShopperContextService implements IShopperContext {
     public currentUser: CurrentUserService,
     public router: RouteService,
     public productFilters: ProductFilterService,
+    public supplierFilters: SupplierFilterService,
     public authentication: AuthService,
     public myResources: OcMeService,
     public orderHistory: OrderHistoryService,
