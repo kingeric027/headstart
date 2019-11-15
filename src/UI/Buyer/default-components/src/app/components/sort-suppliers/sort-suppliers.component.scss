@@ -1,45 +1,4 @@
 @import "../../../styles/main.scss";
-.supplier-list {
-  .supplier-card {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border-top: 8px solid $gray-200;
-    transition: all 200ms ease;
-    // max-width: 32rem;
-    &--logo {
-      max-width: 125px;
-      height: auto;
-    }
-
-    .shop-now {
-      opacity: 1;
-      @include media-breakpoint-up(md) {
-        opacity: 0;
-        transition: opacity 200ms ease;
-      }
-    }
-
-    &:hover {
-      border-top: 8px solid $gray-300;
-      box-shadow: 0 4px 12px -1px rgba(0, 0, 0, 0.1),
-        0 2px 8px -1px rgba(0, 0, 0, 0.06);
-      .shop-now {
-        opacity: 1;
-      }
-    }
-  }
-}
-
-.icon-button {
-  padding: .75rem 1rem;
-  border-radius: 180px;
-  transition: background-color .25s;
-  &:hover {
-    background-color: rgba($gray-900, 0.1);
-    cursor: pointer;
-  }
-}
-
 /* form starting stylings ------------------------------- */
 .group {
   position: relative;
@@ -103,17 +62,5 @@ select:focus ~ .highlight {
   to {
     width: 0;
     background: transparent;
-  }
-}
-
-.badge__counter--large {
-  ::ng-deep {
-    .fa-layers-counter {
-      height: 1.5em;
-      top: -10px;
-      right: -12px;
-      font-size: 45px;
-      background-color: $primary;
-    }
   }
 }

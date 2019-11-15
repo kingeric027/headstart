@@ -30,6 +30,7 @@ import { OCMCart } from './components/cart/cart.component';
 import { OCMLineitemTable } from './components/lineitem-table/lineitem-table.component';
 import { OCMHomePage } from './components/home/home.component';
 import { OCMProductSort } from './components/sort-products/sort-products.component';
+import { OCMSupplierSort } from './components/sort-suppliers/sort-suppliers.component';
 import { OCMCategoryTree } from './components/category-tree/category-tree.component';
 import { OCMFacetMultiSelect } from './components/facet-multiselect/facet-multiselect.component';
 import { OCMProductFacetList } from './components/product-facet-list/product-facet-list.component';
@@ -123,6 +124,7 @@ const components = [
   OCMCart,
   OCMHomePage,
   OCMProductSort,
+  OCMSupplierSort,
   OCMCategoryTree,
   OCMFacetMultiSelect,
   OCMProductFacetList,
@@ -172,7 +174,7 @@ const components = [
   SpecFormRangeComponent,
   SpecFormSelectComponent,
   SpecFormTextAreaComponent,
-  OCMSupplierList
+  OCMSupplierList,
 ];
 
 @NgModule({
@@ -239,6 +241,7 @@ export class AppModule {
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
+    this.buildWebComponent(OCMSupplierSort, 'ocm-supplier-sort');
     this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
     this.buildWebComponent(OCMFacetMultiSelect, 'ocm-facet-multiselect');
     this.buildWebComponent(OCMProductFacetList, 'ocm-product-facet-list');
