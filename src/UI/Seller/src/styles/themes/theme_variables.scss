@@ -1,0 +1,78 @@
+// --------------------------------------------------------------------------------------
+// This file should include variable overrides as well as custom variables
+//
+// we've included a subset of common bootstrap variables you might want to override
+// to start you off. want to see the full list of bootstrap variables?
+// check out node_modules/bootstrap/variables.scss
+// --------------------------------------------------------------------------------------
+
+$blue:              #007bff;
+$indigo:            #490dff;
+$purple:            #490dff;
+$pink:              #d10ce8;
+$red:               #a51700;
+$orange:            #ce600a;
+$yellow:            #f6a914;
+$green:             #28a745;
+$teal:              #20c997;
+$cyan:              #138294;
+
+$brand-navy: #032A43 !default;
+$brand-orange: #F16122 !default;
+$brand-teal: #20ABAD !default;
+
+$gray-100:          #f9f7f4;
+$gray-200:          #f4efe9;
+$gray-300:          #f1eae2;
+$gray-400:          #c1bbb5;
+$gray-500:          #908c87;
+$gray-600:          #787470;
+$gray-700:          #474543;
+$gray-800:          #2f2d2c;
+$gray-900:          #1e1d1d;
+$black:             #000000;
+
+$primary:           $yellow;
+$secondary:         $gray-600;
+$success:           $green;
+$info:              $cyan;
+$warning:           $yellow;
+$danger:            $red;
+$gray-light:        $gray-400;
+$light:             $gray-100;
+$medium:            $gray-700;
+$dark:              $gray-800;
+
+$theme-colors: (
+  'primary': $brand-orange,        
+  'secondary': $brand-navy
+);
+
+// Body
+//
+// Settings for the `<body>` element.
+
+$body-bg:           #fdfdfc;
+$body-color:          $gray-800;
+
+// Fonts
+//
+// Font, line-height, and color for body text, headings, and more.
+
+// @import url('https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,400i,700'); // Avenir Alternative
+
+// @font-face {
+//   font-family: 'American_Captain';
+//   src: url('https://mgrstoragetest.blob.core.windows.net/buyerweb/assets/_font/americancaptain_regular_macroman/American_Captain-webfont.woff')
+//       format('woff2'),
+//     url('https://mgrstoragetest.blob.core.windows.net/buyerweb/assets/_font/americancaptain_regular_macroman/American_Captain-webfont.woff')
+//       format('woff');
+// }
+
+// $font-family-sans-serif: 'Nunito Sans', -apple-system, BlinkMacSystemFont,
+//   'Segoe UI', Roboto, 'Helvetica                                   Neue', Arial,
+//   sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+// $font-size-base: 1rem !default; // Assumes the browser default, typically `16px`
+
+// $h1-font-family: 'American_Captain', $font-family-sans-serif;
+// $h1-font-size: $font-size-base * 3.5;

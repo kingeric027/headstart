@@ -27,7 +27,7 @@ export class OCMOrderStatusFilter extends OCMComponent implements OnInit {
 
   ngOnContextSet() {
     this.context.orderHistory.filters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe((filters: OrderFilters) => {
-      this.form.setValue({ status: filters.status });
+      this.form.setValue({ status: filters.status || '' });
     });
   }
 

@@ -14,7 +14,6 @@ export class CreditCardInputDirective {
   @HostListener('keydown', ['$event'])
   keyDown(event: KeyboardEvent) {
     const key = event.keyCode;
-    console.log('herherhehrehr');
     if (!this.allowedKeys(key) && this.el.nativeElement.value.length >= 23 && key !== 65) {
       event.preventDefault();
     }

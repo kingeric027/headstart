@@ -7,7 +7,7 @@ import { specErrors } from '../errors';
 @Component({
   selector: 'spec-form-range',
   template: `
-    <div class="col-md-12" [formGroup]="group">
+    <div [formGroup]="group">
       <div class="form-input">
         <label>{{ config.label }}</label>
         <input
@@ -15,7 +15,7 @@ import { specErrors } from '../errors';
           [attr.min]="config.min"
           [attr.max]="config.max"
           [attr.step]="config.step"
-          class="form-control"
+          class="form-control form-control-sm"
           [attr.placeholder]="config.placeholder"
           [formControlName]="config.name"
         />

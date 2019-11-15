@@ -15,6 +15,5 @@ export * from '@app-seller/shared/components/carousel-slide-display/carousel-sli
 // services
 export * from '@app-seller/shared/services/form-error/form-error.service';
 export * from '@app-seller/shared/services/app-state/app-state.service';
-export * from '@app-seller/shared/services/modal/modal.service';
 export * from '@app-seller/shared/services/geography/geography.service';
 export * from '@app-seller/shared/services/regex/regex.service';

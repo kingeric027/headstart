@@ -89,9 +89,10 @@
         "layout",
         "shared",
         "product",
-        "address",
-        "user",
-        "category"
+        "order",
+        "buyer",
+        "seller",
+        "supplier"
       ],
       "kebab-case"
     ],
