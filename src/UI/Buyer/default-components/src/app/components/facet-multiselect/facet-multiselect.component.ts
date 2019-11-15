@@ -20,7 +20,9 @@ export class OCMFacetMultiSelect extends OCMComponent {
   faMinusSquare = faMinusSquare;
 
   ngOnContextSet() {
-    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
+    this.context.productFilters.activeFiltersSubject
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(this.handleFiltersChange);
   }
 
   toggleCollapsed() {
