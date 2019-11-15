@@ -1,14 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChange,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { OCMComponent } from '../base-component';
 import { ListSupplier, Supplier } from '@ordercloud/angular-sdk';
 import { faTimes, faFilter } from '@fortawesome/free-solid-svg-icons';
@@ -22,7 +12,7 @@ import SupplierCategoryConfig from './SEB_SupplierCategoryConfig';
   templateUrl: './supplier-list.component.html',
   styleUrls: ['./supplier-list.component.scss'],
 })
-export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges, OnDestroy {
+export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
   @Input() suppliers: ListSupplier;
   @ViewChild('popover', { static: false }) public popover: NgbPopover;
   searchTermForSuppliers: string = null;
@@ -48,7 +38,6 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges, 
     this.serviceCategoryOptions = SupplierCategoryConfig.ServiceCategories;
     this.vendorLevelOptions = SupplierCategoryConfig.VendorLevels;
   }
-  ngOnDestroy() {}
   ngOnChanges() {
     this.activeFilterCount = Object.keys(this.context.supplierFilters.activeFiltersSubject.value.activeFilters).length;
   }
@@ -67,10 +56,6 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges, 
     }
   };
 
-  shopSupplier(supplier: Supplier) {
-    this.context.router.toProductList({ activeFacets: { Supplier: supplier.ID } });
-  }
-
   searchSuppliers(searchStr: string) {
     this.searchTermForSuppliers = searchStr;
     this.context.supplierFilters.searchBy(searchStr);
@@ -80,6 +65,7 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges, 
     this.context.supplierFilters.toPage(page);
     window.scrollTo(0, null);
   }
+
   applyFilters() {
     const { serviceCategory, vendorLevel } = this.filterForm.value;
     const filters = {};
@@ -88,16 +74,16 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges, 
     this.context.supplierFilters.filterByFields(filters);
     this.popover.close();
   }
-  cancelFilters() {
-    this.popover.close();
+
+  clearFilters() {
+    this.context.supplierFilters.clearAllFilters();
   }
+
   openPopover() {
     this.popover.open();
   }
+
   closePopover() {
     this.popover.close();
-  }
-  clearFilters() {
-    this.context.supplierFilters.clearAllFilters();
   }
 }

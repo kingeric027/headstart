@@ -1,0 +1,36 @@
+<div *ngIf="supplier && supplier.xp">
+  <div class="supplier-card border-radius mb-4 p-3">
+    <div class="d-flex justify-content-between align-items-center pb-3 border-bottom mb-3">
+      <div class="d-flex justify-content-start align-items-center">
+        <img *ngIf="supplier.xp.LogoUrl"
+             class="supplier-card--logo mr-4"
+             src="{{supplier.xp.LogoUrl}}"
+             alt="{{supplier.Name}} Logo" />
+        <div class="d-flex flex-column mr-4">
+          <p class="h5 mb-0">{{supplier.Name}}</p>
+          <p class="small"><a href="{{supplier.xp.WebsiteURL}}"
+               target="_blank">{{supplier.xp.WebsiteURL}}</a></p>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-outline-dark shop-now"
+              (click)="shopSupplier(supplier)">Shop now!</button>
+    </div>
+    <div [innerHTML]="supplier.xp.Description"></div>
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="d-flex flex-column mr-4">
+        <p class="small text-muted mb-0">Links</p>
+        <p class="small">No links available</p>
+        <p *ngFor="let link of supplier.xp.Links"
+           class="small"><a href="{{link.URL}}"
+             target="_blank">{{link.DisplayName}}</a></p>
+      </div>
+      <div *ngIf="supplier.xp.Contacts"
+           class="d-flex flex-column text-right mr-4">
+        <p class="small text-muted mb-0">Primary Contact</p>
+        <p class="h6 mb-0">{{supplier.xp.Contacts[0].Name}}</p>
+        <p class="mb-0">{{supplier.xp.Contacts[0].Email}}</p>
+        <p>{{supplier.xp.Contacts[0].Phone}}</p>
+      </div>
+    </div>
+  </div>
+</div>
