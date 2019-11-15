@@ -39,7 +39,7 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.headerConfig = SupplierHeaderConfig;
+    this.headerConfig = MarketMangagerHeaderConfig;
   }
 
   logout() {
