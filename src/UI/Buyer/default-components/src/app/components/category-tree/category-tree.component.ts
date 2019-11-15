@@ -4,6 +4,7 @@ import { ITreeOptions } from 'angular-tree-component';
 import { OCMComponent } from '../base-component';
 import { transform as _transform } from 'lodash';
 import { CategoryTreeNode } from '../../models/category-tree-node.class';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   templateUrl: './category-tree.component.html',
@@ -17,7 +18,7 @@ export class OCMCategoryTree extends OCMComponent {
 
   ngOnContextSet() {
     if (!this.categoryTree) this.categoryTree = this.buildCategoryTree(this.categories.Items);
-    this.context.productFilters.onFiltersChange(filters => {
+    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(filters => {
       this.activeCategoryID = filters.categoryID;
     });
   }

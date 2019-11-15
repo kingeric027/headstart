@@ -1,5 +1,5 @@
 import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion, ListShipment, Shipment, ShipmentItem, BuyerProduct } from '@ordercloud/angular-sdk';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 export * from '@ordercloud/angular-sdk';
 
@@ -22,7 +22,6 @@ export interface ICreditCards {
 
 export interface IOrderHistory {
   activeOrderID: string;
-
   filters: IOrderFilters;
   approveOrder(orderID?: string, Comments?: string,  AllowResubmit?: boolean): Promise<Order>;
   declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<Order>;
@@ -36,6 +35,7 @@ export interface IRouter {
   onUrlChange(callback: (path: string) => void): void;
   toProductDetails(productID: string): void;
   toProductList(options?: ProductFilters): void;
+  toSupplierList(options?: SupplierFilters): void;
   toCheckout(): void;
   toHome(): void;
   toCart(): void;
@@ -92,6 +92,7 @@ export interface ICurrentOrder {
 }
 
 export interface IProductFilters {
+  activeFiltersSubject: BehaviorSubject<ProductFilters>;
   toPage(pageNumber: number): void;
   sortBy(field: string): void;
   clearSort(): void;
@@ -104,10 +105,10 @@ export interface IProductFilters {
   filterByFavorites(showOnlyFavorites: boolean): void;
   clearAllFilters(): void;
   hasFilters(): boolean;
-  onFiltersChange(callback: (filters: ProductFilters) => void): void;
 }
 
 export interface IOrderFilters {
+  activeFiltersSubject: BehaviorSubject<OrderFilters>;
   toPage(pageNumber: number): void;
   sortBy(field: string): void;
   searchBy(searchTerm: string): void;
@@ -116,7 +117,24 @@ export interface IOrderFilters {
   filterByStatus(status: OrderStatus): void;
   filterByDateSubmitted(fromDate: string, toDate: string): void;
   clearAllFilters(): void;
-  onFiltersChange(callback: (filters: ProductFilters) => void): void;
+}
+
+export interface ISupplierFilters {
+  activeFiltersSubject: BehaviorSubject<OrderFilters>;
+  toPage(pageNumber: number): void;
+  sortBy(field: string): void;
+  searchBy(searchTerm: string): void;
+  clearSearch(): void;
+  toSupplier(supplierID: string): void;
+  clearAllFilters(): void;
+  hasFilters(): boolean;
+}
+
+export interface SupplierFilters {
+  supplierID?: string;
+  page?: number;
+  sortBy?: string;
+  search?: string;
 }
 
 export interface IAuthentication {

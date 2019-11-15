@@ -6,10 +6,8 @@ import { Field } from '../field.interface';
 @Component({
   selector: 'spec-form-checkbox',
   template: `
-    <div class="col-md-12">
-      <div class="form-group" [formGroup]="group">
-        <input type="checkbox" class="form-control" [formControlName]="config.name" />{{ config.label }}
-      </div>
+    <div class="form-group" [formGroup]="group">
+      <input type="checkbox" class="form-control form-control-sm" [formControlName]="config.name" />{{ config.label }}
     </div>
   `,
   styleUrls: ['./spec-form-checkbox.component.scss'],

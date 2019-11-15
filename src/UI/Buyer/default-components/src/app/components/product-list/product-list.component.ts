@@ -6,6 +6,7 @@ import { ModalState } from '../../models/modal-state.class';
 import { OCMComponent } from '../base-component';
 import { ProductFilters } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   templateUrl: './product-list.component.html',
@@ -25,7 +26,7 @@ export class OCMProductList extends OCMComponent implements OnInit {
 
   ngOnContextSet() {
     if (this.products) this.facets = this.products.Meta.Facets;
-    this.context.productFilters.onFiltersChange(this.handleFiltersChange);
+    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
     this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
   }
 

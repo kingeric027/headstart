@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { ListBuyerProduct, ListCategory, OcMeService } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   template: `
@@ -12,9 +13,10 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
     ></ocm-product-list>
   `,
 })
-export class ProductListWrapperComponent implements OnInit {
+export class ProductListWrapperComponent implements OnInit, OnDestroy {
   products: ListBuyerProduct;
   categories: ListCategory;
+  alive = true;
 
   constructor(
     private router: Router,
@@ -25,7 +27,7 @@ export class ProductListWrapperComponent implements OnInit {
   ngOnInit() {
     this.products = this.activatedRoute.snapshot.data.products;
     this.categories = this.activatedRoute.snapshot.data.categories;
-    this.context.productFilters.onFiltersChange(this.handleFiltersChange);
+    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
   }
 
   private handleFiltersChange = async () => {
@@ -39,5 +41,9 @@ export class ProductListWrapperComponent implements OnInit {
         // window.scrollTo(0, 0); // scroll to top of screen when new facets are selected.
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 }

@@ -7,8 +7,11 @@ import { specErrors } from '../errors';
 @Component({
   selector: 'spec-form-label',
   template: `
-    <div class="col-md-12" [formGroup]="group">
-      {{ config.label }}: <b>{{ config.options[0] }}</b>
+    <div class="form-group" [formGroup]="group">
+      <label class="text-uppercase font-weight-bolder small text-muted" for="{{ config.name }}">{{
+        config.label
+      }}</label>
+      <p>{{ config.options[0] }}</p>
     </div>
   `,
   styleUrls: ['./spec-form-label.component.scss'],

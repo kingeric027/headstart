@@ -31,6 +31,7 @@ import { ShopperContextService } from './services/shopper-context/shopper-contex
 import { CommonModule } from '@angular/common';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
 import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipments-wrapper.component';
+import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
 
 
 @NgModule({
@@ -77,6 +78,7 @@ import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipm
     OrderShipmentsWrapperComponent,
     MyOrdersWrapperComponent,
     OrdersToApproveWrapperComponent,
+    SupplierListWrapperComponent  
   ],
 })
 export class MarketplaceModule {}

@@ -6,14 +6,14 @@ import { Field } from '../field.interface';
 @Component({
   selector: 'spec-form-select',
   template: `
-    <div class="col-md-12">
-      <div class="form-group" [formGroup]="group">
-        <label for="{{ config.name }}">{{ config.label }}</label>
-        <select [formControlName]="config.name" class="form-control" value="{{ config.value }}">
-          <option *ngIf="!config.value" value=""></option>
+    <div class="form-group" [formGroup]="group">
+      <label class="text-uppercase font-weight-bolder small text-muted" for="{{ config.name }}">{{
+        config.label
+      }}</label>
+      <select [formControlName]="config.name" class="form-control form-control-sm" value="{{ config.value }}">
+        <option *ngIf="!config.value" value=""></option>
           <option *ngFor="let option of config.options"> {{ option }} </option>
-        </select>
-      </div>
+      </select>
     </div>
   `,
   styleUrls: ['./spec-form-select.component.scss'],
@@ -27,6 +27,7 @@ export class SpecFormSelectComponent implements Field, OnInit {
   constructor() {}
 
   ngOnInit() {
+    console.log(this.config);
     this.ctrls = this.group.get('ctrls') as FormArray;
   }
 

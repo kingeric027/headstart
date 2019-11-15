@@ -1,5 +1,5 @@
 // core services
-import { NgModule, Component, OnInit } from '@angular/core';
+import { NgModule, Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
@@ -25,6 +25,8 @@ import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-w
 import { ShopperContextService } from './services/shopper-context/shopper-context.service';
 import { OrderFilterService } from './services/order-history/order-filter.service';
 import { ListOrder } from '@ordercloud/angular-sdk';
+import { takeWhile } from 'rxjs/operators';
+import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
 
 // auth components
 
@@ -32,36 +34,43 @@ import { ListOrder } from '@ordercloud/angular-sdk';
 @Component({
   template: '<ocm-order-history [context]="context" [orders]="orders" [approvalVersion]="false"></ocm-order-history>',
 })
-export class MyOrdersWrapperComponent implements OnInit {
+export class MyOrdersWrapperComponent implements OnInit, OnDestroy {
   orders: ListOrder;
-
+  alive = true;
   constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
 
   async ngOnInit() {
-    this.setOrders();
-    this.orderFilters.onFiltersChange(this.setOrders);
+    this.orderFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrders);
   }
 
   setOrders = async () => {
     this.orders = await this.orderFilters.listOrders();
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 }
 
 @Component({
   template: '<ocm-order-history [context]="context" [orders]="orders" [approvalVersion]="true"></ocm-order-history>',
 })
-export class OrdersToApproveWrapperComponent implements OnInit {
+export class OrdersToApproveWrapperComponent implements OnInit, OnDestroy {
   orders: ListOrder;
+  alive = true;
 
   constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
 
   async ngOnInit() {
-    this.setOrders();
-    this.orderFilters.onFiltersChange(this.setOrders);
+    this.orderFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrders);
   }
 
   setOrders = async () => {
-    this.orders = await this.orderFilters.listOrders();
+    this.orders = await this.orderFilters.listApprovableOrders();
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 }
 
@@ -85,6 +94,7 @@ export const MarketplaceRoutes: Routes = [
 
       { path: 'checkout', component: CheckoutWrapperComponent },
       { path: 'cart', component: CartWrapperComponent },
+      { path: 'suppliers', component: SupplierListWrapperComponent },
       {
         path: 'products',
         component: ProductListWrapperComponent,
@@ -92,6 +102,7 @@ export const MarketplaceRoutes: Routes = [
           categories: MeListCategoriesResolver,
         },
       },
+
       {
         path: 'products/:productID',
         resolve: {
