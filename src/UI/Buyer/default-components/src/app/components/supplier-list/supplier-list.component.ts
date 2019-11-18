@@ -6,7 +6,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { takeWhile } from 'rxjs/operators';
 import { SupplierFilters } from 'marketplace';
-import SupplierCategoryConfig from './SEB_SupplierCategoryConfig';
+// import SupplierCategoryConfig from './SEB_SupplierCategoryConfig';
 
 @Component({
   templateUrl: './supplier-list.component.html',
@@ -14,6 +14,7 @@ import SupplierCategoryConfig from './SEB_SupplierCategoryConfig';
 })
 export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
   @Input() suppliers: ListSupplier;
+  @Input() supplierCategoryConfig: any;
   @ViewChild('popover', { static: false }) public popover: NgbPopover;
   searchTermForSuppliers: string = null;
   filterForm: FormGroup;
@@ -34,9 +35,11 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.setForm();
-
-    this.serviceCategoryOptions = SupplierCategoryConfig.ServiceCategories;
-    this.vendorLevelOptions = SupplierCategoryConfig.VendorLevels;
+    // this.serviceCategoryOptions = SupplierCategoryConfig.ServiceCategories;
+    // this.vendorLevelOptions = SupplierCategoryConfig.VendorLevels;
+  }
+  showSCC() {
+    console.log(this.supplierCategoryConfig);
   }
   ngOnChanges() {
     this.activeFilterCount = Object.keys(this.context.supplierFilters.activeFiltersSubject.value.activeFilters).length;
