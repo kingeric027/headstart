@@ -1,52 +1,69 @@
-<div class="container mt-4"
+<div class="container-fluid mt-4"
      *ngIf="product">
   <div class="row mb-5">
-    <div class="col-md-6">
+    <div class="col-xl-6 col-lg-5">
       <div class="position-relative d-block">
         <ocm-image-gallery [imgUrls]="imageUrls"
-                           [context]="context"></ocm-image-gallery>
+                           [context]="context">
+        </ocm-image-gallery>
       </div>
     </div>
-    <div class="col-md-6 bg-light">
-      <h1 class="h1 my-0">{{ product.Name }}</h1>
-      <div class="d-flex mt-2">
-        <div class="mt-2 text-muted">ID: {{ product.ID }}</div>
-        <div class="mt-2 ml-3">
-          <ocm-toggle-favorite title="Favorite"
-                               (click)="$event.stopPropagation()"
-                               [favorite]="isFavorite()"
-                               (favoriteChanged)="setIsFavorite($event.detail)">
-          </ocm-toggle-favorite>
+    <div class="col-xl-3 col-lg-4">
+      <div class="pb-3 border-bottom border-medium">
+        <!-- NOTE: The line below would/could link to a 'supplier detail page' listing all products by 1 supplier.  Reference Amazon.com -->
+        <small><a href="javascript:;">{{ product.DefaultSupplierID }}</a></small>
+        <h1 class="h3 my-0">{{ product.Name }}</h1>
+        <ocm-toggle-favorite title="Favorite"
+                             (click)="$event.stopPropagation()"
+                             [favorite]="isFavorite()"
+                             (favoriteChanged)="setIsFavorite($event.detail)">
+        </ocm-toggle-favorite>
+      </div>
+      <div class="p-0 d-flex justify-content-start align-items-center">
+        <div class="d-flex flex-column"
+             [ngClass]="{ 'mx-3': i !== 0, 'mr-3': i === 0 }"
+             *ngFor="let break of priceBreaks, let i = index">
+          <small class="font-weight-bold">{{ getPriceBreakRange(i) }}</small>
+          <small>{{ break.Price | currency}}</small>
         </div>
-        <div class="ml-auto"
+      </div>
+      <p [innerHTML]="product.Description || 'This product has no description.'"></p>
+    </div>
+    <div class="col-xl-2 col-lg-3">
+      <div class="p-3 border border-medium border-radius">
+        <div class="d-flex justify-content-between align-items-center">
+          <h4 class="font-weight-bold">{{ price  | currency}}</h4>
+          <span class="badge badge-pill badge-warning"
+                *ngIf="percentSavings > 0">You save {{ percentSavings }}%!
+          </span>
+        </div>
+        <ocm-spec-form *ngIf="isOrderable && specs.Items.length > 0"
+                       [specs]="specs"
+                       [product]="product"
+                       [qty]="0"
+                       (specFormChange)="onSpecFormChange($event)"
+                       [context]="context">
+        </ocm-spec-form>
+        <div *ngIf="!isOrderable"
+             class="alert alert-info">
+          This is a view-only product and cannot be ordered
+        </div>
+        <div class="d-flex flex-column"
              *ngIf="isOrderable">
-          <ocm-quantity-input class="d-inline-block"
+          <ocm-quantity-input class="d-inline-block mb-3"
                               style="max-width: 100px"
                               (qtyChange)="qtyChange($event.detail)"
                               [product]="product"
                               [context]="context">
           </ocm-quantity-input>
-          <button class="btn btn-primary ml-2"
+          <button class="btn btn-block btn-primary"
                   type="submit"
                   [disabled]="!specFormService.event?.valid || !qtyValid"
                   (click)="addToCart($event)">
             Add to Cart
-            <span class="badge badge-light ml-2">{{ price | currency }}</span>
+            <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
           </button>
         </div>
-      </div>
-      <hr />
-      <p class="mt-4"
-         [innerHTML]="product.Description || 'This product has no description.'"></p>
-      <ocm-spec-form *ngIf="isOrderable && specs.Items.length > 0"
-                     [specs]="specs"
-                     [product]="product"
-                     [qty]="0"
-                     (specFormChange)="onSpecFormChange($event)"
-                     [context]="context"></ocm-spec-form>
-      <div *ngIf="!isOrderable"
-           class="alert alert-info">
-        This is a view-only product and cannot be ordered
       </div>
     </div>
   </div>

@@ -40,7 +40,6 @@ export class MyOrdersWrapperComponent implements OnInit, OnDestroy {
   constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
 
   async ngOnInit() {
-    this.setOrders();
     this.orderFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrders);
   }
 
@@ -63,12 +62,11 @@ export class OrdersToApproveWrapperComponent implements OnInit, OnDestroy {
   constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
 
   async ngOnInit() {
-    this.setOrders();
     this.orderFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrders);
   }
 
   setOrders = async () => {
-    this.orders = await this.orderFilters.listOrders();
+    this.orders = await this.orderFilters.listApprovableOrders();
   }
 
   ngOnDestroy() {

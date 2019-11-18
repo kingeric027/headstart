@@ -1,13 +1,34 @@
-import { LineItem, MeUser, Order, ListLineItem, AccessToken, PasswordReset, User, Address, ListPayment, BuyerCreditCard, OcMeService, Payment, ListPromotion, OrderApproval, Promotion, ListShipment, Shipment, ShipmentItem, BuyerProduct } from '@ordercloud/angular-sdk';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import {
+  LineItem,
+  MeUser,
+  Order,
+  ListLineItem,
+  AccessToken,
+  PasswordReset,
+  User,
+  Address,
+  ListPayment,
+  BuyerCreditCard,
+  OcMeService,
+  Payment,
+  ListPromotion,
+  OrderApproval,
+  Promotion,
+  ListShipment,
+  Shipment,
+  ShipmentItem,
+  BuyerProduct
+} from "@ordercloud/angular-sdk";
+import { Observable, Subject, BehaviorSubject } from "rxjs";
 
-export * from '@ordercloud/angular-sdk';
+export * from "@ordercloud/angular-sdk";
 
 export interface IShopperContext {
   router: IRouter;
   currentUser: ICurrentUser;
   currentOrder: ICurrentOrder;
   productFilters: IProductFilters;
+  supplierFilters: ISupplierFilters;
   authentication: IAuthentication;
   orderHistory: IOrderHistory;
   creditCards: ICreditCards;
@@ -23,8 +44,16 @@ export interface ICreditCards {
 export interface IOrderHistory {
   activeOrderID: string;
   filters: IOrderFilters;
-  approveOrder(orderID?: string, Comments?: string,  AllowResubmit?: boolean): Promise<Order>;
-  declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<Order>;
+  approveOrder(
+    orderID?: string,
+    Comments?: string,
+    AllowResubmit?: boolean
+  ): Promise<Order>;
+  declineOrder(
+    orderID?: string,
+    Comments?: string,
+    AllowResubmit?: boolean
+  ): Promise<Order>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
@@ -120,7 +149,7 @@ export interface IOrderFilters {
 }
 
 export interface ISupplierFilters {
-  activeFiltersSubject: BehaviorSubject<OrderFilters>;
+  activeFiltersSubject: BehaviorSubject<SupplierFilters>;
   toPage(pageNumber: number): void;
   sortBy(field: string): void;
   searchBy(searchTerm: string): void;
@@ -128,19 +157,28 @@ export interface ISupplierFilters {
   toSupplier(supplierID: string): void;
   clearAllFilters(): void;
   hasFilters(): boolean;
+  filterByFields(filter: any): void;
 }
 
 export interface SupplierFilters {
   supplierID?: string;
   page?: number;
   sortBy?: string;
+  activeFilters?: any;
   search?: string;
 }
 
 export interface IAuthentication {
-  profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
+  profiledLogin(
+    username: string,
+    password: string,
+    rememberMe: boolean
+  ): Promise<AccessToken>;
   logout(): Promise<void>;
-  validateCurrentPasswordAndChangePassword(newPassword: string, currentPassword: string): Promise<void>;
+  validateCurrentPasswordAndChangePassword(
+    newPassword: string,
+    currentPassword: string
+  ): Promise<void>;
   anonymousLogin(): Promise<AccessToken>;
   forgotPasssword(email: string): Promise<any>;
   register(me: MeUser): Promise<any>;
@@ -169,17 +207,17 @@ export interface OrderFilters {
   /**
    * mm-dd-yyyy
    */
-  toDate?: string ;
+  toDate?: string;
 }
 
 export enum OrderStatus {
-  AllSubmitted = '!Unsubmitted',
-  Unsubmitted = 'Unsubmitted',
-  AwaitingApproval = 'AwaitingApproval',
-  Declined = 'Declined',
-  Open = 'Open',
-  Completed = 'Completed',
-  Canceled = 'Canceled',
+  AllSubmitted = "!Unsubmitted",
+  Unsubmitted = "Unsubmitted",
+  AwaitingApproval = "AwaitingApproval",
+  Declined = "Declined",
+  Open = "Open",
+  Completed = "Completed",
+  Canceled = "Canceled"
 }
 
 export interface AuthNetCreditCard {
@@ -282,7 +320,7 @@ export interface DecodedOCToken {
    * helpful for identifying user types in an app
    * that may have both types
    */
-  usrtype: 'admin' | 'buyer';
+  usrtype: "admin" | "buyer";
 
   /**
    * list of security profile roles that this user
@@ -320,4 +358,3 @@ export interface DecodedOCToken {
    */
   orderid?: string;
 }
-

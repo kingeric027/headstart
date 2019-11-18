@@ -26,6 +26,10 @@ export class OCMProductDetails extends OCMComponent {
   isOrderable = false;
   quantity: number;
   price: number;
+  percentSavings: number;
+  priceBreaks: object;
+  priceBreakRange: string[];
+  selectedBreak: object;
   relatedProducts$: Observable<BuyerProduct[]>;
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
@@ -50,7 +54,7 @@ export class OCMProductDetails extends OCMComponent {
     }
   }
 
-  qtyChange(event: { qty: number, valid: boolean }): void {
+  qtyChange(event: { qty: number; valid: boolean }): void {
     this.qtyValid = event.valid;
     if (this.qtyValid) {
       this.quantity = event.qty;
@@ -66,6 +70,19 @@ export class OCMProductDetails extends OCMComponent {
     });
   }
 
+  getPriceBreakRange(index) {
+    if (!this.product.PriceSchedule && !this.product.PriceSchedule.PriceBreaks.length) {
+      return '';
+    }
+    const priceBreaks = this.product.PriceSchedule.PriceBreaks;
+    const indexOfNextPriceBreak = index + 1;
+    if (indexOfNextPriceBreak < priceBreaks.length) {
+      return `${priceBreaks[index].Quantity} - ${priceBreaks[indexOfNextPriceBreak].Quantity - 1}`;
+    } else {
+      return `${priceBreaks[index].Quantity}+`;
+    }
+  }
+
   getTotalPrice() {
     // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
     // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
@@ -74,11 +91,15 @@ export class OCMProductDetails extends OCMComponent {
       return 0;
     }
     const priceBreaks = this.product.PriceSchedule.PriceBreaks;
+    this.priceBreaks = priceBreaks;
     const startingBreak = _minBy(priceBreaks, 'Quantity');
-
     const selectedBreak = priceBreaks.reduce((current, candidate) => {
       return candidate.Quantity > current.Quantity && candidate.Quantity <= this.quantity ? candidate : current;
     }, startingBreak);
+    this.selectedBreak = selectedBreak;
+    this.percentSavings = parseInt(
+      (((priceBreaks[0].Price - selectedBreak.Price) / priceBreaks[0].Price) * 100).toFixed(0)
+    );
     this.price = this.specFormService.event.valid
       ? this.specFormService.getSpecMarkup(this.specs, selectedBreak, this.quantity || startingBreak.Quantity)
       : selectedBreak.Price * (this.quantity || startingBreak.Quantity);

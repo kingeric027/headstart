@@ -6,7 +6,7 @@
             class="form-control"
             formControlName="status">
       <option *ngFor="let status of statuses"
-              [ngValue]="status">
+              [ngValue]="status || ''">
         {{ status | orderStatusDisplay }}
       </option>
     </select>

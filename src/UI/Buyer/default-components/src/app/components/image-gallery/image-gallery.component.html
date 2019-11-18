@@ -1,4 +1,4 @@
-<div class="bg-light">
+<div>
   <div>
     <ngx-image-zoom class="img-fluid mx-auto d-block pt-2 px-2"
                     [thumbImage]="imgUrls && imgUrls[selectedIndex] ? imgUrls[selectedIndex] : 'http://placehold.it/500x500'"
@@ -6,9 +6,9 @@
                     [zoomMode]="'hover'"
                     [enableScrollZoom]="true"
                     [enableLens]="true"
-                    [lensWidth]="250"
-                    [lensHeight]="250"
-                    [circularLens]="true"
+                    [lensWidth]="200"
+                    [lensHeight]="200"
+                    [circularLens]="false"
                     [magnification]="2"></ngx-image-zoom>
   </div>
   <div>

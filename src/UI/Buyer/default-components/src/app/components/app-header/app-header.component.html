@@ -14,6 +14,11 @@
           Shop
         </a>
       </li>
+      <li class="nav-item clickable cursor-pointer">
+        <a class="nav-link"
+           [ngClass]="{'active': activePath === '/suppliers'}"
+           (click)="context.router.toSupplierList()">Suppliers</a>
+      </li>
     </ul>
     <div class="form-inline"
          *ngIf="anonymous">
@@ -35,7 +40,7 @@
             Account
           </span>
         </div>
-        <div class="dropdown-menu"
+        <div class="dropdown-menu account-dropdown-alignment"
              aria-labelledby="account-dropdown"
              ngbDropdownMenu>
           <h6 class="dropdown-header">Hi, {{ user?.FirstName }}!</h6>
@@ -68,7 +73,7 @@
 <nav class="navbar navbar-expand navbar-light bg-light">
   <div class="container">
     <ocm-search class="mr-3 w-100"
-                placeholderText="Search Products..."
+                [placeholderText]="'Search Products...'"
                 [searchTermInput]="searchTermForProducts"
                 (searched)="searchProducts($event.detail)">
     </ocm-search>

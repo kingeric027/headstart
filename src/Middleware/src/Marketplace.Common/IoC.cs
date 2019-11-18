@@ -72,7 +72,11 @@ namespace Marketplace.Common
                 }, defaultCollectionThroughput: 5000);
 
             services.AddSingleton(typeof(LogQuery), typeof(LogQuery));
+            services.AddSingleton(typeof(ISupplierCategoryConfigQuery), typeof(SupplierCategoryConfigQuery));
+
             services.AddCosmosStore<OrchestrationLog>(cosmosSettings);
+            services.AddCosmosStore<SupplierCategoryConfig>(cosmosSettings);
+
 
             return services.BuildServiceProvider();
         }

@@ -7,12 +7,12 @@ import { specErrors } from '../errors';
 @Component({
   selector: 'spec-form-input',
   template: `
-    <div class="col-md-12" [formGroup]="group">
+    <div [formGroup]="group">
       <div class="form-input">
         <label>{{ config.label }}</label>
         <input
           type="text"
-          class="form-control"
+          class="form-control form-control-sm"
           [attr.placeholder]="config.placeholder"
           [formControlName]="config.name"
         />
