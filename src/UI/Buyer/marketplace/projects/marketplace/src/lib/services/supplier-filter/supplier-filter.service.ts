@@ -157,8 +157,10 @@ export class SupplierFilterService implements ISupplierFilters {
     return Object.entries(filters).some(([key, value]) => !!value);
   }
 
-  getMarketplaceSupplierCategories(marketplaceID: string) {
-    return this.http
+  async getMarketplaceSupplierCategories(
+    marketplaceID: string
+  ): Promise<SupplierCategoryConfig> {
+    return await this.http
       .get<SupplierCategoryConfig>(
         `${this.context.appSettings.middlewareUrl}/marketplace/${marketplaceID}/supplier/category/config`,
         this.options

@@ -16,7 +16,7 @@ import { SupplierCategoryConfig } from "../shopper-context";
 })
 export class SupplierListWrapperComponent implements OnInit, OnDestroy {
   suppliers: ListSupplier;
-  supplierCategoryConfig: SupplierCategoryConfig;
+  supplierCategoryConfig: Promise<SupplierCategoryConfig>;
   alive = true;
 
   constructor(
