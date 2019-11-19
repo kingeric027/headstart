@@ -22,7 +22,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let product of productsList.Items; index as index"
+        <tr *ngFor="let product of resourceList.Items; index as index"
             (click)="selectResource(product)"
             class="selectable-row"
             [ngClass]="{'selected-resource':selectedIndex === index}">
@@ -31,7 +31,7 @@
           <td>{{product.Active ? 'Active' : 'Inactive'}}</td>
         </tr>
         <tr>
-          <td *ngIf="productsList?.Meta?.Page < productsList?.Meta?.TotalPages">More products</td>
+          <td *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">More products</td>
           <td></td>
           <td></td>
         </tr>
@@ -55,7 +55,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let product of productsList.Items"
+          <tr *ngFor="let product of resourceList.Items"
               (click)="selectResource(product)"
               class="selectable-row"
               [ngClass]="{'selected-resource':selectedResourceID === product.ID}">
@@ -63,7 +63,7 @@
 
           </tr>
           <tr>
-            <td *ngIf="productsList?.Meta?.Page < productsList?.Meta?.TotalPages">More products</td>
+            <td *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">More products</td>
 
           </tr>
         </tbody>
@@ -90,8 +90,7 @@
              (input)="updateResource('Description', $event)"
              placeholder="Description">
     </div>
-    <button 
-    (click)="saveUpdates()"
-    *ngIf="JSON.stringify(updatedResource) !== JSON.stringify(resourceInSelection)">Save Changes</button>
+    <button (click)="saveUpdates()"
+            *ngIf="JSON.stringify(updatedResource) !== JSON.stringify(resourceInSelection)">Save Changes</button>
   </div>
 </div>

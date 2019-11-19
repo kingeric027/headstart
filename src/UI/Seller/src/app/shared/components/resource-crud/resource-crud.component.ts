@@ -1,20 +1,15 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit } from '@angular/core';
 import { Meta } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 
-@Component({
-  selector: 'app-product-list',
-  templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.scss'],
-})
-interface ListResource {
+interface ListResource<ResourceType> {
   Meta: Meta;
-  Items: any[];
+  Items: ResourceType[];
 }
 
-export abstract class ResourceCrudComponent implements OnInit, OnDestroy {
+export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
-  resourceList: ListResource = { Meta: {}, Items: [] };
+  resourceList: ListResource<ResourceType> = { Meta: {}, Items: [] };
   searchText: string = null;
 
   // empty string if no resource is selected
@@ -24,9 +19,12 @@ export abstract class ResourceCrudComponent implements OnInit, OnDestroy {
   JSON = JSON;
   ocService: any = {};
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+  constructor(private changeDetectorRef: ChangeDetectorRef, ocService: any) {
+    this.ocService = ocService;
+  }
 
   ngOnInit() {
+    console.log('after content init');
     this.subscribeToResources();
     this.setFilters();
   }

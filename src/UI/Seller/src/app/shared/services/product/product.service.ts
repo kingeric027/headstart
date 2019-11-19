@@ -15,8 +15,8 @@ interface Filters {
 @Injectable({
   providedIn: 'root',
 })
-export class ProductService {
-  public productSubject: BehaviorSubject<ListProduct> = new BehaviorSubject<ListProduct>({ Meta: {}, Items: [] });
+export abstract class ProductService {
+  public resourceSubject: BehaviorSubject<ListProduct> = new BehaviorSubject<ListProduct>({ Meta: {}, Items: [] });
   public filterSubject: BehaviorSubject<Filters> = new BehaviorSubject<Filters>(this.getDefaultParms());
   private itemsPerPage = 100;
 
@@ -25,14 +25,14 @@ export class ProductService {
     private activatedRoute: ActivatedRoute,
     private ocProductsService: OcProductService
   ) {
-    this.activatedRoute.queryParams.subscribe(params => {
+    this.activatedRoute.queryParams.subscribe((params) => {
       if (this.router.url.startsWith('/products')) {
         this.readFromUrlQueryParams(params);
       } else {
         this.filterSubject.next(this.getDefaultParms());
       }
     });
-    this.filterSubject.subscribe(value => {
+    this.filterSubject.subscribe((value) => {
       this.listProducts();
     });
   }
@@ -69,25 +69,25 @@ export class ProductService {
 
   async updateResource(resource: any) {
     const newResource = await this.ocProductsService.Save(resource.ID, resource).toPromise();
-    const resourceIndex = this.productSubject.value.Items.findIndex(i => i.ID === newResource.ID);
-    this.productSubject.value.Items[resourceIndex] = newResource;
-    this.productSubject.next(this.productSubject.value);
+    const resourceIndex = this.resourceSubject.value.Items.findIndex((i) => i.ID === newResource.ID);
+    this.resourceSubject.value.Items[resourceIndex] = newResource;
+    this.resourceSubject.next(this.resourceSubject.value);
   }
 
   setNewProducts(productsResponse: ListProduct) {
-    this.productSubject.next(productsResponse);
+    this.resourceSubject.next(productsResponse);
   }
 
   addProducts(productsResponse: ListProduct) {
-    this.productSubject.next({
+    this.resourceSubject.next({
       Meta: productsResponse.Meta,
-      Items: [...this.productSubject.value.Items, ...productsResponse.Items],
+      Items: [...this.resourceSubject.value.Items, ...productsResponse.Items],
     });
   }
 
   getNextPage() {
-    if (this.productSubject.value.Meta && this.productSubject.value.Meta.Page) {
-      this.listProducts(this.productSubject.value.Meta.Page + 1);
+    if (this.resourceSubject.value.Meta && this.resourceSubject.value.Meta.Page) {
+      this.listProducts(this.resourceSubject.value.Meta.Page + 1);
     }
   }
 
