@@ -281,6 +281,10 @@ export interface AppConfig {
    */
   clientID: string;
   /**
+   * The identifier for the marketplace.
+   */
+  marketplaceID: string;
+  /**
    * If set to true users can browse and submit orders without profiling themselves. This requires
    * additional set up in the dashboard. Click here to
    * [learn more](https://developer.ordercloud.io/documentation/platform-guides/authentication/anonymous-shopping)
@@ -357,4 +361,16 @@ export interface DecodedOCToken {
    * this value will *only* exist for anonymous users
    */
   orderid?: string;
+}
+
+export interface SupplierCategoryConfigFilters {
+  Display: string;
+  Path: string;
+  Values: string[];
+}
+export interface SupplierCategoryConfig {
+  id: string;
+  timestamp: string;
+  MarketplaceName: string;
+  Filters: Array<SupplierCategoryConfigFilters>;
 }

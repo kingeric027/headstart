@@ -5,8 +5,8 @@ import { faTimes, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { takeWhile } from 'rxjs/operators';
-import { SupplierFilters } from 'marketplace';
-import SupplierCategoryConfig from './SEB_SupplierCategoryConfig';
+import { SupplierFilters, SupplierCategoryConfig } from 'marketplace';
+// import SupplierCategoryConfig from './SEB_SupplierCategoryConfig';
 
 @Component({
   templateUrl: './supplier-list.component.html',
@@ -14,6 +14,14 @@ import SupplierCategoryConfig from './SEB_SupplierCategoryConfig';
 })
 export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
   @Input() suppliers: ListSupplier;
+  _supplierCategoryConfig: SupplierCategoryConfig;
+  @Input() set supplierCategoryConfig(value: SupplierCategoryConfig) {
+    this._supplierCategoryConfig = value;
+    this.setForm();
+    this.context.supplierFilters.activeFiltersSubject
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(this.handleFiltersChange);
+  }
   @ViewChild('popover', { static: false }) public popover: NgbPopover;
   searchTermForSuppliers: string = null;
   filterForm: FormGroup;
@@ -21,38 +29,30 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
   faFilter = faFilter;
   serviceCategory = '';
   activeFilters = {};
-  serviceCategoryOptions = [];
-  vendorLevelOptions = [];
   activeFilterCount: number = 0;
 
   ngOnContextSet() {
     this.activeFilterCount = Object.keys(this.context.supplierFilters.activeFiltersSubject.value.activeFilters).length;
-    this.context.supplierFilters.activeFiltersSubject
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(this.handleFiltersChange);
   }
 
-  ngOnInit() {
-    this.setForm();
-
-    this.serviceCategoryOptions = SupplierCategoryConfig.ServiceCategories;
-    this.vendorLevelOptions = SupplierCategoryConfig.VendorLevels;
-  }
+  ngOnInit() {}
   ngOnChanges() {
     this.activeFilterCount = Object.keys(this.context.supplierFilters.activeFiltersSubject.value.activeFilters).length;
   }
 
   setForm() {
-    this.filterForm = new FormGroup({
-      serviceCategory: new FormControl(''),
-      vendorLevel: new FormControl(''),
+    let formGroup = {};
+    this._supplierCategoryConfig.Filters.forEach(filter => {
+      formGroup[filter.Path] = new FormControl('');
     });
+    this.filterForm = new FormGroup(formGroup);
   }
 
   private handleFiltersChange = (filters: SupplierFilters) => {
     if (filters.activeFilters) {
-      this.filterForm.controls.serviceCategory.setValue(filters.activeFilters['Categories.ServiceCategory']);
-      this.filterForm.controls.vendorLevel.setValue(filters.activeFilters['Categories.VendorLevel']);
+      this._supplierCategoryConfig.Filters.forEach(filter => {
+        this.filterForm.controls[filter.Path].setValue(filters.activeFilters[filter.Path]);
+      });
     }
   };
 
@@ -67,10 +67,10 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
   }
 
   applyFilters() {
-    const { serviceCategory, vendorLevel } = this.filterForm.value;
     const filters = {};
-    if (serviceCategory) filters['Categories.ServiceCategory'] = serviceCategory;
-    if (vendorLevel) filters['Categories.VendorLevel'] = vendorLevel;
+    this._supplierCategoryConfig.Filters.forEach(filter => {
+      filters[filter.Path] = this.filterForm.value[filter.Path];
+    });
     this.context.supplierFilters.filterByFields(filters);
     this.popover.close();
   }
