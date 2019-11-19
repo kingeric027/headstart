@@ -1,1 +1,39 @@
-<p>product-list works!</p>
+<!-- 98pc calced height is placeholder for now: will need to change to make responsive or if the layout srtructure is changed -->
+
+<div class="form-group resource-search">
+  <input type="search"
+         class="form-control"
+         id="Search products"
+         aria-describedby="Search products"
+         placeholder="Search products" (onchange)="searchResources($event)">
+</div>
+<perfect-scrollbar style="width: 100%; height: calc(100vh - 98px);"
+                   (psYReachEnd)="handleScrollEnd()">
+  <table id="resource-table"
+         class="table table-hover"
+         [ngClass]="{'edit-resource-view': isResourceSelected}">
+    <thead>
+      <tr>
+        <th scope="
+         col">Name</th>
+        <th *ngIf="!isResourceSelected"
+            scope="col">ID</th>
+        <th *ngIf="!isResourceSelected"
+            scope="col">Active</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of resources; index as index"
+          (click)="selectResource(index)">
+        <td>{{product.Name}}</td>
+        <td *ngIf="!isResourceSelected">{{product.ID}}</td>
+        <td *ngIf="!isResourceSelected">{{product.Active ? 'Active' : 'Inactive'}}</td>
+      </tr>
+      <tr>
+        <td *ngIf="mostRecentMeta.Page < mostRecentMeta.TotalPages">More products</td>
+        <td *ngIf="!isResourceSelected"></td>
+        <td *ngIf="!isResourceSelected"></td>
+      </tr>
+    </tbody>
+  </table>
+</perfect-scrollbar>

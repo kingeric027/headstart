@@ -1,5 +1,5 @@
 // angular
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -20,6 +20,7 @@ import { CategoryFormComponent } from './components/category-form/category-form.
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { ProductImagesComponent } from './components/product-images/product-images.component';
 import { ProductFormComponent } from './components/products-form/product-form.component';
+import { ProductService } from './services/product-filter/product-filter.service';
 
 @NgModule({
   imports: [
@@ -73,4 +74,11 @@ import { ProductFormComponent } from './components/products-form/product-form.co
     ProductFormComponent,
   ],
 })
-export class SharedModule {}
+export class SharedModule {
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: SharedModule,
+      providers: [ProductService],
+    };
+  }
+}
