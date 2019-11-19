@@ -2,17 +2,9 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { Router, Params, ActivatedRoute } from "@angular/router";
 import { transform as _transform, pickBy as _pickBy } from "lodash";
-import {
-  SupplierFilters,
-  ISupplierFilters,
-  SupplierCategoryConfig
-} from "../../shopper-context";
+import { SupplierFilters, ISupplierFilters } from "../../shopper-context";
 import { OcSupplierService, ListSupplier } from "@ordercloud/angular-sdk";
-import { filter } from "rxjs/operators";
-import { OcTokenService } from "@ordercloud/angular-sdk";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { cloneDeep as _cloneDeep } from "lodash";
-import { ShopperContextService } from "../shopper-context/shopper-context.service";
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -25,17 +17,10 @@ export class SupplierFilterService implements ISupplierFilters {
     SupplierFilters
   > = new BehaviorSubject<SupplierFilters>(this.getDefaultParms());
 
-  readonly options = {
-    headers: new HttpHeaders({
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`
-    })
-  };
   constructor(
     private router: Router,
     private ocSupplierService: OcSupplierService,
-    private activatedRoute: ActivatedRoute,
-    private ocTokenService: OcTokenService
+    private activatedRoute: ActivatedRoute
   ) {
     this.activatedRoute.queryParams.subscribe(params => {
       if (this.router.url.startsWith("/suppliers")) {
