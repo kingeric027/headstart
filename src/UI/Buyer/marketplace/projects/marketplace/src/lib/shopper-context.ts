@@ -158,7 +158,6 @@ export interface ISupplierFilters {
   clearAllFilters(): void;
   hasFilters(): boolean;
   filterByFields(filter: any): void;
-  getMarketplaceSupplierCategories(marketplaceID: string);
 }
 
 export interface SupplierFilters {

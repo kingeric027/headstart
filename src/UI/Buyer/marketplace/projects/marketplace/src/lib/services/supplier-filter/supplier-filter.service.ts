@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { Router, Params, ActivatedRoute } from "@angular/router";
 import { transform as _transform, pickBy as _pickBy } from "lodash";
 import {
@@ -35,8 +35,6 @@ export class SupplierFilterService implements ISupplierFilters {
     private router: Router,
     private ocSupplierService: OcSupplierService,
     private activatedRoute: ActivatedRoute,
-    private http: HttpClient,
-    private context: ShopperContextService,
     private ocTokenService: OcTokenService
   ) {
     this.activatedRoute.queryParams.subscribe(params => {
@@ -108,8 +106,7 @@ export class SupplierFilterService implements ISupplierFilters {
   private createFilters(activeFilters, supplierID): any {
     const filters = _transform(
       activeFilters,
-      (result, value, key: any) =>
-        (result[`xp.${key.toLocaleLowerCase()}`] = value),
+      (result, value, key: any) => (result[key.toLocaleLowerCase()] = value),
       {}
     );
     filters.ID = supplierID || undefined;
@@ -155,16 +152,5 @@ export class SupplierFilterService implements ISupplierFilters {
   hasFilters(): boolean {
     const filters = this.activeFiltersSubject.value;
     return Object.entries(filters).some(([key, value]) => !!value);
-  }
-
-  getMarketplaceSupplierCategories(
-    marketplaceID: string
-  ): Promise<SupplierCategoryConfig> {
-    return this.http
-      .get<SupplierCategoryConfig>(
-        `${this.context.appSettings.middlewareUrl}/marketplace/${marketplaceID}/supplier/category/config`,
-        this.options
-      )
-      .toPromise();
   }
 }
