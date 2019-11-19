@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { Product, ListProduct } from '@ordercloud/angular-sdk';
-import { ProductService } from '@app-seller/shared/services/product/product.service';
+import { Meta } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 
 @Component({
@@ -8,9 +7,14 @@ import { takeWhile } from 'rxjs/operators';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
-export class ProductListComponent implements OnInit, OnDestroy {
+interface ListResource {
+  Meta: Meta;
+  Items: any[];
+}
+
+export abstract class ResourceCrudComponent implements OnInit, OnDestroy {
   alive = true;
-  productsList: ListProduct = { Meta: {}, Items: [] };
+  resourceList: ListResource = { Meta: {}, Items: [] };
   searchText: string = null;
 
   // empty string if no resource is selected
@@ -18,8 +22,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
   updatedResource = {};
   resourceInSelection = {};
   JSON = JSON;
+  ocService: any = {};
 
-  constructor(private productService: ProductService, private changeDetectorRef: ChangeDetectorRef) {}
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.subscribeToResources();
@@ -27,23 +32,23 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   subscribeToResources() {
-    this.productService.productSubject.pipe(takeWhile(() => this.alive)).subscribe((productsList) => {
-      this.productsList = productsList;
+    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
+      this.resourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
   }
 
   handleScrollEnd() {
-    this.productService.getNextPage();
+    this.ocService.getNextPage();
   }
 
   setFilters() {
-    this.searchText = this.productService.filterSubject.value.search;
+    this.searchText = this.ocService.filterSubject.value.search;
   }
 
   searchResources(searchStr: string) {
     this.searchText = searchStr;
-    this.productService.searchBy(searchStr);
+    this.ocService.searchBy(searchStr);
   }
 
   selectResource(resource: any) {
@@ -55,8 +60,6 @@ export class ProductListComponent implements OnInit, OnDestroy {
   updateResource(fieldName: string, event) {
     const newValue = event.target.value;
     this.updatedResource[fieldName] = newValue;
-    console.log(this.updatedResource);
-    console.log(this.resourceInSelection);
   }
 
   copyResource(resource: any) {
@@ -64,7 +67,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   saveUpdates() {
-    this.productService.updateResource(this.updatedResource);
+    this.ocService.updateResource(this.updatedResource);
   }
 
   ngOnDestroy() {

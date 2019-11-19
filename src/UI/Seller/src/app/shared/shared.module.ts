@@ -20,7 +20,7 @@ import { CategoryFormComponent } from './components/category-form/category-form.
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { ProductImagesComponent } from './components/product-images/product-images.component';
 import { ProductFormComponent } from './components/products-form/product-form.component';
-import { ProductService } from './services/product-filter/product-filter.service';
+import { ProductService } from './services/product/product.service';
 
 @NgModule({
   imports: [

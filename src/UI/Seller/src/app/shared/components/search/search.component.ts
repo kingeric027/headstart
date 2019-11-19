@@ -1,60 +1,74 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  Input,
-  EventEmitter,
-  Output,
-} from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { Component, OnDestroy, Input, EventEmitter, Output, OnChanges, OnInit } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { debounceTime, takeWhile } from 'rxjs/operators';
+import { debounceTime, takeWhile, filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'shared-search',
+  selector: 'search-component',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })
-export class SearchComponent implements OnInit, OnDestroy {
+export class SearchComponent implements OnInit, OnChanges, OnDestroy {
   alive = true;
-  @Input() placeholderText?: string;
-  @Output() searched = new EventEmitter<string>();
+  @Input()
+  placeholderText?: string;
+  @Input()
+  searchTermInput?: string;
+  @Output()
+  searched = new EventEmitter<string>();
   faSearch = faSearch;
   faTimes = faTimes;
   form: FormGroup;
-
-  constructor(private formBuilder: FormBuilder) {}
+  previousSearchTerm = '';
 
   ngOnInit() {
-    this.form = this.formBuilder.group({ search: '' });
+    this.buildForm();
+  }
+
+  ngOnChanges() {
+    if (this.searchTermInput !== null && this.searchTermInput !== undefined) {
+      this.previousSearchTerm = this.searchTermInput;
+      this.form.setValue({ search: this.searchTermInput });
+    }
+  }
+
+  buildForm() {
+    this.form = new FormGroup({ search: new FormControl('') });
     this.onFormChanges();
   }
 
   private onFormChanges() {
-    this.form.controls['search'].valueChanges
+    this.form.controls.search.valueChanges
       .pipe(
+        filter(searchTerm => {
+          const userTriggered = this.form.dirty;
+          return searchTerm !== this.previousSearchTerm && userTriggered;
+        }),
         debounceTime(500),
         takeWhile(() => this.alive)
       )
-      .subscribe(() => {
+      .subscribe(searchTerm => {
+        this.previousSearchTerm = searchTerm;
         this.search();
       });
   }
 
-  private search() {
-    let searchTerm = this.form.get('search').value;
-    if (!searchTerm) {
-      // emit as undefined so sdk ignores parameter completely
-      searchTerm = undefined;
-    }
-    this.searched.emit(searchTerm);
+  search() {
+    this.form.markAsPristine();
+    // emit as undefined if empty string so sdk ignores parameter completely
+    this.searched.emit(this.getCurrentSearchTerm() || undefined);
+  }
+
+  getCurrentSearchTerm(): string {
+    return this.form.get('search').value;
   }
 
   showClear(): boolean {
-    return this.form.get('search').value !== '';
+    return this.getCurrentSearchTerm() !== '';
   }
 
   clear(): void {
+    this.form.markAsDirty();
     this.form.setValue({ search: '' });
   }
 

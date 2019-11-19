@@ -11,21 +11,13 @@ interface Filters {
   search?: string;
 }
 
-interface ProductListEditMeta {
-  items: Product[];
-  meta: Meta;
-  filters: Filters;
-  selectedIndex: number;
-}
-
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  public productSubject: BehaviorSubject<ProductListEditMeta> = new BehaviorSubject<ProductListEditMeta>(
-    this.getDefaultProductListEditMeta()
-  );
+  public productSubject: BehaviorSubject<ListProduct> = new BehaviorSubject<ListProduct>({ Meta: {}, Items: [] });
+  public filterSubject: BehaviorSubject<Filters> = new BehaviorSubject<Filters>(this.getDefaultParms());
   private itemsPerPage = 100;
 
   constructor(
@@ -33,20 +25,23 @@ export class ProductService {
     private activatedRoute: ActivatedRoute,
     private ocProductsService: OcProductService
   ) {
-    this.activatedRoute.queryParams.subscribe((params) => {
+    this.activatedRoute.queryParams.subscribe(params => {
       if (this.router.url.startsWith('/products')) {
         this.readFromUrlQueryParams(params);
       } else {
-        this.productSubject.next(this.getDefaultProductListEditMeta());
+        this.filterSubject.next(this.getDefaultParms());
       }
+    });
+    this.filterSubject.subscribe(value => {
+      this.listProducts();
     });
   }
 
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
-    const { sortBy, search, categoryID } = params;
-    const showOnlyFavorites = !!params.favorites;
-    this.productSubject.next({ ...this.productSubject.value, filters: { sortBy, search } });
+    const { sortBy, search } = params;
+    console.log('read from url query params');
+    this.filterSubject.next({ sortBy, search });
   }
 
   // Used to update the URL
@@ -56,7 +51,7 @@ export class ProductService {
   }
 
   async listProducts(pageNumber = 1) {
-    const { sortBy, search } = this.productSubject.value.filters;
+    const { sortBy, search } = this.filterSubject.value;
     const productsResponse = await this.ocProductsService
       .List({
         page: pageNumber,
@@ -72,27 +67,37 @@ export class ProductService {
     }
   }
 
+  async updateResource(resource: any) {
+    const newResource = await this.ocProductsService.Save(resource.ID, resource).toPromise();
+    const resourceIndex = this.productSubject.value.Items.findIndex(i => i.ID === newResource.ID);
+    this.productSubject.value.Items[resourceIndex] = newResource;
+    this.productSubject.next(this.productSubject.value);
+  }
+
   setNewProducts(productsResponse: ListProduct) {
-    this.productSubject.next({
-      ...this.productSubject.value,
-      items: productsResponse.Items,
-      meta: productsResponse.Meta,
-    });
+    this.productSubject.next(productsResponse);
   }
 
   addProducts(productsResponse: ListProduct) {
     this.productSubject.next({
-      ...this.productSubject.value,
-      items: [...this.productSubject.value.items, ...productsResponse.Items],
-      meta: productsResponse.Meta,
+      Meta: productsResponse.Meta,
+      Items: [...this.productSubject.value.Items, ...productsResponse.Items],
     });
   }
 
   getNextPage() {
-    this.listProducts(this.productSubject.value.filters.page + 1);
+    if (this.productSubject.value.Meta && this.productSubject.value.Meta.Page) {
+      this.listProducts(this.productSubject.value.Meta.Page + 1);
+    }
   }
 
-  private defaultParams() {
+  private patchFilterState(patch: Filters) {
+    const activeFilters = { ...this.filterSubject.value, ...patch };
+    const queryParams = this.mapToUrlQueryParams(activeFilters);
+    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
+  }
+
+  private getDefaultParms() {
     // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
     return {
       page: undefined,
@@ -101,22 +106,16 @@ export class ProductService {
     };
   }
 
-  private getDefaultProductListEditMeta(): ProductListEditMeta {
-    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
-    return {
-      items: [],
-      meta: {},
-      filters: this.defaultParams(),
-      selectedIndex: -1,
-    };
+  toPage(pageNumber: number) {
+    this.patchFilterState({ page: pageNumber || undefined });
   }
 
   sortBy(field: string) {
-    this.patchFilterState({ sortBy: field || undefined, page: undefined });
+    this.patchFilterState({ sortBy: field || undefined });
   }
 
   searchBy(searchTerm: string) {
-    this.patchFilterState({ search: searchTerm || undefined, page: undefined });
+    this.patchFilterState({ search: searchTerm || undefined });
   }
 
   clearSort() {
