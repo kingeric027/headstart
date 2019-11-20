@@ -61,7 +61,7 @@ namespace Marketplace.Orchestration
                 await context.CallActivityAsync("UpdateCache", wi);
 
                 log.LogInformation($"{wi.RecordId}: {wi.Action.ToString()} successfully");
-                await context.CallActivityAsync<Newtonsoft.Json.Linq.JObject>("LogEvent", new OrchestrationLog(wi));
+                await context.CallActivityAsync<JObject>("LogEvent", new OrchestrationLog(wi));
             }
             catch (OrchestrationException oex)
             {
