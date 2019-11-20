@@ -1,11 +1,7 @@
 import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit } from '@angular/core';
 import { Meta } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
-
-interface ListResource<ResourceType> {
-  Meta: Meta;
-  Items: ResourceType[];
-}
+import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -24,7 +20,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   ngOnInit() {
-    console.log('after content init');
     this.subscribeToResources();
     this.setFilters();
   }
@@ -53,6 +48,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.selectedResourceID = resource.ID;
     this.resourceInSelection = this.copyResource(resource);
     this.updatedResource = this.copyResource(resource);
+    this.changeDetectorRef.detectChanges();
   }
 
   updateResource(fieldName: string, event) {

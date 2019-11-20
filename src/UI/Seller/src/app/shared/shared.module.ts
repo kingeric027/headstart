@@ -21,6 +21,9 @@ import { CategoryDetailsComponent } from './components/category-details/category
 import { ProductImagesComponent } from './components/product-images/product-images.component';
 import { ProductFormComponent } from './components/products-form/product-form.component';
 import { ProductService } from './services/product/product.service';
+import { SupplierService } from './services/supplier/supplier.service';
+import { ResourceTableComponent } from './components/resource-table/resource-table.component';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 
 @NgModule({
   imports: [
@@ -34,6 +37,7 @@ import { ProductService } from './services/product/product.service';
     TreeModule,
     FontAwesomeModule,
     FormsModule,
+    PerfectScrollbarModule,
     NgbPaginationModule.forRoot(),
     NgbTabsetModule.forRoot(),
   ],
@@ -60,6 +64,7 @@ import { ProductService } from './services/product/product.service';
     CategoryDetailsComponent,
     ProductImagesComponent,
     ProductFormComponent,
+    ResourceTableComponent,
   ],
   declarations: [
     SearchComponent,
@@ -72,13 +77,14 @@ import { ProductService } from './services/product/product.service';
     CategoryDetailsComponent,
     ProductImagesComponent,
     ProductFormComponent,
+    ResourceTableComponent,
   ],
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders {
     return {
       ngModule: SharedModule,
-      providers: [ProductService],
+      providers: [ProductService, SupplierService],
     };
   }
 }
