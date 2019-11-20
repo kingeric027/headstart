@@ -1,5 +1,9 @@
-import { Component, Input, Output, ViewChild } from '@angular/core';
-import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { Component, Input, Output, ViewChild, OnInit } from '@angular/core';
+import {
+  ListResource,
+  ResourceCrudService,
+  Options,
+} from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -9,15 +13,16 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './resource-table.component.html',
   styleUrls: ['./resource-table.component.scss'],
 })
-export class ResourceTableComponent {
+export class ResourceTableComponent implements OnInit {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
+  searchTerm = '';
 
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
   @Input()
-  searchText: string;
+  resourceOptions: Options;
   @Input()
   selectedResourceID: string;
   @Input()
@@ -26,6 +31,8 @@ export class ResourceTableComponent {
   resourceInSelection: any;
   @Input()
   resourceName: string;
+  @Input()
+  ocService: ResourceCrudService<any>;
   @Output()
   searched: EventEmitter<any> = new EventEmitter();
   @Output()
@@ -39,9 +46,11 @@ export class ResourceTableComponent {
 
   JSON = JSON;
 
+  ngOnInit() {
+    this.searchTerm = this.resourceOptions.search || '';
+  }
+
   searchedResources(event) {
-    console.log('event in searchedresource');
-    console.log(event);
     this.searched.emit(event);
   }
 
@@ -68,5 +77,9 @@ export class ResourceTableComponent {
   handleApplyFilters() {
     this.closePopover();
     this.applyFilters.emit(null);
+  }
+
+  clearAllFilters() {
+    this.ocService.clearAllFilters();
   }
 }

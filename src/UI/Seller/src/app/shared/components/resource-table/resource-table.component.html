@@ -10,7 +10,7 @@
         <form class="d-flex">
           <search-component class="mr-3 w-100"
                             [placeholderText]="'Search ' + resourceName"
-                            [searchTermInput]="searchText"
+                            [searchTermInput]="searchTerm"
                             (searched)="searchedResources($event)">
           </search-component>
         </form>
@@ -29,7 +29,7 @@
           <div class="icon-button ripple"
                placement="bottom"
                [ngbPopover]="filters"
-               [autoClose]="false"
+               autoClose="outside"
                triggers="manual"
                #popover="ngbPopover"
                (click)="openPopover()"
@@ -50,10 +50,13 @@
                      (click)="clearFilters()"></fa-icon>
           </div>
         </div>
+        <button class="btn btn-light"
+                (click)="clearAllFilters()">Clear All Filters</button>
       </div>
 
       <!-- full table view -->
-      <div *ngIf="!selectedResourceID">
+      <div *ngIf="
+                !selectedResourceID">
         <perfect-scrollbar style="width: 100%; height: calc(100vh - 98px);"
                            (psYReachEnd)="handleScrollEnd()">
           <ng-content select="table"></ng-content>
@@ -65,7 +68,8 @@
            class="row">
         <div class="col-3">
           <perfect-scrollbar style="width: 100%; height: calc(100vh - 98px);"
-                             (psYReachEnd)="handleScrollEnd()">
+                             (psYReachEnd)="handleScrollEnd()"
+                             class="resource-table-side">
             <table class="table table-hover resource-table">
               <thead>
                 <tr>

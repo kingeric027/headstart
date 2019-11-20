@@ -1,13 +1,18 @@
 import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
-import { cloneDeep as _cloneDeep } from 'lodash';
+import { cloneDeep as _cloneDeep, uniqBy as _uniqBy } from 'lodash';
 import { Meta } from '@ordercloud/angular-sdk';
 
-interface Filters {
+export interface Options {
   page?: number;
   sortBy?: string;
   search?: string;
+  filters?: FilterDictionary;
+}
+
+export interface FilterDictionary {
+  [filterKey: string]: string;
 }
 
 export interface ListResource<ResourceType> {
@@ -19,7 +24,7 @@ export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListResource<ResourceType>> = new BehaviorSubject<ListResource<ResourceType>>(
     { Meta: {}, Items: [] }
   );
-  public filterSubject: BehaviorSubject<Filters> = new BehaviorSubject<Filters>(this.getDefaultParms());
+  public optionsSubject: BehaviorSubject<Options> = new BehaviorSubject<Options>({});
   private itemsPerPage = 100;
 
   // route defintes the string of text that the front end needs to match to make list calls
@@ -31,36 +36,54 @@ export abstract class ResourceCrudService<ResourceType> {
       if (this.router.url.startsWith(this.route)) {
         this.readFromUrlQueryParams(params);
       } else {
-        this.filterSubject.next(this.getDefaultParms());
+        this.optionsSubject.next({});
       }
     });
-    this.filterSubject.subscribe((value) => {
+    this.optionsSubject.subscribe((value) => {
       this.listResources();
     });
   }
 
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
-    const { sortBy, search } = params;
+    const { sortBy, search, ...filters } = params;
     console.log('read from url query params');
-    this.filterSubject.next({ sortBy, search });
+    console.log(filters);
+    this.optionsSubject.next({ sortBy, search, filters });
   }
 
   // Used to update the URL
-  mapToUrlQueryParams(model: Filters): Params {
-    const { sortBy, search } = model;
-    return { sortBy, search };
+  mapToUrlQueryParams(options: Options): Params {
+    const { sortBy, search, filters } = options;
+    return { sortBy, search, ...filters };
   }
+
+  // mapXpFiltersToQueryParamsObject(xpFilterDictionary: XpFilterDictionary) {
+  //   const filterDictionary = {};
+  //   Object.values(xpFilterDictionary).forEach((filter) => {
+  //     filterDictionary[filter.displayInQueryParams] = filter.value;
+  //   });
+  //   return filterDictionary;
+  // }
+
+  // mapXpFiltersToQueryParamsObject(xpFilterDictionary) {
+  //   const xpFilterDictionary = {};
+  //   Object.entries(xpFilterDictionary).forEach((filter) => {
+  //     filterDictionary[filter.displayInQueryParams] = filter.value;
+  //   });
+  //   return filterDictionary;
+  // }
 
   async listResources(pageNumber = 1) {
     if (this.router.url.startsWith(this.route)) {
-      const { sortBy, search } = this.filterSubject.value;
+      const { sortBy, search, filters } = this.optionsSubject.value;
       const productsResponse = await this.ocService
         .List({
           page: pageNumber,
           search,
           sortBy,
           pageSize: this.itemsPerPage,
+          filters,
         })
         .toPromise();
       if (pageNumber === 1) {
@@ -95,19 +118,10 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
-  private patchFilterState(patch: Filters) {
-    const activeFilters = { ...this.filterSubject.value, ...patch };
+  private patchFilterState(patch: Options) {
+    const activeFilters = { ...this.optionsSubject.value, ...patch };
     const queryParams = this.mapToUrlQueryParams(activeFilters);
     this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
-  }
-
-  private getDefaultParms() {
-    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
-    return {
-      page: undefined,
-      sortBy: undefined,
-      search: undefined,
-    };
   }
 
   toPage(pageNumber: number) {
@@ -122,6 +136,21 @@ export abstract class ResourceCrudService<ResourceType> {
     this.patchFilterState({ search: searchTerm || undefined });
   }
 
+  addFilters(newFilters: FilterDictionary) {
+    const newFilterDictionary = { ...this.optionsSubject.value.filters, ...newFilters };
+    this.patchFilterState({ filters: newFilterDictionary });
+  }
+
+  removeFilters(filtersToRemove: string[]) {
+    const newFilterDictionary = { ...this.optionsSubject.value.filters };
+    filtersToRemove.forEach((filter) => {
+      if (newFilterDictionary[filter]) {
+        delete newFilterDictionary[filter];
+      }
+    });
+    this.patchFilterState({ filters: newFilterDictionary });
+  }
+
   clearSort() {
     this.sortBy(undefined);
   }
@@ -131,11 +160,15 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   clearAllFilters() {
-    this.patchFilterState(this.getDefaultParms());
+    this.patchFilterState({});
+  }
+
+  clearResources() {
+    this.resourceSubject.next({ Meta: {}, Items: [] });
   }
 
   hasFilters(): boolean {
-    const filters = this.filterSubject.value;
+    const filters = this.optionsSubject.value;
     return Object.entries(filters).some(([key, value]) => {
       return !!value;
     });

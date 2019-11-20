@@ -4,6 +4,10 @@
     cursor: pointer;
 }
 
+.resource-table-side {
+    border-right: 1px solid $gray-300;
+}
+
 .resource-search {
     width: 200px;
 }

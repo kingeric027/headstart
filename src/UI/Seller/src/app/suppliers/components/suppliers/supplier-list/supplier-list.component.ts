@@ -3,6 +3,7 @@ import { ResourceCrudComponent } from '@app-seller/shared/components/resource-cr
 import { Supplier } from '@ordercloud/angular-sdk';
 import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
 import { FormControl, FormGroup } from '@angular/forms';
+import { FilterDictionary } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 
 export interface SupplierCategoryConfigFilters {
   Display: string;
@@ -24,10 +25,9 @@ export interface SupplierCategoryConfig {
 export class SupplierListComponent extends ResourceCrudComponent<Supplier> {
   constructor(private supplierService: SupplierService, changeDetectorRef: ChangeDetectorRef) {
     super(changeDetectorRef, supplierService);
-    this.setForm();
   }
 
-  supplierCategoryConfig: SupplierCategoryConfig = {
+  filterConfig = {
     id: 'SEB',
     timeStamp: '0001-01-01T00:00:00+00:00',
     MarketplaceName: 'Self Esteem Brands',
@@ -124,17 +124,4 @@ export class SupplierListComponent extends ResourceCrudComponent<Supplier> {
       },
     ],
   };
-  filterForm: FormGroup;
-
-  applyFilters() {
-    console.log(this.filterForm);
-  }
-
-  setForm() {
-    const formGroup = {};
-    this.supplierCategoryConfig.Filters.forEach((filter) => {
-      formGroup[filter.Path] = new FormControl('');
-    });
-    this.filterForm = new FormGroup(formGroup);
-  }
 }

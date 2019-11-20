@@ -13,7 +13,7 @@ export class SearchComponent implements OnInit, OnChanges, OnDestroy {
   @Input()
   placeholderText?: string;
   @Input()
-  searchTermInput?: string;
+  searchTermInput = '';
   @Output()
   searched = new EventEmitter<string>();
   faSearch = faSearch;
@@ -26,7 +26,7 @@ export class SearchComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
-    if (this.searchTermInput !== null && this.searchTermInput !== undefined) {
+    if (this.searchTermInput !== null && this.searchTermInput !== undefined && this.form) {
       this.previousSearchTerm = this.searchTermInput;
       this.form.setValue({ search: this.searchTermInput });
     }
@@ -40,14 +40,14 @@ export class SearchComponent implements OnInit, OnChanges, OnDestroy {
   private onFormChanges() {
     this.form.controls.search.valueChanges
       .pipe(
-        filter(searchTerm => {
+        filter((searchTerm) => {
           const userTriggered = this.form.dirty;
           return searchTerm !== this.previousSearchTerm && userTriggered;
         }),
         debounceTime(500),
         takeWhile(() => this.alive)
       )
-      .subscribe(searchTerm => {
+      .subscribe((searchTerm) => {
         this.previousSearchTerm = searchTerm;
         this.search();
       });

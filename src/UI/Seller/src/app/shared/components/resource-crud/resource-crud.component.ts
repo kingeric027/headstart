@@ -1,27 +1,37 @@
 import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit } from '@angular/core';
 import { Meta } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
-import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import {
+  ListResource,
+  Options,
+  ResourceCrudService,
+  FilterDictionary,
+} from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { FormGroup, FormControl } from '@angular/forms';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
   resourceList: ListResource<ResourceType> = { Meta: {}, Items: [] };
-  searchText: string = null;
+  resourceOptions: Options = {};
+  searchText = '';
 
   // empty string if no resource is selected
   selectedResourceID = '';
   updatedResource = {};
   resourceInSelection = {};
   JSON = JSON;
-  ocService: any = {};
+  ocService: ResourceCrudService<ResourceType>;
+  filterForm: FormGroup;
+  filterConfig: any = {};
 
   constructor(private changeDetectorRef: ChangeDetectorRef, ocService: any) {
     this.ocService = ocService;
   }
 
   ngOnInit() {
+    this.setFilterForm();
     this.subscribeToResources();
-    this.setFilters();
+    this.subscribeToOptions();
   }
 
   subscribeToResources() {
@@ -31,14 +41,18 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     });
   }
 
+  subscribeToOptions() {
+    this.ocService.optionsSubject.pipe(takeWhile(() => this.alive)).subscribe((options) => {
+      this.resourceOptions = options;
+      this.setFilterForm();
+      this.changeDetectorRef.detectChanges();
+    });
+  }
+
   handleScrollEnd() {
     if (this.resourceList.Meta.TotalPages > this.resourceList.Meta.Page) {
       this.ocService.getNextPage();
     }
-  }
-
-  setFilters() {
-    this.searchText = this.ocService.filterSubject.value.search;
   }
 
   searchResources(searchStr: string) {
@@ -66,6 +80,31 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     const updatedResource = this.ocService.updateResource(this.updatedResource);
     this.resourceInSelection = this.copyResource(updatedResource);
     this.updatedResource = this.copyResource(updatedResource);
+  }
+
+  applyFilters() {
+    this.ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
+  }
+
+  removeFieldsWithNoValue(formValues: FilterDictionary) {
+    const values = { ...formValues };
+    Object.entries(values).forEach(([key, value]) => {
+      if (!value) {
+        delete values[key];
+      }
+    });
+    return values;
+  }
+
+  setFilterForm() {
+    const formGroup = {};
+    if (this.filterConfig && this.filterConfig.Filters) {
+      this.filterConfig.Filters.forEach((filter) => {
+        const value = (this.resourceOptions.filters && this.resourceOptions.filters[filter.Path]) || '';
+        formGroup[filter.Path] = new FormControl(value);
+      });
+      this.filterForm = new FormGroup(formGroup);
+    }
   }
 
   ngOnDestroy() {
