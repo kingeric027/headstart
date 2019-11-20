@@ -1,10 +1,9 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { Router, Params, ActivatedRoute } from "@angular/router";
 import { transform as _transform, pickBy as _pickBy } from "lodash";
 import { SupplierFilters, ISupplierFilters } from "../../shopper-context";
 import { OcSupplierService, ListSupplier } from "@ordercloud/angular-sdk";
-import { filter } from "rxjs/operators";
 import { cloneDeep as _cloneDeep } from "lodash";
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
@@ -92,8 +91,7 @@ export class SupplierFilterService implements ISupplierFilters {
   private createFilters(activeFilters, supplierID): any {
     const filters = _transform(
       activeFilters,
-      (result, value, key: any) =>
-        (result[`xp.${key.toLocaleLowerCase()}`] = value),
+      (result, value, key: any) => (result[key.toLocaleLowerCase()] = value),
       {}
     );
     filters.ID = supplierID || undefined;
