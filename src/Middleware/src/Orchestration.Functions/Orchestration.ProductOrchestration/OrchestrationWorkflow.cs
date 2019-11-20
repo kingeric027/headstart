@@ -85,7 +85,7 @@ namespace Marketplace.Orchestration
         public async Task LogEvent([ActivityTrigger] OrchestrationLog log) => await _log.Upsert(log);
 
         [FunctionName("RefreshCache")]
-        public async Task<Newtonsoft.Json.Linq.JObject> RefreshCache([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
+        public async Task<JObject> RefreshCache([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
 
         [FunctionName("CleanupQueue")]
         public async Task CleanupQueue([ActivityTrigger] string path) => await _orch.CleanupQueue(path);
@@ -94,18 +94,18 @@ namespace Marketplace.Orchestration
         public async Task UpdateCache([ActivityTrigger] WorkItem wi) => await _orch.SaveToCache(wi);
 
         [FunctionName("OrderCloudAction")]
-        public async Task<Newtonsoft.Json.Linq.JObject> OrderCloudAction([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
+        public async Task<JObject> OrderCloudAction([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
 
         [FunctionName("DetermineAction")]
         public async Task<Action> DetermineAction([ActivityTrigger] WorkItem wi) => await _orch.DetermineAction(wi);
 
         [FunctionName("CalculateDiff")]
-        public async Task<Newtonsoft.Json.Linq.JObject> CalculateDiff([ActivityTrigger] WorkItem wi) => await _orch.CalculateDiff(wi);
+        public async Task<JObject> CalculateDiff([ActivityTrigger] WorkItem wi) => await _orch.CalculateDiff(wi);
 
         [FunctionName("GetQueuedItem")]
-        public async Task<Newtonsoft.Json.Linq.JObject> GetQueuedItem([ActivityTrigger] string path) => await _orch.GetQueuedItem(path);
+        public async Task<JObject> GetQueuedItem([ActivityTrigger] string path) => await _orch.GetQueuedItem(path);
 
         [FunctionName("GetCachedItem")]
-        public async Task<Newtonsoft.Json.Linq.JObject> GetCachedItem([ActivityTrigger] string path) => await _orch.GetCachedItem(path);
+        public async Task<JObject> GetCachedItem([ActivityTrigger] string path) => await _orch.GetCachedItem(path);
     }
 }
