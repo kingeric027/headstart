@@ -47,8 +47,6 @@ export abstract class ResourceCrudService<ResourceType> {
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
     const { sortBy, search, ...filters } = params;
-    console.log('read from url query params');
-    console.log(filters);
     this.optionsSubject.next({ sortBy, search, filters });
   }
 
@@ -57,22 +55,6 @@ export abstract class ResourceCrudService<ResourceType> {
     const { sortBy, search, filters } = options;
     return { sortBy, search, ...filters };
   }
-
-  // mapXpFiltersToQueryParamsObject(xpFilterDictionary: XpFilterDictionary) {
-  //   const filterDictionary = {};
-  //   Object.values(xpFilterDictionary).forEach((filter) => {
-  //     filterDictionary[filter.displayInQueryParams] = filter.value;
-  //   });
-  //   return filterDictionary;
-  // }
-
-  // mapXpFiltersToQueryParamsObject(xpFilterDictionary) {
-  //   const xpFilterDictionary = {};
-  //   Object.entries(xpFilterDictionary).forEach((filter) => {
-  //     filterDictionary[filter.displayInQueryParams] = filter.value;
-  //   });
-  //   return filterDictionary;
-  // }
 
   async listResources(pageNumber = 1) {
     if (this.router.url.startsWith(this.route)) {
@@ -119,8 +101,8 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   private patchFilterState(patch: Options) {
-    const activeFilters = { ...this.optionsSubject.value, ...patch };
-    const queryParams = this.mapToUrlQueryParams(activeFilters);
+    const activeOptions = { ...this.optionsSubject.value, ...patch };
+    const queryParams = this.mapToUrlQueryParams(activeOptions);
     this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
   }
 
@@ -160,7 +142,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   clearAllFilters() {
-    this.patchFilterState({});
+    this.patchFilterState({ filters: {} });
   }
 
   clearResources() {
