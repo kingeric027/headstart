@@ -22,15 +22,19 @@ export abstract class ResourceCrudService<ResourceType> {
   public filterSubject: BehaviorSubject<Filters> = new BehaviorSubject<Filters>(this.getDefaultParms());
   private itemsPerPage = 100;
 
+  // route defintes the string of text that the front end needs to match to make list calls
+  private route = '';
+
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private ocService: any, route: string) {
-    this.activatedRoute.queryParams.subscribe((params) => {
-      if (this.router.url.startsWith(route)) {
+    this.route = route;
+    this.activatedRoute.queryParams.subscribe(params => {
+      if (this.router.url.startsWith(this.route)) {
         this.readFromUrlQueryParams(params);
       } else {
         this.filterSubject.next(this.getDefaultParms());
       }
     });
-    this.filterSubject.subscribe((value) => {
+    this.filterSubject.subscribe(value => {
       this.listResources();
     });
   }
@@ -49,19 +53,21 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async listResources(pageNumber = 1) {
-    const { sortBy, search } = this.filterSubject.value;
-    const productsResponse = await this.ocService
-      .List({
-        page: pageNumber,
-        search,
-        sortBy,
-        pageSize: this.itemsPerPage,
-      })
-      .toPromise();
-    if (pageNumber === 1) {
-      this.setNewProducts(productsResponse);
-    } else {
-      this.addProducts(productsResponse);
+    if (this.router.url.startsWith(this.route)) {
+      const { sortBy, search } = this.filterSubject.value;
+      const productsResponse = await this.ocService
+        .List({
+          page: pageNumber,
+          search,
+          sortBy,
+          pageSize: this.itemsPerPage,
+        })
+        .toPromise();
+      if (pageNumber === 1) {
+        this.setNewProducts(productsResponse);
+      } else {
+        this.addProducts(productsResponse);
+      }
     }
   }
 

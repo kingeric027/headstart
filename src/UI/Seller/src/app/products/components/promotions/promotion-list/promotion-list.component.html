@@ -1,1 +1,53 @@
-<p>promotion-list works!</p>
+<resource-table-component [resourceList]="resourceList"
+                          [searchText]="searchText"
+                          [selectedResourceID]="selectedResourceID"
+                          [updatedResource]="updatedResource"
+                          [resourceInSelection]="resourceInSelection"
+                          (searched)="searchResources($event)"
+                          (hitScrollEnd)="handleScrollEnd()"
+                          (changesSaved)="saveUpdates()"
+                          (resourceSelected)="selectResource($event)">
+  <table class="table table-hover resource-table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let promotion of resourceList.Items; index as index"
+          (click)="selectResource(promotion)"
+          class="selectable-row"
+          [ngClass]="{'selected-resource':selectedIndex === index}"
+          select="table-body-row">
+        <td>{{promotion?.Name}}</td>
+        <td>{{promotion?.ID}}</td>
+      </tr>
+      <tr *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">
+        <td>More promotions</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="resource-edit">
+    <label for="Name">Name</label>
+    <div class="form-group">
+      <input type="text"
+             class="form-control"
+             id="name"
+             aria-describedby="name"
+             value="{{updatedResource.Name}}"
+             (input)="updateResource('Name', $event)"
+             placeholder="Enter resource name">
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <input type="text"
+             class="form-control"
+             id="description"
+             value="{{updatedResource.Description}}"
+             (input)="updateResource('Description', $event)"
+             placeholder="Description">
+    </div>
+  </div>
+</resource-table-component>
