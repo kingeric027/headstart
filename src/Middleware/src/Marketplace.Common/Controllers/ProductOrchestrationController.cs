@@ -7,11 +7,11 @@ using Marketplace.Common.Models;
 
 namespace Marketplace.Common.Controllers
 {
-    public class OrchestrationController : BaseController
+    public class ProductOrchestrationController : BaseController
     {
         private readonly IOrchestrationCommand _command;
 
-        public OrchestrationController(IAppSettings settings, IOrchestrationCommand command) : base(settings)
+        public ProductOrchestrationController(IAppSettings settings, IOrchestrationCommand command) : base(settings)
         {
             _command = command;
         }

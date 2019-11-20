@@ -9,22 +9,22 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Action = Marketplace.Common.Models.Action;
 
-namespace Orchestration.ProductOrchestration
+namespace Marketplace.Orchestration
 {
-    public class ProductOrchestrationWorkflow
+    public class OrchestrationWorkflow
     {
         private readonly IOrchestrationCommand _orch;
         private readonly ISyncCommand _sync;
         private readonly LogQuery _log;
 
-        public ProductOrchestrationWorkflow(IOrchestrationCommand orch, ISyncCommand sync, LogQuery log)
+        public OrchestrationWorkflow(IOrchestrationCommand orch, ISyncCommand sync, LogQuery log)
         {
             _orch = orch;
             _sync = sync;
             _log = log;
         }
 
-        [FunctionName("ProductOrchestrationWorkflow")]
+        [FunctionName("OrchestrationWorkflow")]
         public async Task RunOrchestrator([OrchestrationTrigger] DurableOrchestrationContext context, ILogger log)
         {
             try
