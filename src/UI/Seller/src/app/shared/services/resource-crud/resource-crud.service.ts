@@ -71,7 +71,7 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
-  async updateResource(resource: any) {
+  async updateResource(resource: any): Promise<any> {
     const newResource = await this.ocService.Save(resource.ID, resource).toPromise();
     const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
     this.resourceSubject.value.Items[resourceIndex] = newResource;

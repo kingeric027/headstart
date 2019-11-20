@@ -62,8 +62,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     return JSON.parse(JSON.stringify(resource));
   }
 
-  saveUpdates() {
-    this.ocService.updateResource(this.updatedResource);
+  async saveUpdates() {
+    const updatedResource = this.ocService.updateResource(this.updatedResource);
+    this.resourceInSelection = this.copyResource(updatedResource);
+    this.updatedResource = this.copyResource(updatedResource);
   }
 
   ngOnDestroy() {
