@@ -24,9 +24,15 @@ export class ResourceTableComponent {
   hitScrollEnd: EventEmitter<any> = new EventEmitter();
   @Output()
   changesSaved: EventEmitter<any> = new EventEmitter();
+  @Output()
+  resourceSelected: EventEmitter<any> = new EventEmitter();
+
+  JSON = JSON;
 
   searchedResources(event) {
-    this.searched.emit(this.searchText);
+    console.log('event in searchedresource');
+    console.log(event);
+    this.searched.emit(event);
   }
 
   handleScrollEnd() {
@@ -35,5 +41,9 @@ export class ResourceTableComponent {
 
   handleSaveUpdates() {
     this.changesSaved.emit(null);
+  }
+
+  handleSelectResource(resource: any) {
+    this.resourceSelected.emit(resource);
   }
 }
