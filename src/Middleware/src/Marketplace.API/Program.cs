@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Marketplace.Common;
 
-namespace Orchestration.API
+namespace Marketplace.API
 {
     public class Program
     {

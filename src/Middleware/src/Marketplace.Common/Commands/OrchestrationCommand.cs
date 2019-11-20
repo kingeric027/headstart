@@ -21,7 +21,7 @@ namespace Marketplace.Common.Commands
         Task<JObject> CalculateDiff(WorkItem wi);
         Task<JObject> GetQueuedItem(string path);
         Task<JObject> GetCachedItem(string path);
-        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user) where T : Models.IOrchestrationObject;
+        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : Models.IOrchestrationObject;
     }
 
     public class OrchestrationCommand : IOrchestrationCommand
@@ -37,13 +37,13 @@ namespace Marketplace.Common.Commands
             _log = log;
         }
 
-        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user) where T : Models.IOrchestrationObject
+        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : Models.IOrchestrationObject
         {
             try
             {
                 obj.Token = user.AccessToken;
                 obj.ClientId = user.ClientID;
-                await _blob.Save(_settings.BlobSettings.QueueName, obj.BuildPath(user.SupplierID),
+                await _blob.Save(_settings.BlobSettings.QueueName, obj.BuildPath(resourceId),
                     JsonConvert.SerializeObject(obj));
                 return await Task.FromResult(obj);
             }
@@ -85,7 +85,7 @@ namespace Marketplace.Common.Commands
             if (wi.Cache == null) await Task.CompletedTask;
             try
             {
-                await _blob.Save(_settings.BlobSettings.CacheName, $"{wi.SupplierId.ToLower()}/{wi.RecordType.ToString().ToLower()}/{wi.RecordId}", wi.Cache);
+                await _blob.Save(_settings.BlobSettings.CacheName, $"{wi.ResourceId.ToLower()}/{wi.RecordType.ToString().ToLower()}/{wi.RecordId}", wi.Cache);
             }
             catch (Exception ex)
             {
@@ -105,7 +105,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        public async Task<Newtonsoft.Json.Linq.JObject> GetCachedItem(string path)
+        public async Task<JObject> GetCachedItem(string path)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        public async Task<Newtonsoft.Json.Linq.JObject> CalculateDiff(WorkItem wi)
+        public async Task<JObject> CalculateDiff(WorkItem wi)
         {
             try
             {

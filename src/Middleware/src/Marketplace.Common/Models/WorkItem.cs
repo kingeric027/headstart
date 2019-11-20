@@ -14,7 +14,7 @@ namespace Marketplace.Common.Models
         public WorkItem(string path)
         {
             var split = path.Split("/");
-            this.SupplierId = split[0];
+            this.ResourceId = split[0];
             this.RecordId = split[2].Replace(".json", "");
             switch (split[1])
             {
@@ -54,11 +54,14 @@ namespace Marketplace.Common.Models
                 case "addressassignment":
                     this.RecordType = RecordType.AddressAssignment;
                     break;
+                case "costcenter":
+                    this.RecordType = RecordType.CostCenter;
+                    break;
                 default:
                     throw new OrchestrationException(OrchestrationErrorType.WorkItemDefinition, this, path);
             }
         }
-        public string SupplierId { get; set; }
+        public string ResourceId { get; set; }
         public string RecordId { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public RecordType RecordType { get; set; }

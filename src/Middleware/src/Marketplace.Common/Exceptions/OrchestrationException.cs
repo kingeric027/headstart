@@ -25,7 +25,7 @@ namespace Marketplace.Common.Exceptions
             {
                 Type = type,
                 RecordId = wi.RecordId,
-                SupplierId = wi.SupplierId,
+                SupplierId = wi.ResourceId,
                 Action = wi.Action,
                 RecordType = wi.RecordType,
                 Current = wi.Current,

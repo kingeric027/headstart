@@ -8,6 +8,7 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Action = Marketplace.Common.Models.Action;
+using LogLevel = Marketplace.Common.Models.LogLevel;
 
 namespace Marketplace.Orchestration
 {
@@ -61,7 +62,7 @@ namespace Marketplace.Orchestration
                 await context.CallActivityAsync("UpdateCache", wi);
 
                 log.LogInformation($"{wi.RecordId}: {wi.Action.ToString()} successfully");
-                await context.CallActivityAsync<JObject>("LogEvent", new OrchestrationLog(wi));
+                await context.CallActivityAsync<JObject>("LogEvent", new OrchestrationLog(wi) { Level = LogLevel.Success });
             }
             catch (OrchestrationException oex)
             {

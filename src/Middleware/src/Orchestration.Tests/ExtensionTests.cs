@@ -67,6 +67,34 @@ namespace Orchestration.Tests
                 {
                     ID = "id"
                 });
+                yield return new TestCaseData(RecordType.Buyer, new OrchestrationBuyer()
+                {
+                    ID = "id"
+                });
+                yield return new TestCaseData(RecordType.User, new OrchestrationUser()
+                {
+                    ID = "id"
+                });
+                yield return new TestCaseData(RecordType.UserGroup, new OrchestrationUserGroup()
+                {
+                    ID = "id"
+                });
+                yield return new TestCaseData(RecordType.UserGroupAssignment, new OrchestrationUserGroupAssignment()
+                {
+                    ID = "id"
+                });
+                yield return new TestCaseData(RecordType.CostCenter, new OrchestrationCostCenter()
+                {
+                    ID = "id"
+                });
+                yield return new TestCaseData(RecordType.Address, new OrchestrationAddressAssignment()
+                {
+                    ID = "id"
+                });
+                yield return new TestCaseData(RecordType.AddressAssignment, new OrchestrationAddressAssignment()
+                {
+                    ID = "id"
+                });
             }
         }
     }

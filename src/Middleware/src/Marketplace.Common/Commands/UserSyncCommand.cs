@@ -22,7 +22,11 @@ namespace Marketplace.Common.Commands
             try
             {
                 obj.ID = wi.RecordId;
-                var response = await _oc.Users.CreateAsync("buyerid", obj, wi.Token);
+                // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time
+                // but the value is not null, and it's not a simple evaluation for a minimum. so i'm using the year = 1 because it works
+                if (obj.TermsAccepted != null && obj.TermsAccepted.Value.Year == 1)
+                    obj.TermsAccepted = DateTimeOffset.Now;
+                var response = await _oc.Users.CreateAsync(wi.ResourceId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
@@ -31,7 +35,8 @@ namespace Marketplace.Common.Commands
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateExistsError,
-                    Message = exId.Message
+                    Message = exId.Message,
+                    Level = LogLevel.Error
                 });
                 return await GetAsync(wi);
             }
@@ -40,7 +45,8 @@ namespace Marketplace.Common.Commands
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateGeneralError,
-                    Message = ex.Message
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), ex);
             }
@@ -49,7 +55,8 @@ namespace Marketplace.Common.Commands
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateGeneralError,
-                    Message = e.Message
+                    Message = e.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), e);
             }
@@ -61,14 +68,20 @@ namespace Marketplace.Common.Commands
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
-                var response = await _oc.Users.SaveAsync<User>("buyerid", wi.RecordId, obj, wi.Token);
+                // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time
+                // but the value is not null, and it's not a simple evaluation for a minimum. so i'm using the year = 1 because it works
+                if (obj.TermsAccepted != null && obj.TermsAccepted.Value.Year == 1)
+                    obj.TermsAccepted = DateTimeOffset.Now;
+                var response = await _oc.Users.SaveAsync<User>(wi.ResourceId, wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.UpdateGeneralError
+                    ErrorType = OrchestrationErrorType.UpdateGeneralError,
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.UpdateGeneralError.ToString(), ex);
             }
@@ -79,14 +92,20 @@ namespace Marketplace.Common.Commands
             var obj = JObject.FromObject(wi.Diff).ToObject<PartialUser<OrchestrationUserXp>>();
             try
             {
-                var response = await _oc.Users.PatchAsync("buyerid", wi.RecordId, obj, wi.Token);
+                // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time
+                // but the value is not null, and it's not a simple evaluation for a minimum. so i'm using the year = 1 because it works
+                if (obj.TermsAccepted != null && obj.TermsAccepted.Value.Year == 1)
+                    obj.TermsAccepted = DateTimeOffset.Now;
+                var response = await _oc.Users.PatchAsync(wi.ResourceId, wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.PatchGeneralError
+                    ErrorType = OrchestrationErrorType.PatchGeneralError,
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.PatchGeneralError.ToString(), ex);
             }
@@ -101,14 +120,16 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Users.GetAsync(wi.RecordId, wi.Token);
+                var response = await _oc.Users.GetAsync(wi.ResourceId, wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.GetGeneralError
+                    ErrorType = OrchestrationErrorType.GetGeneralError,
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.GetGeneralError.ToString(), ex);
             }

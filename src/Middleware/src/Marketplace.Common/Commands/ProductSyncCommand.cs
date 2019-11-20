@@ -31,7 +31,8 @@ namespace Marketplace.Common.Commands
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateExistsError,
-                    Message = exId.Message
+                    Message = exId.Message,
+                    Level = LogLevel.Error
                 });
                 return await GetAsync(wi);
             }
@@ -40,7 +41,8 @@ namespace Marketplace.Common.Commands
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateGeneralError,
-                    Message = ex.Message
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), ex);
             }
@@ -49,7 +51,8 @@ namespace Marketplace.Common.Commands
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateGeneralError,
-                    Message = e.Message
+                    Message = e.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), e);
             }
@@ -68,7 +71,9 @@ namespace Marketplace.Common.Commands
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.UpdateGeneralError
+                    ErrorType = OrchestrationErrorType.UpdateGeneralError,
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.UpdateGeneralError.ToString(), ex);
             }
@@ -86,7 +91,9 @@ namespace Marketplace.Common.Commands
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.PatchGeneralError
+                    ErrorType = OrchestrationErrorType.PatchGeneralError,
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.PatchGeneralError.ToString(), ex);
             }
@@ -108,7 +115,9 @@ namespace Marketplace.Common.Commands
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.GetGeneralError
+                    ErrorType = OrchestrationErrorType.GetGeneralError,
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.GetGeneralError.ToString(), ex);
             }

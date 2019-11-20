@@ -17,6 +17,7 @@ namespace Marketplace.Common.Extensions
 
             foreach (var (key, value) in current)
             {
+                if (key == "Token" || key == "ClientId" || key == "TermsAccepted") continue;
                 var previousValue = cache.SelectToken(key);
 
                 if (JToken.DeepEquals(value, previousValue)) continue;

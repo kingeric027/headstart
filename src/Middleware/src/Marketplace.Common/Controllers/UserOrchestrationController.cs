@@ -19,43 +19,43 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route("buyer"), MarketplaceUserAuth()]
         public async Task<OrchestrationBuyer> PostBuyer([FromBody] OrchestrationBuyer obj)
         {
-            return await _command.SaveToQueue(obj, this.VerifiedUserContext);
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext, obj.ID);
         }
 
-        [HttpPost, Route("user"), MarketplaceUserAuth()]
-        public async Task<OrchestrationUser> PostUser([FromBody] OrchestrationUser obj)
+        [HttpPost, Route("{buyerId}/user"), MarketplaceUserAuth()]
+        public async Task<OrchestrationUser> PostUser([FromBody] OrchestrationUser obj, string buyerId)
         {
-            return await _command.SaveToQueue(obj, this.VerifiedUserContext);
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
 
-        [HttpPost, Route("usergroup"), MarketplaceUserAuth()]
-        public async Task<OrchestrationUserGroup> PostUserGroup([FromBody] OrchestrationUserGroup obj)
+        [HttpPost, Route("{buyerId}/usergroup"), MarketplaceUserAuth()]
+        public async Task<OrchestrationUserGroup> PostUserGroup([FromBody] OrchestrationUserGroup obj, string buyerId)
         {
-            return await _command.SaveToQueue(obj, this.VerifiedUserContext);
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
 
-        [HttpPost, Route("usergroupassignment"), MarketplaceUserAuth()]
-        public async Task<OrchestrationUserGroupAssignment> PostUserGroupAssignment([FromBody] OrchestrationUserGroupAssignment obj)
+        [HttpPost, Route("{buyerId}/usergroupassignment"), MarketplaceUserAuth()]
+        public async Task<OrchestrationUserGroupAssignment> PostUserGroupAssignment([FromBody] OrchestrationUserGroupAssignment obj, string buyerId)
         {
-            return await _command.SaveToQueue(obj, this.VerifiedUserContext);
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
 
-        [HttpPost, Route("address"), MarketplaceUserAuth()]
-        public async Task<OrchestrationAddress> PostSpec([FromBody] OrchestrationAddress obj)
+        [HttpPost, Route("{buyerId}/address"), MarketplaceUserAuth()]
+        public async Task<OrchestrationAddress> PostAddress([FromBody] OrchestrationAddress obj, string buyerId)
         {
-            return await _command.SaveToQueue(obj, this.VerifiedUserContext);
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
 
-        [HttpPost, Route("addressassignment"), MarketplaceUserAuth()]
-        public async Task<OrchestrationAddressAssignment> PostAddressAssignment([FromBody] OrchestrationAddressAssignment obj)
+        [HttpPost, Route("{buyerId}/addressassignment"), MarketplaceUserAuth()]
+        public async Task<OrchestrationAddressAssignment> PostAddressAssignment([FromBody] OrchestrationAddressAssignment obj, string buyerId)
         {
-            return await _command.SaveToQueue(obj, this.VerifiedUserContext);
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
 
-        [HttpPost, Route("costcenter"), MarketplaceUserAuth()]
-        public async Task<OrchestrationCostCenter> PostSpecOption([FromBody] OrchestrationCostCenter obj)
+        [HttpPost, Route("{buyerId}/costcenter"), MarketplaceUserAuth()]
+        public async Task<OrchestrationCostCenter> PostCostCenter([FromBody] OrchestrationCostCenter obj, string buyerId)
         {
-            return await _command.SaveToQueue(obj, this.VerifiedUserContext);
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
     }
 }

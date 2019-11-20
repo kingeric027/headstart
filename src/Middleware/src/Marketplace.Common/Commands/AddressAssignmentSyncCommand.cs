@@ -21,7 +21,7 @@ namespace Marketplace.Common.Commands
             var obj = wi.Current.ToObject<AddressAssignment>();
             try
             {
-                await _oc.Addresses.SaveAssignmentAsync("buyerid", obj, wi.Token);
+                await _oc.Addresses.SaveAssignmentAsync(wi.ResourceId, obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
@@ -30,7 +30,8 @@ namespace Marketplace.Common.Commands
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateExistsError,
-                    Message = exId.Message
+                    Message = exId.Message,
+                    Level = LogLevel.Error
                 });
                 return await GetAsync(wi);
             }
@@ -39,7 +40,8 @@ namespace Marketplace.Common.Commands
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateGeneralError,
-                    Message = ex.Message
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), ex);
             }
@@ -48,7 +50,8 @@ namespace Marketplace.Common.Commands
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateGeneralError,
-                    Message = e.Message
+                    Message = e.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), e);
             }
@@ -59,14 +62,16 @@ namespace Marketplace.Common.Commands
             var obj = JObject.FromObject(wi.Current).ToObject<AddressAssignment>();
             try
             {
-                await _oc.Addresses.SaveAssignmentAsync("buyerid", obj, wi.Token);
+                await _oc.Addresses.SaveAssignmentAsync(wi.ResourceId, obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException ex)
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.UpdateGeneralError
+                    ErrorType = OrchestrationErrorType.UpdateGeneralError,
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.UpdateGeneralError.ToString(), ex);
             }
@@ -77,14 +82,16 @@ namespace Marketplace.Common.Commands
             var obj = JObject.FromObject(wi.Diff).ToObject<AddressAssignment>();
             try
             {
-                await _oc.Addresses.SaveAssignmentAsync("buyerid", obj, wi.Token);
+                await _oc.Addresses.SaveAssignmentAsync(wi.ResourceId, obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException ex)
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.PatchGeneralError
+                    ErrorType = OrchestrationErrorType.PatchGeneralError,
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.PatchGeneralError.ToString(), ex);
             }
@@ -99,14 +106,16 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Addresses.ListAssignmentsAsync("buyerid", addressID: wi.RecordId, wi.Token);
+                var response = await _oc.Addresses.ListAssignmentsAsync(wi.ResourceId, addressID: wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
             {
                 await _log.Upsert(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.GetGeneralError
+                    ErrorType = OrchestrationErrorType.GetGeneralError,
+                    Message = ex.Message,
+                    Level = LogLevel.Error
                 });
                 throw new Exception(OrchestrationErrorType.GetGeneralError.ToString(), ex);
             }

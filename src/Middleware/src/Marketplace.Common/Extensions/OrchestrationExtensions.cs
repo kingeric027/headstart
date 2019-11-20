@@ -9,9 +9,9 @@ namespace Marketplace.Common.Extensions
 {
     public static class OrchestrationExtensions
     {
-        public static string BuildPath(this IOrchestrationObject obj, string supplierId)
+        public static string BuildPath(this IOrchestrationObject obj, string resourceId)
         {
-            return $"{supplierId}/{obj.Type()}/{obj.ID}".ToLower();
+            return $"{resourceId}/{obj.Type()}/{obj.ID}".ToLower();
         }
 
         public static RecordType Type(this IOrchestrationObject obj)
