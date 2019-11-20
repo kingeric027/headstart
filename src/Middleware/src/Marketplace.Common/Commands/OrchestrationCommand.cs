@@ -141,13 +141,13 @@ namespace Marketplace.Common.Commands
 
                 // if cache does exists, and there is no difference ignore the action
                 if (wi.Cache != null && wi.Diff == null)
-                    return await Task.FromResult(wi.RecordType == RecordType.SpecProductAssignment ? Action.Ignore : Action.Get);
+                    return await Task.FromResult((wi.RecordType == RecordType.SpecProductAssignment || wi.RecordType == RecordType.UserGroupAssignment) ? Action.Ignore : Action.Get);
 
                 // special case for SpecAssignment because there is no ID for the OC object
                 // but we want one in orchestration to handle caching
                 // in further retrospect I don't think we need to handle updating objects when only the ID is being changed
                 // maybe in the future a true business case will be necessary to do this
-                if (wi.RecordType == RecordType.SpecProductAssignment && wi.Diff.Count == 1 && wi.Diff.SelectToken("ID").Path == "ID")
+                if ((wi.RecordType == RecordType.SpecProductAssignment || wi.RecordType == RecordType.UserGroupAssignment) && wi.Diff.Count == 1 && wi.Diff.SelectToken("ID").Path == "ID")
                     return await Task.FromResult(Action.Ignore);
 
                 if (wi.Cache != null && wi.Diff != null)
