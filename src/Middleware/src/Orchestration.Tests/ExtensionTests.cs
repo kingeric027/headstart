@@ -87,7 +87,7 @@ namespace Orchestration.Tests
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.Address, new OrchestrationAddressAssignment()
+                yield return new TestCaseData(RecordType.Address, new OrchestrationAddress()
                 {
                     ID = "id"
                 });
