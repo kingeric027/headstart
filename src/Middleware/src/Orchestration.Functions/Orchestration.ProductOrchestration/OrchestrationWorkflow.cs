@@ -8,23 +8,24 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Action = Marketplace.Common.Models.Action;
+using LogLevel = Marketplace.Common.Models.LogLevel;
 
-namespace Orchestration.ProductOrchestration
+namespace Marketplace.Orchestration
 {
-    public class ProductOrchestrationWorkflow
+    public class OrchestrationWorkflow
     {
         private readonly IOrchestrationCommand _orch;
         private readonly ISyncCommand _sync;
         private readonly LogQuery _log;
 
-        public ProductOrchestrationWorkflow(IOrchestrationCommand orch, ISyncCommand sync, LogQuery log)
+        public OrchestrationWorkflow(IOrchestrationCommand orch, ISyncCommand sync, LogQuery log)
         {
             _orch = orch;
             _sync = sync;
             _log = log;
         }
 
-        [FunctionName("ProductOrchestrationWorkflow")]
+        [FunctionName("OrchestrationWorkflow")]
         public async Task RunOrchestrator([OrchestrationTrigger] DurableOrchestrationContext context, ILogger log)
         {
             try
@@ -61,7 +62,7 @@ namespace Orchestration.ProductOrchestration
                 await context.CallActivityAsync("UpdateCache", wi);
 
                 log.LogInformation($"{wi.RecordId}: {wi.Action.ToString()} successfully");
-                await context.CallActivityAsync<Newtonsoft.Json.Linq.JObject>("LogEvent", new OrchestrationLog(wi));
+                await context.CallActivityAsync<JObject>("LogEvent", new OrchestrationLog(wi) { Level = LogLevel.Success });
             }
             catch (OrchestrationException oex)
             {
@@ -85,7 +86,7 @@ namespace Orchestration.ProductOrchestration
         public async Task LogEvent([ActivityTrigger] OrchestrationLog log) => await _log.Upsert(log);
 
         [FunctionName("RefreshCache")]
-        public async Task<Newtonsoft.Json.Linq.JObject> RefreshCache([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
+        public async Task<JObject> RefreshCache([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
 
         [FunctionName("CleanupQueue")]
         public async Task CleanupQueue([ActivityTrigger] string path) => await _orch.CleanupQueue(path);
@@ -94,18 +95,18 @@ namespace Orchestration.ProductOrchestration
         public async Task UpdateCache([ActivityTrigger] WorkItem wi) => await _orch.SaveToCache(wi);
 
         [FunctionName("OrderCloudAction")]
-        public async Task<Newtonsoft.Json.Linq.JObject> OrderCloudAction([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
+        public async Task<JObject> OrderCloudAction([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
 
         [FunctionName("DetermineAction")]
         public async Task<Action> DetermineAction([ActivityTrigger] WorkItem wi) => await _orch.DetermineAction(wi);
 
         [FunctionName("CalculateDiff")]
-        public async Task<Newtonsoft.Json.Linq.JObject> CalculateDiff([ActivityTrigger] WorkItem wi) => await _orch.CalculateDiff(wi);
+        public async Task<JObject> CalculateDiff([ActivityTrigger] WorkItem wi) => await _orch.CalculateDiff(wi);
 
         [FunctionName("GetQueuedItem")]
-        public async Task<Newtonsoft.Json.Linq.JObject> GetQueuedItem([ActivityTrigger] string path) => await _orch.GetQueuedItem(path);
+        public async Task<JObject> GetQueuedItem([ActivityTrigger] string path) => await _orch.GetQueuedItem(path);
 
         [FunctionName("GetCachedItem")]
-        public async Task<Newtonsoft.Json.Linq.JObject> GetCachedItem([ActivityTrigger] string path) => await _orch.GetCachedItem(path);
+        public async Task<JObject> GetCachedItem([ActivityTrigger] string path) => await _orch.GetCachedItem(path);
     }
 }

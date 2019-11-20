@@ -8,21 +8,22 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
 {
-    public class SpecProductAssignmentSyncCommand : SyncCommand, IWorkItemCommand
+    public class BuyerSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public SpecProductAssignmentSyncCommand(IAppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public BuyerSyncCommand(IAppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<SpecProductAssignment>();
+            var obj = wi.Current.ToObject<Buyer>();
             try
             {
-                await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);
-                return JObject.FromObject(obj);
+                obj.ID = wi.RecordId;
+                var response = await _oc.Buyers.CreateAsync(obj, wi.Token);
+                return JObject.FromObject(response);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
             {
@@ -59,11 +60,12 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<SpecProductAssignment>();
+            var obj = JObject.FromObject(wi.Current).ToObject<Buyer>();
             try
             {
-                await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);
-                return JObject.FromObject(obj);
+                if (obj.ID == null) obj.ID = wi.RecordId;
+                var response = await _oc.Buyers.SaveAsync<Buyer>(wi.RecordId, obj, wi.Token);
+                return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
             {
@@ -79,11 +81,11 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<SpecProductAssignment>();
+            var obj = JObject.FromObject(wi.Diff).ToObject<PartialBuyer<OrchestrationBuyerXp>>();
             try
             {
-                await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);
-                return JObject.FromObject(obj);
+                var response = await _oc.Buyers.PatchAsync(wi.RecordId, obj, wi.Token);
+                return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
             {
@@ -106,7 +108,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Specs.ListProductAssignmentsAsync(wi.RecordId, wi.Token);
+                var response = await _oc.Buyers.GetAsync(wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
