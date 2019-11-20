@@ -25,7 +25,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   subscribeToResources() {
-    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
+    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
       this.resourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
@@ -45,7 +45,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   selectResource(resource: any) {
-    console.log(resource);
     this.selectedResourceID = resource.ID;
     this.resourceInSelection = this.copyResource(resource);
     this.updatedResource = this.copyResource(resource);
