@@ -32,7 +32,9 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   handleScrollEnd() {
-    this.ocService.getNextPage();
+    if (this.resourceList.Meta.TotalPages > this.resourceList.Meta.Page) {
+      this.ocService.getNextPage();
+    }
   }
 
   setFilters() {

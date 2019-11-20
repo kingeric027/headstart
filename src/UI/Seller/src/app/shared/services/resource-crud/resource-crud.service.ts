@@ -27,14 +27,14 @@ export abstract class ResourceCrudService<ResourceType> {
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private ocService: any, route: string) {
     this.route = route;
-    this.activatedRoute.queryParams.subscribe(params => {
+    this.activatedRoute.queryParams.subscribe((params) => {
       if (this.router.url.startsWith(this.route)) {
         this.readFromUrlQueryParams(params);
       } else {
         this.filterSubject.next(this.getDefaultParms());
       }
     });
-    this.filterSubject.subscribe(value => {
+    this.filterSubject.subscribe((value) => {
       this.listResources();
     });
   }
