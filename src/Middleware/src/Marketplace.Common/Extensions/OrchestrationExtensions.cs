@@ -42,6 +42,8 @@ namespace Marketplace.Common.Extensions
                     return RecordType.UserGroup;
                 case nameof(OrchestrationUserGroupAssignment):
                     return RecordType.UserGroupAssignment;
+                case nameof(OrchestrationAddressAssignment):
+                    return RecordType.AddressAssignment;
                 default:
                     throw new ApiErrorException(ErrorCodes.All["UnrecognizedType"], obj);
             }

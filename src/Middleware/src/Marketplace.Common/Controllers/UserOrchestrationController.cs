@@ -35,13 +35,19 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("usergroupassignment"), MarketplaceUserAuth()]
-        public async Task<OrchestrationUserGroupAssignment> PostProductAssignment([FromBody] OrchestrationUserGroupAssignment obj)
+        public async Task<OrchestrationUserGroupAssignment> PostUserGroupAssignment([FromBody] OrchestrationUserGroupAssignment obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext);
         }
 
         [HttpPost, Route("address"), MarketplaceUserAuth()]
         public async Task<OrchestrationAddress> PostSpec([FromBody] OrchestrationAddress obj)
+        {
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext);
+        }
+
+        [HttpPost, Route("addressassignment"), MarketplaceUserAuth()]
+        public async Task<OrchestrationAddressAssignment> PostAddressAssignment([FromBody] OrchestrationAddressAssignment obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext);
         }

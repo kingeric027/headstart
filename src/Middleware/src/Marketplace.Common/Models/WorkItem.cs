@@ -51,6 +51,9 @@ namespace Marketplace.Common.Models
                 case "usergroupassignment":
                     this.RecordType = RecordType.UserGroupAssignment;
                     break;
+                case "addressassignment":
+                    this.RecordType = RecordType.AddressAssignment;
+                    break;
                 default:
                     throw new OrchestrationException(OrchestrationErrorType.WorkItemDefinition, this, path);
             }
@@ -72,7 +75,7 @@ namespace Marketplace.Common.Models
     public enum RecordType
     {
         Product, PriceSchedule, Spec, SpecOption, SpecProductAssignment, ProductFacet,
-        Buyer, User, UserGroup, Address, CostCenter, UserGroupAssignment
+        Buyer, User, UserGroup, Address, CostCenter, UserGroupAssignment, AddressAssignment
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

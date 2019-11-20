@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Exceptions;
@@ -61,7 +59,7 @@ namespace Marketplace.Common.Commands
             var obj = JObject.FromObject(wi.Current).ToObject<SpecProductAssignment>();
             try
             {
-                await _oc.Specs.SaveProductAssignmentAsync(obj);
+                await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException ex)
@@ -79,7 +77,7 @@ namespace Marketplace.Common.Commands
             var obj = JObject.FromObject(wi.Diff).ToObject<SpecProductAssignment>();
             try
             {
-                await _oc.Specs.SaveProductAssignmentAsync(obj);
+                await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException ex)
@@ -101,7 +99,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Specs.ListProductAssignmentsAsync(wi.RecordId);
+                var response = await _oc.Specs.ListProductAssignmentsAsync(wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
