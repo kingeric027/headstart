@@ -1,6 +1,8 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, Input, Output, ViewChild } from '@angular/core';
 import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
+import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'resource-table-component',
@@ -8,6 +10,10 @@ import { EventEmitter } from '@angular/core';
   styleUrls: ['./resource-table.component.scss'],
 })
 export class ResourceTableComponent {
+  @ViewChild('popover', { static: false })
+  public popover: NgbPopover;
+  faFilter = faFilter;
+
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
   @Input()
@@ -18,6 +24,8 @@ export class ResourceTableComponent {
   updatedResource: any;
   @Input()
   resourceInSelection: any;
+  @Input()
+  resourceName: string;
   @Output()
   searched: EventEmitter<any> = new EventEmitter();
   @Output()
@@ -26,6 +34,8 @@ export class ResourceTableComponent {
   changesSaved: EventEmitter<any> = new EventEmitter();
   @Output()
   resourceSelected: EventEmitter<any> = new EventEmitter();
+  @Output()
+  applyFilters: EventEmitter<any> = new EventEmitter();
 
   JSON = JSON;
 
@@ -45,5 +55,18 @@ export class ResourceTableComponent {
 
   handleSelectResource(resource: any) {
     this.resourceSelected.emit(resource);
+  }
+
+  openPopover() {
+    this.popover.open();
+  }
+
+  closePopover() {
+    this.popover.close();
+  }
+
+  handleApplyFilters() {
+    this.closePopover();
+    this.applyFilters.emit(null);
   }
 }
