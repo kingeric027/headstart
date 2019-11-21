@@ -1,20 +1,20 @@
 using System;
+using Marketplace.Orchestration;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Blob;
-using Orchestration.ProductOrchestration;
 
 [assembly: WebJobsStartup(typeof(Startup))]
-namespace Orchestration.ProductOrchestration
+namespace Marketplace.Orchestration
 {
-    public static class ProductQueueTrigger
+    public static class ObjectQueueTrigger
     {
-        [FunctionName("ProductQueueTrigger")]
+        [FunctionName("ObjectQueueTrigger")]
         public static async void Run([BlobTrigger("orchestration-queue/{name}", Connection = "AzureWebJobsStorage")]CloudBlockBlob blob, string name, [OrchestrationClient]DurableOrchestrationClient client, ILogger log)
         {
             log.LogInformation($"Orchestration item queued: {blob.Name}");
-            await client.StartNewAsync("ProductOrchestrationWorkflow", blob.Name);
+            await client.StartNewAsync("OrchestrationWorkflow", blob.Name);
         }
     }
 }

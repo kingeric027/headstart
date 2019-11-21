@@ -4,7 +4,6 @@ import { DOCUMENT } from '@angular/common';
 import { TokenHelperService } from '../../services/token-helper/token-helper.service';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { AuthService } from '../../services/auth/auth.service';
-import { applicationConfiguration } from '../../config/app.config';
 import { AppConfig } from '../../shopper-context';
 
 @Injectable({
@@ -17,7 +16,7 @@ export class HasTokenGuard implements CanActivate {
     private tokenHelper: TokenHelperService,
     private ocTokenService: OcTokenService,
     @Inject(DOCUMENT) private document: any,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    private appConfig: AppConfig
   ) {}
   async canActivate(): Promise<boolean> {
     /**

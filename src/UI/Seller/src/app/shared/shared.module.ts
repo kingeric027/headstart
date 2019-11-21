@@ -1,9 +1,9 @@
 // angular
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { NgbPaginationModule, NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbPaginationModule, NgbTabsetModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
 import { TreeModule } from 'angular-tree-component';
@@ -20,6 +20,10 @@ import { CategoryFormComponent } from './components/category-form/category-form.
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { ProductImagesComponent } from './components/product-images/product-images.component';
 import { ProductFormComponent } from './components/products-form/product-form.component';
+import { ProductService } from './services/product/product.service';
+import { SupplierService } from './services/supplier/supplier.service';
+import { ResourceTableComponent } from './components/resource-table/resource-table.component';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 
 @NgModule({
   imports: [
@@ -33,6 +37,8 @@ import { ProductFormComponent } from './components/products-form/product-form.co
     TreeModule,
     FontAwesomeModule,
     FormsModule,
+    PerfectScrollbarModule,
+    NgbPopoverModule,
     NgbPaginationModule.forRoot(),
     NgbTabsetModule.forRoot(),
   ],
@@ -59,6 +65,7 @@ import { ProductFormComponent } from './components/products-form/product-form.co
     CategoryDetailsComponent,
     ProductImagesComponent,
     ProductFormComponent,
+    ResourceTableComponent,
   ],
   declarations: [
     SearchComponent,
@@ -71,6 +78,14 @@ import { ProductFormComponent } from './components/products-form/product-form.co
     CategoryDetailsComponent,
     ProductImagesComponent,
     ProductFormComponent,
+    ResourceTableComponent,
   ],
 })
-export class SharedModule {}
+export class SharedModule {
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: SharedModule,
+      providers: [ProductService, SupplierService],
+    };
+  }
+}

@@ -11,9 +11,10 @@ import { CategoryCreateComponent } from './components/categories/category-create
 import { PromotionListComponent } from './components/promotions/promotion-list/promotion-list.component';
 import { PromotionCreateComponent } from './components/promotions/promotion-create/promotion-create.component';
 import { PromotionDetailsComponent } from './components/promotions/promotion-details/promotion-details.component';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 
 @NgModule({
-  imports: [SharedModule, ProductsRoutingModule],
+  imports: [SharedModule, ProductsRoutingModule, PerfectScrollbarModule],
   declarations: [
     ProductListComponent,
     ProductDetailsComponent,

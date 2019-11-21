@@ -7,7 +7,6 @@ import { AuthService } from '../auth/auth.service';
 import { OcMeService } from '@ordercloud/angular-sdk';
 import { OrderHistoryService } from '../order-history/order-history.service';
 import { AuthNetCreditCardService } from '../authorize-net/authorize-net.service';
-import { applicationConfiguration } from '../../config/app.config';
 import { IShopperContext, AppConfig } from '../../shopper-context';
 import { SupplierFilterService } from '../supplier-filter/supplier-filter.service';
 
@@ -25,6 +24,6 @@ export class ShopperContextService implements IShopperContext {
     public myResources: OcMeService,
     public orderHistory: OrderHistoryService,
     public creditCards: AuthNetCreditCardService,
-    @Inject(applicationConfiguration) public appSettings: AppConfig
+    public appSettings: AppConfig
   ) {}
 }

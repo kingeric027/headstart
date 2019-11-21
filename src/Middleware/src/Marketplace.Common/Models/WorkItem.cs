@@ -14,7 +14,7 @@ namespace Marketplace.Common.Models
         public WorkItem(string path)
         {
             var split = path.Split("/");
-            this.SupplierId = split[0];
+            this.ResourceId = split[0];
             this.RecordId = split[2].Replace(".json", "");
             switch (split[1])
             {
@@ -36,11 +36,32 @@ namespace Marketplace.Common.Models
                 case "spec":
                     this.RecordType = RecordType.Spec;
                     break;
+                case "buyer":
+                    this.RecordType = RecordType.Buyer;
+                    break;
+                case "user":
+                    this.RecordType = RecordType.User;
+                    break;
+                case "usergroup":
+                    this.RecordType = RecordType.UserGroup;
+                    break;
+                case "address":
+                    this.RecordType = RecordType.Address;
+                    break;
+                case "usergroupassignment":
+                    this.RecordType = RecordType.UserGroupAssignment;
+                    break;
+                case "addressassignment":
+                    this.RecordType = RecordType.AddressAssignment;
+                    break;
+                case "costcenter":
+                    this.RecordType = RecordType.CostCenter;
+                    break;
                 default:
                     throw new OrchestrationException(OrchestrationErrorType.WorkItemDefinition, this, path);
             }
         }
-        public string SupplierId { get; set; }
+        public string ResourceId { get; set; }
         public string RecordId { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public RecordType RecordType { get; set; }
@@ -56,7 +77,8 @@ namespace Marketplace.Common.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum RecordType
     {
-        Product, PriceSchedule, Spec, SpecOption, SpecProductAssignment, ProductFacet
+        Product, PriceSchedule, Spec, SpecOption, SpecProductAssignment, ProductFacet,
+        Buyer, User, UserGroup, Address, CostCenter, UserGroupAssignment, AddressAssignment
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

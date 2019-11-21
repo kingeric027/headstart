@@ -3,10 +3,10 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Marketplace.Common;
 using Marketplace.Common.Extensions;
-using Orchestration.ProductOrchestration;
+using Marketplace.Orchestration;
 
 [assembly: FunctionsStartup(typeof(Startup))]
-namespace Orchestration.ProductOrchestration
+namespace Marketplace.Orchestration
 {
     public class Startup : FunctionsStartup
     {

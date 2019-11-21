@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29230.47
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Common", "src\Marketplace.Common\Marketplace.Common.csproj", "{487E6294-64B7-4D14-A906-71513D5C49E4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestration.ProductOrchestration", "src\Orchestration.Functions\Orchestration.ProductOrchestration\Orchestration.ProductOrchestration.csproj", "{89B54103-D77D-460A-8307-BEF82776A78F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Orchestration", "src\Orchestration.Functions\Orchestration.ProductOrchestration\Marketplace.Orchestration.csproj", "{89B54103-D77D-460A-8307-BEF82776A78F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestration.Tests", "src\Orchestration.Tests\Orchestration.Tests.csproj", "{83EA5B3A-2658-47AA-BEFC-8AA760D7FA4D}"
 EndProject

@@ -29,13 +29,15 @@ export const ocAppConfig: AppConfig = {
     'AddressAdmin',
     'CategoryAdmin',
     'CatalogAdmin',
+    'PromotionAdmin',
+    'SupplierAdmin',
   ],
 };
 
-export const applicationConfiguration = new InjectionToken<AppConfig>(
-  'app.config',
-  { providedIn: 'root', factory: () => ocAppConfig }
-);
+export const applicationConfiguration = new InjectionToken<AppConfig>('app.config', {
+  providedIn: 'root',
+  factory: () => ocAppConfig,
+});
 
 export interface AppConfig {
   /**

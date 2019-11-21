@@ -12,7 +12,7 @@ using Newtonsoft.Json.Serialization;
 using Marketplace.Common;
 using Marketplace.Common.Helpers;
 
-namespace Orchestration.API
+namespace Marketplace.API
 {
     public class Startup
     {

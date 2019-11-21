@@ -9,9 +9,9 @@ namespace Marketplace.Common.Extensions
 {
     public static class OrchestrationExtensions
     {
-        public static string BuildPath(this IOrchestrationObject obj, string supplierId)
+        public static string BuildPath(this IOrchestrationObject obj, string resourceId)
         {
-            return $"{supplierId}/{obj.Type()}/{obj.ID}".ToLower();
+            return $"{resourceId}/{obj.Type()}/{obj.ID}".ToLower();
         }
 
         public static RecordType Type(this IOrchestrationObject obj)
@@ -30,6 +30,20 @@ namespace Marketplace.Common.Extensions
                     return RecordType.SpecOption;
                 case nameof(OrchestrationSpecProductAssignment):
                     return RecordType.SpecProductAssignment;
+                case nameof(OrchestrationBuyer):
+                    return RecordType.Buyer;
+                case nameof(OrchestrationAddress):
+                    return RecordType.Address;
+                case nameof(OrchestrationCostCenter):
+                    return RecordType.CostCenter;
+                case nameof(OrchestrationUser):
+                    return RecordType.User;
+                case nameof(OrchestrationUserGroup):
+                    return RecordType.UserGroup;
+                case nameof(OrchestrationUserGroupAssignment):
+                    return RecordType.UserGroupAssignment;
+                case nameof(OrchestrationAddressAssignment):
+                    return RecordType.AddressAssignment;
                 default:
                     throw new ApiErrorException(ErrorCodes.All["UnrecognizedType"], obj);
             }

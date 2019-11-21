@@ -1,0 +1,101 @@
+<!-- 98pc calced height is placeholder for now: will need to change to make responsive or if the layout srtructure is changed -->
+
+<div>
+  <div class="row">
+    <div class="col-md-12">
+      <div>
+        <h1>{{resourceName}}</h1>
+      </div>
+      <div class="d-flex justify-content-start">
+        <form class="d-flex">
+          <search-component class="mr-3 w-100"
+                            [placeholderText]="'Search ' + resourceName"
+                            [searchTermInput]="searchTerm"
+                            (searched)="searchedResources($event)">
+          </search-component>
+        </form>
+        <div class="d-flex align-items-center justify-content-start">
+          <ng-template #filters>
+            <div>
+              <ng-content select=".filters"></ng-content>
+              <div class="d-flex justify-content-between align-items-center">
+                <button (click)="closePopover()"
+                        class="btn btn-sm btn-link text-dark">Cancel</button>
+                <button (click)="handleApplyFilters()"
+                        class="btn btn-sm btn-primary">Apply</button>
+              </div>
+            </div>
+          </ng-template>
+          <div class="icon-button ripple"
+               placement="bottom"
+               [ngbPopover]="filters"
+               autoClose="outside"
+               triggers="manual"
+               #popover="ngbPopover"
+               (click)="openPopover()"
+               popoverTitle="Filter">
+            <fa-layers class="fa-layers fa-fw">
+              <fa-icon [icon]="faFilter">
+              </fa-icon>
+              <fa-layers-counter *ngIf="activeFilterCount && activeFilterCount > 0"
+                                 class="badge__counter--large"
+                                 style="background: gray"
+                                 [content]="activeFilterCount">
+              </fa-layers-counter>
+            </fa-layers>
+          </div>
+          <div *ngIf="activeFilterCount > 0"
+               class="icon-button ripple">
+            <fa-icon [icon]="faTimes"
+                     (click)="clearFilters()"></fa-icon>
+          </div>
+        </div>
+        <button class="btn btn-light"
+                (click)="clearAllFilters()">Clear All Filters</button>
+      </div>
+
+      <!-- full table view -->
+      <div *ngIf="
+                !selectedResourceID">
+        <perfect-scrollbar style="width: 100%; height: calc(100vh - 98px);"
+                           (psYReachEnd)="handleScrollEnd()">
+          <ng-content select="table"></ng-content>
+        </perfect-scrollbar>
+      </div>
+
+      <!-- editing/creating view -->
+      <div *ngIf="selectedResourceID"
+           class="row">
+        <div class="col-3">
+          <perfect-scrollbar style="width: 100%; height: calc(100vh - 98px);"
+                             (psYReachEnd)="handleScrollEnd()"
+                             class="resource-table-side">
+            <table class="table table-hover resource-table">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let resource of resourceList.Items"
+                    (click)="handleSelectResource(resource)"
+                    class="selectable-row"
+                    [ngClass]="{'selected-resource': selectedResourceID === resource.ID}">
+                  <td>{{resource.Name}}</td>
+                </tr>
+                <tr>
+                  <td *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">More resources</td>
+                </tr>
+              </tbody>
+            </table>
+          </perfect-scrollbar>
+        </div>
+        <div class="col-9">
+          <ng-content select=".resource-edit"></ng-content>
+          <button (click)="handleSaveUpdates()"
+                  *ngIf="areChanges">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

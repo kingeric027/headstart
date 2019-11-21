@@ -1,1 +1,58 @@
-<p>product-list works!</p>
+<resource-table-component [resourceList]="resourceList"
+                          [resourceOptions]="resourceOptions"
+                          [selectedResourceID]="selectedResourceID"
+                          [updatedResource]="updatedResource"
+                          [resourceInSelection]="resourceInSelection"
+                          [ocService]="ocService"
+                          (searched)="searchResources($event)"
+                          (hitScrollEnd)="handleScrollEnd()"
+                          resourceName="Products"
+                          (changesSaved)="saveUpdates()"
+                          (resourceSelected)="selectResource($event)">
+  <table class="table table-hover resource-table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">ID</th>
+        <th scope="col">Active</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of resourceList.Items; index as index"
+          (click)="selectResource(product)"
+          class="selectable-row"
+          [ngClass]="{'selected-resource':selectedIndex === index}"
+          select="table-body-row">
+        <td>{{product?.Name}}</td>
+        <td>{{product?.ID}}</td>
+        <td>{{product?.Active ? 'Active' : 'Inactive'}}</td>
+      </tr>
+      <tr *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">
+        <td>More products</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="resource-edit">
+    <label for="Name">Name</label>
+    <div class="form-group">
+      <input type="text"
+             class="form-control"
+             id="name"
+             aria-describedby="name"
+             value="{{updatedResource.Name}}"
+             (input)="updateResource('Name', $event)"
+             placeholder="Enter resource name">
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <input type="text"
+             class="form-control"
+             id="description"
+             value="{{updatedResource.Description}}"
+             (input)="updateResource('Description', $event)"
+             placeholder="Description">
+    </div>
+  </div>
+</resource-table-component>

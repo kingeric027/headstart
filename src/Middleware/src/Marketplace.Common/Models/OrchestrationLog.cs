@@ -21,9 +21,9 @@ namespace Marketplace.Common.Models
             this.Cache = wi.Cache;
             this.Diff = wi.Diff;
             this.RecordId = wi.RecordId;
-            this.SupplierId = wi.SupplierId;
+            this.ResourceId = wi.ResourceId;
             this.RecordType = wi.RecordType;
-            this.Level = LogLevel.Success;
+            this.Level = LogLevel.Warn;
         }
 
         public OrchestrationLog(OrchestrationException ex)
@@ -50,7 +50,7 @@ namespace Marketplace.Common.Models
         [Sortable]
         public LogLevel Level { get; set; }
         [Sortable]
-        public string SupplierId { get; set; }
+        public string ResourceId { get; set; }
         [Sortable]
         public string RecordId { get; set; }
         [Sortable]
