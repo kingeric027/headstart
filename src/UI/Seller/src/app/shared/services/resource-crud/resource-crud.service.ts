@@ -69,9 +69,9 @@ export abstract class ResourceCrudService<ResourceType> {
         })
         .toPromise();
       if (pageNumber === 1) {
-        this.setNewProducts(productsResponse);
+        this.setNewResources(productsResponse);
       } else {
-        this.addProducts(productsResponse);
+        this.addResources(productsResponse);
       }
     }
   }
@@ -83,11 +83,11 @@ export abstract class ResourceCrudService<ResourceType> {
     this.resourceSubject.next(this.resourceSubject.value);
   }
 
-  setNewProducts(resourceResponse: ListResource<ResourceType>) {
+  setNewResources(resourceResponse: ListResource<ResourceType>) {
     this.resourceSubject.next(resourceResponse);
   }
 
-  addProducts(resourceResponse: ListResource<ResourceType>) {
+  addResources(resourceResponse: ListResource<ResourceType>) {
     this.resourceSubject.next({
       Meta: resourceResponse.Meta,
       Items: [...this.resourceSubject.value.Items, ...resourceResponse.Items],
