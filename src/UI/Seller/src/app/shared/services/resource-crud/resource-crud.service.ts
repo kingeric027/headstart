@@ -28,10 +28,9 @@ export abstract class ResourceCrudService<ResourceType> {
   private itemsPerPage = 100;
 
   // route defintes the string of text that the front end needs to match to make list calls
-  private route = '';
+  abstract route = '';
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private ocService: any, route: string) {
-    this.route = route;
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private ocService: any) {
     this.activatedRoute.queryParams.subscribe((params) => {
       if (this.router.url.startsWith(this.route)) {
         this.readFromUrlQueryParams(params);
