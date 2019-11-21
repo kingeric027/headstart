@@ -67,7 +67,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   updateResource(fieldName: string, event) {
     const newValue = event.target.value;
-    this.updatedResource[fieldName] = newValue;
+    this.updatedResource = { ...this.updatedResource, [fieldName]: newValue };
+    this.changeDetectorRef.detectChanges();
   }
 
   copyResource(resource: any) {

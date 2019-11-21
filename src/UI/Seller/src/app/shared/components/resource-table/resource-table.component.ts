@@ -18,18 +18,15 @@ export class ResourceTableComponent implements OnInit {
   public popover: NgbPopover;
   faFilter = faFilter;
   searchTerm = '';
-  private _resourceOptions: Options;
+  _resourceOptions: Options;
+  _resourceInSelection: any;
+  _updatedResource: any;
+  areChanges: boolean;
 
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
   @Input()
   selectedResourceID: string;
-  @Input()
-  updatedResource: any;
-  @Input()
-  resourceInSelection: any;
-  @Input()
-  resourceName: string;
   @Input()
   ocService: ResourceCrudService<any>;
   @Output()
@@ -43,12 +40,20 @@ export class ResourceTableComponent implements OnInit {
   @Output()
   applyFilters: EventEmitter<any> = new EventEmitter();
   @Input()
+  set updatedResource(value: any) {
+    this._updatedResource = value;
+    this.checkForChanges();
+  }
+  @Input()
+  set resourceInSelection(value: any) {
+    this._resourceInSelection = value;
+    this.checkForChanges();
+  }
+  @Input()
   set resourceOptions(value: Options) {
     this._resourceOptions = value;
     this.searchTerm = value.search || '';
   }
-
-  JSON = JSON;
 
   searchedResources(event) {
     this.searched.emit(event);
@@ -81,5 +86,9 @@ export class ResourceTableComponent implements OnInit {
 
   clearAllFilters() {
     this.ocService.clearAllFilters();
+  }
+
+  checkForChanges() {
+    this.areChanges = JSON.stringify(this._updatedResource) !== JSON.stringify(this._resourceInSelection);
   }
 }
