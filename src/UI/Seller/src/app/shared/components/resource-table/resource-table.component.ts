@@ -1,11 +1,11 @@
-import { Component, Input, Output, ViewChild, OnInit } from '@angular/core';
+import { Component, Input, Output, ViewChild } from '@angular/core';
 import {
   ListResource,
   ResourceCrudService,
   Options,
 } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -13,10 +13,11 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './resource-table.component.html',
   styleUrls: ['./resource-table.component.scss'],
 })
-export class ResourceTableComponent implements OnInit {
+export class ResourceTableComponent {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
+  faChevronLeft = faChevronLeft;
   searchTerm = '';
   _resourceOptions: Options;
   _resourceInSelection: any;
@@ -29,6 +30,8 @@ export class ResourceTableComponent implements OnInit {
   selectedResourceID: string;
   @Input()
   ocService: ResourceCrudService<any>;
+  @Input()
+  resourceName: string;
   @Output()
   searched: EventEmitter<any> = new EventEmitter();
   @Output()
@@ -52,7 +55,7 @@ export class ResourceTableComponent implements OnInit {
   @Input()
   set resourceOptions(value: Options) {
     this._resourceOptions = value;
-    this.searchTerm = value.search || '';
+    this.searchTerm = (value && value.search) || '';
   }
 
   searchedResources(event) {

@@ -4,13 +4,10 @@ import { SuppliersRoutingModule } from './suppliers-routing.module';
 import { SupplierLocationListComponent } from './components/locations/supplier-location-list/supplier-location-list.component';
 import { SupplierLocationCreateComponent } from './components/locations/supplier-location-create/supplier-location-create.component';
 import { SupplierLocationDetailsComponent } from './components/locations/supplier-location-details/supplier-location-details.component';
-import { SupplierDetailsComponent } from './components/suppliers/supplier-details/supplier-details.component';
-import { SupplierListComponent } from './components/suppliers/supplier-list/supplier-list.component';
+import { SupplierTableComponent } from './components/suppliers/supplier-table/supplier-table.component';
 import { SupplierCreateComponent } from './components/suppliers/supplier-create/supplier-create.component';
-import { SupplierUserListComponent } from './components/users/supplier-user-list/supplier-user-list.component';
-import { SupplierUserCreateComponent } from './components/users/supplier-user-create/supplier-user-create.component';
-import { SupplierUserDetailsComponent } from './components/users/supplier-user-details/supplier-user-details.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { SupplierUserTableComponent } from './components/users/user-table/supplier-user-table.component';
 
 @NgModule({
   imports: [SharedModule, SuppliersRoutingModule, PerfectScrollbarModule],
@@ -18,12 +15,9 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
     SupplierLocationListComponent,
     SupplierLocationCreateComponent,
     SupplierLocationDetailsComponent,
-    SupplierDetailsComponent,
-    SupplierListComponent,
+    SupplierTableComponent,
     SupplierCreateComponent,
-    SupplierUserListComponent,
-    SupplierUserCreateComponent,
-    SupplierUserDetailsComponent,
+    SupplierUserTableComponent,
   ],
 })
 export class SuppliersModule {}

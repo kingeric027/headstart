@@ -12,7 +12,6 @@ import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 export class PromotionService extends ResourceCrudService<Promotion> {
   constructor(router: Router, activatedRoute: ActivatedRoute, ocPromotionService: OcPromotionService) {
     super(router, activatedRoute, ocPromotionService);
+    this.route = '/products/promotions';
   }
-
-  route = '/products/promotions';
 }

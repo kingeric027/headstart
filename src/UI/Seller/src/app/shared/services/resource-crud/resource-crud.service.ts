@@ -28,9 +28,20 @@ export abstract class ResourceCrudService<ResourceType> {
   private itemsPerPage = 100;
 
   // route defintes the string of text that the front end needs to match to make list calls
-  abstract route = '';
+  route = '';
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private ocService: any) {
+  // example parent service would be 'supplier' while in the supplier user service
+  parentRoute = '';
+
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private ocService: any,
+    route: string,
+    parentRoute: string = ''
+  ) {
+    this.parentRoute = parentRoute;
+    this.route = route;
     this.activatedRoute.queryParams.subscribe((params) => {
       if (this.router.url.startsWith(this.route)) {
         this.readFromUrlQueryParams(params);
@@ -58,21 +69,39 @@ export abstract class ResourceCrudService<ResourceType> {
   async listResources(pageNumber = 1) {
     if (this.router.url.startsWith(this.route)) {
       const { sortBy, search, filters } = this.optionsSubject.value;
-      const productsResponse = await this.ocService
-        .List({
-          page: pageNumber,
-          search,
-          sortBy,
-          pageSize: this.itemsPerPage,
-          filters,
-        })
-        .toPromise();
+      const options = {
+        page: pageNumber,
+        search,
+        sortBy,
+        pageSize: this.itemsPerPage,
+        filters,
+      };
+      const resourceResponse = await this.ocService.List(...this.buildListArgs(options)).toPromise();
       if (pageNumber === 1) {
-        this.setNewResources(productsResponse);
+        this.setNewResources(resourceResponse);
       } else {
-        this.addResources(productsResponse);
+        this.addResources(resourceResponse);
       }
     }
+  }
+
+  buildListArgs(options: Options) {
+    if (this.parentService) {
+      const parentResourceID = this.getParentResourceID();
+      return [parentResourceID, options];
+    } else {
+      return [options];
+    }
+  }
+
+  getParentResourceID() {
+    const urlPieces = this.router.url.split('/');
+    const indexOfParent = urlPieces.indexOf(`${this.parentService}s`);
+    return urlPieces[indexOfParent + 1];
+  }
+
+  getResourceById(resourceID: string): Promise<any> {
+    return this.ocService.Get(resourceID).toPromise();
   }
 
   async updateResource(resource: any): Promise<any> {

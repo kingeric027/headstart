@@ -6,13 +6,13 @@
                           [ocService]="ocService"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
-                          resourceName="Suppliers"
+                          resourceName="Supplier Users"
                           (changesSaved)="saveUpdates()"
                           (applyFilters)="applyFilters()"
                           (resourceSelected)="selectResource($event)">
 
   <!-- filter component -->
-  <form class="d-flex flex-column filters"
+  <!-- <form class="d-flex flex-column filters"
         [formGroup]="filterForm">
     <div *ngFor="let filter of filterConfig.Filters"
          class="group">
@@ -26,7 +26,7 @@
       <span class="highlight"></span>
       <label>{{filter.Display}}</label>
     </div>
-  </form>
+  </form> -->
 
   <!-- full view table -->
   <table class="table table-hover resource-table">
@@ -38,13 +38,13 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let supplier of resourceList.Items; index as index"
+      <tr *ngFor="let user of resourceList.Items; index as index"
           (click)="selectResource(supplier)"
           class="selectable-row"
           [ngClass]="{'selected-resource':selectedIndex === index}">
-        <td>{{supplier.Name}}</td>
-        <td>{{supplier.ID}}</td>
-        <td>{{supplier.Active ? 'Active' : 'Inactive'}}</td>
+        <td>{{user.Name}}</td>
+        <td>{{user.ID}}</td>
+        <td>{{user.Active ? 'Active' : 'Inactive'}}</td>
       </tr>
       <tr>
         <td *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">More suppliers</td>

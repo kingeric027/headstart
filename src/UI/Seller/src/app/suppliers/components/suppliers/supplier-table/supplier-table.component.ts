@@ -4,6 +4,7 @@ import { Supplier } from '@ordercloud/angular-sdk';
 import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
 import { FormControl, FormGroup } from '@angular/forms';
 import { FilterDictionary } from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { Router, ActivatedRoute } from '@angular/router';
 
 export interface SupplierCategoryConfigFilters {
   Display: string;
@@ -18,14 +19,22 @@ export interface SupplierCategoryConfig {
 }
 
 @Component({
-  selector: 'app-supplier-list',
-  templateUrl: './supplier-list.component.html',
-  styleUrls: ['./supplier-list.component.scss'],
+  selector: 'app-supplier-table',
+  templateUrl: './supplier-table.component.html',
+  styleUrls: ['./supplier-table.component.scss'],
 })
-export class SupplierListComponent extends ResourceCrudComponent<Supplier> {
-  constructor(private supplierService: SupplierService, changeDetectorRef: ChangeDetectorRef) {
-    super(changeDetectorRef, supplierService);
+export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
+  constructor(
+    private supplierService: SupplierService,
+    changeDetectorRef: ChangeDetectorRef,
+    router: Router,
+    activatedroute: ActivatedRoute
+  ) {
+    super(changeDetectorRef, supplierService, router, activatedroute);
+    this.router = router;
   }
+
+  route = 'supplier';
 
   filterConfig = {
     id: 'SEB',

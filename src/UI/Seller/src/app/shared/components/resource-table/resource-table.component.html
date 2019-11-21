@@ -57,7 +57,7 @@
       <!-- full table view -->
       <div *ngIf="
                 !selectedResourceID">
-        <perfect-scrollbar style="width: 100%; height: calc(100vh - 98px);"
+        <perfect-scrollbar style="width: 100%; height: calc(100vh - 213px);"
                            (psYReachEnd)="handleScrollEnd()">
           <ng-content select="table"></ng-content>
         </perfect-scrollbar>
@@ -67,7 +67,7 @@
       <div *ngIf="selectedResourceID"
            class="row">
         <div class="col-3">
-          <perfect-scrollbar style="width: 100%; height: calc(100vh - 98px);"
+          <perfect-scrollbar style="width: 100%; height: calc(100vh - 213px);"
                              (psYReachEnd)="handleScrollEnd()"
                              class="resource-table-side">
             <table class="table table-hover resource-table">
@@ -91,7 +91,14 @@
           </perfect-scrollbar>
         </div>
         <div class="col-9">
-          <ng-content select=".resource-edit"></ng-content>
+          <span (click)="handleSelectResource({})"
+                class="icon-button ripple">
+            <fa-icon [icon]="faChevronLeft"></fa-icon>
+            back
+          </span>
+          <span>{{resourceInSelection?.Name}}</span>
+          <ng-content select=".resource-edit">
+          </ng-content>
           <button (click)="handleSaveUpdates()"
                   *ngIf="areChanges">Save Changes</button>
         </div>
