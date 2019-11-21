@@ -18,11 +18,10 @@ export class ResourceTableComponent implements OnInit {
   public popover: NgbPopover;
   faFilter = faFilter;
   searchTerm = '';
+  private _resourceOptions: Options;
 
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
-  @Input()
-  resourceOptions: Options;
   @Input()
   selectedResourceID: string;
   @Input()
@@ -43,12 +42,13 @@ export class ResourceTableComponent implements OnInit {
   resourceSelected: EventEmitter<any> = new EventEmitter();
   @Output()
   applyFilters: EventEmitter<any> = new EventEmitter();
+  @Input()
+  set resourceOptions(value: Options) {
+    this._resourceOptions = value;
+    this.searchTerm = value.search || '';
+  }
 
   JSON = JSON;
-
-  ngOnInit() {
-    this.searchTerm = this.resourceOptions.search || '';
-  }
 
   searchedResources(event) {
     this.searched.emit(event);

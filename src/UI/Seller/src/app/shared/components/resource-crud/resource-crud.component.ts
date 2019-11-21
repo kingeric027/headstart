@@ -13,7 +13,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   alive = true;
   resourceList: ListResource<ResourceType> = { Meta: {}, Items: [] };
   resourceOptions: Options = {};
-  searchText = '';
 
   // empty string if no resource is selected
   selectedResourceID = '';
