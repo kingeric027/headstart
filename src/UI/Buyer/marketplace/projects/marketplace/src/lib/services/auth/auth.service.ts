@@ -17,7 +17,6 @@ import {
 import { CookieService } from 'ngx-cookie';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { CurrentOrderService } from '../current-order/current-order.service';
-import { applicationConfiguration } from '../../config/app.config';
 import { IAuthentication, AppConfig } from '../../shopper-context';
 
 @Injectable({
@@ -39,7 +38,7 @@ export class AuthService implements IAuthentication {
     private currentUser: CurrentUserService,
     private ocMeService: OcMeService,
     private ocPasswordResetService: OcPasswordResetService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    private appConfig: AppConfig
   ) {}
 
   // All this isLoggedIn stuff is only used in the header wrapper component

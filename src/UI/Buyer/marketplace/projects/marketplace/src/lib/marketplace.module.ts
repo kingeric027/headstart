@@ -33,7 +33,6 @@ import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-w
 import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipments-wrapper.component';
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
 
-
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
@@ -58,7 +57,7 @@ import { SupplierListWrapperComponent } from './wrapper-components/supplier-list
     ReorderHelperService,
     RouteService,
     TokenHelperService,
-    ShopperContextService
+    ShopperContextService,
   ],
   declarations: [
     CartWrapperComponent,
@@ -78,7 +77,7 @@ import { SupplierListWrapperComponent } from './wrapper-components/supplier-list
     OrderShipmentsWrapperComponent,
     MyOrdersWrapperComponent,
     OrdersToApproveWrapperComponent,
-    SupplierListWrapperComponent  
+    SupplierListWrapperComponent
   ],
 })
 export class MarketplaceModule {}

@@ -2,7 +2,6 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import { applicationConfiguration } from '../../config/app.config';
 import { AppConfig } from '../../shopper-context';
 
 /**
@@ -13,7 +12,7 @@ import { AppConfig } from '../../shopper-context';
   providedIn: 'root',
 })
 export class AutoAppendTokenInterceptor implements HttpInterceptor {
-  constructor(private ocTokenService: OcTokenService, @Inject(applicationConfiguration) private appConfig: AppConfig) {}
+  constructor(private ocTokenService: OcTokenService, private appConfig: AppConfig) {}
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (request.url.includes(this.appConfig.middlewareUrl)) {
       request = request.clone({
