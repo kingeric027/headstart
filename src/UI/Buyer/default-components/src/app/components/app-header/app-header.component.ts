@@ -14,6 +14,7 @@ import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
 import { tap, debounceTime, delay, takeWhile } from 'rxjs/operators';
 import { OCMComponent } from '../base-component';
 import { ProductFilters } from 'marketplace';
+// import styles from '../../../styles/themes/anytime-fitness/variables.scss';
 
 @Component({
   templateUrl: './app-header.component.html',
@@ -46,9 +47,12 @@ export class OCMAppHeader extends OCMComponent {
     this.context.currentOrder.onOrderChange(order => (this.order = order));
     this.context.currentUser.onIsAnonymousChange(isAnon => (this.anonymous = isAnon));
     this.context.currentUser.onUserChange(user => (this.user = user));
-    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
+    this.context.productFilters.activeFiltersSubject
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(this.handleFiltersChange);
     this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
+    // console.log(styles.trim(0, 1));
   }
 
   handleFiltersChange = (filters: ProductFilters) => {

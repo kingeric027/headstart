@@ -1,57 +1,79 @@
 @charset 'UTF-8';
 
-// Theme Variables - must come before vendor
-@import
-  'themes/my-first-theme/variables';
+// // Generic Theme Variables - must come before vendor
+// @import
+//   'themes/my-first-theme/variables';
+
+// Anytime Fitness Theme Variables - must come before vendor
+@import 'themes/anytime-fitness/variables';
+
+// // Waxing the City Theme Variables - must come before vendor
+// @import
+//   'themes/waxing-the-city/variables';
+
+// // Barre Method Theme Variables - must come before vendor
+// @import
+//   'themes/barre-method/variables';
+
+// // Basecamp Theme Variables - must come before vendor
+// @import
+//   'themes/basecamp/variables';
 
 // Vendors
-@import
-  'vendor/bootstrap',
-  'vendor/normalize',
-  'vendor/ngx-toastr';
-  
+@import 'vendor/bootstrap',
+'vendor/normalize',
+'vendor/ngx-toastr';
+
 // Abstracts
-@import
-  'abstracts/variables',
-  'abstracts/functions',
-  'abstracts/mixins';
+@import 'abstracts/variables',
+'abstracts/functions',
+'abstracts/mixins';
 
 // Scaffolding
-@import
-  'base/base',
-  'base/fonts',
-  'base/typography',
-  'base/helpers';
+@import 'base/base',
+'base/fonts',
+'base/typography',
+'base/helpers';
 
 // Layout
-@import
-  'layout/header',
-  'layout/footer';
-  
+@import 'layout/header',
+'layout/footer';
+
 // Components
-@import
-  'components/button',
-  'components/_forms',
-  'components/_product-list',
-  'components/_card-ribbon',
-  'components/_card-hover',
-  'components/_list-items.scss',
-  'components/_carousel-arrow.scss',
-  'components/_modal.scss';
-  
+@import 'components/button',
+'components/_forms',
+'components/_product-list',
+'components/_card-ribbon',
+'components/_card-hover',
+'components/_list-items.scss',
+'components/_carousel-arrow.scss',
+'components/_modal.scss';
+
 // Pages
-@import
-  'pages/_home';
-  
-@import
-  '_shame';
+@import 'pages/_home';
+
+@import '_shame';
 
 // 3rd party libraries
-@import 
-  '~angular-tree-component/dist/angular-tree-component.css';
+@import '~angular-tree-component/dist/angular-tree-component.css';
 
-// Theme
-  @import
-  'themes/my-first-theme/styles';
+// // Generic Theme
+//   @import
+//   'themes/my-first-theme/styles';
+
+// Anytime Fitness Theme
+@import 'themes/anytime-fitness/styles';
+
+// // Waxing the City Theme
+//   @import
+//   'themes/waxing-the-city/styles';
+
+// // Barre Method
+//   @import
+//   'themes/barre-method/styles';
+
+// // Basecamp Theme
+//   @import
+//   'themes/basecamp/styles';
 
 //@import '../app/ocm-default-components/shared.scss'; 
