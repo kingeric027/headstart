@@ -19,7 +19,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   selectedResourceID = '';
   updatedResource = {};
   resourceInSelection = {};
-  JSON = JSON;
   ocService: ResourceCrudService<ResourceType>;
   filterForm: FormGroup;
   filterConfig: any = {};
