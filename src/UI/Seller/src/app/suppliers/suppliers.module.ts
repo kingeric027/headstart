@@ -10,9 +10,10 @@ import { SupplierCreateComponent } from './components/suppliers/supplier-create/
 import { SupplierUserListComponent } from './components/users/supplier-user-list/supplier-user-list.component';
 import { SupplierUserCreateComponent } from './components/users/supplier-user-create/supplier-user-create.component';
 import { SupplierUserDetailsComponent } from './components/users/supplier-user-details/supplier-user-details.component';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 
 @NgModule({
-  imports: [SharedModule, SuppliersRoutingModule],
+  imports: [SharedModule, SuppliersRoutingModule, PerfectScrollbarModule],
   declarations: [
     SupplierLocationListComponent,
     SupplierLocationCreateComponent,
