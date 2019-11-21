@@ -11,7 +11,7 @@ import {
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { MarketplaceModule } from 'marketplace';
+import { MarketplaceModule, AppConfig } from 'marketplace';
 import { createCustomElement } from '@angular/elements';
 import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
@@ -111,6 +111,7 @@ import { SpecFormRangeComponent } from './components/spec-form/spec-form-range/s
 import { SpecFormSelectComponent } from './components/spec-form/spec-form-select/spec-form-select.component';
 import { SpecFormTextAreaComponent } from './components/spec-form/spec-form-textarea/spec-form-textarea.component';
 import { OCMSupplierList } from './components/supplier-list/supplier-list.component';
+import { ocAppConfig } from './config/app.config';
 
 const components = [
   OCMProductCard,
@@ -219,6 +220,7 @@ const components = [
     BrowserAnimationsModule,
   ],
   providers: [
+    { provide: AppConfig, useValue: ocAppConfig },
     { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
     { provide: ErrorHandler, useClass: AppErrorHandler },
     DatePipe, // allows us to use in class as injectable (date filter component)

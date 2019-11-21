@@ -1,7 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BuyerCreditCard, OcTokenService } from '@ordercloud/angular-sdk';
-import { applicationConfiguration } from '../../config/app.config';
 import { ICreditCards, AppConfig, AuthNetCreditCard, CreateCardResponse } from '../../shopper-context';
 
 /**
@@ -33,7 +32,7 @@ export class AuthNetCreditCardService implements ICreditCards {
   constructor(
     private http: HttpClient,
     private ocTokenService: OcTokenService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    private appConfig: AppConfig
   ) {}
 
   private post(body): Promise<any> {

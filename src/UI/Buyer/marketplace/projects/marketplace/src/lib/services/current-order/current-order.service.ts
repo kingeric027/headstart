@@ -19,7 +19,6 @@ import { isUndefined as _isUndefined, get as _get } from 'lodash';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { listAll } from '../../functions/listAll';
-import { applicationConfiguration } from '../../config/app.config';
 import { ICurrentOrder, AppConfig } from '../../shopper-context';
 
 @Injectable({
@@ -42,7 +41,7 @@ export class CurrentOrderService implements ICurrentOrder {
     private tokenHelper: TokenHelperService,
     private ocPaymentService: OcPaymentService,
     private paymentHelper: PaymentHelperService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    private appConfig: AppConfig
   ) {}
 
   private get order(): Order {
