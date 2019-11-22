@@ -28,7 +28,7 @@ export class HeaderComponent implements OnInit {
   faMapMarker = faMapMarkerAlt;
   faSitemap = faSitemap;
   faUserCircle = faUserCircle;
-
+  activeTitle = '';
   headerConfig: HeaderNav[];
 
   constructor(
@@ -45,8 +45,10 @@ export class HeaderComponent implements OnInit {
 
   subscribeToRouteEvents() {
     this.router.events.subscribe(() => {
-      const routersplit = this.router.url.split('/');
-      console.log(routersplit);
+      this.activeTitle = this.headerConfig.find((grouping) => {
+        console.log(grouping);
+        return grouping.routes.some((route) => this.router.url.includes(route.route));
+      }).title;
     });
   }
 
