@@ -5,7 +5,7 @@ import {
   Options,
 } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
-import { faFilter, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
@@ -23,6 +23,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
+  faHome = faHome;
   faChevronLeft = faChevronLeft;
   searchTerm = '';
   _resourceOptions: Options;
