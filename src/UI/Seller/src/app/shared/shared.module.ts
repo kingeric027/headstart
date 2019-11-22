@@ -3,7 +3,7 @@ import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { NgbPaginationModule, NgbTabsetModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbPaginationModule, NgbTabsetModule, NgbPopoverModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
 import { TreeModule } from 'angular-tree-component';
@@ -39,8 +39,9 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
     FormsModule,
     PerfectScrollbarModule,
     NgbPopoverModule,
-    NgbPaginationModule.forRoot(),
-    NgbTabsetModule.forRoot(),
+    NgbDropdownModule,
+    NgbPaginationModule,
+    NgbTabsetModule,
   ],
   exports: [
     // angular
@@ -53,6 +54,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
     FontAwesomeModule,
     NgbPaginationModule,
     NgbTabsetModule,
+    NgbDropdownModule,
 
     // app components
     SearchComponent,

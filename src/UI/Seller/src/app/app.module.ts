@@ -48,7 +48,7 @@ import { AppErrorHandler } from './config/error-handling.config';
      * can live in shared
      */
     SharedModule,
-    NgProgressModule.forRoot(),
+    NgProgressModule,
     NgProgressHttpModule,
     OrderCloudModule.forRoot(OcSDKConfig),
     CookieModule.forRoot(),
