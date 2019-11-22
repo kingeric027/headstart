@@ -30,7 +30,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   _updatedResource: any;
   areChanges: boolean;
   parentResources: ListResource<any>;
-  breadCrumbs: BreadCrumb[] = [];
+  breadCrumbs: string[] = [];
   alive = true;
 
   constructor(
@@ -98,7 +98,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   private setBreadCrumbs() {
-    this.urlPieces = this.router.url.split('/').filter((p) => p);
+    this.breadCrumbs = this.router.url.split('/').filter((p) => p);
     this.changeDetectorRef.detectChanges();
   }
 

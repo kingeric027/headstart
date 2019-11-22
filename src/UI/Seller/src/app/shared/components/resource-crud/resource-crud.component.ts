@@ -9,6 +9,7 @@ import {
 } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { plural } from 'pluralize';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -141,7 +142,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   navigateToSubList(subList: string) {
-    const newUrl = `${this.ocService.primaryResourceLevel}s/${this.selectedResourceID}/${subList}s`;
+    const newUrl = `${plural(this.ocService.primaryResourceLevel)}/${this.selectedResourceID}/${plural(subList)}`;
     this.router.navigateByUrl(newUrl);
   }
 

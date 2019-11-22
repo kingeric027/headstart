@@ -7,8 +7,8 @@
         <ol class="breadcrumb">
           <!-- make this the home icon -->
           <li class="breadcrumb-item"><a href="#">Home</a></li>
-          <li *ngFor="let urlPiece of urlPieces"
-              class="breadcrumb-item"><a href="#">{{urlPiece}}</a></li>
+          <li *ngFor="let breadCrumb of breadCrumbs"
+              class="breadcrumb-item"><a href="#">{{breadCrumb}}</a></li>
         </ol>
       </nav>
       <div>
@@ -104,7 +104,7 @@
                     (click)="handleSelectResource(resource)"
                     class="selectable-row"
                     [ngClass]="{'selected-resource': selectedResourceID === resource.ID}">
-                  <td>{{resource.Name || resource.Username}}</td>
+                  <td>{{resource.Name || resource.Username || resource.AddressName}}</td>
                 </tr>
                 <tr>
                   <td *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">More resources</td>

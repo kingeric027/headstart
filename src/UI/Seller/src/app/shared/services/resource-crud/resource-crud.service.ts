@@ -3,6 +3,7 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { cloneDeep as _cloneDeep, uniqBy as _uniqBy } from 'lodash';
 import { Meta } from '@ordercloud/angular-sdk';
+import { plural } from 'pluralize';
 
 export interface Options {
   page?: number;
@@ -88,9 +89,11 @@ export abstract class ResourceCrudService<ResourceType> {
 
   shouldListResources() {
     if (!this.secondaryResourceLevel) {
+      // for primary resources list if on the route
       return this.router.url.startsWith(this.route);
     } else {
-      return !!this.getParentResourceID();
+      // for secondary resources list there is a parent ID
+      return !!this.getParentResourceID() && this.router.url.includes(this.secondaryResourceLevel);
     }
   }
 
@@ -111,19 +114,27 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   updateUrlForUpdatedParent(resource: any) {
-    // update for pluralize
-    return `${this.primaryResourceLevel}s/${resource.ID}/${this.secondaryResourceLevel}s`;
+    const queryParams = this.router.url.split('?')[1];
+    let newUrl = `${plural(this.primaryResourceLevel)}/${resource.ID}/${plural(this.secondaryResourceLevel)}`;
+    if (queryParams) {
+      newUrl += `?${queryParams}`;
+    }
+    return newUrl;
   }
 
   constructResourceURL(resourceID: string = ''): string {
     let newUrl = '';
+    const queryParams = this.router.url.split('?')[1];
     if (this.secondaryResourceLevel) {
-      newUrl += `${this.route}/${this.getParentResourceID()}/${this.secondaryResourceLevel}s`;
+      newUrl += `${this.route}/${this.getParentResourceID()}/${plural(this.secondaryResourceLevel)}`;
     } else {
       newUrl += `${this.route}`;
     }
     if (resourceID) {
       newUrl += `/${resourceID}`;
+    }
+    if (queryParams) {
+      newUrl += `?${queryParams}`;
     }
     return newUrl;
   }
@@ -139,7 +150,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   getParentResourceID() {
     const urlPieces = this.router.url.split('/');
-    const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}s`);
+    const indexOfParent = urlPieces.indexOf(`${plural(this.primaryResourceLevel)}`);
     return urlPieces[indexOfParent + 1];
   }
 
@@ -221,7 +232,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   getRouteFromResourceName(resourceName: string): string {
-    return `/${resourceName}s`;
+    return `/${plural(resourceName)}`;
   }
 
   hasFilters(): boolean {
