@@ -45,10 +45,10 @@ export class HeaderComponent implements OnInit {
 
   subscribeToRouteEvents() {
     this.router.events.subscribe(() => {
-      this.activeTitle = this.headerConfig.find((grouping) => {
-        console.log(grouping);
+      const activeNavGroup = this.headerConfig.find((grouping) => {
         return grouping.routes.some((route) => this.router.url.includes(route.route));
-      }).title;
+      });
+      this.activeTitle = activeNavGroup && activeNavGroup.title;
     });
   }
 
