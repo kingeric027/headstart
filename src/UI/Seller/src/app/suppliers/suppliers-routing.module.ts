@@ -1,28 +1,22 @@
 // core services
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SupplierListComponent } from './components/suppliers/supplier-list/supplier-list.component';
-import { SupplierCreateComponent } from './components/suppliers/supplier-create/supplier-create.component';
-import { SupplierDetailsComponent } from './components/suppliers/supplier-details/supplier-details.component';
-import { SupplierUserListComponent } from './components/users/supplier-user-list/supplier-user-list.component';
-import { SupplierUserCreateComponent } from './components/users/supplier-user-create/supplier-user-create.component';
-import { SupplierUserDetailsComponent } from './components/users/supplier-user-details/supplier-user-details.component';
-import { SupplierLocationListComponent } from './components/locations/supplier-location-list/supplier-location-list.component';
-import { SupplierLocationCreateComponent } from './components/locations/supplier-location-create/supplier-location-create.component';
-import { SupplierLocationDetailsComponent } from './components/locations/supplier-location-details/supplier-location-details.component';
+import { SupplierTableComponent } from './components/suppliers/supplier-table/supplier-table.component';
+import { SupplierUserTableComponent } from './components/users/user-table/supplier-user-table.component';
+import { SupplierLocationTableComponent } from './components/locations/supplier-location-table/supplier-location-table.component';
 
 const routes: Routes = [
-  { path: '', component: SupplierListComponent },
-  { path: 'new', component: SupplierCreateComponent },
-  { path: ':supplierID', component: SupplierDetailsComponent },
-  { path: ':supplierID/users', component: SupplierUserListComponent },
-  { path: ':supplierID/users/new', component: SupplierUserCreateComponent },
-  { path: ':supplierID/users/:userID', component: SupplierUserDetailsComponent },
-  { path: ':supplierID/locations', component: SupplierLocationListComponent },
-  { path: ':supplierID/locations/new', component: SupplierLocationCreateComponent },
+  { path: '', component: SupplierTableComponent },
+  { path: 'new', component: SupplierTableComponent },
+  { path: ':supplierID', component: SupplierTableComponent },
+  { path: ':supplierID/users', component: SupplierUserTableComponent },
+  { path: ':supplierID/users/new', component: SupplierUserTableComponent },
+  { path: ':supplierID/users/:userID', component: SupplierUserTableComponent },
+  { path: ':supplierID/locations', component: SupplierLocationTableComponent },
+  { path: ':supplierID/locations/new', component: SupplierLocationTableComponent },
   {
     path: ':supplierID/locations/:locationID',
-    component: SupplierLocationDetailsComponent,
+    component: SupplierLocationTableComponent,
   },
 ];
 
