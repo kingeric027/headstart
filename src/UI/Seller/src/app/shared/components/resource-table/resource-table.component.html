@@ -3,6 +3,14 @@
 <div>
   <div class="row">
     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <!-- make this the home icon -->
+          <li class="breadcrumb-item"><a href="#">Home</a></li>
+          <li *ngFor="let urlPiece of urlPieces"
+              class="breadcrumb-item"><a href="#">{{urlPiece}}</a></li>
+        </ol>
+      </nav>
       <div>
         <h1>{{resourceName}}</h1>
       </div>
@@ -52,6 +60,21 @@
         </div>
         <button class="btn btn-light"
                 (click)="clearAllFilters()">Clear All Filters</button>
+
+        <!-- parent resource dropdown -->
+        <div ngbDropdown
+             *ngIf="parentResourceService"
+             class="d-inline-block">
+          <button class="btn btn-outline-primary"
+                  id="parentresourcedropdown"
+                  ngbDropdownToggle>Toggle dropdown</button>
+          <div ngbDropdownMenu
+               aria-labelledby="parent resource dropdown">
+            <button ngbDropdownItem
+                    *ngFor="let resource of parentResources.Items"
+                    (click)="selectParentResource(resource)">{{resource?.Name}}</button>
+          </div>
+        </div>
       </div>
 
       <!-- full table view -->
@@ -81,7 +104,7 @@
                     (click)="handleSelectResource(resource)"
                     class="selectable-row"
                     [ngClass]="{'selected-resource': selectedResourceID === resource.ID}">
-                  <td>{{resource.Name}}</td>
+                  <td>{{resource.Name || resource.Username}}</td>
                 </tr>
                 <tr>
                   <td *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">More resources</td>

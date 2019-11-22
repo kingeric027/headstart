@@ -4,6 +4,7 @@
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
+                          [parentResourceService]="supplierService"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           resourceName="Supplier Users"
@@ -39,15 +40,15 @@
     </thead>
     <tbody>
       <tr *ngFor="let user of resourceList.Items; index as index"
-          (click)="selectResource(supplier)"
+          (click)="selectResource(user)"
           class="selectable-row"
           [ngClass]="{'selected-resource':selectedIndex === index}">
-        <td>{{user.Name}}</td>
+        <td>{{user.Username}}</td>
         <td>{{user.ID}}</td>
         <td>{{user.Active ? 'Active' : 'Inactive'}}</td>
       </tr>
-      <tr>
-        <td *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">More suppliers</td>
+      <tr *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">
+        <td>More users</td>
         <td></td>
         <td></td>
       </tr>

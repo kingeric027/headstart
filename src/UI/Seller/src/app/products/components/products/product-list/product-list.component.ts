@@ -18,6 +18,4 @@ export class ProductListComponent extends ResourceCrudComponent<Product> {
   ) {
     super(changeDetectorRef, productService, router, activatedRoute);
   }
-
-  route = 'product';
 }

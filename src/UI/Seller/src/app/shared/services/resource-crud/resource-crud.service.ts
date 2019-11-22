@@ -27,21 +27,22 @@ export abstract class ResourceCrudService<ResourceType> {
   public optionsSubject: BehaviorSubject<Options> = new BehaviorSubject<Options>({});
   private itemsPerPage = 100;
 
-  // route defintes the string of text that the front end needs to match to make list calls
   route = '';
-
-  // example parent service would be 'supplier' while in the supplier user service
-  parentRoute = '';
+  primaryResourceLevel = '';
+  // example: for supplier user service the primary is supplier and the secondary is users
+  secondaryResourceLevel = '';
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private ocService: any,
     route: string,
-    parentRoute: string = ''
+    primaryResourceLevel: string,
+    secondaryResourceLevel: string = ''
   ) {
-    this.parentRoute = parentRoute;
     this.route = route;
+    this.primaryResourceLevel = primaryResourceLevel;
+    this.secondaryResourceLevel = secondaryResourceLevel;
     this.activatedRoute.queryParams.subscribe((params) => {
       if (this.router.url.startsWith(this.route)) {
         this.readFromUrlQueryParams(params);
@@ -67,7 +68,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async listResources(pageNumber = 1) {
-    if (this.router.url.startsWith(this.route)) {
+    if (this.shouldListResources()) {
       const { sortBy, search, filters } = this.optionsSubject.value;
       const options = {
         page: pageNumber,
@@ -85,8 +86,50 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
+  shouldListResources() {
+    if (!this.secondaryResourceLevel) {
+      return this.router.url.startsWith(this.route);
+    } else {
+      return !!this.getParentResourceID();
+    }
+  }
+
+  selectResource(resource: any) {
+    const newUrl = this.constructResourceURL(resource.ID || '');
+    this.router.navigateByUrl(newUrl);
+  }
+
+  selectParentResource(resource: any) {
+    const newUrl = this.updateUrlForUpdatedParent(resource);
+    this.router.navigateByUrl(newUrl);
+
+    // this settimeout ensures that the new parent resource ID is in the url before the resources are listed
+    // find a better way to update the resources on the parent resource ID change
+    setTimeout(() => {
+      this.listResources();
+    });
+  }
+
+  updateUrlForUpdatedParent(resource: any) {
+    // update for pluralize
+    return `${this.primaryResourceLevel}s/${resource.ID}/${this.secondaryResourceLevel}s`;
+  }
+
+  constructResourceURL(resourceID: string = ''): string {
+    let newUrl = '';
+    if (this.secondaryResourceLevel) {
+      newUrl += `${this.route}/${this.getParentResourceID()}/${this.secondaryResourceLevel}s`;
+    } else {
+      newUrl += `${this.route}`;
+    }
+    if (resourceID) {
+      newUrl += `/${resourceID}`;
+    }
+    return newUrl;
+  }
+
   buildListArgs(options: Options) {
-    if (this.parentService) {
+    if (this.secondaryResourceLevel) {
       const parentResourceID = this.getParentResourceID();
       return [parentResourceID, options];
     } else {
@@ -96,7 +139,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   getParentResourceID() {
     const urlPieces = this.router.url.split('/');
-    const indexOfParent = urlPieces.indexOf(`${this.parentService}s`);
+    const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}s`);
     return urlPieces[indexOfParent + 1];
   }
 
@@ -175,6 +218,10 @@ export abstract class ResourceCrudService<ResourceType> {
 
   clearResources() {
     this.resourceSubject.next({ Meta: {}, Items: [] });
+  }
+
+  getRouteFromResourceName(resourceName: string): string {
+    return `/${resourceName}s`;
   }
 
   hasFilters(): boolean {

@@ -23,7 +23,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   filterForm: FormGroup;
   filterConfig: any = {};
   router: Router;
-  abstract route = '';
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -59,9 +58,12 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   subscribeToResourceSelection() {
     this.activatedRoute.params.subscribe((params) => {
-      const resourceIDSelected = params[`${this.route}ID`];
+      const resourceIDSelected =
+        params[`${this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel}ID`];
       if (resourceIDSelected) {
-        this.setResourceSelection(params[`${this.route}ID`]);
+        this.setResourceSelection(
+          params[`${this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel}ID`]
+        );
       }
     });
   }
@@ -94,11 +96,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   selectResource(resource: any) {
-    if (resource.ID) {
-      this.router.navigateByUrl(`/${this.route}s/${resource.ID}`);
-    } else {
-      this.router.navigateByUrl(`/${this.route}s`);
-    }
+    this.ocService.selectResource(resource);
   }
 
   updateResource(fieldName: string, event) {
@@ -143,7 +141,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   navigateToSubList(subList: string) {
-    const newUrl = `${this.route}s/${this.selectedResourceID}/${subList}s`;
+    const newUrl = `${this.ocService.primaryResourceLevel}s/${this.selectedResourceID}/${subList}s`;
     this.router.navigateByUrl(newUrl);
   }
 

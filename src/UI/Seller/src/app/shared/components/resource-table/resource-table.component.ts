@@ -1,4 +1,4 @@
-import { Component, Input, Output, ViewChild } from '@angular/core';
+import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import {
   ListResource,
   ResourceCrudService,
@@ -7,13 +7,19 @@ import {
 import { EventEmitter } from '@angular/core';
 import { faFilter, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { Router, ActivatedRoute } from '@angular/router';
+import { takeWhile } from 'rxjs/operators';
 
+interface BreadCrumb {
+  text: string;
+  route: string;
+}
 @Component({
   selector: 'resource-table-component',
   templateUrl: './resource-table.component.html',
   styleUrls: ['./resource-table.component.scss'],
 })
-export class ResourceTableComponent {
+export class ResourceTableComponent implements OnInit, OnDestroy {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
@@ -23,6 +29,15 @@ export class ResourceTableComponent {
   _resourceInSelection: any;
   _updatedResource: any;
   areChanges: boolean;
+  parentResources: ListResource<any>;
+  breadCrumbs: BreadCrumb[] = [];
+  alive = true;
+
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
@@ -30,6 +45,8 @@ export class ResourceTableComponent {
   selectedResourceID: string;
   @Input()
   ocService: ResourceCrudService<any>;
+  @Input()
+  parentResourceService?: ResourceCrudService<any>;
   @Input()
   resourceName: string;
   @Output()
@@ -56,6 +73,37 @@ export class ResourceTableComponent {
   set resourceOptions(value: Options) {
     this._resourceOptions = value;
     this.searchTerm = (value && value.search) || '';
+  }
+
+  ngOnInit() {
+    this.setParentResourceSubscription();
+    this.setUrlSubscription();
+  }
+
+  private setParentResourceSubscription() {
+    if (this.parentResourceService) {
+      this.parentResourceService.resourceSubject.subscribe((parentResources) => {
+        this.parentResources = parentResources;
+      });
+    }
+  }
+
+  private setUrlSubscription() {
+    this.router.events.pipe(takeWhile(() => this.alive)).subscribe(() => {
+      this.setBreadCrumbs();
+    });
+    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
+      this.setBreadCrumbs();
+    });
+  }
+
+  private setBreadCrumbs() {
+    this.urlPieces = this.router.url.split('/').filter((p) => p);
+    this.changeDetectorRef.detectChanges();
+  }
+
+  selectParentResource(resource: any) {
+    this.ocService.selectParentResource(resource);
   }
 
   searchedResources(event) {
@@ -93,5 +141,9 @@ export class ResourceTableComponent {
 
   checkForChanges() {
     this.areChanges = JSON.stringify(this._updatedResource) !== JSON.stringify(this._resourceInSelection);
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 }

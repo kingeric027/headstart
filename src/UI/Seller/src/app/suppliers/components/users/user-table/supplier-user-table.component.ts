@@ -3,6 +3,7 @@ import { ResourceCrudComponent } from '@app-seller/shared/components/resource-cr
 import { Supplier } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SupplierUserService } from '@app-seller/shared/services/supplier-user/supplier-user.service';
+import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
 
 @Component({
   selector: 'app-supplier-user-table',
@@ -14,12 +15,9 @@ export class SupplierUserTableComponent extends ResourceCrudComponent<Supplier> 
     private supplierUserService: SupplierUserService,
     changeDetectorRef: ChangeDetectorRef,
     router: Router,
-    activatedroute: ActivatedRoute
+    activatedroute: ActivatedRoute,
+    private supplierService: SupplierService
   ) {
     super(changeDetectorRef, supplierUserService, router, activatedroute);
-    this.router = router;
   }
-
-  isSubList = true;
-  route = 'user';
 }
