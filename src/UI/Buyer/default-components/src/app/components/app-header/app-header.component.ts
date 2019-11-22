@@ -9,8 +9,7 @@ import {
   faHome,
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs';
-import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
+import { Order, MeUser, LineItem } from '@ordercloud/angular-sdk';
 import { tap, debounceTime, delay, takeWhile } from 'rxjs/operators';
 import { OCMComponent } from '../base-component';
 import { ProductFilters } from 'marketplace';
@@ -20,7 +19,6 @@ import { ProductFilters } from 'marketplace';
   styleUrls: ['./app-header.component.scss'],
 })
 export class OCMAppHeader extends OCMComponent {
-  categories$: Observable<ListCategory>;
   isCollapsed = true;
   anonymous: boolean;
   user: MeUser;
@@ -53,7 +51,7 @@ export class OCMAppHeader extends OCMComponent {
 
   handleFiltersChange = (filters: ProductFilters) => {
     this.searchTermForProducts = filters.search || '';
-  };
+  }
 
   buildAddToCartListener() {
     let closePopoverTimeout;
@@ -62,7 +60,7 @@ export class OCMAppHeader extends OCMComponent {
       if (li) {
         this.popover.ngbPopover = `Added ${li.Quantity} items to Cart`;
         setTimeout(() => {
-          if(!this.popover.isOpen()) {
+          if (!this.popover.isOpen()) {
             this.popover.open();
           }
           closePopoverTimeout = setTimeout(() => {

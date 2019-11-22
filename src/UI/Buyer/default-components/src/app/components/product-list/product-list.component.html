@@ -57,10 +57,6 @@
           </div>
         </div>
       </div>
-      <ocm-category-tree *ngIf="categories?.Items?.length"
-                         [categories]="categories"
-                         [context]="context">
-      </ocm-category-tree>
     </div>
     <div class="col-lg-9 col-md-8 ">
       <div class="row flex-wrap-reverse">
@@ -119,8 +115,5 @@
   </div>
   <ocm-modal [state]="categoryModal"
              modalTitle="Select Category">
-    <ocm-category-tree *ngIf="categories?.Items?.length"
-                       [categories]="categories"
-                       [context]="context"></ocm-category-tree>
   </ocm-modal>
 </section>
