@@ -99,7 +99,16 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   private setBreadCrumbs() {
-    this.breadCrumbs = this.router.url.split('/').filter((p) => p);
+    this.breadCrumbs = this.router.url
+      .split('/')
+      .filter((p) => p)
+      .map((p) => {
+        if (p.includes('?')) {
+          return p.slice(0, p.indexOf('?'));
+        } else {
+          return p;
+        }
+      });
     this.changeDetectorRef.detectChanges();
   }
 
