@@ -3,7 +3,6 @@ import { SharedModule } from '@app-seller/shared';
 import { BuyersRoutingModule } from './buyers-routing.module';
 import { BuyerListComponent } from './components/buyers/buyer-list/buyer-list.component';
 import { BuyerDetailsComponent } from './components/buyers/buyer-details/buyer-details.component';
-import { BuyerUserDetailsComponent } from './components/users/buyer-user-details/buyer-user-details.component';
 import { BuyerLocationDetailsComponent } from './components/locations/buyer-location-details/buyer-location-details.component';
 import { BuyerApprovalCreateComponent } from './components/approvals/buyer-approval-create/buyer-approval-create.component';
 import { BuyerCreateComponent } from './components/buyers/buyer-create/buyer-create.component';
@@ -14,15 +13,14 @@ import { BuyerApprovalDetailsComponent } from './components/approvals/buyer-appr
 import { BuyerLocationListComponent } from './components/locations/buyer-location-list/buyer-location-list.component';
 import { BuyerPaymentListComponent } from './components/payments/buyer-payment-list/buyer-payment-list.component';
 import { BuyerPaymentDetailsComponent } from './components/payments/buyer-payment-details/buyer-payment-details.component';
-import { BuyerUserListComponent } from './components/users/buyer-user-list/buyer-user-list.component';
 import { BuyerUserCreateComponent } from './components/users/buyer-user-create/buyer-user-create.component';
+import { BuyerUserTableComponent } from './components/users/buyer-user-table/buyer-user-table.component';
 
 @NgModule({
   imports: [SharedModule, BuyersRoutingModule],
   declarations: [
     BuyerListComponent,
     BuyerDetailsComponent,
-    BuyerUserDetailsComponent,
     BuyerLocationDetailsComponent,
     BuyerApprovalCreateComponent,
     BuyerCreateComponent,
@@ -33,8 +31,8 @@ import { BuyerUserCreateComponent } from './components/users/buyer-user-create/b
     BuyerLocationListComponent,
     BuyerPaymentListComponent,
     BuyerPaymentDetailsComponent,
-    BuyerUserListComponent,
     BuyerUserCreateComponent,
+    BuyerUserTableComponent,
   ],
 })
 export class BuyersModule {}

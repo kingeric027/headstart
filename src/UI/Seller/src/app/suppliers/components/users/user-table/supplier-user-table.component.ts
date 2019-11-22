@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { User } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
-import { SupplierUserService } from '@app-seller/shared/services/supplier-user/supplier-user.service';
+import { SupplierUserService } from '@app-seller/shared/services/supplier/supplier-user.service';
 import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
 
 @Component({
