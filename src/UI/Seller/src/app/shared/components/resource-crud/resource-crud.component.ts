@@ -62,9 +62,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
       const resourceIDSelected =
         params[`${this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel}ID`];
       if (resourceIDSelected) {
-        this.setResourceSelection(
-          params[`${this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel}ID`]
-        );
+        this.setResourceSelection(resourceIDSelected);
       }
     });
   }

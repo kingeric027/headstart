@@ -6,11 +6,11 @@ import { BuyerService } from '@app-seller/shared/services/buyer/buyer.service';
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'buyer-list',
-  templateUrl: './buyer-list.component.html',
-  styleUrls: ['./buyer-list.component.scss'],
+  selector: 'buyer-table',
+  templateUrl: './buyer-table.component.html',
+  styleUrls: ['./buyer-table.component.scss'],
 })
-export class BuyerListComponent extends ResourceCrudComponent<Promotion> {
+export class BuyerTableComponent extends ResourceCrudComponent<Promotion> {
   constructor(
     private buyerService: BuyerService,
     changeDetectorRef: ChangeDetectorRef,

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from '@app-seller/shared';
 import { BuyersRoutingModule } from './buyers-routing.module';
-import { BuyerListComponent } from './components/buyers/buyer-list/buyer-list.component';
+import { BuyerTableComponent } from './components/buyers/buyer-list/buyer-list.component';
 import { BuyerDetailsComponent } from './components/buyers/buyer-details/buyer-details.component';
 import { BuyerLocationDetailsComponent } from './components/locations/buyer-location-details/buyer-location-details.component';
 import { BuyerApprovalCreateComponent } from './components/approvals/buyer-approval-create/buyer-approval-create.component';
@@ -19,7 +19,7 @@ import { BuyerUserTableComponent } from './components/users/buyer-user-table/buy
 @NgModule({
   imports: [SharedModule, BuyersRoutingModule],
   declarations: [
-    BuyerListComponent,
+    BuyerTableComponent,
     BuyerDetailsComponent,
     BuyerLocationDetailsComponent,
     BuyerApprovalCreateComponent,

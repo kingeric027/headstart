@@ -1,7 +1,7 @@
 // core services
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { BuyerListComponent } from './components/buyers/buyer-list/buyer-list.component';
+import { BuyerTableComponent } from './components/buyers/buyer-list/buyer-list.component';
 import { BuyerLocationDetailsComponent } from './components/locations/buyer-location-details/buyer-location-details.component';
 import { BuyerLocationListComponent } from './components/locations/buyer-location-list/buyer-location-list.component';
 import { BuyerPaymentDetailsComponent } from './components/payments/buyer-payment-details/buyer-payment-details.component';
@@ -15,9 +15,9 @@ import { BuyerApprovalCreateComponent } from './components/approvals/buyer-appro
 import { BuyerUserTableComponent } from './components/users/buyer-user-table/buyer-user-table.component';
 
 const routes: Routes = [
-  { path: '', component: BuyerListComponent },
-  { path: 'new', component: BuyerListComponent },
-  { path: ':buyerID', component: BuyerListComponent },
+  { path: '', component: BuyerTableComponent },
+  { path: 'new', component: BuyerTableComponent },
+  { path: ':buyerID', component: BuyerTableComponent },
   { path: ':buyerID/users', component: BuyerUserTableComponent },
   { path: ':buyerID/users/new', component: BuyerUserTableComponent },
   { path: ':buyerID/users/:userID', component: BuyerUserTableComponent },
