@@ -40,6 +40,14 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {
     this.headerConfig = MarketMangagerHeaderConfig;
+    this.subscribeToRouteEvents();
+  }
+
+  subscribeToRouteEvents() {
+    this.router.events.subscribe(() => {
+      const routersplit = this.router.url.split('/');
+      console.log(routersplit);
+    });
   }
 
   logout() {

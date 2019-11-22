@@ -87,7 +87,7 @@
       <!-- full table view -->
       <div *ngIf="
                 !selectedResourceID">
-        <perfect-scrollbar style="width: 100%; height: calc(100vh - 213px);"
+        <perfect-scrollbar style="width: 100%; height: calc(100vh - 255px);"
                            (psYReachEnd)="handleScrollEnd()">
           <ng-content select="table"></ng-content>
         </perfect-scrollbar>
@@ -97,7 +97,7 @@
       <div *ngIf="selectedResourceID"
            class="row">
         <div class="col-3">
-          <perfect-scrollbar style="width: 100%; height: calc(100vh - 213px);"
+          <perfect-scrollbar style="width: 100%; height: calc(100vh - 255px);"
                              (psYReachEnd)="handleScrollEnd()"
                              class="resource-table-side">
             <table class="table table-hover resource-table">

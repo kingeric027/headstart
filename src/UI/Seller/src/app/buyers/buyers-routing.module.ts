@@ -1,7 +1,7 @@
 // core services
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { BuyerTableComponent } from './components/buyers/buyer-list/buyer-list.component';
+import { BuyerTableComponent } from './components/buyers/buyer-table/buyer-table.component';
 import { BuyerLocationDetailsComponent } from './components/locations/buyer-location-details/buyer-location-details.component';
 import { BuyerLocationListComponent } from './components/locations/buyer-location-list/buyer-location-list.component';
 import { BuyerPaymentDetailsComponent } from './components/payments/buyer-payment-details/buyer-payment-details.component';
