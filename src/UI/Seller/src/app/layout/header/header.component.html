@@ -24,8 +24,7 @@
                width="150px"
                src="../../../assets/four51-logo.png">
         </li>
-        <li class="nav-item d-flex flex-column justify-content-center resource-nav-link-container"
-        >
+        <li class="nav-item d-flex flex-column justify-content-center resource-nav-link-container">
           <div class="d-flex">
             <div class="dropdown text-center flex-fill py-2"
                  *ngFor="let nav of headerConfig"
@@ -47,6 +46,7 @@
         <a class="nav-link"
            routerLink="/home">
           <fa-icon [icon]="faUserCircle"
+                   class="user-icon"
                    size="2x"></fa-icon>
         </a>
       </li>

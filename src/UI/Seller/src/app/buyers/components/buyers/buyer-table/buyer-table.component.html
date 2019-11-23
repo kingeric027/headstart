@@ -4,6 +4,7 @@
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
+                          [subResourceList]="subResourceList"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           resourceName="Buyers"
@@ -46,9 +47,5 @@
              (input)="updateResource('Name', $event)"
              placeholder="Enter resource name">
     </div>
-    <button (click)="navigateToSubList('user')"> manage users</button>
-    <button (click)="navigateToSubList('location')"> manage locations</button>
-    <button (click)="navigateToSubList('payment')"> manage payment methods</button>
-    <button (click)="navigateToSubList('approval')"> manage order approval rules</button>
   </div>
 </resource-table-component>

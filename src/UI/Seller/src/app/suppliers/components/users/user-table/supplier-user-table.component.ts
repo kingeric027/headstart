@@ -20,4 +20,6 @@ export class SupplierUserTableComponent extends ResourceCrudComponent<User> {
   ) {
     super(changeDetectorRef, supplierUserService, router, activatedroute);
   }
+
+  subResourceList = ['users', 'locations'];
 }

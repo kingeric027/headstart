@@ -9,11 +9,13 @@ import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-ico
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
+import { plural } from 'pluralize';
 
 interface BreadCrumb {
   text: string;
   route: string;
 }
+
 @Component({
   selector: 'resource-table-component',
   templateUrl: './resource-table.component.html',
@@ -29,6 +31,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   _resourceOptions: Options;
   _resourceInSelection: any;
   _updatedResource: any;
+  _selectedResourceID: string;
   areChanges: boolean;
   parentResources: ListResource<any>;
   breadCrumbs: string[] = [];
@@ -42,8 +45,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
 
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
-  @Input()
-  selectedResourceID: string;
   @Input()
   ocService: ResourceCrudService<any>;
   @Input()
@@ -75,6 +76,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this._resourceOptions = value;
     this.searchTerm = (value && value.search) || '';
   }
+  @Input()
+  subResourceList: string[];
+  @Input()
+  selectedResourceID: string;
 
   ngOnInit() {
     this.setParentResourceSubscription();
