@@ -4,6 +4,7 @@
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
+                          [subResourceList]="subResourceList"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           resourceName="Suppliers"
@@ -75,8 +76,5 @@
              (input)="updateResource('Description', $event)"
              placeholder="Description">
     </div>
-    <button (click)="navigateToSubList('user')"> manage users</button>
-    <button (click)="navigateToSubList('location')"> manage locations</button>
-
   </div>
 </resource-table-component>
