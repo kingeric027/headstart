@@ -24,6 +24,8 @@ import { ProductService } from './services/product/product.service';
 import { SupplierService } from './services/supplier/supplier.service';
 import { ResourceTableComponent } from './components/resource-table/resource-table.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { ResourceSelectDropdown } from './components/resource-select-dropdown/resource-select-dropdown.component';
+import { SummaryResourceDisplay } from './components/summary-resource-display/summary-resource-display.component';
 
 @NgModule({
   imports: [
@@ -65,9 +67,11 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
     CategoryTableComponent,
     CategoryFormComponent,
     CategoryDetailsComponent,
+    ResourceSelectDropdown,
     ProductImagesComponent,
     ProductFormComponent,
     ResourceTableComponent,
+    SummaryResourceDisplay,
   ],
   declarations: [
     SearchComponent,
@@ -79,8 +83,10 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
     CategoryFormComponent,
     CategoryDetailsComponent,
     ProductImagesComponent,
+    ResourceSelectDropdown,
     ProductFormComponent,
     ResourceTableComponent,
+    SummaryResourceDisplay,
   ],
 })
 export class SharedModule {

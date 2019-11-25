@@ -18,7 +18,7 @@
           </ol>
         </nav>
         <div>
-          <h1>{{resourceName}}</h1>
+          <h1>{{parentResourceService ? resourceName + ' - ' + selectedParentResourceName : resourceName}}</h1>
           <hr />
         </div>
         <div class="d-flex justify-content-start">
@@ -26,35 +26,22 @@
                class="row subresource-selects">
             <div class="col-xs-6">
               <!-- parent resource dropdown -->
-              <div ngbDropdown
-                   class="d-inline-block parent-resource-dropdown">
-                <!-- change to currently selected option  -->
-                <button class="btn brand-button"
-                        id="parentresourcedropdown"
-                        ngbDropdownToggle>Select Parent Resource</button>
-                <div ngbDropdownMenu
-                     aria-labelledby="parent resource dropdown">
-                  <button ngbDropdownItem
-                          *ngFor="let resource of parentResources.Items"
-                          (click)="selectParentResource(resource)">{{resource?.Name}}</button>
-                </div>
-              </div>
-
+              <resource-select-dropdown-component [parentService]="parentResourceService"
+                                                  [ocService]="_ocService"></resource-select-dropdown-component>
             </div>
             <div class="col-xs-6">
               <!-- sub resource dropdown -->
               <div ngbDropdown
                    class="d-inline-block parent-resource-dropdown">
                 <!-- change to currently selected option  -->
-                <button class="btn brand-button"
+                <button class="btn btn-outline-dark"
                         id="parentresourcedropdown"
-                        ngbDropdownToggle>Select Sub Resource</button>
+                        ngbDropdownToggle>{{_currentResourceName | titlecase}}</button>
                 <div ngbDropdownMenu
                      aria-labelledby="parent resource dropdown">
                   <button ngbDropdownItem
-                          *ngFor="let subResource of subResourceList"><a [routerLink]="[subResource]"
-                       [replaceUrl]="true">
-                      Manage {{subResource}}
+                          *ngFor="let subResource of parentResourceService.subResourceList"><a routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{subResource}}">
+                      {{subResource | titlecase}}
                     </a></button>
                 </div>
               </div>
@@ -141,7 +128,11 @@
                     (click)="handleSelectResource(resource)"
                     class="selectable-row"
                     [ngClass]="{'selected-resource': selectedResourceID === resource.ID}">
-                  <td>{{resource.Name || resource.Username || resource.AddressName}}</td>
+                  <td>
+                    <summary-resource-display-component [resource]="resource"
+                                                        [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel">
+                    </summary-resource-display-component>
+                  </td>
                 </tr>
                 <tr>
                   <td *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">More resources</td>
@@ -160,9 +151,9 @@
               </button>
               <h3 class="d-inline-block ml-5 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>
-            <span *ngIf="!parentResourceService && subResourceList">
+            <span *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length">
               <button class="btn brand-button ml-3"
-                      *ngFor="let subResource of subResourceList"><a [routerLink]="[subResource]">
+                      *ngFor="let subResource of _ocService.subResourceList"><a [routerLink]="[subResource]">
                   Manage {{subResource}}
                 </a></button>
             </span>
