@@ -12,7 +12,7 @@ export class ReorderHelperService {
 
   public async validateReorder(orderID: string): Promise<OrderReorderResponse> {
     if (!orderID) throw new Error('Needs Order ID');
-    const lineItems = (await listAll(this.ocLineItemService, 'outgoing', orderID)).Items;
+    const lineItems = (await listAll(this.ocLineItemService, this.ocLineItemService.List, 'outgoing', orderID)).Items;
     const products = await this.ListProducts(lineItems);
     const [ValidLi, InvalidLi] = _partition(lineItems, (item) => this.isLineItemValid(item, products));
     return { ValidLi, InvalidLi };

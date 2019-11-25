@@ -6,7 +6,6 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { takeWhile } from 'rxjs/operators';
 import { SupplierFilters, SupplierCategoryConfig } from 'marketplace';
-// import SupplierCategoryConfig from './SEB_SupplierCategoryConfig';
 
 @Component({
   templateUrl: './supplier-list.component.html',
@@ -29,7 +28,7 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
   faFilter = faFilter;
   serviceCategory = '';
   activeFilters = {};
-  activeFilterCount: number = 0;
+  activeFilterCount = 0;
 
   ngOnContextSet() {
     this.activeFilterCount = Object.keys(this.context.supplierFilters.activeFiltersSubject.value.activeFilters).length;
@@ -41,7 +40,7 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
   }
 
   setForm() {
-    let formGroup = {};
+    const formGroup = {};
     this._supplierCategoryConfig.Filters.forEach(filter => {
       formGroup[filter.Path] = new FormControl('');
     });
@@ -54,7 +53,7 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
         this.filterForm.controls[filter.Path].setValue(filters.activeFilters[filter.Path]);
       });
     }
-  };
+  }
 
   searchSuppliers(searchStr: string) {
     this.searchTermForSuppliers = searchStr;

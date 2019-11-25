@@ -17,7 +17,8 @@ import {
   ListShipment,
   Shipment,
   ShipmentItem,
-  BuyerProduct
+  BuyerProduct,
+  Category
 } from '@ordercloud/angular-sdk';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
@@ -28,12 +29,19 @@ export interface IShopperContext {
   currentUser: ICurrentUser;
   currentOrder: ICurrentOrder;
   productFilters: IProductFilters;
+  categories: ICategories;
   supplierFilters: ISupplierFilters;
   authentication: IAuthentication;
   orderHistory: IOrderHistory;
   creditCards: ICreditCards;
   myResources: OcMeService; // TODO - create our own, more limited interface here. Me.Patch(), for example, should not be allowed since it should always go through the current user service.
   appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
+}
+
+export interface ICategories {
+  activeID: string;
+  all: Category[];
+  breadCrumbs: Category[];
 }
 
 export interface ICreditCards {
