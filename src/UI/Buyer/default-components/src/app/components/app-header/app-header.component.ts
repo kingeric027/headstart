@@ -55,7 +55,6 @@ export class OCMAppHeader extends OCMComponent {
 
   handleFiltersChange = (filters: ProductFilters) => {
     this.searchTermForProducts = filters.search || '';
-    debugger;
     this.activeCategoryID = this.context.categories.activeID;
   }
 
