@@ -1,0 +1,5 @@
+@import '../../../styles/main.scss';
+.logo {
+  content: url($logo);
+  max-height: 60px;
+}

@@ -1,23 +1,7 @@
 @charset 'UTF-8';
 
-// // Generic Theme Variables - must come before vendor
-// @import
-//   'themes/my-first-theme/variables';
-
-// Anytime Fitness Theme Variables - must come before vendor
-@import 'themes/anytime-fitness/variables';
-
-// // Waxing the City Theme Variables - must come before vendor
-// @import
-//   'themes/waxing-the-city/variables';
-
-// // Barre Method Theme Variables - must come before vendor
-// @import
-//   'themes/barre-method/variables';
-
-// // Basecamp Theme Variables - must come before vendor
-// @import
-//   'themes/basecamp/variables';
+// Theme Variables - must come before vendor
+@import 'themes/bar-method/variables';
 
 // Vendors
 @import 'vendor/bootstrap',
@@ -57,23 +41,7 @@
 // 3rd party libraries
 @import '~angular-tree-component/dist/angular-tree-component.css';
 
-// // Generic Theme
-//   @import
-//   'themes/my-first-theme/styles';
-
-// Anytime Fitness Theme
-@import 'themes/anytime-fitness/styles';
-
-// // Waxing the City Theme
-//   @import
-//   'themes/waxing-the-city/styles';
-
-// // Barre Method
-//   @import
-//   'themes/barre-method/styles';
-
-// // Basecamp Theme
-//   @import
-//   'themes/basecamp/styles';
+// Theme Styles
+@import 'themes/bar-method/styles';
 
 //@import '../app/ocm-default-components/shared.scss'; 

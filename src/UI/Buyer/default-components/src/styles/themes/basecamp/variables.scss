@@ -6,19 +6,17 @@
 // check out node_modules/bootstrap/variables.scss
 // --------------------------------------------------------------------------------------
 
-$blue: #007bff;
+$blue: #1C3F65;
 $indigo: #6610f2;
+$purple: #6f42c1;
 $pink: #e83e8c;
 $red: #dc3545;
-$orange: #fd7e14;
+$orange: #E65727;
 $yellow: #ffc107;
 $teal: #20c997;
-$cyan: #17a2b8;
+$cyan: #94A8CD;
+$green: #28a745;
 
-// Anytime Fitness Specific Colors
-$purple: #814c9e;
-$green: #9bc953;
-$slate: #343435;
 $logo: 'src/styles/themes/basecamp/logo.png';
 
 $white: #fff;
@@ -33,7 +31,7 @@ $gray-800: #343a40;
 $gray-900: #212529;
 $black: #000;
 
-$primary: $pink;
+$primary: $blue;
 $secondary: $orange;
 $success: $green;
 $info: $cyan;

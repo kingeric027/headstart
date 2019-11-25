@@ -3,7 +3,7 @@
 .supplier-card {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border-top: 8px solid $gray-200;
+  border-top: 8px solid rgba($primary, 0.3);
   transition: all 200ms ease;
   // max-width: 32rem;
   &--logo {
@@ -20,7 +20,7 @@
   }
 
   &:hover {
-    border-top: 8px solid $gray-300;
+    border-top: 8px solid rgba($primary, 0.5);
     box-shadow: 0 4px 12px -1px rgba(0, 0, 0, 0.1),
       0 2px 8px -1px rgba(0, 0, 0, 0.06);
     .shop-now {
