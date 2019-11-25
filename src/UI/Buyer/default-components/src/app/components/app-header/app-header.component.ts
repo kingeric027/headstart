@@ -13,7 +13,6 @@ import { Order, MeUser, LineItem, ListCategory, Category } from '@ordercloud/ang
 import { tap, debounceTime, delay, takeWhile } from 'rxjs/operators';
 import { OCMComponent } from '../base-component';
 import { ProductFilters } from 'marketplace';
-// import styles from '../../../styles/themes/anytime-fitness/variables.scss';
 
 @Component({
   templateUrl: './app-header.component.html',
@@ -54,13 +53,12 @@ export class OCMAppHeader extends OCMComponent {
       .subscribe(this.handleFiltersChange);
     this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
-    // console.log(styles.trim(0, 1));
   }
 
   handleFiltersChange = (filters: ProductFilters) => {
     this.searchTermForProducts = filters.search || '';
     this.activeCategoryID = this.context.categories.activeID;
-  }
+  };
 
   buildAddToCartListener() {
     let closePopoverTimeout;

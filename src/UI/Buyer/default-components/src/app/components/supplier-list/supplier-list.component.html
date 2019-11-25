@@ -68,24 +68,14 @@
           </div>
         </div>
       </div>
-      <!--Loading Indicator-->
-      <ocm-loading-layout [blockCount]="4"
-                          height="234px"
+      <ocm-loading-layout height="234px"
                           width="100%"
                           mb="1.5rem"
                           [resource]="suppliers"
                           [columns]="1"
+                          [rows]="4"
                           [context]="context">
       </ocm-loading-layout>
-      <!-- <div *ngIf="!suppliers">
-        <div class="d-flex flex-column">
-          <div class="loading-box shine"></div>
-          <div class="loading-box shine"></div>
-          <div class="loading-box shine"></div>
-          <div class="loading-box shine"></div>
-        </div>
-      </div> -->
-      </div>
       <div class="card"
            *ngIf="suppliers && suppliers.Items.length === 0">
         <div class="card">

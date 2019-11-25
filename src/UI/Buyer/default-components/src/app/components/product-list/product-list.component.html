@@ -88,12 +88,12 @@
           </p>
         </div>
       </div>
-      <ocm-loading-layout [blockCount]="4"
-                          height="432px"
+      <ocm-loading-layout height="432px"
                           width="100%"
                           mb="1.5rem"
                           [resource]="products"
                           [columns]="4"
+                          [rows]="4"
                           [context]="context">
       </ocm-loading-layout>
       <div *ngIf="products && products.Items.length > 0">

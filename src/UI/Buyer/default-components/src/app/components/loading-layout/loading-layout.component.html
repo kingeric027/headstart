@@ -1,7 +1,7 @@
 <div class="row"
      *ngIf="!resource">
   <div *ngFor="let column of columnsToRender"
-       class="col-{{bootstrapColumns}}">
+       class="col-md-{{bootstrapColumns}}">
     <span *ngFor="let div of divsToRender"
           [style.height]="height"
           [style.width]="width"
