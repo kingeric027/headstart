@@ -89,6 +89,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.setUrlSubscription();
     this.setParentResourceSelectionSubscription();
+    this._ocService.listResources();
   }
 
   private setUrlSubscription() {
