@@ -143,15 +143,8 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   buildListArgs(options: Options) {
-    console.log('outside id');
-    console.log(this.primaryResourceLevel);
-    console.log(this.secondaryResourceLevel);
     if (this.secondaryResourceLevel) {
-      console.log('insside id');
-      console.log(this.primaryResourceLevel);
-      console.log(this.secondaryResourceLevel);
       const parentResourceID = this.getParentResourceID();
-      console.log(parentResourceID);
       return [parentResourceID, options];
     } else {
       return [options];
