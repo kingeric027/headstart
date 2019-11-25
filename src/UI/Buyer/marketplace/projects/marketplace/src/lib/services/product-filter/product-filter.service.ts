@@ -7,6 +7,7 @@ import { IProductFilters, ProductFilters } from '../../shopper-context';
 import { OcMeService, ListProduct } from '@ordercloud/angular-sdk';
 import { filter } from 'rxjs/operators';
 import { cloneDeep as _cloneDeep } from 'lodash';
+import { ProductCategoriesService } from '../product-categories/product-categories.service';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -22,7 +23,8 @@ export class ProductFilterService implements IProductFilters {
     private router: Router,
     private ocMeService: OcMeService,
     private currentUser: CurrentUserService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private categories: ProductCategoriesService
   ) {
     this.activatedRoute.queryParams.subscribe(params => {
       if (this.router.url.startsWith('/products')) {
@@ -36,6 +38,7 @@ export class ProductFilterService implements IProductFilters {
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
     const { page, sortBy, search, categoryID } = params;
+    this.categories.setActiveCategoryID(categoryID);
     const showOnlyFavorites = !!params.favorites;
     const activeFacets = _pickBy(params, (_value, _key) => !this.nonFacetQueryParams.includes(_key));
     this.activeFiltersSubject.next({ page, sortBy, search, categoryID, showOnlyFavorites, activeFacets });
