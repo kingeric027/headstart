@@ -13,13 +13,8 @@
       </nav>
     </div>
   </div>
-  <!-- Mobile section for selecting a category and filtering on favorites -->
+  <!-- Mobile section for filtering on favorites -->
   <div class="d-md-none mb-2">
-    <button class="btn btn-block btn-default btn-outline-dark mb-2"
-            *ngIf="categories?.Items?.length"
-            (click)="openCategoryModal()">
-      Select Category
-    </button>
     <div class="col-xs-6">
       <div (click)="toggleFilterByFavorites()">
         <label>Refine By</label>
@@ -113,7 +108,4 @@
       </div>
     </div>
   </div>
-  <ocm-modal [state]="categoryModal"
-             modalTitle="Select Category">
-  </ocm-modal>
 </section>

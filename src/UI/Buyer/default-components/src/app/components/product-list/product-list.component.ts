@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, ChangeDetectorRef, OnInit } from '@angular/core';
-import { ListBuyerProduct, Category, ListCategory, ListFacet } from '@ordercloud/angular-sdk';
+import { ListBuyerProduct, ListFacet, Category } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { ModalState } from '../../models/modal-state.class';
@@ -14,11 +14,9 @@ import { takeWhile } from 'rxjs/operators';
 })
 export class OCMProductList extends OCMComponent implements OnInit {
   @Input() products: ListBuyerProduct;
-  @Input() categories: ListCategory;
-  categoryModal = ModalState.Closed;
   facets: ListFacet[];
+  categoryCrumbs: Category[];
   favoriteProducts: string[] = [];
-  categoryCrumbs: Category[] = [];
   hasFilters = false;
   showingFavoritesOnly = false;
   closeIcon = faTimes;
@@ -40,8 +38,8 @@ export class OCMProductList extends OCMComponent implements OnInit {
 
   private handleFiltersChange = async (filters: ProductFilters) => {
     this.showingFavoritesOnly = filters.showOnlyFavorites;
-    this.categoryCrumbs = this.buildBreadCrumbs(filters.categoryID);
     this.hasFilters = this.context.productFilters.hasFilters();
+    this.categoryCrumbs = this.context.categories.breadCrumbs;
   }
 
   clearAllFilters() {
@@ -52,34 +50,15 @@ export class OCMProductList extends OCMComponent implements OnInit {
     this.context.productFilters.toPage(page);
   }
 
-  setActiveCategory(categoryID: string): void {
-    this.context.productFilters.filterByCategory(categoryID);
-  }
-
   toggleFilterByFavorites() {
     this.context.productFilters.filterByFavorites(!this.showingFavoritesOnly);
   }
 
-  buildBreadCrumbs(activeCategoryID: string, progress = []): Category[] {
-    if (!activeCategoryID || !this.categories || this.categories.Items.length < 1) {
-      return progress;
-    }
-    const category = this.getCategory(activeCategoryID);
-    if (!category) return progress;
-    progress.unshift(category);
-
-    return this.buildBreadCrumbs(category.ParentID, progress);
-  }
-
-  getCategory(categoryID: string): Category {
-    return this.categories.Items.find(cat => cat.ID === categoryID);
-  }
-
-  openCategoryModal() {
-    this.categoryModal = ModalState.Open;
-  }
-
   isFavorite(productID: string): boolean {
     return this.favoriteProducts.includes(productID);
+  }
+
+  setActiveCategory(categoryID: string): void {
+    this.context.productFilters.filterByCategory(categoryID);
   }
 }
