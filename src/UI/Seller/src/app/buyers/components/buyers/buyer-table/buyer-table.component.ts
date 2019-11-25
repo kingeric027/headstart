@@ -20,6 +20,5 @@ export class BuyerTableComponent extends ResourceCrudComponent<Promotion> {
     super(changeDetectorRef, buyerService, router, activatedRoute);
   }
 
-  subResourceList = ['users', 'locations', 'payments', 'approvals'];
   route = 'buyer';
 }

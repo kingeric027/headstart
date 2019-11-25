@@ -10,6 +10,6 @@ import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 })
 export class SupplierAddressService extends ResourceCrudService<Address> {
   constructor(router: Router, activatedRoute: ActivatedRoute, ccSupplierAddressService: OcSupplierAddressService) {
-    super(router, activatedRoute, ccSupplierAddressService, '/suppliers', 'supplier', 'location');
+    super(router, activatedRoute, ccSupplierAddressService, '/suppliers', 'suppliers', 'locations');
   }
 }

@@ -34,8 +34,6 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
     this.router = router;
   }
 
-  subResourceList = ['users', 'locations'];
-
   filterConfig = {
     id: 'SEB',
     timeStamp: '0001-01-01T00:00:00+00:00',

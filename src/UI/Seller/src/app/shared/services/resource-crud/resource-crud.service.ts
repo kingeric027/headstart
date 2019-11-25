@@ -3,7 +3,6 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { cloneDeep as _cloneDeep, uniqBy as _uniqBy } from 'lodash';
 import { Meta } from '@ordercloud/angular-sdk';
-import { plural } from 'pluralize';
 
 export interface Options {
   page?: number;
@@ -32,6 +31,7 @@ export abstract class ResourceCrudService<ResourceType> {
   primaryResourceLevel = '';
   // example: for supplier user service the primary is supplier and the secondary is users
   secondaryResourceLevel = '';
+  subResourceList: string[];
 
   constructor(
     private router: Router,
@@ -68,12 +68,14 @@ export abstract class ResourceCrudService<ResourceType> {
     return { sortBy, search, ...filters };
   }
 
-  async listResources(pageNumber = 1) {
+  async listResources(pageNumber = 1, searchText = '') {
     if (this.shouldListResources()) {
       const { sortBy, search, filters } = this.optionsSubject.value;
       const options = {
         page: pageNumber,
-        search,
+
+        // allows a list call to pass in a search term that will not appear in the query params
+        search: searchText || search,
         sortBy,
         pageSize: this.itemsPerPage,
         filters,
@@ -115,7 +117,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   updateUrlForUpdatedParent(resource: any) {
     const queryParams = this.router.url.split('?')[1];
-    let newUrl = `${plural(this.primaryResourceLevel)}/${resource.ID}/${plural(this.secondaryResourceLevel)}`;
+    let newUrl = `${this.primaryResourceLevel}/${resource.ID}/${this.secondaryResourceLevel}`;
     if (queryParams) {
       newUrl += `?${queryParams}`;
     }
@@ -126,7 +128,7 @@ export abstract class ResourceCrudService<ResourceType> {
     let newUrl = '';
     const queryParams = this.router.url.split('?')[1];
     if (this.secondaryResourceLevel) {
-      newUrl += `${this.route}/${this.getParentResourceID()}/${plural(this.secondaryResourceLevel)}`;
+      newUrl += `${this.route}/${this.getParentResourceID()}/${this.secondaryResourceLevel}`;
     } else {
       newUrl += `${this.route}`;
     }
@@ -150,12 +152,21 @@ export abstract class ResourceCrudService<ResourceType> {
 
   getParentResourceID() {
     const urlPieces = this.router.url.split('/');
-    const indexOfParent = urlPieces.indexOf(`${plural(this.primaryResourceLevel)}`);
+    const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}`);
     return urlPieces[indexOfParent + 1];
   }
 
   getResourceById(resourceID: string): Promise<any> {
     return this.ocService.Get(resourceID).toPromise();
+  }
+
+  async findOrGetResourceByID(resourceID: string): Promise<any> {
+    const resourceInList = this.resourceSubject.value.Items.find((i) => (i as any).ID === resourceID);
+    if (resourceInList) {
+      return resourceInList;
+    } else {
+      return await this.getResourceById(resourceID);
+    }
   }
 
   async updateResource(resource: any): Promise<any> {
@@ -232,7 +243,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   getRouteFromResourceName(resourceName: string): string {
-    return `/${plural(resourceName)}`;
+    return `/${resourceName}`;
   }
 
   hasFilters(): boolean {

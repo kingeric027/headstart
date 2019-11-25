@@ -21,6 +21,4 @@ export class SupplierLocationTableComponent extends ResourceCrudComponent<Addres
   ) {
     super(changeDetectorRef, supplierAddressService, router, activatedroute);
   }
-
-  subResourceList = ['users', 'locations'];
 }

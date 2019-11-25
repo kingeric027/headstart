@@ -9,7 +9,7 @@ import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-ico
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
-import { plural } from 'pluralize';
+import { singular } from 'pluralize';
 
 interface BreadCrumb {
   text: string;
@@ -32,8 +32,12 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   _resourceInSelection: any;
   _updatedResource: any;
   _selectedResourceID: string;
+  _currentResourceName: string;
+  _ocService: ResourceCrudService<any>;
   areChanges: boolean;
   parentResources: ListResource<any>;
+  selectedParentResourceName = 'Parent Resource Name';
+  selectedParentResourceID = '';
   breadCrumbs: string[] = [];
   alive = true;
 
@@ -46,7 +50,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
   @Input()
-  ocService: ResourceCrudService<any>;
+  set ocService(service: ResourceCrudService<any>) {
+    this._ocService = service;
+    this._currentResourceName = service.secondaryResourceLevel;
+  }
   @Input()
   parentResourceService?: ResourceCrudService<any>;
   @Input()
@@ -77,21 +84,11 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.searchTerm = (value && value.search) || '';
   }
   @Input()
-  subResourceList: string[];
-  @Input()
   selectedResourceID: string;
 
   ngOnInit() {
-    this.setParentResourceSubscription();
     this.setUrlSubscription();
-  }
-
-  private setParentResourceSubscription() {
-    if (this.parentResourceService) {
-      this.parentResourceService.resourceSubject.subscribe((parentResources) => {
-        this.parentResources = parentResources;
-      });
-    }
+    this.setParentResourceSelectionSubscription();
   }
 
   private setUrlSubscription() {
@@ -101,6 +98,20 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
       this.setBreadCrumbs();
     });
+  }
+
+  setParentResourceSelectionSubscription() {
+    this.activatedRoute.params
+      .pipe(takeWhile(() => this.parentResourceService && this.alive))
+      .subscribe(async (params) => {
+        const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
+        const parentResourceID = params[parentIDParamName];
+        if (params && parentResourceID) {
+          const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
+          this.selectedParentResourceName = parentResource.Name;
+          this.selectedParentResourceID = parentResource.ID;
+        }
+      });
   }
 
   private setBreadCrumbs() {
@@ -115,10 +126,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
         }
       });
     this.changeDetectorRef.detectChanges();
-  }
-
-  selectParentResource(resource: any) {
-    this.ocService.selectParentResource(resource);
   }
 
   searchedResources(event) {
@@ -151,7 +158,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   clearAllFilters() {
-    this.ocService.clearAllFilters();
+    this._ocService.clearAllFilters();
   }
 
   checkForChanges() {

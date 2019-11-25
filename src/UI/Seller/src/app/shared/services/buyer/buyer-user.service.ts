@@ -11,6 +11,6 @@ import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 })
 export class BuyerUserService extends ResourceCrudService<User> {
   constructor(router: Router, activatedRoute: ActivatedRoute, ocUserService: OcUserService) {
-    super(router, activatedRoute, ocUserService, '/buyers', 'buyer', 'user');
+    super(router, activatedRoute, ocUserService, '/buyers', 'buyers', 'users');
   }
 }

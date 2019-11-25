@@ -9,7 +9,7 @@ import {
 } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { plural } from 'pluralize';
+import { singular } from 'pluralize';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -60,7 +60,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   subscribeToResourceSelection() {
     this.activatedRoute.params.subscribe((params) => {
       const resourceIDSelected =
-        params[`${this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel}ID`];
+        params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
       if (resourceIDSelected) {
         this.setResourceSelection(resourceIDSelected);
       }
@@ -79,19 +79,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   async setResourceSelection(resourceID: string) {
     this.selectedResourceID = resourceID || '';
-    const resource = await this.findOrGetResource(resourceID);
+    const resource = await this.ocService.findOrGetResourceByID(resourceID);
     this.resourceInSelection = this.copyResource(resource);
     this.updatedResource = this.copyResource(resource);
     this.changeDetectorRef.detectChanges();
-  }
-
-  async findOrGetResource(resourceID: string) {
-    const resourceInList = this.resourceList.Items.find((i) => (i as any).ID === resourceID);
-    if (resourceInList) {
-      return resourceInList;
-    } else {
-      return await this.ocService.getResourceById(resourceID);
-    }
   }
 
   selectResource(resource: any) {
