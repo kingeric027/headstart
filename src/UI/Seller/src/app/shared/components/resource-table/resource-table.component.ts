@@ -12,7 +12,7 @@ import { takeWhile } from 'rxjs/operators';
 import { singular } from 'pluralize';
 
 interface BreadCrumb {
-  text: string;
+  displayText: string;
   route: string;
 }
 
@@ -38,7 +38,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   parentResources: ListResource<any>;
   selectedParentResourceName = 'Parent Resource Name';
   selectedParentResourceID = '';
-  breadCrumbs: string[] = [];
+  breadCrumbs: BreadCrumb[] = [];
   alive = true;
 
   constructor(
@@ -116,7 +116,9 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   private setBreadCrumbs() {
-    this.breadCrumbs = this.router.url
+    // basically we are just taking off the portion of the url after the selected route piece
+    // in the future breadcrumb logic might need to be more complicated than this
+    const urlPieces = this.router.url
       .split('/')
       .filter((p) => p)
       .map((p) => {
@@ -126,6 +128,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
           return p;
         }
       });
+    this.breadCrumbs = urlPieces.map((piece, index) => {
+      const route = `/${urlPieces.slice(0, index + 1).join('/')}`;
+      return {
+        displayText: piece,
+        route,
+      };
+    });
     this.changeDetectorRef.detectChanges();
   }
 

@@ -14,7 +14,7 @@
               </a></li>
             <li *ngFor="let breadCrumb of breadCrumbs"
                 class="breadcrumb-item"><a class="breadcrumb-link"
-                 href="#">{{breadCrumb}}</a></li>
+                 [routerLink]="[breadCrumb.route]">{{breadCrumb.displayText}}</a></li>
           </ol>
         </nav>
         <div>
