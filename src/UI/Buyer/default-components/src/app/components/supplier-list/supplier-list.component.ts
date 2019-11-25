@@ -76,6 +76,7 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
 
   clearFilters() {
     this.context.supplierFilters.clearAllFilters();
+    this.searchSuppliers('');
   }
 
   openPopover() {
