@@ -85,6 +85,18 @@
           <div class="loading-box shine"></div>
         </div>
       </div> -->
+      </div>
+      <div class="card"
+           *ngIf="suppliers && suppliers.Items.length === 0">
+        <div class="card">
+          <p class="card-body text-center">
+            No Suppliers found.
+            <br>
+            <a class="link"
+               (click)="clearFilters()">Clear all Filters</a>
+          </p>
+        </div>
+      </div>
       <div *ngIf="suppliers && suppliers.Items.length > 0">
         <div class="supplier-list"
              *ngFor="let supplier of suppliers.Items">

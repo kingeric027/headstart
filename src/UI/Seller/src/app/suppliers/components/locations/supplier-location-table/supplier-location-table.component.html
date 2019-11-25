@@ -1,0 +1,81 @@
+<resource-table-component [resourceList]="resourceList"
+                          [resourceOptions]="resourceOptions"
+                          [selectedResourceID]="selectedResourceID"
+                          [updatedResource]="updatedResource"
+                          [resourceInSelection]="resourceInSelection"
+                          [ocService]="ocService"
+                          [parentResourceService]="supplierService"
+                          [subResourceList]="subResourceList"
+                          (searched)="searchResources($event)"
+                          (hitScrollEnd)="handleScrollEnd()"
+                          resourceName="Supplier Locations"
+                          (changesSaved)="saveUpdates()"
+                          (applyFilters)="applyFilters()"
+                          (resourceSelected)="selectResource($event)">
+
+  <!-- filter component -->
+  <!-- <form class="d-flex flex-column filters"
+        [formGroup]="filterForm">
+    <div *ngFor="let filter of filterConfig.Filters"
+         class="group">
+      <select class="form-control input-sm"
+              type="select"
+              required
+              [formControlName]="filter.Path">
+        <option *ngFor="let option of filter.Values"
+                value="{{option}}">{{option}}</option>
+      </select>
+      <span class="highlight"></span>
+      <label>{{filter.Display}}</label>
+    </div>
+  </form> -->
+
+  <!-- full view table -->
+  <table class="table table-hover resource-table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">ID</th>
+        <th scope="col">Active</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let location of resourceList.Items; index as index"
+          (click)="selectResource(location)"
+          class="selectable-row"
+          [ngClass]="{'selected-resource':selectedIndex === index}">
+        <td>{{location.AddressName}}</td>
+        <td>{{location.ID}}</td>
+        <td>{{location.Active ? 'Active' : 'Inactive'}}</td>
+      </tr>
+      <tr *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">
+        <td>More locations</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- edit product -->
+  <div class="resource-edit">
+    <div class="form-group">
+      <label for="Name">Name</label>
+      <input type="text"
+             class="form-control"
+             id="name"
+             aria-describedby="name"
+             value="{{updatedResource.Name}}"
+             (input)="updateResource('Name', $event)"
+             placeholder="Enter resource name">
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <input type="text"
+             class="form-control"
+             id="description"
+             value="{{updatedResource.Description}}"
+             (input)="updateResource('Description', $event)"
+             placeholder="Description">
+    </div>
+  </div>
+</resource-table-component>

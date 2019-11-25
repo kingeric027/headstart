@@ -3,6 +3,7 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { cloneDeep as _cloneDeep, uniqBy as _uniqBy } from 'lodash';
 import { Meta } from '@ordercloud/angular-sdk';
+import { plural } from 'pluralize';
 
 export interface Options {
   page?: number;
@@ -27,10 +28,22 @@ export abstract class ResourceCrudService<ResourceType> {
   public optionsSubject: BehaviorSubject<Options> = new BehaviorSubject<Options>({});
   private itemsPerPage = 100;
 
-  // route defintes the string of text that the front end needs to match to make list calls
-  abstract route = '';
+  route = '';
+  primaryResourceLevel = '';
+  // example: for supplier user service the primary is supplier and the secondary is users
+  secondaryResourceLevel = '';
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private ocService: any) {
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private ocService: any,
+    route: string,
+    primaryResourceLevel: string,
+    secondaryResourceLevel: string = ''
+  ) {
+    this.route = route;
+    this.primaryResourceLevel = primaryResourceLevel;
+    this.secondaryResourceLevel = secondaryResourceLevel;
     this.activatedRoute.queryParams.subscribe((params) => {
       if (this.router.url.startsWith(this.route)) {
         this.readFromUrlQueryParams(params);
@@ -56,23 +69,93 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async listResources(pageNumber = 1) {
-    if (this.router.url.startsWith(this.route)) {
+    if (this.shouldListResources()) {
       const { sortBy, search, filters } = this.optionsSubject.value;
-      const productsResponse = await this.ocService
-        .List({
-          page: pageNumber,
-          search,
-          sortBy,
-          pageSize: this.itemsPerPage,
-          filters,
-        })
-        .toPromise();
+      const options = {
+        page: pageNumber,
+        search,
+        sortBy,
+        pageSize: this.itemsPerPage,
+        filters,
+      };
+      const resourceResponse = await this.ocService.List(...this.buildListArgs(options)).toPromise();
       if (pageNumber === 1) {
-        this.setNewResources(productsResponse);
+        this.setNewResources(resourceResponse);
       } else {
-        this.addResources(productsResponse);
+        this.addResources(resourceResponse);
       }
     }
+  }
+
+  shouldListResources() {
+    if (!this.secondaryResourceLevel) {
+      // for primary resources list if on the route
+      return this.router.url.startsWith(this.route);
+    } else {
+      // for secondary resources list there is a parent ID
+      return !!this.getParentResourceID() && this.router.url.includes(this.secondaryResourceLevel);
+    }
+  }
+
+  selectResource(resource: any) {
+    const newUrl = this.constructResourceURL(resource.ID || '');
+    this.router.navigateByUrl(newUrl);
+  }
+
+  selectParentResource(resource: any) {
+    const newUrl = this.updateUrlForUpdatedParent(resource);
+    this.router.navigateByUrl(newUrl);
+
+    // this settimeout ensures that the new parent resource ID is in the url before the resources are listed
+    // find a better way to update the resources on the parent resource ID change
+    setTimeout(() => {
+      this.listResources();
+    });
+  }
+
+  updateUrlForUpdatedParent(resource: any) {
+    const queryParams = this.router.url.split('?')[1];
+    let newUrl = `${plural(this.primaryResourceLevel)}/${resource.ID}/${plural(this.secondaryResourceLevel)}`;
+    if (queryParams) {
+      newUrl += `?${queryParams}`;
+    }
+    return newUrl;
+  }
+
+  constructResourceURL(resourceID: string = ''): string {
+    let newUrl = '';
+    const queryParams = this.router.url.split('?')[1];
+    if (this.secondaryResourceLevel) {
+      newUrl += `${this.route}/${this.getParentResourceID()}/${plural(this.secondaryResourceLevel)}`;
+    } else {
+      newUrl += `${this.route}`;
+    }
+    if (resourceID) {
+      newUrl += `/${resourceID}`;
+    }
+    if (queryParams) {
+      newUrl += `?${queryParams}`;
+    }
+    return newUrl;
+  }
+
+  buildListArgs(options: Options) {
+    if (this.secondaryResourceLevel) {
+      const parentResourceID = this.getParentResourceID();
+      return [parentResourceID, options];
+    } else {
+      return [options];
+    }
+  }
+
+  getParentResourceID() {
+    const urlPieces = this.router.url.split('/');
+    const indexOfParent = urlPieces.indexOf(`${plural(this.primaryResourceLevel)}`);
+    return urlPieces[indexOfParent + 1];
+  }
+
+  getResourceById(resourceID: string): Promise<any> {
+    return this.ocService.Get(resourceID).toPromise();
   }
 
   async updateResource(resource: any): Promise<any> {
@@ -146,6 +229,10 @@ export abstract class ResourceCrudService<ResourceType> {
 
   clearResources() {
     this.resourceSubject.next({ Meta: {}, Items: [] });
+  }
+
+  getRouteFromResourceName(resourceName: string): string {
+    return `/${plural(resourceName)}`;
   }
 
   hasFilters(): boolean {

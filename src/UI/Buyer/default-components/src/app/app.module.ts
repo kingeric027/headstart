@@ -32,7 +32,6 @@ import { OCMHomePage } from './components/home/home.component';
 import { OCMProductSort } from './components/sort-products/sort-products.component';
 import { OCMSupplierSort } from './components/sort-suppliers/sort-suppliers.component';
 import { OCMSupplierCard } from './components/supplier-card/supplier-card.component';
-import { OCMCategoryTree } from './components/category-tree/category-tree.component';
 import { OCMFacetMultiSelect } from './components/facet-multiselect/facet-multiselect.component';
 import { OCMProductFacetList } from './components/product-facet-list/product-facet-list.component';
 import { OCMProductList } from './components/product-list/product-list.component';
@@ -129,7 +128,6 @@ const components = [
   OCMProductSort,
   OCMSupplierSort,
   OCMSupplierCard,
-  OCMCategoryTree,
   OCMFacetMultiSelect,
   OCMProductFacetList,
   OCMProductList,
@@ -249,7 +247,6 @@ export class AppModule {
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
     this.buildWebComponent(OCMSupplierSort, 'ocm-supplier-sort');
     this.buildWebComponent(OCMSupplierCard, 'ocm-supplier-card');
-    this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
     this.buildWebComponent(OCMFacetMultiSelect, 'ocm-facet-multiselect');
     this.buildWebComponent(OCMProductFacetList, 'ocm-product-facet-list');
     this.buildWebComponent(OCMProductList, 'ocm-product-list');

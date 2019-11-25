@@ -17,7 +17,7 @@ import { AddressListWrapperComponent } from './wrapper-components/address-list-w
 import { MeListBuyerAddressResolver } from './resolves/me.resolve';
 import { PaymentListWrapperComponent } from './wrapper-components/payment-list-wrapper.component';
 import { ProductListWrapperComponent } from './wrapper-components/product-list-wrapper.component';
-import { MeListCategoriesResolver,
+import {
   MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
 import { ProductDetailWrapperComponent } from './wrapper-components/product-detail-wrapper.component';
 import { LoginWrapperComponent } from './wrapper-components/login-wrapper.component';
@@ -98,11 +98,7 @@ export const MarketplaceRoutes: Routes = [
       {
         path: 'products',
         component: ProductListWrapperComponent,
-        resolve: {
-          categories: MeListCategoriesResolver,
-        },
       },
-
       {
         path: 'products/:productID',
         resolve: {

@@ -145,7 +145,7 @@ export class CurrentOrderService implements ICurrentOrder {
       this.order = await this.ocOrderService.Create('outgoing', {}).toPromise();
     }
     if (this.order.DateCreated) {
-      this.lineItems = await listAll(this.ocLineItemService, 'outgoing', this.order.ID);
+      this.lineItems = await listAll(this.ocLineItemService, this.ocLineItemService.List, 'outgoing', this.order.ID);
     }
   }
 

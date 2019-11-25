@@ -11,8 +11,6 @@ import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 })
 export class SupplierService extends ResourceCrudService<Supplier> {
   constructor(router: Router, activatedRoute: ActivatedRoute, ocSupplierService: OcSupplierService) {
-    super(router, activatedRoute, ocSupplierService);
+    super(router, activatedRoute, ocSupplierService, '/suppliers', 'supplier');
   }
-
-  route = '/suppliers';
 }
