@@ -139,11 +139,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  navigateToSubList(subList: string) {
-    const newUrl = `${plural(this.ocService.primaryResourceLevel)}/${this.selectedResourceID}/${plural(subList)}`;
-    this.router.navigateByUrl(newUrl);
-  }
-
   ngOnDestroy() {
     this.alive = false;
   }
