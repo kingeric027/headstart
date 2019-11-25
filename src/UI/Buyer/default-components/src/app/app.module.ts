@@ -48,6 +48,7 @@ import { OCMCreditCardForm } from './components/credit-card-form/credit-card-for
 import { OCMOrderStatusFilter } from './components/order-status-filter/order-status-filter.component';
 import { OCMOrderDateFilter } from './components/order-date-filter/order-date-filter.component';
 import { OCMOrderList } from './components/order-list/order-list.component';
+import { OCMLoadingLayout } from './components/loading-layout/loading-layout.component';
 import { OCMLogin } from './components/login/login.component';
 import { OCMForgotPassword } from './components/forgot-password/forgot-password.component';
 import { OCMRegister } from './components/register/register.component';
@@ -143,6 +144,7 @@ const components = [
   OCMOrderStatusFilter,
   OCMOrderDateFilter,
   OCMOrderList,
+  OCMLoadingLayout,
   OCMLogin,
   OCMForgotPassword,
   OCMRegister,
@@ -262,6 +264,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderStatusFilter, 'ocm-order-status-filter');
     this.buildWebComponent(OCMOrderDateFilter, 'ocm-order-date-filter');
     this.buildWebComponent(OCMOrderList, 'ocm-order-list');
+    this.buildWebComponent(OCMLoadingLayout, 'ocm-loading-layout');
     this.buildWebComponent(OCMLogin, 'ocm-login');
     this.buildWebComponent(OCMForgotPassword, 'ocm-forgot-password');
     this.buildWebComponent(OCMRegister, 'ocm-register');

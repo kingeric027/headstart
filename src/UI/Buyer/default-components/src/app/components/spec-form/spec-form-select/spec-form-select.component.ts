@@ -12,7 +12,7 @@ import { Field } from '../field.interface';
       }}</label>
       <select [formControlName]="config.name" class="form-control form-control-sm" value="{{ config.value }}">
         <option *ngIf="!config.value" value=""></option>
-          <option *ngFor="let option of config.options"> {{ option }} </option>
+        <option *ngFor="let option of config.options"> {{ option }} </option>
       </select>
     </div>
   `,
@@ -27,7 +27,6 @@ export class SpecFormSelectComponent implements Field, OnInit {
   constructor() {}
 
   ngOnInit() {
-    console.log(this.config);
     this.ctrls = this.group.get('ctrls') as FormArray;
   }
 
