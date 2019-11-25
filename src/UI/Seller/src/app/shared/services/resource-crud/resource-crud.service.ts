@@ -44,6 +44,7 @@ export abstract class ResourceCrudService<ResourceType> {
     this.route = route;
     this.primaryResourceLevel = primaryResourceLevel;
     this.secondaryResourceLevel = secondaryResourceLevel;
+
     this.activatedRoute.queryParams.subscribe((params) => {
       if (this.router.url.startsWith(this.route)) {
         this.readFromUrlQueryParams(params);
@@ -142,8 +143,15 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   buildListArgs(options: Options) {
+    console.log('outside id');
+    console.log(this.primaryResourceLevel);
+    console.log(this.secondaryResourceLevel);
     if (this.secondaryResourceLevel) {
+      console.log('insside id');
+      console.log(this.primaryResourceLevel);
+      console.log(this.secondaryResourceLevel);
       const parentResourceID = this.getParentResourceID();
+      console.log(parentResourceID);
       return [parentResourceID, options];
     } else {
       return [options];
@@ -157,7 +165,17 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   getResourceById(resourceID: string): Promise<any> {
-    return this.ocService.Get(resourceID).toPromise();
+    const getArgs = this.buildGetArgs(resourceID);
+    return this.ocService.Get(...getArgs).toPromise();
+  }
+
+  buildGetArgs(resourceID: string) {
+    if (this.secondaryResourceLevel) {
+      const parentResourceID = this.getParentResourceID();
+      return [parentResourceID, resourceID];
+    } else {
+      return [resourceID];
+    }
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {

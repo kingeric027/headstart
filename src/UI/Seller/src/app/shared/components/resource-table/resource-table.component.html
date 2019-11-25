@@ -131,7 +131,6 @@
                   <td>
                     <summary-resource-display-component [resource]="resource"
                                                         [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel">
-
                     </summary-resource-display-component>
                   </td>
                 </tr>
@@ -152,7 +151,7 @@
               </button>
               <h3 class="d-inline-block ml-5 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>
-            <span *ngIf="!parentResourceService && _ocService.subResourceList.length">
+            <span *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length">
               <button class="btn brand-button ml-3"
                       *ngFor="let subResource of _ocService.subResourceList"><a [routerLink]="[subResource]">
                   Manage {{subResource}}

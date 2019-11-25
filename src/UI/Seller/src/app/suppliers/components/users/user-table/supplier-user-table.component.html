@@ -43,7 +43,11 @@
           (click)="selectResource(user)"
           class="selectable-row"
           [ngClass]="{'selected-resource':selectedIndex === index}">
-        <td>{{user.Username}}</td>
+        <td>
+          <summary-resource-display-component [resource]="user"
+                                              resourceType="users">
+          </summary-resource-display-component>
+        </td>
         <td>{{user.ID}}</td>
         <td>{{user.Active ? 'Active' : 'Inactive'}}</td>
       </tr>

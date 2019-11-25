@@ -38,7 +38,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
   }
 
   private setParentResourceSubscription() {
-    this.parentService.resourceSubject.subscribe((resourceList) => {
+    this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
       this.parentResourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
