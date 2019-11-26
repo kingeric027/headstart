@@ -32,13 +32,15 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   _resourceInSelection: any;
   _updatedResource: any;
   _selectedResourceID: string;
-  _currentResourceName: string;
+  _currentResourceNamePlural: string;
+  _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
   areChanges: boolean;
   parentResources: ListResource<any>;
   selectedParentResourceName = 'Parent Resource Name';
   selectedParentResourceID = '';
   breadCrumbs: BreadCrumb[] = [];
+  isCreatingNew = false;
   alive = true;
 
   constructor(
@@ -52,12 +54,11 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   @Input()
   set ocService(service: ResourceCrudService<any>) {
     this._ocService = service;
-    this._currentResourceName = service.secondaryResourceLevel;
+    this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
+    this._currentResourceNameSingular = singular(this._currentResourceNamePlural);
   }
   @Input()
   parentResourceService?: ResourceCrudService<any>;
-  @Input()
-  resourceName: string;
   @Output()
   searched: EventEmitter<any> = new EventEmitter();
   @Output()
@@ -98,21 +99,28 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     });
     this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
       this.setBreadCrumbs();
+      this.checkIfCreatingNew();
     });
   }
 
-  setParentResourceSelectionSubscription() {
+  private setParentResourceSelectionSubscription() {
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
       .subscribe(async (params) => {
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
+        this.selectedParentResourceID = parentResourceID;
         if (params && parentResourceID) {
           const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
           this.selectedParentResourceName = parentResource.Name;
-          this.selectedParentResourceID = parentResource.ID;
         }
       });
+  }
+
+  private checkIfCreatingNew() {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
+    this.isCreatingNew = endUrl === '/new';
   }
 
   private setBreadCrumbs() {
