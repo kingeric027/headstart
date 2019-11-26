@@ -5,11 +5,11 @@ import { ResourceCrudComponent } from '@app-seller/shared/components/resource-cr
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-product-list',
-  templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.scss'],
+  selector: 'app-product-table',
+  templateUrl: './product-table.component.html',
+  styleUrls: ['./product-table.component.scss'],
 })
-export class ProductListComponent extends ResourceCrudComponent<Product> {
+export class ProductTableComponent extends ResourceCrudComponent<Product> {
   constructor(
     private productService: ProductService,
     changeDetectorRef: ChangeDetectorRef,

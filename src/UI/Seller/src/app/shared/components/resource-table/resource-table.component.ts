@@ -1,4 +1,4 @@
-import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core';
 import {
   ListResource,
   ResourceCrudService,
@@ -7,8 +7,8 @@ import {
 import { EventEmitter } from '@angular/core';
 import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { Router, ActivatedRoute } from '@angular/router';
-import { takeWhile } from 'rxjs/operators';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { takeWhile, filter } from 'rxjs/operators';
 import { singular } from 'pluralize';
 
 interface BreadCrumb {
@@ -46,7 +46,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {}
 
   @Input()
@@ -94,9 +95,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   private setUrlSubscription() {
-    this.router.events.pipe(takeWhile(() => this.alive)).subscribe(() => {
-      this.setBreadCrumbs();
-    });
+    this.router.events
+      .pipe(takeWhile(() => this.alive))
+      // only need to set the breadcrumbs on nav end events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.setBreadCrumbs();
+      });
     this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
       this.setBreadCrumbs();
       this.checkIfCreatingNew();
@@ -154,11 +159,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.hitScrollEnd.emit(null);
   }
 
-  handleSaveUpdates() {
+  handleSave() {
     this.changesSaved.emit(null);
   }
 
   handleSelectResource(resource: any) {
+    const newURL = this._ocService.constructResourceURL(resource.ID || '');
+    this.ngZone.run(() => this.router.navigateByUrl(newURL)).then();
     this.resourceSelected.emit(resource);
   }
 

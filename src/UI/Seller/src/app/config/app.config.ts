@@ -34,6 +34,7 @@ export const ocAppConfig: AppConfig = {
     'CreditCardAdmin',
     'SupplierAdmin',
     'SupplierUserAdmin',
+    'SupplierAddressAdmin',
   ],
 };
 

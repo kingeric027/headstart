@@ -61,23 +61,44 @@
   <!-- edit product -->
   <div class="resource-edit">
     <div class="form-group">
-      <label for="Name">Name</label>
+      <label for="Username">Username</label>
       <input type="text"
              class="form-control"
-             id="name"
-             aria-describedby="name"
-             value="{{updatedResource.Name}}"
-             (input)="updateResource('Name', $event)"
-             placeholder="Enter resource name">
+             id="Username"
+             aria-describedby="Username"
+             value="{{updatedResource.Username}}"
+             (input)="updateResource('Username', $event)"
+             placeholder="Enter username">
     </div>
     <div class="form-group">
-      <label for="description">Description</label>
+      <label for="First Name">First Name</label>
       <input type="text"
              class="form-control"
-             id="description"
-             value="{{updatedResource.Description}}"
-             (input)="updateResource('Description', $event)"
-             placeholder="Description">
+             id="FirstName"
+             aria-describedby="First Name"
+             value="{{updatedResource.FirstName}}"
+             (input)="updateResource('FirstName', $event)"
+             placeholder="Enter First Name">
+    </div>
+    <div class="form-group">
+      <label for="Last Name">Last Name</label>
+      <input type="text"
+             class="form-control"
+             id="LastName"
+             aria-describedby="Last Name"
+             value="{{updatedResource.LastName}}"
+             (input)="updateResource('LastName', $event)"
+             placeholder="Enter Last Name">
+    </div>
+    <div class="form-group">
+      <label for="Email">Email</label>
+      <input type="text"
+             class="form-control"
+             id="Email"
+             aria-describedby="Email"
+             value="{{updatedResource.Email}}"
+             (input)="updateResource('Email', $event)"
+             placeholder="Enter Email">
     </div>
   </div>
 </resource-table-component>

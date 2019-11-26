@@ -94,7 +94,6 @@ export class SummaryResourceDisplay {
   }
 
   getValueOnPlaceHolderResource(valueType: string) {
-    console.log('hererhehrwejkrhasdjkfhasjk');
     switch (valueType) {
       case 'toPrimaryHeader':
         return `Your new ${singular(this.resourceType)}`;

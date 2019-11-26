@@ -1,8 +1,9 @@
 import { BehaviorSubject } from 'rxjs';
-import { Router, Params, ActivatedRoute } from '@angular/router';
+import { Router, Params, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { cloneDeep as _cloneDeep, uniqBy as _uniqBy } from 'lodash';
 import { Meta } from '@ordercloud/angular-sdk';
+import { filter } from 'rxjs/operators';
 
 export interface Options {
   page?: number;
@@ -81,7 +82,9 @@ export abstract class ResourceCrudService<ResourceType> {
         pageSize: this.itemsPerPage,
         filters,
       };
-      const resourceResponse = await this.ocService.List(...this.buildListArgs(options)).toPromise();
+      const resourceResponse = await this.ocService
+        .List(...this.appendParentIDToCallArgsIfSubResource([options]))
+        .toPromise();
       if (pageNumber === 1) {
         this.setNewResources(resourceResponse);
       } else {
@@ -100,9 +103,27 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
-  selectResource(resource: any) {
+  getRouteToResource(resource: any) {
     const newUrl = this.constructResourceURL(resource.ID || '');
+    console.log(newUrl);
     this.router.navigateByUrl(newUrl);
+
+    // const newUrl = this.constructResourceURLs(resource.ID || '');
+    // console.log(newUrl);
+    // this.router.navigate(newUrl);
+  }
+
+  constructResourceURLs(resourceID: string = ''): string[] {
+    const newUrlPieces = [];
+    newUrlPieces.push(this.route);
+    if (this.secondaryResourceLevel) {
+      newUrlPieces.push(`/${this.getParentResourceID()}`);
+      newUrlPieces.push(`/${this.secondaryResourceLevel}`);
+    }
+    if (resourceID) {
+      newUrlPieces.push(`/${resourceID}`);
+    }
+    return newUrlPieces;
   }
 
   selectParentResource(resource: any) {
@@ -142,15 +163,6 @@ export abstract class ResourceCrudService<ResourceType> {
     return newUrl;
   }
 
-  buildListArgs(options: Options) {
-    if (this.secondaryResourceLevel) {
-      const parentResourceID = this.getParentResourceID();
-      return [parentResourceID, options];
-    } else {
-      return [options];
-    }
-  }
-
   getParentResourceID() {
     const urlPieces = this.router.url.split('/');
     const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}`);
@@ -158,16 +170,19 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   getResourceById(resourceID: string): Promise<any> {
-    const getArgs = this.buildGetArgs(resourceID);
-    return this.ocService.Get(...getArgs).toPromise();
+    return this.ocService.Get(...this.appendParentIDToCallArgsIfSubResource([resourceID])).toPromise();
   }
 
-  buildGetArgs(resourceID: string) {
+  appendParentIDToCallArgsIfSubResource(nonParentIDArgs: any[]) {
+    /* ordercloud services follow a patter where the paramters to a function (Save, Create, List)
+      are the nearly the same for all resource. However, sub resources (supplier users, buyer payment methods, etc...)
+      have the parent resource ID as the first paramter before the expected argument
+    */
     if (this.secondaryResourceLevel) {
       const parentResourceID = this.getParentResourceID();
-      return [parentResourceID, resourceID];
+      return [parentResourceID, ...nonParentIDArgs];
     } else {
-      return [resourceID];
+      return [...nonParentIDArgs];
     }
   }
 
@@ -181,10 +196,22 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async updateResource(resource: any): Promise<any> {
-    const newResource = await this.ocService.Save(resource.ID, resource).toPromise();
+    const newResource = await this.ocService
+      .Save(...this.appendParentIDToCallArgsIfSubResource([resource.ID, resource]))
+      .toPromise();
     const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
     this.resourceSubject.value.Items[resourceIndex] = newResource;
     this.resourceSubject.next(this.resourceSubject.value);
+    return newResource;
+  }
+
+  async createNewResource(resource: any): Promise<any> {
+    const newResource = await this.ocService
+      .Create(...this.appendParentIDToCallArgsIfSubResource([resource]))
+      .toPromise();
+    this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
+    this.resourceSubject.next(this.resourceSubject.value);
+    return newResource;
   }
 
   setNewResources(resourceResponse: ListResource<ResourceType>) {

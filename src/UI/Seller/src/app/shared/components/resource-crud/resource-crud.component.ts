@@ -24,6 +24,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   filterForm: FormGroup;
   filterConfig: any = {};
   router: Router;
+  isCreatingNew: boolean;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -59,12 +60,23 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   subscribeToResourceSelection() {
     this.activatedRoute.params.subscribe((params) => {
+      console.log('erererere');
+      this.setIsCreatingNew();
       const resourceIDSelected =
         params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
       if (resourceIDSelected) {
         this.setResourceSelection(resourceIDSelected);
       }
+      if (this.isCreatingNew) {
+        this.setResoureObjectsForCreatingNew();
+      }
     });
+  }
+
+  private setIsCreatingNew() {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
+    this.isCreatingNew = endUrl === '/new';
   }
 
   handleScrollEnd() {
@@ -85,13 +97,20 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.changeDetectorRef.detectChanges();
   }
 
+  setResoureObjectsForCreatingNew() {
+    this.resourceInSelection = {};
+    this.updatedResource = {};
+  }
+
   selectResource(resource: any) {
-    this.ocService.selectResource(resource);
+    const newURL = this.ocService.constructResourceURL(resource.ID || '');
+    this.router.navigateByUrl(newURL);
   }
 
   updateResource(fieldName: string, event) {
     const newValue = event.target.value;
     this.updatedResource = { ...this.updatedResource, [fieldName]: newValue };
+    console.log(this.updatedResource);
     this.changeDetectorRef.detectChanges();
   }
 
@@ -100,9 +119,22 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   async saveUpdates() {
-    const updatedResource = this.ocService.updateResource(this.updatedResource);
+    if (this.isCreatingNew) {
+      this.createNewResource();
+    } else {
+      this.updateExitingResource();
+    }
+  }
+
+  async updateExitingResource() {
+    const updatedResource = await this.ocService.updateResource(this.updatedResource);
     this.resourceInSelection = this.copyResource(updatedResource);
     this.updatedResource = this.copyResource(updatedResource);
+  }
+
+  async createNewResource() {
+    const newResource = await this.ocService.createNewResource(this.updatedResource);
+    this.selectResource(newResource);
   }
 
   applyFilters() {

@@ -1,6 +1,6 @@
 <!-- 98pc calced height is placeholder for now: will need to change to make responsive or if the layout srtructure is changed -->
 
-<div>
+<div *ngIf="_ocService">
   <div class="row">
     <div class="col-md-12">
       <div class="table-header-container">
@@ -175,8 +175,8 @@
           <ng-content select=".resource-edit">
           </ng-content>
           <button class="btn brand-button"
-                  (click)="handleSaveUpdates()"
-                  *ngIf="areChanges">Save Changes</button>
+                  (click)="handleSave()"
+                  *ngIf="areChanges">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
         </div>
       </div>
     </div>
