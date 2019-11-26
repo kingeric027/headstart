@@ -30,6 +30,8 @@ export const ocAppConfig: AppConfig = {
     'CategoryAdmin',
     'CatalogAdmin',
     'PromotionAdmin',
+    'ApprovalRuleAdmin',
+    'CreditCardAdmin',
     'SupplierAdmin',
     'SupplierUserAdmin',
   ],
