@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
-import { OcMeService, ListBuyerProduct, BuyerProduct, ListBuyerSpec, BuyerSpec, ListCategory } from '@ordercloud/angular-sdk';
+import { OcMeService, ListBuyerProduct, BuyerProduct, ListBuyerSpec, BuyerSpec } from '@ordercloud/angular-sdk';
 import { each as _each } from 'lodash';
 import { Observable, of } from 'rxjs';
 
@@ -51,14 +51,5 @@ export class MeSpecsResolver implements Resolve<BuyerSpec> {
       calls.push(this.service.GetSpec(productID, item.ID).toPromise());
     });
     return Promise.all(calls);
-  }
-}
-
-@Injectable()
-export class MeListCategoriesResolver implements Resolve<ListCategory> {
-  constructor(private service: OcMeService) {}
-
-  resolve(): Observable<ListCategory> | Promise<ListCategory> | any {
-    return this.service.ListCategories({ depth: 'all' });
   }
 }

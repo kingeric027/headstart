@@ -133,3 +133,45 @@
       }
     }
   }
+
+.table-header-container {
+  margin-left: 30px;
+}
+
+.breadcrumb-oc {
+  background-color: transparent;
+}
+
+.breadcrumb-link {
+  color: $brand-navy;
+}
+
+.parent-resource-dropdown {
+  margin-right: 20px;
+}
+
+.subresource-selects {
+  margin-left: 0px;
+  margin-right: 30px;
+  border-right: 1px solid rgba($gray-900, 0.1);
+}
+
+.filter-icon-container {
+  margin-top: -5px;
+  margin-right: 10px;
+}
+
+.filter-container{
+  height: 34px;
+  margin-left: 25px;
+}
+
+.resource-table-container {
+  border-top: 1px solid rgba($gray-900, 0.1);
+  width: 99%;
+  margin: 0 auto;
+}
+
+.resource-title-container {
+  border-bottom: 1px solid rgba($gray-900, 0.1);
+} 
