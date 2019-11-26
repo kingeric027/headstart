@@ -1,34 +1,63 @@
-import { Component, Input, Output, ViewChild, OnInit } from '@angular/core';
+import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import {
   ListResource,
   ResourceCrudService,
   Options,
 } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { Router, ActivatedRoute } from '@angular/router';
+import { takeWhile } from 'rxjs/operators';
+import { singular } from 'pluralize';
+
+interface BreadCrumb {
+  displayText: string;
+  route: string;
+}
 
 @Component({
   selector: 'resource-table-component',
   templateUrl: './resource-table.component.html',
   styleUrls: ['./resource-table.component.scss'],
 })
-export class ResourceTableComponent implements OnInit {
+export class ResourceTableComponent implements OnInit, OnDestroy {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
+  faHome = faHome;
+  faChevronLeft = faChevronLeft;
   searchTerm = '';
   _resourceOptions: Options;
   _resourceInSelection: any;
   _updatedResource: any;
+  _selectedResourceID: string;
+  _currentResourceName: string;
+  _ocService: ResourceCrudService<any>;
   areChanges: boolean;
+  parentResources: ListResource<any>;
+  selectedParentResourceName = 'Parent Resource Name';
+  selectedParentResourceID = '';
+  breadCrumbs: BreadCrumb[] = [];
+  alive = true;
+
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
   @Input()
-  selectedResourceID: string;
+  set ocService(service: ResourceCrudService<any>) {
+    this._ocService = service;
+    this._currentResourceName = service.secondaryResourceLevel;
+  }
   @Input()
-  ocService: ResourceCrudService<any>;
+  parentResourceService?: ResourceCrudService<any>;
+  @Input()
+  resourceName: string;
   @Output()
   searched: EventEmitter<any> = new EventEmitter();
   @Output()
@@ -52,7 +81,61 @@ export class ResourceTableComponent implements OnInit {
   @Input()
   set resourceOptions(value: Options) {
     this._resourceOptions = value;
-    this.searchTerm = value.search || '';
+    this.searchTerm = (value && value.search) || '';
+  }
+  @Input()
+  selectedResourceID: string;
+
+  ngOnInit() {
+    this.setUrlSubscription();
+    this.setParentResourceSelectionSubscription();
+    this._ocService.listResources();
+  }
+
+  private setUrlSubscription() {
+    this.router.events.pipe(takeWhile(() => this.alive)).subscribe(() => {
+      this.setBreadCrumbs();
+    });
+    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
+      this.setBreadCrumbs();
+    });
+  }
+
+  setParentResourceSelectionSubscription() {
+    this.activatedRoute.params
+      .pipe(takeWhile(() => this.parentResourceService && this.alive))
+      .subscribe(async (params) => {
+        const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
+        const parentResourceID = params[parentIDParamName];
+        if (params && parentResourceID) {
+          const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
+          this.selectedParentResourceName = parentResource.Name;
+          this.selectedParentResourceID = parentResource.ID;
+        }
+      });
+  }
+
+  private setBreadCrumbs() {
+    // basically we are just taking off the portion of the url after the selected route piece
+    // in the future breadcrumb logic might need to be more complicated than this
+    const urlPieces = this.router.url
+      .split('/')
+      .filter((p) => p)
+      .map((p) => {
+        if (p.includes('?')) {
+          return p.slice(0, p.indexOf('?'));
+        } else {
+          return p;
+        }
+      });
+    this.breadCrumbs = urlPieces.map((piece, index) => {
+      const route = `/${urlPieces.slice(0, index + 1).join('/')}`;
+      return {
+        displayText: piece,
+        route,
+      };
+    });
+    this.changeDetectorRef.detectChanges();
   }
 
   searchedResources(event) {
@@ -85,10 +168,14 @@ export class ResourceTableComponent implements OnInit {
   }
 
   clearAllFilters() {
-    this.ocService.clearAllFilters();
+    this._ocService.clearAllFilters();
   }
 
   checkForChanges() {
     this.areChanges = JSON.stringify(this._updatedResource) !== JSON.stringify(this._resourceInSelection);
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 }

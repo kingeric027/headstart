@@ -13,13 +13,8 @@
       </nav>
     </div>
   </div>
-  <!-- Mobile section for selecting a category and filtering on favorites -->
+  <!-- Mobile section for filtering on favorites -->
   <div class="d-md-none mb-2">
-    <button class="btn btn-block btn-default btn-outline-dark mb-2"
-            *ngIf="categories?.Items?.length"
-            (click)="openCategoryModal()">
-      Select Category
-    </button>
     <div class="col-xs-6">
       <div (click)="toggleFilterByFavorites()">
         <label>Refine By</label>
@@ -57,15 +52,12 @@
           </div>
         </div>
       </div>
-      <ocm-category-tree *ngIf="categories?.Items?.length"
-                         [categories]="categories"
-                         [context]="context">
-      </ocm-category-tree>
     </div>
     <div class="col-lg-9 col-md-8 ">
       <div class="row flex-wrap-reverse">
         <div class="col-12 col-md-auto mr-auto ">
-          <div class="m-0 mt-1 text-center">
+          <div class="m-0 mt-1 text-center"
+               *ngIf="products">
             <span *ngIf="products && products.Meta.TotalPages > 1">
               {{ (products.Meta.Page - 1) * products.Meta.PageSize + 1 }}
               - {{ products.Meta.Page * products.Meta.PageSize }} of
@@ -96,6 +88,14 @@
           </p>
         </div>
       </div>
+      <ocm-loading-layout height="432px"
+                          width="100%"
+                          mb="1.5rem"
+                          [resource]="products"
+                          [columns]="4"
+                          [rows]="4"
+                          [context]="context">
+      </ocm-loading-layout>
       <div *ngIf="products && products.Items.length > 0">
         <div class="product-list-grid row align-items-stretch">
           <ocm-product-card *ngFor="let product of products.Items; let i = index"
@@ -117,10 +117,4 @@
       </div>
     </div>
   </div>
-  <ocm-modal [state]="categoryModal"
-             modalTitle="Select Category">
-    <ocm-category-tree *ngIf="categories?.Items?.length"
-                       [categories]="categories"
-                       [context]="context"></ocm-category-tree>
-  </ocm-modal>
 </section>

@@ -18,52 +18,6 @@ import { CookieModule } from 'ngx-cookie';
 import { OrderCloudModule } from '@ordercloud/angular-sdk';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { OCMProductCard } from './components/products/product-card/product-card.component';
-import { OCMToggleFavorite } from './components/layout/toggle-favorite/toggle-favorite.component';
-import { OCMQuantityInput } from './components/products/quantity-input/quantity-input.component';
-import { OCMProductCarousel } from './components/products/product-carousel/product-carousel.component';
-import { OCMProductDetails } from './components/products/product-details/product-details.component';
-import { OCMImageGallery } from './components/products/image-gallery/image-gallery.component';
-import { OCMSpecForm } from './components/products/spec-form/spec-form.component';
-import { OCMOrderSummary } from './components/orders/order-summary/order-summary.component';
-import { OCMCart } from './components/cart/cart/cart.component';
-import { OCMLineitemTable } from './components/cart/lineitem-table/lineitem-table.component';
-import { OCMHomePage } from './components/layout/home/home.component';
-import { OCMProductSort } from './components/products/sort-products/sort-products.component';
-import { OCMSupplierSort } from './components/suppliers/sort-suppliers/sort-suppliers.component';
-import { OCMSupplierCard } from './components/suppliers/supplier-card/supplier-card.component';
-import { OCMCategoryTree } from './components/products/category-tree/category-tree.component';
-import { OCMFacetMultiSelect } from './components/products/facet-multiselect/facet-multiselect.component';
-import { OCMProductFacetList } from './components/products/product-facet-list/product-facet-list.component';
-import { OCMProductList } from './components/products/product-list/product-list.component';
-import { OCMSearch } from './components/layout/search/search.component';
-import { OCMMiniCart } from './components/cart/mini-cart/mini-cart.component';
-import { OCMPaymentList } from './components/payments/payment-list/payment-list.component';
-import { OCMAppHeader } from './components/layout/app-header/app-header.component';
-import { OCMAddressCard } from './components/profile/address-card/address-card.component';
-import { OCMCreditCardIcon } from './components/payments/credit-card-icon/credit-card-icon.component';
-import { OCMCreditCardDisplay } from './components/payments/credit-card-display/credit-card-display.component';
-import { OCMModal } from './components/layout/modal/modal.component';
-import { OCMOrderStatusIcon } from './components/orders/order-status-icon/order-status-icon.component';
-import { OCMCreditCardForm } from './components/payments/credit-card-form/credit-card-form.component';
-import { OCMOrderStatusFilter } from './components/orders/order-status-filter/order-status-filter.component';
-import { OCMOrderDateFilter } from './components/orders/order-date-filter/order-date-filter.component';
-import { OCMOrderList } from './components/orders/order-list/order-list.component';
-import { OCMLogin } from './components/authentication/login/login.component';
-import { OCMForgotPassword } from './components/authentication/forgot-password/forgot-password.component';
-import { OCMRegister } from './components/authentication/register/register.component';
-import { OCMResetPassword } from './components/authentication/reset-password/reset-password.component';
-import { OCMChangePasswordForm } from './components/profile/change-password-form/change-password-form.component';
-import { OCMAddressList } from './components/profile/address-list/address-list.component';
-import { OMCAddressForm } from './components/profile/address-form/address-form.component';
-import { OCMGenericList } from './components/layout/generic-list/generic-list.component';
-import { OCMPaymentPurchaseOrder } from './components/payments/payment-purchase-order/payment-purchase-order.component';
-import { OCMPaymentSpendingAccount } from './components/payments/payment-spending-account/payment-spending-account.component';
-import { OCMCheckoutAddress } from './components/checkout/checkout-address/checkout-address.component';
-import { OCMCheckoutPayment } from './components/checkout/checkout-payment/checkout-payment.component';
-import { OCMPaymentMethodManagement } from './components/payments/payment-method-management/payment-method-management.component';
-import { OCMOrderDetails } from './components/orders/order-detail/order-detail.component';
-import { OCMAppFooter } from './components/layout/app-footer/app-footer.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TreeModule } from 'angular-tree-component';
@@ -112,6 +66,52 @@ import { OCMCheckoutConfirm } from './components/checkout/checkout-confirm/check
 import { OCMCheckout } from './components/checkout/checkout/checkout.component';
 import { OCMProfile } from './components/profile/profile/profile.component';
 import { OCMProfileNav } from './components/profile/profile-nav/profile-nav.component';
+import { OCMAppFooter } from './components/layout/app-footer/app-footer.component';
+import { OCMOrderDetails } from './components/orders/order-detail/order-detail.component';
+import { OCMPaymentMethodManagement } from './components/payments/payment-method-management/payment-method-management.component';
+import { OCMCheckoutPayment } from './components/checkout/checkout-payment/checkout-payment.component';
+import { OCMCheckoutAddress } from './components/checkout/checkout-address/checkout-address.component';
+import { OCMPaymentSpendingAccount } from './components/payments/payment-spending-account/payment-spending-account.component';
+import { OCMPaymentPurchaseOrder } from './components/payments/payment-purchase-order/payment-purchase-order.component';
+import { OMCAddressForm } from './components/profile/address-form/address-form.component';
+import { OCMGenericList } from './components/layout/generic-list/generic-list.component';
+import { OCMAddressList } from './components/profile/address-list/address-list.component';
+import { OCMChangePasswordForm } from './components/profile/change-password-form/change-password-form.component';
+import { OCMResetPassword } from './components/authentication/reset-password/reset-password.component';
+import { OCMRegister } from './components/authentication/register/register.component';
+import { OCMForgotPassword } from './components/authentication/forgot-password/forgot-password.component';
+import { OCMLogin } from './components/authentication/login/login.component';
+import { OCMLoadingLayout } from './components/layout/loading-layout/loading-layout.component';
+import { OCMOrderList } from './components/orders/order-list/order-list.component';
+import { OCMOrderDateFilter } from './components/orders/order-date-filter/order-date-filter.component';
+import { OCMOrderStatusFilter } from './components/orders/order-status-filter/order-status-filter.component';
+import { OCMOrderStatusIcon } from './components/orders/order-status-icon/order-status-icon.component';
+import { OCMModal } from './components/layout/modal/modal.component';
+import { OCMProductCard } from './components/products/product-card/product-card.component';
+import { OCMToggleFavorite } from './components/layout/toggle-favorite/toggle-favorite.component';
+import { OCMQuantityInput } from './components/products/quantity-input/quantity-input.component';
+import { OCMProductCarousel } from './components/products/product-carousel/product-carousel.component';
+import { OCMProductDetails } from './components/products/product-details/product-details.component';
+import { OCMImageGallery } from './components/products/image-gallery/image-gallery.component';
+import { OCMSpecForm } from './components/products/spec-form/spec-form.component';
+import { OCMOrderSummary } from './components/orders/order-summary/order-summary.component';
+import { OCMLineitemTable } from './components/cart/lineitem-table/lineitem-table.component';
+import { OCMCart } from './components/cart/cart/cart.component';
+import { OCMHomePage } from './components/layout/home/home.component';
+import { OCMProductSort } from './components/products/sort-products/sort-products.component';
+import { OCMSupplierSort } from './components/suppliers/sort-suppliers/sort-suppliers.component';
+import { OCMSupplierCard } from './components/suppliers/supplier-card/supplier-card.component';
+import { OCMFacetMultiSelect } from './components/products/facet-multiselect/facet-multiselect.component';
+import { OCMProductFacetList } from './components/products/product-facet-list/product-facet-list.component';
+import { OCMProductList } from './components/products/product-list/product-list.component';
+import { OCMSearch } from './components/layout/search/search.component';
+import { OCMMiniCart } from './components/cart/mini-cart/mini-cart.component';
+import { OCMAppHeader } from './components/layout/app-header/app-header.component';
+import { OCMPaymentList } from './components/payments/payment-list/payment-list.component';
+import { OCMAddressCard } from './components/profile/address-card/address-card.component';
+import { OCMCreditCardIcon } from './components/payments/credit-card-icon/credit-card-icon.component';
+import { OCMCreditCardDisplay } from './components/payments/credit-card-display/credit-card-display.component';
+import { OCMCreditCardForm } from './components/payments/credit-card-form/credit-card-form.component';
 
 const components = [
   OCMProductCard,
@@ -128,7 +128,6 @@ const components = [
   OCMProductSort,
   OCMSupplierSort,
   OCMSupplierCard,
-  OCMCategoryTree,
   OCMFacetMultiSelect,
   OCMProductFacetList,
   OCMProductList,
@@ -145,6 +144,7 @@ const components = [
   OCMOrderStatusFilter,
   OCMOrderDateFilter,
   OCMOrderList,
+  OCMLoadingLayout,
   OCMLogin,
   OCMForgotPassword,
   OCMRegister,
@@ -247,7 +247,6 @@ export class AppModule {
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
     this.buildWebComponent(OCMSupplierSort, 'ocm-supplier-sort');
     this.buildWebComponent(OCMSupplierCard, 'ocm-supplier-card');
-    this.buildWebComponent(OCMCategoryTree, 'ocm-category-tree');
     this.buildWebComponent(OCMFacetMultiSelect, 'ocm-facet-multiselect');
     this.buildWebComponent(OCMProductFacetList, 'ocm-product-facet-list');
     this.buildWebComponent(OCMProductList, 'ocm-product-list');
@@ -265,6 +264,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderStatusFilter, 'ocm-order-status-filter');
     this.buildWebComponent(OCMOrderDateFilter, 'ocm-order-date-filter');
     this.buildWebComponent(OCMOrderList, 'ocm-order-list');
+    this.buildWebComponent(OCMLoadingLayout, 'ocm-loading-layout');
     this.buildWebComponent(OCMLogin, 'ocm-login');
     this.buildWebComponent(OCMForgotPassword, 'ocm-forgot-password');
     this.buildWebComponent(OCMRegister, 'ocm-register');

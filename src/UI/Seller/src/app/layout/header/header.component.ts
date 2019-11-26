@@ -28,7 +28,7 @@ export class HeaderComponent implements OnInit {
   faMapMarker = faMapMarkerAlt;
   faSitemap = faSitemap;
   faUserCircle = faUserCircle;
-
+  activeTitle = '';
   headerConfig: HeaderNav[];
 
   constructor(
@@ -40,6 +40,16 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {
     this.headerConfig = MarketMangagerHeaderConfig;
+    this.subscribeToRouteEvents();
+  }
+
+  subscribeToRouteEvents() {
+    this.router.events.subscribe(() => {
+      const activeNavGroup = this.headerConfig.find((grouping) => {
+        return grouping.routes.some((route) => this.router.url.includes(route.route));
+      });
+      this.activeTitle = activeNavGroup && activeNavGroup.title;
+    });
   }
 
   logout() {

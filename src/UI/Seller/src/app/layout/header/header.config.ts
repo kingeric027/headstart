@@ -18,11 +18,11 @@ export const MarketMangagerHeaderConfig: HeaderNav[] = [
       },
       {
         title: 'Promotions',
-        route: '/products/promotions',
+        route: '/promotions',
       },
       {
         title: 'Categories',
-        route: '/products/categories',
+        route: '/categories',
       },
     ],
   },
@@ -106,11 +106,11 @@ export const SellerHeaderConfig: HeaderNav[] = [
       },
       {
         title: 'Promotions',
-        route: '/products/promotions',
+        route: '/promotions',
       },
       {
         title: 'Categories',
-        route: '/products/categories',
+        route: '/categories',
       },
     ],
   },
@@ -218,11 +218,11 @@ export const SupplierHeaderConfig: HeaderNav[] = [
       },
       {
         title: 'Promotions',
-        route: '/products/promotions',
+        route: '/promotions',
       },
       {
         title: 'Categories',
-        route: '/products/categories',
+        route: '/categories',
       },
     ],
   },

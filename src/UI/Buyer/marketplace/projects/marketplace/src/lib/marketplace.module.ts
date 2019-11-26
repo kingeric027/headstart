@@ -16,7 +16,7 @@ import { RegisterWrapperComponent } from './wrapper-components/register-wrapper.
 import { ResetPasswordWrapperComponent } from './wrapper-components/reset-password-wrapper.component';
 import { FeaturedProductsResolver } from './resolves/features-products.resolve';
 import { MeListBuyerAddressResolver } from './resolves/me.resolve';
-import { MeListCategoriesResolver, MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
+import { MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
 import { AuthNetCreditCardService } from './services/authorize-net/authorize-net.service';
 import { AuthService } from './services/auth/auth.service';
 import { CurrentOrderService } from './services/current-order/current-order.service';
@@ -42,7 +42,6 @@ import { SupplierListWrapperComponent } from './wrapper-components/supplier-list
   providers: [
     FeaturedProductsResolver,
     MeListBuyerAddressResolver,
-    MeListCategoriesResolver,
     MeProductResolver,
     MeListSpecsResolver,
     MeListRelatedProductsResolver,

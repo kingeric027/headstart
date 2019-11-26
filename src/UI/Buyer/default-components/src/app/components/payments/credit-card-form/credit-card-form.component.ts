@@ -46,7 +46,6 @@ export class OCMCreditCardForm implements OnInit {
   ngOnInit() {
     this.setAvailableCardOptions();
     this.setCardForm();
-    console.log(this);
   }
 
   handleCardNumberKeyup($event) {

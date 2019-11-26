@@ -9,8 +9,7 @@ import {
   faHome,
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs';
-import { Order, MeUser, ListCategory, LineItem } from '@ordercloud/angular-sdk';
+import { Order, MeUser, LineItem, ListCategory, Category } from '@ordercloud/angular-sdk';
 import { tap, debounceTime, delay, takeWhile } from 'rxjs/operators';
 import { OCMComponent } from '../../base-component';
 import { ProductFilters } from 'marketplace';
@@ -20,7 +19,6 @@ import { ProductFilters } from 'marketplace';
   styleUrls: ['./app-header.component.scss'],
 })
 export class OCMAppHeader extends OCMComponent {
-  categories$: Observable<ListCategory>;
   isCollapsed = true;
   anonymous: boolean;
   user: MeUser;
@@ -30,6 +28,9 @@ export class OCMAppHeader extends OCMComponent {
   searchTermForProducts: string = null;
   activePath: string;
   appName: string;
+  activeCategoryID: string = undefined;
+  categories: Category[] = [];
+
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
 
@@ -41,18 +42,22 @@ export class OCMAppHeader extends OCMComponent {
   faUserCircle = faUserCircle;
   faHome = faHome;
 
-  ngOnContextSet() {
+  async ngOnContextSet() {
+    this.categories = this.context.categories.all;
     this.appName = this.context.appSettings.appname;
     this.context.currentOrder.onOrderChange(order => (this.order = order));
     this.context.currentUser.onIsAnonymousChange(isAnon => (this.anonymous = isAnon));
     this.context.currentUser.onUserChange(user => (this.user = user));
-    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
+    this.context.productFilters.activeFiltersSubject
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(this.handleFiltersChange);
     this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
   }
 
   handleFiltersChange = (filters: ProductFilters) => {
     this.searchTermForProducts = filters.search || '';
+    this.activeCategoryID = this.context.categories.activeID;
   };
 
   buildAddToCartListener() {
@@ -62,7 +67,7 @@ export class OCMAppHeader extends OCMComponent {
       if (li) {
         this.popover.ngbPopover = `Added ${li.Quantity} items to Cart`;
         setTimeout(() => {
-          if(!this.popover.isOpen()) {
+          if (!this.popover.isOpen()) {
             this.popover.open();
           }
           closePopoverTimeout = setTimeout(() => {
@@ -88,5 +93,9 @@ export class OCMAppHeader extends OCMComponent {
     if (event.y < rect.top + rect.height) {
       popover.close();
     }
+  }
+
+  setActiveCategory(categoryID: string): void {
+    this.context.productFilters.filterByCategory(categoryID);
   }
 }

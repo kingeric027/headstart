@@ -8,6 +8,8 @@ import {
   FilterDictionary,
 } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { FormGroup, FormControl } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { singular } from 'pluralize';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -21,15 +23,23 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   ocService: ResourceCrudService<ResourceType>;
   filterForm: FormGroup;
   filterConfig: any = {};
+  router: Router;
 
-  constructor(private changeDetectorRef: ChangeDetectorRef, ocService: any) {
+  constructor(
+    private changeDetectorRef: ChangeDetectorRef,
+    ocService: any,
+    router: Router,
+    private activatedRoute: ActivatedRoute
+  ) {
     this.ocService = ocService;
+    this.router = router;
   }
 
   ngOnInit() {
     this.setFilterForm();
     this.subscribeToResources();
     this.subscribeToOptions();
+    this.subscribeToResourceSelection();
   }
 
   subscribeToResources() {
@@ -47,6 +57,16 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     });
   }
 
+  subscribeToResourceSelection() {
+    this.activatedRoute.params.subscribe((params) => {
+      const resourceIDSelected =
+        params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
+      if (resourceIDSelected) {
+        this.setResourceSelection(resourceIDSelected);
+      }
+    });
+  }
+
   handleScrollEnd() {
     if (this.resourceList.Meta.TotalPages > this.resourceList.Meta.Page) {
       this.ocService.getNextPage();
@@ -54,15 +74,19 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   searchResources(searchStr: string) {
-    this.searchText = searchStr;
     this.ocService.searchBy(searchStr);
   }
 
-  selectResource(resource: any) {
-    this.selectedResourceID = resource.ID;
+  async setResourceSelection(resourceID: string) {
+    this.selectedResourceID = resourceID || '';
+    const resource = await this.ocService.findOrGetResourceByID(resourceID);
     this.resourceInSelection = this.copyResource(resource);
     this.updatedResource = this.copyResource(resource);
     this.changeDetectorRef.detectChanges();
+  }
+
+  selectResource(resource: any) {
+    this.ocService.selectResource(resource);
   }
 
   updateResource(fieldName: string, event) {

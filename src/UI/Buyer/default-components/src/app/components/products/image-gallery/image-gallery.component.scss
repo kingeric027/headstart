@@ -3,6 +3,8 @@ $square-thumb-side: 70px;
   padding-top: 10px;
   padding-bottom: 10px;
   .gallery-item {
+    display: flex;
+    justify-content: center;
     opacity: .5;
     padding: 3px !important;
     img {

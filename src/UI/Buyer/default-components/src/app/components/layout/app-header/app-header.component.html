@@ -3,15 +3,14 @@
   <div class="container">
     <a class="navbar-brand clickable cursor-pointer"
        (click)="context.router.toHome()">
-      <span class="d-none d-md-inline">{{appName}}</span>
-      <span class="d-md-none">OCS</span>
+      <img class="logo" />
     </a>
     <ul class="navbar-nav mr-auto">
       <li class="nav-item clickable cursor-pointer"
           [ngClass]="{'active': activePath === '/products'}">
         <a class="nav-link"
            (click)="context.router.toProductList()">
-          Shop
+          Products
         </a>
       </li>
       <li class="nav-item clickable cursor-pointer">
