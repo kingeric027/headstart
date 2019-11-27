@@ -38,14 +38,14 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
   }
 
   private setParentResourceSubscription() {
-    this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
+    this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
       this.parentResourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
   }
 
   setParentResourceSelectionSubscription() {
-    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(async (params) => {
+    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(async params => {
       const parentIDParamName = `${singular(this.parentService.primaryResourceLevel)}ID`;
       const resourceID = params[parentIDParamName];
       if (params && resourceID) {

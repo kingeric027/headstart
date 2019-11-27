@@ -103,16 +103,6 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
-  getRouteToResource(resource: any) {
-    const newUrl = this.constructResourceURL(resource.ID || '');
-    console.log(newUrl);
-    this.router.navigateByUrl(newUrl);
-
-    // const newUrl = this.constructResourceURLs(resource.ID || '');
-    // console.log(newUrl);
-    // this.router.navigate(newUrl);
-  }
-
   constructResourceURLs(resourceID: string = ''): string[] {
     const newUrlPieces = [];
     newUrlPieces.push(this.route);
@@ -146,9 +136,10 @@ export abstract class ResourceCrudService<ResourceType> {
     return newUrl;
   }
 
-  constructResourceURL(resourceID: string = ''): string {
+  constructNewRouteInformation(resourceID: string = ''): any[] {
     let newUrl = '';
-    const queryParams = this.router.url.split('?')[1];
+    const queryParams = this.activatedRoute.snapshot.queryParams;
+
     if (this.secondaryResourceLevel) {
       newUrl += `${this.route}/${this.getParentResourceID()}/${this.secondaryResourceLevel}`;
     } else {
@@ -157,10 +148,7 @@ export abstract class ResourceCrudService<ResourceType> {
     if (resourceID) {
       newUrl += `/${resourceID}`;
     }
-    if (queryParams) {
-      newUrl += `?${queryParams}`;
-    }
-    return newUrl;
+    return [newUrl, queryParams];
   }
 
   getParentResourceID() {

@@ -1,4 +1,4 @@
-import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit } from '@angular/core';
+import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit, NgZone } from '@angular/core';
 import { Meta } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 import {
@@ -30,10 +30,26 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     private changeDetectorRef: ChangeDetectorRef,
     ocService: any,
     router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private ngZone: NgZone
   ) {
     this.ocService = ocService;
     this.router = router;
+  }
+
+  public navigate(url: string, options: any): void {
+    /* 
+    * Had a bug where clicking on a resource on the second page of resources was triggering an error
+    * navigation trigger outside of Angular zone. Might be caused by inheritance or using 
+    * changeDetector.detectChange, but couldn't resolve any other way
+    * Please remove the need for this if you can
+    * https://github.com/angular/angular/issues/25837
+    */
+    if (Object.keys(options)) {
+      this.ngZone.run(() => this.router.navigate([url], options)).then();
+    } else {
+      this.ngZone.run(() => this.router.navigate([url])).then();
+    }
   }
 
   ngOnInit() {
@@ -60,7 +76,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   subscribeToResourceSelection() {
     this.activatedRoute.params.subscribe((params) => {
-      console.log('erererere');
       this.setIsCreatingNew();
       const resourceIDSelected =
         params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
@@ -103,14 +118,13 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   selectResource(resource: any) {
-    const newURL = this.ocService.constructResourceURL(resource.ID || '');
-    this.router.navigateByUrl(newURL);
+    const [newURL, queryParams] = this.ocService.constructNewRouteInformation(resource.ID || '');
+    this.navigate(newURL, { queryParams });
   }
 
   updateResource(fieldName: string, event) {
     const newValue = event.target.value;
     this.updatedResource = { ...this.updatedResource, [fieldName]: newValue };
-    console.log(this.updatedResource);
     this.changeDetectorRef.detectChanges();
   }
 

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { BuyerAddress } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -16,8 +16,9 @@ export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddr
     changeDetectorRef: ChangeDetectorRef,
     router: Router,
     activatedroute: ActivatedRoute,
-    private buyerService: BuyerService
+    private buyerService: BuyerService,
+    ngZone: NgZone
   ) {
-    super(changeDetectorRef, buyerLocationService, router, activatedroute);
+    super(changeDetectorRef, buyerLocationService, router, activatedroute, ngZone);
   }
 }

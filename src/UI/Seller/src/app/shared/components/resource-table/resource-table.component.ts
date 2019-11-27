@@ -47,7 +47,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
-    private ngZone: NgZone
+    ngZone: NgZone
   ) {}
 
   @Input()
@@ -164,8 +164,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   handleSelectResource(resource: any) {
-    const newURL = this._ocService.constructResourceURL(resource.ID || '');
-    this.ngZone.run(() => this.router.navigateByUrl(newURL)).then();
+    const [newURL, queryParams] = this._ocService.constructNewRouteInformation(resource.ID || '');
+    this.router.navigate([newURL], { queryParams });
     this.resourceSelected.emit(resource);
   }
 
