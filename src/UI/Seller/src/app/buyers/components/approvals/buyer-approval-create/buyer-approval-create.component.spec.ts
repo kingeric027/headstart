@@ -1,19 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BuyerApprovalsCreateComponent } from './buyer-approval-create.component';
+import { BuyerUserCreateComponent } from './buyer-approval-create.component';
 
-describe('BuyerApprovalsCreateComponent', () => {
-  let component: BuyerApprovalsCreateComponent;
-  let fixture: ComponentFixture<BuyerApprovalsCreateComponent>;
+describe('BuyerUserCreateComponent', () => {
+  let component: BuyerUserCreateComponent;
+  let fixture: ComponentFixture<BuyerUserCreateComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [BuyerApprovalsCreateComponent],
-    }).compileComponents();
+      declarations: [ BuyerUserCreateComponent ]
+    })
+    .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BuyerApprovalsCreateComponent);
+    fixture = TestBed.createComponent(BuyerUserCreateComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

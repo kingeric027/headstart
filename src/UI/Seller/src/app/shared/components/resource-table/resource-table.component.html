@@ -18,25 +18,27 @@
           </ol>
         </nav>
         <div>
-          <h1>{{parentResourceService ? resourceName + ' - ' + selectedParentResourceName : resourceName}}</h1>
+          <h1>{{(parentResourceService ? _currentResourceNamePlural + ' - ' + selectedParentResourceName : _currentResourceNamePlural) | titlecase}}</h1>
           <hr />
         </div>
-        <div class="d-flex justify-content-start">
-          <div *ngIf="parentResourceService"
+        <div class="d-flex justify-content-start pb-2">
+          <div *ngIf="!isCreatingNew || parentResourceService"
                class="row subresource-selects">
-            <div class="col-xs-6">
+            <div *ngIf="parentResourceService"
+                 class="col-xs-6">
               <!-- parent resource dropdown -->
               <resource-select-dropdown-component [parentService]="parentResourceService"
                                                   [ocService]="_ocService"></resource-select-dropdown-component>
             </div>
-            <div class="col-xs-6">
+            <div *ngIf="parentResourceService"
+                 class="col-xs-6">
               <!-- sub resource dropdown -->
               <div ngbDropdown
                    class="d-inline-block parent-resource-dropdown">
                 <!-- change to currently selected option  -->
                 <button class="btn btn-outline-dark"
                         id="parentresourcedropdown"
-                        ngbDropdownToggle>{{_currentResourceName | titlecase}}</button>
+                        ngbDropdownToggle>{{_currentResourceNamePlural | titlecase}}</button>
                 <div ngbDropdownMenu
                      aria-labelledby="parent resource dropdown">
                   <button ngbDropdownItem
@@ -46,12 +48,17 @@
                 </div>
               </div>
             </div>
+            <div *ngIf="!isCreatingNew">
+              <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
+              <button class="btn clear-filters-btn create-new-button brand-button--orange mr-3"
+                      routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new">Create New {{_currentResourceNameSingular}}</button>
+            </div>
           </div>
 
 
           <form class="d-flex">
             <search-component class="mr-3 w-100"
-                              [placeholderText]="'Search ' + resourceName"
+                              [placeholderText]="'Search ' + _currentResourceNamePlural"
                               [searchTermInput]="searchTerm"
                               (searched)="searchedResources($event)">
             </search-component>
@@ -96,12 +103,11 @@
             <button class="btn brand-button clear-filters-btn"
                     (click)="clearAllFilters()">Clear All Filters</button>
           </div>
-
         </div>
       </div>
 
       <!-- full table view -->
-      <div *ngIf="!selectedResourceID"
+      <div *ngIf="!selectedResourceID && !isCreatingNew"
            class="row resource-table-container">
         <perfect-scrollbar class="scrollbar-top"
                            style="width: 100%; height: calc(100vh - 255px);"
@@ -111,7 +117,7 @@
       </div>
 
       <!-- editing/creating view -->
-      <div *ngIf="selectedResourceID"
+      <div *ngIf="selectedResourceID || isCreatingNew"
            class="row resource-table-container">
         <div class="col-3 p-0">
           <perfect-scrollbar style="width: 100%; height: calc(100vh - 255px);"
@@ -124,6 +130,14 @@
                 </tr>
               </thead>
               <tbody>
+                <tr *ngIf="isCreatingNew"
+                    class="selectable-row selected-resource">
+                  <td>
+                    <summary-resource-display-component [isNewPlaceHolder]="true"
+                                                        [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel">
+                    </summary-resource-display-component>
+                  </td>
+                </tr>
                 <tr *ngFor="let resource of resourceList.Items"
                     (click)="handleSelectResource(resource)"
                     class="selectable-row"
@@ -151,18 +165,19 @@
               </button>
               <h3 class="d-inline-block ml-5 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>
-            <span *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length">
-              <button class="btn brand-button ml-3"
-                      *ngFor="let subResource of _ocService.subResourceList"><a [routerLink]="[subResource]">
-                  Manage {{subResource}}
-                </a></button>
+            <span *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length && !isCreatingNew">
+              <a class="btn brand-button ml-3"
+                 *ngFor="let subResource of _ocService.subResourceList"
+                 [routerLink]="[subResource]">
+                Manage {{subResource}}
+              </a>
             </span>
           </div>
           <ng-content select=".resource-edit">
           </ng-content>
           <button class="btn brand-button"
-                  (click)="handleSaveUpdates()"
-                  *ngIf="areChanges">Save Changes</button>
+                  (click)="handleSave()"
+                  *ngIf="areChanges">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
         </div>
       </div>
     </div>

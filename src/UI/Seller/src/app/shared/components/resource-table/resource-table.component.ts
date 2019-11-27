@@ -1,4 +1,4 @@
-import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core';
 import {
   ListResource,
   ResourceCrudService,
@@ -7,8 +7,8 @@ import {
 import { EventEmitter } from '@angular/core';
 import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { Router, ActivatedRoute } from '@angular/router';
-import { takeWhile } from 'rxjs/operators';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { takeWhile, filter } from 'rxjs/operators';
 import { singular } from 'pluralize';
 
 interface BreadCrumb {
@@ -32,19 +32,22 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   _resourceInSelection: any;
   _updatedResource: any;
   _selectedResourceID: string;
-  _currentResourceName: string;
+  _currentResourceNamePlural: string;
+  _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
   areChanges: boolean;
   parentResources: ListResource<any>;
   selectedParentResourceName = 'Parent Resource Name';
   selectedParentResourceID = '';
   breadCrumbs: BreadCrumb[] = [];
+  isCreatingNew = false;
   alive = true;
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    ngZone: NgZone
   ) {}
 
   @Input()
@@ -52,12 +55,11 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   @Input()
   set ocService(service: ResourceCrudService<any>) {
     this._ocService = service;
-    this._currentResourceName = service.secondaryResourceLevel;
+    this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
+    this._currentResourceNameSingular = singular(this._currentResourceNamePlural);
   }
   @Input()
   parentResourceService?: ResourceCrudService<any>;
-  @Input()
-  resourceName: string;
   @Output()
   searched: EventEmitter<any> = new EventEmitter();
   @Output()
@@ -93,26 +95,37 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   private setUrlSubscription() {
-    this.router.events.pipe(takeWhile(() => this.alive)).subscribe(() => {
-      this.setBreadCrumbs();
-    });
+    this.router.events
+      .pipe(takeWhile(() => this.alive))
+      // only need to set the breadcrumbs on nav end events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.setBreadCrumbs();
+      });
     this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
       this.setBreadCrumbs();
+      this.checkIfCreatingNew();
     });
   }
 
-  setParentResourceSelectionSubscription() {
+  private setParentResourceSelectionSubscription() {
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
       .subscribe(async (params) => {
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
+        this.selectedParentResourceID = parentResourceID;
         if (params && parentResourceID) {
           const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
           this.selectedParentResourceName = parentResource.Name;
-          this.selectedParentResourceID = parentResource.ID;
         }
       });
+  }
+
+  private checkIfCreatingNew() {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
+    this.isCreatingNew = endUrl === '/new';
   }
 
   private setBreadCrumbs() {
@@ -146,11 +159,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.hitScrollEnd.emit(null);
   }
 
-  handleSaveUpdates() {
+  handleSave() {
     this.changesSaved.emit(null);
   }
 
   handleSelectResource(resource: any) {
+    const [newURL, queryParams] = this._ocService.constructNewRouteInformation(resource.ID || '');
+    this.router.navigate([newURL], { queryParams });
     this.resourceSelected.emit(resource);
   }
 

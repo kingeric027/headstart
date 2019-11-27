@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { singular } from 'pluralize';
 
 interface ResourceInfoPath {
   toPrimaryHeader: string;
@@ -19,6 +20,7 @@ export class SummaryResourceDisplay {
   _primaryHeader = '';
   _secondaryHeader = '';
   _imgPath = '';
+  _isNewPlaceHolder = false;
 
   resourceTypeMap: ResourceInfoPathsDictionary = {
     suppliers: {
@@ -56,13 +58,22 @@ export class SummaryResourceDisplay {
   @Input()
   resourceType: any;
   @Input()
+  set isNewPlaceHolder(value: boolean) {
+    this._isNewPlaceHolder = value;
+    this.setDisplayValuesForPlaceholder();
+  }
+  @Input()
   set resource(value: any) {
-    this._primaryHeader = this.getValueOnResource(value, 'toPrimaryHeader');
-    this._secondaryHeader = this.getValueOnResource(value, 'toSecondaryHeader');
-    this._imgPath = this.getValueOnResource(value, 'toImage');
+    this.setDisplayValuesForResource(value);
   }
 
-  getValueOnResource(value: any, valueType: string) {
+  setDisplayValuesForResource(resource: any) {
+    this._primaryHeader = this.getValueOnExistingResource(resource, 'toPrimaryHeader');
+    this._secondaryHeader = this.getValueOnExistingResource(resource, 'toSecondaryHeader');
+    this._imgPath = this.getValueOnExistingResource(resource, 'toImage');
+  }
+
+  getValueOnExistingResource(value: any, valueType: string) {
     const pathToValue = this.resourceTypeMap[this.resourceType][valueType];
     const piecesOfPath = pathToValue.split('.');
     if (pathToValue) {
@@ -73,6 +84,21 @@ export class SummaryResourceDisplay {
       return currentObject;
     } else {
       return '';
+    }
+  }
+
+  setDisplayValuesForPlaceholder() {
+    this._primaryHeader = this.getValueOnPlaceHolderResource('toPrimaryHeader');
+    this._secondaryHeader = this.getValueOnPlaceHolderResource('toSecondaryHeader');
+    this._imgPath = this.getValueOnPlaceHolderResource('toImage');
+  }
+
+  getValueOnPlaceHolderResource(valueType: string) {
+    switch (valueType) {
+      case 'toPrimaryHeader':
+        return `Your new ${singular(this.resourceType)}`;
+      default:
+        return '';
     }
   }
 }
