@@ -166,10 +166,11 @@
               <h3 class="d-inline-block ml-5 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>
             <span *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length && !isCreatingNew">
-              <button class="btn brand-button ml-3"
-                      *ngFor="let subResource of _ocService.subResourceList"><a [routerLink]="[subResource]">
-                  Manage {{subResource}}
-                </a></button>
+              <a class="btn brand-button ml-3"
+                 *ngFor="let subResource of _ocService.subResourceList"
+                 [routerLink]="[subResource]">
+                Manage {{subResource}}
+              </a>
             </span>
           </div>
           <ng-content select=".resource-edit">
