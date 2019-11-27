@@ -193,6 +193,15 @@ export abstract class ResourceCrudService<ResourceType> {
     return newResource;
   }
 
+  async deleteResource(resourceID: string): Promise<null> {
+    const newResource = await this.ocService
+      .Delete(...this.appendParentIDToCallArgsIfSubResource([resourceID]))
+      .toPromise();
+    this.resourceSubject.value.Items = this.resourceSubject.value.Items.filter((i: any) => i.ID !== resourceID);
+    this.resourceSubject.next(this.resourceSubject.value);
+    return;
+  }
+
   async createNewResource(resource: any): Promise<any> {
     const newResource = await this.ocService
       .Create(...this.appendParentIDToCallArgsIfSubResource([resource]))

@@ -140,6 +140,16 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
+  async deleteResource() {
+    await this.ocService.deleteResource(this.selectedResourceID);
+    this.selectResource({});
+  }
+
+  discardChanges() {
+    this.updatedResource = this.resourceInSelection;
+    this.changeDetectorRef.detectChanges();
+  }
+
   async updateExitingResource() {
     const updatedResource = await this.ocService.updateResource(this.updatedResource);
     this.resourceInSelection = this.copyResource(updatedResource);

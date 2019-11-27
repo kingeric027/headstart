@@ -3,7 +3,13 @@ import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { NgbPaginationModule, NgbTabsetModule, NgbPopoverModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbPaginationModule,
+  NgbTabsetModule,
+  NgbPopoverModule,
+  NgbDropdownModule,
+  NgbModalModule,
+} from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
 import { TreeModule } from 'angular-tree-component';
@@ -26,6 +32,7 @@ import { ResourceTableComponent } from './components/resource-table/resource-tab
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ResourceSelectDropdown } from './components/resource-select-dropdown/resource-select-dropdown.component';
 import { SummaryResourceDisplay } from './components/summary-resource-display/summary-resource-display.component';
+import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-confirm-modal.component';
 
 @NgModule({
   imports: [
@@ -44,6 +51,7 @@ import { SummaryResourceDisplay } from './components/summary-resource-display/su
     NgbDropdownModule,
     NgbPaginationModule,
     NgbTabsetModule,
+    NgbModalModule,
   ],
   exports: [
     // angular
@@ -86,6 +94,7 @@ import { SummaryResourceDisplay } from './components/summary-resource-display/su
     ResourceSelectDropdown,
     ProductFormComponent,
     ResourceTableComponent,
+    DeleteConfirmModal,
     SummaryResourceDisplay,
   ],
 })

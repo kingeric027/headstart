@@ -7,6 +7,8 @@
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
+                          (changesDiscarded)="discardChanges()"
+                          (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
   <table class="table table-hover resource-table">
     <thead>

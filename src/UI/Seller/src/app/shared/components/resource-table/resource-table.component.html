@@ -1,6 +1,6 @@
 <!-- 98pc calced height is placeholder for now: will need to change to make responsive or if the layout srtructure is changed -->
 
-<div>
+<div class="resource-table-component-container">
   <div class="row">
     <div class="col-md-12">
       <div class="table-header-container">
@@ -8,7 +8,7 @@
           <ol class="breadcrumb breadcrumb-oc">
             <!-- make this the home icon -->
             <li class="breadcrumb-item"><a class="breadcrumb-link"
-                 href="#">
+                 [routerLink]="'/'">
                 <fa-icon [icon]="faHome">
                 </fa-icon>
               </a></li>
@@ -18,7 +18,7 @@
           </ol>
         </nav>
         <div>
-          <h1>{{(parentResourceService ? _currentResourceNamePlural + ' - ' + selectedParentResourceName : _currentResourceNamePlural) | titlecase}}</h1>
+          <h1 class="resource-name">{{(parentResourceService ? _currentResourceNamePlural + ' - ' + selectedParentResourceName : _currentResourceNamePlural) | titlecase}}</h1>
           <hr />
         </div>
         <div class="d-flex justify-content-start pb-2">
@@ -178,6 +178,11 @@
           <button class="btn brand-button"
                   (click)="handleSave()"
                   *ngIf="areChanges">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
+          <button class="btn brand-button ml-3"
+                  (click)="handleDiscardChanges()"
+                  *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+          <delete-confirm-modal-component *ngIf="!isCreatingNew"
+                                          (deleteConfirmed)="handleDelete($event)"></delete-confirm-modal-component>
         </div>
       </div>
     </div>
