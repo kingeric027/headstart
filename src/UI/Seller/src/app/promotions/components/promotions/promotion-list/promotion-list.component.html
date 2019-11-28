@@ -33,24 +33,8 @@
     </tbody>
   </table>
   <div class="resource-edit">
-    <label for="Name">Name</label>
-    <div class="form-group">
-      <input type="text"
-             class="form-control"
-             id="name"
-             aria-describedby="name"
-             value="{{updatedResource.Name}}"
-             (input)="updateResource('Name', $event)"
-             placeholder="Enter resource name">
-    </div>
-    <div class="form-group">
-      <label for="description">Description</label>
-      <input type="text"
-             class="form-control"
-             id="description"
-             value="{{updatedResource.Description}}"
-             (input)="updateResource('Description', $event)"
-             placeholder="Description">
-    </div>
+    <resource-edit-component resourceType="Promotion"
+                             (updateResource)="updateResource($event)"
+                             [resource]="updatedResource"></resource-edit-component>
   </div>
 </resource-table-component>

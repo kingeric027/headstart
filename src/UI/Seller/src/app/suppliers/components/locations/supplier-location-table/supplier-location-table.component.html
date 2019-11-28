@@ -58,55 +58,8 @@
 
   <!-- edit product -->
   <div class="resource-edit">
-    <div class="form-group">
-      <label for="Street1">Street1</label>
-      <input type="text"
-             class="form-control"
-             id="Street1"
-             aria-describedby="Street1"
-             value="{{updatedResource.Street1}}"
-             (input)="updateResource('Street1', $event)"
-             placeholder="Enter resource Street1">
-    </div>
-    <div class="form-group">
-      <label for="City">City</label>
-      <input type="text"
-             class="form-control"
-             id="City"
-             aria-describedby="City"
-             value="{{updatedResource.City}}"
-             (input)="updateResource('City', $event)"
-             placeholder="Enter resource City">
-    </div>
-    <div class="form-group">
-      <label for="State">State</label>
-      <input type="text"
-             class="form-control"
-             id="State"
-             aria-describedby="State"
-             value="{{updatedResource.State}}"
-             (input)="updateResource('State', $event)"
-             placeholder="Enter resource State">
-    </div>
-    <div class="form-group">
-      <label for="Zip">Zip</label>
-      <input type="text"
-             class="form-control"
-             id="Zip"
-             aria-describedby="Zip"
-             value="{{updatedResource.Zip}}"
-             (input)="updateResource('Zip', $event)"
-             placeholder="Enter resource Zip">
-    </div>
-    <div class="form-group">
-      <label for="Country">Country</label>
-      <input type="text"
-             class="form-control"
-             id="Country"
-             aria-describedby="Country"
-             value="{{updatedResource.Country}}"
-             (input)="updateResource('Country', $event)"
-             placeholder="Enter resource Country">
-    </div>
+    <resource-edit-component resourceType="Address"
+                             (updateResource)="updateResource($event)"
+                             [resource]="updatedResource"></resource-edit-component>
   </div>
 </resource-table-component>

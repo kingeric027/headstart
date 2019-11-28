@@ -33,6 +33,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ResourceSelectDropdown } from './components/resource-select-dropdown/resource-select-dropdown.component';
 import { SummaryResourceDisplay } from './components/summary-resource-display/summary-resource-display.component';
 import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-confirm-modal.component';
+import { ResourceEditComponent } from './components/resource-edit/resource-edit.component';
 
 @NgModule({
   imports: [
@@ -80,6 +81,7 @@ import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-con
     ProductFormComponent,
     ResourceTableComponent,
     SummaryResourceDisplay,
+    ResourceEditComponent,
   ],
   declarations: [
     SearchComponent,
@@ -96,6 +98,7 @@ import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-con
     ResourceTableComponent,
     DeleteConfirmModal,
     SummaryResourceDisplay,
+    ResourceEditComponent,
   ],
 })
 export class SharedModule {
