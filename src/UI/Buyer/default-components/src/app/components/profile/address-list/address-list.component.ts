@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnChanges } from '@angular/core';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
@@ -9,7 +9,7 @@ import { ModalState } from '../../../models/modal-state.class';
   templateUrl: './address-list.component.html',
   styleUrls: ['./address-list.component.scss'],
 })
-export class OCMAddressList extends OCMComponent implements OnInit {
+export class OCMAddressList extends OCMComponent implements OnInit, OnChanges {
   @Input() addresses: ListBuyerAddress;
   faPlus = faPlus;
   faArrowLeft = faArrowLeft;
@@ -22,13 +22,15 @@ export class OCMAddressList extends OCMComponent implements OnInit {
   };
   resultsPerPage = 8;
   areYouSureModal = ModalState.Closed;
-  addAddressModal = ModalState.Closed;
+  showCreateAddressForm = false;
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ngOnChanges() {}
+
+  ngOnContextSet() {
     this.reloadAddresses();
   }
-
-  ngOnContextSet() {}
 
   reset() {
     this.currentAddress = {};
@@ -37,12 +39,12 @@ export class OCMAddressList extends OCMComponent implements OnInit {
   showAddAddress() {
     console.log('show');
     this.currentAddress = null;
-    this.addAddressModal = ModalState.Open;
+    this.showCreateAddressForm = true;
   }
 
   showEditAddress(address: BuyerAddress) {
     this.currentAddress = address;
-    this.addAddressModal = ModalState.Open;
+    this.showCreateAddressForm = true;
   }
 
   showAreYouSure(address: BuyerAddress) {
@@ -55,13 +57,19 @@ export class OCMAddressList extends OCMComponent implements OnInit {
     this.areYouSureModal = ModalState.Closed;
   }
 
+  dismissEditAddressForm() {
+    this.currentAddress = null;
+    this.showCreateAddressForm = false;
+  }
+
   protected refresh() {
     this.currentAddress = null;
     this.reloadAddresses();
   }
 
   addressFormSubmitted(address: BuyerAddress) {
-    this.addAddressModal = ModalState.Closed;
+    this.showCreateAddressForm = false;
+    window.scrollTo(0, null);
     if (this.currentAddress) {
       this.updateAddress(address);
     } else {
@@ -69,42 +77,23 @@ export class OCMAddressList extends OCMComponent implements OnInit {
     }
   }
 
-  private addAddress(address: BuyerAddress) {
+  private async addAddress(address: BuyerAddress) {
     address.Shipping = true;
     address.Billing = true;
-    // this.ocMeService.CreateAddress(address).subscribe(
-    //   () => {
-    //     this.refresh();
-    //   },
-    //   (error) => {
-    //     throw error;
-    //   }
-    // );
+    const newAddress = await this.context.myResources.CreateAddress(address).toPromise();
+    this.addresses.Items = [...this.addresses.Items, newAddress];
   }
 
-  private updateAddress(address: BuyerAddress) {
+  private async updateAddress(address: BuyerAddress): Promise<any> {
     address.ID = this.currentAddress.ID;
-    // this.ocMeService.PatchAddress(address.ID, address).subscribe(
-    //   () => {
-    //     this.refresh();
-    //   },
-    //   (error) => {
-    //     throw error;
-    //   }
-    // );
+    await this.context.myResources.PatchAddress(address.ID, address).toPromise();
+    this.refresh();
   }
 
-  deleteAddress(address: BuyerAddress) {
-    console.log(address);
-    // this.ocMeService.DeleteAddress(address.ID).subscribe(
-    //   () => {
-    //     this.closeAreYouSure();
-    //     this.reloadAddresses();
-    //   },
-    //   (error) => {
-    //     throw error;
-    //   }
-    // );
+  async deleteAddress(address: BuyerAddress) {
+    this.areYouSureModal = ModalState.Closed;
+    await this.context.myResources.DeleteAddress(address.ID).toPromise();
+    this.addresses.Items = this.addresses.Items.filter(a => a.ID !== address.ID);
   }
 
   updateRequestOptions(newOptions: { page?: number; search?: string }) {
@@ -113,6 +102,8 @@ export class OCMAddressList extends OCMComponent implements OnInit {
   }
 
   private reloadAddresses() {
-    // this.ocMeService.ListAddresses({ ...this.requestOptions, pageSize: this.resultsPerPage }).subscribe((res) => (this.addresses = res));
+    this.context.myResources.ListAddresses(this.requestOptions).subscribe(res => {
+      this.addresses = res;
+    });
   }
 }

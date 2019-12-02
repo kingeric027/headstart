@@ -111,6 +111,25 @@ shared-address-display {
   }
 }
 
+// Icon Buttons
+
+.icon-button {
+  padding: .75rem;
+  border-radius: 180px;
+  transition: background-color .25s;
+  &:hover {
+    background-color: rgba($gray-900, 0.1);
+    cursor: pointer;
+  }
+  .icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .ripple {
   position: relative;
   overflow: hidden;
@@ -139,7 +158,6 @@ shared-address-display {
   opacity: .3;
   transition: 0s;
 }
-
 
 ocm-credit-card-form {
   width: 100%;

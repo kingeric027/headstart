@@ -1,16 +1,5 @@
 @import "../../../../styles/main.scss"; // TODO - may not be needed
 
-
-.icon-button {
-  padding: .75rem 1rem;
-  border-radius: 180px;
-  transition: background-color .25s;
-  &:hover {
-    background-color: rgba($gray-900, 0.1);
-    cursor: pointer;
-  }
-}
-
 /* form starting stylings ------------------------------- */
 .group {
   position: relative;

@@ -1,7 +1,7 @@
 @charset 'UTF-8';
 
 // Theme Variables - must come before vendor
-@import 'themes/bar-method/variables';
+@import 'themes/basecamp/variables';
 
 // Vendors
 @import 'vendor/bootstrap',
@@ -42,6 +42,6 @@
 @import '~angular-tree-component/dist/angular-tree-component.css';
 
 // Theme Styles
-@import 'themes/bar-method/styles';
+@import 'themes/basecamp/styles';
 
 //@import '../app/ocm-default-components/shared.scss'; 

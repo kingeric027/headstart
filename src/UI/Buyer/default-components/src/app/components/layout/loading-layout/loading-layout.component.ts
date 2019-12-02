@@ -6,6 +6,7 @@ import { OCMComponent } from '../../base-component';
   styleUrls: ['./loading-layout.component.scss'],
 })
 export class OCMLoadingLayout extends OCMComponent {
+  @Input() isLoading?: boolean;
   @Input() resource: any; // which resource you're basing loading off of (e.g. suppliers, products, etc)
   @Input() height: string; // height of individual loading block
   @Input() width: string; // width of individual loading block

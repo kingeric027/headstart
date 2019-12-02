@@ -14,6 +14,7 @@ import { GeographyConfig } from '../../../config/geography.class';
 export class OMCAddressForm implements OnInit {
   private ExistingAddress: BuyerAddress = {};
   @Input() btnText: string;
+  @Output() formDismissed = new EventEmitter();
   @Output()
   formSubmitted = new EventEmitter<{ address: Address; formDirty: boolean }>();
   stateOptions: string[] = [];
@@ -40,7 +41,7 @@ export class OMCAddressForm implements OnInit {
       LastName: new FormControl(this.ExistingAddress.LastName || '', [Validators.required, ValidateName]),
       Street1: new FormControl(this.ExistingAddress.Street1 || '', Validators.required),
       Street2: new FormControl(this.ExistingAddress.Street2 || ''),
-      City: new FormControl(this.ExistingAddress.City || '', [Validators.required, ValidateName]),
+      City: new FormControl(this.ExistingAddress.City || ''),
       State: new FormControl(this.ExistingAddress.State || null, Validators.required),
       Zip: new FormControl(this.ExistingAddress.Zip || '', [Validators.required, ValidateUSZip]),
       Phone: new FormControl(this.ExistingAddress.Phone || '', ValidatePhone),
@@ -67,5 +68,8 @@ export class OMCAddressForm implements OnInit {
       address: this.addressForm.value,
       formDirty: this.addressForm.dirty,
     });
+  }
+  dismissForm() {
+    this.formDismissed.emit();
   }
 }
