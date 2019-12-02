@@ -67,6 +67,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   @Output()
   changesSaved: EventEmitter<any> = new EventEmitter();
   @Output()
+  resourceDelete: EventEmitter<any> = new EventEmitter();
+  @Output()
+  changesDiscarded: EventEmitter<any> = new EventEmitter();
+  @Output()
   resourceSelected: EventEmitter<any> = new EventEmitter();
   @Output()
   applyFilters: EventEmitter<any> = new EventEmitter();
@@ -161,6 +165,14 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
 
   handleSave() {
     this.changesSaved.emit(null);
+  }
+
+  handleDelete() {
+    this.resourceDelete.emit(null);
+  }
+
+  handleDiscardChanges() {
+    this.changesDiscarded.emit(null);
   }
 
   handleSelectResource(resource: any) {

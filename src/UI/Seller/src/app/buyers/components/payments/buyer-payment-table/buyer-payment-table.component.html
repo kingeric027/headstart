@@ -8,6 +8,8 @@
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
+                          (changesDiscarded)="discardChanges()"
+                          (resourceDelete)="deleteResource()"
                           (applyFilters)="applyFilters()"
                           (resourceSelected)="selectResource($event)">
 
@@ -56,24 +58,8 @@
 
   <!-- edit product -->
   <div class="resource-edit">
-    <div class="form-group">
-      <label for="Name">Name</label>
-      <input type="text"
-             class="form-control"
-             id="name"
-             aria-describedby="name"
-             value="{{updatedResource.Name}}"
-             (input)="updateResource('Name', $event)"
-             placeholder="Enter resource name">
-    </div>
-    <div class="form-group">
-      <label for="description">Description</label>
-      <input type="text"
-             class="form-control"
-             id="description"
-             value="{{updatedResource.Description}}"
-             (input)="updateResource('Description', $event)"
-             placeholder="Description">
-    </div>
+    <resource-edit-component resourceType="CreditCard"
+                             (updateResource)="updateResource($event)"
+                             [resource]="updatedResource"></resource-edit-component>
   </div>
 </resource-table-component>

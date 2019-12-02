@@ -122,9 +122,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.navigate(newURL, { queryParams });
   }
 
-  updateResource(fieldName: string, event) {
-    const newValue = event.target.value;
-    this.updatedResource = { ...this.updatedResource, [fieldName]: newValue };
+  updateResource(resourceUpdate: any) {
+    this.updatedResource = { ...this.updatedResource, [resourceUpdate.field]: resourceUpdate.value };
     this.changeDetectorRef.detectChanges();
   }
 
@@ -138,6 +137,17 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     } else {
       this.updateExitingResource();
     }
+  }
+
+  async deleteResource() {
+    console.log(this.selectedResourceID);
+    await this.ocService.deleteResource(this.selectedResourceID);
+    this.selectResource({});
+  }
+
+  discardChanges() {
+    this.updatedResource = this.resourceInSelection;
+    this.changeDetectorRef.detectChanges();
   }
 
   async updateExitingResource() {
