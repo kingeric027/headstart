@@ -35,6 +35,7 @@ export const ocAppConfig: AppConfig = {
     'SupplierAdmin',
     'SupplierUserAdmin',
     'SupplierAddressAdmin',
+    'AdminUserAdmin',
   ],
 };
 

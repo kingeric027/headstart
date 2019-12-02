@@ -34,6 +34,7 @@ import { ResourceSelectDropdown } from './components/resource-select-dropdown/re
 import { SummaryResourceDisplay } from './components/summary-resource-display/summary-resource-display.component';
 import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-confirm-modal.component';
 import { ResourceEditComponent } from './components/resource-edit/resource-edit.component';
+import { FullResourceTableComponent } from './components/full-resource-table/full-resource-table.component';
 
 @NgModule({
   imports: [
@@ -81,6 +82,7 @@ import { ResourceEditComponent } from './components/resource-edit/resource-edit.
     ProductFormComponent,
     ResourceTableComponent,
     SummaryResourceDisplay,
+    FullResourceTableComponent,
     ResourceEditComponent,
   ],
   declarations: [
@@ -98,6 +100,7 @@ import { ResourceEditComponent } from './components/resource-edit/resource-edit.
     ResourceTableComponent,
     DeleteConfirmModal,
     SummaryResourceDisplay,
+    FullResourceTableComponent,
     ResourceEditComponent,
   ],
 })
