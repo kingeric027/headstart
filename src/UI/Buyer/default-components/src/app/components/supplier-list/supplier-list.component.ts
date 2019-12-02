@@ -49,7 +49,7 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
 
   private handleFiltersChange = (filters: SupplierFilters) => {
     if (filters.activeFilters) {
-      this.searchTermForSuppliers = filters.search;
+      this.searchTermForSuppliers = filters.search || '';
       this._supplierCategoryConfig.Filters.forEach(filter => {
         this.filterForm.controls[filter.Path].setValue(filters.activeFilters[filter.Path]);
       });
@@ -77,7 +77,6 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
 
   clearFilters() {
     this.context.supplierFilters.clearAllFilters();
-    this.searchSuppliers('');
   }
 
   openPopover() {
