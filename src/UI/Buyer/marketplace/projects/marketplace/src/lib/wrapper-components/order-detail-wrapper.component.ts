@@ -5,7 +5,7 @@ import { OrderHistoryService } from '../services/order-history/order-history.ser
 
 @Component({
   template: `
-    <ocm-order-details [context]="context"></ocm-order-details>
+    <ocm-order-details></ocm-order-details>
   `,
 })
 export class OrderDetailWrapperComponent {

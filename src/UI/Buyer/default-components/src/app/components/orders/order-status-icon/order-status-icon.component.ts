@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { faCircle, faClock, faBan } from '@fortawesome/free-solid-svg-icons';
-import { OCMComponent } from '../../base-component';
 import { OrderStatus } from 'marketplace';
 
 @Component({

@@ -1,17 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ListBuyerCreditCard, BuyerCreditCard, ListSpendingAccount } from '@ordercloud/angular-sdk';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import * as moment_ from 'moment';
 const moment = moment_;
-import { OCMComponent } from '../../base-component';
-import { AuthNetCreditCard } from 'marketplace';
+import { AuthNetCreditCard, ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './payment-method-management.component.html',
   styleUrls: ['./payment-method-management.component.scss'],
 })
-export class OCMPaymentMethodManagement extends OCMComponent {
+export class OCMPaymentMethodManagement implements OnInit {
   alive = true;
   showCardForm = false;
   faPlus = faPlus;
@@ -22,7 +21,9 @@ export class OCMPaymentMethodManagement extends OCMComponent {
   accounts: ListSpendingAccount;
   currentCard: BuyerCreditCard = null;
 
-  ngOnContextSet() {
+  constructor(private context: ShopperContextService) {}
+
+  ngOnInit() {
     this.getCards();
     this.getAccounts();
   }

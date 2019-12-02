@@ -6,7 +6,7 @@ import { CurrentUserService } from '../services/current-user/current-user.servic
 
 @Component({
   template: `
-    <ocm-product-details [product]="product" [specs]="specs" [context]="context"> </ocm-product-details>
+    <ocm-product-details [product]="product" [specs]="specs"> </ocm-product-details>
   `,
 })
 export class ProductDetailWrapperComponent implements OnInit {

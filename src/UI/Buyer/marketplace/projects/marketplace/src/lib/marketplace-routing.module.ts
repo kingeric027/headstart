@@ -32,7 +32,7 @@ import { SupplierListWrapperComponent } from './wrapper-components/supplier-list
 
 // TODO - move or remove these
 @Component({
-  template: '<ocm-order-history [context]="context" [orders]="orders" [approvalVersion]="false"></ocm-order-history>',
+  template: '<ocm-order-history [orders]="orders" [approvalVersion]="false"></ocm-order-history>',
 })
 export class MyOrdersWrapperComponent implements OnInit, OnDestroy {
   orders: ListOrder;
@@ -53,7 +53,7 @@ export class MyOrdersWrapperComponent implements OnInit, OnDestroy {
 }
 
 @Component({
-  template: '<ocm-order-history [context]="context" [orders]="orders" [approvalVersion]="true"></ocm-order-history>',
+  template: '<ocm-order-history [orders]="orders" [approvalVersion]="true"></ocm-order-history>',
 })
 export class OrdersToApproveWrapperComponent implements OnInit, OnDestroy {
   orders: ListOrder;

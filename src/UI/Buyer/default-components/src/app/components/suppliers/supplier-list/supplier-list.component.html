@@ -58,9 +58,7 @@
               </fa-layers-counter>
             </fa-layers>
           </div>
-          <ocm-supplier-sort [context]="context"
-                             (closePopoverEvent)="closePopover($event.detail)">
-          </ocm-supplier-sort>
+          <ocm-supplier-sort (closePopoverEvent)="closePopover($event.detail)"></ocm-supplier-sort>
           <div *ngIf="activeFilterCount > 0"
                class="icon-button ripple">
             <fa-icon [icon]="faTimes"
@@ -73,8 +71,7 @@
                           mb="1.5rem"
                           [resource]="suppliers"
                           [columns]="1"
-                          [rows]="4"
-                          [context]="context">
+                          [rows]="4">
       </ocm-loading-layout>
       <div class="card"
            *ngIf="suppliers && suppliers.Items.length === 0">
@@ -90,8 +87,7 @@
       <div *ngIf="suppliers && suppliers.Items.length > 0">
         <div class="supplier-list"
              *ngFor="let supplier of suppliers.Items">
-          <ocm-supplier-card [context]="context"
-                             [supplier]="supplier"></ocm-supplier-card>
+          <ocm-supplier-card [supplier]="supplier"></ocm-supplier-card>
         </div>
         <ngb-pagination *ngIf="suppliers.Meta.TotalPages > 1"
                         maxSize="10"

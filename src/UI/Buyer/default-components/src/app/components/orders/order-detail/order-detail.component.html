@@ -1,5 +1,5 @@
 <div class="container">
-  <ocm-profile-nav [context]="context">
+  <ocm-profile-nav>
     <div *ngIf="order">
       <nav class="breadcrumb"
            aria-label="breadcrumb">
@@ -28,12 +28,10 @@
           </button>
           <ocm-reorder *ngIf="!approvalVersion"
                        class="float-right pb-2 mr-2 mb-2"
-                       [orderID]='order.ID'
-                       [context]="context"></ocm-reorder>
+                       [orderID]='order.ID'></ocm-reorder>
           <ocm-order-approval *ngIf="approvalVersion"
                               class="float-right"
-                              [orderID]='order.ID'
-                              [context]="context"></ocm-order-approval>
+                              [orderID]='order.ID'></ocm-order-approval>
         </div>
       </div>
       <ul class="nav nav-tabs mb-3">
@@ -54,9 +52,7 @@
       </ul>
     </div>
     <ocm-order-historical *ngIf="orderDetails && showDetails()"
-                          [context]="context"
                           [orderDetails]="orderDetails"></ocm-order-historical>
-    <ocm-order-shipments *ngIf="showShipments()"
-                         [context]="context"></ocm-order-shipments>
+    <ocm-order-shipments *ngIf="showShipments()"></ocm-order-shipments>
   </ocm-profile-nav>
 </div>

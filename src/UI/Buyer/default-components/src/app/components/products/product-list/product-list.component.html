@@ -41,8 +41,7 @@
                   (click)="clearAllFilters()">Clear All Filters
           </button>
           <ocm-product-facet-list *ngIf="products?.Meta?.Facets?.length"
-                                  [facetList]="products.Meta.Facets"
-                                  [context]="context">
+                                  [facetList]="products.Meta.Facets">
           </ocm-product-facet-list>
           <div (click)="toggleFilterByFavorites()">
             <span class="sr-only">Sort By Favorites</span>
@@ -74,7 +73,7 @@
           </button>
         </div>
         <div class="col-12 col-md-auto ">
-          <ocm-product-sort [context]="context"></ocm-product-sort>
+          <ocm-product-sort></ocm-product-sort>
         </div>
       </div>
       <div class="card"
@@ -93,15 +92,13 @@
                           mb="1.5rem"
                           [resource]="products"
                           [columns]="4"
-                          [rows]="4"
-                          [context]="context">
+                          [rows]="4">
       </ocm-loading-layout>
       <div *ngIf="products && products.Items.length > 0">
         <div class="product-list-grid row align-items-stretch">
           <ocm-product-card *ngFor="let product of products.Items; let i = index"
                             class="col-sm-6 col-md-4 col-xl-3 d-flex"
                             [product]="product"
-                            [context]="context"
                             [isFavorite]="isFavorite(product.ID)">
           </ocm-product-card>
         </div>

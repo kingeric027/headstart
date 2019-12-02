@@ -5,7 +5,7 @@
     <fa-icon class="text-muted"
              [icon]="isCollapsed ?  faPlusSquare : faMinusSquare"
              pull="right"></fa-icon>
-    {{ facet?.Name }}
+    {{ _facet?.Name }}
   </h6>
 
   <!-- Facet Values -->
@@ -17,9 +17,9 @@
              [ngModel]="checkbox.checked"
              type="checkbox"
              class="custom-control-input"
-             name="{{facet.Name}}facetCheckbox{{i}}"
-             id="{{facet.Name}}facetCheckbox{{i}}">
-      <label for="{{facet.Name}}facetCheckbox{{i}}"
+             name="{{_facet.Name}}facetCheckbox{{i}}"
+             id="{{_facet.Name}}facetCheckbox{{i}}">
+      <label for="{{_facet.Name}}facetCheckbox{{i}}"
              class="custom-control-label">{{checkbox.facet.Value}}<small class="text-secondary font-weight-bold badge badge-pill badge-light">({{checkbox.facet.Count}})</small></label>
     </div>
     <a *ngIf="visibleFacetLength < checkboxArray.length"
