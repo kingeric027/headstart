@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { Promotion } from '@ordercloud/angular-sdk';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { PromotionService } from '@app-seller/shared/services/promotion/promotion.service';
@@ -14,8 +14,9 @@ export class PromotionListComponent extends ResourceCrudComponent<Promotion> {
     private promotionService: PromotionService,
     changeDetectorRef: ChangeDetectorRef,
     router: Router,
-    activatedRoute: ActivatedRoute
+    activatedRoute: ActivatedRoute,
+    ngZone: NgZone
   ) {
-    super(changeDetectorRef, promotionService, router, activatedRoute);
+    super(changeDetectorRef, promotionService, router, activatedRoute, ngZone);
   }
 }

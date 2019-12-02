@@ -1,4 +1,4 @@
-import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit } from '@angular/core';
+import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit, NgZone } from '@angular/core';
 import { Meta } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 import {
@@ -24,15 +24,32 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   filterForm: FormGroup;
   filterConfig: any = {};
   router: Router;
+  isCreatingNew: boolean;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     ocService: any,
     router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private ngZone: NgZone
   ) {
     this.ocService = ocService;
     this.router = router;
+  }
+
+  public navigate(url: string, options: any): void {
+    /* 
+    * Had a bug where clicking on a resource on the second page of resources was triggering an error
+    * navigation trigger outside of Angular zone. Might be caused by inheritance or using 
+    * changeDetector.detectChange, but couldn't resolve any other way
+    * Please remove the need for this if you can
+    * https://github.com/angular/angular/issues/25837
+    */
+    if (Object.keys(options)) {
+      this.ngZone.run(() => this.router.navigate([url], options)).then();
+    } else {
+      this.ngZone.run(() => this.router.navigate([url])).then();
+    }
   }
 
   ngOnInit() {
@@ -59,12 +76,22 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   subscribeToResourceSelection() {
     this.activatedRoute.params.subscribe((params) => {
+      this.setIsCreatingNew();
       const resourceIDSelected =
         params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
       if (resourceIDSelected) {
         this.setResourceSelection(resourceIDSelected);
       }
+      if (this.isCreatingNew) {
+        this.setResoureObjectsForCreatingNew();
+      }
     });
+  }
+
+  private setIsCreatingNew() {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
+    this.isCreatingNew = endUrl === '/new';
   }
 
   handleScrollEnd() {
@@ -85,13 +112,18 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.changeDetectorRef.detectChanges();
   }
 
-  selectResource(resource: any) {
-    this.ocService.selectResource(resource);
+  setResoureObjectsForCreatingNew() {
+    this.resourceInSelection = {};
+    this.updatedResource = {};
   }
 
-  updateResource(fieldName: string, event) {
-    const newValue = event.target.value;
-    this.updatedResource = { ...this.updatedResource, [fieldName]: newValue };
+  selectResource(resource: any) {
+    const [newURL, queryParams] = this.ocService.constructNewRouteInformation(resource.ID || '');
+    this.navigate(newURL, { queryParams });
+  }
+
+  updateResource(resourceUpdate: any) {
+    this.updatedResource = { ...this.updatedResource, [resourceUpdate.field]: resourceUpdate.value };
     this.changeDetectorRef.detectChanges();
   }
 
@@ -100,9 +132,33 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   async saveUpdates() {
-    const updatedResource = this.ocService.updateResource(this.updatedResource);
+    if (this.isCreatingNew) {
+      this.createNewResource();
+    } else {
+      this.updateExitingResource();
+    }
+  }
+
+  async deleteResource() {
+    console.log(this.selectedResourceID);
+    await this.ocService.deleteResource(this.selectedResourceID);
+    this.selectResource({});
+  }
+
+  discardChanges() {
+    this.updatedResource = this.resourceInSelection;
+    this.changeDetectorRef.detectChanges();
+  }
+
+  async updateExitingResource() {
+    const updatedResource = await this.ocService.updateResource(this.updatedResource);
     this.resourceInSelection = this.copyResource(updatedResource);
     this.updatedResource = this.copyResource(updatedResource);
+  }
+
+  async createNewResource() {
+    const newResource = await this.ocService.createNewResource(this.updatedResource);
+    this.selectResource(newResource);
   }
 
   applyFilters() {

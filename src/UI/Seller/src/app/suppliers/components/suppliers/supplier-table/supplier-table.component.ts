@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Supplier } from '@ordercloud/angular-sdk';
 import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
@@ -28,9 +28,10 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
     private supplierService: SupplierService,
     changeDetectorRef: ChangeDetectorRef,
     router: Router,
-    activatedroute: ActivatedRoute
+    activatedroute: ActivatedRoute,
+    ngZone: NgZone
   ) {
-    super(changeDetectorRef, supplierService, router, activatedroute);
+    super(changeDetectorRef, supplierService, router, activatedroute, ngZone);
     this.router = router;
   }
 
