@@ -25,16 +25,17 @@ import { ShopperContextService } from 'marketplace';
 })
 export class OCMSpecForm {
   _specs: ListBuyerSpec;
-  @Input() set specs(value: ListBuyerSpec) {
-    this._specs = value;
-    this.init();
-  }
   @Output() specFormChange: EventEmitter<any> = new EventEmitter<any>();
 
   config: FieldConfig[] = [];
   form: FormGroup;
 
   constructor(private fb: FormBuilder) {}
+
+  @Input() set specs(value: ListBuyerSpec) {
+    this._specs = value;
+    this.init();
+  }
 
   init() {
     this.config = this.createFieldConfig();
