@@ -4,15 +4,15 @@
       <h1 class="page-heading">Addresses</h1>
       <button (click)="showAddAddress()"
               class="btn btn-primary btn-sm">
-        <fa-icon [icon]="faPlus"></fa-icon> Add an Address
+        <fa-icon [icon]="faPlus"></fa-icon> Add
       </button>
     </div>
     <ocm-modal [state]="areYouSureModal"
                [modalTitle]="'Delete this Address?'">
       <div>
-        <button class="btn btn-primary"
+        <button class="btn btn-sm btn-primary"
                 (click)="deleteAddress(currentAddress)">Delete</button>
-        <button class="btn float-right"
+        <button class="btn btn-sm float-right"
                 (click)="closeAreYouSure()">Cancel</button>
       </div>
     </ocm-modal>
