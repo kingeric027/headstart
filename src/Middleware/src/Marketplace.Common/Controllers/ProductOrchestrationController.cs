@@ -57,5 +57,11 @@ namespace Marketplace.Common.Controllers
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }
+
+        [HttpPost, Route("catalogproductassignment"), MarketplaceUserAuth()]
+        public async Task<OrchestrationCatalogAssignment> PostCatalogProductAssignment([FromBody] OrchestrationCatalogAssignment obj)
+        {
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
+        }
     }
 }
