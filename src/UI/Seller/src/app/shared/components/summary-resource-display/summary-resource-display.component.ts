@@ -1,15 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { singular } from 'pluralize';
-
-interface ResourceInfoPath {
-  toPrimaryHeader: string;
-  toSecondaryHeader: string;
-  toImage: string;
-}
-
-interface ResourceInfoPathsDictionary {
-  [resourceType: string]: ResourceInfoPath;
-}
+import {
+  PRODUCT_IMAGE_PATH_STRATEGY,
+  getProductMainImageUrlOrPlaceholder,
+} from '@app-seller/shared/services/product/product-image.helper';
+import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/services/configuration/table-display';
 
 @Component({
   selector: 'summary-resource-display-component',
@@ -21,39 +16,6 @@ export class SummaryResourceDisplay {
   _secondaryHeader = '';
   _imgPath = '';
   _isNewPlaceHolder = false;
-
-  resourceTypeMap: ResourceInfoPathsDictionary = {
-    suppliers: {
-      toPrimaryHeader: 'Name',
-      toSecondaryHeader: '',
-      toImage: '',
-    },
-    users: {
-      toPrimaryHeader: 'Name',
-      toSecondaryHeader: 'ID',
-      toImage: '',
-    },
-    products: {
-      toPrimaryHeader: 'Name',
-      toSecondaryHeader: 'ID',
-      toImage: '',
-    },
-    promotions: {
-      toPrimaryHeader: 'Name',
-      toSecondaryHeader: 'Code',
-      toImage: '',
-    },
-    buyers: {
-      toPrimaryHeader: 'Name',
-      toSecondaryHeader: 'ID',
-      toImage: '',
-    },
-    locations: {
-      toPrimaryHeader: 'Name',
-      toSecondaryHeader: 'ID',
-      toImage: '',
-    },
-  };
 
   @Input()
   resourceType: any;
@@ -74,14 +36,18 @@ export class SummaryResourceDisplay {
   }
 
   getValueOnExistingResource(value: any, valueType: string) {
-    const pathToValue = this.resourceTypeMap[this.resourceType][valueType];
+    const pathToValue = SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY[this.resourceType][valueType];
     const piecesOfPath = pathToValue.split('.');
     if (pathToValue) {
-      let currentObject = value;
-      piecesOfPath.forEach((piece) => {
-        currentObject = currentObject && currentObject[piece];
-      });
-      return currentObject;
+      if (pathToValue === PRODUCT_IMAGE_PATH_STRATEGY) {
+        return getProductMainImageUrlOrPlaceholder(value);
+      } else {
+        let currentObject = value;
+        piecesOfPath.forEach((piece) => {
+          currentObject = currentObject && currentObject[piece];
+        });
+        return currentObject;
+      }
     } else {
       return '';
     }

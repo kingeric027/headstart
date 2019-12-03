@@ -51,7 +51,7 @@
             <div *ngIf="!isCreatingNew">
               <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
               <button class="btn clear-filters-btn create-new-button brand-button--orange mr-3"
-                      routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new">Create New {{_currentResourceNameSingular}}</button>
+                      routerLink="/{{_ocService.route}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new">Create New {{_currentResourceNameSingular}}</button>
             </div>
           </div>
 
@@ -112,11 +112,15 @@
         <perfect-scrollbar class="scrollbar-top"
                            style="width: 100%; height: calc(100vh - 255px);"
                            (psYReachEnd)="handleScrollEnd()">
-          <ng-content select="table"></ng-content>
+          <full-resource-table-component [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel"
+                                         (resourceSelected)="handleSelectResource($event)"
+                                         [resourceList]="resourceList"></full-resource-table-component>
         </perfect-scrollbar>
       </div>
-
-      <!-- editing/creating view -->
+      <!--
+                                         editing/creating
+                                         view
+                                         -->
       <div *ngIf="selectedResourceID || isCreatingNew"
            class="row resource-table-container">
         <div class="col-3 p-0">
@@ -173,8 +177,10 @@
               </a>
             </span>
           </div>
-          <ng-content select=".resource-edit">
-          </ng-content>
+          <perfect-scrollbar style="width: 100%; height: calc(100vh - 325px);">
+            <ng-content select=".resource-edit">
+            </ng-content>
+          </perfect-scrollbar>
           <button class="btn brand-button"
                   (click)="handleSave()"
                   *ngIf="areChanges">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
