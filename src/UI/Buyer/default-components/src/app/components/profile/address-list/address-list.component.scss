@@ -5,7 +5,7 @@
     @include media-breakpoint-down(md) {
       opacity: 1;
     }
-    transition: all 200ms fade;
+    transition: 200ms ease all;
   }
   border-bottom: 1px solid $gray-200;
   &:last-child {
