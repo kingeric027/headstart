@@ -162,3 +162,15 @@ shared-address-display {
 ocm-credit-card-form {
   width: 100%;
 }
+
+// Styles for the progress loader
+ng-progress {
+  .ng-progress-bar {
+    .ng-bar-placeholder {
+      height: 3px !important;
+      .ng-bar {
+        background-color: $primary !important;
+      }
+    }
+  }
+}
