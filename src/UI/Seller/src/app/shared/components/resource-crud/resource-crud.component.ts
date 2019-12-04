@@ -99,13 +99,17 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   setForm(resource: any) {
-    this.resourceForm = this.createForm(resource);
-    this.changeDetectorRef.detectChanges();
+    if (this.createForm) {
+      this.resourceForm = this.createForm(resource);
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   resetForm(resource: any) {
-    this.resourceForm.reset(this.createForm(resource));
-    this.changeDetectorRef.detectChanges();
+    if (this.createForm) {
+      this.resourceForm.reset(this.createForm(resource));
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   private setIsCreatingNew() {
