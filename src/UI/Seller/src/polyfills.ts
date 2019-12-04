@@ -15,9 +15,8 @@
  */
 
 /***************************************************************************************************
-* BROWSER POLYFILLS
-*/
-
+ * BROWSER POLYFILLS
+ */
 
 /** IE10 and IE11 requires the following for NgClass support on SVG elements */
 // import 'classlist.js';  // Run `npm install --save classlist.js`.
@@ -52,9 +51,10 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
  * I will make a PR to the library to allow clientside and serverside
  * usage, if accepted we can remove this polyfill
  */
-(window as any).Buffer = (stringToEncode) => ({
-  toString: () => btoa(stringToEncode),
-});
+// this polyfill is used on the buy app, but ignored here as it overrides the buffer object used in the quill on the product form
+// (window as any).Buffer = (stringToEncode) => ({
+//   toString: () => btoa(stringToEncode),
+// });
 
 /**
  * polyfill for childNode.remove() to work in IE.
