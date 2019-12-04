@@ -1,5 +1,4 @@
-<div class="pb-2 mb-3"
-     [ngClass]="{'border-bottom': (index + 1) !== totalAddresses, 'bg-light': highlight}">
+<div [ngClass]="{'bg-light': highlight}">
   <div class="d-flex justify-content-between align-items-center">
     <div>
       <p class="mb-0 text-capitalize font-weight-bold">{{address.Street1}}<span *ngIf="address.Street2">, {{address.Street2}}</span></p>
