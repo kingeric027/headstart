@@ -48,23 +48,27 @@
                #popover="ngbPopover"
                (click)="openPopover()"
                popoverTitle="Filter">
-            <fa-layers class="fa-layers fa-fw">
-              <fa-icon [icon]="faFilter">
-              </fa-icon>
-              <fa-layers-counter *ngIf="activeFilterCount && activeFilterCount > 0"
-                                 class="badge__counter--large"
-                                 style="background: gray"
-                                 [content]="activeFilterCount">
-              </fa-layers-counter>
-            </fa-layers>
+            <div class="icon-wrapper">
+              <fa-layers class="fa-layers fa-fw">
+                <fa-icon [icon]="faFilter">
+                </fa-icon>
+                <fa-layers-counter *ngIf="activeFilterCount && activeFilterCount > 0"
+                                   class="badge__counter--large"
+                                   style="background: gray"
+                                   [content]="activeFilterCount">
+                </fa-layers-counter>
+              </fa-layers>
+            </div>
           </div>
           <ocm-supplier-sort [context]="context"
                              (closePopoverEvent)="closePopover($event.detail)">
           </ocm-supplier-sort>
           <div *ngIf="activeFilterCount > 0"
                class="icon-button ripple">
-            <fa-icon [icon]="faTimes"
-                     (click)="clearFilters()"></fa-icon>
+            <div class="icon-wrapper">
+              <fa-icon [icon]="faTimes"
+                       (click)="clearFilters()"></fa-icon>
+            </div>
           </div>
         </div>
       </div>

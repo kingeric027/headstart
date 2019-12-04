@@ -1,42 +1,84 @@
 <ocm-profile-nav [context]="context">
-  <h1 class="page-heading border-bottom pb-3">Addresses</h1>
-  <div class="mb-3 justify-content-end no-gutters float-right">
-    <button (click)="showAddAddress()"
-            class="btn btn-primary">
-      <fa-icon [icon]="faPlus"></fa-icon> Add an Address
-    </button>
-  </div>
-  <ocm-generic-list [meta]="addresses?.Meta"
-                    [searchPlaceholder]="'addresses'"
-                    (requestOptionsUpdated)="updateRequestOptions($event)">
-    <div class="col-sm-12 col-lg-12 col-md-12 d-flex"
-         *ngFor="let address of addresses?.Items">
-      <ocm-address-card [address]="address">
-        <div *ngIf="address.Editable">
-          <fa-icon class="text-danger ml-3 icon-button--hover-reactive"
-                   (click)="showAreYouSure(address)"
-                   [icon]="faTrashAlt"></fa-icon>
-          <fa-icon class="text-primary ml-3 icon-button--hover-reactive"
-                   (click)="showEditAddress(address)"
-                   [icon]="faEdit"></fa-icon>
-        </div>
-      </ocm-address-card>
+  <div *ngIf="!isLoading">
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="page-heading">Addresses</h1>
+      <button (click)="showAddAddress()"
+              class="btn btn-primary btn-sm">
+        <fa-icon [icon]="faPlus"></fa-icon> Add
+      </button>
     </div>
-  </ocm-generic-list>
-  <ocm-modal [state]="addAddressModal"
-             (closeEvent)="reset()"
-             modalTitle="{{ currentAddress ? 'Edit' : 'Add'}} Address">
-    <ocm-address-form (formSubmitted)="addressFormSubmitted($event.detail.address)"
-                      [existingAddress]="currentAddress"
-                      [btnText]="currentAddress ? 'Save Changes' : 'Create Address'"></ocm-address-form>
-  </ocm-modal>
-  <ocm-modal [state]="areYouSureModal"
-             modalTitle="Delete this Address?">
-    <ocm-address-card *ngIf="currentAddress"
-                      [address]="currentAddress"> </ocm-address-card>
-    <button class="btn btn-primary"
-            (click)="deleteAddress(currentAddress)">Delete</button>
-    <button class="btn float-right"
-            (click)="closeAreYouSure()">Cancel</button>
-  </ocm-modal>
+    <ocm-modal [state]="areYouSureModal"
+               [modalTitle]="'Delete this Address?'">
+      <div>
+        <button class="btn btn-sm btn-primary"
+                (click)="deleteAddress(currentAddress)">Delete</button>
+        <button class="btn btn-sm float-right"
+                (click)="closeAreYouSure()">Cancel</button>
+      </div>
+    </ocm-modal>
+    <div class="row">
+      <!-- Display the address form on mobile (md-) -->
+      <div class="col-lg-6 d-lg-none d-block mb-3"
+           *ngIf="showCreateAddressForm">
+        <ocm-address-form (formSubmitted)="addressFormSubmitted($event.detail.address)"
+                          [existingAddress]="currentAddress"
+                          [btnText]="currentAddress ? 'Save Changes' : 'Create Address'"
+                          (formDismissed)="dismissEditAddressForm()">
+        </ocm-address-form>
+      </div>
+      <div [ngClass]="{'col-lg-12': !showCreateAddressForm, 'col-lg-6': showCreateAddressForm}">
+        <ocm-generic-list [meta]="addresses?.Meta"
+                          [searchPlaceholder]="'addresses'"
+                          (requestOptionsUpdated)="updateRequestOptions($event.detail)">
+          <div class="address-card pb-3 mb-3"
+               *ngFor="let address of addresses?.Items">
+            <ocm-address-card [address]="address"
+                              [highlight]="currentAddress === address">
+              <!-- Action Buttons for SLOT in Generic List -->
+              <div class="d-flex justify-content-between align-items-center"
+                   *ngIf="address.Editable">
+                <!-- Edit Button -->
+                <div class="icon-button ripple hover-btn"
+                     (click)="showEditAddress(address)">
+                  <div class="icon-wrapper">
+                    <fa-icon [icon]="faEdit">
+                    </fa-icon>
+                  </div>
+                </div>
+                <!-- Delete Button -->
+                <div class="icon-button ripple hover-btn"
+                     (click)="showAreYouSure(address)">
+                  <div class="icon-wrapper">
+                    <fa-icon class="text-danger"
+                             [icon]="faTrashAlt">
+                    </fa-icon>
+                  </div>
+                </div>
+              </div>
+            </ocm-address-card>
+          </div>
+        </ocm-generic-list>
+      </div>
+      <!-- Display the Address Form on Desktop View (lg+) -->
+      <div class="col-lg-6 d-none d-lg-block border-left"
+           *ngIf="showCreateAddressForm">
+        <ocm-address-form (formSubmitted)="addressFormSubmitted($event.detail.address)"
+                          [existingAddress]="currentAddress"
+                          [btnText]="currentAddress ? 'Save Changes' : 'Create Address'"
+                          (formDismissed)="dismissEditAddressForm()">
+        </ocm-address-form>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="isLoading">
+    <ocm-loading-layout height="335px"
+                        width="100%"
+                        mb="1.5rem"
+                        [resource]="addresses"
+                        [rows]="3"
+                        [columns]="3"
+                        [context]="context"
+                        [isLoading]="isLoading"></ocm-loading-layout>
+
+  </div>
 </ocm-profile-nav>

@@ -111,6 +111,25 @@ shared-address-display {
   }
 }
 
+// Icon Buttons
+
+.icon-button {
+  padding: .75rem;
+  border-radius: 180px;
+  transition: background-color .25s;
+  &:hover {
+    background-color: rgba($gray-900, 0.1);
+    cursor: pointer;
+  }
+  .icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .ripple {
   position: relative;
   overflow: hidden;
@@ -140,7 +159,18 @@ shared-address-display {
   transition: 0s;
 }
 
-
 ocm-credit-card-form {
   width: 100%;
+}
+
+// Styles for the progress loader
+ng-progress {
+  .ng-progress-bar {
+    .ng-bar-placeholder {
+      height: 3px !important;
+      .ng-bar {
+        background-color: $primary !important;
+      }
+    }
+  }
 }

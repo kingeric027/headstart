@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, Input, OnChanges } from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, OnInit } from '@angular/core';
 import {
   faSearch,
   faShoppingCart,
@@ -13,12 +13,13 @@ import { Order, MeUser, LineItem, ListCategory, Category } from '@ordercloud/ang
 import { tap, debounceTime, delay, takeWhile } from 'rxjs/operators';
 import { OCMComponent } from '../../base-component';
 import { ProductFilters } from 'marketplace';
+import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 
 @Component({
   templateUrl: './app-header.component.html',
   styleUrls: ['./app-header.component.scss'],
 })
-export class OCMAppHeader extends OCMComponent {
+export class OCMAppHeader extends OCMComponent implements OnInit {
   isCollapsed = true;
   anonymous: boolean;
   user: MeUser;
@@ -30,6 +31,7 @@ export class OCMAppHeader extends OCMComponent {
   appName: string;
   activeCategoryID: string = undefined;
   categories: Category[] = [];
+  screenSize = getScreenSizeBreakPoint();
 
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
@@ -54,7 +56,9 @@ export class OCMAppHeader extends OCMComponent {
     this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
   }
-
+  ngOnInit() {
+    this.screenSize = getScreenSizeBreakPoint();
+  }
   handleFiltersChange = (filters: ProductFilters) => {
     this.searchTermForProducts = filters.search || '';
     this.activeCategoryID = this.context.categories.activeID;
@@ -97,5 +101,9 @@ export class OCMAppHeader extends OCMComponent {
 
   setActiveCategory(categoryID: string): void {
     this.context.productFilters.filterByCategory(categoryID);
+  }
+
+  toggleCollapsed(): void {
+    this.isCollapsed = !this.isCollapsed;
   }
 }
