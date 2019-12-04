@@ -59,12 +59,6 @@
                                          resourceField="Description"
                                          pathOnResource="xp.Description"
                                          (resourceUpdated)="updateResource($event)">
-          <!-- <reactive-quill-editor-component [updatedResource]="updatedResource"
-                                         [resourceInSelection]="resourceInSelection"
-                                         [formControlForText]="resourceForm.Description"
-                                         resourceField="Description"
-                                         pathOnResource="xp.Description"
-                                         (resourceUpdated)="updateResource($event)"> -->
         </reactive-quill-editor-component>
         <label for="Primary Contact Name">Primary Contact Name</label>
         <input type="text"
@@ -86,17 +80,6 @@
                  (input)="handleUpdateResource($event, 'xp.Contacts.0.Email')"
                  placeholder="Enter Primary Contact Email">
         </div>
-        <!-- <div class="form-group">
-          <input type="text"
-                 class="form-control"
-                 id="Primary Contact Email"
-                 showErrors
-                 [resourceForm]="resourceForm"
-                 aria-describedby="Primary Contact Email"
-                 formControlName="PrimaryContactEmail"
-                 (input)="handleUpdateResource($event, 'xp.Contacts.0.Email')"
-                 placeholder="Enter Primary Contact Email">
-        </div> -->
         <!-- no phone validation currently because this field has extraneous values that would break validation -->
         <div class="form-group">
           <label for="Primary Contact Phone">Primary Contact Phone</label>
@@ -109,6 +92,7 @@
                  (input)="handleUpdateResource($event, 'xp.Contacts.0.Phone')"
                  placeholder="Enter Primary Contact Phone">
         </div>
+        <!-- specific component for this in progress -->
         <!-- <label for="Vendor Level">Vendor Level</label>
         <select class="form-control input-sm"
                 type="select"
