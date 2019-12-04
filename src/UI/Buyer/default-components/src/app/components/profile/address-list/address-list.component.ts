@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
@@ -9,7 +9,7 @@ import { ModalState } from '../../../models/modal-state.class';
   templateUrl: './address-list.component.html',
   styleUrls: ['./address-list.component.scss'],
 })
-export class OCMAddressList extends OCMComponent implements OnInit, OnChanges {
+export class OCMAddressList extends OCMComponent {
   @Input() addresses: ListBuyerAddress;
   faPlus = faPlus;
   faArrowLeft = faArrowLeft;
@@ -23,10 +23,6 @@ export class OCMAddressList extends OCMComponent implements OnInit, OnChanges {
   resultsPerPage = 8;
   areYouSureModal = ModalState.Closed;
   showCreateAddressForm = false;
-
-  ngOnInit() {}
-
-  ngOnChanges() {}
 
   ngOnContextSet() {
     this.reloadAddresses();
