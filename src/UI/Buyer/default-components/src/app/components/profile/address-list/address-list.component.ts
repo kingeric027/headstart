@@ -97,9 +97,8 @@ export class OCMAddressList extends OCMComponent {
     this.reloadAddresses();
   }
 
-  private reloadAddresses() {
-    this.context.myResources.ListAddresses(this.requestOptions).subscribe(res => {
-      this.addresses = res;
-    });
+  private async reloadAddresses() {
+    const addresses = await this.context.myResources.ListAddresses(this.requestOptions).toPromise();
+    this.addresses = addresses;
   }
 }
