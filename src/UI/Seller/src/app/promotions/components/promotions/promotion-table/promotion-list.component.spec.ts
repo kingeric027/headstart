@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BuyerUserCreateComponent } from './buyer-approval-create.component';
+import { PromotionListComponent } from './promotion-table.component';
 
-describe('BuyerUserCreateComponent', () => {
-  let component: BuyerUserCreateComponent;
-  let fixture: ComponentFixture<BuyerUserCreateComponent>;
+describe('PromotionListComponent', () => {
+  let component: PromotionListComponent;
+  let fixture: ComponentFixture<PromotionListComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BuyerUserCreateComponent ]
+      declarations: [ PromotionListComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BuyerUserCreateComponent);
+    fixture = TestBed.createComponent(PromotionListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

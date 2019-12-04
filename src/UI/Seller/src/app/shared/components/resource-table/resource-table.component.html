@@ -182,6 +182,7 @@
             </ng-content>
           </perfect-scrollbar>
           <button class="btn brand-button"
+                  type="submit"
                   (click)="handleSave()"
                   *ngIf="areChanges">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
           <button class="btn brand-button ml-3"

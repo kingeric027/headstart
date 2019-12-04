@@ -14,7 +14,7 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
   suppliers: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
-    toImage: '',
+    toImage: 'xp.LogoUrl',
   },
   users: {
     toPrimaryHeader: 'Username',
@@ -108,7 +108,7 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
       {
         path: 'Name',
         header: 'Name',
-        type: BASIC_STRING,
+        type: STRING_WITH_IMAGE,
       },
       {
         path: 'ID',
@@ -121,7 +121,7 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         type: BASIC_STRING,
       },
     ],
-    imgPath: '',
+    imgPath: 'xp.LogoUrl',
   },
   users: {
     fields: [

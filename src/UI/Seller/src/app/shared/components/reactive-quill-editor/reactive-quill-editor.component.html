@@ -1,0 +1,5 @@
+<div *ngIf="formControlForText">
+  <quill-editor [formControl]="formControlForText"
+                id="Description"></quill-editor>
+  <div [ngClass]="{'error-message': formControlForText.status === 'INVALID'}">Characters: {{formControlForText.value?.length || 0}}/1000 (includes HTML formatting characters)</div>
+</div>

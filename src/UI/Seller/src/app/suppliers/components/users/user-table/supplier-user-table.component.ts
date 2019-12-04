@@ -4,6 +4,17 @@ import { User } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SupplierUserService } from '@app-seller/shared/services/supplier/supplier-user.service';
 import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+
+function createSupplierUserForm(user: User) {
+  return new FormGroup({
+    Username: new FormControl(user.Username, Validators.required),
+    FirstName: new FormControl(user.FirstName, Validators.required),
+    LastName: new FormControl(user.LastName, Validators.required),
+    Email: new FormControl(user.Email, Validators.required),
+    Password: new FormControl(user.Password, Validators.required),
+  });
+}
 
 @Component({
   selector: 'app-supplier-user-table',

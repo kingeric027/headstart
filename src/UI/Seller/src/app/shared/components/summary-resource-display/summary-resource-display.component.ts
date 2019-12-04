@@ -3,6 +3,7 @@ import { singular } from 'pluralize';
 import {
   PRODUCT_IMAGE_PATH_STRATEGY,
   getProductMainImageUrlOrPlaceholder,
+  PLACEHOLDER_URL,
 } from '@app-seller/shared/services/product/product-image.helper';
 import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/services/configuration/table-display';
 
@@ -15,6 +16,7 @@ export class SummaryResourceDisplay {
   _primaryHeader = '';
   _secondaryHeader = '';
   _imgPath = '';
+  _shouldShowImage = false;
   _isNewPlaceHolder = false;
 
   @Input()
@@ -32,7 +34,8 @@ export class SummaryResourceDisplay {
   setDisplayValuesForResource(resource: any) {
     this._primaryHeader = this.getValueOnExistingResource(resource, 'toPrimaryHeader');
     this._secondaryHeader = this.getValueOnExistingResource(resource, 'toSecondaryHeader');
-    this._imgPath = this.getValueOnExistingResource(resource, 'toImage');
+    this._shouldShowImage = !!SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY[this.resourceType]['toImage'];
+    this._imgPath = this.getValueOnExistingResource(resource, 'toImage') || PLACEHOLDER_URL;
   }
 
   getValueOnExistingResource(value: any, valueType: string) {

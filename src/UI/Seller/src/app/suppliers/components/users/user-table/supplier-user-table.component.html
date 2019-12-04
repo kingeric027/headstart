@@ -32,8 +32,50 @@
 
   <!-- edit product -->
   <div class="resource-edit">
-    <resource-edit-component resourceType="User"
-                             (updateResource)="updateResource($event)"
-                             [resource]="updatedResource"></resource-edit-component>
+    <form *ngIf="resourceForm"
+          [formGroup]="resourceForm">
+      <div class="form-group">
+        <label for="Username">Username</label>
+        <input type="text"
+               class="form-control"
+               id="Username"
+               aria-describedby="Username"
+               formControlName="Username"
+               (input)="handleUpdateResource($event, 'Username')"
+               placeholder="Enter Username">
+        <label for="FirstName">FirstName</label>
+        <input type="text"
+               class="form-control"
+               id="FirstName"
+               aria-describedby="FirstName"
+               formControlName="FirstName"
+               (input)="handleUpdateResource($event, 'xp.FirstName')"
+               placeholder="Enter FirstName">
+        <label for="LastName">LastName</label>
+        <input type="text"
+               class="form-control"
+               id="LastName"
+               aria-describedby="LastName"
+               formControlName="LastName"
+               (input)="handleUpdateResource($event, 'xp.LastName')"
+               placeholder="Enter LastName">
+        <label for="Email">Email</label>
+        <input type="text"
+               class="form-control"
+               id="Email"
+               aria-describedby="Email"
+               formControlName="Email"
+               (input)="handleUpdateResource($event, 'xp.Email')"
+               placeholder="Enter Email">
+        <label for="Password">Password</label>
+        <input type="text"
+               class="form-control"
+               id="Password"
+               aria-describedby="Password"
+               formControlName="Password"
+               (input)="handleUpdateResource($event, 'xp.Password')"
+               placeholder="Enter Password">
+      </div>
+    </form>
   </div>
 </resource-table-component>
