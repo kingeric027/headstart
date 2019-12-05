@@ -87,9 +87,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   subscribeToResourceSelection() {
-    this.activatedRoute.params
-      .pipe(takeWhile(() => this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT))
-      .subscribe((params) => {
+    this.activatedRoute.params.subscribe((params) => {
+      if (this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
         const resourceIDSelected =
           params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
@@ -99,7 +98,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
         if (this.isCreatingNew) {
           this.setResoureObjectsForCreatingNew();
         }
-      });
+      }
+    });
   }
 
   setForm(resource: any) {
