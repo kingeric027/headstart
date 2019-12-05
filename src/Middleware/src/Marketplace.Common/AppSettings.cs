@@ -9,7 +9,6 @@ namespace Marketplace.Common
     public interface IAppSettings
     {
         AppEnvironment Env { get; set; }
-        string BaseUrl { get; set; }
         BlobSettings BlobSettings { get; set; }
         CosmosSettings CosmosSettings { get; set; }
         OrderCloudSettings OrderCloudSettings { get; set; }
@@ -28,13 +27,11 @@ namespace Marketplace.Common
         public string AuthUrl { get; set; }
         public string ApiUrl { get; set; }
         public string ClientSecret { get; set; }
-        public string DevCenterClientId { get; set; }
         public string DefaultPassword { get; set; }
     }
 
     public class BlobSettings
     {
-        public string Key { get; set; }
         public string ConnectionString { get; set; }
         public string QueueName { get; set; }
         public string CacheName { get; set; }
