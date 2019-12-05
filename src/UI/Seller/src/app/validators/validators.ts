@@ -35,7 +35,8 @@ export function ValidatePhone(control: AbstractControl): ValidationErrors | null
 
 // contains @ and . with text surrounding
 export function ValidateEmail(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(control.value);
+  // longest TLD currently in existence is 24 characters
+  const isValid = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,24}$/.test(control.value);
   if (!control.value || isValid) {
     return null;
   }
