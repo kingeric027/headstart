@@ -1,7 +1,7 @@
 import { HeaderNav } from './header.component';
 
 // ! included to ensure no overlap with ordercloud ids as this in invalid in ids
-export const REDIRECT_TO_FIRST_PARENT = 'automatically_selecting!';
+export const REDIRECT_TO_FIRST_PARENT = '!';
 
 export const MarketMangagerHeaderConfig: HeaderNav[] = [
   {
