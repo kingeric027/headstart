@@ -14,6 +14,7 @@ using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.DevCenter;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common
@@ -30,6 +31,7 @@ namespace Marketplace.Common
         public static IServiceCollection SharedServices(this IServiceCollection services)
         {
             services.AddTransient<IBlobService, BlobService>();
+            services.AddTransient<IDevCenterService, DevCenterService>();
             services.AddTransient<IOrchestrationCommand, OrchestrationCommand>();
             services.AddTransient<IFlurlClient, FlurlClient>();
             services.AddTransient<ISyncCommand, SyncCommand>();
@@ -62,6 +64,8 @@ namespace Marketplace.Common
             services.AddSingleton(settings);
 
             services.AddTransient<IOrchestrationLogCommand, OrchestrationLogCommand>();
+            services.AddTransient<IEnvironmentSeedCommand, EnvironmentSeedCommand>();
+
             services.SharedServices();
 
             var cosmosSettings = new CosmosStoreSettings(settings.CosmosSettings.DatabaseName, settings.CosmosSettings.EndpointUri,
@@ -73,13 +77,10 @@ namespace Marketplace.Common
 
             services.AddSingleton(typeof(LogQuery), typeof(LogQuery));
             services.AddSingleton(typeof(ISupplierCategoryConfigQuery), typeof(SupplierCategoryConfigQuery));
-
             services.AddCosmosStore<OrchestrationLog>(cosmosSettings);
             services.AddCosmosStore<SupplierCategoryConfig>(cosmosSettings);
-
 
             return services.BuildServiceProvider();
         }
     }
-   
 }
