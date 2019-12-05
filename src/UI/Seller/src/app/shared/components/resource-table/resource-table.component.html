@@ -181,7 +181,9 @@
             <ng-content select=".resource-edit">
             </ng-content>
           </perfect-scrollbar>
-          <button class="btn brand-button"
+          <button class="btn btn-primary"
+                  type="submit"
+                  [disabled]="!isValidResource"
                   (click)="handleSave()"
                   *ngIf="areChanges">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
           <button class="btn brand-button ml-3"

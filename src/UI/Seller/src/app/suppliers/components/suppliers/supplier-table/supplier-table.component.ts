@@ -1,10 +1,11 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Supplier } from '@ordercloud/angular-sdk';
 import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
-import { FormControl, FormGroup } from '@angular/forms';
-import { FilterDictionary } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { get as _get } from 'lodash';
+import { ValidateRichTextDescription, ValidateEmail, ValidatePhone } from '@app-seller/validators/validators';
 
 export interface SupplierCategoryConfigFilters {
   Display: string;
@@ -16,6 +17,30 @@ export interface SupplierCategoryConfig {
   timeStamp: string;
   MarketplaceName: string;
   Filters: Array<SupplierCategoryConfigFilters>;
+}
+
+function createSupplierForm(supplier: Supplier) {
+  return new FormGroup({
+    Name: new FormControl(supplier.Name, Validators.required),
+    LogoUrl: new FormControl(_get(supplier, 'xp.LogoUrl')),
+    Description: new FormControl(_get(supplier, 'xp.Description'), ValidateRichTextDescription),
+    WebSiteUrl: new FormControl(_get(supplier, 'xp.WebsiteUrl')),
+    // need to figure out strucure of free string array
+    // StaticContentLinks: new FormControl(_get(supplier, 'xp.StaticContentLinks'), Validators.required),
+    PrimaryContactName: new FormControl(
+      (_get(supplier, 'xp.Categories') && _get(supplier, 'xp.Contacts')[0].Name) || ''
+    ),
+    PrimaryContactEmail: new FormControl(
+      (_get(supplier, 'xp.Contacts') && _get(supplier, 'xp.Contacts')[0].Email) || '',
+      ValidateEmail
+    ),
+    PrimaryContactPhone: new FormControl(
+      (_get(supplier, 'xp.Contacts') && _get(supplier, 'xp.Contacts')[0].Phone) || ''
+    ),
+    // need to confirm understanding of supplier model
+    // VendorLevel: new FormControl(_get(supplier, 'xp.Categories.VendorLevel', '')),
+    // ServiceCategory: new FormControl(_get(supplier, 'xp.Categories.ServiceCategory', '')),
+  });
 }
 
 @Component({
@@ -31,7 +56,7 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
     activatedroute: ActivatedRoute,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, supplierService, router, activatedroute, ngZone);
+    super(changeDetectorRef, supplierService, router, activatedroute, ngZone, createSupplierForm);
     this.router = router;
   }
 

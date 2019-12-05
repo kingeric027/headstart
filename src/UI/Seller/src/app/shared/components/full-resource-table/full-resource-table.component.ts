@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {
   PRODUCT_IMAGE_PATH_STRATEGY,
   getProductMainImageUrlOrPlaceholder,
+  PLACEHOLDER_URL,
 } from '@app-seller/shared/services/product/product-image.helper';
 import {
   FULL_TABLE_RESOURCE_DICTIONARY,
@@ -39,11 +40,11 @@ export class FullResourceTableComponent {
   }
 
   getHeaders(resources: any[]): string[] {
-    return FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].fields.map(r => r.header);
+    return FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].fields.map((r) => r.header);
   }
 
   getRows(resources: any[]): ResourceRow[] {
-    return resources.map(resource => {
+    return resources.map((resource) => {
       return this.createResourceRow(resource);
     });
   }
@@ -55,10 +56,10 @@ export class FullResourceTableComponent {
   createResourceRow(resource: any): ResourceRow {
     const resourceConfiguration = FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType];
     const fields = resourceConfiguration.fields;
-    const resourceCells = fields.map(fieldConfiguration => {
+    const resourceCells = fields.map((fieldConfiguration) => {
       return {
         type: fieldConfiguration.type,
-        value: this.getValueOnExistingResource(resource, fieldConfiguration),
+        value: this.getValueOnExistingResource(resource, fieldConfiguration.path),
       };
     });
     return {
@@ -69,22 +70,24 @@ export class FullResourceTableComponent {
   }
 
   getImage(resource: any, resourceConfiguration: ResourceConfiguration): string {
+    let imgUrl = '';
     if (resourceConfiguration.imgPath === PRODUCT_IMAGE_PATH_STRATEGY) {
-      return getProductMainImageUrlOrPlaceholder(resource);
+      imgUrl = getProductMainImageUrlOrPlaceholder(resource);
     } else {
-      throw new Error('implement other image path creator');
+      imgUrl = this.getValueOnExistingResource(resource, FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].imgPath);
     }
+    return imgUrl || PLACEHOLDER_URL;
   }
 
   selectResource(value: any) {
     this.resourceSelected.emit(value);
   }
 
-  getValueOnExistingResource(value: any, fieldConfiguration: ResourceColumnConfiguration) {
-    const piecesOfPath = fieldConfiguration.path.split('.');
-    if (fieldConfiguration.path) {
+  getValueOnExistingResource(value: any, path: string) {
+    const piecesOfPath = path.split('.');
+    if (path) {
       let currentObject = value;
-      piecesOfPath.forEach(piece => {
+      piecesOfPath.forEach((piece) => {
         currentObject = currentObject && currentObject[piece];
       });
       return currentObject;

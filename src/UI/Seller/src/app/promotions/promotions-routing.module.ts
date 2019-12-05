@@ -1,12 +1,12 @@
 // core services
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PromotionListComponent } from './components/promotions/promotion-list/promotion-list.component';
+import { PromotionTableComponent } from './components/promotions/promotion-table/promotion-table.component';
 
 const routes: Routes = [
-  { path: '', component: PromotionListComponent },
-  { path: 'new', component: PromotionListComponent },
-  { path: ':promotionID', component: PromotionListComponent },
+  { path: '', component: PromotionTableComponent },
+  { path: 'new', component: PromotionTableComponent },
+  { path: ':promotionID', component: PromotionTableComponent },
 ];
 @NgModule({
   imports: [RouterModule.forChild(routes)],

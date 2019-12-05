@@ -4447,7 +4447,7 @@ export class ResourceEditComponent {
     this._resource = value;
     this.changeDetectorRef.detectChanges();
   }
-  @Input() 
+  @Input()
   set resourceType(value: string) {
     this._resourceFields = this.buildResourceFields(value);
   }
@@ -4455,7 +4455,6 @@ export class ResourceEditComponent {
   updateResource = new EventEmitter();
 
   handleUpdateResource(event: any, fieldType: string) {
-    console.log(event.target.checked);
     const resourceUpdate = {
       field: event.target.id,
       value: fieldType === 'boolean' ? event.target.checked : event.target.value,
@@ -4471,6 +4470,6 @@ export class ResourceEditComponent {
           type: value['type'],
         };
       })
-      .filter((r) => r.field !== 'xp');
+      .filter(r => r.field !== 'xp');
   }
 }

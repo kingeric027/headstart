@@ -5,11 +5,11 @@ import { PromotionService } from '@app-seller/shared/services/promotion/promotio
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-promotion-list',
-  templateUrl: './promotion-list.component.html',
-  styleUrls: ['./promotion-list.component.scss'],
+  selector: 'app-promotion-table',
+  templateUrl: './promotion-table.component.html',
+  styleUrls: ['./promotion-table.component.scss'],
 })
-export class PromotionListComponent extends ResourceCrudComponent<Promotion> {
+export class PromotionTableComponent extends ResourceCrudComponent<Promotion> {
   constructor(
     private promotionService: PromotionService,
     changeDetectorRef: ChangeDetectorRef,

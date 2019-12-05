@@ -1,4 +1,4 @@
-import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit, NgZone } from '@angular/core';
+import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit, NgZone, createPlatform } from '@angular/core';
 import { Meta } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 import {
@@ -7,9 +7,11 @@ import {
   ResourceCrudService,
   FilterDictionary,
 } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
+import { resource } from 'selenium-webdriver/http';
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -20,6 +22,13 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   selectedResourceID = '';
   updatedResource = {};
   resourceInSelection = {};
+
+  resourceForm: FormGroup;
+  isValidResource: boolean;
+
+  // form setting defined in component implementing this component
+  createForm: (resource: any) => FormGroup;
+
   ocService: ResourceCrudService<ResourceType>;
   filterForm: FormGroup;
   filterConfig: any = {};
@@ -31,10 +40,12 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     ocService: any,
     router: Router,
     private activatedRoute: ActivatedRoute,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    createForm?: (resource: any) => FormGroup
   ) {
     this.ocService = ocService;
     this.router = router;
+    this.createForm = createForm;
   }
 
   public navigate(url: string, options: any): void {
@@ -57,6 +68,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.subscribeToResources();
     this.subscribeToOptions();
     this.subscribeToResourceSelection();
+    this.setForm(this.updatedResource);
   }
 
   subscribeToResources() {
@@ -75,17 +87,33 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   subscribeToResourceSelection() {
-    this.activatedRoute.params.subscribe((params) => {
-      this.setIsCreatingNew();
-      const resourceIDSelected =
-        params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
-      if (resourceIDSelected) {
-        this.setResourceSelection(resourceIDSelected);
-      }
-      if (this.isCreatingNew) {
-        this.setResoureObjectsForCreatingNew();
-      }
-    });
+    this.activatedRoute.params
+      .pipe(takeWhile(() => this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT))
+      .subscribe((params) => {
+        this.setIsCreatingNew();
+        const resourceIDSelected =
+          params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
+        if (resourceIDSelected) {
+          this.setResourceSelection(resourceIDSelected);
+        }
+        if (this.isCreatingNew) {
+          this.setResoureObjectsForCreatingNew();
+        }
+      });
+  }
+
+  setForm(resource: any) {
+    if (this.createForm) {
+      this.resourceForm = this.createForm(resource);
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  resetForm(resource: any) {
+    if (this.createForm) {
+      this.resourceForm.reset(this.createForm(resource));
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   private setIsCreatingNew() {
@@ -108,13 +136,12 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.selectedResourceID = resourceID || '';
     const resource = await this.ocService.findOrGetResourceByID(resourceID);
     this.resourceInSelection = this.copyResource(resource);
-    this.updatedResource = this.copyResource(resource);
-    this.changeDetectorRef.detectChanges();
+    this.setUpdatedResourceAndResourceForm(resource);
   }
 
   setResoureObjectsForCreatingNew() {
-    this.resourceInSelection = {};
-    this.updatedResource = {};
+    this.resourceInSelection = this.ocService.emptyResource;
+    this.setUpdatedResourceAndResourceForm(this.ocService.emptyResource);
   }
 
   selectResource(resource: any) {
@@ -123,8 +150,40 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   updateResource(resourceUpdate: any) {
-    this.updatedResource = { ...this.updatedResource, [resourceUpdate.field]: resourceUpdate.value };
+    // copying a resetting this.updated resource ensures that the copy and base object
+    // reference is broken
+    // not the prettiest function, feel free to improve
+    const piecesOfField = resourceUpdate.field.split('.');
+    const depthOfField = piecesOfField.length;
+    const updatedResourceCopy = this.copyResource(this.updatedResource);
+    switch (depthOfField) {
+      case 4:
+        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
+          resourceUpdate.value;
+        break;
+      case 3:
+        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]] = resourceUpdate.value;
+        break;
+      case 2:
+        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]] = resourceUpdate.value;
+        break;
+      default:
+        updatedResourceCopy[piecesOfField[0]] = resourceUpdate.value;
+        break;
+    }
+    this.updatedResource = updatedResourceCopy;
+    console.log(this.resourceForm.status);
+    console.log(this.updatedResource);
+    this.isValidResource = this.resourceForm.status === 'VALID';
     this.changeDetectorRef.detectChanges();
+  }
+
+  handleUpdateResource(event: any, field: string) {
+    const resourceUpdate = {
+      field: field,
+      value: event.target.value,
+    };
+    this.updateResource(resourceUpdate);
   }
 
   copyResource(resource: any) {
@@ -140,20 +199,24 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   async deleteResource() {
-    console.log(this.selectedResourceID);
     await this.ocService.deleteResource(this.selectedResourceID);
     this.selectResource({});
   }
 
   discardChanges() {
-    this.updatedResource = this.resourceInSelection;
-    this.changeDetectorRef.detectChanges();
+    this.setUpdatedResourceAndResourceForm(this.resourceInSelection);
   }
 
   async updateExitingResource() {
     const updatedResource = await this.ocService.updateResource(this.updatedResource);
     this.resourceInSelection = this.copyResource(updatedResource);
+    this.setUpdatedResourceAndResourceForm(updatedResource);
+  }
+
+  setUpdatedResourceAndResourceForm(updatedResource: any) {
     this.updatedResource = this.copyResource(updatedResource);
+    this.setForm(updatedResource);
+    this.changeDetectorRef.detectChanges();
   }
 
   async createNewResource() {
