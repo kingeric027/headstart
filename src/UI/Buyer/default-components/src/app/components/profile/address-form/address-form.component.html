@@ -2,20 +2,6 @@
       novalidate
       [formGroup]="addressForm"
       name="RegisterForm">
-  <div class="form-group">
-    <label class="sr-only"
-           for="country">Country</label>
-    <select formControlName="Country"
-            class="form-control"
-            id="Country"
-            showErrors
-            (change)="onCountryChange($event)">
-      <option [ngValue]="null"
-              disabled>Country</option>
-      <option *ngFor="let country of countryOptions"
-              [value]="country.abbreviation">{{ country.label }}</option>
-    </select>
-  </div>
   <div class="row">
     <div [hidden]="true"
          class="col-md-6 form-group">
@@ -74,7 +60,7 @@
            showErrors />
   </div>
   <div class="row">
-    <div class="col-md-4 form-group">
+    <div class="col-md-5 form-group">
       <label class="sr-only"
              for="City">City</label>
       <input type="text"
@@ -85,7 +71,7 @@
              autocomplete="off"
              showErrors />
     </div>
-    <div class="col-md-2 form-group">
+    <div class="col-md-3 form-group">
       <label class="sr-only"
              for="State">State</label>
       <select *ngIf="stateOptions.length !== 0"
@@ -106,18 +92,34 @@
              autocomplete="off"
              showErrors />
     </div>
-    <div class="col-md-3 form-group">
+    <div class="col-md-4 form-group">
       <label class="sr-only"
-             for="zipCode">Zip Code</label>
+             for="zipCode">Zip</label>
       <input type="text"
              formControlName="Zip"
              class="form-control"
              id="zipCode"
-             placeholder="Zip Code"
+             placeholder="Zip"
              autocomplete="off"
              showErrors />
     </div>
-    <div class="col-md-3 form-group">
+  </div>
+  <div class="row">
+    <div class="col-md-6 form-group">
+      <label class="sr-only"
+             for="country">Country</label>
+      <select formControlName="Country"
+              class="form-control"
+              id="Country"
+              showErrors
+              (change)="onCountryChange($event)">
+        <option [ngValue]="null"
+                disabled>Country</option>
+        <option *ngFor="let country of countryOptions"
+                [value]="country.abbreviation">{{ country.label }}</option>
+      </select>
+    </div>
+    <div class="col-md-6 form-group">
       <label class="sr-only"
              for="Phone">Phone Number</label>
       <input type="text"
@@ -129,6 +131,11 @@
              showErrors />
     </div>
   </div>
-  <button type="submit"
-          class="btn btn-primary">{{ btnText }}</button>
+  <div class="d-flex justify-content-start align-items-center">
+    <button type="submit"
+            class="btn btn-primary btn-sm mr-2">{{ btnText }}</button>
+    <button type="button"
+            class="btn btn-link text-danger"
+            (click)="dismissForm()">Cancel</button>
+  </div>
 </form>

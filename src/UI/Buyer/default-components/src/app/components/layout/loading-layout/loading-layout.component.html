@@ -1,5 +1,5 @@
 <div class="row"
-     *ngIf="!resource">
+     *ngIf="!resource || isLoading">
   <div *ngFor="let column of columnsToRender"
        class="col-md-{{bootstrapColumns}}">
     <span *ngFor="let div of divsToRender"

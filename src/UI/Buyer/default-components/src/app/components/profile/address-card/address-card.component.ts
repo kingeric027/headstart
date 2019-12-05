@@ -8,7 +8,7 @@ import { Address } from '@ordercloud/angular-sdk';
 })
 export class OCMAddressCard implements OnChanges {
   @Input() address: Address = {};
-  @Input() addressTitle?: string;
+  @Input() highlight?: boolean;
 
   ngOnChanges() {
     this.address['FullName'] = this.getFullName(this.address);

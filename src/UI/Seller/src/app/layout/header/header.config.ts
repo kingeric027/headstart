@@ -59,12 +59,12 @@ export const MarketMangagerHeaderConfig: HeaderNav[] = [
         route: '/buyers',
       },
       {
-        title: 'Sellers',
-        route: '/sellers',
-      },
-      {
         title: 'Suppliers',
         route: '/suppliers',
+      },
+      {
+        title: 'Seller Users',
+        route: '/seller-users',
       },
     ],
   },

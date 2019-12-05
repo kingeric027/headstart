@@ -1,7 +1,8 @@
   <div class="d-flex">
-    <img alt="Avatar"
+    <img *ngIf="_imgPath"
+         alt="Avatar"
          class="avatar rounded-circle"
-         src="https://four51.io/wp-content/uploads/2019/09/01_Rob.jpg"
+         src="{{_imgPath}}"
          alt="">
     <span class="ml-3 d-flex flex-column justify-content-center">
       <div class="h6">{{_primaryHeader}}</div>
