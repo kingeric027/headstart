@@ -18,7 +18,7 @@ export class FormControlErrorDirective implements OnInit {
   set resourceForm(value: FormGroup) {
     // need this to remove the error when the selected resource is changed
     if (this.errorSpan) {
-      this.displayErrorMsg();
+      this.errorSpan.innerHTML = '';
     }
   }
 
