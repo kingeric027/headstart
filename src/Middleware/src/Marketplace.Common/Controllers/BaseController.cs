@@ -70,6 +70,7 @@ namespace Marketplace.Common.Controllers
         {
             get { return _c.Claims.First(c => c.Type == "buyer").Value; }
         }
+
         public string AccessToken
         {
             get { return _c.Claims.First(c => c.Type == "accesstoken").Value; }
