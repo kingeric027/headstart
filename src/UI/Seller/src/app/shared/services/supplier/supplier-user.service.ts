@@ -22,4 +22,12 @@ export class SupplierUserService extends ResourceCrudService<User> {
       'users'
     );
   }
+
+  emptyResource = {
+    Username: '',
+    FirstName: '',
+    LastName: '',
+    Email: '',
+    Phone: '',
+  };
 }

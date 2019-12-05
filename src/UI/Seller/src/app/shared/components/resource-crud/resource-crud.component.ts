@@ -173,6 +173,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
     this.updatedResource = updatedResourceCopy;
     this.isValidResource = this.resourceForm.status === 'VALID';
+    console.log(this.resourceForm);
     this.changeDetectorRef.detectChanges();
   }
 

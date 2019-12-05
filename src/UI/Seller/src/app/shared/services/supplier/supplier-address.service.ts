@@ -21,4 +21,19 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
       'locations'
     );
   }
+
+  emptyResource = {
+    CompanyName: '',
+    FirstName: '',
+    LastName: '',
+    Street1: '',
+    Street2: '',
+    City: '',
+    State: '',
+    Zip: '',
+    Country: '',
+    Phone: '',
+    AddressName: 'Your new supplier location',
+    xp: null,
+  };
 }
