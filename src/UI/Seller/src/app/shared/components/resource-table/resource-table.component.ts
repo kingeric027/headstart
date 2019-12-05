@@ -101,13 +101,9 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   private async initializeSubscriptions() {
-    console.log('1');
     await this.redirectToFirstParentIfNeeded();
-    console.log('2');
     this.setUrlSubscription();
-    console.log('3');
     this.setParentResourceSelectionSubscription();
-    console.log('4');
     this._ocService.listResources();
   }
 
