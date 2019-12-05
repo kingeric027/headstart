@@ -10,6 +10,8 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { takeWhile, filter } from 'rxjs/operators';
 import { singular } from 'pluralize';
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
+import { pipe } from 'rxjs';
 
 interface BreadCrumb {
   displayText: string;
@@ -37,7 +39,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   _ocService: ResourceCrudService<any>;
   areChanges: boolean;
   parentResources: ListResource<any>;
-  selectedParentResourceName = 'Parent Resource Name';
+  selectedParentResourceName = 'Fetching Data';
   selectedParentResourceID = '';
   breadCrumbs: BreadCrumb[] = [];
   isCreatingNew = false;
@@ -95,9 +97,27 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   isValidResource: boolean;
 
   ngOnInit() {
+    this.initializeSubscriptions();
+  }
+
+  private async initializeSubscriptions() {
+    console.log('1');
+    await this.redirectToFirstParentIfNeeded();
+    console.log('2');
     this.setUrlSubscription();
+    console.log('3');
     this.setParentResourceSelectionSubscription();
+    console.log('4');
     this._ocService.listResources();
+  }
+
+  private async redirectToFirstParentIfNeeded() {
+    if (this.parentResourceService) {
+      if (this.parentResourceService.getParentResourceID() === REDIRECT_TO_FIRST_PARENT) {
+        await this.parentResourceService.listResources();
+        this._ocService.selectParentResource(this.parentResourceService.resourceSubject.value.Items[0]);
+      }
+    }
   }
 
   private setUrlSubscription() {
@@ -118,12 +138,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
       .subscribe(async (params) => {
+        await this.redirectToFirstParentIfNeeded();
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
         this.selectedParentResourceID = parentResourceID;
         if (params && parentResourceID) {
           const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
-          this.selectedParentResourceName = parentResource.Name;
+          if (parentResource) this.selectedParentResourceName = parentResource.Name;
         }
       });
   }

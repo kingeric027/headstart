@@ -3,7 +3,8 @@ import { Router, Params, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { cloneDeep as _cloneDeep, uniqBy as _uniqBy } from 'lodash';
 import { Meta } from '@ordercloud/angular-sdk';
-import { filter } from 'rxjs/operators';
+import { filter, takeWhile } from 'rxjs/operators';
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 
 export interface Options {
   page?: number;
@@ -54,9 +55,11 @@ export abstract class ResourceCrudService<ResourceType> {
         this.optionsSubject.next({});
       }
     });
-    this.optionsSubject.subscribe((value) => {
-      this.listResources();
-    });
+    this.optionsSubject
+      .pipe(takeWhile(() => this.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT))
+      .subscribe((value) => {
+        this.listResources();
+      });
   }
 
   // Handle URL updates
@@ -180,7 +183,9 @@ export abstract class ResourceCrudService<ResourceType> {
     if (resourceInList) {
       return resourceInList;
     } else {
-      return await this.getResourceById(resourceID);
+      if(resourceID !== REDIRECT_TO_FIRST_PARENT) {
+        return await this.getResourceById(resourceID);
+      }
     }
   }
 

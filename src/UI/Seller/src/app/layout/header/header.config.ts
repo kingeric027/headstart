@@ -1,5 +1,8 @@
 import { HeaderNav } from './header.component';
 
+// ! included to ensure no overlap with ordercloud ids as this in invalid in ids
+export const REDIRECT_TO_FIRST_PARENT = 'automatically_selecting!';
+
 export const MarketMangagerHeaderConfig: HeaderNav[] = [
   {
     title: 'Products',
@@ -52,16 +55,50 @@ export const MarketMangagerHeaderConfig: HeaderNav[] = [
     ],
   },
   {
-    title: 'Organizations',
+    title: 'Buyers',
     routes: [
       {
-        title: 'Buyers',
+        title: 'Organizations',
         route: '/buyers',
       },
       {
-        title: 'Suppliers',
+        title: 'Users',
+        route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/users`,
+      },
+      {
+        title: 'Purchasing Locations',
+        route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/locations`,
+      },
+      {
+        title: 'Shared Payment Methods',
+        route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/payments`,
+      },
+      {
+        title: 'Order Approval Rules',
+        route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/approvals`,
+      },
+    ],
+  },
+  {
+    title: 'Suppliers',
+    routes: [
+      {
+        title: 'Organizations',
         route: '/suppliers',
       },
+      {
+        title: 'Users',
+        route: `/suppliers/${REDIRECT_TO_FIRST_PARENT}/users`,
+      },
+      {
+        title: 'Locations',
+        route: `/suppliers/${REDIRECT_TO_FIRST_PARENT}/locations`,
+      },
+    ],
+  },
+  {
+    title: 'Seller Users',
+    routes: [
       {
         title: 'Seller Users',
         route: '/seller-users',

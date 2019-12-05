@@ -11,6 +11,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
 import { resource } from 'selenium-webdriver/http';
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -86,17 +87,19 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   subscribeToResourceSelection() {
-    this.activatedRoute.params.subscribe((params) => {
-      this.setIsCreatingNew();
-      const resourceIDSelected =
-        params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
-      if (resourceIDSelected) {
-        this.setResourceSelection(resourceIDSelected);
-      }
-      if (this.isCreatingNew) {
-        this.setResoureObjectsForCreatingNew();
-      }
-    });
+    this.activatedRoute.params
+      .pipe(takeWhile(() => this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT))
+      .subscribe((params) => {
+        this.setIsCreatingNew();
+        const resourceIDSelected =
+          params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
+        if (resourceIDSelected) {
+          this.setResourceSelection(resourceIDSelected);
+        }
+        if (this.isCreatingNew) {
+          this.setResoureObjectsForCreatingNew();
+        }
+      });
   }
 
   setForm(resource: any) {
