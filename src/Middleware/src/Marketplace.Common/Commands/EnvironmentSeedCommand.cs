@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Flurl.Http;
 using Marketplace.Common.Controllers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Services.DevCenter;
@@ -16,8 +15,7 @@ namespace Marketplace.Common.Commands
     }
     public class EnvironmentSeedCommand : IEnvironmentSeedCommand
     {
-        private IOrderCloudClient _oc;
-        private readonly IFlurlClient _flurl;
+        private readonly IOrderCloudClient _oc;
         private readonly IAppSettings _settings;
         private readonly IDevCenterService _dev;
         private EnvironmentSeed _seed;
@@ -25,7 +23,6 @@ namespace Marketplace.Common.Commands
         public EnvironmentSeedCommand(IAppSettings settings, IOrderCloudClient oc, IDevCenterService dev)
         {
             _settings = settings;
-            _flurl = new FlurlClient("https://api.ordercloud.io");
             _oc = oc;
             _dev = dev;
         }
@@ -33,15 +30,6 @@ namespace Marketplace.Common.Commands
         public async Task Seed(EnvironmentSeed seed, VerifiedUserContext user)
         {
             _seed = seed;
-            //_oc = new OrderCloudClient(new OrderCloudClientConfig()
-            //{
-            //    ClientId = _settings.OrderCloudSettings.DevCenterClientId,
-            //    Roles = new[] { ApiRole.FullAccess },
-            //    GrantType = GrantType.Password,
-            //    Username = "sdavis@four51.com",
-            //    Password = "burninhe!1"
-            //});
-            //var token = await _oc.AuthenticateAsync();
             var org = await this.CreateOrganization(user.AccessToken);
             var company = await _dev.GetOrganizations(org.OwnerDevID, user.AccessToken);
 
