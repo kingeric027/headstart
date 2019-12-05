@@ -14,4 +14,19 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
   constructor(router: Router, activatedRoute: ActivatedRoute, ocAddressService: OcAddressService) {
     super(router, activatedRoute, ocAddressService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'locations');
   }
+
+  emptyResource = {
+    CompanyName: '',
+    FirstName: '',
+    LastName: '',
+    Street1: '',
+    Street2: '',
+    City: '',
+    State: '',
+    Zip: '',
+    Country: '',
+    Phone: '',
+    AddressName: 'Your new supplier location',
+    xp: null,
+  };
 }

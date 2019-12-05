@@ -5,7 +5,7 @@
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
                           [parentResourceService]="buyerService"
-                                                    [isValidResource]="isValidResource"
+                          [isValidResource]="isValidResource"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
@@ -31,10 +31,52 @@
     </div>
   </form> -->
 
-  <!-- edit product -->
+  <!-- edit user -->
   <div class="resource-edit">
-    <resource-edit-component resourceType="User"
-                             (updateResource)="updateResource($event)"
-                             [resource]="updatedResource"></resource-edit-component>
+    <form *ngIf="resourceForm"
+          [formGroup]="resourceForm">
+      <div class="form-group">
+        <label for="Username">Username</label>
+        <input type="text"
+               class="form-control"
+               id="Username"
+               maxlength="100"
+               aria-describedby="Username"
+               formControlName="Username"
+               (input)="handleUpdateResource($event, 'Username')"
+               placeholder="Enter Username">
+        <label for="FirstName">First Name</label>
+        <input type="text"
+               class="form-control"
+               id="FirstName"
+               maxlength="100"
+               aria-describedby="FirstName"
+               formControlName="FirstName"
+               (input)="handleUpdateResource($event, 'FirstName')"
+               placeholder="Enter FirstName">
+        <label for="LastName">Last Name</label>
+        <input type="text"
+               class="form-control"
+               id="LastName"
+               maxlength="100"
+               aria-describedby="LastName"
+               formControlName="LastName"
+               (input)="handleUpdateResource($event, 'LastName')"
+               placeholder="Enter LastName">
+        <div class="form-group">
+          <label for="Email">Email</label>
+          <input type="text"
+                 class="form-control"
+                 id="Email"
+                 maxlength="200"
+                 showErrors
+                 [resourceForm]="resourceForm"
+                 aria-describedby="Email"
+                 formControlName="Email"
+                 (input)="handleUpdateResource($event, 'Email')"
+                 placeholder="Enter Email">
+        </div>
+      </div>
+    </form>
   </div>
 </resource-table-component>

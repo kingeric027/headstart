@@ -14,4 +14,12 @@ export class BuyerUserService extends ResourceCrudService<User> {
   constructor(router: Router, activatedRoute: ActivatedRoute, ocUserService: OcUserService) {
     super(router, activatedRoute, ocUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'users');
   }
+
+  emptyResource = {
+    Username: '',
+    FirstName: '',
+    LastName: '',
+    Email: '',
+    Phone: '',
+  };
 }
