@@ -5,6 +5,7 @@
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
                           [parentResourceService]="supplierService"
+                          [isValidResource]="isValidResource"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
@@ -43,38 +44,34 @@
                formControlName="Username"
                (input)="handleUpdateResource($event, 'Username')"
                placeholder="Enter Username">
-        <label for="FirstName">FirstName</label>
+        <label for="FirstName">First Name</label>
         <input type="text"
                class="form-control"
                id="FirstName"
                aria-describedby="FirstName"
                formControlName="FirstName"
-               (input)="handleUpdateResource($event, 'xp.FirstName')"
+               (input)="handleUpdateResource($event, 'FirstName')"
                placeholder="Enter FirstName">
-        <label for="LastName">LastName</label>
+        <label for="LastName">Last Name</label>
         <input type="text"
                class="form-control"
                id="LastName"
                aria-describedby="LastName"
                formControlName="LastName"
-               (input)="handleUpdateResource($event, 'xp.LastName')"
+               (input)="handleUpdateResource($event, 'LastName')"
                placeholder="Enter LastName">
-        <label for="Email">Email</label>
-        <input type="text"
-               class="form-control"
-               id="Email"
-               aria-describedby="Email"
-               formControlName="Email"
-               (input)="handleUpdateResource($event, 'xp.Email')"
-               placeholder="Enter Email">
-        <label for="Password">Password</label>
-        <input type="text"
-               class="form-control"
-               id="Password"
-               aria-describedby="Password"
-               formControlName="Password"
-               (input)="handleUpdateResource($event, 'xp.Password')"
-               placeholder="Enter Password">
+        <div class="form-group">
+          <label for="Email">Email</label>
+          <input type="text"
+                 class="form-control"
+                 id="Email"
+                 showErrors
+                 [resourceForm]="resourceForm"
+                 aria-describedby="Email"
+                 formControlName="Email"
+                 (input)="handleUpdateResource($event, 'Email')"
+                 placeholder="Enter Email">
+        </div>
       </div>
     </form>
   </div>

@@ -15,5 +15,16 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     super(router, activatedRoute, ocSupplierService, '/suppliers', 'suppliers');
   }
 
+  emptyResource = {
+    Name: 'Your new supplier',
+    xp: {
+      Description: '',
+      WebsiteUrl: '',
+      LogoUrl: '',
+      StaticContentURLs: '',
+      Contacts: [{ Name: '', Email: '', Phone: '' }],
+      Categories: [{ ServiceCategory: '', VendorLevel: '' }],
+    },
+  };
   subResourceList = ['users', 'locations'];
 }

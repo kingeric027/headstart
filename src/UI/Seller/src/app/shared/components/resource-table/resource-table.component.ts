@@ -91,6 +91,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
   @Input()
   selectedResourceID: string;
+  @Input()
+  isValidResource: boolean;
 
   ngOnInit() {
     this.setUrlSubscription();

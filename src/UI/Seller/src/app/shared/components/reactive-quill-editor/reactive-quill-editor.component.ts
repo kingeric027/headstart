@@ -10,13 +10,18 @@ import { ValidateRichTextDescription } from '@app-seller/validators/validators';
 })
 export class ReactiveQuillComponent {
   _updatedResource: any;
+  _formControlForText: any;
+  quillChangeSubscription: any;
 
   @Input()
   pathOnResource: string;
   @Output()
   resourceUpdated = new EventEmitter();
   @Input()
-  formControlForText: FormControl;
+  set formControlForText(value: FormControl) {
+    this._formControlForText = value;
+    this.setQuillChangeEvent();
+  }
 
   @Input()
   set resourceInSelection(resource: any) {
@@ -24,8 +29,8 @@ export class ReactiveQuillComponent {
   }
 
   setQuillChangeEvent() {
-    if (this.formControlForText) {
-      this.formControlForText.valueChanges.subscribe((newFormValue) => {
+    if (this._formControlForText) {
+      this.quillChangeSubscription = this._formControlForText.valueChanges.subscribe((newFormValue) => {
         this.resourceUpdated.emit({ field: this.pathOnResource, value: newFormValue });
       });
     }

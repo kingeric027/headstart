@@ -33,6 +33,7 @@ export abstract class ResourceCrudService<ResourceType> {
   // example: for supplier user service the primary is supplier and the secondary is users
   secondaryResourceLevel = '';
   subResourceList: string[];
+  emptyResource: any = {};
 
   constructor(
     private router: Router,

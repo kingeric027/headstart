@@ -5,14 +5,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { SupplierUserService } from '@app-seller/shared/services/supplier/supplier-user.service';
 import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ValidateEmail } from '@app-seller/validators/validators';
 
 function createSupplierUserForm(user: User) {
   return new FormGroup({
     Username: new FormControl(user.Username, Validators.required),
     FirstName: new FormControl(user.FirstName, Validators.required),
     LastName: new FormControl(user.LastName, Validators.required),
-    Email: new FormControl(user.Email, Validators.required),
-    Password: new FormControl(user.Password, Validators.required),
+    Email: new FormControl(user.Email, [Validators.required, ValidateEmail]),
   });
 }
 
@@ -30,6 +30,6 @@ export class SupplierUserTableComponent extends ResourceCrudComponent<User> {
     private supplierService: SupplierService,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, supplierUserService, router, activatedroute, ngZone);
+    super(changeDetectorRef, supplierUserService, router, activatedroute, ngZone, createSupplierUserForm);
   }
 }
