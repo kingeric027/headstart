@@ -11,6 +11,7 @@ export class OCMLogin extends OCMComponent implements OnInit {
   form: FormGroup;
   isAnon: boolean;
   appName: string;
+  ssoLink: string; // TODO - remove from marketplace generic. Should be SEB specific.
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -21,6 +22,7 @@ export class OCMLogin extends OCMComponent implements OnInit {
   }
 
   ngOnContextSet() {
+    this.ssoLink = this.context.appSettings.ssoLink;
     this.appName = this.context.appSettings.appname;
     this.isAnon = this.context.currentUser.isAnonymous;
   }
