@@ -7,6 +7,7 @@ import {
   faUserCircle,
   faSignOutAlt,
   faHome,
+  faBars
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Order, MeUser, LineItem, ListCategory, Category } from '@ordercloud/angular-sdk';
@@ -30,6 +31,7 @@ export class OCMAppHeader extends OCMComponent {
   appName: string;
   activeCategoryID: string = undefined;
   categories: Category[] = [];
+  showDropdown: Boolean = false;
 
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
@@ -41,6 +43,7 @@ export class OCMAppHeader extends OCMComponent {
   faSignOutAlt = faSignOutAlt;
   faUserCircle = faUserCircle;
   faHome = faHome;
+  faBars = faBars;
 
   async ngOnContextSet() {
     this.categories = this.context.categories.all;
@@ -51,6 +54,10 @@ export class OCMAppHeader extends OCMComponent {
     this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
     this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
+  }
+
+  toggleDropdown() {
+    this.showDropdown = !this.showDropdown;
   }
 
   handleFiltersChange = (filters: ProductFilters) => {

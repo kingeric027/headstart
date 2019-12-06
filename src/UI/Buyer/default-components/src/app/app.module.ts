@@ -71,6 +71,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TreeModule } from 'angular-tree-component';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
+import { OCMCategoryDropdown } from './components/category-dropdown/category-dropdown.component';
 import {
   NgbCarouselModule,
   NgbCollapseModule,
@@ -113,6 +114,7 @@ import { OCMSupplierList } from './components/supplier-list/supplier-list.compon
 import { ocAppConfig } from './config/app.config';
 
 const components = [
+  OCMCategoryDropdown,
   OCMProductCard,
   OCMToggleFavorite,
   OCMQuantityInput,
@@ -251,6 +253,7 @@ export class AppModule {
     this.buildWebComponent(OCMSearch, 'ocm-search');
     this.buildWebComponent(OCMMiniCart, 'ocm-mini-cart');
     this.buildWebComponent(OCMAppHeader, 'ocm-app-header');
+    this.buildWebComponent(OCMCategoryDropdown, 'ocm-category-dropdown');
 
     this.buildWebComponent(OCMPaymentList, 'ocm-payment-list');
     this.buildWebComponent(OCMAddressCard, 'ocm-address-card');
