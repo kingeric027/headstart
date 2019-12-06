@@ -4,7 +4,7 @@
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
-                          [isValidResource]="isValidResource"
+                          [resourceForm]="resourceForm"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
@@ -103,6 +103,14 @@
                  formControlName="PrimaryContactPhone"
                  (input)="handleUpdateResource($event, 'xp.Contacts.0.Phone')"
                  placeholder="Enter Primary Contact Phone">
+        </div>
+        <div class="form-group">
+          <label for="Category">Categories</label>
+          <supplier-category-select-component [categorySelectionsControl]="resourceForm.controls.Categories"
+                                              [filterConfig]="filterConfig"
+                                              (selectionsChanged)="updateResource($event)">
+
+          </supplier-category-select-component>
         </div>
         <!-- specific component for this in progress -->
         <!-- <label for="Vendor Level">Vendor Level</label>
