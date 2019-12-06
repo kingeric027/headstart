@@ -24,7 +24,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   resourceInSelection = {};
 
   resourceForm: FormGroup;
-  isValidResource: boolean;
 
   // form setting defined in component implementing this component
   createForm: (resource: any) => FormGroup;
@@ -172,8 +171,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
         break;
     }
     this.updatedResource = updatedResourceCopy;
-    this.isValidResource = this.resourceForm.status === 'VALID';
-    console.log(this.resourceForm);
     this.changeDetectorRef.detectChanges();
   }
 
@@ -214,7 +211,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   setUpdatedResourceAndResourceForm(updatedResource: any) {
     this.updatedResource = this.copyResource(updatedResource);
-    this.setForm(updatedResource);
+    this.setForm(this.copyResource(updatedResource));
     this.changeDetectorRef.detectChanges();
   }
 

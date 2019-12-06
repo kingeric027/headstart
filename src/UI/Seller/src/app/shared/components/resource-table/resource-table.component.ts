@@ -12,6 +12,7 @@ import { takeWhile, filter } from 'rxjs/operators';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { pipe } from 'rxjs';
+import { FormGroup } from '@angular/forms';
 
 interface BreadCrumb {
   displayText: string;
@@ -94,7 +95,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   @Input()
   selectedResourceID: string;
   @Input()
-  isValidResource: boolean;
+  resourceForm: FormGroup;
 
   ngOnInit() {
     this.initializeSubscriptions();
