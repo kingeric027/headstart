@@ -1,6 +1,7 @@
 import { Directive, Self, ElementRef, OnInit, Renderer, Input, ChangeDetectorRef } from '@angular/core';
 import { NgControl, FormGroup } from '@angular/forms';
 import { ErrorDictionary } from '../../../app/validators/validators';
+import { fromEvent } from 'rxjs';
 
 @Directive({
   selector: '[showErrors]',
@@ -31,9 +32,6 @@ export class FormControlErrorDirective implements OnInit {
     this.errorSpan = this.renderer.createElement(this.el.nativeElement.parentNode, 'span');
     this.renderer.setElementAttribute(this.errorSpan, 'class', 'error-message');
     (this.control as any).update.subscribe(this.displayErrorMsg);
-    this.control.valueChanges.subscribe(this.displayErrorMsg);
-    // submit button might not exist within the form directly or may not be on the page, might need to find another way to show erros on form submit
-    // fromEvent(this.el.nativeElement.form, 'submit').subscribe(this.displayErrorMsg);
   }
 
   displayErrorMsg = () => {

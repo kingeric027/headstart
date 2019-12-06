@@ -24,7 +24,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   resourceInSelection = {};
 
   resourceForm: FormGroup;
-  isValidResource: boolean;
 
   // form setting defined in component implementing this component
   createForm: (resource: any) => FormGroup;
@@ -87,9 +86,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   subscribeToResourceSelection() {
-    this.activatedRoute.params
-      .pipe(takeWhile(() => this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT))
-      .subscribe((params) => {
+    this.activatedRoute.params.subscribe((params) => {
+      if (this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
         const resourceIDSelected =
           params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
@@ -99,7 +97,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
         if (this.isCreatingNew) {
           this.setResoureObjectsForCreatingNew();
         }
-      });
+      }
+    });
   }
 
   setForm(resource: any) {
@@ -172,9 +171,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
         break;
     }
     this.updatedResource = updatedResourceCopy;
-    console.log(this.resourceForm.status);
-    console.log(this.updatedResource);
-    this.isValidResource = this.resourceForm.status === 'VALID';
     this.changeDetectorRef.detectChanges();
   }
 
@@ -215,7 +211,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   setUpdatedResourceAndResourceForm(updatedResource: any) {
     this.updatedResource = this.copyResource(updatedResource);
-    this.setForm(updatedResource);
+    this.setForm(this.copyResource(updatedResource));
     this.changeDetectorRef.detectChanges();
   }
 

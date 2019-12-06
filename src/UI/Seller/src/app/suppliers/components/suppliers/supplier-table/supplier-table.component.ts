@@ -5,7 +5,12 @@ import { SupplierService } from '@app-seller/shared/services/supplier/supplier.s
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { get as _get } from 'lodash';
-import { ValidateRichTextDescription, ValidateEmail, ValidatePhone } from '@app-seller/validators/validators';
+import {
+  ValidateRichTextDescription,
+  ValidateEmail,
+  ValidatePhone,
+  ValidateSupplierCategorySelection,
+} from '@app-seller/validators/validators';
 
 export interface SupplierCategoryConfigFilters {
   Display: string;
@@ -37,9 +42,7 @@ function createSupplierForm(supplier: Supplier) {
     PrimaryContactPhone: new FormControl(
       (_get(supplier, 'xp.Contacts') && _get(supplier, 'xp.Contacts')[0].Phone) || ''
     ),
-    // need to confirm understanding of supplier model
-    // VendorLevel: new FormControl(_get(supplier, 'xp.Categories.VendorLevel', '')),
-    // ServiceCategory: new FormControl(_get(supplier, 'xp.Categories.ServiceCategory', '')),
+    Categories: new FormControl(_get(supplier, 'xp.Categories', []), ValidateSupplierCategorySelection),
   });
 }
 

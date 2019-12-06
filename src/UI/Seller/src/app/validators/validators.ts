@@ -1,4 +1,8 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn, ControlContainer } from '@angular/forms';
+import {
+  areAllCategoriesComplete,
+  areDuplicateCategories,
+} from '@app-seller/suppliers/components/category-select/supplier-category-select.component';
 
 export const ErrorDictionary = {
   name: `Name can only contain characters Aa-Zz 0-9 - ' .`,
@@ -13,6 +17,7 @@ export const ErrorDictionary = {
     one letter and one number. Password can also include special characters.`,
   richTextFormatError:
     'Descriptions can only be 1000 characters. Remember the character count includes HTML formatting text.',
+  supplierCategoryError: 'Supplier category selections are invalid',
 };
 
 // only alphanumic and space . '
@@ -35,7 +40,8 @@ export function ValidatePhone(control: AbstractControl): ValidationErrors | null
 
 // contains @ and . with text surrounding
 export function ValidateEmail(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(control.value);
+  // longest TLD currently in existence is 24 characters
+  const isValid = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,24}$/.test(control.value);
   if (!control.value || isValid) {
     return null;
   }
@@ -121,4 +127,11 @@ export function DateValidator(control: AbstractControl): ValidationErrors | null
 
 export function ValidateRichTextDescription(control: AbstractControl): ValidationErrors | null {
   return control.value && control.value.length >= 1000 ? { richTextFormatError: true } : null;
+}
+
+export function ValidateSupplierCategorySelection(control: AbstractControl): ValidationErrors | null {
+  const isValidResource =
+    control.value.length > 0 && areAllCategoriesComplete(control.value) && !areDuplicateCategories(control.value);
+  console.log(isValidResource);
+  return isValidResource ? null : { SupplierCategoryError: true };
 }

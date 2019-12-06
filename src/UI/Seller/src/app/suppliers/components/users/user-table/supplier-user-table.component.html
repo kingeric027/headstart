@@ -5,7 +5,7 @@
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
                           [parentResourceService]="supplierService"
-                          [isValidResource]="isValidResource"
+                          [resourceForm]="resourceForm"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
@@ -31,7 +31,7 @@
     </div>
   </form> -->
 
-  <!-- edit product -->
+  <!-- edit user -->
   <div class="resource-edit">
     <form *ngIf="resourceForm"
           [formGroup]="resourceForm">
@@ -40,6 +40,7 @@
         <input type="text"
                class="form-control"
                id="Username"
+               maxlength="100"
                aria-describedby="Username"
                formControlName="Username"
                (input)="handleUpdateResource($event, 'Username')"
@@ -48,6 +49,7 @@
         <input type="text"
                class="form-control"
                id="FirstName"
+               maxlength="100"
                aria-describedby="FirstName"
                formControlName="FirstName"
                (input)="handleUpdateResource($event, 'FirstName')"
@@ -56,6 +58,7 @@
         <input type="text"
                class="form-control"
                id="LastName"
+               maxlength="100"
                aria-describedby="LastName"
                formControlName="LastName"
                (input)="handleUpdateResource($event, 'LastName')"
@@ -65,6 +68,7 @@
           <input type="text"
                  class="form-control"
                  id="Email"
+                 maxlength="200"
                  showErrors
                  [resourceForm]="resourceForm"
                  aria-describedby="Email"

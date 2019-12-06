@@ -183,7 +183,7 @@
           </perfect-scrollbar>
           <button class="btn btn-primary"
                   type="submit"
-                  [disabled]="!isValidResource"
+                  [disabled]="resourceForm.status === 'INVALID'"
                   (click)="handleSave()"
                   *ngIf="areChanges">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
           <button class="btn brand-button ml-3"
