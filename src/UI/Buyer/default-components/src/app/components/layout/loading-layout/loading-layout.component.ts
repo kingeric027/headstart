@@ -5,6 +5,7 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./loading-layout.component.scss'],
 })
 export class OCMLoadingLayout implements OnInit {
+  @Input() isLoading?: boolean;
   @Input() resource: any; // which resource you're basing loading off of (e.g. suppliers, products, etc)
   @Input() height: string; // height of individual loading block
   @Input() width: string; // width of individual loading block

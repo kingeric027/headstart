@@ -1,21 +1,16 @@
 // angular
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 // angular libs
 import { ToastrService } from 'ngx-toastr';
 
 // ordercloud
-import {
-  AppMatchFieldsValidator,
-  AppFormErrorService,
-} from '@app-seller/shared';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config';
+import { AppFormErrorService } from '@app-seller/shared';
+import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 import { OcPasswordResetService, PasswordReset } from '@ordercloud/angular-sdk';
+import { ValidateFieldMatches, ValidateStrongPassword } from '@app-seller/validators/validators';
 
 @Component({
   selector: 'auth-reset-password',
@@ -42,13 +37,10 @@ export class ResetPasswordComponent implements OnInit {
     this.username = urlParams['user'];
     this.resetCode = urlParams['code'];
 
-    this.resetPasswordForm = this.formBuilder.group(
-      {
-        password: '',
-        passwordConfirm: '',
-      },
-      { validator: AppMatchFieldsValidator('password', 'passwordConfirm') }
-    );
+    this.resetPasswordForm = new FormGroup({
+      password: new FormControl('', [Validators.required, ValidateStrongPassword]),
+      passwordConfirm: new FormControl('', [Validators.required, ValidateFieldMatches('password')]),
+    });
   }
 
   onSubmit() {
@@ -62,17 +54,15 @@ export class ResetPasswordComponent implements OnInit {
       Username: this.username,
     };
 
-    this.ocPasswordResetService
-      .ResetPasswordByVerificationCode(this.resetCode, config)
-      .subscribe(
-        () => {
-          this.toasterService.success('Password Reset Successfully');
-          this.router.navigateByUrl('/login');
-        },
-        (error) => {
-          throw error;
-        }
-      );
+    this.ocPasswordResetService.ResetPasswordByVerificationCode(this.resetCode, config).subscribe(
+      () => {
+        this.toasterService.success('Password Reset Successfully');
+        this.router.navigateByUrl('/login');
+      },
+      (error) => {
+        throw error;
+      }
+    );
   }
 
   // control visibility of password mismatch error

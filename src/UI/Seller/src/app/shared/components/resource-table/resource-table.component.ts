@@ -1,15 +1,14 @@
 import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core';
-import {
-  ListResource,
-  ResourceCrudService,
-  Options,
-} from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
 import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { takeWhile, filter } from 'rxjs/operators';
 import { singular } from 'pluralize';
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
+import { FormGroup } from '@angular/forms';
+import { ListResource, Options } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 
 interface BreadCrumb {
   displayText: string;
@@ -37,7 +36,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   _ocService: ResourceCrudService<any>;
   areChanges: boolean;
   parentResources: ListResource<any>;
-  selectedParentResourceName = 'Parent Resource Name';
+  selectedParentResourceName = 'Fetching Data';
   selectedParentResourceID = '';
   breadCrumbs: BreadCrumb[] = [];
   isCreatingNew = false;
@@ -91,11 +90,27 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
   @Input()
   selectedResourceID: string;
+  @Input()
+  resourceForm: FormGroup;
 
   ngOnInit() {
+    this.initializeSubscriptions();
+  }
+
+  private async initializeSubscriptions() {
+    await this.redirectToFirstParentIfNeeded();
     this.setUrlSubscription();
     this.setParentResourceSelectionSubscription();
     this._ocService.listResources();
+  }
+
+  private async redirectToFirstParentIfNeeded() {
+    if (this.parentResourceService) {
+      if (this.parentResourceService.getParentResourceID() === REDIRECT_TO_FIRST_PARENT) {
+        await this.parentResourceService.listResources();
+        this._ocService.selectParentResource(this.parentResourceService.resourceSubject.value.Items[0]);
+      }
+    }
   }
 
   private setUrlSubscription() {
@@ -116,12 +131,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
       .subscribe(async (params) => {
+        await this.redirectToFirstParentIfNeeded();
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
         this.selectedParentResourceID = parentResourceID;
         if (params && parentResourceID) {
           const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
-          this.selectedParentResourceName = parentResource.Name;
+          if (parentResource) this.selectedParentResourceName = parentResource.Name;
         }
       });
   }

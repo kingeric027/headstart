@@ -3,23 +3,9 @@ import { Router, Params, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { cloneDeep as _cloneDeep, uniqBy as _uniqBy } from 'lodash';
 import { Meta } from '@ordercloud/angular-sdk';
-import { filter } from 'rxjs/operators';
-
-export interface Options {
-  page?: number;
-  sortBy?: string;
-  search?: string;
-  filters?: FilterDictionary;
-}
-
-export interface FilterDictionary {
-  [filterKey: string]: string;
-}
-
-export interface ListResource<ResourceType> {
-  Meta: Meta;
-  Items: ResourceType[];
-}
+import { filter, takeWhile } from 'rxjs/operators';
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
+import { ListResource, Options, FilterDictionary } from './resource-crud.types';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListResource<ResourceType>> = new BehaviorSubject<ListResource<ResourceType>>(
@@ -33,6 +19,7 @@ export abstract class ResourceCrudService<ResourceType> {
   // example: for supplier user service the primary is supplier and the secondary is users
   secondaryResourceLevel = '';
   subResourceList: string[];
+  emptyResource: any = {};
 
   constructor(
     private router: Router,
@@ -40,22 +27,46 @@ export abstract class ResourceCrudService<ResourceType> {
     private ocService: any,
     route: string,
     primaryResourceLevel: string,
+    subResourceList: string[] = [],
     secondaryResourceLevel: string = ''
   ) {
     this.route = route;
     this.primaryResourceLevel = primaryResourceLevel;
     this.secondaryResourceLevel = secondaryResourceLevel;
+    this.subResourceList = subResourceList;
 
     this.activatedRoute.queryParams.subscribe((params) => {
-      if (this.router.url.startsWith(this.route)) {
+      // this prevents service from reading from query params when not on the route related to the service
+      if (this.isOnRelatedRoute()) {
         this.readFromUrlQueryParams(params);
       } else {
         this.optionsSubject.next({});
       }
     });
     this.optionsSubject.subscribe((value) => {
-      this.listResources();
+      if (this.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
+        this.listResources();
+      }
     });
+  }
+
+  private isOnRelatedRoute(): boolean {
+    const isOnSubResource =
+      this.subResourceList &&
+      this.subResourceList.some((subResource) => {
+        return this.router.url.includes(`/${subResource}`);
+      });
+    const isOnBaseRoute = this.router.url.includes(this.route);
+    const isOnRelatedSubResource = this.router.url.includes(`/${this.secondaryResourceLevel}`);
+    if (!isOnBaseRoute) {
+      return false;
+    } else if (isOnSubResource && this.secondaryResourceLevel && isOnRelatedSubResource) {
+      return true;
+    } else if (!isOnSubResource && !this.secondaryResourceLevel) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   // Handle URL updates
@@ -179,7 +190,9 @@ export abstract class ResourceCrudService<ResourceType> {
     if (resourceInList) {
       return resourceInList;
     } else {
-      return await this.getResourceById(resourceID);
+      if (resourceID !== REDIRECT_TO_FIRST_PARENT) {
+        return await this.getResourceById(resourceID);
+      }
     }
   }
 

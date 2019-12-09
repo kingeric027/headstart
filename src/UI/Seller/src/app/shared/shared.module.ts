@@ -34,6 +34,10 @@ import { ResourceSelectDropdown } from './components/resource-select-dropdown/re
 import { SummaryResourceDisplay } from './components/summary-resource-display/summary-resource-display.component';
 import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-confirm-modal.component';
 import { ResourceEditComponent } from './components/resource-edit/resource-edit.component';
+import { FullResourceTableComponent } from './components/full-resource-table/full-resource-table.component';
+import { QuillModule } from 'ngx-quill';
+import { ReactiveQuillComponent } from './components/reactive-quill-editor/reactive-quill-editor.component';
+import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 
 @NgModule({
   imports: [
@@ -53,6 +57,7 @@ import { ResourceEditComponent } from './components/resource-edit/resource-edit.
     NgbPaginationModule,
     NgbTabsetModule,
     NgbModalModule,
+    QuillModule.forRoot(),
   ],
   exports: [
     // angular
@@ -81,7 +86,11 @@ import { ResourceEditComponent } from './components/resource-edit/resource-edit.
     ProductFormComponent,
     ResourceTableComponent,
     SummaryResourceDisplay,
+    FullResourceTableComponent,
     ResourceEditComponent,
+    QuillModule,
+    ReactiveQuillComponent,
+    FormControlErrorDirective,
   ],
   declarations: [
     SearchComponent,
@@ -98,7 +107,10 @@ import { ResourceEditComponent } from './components/resource-edit/resource-edit.
     ResourceTableComponent,
     DeleteConfirmModal,
     SummaryResourceDisplay,
+    FullResourceTableComponent,
     ResourceEditComponent,
+    ReactiveQuillComponent,
+    FormControlErrorDirective,
   ],
 })
 export class SharedModule {

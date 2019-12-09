@@ -1,10 +1,12 @@
 import { Component, Input, ViewChild, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { ListResource, ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { faFilter, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
 import { singular } from 'pluralize';
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
+import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 
 @Component({
   selector: 'resource-select-dropdown-component',
@@ -17,7 +19,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
   faFilter = faFilter;
   faHome = faHome;
   searchTerm = '';
-  selectedParentResourceName = 'Parent Resource Name';
+  selectedParentResourceName = 'Fetching Data';
   alive = true;
 
   constructor(
@@ -38,19 +40,21 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
   }
 
   private setParentResourceSubscription() {
-    this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
+    this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
       this.parentResourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
   }
 
   setParentResourceSelectionSubscription() {
-    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(async params => {
-      const parentIDParamName = `${singular(this.parentService.primaryResourceLevel)}ID`;
-      const resourceID = params[parentIDParamName];
-      if (params && resourceID) {
-        const resource = await this.parentService.findOrGetResourceByID(resourceID);
-        this.selectedParentResourceName = resource.Name;
+    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(async (params) => {
+      if (this.parentService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
+        const parentIDParamName = `${singular(this.parentService.primaryResourceLevel)}ID`;
+        const resourceID = params[parentIDParamName];
+        if (params && resourceID) {
+          const resource = await this.parentService.findOrGetResourceByID(resourceID);
+          this.selectedParentResourceName = resource.Name;
+        }
       }
     });
   }

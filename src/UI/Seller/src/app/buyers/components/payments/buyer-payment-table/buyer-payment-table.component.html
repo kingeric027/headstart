@@ -5,6 +5,7 @@
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
                           [parentResourceService]="buyerService"
+                          [resourceForm]="resourceForm"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
@@ -29,32 +30,6 @@
       <label>{{filter.Display}}</label>
     </div>
   </form> -->
-
-  <!-- full view table -->
-  <table class="table table-hover resource-table">
-    <thead>
-      <tr>
-        <th scope="col">Name</th>
-        <th scope="col">ID</th>
-        <th scope="col">Active</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let location of resourceList.Items; index as index"
-          (click)="selectResource(location)"
-          class="selectable-row"
-          [ngClass]="{'selected-resource':selectedIndex === index}">
-        <td>{{location.Name}}</td>
-        <td>{{location.ID}}</td>
-        <td>{{location.Active ? 'Active' : 'Inactive'}}</td>
-      </tr>
-      <tr *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">
-        <td>More locations</td>
-        <td></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
 
   <!-- edit product -->
   <div class="resource-edit">

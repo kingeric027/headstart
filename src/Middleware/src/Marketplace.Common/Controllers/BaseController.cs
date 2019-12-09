@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -70,6 +68,7 @@ namespace Marketplace.Common.Controllers
         {
             get { return _c.Claims.First(c => c.Type == "buyer").Value; }
         }
+
         public string AccessToken
         {
             get { return _c.Claims.First(c => c.Type == "accesstoken").Value; }

@@ -4,6 +4,17 @@ import { User } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BuyerUserService } from '@app-seller/shared/services/buyer/buyer-user.service';
 import { BuyerService } from '@app-seller/shared/services/buyer/buyer.service';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ValidateEmail } from '@app-seller/validators/validators';
+
+function createBuyerUserForm(user: User) {
+  return new FormGroup({
+    Username: new FormControl(user.Username, Validators.required),
+    FirstName: new FormControl(user.FirstName, Validators.required),
+    LastName: new FormControl(user.LastName, Validators.required),
+    Email: new FormControl(user.Email, [Validators.required, ValidateEmail]),
+  });
+}
 
 @Component({
   selector: 'app-buyer-user-table',
@@ -19,6 +30,6 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
     private buyerService: BuyerService,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, buyerUserService, router, activatedroute, ngZone);
+    super(changeDetectorRef, buyerUserService, router, activatedroute, ngZone, createBuyerUserForm);
   }
 }

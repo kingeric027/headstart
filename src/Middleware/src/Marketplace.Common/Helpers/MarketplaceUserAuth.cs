@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Marketplace.Common.Queries;
+using Marketplace.Common.Services.DevCenter;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Helpers
@@ -30,12 +32,14 @@ namespace Marketplace.Common.Helpers
     public class MarketplaceUserAuthHandler : AuthenticationHandler<MarketplaceUserAuthOptions>
     {
         private readonly IOrderCloudClient _oc;
+        private readonly IDevCenterService _dev;
 
         public MarketplaceUserAuthHandler(IOptionsMonitor<MarketplaceUserAuthOptions> options, ILoggerFactory logger,
-            UrlEncoder encoder, ISystemClock clock, IOrderCloudClient oc)
+            UrlEncoder encoder, ISystemClock clock, IOrderCloudClient oc, IDevCenterService dev)
             : base(options, logger, encoder, clock)
         {
             _oc = oc;
+            _dev = dev;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -49,23 +53,38 @@ namespace Marketplace.Common.Helpers
 
                 var jwt = new JwtSecurityToken(token);
                 var clientId = jwt.Claims.FirstOrDefault(x => x.Type == "cid")?.Value;
+                var usrtype = jwt.Claims.FirstOrDefault(x => x.Type == "usrtype")?.Value;
                 if (clientId == null)
                     return AuthenticateResult.Fail("The provided bearer token does not contain a 'cid' (Client ID) claim.");
                 
                 // we've validated the token as much as we can on this end, go make sure it's ok on OC
-                var user = await _oc.Me.GetAsync(token);
-                if (!user.Active)
-                    return AuthenticateResult.Fail("Authentication failure");
 
                 var cid = new ClaimsIdentity("MarketplaceUser");
                 cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
-                cid.AddClaim(new Claim("username", user.Username));
-                cid.AddClaim(new Claim("userid", user.ID));
-                cid.AddClaim(new Claim("email", user.Email));
-                cid.AddClaim(new Claim("buyer", user.Buyer?.ID ?? ""));
-                cid.AddClaim(new Claim("supplier", user.Supplier?.ID ?? ""));
-                cid.AddClaims(user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)));
+                
+                if (usrtype == "dev")
+                {
+                    var user = await _dev.GetMe(token);
+                    cid.AddClaims(new List<Claim>() { new Claim(ClaimTypes.Role, jwt.Claims.FirstOrDefault(x => x.Type == "role")?.Value) });
+                    cid.AddClaim(new Claim("username", jwt.Claims.FirstOrDefault(x => x.Type == "role")?.Value));
+                    cid.AddClaim(new Claim("username", user.Username));
+                    cid.AddClaim(new Claim("userid", user.ID.ToString()));
+                    cid.AddClaim(new Claim("email", user.Email));
+                }
+                else
+                {
+                    var user = await _oc.Me.GetAsync(token);
+                    if (!user.Active)
+                        return AuthenticateResult.Fail("Authentication failure");
+                    cid.AddClaim(new Claim("username", user.Username));
+                    cid.AddClaim(new Claim("userid", user.ID));
+                    cid.AddClaim(new Claim("email", user.Email));
+                    cid.AddClaim(new Claim("buyer", user.Buyer?.ID ?? ""));
+                    cid.AddClaim(new Claim("supplier", user.Supplier?.ID ?? ""));
+                    var t = user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r));
+                    cid.AddClaims(user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)));
+                }
 
                 var ticket = new AuthenticationTicket(new ClaimsPrincipal(cid), "MarketplaceUser");
                 return AuthenticateResult.Success(ticket);

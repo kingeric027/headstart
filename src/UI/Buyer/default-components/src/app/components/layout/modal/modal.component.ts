@@ -22,10 +22,7 @@ export class OCMModal implements OnInit, OnDestroy {
 
   constructor(private elementRef: ElementRef, @Inject(DOCUMENT) private document: any) {}
 
-  ngOnInit(): void {
-    // move element to bottom of page (just before </body>) so it can be displayed above everything else
-    this.document.body.appendChild(this.elementRef.nativeElement);
-  }
+  ngOnInit(): void {}
 
   // remove self when directive is destroyed
   ngOnDestroy(): void {
