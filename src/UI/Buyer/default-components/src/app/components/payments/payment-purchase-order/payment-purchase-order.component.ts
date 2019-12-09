@@ -2,25 +2,28 @@ import { Component, OnChanges, SimpleChanges, Output, EventEmitter, Input, OnIni
 import { FormGroup, FormControl } from '@angular/forms';
 import { get as _get } from 'lodash';
 import { Payment, Order } from '@ordercloud/angular-sdk';
-import { OCMComponent } from '../../base-component';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './payment-purchase-order.component.html',
   styleUrls: ['./payment-purchase-order.component.scss'],
 })
-export class OCMPaymentPurchaseOrder extends OCMComponent implements OnInit, OnChanges {
+export class OCMPaymentPurchaseOrder implements OnInit {
   order: Order;
   form: FormGroup;
-  @Input() payment: Payment;
+  _payment: Payment;
   @Output() continue = new EventEmitter();
 
-  ngOnInit() {
-    this.form = new FormGroup({ PONumber: new FormControl('') });
+  constructor(private context: ShopperContextService) {}
+
+  @Input() set payment(value: Payment) {
+    this._payment = value;
+    this.form.setValue({ PONumber: this.getPONumber(value) });
   }
 
-  ngOnContextSet() {
-    this.form.setValue({ PONumber: this.getPONumber(this.payment) });
+  ngOnInit() {
     this.order = this.context.currentOrder.get();
+    this.form = new FormGroup({ PONumber: new FormControl('') });
   }
 
   getPONumber(payment: Payment): string {
@@ -28,26 +31,16 @@ export class OCMPaymentPurchaseOrder extends OCMComponent implements OnInit, OnC
     return payment.xp.PONumber;
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.payment) {
-      this.payment = changes.payment.currentValue;
-      // set form
-      if (changes.payment.firstChange) {
-        this.form.setValue({ PONumber: this.getPONumber(this.payment) });
-      }
-    }
-  }
-
   async saveAndContinue() {
     const PONumber = this.form.value.PONumber;
-    this.payment = { Type: 'PurchaseOrder', Amount: this.order.Total, xp: { PONumber } };
-    await this.context.currentOrder.createPayment(this.payment);
+    this._payment = { Type: 'PurchaseOrder', Amount: this.order.Total, xp: { PONumber } };
+    await this.context.currentOrder.createPayment(this._payment);
     if (this.paymentValid()) {
       this.continue.emit();
     }
   }
 
   paymentValid(): boolean {
-    return !!this.payment && this.payment.Amount === this.order.Total;
+    return !!this._payment && this._payment.Amount === this.order.Total;
   }
 }

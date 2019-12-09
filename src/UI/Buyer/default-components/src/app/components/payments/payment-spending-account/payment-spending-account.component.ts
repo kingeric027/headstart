@@ -3,13 +3,13 @@ import { SpendingAccount, ListSpendingAccount, Payment, Order } from '@orderclou
 import * as moment_ from 'moment';
 const moment = moment_;
 import { ModalState } from '../../../models/modal-state.class';
-import { OCMComponent } from '../../base-component';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './payment-spending-account.component.html',
   styleUrls: ['./payment-spending-account.component.scss'],
 })
-export class OCMPaymentSpendingAccount extends OCMComponent {
+export class OCMPaymentSpendingAccount implements OnInit {
   order: Order;
   @Input() payment: Payment;
   @Output() continue = new EventEmitter();
@@ -22,7 +22,9 @@ export class OCMPaymentSpendingAccount extends OCMComponent {
   resultsPerPage = 6;
   spendingAccountModal = ModalState.Closed;
 
-  async ngOnContextSet() {
+  constructor(private context: ShopperContextService) {}
+
+  async ngOnInit() {
     this.order = this.context.currentOrder.get();
     this.spendingAccounts = await this.listSpendingAccounts();
     this.selectedSpendingAccount = this.getSavedSpendingAccount(this.spendingAccounts);

@@ -3,7 +3,7 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
 
 @Component({
   template: `
-    <ocm-payment-method-management [context]="context"></ocm-payment-method-management>
+    <ocm-payment-method-management></ocm-payment-method-management>
   `,
 })
 export class PaymentListWrapperComponent {

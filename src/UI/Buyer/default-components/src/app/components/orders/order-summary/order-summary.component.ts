@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Order } from '@ordercloud/angular-sdk';
 import { CurrencyPipe } from '@angular/common';
-import { OCMComponent } from '../../base-component';
 
 @Component({
   templateUrl: './order-summary.component.html',

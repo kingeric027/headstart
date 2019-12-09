@@ -1,4 +1,4 @@
-<ocm-profile-nav [context]="context">
+<ocm-profile-nav>
   <h1 class="page-heading border-bottom pb-3">{{ approvalVersion ? 'Orders To Appprove' : 'My Orders' }}</h1>
   <ocm-search placeholderText="Search Orders"
               [searchTermInput]="searchTerm"
@@ -15,14 +15,13 @@
     </div>
     <div class="col-md-2 col-sm-6"
           *ngIf="!approvalVersion">
-      <ocm-order-status-filter [context]="context"></ocm-order-status-filter>
+      <ocm-order-status-filter></ocm-order-status-filter>
     </div>
     <div class="col">
-      <ocm-order-date-filter [context]="context"></ocm-order-date-filter>
+      <ocm-order-date-filter></ocm-order-date-filter>
     </div>
   </div>
   <ocm-order-list *ngIf="orders"
-                  [context]="context"
                   [orders]="orders"
                   [columns]="columns"
                   [sortBy]="sortBy"

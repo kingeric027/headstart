@@ -1,14 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Order } from '@ordercloud/angular-sdk';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import { OCMComponent } from '../../base-component';
-import { OrderDetails } from 'marketplace';
+import { OrderDetails, ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './order-detail.component.html',
   styleUrls: ['./order-detail.component.scss'],
 })
-export class OCMOrderDetails extends OCMComponent {
+export class OCMOrderDetails implements OnInit {
   order: Order;
   orderDetails: OrderDetails;
   approvalVersion: boolean;
@@ -16,7 +15,9 @@ export class OCMOrderDetails extends OCMComponent {
   faTruck = faTruck;
   subView: 'details' | 'shipments' = 'details';
 
-  async ngOnContextSet() {
+  constructor(private context: ShopperContextService) {}
+
+  async ngOnInit() {
     this.orderDetails = await this.context.orderHistory.getOrderDetails();
     this.order = this.orderDetails.order;
     const url = this.context.router.getActiveUrl();

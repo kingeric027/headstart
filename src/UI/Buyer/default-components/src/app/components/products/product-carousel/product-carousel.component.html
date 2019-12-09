@@ -8,8 +8,7 @@
   <div class="col-10 product-list-grid row d-flex align-items-stretch">
     <ocm-product-card *ngFor="let product of getProducts(); let i = index"
                       class="col-lg-3 col-md-4 col-sm-6 d-flex flex-grow-1 flex-shrink-1"
-                      [product]="product"
-                      [context]="context">
+                      [product]="product">
     </ocm-product-card>
   </div>
   <div class="col-1 carousel-arrow">

@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { faHeart as _faHeartFilled } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as _faHeartOutline } from '@fortawesome/free-regular-svg-icons';
-import { OCMComponent } from '../../base-component';
 
 @Component({
   templateUrl: './toggle-favorite.component.html',

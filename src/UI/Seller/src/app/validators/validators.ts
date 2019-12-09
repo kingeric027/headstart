@@ -132,6 +132,5 @@ export function ValidateRichTextDescription(control: AbstractControl): Validatio
 export function ValidateSupplierCategorySelection(control: AbstractControl): ValidationErrors | null {
   const isValidResource =
     control.value.length > 0 && areAllCategoriesComplete(control.value) && !areDuplicateCategories(control.value);
-  console.log(isValidResource);
   return isValidResource ? null : { SupplierCategoryError: true };
 }

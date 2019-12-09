@@ -1,9 +1,5 @@
 import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core';
-import {
-  ListResource,
-  ResourceCrudService,
-  Options,
-} from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
 import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -11,8 +7,8 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { takeWhile, filter } from 'rxjs/operators';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
-import { pipe } from 'rxjs';
 import { FormGroup } from '@angular/forms';
+import { ListResource, Options } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 
 interface BreadCrumb {
   displayText: string;

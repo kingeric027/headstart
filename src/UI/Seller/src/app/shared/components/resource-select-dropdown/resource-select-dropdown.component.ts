@@ -1,11 +1,12 @@
 import { Component, Input, ViewChild, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { ListResource, ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { faFilter, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
+import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 
 @Component({
   selector: 'resource-select-dropdown-component',

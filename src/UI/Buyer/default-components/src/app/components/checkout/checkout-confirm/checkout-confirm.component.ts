@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Order, ListPayment, ListLineItem } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
-import { OCMComponent } from '../../base-component';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-confirm.component.html',
   styleUrls: ['./checkout-confirm.component.scss'],
 })
-export class OCMCheckoutConfirm extends OCMComponent implements OnInit {
+export class OCMCheckoutConfirm implements OnInit {
   form: FormGroup;
   order: Order;
   payments: ListPayment;
@@ -15,11 +15,10 @@ export class OCMCheckoutConfirm extends OCMComponent implements OnInit {
   anonEnabled: boolean;
   isSubmittingOrder = false; // prevent double-click submits
 
+  constructor(private context: ShopperContextService) {}
+
   async ngOnInit() {
     this.form = new FormGroup({ comments: new FormControl('') });
-  }
-
-  async ngOnContextSet() {
     this.anonEnabled = this.context.appSettings.anonymousShoppingEnabled;
     this.order = this.context.currentOrder.get();
     this.lineItems = this.context.currentOrder.getLineItems();

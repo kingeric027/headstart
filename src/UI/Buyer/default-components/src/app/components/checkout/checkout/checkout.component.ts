@@ -1,14 +1,14 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { Order } from '@ordercloud/angular-sdk';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
-import { OCMComponent } from '../../base-component';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],
 })
-export class OCMCheckout extends OCMComponent {
+export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
   order: Order;
   isAnon: boolean;
@@ -37,7 +37,9 @@ export class OCMCheckout extends OCMComponent {
     },
   ];
 
-  ngOnContextSet() {
+  constructor(private context: ShopperContextService) {}
+
+  ngOnInit() {
     this.context.currentOrder.onOrderChange(order => (this.order = order));
     this.isAnon = this.context.currentUser.isAnonymous;
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';

@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { fromEvent } from 'rxjs';
-import { OCMComponent } from '../../base-component';
 
 @Component({
   templateUrl: './image-gallery.component.html',

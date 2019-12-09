@@ -20,15 +20,13 @@
   <div class="row flex-lg-row-reverse"
        *ngIf="order?.LineItemCount">
     <div class="col-lg-4">
-      <ocm-order-summary [order]="order"
-                         [context]="context"></ocm-order-summary>
+      <ocm-order-summary [order]="order"></ocm-order-summary>
       <button class="btn btn-primary btn-block mb-4 font-weight-bold"
               (click)="toCheckout()">CHECKOUT</button>
     </div>
     <div class="col-lg-8">
       <ocm-lineitem-table [lineItems]="lineItems"
-                          [readOnly]="false"
-                          [context]="context">
+                          [readOnly]="false">
       </ocm-lineitem-table>
     </div>
   </div>
