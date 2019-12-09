@@ -1,22 +1,21 @@
 // angular
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { OCMComponent } from '../../base-component';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
 })
-export class OCMForgotPassword extends OCMComponent implements OnInit {
+export class OCMForgotPassword implements OnInit {
   form: FormGroup;
   appName: string;
 
-  ngOnInit() {
-    this.form = new FormGroup({ email: new FormControl('') });
-  }
+  constructor(private context: ShopperContextService) {}
 
-  ngOnContextSet() {
+  ngOnInit() {
     this.appName = this.context.appSettings.appname;
+    this.form = new FormGroup({ email: new FormControl('') });
   }
 
   async onSubmit() {

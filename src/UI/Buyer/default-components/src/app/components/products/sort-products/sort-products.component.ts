@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { OCMComponent } from '../../base-component';
 import { takeWhile } from 'rxjs/operators';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './sort-products.component.html',
   styleUrls: ['./sort-products.component.scss'],
 })
-export class OCMProductSort extends OCMComponent implements OnInit {
+export class OCMProductSort implements OnInit, OnDestroy {
+  alive = true;
   form: FormGroup;
   options = [
     { value: 'ID', label: 'ID: A to Z' },
@@ -16,11 +17,10 @@ export class OCMProductSort extends OCMComponent implements OnInit {
     { value: '!Name', label: 'Name: Z to A' },
   ];
 
+  constructor(private context: ShopperContextService) {}
+
   ngOnInit() {
     this.form = new FormGroup({ sortBy: new FormControl(null) });
-  }
-
-  ngOnContextSet() {
     this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(filters => {
       this.setForm(filters.sortBy);
     });
@@ -34,5 +34,9 @@ export class OCMProductSort extends OCMComponent implements OnInit {
   sortStrategyChanged() {
     const sortValue = this.form.get('sortBy').value;
     this.context.productFilters.sortBy(sortValue);
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 }

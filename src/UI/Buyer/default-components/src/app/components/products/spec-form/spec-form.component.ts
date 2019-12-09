@@ -6,7 +6,7 @@ import { map as _map, find as _find, minBy as _minBy, sortBy as _sortBy } from '
 import { FieldConfig } from './field-config.interface';
 import { ListBuyerSpec, BuyerProduct, SpecOption } from '@ordercloud/angular-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
-import { OCMComponent } from '../../base-component';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   template: `
@@ -23,20 +23,21 @@ import { OCMComponent } from '../../base-component';
   `,
   styleUrls: ['./spec-form.component.scss'],
 })
-export class OCMSpecForm extends OCMComponent {
-  @Input() specs: ListBuyerSpec;
-  @Input() product: BuyerProduct;
-  @Input() qty: number;
+export class OCMSpecForm {
+  _specs: ListBuyerSpec;
   @Output() specFormChange: EventEmitter<any> = new EventEmitter<any>();
 
   config: FieldConfig[] = [];
   form: FormGroup;
 
-  constructor(private fb: FormBuilder) {
-    super();
+  constructor(private fb: FormBuilder) {}
+
+  @Input() set specs(value: ListBuyerSpec) {
+    this._specs = value;
+    this.init();
   }
 
-  ngOnContextSet() {
+  init() {
     this.config = this.createFieldConfig();
     this.form = this.createGroup();
     this.form.valueChanges.subscribe(() => {
@@ -61,8 +62,8 @@ export class OCMSpecForm extends OCMComponent {
 
   createFieldConfig(): FieldConfig[] {
     const c: FieldConfig[] = [];
-    if (!this.specs || !this.specs.Items) return c;
-    for (const spec of this.specs.Items) {
+    if (!this._specs || !this._specs.Items) return c;
+    for (const spec of this._specs.Items) {
       if (spec.xp.control === 'checkbox') {
         c.push({
           type: 'checkbox',

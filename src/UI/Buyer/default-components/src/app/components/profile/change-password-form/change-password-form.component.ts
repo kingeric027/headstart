@@ -2,28 +2,24 @@ import { Component, OnInit } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MeUser } from '@ordercloud/angular-sdk';
-import { OCMComponent } from '../../base-component';
 import { ValidateStrongPassword, ValidateFieldMatches } from '../../../validators/validators';
 import { ToastrService } from 'ngx-toastr';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './change-password-form.component.html',
   styleUrls: ['./change-password-form.component.scss'],
 })
-export class OCMChangePasswordForm extends OCMComponent implements OnInit {
+export class OCMChangePasswordForm implements OnInit {
   form: FormGroup;
   me: MeUser;
   faTimes = faTimes;
 
-  constructor(private toasterService: ToastrService) {
-    super();
-  }
+  constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
 
   ngOnInit() {
     this.setForm();
   }
-
-  ngOnContextSet() {}
 
   setForm() {
     this.form = new FormGroup({

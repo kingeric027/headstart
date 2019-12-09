@@ -23,12 +23,10 @@
   </div>
 </div>
 <ocm-payment-purchase-order *ngIf="selectedPaymentMethod === 'PurchaseOrder'"
-                            [context]="context"
                             [payment]="existingPayment"
                             (continue)="onContinueClicked()">
 </ocm-payment-purchase-order>
 <ocm-payment-spending-account *ngIf="selectedPaymentMethod === 'SpendingAccount'"
-                              [context]="context"
                               [payment]="existingPayment"
                               (continue)="onContinueClicked()">></ocm-payment-spending-account>
 <ocm-credit-card-form *ngIf="selectedPaymentMethod === 'CreditCard'"

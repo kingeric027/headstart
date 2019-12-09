@@ -1,14 +1,16 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { Payment, Order } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
-import { OCMComponent } from '../../base-component';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-payment.component.html',
   styleUrls: ['./checkout-payment.component.scss'],
 })
-export class OCMCheckoutPayment extends OCMComponent {
+export class OCMCheckoutPayment implements OnInit {
   @Output() continue = new EventEmitter();
+
+  constructor(private context: ShopperContextService) {}
 
   order: Order;
   isAnon: boolean;
@@ -19,7 +21,7 @@ export class OCMCheckoutPayment extends OCMComponent {
     selectedPaymentMethod: new FormControl({ value: '', disabled: this.availablePaymentMethods.length === 1 }),
   });
 
-  async ngOnContextSet() {
+  async ngOnInit() {
     this.order = this.context.currentOrder.get();
     this.isAnon = this.context.currentUser.isAnonymous;
     await this.initializePaymentMethod();

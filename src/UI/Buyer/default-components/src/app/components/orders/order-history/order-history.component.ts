@@ -1,14 +1,14 @@
-import { Component, AfterViewInit, Input } from '@angular/core';
+import { Component, AfterViewInit, Input, OnDestroy, OnInit } from '@angular/core';
 import { ListOrder } from '@ordercloud/angular-sdk';
-import { OCMComponent } from '../../base-component';
-import { OrderStatus, OrderFilters } from 'marketplace';
+import { OrderStatus, OrderFilters, ShopperContextService } from 'marketplace';
 import { takeWhile } from 'rxjs/operators';
 
 @Component({
   templateUrl: './order-history.component.html',
   styleUrls: ['./order-history.component.scss'],
 })
-export class OCMOrderHistory extends OCMComponent implements AfterViewInit {
+export class OCMOrderHistory implements OnInit, AfterViewInit, OnDestroy {
+  alive = true;
   columns: string[] = ['ID', 'Status', 'DateSubmitted', 'Total'];
   @Input() orders: ListOrder;
   @Input() approvalVersion: boolean;
@@ -16,7 +16,9 @@ export class OCMOrderHistory extends OCMComponent implements AfterViewInit {
   sortBy: string;
   searchTerm: string;
 
-  ngOnContextSet() {
+  constructor(private context: ShopperContextService) {}
+
+  ngOnInit() {
     this.context.orderHistory.filters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
   }
 
@@ -52,4 +54,7 @@ export class OCMOrderHistory extends OCMComponent implements AfterViewInit {
     this.context.orderHistory.filters.filterByFavorites(showOnlyFavorites);
   }
 
+  ngOnDestroy() {
+    this.alive = false;
+  }
 }

@@ -1,13 +1,13 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
 import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
-import { OCMComponent } from '../../base-component';
 import { ModalState } from '../../../models/modal-state.class';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-address.component.html',
   styleUrls: ['./checkout-address.component.scss'],
 })
-export class OCMCheckoutAddress extends OCMComponent implements OnChanges {
+export class OCMCheckoutAddress implements OnInit {
   @Input() addressType: 'Shipping' | 'Billing';
   @Output() continue = new EventEmitter();
   isAnon: boolean;
@@ -23,13 +23,12 @@ export class OCMCheckoutAddress extends OCMComponent implements OnChanges {
   };
   usingShippingAsBilling = false;
 
-  ngOnContextSet() {
+  constructor(private context: ShopperContextService) {}
+
+  ngOnInit() {
     this.isAnon = this.context.currentUser.isAnonymous;
     this.order = this.context.currentOrder.get();
     this.lineItems = this.context.currentOrder.getLineItems();
-  }
-
-  ngOnChanges() {
     if (!this.isAnon) {
       this.getSavedAddresses();
     }

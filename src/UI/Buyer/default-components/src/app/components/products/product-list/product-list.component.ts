@@ -1,10 +1,8 @@
-import { Component, Input, OnChanges, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { ListBuyerProduct, ListFacet, Category } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty as _isEmpty, each as _each } from 'lodash';
-import { ModalState } from '../../../models/modal-state.class';
-import { OCMComponent } from '../../base-component';
-import { ProductFilters } from 'marketplace';
+import { ProductFilters, ShopperContextService } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { takeWhile } from 'rxjs/operators';
 
@@ -12,8 +10,9 @@ import { takeWhile } from 'rxjs/operators';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
-export class OCMProductList extends OCMComponent implements OnInit {
+export class OCMProductList implements OnInit, OnDestroy {
   @Input() products: ListBuyerProduct;
+  alive = true;
   facets: ListFacet[];
   categoryCrumbs: Category[];
   favoriteProducts: string[] = [];
@@ -22,13 +21,11 @@ export class OCMProductList extends OCMComponent implements OnInit {
   closeIcon = faTimes;
   numberOfItemsInPagination = 10;
 
-  ngOnContextSet() {
-    if (this.products) this.facets = this.products.Meta.Facets;
-    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
-    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
-  }
+  constructor(private context: ShopperContextService) {}
 
   ngOnInit() {
+    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
+    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
     if (getScreenSizeBreakPoint() === 'xs') {
       this.numberOfItemsInPagination = 3;
     } else if (getScreenSizeBreakPoint() === 'sm') {
@@ -60,5 +57,9 @@ export class OCMProductList extends OCMComponent implements OnInit {
 
   setActiveCategory(categoryID: string): void {
     this.context.productFilters.filterByCategory(categoryID);
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 }

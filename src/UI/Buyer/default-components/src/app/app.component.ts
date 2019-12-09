@@ -4,7 +4,7 @@ import { ShopperContextService } from 'marketplace';
 @Component({
   selector: 'app-root',
   template: `
-    <ocm-app-header class="fixed-top" [context]="context" *ngIf="showHeader"></ocm-app-header>
+    <ocm-app-header class="fixed-top" *ngIf="showHeader"></ocm-app-header>
     <router-outlet></router-outlet>
     <ocm-app-footer [showFooter]="showHeader" *ngIf="showHeader"></ocm-app-footer>
     <ng-progress></ng-progress>

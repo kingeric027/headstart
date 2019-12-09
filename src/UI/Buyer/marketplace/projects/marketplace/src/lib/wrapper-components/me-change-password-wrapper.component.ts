@@ -3,7 +3,7 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
 
 @Component({
   template: `
-    <ocm-change-password [context]="context"></ocm-change-password>
+    <ocm-change-password></ocm-change-password>
   `,
 })
 export class MeChangePasswordWrapperComponent {

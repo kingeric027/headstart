@@ -1,27 +1,20 @@
-import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
-import { OCMComponent } from '../../base-component';
+import { Component, Input, OnChanges, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ListSupplier, Supplier } from '@ordercloud/angular-sdk';
 import { faTimes, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { takeWhile } from 'rxjs/operators';
-import { SupplierFilters, SupplierCategoryConfig } from 'marketplace';
+import { SupplierFilters, SupplierCategoryConfig, ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './supplier-list.component.html',
   styleUrls: ['./supplier-list.component.scss'],
 })
-export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
+export class OCMSupplierList implements OnChanges, OnDestroy {
   @Input() suppliers: ListSupplier;
   _supplierCategoryConfig: SupplierCategoryConfig;
-  @Input() set supplierCategoryConfig(value: SupplierCategoryConfig) {
-    this._supplierCategoryConfig = value;
-    this.setForm();
-    this.context.supplierFilters.activeFiltersSubject
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(this.handleFiltersChange);
-  }
   @ViewChild('popover', { static: false }) public popover: NgbPopover;
+  alive = true; 
   searchTermForSuppliers: string = null;
   filterForm: FormGroup;
   faTimes = faTimes;
@@ -30,11 +23,16 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
   activeFilters = {};
   activeFilterCount = 0;
 
-  ngOnContextSet() {
-    this.activeFilterCount = Object.keys(this.context.supplierFilters.activeFiltersSubject.value.activeFilters).length;
+  constructor(private context: ShopperContextService) {}
+
+  @Input() set supplierCategoryConfig(value: SupplierCategoryConfig) {
+    this._supplierCategoryConfig = value;
+    this.setForm();
+    this.context.supplierFilters.activeFiltersSubject
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(this.handleFiltersChange);
   }
 
-  ngOnInit() {}
   ngOnChanges() {
     this.activeFilterCount = Object.keys(this.context.supplierFilters.activeFiltersSubject.value.activeFilters).length;
   }
@@ -85,5 +83,9 @@ export class OCMSupplierList extends OCMComponent implements OnInit, OnChanges {
 
   closePopover() {
     this.popover.close();
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 }

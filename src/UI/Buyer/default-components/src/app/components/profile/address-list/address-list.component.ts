@@ -1,15 +1,15 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
-import { OCMComponent } from '../../base-component';
 import { ModalState } from '../../../models/modal-state.class';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './address-list.component.html',
   styleUrls: ['./address-list.component.scss'],
 })
-export class OCMAddressList extends OCMComponent {
+export class OCMAddressList implements OnInit {
   @Input() addresses: ListBuyerAddress;
   faPlus = faPlus;
   faArrowLeft = faArrowLeft;
@@ -24,7 +24,9 @@ export class OCMAddressList extends OCMComponent {
   areYouSureModal = ModalState.Closed;
   showCreateAddressForm = false;
 
-  ngOnContextSet() {
+  constructor(private context: ShopperContextService) {}
+
+  ngOnInit() {
     this.reloadAddresses();
   }
 
