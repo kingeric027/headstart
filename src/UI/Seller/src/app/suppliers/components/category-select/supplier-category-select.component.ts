@@ -56,14 +56,16 @@ export class SupplierCategorySelectComponent {
   _categorySelections: SupplierCategorySelection[];
 
   isSecondDuplicateCategory = isSecondDuplicateCategory;
+  areNoCategories = false;
+
   @Input()
   set categorySelectionsControl(value: FormControl) {
-    this.checkIfAllFieldsAreSelected(value.value);
+    this.updateCategoryValidation(value.value);
     this._categorySelectionsControl = value;
     this._categorySelections = value.value;
     this._categorySelectionsControl.valueChanges.subscribe((categorySelections) => {
       this._categorySelections = categorySelections;
-      this.checkIfAllFieldsAreSelected(categorySelections);
+      this.updateCategoryValidation(categorySelections);
     });
   }
   @Input()
@@ -72,28 +74,30 @@ export class SupplierCategorySelectComponent {
   selectionsChanged = new EventEmitter();
 
   removeCategory(index: number): void {
-    const newCategorySelection = this._categorySelections;
+    const newCategorySelection = JSON.parse(JSON.stringify(this._categorySelections));
     newCategorySelection.splice(index, 1);
-    this.selectionsChanged.emit({ field: 'xp.Categories', value: newCategorySelection });
-    this.checkIfAllFieldsAreSelected(newCategorySelection);
+    this.updateCategory(newCategorySelection);
   }
 
   addCategory(): void {
     const newCategorySelection = [...this._categorySelections, { ServiceCategory: '', VendorLevel: '' }];
-    this.selectionsChanged.emit({ field: 'xp.Categories', value: newCategorySelection });
-    this._categorySelectionsControl.setValue(newCategorySelection);
-    this.checkIfAllFieldsAreSelected(newCategorySelection);
+    this.updateCategory(newCategorySelection);
   }
 
   makeSelection(event: any, field: string, index: number): void {
     const newCategorySelection = this._categorySelections;
     newCategorySelection[index][field] = event.target.value;
-    this.selectionsChanged.emit({ field: 'xp.Categories', value: newCategorySelection });
-    this._categorySelectionsControl.setValue(newCategorySelection);
-    this.checkIfAllFieldsAreSelected(newCategorySelection);
+    this.updateCategory(newCategorySelection);
   }
 
-  checkIfAllFieldsAreSelected(newCategorySelection: SupplierCategorySelection[]): void {
+  updateCategory(newCategorySelection: SupplierCategorySelection[]) {
+    this.updateCategoryValidation(newCategorySelection);
+    this.selectionsChanged.emit({ field: 'xp.Categories', value: newCategorySelection });
+    this._categorySelectionsControl.setValue(newCategorySelection);
+  }
+
+  updateCategoryValidation(newCategorySelection: SupplierCategorySelection[]): void {
+    this.areNoCategories = !newCategorySelection.length;
     this.canAddAnotherCategory = areAllCategoriesComplete(newCategorySelection);
   }
 }
