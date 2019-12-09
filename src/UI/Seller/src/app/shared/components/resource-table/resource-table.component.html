@@ -113,6 +113,7 @@
                            style="width: 100%; height: calc(100vh - 255px);"
                            (psYReachEnd)="handleScrollEnd()">
           <full-resource-table-component [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel"
+                                         [requestStatus]="requestStatus"
                                          (resourceSelected)="handleSelectResource($event)"
                                          [resourceList]="resourceList"></full-resource-table-component>
         </perfect-scrollbar>
@@ -133,8 +134,11 @@
                   <th scope="col">Name</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr *ngIf="isCreatingNew"
+
+              <!-- successfull response with items -->
+              <tbody *ngIf="requestStatus === 'SUCCESSFUL_WITH_ITEMS' || requestStatus === 'REFRESHING_ITEMS'">
+                <tr *ngIf="
+                     isCreatingNew"
                     class="selectable-row selected-resource">
                   <td>
                     <summary-resource-display-component [isNewPlaceHolder]="true"
@@ -156,6 +160,24 @@
                   <td *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">More resources</td>
                 </tr>
               </tbody>
+
+              <tbody *ngIf="requestStatus === 'SUCCESSFUL_NO_ITEMS_NO_FILTERS'">
+                <tr>
+                  <td>No items</td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="requestStatus === 'SUCCESSFUL_NO_ITEMS_WITH_FILTERS'">
+                <tr>
+                  <td>No items, try changing search or removing filters</td>
+                </tr>
+              </tbody>
+
+              <tbody *ngIf="requestStatus === 'GETTING_NEW_ITEMS'">
+                <tr>
+                  <td>Getting items</td>
+                </tr>
+              </tbody>
+
             </table>
           </perfect-scrollbar>
         </div>

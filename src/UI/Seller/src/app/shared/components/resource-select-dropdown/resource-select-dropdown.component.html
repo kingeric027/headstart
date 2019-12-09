@@ -11,7 +11,7 @@
                       [searchTermInput]="searchTerm"
                       (searched)="searchedResources($event)">
     </search-component>
-    <perfect-scrollbar style="height: 400px"
+    <perfect-scrollbar style="height: 400px; min-width: 400px;"
                        (psYReachEnd)="handleScrollEnd()">
       <button ngbDropdownItem
               *ngFor="let resource of parentResourceList.Items"
