@@ -309,6 +309,10 @@ export class AppConfig {
    */
   cmsUrl: string;
   /**
+   *  TODO - Link to identity provider's authorization server. this field should probably be SEB-specific.
+   */
+  ssoLink: string;
+  /**
    * An array of security roles that will be requested upon login.
    * These roles allow access to specific endpoints in the OrderCloud.io API.
    * To learn more about these roles and the security profiles that comprise them
