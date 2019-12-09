@@ -141,8 +141,6 @@ export abstract class ResourceCrudService<ResourceType> {
     const areFilters = this.areFiltersOnOptions(options);
     const areItems = !!resourceResponse.Items.length;
     if (areItems) return SUCCESSFUL_WITH_ITEMS;
-
-    console.log(options);
     return areFilters ? SUCCESSFUL_NO_ITEMS_WITH_FILTERS : SUCCESSFUL_NO_ITEMS_NO_FILTERS;
   }
 
