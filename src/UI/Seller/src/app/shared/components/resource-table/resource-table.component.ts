@@ -8,7 +8,7 @@ import { takeWhile, filter } from 'rxjs/operators';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { FormGroup } from '@angular/forms';
-import { ListResource, Options } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { ListResource, Options, RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 
 interface BreadCrumb {
   displayText: string;
@@ -36,6 +36,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   _ocService: ResourceCrudService<any>;
   areChanges: boolean;
   parentResources: ListResource<any>;
+  requestStatus: RequestStatus;
   selectedParentResourceName = 'Fetching Data';
   selectedParentResourceID = '';
   breadCrumbs: BreadCrumb[] = [];
@@ -101,6 +102,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     await this.redirectToFirstParentIfNeeded();
     this.setUrlSubscription();
     this.setParentResourceSelectionSubscription();
+    this.setListRequestStatusSubscription();
     this._ocService.listResources();
   }
 
@@ -140,6 +142,12 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
           if (parentResource) this.selectedParentResourceName = parentResource.Name;
         }
       });
+  }
+
+  private setListRequestStatusSubscription() {
+    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe((requestStatus) => {
+      this.requestStatus = requestStatus;
+    });
   }
 
   private checkIfCreatingNew() {

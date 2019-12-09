@@ -11,6 +11,7 @@ import {
   ResourceRow,
   ResourceConfiguration,
 } from '@app-seller/shared/services/configuration/table-display';
+import { RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -25,6 +26,8 @@ export class FullResourceTableComponent {
 
   @Input()
   resourceType: any;
+  @Input()
+  requestStatus: RequestStatus;
   @Input()
   set resourceList(value: any) {
     this._resourceList = value;
