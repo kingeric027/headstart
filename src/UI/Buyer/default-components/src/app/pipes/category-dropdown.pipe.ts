@@ -31,7 +31,6 @@ export class CategoryFilterPipe implements PipeTransform {
                 }
             }
         });
-
         if (level === 'parent') {
             return parentCategories;
         } else if (level === 'subCategory') {

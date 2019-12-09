@@ -119,4 +119,4 @@
   </div>
 </nav>
 <ocm-category-dropdown [categories]="categories"
-                       [showItems]="showDropdown"></ocm-category-dropdown>
+                       *ngIf="showDropdown"></ocm-category-dropdown>

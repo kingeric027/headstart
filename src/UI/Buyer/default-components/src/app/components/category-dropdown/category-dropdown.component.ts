@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { OCMComponent } from '../base-component';
-import { Category } from '@ordercloud/angular-sdk';
+import { Category, ListCategory } from '@ordercloud/angular-sdk';
 import { CategoryFilterPipe } from '../../pipes/category-dropdown.pipe';
 
 @Component({
@@ -8,21 +8,18 @@ import { CategoryFilterPipe } from '../../pipes/category-dropdown.pipe';
 	styleUrls: ['./category-dropdown.component.scss'],
 	providers: [CategoryFilterPipe]
 })
-export class OCMCategoryDropdown extends OCMComponent implements OnChanges {
+export class OCMCategoryDropdown extends OCMComponent {
 	constructor(private categoryFilterPipe: CategoryFilterPipe) { super() }
-	@Input() showItems;
-	@Input() categories;
+
+	@Input() set categories(value: Category[]) {
+		this.parentCategories = this.categoryFilterPipe.transform(value, 'parent');
+		this.subCategories = this.categoryFilterPipe.transform(value, 'subCategory');
+		this.subSubCategories = this.categoryFilterPipe.transform(value, 'subSubCategory');
+	}
 
 	parentCategories: Category[] = [];
 	subCategories: Category[] = [];
 	subSubCategories: Category[] = [];
-
-	ngOnChanges() {
-		this.parentCategories = this.categoryFilterPipe.transform(this.categories, 'parent');
-		this.subCategories = this.categoryFilterPipe.transform(this.categories, 'subCategory');
-		this.subSubCategories = this.categoryFilterPipe.transform(this.categories, 'subSubCategory');
-		console.log(this.subCategories, this.subSubCategories)
-	}
 
 	ngOnContextSet() { }
 
