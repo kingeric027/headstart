@@ -10,10 +10,11 @@ export class CategoryFilterPipe implements PipeTransform {
         var parentCategories;
         var subCategories = [];
         var subSubCategories = [];
+
         if (!categories || !level) {
             return categories;
         }
-        // returns a list of only top-level (parent) categories
+
         parentCategories = categories.filter(category => category.ParentID === null);
 
         categories.forEach(category => {
@@ -31,6 +32,7 @@ export class CategoryFilterPipe implements PipeTransform {
                 }
             }
         });
+
         if (level === 'parent') {
             return parentCategories;
         } else if (level === 'subCategory') {
@@ -38,5 +40,6 @@ export class CategoryFilterPipe implements PipeTransform {
         } else if (level === 'subSubCategory') {
             return subSubCategories;
         }
+
     }
 }

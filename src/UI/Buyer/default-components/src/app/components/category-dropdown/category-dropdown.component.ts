@@ -10,11 +10,15 @@ import { CategoryFilterPipe } from '../../pipes/category-dropdown.pipe';
 })
 export class OCMCategoryDropdown extends OCMComponent {
 	constructor(private categoryFilterPipe: CategoryFilterPipe) { super() }
-
+	@Input() showMenu;
 	@Input() set categories(value: Category[]) {
 		this.parentCategories = this.categoryFilterPipe.transform(value, 'parent');
 		this.subCategories = this.categoryFilterPipe.transform(value, 'subCategory');
 		this.subSubCategories = this.categoryFilterPipe.transform(value, 'subSubCategory');
+	}
+
+	closeDropdown() {
+		this.showMenu = false;
 	}
 
 	parentCategories: Category[] = [];

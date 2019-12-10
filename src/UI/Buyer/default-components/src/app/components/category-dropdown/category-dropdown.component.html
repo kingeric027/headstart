@@ -1,12 +1,10 @@
 <div class="collapse navbar-collapse d-flex justify-content-between">
   <ul class="category-dropdown">
     <li *ngFor="let parentCategory of parentCategories"><a href="#">{{parentCategory.Name}}</a>
-      <ul>
-        <li *ngFor="let subCategory of subCategories"><a *ngIf="subCategory.ParentID === parentCategory.ID"
-             href="#">{{subCategory.Name}}</a>
-          <ul>
-            <li *ngFor="let subSubCategory of subSubCategories"><a *ngIf="subSubCategory.ParentID === subCategory.ID"
-                 href="#">{{subSubCategory.Name}}</a></li>
+      <ul class="sub-menu">
+        <li *ngFor="let subCategory of subCategories | childCategoryFilter: parentCategory.ID"><a href="#">{{subCategory.Name}}</a>
+          <ul class="sub-sub-menu">
+            <li *ngFor="let subSubCategory of subSubCategories | childCategoryFilter: subCategory.ID"><a href="#">{{subSubCategory.Name}}</a></li>
           </ul>
         </li>
       </ul>
