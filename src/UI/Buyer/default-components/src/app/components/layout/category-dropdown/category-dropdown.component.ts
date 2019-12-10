@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Category } from '@ordercloud/angular-sdk';
-import { CategoryFilterPipe } from '../../pipes/category-dropdown.pipe';
+import { CategoryFilterPipe } from '../../../pipes/category-dropdown.pipe';
 import { ShopperContextService } from 'marketplace';
 
 @Component({
