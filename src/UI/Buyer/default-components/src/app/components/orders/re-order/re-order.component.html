@@ -1,6 +1,6 @@
 <button type="button"
         class="btn  btn-secondary"
-        (click)="orderReorder()">Reorder</button>
+        (click)="openModal()">Reorder</button>
 <ocm-modal [state]="reorderModal"
            modalTitle="Order Reorder">
   <div *ngIf="reorderResponse">
@@ -12,7 +12,6 @@
     </div>
     <ocm-lineitem-table *ngIf="reorderResponse.InvalidLi.length"
                         [lineItems]="{ Items: reorderResponse.InvalidLi }"
-                        [context]="context"
                         [readOnly]="true">
     </ocm-lineitem-table>
     <button type="button"

@@ -6,7 +6,7 @@ import { ListLineItemWithProduct, LineItemWithProduct } from '../shopper-context
 
 @Component({
   template: `
-    <ocm-cart [order]="order" [lineItems]="lineItems" [context]="context"></ocm-cart>
+    <ocm-cart [order]="order" [lineItems]="lineItems"></ocm-cart>
   `,
 })
 export class CartWrapperComponent implements OnInit {

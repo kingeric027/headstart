@@ -5,7 +5,7 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
 
 @Component({
   template: `
-    <ocm-address-list [addresses]="addresses" [context]="context"></ocm-address-list>
+    <ocm-address-list [addresses]="addresses"></ocm-address-list>
   `,
 })
 export class AddressListWrapperComponent implements OnInit {

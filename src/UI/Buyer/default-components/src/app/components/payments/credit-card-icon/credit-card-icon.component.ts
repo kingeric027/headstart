@@ -1,6 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { faCcVisa, faCcMastercard, faCcDiscover, IconDefinition } from '@fortawesome/free-brands-svg-icons';
-import { OCMComponent } from '../../base-component';
 
 @Component({
   templateUrl: './credit-card-icon.component.html',

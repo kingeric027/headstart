@@ -10,8 +10,7 @@
     <div class="row flex-lg-row-reverse"
          *ngIf="order.LineItemCount">
       <div class="col-lg-3">
-        <ocm-order-summary [order]="order"
-                           [context]="context"></ocm-order-summary>
+        <ocm-order-summary [order]="order"></ocm-order-summary>
       </div>
       <div class="col-lg-9">
         <ngb-accordion [closeOthers]="true"
@@ -51,8 +50,7 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-address [context]="context"
-                                    [addressType]="'Shipping'"
+              <ocm-checkout-address [addressType]="'Shipping'"
                                     (continue)="toSection('billingAddress')"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
@@ -64,8 +62,7 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-address [context]="context"
-                                    [addressType]="'Billing'"
+              <ocm-checkout-address [addressType]="'Billing'"
                                     (continue)="toSection('payment')"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
@@ -77,8 +74,7 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-payment [context]="context"
-                                    (continue)="toSection('confirm')"></ocm-checkout-payment>
+              <ocm-checkout-payment (continue)="toSection('confirm')"></ocm-checkout-payment>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="confirm">
@@ -86,7 +82,7 @@
               <a class="link-text"> Confirm </a>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-confirm [context]="context"></ocm-checkout-confirm>
+              <ocm-checkout-confirm></ocm-checkout-confirm>
             </ng-template>
           </ngb-panel>
         </ngb-accordion>

@@ -1,7 +1,6 @@
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MeUser } from '@ordercloud/angular-sdk';
-import { OCMComponent } from '../../base-component';
 import {
   ValidateName,
   ValidateEmail,
@@ -9,17 +8,21 @@ import {
   ValidateStrongPassword,
   ValidateFieldMatches,
 } from '../../../validators/validators';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
-export class OCMRegister extends OCMComponent implements OnInit {
+export class OCMRegister implements OnInit {
   form: FormGroup;
   appName: string;
 
+  constructor(private context: ShopperContextService) {}
+
   // TODO: validation isn't working
   ngOnInit() {
+    this.appName = this.context.appSettings.appname;
     this.form = new FormGroup({
       Username: new FormControl('', Validators.required),
       FirstName: new FormControl('', [Validators.required, ValidateName]),
@@ -30,11 +33,7 @@ export class OCMRegister extends OCMComponent implements OnInit {
       ConfirmPassword: new FormControl('', [Validators.required, ValidateFieldMatches('Password')]),
     });
   }
-
-  ngOnContextSet() {
-    this.appName = this.context.appSettings.appname;
-  }
-
+  
   // TODO: requires anonymous token, but not checked for here
   async onSubmit() {
     const me: MeUser = this.form.value;

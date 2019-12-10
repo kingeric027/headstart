@@ -1,13 +1,12 @@
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
 import { Component, Input } from '@angular/core';
-import { OCMComponent } from '../../base-component';
 
 @Component({
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class OCMHomePage extends OCMComponent {
+export class OCMHomePage {
   @Input() featuredProducts: BuyerProduct[];
   faBullhorn = faBullhorn;
 
@@ -25,6 +24,4 @@ export class OCMHomePage extends OCMComponent {
       bodyText: 'This is the third image',
     },
   ];
-
-  ngOnContextSet() {}
 }

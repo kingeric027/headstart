@@ -1,17 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Order, ListLineItem } from '@ordercloud/angular-sdk';
-import { OCMComponent } from '../../base-component';
-import { ListLineItemWithProduct } from 'marketplace';
+import { ListLineItemWithProduct, ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss'],
 })
-export class OCMCart extends OCMComponent {
+export class OCMCart {
   @Input() order: Order;
   @Input() lineItems: ListLineItemWithProduct;
 
-  ngOnContextSet() {}
+  constructor(private context: ShopperContextService) {}
 
   toProductList() {
     this.context.router.toProductList();

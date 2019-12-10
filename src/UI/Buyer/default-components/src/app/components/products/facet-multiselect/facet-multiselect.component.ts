@@ -1,17 +1,17 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { ListFacet, ListFacetValue } from '@ordercloud/angular-sdk';
 import { each as _each, get as _get, xor as _xor } from 'lodash';
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
-import { OCMComponent } from '../../base-component';
-import { ProductFilters } from 'marketplace';
+import { ProductFilters, ShopperContextService } from 'marketplace';
 import { takeWhile } from 'rxjs/operators';
 
 @Component({
   templateUrl: './facet-multiselect.component.html',
   styleUrls: ['./facet-multiselect.component.scss'],
 })
-export class OCMFacetMultiSelect extends OCMComponent {
-  @Input() facet: ListFacet;
+export class OCMFacetMultiSelect implements OnDestroy {
+  _facet: ListFacet;
+  alive = true;
   checkboxArray: { facet: ListFacetValue; checked: boolean }[] = [];
   private activeFacetValues: string[] = [];
   visibleFacetLength = 5;
@@ -19,7 +19,10 @@ export class OCMFacetMultiSelect extends OCMComponent {
   faPlusSquare = faPlusSquare;
   faMinusSquare = faMinusSquare;
 
-  ngOnContextSet() {
+  constructor(private context: ShopperContextService) {}
+
+  @Input() set facet(value: ListFacet) {
+    this._facet = value;
     this.context.productFilters.activeFiltersSubject
       .pipe(takeWhile(() => this.alive))
       .subscribe(this.handleFiltersChange);
@@ -31,7 +34,7 @@ export class OCMFacetMultiSelect extends OCMComponent {
   }
 
   showAll() {
-    this.visibleFacetLength = this.facet.Values.length;
+    this.visibleFacetLength = this._facet.Values.length;
   }
 
   handleCheckBoxClick(facetValue: string) {
@@ -41,14 +44,14 @@ export class OCMFacetMultiSelect extends OCMComponent {
   }
 
   private handleFiltersChange = (filters: ProductFilters) => {
-    const activeFacet = _get(filters.activeFacets, this.facet.Name, null);
+    const activeFacet = _get(filters.activeFacets, this._facet.Name, null);
     this.activeFacetValues = activeFacet ? activeFacet.split('|') : [];
     this.updateCheckBoxes(this.activeFacetValues);
-  };
+  }
 
   // TODO - there is this little flash when a checkbox is click. get rid of it.
   private updateCheckBoxes(activeFacetValues: string[]) {
-    this.checkboxArray = this.facet.Values.map(facet => {
+    this.checkboxArray = this._facet.Values.map(facet => {
       const checked = activeFacetValues.includes(facet.Value);
       return { facet, checked };
     });
@@ -58,6 +61,10 @@ export class OCMFacetMultiSelect extends OCMComponent {
     // TODO - maybe all this joining and spliting should be done in the service?
     // Abstract out the way the filters work under the hood?
     const values = activeFacetValues.join('|');
-    this.context.productFilters.filterByFacet(this.facet.Name, values);
+    this.context.productFilters.filterByFacet(this._facet.Name, values);
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 }

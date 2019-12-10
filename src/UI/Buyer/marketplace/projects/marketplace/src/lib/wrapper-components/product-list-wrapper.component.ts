@@ -6,10 +6,7 @@ import { takeWhile } from 'rxjs/operators';
 
 @Component({
   template: `
-    <ocm-product-list
-      [products]="products"
-      [context]="context"
-    ></ocm-product-list>
+    <ocm-product-list [products]="products"></ocm-product-list>
   `,
 })
 export class ProductListWrapperComponent implements OnInit, OnDestroy {

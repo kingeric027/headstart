@@ -1,14 +1,14 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { ListOrder } from '@ordercloud/angular-sdk';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
-import { OCMComponent } from '../../base-component';
 import { OrderListColumn } from '../../../models/order-list-column';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './order-list.component.html',
   styleUrls: ['./order-list.component.scss'],
 })
-export class OCMOrderList extends OCMComponent {
+export class OCMOrderList {
   @Input() orders: ListOrder;
   @Input() columns: OrderListColumn[];
   faCaretDown = faCaretDown;
@@ -19,7 +19,7 @@ export class OCMOrderList extends OCMComponent {
   @Output() updatedSort = new EventEmitter<string>();
   @Output() changedPage = new EventEmitter<number>();
 
-  ngOnContextSet() {}
+  constructor(private context: ShopperContextService) {}
 
   updateSort(selectedSortBy) {
     let sortBy;

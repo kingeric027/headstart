@@ -3,7 +3,7 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
 
 @Component({
   template: `
-    <ocm-profile [context]="context"></ocm-profile>
+    <ocm-profile></ocm-profile>
   `,
 })
 export class ProfileWrapperComponent {

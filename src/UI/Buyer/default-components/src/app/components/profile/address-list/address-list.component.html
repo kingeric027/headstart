@@ -1,4 +1,4 @@
-<ocm-profile-nav [context]="context">
+<ocm-profile-nav>
   <div *ngIf="!isLoading">
     <div class="d-flex justify-content-between align-items-center">
       <h1 class="page-heading">Addresses</h1>
@@ -77,7 +77,6 @@
                         [resource]="addresses"
                         [rows]="3"
                         [columns]="3"
-                        [context]="context"
                         [isLoading]="isLoading"></ocm-loading-layout>
 
   </div>
