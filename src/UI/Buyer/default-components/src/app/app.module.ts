@@ -22,7 +22,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TreeModule } from 'angular-tree-component';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
-import { OCMCategoryDropdown } from './components/category-dropdown/category-dropdown.component';
+import { OCMCategoryDropdown } from './components/layout/category-dropdown/category-dropdown.component';
 import {
   NgbCarouselModule,
   NgbCollapseModule,
