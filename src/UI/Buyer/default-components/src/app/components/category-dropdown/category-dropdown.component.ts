@@ -1,6 +1,7 @@
-import { Component, Input, OnChanges } from '@angular/core';
-import { Category, ListCategory } from '@ordercloud/angular-sdk';
+import { Component, Input } from '@angular/core';
+import { Category } from '@ordercloud/angular-sdk';
 import { CategoryFilterPipe } from '../../pipes/category-dropdown.pipe';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
 	templateUrl: './category-dropdown.component.html',
@@ -8,7 +9,8 @@ import { CategoryFilterPipe } from '../../pipes/category-dropdown.pipe';
 	providers: [CategoryFilterPipe]
 })
 export class OCMCategoryDropdown {
-	constructor(private categoryFilterPipe: CategoryFilterPipe) { }
+	constructor(private categoryFilterPipe: CategoryFilterPipe, private context: ShopperContextService) { }
+
 	@Input() showMenu;
 	@Input() set categories(value: Category[]) {
 		this.parentCategories = this.categoryFilterPipe.transform(value, 'parent');
@@ -19,5 +21,9 @@ export class OCMCategoryDropdown {
 	parentCategories: Category[] = [];
 	subCategories: Category[] = [];
 	subSubCategories: Category[] = [];
+
+	setActiveCategory(categoryID: string): void {
+		this.context.router.toProductList({ categoryID });
+	}
 
 }
