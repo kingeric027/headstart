@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import {
@@ -11,17 +11,16 @@ import {
   minBy as _minBy,
   has as _has,
 } from 'lodash';
-import { OCMComponent } from '../../base-component';
 import { SpecFormService } from '../spec-form/spec-form.service';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
 })
-export class OCMProductDetails extends OCMComponent {
-  @Input() specs: ListSpec;
-  @Input() product: BuyerProduct;
-
+export class OCMProductDetails implements OnInit {
+  _specs: ListSpec;
+  _product: BuyerProduct;
   specFormService: SpecFormService;
   isOrderable = false;
   quantity: number;
@@ -35,16 +34,23 @@ export class OCMProductDetails extends OCMComponent {
   favoriteProducts: string[] = [];
   qtyValid = true;
 
-  constructor(private formService: SpecFormService) {
-    super();
+  constructor(private formService: SpecFormService, private context: ShopperContextService) {
     this.specFormService = formService;
   }
 
-  ngOnContextSet() {
-    this.isOrderable = !!this.product.PriceSchedule;
+  @Input() set specs(value: ListSpec) {
+    this._specs = value;
+    this.specFormService.event.valid = this._specs.Items.length === 0;
+  }
+
+  @Input() set product(value: BuyerProduct) {
+    this._product = value;
+    this.isOrderable = !!this._product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
+  }
+
+  ngOnInit() {
     this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
-    this.specFormService.event.valid = this.specs.Items.length === 0;
   }
 
   onSpecFormChange(event): void {
@@ -64,17 +70,17 @@ export class OCMProductDetails extends OCMComponent {
 
   addToCart(event: any): void {
     this.context.currentOrder.addToCart({
-      ProductID: this.product.ID,
+      ProductID: this._product.ID,
       Quantity: this.quantity,
-      Specs: this.specFormService.getLineItemSpecs(this.specs),
+      Specs: this.specFormService.getLineItemSpecs(this._specs),
     });
   }
 
   getPriceBreakRange(index) {
-    if (!this.product.PriceSchedule && !this.product.PriceSchedule.PriceBreaks.length) {
+    if (!this._product.PriceSchedule && !this._product.PriceSchedule.PriceBreaks.length) {
       return '';
     }
-    const priceBreaks = this.product.PriceSchedule.PriceBreaks;
+    const priceBreaks = this._product.PriceSchedule.PriceBreaks;
     const indexOfNextPriceBreak = index + 1;
     if (indexOfNextPriceBreak < priceBreaks.length) {
       return `${priceBreaks[index].Quantity} - ${priceBreaks[indexOfNextPriceBreak].Quantity - 1}`;
@@ -87,10 +93,10 @@ export class OCMProductDetails extends OCMComponent {
     // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
     // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
     // is the cost per item.
-    if (!this.product.PriceSchedule && !this.product.PriceSchedule.PriceBreaks.length) {
+    if (!this._product.PriceSchedule && !this._product.PriceSchedule.PriceBreaks.length) {
       return 0;
     }
-    const priceBreaks = this.product.PriceSchedule.PriceBreaks;
+    const priceBreaks = this._product.PriceSchedule.PriceBreaks;
     this.priceBreaks = priceBreaks;
     const startingBreak = _minBy(priceBreaks, 'Quantity');
     const selectedBreak = priceBreaks.reduce((current, candidate) => {
@@ -101,14 +107,14 @@ export class OCMProductDetails extends OCMComponent {
       (((priceBreaks[0].Price - selectedBreak.Price) / priceBreaks[0].Price) * 100).toFixed(0)
     );
     this.price = this.specFormService.event.valid
-      ? this.specFormService.getSpecMarkup(this.specs, selectedBreak, this.quantity || startingBreak.Quantity)
+      ? this.specFormService.getSpecMarkup(this._specs, selectedBreak, this.quantity || startingBreak.Quantity)
       : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
   }
 
   // TODO - we need a unified getImageUrl() function
   getImageUrls(): string[] {
     const images =
-      _uniq(this.product.xp.Images, (img: any) => {
+      _uniq(this._product.xp.Images, (img: any) => {
         return img.Url;
       }) || [];
     const result = _map(images, img => {
@@ -118,10 +124,10 @@ export class OCMProductDetails extends OCMComponent {
   }
 
   isFavorite(): boolean {
-    return this.favoriteProducts.includes(this.product.ID);
+    return this.favoriteProducts.includes(this._product.ID);
   }
 
   setIsFavorite(isFav: boolean) {
-    this.context.currentUser.setIsFavoriteProduct(isFav, this.product.ID);
+    this.context.currentUser.setIsFavoriteProduct(isFav, this._product.ID);
   }
 }

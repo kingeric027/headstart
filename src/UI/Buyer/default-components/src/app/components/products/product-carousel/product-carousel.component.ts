@@ -1,13 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
-import { OCMComponent } from '../../base-component';
 
 @Component({
   templateUrl: './product-carousel.component.html',
   styleUrls: ['./product-carousel.component.scss'],
 })
-export class OCMProductCarousel extends OCMComponent {
+export class OCMProductCarousel {
   @Input() products: BuyerProduct[] = [];
   @Input() displayTitle: string;
 
@@ -15,8 +14,6 @@ export class OCMProductCarousel extends OCMComponent {
   rowLength = 4;
   faAngleLeft = faAngleLeft;
   faAngleRight = faAngleRight;
-
-  ngOnContextSet() {}
 
   left(): void {
     this.index -= this.rowLength;

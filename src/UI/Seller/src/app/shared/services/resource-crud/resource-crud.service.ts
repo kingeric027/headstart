@@ -5,27 +5,24 @@ import { cloneDeep as _cloneDeep, uniqBy as _uniqBy } from 'lodash';
 import { Meta } from '@ordercloud/angular-sdk';
 import { filter, takeWhile } from 'rxjs/operators';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
-
-export interface Options {
-  page?: number;
-  sortBy?: string;
-  search?: string;
-  filters?: FilterDictionary;
-}
-
-export interface FilterDictionary {
-  [filterKey: string]: string;
-}
-
-export interface ListResource<ResourceType> {
-  Meta: Meta;
-  Items: ResourceType[];
-}
+import {
+  ListResource,
+  Options,
+  FilterDictionary,
+  RequestStatus,
+  SUCCESSFUL_WITH_ITEMS,
+  ERROR,
+  GETTING_NEW_ITEMS,
+  REFRESHING_ITEMS,
+  SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
+  SUCCESSFUL_NO_ITEMS_NO_FILTERS,
+} from './resource-crud.types';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListResource<ResourceType>> = new BehaviorSubject<ListResource<ResourceType>>(
     { Meta: {}, Items: [] }
   );
+  public resourceRequestStatus: BehaviorSubject<RequestStatus> = new BehaviorSubject<RequestStatus>(GETTING_NEW_ITEMS);
   public optionsSubject: BehaviorSubject<Options> = new BehaviorSubject<Options>({});
   private itemsPerPage = 100;
 
@@ -50,7 +47,7 @@ export abstract class ResourceCrudService<ResourceType> {
     this.secondaryResourceLevel = secondaryResourceLevel;
     this.subResourceList = subResourceList;
 
-    this.activatedRoute.queryParams.subscribe(params => {
+    this.activatedRoute.queryParams.subscribe((params) => {
       // this prevents service from reading from query params when not on the route related to the service
       if (this.isOnRelatedRoute()) {
         this.readFromUrlQueryParams(params);
@@ -58,7 +55,7 @@ export abstract class ResourceCrudService<ResourceType> {
         this.optionsSubject.next({});
       }
     });
-    this.optionsSubject.subscribe(value => {
+    this.optionsSubject.subscribe((value) => {
       if (this.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         this.listResources();
       }
@@ -68,7 +65,7 @@ export abstract class ResourceCrudService<ResourceType> {
   private isOnRelatedRoute(): boolean {
     const isOnSubResource =
       this.subResourceList &&
-      this.subResourceList.some(subResource => {
+      this.subResourceList.some((subResource) => {
         return this.router.url.includes(`/${subResource}`);
       });
     const isOnBaseRoute = this.router.url.includes(this.route);
@@ -101,22 +98,50 @@ export abstract class ResourceCrudService<ResourceType> {
       const { sortBy, search, filters } = this.optionsSubject.value;
       const options = {
         page: pageNumber,
-
         // allows a list call to pass in a search term that will not appear in the query params
         search: searchText || search,
         sortBy,
         pageSize: this.itemsPerPage,
         filters,
       };
-      const resourceResponse = await this.ocService
-        .List(...this.appendParentIDToCallArgsIfSubResource([options]))
-        .toPromise();
+      const resourceResponse = await this.listWithStatusIndicator(options);
       if (pageNumber === 1) {
         this.setNewResources(resourceResponse);
       } else {
         this.addResources(resourceResponse);
       }
     }
+  }
+
+  private async listWithStatusIndicator(options: Options): Promise<ListResource<ResourceType>> {
+    try {
+      this.resourceRequestStatus.next(this.getFetchStatus(options));
+      const resourceResponse = await this.ocService
+        .List(...this.appendParentIDToCallArgsIfSubResource([options]))
+        .toPromise();
+      this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
+      return resourceResponse;
+    } catch (error) {
+      this.resourceRequestStatus.next(ERROR);
+      throw error;
+    }
+  }
+
+  getFetchStatus(options: Options) {
+    const isSubsequentPage = options.page > 1;
+    const areCurrentlyItems = this.resourceSubject.value.Items.length;
+
+    // will not want to show a loading indicator in certain situations so this
+    // differentiates between refreshes and new lists
+    // when filters are applied REFRESHING_ITEMS will be returned
+    return isSubsequentPage || !areCurrentlyItems ? GETTING_NEW_ITEMS : REFRESHING_ITEMS;
+  }
+
+  getSucessStatus(options: Options, resourceResponse: ListResource<ResourceType>) {
+    const areFilters = this.areFiltersOnOptions(options);
+    const areItems = !!resourceResponse.Items.length;
+    if (areItems) return SUCCESSFUL_WITH_ITEMS;
+    return areFilters ? SUCCESSFUL_NO_ITEMS_WITH_FILTERS : SUCCESSFUL_NO_ITEMS_NO_FILTERS;
   }
 
   shouldListResources() {
@@ -201,7 +226,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
-    const resourceInList = this.resourceSubject.value.Items.find(i => (i as any).ID === resourceID);
+    const resourceInList = this.resourceSubject.value.Items.find((i) => (i as any).ID === resourceID);
     if (resourceInList) {
       return resourceInList;
     } else {
@@ -281,7 +306,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   removeFilters(filtersToRemove: string[]) {
     const newFilterDictionary = { ...this.optionsSubject.value.filters };
-    filtersToRemove.forEach(filter => {
+    filtersToRemove.forEach((filter) => {
       if (newFilterDictionary[filter]) {
         delete newFilterDictionary[filter];
       }
@@ -314,5 +339,15 @@ export abstract class ResourceCrudService<ResourceType> {
     return Object.entries(filters).some(([key, value]) => {
       return !!value;
     });
+  }
+
+  areFiltersOnOptions(options: Options): boolean {
+    return (
+      !!options.search ||
+      (options.filters &&
+        Object.entries(options.filters).some(([key, value]) => {
+          return !!value;
+        }))
+    );
   }
 }

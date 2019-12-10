@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { OCMComponent } from '../../base-component';
 import { OrderDetails } from 'marketplace';
 
 import { Order, OrderApproval, ListLineItem, Promotion, ListPayment } from '@ordercloud/angular-sdk';
@@ -8,7 +7,7 @@ import { Order, OrderApproval, ListLineItem, Promotion, ListPayment } from '@ord
   templateUrl: './order-historical.component.html',
   styleUrls: ['./order-historical.component.scss'],
 })
-export class OCMOrderHistorical extends OCMComponent {
+export class OCMOrderHistorical {
     order: Order;
     lineItems: ListLineItem;
     promotions: Promotion[] = [];
@@ -22,7 +21,5 @@ export class OCMOrderHistorical extends OCMComponent {
         this.payments = value.payments;
         this.approvals = value.approvals;
     }
-
-    ngOnContextSet() {}
 }
 

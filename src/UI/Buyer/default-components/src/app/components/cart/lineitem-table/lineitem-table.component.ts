@@ -2,19 +2,18 @@ import { Component, Input } from '@angular/core';
 import { LineItem, ListLineItem } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { get as _get, map as _map, without as _without } from 'lodash';
-import { OCMComponent } from '../../base-component';
-import { ListLineItemWithProduct } from 'marketplace';
+import { ListLineItemWithProduct, ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
   styleUrls: ['./lineitem-table.component.scss'],
 })
-export class OCMLineitemTable extends OCMComponent {
+export class OCMLineitemTable {
   closeIcon = faTimes;
   @Input() lineItems: ListLineItem | ListLineItemWithProduct;
   @Input() readOnly: boolean;
 
-  ngOnContextSet() {}
+  constructor(private context: ShopperContextService) {}
 
   removeLineItem(lineItemID: string) {
     this.context.currentOrder.removeFromCart(lineItemID);

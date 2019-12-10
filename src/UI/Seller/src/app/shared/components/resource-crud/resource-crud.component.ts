@@ -1,17 +1,13 @@
 import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit, NgZone, createPlatform } from '@angular/core';
 import { Meta } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
-import {
-  ListResource,
-  Options,
-  ResourceCrudService,
-  FilterDictionary,
-} from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
 import { resource } from 'selenium-webdriver/http';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
+import { ListResource, Options, FilterDictionary } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;

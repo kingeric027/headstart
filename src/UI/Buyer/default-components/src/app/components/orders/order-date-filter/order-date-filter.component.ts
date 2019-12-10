@@ -3,22 +3,20 @@ import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormControl } from '@angular/forms';
 import { debounceTime, takeWhile } from 'rxjs/operators';
 import { DateValidator } from '../../../validators/validators';
-import { OCMComponent } from '../../base-component';
-import { OrderFilters } from 'marketplace';
+import { OrderFilters, ShopperContextService } from 'marketplace';
 import { DatePipe } from '@angular/common';
 
 @Component({
   templateUrl: './order-date-filter.component.html',
   styleUrls: ['./order-date-filter.component.scss'],
 })
-export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestroy {
+export class OCMOrderDateFilter implements OnInit, OnDestroy {
+  alive = true;
   faCalendar = faCalendar;
   faTimes = faTimes;
   form: FormGroup;
 
-  constructor(private datePipe: DatePipe) {
-    super();
-  }
+  constructor(private datePipe: DatePipe, private context: ShopperContextService) {}
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -26,9 +24,6 @@ export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestro
       toDate: new FormControl(null as Date, DateValidator),
     });
     this.onFormChanges();
-  }
-
-  ngOnContextSet() {
     this.context.orderHistory.filters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handlefiltersChange);
   }
 
@@ -74,5 +69,9 @@ export class OCMOrderDateFilter extends OCMComponent implements OnInit, OnDestro
 
   private inverseFormatDate(date: string): Date {
     return date ? new Date(date) : null;
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 }

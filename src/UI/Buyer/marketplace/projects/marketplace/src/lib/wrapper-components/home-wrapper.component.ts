@@ -5,7 +5,7 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
 
 @Component({
   template: `
-    <ocm-home-page [featuredProducts]="featuredProducts.Items" [context]="context"></ocm-home-page>
+    <ocm-home-page [featuredProducts]="featuredProducts.Items"></ocm-home-page>
   `,
 })
 export class HomeWrapperComponent implements OnInit {

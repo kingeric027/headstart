@@ -28,6 +28,8 @@
   <span class="error-message"
         *ngIf="!categorySelection.ServiceCategory || !categorySelection.VendorLevel">Please complete category selection</span>
 </div>
+<span class="error-message"
+      *ngIf="areNoCategories">A supplier must but a part of at least one category</span>
 <div>
   <button class="btn brand-button mt-1"
           *ngIf="canAddAnotherCategory"
