@@ -22,6 +22,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TreeModule } from 'angular-tree-component';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
+import { OCMCategoryDropdown } from './components/category-dropdown/category-dropdown.component';
 import {
   NgbCarouselModule,
   NgbCollapseModule,
@@ -36,6 +37,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
 import { CreditCardInputDirective } from './directives/credit-card-input.directive';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
+import { ChildCategoryPipe } from './pipes/category-children.pipe';
 import { CreditCardFormatPipe } from './pipes/credit-card-format.pipe';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
 import { HttpClientModule } from '@angular/common/http';
@@ -114,6 +116,7 @@ import { OCMCreditCardDisplay } from './components/payments/credit-card-display/
 import { OCMCreditCardForm } from './components/payments/credit-card-form/credit-card-form.component';
 
 const components = [
+  OCMCategoryDropdown,
   OCMProductCard,
   OCMToggleFavorite,
   OCMQuantityInput,
@@ -189,6 +192,7 @@ const components = [
     SpecFieldDirective,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
+    ChildCategoryPipe,
     CreditCardFormatPipe,
     PaymentMethodDisplayPipe,
     ShipperTrackingPipe,
@@ -253,6 +257,7 @@ export class AppModule {
     this.buildWebComponent(OCMSearch, 'ocm-search');
     this.buildWebComponent(OCMMiniCart, 'ocm-mini-cart');
     this.buildWebComponent(OCMAppHeader, 'ocm-app-header');
+    this.buildWebComponent(OCMCategoryDropdown, 'ocm-category-dropdown');
 
     this.buildWebComponent(OCMPaymentList, 'ocm-payment-list');
     this.buildWebComponent(OCMAddressCard, 'ocm-address-card');
