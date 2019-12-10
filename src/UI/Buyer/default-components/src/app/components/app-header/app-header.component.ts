@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, Input, OnChanges } from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, OnChanges, OnInit } from '@angular/core';
 import {
   faSearch,
   faShoppingCart,
@@ -12,14 +12,15 @@ import {
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Order, MeUser, LineItem, ListCategory, Category } from '@ordercloud/angular-sdk';
 import { tap, debounceTime, delay, takeWhile } from 'rxjs/operators';
-import { OCMComponent } from '../base-component';
-import { ProductFilters } from 'marketplace';
+import { ProductFilters, ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './app-header.component.html',
   styleUrls: ['./app-header.component.scss'],
 })
-export class OCMAppHeader extends OCMComponent {
+export class OCMAppHeader implements OnInit {
+  constructor(private context: ShopperContextService) { }
+
   isCollapsed = true;
   anonymous: boolean;
   user: MeUser;
@@ -45,7 +46,7 @@ export class OCMAppHeader extends OCMComponent {
   faHome = faHome;
   faBars = faBars;
 
-  async ngOnContextSet() {
+  async ngOnInit() {
     this.categories = this.context.categories.all;
     this.appName = this.context.appSettings.appname;
     this.context.currentOrder.onOrderChange(order => (this.order = order));

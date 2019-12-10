@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { OCMComponent } from '../base-component';
 import { Category, ListCategory } from '@ordercloud/angular-sdk';
 import { CategoryFilterPipe } from '../../pipes/category-dropdown.pipe';
 
@@ -8,8 +7,8 @@ import { CategoryFilterPipe } from '../../pipes/category-dropdown.pipe';
 	styleUrls: ['./category-dropdown.component.scss'],
 	providers: [CategoryFilterPipe]
 })
-export class OCMCategoryDropdown extends OCMComponent {
-	constructor(private categoryFilterPipe: CategoryFilterPipe) { super() }
+export class OCMCategoryDropdown {
+	constructor(private categoryFilterPipe: CategoryFilterPipe) { }
 	@Input() showMenu;
 	@Input() set categories(value: Category[]) {
 		this.parentCategories = this.categoryFilterPipe.transform(value, 'parent');
@@ -17,14 +16,8 @@ export class OCMCategoryDropdown extends OCMComponent {
 		this.subSubCategories = this.categoryFilterPipe.transform(value, 'subSubCategory');
 	}
 
-	closeDropdown() {
-		this.showMenu = false;
-	}
-
 	parentCategories: Category[] = [];
 	subCategories: Category[] = [];
 	subSubCategories: Category[] = [];
-
-	ngOnContextSet() { }
 
 }
