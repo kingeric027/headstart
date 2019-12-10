@@ -1,0 +1,39 @@
+<resource-table-component [resourceList]="resourceList"
+                          [resourceOptions]="resourceOptions"
+                          [selectedResourceID]="selectedResourceID"
+                          [updatedResource]="updatedResource"
+                          [resourceInSelection]="resourceInSelection"
+                          [ocService]="ocService"
+                          [resourceForm]="resourceForm"
+                          (searched)="searchResources($event)"
+                          (hitScrollEnd)="handleScrollEnd()"
+                          (changesSaved)="saveUpdates()"
+                          (changesDiscarded)="discardChanges()"
+                          (resourceDelete)="deleteResource()"
+                          (applyFilters)="applyFilters()"
+                          (resourceSelected)="selectResource($event)">
+
+  <!-- filter component -->
+  <!-- <form class="d-flex flex-column filters"
+        [formGroup]="filterForm">
+    <div *ngFor="let filter of filterConfig.Filters"
+         class="group">
+      <select class="form-control input-sm"
+              type="select"
+              required
+              [formControlName]="filter.Path">
+        <option *ngFor="let option of filter.Values"
+                value="{{option}}">{{option}}</option>
+      </select>
+      <span class="highlight"></span>
+      <label>{{filter.Display}}</label>
+    </div>
+  </form> -->
+
+  <!-- edit product -->
+  <div class="resource-edit">
+    <resource-edit-component resourceType="User"
+                             (updateResource)="updateResource($event)"
+                             [resource]="updatedResource"></resource-edit-component>
+  </div>
+</resource-table-component>

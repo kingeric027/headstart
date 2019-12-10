@@ -1,0 +1,19 @@
+$square-thumb-side: 70px;
+.gallery-container {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  .gallery-item {
+    display: flex;
+    justify-content: center;
+    opacity: .5;
+    padding: 3px !important;
+    img {
+      width: auto;
+      height: $square-thumb-side;
+    }
+  }
+  .gallery-item.active {
+    opacity: 1;
+  }
+
+}

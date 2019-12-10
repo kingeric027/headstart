@@ -1,0 +1,12 @@
+  <div class="d-flex">
+    <img *ngIf="_shouldShowImage"
+         alt="Avatar"
+         class="avatar rounded-circle"
+         src="{{_imgPath}}"
+         alt="">
+    <span class="ml-3 d-flex flex-column justify-content-center">
+      <div class="h6">{{_primaryHeader}}</div>
+      <div>{{_secondaryHeader}}</div>
+      <div>{{isNewPlaceHolder}}</div>
+    </span>
+  </div>

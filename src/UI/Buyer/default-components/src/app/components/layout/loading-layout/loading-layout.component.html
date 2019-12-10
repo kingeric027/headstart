@@ -1,0 +1,12 @@
+<div class="row"
+     *ngIf="!resource || isLoading">
+  <div *ngFor="let column of columnsToRender"
+       class="col-md-{{bootstrapColumns}}">
+    <span *ngFor="let div of divsToRender"
+          [style.height]="height"
+          [style.width]="width"
+          [style.margin-bottom]="mb"
+          class="loading-box shine">
+    </span>
+  </div>
+</div>

@@ -3,7 +3,13 @@ import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { NgbPaginationModule, NgbTabsetModule, NgbPopoverModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbPaginationModule,
+  NgbTabsetModule,
+  NgbPopoverModule,
+  NgbDropdownModule,
+  NgbModalModule,
+} from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
 import { TreeModule } from 'angular-tree-component';
@@ -24,6 +30,14 @@ import { ProductService } from './services/product/product.service';
 import { SupplierService } from './services/supplier/supplier.service';
 import { ResourceTableComponent } from './components/resource-table/resource-table.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { ResourceSelectDropdown } from './components/resource-select-dropdown/resource-select-dropdown.component';
+import { SummaryResourceDisplay } from './components/summary-resource-display/summary-resource-display.component';
+import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-confirm-modal.component';
+import { ResourceEditComponent } from './components/resource-edit/resource-edit.component';
+import { FullResourceTableComponent } from './components/full-resource-table/full-resource-table.component';
+import { QuillModule } from 'ngx-quill';
+import { ReactiveQuillComponent } from './components/reactive-quill-editor/reactive-quill-editor.component';
+import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 
 @NgModule({
   imports: [
@@ -42,6 +56,8 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
     NgbDropdownModule,
     NgbPaginationModule,
     NgbTabsetModule,
+    NgbModalModule,
+    QuillModule.forRoot(),
   ],
   exports: [
     // angular
@@ -65,9 +81,16 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
     CategoryTableComponent,
     CategoryFormComponent,
     CategoryDetailsComponent,
+    ResourceSelectDropdown,
     ProductImagesComponent,
     ProductFormComponent,
     ResourceTableComponent,
+    SummaryResourceDisplay,
+    FullResourceTableComponent,
+    ResourceEditComponent,
+    QuillModule,
+    ReactiveQuillComponent,
+    FormControlErrorDirective,
   ],
   declarations: [
     SearchComponent,
@@ -79,8 +102,15 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
     CategoryFormComponent,
     CategoryDetailsComponent,
     ProductImagesComponent,
+    ResourceSelectDropdown,
     ProductFormComponent,
     ResourceTableComponent,
+    DeleteConfirmModal,
+    SummaryResourceDisplay,
+    FullResourceTableComponent,
+    ResourceEditComponent,
+    ReactiveQuillComponent,
+    FormControlErrorDirective,
   ],
 })
 export class SharedModule {

@@ -4,16 +4,18 @@
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
-                          [subResourceList]="subResourceList"
+                          [resourceForm]="resourceForm"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
-                          resourceName="Suppliers"
                           (changesSaved)="saveUpdates()"
+                          (changesDiscarded)="discardChanges()"
+                          (resourceDelete)="deleteResource()"
                           (applyFilters)="applyFilters()"
                           (resourceSelected)="selectResource($event)">
 
   <!-- filter component -->
-  <form class="d-flex flex-column filters"
+  <form *ngIf="filterForm"
+        class="d-flex flex-column filters"
         [formGroup]="filterForm">
     <div *ngFor="let filter of filterConfig.Filters"
          class="group">
@@ -29,52 +31,107 @@
     </div>
   </form>
 
-  <!-- full view table -->
-  <table class="table table-hover resource-table">
-    <thead>
-      <tr>
-        <th scope="col">Name</th>
-        <th scope="col">ID</th>
-        <th scope="col">Active</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let supplier of resourceList.Items; index as index"
-          (click)="selectResource(supplier)"
-          class="selectable-row"
-          [ngClass]="{'selected-resource':selectedIndex === index}">
-        <td>{{supplier.Name}}</td>
-        <td>{{supplier.ID}}</td>
-        <td>{{supplier.Active ? 'Active' : 'Inactive'}}</td>
-      </tr>
-      <tr>
-        <td *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">More suppliers</td>
-        <td></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- edit product -->
+  <!-- edit supplier -->
   <div class="resource-edit">
-    <div class="form-group">
-      <label for="Name">Name</label>
-      <input type="text"
-             class="form-control"
-             id="name"
-             aria-describedby="name"
-             value="{{updatedResource.Name}}"
-             (input)="updateResource('Name', $event)"
-             placeholder="Enter resource name">
-    </div>
-    <div class="form-group">
-      <label for="description">Description</label>
-      <input type="text"
-             class="form-control"
-             id="description"
-             value="{{updatedResource.Description}}"
-             (input)="updateResource('Description', $event)"
-             placeholder="Description">
-    </div>
+    <form *ngIf="resourceForm"
+          [formGroup]="resourceForm">
+      <div class="form-group">
+        <div class="form-group">
+          <label for="Name">Name</label>
+          <input type="text"
+                 class="form-control"
+                 id="Name"
+                 showErrors
+                 aria-describedby="Name"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="Name"
+                 (input)="handleUpdateResource($event, 'Name')"
+                 placeholder="Enter Name">
+        </div>
+        <div class="form-group">
+          <label for="Logo URL">Logo URL</label>
+          <input type="text"
+                 class="form-control"
+                 id="Logo URL"
+                 showErrors
+                 [resourceForm]="resourceForm"
+                 aria-describedby="Logo URL"
+                 formControlName="LogoUrl"
+                 (input)="handleUpdateResource($event, 'xp.LogoUrl')"
+                 placeholder="Enter Logo URL">
+        </div>
+        <div class="form-group">
+          <label for="Description">Description</label>
+          <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
+                                           [formControlForText]="resourceForm.controls.Description"
+                                           resourceField="Description"
+                                           pathOnResource="xp.Description"
+                                           (resourceUpdated)="updateResource($event)">
+          </reactive-quill-editor-component>
+        </div>
+        <div class="form-group">
+          <label for="Primary Contact Name">Primary Contact Name</label>
+          <input type="text"
+                 class="form-control"
+                 id="Primary Contact Name"
+                 aria-describedby="Primary Contact Name"
+                 formControlName="PrimaryContactName"
+                 (input)="handleUpdateResource($event, 'xp.Contacts.0.Name')"
+                 placeholder="Enter Primary Contact Name">
+        </div>
+        <div class="form-group">
+          <label for="Primary Contact Name">Primary Contact Email</label>
+          <input type="text"
+                 class="form-control"
+                 id="Primary Contact Email"
+                 showErrors
+                 [resourceForm]="resourceForm"
+                 aria-describedby="Primary Contact Email"
+                 formControlName="PrimaryContactEmail"
+                 (input)="handleUpdateResource($event, 'xp.Contacts.0.Email')"
+                 placeholder="Enter Primary Contact Email">
+        </div>
+        <!-- no phone validation currently because this field has extraneous values that would break validation -->
+        <div class="form-group">
+          <label for="Primary Contact Phone">Primary Contact Phone</label>
+          <input type="text"
+                 class="form-control"
+                 showErrors
+                 id="Primary Contact Phone"
+                 aria-describedby="Primary Contact Phone"
+                 formControlName="PrimaryContactPhone"
+                 (input)="handleUpdateResource($event, 'xp.Contacts.0.Phone')"
+                 placeholder="Enter Primary Contact Phone">
+        </div>
+        <div class="form-group">
+          <label for="Category">Categories</label>
+          <supplier-category-select-component [categorySelectionsControl]="resourceForm.controls.Categories"
+                                              [filterConfig]="filterConfig"
+                                              (selectionsChanged)="updateResource($event)">
+
+          </supplier-category-select-component>
+        </div>
+        <!-- specific component for this in progress -->
+        <!-- <label for="Vendor Level">Vendor Level</label>
+        <select class="form-control input-sm"
+                type="select"
+                required
+                (change)="handleUpdateResource($event, 'xp.Categories.VendorLevel')"
+                formControlName="VendorLevel">
+          <option *ngFor="let option of filterConfig.Filters[0].Values"
+                  value="{{option}}">{{option}}</option>
+        </select>
+        <label for="Service Category">Service Category</label>
+        <select class="form-control input-sm"
+                type="select"
+                required
+                (change)="handleUpdateResource($event, 'xp.Categories.ServiceCategory')"
+                formControlName="ServiceCategory">
+          <option *ngFor="let option of filterConfig.Filters[1].Values"
+                  value="{{option}}">{{option}}</option>
+        </select> -->
+      </div>
+    </form>
   </div>
 </resource-table-component>

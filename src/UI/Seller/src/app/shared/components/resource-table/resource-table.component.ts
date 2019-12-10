@@ -1,4 +1,4 @@
-import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core';
 import {
   ListResource,
   ResourceCrudService,
@@ -7,12 +7,15 @@ import {
 import { EventEmitter } from '@angular/core';
 import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { Router, ActivatedRoute } from '@angular/router';
-import { takeWhile } from 'rxjs/operators';
-import { plural } from 'pluralize';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { takeWhile, filter } from 'rxjs/operators';
+import { singular } from 'pluralize';
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
+import { pipe } from 'rxjs';
+import { FormGroup } from '@angular/forms';
 
 interface BreadCrumb {
-  text: string;
+  displayText: string;
   route: string;
 }
 
@@ -32,31 +35,44 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   _resourceInSelection: any;
   _updatedResource: any;
   _selectedResourceID: string;
+  _currentResourceNamePlural: string;
+  _currentResourceNameSingular: string;
+  _ocService: ResourceCrudService<any>;
   areChanges: boolean;
   parentResources: ListResource<any>;
-  breadCrumbs: string[] = [];
+  selectedParentResourceName = 'Fetching Data';
+  selectedParentResourceID = '';
+  breadCrumbs: BreadCrumb[] = [];
+  isCreatingNew = false;
   alive = true;
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    ngZone: NgZone
   ) {}
 
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
   @Input()
-  ocService: ResourceCrudService<any>;
+  set ocService(service: ResourceCrudService<any>) {
+    this._ocService = service;
+    this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
+    this._currentResourceNameSingular = singular(this._currentResourceNamePlural);
+  }
   @Input()
   parentResourceService?: ResourceCrudService<any>;
-  @Input()
-  resourceName: string;
   @Output()
   searched: EventEmitter<any> = new EventEmitter();
   @Output()
   hitScrollEnd: EventEmitter<any> = new EventEmitter();
   @Output()
   changesSaved: EventEmitter<any> = new EventEmitter();
+  @Output()
+  resourceDelete: EventEmitter<any> = new EventEmitter();
+  @Output()
+  changesDiscarded: EventEmitter<any> = new EventEmitter();
   @Output()
   resourceSelected: EventEmitter<any> = new EventEmitter();
   @Output()
@@ -77,34 +93,69 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.searchTerm = (value && value.search) || '';
   }
   @Input()
-  subResourceList: string[];
-  @Input()
   selectedResourceID: string;
+  @Input()
+  resourceForm: FormGroup;
 
   ngOnInit() {
-    this.setParentResourceSubscription();
-    this.setUrlSubscription();
+    this.initializeSubscriptions();
   }
 
-  private setParentResourceSubscription() {
+  private async initializeSubscriptions() {
+    await this.redirectToFirstParentIfNeeded();
+    this.setUrlSubscription();
+    this.setParentResourceSelectionSubscription();
+    this._ocService.listResources();
+  }
+
+  private async redirectToFirstParentIfNeeded() {
     if (this.parentResourceService) {
-      this.parentResourceService.resourceSubject.subscribe((parentResources) => {
-        this.parentResources = parentResources;
-      });
+      if (this.parentResourceService.getParentResourceID() === REDIRECT_TO_FIRST_PARENT) {
+        await this.parentResourceService.listResources();
+        this._ocService.selectParentResource(this.parentResourceService.resourceSubject.value.Items[0]);
+      }
     }
   }
 
   private setUrlSubscription() {
-    this.router.events.pipe(takeWhile(() => this.alive)).subscribe(() => {
-      this.setBreadCrumbs();
-    });
+    this.router.events
+      .pipe(takeWhile(() => this.alive))
+      // only need to set the breadcrumbs on nav end events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.setBreadCrumbs();
+      });
     this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
       this.setBreadCrumbs();
+      this.checkIfCreatingNew();
     });
   }
 
+  private setParentResourceSelectionSubscription() {
+    this.activatedRoute.params
+      .pipe(takeWhile(() => this.parentResourceService && this.alive))
+      .subscribe(async (params) => {
+        await this.redirectToFirstParentIfNeeded();
+        const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
+        const parentResourceID = params[parentIDParamName];
+        this.selectedParentResourceID = parentResourceID;
+        if (params && parentResourceID) {
+          const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
+          if (parentResource) this.selectedParentResourceName = parentResource.Name;
+        }
+      });
+  }
+
+  private checkIfCreatingNew() {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
+    this.isCreatingNew = endUrl === '/new';
+  }
+
   private setBreadCrumbs() {
-    this.breadCrumbs = this.router.url
+    // basically we are just taking off the portion of the url after the selected route piece
+    // in the future breadcrumb logic might need to be more complicated than this
+    const urlPieces = this.router.url
       .split('/')
       .filter((p) => p)
       .map((p) => {
@@ -114,11 +165,14 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
           return p;
         }
       });
+    this.breadCrumbs = urlPieces.map((piece, index) => {
+      const route = `/${urlPieces.slice(0, index + 1).join('/')}`;
+      return {
+        displayText: piece,
+        route,
+      };
+    });
     this.changeDetectorRef.detectChanges();
-  }
-
-  selectParentResource(resource: any) {
-    this.ocService.selectParentResource(resource);
   }
 
   searchedResources(event) {
@@ -129,11 +183,21 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.hitScrollEnd.emit(null);
   }
 
-  handleSaveUpdates() {
+  handleSave() {
     this.changesSaved.emit(null);
   }
 
+  handleDelete() {
+    this.resourceDelete.emit(null);
+  }
+
+  handleDiscardChanges() {
+    this.changesDiscarded.emit(null);
+  }
+
   handleSelectResource(resource: any) {
+    const [newURL, queryParams] = this._ocService.constructNewRouteInformation(resource.ID || '');
+    this.router.navigate([newURL], { queryParams });
     this.resourceSelected.emit(resource);
   }
 
@@ -151,7 +215,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   clearAllFilters() {
-    this.ocService.clearAllFilters();
+    this._ocService.clearAllFilters();
   }
 
   checkForChanges() {

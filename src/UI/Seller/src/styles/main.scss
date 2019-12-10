@@ -11,6 +11,10 @@
 @import 'components/_modal.scss';
 @import 'components/hover-select';
 
+@import '~quill/dist/quill.core.css';
+@import '~quill/dist/quill.bubble.css';
+@import '~quill/dist/quill.snow.css';
+
 html {
   font-size: 0.9rem;
 }
@@ -56,4 +60,14 @@ html {
 .brand-button {
   color: $brand-navy;
   background-color: #dfe6f2;
+}
+
+.brand-button--orange {
+  color: $brand-navy;
+  background-color: rgba($brand-orange, 0.2);
+}
+
+.brand-button--danger {
+  color: $brand-navy;
+  background-color: rgba(red, 0.2);
 }

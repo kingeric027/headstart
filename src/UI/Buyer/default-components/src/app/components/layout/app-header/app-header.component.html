@@ -1,0 +1,152 @@
+<!-- Primary Nav -->
+<nav class="navbar navbar-expand-md navbar-light bg-white">
+  <div class="container">
+    <!-- Brand Logo -->
+    <a class="navbar-brand clickable cursor-pointer"
+       (click)="context.router.toHome()">
+      <img class="logo" />
+    </a>
+    <!-- /Brand Logo -->
+    <!-- Mobile Toggle -->
+    <button class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+            (click)="toggleCollapsed()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- /Mobile Toggle -->
+    <!-- Inline Nav Items -->
+    <div [ngClass]="{'collapse': isCollapsed, 'navbar-collapse': true}"
+         id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item clickable cursor-pointer"
+            [ngClass]="{'active': activePath === '/products'}">
+          <a class="nav-link"
+             (click)="isCollapsed = !isCollapsed"
+             (click)="context.router.toProductList()">
+            Products
+          </a>
+        </li>
+        <li class="nav-item clickable cursor-pointer">
+          <a class="nav-link"
+             [ngClass]="{'active': activePath === '/suppliers'}"
+             (click)="isCollapsed = !isCollapsed"
+             (click)="context.router.toSupplierList()">Suppliers</a>
+        </li>
+        <!-- Mobile Profile Menu Items -->
+        <div *ngIf="screenSize === 'xs' || screenSize === 'sm'">
+          <div class="dropdown-divider"></div>
+          <li class="nav-item clickable cursor-pointer">
+            <a class="nav-link"
+               [ngClass]="{'active': activePath?.indexOf('/profile') === 0}"
+               (click)="isCollapsed = !isCollapsed"
+               (click)="context.router.toMyProfile()">My Profile</a>
+          </li>
+        </div>
+        <!-- /Mobile Profile Menu Items -->
+      </ul>
+      <div class="form-inline"
+           *ngIf="anonymous">
+        <a class="btn btn-sm btn-outline-dark"
+           (click)="isCollapsed = !isCollapsed"
+           (click)="context.router.toLogin()">Login</a>
+        <a class="btn btn-sm btn-primary d-none d-sm-block ml-2"
+           (click)="isCollapsed = !isCollapsed"
+           (click)="context.router.toRegister()">Register</a>
+      </div>
+      <ul class="navbar-nav"
+          *ngIf="!anonymous && screenSize !== 'xs' && screenSize !== 'sm'">
+        <li class="nav-item dropdown cursor-pointer"
+            ngbDropdown
+            placement="bottom-right">
+          <div class="nav-link dropdown-toggle text-nowrap"
+               id="account-dropdown"
+               ngbDropdownToggle>
+            <fa-icon [icon]="faUserCircle"></fa-icon>
+            <span class="d-none d-md-inline">
+              Account
+            </span>
+          </div>
+          <div class="dropdown-menu account-dropdown-alignment"
+               aria-labelledby="account-dropdown"
+               ngbDropdownMenu>
+            <h6 class="dropdown-header">Hi, {{ user?.FirstName }}!</h6>
+
+            <a class="nav-item dropdown-item cursor-pointer"
+               [ngClass]="{'active': activePath === '/profile/details'}"
+               (click)="context.router.toMyProfile()">My Profile</a>
+            <a class="nav-item dropdown-item cursor-pointer"
+               [ngClass]="{'active': activePath === '/profile/addresses'}"
+               (click)="context.router.toMyAddresses()">Address Book</a>
+            <a class="nav-item dropdown-item cursor-pointer"
+               [ngClass]="{'active': activePath === '/profile/payment-methods'}"
+               (click)="context.router.toMyPaymentMethods()">Payment Methods</a>
+            <a class="nav-item dropdown-item cursor-pointer"
+               [ngClass]="{'active': activePath === '/profile/orders'}"
+               (click)="context.router.toMyOrders()">My Orders</a>
+            <a class="nav-item dropdown-item cursor-pointer"
+               [ngClass]="{'active': activePath === '/profile/orders/approval'}"
+               (click)="context.router.toOrdersToApprove()">Orders To Approve</a>
+            <div class="dropdown-divider"></div>
+            <a class="nav-item dropdown-item cursor-pointer"
+               (click)="logout()"
+               href="/login">
+              <fa-icon [icon]="faSignOutAlt"></fa-icon> Logout
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- /Inline Nav Items -->
+  </div>
+</nav>
+<!-- /Primary Nav -->
+<!-- Search / Cart Nav -->
+<nav class="navbar navbar-expand navbar-light bg-light">
+  <div class="container">
+    <ocm-search class="mr-3 w-100"
+                [placeholderText]="'Search Products...'"
+                [searchTermInput]="searchTermForProducts"
+                (searched)="searchProducts($event.detail)">
+    </ocm-search>
+    <ul class="navbar-nav"
+        #cartIcon
+        (mouseleave)="closeMiniCart($event, popover)">
+      <li class="nav-item cursor-pointer"
+          [ngbPopover]="CartHoverContent"
+          #popover="ngbPopover"
+          triggers="mouseenter:click"
+          placement="bottom-right"
+          popoverClass="mini-cart-popover"
+          [autoClose]="'outside'">
+        <ng-template #CartHoverContent>
+          <ocm-mini-cart [context]="context"
+                         (mouseleave)="popover.close()"
+                         (navigate)="popover.close()">
+          </ocm-mini-cart>
+        </ng-template>
+        <a class="nav-link text-nowrap clickable"
+           [ngClass]="{'active': activePath === '/cart'}"
+           (click)="context.router.toCart()"
+           ngbPopover="Item(s) Added to Cart"
+           placement="bottom"
+           triggers="manual"
+           #addtocartPopover="ngbPopover">
+          <span class="d-none d-lg-inline">Cart </span>
+          <fa-layers class="fa-fw">
+            <fa-icon [icon]="faShoppingCart"></fa-icon>
+            <fa-layers-counter *ngIf="order && order.LineItemCount"
+                               class="badge__counter--large"
+                               [content]="order.LineItemCount">
+            </fa-layers-counter>
+          </fa-layers>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<!-- /Search / Cart Nav -->
