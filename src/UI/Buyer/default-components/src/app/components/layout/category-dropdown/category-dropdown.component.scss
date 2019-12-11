@@ -1,3 +1,8 @@
+
+a {
+  cursor: pointer;
+}
+
 ul {
     list-style: none;
     left: 100%;
@@ -15,21 +20,22 @@ ul {
 
 ul li a {
   display: block;
-  padding: 1em;
+  padding: .6em;
   text-decoration: none;
   white-space: nowrap;
   color: #808080;
 }
 
-ul ul { top: 0; }
-
-ul li a:hover { background: #8348ad; color: #fff}
+ul li a:hover {
+   background: #8348ad;
+   color: #fff; 
+}
 
 li:hover > ul {
     top: 0;
     display: block;
     position: absolute;
-  }
+}
   
   li:hover li { float: none; }
   
