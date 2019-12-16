@@ -37,6 +37,21 @@ namespace Marketplace.Common.Commands
             var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
             await this.PatchDefaultApiClients(impersonation.access_token);
             await this.CreateSuppliers(user, impersonation.access_token);
+            await this.ConfigureBuyers(impersonation.access_token);
+        }
+
+        private async Task ConfigureBuyers(string token)
+        {
+            foreach (var (key, value) in _seed.Suppliers)
+            {
+                await _oc.Catalogs.SaveAssignmentAsync(new CatalogAssignment()
+                {
+                    BuyerID = "Default_Marketplace_Buyer",
+                    CatalogID = key,
+                    ViewAllCategories = true,
+                    ViewAllProducts = true
+                }, token);
+            }
         }
 
         private async Task CreateSuppliers(VerifiedUserContext user, string token)
@@ -135,7 +150,7 @@ namespace Marketplace.Common.Commands
             {
                 Name = $"Marketplace.Print {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}",
                 Active = true,
-                BuyerID = Guid.NewGuid().ToString(),
+                BuyerID = "Default_Marketplace_Buyer",
                 BuyerApiClientName = $"Default Marketplace Buyer UI",
                 BuyerName = $"Default Marketplace Buyer",
                 BuyerUserName = $"Default_Buyer",

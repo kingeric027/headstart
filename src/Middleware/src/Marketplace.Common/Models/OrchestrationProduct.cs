@@ -29,7 +29,7 @@ namespace Marketplace.Common.Models
     {
         public dynamic Data { get; set; }
         public IEnumerable<ImageRef> Images { get; set; } = new List<ImageRef>();
-        public Dictionary<string, string> Facets = new Dictionary<string, string>();
+        public Dictionary<string, List<string>> Facets = new Dictionary<string, List<string>>();
     }
 
     public class ImageRef
