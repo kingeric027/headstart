@@ -107,6 +107,11 @@
 <!-- /Primary Nav -->
 <!-- Search / Cart Nav -->
 <nav class="navbar navbar-expand navbar-light bg-light">
+  <a class="cursor-pointer"
+     (click)="toggleDropdown()"
+     position="absolute">
+    <fa-icon [icon]="faBars"></fa-icon>
+  </a>
   <div class="container">
     <ocm-search class="mr-3 w-100"
                 [placeholderText]="'Search Products...'"
@@ -148,4 +153,6 @@
     </ul>
   </div>
 </nav>
+<ocm-category-dropdown [categories]="categories"
+                       *ngIf="showDropdown"></ocm-category-dropdown>
 <!-- /Search / Cart Nav -->

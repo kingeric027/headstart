@@ -13,6 +13,7 @@ import {
   SUCCESSFUL_WITH_ITEMS,
   ERROR,
   GETTING_NEW_ITEMS,
+  FETCHING_SUBSEQUENT_PAGES,
   REFRESHING_ITEMS,
   SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
@@ -47,7 +48,7 @@ export abstract class ResourceCrudService<ResourceType> {
     this.secondaryResourceLevel = secondaryResourceLevel;
     this.subResourceList = subResourceList;
 
-    this.activatedRoute.queryParams.subscribe((params) => {
+    this.activatedRoute.queryParams.subscribe(params => {
       // this prevents service from reading from query params when not on the route related to the service
       if (this.isOnRelatedRoute()) {
         this.readFromUrlQueryParams(params);
@@ -55,7 +56,7 @@ export abstract class ResourceCrudService<ResourceType> {
         this.optionsSubject.next({});
       }
     });
-    this.optionsSubject.subscribe((value) => {
+    this.optionsSubject.subscribe(value => {
       if (this.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         this.listResources();
       }
@@ -65,7 +66,7 @@ export abstract class ResourceCrudService<ResourceType> {
   private isOnRelatedRoute(): boolean {
     const isOnSubResource =
       this.subResourceList &&
-      this.subResourceList.some((subResource) => {
+      this.subResourceList.some(subResource => {
         return this.router.url.includes(`/${subResource}`);
       });
     const isOnBaseRoute = this.router.url.includes(this.route);
@@ -130,11 +131,20 @@ export abstract class ResourceCrudService<ResourceType> {
   getFetchStatus(options: Options) {
     const isSubsequentPage = options.page > 1;
     const areCurrentlyItems = this.resourceSubject.value.Items.length;
-
     // will not want to show a loading indicator in certain situations so this
     // differentiates between refreshes and new lists
     // when filters are applied REFRESHING_ITEMS will be returned
-    return isSubsequentPage || !areCurrentlyItems ? GETTING_NEW_ITEMS : REFRESHING_ITEMS;
+    if (!areCurrentlyItems && !isSubsequentPage) {
+      return GETTING_NEW_ITEMS;
+    }
+    if (!isSubsequentPage && areCurrentlyItems) {
+      return REFRESHING_ITEMS;
+    }
+    if (isSubsequentPage && areCurrentlyItems) {
+      console.log('contrary to popular belief, we actually are FETCHING_SUBSEQUENT_PAGES');
+      return FETCHING_SUBSEQUENT_PAGES;
+    }
+    // return isSubsequentPage || !areCurrentlyItems ? GETTING_NEW_ITEMS : REFRESHING_ITEMS;
   }
 
   getSucessStatus(options: Options, resourceResponse: ListResource<ResourceType>) {
@@ -226,7 +236,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
-    const resourceInList = this.resourceSubject.value.Items.find((i) => (i as any).ID === resourceID);
+    const resourceInList = this.resourceSubject.value.Items.find(i => (i as any).ID === resourceID);
     if (resourceInList) {
       return resourceInList;
     } else {
@@ -306,7 +316,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   removeFilters(filtersToRemove: string[]) {
     const newFilterDictionary = { ...this.optionsSubject.value.filters };
-    filtersToRemove.forEach((filter) => {
+    filtersToRemove.forEach(filter => {
       if (newFilterDictionary[filter]) {
         delete newFilterDictionary[filter];
       }

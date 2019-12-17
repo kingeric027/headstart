@@ -5,7 +5,7 @@
           scope="col">{{header}}</th>
     </tr>
   </thead>
-  <tbody *ngIf="requestStatus === 'SUCCESSFUL_WITH_ITEMS' || requestStatus === 'REFRESHING_ITEMS'">
+  <tbody *ngIf="requestStatus === 'SUCCESSFUL_WITH_ITEMS' || requestStatus === 'REFRESHING_ITEMS' || requestStatus === 'FETCHING_SUBSEQUENT_PAGES'">
     <tr *ngFor="let row of rows; index as index"
         (click)="selectResource(row.resource)"
         class="selectable-row"
@@ -26,30 +26,6 @@
           </span>
         </div>
       </td>
-    </tr>
-    <tr *ngIf="_resourceList?.Meta?.Page < _resourceList?.Meta?.TotalPages">
-      <td>More...</td>
-      <td [attr.colspan]="numberOfColumns-1"></td>
-    </tr>
-  </tbody>
-
-  <tbody *ngIf="requestStatus === 'SUCCESSFUL_NO_ITEMS_NO_FILTERS'">
-    <tr>
-      <td>No items</td>
-      <td [attr.colspan]="numberOfColumns-1"></td>
-    </tr>
-  </tbody>
-  <tbody *ngIf="requestStatus === 'SUCCESSFUL_NO_ITEMS_WITH_FILTERS'">
-    <tr>
-      <td>No items, try changing search or removing filters</td>
-      <td [attr.colspan]="numberOfColumns-1"></td>
-    </tr>
-  </tbody>
-
-  <tbody *ngIf="requestStatus === 'GETTING_NEW_ITEMS'">
-    <tr>
-      <td>Getting items</td>
-      <td [attr.colspan]="numberOfColumns-1"></td>
     </tr>
   </tbody>
 </table>

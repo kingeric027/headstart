@@ -8,10 +8,10 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
 {
-    public class CatalogProductAssignmentSyncCommand : SyncCommand, IWorkItemCommand
+    public class CatalogAssignmentSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public CatalogProductAssignmentSyncCommand(IAppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public CatalogAssignmentSyncCommand(IAppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
         }
