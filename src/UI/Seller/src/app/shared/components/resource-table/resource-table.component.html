@@ -200,28 +200,21 @@
               </a>
             </span>
           </div>
-          <div *ngIf="!isMyResource; else editUnwrapped">
+          <div *ngIf="!isMyResource">
             <ng-content *ngTemplateOutlet="editUnwrapped">
             </ng-content>
           </div>
-          <!-- <perfect-scrollbar style="width: 100%; height: calc(100vh - 325px);">
-          </perfect-scrollbar>
-          <button class="btn btn-primary"
-                  type="submit"
-                  [disabled]="resourceForm.status === 'INVALID'"
-                  (click)="handleSave()"
-                  *ngIf="areChanges">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
-          <button class="btn brand-button ml-3"
-                  (click)="handleDiscardChanges()"
-                  *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
-          <delete-confirm-modal-component *ngIf="!isCreatingNew"
-                                          (deleteConfirmed)="handleDelete($event)"></delete-confirm-modal-component> -->
         </div>
       </div>
 
+      <!-- ng content can only be used once for transclusion, ngTemplatOutlets are required so that 
+      we are only using the component once in the resource table -->
+
+      <ng-container *ngIf="isMyResource">
+        <div *ngTemplateOutlet="editUnwrapped"></div>
+      </ng-container>
       <ng-template #editUnwrapped>
-        hihihihi
-        <!-- <div>
+        <div>
           <perfect-scrollbar style="width: 100%; height: calc(100vh - 325px);">
             <ng-content select=".resource-edit">
             </ng-content>
@@ -236,7 +229,7 @@
                   *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
           <delete-confirm-modal-component *ngIf="!isCreatingNew"
                                           (deleteConfirmed)="handleDelete($event)"></delete-confirm-modal-component>
-        </div> -->
+        </div>
       </ng-template>
 
     </div>

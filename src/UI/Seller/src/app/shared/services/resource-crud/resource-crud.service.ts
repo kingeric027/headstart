@@ -48,7 +48,7 @@ export abstract class ResourceCrudService<ResourceType> {
     this.secondaryResourceLevel = secondaryResourceLevel;
     this.subResourceList = subResourceList;
 
-    this.activatedRoute.queryParams.subscribe(params => {
+    this.activatedRoute.queryParams.subscribe((params) => {
       // this prevents service from reading from query params when not on the route related to the service
       if (this.isOnRelatedRoute()) {
         this.readFromUrlQueryParams(params);
@@ -56,17 +56,20 @@ export abstract class ResourceCrudService<ResourceType> {
         this.optionsSubject.next({});
       }
     });
-    this.optionsSubject.subscribe(value => {
+    this.optionsSubject.subscribe((value) => {
       if (this.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         this.listResources();
       }
     });
   }
+  async getMyResource(): Promise<any> {
+    console.log('get my resource for this resource not defined');
+  }
 
   private isOnRelatedRoute(): boolean {
     const isOnSubResource =
       this.subResourceList &&
-      this.subResourceList.some(subResource => {
+      this.subResourceList.some((subResource) => {
         return this.router.url.includes(`/${subResource}`);
       });
     const isOnBaseRoute = this.router.url.includes(this.route);
@@ -236,7 +239,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
-    const resourceInList = this.resourceSubject.value.Items.find(i => (i as any).ID === resourceID);
+    const resourceInList = this.resourceSubject.value.Items.find((i) => (i as any).ID === resourceID);
     if (resourceInList) {
       return resourceInList;
     } else {
@@ -316,7 +319,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   removeFilters(filtersToRemove: string[]) {
     const newFilterDictionary = { ...this.optionsSubject.value.filters };
-    filtersToRemove.forEach(filter => {
+    filtersToRemove.forEach((filter) => {
       if (newFilterDictionary[filter]) {
         delete newFilterDictionary[filter];
       }

@@ -26,21 +26,22 @@
         </li>
         <li class="nav-item d-flex flex-column justify-content-center resource-nav-link-container">
           <div class="d-flex">
-            <div class="dropdown text-center flex-fill py-2 dropdown-column-width"
+            <div class="dropdown text-center flex-fill py-2 nav-grouping-width"
                  *ngFor="let nav of headerConfig"
                  [ngClass]="{'active-nav-group' : nav.title === activeTitle}">
-              <a *ngIf="nav.routes.length > 1"
+              <a *ngIf="nav.subRoutes"
+                 [routerLink]="nav.route"
                  class="text-white">{{ nav.title }}
               </a>
-              <a *ngIf="nav.routes.length === 1"
-                 [routerLink]="nav.routes[0].route"
+              <a *ngIf="!nav.subRoutes"
+                 [routerLink]="nav.route"
                  class="text-white">{{ nav.title }}
               </a>
-              <div *ngIf="nav.routes.length > 1"
+              <div *ngIf="nav.subRoutes"
                    class="dropdown-content mt-2 dropdown-column-width">
                 <a [routerLink]="route.route"
                    class="text-left"
-                   *ngFor="let route of nav.routes">{{ route.title }}</a>
+                   *ngFor="let route of nav.subRoutes">{{ route.title }}</a>
               </div>
             </div>
           </div>
