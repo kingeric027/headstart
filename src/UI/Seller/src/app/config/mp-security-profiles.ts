@@ -147,7 +147,10 @@ const MarketPlaceManager = {
     MPMeSupplierAdmin,
   ],
 };
+
 // SEB Specific Roles
+// Ultimately these will not be hardcoded in the app but live outside and by dynamic
+
 const SupplierManager = {
   Name: 'SupplierManager',
   MPRoles: [
