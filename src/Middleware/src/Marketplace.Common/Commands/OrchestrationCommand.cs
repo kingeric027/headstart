@@ -11,6 +11,7 @@ using Marketplace.Common.Services;
 using ErrorCodes = Marketplace.Common.Exceptions.ErrorCodes;
 using Marketplace.Helpers.Models;
 using Action = Marketplace.Common.Models.Action;
+using Marketplace.Helpers.Extensions;
 
 namespace Marketplace.Common.Commands
 {

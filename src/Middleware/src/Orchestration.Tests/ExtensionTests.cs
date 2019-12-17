@@ -6,6 +6,7 @@ using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using OrderCloud.SDK;
 using Marketplace.Helpers.Models;
+using Marketplace.Helpers.Extensions;
 
 namespace Orchestration.Tests
 {

@@ -9,6 +9,7 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
 using Marketplace.Helpers.Models;
+using Marketplace.Helpers.Extensions;
 
 namespace Marketplace.Common.Commands
 {
