@@ -38,6 +38,7 @@ import { FullResourceTableComponent } from './components/full-resource-table/ful
 import { QuillModule } from 'ngx-quill';
 import { ReactiveQuillComponent } from './components/reactive-quill-editor/reactive-quill-editor.component';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
+import { RequestStatus } from './components/request-status/request-status.component';
 
 @NgModule({
   imports: [
@@ -105,6 +106,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
     ResourceSelectDropdown,
     ProductFormComponent,
     ResourceTableComponent,
+    RequestStatus,
     DeleteConfirmModal,
     SummaryResourceDisplay,
     FullResourceTableComponent,

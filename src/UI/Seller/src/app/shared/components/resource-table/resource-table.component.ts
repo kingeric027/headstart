@@ -119,7 +119,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.router.events
       .pipe(takeWhile(() => this.alive))
       // only need to set the breadcrumbs on nav end events
-      .pipe(filter((event) => event instanceof NavigationEnd))
+      .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         this.setBreadCrumbs();
       });
@@ -132,7 +132,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   private setParentResourceSelectionSubscription() {
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
-      .subscribe(async (params) => {
+      .subscribe(async params => {
         await this.redirectToFirstParentIfNeeded();
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
@@ -145,8 +145,9 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   private setListRequestStatusSubscription() {
-    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe((requestStatus) => {
+    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe(requestStatus => {
       this.requestStatus = requestStatus;
+      this.changeDetectorRef.detectChanges();
     });
   }
 
@@ -161,8 +162,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     // in the future breadcrumb logic might need to be more complicated than this
     const urlPieces = this.router.url
       .split('/')
-      .filter((p) => p)
-      .map((p) => {
+      .filter(p => p)
+      .map(p => {
         if (p.includes('?')) {
           return p.slice(0, p.indexOf('?'));
         } else {
