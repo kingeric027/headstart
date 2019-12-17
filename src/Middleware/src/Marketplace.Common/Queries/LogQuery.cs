@@ -5,8 +5,8 @@ using Cosmonaut;
 using Cosmonaut.Extensions;
 using Cosmonaut.Response;
 using Marketplace.Common.Extensions;
-using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
+using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Queries

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Cosmonaut.Response;
-using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
+using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Extensions

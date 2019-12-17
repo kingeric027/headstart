@@ -1,7 +1,7 @@
 ﻿using Cosmonaut;
-using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;

@@ -10,7 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
 using Marketplace.Common;
-using Marketplace.Common.Helpers;
+using Marketplace.Helpers;
+using Marketplace.Helpers.Attributes;
 
 namespace Marketplace.API
 {
