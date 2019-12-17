@@ -10,7 +10,8 @@ import { CookieService } from 'ngx-cookie';
 import { keys as _keys } from 'lodash';
 import { isUndefined as _isUndefined } from 'lodash';
 import { AppStateService } from '@app-seller/shared/services/app-state/app-state.service';
-import { getRolesFromToken } from './app-auth.constants';
+import * as jwtDecode from 'jwt-decode';
+import { DecodedOrderCloudToken } from '@app-seller/shared';
 
 export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possible';
 @Injectable({
@@ -58,7 +59,20 @@ export class AppAuthService {
 
   getUserRoles(): string[] {
     const userToken = this.ocTokenService.GetAccess();
-    return getRolesFromToken(userToken);
+    return this.getRolesFromToken(userToken);
+  }
+
+  getRolesFromToken(token: string): string[] {
+    let decodedToken: DecodedOrderCloudToken;
+    try {
+      decodedToken = jwtDecode(token);
+    } catch (e) {
+      decodedToken = null;
+    }
+    if (!decodedToken) {
+      throw new Error('decoded jwt was null when attempting to get user type');
+    }
+    return decodedToken.role;
   }
 
   fetchToken(): Observable<string> {
