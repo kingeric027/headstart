@@ -8,10 +8,10 @@ using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Services;
-using ErrorCodes = Marketplace.Common.Exceptions.ErrorCodes;
 using Marketplace.Helpers.Models;
 using Action = Marketplace.Common.Models.Action;
 using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Exceptions;
 
 namespace Marketplace.Common.Commands
 {
