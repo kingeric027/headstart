@@ -11,6 +11,7 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Services;
 using WorkItem = Marketplace.Common.Models.WorkItem;
+using Marketplace.Helpers.Services;
 
 namespace Orchestration.Tests
 {
