@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Helpers
 {

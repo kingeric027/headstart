@@ -7,6 +7,7 @@ using Cosmonaut.Response;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Queries
 {
@@ -19,7 +20,7 @@ namespace Marketplace.Common.Queries
             _store = store;
         }
 
-        public async Task<Models.ListPage<OrchestrationLog>> List(IListArgs args)
+        public async Task<ListPage<OrchestrationLog>> List(IListArgs args)
         {
             var query = _store.Query()
                 .Search(args)

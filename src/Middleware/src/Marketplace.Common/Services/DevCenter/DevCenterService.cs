@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Flurl.Http;
 using Marketplace.Common.Models;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Services.DevCenter
 {

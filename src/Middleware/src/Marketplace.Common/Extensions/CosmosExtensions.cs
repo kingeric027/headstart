@@ -3,6 +3,7 @@ using System.Linq;
 using Cosmonaut.Response;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Extensions
 {

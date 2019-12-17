@@ -7,6 +7,7 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {

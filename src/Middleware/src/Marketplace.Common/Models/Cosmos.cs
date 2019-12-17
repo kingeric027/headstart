@@ -20,6 +20,5 @@ namespace Marketplace.Common.Models
 
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum LogLevel { Progress, Error, Warn, Success }
+
 }

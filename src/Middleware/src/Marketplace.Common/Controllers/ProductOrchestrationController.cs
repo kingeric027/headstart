@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Controllers
 {

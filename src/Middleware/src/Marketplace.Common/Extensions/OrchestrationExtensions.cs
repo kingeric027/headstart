@@ -4,6 +4,7 @@ using System.Security.AccessControl;
 using System.Text;
 using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Extensions
 {
