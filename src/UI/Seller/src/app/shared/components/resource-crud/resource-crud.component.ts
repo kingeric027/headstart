@@ -5,7 +5,6 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
-import { resource } from 'selenium-webdriver/http';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ListResource, Options, FilterDictionary } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 
@@ -20,6 +19,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   resourceInSelection = {};
 
   resourceForm: FormGroup;
+  isMyResource = false;
 
   // form setting defined in component implementing this component
   createForm: (resource: any) => FormGroup;
@@ -59,6 +59,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   ngOnInit() {
+    this.determineViewingContext();
     this.setFilterForm();
     this.subscribeToResources();
     this.subscribeToOptions();
@@ -71,6 +72,14 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
       this.resourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
+  }
+
+  async determineViewingContext() {
+    this.isMyResource = this.router.url.startsWith('/my-');
+    if (this.isMyResource) {
+      const supplier = await this.ocService.getMyResource();
+      this.setResourceSelectionFromResource(supplier);
+    }
   }
 
   subscribeToOptions() {
@@ -88,7 +97,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
         const resourceIDSelected =
           params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
         if (resourceIDSelected) {
-          this.setResourceSelection(resourceIDSelected);
+          this.setResourceSelectionFromID(resourceIDSelected);
         }
         if (this.isCreatingNew) {
           this.setResoureObjectsForCreatingNew();
@@ -127,9 +136,16 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.ocService.searchBy(searchStr);
   }
 
-  async setResourceSelection(resourceID: string) {
+  async setResourceSelectionFromID(resourceID: string) {
     this.selectedResourceID = resourceID || '';
     const resource = await this.ocService.findOrGetResourceByID(resourceID);
+    this.resourceInSelection = this.copyResource(resource);
+    this.setUpdatedResourceAndResourceForm(resource);
+  }
+
+  async setResourceSelectionFromResource(resource: any) {
+    this.selectedResourceID = (resource && resource.ID) || '';
+
     this.resourceInSelection = this.copyResource(resource);
     this.setUpdatedResourceAndResourceForm(resource);
   }
@@ -179,6 +195,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   copyResource(resource: any) {
+    console.log(resource);
     return JSON.parse(JSON.stringify(resource));
   }
 

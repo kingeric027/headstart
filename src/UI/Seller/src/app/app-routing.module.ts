@@ -13,39 +13,43 @@ const routes: Routes = [
       { path: 'home', component: HomeComponent },
       {
         path: 'products',
-        loadChildren: () => import('./products/products.module').then(m => m.ProductsModule),
+        loadChildren: () => import('./products/products.module').then((m) => m.ProductsModule),
       },
       {
         path: 'promotions',
-        loadChildren: () => import('./promotions/promotions.module').then(m => m.PromotionsModule),
+        loadChildren: () => import('./promotions/promotions.module').then((m) => m.PromotionsModule),
       },
       {
         path: 'categories',
-        loadChildren: () => import('./categories/categories.module').then(m => m.CategoriesModule),
+        loadChildren: () => import('./categories/categories.module').then((m) => m.CategoriesModule),
       },
       {
         path: 'orders',
-        loadChildren: () => import('./orders/orders.module').then(m => m.OrdersModule),
+        loadChildren: () => import('./orders/orders.module').then((m) => m.OrdersModule),
       },
       {
         path: 'buyers',
-        loadChildren: () => import('./buyers/buyers.module').then(m => m.BuyersModule),
+        loadChildren: () => import('./buyers/buyers.module').then((m) => m.BuyersModule),
       },
       {
         path: 'seller-users',
-        loadChildren: () => import('./seller-users/seller-users.module').then(m => m.SellerUsersModule),
+        loadChildren: () => import('./seller-users/seller-users.module').then((m) => m.SellerUsersModule),
       },
       {
         path: 'suppliers',
-        loadChildren: () => import('./suppliers/suppliers.module').then(m => m.SuppliersModule),
+        loadChildren: () => import('./suppliers/suppliers.module').then((m) => m.SuppliersModule),
+      },
+      {
+        path: 'my-supplier-profile',
+        loadChildren: () => import('./suppliers/suppliers.module').then((m) => m.SuppliersModule),
       },
       {
         path: 'reports',
-        loadChildren: () => import('./reports/reports.module').then(m => m.ReportsModule),
+        loadChildren: () => import('./reports/reports.module').then((m) => m.ReportsModule),
       },
       {
         path: 'storefronts',
-        loadChildren: () => import('./storefronts/storefronts.module').then(m => m.StorefrontsModule),
+        loadChildren: () => import('./storefronts/storefronts.module').then((m) => m.StorefrontsModule),
       },
     ],
   },
