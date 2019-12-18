@@ -18,6 +18,7 @@ export class HasTokenGuard implements CanActivate {
     @Inject(DOCUMENT) private document: any,
     private appConfig: AppConfig
   ) {}
+  // testing git permissions
   async canActivate(): Promise<boolean> {
     /**
      * very simple test to make sure a token exists,
