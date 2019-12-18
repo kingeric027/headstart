@@ -117,6 +117,10 @@
                                          [requestStatus]="requestStatus"
                                          (resourceSelected)="handleSelectResource($event)"
                                          [resourceList]="resourceList"></full-resource-table-component>
+          <request-status [requestStatus]="requestStatus"
+                          [subResourceName]="_ocService.secondaryResourceLevel || ''"
+                          [selectedParentResouceName]="selectedParentResourceName">
+          </request-status>
         </perfect-scrollbar>
       </div>
       <!--
@@ -129,7 +133,8 @@
           <perfect-scrollbar style="width: 100%; height: calc(100vh - 255px);"
                              (psYReachEnd)="handleScrollEnd()"
                              class="resource-table-side">
-            <table class="table table-hover resource-table">
+            <table *ngIf="requestStatus === 'GETTING_NEW_ITEMS' || requestStatus === 'SUCCESSFUL_WITH_ITEMS' || requestStatus === 'REFRESHING_ITEMS'"
+                   class="table table-hover resource-table">
               <thead>
                 <tr>
                   <th scope="col">Name</th>
@@ -137,7 +142,7 @@
               </thead>
 
               <!-- successfull response with items -->
-              <tbody *ngIf="requestStatus === 'SUCCESSFUL_WITH_ITEMS' || requestStatus === 'REFRESHING_ITEMS'">
+              <tbody>
                 <tr *ngIf="
                      isCreatingNew"
                     class="selectable-row selected-resource">
@@ -162,24 +167,11 @@
                 </tr>
               </tbody>
 
-              <tbody *ngIf="requestStatus === 'SUCCESSFUL_NO_ITEMS_NO_FILTERS'">
-                <tr>
-                  <td>No items</td>
-                </tr>
-              </tbody>
-              <tbody *ngIf="requestStatus === 'SUCCESSFUL_NO_ITEMS_WITH_FILTERS'">
-                <tr>
-                  <td>No items, try changing search or removing filters</td>
-                </tr>
-              </tbody>
-
-              <tbody *ngIf="requestStatus === 'GETTING_NEW_ITEMS'">
-                <tr>
-                  <td>Getting items</td>
-                </tr>
-              </tbody>
-
             </table>
+            <request-status [requestStatus]="requestStatus"
+                            [subResourceName]="_ocService.secondaryResourceLevel || ''"
+                            [selectedParentResouceName]="selectedParentResourceName">
+            </request-status>
           </perfect-scrollbar>
         </div>
         <div class="col-9">
