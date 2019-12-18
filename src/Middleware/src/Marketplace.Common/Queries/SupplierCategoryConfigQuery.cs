@@ -1,5 +1,6 @@
 ﻿using Cosmonaut;
 using Marketplace.Common.Models;
+using Marketplace.Helpers.Models;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using System;

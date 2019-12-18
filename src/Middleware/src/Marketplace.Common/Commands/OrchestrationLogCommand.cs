@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
