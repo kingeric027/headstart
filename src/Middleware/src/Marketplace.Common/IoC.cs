@@ -58,30 +58,5 @@ namespace Marketplace.Common
             services.AddSingleton(typeof(LogQuery), typeof(LogQuery));
             services.AddCosmosStore<OrchestrationLog>(cosmosSettings);
         }
-
-        public static ServiceProvider RegisterApiServices(this IServiceCollection services, IAppSettings settings)
-        {
-            services.AddTransient<GlobalExceptionHandler>();
-            services.AddSingleton(settings);
-
-            services.AddTransient<IOrchestrationLogCommand, OrchestrationLogCommand>();
-            services.AddTransient<IEnvironmentSeedCommand, EnvironmentSeedCommand>();
-
-            services.SharedServices();
-
-            var cosmosSettings = new CosmosStoreSettings(settings.CosmosSettings.DatabaseName, settings.CosmosSettings.EndpointUri,
-                settings.CosmosSettings.PrimaryKey, new ConnectionPolicy
-                {
-                    ConnectionProtocol = Protocol.Tcp,
-                    ConnectionMode = ConnectionMode.Direct
-                }, defaultCollectionThroughput: 5000);
-
-            services.AddSingleton(typeof(LogQuery), typeof(LogQuery));
-            services.AddSingleton(typeof(ISupplierCategoryConfigQuery), typeof(SupplierCategoryConfigQuery));
-            services.AddCosmosStore<OrchestrationLog>(cosmosSettings);
-            services.AddCosmosStore<SupplierCategoryConfig>(cosmosSettings);
-
-            return services.BuildServiceProvider();
-        }
     }
 }

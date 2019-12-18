@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
@@ -12,7 +13,7 @@ using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Queries
 {
-    public class LogQuery
+    public class LogQuery : ICosmosQuery<OrchestrationLog>
     {
         private readonly ICosmosStore<OrchestrationLog> _store;
 
@@ -38,23 +39,22 @@ namespace Marketplace.Common.Queries
             return item;
         }
 
-        public async Task<CosmosResponse<OrchestrationLog>> Upsert(OrchestrationLog log)
+        public async Task<OrchestrationLog> Save(OrchestrationLog log)
         {
             log.timeStamp = DateTime.Now;
             var result = await _store.UpsertAsync(log);
-            return result;
+            return result.Entity;
         }
 
-        public async Task<CosmosMultipleResponse<OrchestrationLog>> UpsertList(List<OrchestrationLog> logs)
+        public async Task<List<OrchestrationLog>> SaveMany(List<OrchestrationLog> logs)
         {
             var result = await _store.UpsertRangeAsync(logs);
-            return result;
+            return result.SuccessfulEntities.Select(e => e.Entity).ToList();
         }
 
-        public async Task<CosmosResponse<OrchestrationLog>> Delete(string id)
+        public async Task Delete(string id)
         {
-            var result = await _store.RemoveByIdAsync(id);
-            return result;
+            await _store.RemoveByIdAsync(id);
         }
     }
 }
