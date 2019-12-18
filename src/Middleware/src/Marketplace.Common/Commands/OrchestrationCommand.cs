@@ -56,7 +56,7 @@ namespace Marketplace.Common.Commands
             }
             catch (Exception)
             {
-                await _log.Upsert(new OrchestrationLog()
+                await _log.Save(new OrchestrationLog()
                 {
                     Level = LogLevel.Error,
                     Message = $"Failed to save blob to queue from API: {user.SupplierID} - {typeof(T)}",
@@ -74,7 +74,7 @@ namespace Marketplace.Common.Commands
             }
             catch (Exception ex)
             {
-                await _log.Upsert(new OrchestrationLog()
+                await _log.Save(new OrchestrationLog()
                 {
                     Level = LogLevel.Error,
                     Message = $"Failed to remove blob to queue: {path}",

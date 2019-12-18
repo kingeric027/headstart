@@ -83,7 +83,7 @@ namespace Marketplace.Orchestration
         }
 
         [FunctionName("LogEvent")]
-        public async Task LogEvent([ActivityTrigger] OrchestrationLog log) => await _log.Upsert(log);
+        public async Task LogEvent([ActivityTrigger] OrchestrationLog log) => await _log.Save(log);
 
         [FunctionName("RefreshCache")]
         public async Task<JObject> RefreshCache([ActivityTrigger] WorkItem wi) => await _sync.Dispatch(wi);
