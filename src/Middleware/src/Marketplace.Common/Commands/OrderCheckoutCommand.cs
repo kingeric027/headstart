@@ -12,7 +12,7 @@ namespace Marketplace.Common.Commands
 	{
 		Task<MockShippingQuote> GetSingleShippingQuote(string orderID, string shippingQuoteID);
 		Task<IEnumerable<MockShippingQuote>> ListShippingQuotes(string orderID);
-		Task<Order> SetShippingQuote(string orderID, string shippingQuoteID);
+		Task<Order> SetShippingQuoteAndCalculateTax(string orderID, string shippingQuoteID);
 	}
 
 	public class OrderCheckoutCommand : IOrderCheckoutCommand
@@ -66,7 +66,7 @@ namespace Marketplace.Common.Commands
 			return _mockShippingQuoteCache;
 		}
 
-		public async Task<Order> SetShippingQuote(string orderID, string quoteID)
+		public async Task<Order> SetShippingQuoteAndCalculateTax(string orderID, string quoteID)
 		{	
 			var shippingQuote = _mockShippingQuoteCache.First(quote => quote.ID == quoteID);
 			// Quote not found error.

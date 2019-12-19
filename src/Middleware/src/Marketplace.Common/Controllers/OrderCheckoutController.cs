@@ -31,7 +31,7 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[HttpPost, Route("{orderID}/shipping/quotes/{quoteID}"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<Order> SetShippingQuote(string orderID, string quoteID)
+		public async Task<Order> SetShippingQuoteAndCalculateTax(string orderID, string quoteID)
 		{
 			return await _command.SetShippingQuote(orderID, quoteID);
 		}
