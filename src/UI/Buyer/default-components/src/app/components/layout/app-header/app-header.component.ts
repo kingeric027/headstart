@@ -63,8 +63,8 @@ export class OCMAppHeader implements OnInit {
     this.buildAddToCartListener();
   }
 
-  toggleDropdown() {
-    this.showDropdown = !this.showDropdown;
+  toggleDropdown(bool: boolean) {
+    this.showDropdown = bool;
   }
 
   handleFiltersChange = (filters: ProductFilters) => {

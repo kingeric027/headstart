@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Category } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'marketplace';
+import { faCaretRight } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
 	templateUrl: './category-dropdown.component.html',
@@ -9,6 +10,9 @@ import { ShopperContextService } from 'marketplace';
 export class OCMCategoryDropdown {
 	constructor(private context: ShopperContextService) { }
 
+	faCaretRight = faCaretRight;
+
+	@Output() showDropdown = new EventEmitter();
 	@Input() set categories(value: Category[]) {
 		this.parentCategories = this.assignCategories(value, 'parent');
 		this.subCategories = this.assignCategories(value, 'subCategory');
@@ -49,8 +53,17 @@ export class OCMCategoryDropdown {
 		else if (level === 'subSubCategory') return subSubCategories;
 	}
 
+	checkForChildren(category: Category): Boolean {
+		if (category.ChildCount > 0) return true;
+		else { return false; }
+	}
+
 	setActiveCategory(categoryID: string): void {
 		this.context.router.toProductList({ categoryID });
+	}
+
+	closeDropdown() {
+		this.showDropdown.emit(false)
 	}
 
 }

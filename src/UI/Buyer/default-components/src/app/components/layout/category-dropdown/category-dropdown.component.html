@@ -1,13 +1,17 @@
-<div class="collapse navbar-collapse d-flex justify-content-between">
+<div class="d-flex justify-content-between">
   <ul>
     <li *ngFor="let parentCategory of parentCategories">
-      <a (click)="setActiveCategory(parentCategory.ID)">{{parentCategory.Name}}</a>
+      <a (click)="setActiveCategory(parentCategory.ID); closeDropdown()">{{parentCategory.Name}} <span *ngIf="checkForChildren(parentCategory)">
+          <fa-icon [icon]="faCaretRight"></fa-icon>
+        </span></a>
       <ul>
         <li *ngFor="let subCategory of subCategories | childCategoryFilter: parentCategory.ID">
-          <a (click)="setActiveCategory(subCategory.ID)">{{subCategory.Name}}</a>
+          <a (click)="setActiveCategory(subCategory.ID); closeDropdown()">{{subCategory.Name}} <span *ngIf="checkForChildren(subCategory)">
+              <fa-icon [icon]="faCaretRight"></fa-icon>
+            </span></a>
           <ul>
             <li *ngFor="let subSubCategory of subSubCategories | childCategoryFilter: subCategory.ID">
-              <a (click)="setActiveCategory(subSubCategory.ID)">{{subSubCategory.Name}}</a>
+              <a (click)="setActiveCategory(subSubCategory.ID); closeDropdown()">{{subSubCategory.Name}}</a>
             </li>
           </ul>
         </li>
