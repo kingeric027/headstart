@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
 import { faTrashAlt, faPlusCircle, faCircle } from '@fortawesome/free-solid-svg-icons';
 import { Category, OcCategoryService, ListCategoryAssignment, OcCatalogService } from '@ordercloud/angular-sdk';
-import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { CategoryTreeNode, AssignedCategory } from '@app-seller/shared/models/category-tree-node.class';
 import { ITreeOptions } from 'angular-tree-component';
 import { forkJoin, Observable } from 'rxjs';
@@ -21,8 +20,10 @@ export class CategoryTableComponent implements OnInit {
   // Use for assigning categories to user groups
   @Input()
   userGroupID: string;
-
+  @Input()
   catalogID: string;
+  @Input()
+  buyerID: string;
   categories: AssignedCategory[];
   categoryTree: CategoryTreeNode[];
   treeOptions: ITreeOptions = {
@@ -32,15 +33,9 @@ export class CategoryTableComponent implements OnInit {
     levelPadding: 40,
   };
 
-  constructor(
-    private ocCategoryService: OcCategoryService,
-    private ocCatalogService: OcCatalogService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  constructor(private ocCategoryService: OcCategoryService, private ocCatalogService: OcCatalogService) {}
 
   ngOnInit() {
-    // The default for a new OC buyer organization is one Catalog with ID equal to the buyerID
-    this.catalogID = this.appConfig.buyerID;
     this.loadCategories();
   }
 
@@ -59,8 +54,8 @@ export class CategoryTableComponent implements OnInit {
   }
 
   loadCategories(): void {
-    this.ocCategoryService.List(this.catalogID, { depth: 'all', pageSize: 100 }).subscribe((categories) => {
-      const requests = categories.Items.map((cat) => this.getAssignment(cat));
+    this.ocCategoryService.List(this.catalogID, { depth: 'all', pageSize: 100 }).subscribe(categories => {
+      const requests = categories.Items.map(cat => this.getAssignment(cat));
       forkJoin(requests).subscribe((res: ListCategoryAssignment[]) => {
         res.forEach((assignment, index) => {
           if (assignment.Items.length === 0) return;
@@ -81,24 +76,24 @@ export class CategoryTableComponent implements OnInit {
       if (node.parent && (node.parent.category.Assigned || node.parent.category.AssignedByParent)) {
         node.category.AssignedByParent = true;
       }
-      node.children.forEach((child) => checkNode(child));
+      node.children.forEach(child => checkNode(child));
     }
 
-    this.categoryTree.forEach((topLevelCat) => checkNode(topLevelCat));
+    this.categoryTree.forEach(topLevelCat => checkNode(topLevelCat));
   }
 
   getAssignment(category: Category): Observable<ListCategoryAssignment> {
     return this.ocCategoryService
       .ListAssignments(this.catalogID, {
-        buyerID: this.appConfig.buyerID,
+        buyerID: this.buyerID,
         categoryID: category.ID,
         userGroupID: this.userGroupID || undefined,
       })
       .pipe(
-        map((assignments) => {
+        map(assignments => {
           _remove(
             assignments.Items,
-            (assignment) => assignment.UserGroupID !== (this.userGroupID || null) // for buyer-level assignments, userGroupID should be null
+            assignment => assignment.UserGroupID !== (this.userGroupID || null) // for buyer-level assignments, userGroupID should be null
           );
           return assignments;
         })
@@ -109,7 +104,7 @@ export class CategoryTableComponent implements OnInit {
   resetCache(): Observable<any> {
     const assignment = {
       CatalogID: this.catalogID,
-      BuyerID: this.appConfig.buyerID,
+      BuyerID: this.buyerID,
       ViewAllCategories: true,
     };
     return this.ocCatalogService.SaveAssignment(assignment).pipe(
@@ -125,12 +120,12 @@ export class CategoryTableComponent implements OnInit {
     const request = assigned
       ? this.ocCategoryService.SaveAssignment(this.catalogID, {
           CategoryID: categoryID,
-          BuyerID: this.appConfig.buyerID,
+          BuyerID: this.buyerID,
           UserGroupID: this.userGroupID || undefined,
           Visible: true,
           ViewAllProducts: true,
         })
-      : this.ocCategoryService.DeleteAssignment(this.catalogID, categoryID, this.appConfig.buyerID, {
+      : this.ocCategoryService.DeleteAssignment(this.catalogID, categoryID, this.buyerID, {
           userGroupID: this.userGroupID || undefined,
         });
     request.subscribe(() => {
@@ -148,16 +143,16 @@ export class CategoryTableComponent implements OnInit {
     });
 
     // the category that the user moved
-    const moved: Category = siblings.find((x) => x.ID === $event.node.category.ID);
+    const moved: Category = siblings.find(x => x.ID === $event.node.category.ID);
     // updates the parentID if category became nested
     moved.ParentID = $event.to.parent.virtual ? null : $event.to.parent.id;
 
     // of the sibling categories get the displaced ones
     const displaced: Category[] = siblings.filter(
-      (category, index) => this.categories.find((x) => x.ID === category.ID).ListOrder !== index
+      (category, index) => this.categories.find(x => x.ID === category.ID).ListOrder !== index
     );
 
-    const queue: Observable<Category>[] = [moved, ...displaced].map((category) => {
+    const queue: Observable<Category>[] = [moved, ...displaced].map(category => {
       category.ListOrder = (category as any).siblingIndex;
       return this.ocCategoryService.Patch(this.catalogID, category.ID, category);
     });
@@ -165,7 +160,7 @@ export class CategoryTableComponent implements OnInit {
   }
 
   buildCategoryTree(ocCategories: AssignedCategory[]): CategoryTreeNode[] {
-    const orderedIDs = ocCategories.map((x) => x.ID);
+    const orderedIDs = ocCategories.map(x => x.ID);
     // in nodeDictionary, key is categoryID, value is a CategoryTreeNode
     const nodeDict = ocCategories.reduce((acc, x) => {
       const node = new CategoryTreeNode();
@@ -178,7 +173,7 @@ export class CategoryTableComponent implements OnInit {
     }, {});
 
     // Ordered by ListOrder. That order will be preserved within an array of child nodes.
-    orderedIDs.forEach((id) => {
+    orderedIDs.forEach(id => {
       if (!nodeDict[id].category.ParentID || !nodeDict[nodeDict[id].category.ParentID]) {
         // category is not a child node
         return;
@@ -188,7 +183,7 @@ export class CategoryTableComponent implements OnInit {
     });
 
     // Return all top-level nodes in order
-    return orderedIDs.map((x) => nodeDict[x]).filter((x) => !x.parent);
+    return orderedIDs.map(x => nodeDict[x]).filter(x => !x.parent);
   }
 
   getAlertText(): string {
