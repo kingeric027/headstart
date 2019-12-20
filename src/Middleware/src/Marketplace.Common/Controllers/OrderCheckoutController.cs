@@ -14,6 +14,7 @@ namespace Marketplace.Common.Controllers
 	public class OrderCheckoutController : BaseController
 	{
 		private readonly IOrderCheckoutCommand _command;
+
 		public OrderCheckoutController(IAppSettings settings, IOrderCheckoutCommand command) : base(settings) {
 			_command = command;
 		}
@@ -33,7 +34,7 @@ namespace Marketplace.Common.Controllers
 		[HttpPost, Route("{orderID}/shipping/quotes/{quoteID}"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<Order> SetShippingQuoteAndCalculateTax(string orderID, string quoteID)
 		{
-			return await _command.SetShippingQuote(orderID, quoteID);
+			return await _command.SetShippingQuoteAndCalculateTax(orderID, quoteID);
 		}
 	}
 }

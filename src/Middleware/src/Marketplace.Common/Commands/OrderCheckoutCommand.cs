@@ -1,4 +1,6 @@
 ﻿using Marketplace.Common.Models;
+using Marketplace.Common.Services;
+using Marketplace.Common.Services.Winmark.Common.Services;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -10,76 +12,41 @@ namespace Marketplace.Common.Commands
 {
 	public interface IOrderCheckoutCommand
 	{
-		Task<MockShippingQuote> GetSingleShippingQuote(string orderID, string shippingQuoteID);
-		Task<IEnumerable<MockShippingQuote>> ListShippingQuotes(string orderID);
-		Task<Order> SetShippingQuoteAndCalculateTax(string orderID, string shippingQuoteID);
+		Task<Order> SetShippingAndTax(string orderID, string shippingQuoteID);
 	}
 
 	public class OrderCheckoutCommand : IOrderCheckoutCommand
 	{
 		private readonly IOrderCloudClient _oc;
-		private readonly IAppSettings _settings;
+		private readonly IMockShippingService _shipping;
+		private readonly IAvataxService _avatax;
 
-		// TODO - Remove. Where this will be stored? OrderCloud, FreightPoP, BlobStorage
-		private readonly IEnumerable<MockShippingQuote> _mockShippingQuoteCache = new[] {
-			new MockShippingQuote() {
-					ID = "12345",
-					DeliveryDays = 1,
-					Cost = 18.99M,
-					Carrier = "Fedex",
-					Service = "Priority Air"
-			},
-			new MockShippingQuote()
-			{
-					ID = "34567",
-					DeliveryDays = 1,
-					Cost = 15.99M,
-					Carrier = "UPS",
-					Service = "Air Elite"
-			},
-			new MockShippingQuote()
-			{
-					ID = "56789",
-					DeliveryDays = 2,
-					Cost = 10.99M,
-					Carrier = "Unites State Postal Service",
-					Service = "Ground"
-			},
-		};
-
-		public OrderCheckoutCommand(IAppSettings settings, IOrderCloudClient oc)
+		public OrderCheckoutCommand(IOrderCloudClient oc, IAvataxService avatax, IMockShippingService shipping)
 		{
 			_oc = oc;
-			_settings = settings;
+			_avatax = avatax;
+			_shipping = shipping;
 		}
 
-		public async Task<MockShippingQuote> GetSingleShippingQuote(string orderID, string quoteID)
-		{
-			// TODO - Replace. Get a saved quote from the cache with orderID and quoteID
-			return _mockShippingQuoteCache.First(quote => quote.ID == quoteID);
-		}
-
-		public async Task<IEnumerable<MockShippingQuote>> ListShippingQuotes(string orderID)
-		{
-			// TODO - Get all Order Details
-			// TODO - Go get fresh shipping quotes from FreightPop based on Order
-			return _mockShippingQuoteCache;
-		}
-
-		public async Task<Order> SetShippingQuoteAndCalculateTax(string orderID, string quoteID)
+		public async Task<Order> SetShippingAndTax(string orderID, string shippingQuoteID)
 		{	
-			var shippingQuote = _mockShippingQuoteCache.First(quote => quote.ID == quoteID);
-			// Quote not found error.
 			var order = await _oc.Orders.GetAsync(OrderDirection.Outgoing, orderID);
-			// TODO - check that order is in correct state. e.g., is not already submitted.
-			return await _oc.Orders.PatchAsync(OrderDirection.Outgoing, orderID, new PartialOrder()
+			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, orderID);
+
+			var shippingQuote = await _shipping.GetSavedShippingQuote(orderID, shippingQuoteID);
+			var taxTransaction = await _avatax.CreateTaxTransactionAsync(order, lineItems);
+
+			var patchOrder = new PartialOrder()
 			{
 				ShippingCost = shippingQuote.Cost,
-				xp = new
-				{
-					ShippingQuoteID = shippingQuote.ID     // TODO - This xp is a placeholder until we learn more.
+				TaxCost = taxTransaction.totalTax ?? 0,
+				xp = new {
+					ShippingQuoteID = shippingQuote.ID,     // TODO - These xp's are placeholders until we actually define them.
+					AvalaraTaxTransactionCode = taxTransaction.code
 				}
-			});
+			};
+
+			return await _oc.Orders.PatchAsync(OrderDirection.Outgoing, orderID, patchOrder);
 		}
 	}
 }

@@ -5,28 +5,27 @@ using System.Text;
 namespace Marketplace.Common.Services
 {
 	using Avalara.AvaTax.RestClient;
-	using OrderCloud.SDK;
+    using OrderCloud.SDK;
 	using System;
 	using System.Collections.Generic;
-	using System.Linq;
 	using System.Threading.Tasks;
 
 	namespace Winmark.Common.Services
 	{
-		public interface IAvaTaxService
+		public interface IAvataxService
 		{
-			Task<TransactionModel> CalculateTaxEstimateAsync(Order order, ListPage<LineItem> lineItems);
-			Task<TransactionModel> CommitTaxTransactionAsync(Order order, ListPage<LineItem> lineItems);
-
+			Task<TransactionModel> GetTaxTransactionAsync(string transactionID); // Is this needed? for reporting maybe?
+			Task<TransactionModel> CreateTaxTransactionAsync(Order order, ListPage<LineItem> lineItems);
+			Task<TransactionModel> CommitTaxTransactionAsync(string transactionID);
 		}
 
-		public class AvaTaxService : IAvaTaxService
+		public class AvataxService : IAvataxService
 		{
 			private readonly IAppSettings _settings;
 			private readonly IOrderCloudClient _oc;
 			//private readonly AvaTaxClient _client;
 
-			public AvaTaxService(IAppSettings settings, IOrderCloudClient oc)
+			public AvataxService(IAppSettings settings, IOrderCloudClient oc)
 			{
 				_oc = oc;
 				_settings = settings;
@@ -37,13 +36,23 @@ namespace Marketplace.Common.Services
 
 			}
 
-			public async Task<TransactionModel> CalculateTaxEstimateAsync(Order order, ListPage<LineItem> lineItems)
+			public async Task<TransactionModel> GetTaxTransactionAsync(string transactionID)
+			{
+				return null;
+			}
+
+			public async Task<TransactionModel> CommitTaxTransactionAsync(string transactionID)
+			{
+				return null;
+			}
+
+			public async Task<TransactionModel> CreateTaxTransactionAsync(Order order, ListPage<LineItem> lineItems)
 			{
 				// Return fake, static data. In the correct format though.
 				return new TransactionModel()
 				{
 					id = 0,
-					code = "63184372-8a62-421e-aa94-70373058f166",
+					code = "63184372-8a62-421e-aa94-70373058f166(fake)",
 					companyId = 835775,
 					date = DateTime.Parse("2019-12-18"),
 					paymentDate = DateTime.Parse("2019-12-18"),
