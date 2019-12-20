@@ -107,13 +107,27 @@
 <!-- /Primary Nav -->
 <!-- Search / Cart Nav -->
 <nav class="navbar navbar-expand navbar-light bg-light">
-  <a class="cursor-pointer"
-     (click)="toggleDropdown()"
-     position="absolute">
-    <fa-icon [icon]="faBars"></fa-icon>
-  </a>
   <div class="container">
-    <ocm-search class="mr-3 w-100"
+    <button class="btn btn-light cursor-pointer"
+            placement="left"
+            ngbTooltip="Categories"
+            [openDelay]="500"
+            (click)="toggleCategoryDropdown(true)"
+            position="absolute"
+            *ngIf="!showCategoryDropdown">
+      <fa-icon [icon]="faBars"></fa-icon>
+    </button>
+    <button class="btn btn-light cursor-pointer"
+            placement="left"
+            ngbTooltip="Categories"
+            [openDelay]="500"
+            (click)="toggleCategoryDropdown(false)"
+            position="absolute"
+            *ngIf="showCategoryDropdown">
+      <fa-icon [icon]="faBars"></fa-icon>
+    </button>
+
+    <ocm-search class="ml-3 mr-3 w-100"
                 [placeholderText]="'Search Products...'"
                 [searchTermInput]="searchTermForProducts"
                 (searched)="searchProducts($event.detail)">
@@ -153,6 +167,7 @@
     </ul>
   </div>
 </nav>
-<ocm-category-dropdown [categories]="categories"
-                       *ngIf="showDropdown"></ocm-category-dropdown>
+<ocm-category-dropdown (closeDropdown)="toggleCategoryDropdown($event.detail)"
+                       [categories]="categories"
+                       *ngIf="showCategoryDropdown"></ocm-category-dropdown>
 <!-- /Search / Cart Nav -->
