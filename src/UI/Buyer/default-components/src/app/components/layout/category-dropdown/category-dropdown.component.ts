@@ -12,7 +12,7 @@ export class OCMCategoryDropdown {
 
 	faCaretRight = faCaretRight;
 
-	@Output() showDropdown = new EventEmitter();
+	@Output() closeDropdown = new EventEmitter();
 	@Input() set categories(value: Category[]) {
 		this.parentCategories = this.assignCategories(value, 'parent');
 		this.subCategories = this.assignCategories(value, 'subCategory');
@@ -54,16 +54,12 @@ export class OCMCategoryDropdown {
 	}
 
 	checkForChildren(category: Category): Boolean {
-		if (category.ChildCount > 0) return true;
-		else { return false; }
+		return category.ChildCount > 0;
 	}
 
 	setActiveCategory(categoryID: string): void {
 		this.context.router.toProductList({ categoryID });
-	}
-
-	closeDropdown() {
-		this.showDropdown.emit(false)
+		this.closeDropdown.emit(false);
 	}
 
 }

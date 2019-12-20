@@ -112,18 +112,18 @@
             placement="left"
             ngbTooltip="Categories"
             [openDelay]="500"
-            (click)="toggleDropdown(true)"
+            (click)="toggleCategoryDropdown(true)"
             position="absolute"
-            *ngIf="!showDropdown">
+            *ngIf="!showCategoryDropdown">
       <fa-icon [icon]="faBars"></fa-icon>
     </button>
     <button class="btn btn-light cursor-pointer"
             placement="left"
             ngbTooltip="Categories"
             [openDelay]="500"
-            (click)="toggleDropdown(false)"
+            (click)="toggleCategoryDropdown(false)"
             position="absolute"
-            *ngIf="showDropdown">
+            *ngIf="showCategoryDropdown">
       <fa-icon [icon]="faBars"></fa-icon>
     </button>
 
@@ -167,7 +167,7 @@
     </ul>
   </div>
 </nav>
-<ocm-category-dropdown (showDropdown)="toggleDropdown($event.detail)"
+<ocm-category-dropdown (closeDropdown)="toggleCategoryDropdown($event.detail)"
                        [categories]="categories"
-                       *ngIf="showDropdown"></ocm-category-dropdown>
+                       *ngIf="showCategoryDropdown"></ocm-category-dropdown>
 <!-- /Search / Cart Nav -->
