@@ -5,24 +5,20 @@ import { Router } from '@angular/router';
 
 // 3rd party
 import { OcTokenService, OcAuthService } from '@ordercloud/angular-sdk';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config';
+import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 import { CookieService } from 'ngx-cookie';
 import { keys as _keys } from 'lodash';
 import { isUndefined as _isUndefined } from 'lodash';
 import { AppStateService } from '@app-seller/shared/services/app-state/app-state.service';
+import * as jwtDecode from 'jwt-decode';
+import { DecodedOrderCloudToken } from '@app-seller/shared';
 
-export const TokenRefreshAttemptNotPossible =
-  'Token refresh attempt not possible';
+export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possible';
 @Injectable({
   providedIn: 'root',
 })
 export class AppAuthService {
-  private rememberMeCookieName = `${this.appConfig.appname
-    .replace(/ /g, '_')
-    .toLowerCase()}_rememberMe`;
+  private rememberMeCookieName = `${this.appConfig.appname.replace(/ /g, '_').toLowerCase()}_rememberMe`;
   fetchingRefreshToken = false;
   failedRefreshAttempt = false;
   refreshToken: BehaviorSubject<string>;
@@ -61,6 +57,24 @@ export class AppAuthService {
     );
   }
 
+  getUserRoles(): string[] {
+    const userToken = this.ocTokenService.GetAccess();
+    return this.getRolesFromToken(userToken);
+  }
+
+  getRolesFromToken(token: string): string[] {
+    let decodedToken: DecodedOrderCloudToken;
+    try {
+      decodedToken = jwtDecode(token);
+    } catch (e) {
+      decodedToken = null;
+    }
+    if (!decodedToken) {
+      throw new Error('decoded jwt was null when attempting to get user type');
+    }
+    return decodedToken.role;
+  }
+
   fetchToken(): Observable<string> {
     const accessToken = this.ocTokenService.GetAccess();
     if (accessToken) {
@@ -72,23 +86,19 @@ export class AppAuthService {
   fetchRefreshToken(): Observable<string> {
     const refreshToken = this.ocTokenService.GetRefresh();
     if (refreshToken) {
-      return this.ocAuthService
-        .RefreshToken(refreshToken, this.appConfig.clientID)
-        .pipe(
-          map((authResponse) => authResponse.access_token),
-          tap((token) => this.ocTokenService.SetAccess(token)),
-          catchError((error) => {
-            return throwError(error);
-          })
-        );
+      return this.ocAuthService.RefreshToken(refreshToken, this.appConfig.clientID).pipe(
+        map((authResponse) => authResponse.access_token),
+        tap((token) => this.ocTokenService.SetAccess(token)),
+        catchError((error) => {
+          return throwError(error);
+        })
+      );
     }
     throwError(TokenRefreshAttemptNotPossible);
   }
 
   logout(): Observable<any> {
-    const cookiePrefix = this.appConfig.appname
-      .replace(/ /g, '_')
-      .toLowerCase();
+    const cookiePrefix = this.appConfig.appname.replace(/ /g, '_').toLowerCase();
     const appCookieNames = _keys(this.cookieService.getAll());
     appCookieNames.forEach((cookieName) => {
       if (cookieName.indexOf(cookiePrefix) > -1) {
@@ -104,9 +114,7 @@ export class AppAuthService {
   }
 
   getRememberStatus(): boolean {
-    const rememberMe = <{ status: string }>(
-      this.cookieService.getObject(this.rememberMeCookieName)
-    );
+    const rememberMe = <{ status: string }>this.cookieService.getObject(this.rememberMeCookieName);
     return !!(rememberMe && rememberMe.status);
   }
 }

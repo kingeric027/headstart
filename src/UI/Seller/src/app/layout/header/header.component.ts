@@ -12,7 +12,8 @@ import {
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { Router } from '@angular/router';
 import { AppStateService } from '@app-seller/shared';
-import { MarketMangagerHeaderConfig, SellerHeaderConfig, SupplierHeaderConfig } from './header.config';
+import { getHeaderConfig, MPRoute } from './header.config';
+import { AppAuthService } from '@app-seller/auth';
 
 @Component({
   selector: 'layout-header',
@@ -29,24 +30,29 @@ export class HeaderComponent implements OnInit {
   faSitemap = faSitemap;
   faUserCircle = faUserCircle;
   activeTitle = '';
-  headerConfig: HeaderNav[];
+  headerConfig: MPRoute[];
 
   constructor(
     private ocTokenService: OcTokenService,
     private router: Router,
     private appStateService: AppStateService,
+    private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) protected appConfig: AppConfig
   ) {}
 
   ngOnInit() {
-    this.headerConfig = MarketMangagerHeaderConfig;
+    this.headerConfig = getHeaderConfig(this.appAuthService.getUserRoles());
     this.subscribeToRouteEvents();
   }
 
   subscribeToRouteEvents() {
     this.router.events.subscribe(() => {
       const activeNavGroup = this.headerConfig.find((grouping) => {
-        return grouping.routes.some((route) => this.router.url.includes(route.route));
+        if (grouping.subRoutes) {
+          return grouping.subRoutes.some((route) => this.router.url.includes(route.route));
+        } else {
+          return this.router.url.includes(grouping.route);
+        }
       });
       this.activeTitle = activeNavGroup && activeNavGroup.title;
     });

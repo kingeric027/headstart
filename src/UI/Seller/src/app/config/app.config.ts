@@ -5,9 +5,6 @@ export const ocAppConfig: AppConfig = {
   appname: 'OrderCloud Admin',
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
-  buyerID: environment.buyerID,
-  buyerClientID: environment.buyerClientID,
-  buyerUrl: environment.buyerUrl,
   scope: [
     'MeAddressAdmin',
     'MeAdmin',
@@ -36,6 +33,26 @@ export const ocAppConfig: AppConfig = {
     'SupplierUserAdmin',
     'SupplierAddressAdmin',
     'AdminUserAdmin',
+
+    // custom roles used to conditionally display ui
+    'MPMeProductAdmin',
+    'MPMeProductReader',
+    'MPProductAdmin',
+    'MPProductReader',
+    'MPPromotionAdmin',
+    'MPPromotionReader',
+    'MPCategoryAdmin',
+    'MPCategoryReader',
+    'MPOrderAdmin',
+    'MPOrderReader',
+    'MPShipmentAdmin',
+    'MPBuyerAdmin',
+    'MPBuyerReader',
+    'MPSellerAdmin',
+    'MPSupplierAdmin',
+    'MPMeSupplierAdmin',
+    'MPMeSupplierAddressAdmin',
+    'MPMeSupplierUserAdmin',
   ],
 };
 
@@ -57,23 +74,6 @@ export interface AppConfig {
    * you own or are a contributor to on the [dashboard](https://developer.ordercloud.io/dashboard)
    */
   clientID: string;
-
-  /**
-   * The identifier of the buyer org. This admin app is designed to manage a single Buyer organization. The OC
-   * API supports multiple buyer organizations per seller, but this app is not currently indended for that architecture.
-   */
-  buyerID: string;
-
-  /**
-   * The client ID of the buyer org.
-   */
-  buyerClientID: string;
-
-  /**
-   * base path to buyer site
-   */
-  buyerUrl: string;
-
   /**
    * base path to middleware
    */

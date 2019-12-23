@@ -21,7 +21,8 @@
           <h1 class="resource-name">{{(parentResourceService ? _currentResourceNamePlural + ' - ' + selectedParentResourceName : _currentResourceNamePlural) | titlecase}}</h1>
           <hr />
         </div>
-        <div class="d-flex justify-content-start pb-2">
+        <div *ngIf="!isMyResource"
+             class="d-flex justify-content-start pb-2">
           <div *ngIf="!isCreatingNew || parentResourceService"
                class="row subresource-selects">
             <div *ngIf="parentResourceService"
@@ -107,7 +108,7 @@
       </div>
 
       <!-- full table view -->
-      <div *ngIf="!selectedResourceID && !isCreatingNew"
+      <div *ngIf="!selectedResourceID && !isCreatingNew && !isMyResource"
            class="row resource-table-container">
         <perfect-scrollbar class="scrollbar-top"
                            style="width: 100%; height: calc(100vh - 255px);"
@@ -126,7 +127,7 @@
                                          editing/creating
                                          view
                                          -->
-      <div *ngIf="selectedResourceID || isCreatingNew"
+      <div *ngIf="(selectedResourceID || isCreatingNew) && !isMyResource"
            class="row resource-table-container">
         <div class="col-3 p-0">
           <perfect-scrollbar style="width: 100%; height: calc(100vh - 255px);"
@@ -191,6 +192,21 @@
               </a>
             </span>
           </div>
+          <div *ngIf="!isMyResource">
+            <ng-content *ngTemplateOutlet="editUnwrapped">
+            </ng-content>
+          </div>
+        </div>
+      </div>
+
+      <!-- ng content can only be used once for transclusion, ngTemplatOutlets are required so that 
+      we are only using the component once in the resource table -->
+
+      <ng-container *ngIf="isMyResource">
+        <div *ngTemplateOutlet="editUnwrapped"></div>
+      </ng-container>
+      <ng-template #editUnwrapped>
+        <div>
           <perfect-scrollbar style="width: 100%; height: calc(100vh - 325px);">
             <ng-content select=".resource-edit">
             </ng-content>
@@ -206,7 +222,8 @@
           <delete-confirm-modal-component *ngIf="!isCreatingNew"
                                           (deleteConfirmed)="handleDelete($event)"></delete-confirm-modal-component>
         </div>
-      </div>
+      </ng-template>
+
     </div>
   </div>
 </div>

@@ -62,6 +62,9 @@ export abstract class ResourceCrudService<ResourceType> {
       }
     });
   }
+  async getMyResource(): Promise<any> {
+    console.log('get my resource for this resource not defined');
+  }
 
   private isOnRelatedRoute(): boolean {
     const isOnSubResource =
@@ -141,7 +144,6 @@ export abstract class ResourceCrudService<ResourceType> {
       return REFRESHING_ITEMS;
     }
     if (isSubsequentPage && areCurrentlyItems) {
-      console.log('contrary to popular belief, we actually are FETCHING_SUBSEQUENT_PAGES');
       return FETCHING_SUBSEQUENT_PAGES;
     }
     // return isSubsequentPage || !areCurrentlyItems ? GETTING_NEW_ITEMS : REFRESHING_ITEMS;

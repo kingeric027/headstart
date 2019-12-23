@@ -25,6 +25,7 @@ import { NgxImageZoomModule } from 'ngx-image-zoom';
 import { OCMCategoryDropdown } from './components/layout/category-dropdown/category-dropdown.component';
 import {
   NgbCarouselModule,
+  NgbTooltipModule,
   NgbCollapseModule,
   NgbPaginationModule,
   NgbPopoverModule,
@@ -214,6 +215,7 @@ const components = [
     TreeModule,
     NgbCarouselModule,
     NgbCollapseModule,
+    NgbTooltipModule,
     NgbPaginationModule,
     NgbPopoverModule,
     NgbDropdownModule,

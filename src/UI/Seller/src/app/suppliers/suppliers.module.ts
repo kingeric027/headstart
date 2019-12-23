@@ -6,6 +6,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { SupplierUserTableComponent } from './components/users/user-table/supplier-user-table.component';
 import { SupplierLocationTableComponent } from './components/locations/supplier-location-table/supplier-location-table.component';
 import { SupplierCategorySelectComponent } from './components/category-select/supplier-category-select.component';
+import { SupplierEditComponent } from './components/suppliers/supplier-edit/supplier-edit.component';
 
 @NgModule({
   imports: [SharedModule, SuppliersRoutingModule, PerfectScrollbarModule],
@@ -14,6 +15,7 @@ import { SupplierCategorySelectComponent } from './components/category-select/su
     SupplierTableComponent,
     SupplierUserTableComponent,
     SupplierCategorySelectComponent,
+    SupplierEditComponent
   ],
 })
 export class SuppliersModule {}
