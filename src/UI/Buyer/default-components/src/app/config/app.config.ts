@@ -3,7 +3,7 @@ import { AppConfig } from 'marketplace';
 export const ocAppConfig: AppConfig = {
   appname: 'OrderCloud',
   anonymousShoppingEnabled: false,
-  clientID: '78F16865-A4C3-4D28-832D-A0371A93F1EA',
+  clientID: '26B45BD1-5D02-489D-A60E-3B37C852606C',
   marketplaceID: 'SEB',
   baseUrl: 'http://localhost:33333',
   middlewareUrl: 'https://marketplace-api-qa.azurewebsites.net',
