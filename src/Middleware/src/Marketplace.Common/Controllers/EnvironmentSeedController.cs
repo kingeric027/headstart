@@ -12,7 +12,7 @@ namespace Marketplace.Common.Controllers
     {
         private readonly IEnvironmentSeedCommand _command;
 
-        public EnvironmentSeedController(IAppSettings settings, IEnvironmentSeedCommand command) : base(settings)
+        public EnvironmentSeedController(AppSettings settings, IEnvironmentSeedCommand command) : base(settings)
         {
             _command = command;
         }

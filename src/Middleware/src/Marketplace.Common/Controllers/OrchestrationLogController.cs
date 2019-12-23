@@ -11,7 +11,7 @@ namespace Marketplace.Common.Controllers
     public class OrchestrationLogController : BaseController
     {
         private readonly IOrchestrationLogCommand _command;
-        public OrchestrationLogController(IAppSettings settings, IOrchestrationLogCommand command) : base(settings)
+        public OrchestrationLogController(AppSettings settings, IOrchestrationLogCommand command) : base(settings)
         {
             _command = command;
         }

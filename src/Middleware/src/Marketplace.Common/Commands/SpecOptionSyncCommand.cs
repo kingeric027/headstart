@@ -16,7 +16,7 @@ namespace Marketplace.Common.Commands
     public class SpecOptionSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public SpecOptionSyncCommand(IAppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public SpecOptionSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
         }

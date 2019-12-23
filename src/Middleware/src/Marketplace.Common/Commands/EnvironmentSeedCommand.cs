@@ -17,11 +17,11 @@ namespace Marketplace.Common.Commands
     public class EnvironmentSeedCommand : IEnvironmentSeedCommand
     {
         private readonly IOrderCloudClient _oc;
-        private readonly IAppSettings _settings;
+        private readonly AppSettings _settings;
         private readonly IDevCenterService _dev;
         private EnvironmentSeed _seed;
 
-        public EnvironmentSeedCommand(IAppSettings settings, IOrderCloudClient oc, IDevCenterService dev)
+        public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev)
         {
             _settings = settings;
             _oc = oc;

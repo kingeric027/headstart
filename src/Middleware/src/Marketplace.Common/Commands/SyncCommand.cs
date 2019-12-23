@@ -28,11 +28,11 @@ namespace Marketplace.Common.Commands
     public class SyncCommand : ISyncCommand
     {
         private const string ASSEMBLY = "Marketplace.Common.Commands.";
-        protected readonly IAppSettings _settings;
+        protected readonly AppSettings _settings;
         protected readonly LogQuery _log;
         private IOrderCloudClient _oc;
         
-        public SyncCommand(IAppSettings settings, LogQuery log)
+        public SyncCommand(AppSettings settings, LogQuery log)
         {
             _settings = settings;
             _log = log;

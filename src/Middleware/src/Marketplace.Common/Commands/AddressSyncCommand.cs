@@ -12,7 +12,7 @@ namespace Marketplace.Common.Commands
     public class AddressSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public AddressSyncCommand(IAppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public AddressSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
         }
