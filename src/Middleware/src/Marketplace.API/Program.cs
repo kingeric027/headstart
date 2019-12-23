@@ -10,6 +10,7 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Services.DevCenter;
+using Marketplace.Common.Services;
 
 namespace Marketplace.API
 {
@@ -45,7 +46,9 @@ namespace Marketplace.API
                     .Inject<IDevCenterService>()
                     .Inject<IFlurlClient>()
                     .Inject<ISyncCommand>()
-                    .Inject<IOrchestrationLogCommand>()
+					.Inject<IAvataxService>()
+					.Inject<IMockShippingService>()
+					.Inject<IOrchestrationLogCommand>()
 					.Inject<IEnvironmentSeedCommand>()
 					.InjectCosmosStore<OrchestrationLog, LogQuery>(cosmosConfig)
 					.InjectCosmosStore<SupplierCategoryConfig, SupplierCategoryConfigQuery>(cosmosConfig)

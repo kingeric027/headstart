@@ -14,7 +14,7 @@ namespace Marketplace.Common.Services
 		Task<IEnumerable<MockShippingQuote>> GenerateShipmentQuotes(IEnumerable<LineItem> lineItems);
 	}
 
-	public class MockShippingService
+	public class MockShippingService : IMockShippingService
 	{
 		// TODO - Remove. Where this will be stored? OrderCloud, FreightPoP, BlobStorage
 		private readonly IEnumerable<MockShippingQuote> _mockShippingQuoteCache = new[] {

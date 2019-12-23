@@ -17,7 +17,7 @@ namespace Marketplace.Common.Controllers
 		private readonly IOrderCheckoutCommand _checkoutCommand;
 		private readonly IMockShippingService _shippingService;
 
-		public OrderCheckoutController(IAppSettings settings, IOrderCheckoutCommand command, IMockShippingService shipping) : base(settings) {
+		public OrderCheckoutController(AppSettings settings, IOrderCheckoutCommand command, IMockShippingService shipping) : base(settings) {
 			_checkoutCommand = command;
 			_shippingService = shipping;
 		}
