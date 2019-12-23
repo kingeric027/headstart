@@ -6,14 +6,14 @@ namespace Marketplace.Common
 {
     public enum AppEnvironment { Local, Qa, Prod}
 
-    public interface IAppSettings
-    {
-        AppEnvironment Env { get; set; }
-        BlobSettings BlobSettings { get; set; }
-        CosmosSettings CosmosSettings { get; set; }
-        OrderCloudSettings OrderCloudSettings { get; set; }
-    }
-    public class AppSettings : IAppSettings
+    //public interface IAppSettings
+    //{
+    //    AppEnvironment Env { get; set; }
+    //    BlobSettings BlobSettings { get; set; }
+    //    CosmosSettings CosmosSettings { get; set; }
+    //    OrderCloudSettings OrderCloudSettings { get; set; }
+    //}
+    public class AppSettings // : IAppSettings
     {
         public AppEnvironment Env { get; set; }
         public string BaseUrl { get; set; }

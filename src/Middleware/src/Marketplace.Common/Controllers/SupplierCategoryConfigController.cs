@@ -12,7 +12,7 @@ namespace Marketplace.Common.Controllers
     {
         private ISupplierCategoryConfigQuery _query;
 
-        public SupplierCategoryConfigController(IAppSettings settings, ISupplierCategoryConfigQuery query) : base(settings)
+        public SupplierCategoryConfigController(AppSettings settings, ISupplierCategoryConfigQuery query) : base(settings)
         {
             _query = query;
         }
