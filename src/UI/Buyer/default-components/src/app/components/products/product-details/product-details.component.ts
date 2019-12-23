@@ -118,7 +118,7 @@ export class OCMProductDetails implements OnInit {
         return img.Url;
       }) || [];
     const result = _map(images, img => {
-      return img.Url.replace('{url}', this.context.appSettings.cmsUrl);
+      return img.Url.replace('{u}', this.context.appSettings.cmsUrl);
     });
     return _without(result, undefined) as string[];
   }
