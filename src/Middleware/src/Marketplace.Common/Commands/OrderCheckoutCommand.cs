@@ -1,4 +1,5 @@
-﻿using Marketplace.Common.Models;
+﻿using Marketplace.Common.Extensions;
+using Marketplace.Common.Models;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.Winmark.Common.Services;
 using OrderCloud.SDK;
@@ -12,7 +13,8 @@ namespace Marketplace.Common.Commands
 {
 	public interface IOrderCheckoutCommand
 	{
-		Task<Order> SetShippingAndTax(string orderID, string shippingQuoteID);
+		Task<Order> SetShippingAndTax(string orderID, IEnumerable<ShippingSelectionsFromOneAddress> shippingSelections);
+		Task<IEnumerable<ShippingOptionsFromOneAddress>> GenerateShippingQuotes(string orderID);
 	}
 
 	public class OrderCheckoutCommand : IOrderCheckoutCommand
@@ -28,25 +30,46 @@ namespace Marketplace.Common.Commands
 			_shipping = shipping;
 		}
 
-		public async Task<Order> SetShippingAndTax(string orderID, string shippingQuoteID)
+
+
+		public async Task<Order> SetShippingAndTax(string orderID, IEnumerable<ShippingSelectionsFromOneAddress> shippingSelections)
 		{	
 			var order = await _oc.Orders.GetAsync(OrderDirection.Outgoing, orderID);
 			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, orderID);
 
-			var shippingQuote = await _shipping.GetSavedShippingQuote(orderID, shippingQuoteID);
 			var taxTransaction = await _avatax.CreateTaxTransactionAsync(order, lineItems);
+			var shippingCost = (await shippingSelections
+				.SelectAsync(async sel => await _shipping.GetSavedShipmentQuote(orderID, sel.ShippingQuoteID)))
+				.Sum(quote => quote.Cost);
 
 			var patchOrder = new PartialOrder()
 			{
-				ShippingCost = shippingQuote.Cost,
+				ShippingCost = shippingCost,
 				TaxCost = taxTransaction.totalTax ?? 0,
 				xp = new {
-					ShippingQuoteID = shippingQuote.ID,     // TODO - These xp's are placeholders until we actually define them.
+					ShippingSelections = shippingSelections,  // TODO - These xp's are placeholders until we actually define them.
 					AvalaraTaxTransactionCode = taxTransaction.code
 				}
 			};
 
 			return await _oc.Orders.PatchAsync(OrderDirection.Outgoing, orderID, patchOrder);
+		}
+
+		public async Task<IEnumerable<ShippingOptionsFromOneAddress>> GenerateShippingQuotes(string orderID)
+		{
+			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, orderID);
+			var shipments = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
+			return await shipments.SelectAsync(async lineItemGrouping =>
+			{
+				var lineItemsInShipment = lineItemGrouping.ToList();
+				var options = await _shipping.GenerateShipmentQuotes(lineItemsInShipment);
+				return new ShippingOptionsFromOneAddress()
+				{
+					SupplierID = lineItemsInShipment.First().SupplierID, // Assumes ShipFromAddressID is unqiue accross suppliers
+					ShipFromAddressID = lineItemGrouping.Key,
+					Options = options
+				};
+			});
 		}
 	}
 }

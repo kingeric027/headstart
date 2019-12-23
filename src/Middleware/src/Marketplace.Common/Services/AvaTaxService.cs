@@ -38,17 +38,20 @@ namespace Marketplace.Common.Services
 
 			public async Task<TransactionModel> GetTaxTransactionAsync(string transactionID)
 			{
+				// TODO - use Avarala endpoint
 				return null;
 			}
 
 			public async Task<TransactionModel> CommitTaxTransactionAsync(string transactionID)
 			{
+				// TODO - use Avarala endpoint
 				return null;
 			}
 
 			public async Task<TransactionModel> CreateTaxTransactionAsync(Order order, ListPage<LineItem> lineItems)
 			{
-				// Return fake, static data. In the correct format though.
+				// Returns fake, static data. In the correct format though.
+				// TODO - use Avarala endpoint
 				return new TransactionModel()
 				{
 					id = 0,

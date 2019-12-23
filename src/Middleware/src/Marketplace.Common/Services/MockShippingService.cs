@@ -1,4 +1,5 @@
 ﻿using Marketplace.Common.Models;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace Marketplace.Common.Services
 {
 	public interface IMockShippingService
 	{
-		Task<MockShippingQuote> GetSavedShippingQuote(string orderID, string shippingQuoteID);
-		Task<IEnumerable<MockShippingQuote>> GenerateShippingQuotes(string orderID);
+		Task<MockShippingQuote> GetSavedShipmentQuote(string orderID, string shippingQuoteID);
+		Task<IEnumerable<MockShippingQuote>> GenerateShipmentQuotes(IEnumerable<LineItem> lineItems);
 	}
 
 	public class MockShippingService
@@ -42,16 +43,15 @@ namespace Marketplace.Common.Services
 			},
 		};
 
-		public async Task<MockShippingQuote> GetSavedShippingQuote(string orderID, string quoteID)
+		public async Task<MockShippingQuote> GetSavedShipmentQuote(string orderID, string quoteID)
 		{
 			// TODO - Replace. Get a saved quote from the cache with orderID and quoteID
 			return _mockShippingQuoteCache.First(quote => quote.ID == quoteID);
 		}
 
-		public async Task<IEnumerable<MockShippingQuote>> GenerateShippingQuotes(string orderID)
+		public async Task<IEnumerable<MockShippingQuote>> GenerateShipmentQuotes(IEnumerable<LineItem> shipment)
 		{
-			// TODO - Get all Order Details
-			// TODO - Go get fresh shipping quotes from FreightPop based on Order
+			// TODO - Go get fresh shipping quotes from FreightPop.
 			return _mockShippingQuoteCache;
 		}
 	}
