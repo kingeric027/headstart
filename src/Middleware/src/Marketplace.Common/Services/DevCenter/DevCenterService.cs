@@ -17,9 +17,9 @@ namespace Marketplace.Common.Services.DevCenter
     public class DevCenterService : IDevCenterService
     {
         private readonly IFlurlClient _client;
-        private readonly IAppSettings _settings;
+        private readonly AppSettings _settings;
 
-        public DevCenterService(IAppSettings settings)
+        public DevCenterService(AppSettings settings)
         {
             _settings = settings;
             _client = new FlurlClient("https://api.ordercloud.io");

@@ -12,9 +12,9 @@ namespace Marketplace.Common.Controllers
 {
     public class BaseController : MarketplaceController
     {
-		public IAppSettings Settings;
+		public AppSettings Settings;
 
-		public BaseController(IAppSettings settings)
+		public BaseController(AppSettings settings)
 		{
 			Settings = settings;
 		}

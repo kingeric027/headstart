@@ -14,10 +14,10 @@ namespace Marketplace.Common.Commands
 
     public class OrchestrationLogCommand : IOrchestrationLogCommand
     {
-        private readonly IAppSettings _settings;
+        private readonly AppSettings _settings;
         private readonly LogQuery _log;
 
-        public OrchestrationLogCommand(IAppSettings settings, LogQuery log)
+        public OrchestrationLogCommand(AppSettings settings, LogQuery log)
         {
             _settings = settings;
             _log = log;

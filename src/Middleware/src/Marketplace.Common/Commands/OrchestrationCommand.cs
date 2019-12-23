@@ -30,13 +30,17 @@ namespace Marketplace.Common.Commands
     public class OrchestrationCommand : IOrchestrationCommand
     {
         private readonly IBlobService _blob;
-        private readonly IAppSettings _settings;
+        private readonly AppSettings _settings;
         private readonly LogQuery _log;
 
-        public OrchestrationCommand(IAppSettings settings, IBlobService blob, LogQuery log)
+        public OrchestrationCommand(AppSettings settings, LogQuery log)
         {
             _settings = settings;
-            _blob = blob;
+            _blob = new BlobService(new BlobServiceConfig()
+            {
+                ConnectionString = settings.BlobSettings.ConnectionString,
+                Container = settings.BlobSettings.QueueName
+            });
             _log = log;
         }
 

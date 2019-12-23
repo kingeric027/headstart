@@ -10,7 +10,7 @@ namespace Marketplace.Common.Controllers
     [Route("env")]
     public class EnvController : BaseController
     {
-        public EnvController(IAppSettings settings) : base(settings)
+        public EnvController(AppSettings settings) : base(settings)
         {
         }
 

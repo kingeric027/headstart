@@ -12,7 +12,7 @@ namespace Marketplace.Common.Controllers
     {
         private readonly IOrchestrationCommand _command;
 
-        public UserOrchestrationController(IAppSettings settings, IOrchestrationCommand command) : base(settings)
+        public UserOrchestrationController(AppSettings settings, IOrchestrationCommand command) : base(settings)
         {
             _command = command;
         }
