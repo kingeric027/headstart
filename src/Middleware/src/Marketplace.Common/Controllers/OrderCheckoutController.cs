@@ -22,22 +22,22 @@ namespace Marketplace.Common.Controllers
 			_shippingService = shipping;
 		}
 
-		[HttpGet, Route("{orderID}/shipping-quotes"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<IEnumerable<ShippingOptionsFromOneAddress>> GenerateShippingQuotes(string orderID)
+		[HttpGet, Route("{orderID}/shipping-quote")]
+		public async Task<IEnumerable<ShippingOptions>> GenerateShippingQuotes(string orderID)
 		{
 			return await _checkoutCommand.GenerateShippingQuotes(orderID);
 		}
 
-		[HttpGet, Route("{orderID}/shipping-quotes/{quoteID}"), MarketplaceUserAuth(ApiRole.Shopper)]
+		[HttpGet, Route("{orderID}/shipping-quote/{quoteID}")]
 		public async Task<MockShippingQuote> GetSavedShippingQuote(string orderID, string quoteID)
 		{
 			return await _shippingService.GetSavedShipmentQuote(orderID, quoteID);
 		}
 
-		[HttpPost, Route("{orderID}/shipping-quotes"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<Order> SetShippingAndTax(string orderID, [FromBody] IEnumerable<ShippingSelectionsFromOneAddress> shippingSelections)
+		[HttpPut, Route("{orderID}/shipping-quote")]
+		public async Task<Order> SetShippingAndTax(string orderID, [FromBody] ShippingSelection shippingSelection)
 		{
-			return await _checkoutCommand.SetShippingAndTax(orderID, shippingSelections);
+			return await _checkoutCommand.SetShippingSelection(orderID, shippingSelection);
 		}
 	}
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Marketplace.Common.Models
 {
-	public class ShippingSelectionsFromOneAddress
+	public class ShippingSelection
 	{
 		public string SupplierID { get; set; }
 		public string ShipFromAddressID { get; set; }
