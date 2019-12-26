@@ -9,7 +9,9 @@ using Marketplace.Helpers.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Commands;
+using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.DevCenter;
+using Marketplace.Helpers;
 
 namespace Marketplace.API
 {
@@ -50,8 +52,9 @@ namespace Marketplace.API
 					.InjectCosmosStore<OrchestrationLog, LogQuery>(cosmosConfig)
 					.InjectCosmosStore<SupplierCategoryConfig, SupplierCategoryConfigQuery>(cosmosConfig)
 					.Inject<ISupplierCategoryConfigQuery>()
-					.AddAuthenticationScheme("MarketplaceUser");
-			}
+                    .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
+                    .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
+            }
 
 			// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 			public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
