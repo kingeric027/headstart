@@ -14,7 +14,6 @@
                              [favorite]="isFavorite()"
                              (favoriteChanged)="setIsFavorite($event.detail)">
         </ocm-toggle-favorite>
-
       </div>
       <div>
         <div>
@@ -43,7 +42,7 @@
               </ocm-quantity-input>
             </div>
 
-            <button class="btn btn-block btn-primary"
+            <button class="btn btn-block btn-primary mb-3"
                     style="max-width: 200px"
                     type="submit"
                     [disabled]="!specFormService.event?.valid || !qtyValid"
@@ -54,11 +53,11 @@
           </div>
         </div>
       </div>
-      <p class="mt-4 p-3 border border-medium border-radius"
-         [innerHTML]="_product.Description || 'This product has no description.'">
-      </p>
+      <div class="p-3 border border-medium border-radius"><strong>Description:</strong>
+        <p [innerHTML]="_product.Description || 'This product has no description.'">
+        </p>
+      </div>
     </div>
-
   </div>
   <div *ngIf="relatedProducts$ | async; let relatedProducts">
     <ocm-product-carousel *ngIf="relatedProducts.length > 0"
