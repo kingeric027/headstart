@@ -130,4 +130,10 @@ export class OCMProductDetails implements OnInit {
   setIsFavorite(isFav: boolean) {
     this.context.currentUser.setIsFavoriteProduct(isFav, this._product.ID);
   }
+
+  setActiveSupplier(supplierId: string) {
+    this.context.router.toProductList({ activeFacets: { supplier: supplierId } });
+  }
 }
+
+
