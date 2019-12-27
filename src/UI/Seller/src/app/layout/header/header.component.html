@@ -1,5 +1,12 @@
-<nav class="navbar navbar-expand-lg border-bottom navbar-oc justify-content-between">
-
+<nav class="navbar navbar-dark navbar-expand-lg border-bottom bg-primary">
+  <!-- Brand Logo -->
+  <a class="navbar-brand clickable cursor-pointer">
+    <img class="nav-link navbar-brand"
+         routerLink="/home"
+         width="150px"
+         src="https://four51.io/wp-content/uploads/2019/08/Four51_Logo_MPLS_White@2x@1x.png">
+  </a>
+  <!-- /Brand Logo -->
   <!-- Mobile Menu Toggle -->
   <button class="navbar-toggler"
           type="button"
@@ -11,52 +18,46 @@
           (click)="isCollapsed = !isCollapsed">
     <span class="navbar-toggler-icon"></span>
   </button>
-
+  <!-- /Mobile Menu Toggle -->
   <!-- Collapsible Navbar Menu -->
-  <div class="collapse navbar-collapse d-flex justify-content-between"
-       id="navbarSupportedContent"
-       [ngClass]="{'show': !isCollapsed}">
-    <div>
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <img class="nav-link navbar-brand"
-               routerLink="/home"
-               width="150px"
-               src="https://four51.io/wp-content/uploads/2019/08/Four51_Logo_MPLS_White@2x@1x.png">
-        </li>
-        <li class="nav-item d-flex flex-column justify-content-center resource-nav-link-container">
-          <div class="d-flex">
-            <div class="dropdown text-center flex-fill py-2 nav-grouping-width"
-                 *ngFor="let nav of headerConfig"
-                 [ngClass]="{'active-nav-group' : nav.title === activeTitle}">
-              <a *ngIf="nav.subRoutes"
-                 [routerLink]="nav.route"
-                 class="text-white">{{ nav.title }}
-              </a>
-              <a *ngIf="!nav.subRoutes"
-                 [routerLink]="nav.route"
-                 class="text-white">{{ nav.title }}
-              </a>
-              <div *ngIf="nav.subRoutes"
-                   class="dropdown-content mt-2 dropdown-column-width">
-                <a [routerLink]="route.route"
-                   class="text-left"
-                   *ngFor="let route of nav.subRoutes">{{ route.title }}</a>
-              </div>
-            </div>
+  <div [ngClass]="{'collapse': isCollapsed, 'navbar-collapse': true}"
+       id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li *ngFor="let nav of headerConfig"
+          class="nav-item clickable cursor-pointer"
+          [ngClass]="{'active-nav-group' : nav.title === activeTitle, 'dropdown': nav.subRoutes}">
+        <!-- [routerLink]="nav.route" -->
+        <div ngbDropdown
+             *ngIf="nav.subRoutes"
+             role="button"
+             [ngClass]="{'active' : nav.title === activeTitle}">
+          <a class="nav-link navbarDropdown"
+             data-toggle="dropdown"
+             ngbDropdownToggle
+             aria-haspopup="true"
+             aria-expanded="false">{{ nav.title }}
+          </a>
+          <!-- Nav Item Dropdown -->
+          <div ngbDropdownMenu
+               *ngIf="nav.subRoutes"
+               class="dropdown-menu"
+               aria-labelledby="navbarDropdown">
+            <a [routerLink]="route.route"
+               (click)="isCollapsed = !isCollapsed"
+               class="dropdown-item"
+               *ngFor="let route of nav.subRoutes">{{ route.title }}</a>
           </div>
-        </li>
-      </ul>
-    </div>
+          <!-- /Nav Item Dropdown -->
+        </div>
 
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link"
-           routerLink="/home">
-          <fa-icon [icon]="faUserCircle"
-                   class="user-icon"
-                   size="2x"></fa-icon>
+        <!-- Single Level Nav Items -->
+        <a *ngIf="!nav.subRoutes"
+           [routerLink]="nav.route"
+           (click)="isCollapsed = !isCollapsed"
+           [ngClass]="{'active' : nav.title === activeTitle}"
+           class="nav-link">{{ nav.title }}
         </a>
+        <!-- /Single Level Nav Items -->
       </li>
     </ul>
   </div>

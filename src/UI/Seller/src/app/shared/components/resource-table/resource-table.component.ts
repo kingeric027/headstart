@@ -43,6 +43,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   isCreatingNew = false;
   isMyResource = false;
   alive = true;
+  screenSize;
 
   constructor(
     private router: Router,
@@ -95,9 +96,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   @Input()
   resourceForm: FormGroup;
 
-  ngOnInit() {
+  async ngOnInit() {
     this.determineViewingContext();
     this.initializeSubscriptions();
+    this.screenSize = this.getScreenSizeBreakPoint();
   }
 
   determineViewingContext() {
@@ -125,7 +127,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.router.events
       .pipe(takeWhile(() => this.alive))
       // only need to set the breadcrumbs on nav end events
-      .pipe(filter((event) => event instanceof NavigationEnd))
+      .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         this.setBreadCrumbs();
       });
@@ -138,7 +140,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   private setParentResourceSelectionSubscription() {
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
-      .subscribe(async (params) => {
+      .subscribe(async params => {
         await this.redirectToFirstParentIfNeeded();
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
@@ -151,7 +153,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   private setListRequestStatusSubscription() {
-    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe((requestStatus) => {
+    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe(requestStatus => {
       this.requestStatus = requestStatus;
       this.changeDetectorRef.detectChanges();
     });
@@ -168,8 +170,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     // in the future breadcrumb logic might need to be more complicated than this
     const urlPieces = this.router.url
       .split('/')
-      .filter((p) => p)
-      .map((p) => {
+      .filter(p => p)
+      .map(p => {
         if (p.includes('?')) {
           return p.slice(0, p.indexOf('?'));
         } else {
@@ -235,5 +237,27 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.alive = false;
+  }
+  //TODO: MOVE THIS TO A HELPER OR SERVICE
+  getScreenSizeBreakPoint() {
+    const map = {
+      xs: 575,
+      sm: 767,
+      md: 991,
+      lg: 1199,
+    };
+    const innerWidth = window.innerWidth;
+
+    if (innerWidth < map.xs) {
+      return 'xs';
+    } else if (innerWidth > map.xs && innerWidth < map.sm) {
+      return 'sm';
+    } else if (innerWidth > map.sm && innerWidth < map.md) {
+      return 'md';
+    } else if (innerWidth > map.md && innerWidth < map.lg) {
+      return 'lg';
+    } else if (innerWidth > map.lg) {
+      return 'xl';
+    }
   }
 }

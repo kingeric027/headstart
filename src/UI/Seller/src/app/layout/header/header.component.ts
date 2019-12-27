@@ -10,7 +10,7 @@ import {
   faUserCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { AppStateService } from '@app-seller/shared';
 import { getHeaderConfig, MPRoute } from './header.config';
 import { AppAuthService } from '@app-seller/auth';
@@ -43,20 +43,24 @@ export class HeaderComponent implements OnInit {
   ngOnInit() {
     this.headerConfig = getHeaderConfig(this.appAuthService.getUserRoles());
     this.subscribeToRouteEvents();
+    this.urlChange(this.router.url);
   }
 
   subscribeToRouteEvents() {
-    this.router.events.subscribe(() => {
-      const activeNavGroup = this.headerConfig.find((grouping) => {
-        if (grouping.subRoutes) {
-          return grouping.subRoutes.some((route) => this.router.url.includes(route.route));
-        } else {
-          return this.router.url.includes(grouping.route);
-        }
-      });
-      this.activeTitle = activeNavGroup && activeNavGroup.title;
+    console.log(this.router.events);
+    this.router.events.subscribe(ev => {
+      if (ev instanceof NavigationEnd) {
+        this.urlChange(ev.url);
+      }
     });
   }
+
+  urlChange = (url: string) => {
+    const activeNavGroup = this.headerConfig.find(grouping => {
+      return url.includes(grouping.route);
+    });
+    this.activeTitle = activeNavGroup && activeNavGroup.title;
+  };
 
   logout() {
     this.ocTokenService.RemoveAccess();

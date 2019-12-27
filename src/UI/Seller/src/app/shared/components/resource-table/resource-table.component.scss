@@ -56,72 +56,6 @@
     }
   }
   
-  /* form starting stylings ------------------------------- */
-  .group {
-    position: relative;
-    margin-bottom: 1.5rem;
-    margin-top: 1rem;
-  }
-  :host {
-    select {
-      display: block;
-    }
-    select:focus {
-      box-shadow: none;
-      outline: none;
-    }
-  }
-  
-  /* LABEL ======================================= */
-  label {
-    color: #999;
-    font-weight: normal;
-    position: absolute;
-    pointer-events: none;
-    left: 5px;
-    top: 10px;
-    transition: 0.2s ease all;
-  }
-  
-  /* active state */
-  select:focus ~ label,
-  select:valid ~ label {
-    top: -8px;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-    background-color: white;
-    font-size: 10px;
-    color: $dark;
-    font-weight: bold;
-  }
-  
-  /* HIGHLIGHTER ================================== */
-  .highlight {
-    position: absolute;
-    height: 60%;
-    width: auto;
-    top: 25%;
-    left: 0;
-    pointer-events: none;
-    opacity: 0.5;
-  }
-  
-  /* active state */
-  select:focus ~ .highlight {
-    animation: selectHighlighter 0.3s ease;
-  }
-  
-  /* ANIMATIONS ================ */
-  @keyframes selectHighlighter {
-    from {
-      background: $primary;
-    }
-    to {
-      width: 0;
-      background: transparent;
-    }
-  }
-  
   .badge__counter--large {
     ::ng-deep {
       .fa-layers-counter {
@@ -134,32 +68,19 @@
     }
   }
 
-.table-header-container {
-  margin-left: 30px;
-}
-
 .breadcrumb-oc {
   background-color: transparent;
 }
 
 .breadcrumb-link {
+  text-decoration: underline;
   color: $brand-navy;
 }
 
-.parent-resource-dropdown {
-  margin-right: 20px;
-}
-
-.subresource-selects {
-  margin-left: 0px;
-  margin-right: 30px;
-  border-right: 1px solid rgba($gray-900, 0.1);
-}
-
-.filter-icon-container {
-  margin-top: -5px;
-  margin-right: 10px;
-}
+// .filter-icon-container {
+//   margin-top: -5px;
+//   margin-right: 10px;
+// }
 
 .filter-container{
   height: 34px;
@@ -176,15 +97,14 @@
   border-bottom: 1px solid rgba($gray-900, 0.1);
 } 
 
-.create-new-button {
-  width: 300px;
-}
-
 .resource-name {
-  margin-top: -24px;
+  font-size: 22px;
+  @include media-breakpoint-up(sm) {
+    font-size: 28px;
+  }
+  // margin-top: -24px;
 }
 
-.resource-table-component-container {
-  width: 98%;
-  margin: 0 auto;
+.page-title-container {
+  margin-top: -1.5rem;
 }

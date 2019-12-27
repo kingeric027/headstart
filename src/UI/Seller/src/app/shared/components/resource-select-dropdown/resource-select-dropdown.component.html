@@ -1,17 +1,17 @@
 <!-- parent resource dropdown -->
 <div ngbDropdown
-     class="d-inline-block parent-resource-dropdown">
+     class="parent-resource-dropdown">
   <button class="btn btn-outline-dark"
           id="parentresourcedropdown"
           ngbDropdownToggle>{{selectedParentResourceName}}</button>
   <div ngbDropdownMenu
-       aria-labelledby="parent resource dropdown h-400">
+       aria-labelledby="parent resource dropdown">
     <search-component class="mr-3 w-100"
                       [placeholderText]="'Search'"
                       [searchTermInput]="searchTerm"
                       (searched)="searchedResources($event)">
     </search-component>
-    <perfect-scrollbar style="height: 400px; min-width: 400px;"
+    <perfect-scrollbar style="height: 400px; max-width: 200px;"
                        (psYReachEnd)="handleScrollEnd()">
       <button ngbDropdownItem
               *ngFor="let resource of parentResourceList.Items"

@@ -71,3 +71,9 @@ html {
   color: $brand-navy;
   background-color: rgba(red, 0.2);
 }
+
+.cursor-pointer,
+.link,
+.btn {
+  cursor: $custom-range-track-cursor;
+}
