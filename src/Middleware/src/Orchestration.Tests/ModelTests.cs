@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using OrderCloud.SDK;
+using Marketplace.Helpers.Models;
 
 namespace Orchestration.Tests
 {

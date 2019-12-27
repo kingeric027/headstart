@@ -8,8 +8,11 @@ using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Services;
+using Marketplace.Helpers.Models;
 using Action = Marketplace.Common.Models.Action;
-using ErrorCodes = Marketplace.Common.Exceptions.ErrorCodes;
+using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Exceptions;
+using Marketplace.Helpers.Services;
 
 namespace Marketplace.Common.Commands
 {
@@ -21,23 +24,27 @@ namespace Marketplace.Common.Commands
         Task<JObject> CalculateDiff(WorkItem wi);
         Task<JObject> GetQueuedItem(string path);
         Task<JObject> GetCachedItem(string path);
-        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : Models.IOrchestrationObject;
+        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IOrchestrationObject;
     }
 
     public class OrchestrationCommand : IOrchestrationCommand
     {
         private readonly IBlobService _blob;
-        private readonly IAppSettings _settings;
+        private readonly AppSettings _settings;
         private readonly LogQuery _log;
 
-        public OrchestrationCommand(IAppSettings settings, IBlobService blob, LogQuery log)
+        public OrchestrationCommand(AppSettings settings, LogQuery log)
         {
             _settings = settings;
-            _blob = blob;
+            _blob = new BlobService(new BlobServiceConfig()
+            {
+                ConnectionString = settings.BlobSettings.ConnectionString,
+                Container = settings.BlobSettings.QueueName
+            });
             _log = log;
         }
 
-        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : Models.IOrchestrationObject
+        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IOrchestrationObject
         {
             try
             {
@@ -53,7 +60,7 @@ namespace Marketplace.Common.Commands
             }
             catch (Exception)
             {
-                await _log.Upsert(new OrchestrationLog()
+                await _log.Save(new OrchestrationLog()
                 {
                     Level = LogLevel.Error,
                     Message = $"Failed to save blob to queue from API: {user.SupplierID} - {typeof(T)}",
@@ -71,7 +78,7 @@ namespace Marketplace.Common.Commands
             }
             catch (Exception ex)
             {
-                await _log.Upsert(new OrchestrationLog()
+                await _log.Save(new OrchestrationLog()
                 {
                     Level = LogLevel.Error,
                     Message = $"Failed to remove blob to queue: {path}",

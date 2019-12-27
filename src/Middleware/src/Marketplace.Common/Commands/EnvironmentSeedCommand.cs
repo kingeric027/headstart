@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Marketplace.Common.Controllers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Services.DevCenter;
+using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -16,11 +17,11 @@ namespace Marketplace.Common.Commands
     public class EnvironmentSeedCommand : IEnvironmentSeedCommand
     {
         private readonly IOrderCloudClient _oc;
-        private readonly IAppSettings _settings;
+        private readonly AppSettings _settings;
         private readonly IDevCenterService _dev;
         private EnvironmentSeed _seed;
 
-        public EnvironmentSeedCommand(IAppSettings settings, IOrderCloudClient oc, IDevCenterService dev)
+        public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev)
         {
             _settings = settings;
             _oc = oc;

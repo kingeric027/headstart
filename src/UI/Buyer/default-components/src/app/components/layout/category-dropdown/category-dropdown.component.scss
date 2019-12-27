@@ -1,61 +1,126 @@
+@import '../../../../styles/themes/anytime-fitness/variables.scss';
+
+div {
+  width: 1125px;
+  height: 500px;
+  background: $primary;
+  border-radius: 3px;
+}
 
 a {
   cursor: pointer;
 }
 
+span {
+  display: inline-block;
+  margin-left: .3em;
+  transition: transform 0.3s ease;
+  transform: translate(0px);
+}
+
+a:hover > span{
+  transform: translate(10px);
+}
+
 ul {
+    display: block;
     list-style: none;
     left: 100%;
     padding: 0;
     margin: 0;
-    background: #e9ecef;
-  }
-  
-  ul li {
-    position: relative;
-    background: #e9ecef;
-  }
+    background: $primary;
+    border-right: 1px solid $gray-200;
+    height: 500px;
+    width: 375px;
+    max-height: 500px;
+    overflow: auto;
+    overflow-wrap: break-word;
+}
 
-  li ul { display: none; }
+ul li {
+  position: static;
+  background: $primary;
+}
+
+li ul { 
+  display: none;
+}
 
 ul li a {
   display: block;
   padding: .6em;
   text-decoration: none;
   white-space: nowrap;
-  color: #808080;
+  color: $white;
+  transition: background .3s, color .3s;
+}
+
+ul li ul { 
+  top: 122px;
+  left: 375px;
+  position: fixed;
+  max-height: 500px;
+  max-width: 375px;
+  overflow-wrap: break-word;
+  border-right: 1px solid $gray-200;
+}
+
+ul li ul li ul {
+  top: 122px;
+  left: 750px;
+  position: fixed;
+  max-height: 500px;
+  max-width: 375px;
+  overflow-wrap: break-word;
+  overflow: auto;
+  border-right: none;
 }
 
 ul li a:hover {
-   background: #8348ad;
-   color: #fff; 
+  background: $gray-200;
+  color: $primary;
 }
 
 li:hover > ul {
-    top: 0;
-    display: block;
-    position: absolute;
+  top: 0;
+  display: block;
+  position: absolute;
 }
-  
-  li:hover li { float: none; }
-  
-  li:hover a {
-    display: block;
-    top: 0;
-    background: #e9ecef }
-  
-  li:hover li a:hover { background: #8348ad }
-  
-  .main-navigation li ul li { border-top: 0; }
 
-  ul ul ul {
-    top: 0;
-  }
+li:hover li { 
+  float: none; 
+}
 
-  ul:before,
+li:hover a {
+  display: block;
+  top: 75;
+  background: $primary 
+}
+
+li:hover li a:hover { 
+  background: $gray-200 
+}
+
+ul:before,
 ul:after {
   content: " ";
   display: table;
 }
 
-ul:after { clear: both; }
+ul:after { 
+  clear: both; 
+}
+
+// scroll-bar
+
+::-webkit-scrollbar {
+  width: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $gray-200;
+}
+
+::-webkit-scrollbar-track {
+  background: $primary;
+}

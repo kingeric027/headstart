@@ -9,7 +9,6 @@ using Marketplace.Common.Commands;
 using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
-using Marketplace.Common.Services;
 using WorkItem = Marketplace.Common.Models.WorkItem;
 
 namespace Orchestration.Tests
@@ -42,7 +41,7 @@ namespace Orchestration.Tests
         [Test, TestCaseSource(typeof(ActionFactory), nameof(ActionFactory.TestCases))]
         public async Task<Action> determine_action_results(WorkItem wi)
         {
-            var command = new OrchestrationCommand(Substitute.For<IAppSettings>(), Substitute.For<IBlobService>(), new LogQuery(Substitute.For<ICosmosStore<OrchestrationLog>>()));
+            var command = new OrchestrationCommand(Substitute.For<AppSettings>(), new LogQuery(Substitute.For<ICosmosStore<OrchestrationLog>>()));
             wi.Diff = await command.CalculateDiff(wi);
             var action = await command.DetermineAction(wi);
             return action;
@@ -51,7 +50,7 @@ namespace Orchestration.Tests
         [Test, TestCaseSource(typeof(DiffFactory), nameof(DiffFactory.TestCases))]
         public async Task<JObject> diff_results(WorkItem wi)
         {
-            var command = new OrchestrationCommand(Substitute.For<IAppSettings>(), Substitute.For<IBlobService>(), new LogQuery(Substitute.For<ICosmosStore<OrchestrationLog>>()));
+            var command = new OrchestrationCommand(Substitute.For<AppSettings>(), new LogQuery(Substitute.For<ICosmosStore<OrchestrationLog>>()));
             var diff = await command.CalculateDiff(wi);
             return diff;
         }

@@ -33,7 +33,7 @@ export class OCMAppHeader implements OnInit {
   activeCategoryID: string = undefined;
   categories: Category[] = [];
   screenSize = getScreenSizeBreakPoint();
-  showDropdown: Boolean = false;
+  showCategoryDropdown: Boolean = false;
 
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
@@ -63,8 +63,8 @@ export class OCMAppHeader implements OnInit {
     this.buildAddToCartListener();
   }
 
-  toggleDropdown() {
-    this.showDropdown = !this.showDropdown;
+  toggleCategoryDropdown(bool: boolean) {
+    this.showCategoryDropdown = bool;
   }
 
   handleFiltersChange = (filters: ProductFilters) => {

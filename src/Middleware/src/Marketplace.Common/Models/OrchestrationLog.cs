@@ -4,7 +4,8 @@ using System.Text;
 using Microsoft.Azure.WebJobs;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Exceptions;
-using Marketplace.Common.Helpers;
+using Marketplace.Helpers.Attributes;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Models
 {

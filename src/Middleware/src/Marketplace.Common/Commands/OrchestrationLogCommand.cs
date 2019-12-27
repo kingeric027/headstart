@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
@@ -13,10 +14,10 @@ namespace Marketplace.Common.Commands
 
     public class OrchestrationLogCommand : IOrchestrationLogCommand
     {
-        private readonly IAppSettings _settings;
+        private readonly AppSettings _settings;
         private readonly LogQuery _log;
 
-        public OrchestrationLogCommand(IAppSettings settings, LogQuery log)
+        public OrchestrationLogCommand(AppSettings settings, LogQuery log)
         {
             _settings = settings;
             _log = log;

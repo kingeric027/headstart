@@ -5,73 +5,18 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Marketplace.Helpers.Models;
+using Marketplace.Helpers.Controllers;
 
 namespace Marketplace.Common.Controllers
 {
-    [EnableCors("marketplacecors")]
-    [Produces("application/json")]
-    public class BaseController : Controller
+    public class BaseController : MarketplaceController
     {
-        public VerifiedUserContext VerifiedUserContext;
-        public IAppSettings Settings;
+		public AppSettings Settings;
 
-        public BaseController(IAppSettings settings)
-        {
-            Settings = settings;
-        }
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            VerifiedUserContext = new VerifiedUserContext(User);
-            base.OnActionExecuting(context);
-        }
-    }
-
-    public class VerifiedUserContext
-    {
-        private readonly ClaimsPrincipal _c;
-        private readonly JwtSecurityToken _token;
-
-        public VerifiedUserContext(ClaimsPrincipal c)
-        {
-            _c = c;
-            if (_c.Claims.Any())
-                _token = new JwtSecurityTokenHandler().ReadJwtToken(this.AccessToken);
-        }
-
-        public string UsrType
-        {
-            get { return _token.Payload.FirstOrDefault(t => t.Key == "usrtype").Value?.ToString(); }
-        }
-        
-        public string UserID
-        {
-            get { return _c.Claims.First(c => c.Type == "userid").Value; }
-        }
-        public string Username
-        {
-            get { return _c.Claims.First(c => c.Type == "username").Value; }
-        }
-        public string ClientID
-        {
-            get { return _c.Claims.First(c => c.Type == "clientid").Value; }
-        }
-        public string Email
-        {
-            get { return _c.Claims.First(c => c.Type == "email").Value; }
-        }
-        public string SupplierID
-        {
-            get { return _c.Claims.First(c => c.Type == "supplier").Value; }
-        }
-        public string BuyerID
-        {
-            get { return _c.Claims.First(c => c.Type == "buyer").Value; }
-        }
-
-        public string AccessToken
-        {
-            get { return _c.Claims.First(c => c.Type == "accesstoken").Value; }
-        }
-    }
+		public BaseController(AppSettings settings)
+		{
+			Settings = settings;
+		}
+	}
 }

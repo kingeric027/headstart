@@ -8,13 +8,14 @@ using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
     public class SpecSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public SpecSyncCommand(IAppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public SpecSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
         }
@@ -31,7 +32,7 @@ namespace Marketplace.Common.Commands
             catch (OrderCloudException exId) when (IdExists(exId))
             {
                 // handle 409 errors by refreshing cache
-                await _log.Upsert(new OrchestrationLog(wi)
+                await _log.Save(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateExistsError,
                     Message = exId.Message,
@@ -41,7 +42,7 @@ namespace Marketplace.Common.Commands
             }
             catch (OrderCloudException ex)
             {
-                await _log.Upsert(new OrchestrationLog(wi)
+                await _log.Save(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateGeneralError,
                     Message = ex.Message,
@@ -51,7 +52,7 @@ namespace Marketplace.Common.Commands
             }
             catch (Exception e)
             {
-                await _log.Upsert(new OrchestrationLog(wi)
+                await _log.Save(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.CreateGeneralError,
                     Message = e.Message,
@@ -72,7 +73,7 @@ namespace Marketplace.Common.Commands
             }
             catch (OrderCloudException ex)
             {
-                await _log.Upsert(new OrchestrationLog(wi)
+                await _log.Save(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.UpdateGeneralError,
                     Message = ex.Message,
@@ -92,7 +93,7 @@ namespace Marketplace.Common.Commands
             }
             catch (OrderCloudException ex)
             {
-                await _log.Upsert(new OrchestrationLog(wi)
+                await _log.Save(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.PatchGeneralError,
                     Message = ex.Message,
@@ -116,7 +117,7 @@ namespace Marketplace.Common.Commands
             }
             catch (OrderCloudException ex)
             {
-                await _log.Upsert(new OrchestrationLog(wi)
+                await _log.Save(new OrchestrationLog(wi)
                 {
                     ErrorType = OrchestrationErrorType.GetGeneralError,
                     Message = ex.Message,
