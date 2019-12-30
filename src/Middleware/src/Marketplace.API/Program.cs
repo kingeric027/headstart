@@ -43,15 +43,15 @@ namespace Marketplace.API
 
 				services
 					.ConfigureWebApiServices(_settings, "v1", "Marketplace API")
-                    .Inject<IOrchestrationCommand>()
                     .Inject<IDevCenterService>()
                     .Inject<IFlurlClient>()
                     .Inject<ISyncCommand>()
-                    .Inject<IOrchestrationLogCommand>()
-					.Inject<IEnvironmentSeedCommand>()
-					.InjectCosmosStore<OrchestrationLog, LogQuery>(cosmosConfig)
-					.InjectCosmosStore<SupplierCategoryConfig, SupplierCategoryConfigQuery>(cosmosConfig)
+					.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
+					.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
 					.Inject<ISupplierCategoryConfigQuery>()
+                    .Inject<IOrchestrationCommand>()
+                    .Inject<IOrchestrationLogCommand>()
+                    .Inject<IEnvironmentSeedCommand>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                     .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
             }

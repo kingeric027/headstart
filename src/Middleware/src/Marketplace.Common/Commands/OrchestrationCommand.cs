@@ -49,13 +49,13 @@ namespace Marketplace.Common.Commands
             _log = log;
         }
 
-        public OrchestrationCommand(AppSettings settings, LogQuery log, IBlobService queueBlob, IBlobService cacheBlob)
-        {
-            _settings = settings;
-            _blobQueue = queueBlob;
-            _blobCache = cacheBlob;
-            _log = log;
-        }
+        //public OrchestrationCommand(AppSettings settings, LogQuery log, IBlobService queueBlob, IBlobService cacheBlob) : this(settings, log)
+        //{
+        //    _settings = settings;
+        //    _blobQueue = queueBlob;
+        //    _blobCache = cacheBlob;
+        //    _log = log;
+        //}
 
         public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IOrchestrationObject
         {
@@ -63,20 +63,19 @@ namespace Marketplace.Common.Commands
             {
                 obj.Token = user.AccessToken;
                 obj.ClientId = user.ClientID;
-                await _blobQueue.Save(_settings.BlobSettings.QueueName, obj.BuildPath(resourceId),
-                    JsonConvert.SerializeObject(obj));
+                await _blobQueue.Save(obj.BuildPath(resourceId), JsonConvert.SerializeObject(obj));
                 return await Task.FromResult(obj);
             }
             catch (ApiErrorException ex)
             {
                 throw new ApiErrorException(ex.ApiError);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await _log.Save(new OrchestrationLog()
                 {
                     Level = LogLevel.Error,
-                    Message = $"Failed to save blob to queue from API: {user.SupplierID} - {typeof(T)}",
+                    Message = $"Failed to save blob to queue from API: {user.SupplierID} - {typeof(T)}:  {ex.Message}",
                     Current = JObject.FromObject(obj)
                 });
                 throw new ApiErrorException(ErrorCodes.All["WriteFailure"], obj);
