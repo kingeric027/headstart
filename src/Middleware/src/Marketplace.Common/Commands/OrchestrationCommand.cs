@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Common.Controllers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Exceptions;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
-using Marketplace.Common.Services;
 using Marketplace.Helpers.Models;
 using Action = Marketplace.Common.Models.Action;
 using Marketplace.Helpers.Extensions;
@@ -29,18 +27,33 @@ namespace Marketplace.Common.Commands
 
     public class OrchestrationCommand : IOrchestrationCommand
     {
-        private readonly IBlobService _blob;
+        private readonly IBlobService _blobQueue;
+        private readonly IBlobService _blobCache;
         private readonly AppSettings _settings;
         private readonly LogQuery _log;
 
         public OrchestrationCommand(AppSettings settings, LogQuery log)
         {
             _settings = settings;
-            _blob = new BlobService(new BlobServiceConfig()
+            _blobQueue = new BlobService(new BlobServiceConfig()
             {
                 ConnectionString = settings.BlobSettings.ConnectionString,
                 Container = settings.BlobSettings.QueueName
             });
+
+            _blobCache = new BlobService(new BlobServiceConfig()
+            {
+                ConnectionString = settings.BlobSettings.ConnectionString,
+                Container = settings.BlobSettings.CacheName
+            });
+            _log = log;
+        }
+
+        public OrchestrationCommand(AppSettings settings, LogQuery log, IBlobService queueBlob, IBlobService cacheBlob)
+        {
+            _settings = settings;
+            _blobQueue = queueBlob;
+            _blobCache = cacheBlob;
             _log = log;
         }
 
@@ -50,7 +63,7 @@ namespace Marketplace.Common.Commands
             {
                 obj.Token = user.AccessToken;
                 obj.ClientId = user.ClientID;
-                await _blob.Save(_settings.BlobSettings.QueueName, obj.BuildPath(resourceId),
+                await _blobQueue.Save(_settings.BlobSettings.QueueName, obj.BuildPath(resourceId),
                     JsonConvert.SerializeObject(obj));
                 return await Task.FromResult(obj);
             }
@@ -74,7 +87,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                await _blob.Delete(_settings.BlobSettings.QueueName, path);
+                await _blobQueue.Delete(path);
             }
             catch (Exception ex)
             {
@@ -92,7 +105,7 @@ namespace Marketplace.Common.Commands
             if (wi.Cache == null) await Task.CompletedTask;
             try
             {
-                await _blob.Save(_settings.BlobSettings.CacheName, $"{wi.ResourceId.ToLower()}/{wi.RecordType.ToString().ToLower()}/{wi.RecordId}", wi.Cache);
+                await _blobCache.Save($"{wi.ResourceId.ToLower()}/{wi.RecordType.ToString().ToLower()}/{wi.RecordId}", wi.Cache);
             }
             catch (Exception ex)
             {
@@ -104,7 +117,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                return await _blob.Get<JObject>(_settings.BlobSettings.QueueName, path);
+                return await _blobQueue.Get<JObject>(path);
             }
             catch (Exception ex)
             {
@@ -116,7 +129,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                return await _blob.Get<JObject>(_settings.BlobSettings.CacheName, $"{path}");
+                return await _blobCache.Get<JObject>($"{path}");
             }
             catch (Exception)
             {
