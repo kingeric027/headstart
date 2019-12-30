@@ -77,3 +77,11 @@ html {
 .btn {
   cursor: $custom-range-track-cursor;
 }
+
+.table {
+  thead {
+      color: $gray-600;
+      text-transform: uppercase;
+      font-size: .8rem;
+  }
+}

@@ -1,8 +1,8 @@
 <!-- 98pc calced height is placeholder for now: will need to change to make responsive or if the layout srtructure is changed -->
 <div class="container-fluid">
-  <div class="row">
+  <!-- Breadcrumbs -->
+  <div class="row calculate">
     <div class="col-md-12">
-      <!-- Breadcrumbs -->
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb breadcrumb-oc">
           <!-- make this the home icon -->
@@ -21,48 +21,45 @@
           </li>
         </ol>
       </nav>
-      <!-- /Breadcrumbs -->
     </div>
   </div>
-  <div class="row">
+  <!-- /Breadcrumbs -->
+  <!-- Page Title -->
+  <div class="row calculate">
     <div class="col-md-12">
-      <!-- Page Title -->
       <div class="page-title-container">
         <h1 class="resource-name mb-0">{{(parentResourceService ? _currentResourceNamePlural + ' - ' + selectedParentResourceName : _currentResourceNamePlural) | titlecase}}</h1>
-        <hr />
       </div>
-
     </div>
-
     <!-- /Page Title -->
   </div>
-  <div class="row">
-    <div class="col-lg-3 col-md-4 col-sm-5 d-flex justify-content-start align-items-center">
-      <div *ngIf="parentResourceService">
-        <!-- parent resource dropdown -->
-        <resource-select-dropdown-component [parentService]="parentResourceService"
-                                            [ocService]="_ocService">
-        </resource-select-dropdown-component>
-      </div>
-      <div *ngIf="parentResourceService">
-        <!-- sub resource dropdown -->
-        <div ngbDropdown
-             class="d-inline-block parent-resource-dropdown">
-          <!-- change to currently selected option  -->
-          <button class="btn btn-outline-dark"
-                  id="parentresourcedropdown"
-                  ngbDropdownToggle>{{_currentResourceNamePlural | titlecase}}</button>
-          <div ngbDropdownMenu
-               aria-labelledby="parent resource dropdown">
-            <button ngbDropdownItem
-                    *ngFor="let subResource of parentResourceService.subResourceList"><a routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{subResource}}">
-                {{subResource | titlecase}}
-              </a></button>
-          </div>
+  <!-- /Page Title -->
+  <!-- Filter Bar -->
+  <div *ngIf="!isMyResource"
+       class="row calculate">
+    <div *ngIf="parentResourceService"
+         class="col-lg-3 col-md-4 col-sm-5 d-flex justify-content-start align-items-center">
+      <!-- parent resource dropdown -->
+      <resource-select-dropdown-component [parentService]="parentResourceService"
+                                          [ocService]="_ocService">
+      </resource-select-dropdown-component>
+      <!-- sub resource dropdown -->
+      <div ngbDropdown
+           class="d-inline-block parent-resource-dropdown">
+        <!-- change to currently selected option  -->
+        <button class="btn btn-outline-dark"
+                id="parentresourcedropdown"
+                ngbDropdownToggle>{{_currentResourceNamePlural | titlecase}}</button>
+        <div ngbDropdownMenu
+             aria-labelledby="parent resource dropdown">
+          <button ngbDropdownItem
+                  *ngFor="let subResource of parentResourceService.subResourceList"><a routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{subResource}}">
+              {{subResource | titlecase}}
+            </a></button>
         </div>
       </div>
     </div>
-    <div class="col-md-3 col-sm-7"
+    <div class="col-md-3 col-sm-7 d-flex justify-content-start align-items-center"
          *ngIf="!isCreatingNew">
       <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
       <button class="btn btn-block brand-button--orange mr-3"
@@ -119,14 +116,15 @@
       <!-- /ngContent for filters popover -->
     </div>
   </div>
+  <!-- /Filter Bar -->
   <div class="row">
     <div class="col-md-12">
-
       <!-- full table view -->
-      <div *ngIf="!selectedResourceID && !isCreatingNew && !isMyResource"
-           class="row resource-table-container">
-        <perfect-scrollbar class="scrollbar-top"
-                           style="width: 100%; height: calc(100vh - 333px);"
+      <div *ngIf="!selectedResourceID && !isCreatingNew && !isMyResource">
+        <perfect-scrollbar id="perfectScroll"
+                           class="scrollbar-top"
+                           style="width: 100%;"
+                           [ngStyle]="{'height.px': psHeight}"
                            (psYReachEnd)="handleScrollEnd()">
           <full-resource-table-component [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel"
                                          [requestStatus]="requestStatus"
@@ -141,8 +139,9 @@
       <!-- editing/creating view -->
       <div *ngIf="(selectedResourceID || isCreatingNew) && !isMyResource"
            class="row resource-table-container">
-        <div class="col-3 p-0">
-          <perfect-scrollbar style="width: 100%; height: calc(100vh - 255px);"
+        <div class="col-3 p-0 d-md-block d-none">
+          <perfect-scrollbar style="width: 100%;"
+                             [ngStyle]="{'height.px': psHeight}"
                              (psYReachEnd)="handleScrollEnd()"
                              class="resource-table-side">
             <table *ngIf="requestStatus === 'GETTING_NEW_ITEMS' || requestStatus === 'SUCCESSFUL_WITH_ITEMS' || requestStatus === 'REFRESHING_ITEMS' || requestStatus === 'FETCHING_SUBSEQUENT_PAGES'"
@@ -183,8 +182,8 @@
             </request-status>
           </perfect-scrollbar>
         </div>
-        <div class="col-9">
-          <div class="pt-3 pb-3 d-flex flex-row justify-content-between resource-title-container">
+        <div class="col-md-9 col-sm-12">
+          <div class="pt-3 pb-3 d-flex flex-row justify-content-between resource-title-container calculate">
             <span class="d-flex flex-row justify-content-start">
               <button class="btn brand-button"
                       (click)="handleSelectResource({})">
@@ -216,9 +215,12 @@
       </ng-container>
       <ng-template #editUnwrapped>
         <div>
-          <perfect-scrollbar style="width: 100%; height: calc(100vh - 325px);">
+          <perfect-scrollbar style="width: 100%;"
+                             [ngStyle]="{'height.px': psHeight}">
             <ng-content select=".resource-edit">
             </ng-content>
+            <delete-confirm-modal-component *ngIf="!isCreatingNew"
+                                            (deleteConfirmed)="handleDelete($event)"></delete-confirm-modal-component>
           </perfect-scrollbar>
           <button class="btn btn-primary"
                   type="submit"
@@ -228,8 +230,6 @@
           <button class="btn brand-button ml-3"
                   (click)="handleDiscardChanges()"
                   *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
-          <delete-confirm-modal-component *ngIf="!isCreatingNew"
-                                          (deleteConfirmed)="handleDelete($event)"></delete-confirm-modal-component>
         </div>
       </ng-template>
 

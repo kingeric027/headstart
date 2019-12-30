@@ -44,6 +44,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   isMyResource = false;
   alive = true;
   screenSize;
+  psHeight: number = 450;
 
   constructor(
     private router: Router,
@@ -100,6 +101,19 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.determineViewingContext();
     this.initializeSubscriptions();
     this.screenSize = this.getScreenSizeBreakPoint();
+    // Need to use a timeout here to ensure DOM is totally loaded before getting element heights
+    setTimeout(() => {
+      this.getPsHeight();
+    }, 500);
+  }
+
+  getPsHeight() {
+    let divsToCaluclate: any = Array.from(document.getElementsByClassName('calculate')),
+      totalHeight: number = 0;
+    divsToCaluclate.forEach(div => {
+      totalHeight += div.offsetHeight;
+    });
+    this.psHeight = window.innerHeight - totalHeight;
   }
 
   determineViewingContext() {
