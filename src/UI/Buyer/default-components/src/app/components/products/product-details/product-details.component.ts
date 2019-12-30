@@ -33,6 +33,7 @@ export class OCMProductDetails implements OnInit {
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
+  note = "Placeholder for supplier message associated with specific product";
 
   constructor(private formService: SpecFormService, private context: ShopperContextService) {
     this.specFormService = formService;
