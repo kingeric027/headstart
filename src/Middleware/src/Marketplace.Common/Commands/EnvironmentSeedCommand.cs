@@ -38,7 +38,7 @@ namespace Marketplace.Common.Commands
             var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
             await this.PatchDefaultApiClients(impersonation.access_token);
             await this.CreateSuppliers(user, impersonation.access_token);
-            await this.ConfigureBuyers(impersonation.access_token);
+            //await this.ConfigureBuyers(impersonation.access_token);
         }
 
         private async Task ConfigureBuyers(string token)
@@ -86,7 +86,7 @@ namespace Marketplace.Common.Commands
                     FirstName = "Integration",
                     LastName = "Developer",
                     Password = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-                    Username = $"dev_{supplier.Name}"
+                    Username = $"dev_{supplier.ID}"
                 }, token);
                 var apiClient = await _oc.ApiClients.CreateAsync(new ApiClient()
                 {
