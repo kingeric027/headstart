@@ -17,6 +17,12 @@ namespace Marketplace.Common.Controllers
             _command = command;
         }
 
+        [HttpPost, Route("catalog"), MarketplaceUserAuth()]
+        public async Task<OrchestrationCatalog> PostCatalog([FromBody] OrchestrationCatalog obj)
+        {
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
+        }
+
         [HttpPost, Route("product"), MarketplaceUserAuth()]
         public async Task<OrchestrationProduct> PostProduct([FromBody] OrchestrationProduct obj)
         {

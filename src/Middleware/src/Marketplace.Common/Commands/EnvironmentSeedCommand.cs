@@ -74,13 +74,6 @@ namespace Marketplace.Common.Commands
                     Name = value,
                     xp = { }
                 }, token);
-                var catalog = await _oc.Catalogs.CreateAsync(new Catalog()
-                {
-                    Active = true,
-                    ID = $"{supplier.ID}",
-                    Description = $"{supplier.Name} Default Catalog",
-                    Name = $"{supplier.Name} Default Catalog"
-                }, token);
                 var userGroup = await _oc.SupplierUserGroups.CreateAsync(key, new UserGroup()
                 {
                     Description = "Integrations",
