@@ -49,7 +49,7 @@ namespace Marketplace.Common.Commands
             _log = log;
         }
 
-        //public OrchestrationCommand(AppSettings settings, LogQuery log, IBlobService queueBlob, IBlobService cacheBlob) : this(settings, log)
+        //public OrchestrationCommand(AppSettings settings, LogQuery log, IBlobService queueBlob, IBlobService cacheBlob)
         //{
         //    _settings = settings;
         //    _blobQueue = queueBlob;
