@@ -107,7 +107,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     }, 500);
   }
 
-  getPsHeight() {
+  private getPsHeight() {
     let divsToCaluclate: any = Array.from(document.getElementsByClassName('calculate')),
       totalHeight: number = 0;
     divsToCaluclate.forEach(div => {

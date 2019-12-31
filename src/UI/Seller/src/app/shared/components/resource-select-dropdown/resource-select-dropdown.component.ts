@@ -21,6 +21,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
   searchTerm = '';
   selectedParentResourceName = 'Fetching Data';
   alive = true;
+  psHeight: number = 450;
 
   constructor(
     private router: Router,
@@ -37,17 +38,30 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
   ngOnInit() {
     this.setParentResourceSubscription();
     this.setParentResourceSelectionSubscription();
+    // Need to use a timeout here to ensure DOM is totally loaded before getting element heights
+    setTimeout(() => {
+      this.getPsHeight();
+    }, 500);
   }
 
   private setParentResourceSubscription() {
-    this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
+    this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
       this.parentResourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
   }
+  //TODO: Move this into a service, it's being used in two different components.
+  private getPsHeight() {
+    let divsToCaluclate: any = Array.from(document.getElementsByClassName('calculate')),
+      totalHeight: number = 0;
+    divsToCaluclate.forEach(div => {
+      totalHeight += div.offsetHeight;
+    });
+    this.psHeight = window.innerHeight - totalHeight;
+  }
 
   setParentResourceSelectionSubscription() {
-    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(async (params) => {
+    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(async params => {
       if (this.parentService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         const parentIDParamName = `${singular(this.parentService.primaryResourceLevel)}ID`;
         const resourceID = params[parentIDParamName];

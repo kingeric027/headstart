@@ -1,33 +1,30 @@
-<!-- 98pc calced height is placeholder for now: will need to change to make responsive or if the layout srtructure is changed -->
+<!-- Breadcrumbs -->
+<div class="d-flex justify-content-between align-items-center bg-primary-dark calculate">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-oc">
+      <!-- make this the home icon -->
+      <li class="breadcrumb-item">
+        <a class="breadcrumb-link"
+           [routerLink]="'/'">
+          <fa-icon [icon]="faHome">
+          </fa-icon>
+        </a>
+      </li>
+      <li *ngFor="let breadCrumb of breadCrumbs"
+          class="breadcrumb-item">
+        <a class="breadcrumb-link"
+           [routerLink]="[breadCrumb.route]">{{breadCrumb.displayText | titlecase}}
+        </a>
+      </li>
+    </ol>
+  </nav>
+</div>
+<!-- /Breadcrumbs -->
 <div class="container-fluid">
-  <!-- Breadcrumbs -->
-  <div class="row calculate">
-    <div class="col-md-12">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb breadcrumb-oc">
-          <!-- make this the home icon -->
-          <li class="breadcrumb-item">
-            <a class="breadcrumb-link"
-               [routerLink]="'/'">
-              <fa-icon [icon]="faHome">
-              </fa-icon>
-            </a>
-          </li>
-          <li *ngFor="let breadCrumb of breadCrumbs"
-              class="breadcrumb-item">
-            <a class="breadcrumb-link"
-               [routerLink]="[breadCrumb.route]">{{breadCrumb.displayText | titlecase}}
-            </a>
-          </li>
-        </ol>
-      </nav>
-    </div>
-  </div>
-  <!-- /Breadcrumbs -->
   <!-- Page Title -->
   <div class="row calculate">
     <div class="col-md-12">
-      <div class="page-title-container">
+      <div class="py-3">
         <h1 class="resource-name mb-0">{{(parentResourceService ? _currentResourceNamePlural + ' - ' + selectedParentResourceName : _currentResourceNamePlural) | titlecase}}</h1>
       </div>
     </div>
@@ -38,31 +35,35 @@
   <div *ngIf="!isMyResource"
        class="row calculate">
     <div *ngIf="parentResourceService"
-         class="col-lg-3 col-md-4 col-sm-5 d-flex justify-content-start align-items-center">
+         class="col-lg-3 col-md-4 col-sm-5 parent-resources">
       <!-- parent resource dropdown -->
-      <resource-select-dropdown-component [parentService]="parentResourceService"
+      <resource-select-dropdown-component class="btn-block resource-btn mr-1 mb-1"
+                                          [parentService]="parentResourceService"
                                           [ocService]="_ocService">
       </resource-select-dropdown-component>
+      <!-- /parent resource dropdown -->
       <!-- sub resource dropdown -->
       <div ngbDropdown
-           class="d-inline-block parent-resource-dropdown">
+           class="d-inline-block parent-resource-dropdown btn-block mt-0 mb-1">
         <!-- change to currently selected option  -->
-        <button class="btn btn-outline-dark"
+        <button class="btn btn-block btn-outline-dark"
                 id="parentresourcedropdown"
                 ngbDropdownToggle>{{_currentResourceNamePlural | titlecase}}</button>
         <div ngbDropdownMenu
-             aria-labelledby="parent resource dropdown">
+             aria-labelledby="parent resource dropdown"
+             class="w-100">
           <button ngbDropdownItem
                   *ngFor="let subResource of parentResourceService.subResourceList"><a routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{subResource}}">
               {{subResource | titlecase}}
             </a></button>
         </div>
       </div>
+      <!-- /sub resource dropdown -->
     </div>
     <div class="col-md-3 col-sm-7 d-flex justify-content-start align-items-center"
          *ngIf="!isCreatingNew">
       <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
-      <button class="btn btn-block brand-button--orange mr-3"
+      <button class="btn btn-block brand-button--orange"
               routerLink="/{{_ocService.route}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new">
         Create New {{_currentResourceNameSingular | titlecase}}
       </button>
@@ -220,19 +221,18 @@
             <ng-content select=".resource-edit">
             </ng-content>
             <delete-confirm-modal-component *ngIf="!isCreatingNew"
-                                            (deleteConfirmed)="handleDelete($event)"></delete-confirm-modal-component>
+                                            (deleteConfirmed)="handleDelete($event)">
+            </delete-confirm-modal-component>
+            <button class="btn btn-primary"
+                    type="submit"
+                    [disabled]="resourceForm.status === 'INVALID'"
+                    (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
+            <button class="btn brand-button ml-3"
+                    (click)="handleDiscardChanges()"
+                    *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
           </perfect-scrollbar>
-          <button class="btn btn-primary"
-                  type="submit"
-                  [disabled]="resourceForm.status === 'INVALID'"
-                  (click)="handleSave()"
-                  *ngIf="areChanges">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
-          <button class="btn brand-button ml-3"
-                  (click)="handleDiscardChanges()"
-                  *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
         </div>
       </ng-template>
-
     </div>
   </div>
 </div>
