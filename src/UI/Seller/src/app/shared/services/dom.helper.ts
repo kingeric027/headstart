@@ -8,7 +8,6 @@ export function getPsHeight(additionalClass: string = '') {
   let totalHeight: number = 0;
   [...baseLayoutItems, ...additionalItems].forEach(div => {
     // div does contain the property 'offsetHeight, but typescript throws error
-    console.log((div as any).offsetHeight);
     totalHeight += (div as any).offsetHeight;
   });
   return window.innerHeight - totalHeight;
