@@ -30,6 +30,9 @@ interface BreadCrumb {
   selector: 'resource-table-component',
   templateUrl: './resource-table.component.html',
   styleUrls: ['./resource-table.component.scss'],
+  host: {
+    '(window:resize)': 'onResize($event)',
+  },
 })
 export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('popover', { static: false })
@@ -116,7 +119,15 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.screenSize = getScreenSizeBreakPoint();
   }
 
+  onResize(event) {
+    this.setPsHeights();
+  }
+
   ngAfterViewChecked() {
+    this.setPsHeights();
+  }
+
+  setPsHeights() {
     this.myResourceHeight = getPsHeight('');
     this.tableHeight = getPsHeight('additional-item-table');
     this.editResourceHeight = getPsHeight('additional-item-edit-resource');
