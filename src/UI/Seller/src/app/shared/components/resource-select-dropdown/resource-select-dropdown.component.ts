@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, Input, ViewChild, OnInit, ChangeDetectorRef, OnDestroy, AfterViewChecked } from '@angular/core';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { faFilter, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -14,7 +14,7 @@ import { getPsHeight } from '@app-seller/shared/services/dom.helper';
   templateUrl: './resource-select-dropdown.component.html',
   styleUrls: ['./resource-select-dropdown.component.scss'],
 })
-export class ResourceSelectDropdown implements OnInit, OnDestroy {
+export class ResourceSelectDropdown implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
@@ -39,13 +39,12 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
   ngOnInit() {
     this.setParentResourceSubscription();
     this.setParentResourceSelectionSubscription();
-    // Need to use a timeout here to ensure DOM is totally loaded before getting element heights
-    setTimeout(() => {
-      // TODO: Magic number ... the 'search' element doesn't exist in the DOM at time of instantiation
-      this.resourceSelectDropdownHeight = getPsHeight('additional-item-resource-select-dropdown') - 75;
-    }, 500);
   }
 
+  ngAfterViewChecked() {
+    // TODO: Magic number ... the 'search' element doesn't exist in the DOM at time of instantiation
+    this.resourceSelectDropdownHeight = getPsHeight('additional-item-resource-select-dropdown') - 75;
+  }
   private setParentResourceSubscription() {
     this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
       this.parentResourceList = resourceList;

@@ -1,4 +1,14 @@
-import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  ViewChild,
+  OnInit,
+  ChangeDetectorRef,
+  OnDestroy,
+  NgZone,
+  AfterViewChecked,
+} from '@angular/core';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
 import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
@@ -21,7 +31,7 @@ interface BreadCrumb {
   templateUrl: './resource-table.component.html',
   styleUrls: ['./resource-table.component.scss'],
 })
-export class ResourceTableComponent implements OnInit, OnDestroy {
+export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
@@ -104,17 +114,14 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.determineViewingContext();
     this.initializeSubscriptions();
     this.screenSize = getScreenSizeBreakPoint();
-    this.getPerfectScrollHeights();
   }
 
-  getPerfectScrollHeights() {
-    // Need to use a timeout here to ensure DOM is totally loaded before getting element heights
-    setTimeout(() => {
-      this.myResourceHeight = getPsHeight('');
-      this.tableHeight = getPsHeight('additional-item-table');
-      this.editResourceHeight = getPsHeight('additional-item-edit-resource');
-    }, 500);
+  ngAfterViewChecked() {
+    this.myResourceHeight = getPsHeight('');
+    this.tableHeight = getPsHeight('additional-item-table');
+    this.editResourceHeight = getPsHeight('additional-item-edit-resource');
   }
+
   determineViewingContext() {
     this.isMyResource = this.router.url.startsWith('/my-');
   }
