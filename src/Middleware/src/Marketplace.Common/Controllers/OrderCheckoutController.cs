@@ -13,44 +13,48 @@ using System.Threading.Tasks;
 namespace Marketplace.Common.Controllers
 {
 	[Route("orders")]
-	public class OrderCheckoutController : BaseController
+	public class OrderCheckoutController: Controller
 	{
 		private readonly IOrderCheckoutCommand _checkoutCommand;
 		private readonly IMockShippingService _shippingService;
 		private readonly IAvataxService _taxService;
 
-		// How to do authentication? These methods should only work for a specific user's orders.
+		// Needs more authentication. These methods should only work for a specific user's orders.
 
-		public OrderCheckoutController(AppSettings settings, IOrderCheckoutCommand command, IMockShippingService shipping, IAvataxService taxService) : base(settings) {
+		public OrderCheckoutController(AppSettings settings, IOrderCheckoutCommand command, IMockShippingService shipping, IAvataxService taxService) : base() {
 			_checkoutCommand = command;
 			_shippingService = shipping;
 			_taxService = taxService;
 		}
 
-		[HttpGet, Route("{orderID}/shipping-quote")]
+		[HttpGet, Route("{orderID}/shipping-quote"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<IEnumerable<ShippingOptions>> GenerateShippingQuotes(string orderID)
 		{
 			return await _checkoutCommand.GenerateShippingQuotes(orderID);
 		}
 
-		[HttpGet, Route("{orderID}/shipping-quote/{quoteID}")]
+		[HttpGet, Route("{orderID}/shipping-quote/{quoteID}"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<MockShippingQuote> GetSavedShippingQuote(string orderID, string quoteID)
 		{
 			return await _shippingService.GetSavedShipmentQuote(orderID, quoteID);
 		}
 
-		[HttpGet, Route("{orderID}/tax-transaction/{transactionID}")]
+		[HttpGet, Route("{orderID}/tax-transaction/{transactionID}"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<TransactionModel> GetSavedTaxTransaction(string orderID, string transactionID)
 		{
 			return await _taxService.GetTaxTransactionAsync(transactionID);
 		}
 
-		[HttpPut, Route("{orderID}/shipping-quote")]
-		public async Task<MarketplaceOrder> SetShippingAndTax(string orderID, [FromBody] ShippingSelection shippingSelection)
+		[HttpPost, Route("{orderID}/calculate-tax"), MarketplaceUserAuth(ApiRole.Shopper)]
+		public async Task<MarketplaceOrder> CalculateTax(string orderID)
+		{
+			return await _checkoutCommand.CalculateTax(orderID);
+		}
+
+		[HttpPost, Route("{orderID}/set-shipping-quote"), MarketplaceUserAuth(ApiRole.Shopper)]
+		public async Task<MarketplaceOrder> SetShippingQuote(string orderID, [FromBody] ShippingSelection shippingSelection)
 		{
 			return await _checkoutCommand.SetShippingSelection(orderID, shippingSelection);
 		}
-
-
 	}
 }

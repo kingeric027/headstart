@@ -2,6 +2,7 @@
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.DevCenter;
 using Marketplace.Helpers;
 using OrderCloud.SDK;
 using System;
@@ -28,11 +29,12 @@ namespace Marketplace.Common.Commands
 
 		public OrderCheckoutCommand(AppSettings settings, IAvataxService avatax, IMockShippingService shipping)
 		{
+			// TODO - this authentication needs to be completely different. It needs to work accross ordercloud orgs. 
 			_oc = new OrderCloudClient(new OrderCloudClientConfig()
 			{
-				ApiUrl = settings.OrderCloudSettings.ApiUrl,
-				AuthUrl = settings.OrderCloudSettings.AuthUrl,
-				ClientId = "F1631510-F165-4278-A4EB-E655C5AC2E06"
+				ClientId = "2234C6E1-8FA5-41A2-8A7F-A560C6BA44D8",
+				ClientSecret = "z08ibzgsb337ln8EzJx5efI1VKxqdqeBW0IB7p1SJaygloJ4J9uZOtPu1Aql",
+				Roles = new[] { ApiRole.FullAccess }
 			});
 			_avatax = avatax;
 			_shipping = shipping;
@@ -40,8 +42,8 @@ namespace Marketplace.Common.Commands
 
 		public async Task<MarketplaceOrder> CalculateTax(string orderID)
 		{	
-			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID);
-			var items = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, orderID);
+			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+			var items = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
 
 			var inValid = ListShipmentsWithoutSelection(order, items.Items);
 			Require.That(inValid.Count() == 0, ErrorCodes.Checkout.MissingShippingSelection, new MissingShippingSelectionError(inValid));
@@ -60,7 +62,7 @@ namespace Marketplace.Common.Commands
 
 		public async Task<IEnumerable<ShippingOptions>> GenerateShippingQuotes(string orderID)
 		{
-			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, orderID);
+			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
 			var shipments = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
 			return await shipments.SelectAsync(async lineItemGrouping =>
 			{
@@ -77,8 +79,8 @@ namespace Marketplace.Common.Commands
 
 		public async Task<MarketplaceOrder> SetShippingSelection(string orderID, ShippingSelection selection)
 		{
-			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID);
-			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, orderID);
+			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
 
 			var valid = lineItems.Items.Any(li => li.ShipFromAddressID == selection.ShipFromAddressID);
 			Require.That(valid, ErrorCodes.Checkout.InvalidShipFromAddress, new InvalidShipFromAddressIDError(selection.ShipFromAddressID));
