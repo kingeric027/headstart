@@ -13,6 +13,12 @@ export interface MPRoute {
 }
 
 // Products
+const AllProducts: MPRoute = {
+  rolesWithAccess: ['MPPRoductAdmin', 'MPProductReader', 'MPMeProductAdmin'],
+  title: 'All Products',
+  route: '/products',
+};
+
 const LiveProducts: MPRoute = {
   rolesWithAccess: ['MPPRoductAdmin', 'MPProductReader', 'MPMeProductAdmin'],
   title: 'Live Products',
@@ -41,10 +47,16 @@ const ProductNavGrouping: MPRoute = {
   rolesWithAccess: ['MPPRoductAdmin', 'MPProductReader', 'MPMeProductAdmin'],
   title: 'Products',
   route: '/products',
-  subRoutes: [LiveProducts, PendingProducts, Promotions, Categories],
+  subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, Categories],
 };
 
 //Orders
+const AllOrders: MPRoute = {
+  rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdming'],
+  title: 'All Orders',
+  route: '/orders',
+};
+
 const OpenOrders: MPRoute = {
   rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdming'],
   title: 'Open Orders',
@@ -73,10 +85,16 @@ const OrderNavGrouping: MPRoute = {
   rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdming'],
   title: 'Orders',
   route: '/orders',
-  subRoutes: [OpenOrders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders],
+  subRoutes: [AllOrders, OpenOrders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders],
 };
 
 //Buyers
+const AllBuyers: MPRoute = {
+  rolesWithAccess: ['MPBuyerAdmin', 'MPBuyerReader'],
+  title: 'All Buyers',
+  route: `/buyers`,
+};
+
 const BuyerUsers: MPRoute = {
   rolesWithAccess: ['MPBuyerAdmin', 'MPBuyerReader'],
   title: 'Users',
@@ -105,10 +123,16 @@ const BuyerNavGrouping = {
   rolesWithAccess: ['MPBuyerAdmin', 'MPBuyerReader'],
   title: 'Buyers',
   route: '/buyers',
-  subRoutes: [BuyerUsers, BuyerPurchasingLocations, BuyerPaymentMethods, BuyerApprovalRules],
+  subRoutes: [AllBuyers, BuyerUsers, BuyerPurchasingLocations, BuyerPaymentMethods, BuyerApprovalRules],
 };
 
 //Suppliers
+const AllSuppliers: MPRoute = {
+  rolesWithAccess: ['MPSupplierAdmin'],
+  title: 'All Suppliers',
+  route: `/suppliers`,
+};
+
 const SupplierUsers: MPRoute = {
   rolesWithAccess: ['MPSupplierAdmin'],
   title: 'Users',
@@ -125,7 +149,7 @@ const SupplierNavGrouping: MPRoute = {
   rolesWithAccess: ['MPSupplierAdmin'],
   title: 'Suppliers',
   route: '/suppliers',
-  subRoutes: [SupplierUsers, SupplierLocations],
+  subRoutes: [AllSuppliers, SupplierUsers, SupplierLocations],
 };
 
 const ReportsRoute = {

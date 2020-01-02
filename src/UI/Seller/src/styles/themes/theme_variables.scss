@@ -21,6 +21,39 @@ $brand-navy: #032A43 !default;
 $brand-orange: #F16122 !default;
 $brand-teal: #20ABAD !default;
 
+$navy-50:           #E1E5E8;
+$navy-100:          #B3BFC7;
+$navy-200:          #8195A1;
+$navy-300:          #4F6A7B;
+$navy-400:          #294A5F;
+$navy-500:          #032A43;
+$navy-600:          #03253D;
+$navy-700:          #021F34;
+$navy-800:          #02192C;
+$navy-900:          #010F1E;
+
+$orange-50:         #FDECE4;
+$orange-100:        #FBD0BD;
+$orange-200:        #F8B091;
+$orange-300:        #F59064;
+$orange-400:        #F37943;
+$orange-500:        #F16122;
+$orange-600:        #EF591E;
+$orange-700:        #ED4F19;
+$orange-800:        #EB4514;
+$orange-900:        #E7330C;
+
+$teal-50:           #E4F5F5;
+$teal-100:          #BCE6E6;
+$teal-200:          #90D5D6;
+$teal-300:          #63C4C6;
+$teal-400:          #41B8B9;
+$teal-500:          #20ABAD;
+$teal-600:          #1CA4A6;
+$teal-700:          #189A9C;
+$teal-800:          #139193;
+$teal-900:          #0B8083;
+
 $gray-100:          #f9f7f4;
 $gray-200:          #f4efe9;
 $gray-300:          #f1eae2;
@@ -32,8 +65,8 @@ $gray-800:          #2f2d2c;
 $gray-900:          #1e1d1d;
 $black:             #000000;
 
-$primary:           $yellow;
-$secondary:         $gray-600;
+$primary:           $navy-500;
+$secondary:         $orange-500;
 $success:           $green;
 $info:              $cyan;
 $warning:           $yellow;
@@ -42,17 +75,19 @@ $gray-light:        $gray-400;
 $light:             $gray-100;
 $medium:            $gray-700;
 $dark:              $gray-800;
+$primary-dark:      $navy-700;
 
 $theme-colors: (
-  'primary': $brand-navy,        
-  'secondary': $brand-orange
+  'primary': $navy-500,        
+  'secondary': $orange-500,
+  'primary-dark': $primary-dark
 );
 
 // Body
 //
 // Settings for the `<body>` element.
 
-$body-bg:           #fdfdfc;
+$body-bg:           #fafafa;
 $body-color:          $gray-800;
 
 // Fonts
