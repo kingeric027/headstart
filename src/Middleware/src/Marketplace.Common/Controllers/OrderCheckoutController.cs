@@ -33,13 +33,13 @@ namespace Marketplace.Common.Controllers
 			return await _checkoutCommand.GenerateShippingQuotes(orderID);
 		}
 
-		[HttpGet, Route("{orderID}/shipping-quote/{quoteID}"), MarketplaceUserAuth(ApiRole.Shopper)]
+		[HttpGet, Route("{orderID}/shipping-quote/{quoteID}")]
 		public async Task<MockShippingQuote> GetSavedShippingQuote(string orderID, string quoteID)
 		{
 			return await _shippingService.GetSavedShipmentQuote(orderID, quoteID);
 		}
 
-		[HttpGet, Route("{orderID}/tax-transaction/{transactionID}"), MarketplaceUserAuth(ApiRole.Shopper)]
+		[HttpGet, Route("{orderID}/tax-transaction/{transactionID}")]
 		public async Task<TransactionModel> GetSavedTaxTransaction(string orderID, string transactionID)
 		{
 			return await _taxService.GetTaxTransactionAsync(transactionID);
