@@ -9,6 +9,7 @@ import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { FormGroup } from '@angular/forms';
 import { ListResource, Options, RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { getScreenSizeBreakPoint, getPsHeight } from '@app-seller/shared/services/dom.helper';
 
 interface BreadCrumb {
   displayText: string;
@@ -44,7 +45,9 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   isMyResource = false;
   alive = true;
   screenSize;
-  psHeight: number = 450;
+  myResourceHeight: number = 450;
+  tableHeight: number = 450;
+  editResourceHeight: number = 450;
 
   constructor(
     private router: Router,
@@ -100,22 +103,18 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.determineViewingContext();
     this.initializeSubscriptions();
-    this.screenSize = this.getScreenSizeBreakPoint();
+    this.screenSize = getScreenSizeBreakPoint();
+    this.getPerfectScrollHeights();
+  }
+
+  getPerfectScrollHeights() {
     // Need to use a timeout here to ensure DOM is totally loaded before getting element heights
     setTimeout(() => {
-      this.getPsHeight();
+      this.myResourceHeight = getPsHeight('');
+      this.tableHeight = getPsHeight('additional-item-table');
+      this.editResourceHeight = getPsHeight('additional-item-edit-resource');
     }, 500);
   }
-
-  private getPsHeight() {
-    let divsToCaluclate: any = Array.from(document.getElementsByClassName('calculate')),
-      totalHeight: number = 0;
-    divsToCaluclate.forEach(div => {
-      totalHeight += div.offsetHeight;
-    });
-    this.psHeight = window.innerHeight - totalHeight;
-  }
-
   determineViewingContext() {
     this.isMyResource = this.router.url.startsWith('/my-');
   }
@@ -251,27 +250,5 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.alive = false;
-  }
-  //TODO: MOVE THIS TO A HELPER OR SERVICE
-  getScreenSizeBreakPoint() {
-    const map = {
-      xs: 575,
-      sm: 767,
-      md: 991,
-      lg: 1199,
-    };
-    const innerWidth = window.innerWidth;
-
-    if (innerWidth < map.xs) {
-      return 'xs';
-    } else if (innerWidth > map.xs && innerWidth < map.sm) {
-      return 'sm';
-    } else if (innerWidth > map.sm && innerWidth < map.md) {
-      return 'md';
-    } else if (innerWidth > map.md && innerWidth < map.lg) {
-      return 'lg';
-    } else if (innerWidth > map.lg) {
-      return 'xl';
-    }
   }
 }

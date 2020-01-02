@@ -7,6 +7,7 @@ import { takeWhile } from 'rxjs/operators';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { getPsHeight } from '@app-seller/shared/services/dom.helper';
 
 @Component({
   selector: 'resource-select-dropdown-component',
@@ -21,7 +22,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
   searchTerm = '';
   selectedParentResourceName = 'Fetching Data';
   alive = true;
-  psHeight: number = 450;
+  resourceSelectDropdownHeight: number = 450;
 
   constructor(
     private router: Router,
@@ -40,7 +41,8 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
     this.setParentResourceSelectionSubscription();
     // Need to use a timeout here to ensure DOM is totally loaded before getting element heights
     setTimeout(() => {
-      this.getPsHeight();
+      // TODO: Magic number ... the 'search' element doesn't exist in the DOM at time of instantiation
+      this.resourceSelectDropdownHeight = getPsHeight('additional-item-resource-select-dropdown') - 75;
     }, 500);
   }
 
@@ -49,15 +51,6 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
       this.parentResourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
-  }
-  //TODO: Move this into a service, it's being used in two different components.
-  private getPsHeight() {
-    let divsToCaluclate: any = Array.from(document.getElementsByClassName('calculate')),
-      totalHeight: number = 0;
-    divsToCaluclate.forEach(div => {
-      totalHeight += div.offsetHeight;
-    });
-    this.psHeight = window.innerHeight - totalHeight;
   }
 
   setParentResourceSelectionSubscription() {
