@@ -15,8 +15,8 @@ namespace Marketplace.Common.Commands
 {
 	public interface IOrderCheckoutCommand
 	{
-		Task<Order> SetShippingSelection(string orderID, ShippingSelection shippingSelection);
-		Task<Order> CalculateTax(string orderID);
+		Task<MarketplaceOrder> SetShippingSelection(string orderID, ShippingSelection shippingSelection);
+		Task<MarketplaceOrder> CalculateTax(string orderID);
 		Task<IEnumerable<ShippingOptions>> GenerateShippingQuotes(string orderID);
 	}
 
@@ -33,17 +33,17 @@ namespace Marketplace.Common.Commands
 			_shipping = shipping;
 		}
 
-		public async Task<Order> CalculateTax(string orderID)
+		public async Task<MarketplaceOrder> CalculateTax(string orderID)
 		{	
 			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID);
 			var items = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, orderID);
 
-			var inValid = ShipmentsMissingSelection(order, items.Items);
+			var inValid = ListShipmentsWithoutSelection(order, items.Items);
 			Require.That(inValid.Count() == 0, ErrorCodes.Checkout.MissingShippingSelection, new MissingShippingSelectionError(inValid));
 
 			var taxTransaction = await _avatax.CreateTaxTransactionAsync(order, items);
 			
-			return await _oc.Orders.PatchAsync(OrderDirection.Outgoing, orderID, new PartialOrder()
+			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID, new PartialOrder()
 			{
 				TaxCost = taxTransaction.totalTax ?? 0,
 				xp = new
@@ -70,7 +70,7 @@ namespace Marketplace.Common.Commands
 			});
 		}
 
-		public async Task<Order> SetShippingSelection(string orderID, ShippingSelection selection)
+		public async Task<MarketplaceOrder> SetShippingSelection(string orderID, ShippingSelection selection)
 		{
 			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID);
 			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, orderID);
@@ -83,7 +83,7 @@ namespace Marketplace.Common.Commands
 				.SelectAsync(async sel => await _shipping.GetSavedShipmentQuote(orderID, sel.Value.ShippingQuoteID)))
 				.Sum(savedQuote => savedQuote.Cost);
 
-			return await _oc.Orders.PatchAsync(OrderDirection.Incoming, orderID, new PartialOrder()
+			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()
 			{
 				ShippingCost = totalCost,
 				xp = new {
@@ -92,7 +92,7 @@ namespace Marketplace.Common.Commands
 			});
 		}
 
-		private IEnumerable<string> ShipmentsMissingSelection(MarketplaceOrder order, IList<LineItem> items)
+		private IEnumerable<string> ListShipmentsWithoutSelection(MarketplaceOrder order, IList<LineItem> items)
 		{
 			var shipFromAddressIDs = items.GroupBy(li => li.ShipFromAddressID).Select(group => group.Key);
 			var selections = order.xp.ShippingSelections.Select(sel => sel.Value.ShipFromAddressID);

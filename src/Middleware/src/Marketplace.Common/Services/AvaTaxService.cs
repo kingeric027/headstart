@@ -21,62 +21,34 @@ namespace Marketplace.Common.Services
 	{
 		private readonly AppSettings _settings;
 		private readonly IOrderCloudClient _oc;
-		//private readonly AvaTaxClient _client;
-
-		public AvataxService(AppSettings settings, IOrderCloudClient oc)
+		// fake, static data.In the correct format though.
+		private readonly TransactionModel _mockTransaction = new TransactionModel()
 		{
-			_oc = oc;
-			_settings = settings;
-
-			//var avaEnv = env.Contains("production") ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;
-			//_client = new AvaTaxClient("Four51 Marketplace", "v1", env, avaEnv)
-			//		.WithSecurity(settings.AvalaraAccountID, settings.AvalaraLicenseKey);
-
-		}
-
-		public async Task<TransactionModel> GetTaxTransactionAsync(string transactionID)
-		{
-			// TODO - use Avarala endpoint
-			return null;
-		}
-
-		public async Task<TransactionModel> CommitTaxTransactionAsync(string transactionID)
-		{
-			// TODO - use Avarala endpoint
-			return null;
-		}
-
-		public async Task<TransactionModel> CreateTaxTransactionAsync(Order order, ListPage<LineItem> lineItems)
-		{
-			// Returns fake, static data. In the correct format though.
-			// TODO - use Avarala endpoint
-			return new TransactionModel()
-			{
-				id = 0,
-				code = "63184372-8a62-421e-aa94-70373058f166(fake)",
-				companyId = 835775,
-				date = DateTime.Parse("2019-12-18"),
-				paymentDate = DateTime.Parse("2019-12-18"),
-				status = DocumentStatus.Temporary,
-				type = DocumentType.SalesOrder,
-				customerVendorCode = "ABC",
-				customerCode = "ABC",
-				reconciled = false,
-				totalAmount = 40.21M,
-				totalExempt = 0,
-				totalDiscount = 0,
-				totalTax = 3.11M,
-				totalTaxable = 40.21M,
-				totalTaxCalculated = 3.11M,
-				adjustmentReason = AdjustmentReason.NotAdjusted,
-				locked = false,
-				version = 1,
-				exchangeRateEffectiveDate = DateTime.Parse("2019-12-18"),
-				exchangeRate = 1,
-				modifiedDate = DateTime.Parse("2019-12-18T22:41:35.335454Z"),
-				modifiedUserId = 247126,
-				taxDate = DateTime.Parse("2019-12-18T00:00:00"),
-				summary = new List<TransactionSummary> { 
+			id = 0,
+			code = "63184372-8a62-421e-aa94-70373058f166(fake)",
+			companyId = 835775,
+			date = DateTime.Parse("2019-12-18"),
+			paymentDate = DateTime.Parse("2019-12-18"),
+			status = DocumentStatus.Temporary,
+			type = DocumentType.SalesOrder,
+			customerVendorCode = "ABC",
+			customerCode = "ABC",
+			reconciled = false,
+			totalAmount = 40.21M,
+			totalExempt = 0,
+			totalDiscount = 0,
+			totalTax = 3.11M,
+			totalTaxable = 40.21M,
+			totalTaxCalculated = 3.11M,
+			adjustmentReason = AdjustmentReason.NotAdjusted,
+			locked = false,
+			version = 1,
+			exchangeRateEffectiveDate = DateTime.Parse("2019-12-18"),
+			exchangeRate = 1,
+			modifiedDate = DateTime.Parse("2019-12-18T22:41:35.335454Z"),
+			modifiedUserId = 247126,
+			taxDate = DateTime.Parse("2019-12-18T00:00:00"),
+			summary = new List<TransactionSummary> {
 					new TransactionSummary() {
 						country = "US",
 						region = "CA",
@@ -97,7 +69,36 @@ namespace Marketplace.Common.Services
 						exemption = 0
 					}
 				}
-			};
+		};
+		//private readonly AvaTaxClient _client;
+
+		public AvataxService(AppSettings settings, IOrderCloudClient oc)
+		{
+			_oc = oc;
+			_settings = settings;
+
+			//var avaEnv = env.Contains("production") ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;
+			//_client = new AvaTaxClient("Four51 Marketplace", "v1", env, avaEnv)
+			//		.WithSecurity(settings.AvalaraAccountID, settings.AvalaraLicenseKey);
+
+		}
+
+		public async Task<TransactionModel> GetTaxTransactionAsync(string transactionID)
+		{
+			// TODO - use Avarala endpoint
+			return _mockTransaction;
+		}
+
+		public async Task<TransactionModel> CommitTaxTransactionAsync(string transactionID)
+		{
+			// TODO - use Avarala endpoint
+			return _mockTransaction;
+		}
+
+		public async Task<TransactionModel> CreateTaxTransactionAsync(Order order, ListPage<LineItem> lineItems)
+		{
+			// TODO - use Avarala endpoint
+			return _mockTransaction; 
 		}
 	}
 }
