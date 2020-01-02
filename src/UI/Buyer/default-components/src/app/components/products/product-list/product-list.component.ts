@@ -20,8 +20,9 @@ export class OCMProductList implements OnInit, OnDestroy {
   showingFavoritesOnly = false;
   closeIcon = faTimes;
   numberOfItemsInPagination = 10;
+  searchTermForProducts = "";
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService) { }
 
   ngOnInit() {
     this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
@@ -37,6 +38,7 @@ export class OCMProductList implements OnInit, OnDestroy {
     this.showingFavoritesOnly = filters.showOnlyFavorites;
     this.hasFilters = this.context.productFilters.hasFilters();
     this.categoryCrumbs = this.context.categories.breadCrumbs;
+    this.searchTermForProducts = filters.search;
   }
 
   clearAllFilters() {
