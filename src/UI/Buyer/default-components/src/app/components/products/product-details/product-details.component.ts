@@ -33,6 +33,7 @@ export class OCMProductDetails implements OnInit {
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
+  note = "Placeholder for supplier message associated with specific product";
 
   constructor(private formService: SpecFormService, private context: ShopperContextService) {
     this.specFormService = formService;
@@ -130,4 +131,10 @@ export class OCMProductDetails implements OnInit {
   setIsFavorite(isFav: boolean) {
     this.context.currentUser.setIsFavoriteProduct(isFav, this._product.ID);
   }
+
+  setActiveSupplier(supplierId: string) {
+    this.context.router.toProductList({ activeFacets: { supplier: supplierId } });
+  }
 }
+
+
