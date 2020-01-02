@@ -36,7 +36,7 @@ export class OCMLineitemTable {
     const host = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
     const images = li.Product.xp.Images || [];
     const result = _map(images, img => {
-      return img.Url.replace('{url}', host);
+      return img.Url.replace('{u}', host);
     });
     const filtered = _without(result, undefined);
     return filtered.length > 0 ? filtered[0] : 'http://placehold.it/300x300';

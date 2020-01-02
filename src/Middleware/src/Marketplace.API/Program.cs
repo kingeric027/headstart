@@ -9,9 +9,10 @@ using Marketplace.Helpers.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Commands;
+using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services;
-
+using Marketplace.Helpers;
 namespace Marketplace.API
 {
 	public static class Program
@@ -42,19 +43,19 @@ namespace Marketplace.API
 
 				services
 					.ConfigureWebApiServices(_settings, "v1", "Marketplace API")
-                    .Inject<IOrchestrationCommand>()
                     .Inject<IDevCenterService>()
                     .Inject<IFlurlClient>()
                     .Inject<ISyncCommand>()
 					.Inject<IAvataxService>()
 					.Inject<IMockShippingService>()
-					.Inject<IOrchestrationLogCommand>()
-					.Inject<IEnvironmentSeedCommand>()
-					.InjectCosmosStore<OrchestrationLog, LogQuery>(cosmosConfig)
-					.InjectCosmosStore<SupplierCategoryConfig, SupplierCategoryConfigQuery>(cosmosConfig)
-					.Inject<ISupplierCategoryConfigQuery>()
-					.AddAuthenticationScheme("MarketplaceUser");
-			}
+					.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
+					.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
+                    .Inject<IOrchestrationCommand>()
+                    .Inject<IOrchestrationLogCommand>()
+                    .Inject<IEnvironmentSeedCommand>()
+                    .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
+                    .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
+            }
 
 			// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 			public static void Configure(IApplicationBuilder app, IHostingEnvironment env)

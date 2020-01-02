@@ -19,6 +19,8 @@ namespace Marketplace.Common.Controllers
 		private readonly IMockShippingService _shippingService;
 		private readonly IAvataxService _taxService;
 
+		// How to do authentication? These methods should only work for a specific user's orders.
+
 		public OrderCheckoutController(AppSettings settings, IOrderCheckoutCommand command, IMockShippingService shipping, IAvataxService taxService) : base(settings) {
 			_checkoutCommand = command;
 			_shippingService = shipping;
@@ -37,9 +39,8 @@ namespace Marketplace.Common.Controllers
 			return await _shippingService.GetSavedShipmentQuote(orderID, quoteID);
 		}
 
-		// How to do authentication?
-		[HttpGet, Route("tax-transaction/{transactionID}")]
-		public async Task<TransactionModel> GetSavedTaxTransaction(string transactionID)
+		[HttpGet, Route("{orderID}/tax-transaction/{transactionID}")]
+		public async Task<TransactionModel> GetSavedTaxTransaction(string orderID, string transactionID)
 		{
 			return await _taxService.GetTaxTransactionAsync(transactionID);
 		}

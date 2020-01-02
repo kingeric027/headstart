@@ -26,9 +26,14 @@ namespace Marketplace.Common.Commands
 		private readonly IMockShippingService _shipping;
 		private readonly IAvataxService _avatax;
 
-		public OrderCheckoutCommand(IOrderCloudClient oc, IAvataxService avatax, IMockShippingService shipping)
+		public OrderCheckoutCommand(AppSettings settings, IAvataxService avatax, IMockShippingService shipping)
 		{
-			_oc = oc;
+			_oc = new OrderCloudClient(new OrderCloudClientConfig()
+			{
+				ApiUrl = settings.OrderCloudSettings.ApiUrl,
+				AuthUrl = settings.OrderCloudSettings.AuthUrl,
+				ClientId = "F1631510-F165-4278-A4EB-E655C5AC2E06"
+			});
 			_avatax = avatax;
 			_shipping = shipping;
 		}

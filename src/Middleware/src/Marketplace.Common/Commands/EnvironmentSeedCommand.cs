@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Controllers;
-using Marketplace.Common.Models;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
@@ -38,7 +36,7 @@ namespace Marketplace.Common.Commands
             var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
             await this.PatchDefaultApiClients(impersonation.access_token);
             await this.CreateSuppliers(user, impersonation.access_token);
-            await this.ConfigureBuyers(impersonation.access_token);
+            //await this.ConfigureBuyers(impersonation.access_token);
         }
 
         private async Task ConfigureBuyers(string token)
@@ -74,13 +72,6 @@ namespace Marketplace.Common.Commands
                     Name = value,
                     xp = { }
                 }, token);
-                var catalog = await _oc.Catalogs.CreateAsync(new Catalog()
-                {
-                    Active = true,
-                    ID = $"{supplier.ID}",
-                    Description = $"{supplier.Name} Default Catalog",
-                    Name = $"{supplier.Name} Default Catalog"
-                }, token);
                 var userGroup = await _oc.SupplierUserGroups.CreateAsync(key, new UserGroup()
                 {
                     Description = "Integrations",
@@ -92,15 +83,15 @@ namespace Marketplace.Common.Commands
                     Email = user.Email,
                     FirstName = "Integration",
                     LastName = "Developer",
-                    Password = _settings.OrderCloudSettings.DefaultPassword,
-                    Username = $"dev_{supplier.Name}"
+                    Password = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
+                    Username = $"dev_{supplier.ID}"
                 }, token);
                 var apiClient = await _oc.ApiClients.CreateAsync(new ApiClient()
                 {
                     AppName = $"Integration Client {value}",
                     Active = true,
                     DefaultContextUserName = supplierUser.Username,
-                    ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                    ClientSecret = "d576450ca8f89967eea0d3477544ea4bee60af051a5c173be09db08c562b", // _settings.OrderCloudSettings.ClientSecret,
                     AccessTokenDuration = 600,
                     RefreshTokenDuration = 43200,
                     AllowAnyBuyer = false,
@@ -155,9 +146,9 @@ namespace Marketplace.Common.Commands
                 BuyerApiClientName = $"Default Marketplace Buyer UI",
                 BuyerName = $"Default Marketplace Buyer",
                 BuyerUserName = $"Default_Buyer",
-                BuyerPassword = _settings.OrderCloudSettings.DefaultPassword,
+                BuyerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
                 SellerApiClientName = $"Default Marketplace Admin UI",
-                SellerPassword = _settings.OrderCloudSettings.DefaultPassword,
+                SellerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
                 SellerUserName = $"Default_Admin"
             };
             var request = await _dev.PostOrganization(org, token);
