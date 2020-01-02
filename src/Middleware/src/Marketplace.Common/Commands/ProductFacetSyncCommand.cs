@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers.Extensions;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -66,7 +67,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
-                var response = await _oc.ProductFacets.SaveAsync<ProductFacet>(wi.RecordId, obj);
+                var response = await _oc.ProductFacets.SaveAsync<ProductFacet>(wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -86,7 +87,7 @@ namespace Marketplace.Common.Commands
             var obj = JObject.FromObject(wi.Diff).ToObject<PartialProductFacet>();
             try
             {
-                var response = await _oc.ProductFacets.PatchAsync(wi.RecordId, obj);
+                var response = await _oc.ProductFacets.PatchAsync(wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -110,7 +111,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.ProductFacets.GetAsync(wi.RecordId);
+                var response = await _oc.ProductFacets.GetAsync(wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
