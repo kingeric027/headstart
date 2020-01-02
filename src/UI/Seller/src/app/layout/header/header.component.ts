@@ -47,7 +47,6 @@ export class HeaderComponent implements OnInit {
   }
 
   subscribeToRouteEvents() {
-    console.log(this.router.events);
     this.router.events.subscribe(ev => {
       if (ev instanceof NavigationEnd) {
         this.urlChange(ev.url);
