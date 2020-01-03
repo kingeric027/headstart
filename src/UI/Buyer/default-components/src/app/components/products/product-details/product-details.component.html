@@ -8,7 +8,9 @@
       <div class="pb-3 border-bottom border-medium">
         <small><a href="javascript:;"
              (click)="setActiveSupplier(_product?.xp.Facets?.supplier[0])">{{_product?.xp.Facets?.supplier[0]}}</a></small>
-        <h1 class="h3 my-0">{{ _product.xp.Facets?.manufacturer[0]}} {{ _product.Name }}</h1>
+        <h1 class="h3 my-0">{{ _product.xp.Facets?.manufacturer[0]}} {{ _product.Name }}
+          <small class="text-muted">1 per set</small> <!-- TODO: Plug in unit of measure when data is in OC. -->
+        </h1>
         <ocm-toggle-favorite title="Favorite"
                              (click)="$event.stopPropagation()"
                              [favorite]="isFavorite()"
@@ -21,13 +23,9 @@
       </div>
       <div>
         <div>
-          <div class="d-flex justify-content-between align-items-center">
-            <h4 class="font-weight-bold">{{ price  | currency}}</h4>
-            <p class="text-muted ml-3">1 per set</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
-            <span class="badge badge-pill badge-warning"
-                  *ngIf="percentSavings > 0">You save {{ percentSavings }}%!
-            </span>
-          </div>
+          <span class="badge badge-pill badge-warning"
+                *ngIf="percentSavings > 0">You save {{ percentSavings }}%!
+          </span>
           <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
                          [specs]="_specs"
                          (specFormChange)="onSpecFormChange($event)">
@@ -38,6 +36,7 @@
           </div>
           <div class="d-flex flex-column"
                *ngIf="isOrderable">
+            <h5 class="font-weight-bold">{{ price  | currency}}</h5>
             <div>Quantity: <br>
               <ocm-quantity-input class="d-inline-block mb-3"
                                   style="max-width: 200px"
@@ -45,7 +44,6 @@
                                   [product]="_product">
               </ocm-quantity-input>
             </div>
-
             <button class="btn btn-block btn-primary mb-3"
                     style="max-width: 200px"
                     type="submit"
@@ -57,7 +55,20 @@
           </div>
         </div>
       </div>
-      <div class="p-3 border border-medium border-radius"><strong>Description:</strong>
+      <div *ngIf="_product.PriceSchedule.PriceBreaks.length > 1">
+        <strong>Tiered Pricing: </strong>
+        <div class=" border border-medium border-radius mb-3 p-2">
+          <span>For select items, the more you order - the more you save! Details listed below. Pricing excludes additional charges for sizes and modifications.</span>
+          <div class="d-flex flex-row">
+            <span *ngFor="let priceBreak of _product.PriceSchedule.PriceBreaks; let i = index"
+                  class="font-weight-bold d-flex mt-2">{{ getPriceBreakRange(i) }}:
+              <p class="font-weight-normal ml-1 mr-4">{{priceBreak.Price | currency}}</p>
+            </span>
+          </div>
+        </div>
+      </div>
+      <strong>Description:</strong>
+      <div class="p-2 border border-medium border-radius">
         <p [innerHTML]="_product.Description || 'This product has no description.'">
         </p>
       </div>
