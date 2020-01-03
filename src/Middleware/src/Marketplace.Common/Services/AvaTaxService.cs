@@ -19,8 +19,6 @@ namespace Marketplace.Common.Services
 
 	public class AvataxService : IAvataxService
 	{
-		private readonly AppSettings _settings;
-		private readonly IOrderCloudClient _oc;
 		// fake, static data.In the correct format though.
 		private readonly TransactionModel _mockTransaction = new TransactionModel()
 		{
@@ -72,15 +70,11 @@ namespace Marketplace.Common.Services
 		};
 		//private readonly AvaTaxClient _client;
 
-		public AvataxService(AppSettings settings, IOrderCloudClient oc)
+		public AvataxService()
 		{
-			_oc = oc;
-			_settings = settings;
-
 			//var avaEnv = env.Contains("production") ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;
 			//_client = new AvaTaxClient("Four51 Marketplace", "v1", env, avaEnv)
 			//		.WithSecurity(settings.AvalaraAccountID, settings.AvalaraLicenseKey);
-
 		}
 
 		public async Task<TransactionModel> GetTaxTransactionAsync(string transactionID)

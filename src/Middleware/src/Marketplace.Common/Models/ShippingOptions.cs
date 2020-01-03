@@ -1,4 +1,5 @@
 ﻿using Marketplace.Common.Services;
+using Marketplace.Common.Services.FreightPop;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +13,6 @@ namespace Marketplace.Common.Models
 	{
 		public string SupplierID { get; set; }
 		public string ShipFromAddressID { get; set; }
-		public IEnumerable<MockShippingQuote> Quotes { get; set; }
+		public IEnumerable<ShippingRate> Quotes { get; set; }
 	}
 }
