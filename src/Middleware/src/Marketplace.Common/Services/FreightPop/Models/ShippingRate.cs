@@ -7,7 +7,7 @@ namespace Marketplace.Common.Services.FreightPop
 	public class ShippingRate
 	{
 		public string Id { get; set; }
-		public string QuoteId { get; set; } // Why two IDs? And which whould we use?
+		//public string QuoteId { get; set; } Why two IDs? And which whould we use?
 		public string AccountName { get; set; }
 		public string Carrier { get; set; }
 		public string Currency { get; set; }
@@ -15,7 +15,7 @@ namespace Marketplace.Common.Services.FreightPop
 		public int DeliveryDays { get; set; }
 		public string CarrierQuoteId { get; set; }
 		public string Service { get; set; }
-		public decimal ListCost { get; set; }
-		public decimal TotalCost { get; set; } // Why two costs? Which should we use?
+		//public decimal ListCost { get; set; } Why two costs? Which should we use?
+		public decimal TotalCost { get; set; } 
 	}
 }

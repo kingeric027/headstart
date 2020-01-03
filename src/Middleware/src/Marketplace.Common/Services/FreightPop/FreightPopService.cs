@@ -30,12 +30,10 @@ namespace Marketplace.Common.Services
 					Rates = new[] {
 						new ShippingRate() {
 								Id = "12345",
-								QuoteId = "sample string 6",
 								CarrierQuoteId = "sample string 7",
 								AccountName = "sample string 2",
 								DeliveryDays = 1,
 								DeliveryDate = DateTime.Parse("2020-01-03T08:03:18.0552937-08:00"),
-								ListCost = 9.0M,
 								TotalCost = 10.0M,
 								Currency = "USD",
 								Carrier = "Fedex",
@@ -44,12 +42,10 @@ namespace Marketplace.Common.Services
 						new ShippingRate()
 						{
 								Id = "34567",
-								QuoteId = "sample string 6",
 								CarrierQuoteId = "sample string 7",
 								AccountName = "sample string 2",
 								DeliveryDays = 2,
 								DeliveryDate = DateTime.Parse("2020-01-03T08:03:18.0552937-08:00"),
-								ListCost = 5.0M,
 								TotalCost = 6.0M,
 								Currency = "USD",
 								Carrier = "UPS",
@@ -58,12 +54,10 @@ namespace Marketplace.Common.Services
 						new ShippingRate()
 						{
 								Id = "56789",
-								QuoteId = "sample string 6",
 								CarrierQuoteId = "sample string 7",
 								AccountName = "sample string 2",
 								DeliveryDays = 3,
 								DeliveryDate = DateTime.Parse("2020-01-03T08:03:18.0552937-08:00"),
-								ListCost = 2.0M,
 								TotalCost = 4.0M,
 								Currency = "USD",
 								Carrier = "Unites State Postal Service",
