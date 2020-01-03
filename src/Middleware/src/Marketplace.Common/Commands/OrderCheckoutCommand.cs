@@ -17,17 +17,18 @@ namespace Marketplace.Common.Commands
 	public interface IOrderCheckoutCommand
 	{
 		Task<MarketplaceOrder> SetShippingSelection(string orderID, ShippingSelection shippingSelection);
-		Task<MarketplaceOrder> CalculateTax(string orderID);
+		Task<MarketplaceOrder> CalcTaxAndPatchOrder(string orderID);
 		Task<IEnumerable<ShippingOptions>> GenerateShippingQuotes(string orderID);
 	}
 
 	public class OrderCheckoutCommand : IOrderCheckoutCommand
 	{
 		private readonly IOrderCloudClient _oc;
-		private readonly IMockShippingService _shipping;
+		private readonly IFreightPopService _freightPop;
+		private readonly IMockShippingCacheService _shippingCache;
 		private readonly IAvataxService _avatax;
 
-		public OrderCheckoutCommand(AppSettings settings, IAvataxService avatax, IMockShippingService shipping)
+		public OrderCheckoutCommand(AppSettings settings, IAvataxService avatax, IFreightPopService freightPop, IMockShippingCacheService shippingCache)
 		{
 			// TODO - this authentication needs to be completely different. It needs to work accross ordercloud orgs. 
 			_oc = new OrderCloudClient(new OrderCloudClientConfig()
@@ -37,10 +38,11 @@ namespace Marketplace.Common.Commands
 				Roles = new[] { ApiRole.FullAccess }
 			});
 			_avatax = avatax;
-			_shipping = shipping;
+			_freightPop = freightPop;
+			_shippingCache = shippingCache;
 		}
 
-		public async Task<MarketplaceOrder> CalculateTax(string orderID)
+		public async Task<MarketplaceOrder> CalcTaxAndPatchOrder(string orderID)
 		{	
 			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
 			var items = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
@@ -66,13 +68,15 @@ namespace Marketplace.Common.Commands
 			var shipments = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
 			return await shipments.SelectAsync(async lineItemGrouping =>
 			{
-				var lineItemsInShipment = lineItemGrouping.ToList();
-				var options = await _shipping.GenerateShipmentQuotes(lineItemsInShipment);
+				var shipFrom = lineItemGrouping.First().ShipFromAddress;
+				var shipTo = lineItemGrouping.First().ShippingAddress;
+				var fPopResponse = await _freightPop.GetRates(shipFrom, shipTo, lineItemGrouping.ToList());
+				await _shippingCache.SaveShippingQuotes(fPopResponse.Data.Rates);
 				return new ShippingOptions()
 				{
-					SupplierID = lineItemsInShipment.First().SupplierID, // Assumes ShipFromAddressID is unqiue accross suppliers
+					SupplierID = lineItemGrouping.First().SupplierID, // Assumes ShipFromAddressID is unqiue accross suppliers
 					ShipFromAddressID = lineItemGrouping.Key,
-					Quotes = options
+					Quotes = fPopResponse.Data.Rates
 				};
 			});
 		}
@@ -87,8 +91,8 @@ namespace Marketplace.Common.Commands
 
 			order.xp.ShippingSelections[selection.ShipFromAddressID] = selection;
 			var totalCost = (await order.xp.ShippingSelections
-				.SelectAsync(async sel => await _shipping.GetSavedShipmentQuote(orderID, sel.Value.ShippingQuoteID)))
-				.Sum(savedQuote => savedQuote.Cost);
+				.SelectAsync(async sel => await _shippingCache.GetSavedShippingQuote(orderID, sel.Value.ShippingQuoteID)))
+				.Sum(savedQuote => savedQuote.TotalCost);
 
 			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()
 			{
