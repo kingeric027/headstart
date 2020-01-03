@@ -10,8 +10,8 @@ namespace Marketplace.Common.Services
 {
 	public interface IMockShippingService
 	{
-		Task<MockShippingQuote> GetSavedShipmentQuote(string orderID, string shippingQuoteID);
-		Task<IEnumerable<MockShippingQuote>> GenerateShipmentQuotes(IEnumerable<LineItem> lineItems);
+		Task<MockShippingQuote> GetSavedShippingQuote(string orderID, string shippingQuoteID);
+		Task<IEnumerable<MockShippingQuote>> GenerateShippingQuotes(IEnumerable<LineItem> lineItems);
 	}
 
 	public class MockShippingService : IMockShippingService
@@ -43,14 +43,14 @@ namespace Marketplace.Common.Services
 			},
 		};
 
-		public async Task<MockShippingQuote> GetSavedShipmentQuote(string orderID, string quoteID)
+		public async Task<MockShippingQuote> GetSavedShippingQuote(string orderID, string quoteID)
 		{
 			// TODO - Replace. Get a saved quote from the cache with orderID and quoteID
 			// Make sure to throw invalid quoteID error
 			return _mockShippingQuoteCache.First(quote => quote.ID == quoteID);
 		}
 
-		public async Task<IEnumerable<MockShippingQuote>> GenerateShipmentQuotes(IEnumerable<LineItem> shipment)
+		public async Task<IEnumerable<MockShippingQuote>> GenerateShippingQuotes(IEnumerable<LineItem> shipment)
 		{
 			// TODO - Go get fresh shipping quotes from FreightPop.
 			return _mockShippingQuoteCache;

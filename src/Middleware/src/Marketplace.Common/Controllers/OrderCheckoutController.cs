@@ -36,7 +36,7 @@ namespace Marketplace.Common.Controllers
 		[HttpGet, Route("{orderID}/shipping-quote/{quoteID}"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<MockShippingQuote> GetSavedShippingQuote(string orderID, string quoteID)
 		{
-			return await _shippingService.GetSavedShipmentQuote(orderID, quoteID);
+			return await _shippingService.GetSavedShippingQuote(orderID, quoteID);
 		}
 
 		[HttpGet, Route("{orderID}/tax-transaction/{transactionID}"), MarketplaceUserAuth(ApiRole.Shopper)]
@@ -51,8 +51,8 @@ namespace Marketplace.Common.Controllers
 			return await _checkoutCommand.CalculateTax(orderID);
 		}
 
-		[HttpPut, Route("{orderID}/shipping-quote"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<MarketplaceOrder> SetShippingQuote(string orderID, [FromBody] ShippingSelection shippingSelection)
+		[HttpPut, Route("{orderID}/shipping-selection"), MarketplaceUserAuth(ApiRole.Shopper)]
+		public async Task<MarketplaceOrder> SetShippingSelection(string orderID, [FromBody] ShippingSelection shippingSelection)
 		{
 			return await _checkoutCommand.SetShippingSelection(orderID, shippingSelection);
 		}
