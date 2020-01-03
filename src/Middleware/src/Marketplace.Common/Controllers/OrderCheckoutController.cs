@@ -27,31 +27,31 @@ namespace Marketplace.Common.Controllers
 			_taxService = taxService;
 		}
 
-		[HttpGet, Route("{orderID}/shipping-quote"), MarketplaceUserAuth(ApiRole.Shopper)]
+		[HttpPost, Route("{orderID}/shipping-quote"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<IEnumerable<ShippingOptions>> GenerateShippingQuotes(string orderID)
 		{
 			return await _checkoutCommand.GenerateShippingQuotes(orderID);
 		}
 
-		[HttpGet, Route("{orderID}/shipping-quote/{quoteID}")]
+		[HttpGet, Route("{orderID}/shipping-quote/{quoteID}"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<MockShippingQuote> GetSavedShippingQuote(string orderID, string quoteID)
 		{
 			return await _shippingService.GetSavedShipmentQuote(orderID, quoteID);
 		}
 
-		[HttpGet, Route("{orderID}/tax-transaction/{transactionID}")]
+		[HttpGet, Route("{orderID}/tax-transaction/{transactionID}"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<TransactionModel> GetSavedTaxTransaction(string orderID, string transactionID)
 		{
 			return await _taxService.GetTaxTransactionAsync(transactionID);
 		}
 
-		[HttpPost, Route("{orderID}/calculate-tax"), MarketplaceUserAuth(ApiRole.Shopper)]
+		[HttpPost, Route("{orderID}/tax-transaction"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<MarketplaceOrder> CalculateTax(string orderID)
 		{
 			return await _checkoutCommand.CalculateTax(orderID);
 		}
 
-		[HttpPost, Route("{orderID}/set-shipping-quote"), MarketplaceUserAuth(ApiRole.Shopper)]
+		[HttpPut, Route("{orderID}/shipping-quote"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<MarketplaceOrder> SetShippingQuote(string orderID, [FromBody] ShippingSelection shippingSelection)
 		{
 			return await _checkoutCommand.SetShippingSelection(orderID, shippingSelection);
