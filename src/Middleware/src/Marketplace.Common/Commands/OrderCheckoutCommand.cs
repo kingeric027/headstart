@@ -70,7 +70,7 @@ namespace Marketplace.Common.Commands
 			{
 				var shipFrom = lineItemGrouping.First().ShipFromAddress;
 				var shipTo = lineItemGrouping.First().ShippingAddress;
-				var fPopResponse = await _freightPop.GetRates(shipFrom, shipTo, lineItemGrouping.ToList());
+				var fPopResponse = await _freightPop.GetRatesAsync(shipFrom, shipTo, lineItemGrouping.ToList());
 				await _shippingCache.SaveShippingQuotesAsync(fPopResponse.Data.Rates);
 				return new ShippingOptions()
 				{

@@ -11,12 +11,12 @@ namespace Marketplace.Common.Services
 {
 	public interface IFreightPopService
 	{
-		Task<FreightPopResponse<GetRatesData>> GetRates(Address shipFrom, Address shipTo, IEnumerable<LineItem> items);
+		Task<FreightPopResponse<GetRatesData>> GetRatesAsync(Address shipFrom, Address shipTo, IEnumerable<LineItem> items);
 	}
 
 	public class FreightPopService : IFreightPopService
 	{
-		public async Task<FreightPopResponse<GetRatesData>> GetRates(Address shipFrom, Address shipTo, IEnumerable<LineItem> items)
+		public async Task<FreightPopResponse<GetRatesData>> GetRatesAsync(Address shipFrom, Address shipTo, IEnumerable<LineItem> items)
 		{
 			// fake, static data.In the correct format though.
 			// TODO - use real endpoint

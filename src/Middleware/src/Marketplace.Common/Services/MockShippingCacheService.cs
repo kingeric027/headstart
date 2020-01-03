@@ -27,7 +27,7 @@ namespace Marketplace.Common.Services
 		{
 			// TODO - make sure quote is still valid
 			// TODO - Don't use freightPop. Instead, get from cache.
-			return (await _freightPop.GetRates(null, null, null)).Data.Rates.First(r => r.Id == quoteID);
+			return (await _freightPop.GetRatesAsync(null, null, null)).Data.Rates.First(r => r.Id == quoteID);
 		}
 
 		public async Task<IEnumerable<ShippingRate>> SaveShippingQuotesAsync(IEnumerable<ShippingRate> quotes)
