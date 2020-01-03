@@ -16,9 +16,9 @@ namespace Marketplace.Common.Commands
 {
 	public interface IOrderCheckoutCommand
 	{
-		Task<MarketplaceOrder> SetShippingSelection(string orderID, ShippingSelection shippingSelection);
-		Task<MarketplaceOrder> CalcTaxAndPatchOrder(string orderID);
-		Task<IEnumerable<ShippingOptions>> GenerateShippingQuotes(string orderID);
+		Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, ShippingSelection shippingSelection);
+		Task<MarketplaceOrder> CalcTaxAndPatchOrderAsync(string orderID);
+		Task<IEnumerable<ShippingOptions>> GenerateShippingQuotesAsync(string orderID);
 	}
 
 	public class OrderCheckoutCommand : IOrderCheckoutCommand
@@ -42,7 +42,7 @@ namespace Marketplace.Common.Commands
 			_shippingCache = shippingCache;
 		}
 
-		public async Task<MarketplaceOrder> CalcTaxAndPatchOrder(string orderID)
+		public async Task<MarketplaceOrder> CalcTaxAndPatchOrderAsync(string orderID)
 		{	
 			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
 			var items = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
@@ -62,7 +62,7 @@ namespace Marketplace.Common.Commands
 			});
 		}
 
-		public async Task<IEnumerable<ShippingOptions>> GenerateShippingQuotes(string orderID)
+		public async Task<IEnumerable<ShippingOptions>> GenerateShippingQuotesAsync(string orderID)
 		{
 			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
 			var shipments = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
@@ -71,7 +71,7 @@ namespace Marketplace.Common.Commands
 				var shipFrom = lineItemGrouping.First().ShipFromAddress;
 				var shipTo = lineItemGrouping.First().ShippingAddress;
 				var fPopResponse = await _freightPop.GetRates(shipFrom, shipTo, lineItemGrouping.ToList());
-				await _shippingCache.SaveShippingQuotes(fPopResponse.Data.Rates);
+				await _shippingCache.SaveShippingQuotesAsync(fPopResponse.Data.Rates);
 				return new ShippingOptions()
 				{
 					SupplierID = lineItemGrouping.First().SupplierID, // Assumes ShipFromAddressID is unqiue accross suppliers
@@ -81,7 +81,7 @@ namespace Marketplace.Common.Commands
 			});
 		}
 
-		public async Task<MarketplaceOrder> SetShippingSelection(string orderID, ShippingSelection selection)
+		public async Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, ShippingSelection selection)
 		{
 			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
 			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
@@ -91,7 +91,7 @@ namespace Marketplace.Common.Commands
 
 			order.xp.ShippingSelections[selection.ShipFromAddressID] = selection;
 			var totalCost = (await order.xp.ShippingSelections
-				.SelectAsync(async sel => await _shippingCache.GetSavedShippingQuote(orderID, sel.Value.ShippingQuoteID)))
+				.SelectAsync(async sel => await _shippingCache.GetSavedShippingQuoteAsync(orderID, sel.Value.ShippingQuoteID)))
 				.Sum(savedQuote => savedQuote.TotalCost);
 
 			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()

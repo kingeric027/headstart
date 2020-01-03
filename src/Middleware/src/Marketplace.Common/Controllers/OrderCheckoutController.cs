@@ -29,31 +29,31 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[HttpPost, Route("{orderID}/shipping-quote"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<IEnumerable<ShippingOptions>> GenerateShippingQuotes(string orderID)
+		public async Task<IEnumerable<ShippingOptions>> GenerateShippingQuotesAsync(string orderID)
 		{
-			return await _checkoutCommand.GenerateShippingQuotes(orderID);
+			return await _checkoutCommand.GenerateShippingQuotesAsync(orderID);
 		}
 
 		[HttpGet, Route("{orderID}/shipping-quote/{quoteID}"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<ShippingRate> GetSavedShippingQuote(string orderID, string quoteID)
+		public async Task<ShippingRate> GetSavedShippingQuoteAsync(string orderID, string quoteID)
 		{
-			return await _shippingCache.GetSavedShippingQuote(orderID, quoteID);
+			return await _shippingCache.GetSavedShippingQuoteAsync(orderID, quoteID);
 		}
 
 		[HttpPut, Route("{orderID}/shipping-selection"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<MarketplaceOrder> SetShippingSelection(string orderID, [FromBody] ShippingSelection shippingSelection)
+		public async Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, [FromBody] ShippingSelection shippingSelection)
 		{
-			return await _checkoutCommand.SetShippingSelection(orderID, shippingSelection);
+			return await _checkoutCommand.SetShippingSelectionAsync(orderID, shippingSelection);
 		}
 
 		[HttpPost, Route("{orderID}/tax-transaction"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<MarketplaceOrder> CalcTaxAndPatchOrder(string orderID)
+		public async Task<MarketplaceOrder> CalcTaxAndPatchOrderAsync(string orderID)
 		{
-			return await _checkoutCommand.CalcTaxAndPatchOrder(orderID);
+			return await _checkoutCommand.CalcTaxAndPatchOrderAsync(orderID);
 		}
 
 		[HttpGet, Route("{orderID}/tax-transaction/{transactionID}"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<TransactionModel> GetSavedTaxTransaction(string orderID, string transactionID)
+		public async Task<TransactionModel> GetSavedTaxTransactionAsync(string orderID, string transactionID)
 		{
 			return await _taxService.GetTaxTransactionAsync(transactionID);
 		}
