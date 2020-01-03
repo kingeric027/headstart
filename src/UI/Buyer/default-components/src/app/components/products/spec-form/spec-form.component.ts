@@ -30,7 +30,7 @@ export class OCMSpecForm {
   config: FieldConfig[] = [];
   form: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) { }
 
   @Input() set specs(value: ListBuyerSpec) {
     this._specs = value;
@@ -64,7 +64,7 @@ export class OCMSpecForm {
     const c: FieldConfig[] = [];
     if (!this._specs || !this._specs.Items) return c;
     for (const spec of this._specs.Items) {
-      if (spec.xp.control === 'checkbox') {
+      if (spec.xp && spec.xp.control === 'checkbox') {
         c.push({
           type: 'checkbox',
           label: spec.Name,
@@ -73,7 +73,7 @@ export class OCMSpecForm {
           options: _map(spec.Options, 'Value'),
           validation: [Validators.nullValidator],
         });
-      } else if (spec.xp.control === 'range') {
+      } else if (spec.xp && spec.xp.control === 'range') {
         c.push({
           type: 'range',
           label: spec.Name,
@@ -101,8 +101,8 @@ export class OCMSpecForm {
           name: spec.Name.replace(/ /g, ''),
           value: spec.DefaultOptionID
             ? _find(spec.Options, option => {
-                return option.ID === spec.DefaultOptionID;
-              }).Value
+              return option.ID === spec.DefaultOptionID;
+            }).Value
             : null,
           options: _map(spec.Options, 'Value'),
           validation: [spec.Required ? Validators.required : Validators.nullValidator],
