@@ -31,7 +31,7 @@ interface BreadCrumb {
   templateUrl: './resource-table.component.html',
   styleUrls: ['./resource-table.component.scss'],
   host: {
-    '(window:resize)': 'onResize($event)',
+    '(window:resize)': 'ngAfterViewChecked()',
   },
 })
 export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewChecked {
@@ -119,12 +119,9 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.screenSize = getScreenSizeBreakPoint();
   }
 
-  onResize(event) {
-    this.setPsHeights();
-  }
-
   ngAfterViewChecked() {
     this.setPsHeights();
+    this.changeDetectorRef.detectChanges();
   }
 
   setPsHeights() {

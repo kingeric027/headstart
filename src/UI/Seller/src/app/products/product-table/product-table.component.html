@@ -11,9 +11,8 @@
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
-  <div class="resource-edit">
-    <resource-edit-component resourceType="Product"
-                             (updateResource)="updateResource($event)"
-                             [resource]="updatedResource"></resource-edit-component>
-  </div>
+  <app-product-edit class="resource-edit"
+                    *ngIf="resourceForm"
+                    [resourceForm]="resourceForm"
+                    (updateResource)="updateResource($event)"></app-product-edit>
 </resource-table-component>

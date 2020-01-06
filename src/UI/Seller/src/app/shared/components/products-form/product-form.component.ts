@@ -45,14 +45,8 @@ export class ProductFormComponent implements OnInit {
 
   setForm() {
     this.productForm = this.formBuilder.group({
-      ID: [
-        this._existingProduct.ID || '',
-        Validators.pattern(this.regexService.ID),
-      ],
-      Name: [
-        this._existingProduct.Name || '',
-        [Validators.required, Validators.pattern(this.regexService.ID)],
-      ],
+      ID: [this._existingProduct.ID || '', Validators.pattern(this.regexService.ID)],
+      Name: [this._existingProduct.Name || '', [Validators.required, Validators.pattern(this.regexService.ID)]],
       Description: [this._existingProduct.Description || ''],
       Active: [!!this._existingProduct.Active],
       Featured: [this._existingProduct.xp && this._existingProduct.xp.Featured],

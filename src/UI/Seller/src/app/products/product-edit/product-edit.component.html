@@ -1,0 +1,147 @@
+<div class="container-fluid resource-edit">
+  <form [formGroup]="resourceForm">
+    <!-- Product Details -->
+    <div class="row pt-3">
+      <div class="col-md-5">
+        <h5>Product Details</h5>
+        <p class="font-italic">This is a description of the basic information section.</p>
+      </div>
+      <div class="col-md-7 form-group">
+        <div class="form-group">
+          <label for="Name">Name</label>
+          <input type="text"
+                 class="form-control"
+                 id="Name"
+                 showErrors
+                 aria-describedby="Name"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="Name"
+                 (input)="updateResourceFromEvent($event, 'Name')"
+                 placeholder="Enter Name">
+        </div>
+        <div class="form-group">
+          <label for="Description">Description</label>
+          <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
+                                           [formControlForText]="resourceForm?.controls.Description"
+                                           resourceField="Description"
+                                           pathOnResource="Description"
+                                           (resourceUpdated)="updateResource.emit($event)">
+          </reactive-quill-editor-component>
+        </div>
+        <div class="form-group">
+          <label for="QuantityMultiplier">Quantity Multiplier</label>
+          <input type="number"
+                 class="form-control"
+                 id="QuantityMultiplier"
+                 showErrors
+                 aria-describedby="Quantity Multiplier"
+                 min="1"
+                 [resourceForm]="resourceForm"
+                 formControlName="QuantityMultiplier"
+                 (input)="updateResourceFromEvent($event, 'QuantityMultiplier')"
+                 placeholder="Quantity Multiplier">
+        </div>
+      </div>
+    </div>
+    <!-- /Product Details -->
+
+    <!-- Product Variations -->
+    <div class="row pt-3 mt-5 border-top">
+      <div class="col-md-5">
+        <h5>Product Variations</h5>
+        <p class="font-italic">Does your product come in different varieties? Add them here.</p>
+      </div>
+      <div class="col-md-7">
+        <button *ngIf="!hasVariations"
+                class="btn btn-outline-dark"
+                (click)="hasVariations = true">Add Variations</button>
+        <div *ngIf="hasVariations"
+             class="variation-form-container">
+          <div class="form-group">
+            <label for="VariationType">Add a variation</label>
+            <select type="dropdown"
+                    class="form-control"
+                    id="VariationType"
+                    aria-describedby="Variation type"
+                    placeholder="Choose variation type">
+              <option default
+                      disabled>Choose a variation type</option>
+              <option>Color</option>
+              <option>Size</option>
+              <option>Height</option>
+            </select>
+          </div>
+          <button class="btn btn-link text-danger"
+                  (click)="hasVariations = false">Cancel variations</button>
+        </div>
+      </div>
+    </div>
+    <!-- /Product Variations -->
+
+    <!-- Shipping Information -->
+    <div class="row pt-3 mt-5 border-top">
+      <div class="col-md-5">
+        <h5>Shipping Information</h5>
+        <p class="font-italic">Provide accurate shipping weight and dimensions for the most accurate shipping estimates.</p>
+      </div>
+      <div class="col-md-7">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="ShipHeight">Ship Height</label>
+            <input type="number"
+                   class="form-control"
+                   id="ShipHeight"
+                   showErrors
+                   aria-describedby="Ship Height"
+                   maxlength="100"
+                   [resourceForm]="resourceForm"
+                   formControlName="ShipHeight"
+                   (input)="updateResourceFromEvent($event, 'ShipHeight')"
+                   placeholder="Enter Ship Height">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="ShipWidth">Ship Width</label>
+            <input type="number"
+                   class="form-control"
+                   id="ShipWidth"
+                   showErrors
+                   aria-describedby="Ship Width"
+                   [resourceForm]="resourceForm"
+                   formControlName="ShipWidth"
+                   (input)="updateResourceFromEvent($event, 'ShipWidth')"
+                   placeholder="Ship Width">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="ShipLength">Ship Length</label>
+            <input type="number"
+                   class="form-control"
+                   id="ShipLength"
+                   showErrors
+                   aria-describedby="Ship Length"
+                   maxlength="100"
+                   [resourceForm]="resourceForm"
+                   formControlName="ShipLength"
+                   (input)="updateResourceFromEvent($event, 'ShipLength')"
+                   placeholder="Enter Ship Length">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="ShipWeight">Ship Weight</label>
+            <input type="number"
+                   class="form-control"
+                   id="ShipWeight"
+                   showErrors
+                   aria-describedby="Ship Weight"
+                   [resourceForm]="resourceForm"
+                   formControlName="ShipWeight"
+                   (input)="updateResourceFromEvent($event, 'ShipWeight')"
+                   placeholder="Ship Weight">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Shipping Information -->
+  </form>
+</div>
