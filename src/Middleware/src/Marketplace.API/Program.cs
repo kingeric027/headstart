@@ -11,8 +11,8 @@ using Marketplace.Common.Queries;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.DevCenter;
+using Marketplace.Common.Services;
 using Marketplace.Helpers;
-
 namespace Marketplace.API
 {
 	public static class Program
@@ -46,12 +46,15 @@ namespace Marketplace.API
                     .Inject<IDevCenterService>()
                     .Inject<IFlurlClient>()
                     .Inject<ISyncCommand>()
+					.Inject<IAvataxService>()
+					.Inject<IMockShippingCacheService>()
+					.Inject<IFreightPopService>()
 					.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
 					.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
-					.Inject<ISupplierCategoryConfigQuery>()
                     .Inject<IOrchestrationCommand>()
                     .Inject<IOrchestrationLogCommand>()
                     .Inject<IEnvironmentSeedCommand>()
+					.Inject<ISupplierCategoryConfigQuery>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                     .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
             }

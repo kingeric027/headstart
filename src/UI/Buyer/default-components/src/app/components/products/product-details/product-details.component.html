@@ -8,7 +8,9 @@
       <div class="pb-3 border-bottom border-medium">
         <small><a href="javascript:;"
              (click)="setActiveSupplier(_product?.xp.Facets?.supplier[0])">{{_product?.xp.Facets?.supplier[0]}}</a></small>
-        <h1 class="h3 my-0">{{ _product.xp.Facets?.manufacturer[0]}} {{ _product.Name }}</h1>
+        <h1 class="h3 my-0">{{ _product.xp.Facets?.manufacturer[0]}} {{ _product.Name }}
+          <small class="text-muted">1 per set</small> <!-- TODO: Plug in unit of measure when data is in OC. -->
+        </h1>
         <ocm-toggle-favorite title="Favorite"
                              (click)="$event.stopPropagation()"
                              [favorite]="isFavorite()"
@@ -57,9 +59,22 @@
           </div>
         </div>
       </div>
-      <div class="p-3 border border-medium border-radius"><strong>Description:</strong>
-        <p [innerHTML]="_product.Description || 'This product has no description.'"></p>
-        <p class="text-muted">Product ID: {{_product.ID}}</p>
+      <div *ngIf="_product.PriceSchedule.PriceBreaks.length > 1">
+        <strong>Tiered Pricing: </strong>
+        <div class=" border border-medium border-radius mb-3 p-2">
+          <span>For select items, the more you order - the more you save! Details listed below. Pricing excludes additional charges for sizes and modifications.</span>
+          <div class="d-flex flex-row">
+            <span *ngFor="let priceBreak of _product.PriceSchedule.PriceBreaks; let i = index"
+                  class="font-weight-bold d-flex mt-2">{{ getPriceBreakRange(i) }}:
+              <p class="font-weight-normal ml-1 mr-4">{{priceBreak.Price | currency}}</p>
+            </span>
+          </div>
+        </div>
+      </div>
+      <strong>Description:</strong>
+      <div class="p-2 border border-medium border-radius">
+        <p [innerHTML]="_product.Description || 'This product has no description.'">
+        </p>
       </div>
     </div>
     <!-- DISPLAY LONG SPEC FORM TO RIGHT -->

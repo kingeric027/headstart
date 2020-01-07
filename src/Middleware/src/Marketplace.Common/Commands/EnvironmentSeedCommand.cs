@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Controllers;
-using Marketplace.Common.Models;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
