@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Marketplace.Common.Controllers
 {
-	[RoutePrefix("{orderID}/tax-transaction")]
+	[Route("{orderID}/tax-transaction")]
 	public class TaxTransactionController: BaseController
 	{
 		private readonly IAvataxService _taxService;
