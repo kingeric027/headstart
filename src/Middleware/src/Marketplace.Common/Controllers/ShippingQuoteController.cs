@@ -14,18 +14,15 @@ using System.Threading.Tasks;
 namespace Marketplace.Common.Controllers
 {
 	[Route("orders")]
-	public class OrderCheckoutController: Controller
+	public class ShippingQuoteController: BaseController
 	{
 		private readonly IOrderCheckoutCommand _checkoutCommand;
 		private readonly IMockShippingCacheService _shippingCache;
-		private readonly IAvataxService _taxService;
 
 		// Needs more authentication. These methods should only work for a specific user's orders.
-
-		public OrderCheckoutController(AppSettings settings, IOrderCheckoutCommand command, IMockShippingCacheService shippingCache, IAvataxService taxService) : base() {
+		public ShippingQuoteController(AppSettings settings, IOrderCheckoutCommand command, IMockShippingCacheService shippingCache) : base(settings) {
 			_checkoutCommand = command;
 			_shippingCache = shippingCache;
-			_taxService = taxService;
 		}
 
 		[HttpPost, Route("{orderID}/shipping-quote"), MarketplaceUserAuth(ApiRole.Shopper)]
@@ -44,18 +41,6 @@ namespace Marketplace.Common.Controllers
 		public async Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, [FromBody] ShippingSelection shippingSelection)
 		{
 			return await _checkoutCommand.SetShippingSelectionAsync(orderID, shippingSelection);
-		}
-
-		[HttpPost, Route("{orderID}/tax-transaction"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<MarketplaceOrder> CalcTaxAndPatchOrderAsync(string orderID)
-		{
-			return await _checkoutCommand.CalcTaxAndPatchOrderAsync(orderID);
-		}
-
-		[HttpGet, Route("{orderID}/tax-transaction/{transactionID}"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<TransactionModel> GetSavedTaxTransactionAsync(string orderID, string transactionID)
-		{
-			return await _taxService.GetTaxTransactionAsync(transactionID);
 		}
 	}
 }
