@@ -9,16 +9,16 @@ namespace Marketplace.Common.Exceptions
 	{
 		public static IDictionary<string, ErrorCode> All { get; } = new Dictionary<string, ErrorCode>
 		{
-			{ "Checkout.MissingShippingSelection", new ErrorCode("MissingShippingSelection", 404, "Cannot proceed until all shipping selections have been made.") },
-			{ "Checkout.InvalidShipFromAddress", new ErrorCode("InvalidShipFromAddress", 400, "This ShipFromAddressID does not exist.") },
+			{ "Checkout.MissingShippingSelection", new  ErrorCode<MissingShippingSelectionError>("MissingShippingSelection", 404, "Cannot proceed until all shipping selections have been made.") },
+			{ "Checkout.InvalidShipFromAddress", new ErrorCode<InvalidShipFromAddressIDError>("InvalidShipFromAddress", 400, "This ShipFromAddressID does not match any products in the order") },
 		};
 
 		public static class Checkout
 		{
 			/// <summary>Cannot proceed until all shipping selections have been made.</summary>
-			public static readonly ErrorCode<MissingShippingSelectionError> MissingShippingSelection = All["Chekout.MissingShippingSelection"] as ErrorCode<MissingShippingSelectionError>;
-			/// <summary>This ShipFromAddressID does not exist.</summary>
-			public static readonly ErrorCode<InvalidShipFromAddressIDError> InvalidShipFromAddress = All["Chekout.MissingShippingSelection"] as ErrorCode<InvalidShipFromAddressIDError>;
+			public static ErrorCode<MissingShippingSelectionError> MissingShippingSelection => All["Checkout.MissingShippingSelection"] as ErrorCode<MissingShippingSelectionError>;
+			/// <summary>This ShipFromAddressID does not exist on the order.</summary>
+			public static ErrorCode<InvalidShipFromAddressIDError> InvalidShipFromAddress => All["Checkout.InvalidShipFromAddress"] as ErrorCode<InvalidShipFromAddressIDError>;
 		}
 	}
 }

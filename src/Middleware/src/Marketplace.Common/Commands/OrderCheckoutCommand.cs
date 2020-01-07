@@ -52,7 +52,7 @@ namespace Marketplace.Common.Commands
 
 			var taxTransaction = await _avatax.CreateTaxTransactionAsync(order, items);
 			
-			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID, new PartialOrder()
+			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()
 			{
 				TaxCost = taxTransaction.totalTax ?? 0,
 				xp = new
@@ -86,19 +86,20 @@ namespace Marketplace.Common.Commands
 			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
 			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
 
-			var valid = lineItems.Items.Any(li => li.ShipFromAddressID == selection.ShipFromAddressID);
-			Require.That(valid, ErrorCodes.Checkout.InvalidShipFromAddress, new InvalidShipFromAddressIDError(selection.ShipFromAddressID));
+			var exists = lineItems.Items.Any(li => li.ShipFromAddressID == selection.ShipFromAddressID);
+			Require.That(exists, ErrorCodes.Checkout.InvalidShipFromAddress, new InvalidShipFromAddressIDError(selection.ShipFromAddressID)); ;
 
-			order.xp.ShippingSelections[selection.ShipFromAddressID] = selection;
-			var totalCost = (await order.xp.ShippingSelections
+			var selections = order.xp?.ShippingSelections ?? new Dictionary<string, ShippingSelection>();
+			selections[selection.ShipFromAddressID] = selection;
+			var totalShippingCost = (await selections
 				.SelectAsync(async sel => await _shippingCache.GetSavedShippingQuoteAsync(orderID, sel.Value.ShippingQuoteID)))
 				.Sum(savedQuote => savedQuote.TotalCost);
 
 			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()
 			{
-				ShippingCost = totalCost,
+				ShippingCost = totalShippingCost,
 				xp = new {
-					ShippingSelections = order.xp.ShippingSelections
+					ShippingSelections = selections
 				}
 			});
 		}
