@@ -76,7 +76,7 @@ export class SpecFormService {
       return spec.Options[value ? 1 : 0] as SpecOption;
     }
 
-    if (spec.xp.control === 'range') {
+    if (spec.xp && spec.xp.control === 'range') {
       const sorted = _sortBy(spec.Options, (v: SpecOption) => +v.Value);
       const o = _find(sorted, (option: SpecOption, index: number) => {
         if (sorted.length - 1 === index) {

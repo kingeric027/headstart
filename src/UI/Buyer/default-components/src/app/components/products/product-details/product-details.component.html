@@ -23,35 +23,39 @@
       </div>
       <div>
         <div>
-          <span class="badge badge-pill badge-warning"
-                *ngIf="percentSavings > 0">You save {{ percentSavings }}%!
-          </span>
-          <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
-                         [specs]="_specs"
-                         (specFormChange)="onSpecFormChange($event)">
-          </ocm-spec-form>
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="font-weight-bold">{{ price  | currency}}</h4>
+            <p class="text-muted ml-3">1 per set</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
+            <span class="badge badge-pill badge-warning"
+                  *ngIf="percentSavings > 0">You save {{ percentSavings }}%!
+            </span>
+          </div>
+          <!--DISPLAY SHORT SPEC FORM -->
+          <div *ngIf="specLength < 4">
+            <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
+                           [specs]="_specs"
+                           (specFormChange)="onSpecFormChange($event)">
+            </ocm-spec-form>
+            <div class="d-flex flex-column"
+                 *ngIf="isOrderable">Quantity: <br>
+              <div class="d-flex flex-row">
+                <ocm-quantity-input class="d-inline-block mb-3 mr-3"
+                                    (qtyChange)="qtyChange($event.detail)"
+                                    [product]="_product">
+                </ocm-quantity-input>
+                <button class="btn btn-block btn-primary mb-3"
+                        type="submit"
+                        [disabled]="!specFormService.event?.valid || !qtyValid"
+                        (click)="addToCart($event)">
+                  Add to Cart
+                  <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
+                </button>
+              </div>
+            </div>
+          </div>
           <div *ngIf="!isOrderable"
                class="alert alert-info">
             This is a view-only product and cannot be ordered
-          </div>
-          <div class="d-flex flex-column"
-               *ngIf="isOrderable">
-            <h5 class="font-weight-bold">{{ price  | currency}}</h5>
-            <div>Quantity: <br>
-              <ocm-quantity-input class="d-inline-block mb-3"
-                                  style="max-width: 200px"
-                                  (qtyChange)="qtyChange($event.detail)"
-                                  [product]="_product">
-              </ocm-quantity-input>
-            </div>
-            <button class="btn btn-block btn-primary mb-3"
-                    style="max-width: 200px"
-                    type="submit"
-                    [disabled]="!specFormService.event?.valid || !qtyValid"
-                    (click)="addToCart($event)">
-              Add to Cart
-              <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
-            </button>
           </div>
         </div>
       </div>
@@ -71,6 +75,40 @@
       <div class="p-2 border border-medium border-radius">
         <p [innerHTML]="_product.Description || 'This product has no description.'">
         </p>
+      </div>
+    </div>
+    <!-- DISPLAY LONG SPEC FORM TO RIGHT -->
+    <div class="col-xl-2 col-lg-3"
+         *ngIf="specLength > 3">
+      <div class="p-3 border border-medium border-radius">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="badge badge-pill badge-warning"
+                *ngIf="percentSavings > 0">You save {{ percentSavings }}%!
+          </span>
+        </div>
+        <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
+                       [specs]="_specs"
+                       (specFormChange)="onSpecFormChange($event)">
+        </ocm-spec-form>
+        <div *ngIf="!isOrderable"
+             class="alert alert-info">
+          This is a view-only product and cannot be ordered
+        </div>
+        <div class="d-flex flex-column"
+             *ngIf="isOrderable">Quantity:
+          <ocm-quantity-input class="d-inline-block mb-3"
+                              style="max-width: 100px"
+                              (qtyChange)="qtyChange($event.detail)"
+                              [product]="_product">
+          </ocm-quantity-input>
+          <button class="btn btn-block btn-primary"
+                  type="submit"
+                  [disabled]="!specFormService.event?.valid || !qtyValid"
+                  (click)="addToCart($event)">
+            Add to Cart
+            <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
+          </button>
+        </div>
       </div>
     </div>
   </div>
