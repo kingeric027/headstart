@@ -167,7 +167,9 @@
     </ul>
   </div>
 </nav>
-<ocm-category-dropdown (closeDropdown)="toggleCategoryDropdown($event.detail)"
+<ocm-category-dropdown class="categoryDropdown"
+                       (window:mouseup)="clickOutsideCategoryDropdown($event)"
+                       (closeDropdown)="toggleCategoryDropdown($event.detail)"
                        [categories]="categories"
                        *ngIf="showCategoryDropdown"></ocm-category-dropdown>
 <!-- /Search / Cart Nav -->

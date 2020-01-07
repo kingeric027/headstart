@@ -67,6 +67,11 @@ export class OCMAppHeader implements OnInit {
     this.showCategoryDropdown = bool;
   }
 
+  clickOutsideCategoryDropdown(event) {
+    var clickIsOutside: boolean = !event.target.closest(".categoryDropdown");
+    if (clickIsOutside) { this.showCategoryDropdown = false; }
+  }
+
   handleFiltersChange = (filters: ProductFilters) => {
     this.searchTermForProducts = filters.search || '';
     this.activeCategoryID = this.context.categories.activeID;
