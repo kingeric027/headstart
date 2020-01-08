@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,6 +19,7 @@ namespace Marketplace.Common
         public BlobSettings BlobSettings { get; set; }
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
+        public string SendgridApiKey { get; set; }
     }
 
     public class OrderCloudSettings
