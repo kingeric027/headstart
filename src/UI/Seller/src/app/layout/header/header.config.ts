@@ -188,9 +188,6 @@ const AllNavGroupings: MPRoute[] = [
 ];
 
 export const getHeaderConfig = (userRoles: string[]): MPRoute[] => {
-  // return AllNavGroupings;
-
-  // returning all nav groupings for now until more users are created that have the proper roles
   const navGroupingsApplicableToUser = AllNavGroupings.filter(navGrouping => {
     return navGrouping.rolesWithAccess.some(role => userRoles.includes(role));
   });
@@ -205,5 +202,4 @@ export const getHeaderConfig = (userRoles: string[]): MPRoute[] => {
       return navGrouping;
     }
   });
-  return navGroupingsApplicableToUser;
 };
