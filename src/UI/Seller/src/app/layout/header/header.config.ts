@@ -140,7 +140,7 @@ const SupplierUsers: MPRoute = {
 };
 
 const SupplierLocations: MPRoute = {
-  rolesWithAccess: ['MPSupplierAdmin', 'MPMeSu'],
+  rolesWithAccess: ['MPSupplierAdmin', 'MPMeSupplierAdmin'],
   title: 'Locations',
   route: `/suppliers/${REDIRECT_TO_FIRST_PARENT}/locations`,
 };
@@ -188,22 +188,22 @@ const AllNavGroupings: MPRoute[] = [
 ];
 
 export const getHeaderConfig = (userRoles: string[]): MPRoute[] => {
-  return AllNavGroupings;
+  // return AllNavGroupings;
 
   // returning all nav groupings for now until more users are created that have the proper roles
-  // const navGroupingsApplicableToUser = AllNavGroupings.filter((navGrouping) => {
-  //   return navGrouping.rolesWithAccess.some((role) => userRoles.includes(role));
-  // });
-  // return navGroupingsApplicableToUser.map((navGrouping) => {
-  //   if (!navGrouping.subRoutes) {
-  //     return navGrouping;
-  //   } else {
-  //     const routesApplicableToUser = navGrouping.subRoutes.filter((subRoute) => {
-  //       return subRoute.rolesWithAccess.some((role) => userRoles.includes(role));
-  //     });
-  //     navGrouping.subRoutes = routesApplicableToUser;
-  //     return navGrouping;
-  //   }
-  // });
-  // return navGroupingsApplicableToUser;
+  const navGroupingsApplicableToUser = AllNavGroupings.filter(navGrouping => {
+    return navGrouping.rolesWithAccess.some(role => userRoles.includes(role));
+  });
+  return navGroupingsApplicableToUser.map(navGrouping => {
+    if (!navGrouping.subRoutes) {
+      return navGrouping;
+    } else {
+      const routesApplicableToUser = navGrouping.subRoutes.filter(subRoute => {
+        return subRoute.rolesWithAccess.some(role => userRoles.includes(role));
+      });
+      navGrouping.subRoutes = routesApplicableToUser;
+      return navGrouping;
+    }
+  });
+  return navGroupingsApplicableToUser;
 };
