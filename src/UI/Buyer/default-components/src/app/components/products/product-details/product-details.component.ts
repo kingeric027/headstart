@@ -135,7 +135,6 @@ export class OCMProductDetails implements OnInit {
   }
 
   setActiveSupplier(supplierId: string) {
-    var id = supplierId.toLowerCase()
-    this.context.router.toProductList({ activeFacets: { Supplier: id } });
+    this.context.router.toProductList({ activeFacets: { Supplier: supplierId.toLowerCase() } });
   }
 }
