@@ -89,7 +89,7 @@ namespace Marketplace.Common.Commands
 			var exists = lineItems.Items.Any(li => li.ShipFromAddressID == selection.ShipFromAddressID);
 			Require.That(exists, ErrorCodes.Checkout.InvalidShipFromAddress, new InvalidShipFromAddressIDError(selection.ShipFromAddressID));
 
-			var selections = order.xp?.ShippingSelections ?? new Dictionary<string, ShippingSelection>();
+			var selections = order.xp?.ShippingSelections?.ToDictionary(s => s.ShipFromAddressID) ?? new Dictionary<string, ShippingSelection> { };
 			selections[selection.ShipFromAddressID] = selection;
 			var totalShippingCost = (await selections
 				.SelectAsync(async sel => await _shippingCache.GetSavedShippingRateAsync(orderID, sel.Value.ShippingRateID)))
@@ -99,7 +99,7 @@ namespace Marketplace.Common.Commands
 			{
 				ShippingCost = totalShippingCost,
 				xp = new {
-					ShippingSelections = selections
+					ShippingSelections = selections.Values.ToArray()
 				}
 			});
 		}
@@ -107,7 +107,7 @@ namespace Marketplace.Common.Commands
 		private IEnumerable<string> ListShipmentsWithoutSelection(MarketplaceOrder order, IList<LineItem> items)
 		{
 			var shipFromAddressIDs = items.GroupBy(li => li.ShipFromAddressID).Select(group => group.Key);
-			var selections = order.xp.ShippingSelections.Select(sel => sel.Value.ShipFromAddressID);
+			var selections = order.xp.ShippingSelections.Select(sel => sel.ShipFromAddressID);
 			return shipFromAddressIDs.Except(selections);
 		}
 	}
