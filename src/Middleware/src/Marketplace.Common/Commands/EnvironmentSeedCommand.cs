@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Controllers;
-using Marketplace.Common.Models;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
@@ -38,6 +36,7 @@ namespace Marketplace.Common.Commands
             var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
             await this.PatchDefaultApiClients(impersonation.access_token);
             await this.CreateSuppliers(user, impersonation.access_token);
+            await this.CreateMarketPlaceRoles(impersonation.access_token);
             //await this.ConfigureBuyers(impersonation.access_token);
         }
 
@@ -155,6 +154,34 @@ namespace Marketplace.Common.Commands
             };
             var request = await _dev.PostOrganization(org, token);
             return request;
+        }
+
+
+        static readonly List<SecurityProfile> DefaultSecurityProfiles = new List<SecurityProfile>() {
+            new SecurityProfile(){ Name = "MPMeProductAdmin", CustomRoles = { "MPMeProductAdmin" }, ID = "MPMeProductAdmin", Roles = { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin, ApiRole.InventoryAdmin } },
+            new SecurityProfile(){ Name = "MPMeProductReader", CustomRoles = { "MPMeProductReader" }, ID = "MPMeProductReader", Roles = { ApiRole.ProductReader, ApiRole.PriceScheduleReader } },
+            new SecurityProfile(){ Name = "MPProductAdmin", CustomRoles = { "MPProductAdmin" }, ID = "MPProductAdmin", Roles = { ApiRole.ProductReader, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin } },
+            new SecurityProfile(){ Name = "MPProductReader", CustomRoles = { "MPProductReader" }, ID = "MPProductReader", Roles = { ApiRole.ProductReader, ApiRole.CatalogReader, ApiRole.ProductFacetReader} },
+            new SecurityProfile(){ Name = "MPPromotionAdmin", CustomRoles = { "MPPromotionAdmin" }, ID = "MPPromotionAdmin", Roles = { ApiRole.PromotionAdmin } },
+            new SecurityProfile(){ Name = "MPPromotionReader", CustomRoles = { "MPPromotionReader" }, ID = "MPPromotionReader", Roles = { ApiRole.PromotionReader } },
+            new SecurityProfile(){ Name = "MPCategoryAdmin", CustomRoles = { "MPCategoryAdmin" }, ID = "MPCategoryAdmin", Roles = { ApiRole.CategoryAdmin } },
+            new SecurityProfile(){ Name = "MPCategoryReader", CustomRoles = { "MPCategoryReader" }, ID = "MPCategoryReader", Roles = { ApiRole.CategoryReader } },
+            new SecurityProfile(){ Name = "MPOrderAdmin", CustomRoles = { "MPOrderAdmin" }, ID = "MPOrderAdmin", Roles = { ApiRole.OrderAdmin, ApiRole.ShipmentReader } },
+            new SecurityProfile(){ Name = "MPOrderReader", CustomRoles = { "MPOrderReader" }, ID = "MPOrderReader", Roles = { ApiRole.OrderReader, ApiRole.ShipmentAdmin } },
+            new SecurityProfile(){ Name = "MPShipmentAdmin", CustomRoles = { "MPShipmentAdmin" }, ID = "MPShipmentAdmin", Roles = { ApiRole.OrderReader, ApiRole.ShipmentAdmin } },
+            new SecurityProfile(){ Name = "MPBuyerAdmin", CustomRoles = { "MPBuyerAdmin" }, ID = "MPBuyerAdmin", Roles = { ApiRole.BuyerAdmin, ApiRole.BuyerUserAdmin, ApiRole.UserGroupAdmin, ApiRole.AddressAdmin, ApiRole.CreditCardAdmin, ApiRole.ApprovalRuleAdmin } },
+            new SecurityProfile(){ Name = "MPBuyerReader", CustomRoles = { "MPBuyerReader" }, ID = "MPBuyerReader", Roles = { ApiRole.BuyerReader, ApiRole.BuyerUserReader, ApiRole.UserGroupReader, ApiRole.AddressReader, ApiRole.CreditCardReader, ApiRole.ApprovalRuleReader } },
+            new SecurityProfile(){ Name = "MPSellerAdmin", CustomRoles = { "MPSellerAdmin" }, ID = "MPSellerAdmin", Roles = { ApiRole.AdminUserAdmin } },
+            new SecurityProfile(){ Name = "MPSupplierAdmin", CustomRoles = { "MPSupplierAdmin" }, ID = "MPSupplierAdmin", Roles = { ApiRole.SupplierAdmin, ApiRole.SupplierUserAdmin, ApiRole.SupplierAddressAdmin } },
+            new SecurityProfile(){ Name = "MPMeSupplierAddressAdmin", CustomRoles = { "MPMeSupplierAddressAdmin" }, ID = "MPMeSupplierAddressAdmin", Roles = { ApiRole.SupplierReader, ApiRole.SupplierAddressAdmin } },
+            new SecurityProfile(){ Name = "MPMeSupplierUserAdmin", CustomRoles = { "MPMeSupplierUserAdmin" }, ID = "MPMeSupplierUserAdmin", Roles = { ApiRole.SupplierReader, ApiRole.SupplierUserAdmin } },
+        };
+        public async Task CreateMarketPlaceRoles(string accessToken)
+        {
+            foreach (SecurityProfile securityProfile in DefaultSecurityProfiles)
+            {
+                await _oc.SecurityProfiles.CreateAsync(securityProfile, accessToken);
+            }
         }
     }
 }
