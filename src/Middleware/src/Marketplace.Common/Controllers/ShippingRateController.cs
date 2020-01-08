@@ -14,27 +14,27 @@ using System.Threading.Tasks;
 namespace Marketplace.Common.Controllers
 {
 	[Route("orders")]
-	public class ShippingQuoteController: BaseController
+	public class ShippingRateController: BaseController
 	{
 		private readonly IOrderCheckoutCommand _checkoutCommand;
 		private readonly IMockShippingCacheService _shippingCache;
 
 		// Needs more authentication. These methods should only work for a specific user's orders.
-		public ShippingQuoteController(AppSettings settings, IOrderCheckoutCommand command, IMockShippingCacheService shippingCache) : base(settings) {
+		public ShippingRateController(AppSettings settings, IOrderCheckoutCommand command, IMockShippingCacheService shippingCache) : base(settings) {
 			_checkoutCommand = command;
 			_shippingCache = shippingCache;
 		}
 
-		[HttpPost, Route("{orderID}/shipping-quote"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<IEnumerable<ShippingOptions>> GenerateShippingQuotesAsync(string orderID)
+		[HttpPost, Route("{orderID}/shipping-rate"), MarketplaceUserAuth(ApiRole.Shopper)]
+		public async Task<IEnumerable<ShippingOptions>> GenerateShippingRatesAsync(string orderID)
 		{
-			return await _checkoutCommand.GenerateShippingQuotesAsync(orderID);
+			return await _checkoutCommand.GenerateShippingRatesAsync(orderID);
 		}
 
-		[HttpGet, Route("{orderID}/shipping-quote/{quoteID}"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<ShippingRate> GetSavedShippingQuoteAsync(string orderID, string quoteID)
+		[HttpGet, Route("{orderID}/shipping-rate/{rateID}"), MarketplaceUserAuth(ApiRole.Shopper)]
+		public async Task<ShippingRate> GetSavedShippingRateAsync(string orderID, string rateID)
 		{
-			return await _shippingCache.GetSavedShippingQuoteAsync(orderID, quoteID);
+			return await _shippingCache.GetSavedShippingRateAsync(orderID, rateID);
 		}
 
 		[HttpPut, Route("{orderID}/shipping-selection"), MarketplaceUserAuth(ApiRole.Shopper)]

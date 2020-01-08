@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
-import { Payment, Order } from '@ordercloud/angular-sdk';
+import { Payment } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-payment.component.html',
@@ -12,7 +12,7 @@ export class OCMCheckoutPayment implements OnInit {
 
   constructor(private context: ShopperContextService) {}
 
-  order: Order;
+  order: MarketplaceOrder;
   isAnon: boolean;
   availablePaymentMethods = ['PurchaseOrder', 'SpendingAccount', 'CreditCard'];
   selectedPaymentMethod: string;

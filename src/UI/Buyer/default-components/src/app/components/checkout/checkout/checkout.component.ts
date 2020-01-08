@@ -1,8 +1,7 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { Order } from '@ordercloud/angular-sdk';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -10,7 +9,7 @@ import { ShopperContextService } from 'marketplace';
 })
 export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
-  order: Order;
+  order: MarketplaceOrder;
   isAnon: boolean;
   currentPanel: string;
   faCheck = faCheck;

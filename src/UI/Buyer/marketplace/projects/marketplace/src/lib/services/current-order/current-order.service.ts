@@ -4,7 +4,6 @@ import { Injectable, Inject } from '@angular/core';
 // third party
 import {
   OcMeService,
-  Order,
   OcOrderService,
   ListLineItem,
   OcLineItemService,
@@ -19,7 +18,8 @@ import { isUndefined as _isUndefined, get as _get } from 'lodash';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { listAll } from '../../functions/listAll';
-import { ICurrentOrder, AppConfig } from '../../shopper-context';
+import { ICurrentOrder, AppConfig, ShippingRate, ShippingSelection, ShippingOptions, MarketplaceOrder } from '../../shopper-context';
+import { MarketplaceMiddlewareApiService } from '../marketplace-middleware-api/marketplace-middleware-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -30,9 +30,10 @@ export class CurrentOrderService implements ICurrentOrder {
     Items: [],
   };
   private initializingOrder = false;
-  public addToCartSubject: Subject<LineItem> = new Subject<LineItem>(); // need to make available as observable
-  private orderSubject: BehaviorSubject<Order> = new BehaviorSubject<Order>(null);
-  private lineItemSubject: BehaviorSubject<ListLineItem> = new BehaviorSubject<ListLineItem>(this.DefaultLineItems);
+  public addToCartSubject = new Subject<LineItem>(); // need to make available as observable
+  private orderSubject = new BehaviorSubject<MarketplaceOrder>(null);
+  private lineItemSubject = new BehaviorSubject<ListLineItem>(this.DefaultLineItems);
+  private shippingOptions: ShippingOptions[] = null;
 
   constructor(
     private ocOrderService: OcOrderService,
@@ -41,35 +42,20 @@ export class CurrentOrderService implements ICurrentOrder {
     private tokenHelper: TokenHelperService,
     private ocPaymentService: OcPaymentService,
     private paymentHelper: PaymentHelperService,
+    private middlewareApi: MarketplaceMiddlewareApiService,
     private appConfig: AppConfig
   ) {}
 
-  private get order(): Order {
-    return this.orderSubject.value;
-  }
-
-  private set order(value: Order) {
-    this.orderSubject.next(value);
-  }
-
-  onOrderChange(callback: (order: Order) => void) {
+  onOrderChange(callback: (order: MarketplaceOrder) => void) {
     this.orderSubject.subscribe(callback);
   }
 
-  get(): Order {
+  get(): MarketplaceOrder {
     return this.order;
   }
 
-  async patch(order: Order): Promise<Order> {
+  async patch(order: MarketplaceOrder): Promise<MarketplaceOrder> {
     return (this.order = await this.ocOrderService.Patch('outgoing', this.order.ID, order).toPromise());
-  }
-
-  private get lineItems(): ListLineItem {
-    return this.lineItemSubject.value;
-  }
-
-  private set lineItems(value: ListLineItem) {
-    this.lineItemSubject.next(value);
   }
 
   onLineItemsChange(callback: (lineItems: ListLineItem) => void) {
@@ -92,15 +78,15 @@ export class CurrentOrderService implements ICurrentOrder {
     await this.reset();
   }
 
-  async setBillingAddress(address: Address): Promise<Order> {
+  async setBillingAddress(address: Address): Promise<MarketplaceOrder> {
     return (this.order = await this.ocOrderService.SetBillingAddress('outgoing', this.order.ID, address).toPromise());
   }
 
-  async setShippingAddress(address: Address): Promise<Order> {
+  async setShippingAddress(address: Address): Promise<MarketplaceOrder> {
     return (this.order = await this.ocOrderService.SetShippingAddress('outgoing', this.order.ID, address).toPromise());
   }
 
-  async setBillingAddressByID(addressID: string): Promise<Order> {
+  async setBillingAddressByID(addressID: string): Promise<MarketplaceOrder> {
     try {
       return await this.patch({ BillingAddressID: addressID });
     } catch (ex) {
@@ -110,7 +96,7 @@ export class CurrentOrderService implements ICurrentOrder {
     }
   }
 
-  async setShippingAddressByID(addressID: string): Promise<Order> {
+  async setShippingAddressByID(addressID: string): Promise<MarketplaceOrder> {
     try {
       return await this.patch({ ShippingAddressID: addressID });
     } catch (ex) {
@@ -140,7 +126,7 @@ export class CurrentOrderService implements ICurrentOrder {
     if (orders.Items.length) {
       this.order = orders.Items[0];
     } else if (this.appConfig.anonymousShoppingEnabled) {
-      this.order = { ID: this.tokenHelper.getAnonymousOrderID() } as Order;
+      this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
     } else {
       this.order = await this.ocOrderService.Create('outgoing', {}).toPromise();
     }
@@ -148,6 +134,8 @@ export class CurrentOrderService implements ICurrentOrder {
       this.lineItems = await listAll(this.ocLineItemService, this.ocLineItemService.List, 'outgoing', this.order.ID);
     }
   }
+
+  // Cart Methods
 
   // TODO - get rid of the progress spinner for all Cart functions. Just makes it look slower.
   async addToCart(lineItem: LineItem): Promise<LineItem> {
@@ -175,8 +163,7 @@ export class CurrentOrderService implements ICurrentOrder {
 
   async setQuantityInCart(lineItemID: string, newQuantity: number): Promise<LineItem> {
     try {
-      const li = await this.patchLineItem(lineItemID, { Quantity: newQuantity });
-      return li;
+      return await this.patchLineItem(lineItemID, { Quantity: newQuantity });
     } finally {
       this.reset();
     }
@@ -198,6 +185,41 @@ export class CurrentOrderService implements ICurrentOrder {
     }
   }
 
+  // Integration Methods
+
+  async getShippingRates(shipFromAddressID: string): Promise<ShippingRate[]> {
+    if (this.shippingOptions === null) {
+      this.shippingOptions = await this.middlewareApi.generateShippingRates(this.order.ID);
+    }
+    return this.shippingOptions.find(opt => opt.ShipFromAddressID === shipFromAddressID).Rates;
+  }
+
+  async selectShippingRate(selection: ShippingSelection): Promise<MarketplaceOrder> {
+    return (this.order = await this.middlewareApi.selectShippingRate(this.order.ID, selection));
+  }
+
+  async calculateTax(): Promise<MarketplaceOrder> {
+    return (this.order = await this.middlewareApi.calculateTax(this.order.ID));
+  }
+
+  // Private Methods
+
+  private get order(): MarketplaceOrder {
+    return this.orderSubject.value;
+  }
+
+  private set order(value: MarketplaceOrder) {
+    this.orderSubject.next(value);
+  }
+
+  private get lineItems(): ListLineItem {
+    return this.lineItemSubject.value;
+  }
+
+  private set lineItems(value: ListLineItem) {
+    this.lineItemSubject.next(value);
+  }
+
   private async createLineItem(lineItem: LineItem): Promise<LineItem> {
     // if line item exists simply update quantity, else create
     const existingLI = this.lineItems.Items.find((li) => this.LineItemsMatch(li, lineItem));
@@ -217,7 +239,7 @@ export class CurrentOrderService implements ICurrentOrder {
     }
   }
 
-  private calculateOrder(): Order {
+  private calculateOrder(): MarketplaceOrder {
     const LineItemCount = this.lineItems.Items.length;
     this.lineItems.Items.forEach((li) => {
       li.LineTotal = li.Quantity * li.UnitPrice;
@@ -236,5 +258,10 @@ export class CurrentOrderService implements ICurrentOrder {
       if (spec1.Value !== spec2.Value) return false;
     }
     return true;
+  }
+
+  private async invalidateChekout() {
+    this.shippingOptions = null;
+    // TODO - patch the actual order
   }
 }

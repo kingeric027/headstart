@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
-import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
+import { ListBuyerAddress, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
 import { ModalState } from '../../../models/modal-state.class';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-address.component.html',
@@ -14,7 +14,7 @@ export class OCMCheckoutAddress implements OnInit {
   addressModal = ModalState.Closed;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
-  order: Order;
+  order: MarketplaceOrder;
   lineItems: ListLineItem;
   resultsPerPage = 8;
   requestOptions: { page?: number; search?: string } = {
@@ -92,7 +92,7 @@ export class OCMCheckoutAddress implements OnInit {
     this.continue.emit();
   }
 
-  private async setOneTimeAddress(address: BuyerAddress): Promise<Order> {
+  private async setOneTimeAddress(address: BuyerAddress): Promise<MarketplaceOrder> {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     address.ID = null;
@@ -103,7 +103,7 @@ export class OCMCheckoutAddress implements OnInit {
     }
   }
 
-  private async setSavedAddress(addressID: string): Promise<Order> {
+  private async setSavedAddress(addressID: string): Promise<MarketplaceOrder> {
     if (this.addressType === 'Shipping') {
       return await this.context.currentOrder.setShippingAddressByID(addressID);
     } else if (this.addressType === 'Billing') {

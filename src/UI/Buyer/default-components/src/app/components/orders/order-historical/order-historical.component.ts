@@ -1,14 +1,14 @@
 import { Component, Input } from '@angular/core';
-import { OrderDetails } from 'marketplace';
+import { OrderDetails, MarketplaceOrder } from 'marketplace';
 
-import { Order, OrderApproval, ListLineItem, Promotion, ListPayment } from '@ordercloud/angular-sdk';
+import { OrderApproval, ListLineItem, Promotion, ListPayment } from '@ordercloud/angular-sdk';
 
 @Component({
   templateUrl: './order-historical.component.html',
   styleUrls: ['./order-historical.component.scss'],
 })
 export class OCMOrderHistorical {
-    order: Order;
+    order: MarketplaceOrder;
     lineItems: ListLineItem;
     promotions: Promotion[] = [];
     payments: ListPayment;

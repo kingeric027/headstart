@@ -11,9 +11,9 @@ import {
   faBars
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { Order, MeUser, LineItem, ListCategory, Category } from '@ordercloud/angular-sdk';
+import { MeUser, LineItem, ListCategory, Category } from '@ordercloud/angular-sdk';
 import { tap, debounceTime, delay, takeWhile } from 'rxjs/operators';
-import { ProductFilters, ShopperContextService } from 'marketplace';
+import { ProductFilters, ShopperContextService, MarketplaceOrder } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 
 @Component({
@@ -24,7 +24,7 @@ export class OCMAppHeader implements OnInit {
   isCollapsed = true;
   anonymous: boolean;
   user: MeUser;
-  order: Order;
+  order: MarketplaceOrder;
   alive = true;
   addToCartQuantity: number;
   searchTermForProducts: string = null;
@@ -68,7 +68,7 @@ export class OCMAppHeader implements OnInit {
   }
 
   clickOutsideCategoryDropdown(event) {
-    var clickIsOutside: boolean = !event.target.closest(".categoryDropdown");
+    const clickIsOutside: boolean = !event.target.closest('.categoryDropdown');
     if (clickIsOutside) { this.showCategoryDropdown = false; }
   }
 

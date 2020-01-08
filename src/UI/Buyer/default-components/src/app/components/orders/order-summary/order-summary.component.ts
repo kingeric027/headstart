@@ -1,23 +1,25 @@
 import { Component, Input } from '@angular/core';
-import { Order } from '@ordercloud/angular-sdk';
 import { CurrencyPipe } from '@angular/common';
+import { MarketplaceOrder } from 'marketplace';
 
 @Component({
   templateUrl: './order-summary.component.html',
   styleUrls: ['./order-summary.component.scss'],
 })
 export class OCMOrderSummary {
-  @Input() order: Order;
+  @Input() order: MarketplaceOrder;
 
-  display(field) {
-    if (!(this.order.xp && this.order.xp.AddOnsCalculated)) {
+  displayTax() {
+    if (!this.order.xp || !this.order.xp.AvalaraTaxTransactionCode) {
       return 'Calculated during checkout';
     }
+    return new CurrencyPipe('en-US').transform(this.order.ShippingCost);
+  }
 
-    if (this.order[`${field}`] === 0) {
-      return 'Free';
+  displayShipping() {
+    if (!this.order.xp || this.order.xp.ShippingSelections.length === 0) {
+      return 'Calculated during checkout';
     }
-
-    return new CurrencyPipe('en-US').transform(this.order[`${field}`]);
+    return new CurrencyPipe('en-US').transform(this.order.TaxCost);
   }
 }

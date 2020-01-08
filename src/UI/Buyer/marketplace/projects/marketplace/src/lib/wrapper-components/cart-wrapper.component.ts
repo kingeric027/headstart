@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Order, ListLineItem, Product, OcProductService, OcMeService } from '@ordercloud/angular-sdk';
+import { ListLineItem, Product, OcProductService, OcMeService } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from '../services/current-order/current-order.service';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { ListLineItemWithProduct, LineItemWithProduct } from '../shopper-context';
+import { ListLineItemWithProduct, LineItemWithProduct, MarketplaceOrder } from '../shopper-context';
 
 @Component({
   template: `
@@ -10,7 +10,7 @@ import { ListLineItemWithProduct, LineItemWithProduct } from '../shopper-context
   `,
 })
 export class CartWrapperComponent implements OnInit {
-  order: Order;
+  order: MarketplaceOrder;
   lineItems: ListLineItemWithProduct;
   productCache: Product[] = []; // TODO - move to cart service?
 
@@ -25,7 +25,7 @@ export class CartWrapperComponent implements OnInit {
     this.currentOrder.onLineItemsChange(this.setLineItems);
   }
 
-  setOrder = (order: Order): void => {
+  setOrder = (order: MarketplaceOrder): void => {
     this.order = order;
   }
 

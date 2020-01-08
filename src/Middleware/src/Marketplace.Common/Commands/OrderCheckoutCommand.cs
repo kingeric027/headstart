@@ -18,7 +18,7 @@ namespace Marketplace.Common.Commands
 	{
 		Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, ShippingSelection shippingSelection);
 		Task<MarketplaceOrder> CalcTaxAndPatchOrderAsync(string orderID);
-		Task<IEnumerable<ShippingOptions>> GenerateShippingQuotesAsync(string orderID);
+		Task<IEnumerable<ShippingOptions>> GenerateShippingRatesAsync(string orderID);
 	}
 
 	public class OrderCheckoutCommand : IOrderCheckoutCommand
@@ -62,7 +62,7 @@ namespace Marketplace.Common.Commands
 			});
 		}
 
-		public async Task<IEnumerable<ShippingOptions>> GenerateShippingQuotesAsync(string orderID)
+		public async Task<IEnumerable<ShippingOptions>> GenerateShippingRatesAsync(string orderID)
 		{
 			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
 			var shipments = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
@@ -71,12 +71,12 @@ namespace Marketplace.Common.Commands
 				var shipFrom = lineItemGrouping.First().ShipFromAddress;
 				var shipTo = lineItemGrouping.First().ShippingAddress;
 				var fPopResponse = await _freightPop.GetRatesAsync(shipFrom, shipTo, lineItemGrouping.ToList());
-				await _shippingCache.SaveShippingQuotesAsync(fPopResponse.Data.Rates);
+				await _shippingCache.SaveShippingRatesAsync(fPopResponse.Data.Rates);
 				return new ShippingOptions()
 				{
 					SupplierID = lineItemGrouping.First().SupplierID, // Assumes ShipFromAddressID is unqiue accross suppliers
 					ShipFromAddressID = lineItemGrouping.Key,
-					Quotes = fPopResponse.Data.Rates
+					Rates = fPopResponse.Data.Rates
 				};
 			});
 		}
@@ -87,12 +87,12 @@ namespace Marketplace.Common.Commands
 			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
 
 			var exists = lineItems.Items.Any(li => li.ShipFromAddressID == selection.ShipFromAddressID);
-			Require.That(exists, ErrorCodes.Checkout.InvalidShipFromAddress, new InvalidShipFromAddressIDError(selection.ShipFromAddressID)); ;
+			Require.That(exists, ErrorCodes.Checkout.InvalidShipFromAddress, new InvalidShipFromAddressIDError(selection.ShipFromAddressID));
 
 			var selections = order.xp?.ShippingSelections ?? new Dictionary<string, ShippingSelection>();
 			selections[selection.ShipFromAddressID] = selection;
 			var totalShippingCost = (await selections
-				.SelectAsync(async sel => await _shippingCache.GetSavedShippingQuoteAsync(orderID, sel.Value.ShippingQuoteID)))
+				.SelectAsync(async sel => await _shippingCache.GetSavedShippingRateAsync(orderID, sel.Value.ShippingRateID)))
 				.Sum(savedQuote => savedQuote.TotalCost);
 
 			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()
