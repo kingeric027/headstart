@@ -80,6 +80,7 @@ export class OCMAddressList implements OnInit {
     address.Billing = true;
     const newAddress = await this.context.myResources.CreateAddress(address).toPromise();
     this.addresses.Items = [...this.addresses.Items, newAddress];
+    this.refresh();
   }
 
   private async updateAddress(address: BuyerAddress): Promise<any> {

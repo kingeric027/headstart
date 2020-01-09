@@ -1,4 +1,4 @@
-<div *ngIf="meta?.TotalCount > 0">
+<div>
   <ocm-search class="mt-1"
               placeholderText="Search {{ searchPlaceholder }}..."
               (searched)="requestOptionsUpdated.emit({ search: $event.detail || undefined, page: undefined })">
