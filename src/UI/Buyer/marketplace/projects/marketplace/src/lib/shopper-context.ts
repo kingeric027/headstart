@@ -19,10 +19,10 @@ import {
   ShipmentItem,
   BuyerProduct,
   Category
-} from '@ordercloud/angular-sdk';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+} from "@ordercloud/angular-sdk";
+import { Observable, Subject, BehaviorSubject } from "rxjs";
 
-export * from '@ordercloud/angular-sdk';
+export * from "@ordercloud/angular-sdk";
 
 export interface IShopperContext {
   router: IRouter;
@@ -219,13 +219,13 @@ export interface OrderFilters {
 }
 
 export enum OrderStatus {
-  AllSubmitted = '!Unsubmitted',
-  Unsubmitted = 'Unsubmitted',
-  AwaitingApproval = 'AwaitingApproval',
-  Declined = 'Declined',
-  Open = 'Open',
-  Completed = 'Completed',
-  Canceled = 'Canceled'
+  AllSubmitted = "!Unsubmitted",
+  Unsubmitted = "Unsubmitted",
+  AwaitingApproval = "AwaitingApproval",
+  Declined = "Declined",
+  Open = "Open",
+  Completed = "Completed",
+  Canceled = "Canceled"
 }
 
 export interface AuthNetCreditCard {
@@ -336,7 +336,7 @@ export interface DecodedOCToken {
    * helpful for identifying user types in an app
    * that may have both types
    */
-  usrtype: 'admin' | 'buyer';
+  usrtype: "admin" | "buyer";
 
   /**
    * list of security profile roles that this user
