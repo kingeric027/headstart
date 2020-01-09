@@ -7,7 +7,7 @@ import { SupplierCategoryConfig, ShippingSelection, ShippingOptions, Marketplace
   providedIn: 'root'
 })
 export class MarketplaceMiddlewareApiService {
-  readonly options = {
+  readonly headers = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.ocTokenService.GetAccess()}`
@@ -28,26 +28,26 @@ export class MarketplaceMiddlewareApiService {
     return this.http
       .get<SupplierCategoryConfig>(
         `${this.baseUrl}/marketplace/${marketplaceID}/supplier/category/config`,
-        this.options
+        this.headers
       )
       .toPromise();
   }
 
   generateShippingRates(orderID: string): Promise<ShippingOptions[]> {
     return this.http.post<ShippingOptions[]>(
-      `${this.baseUrl}/orders/${orderID}/shipping-rate`, {}, this.options)
+      `${this.baseUrl}/orders/${orderID}/shipping/generate-rates`, {}, this.headers)
     .toPromise();
   }
 
   selectShippingRate(orderID: string, selection: ShippingSelection): Promise<MarketplaceOrder> {
     return this.http.put<MarketplaceOrder>(
-      `${this.baseUrl}/orders/${orderID}/shipping-selection`, selection, this.options)
+      `${this.baseUrl}/orders/${orderID}/shipping/select`, selection, this.headers)
     .toPromise();
   }
 
   calculateTax(orderID: string): Promise<MarketplaceOrder> {
     return this.http.post<MarketplaceOrder>(
-      `${this.baseUrl}/orders/${orderID}/tax-transaction`, {}, this.options)
+      `${this.baseUrl}/orders/${orderID}/tax-transaction`, {}, this.headers)
     .toPromise();
   }
 }
