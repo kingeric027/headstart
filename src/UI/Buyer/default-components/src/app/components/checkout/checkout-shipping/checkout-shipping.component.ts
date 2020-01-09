@@ -36,6 +36,7 @@ export class OCMCheckoutShipping implements OnInit {
 
   getExistingSelection(lineItems: LineItem[]): ShippingSelection {
     const ID = lineItems[0].ShipFromAddressID;
+    if (!this.order.xp || this.order.xp.ShippingSelections) return null;
     return this.order.xp.ShippingSelections.find(s => s.ShipFromAddressID === ID);
   }
 
