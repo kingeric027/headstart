@@ -49,9 +49,7 @@ export class OCMLineitemTable implements OnInit {
     return this.lineItems.find(li => li.ID === lineItemID);
   }
 
-  // TODO - this will change. also it is repeated
   getShipFromAddressID(): string {
-    if (!this.lineItems || this.lineItems.length === 0) return null;
     return this.lineItems[0].ShipFromAddressID; 
   }
 }

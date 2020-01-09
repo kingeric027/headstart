@@ -66,6 +66,7 @@ namespace Marketplace.Common.Commands
 		{
 			var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
 			var shipments = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
+
 			return await shipments.SelectAsync(async lineItemGrouping =>
 			{
 				var shipFrom = lineItemGrouping.First().ShipFromAddress;

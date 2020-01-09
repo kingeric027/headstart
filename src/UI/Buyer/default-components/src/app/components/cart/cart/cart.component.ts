@@ -9,11 +9,16 @@ import { groupBy as _groupBy } from 'lodash';
 export class OCMCart {
   @Input() order: MarketplaceOrder;
   @Input() set lineItems(value: ListLineItemWithProduct) {
-    this.liGroupedByShipFrom = Object.values(_groupBy(value.Items, li => li.ShipFromAddressID));
+    this.liGroupedByShipFrom = this.groupLineItemsByShipFrom(value);
   }
+
   liGroupedByShipFrom: LineItemWithProduct[][];
 
   constructor(private context: ShopperContextService) {}
+
+  groupLineItemsByShipFrom(lis: ListLineItemWithProduct) {
+    return Object.values(_groupBy(lis.Items, li => li.ShipFromAddressID));
+  }
 
   toProductList() {
     this.context.router.toProductList();

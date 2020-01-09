@@ -29,26 +29,17 @@ export class OCMCheckoutShipping implements OnInit {
     this.continue.emit();
   }
 
-  // TODO - this will change. also it is repeated
-  getShipFromAddressID(lineItems: LineItem[]): string {
-    if (!lineItems || lineItems.length === 0) return null;
-    return lineItems[0].ShipFromAddressID; 
+  getshippingOptions(lineItems: LineItem[]): ShippingOptions {
+    const ID = lineItems[0].ShipFromAddressID;
+    return this.shippingOptions.find(o => o.ShipFromAddressID === ID);
   }
 
-  getshippingOptions(lineItems: LineItem[]): ShippingOptions {
-    const shipFromAddressID = this.getShipFromAddressID(lineItems);
-    if (shipFromAddressID === null) return null; 
-    return this.shippingOptions.find(o => o.ShipFromAddressID === shipFromAddressID);
+  getExistingSelection(lineItems: LineItem[]): ShippingSelection {
+    const ID = lineItems[0].ShipFromAddressID;
+    return this.order.xp.ShippingSelections.find(s => s.ShipFromAddressID === ID);
   }
 
   selectRate(selection: ShippingSelection) {
     this.context.currentOrder.selectShippingRate(selection);
   }
-
-  getExistingSelection(lineItems: LineItem[]): ShippingSelection {
-    const shipFromAddressID = this.getShipFromAddressID(lineItems);
-    if (shipFromAddressID === null) return null; 
-    return this.order.xp.ShippingSelections.find(s => s.ShipFromAddressID === shipFromAddressID);
-  }
-
 }

@@ -18,7 +18,7 @@ export class OCMShippingSelectionForm implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.form = new FormGroup({  rateID: new FormControl(null) });
+    this.form = new FormGroup({ rateID: new FormControl(null) });
   }
 
   setSelectedRate(selection: ShippingSelection) {
