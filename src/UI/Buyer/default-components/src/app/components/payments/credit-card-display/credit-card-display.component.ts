@@ -7,4 +7,5 @@ import { BuyerCreditCard } from '@ordercloud/angular-sdk';
 })
 export class OCMCreditCardDisplay {
   @Input() card: BuyerCreditCard;
+  @Input() highlight?: boolean;
 }

@@ -11,10 +11,10 @@ export function getProductMainImageUrlOrPlaceholder(product: Product) {
 
 export function getProductImageUrls(product: Product): string[] {
   const images = (product.xp && product.xp.Images) || [];
-  const result = images.map((img) => {
-    return img.Url.replace('{url}', IMAGE_HOST_URL);
+  const result = images.map(img => {
+    return img.Url.replace('{u}', IMAGE_HOST_URL);
   });
 
   //remove undefined values
-  return result.filter((r) => r);
+  return result.filter(r => r);
 }

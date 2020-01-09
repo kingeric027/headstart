@@ -24,6 +24,7 @@ export class OCMCreditCardForm implements OnInit {
   constructor(private formBuilder: FormBuilder, private creditCardFormatPipe: CreditCardFormatPipe) {}
 
   @Output() formSubmitted = new EventEmitter<AuthNetCreditCard>();
+  @Output() formDismissed = new EventEmitter();
   @Input() card: AuthNetCreditCard;
   @Input() amount;
   @Input() submitText: string;
@@ -156,5 +157,9 @@ export class OCMCreditCardForm implements OnInit {
         SecurityCode: ['', Validators.required],
       });
     }
+  }
+
+  dismissForm() {
+    this.formDismissed.emit();
   }
 }
