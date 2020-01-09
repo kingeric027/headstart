@@ -66,7 +66,6 @@ export class OCMSearch implements OnInit, OnChanges, OnDestroy {
   clear(): void {
     this.form.markAsDirty();
     this.form.setValue({ search: '' });
-    this.search();
   }
 
   ngOnDestroy() {
