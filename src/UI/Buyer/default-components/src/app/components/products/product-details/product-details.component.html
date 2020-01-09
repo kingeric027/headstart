@@ -9,7 +9,6 @@
         <small><a href="javascript:;"
              (click)="setActiveSupplier(_product?.xp.Facets?.supplier[0])">{{_product?.xp.Facets?.supplier[0]}}</a></small>
         <h1 class="h3 my-0">{{ _product.xp.Facets?.manufacturer[0]}} {{ _product.Name }}
-          <small class="text-muted">1 per set</small> <!-- TODO: Plug in unit of measure when data is in OC. -->
         </h1>
         <ocm-toggle-favorite title="Favorite"
                              (click)="$event.stopPropagation()"
