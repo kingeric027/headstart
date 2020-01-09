@@ -33,7 +33,6 @@ export class CurrentOrderService implements ICurrentOrder {
   public addToCartSubject = new Subject<LineItem>(); // need to make available as observable
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(null);
   private lineItemSubject = new BehaviorSubject<ListLineItem>(this.DefaultLineItems);
-  private shippingOptions: ShippingOptions[] = null;
 
   constructor(
     private ocOrderService: OcOrderService,
@@ -187,11 +186,8 @@ export class CurrentOrderService implements ICurrentOrder {
 
   // Integration Methods
 
-  async getShippingRates(shipFromAddressID: string): Promise<ShippingRate[]> {
-    if (this.shippingOptions === null) {
-      this.shippingOptions = await this.middlewareApi.generateShippingRates(this.order.ID);
-    }
-    return this.shippingOptions.find(opt => opt.ShipFromAddressID === shipFromAddressID).Rates;
+  async getShippingRates(): Promise<ShippingOptions[]> {
+    return await this.middlewareApi.generateShippingRates(this.order.ID);
   }
 
   async selectShippingRate(selection: ShippingSelection): Promise<MarketplaceOrder> {
@@ -258,10 +254,5 @@ export class CurrentOrderService implements ICurrentOrder {
       if (spec1.Value !== spec2.Value) return false;
     }
     return true;
-  }
-
-  private async invalidateChekout() {
-    this.shippingOptions = null;
-    // TODO - patch the actual order
   }
 }

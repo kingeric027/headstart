@@ -23,6 +23,10 @@ export class OCMCheckout implements OnInit {
       valid: false,
     },
     {
+      id: 'shippingSelection',
+      valid: false,
+    },
+    {
       id: 'billingAddress',
       valid: false,
     },

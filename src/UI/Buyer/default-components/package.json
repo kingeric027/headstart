@@ -34,6 +34,7 @@
     "@ngx-progressbar/core": "^5.2.1",
     "@ngx-progressbar/http": "^5.2.1",
     "@ordercloud/angular-sdk": "0.0.1-26",
+    "@types/lodash": "^4.14.149",
     "angular-tree-component": "^8.4.0",
     "bootstrap": "^4.3.1",
     "jwt-decode": "^2.2.0",

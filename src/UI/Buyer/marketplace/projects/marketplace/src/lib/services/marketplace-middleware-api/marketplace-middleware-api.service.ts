@@ -35,19 +35,19 @@ export class MarketplaceMiddlewareApiService {
 
   generateShippingRates(orderID: string): Promise<ShippingOptions[]> {
     return this.http.post<ShippingOptions[]>(
-      `${this.baseUrl}/order/${orderID}/shipping-rate`, {})
+      `${this.baseUrl}/orders/${orderID}/shipping-rate`, {}, this.options)
     .toPromise();
   }
 
   selectShippingRate(orderID: string, selection: ShippingSelection): Promise<MarketplaceOrder> {
     return this.http.put<MarketplaceOrder>(
-      `${this.baseUrl}/order/${orderID}/shipping-rate`, selection)
+      `${this.baseUrl}/orders/${orderID}/shipping-selection`, selection, this.options)
     .toPromise();
   }
 
   calculateTax(orderID: string): Promise<MarketplaceOrder> {
     return this.http.post<MarketplaceOrder>(
-      `${this.baseUrl}/order/${orderID}/tax-transaction`, {})
+      `${this.baseUrl}/orders/${orderID}/tax-transaction`, {}, this.options)
     .toPromise();
   }
 }

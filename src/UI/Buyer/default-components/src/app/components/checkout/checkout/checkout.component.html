@@ -51,7 +51,18 @@
             </ng-template>
             <ng-template ngbPanelContent>
               <ocm-checkout-address [addressType]="'Shipping'"
-                                    (continue)="toSection('billingAddress')"></ocm-checkout-address>
+                                    (continue)="toSection('shippingSelection')"></ocm-checkout-address>
+            </ng-template>
+          </ngb-panel>
+          <ngb-panel id="shippingSelection">
+            <ng-template ngbPanelTitle>
+              <a class="link-text"> Shipping Selection </a>
+              <fa-icon class="float-right text-success"
+                       *ngIf="getValidation('shippingSelection')"
+                       [icon]="faCheck"></fa-icon>
+            </ng-template>
+            <ng-template ngbPanelContent>
+              <ocm-checkout-shipping (continue)="toSection('billingAddress')"></ocm-checkout-shipping>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="billingAddress">

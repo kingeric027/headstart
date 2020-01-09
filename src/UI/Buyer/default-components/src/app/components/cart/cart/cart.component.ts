@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ListLineItemWithProduct, ShopperContextService, MarketplaceOrder } from 'marketplace';
+import { ListLineItemWithProduct, ShopperContextService, MarketplaceOrder, LineItemWithProduct } from 'marketplace';
+import { groupBy as _groupBy } from 'lodash';
 
 @Component({
   templateUrl: './cart.component.html',
@@ -7,7 +8,10 @@ import { ListLineItemWithProduct, ShopperContextService, MarketplaceOrder } from
 })
 export class OCMCart {
   @Input() order: MarketplaceOrder;
-  @Input() lineItems: ListLineItemWithProduct;
+  @Input() set lineItems(value: ListLineItemWithProduct) {
+    this.liGroupedByShipFrom = Object.values(_groupBy(value.Items, li => li.ShipFromAddressID));
+  }
+  liGroupedByShipFrom: LineItemWithProduct[][];
 
   constructor(private context: ShopperContextService) {}
 

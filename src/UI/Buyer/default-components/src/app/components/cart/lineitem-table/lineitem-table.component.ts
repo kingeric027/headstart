@@ -1,19 +1,22 @@
-import { Component, Input } from '@angular/core';
-import { LineItem, ListLineItem } from '@ordercloud/angular-sdk';
+import { Component, Input, OnInit } from '@angular/core';
+import { LineItem } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { get as _get, map as _map, without as _without } from 'lodash';
-import { ListLineItemWithProduct, ShopperContextService } from 'marketplace';
+import { ShopperContextService, LineItemWithProduct, ShippingRate, ShippingOptions } from 'marketplace';
+import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
   styleUrls: ['./lineitem-table.component.scss'],
 })
-export class OCMLineitemTable {
+export class OCMLineitemTable implements OnInit {
   closeIcon = faTimes;
-  @Input() lineItems: ListLineItem | ListLineItemWithProduct;
+  @Input() lineItems: LineItem[] | LineItemWithProduct[] = [];
   @Input() readOnly: boolean;
-
+ 
   constructor(private context: ShopperContextService) {}
+
+  ngOnInit() {}
 
   removeLineItem(lineItemID: string) {
     this.context.currentOrder.removeFromCart(lineItemID);
@@ -43,6 +46,12 @@ export class OCMLineitemTable {
   }
 
   getLineItem(lineItemID: string): LineItem {
-    return this.lineItems.Items.find(li => li.ID === lineItemID);
+    return this.lineItems.find(li => li.ID === lineItemID);
+  }
+
+  // TODO - this will change. also it is repeated
+  getShipFromAddressID(): string {
+    if (!this.lineItems || this.lineItems.length === 0) return null;
+    return this.lineItems[0].ShipFromAddressID; 
   }
 }

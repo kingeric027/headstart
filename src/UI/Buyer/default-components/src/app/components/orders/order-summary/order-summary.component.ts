@@ -13,13 +13,13 @@ export class OCMOrderSummary {
     if (!this.order.xp || !this.order.xp.AvalaraTaxTransactionCode) {
       return 'Calculated during checkout';
     }
-    return new CurrencyPipe('en-US').transform(this.order.ShippingCost);
+    return new CurrencyPipe('en-US').transform(this.order.TaxCost);
   }
 
   displayShipping() {
     if (!this.order.xp || this.order.xp.ShippingSelections.length === 0) {
       return 'Calculated during checkout';
     }
-    return new CurrencyPipe('en-US').transform(this.order.TaxCost);
+    return new CurrencyPipe('en-US').transform(this.order.ShippingCost);
   }
 }

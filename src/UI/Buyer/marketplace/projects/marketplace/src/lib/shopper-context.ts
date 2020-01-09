@@ -124,7 +124,7 @@ export interface ICurrentOrder {
   setBillingAddressByID(addressID: string): Promise<MarketplaceOrder>;
   setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
 
-  getShippingRates(shipFromAddressID: string): Promise<ShippingRate[]>;
+  getShippingRates(): Promise<ShippingOptions[]>;
   selectShippingRate(selection: ShippingSelection): Promise<MarketplaceOrder>;
   calculateTax(): Promise<MarketplaceOrder>;
 
@@ -193,9 +193,9 @@ export interface ShippingRate {
 }
 
 export interface ShippingSelection {
-  shipToAddressID: string;
-  supplierID: string;
-  shippingRateID: string;
+  ShipFromAddressID: string;
+  SupplierID: string;
+  ShippingRateID: string;
 }
 
 export interface ShippingOptions {
