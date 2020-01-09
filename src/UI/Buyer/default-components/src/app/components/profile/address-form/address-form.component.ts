@@ -11,7 +11,7 @@ import { GeographyConfig } from '../../../config/geography.class';
   templateUrl: './address-form.component.html',
   styleUrls: ['./address-form.component.scss'],
 })
-export class OMCAddressForm implements OnInit {
+export class OCMAddressForm implements OnInit {
   private ExistingAddress: BuyerAddress = {};
   @Input() btnText: string;
   @Output() formDismissed = new EventEmitter();
