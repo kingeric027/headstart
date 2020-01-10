@@ -17,7 +17,7 @@ namespace Marketplace.Common.Commands
 	public interface IOrderCheckoutCommand
 	{
 		Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, ShippingSelection shippingSelection);
-		Task<MarketplaceOrder> CalcTaxAndPatchOrderAsync(string orderID);
+		Task<MarketplaceOrder> ApplyTaxEstimate(string orderID);
 		Task<IEnumerable<ShippingOptions>> GenerateShippingRatesAsync(string orderID);
 	}
 
@@ -42,7 +42,7 @@ namespace Marketplace.Common.Commands
 			_shippingCache = shippingCache;
 		}
 
-		public async Task<MarketplaceOrder> CalcTaxAndPatchOrderAsync(string orderID)
+		public async Task<MarketplaceOrder> ApplyTaxEstimate(string orderID)
 		{	
 			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
 			var items = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
@@ -50,15 +50,13 @@ namespace Marketplace.Common.Commands
 			var inValid = ListShipmentsWithoutSelection(order, items.Items);
 			Require.That(inValid.Count() == 0, ErrorCodes.Checkout.MissingShippingSelection, new MissingShippingSelectionError(inValid));
 
-			var taxTransaction = await _avatax.CreateTaxTransactionAsync(order, items);
+			var taxOrder = new TaxableOrder() { Order = order, Lines = items.Items, SelectedRates = null }; // should not be null
+
+			var totalTax = await _avatax.GetTaxEstimateAsync(taxOrder);
 			
 			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()
 			{
-				TaxCost = taxTransaction.totalTax ?? 0,
-				xp = new
-				{
-					AvalaraTaxTransactionCode = taxTransaction.code
-				}
+				TaxCost = totalTax
 			});
 		}
 
