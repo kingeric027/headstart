@@ -12,7 +12,7 @@ export class OCMProfileForm implements OnInit {
   private Me: MeUser = {};
   @Output() formDismissed = new EventEmitter();
   @Output()
-  formSubmitted = new EventEmitter<{ me: MeUser; formDirty: boolean }>();
+  formSubmitted = new EventEmitter<{ me: MeUser }>();
   profileForm: FormGroup;
 
   ngOnInit() {
@@ -39,10 +39,7 @@ export class OCMProfileForm implements OnInit {
     if (this.profileForm.status === 'INVALID') {
       return;
     }
-    this.formSubmitted.emit({
-      me: this.profileForm.value,
-      formDirty: this.profileForm.dirty,
-    });
+    this.formSubmitted.emit({ me: this.profileForm.value });
   }
 
   dismissForm() {
