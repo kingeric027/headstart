@@ -12,7 +12,6 @@
          *ngIf="showEditProfileForm">
       <ocm-profile-form [me]="me"
                         (formSubmitted)="profileFormSubmitted($event.detail.me)"
-                        [formGroup]="form"
                         (formDismissed)="dismissProfileEditForm()">
       </ocm-profile-form>
     </div>
@@ -40,7 +39,6 @@
          *ngIf="showEditProfileForm">
       <ocm-profile-form [me]="me"
                         (formSubmitted)="profileFormSubmitted($event.detail.me)"
-                        [formGroup]="form"
                         (formDismissed)="dismissProfileEditForm()">
       </ocm-profile-form>
     </div>

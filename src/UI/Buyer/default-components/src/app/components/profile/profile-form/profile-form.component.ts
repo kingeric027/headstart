@@ -1,9 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-
 // 3rd party
 import { MeUser } from '@ordercloud/angular-sdk';
-
 import { ValidateName, ValidateEmail, ValidatePhone } from '../../../validators/validators';
 
 @Component({
