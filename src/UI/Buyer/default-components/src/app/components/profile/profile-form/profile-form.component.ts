@@ -9,7 +9,7 @@ import { ValidateName, ValidateEmail, ValidatePhone } from '../../../validators/
   styleUrls: ['./profile-form.component.scss'],
 })
 export class OCMProfileForm implements OnInit {
-  private Me: MeUser = {};
+  private _me: MeUser = {};
   @Output() formDismissed = new EventEmitter();
   @Output()
   formSubmitted = new EventEmitter<{ me: MeUser }>();
@@ -20,18 +20,18 @@ export class OCMProfileForm implements OnInit {
   }
 
   @Input() set me(me: MeUser) {
-    this.Me = me || {};
+    this._me = me || {};
     this.setForm();
     this.profileForm.markAsPristine();
   }
 
   setForm() {
     this.profileForm = new FormGroup({
-      FirstName: new FormControl(this.Me.FirstName || '', [Validators.required, ValidateName]),
-      LastName: new FormControl(this.Me.LastName || '', [Validators.required, ValidateName]),
-      Username: new FormControl(this.Me.Username || '', Validators.required),
-      Email: new FormControl(this.Me.Email || '', ValidateEmail),
-      Phone: new FormControl(this.Me.Phone || '', ValidatePhone),
+      FirstName: new FormControl(this._me.FirstName || '', [Validators.required, ValidateName]),
+      LastName: new FormControl(this._me.LastName || '', [Validators.required, ValidateName]),
+      Username: new FormControl(this._me.Username || '', Validators.required),
+      Email: new FormControl(this._me.Email || '', ValidateEmail),
+      Phone: new FormControl(this._me.Phone || '', ValidatePhone),
     });
   }
 
