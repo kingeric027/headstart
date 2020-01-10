@@ -56,19 +56,17 @@ namespace Marketplace.Common.Services
 				.SelectAsync(async lineGroup =>
 				{
 					var lineItems = lineGroup.ToList();
-					var from = lineItems.First().ShipFromAddress;
-					var to = lineItems.First().ShippingAddress;
 					var builder = new TransactionBuilder(_avaTax, companyCode, docType, GetCustomerCode(taxableOrder));
-					builder.WithAddress(TransactionAddressType.ShipFrom, from.Street1, from.Street2, null, from.City, from.State, from.Zip, from.Country);
-					builder.WithAddress(TransactionAddressType.ShipTo, to.Street1, to.Street2, null, to.City, to.State, to.Zip, to.Country);
+					builder.WithAddress(TransactionAddressType.ShipFrom, lineItems.First().ShipFromAddress);
+					builder.WithAddress(TransactionAddressType.ShipTo, lineItems.First().ShippingAddress);
 
-					foreach (var line in TaxableLineMapper.MapFrom(lineItems))
+					foreach (var line in TransactionLineMapper.MapFrom(lineItems))
 					{
-						builder.WithLine(line.Amount, 1, line.TaxCode, null, line.ItemCode, line.CustomerUsageType, line.LineNumber);
+						builder.WithLine(line);
 					}
 
-					var shipLine = TaxableLineMapper.MapFrom(taxableOrder.SelectedRates[lineGroup.Key]);
-					builder.WithLine(shipLine.Amount, 1, shipLine.TaxCode, null, shipLine.ItemCode, shipLine.CustomerUsageType, shipLine.LineNumber);
+					var shipLine = TransactionLineMapper.MapFrom(taxableOrder.SelectedRates[lineGroup.Key]);
+					builder.WithLine(shipLine);
 
 
 					return await builder.CreateAsync();
