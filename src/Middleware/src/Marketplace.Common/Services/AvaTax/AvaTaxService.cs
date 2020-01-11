@@ -6,7 +6,6 @@ namespace Marketplace.Common.Services
 {
 	using Avalara.AvaTax.RestClient;
     using Marketplace.Common.Extensions;
-    using Marketplace.Common.Mapping;
     using Marketplace.Common.Models;
     using Marketplace.Common.Services.FreightPop;
     using OrderCloud.SDK;
@@ -46,7 +45,7 @@ namespace Marketplace.Common.Services
 
 		public async Task<IEnumerable<TransactionModel>> CreateTransactionsAsync(TaxableOrder taxableOrder)
 		{
-			return await CreateTransactionsAsync(DocumentType.SalesOrder, taxableOrder);
+			return await CreateTransactionsAsync(DocumentType.SalesInvoice, taxableOrder);
 		}
 
 		private async Task<IEnumerable<TransactionModel>> CreateTransactionsAsync(DocumentType docType, TaxableOrder taxableOrder)
@@ -55,22 +54,24 @@ namespace Marketplace.Common.Services
 				.GroupBy(line => line.ShipFromAddressID)
 				.SelectAsync(async lineGroup =>
 				{
-					var lineItems = lineGroup.ToList();
-					var builder = new TransactionBuilder(_avaTax, companyCode, docType, GetCustomerCode(taxableOrder));
-					builder.WithAddress(TransactionAddressType.ShipFrom, lineItems.First().ShipFromAddress);
-					builder.WithAddress(TransactionAddressType.ShipTo, lineItems.First().ShippingAddress);
-
-					foreach (var line in TransactionLineMapper.MapFrom(lineItems))
-					{
-						builder.WithLine(line);
-					}
-
-					var shipLine = TransactionLineMapper.MapFrom(taxableOrder.SelectedRates[lineGroup.Key]);
-					builder.WithLine(shipLine);
-
-
-					return await builder.CreateAsync();
+					var shippingRate = taxableOrder.SelectedRates[lineGroup.Key];
+					return await CreateOneTransactionAsync(docType, GetCustomerCode(taxableOrder), lineGroup.ToList(), shippingRate);					
 				});
+		}
+
+		private async Task<TransactionModel> CreateOneTransactionAsync(DocumentType docType, string customerCode, IEnumerable<LineItem> lines, ShippingRate shipping)
+		{
+			var builder = new TransactionBuilder(_avaTax, companyCode, docType, customerCode);
+			builder.WithShipFrom(lines.First().ShipFromAddress);
+			builder.WithShipTo(lines.First().ShippingAddress);
+			builder.WithShippingRate(shipping);
+
+			foreach (var lineItem in lines)
+			{
+				builder.WithLineItem(lineItem);
+			}
+
+			return await builder.CreateAsync();
 		}
 
 
