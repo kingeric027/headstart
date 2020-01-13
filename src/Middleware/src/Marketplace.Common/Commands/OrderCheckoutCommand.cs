@@ -50,7 +50,12 @@ namespace Marketplace.Common.Commands
 			var inValid = ListShipmentsWithoutSelection(order, items.Items);
 			Require.That(inValid.Count() == 0, ErrorCodes.Checkout.MissingShippingSelection, new MissingShippingSelectionError(inValid));
 
-			var taxOrder = new TaxableOrder() { Order = order, Lines = items.Items, SelectedRates = null }; // should not be null
+			var shippingSelection = await order.xp.ShippingSelections.SelectAsync(async selection =>
+			{
+				return await _shippingCache.GetSavedShippingRateAsync(orderID, selection.ShippingRateID);
+			});
+
+			var taxOrder = new TaxableOrder() { Order = order, Lines = items.Items, ShippingRates = shippingSelection };
 
 			var totalTax = await _avatax.GetTaxEstimateAsync(taxOrder);
 			

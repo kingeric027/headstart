@@ -19,7 +19,7 @@ namespace Marketplace.Common.Services
 		// Use this before checkout. No records will be saved in avalara.
 		Task<decimal> GetTaxEstimateAsync(TaxableOrder taxableOrder);
 		// Use this during submit.
-		Task<IEnumerable<TransactionModel>> CreateTransactionsAsync(TaxableOrder taxableOrder);
+		Task<TransactionModel> CreateTransactionAsync(TaxableOrder taxableOrder);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
 		// When should we do this? On order complete (When the credit card is charged) ? 
 		Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode);
@@ -39,41 +39,23 @@ namespace Marketplace.Common.Services
 
 		public async Task<decimal> GetTaxEstimateAsync(TaxableOrder taxableOrder)
 		{
-			var transactions = await CreateTransactionsAsync(DocumentType.SalesOrder, taxableOrder);
-			return transactions.Sum(t => t.totalTax) ?? 0;
+			var transaction = await CreateTransactionAsync(DocumentType.SalesOrder, taxableOrder);
+			return transaction.totalTax ?? 0;
 		}
 
-		public async Task<IEnumerable<TransactionModel>> CreateTransactionsAsync(TaxableOrder taxableOrder)
+		public async Task<TransactionModel> CreateTransactionAsync(TaxableOrder taxableOrder)
 		{
-			return await CreateTransactionsAsync(DocumentType.SalesInvoice, taxableOrder);
+			return await CreateTransactionAsync(DocumentType.SalesInvoice, taxableOrder);
 		}
 
-		private async Task<IEnumerable<TransactionModel>> CreateTransactionsAsync(DocumentType docType, TaxableOrder taxableOrder)
+		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, TaxableOrder taxableOrder)
 		{
-			return await taxableOrder.Lines
-				.GroupBy(line => line.ShipFromAddressID)
-				.SelectAsync(async lineGroup =>
-				{
-					var shippingRate = taxableOrder.SelectedRates[lineGroup.Key];
-					return await CreateOneTransactionAsync(docType, GetCustomerCode(taxableOrder), lineGroup.ToList(), shippingRate);					
-				});
+			var trans = new TransactionBuilder(_avaTax, companyCode, docType, GetCustomerCode(taxableOrder));
+			foreach (var line in taxableOrder.Lines) trans.WithLineItem(line);
+			foreach (var rate in taxableOrder.ShippingRates) trans.WithShippingRate(rate);
+
+			return await trans.CreateAsync();
 		}
-
-		private async Task<TransactionModel> CreateOneTransactionAsync(DocumentType docType, string customerCode, IEnumerable<LineItem> lines, ShippingRate shipping)
-		{
-			var builder = new TransactionBuilder(_avaTax, companyCode, docType, customerCode);
-			builder.WithShipFrom(lines.First().ShipFromAddress);
-			builder.WithShipTo(lines.First().ShippingAddress);
-			builder.WithShippingRate(shipping);
-
-			foreach (var lineItem in lines)
-			{
-				builder.WithLineItem(lineItem);
-			}
-
-			return await builder.CreateAsync();
-		}
-
 
 		public async Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode)
 		{
