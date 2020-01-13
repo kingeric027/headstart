@@ -3,22 +3,17 @@ using Marketplace.Common.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Marketplace.Common.Controllers
 {
     public class WebhooksController : BaseController
-    { 
+    {
 
         private readonly AppSettings _settings;
-        private readonly SendgridService _sendgridService;
-        
-        public WebhooksController(AppSettings settings, SendgridService sendgridService) : base(settings)
+        private readonly ISendgridService _sendgridService;
+
+        public WebhooksController(AppSettings settings, ISendgridService sendgridService) : base(settings)
         {
             _settings = settings;
             _sendgridService = sendgridService;
@@ -26,11 +21,11 @@ namespace Marketplace.Common.Controllers
 
         // BUYER EMAILS
 
-        [HttpPost, Route("ordersubmit")] // TESTED - WORKS (STOPPED WORKING AFTER REFACTOR)
-        public void HandleOrderSubmit([FromBody] WebhookPayloads.Orders.Submit payload)
+        [HttpPost, Route("ordersubmit")] // TESTED - WORKS
+        public async void HandleOrderSubmit([FromBody] WebhookPayloads.Orders.Submit payload)
         {
             Console.WriteLine("order submit received", payload);
-          // _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "Order Confirmation", "<h1>this is a test email for order submit</h1>");
+            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "Order Confirmation", "<h1>this is a test email for order submit</h1>");
         }
 
         [HttpPost, Route("ordersentforapproval")] // TO DO: TEST & FIND PROPER PAYLOAD
