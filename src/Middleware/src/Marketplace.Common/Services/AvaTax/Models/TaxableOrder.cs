@@ -10,6 +10,6 @@ namespace Marketplace.Common.Models
 	{
 		public MarketplaceOrder Order { get; set; }
 		public IEnumerable<LineItem> Lines { get; set; }
-		public IDictionary<string, ShippingRate> SelectedRates { get; set; }
+		public IEnumerable<ShippingRate> ShippingRates { get; set; }
 	}
 }
