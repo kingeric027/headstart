@@ -33,6 +33,8 @@ export class OCMProductDetails implements OnInit {
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
+  note = "Placeholder for supplier message associated with specific product";
+  specLength: number;
 
   constructor(private formService: SpecFormService, private context: ShopperContextService) {
     this.specFormService = formService;
@@ -41,6 +43,7 @@ export class OCMProductDetails implements OnInit {
   @Input() set specs(value: ListSpec) {
     this._specs = value;
     this.specFormService.event.valid = this._specs.Items.length === 0;
+    this.specLength = this._specs.Items.length;
   }
 
   @Input() set product(value: BuyerProduct) {
@@ -129,5 +132,9 @@ export class OCMProductDetails implements OnInit {
 
   setIsFavorite(isFav: boolean) {
     this.context.currentUser.setIsFavoriteProduct(isFav, this._product.ID);
+  }
+
+  setActiveSupplier(supplierId: string) {
+    this.context.router.toProductList({ activeFacets: { Supplier: supplierId.toLowerCase() } });
   }
 }

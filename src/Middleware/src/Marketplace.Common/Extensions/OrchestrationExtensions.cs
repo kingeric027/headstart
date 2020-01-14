@@ -1,6 +1,7 @@
 ﻿using Marketplace.Common.Models;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Models;
+using ErrorCodes = Marketplace.Helpers.Exceptions.ErrorCodes;
 
 namespace Marketplace.Common.Extensions
 {

@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, Input, ViewChild, OnInit, ChangeDetectorRef, OnDestroy, AfterViewChecked } from '@angular/core';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { faFilter, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -7,13 +7,14 @@ import { takeWhile } from 'rxjs/operators';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { getPsHeight } from '@app-seller/shared/services/dom.helper';
 
 @Component({
   selector: 'resource-select-dropdown-component',
   templateUrl: './resource-select-dropdown.component.html',
   styleUrls: ['./resource-select-dropdown.component.scss'],
 })
-export class ResourceSelectDropdown implements OnInit, OnDestroy {
+export class ResourceSelectDropdown implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
@@ -21,6 +22,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
   searchTerm = '';
   selectedParentResourceName = 'Fetching Data';
   alive = true;
+  resourceSelectDropdownHeight: number = 450;
 
   constructor(
     private router: Router,
@@ -39,15 +41,19 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy {
     this.setParentResourceSelectionSubscription();
   }
 
+  ngAfterViewChecked() {
+    // TODO: Magic number ... the 'search' element doesn't exist in the DOM at time of instantiation
+    this.resourceSelectDropdownHeight = getPsHeight('additional-item-resource-select-dropdown') - 75;
+  }
   private setParentResourceSubscription() {
-    this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
+    this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
       this.parentResourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
   }
 
   setParentResourceSelectionSubscription() {
-    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(async (params) => {
+    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(async params => {
       if (this.parentService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         const parentIDParamName = `${singular(this.parentService.primaryResourceLevel)}ID`;
         const resourceID = params[parentIDParamName];

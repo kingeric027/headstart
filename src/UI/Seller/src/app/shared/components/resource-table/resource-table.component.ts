@@ -1,4 +1,14 @@
-import { Component, Input, Output, ViewChild, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  ViewChild,
+  OnInit,
+  ChangeDetectorRef,
+  OnDestroy,
+  NgZone,
+  AfterViewChecked,
+} from '@angular/core';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
 import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
@@ -9,6 +19,7 @@ import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { FormGroup } from '@angular/forms';
 import { ListResource, Options, RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { getScreenSizeBreakPoint, getPsHeight } from '@app-seller/shared/services/dom.helper';
 
 interface BreadCrumb {
   displayText: string;
@@ -19,8 +30,11 @@ interface BreadCrumb {
   selector: 'resource-table-component',
   templateUrl: './resource-table.component.html',
   styleUrls: ['./resource-table.component.scss'],
+  host: {
+    '(window:resize)': 'ngAfterViewChecked()',
+  },
 })
-export class ResourceTableComponent implements OnInit, OnDestroy {
+export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
@@ -43,6 +57,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   isCreatingNew = false;
   isMyResource = false;
   alive = true;
+  screenSize;
+  myResourceHeight: number = 450;
+  tableHeight: number = 450;
+  editResourceHeight: number = 450;
 
   constructor(
     private router: Router,
@@ -95,9 +113,21 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   @Input()
   resourceForm: FormGroup;
 
-  ngOnInit() {
+  async ngOnInit() {
     this.determineViewingContext();
     this.initializeSubscriptions();
+    this.screenSize = getScreenSizeBreakPoint();
+  }
+
+  ngAfterViewChecked() {
+    this.setPsHeights();
+    this.changeDetectorRef.detectChanges();
+  }
+
+  setPsHeights() {
+    this.myResourceHeight = getPsHeight('');
+    this.tableHeight = getPsHeight('additional-item-table');
+    this.editResourceHeight = getPsHeight('additional-item-edit-resource');
   }
 
   determineViewingContext() {
@@ -125,7 +155,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     this.router.events
       .pipe(takeWhile(() => this.alive))
       // only need to set the breadcrumbs on nav end events
-      .pipe(filter((event) => event instanceof NavigationEnd))
+      .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         this.setBreadCrumbs();
       });
@@ -138,7 +168,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   private setParentResourceSelectionSubscription() {
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
-      .subscribe(async (params) => {
+      .subscribe(async params => {
         await this.redirectToFirstParentIfNeeded();
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
@@ -151,7 +181,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
   }
 
   private setListRequestStatusSubscription() {
-    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe((requestStatus) => {
+    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe(requestStatus => {
       this.requestStatus = requestStatus;
       this.changeDetectorRef.detectChanges();
     });
@@ -168,8 +198,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy {
     // in the future breadcrumb logic might need to be more complicated than this
     const urlPieces = this.router.url
       .split('/')
-      .filter((p) => p)
-      .map((p) => {
+      .filter(p => p)
+      .map(p => {
         if (p.includes('?')) {
           return p.slice(0, p.indexOf('?'));
         } else {

@@ -1,26 +1,36 @@
 @import "../../.././styles/main.scss";
 
-.navbar-oc {
-    background-color: $brand-navy;
-}
-
 .resource-nav-link-container{
     width: 800px;
     margin-left: 100px;
 }
 
-.active-nav-group {
-    border: 1px dashed rgba($brand-orange, 0.8);
+@include media-breakpoint-down(md) {
+    .dropdown-menu {
+        border: none;
+        background-color: $primary;
+        .dropdown-item {
+            color: rgba(255, 255, 255, 0.75);
+            background-color: $primary;
+            &:active {
+                background-color: $primary;
+            }
+            &:hover {
+                color: white;
+            }
+        }
+    }
 }
-
-.user-icon {
-    color: $brand-orange;
-} 
-
-.dropdown-column-width{
-    width: 200px;
-}
-
-.nav-grouping-width {
-    width: 150px;
-}
+// TODO: Fix for single level nav items
+// .active-nav-group {
+//     @include media-breakpoint-up(md) {
+//         &:after {
+//             position: absolute;
+//             bottom: -15px;
+//             left: 0;
+//             width: 100%;
+//             content: " ";
+//             border-bottom: 3px solid $brand-orange !important;
+//         }
+//     }
+// }
