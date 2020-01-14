@@ -1,29 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Exceptions;
+using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
 using Marketplace.Helpers.Models;
+using Marketplace.Helpers.Extensions;
 
 namespace Marketplace.Common.Commands
 {
-    public class ProductSyncCommand : SyncCommand, IWorkItemCommand
+    public class SpecOptionSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public ProductSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public SpecOptionSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<Product>();
+            var obj = wi.Current.ToObject<SpecOption>();
             try
             {
                 obj.ID = wi.RecordId;
-                var response = await _oc.Products.CreateAsync(obj, wi.Token);
+                var response = await _oc.Specs.CreateOptionAsync(obj.xp.SpecID, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
@@ -61,11 +65,11 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<Product>();
+            var obj = JObject.FromObject(wi.Current).ToObject<SpecOption>();
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
-                var response = await _oc.Products.SaveAsync<Product>(wi.RecordId, obj, wi.Token);
+                var response = await _oc.Specs.SaveOptionAsync(obj.xp.SpecID, wi.RecordId, obj);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -82,10 +86,12 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialProduct<OrchestrationProductXp>>();
+            var obj = JObject.FromObject(wi.Diff).ToObject<PartialSpecOption>();
             try
             {
-                var response = await _oc.Products.PatchAsync(wi.RecordId, obj, wi.Token);
+                // must get ID from current or cache in case it's not part of the Diff (and it's not expected to be)
+                var cache = JObject.FromObject(wi.Cache).ToObject<PartialSpecOption>();
+                var response = await _oc.Specs.PatchOptionAsync(cache.xp.SpecID, wi.RecordId, obj);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -109,7 +115,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Products.GetAsync(wi.RecordId, wi.Token);
+                var response = await _oc.Specs.GetOptionAsync(wi.Current.To<SpecOption>().xp.SpecID, wi.RecordId);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)

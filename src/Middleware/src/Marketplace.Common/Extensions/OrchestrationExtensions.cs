@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.AccessControl;
-using System.Text;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Models;
+﻿using Marketplace.Common.Models;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Models;
 using ErrorCodes = Marketplace.Helpers.Exceptions.ErrorCodes;
@@ -12,44 +7,44 @@ namespace Marketplace.Common.Extensions
 {
     public static class OrchestrationExtensions
     {
-        public static string BuildPath(this IOrchestrationObject obj, string resourceId)
+        public static string BuildPath<T>(this OrchestrationObject<T> obj, string resourceId) where T : IMarketplaceObject
         {
-            return $"{resourceId}/{obj.Type()}/{obj.ID}".ToLower();
+            return $"{resourceId}/{obj.Model.Type()}/{obj.ID}".ToLower();
         }
 
-        public static RecordType Type(this IOrchestrationObject obj)
+        public static RecordType Type(this IMarketplaceObject obj)
         {
             switch (obj.GetType().Name)
             {
-                case nameof(OrchestrationProduct):
+                case nameof(MarketplaceProduct):
                     return RecordType.Product;
-                case nameof(OrchestrationProductFacet):
+                case nameof(MarketplaceProductFacet):
                     return RecordType.ProductFacet;
-                case nameof(OrchestrationPriceSchedule):
+                case nameof(MarketplacePriceSchedule):
                     return RecordType.PriceSchedule;
-                case nameof(OrchestrationSpec):
+                case nameof(MarketplaceSpec):
                     return RecordType.Spec;
-                case nameof(OrchestrationSpecOption):
+                case nameof(MarketplaceSpecOption):
                     return RecordType.SpecOption;
-                case nameof(OrchestrationSpecProductAssignment):
+                case nameof(MarketplaceSpecProductAssignment):
                     return RecordType.SpecProductAssignment;
-                case nameof(OrchestrationBuyer):
+                case nameof(MarketplaceBuyer):
                     return RecordType.Buyer;
-                case nameof(OrchestrationAddress):
+                case nameof(MarketplaceAddress):
                     return RecordType.Address;
-                case nameof(OrchestrationCostCenter):
+                case nameof(BaseCostCenter):
                     return RecordType.CostCenter;
-                case nameof(OrchestrationUser):
+                case nameof(MarketplaceUser):
                     return RecordType.User;
-                case nameof(OrchestrationUserGroup):
+                case nameof(MarketplaceUserGroup):
                     return RecordType.UserGroup;
-                case nameof(OrchestrationUserGroupAssignment):
+                case nameof(MarketplaceUserGroupAssignment):
                     return RecordType.UserGroupAssignment;
-                case nameof(OrchestrationAddressAssignment):
+                case nameof(MarketplaceAddressAssignment):
                     return RecordType.AddressAssignment;
-                case nameof(OrchestrationCatalogAssignment):
+                case nameof(MarketplaceCatalogAssignment):
                     return RecordType.CatalogAssignment;
-                case nameof(OrchestrationCatalog):
+                case nameof(MarketplaceCatalog):
                     return RecordType.Catalog;
                 default:
                     throw new ApiErrorException(ErrorCodes.All["UnrecognizedType"], obj);

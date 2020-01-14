@@ -71,7 +71,7 @@ export class OCMCheckoutAddress implements OnInit {
     this.selectedAddress = this.lineItems.Items[0].ShippingAddress;
   }
 
-  async saveAddress(address: Address, formDirty: boolean) {
+  async saveAddress(address: Address, formDirty: boolean, shouldSaveAddress: boolean) {
     // TODO: make bellow line better
     const setOneTimeAddress =
       this.isAnon ||
@@ -79,10 +79,14 @@ export class OCMCheckoutAddress implements OnInit {
       (this.usingShippingAsBilling && !this.order.ShippingAddressID) ||
       !address.ID ||
       address.ID === '';
-    if (setOneTimeAddress) {
-      this.order = await this.setOneTimeAddress(address);
+    if (shouldSaveAddress) {
+      this.order = await this.saveAndSetAddress(address);
     } else {
-      this.order = await this.setSavedAddress(address.ID);
+      if (setOneTimeAddress) {
+        this.order = await this.setOneTimeAddress(address);
+      } else {
+        this.order = await this.setSavedAddress(address.ID);
+      }
     }
     if (this.addressType === 'Shipping') {
       this.lineItems.Items[0].ShippingAddress = address;
@@ -90,6 +94,20 @@ export class OCMCheckoutAddress implements OnInit {
       // this.context.currentOrder.lineItems = this.lineItems;
     }
     this.continue.emit();
+  }
+
+  private async saveAndSetAddress(address: BuyerAddress): Promise<Order> {
+    const addressToSave = this.addShippingAndBillingOptionsOnAddress(address);
+    const savedAddress = await this.context.myResources.CreateAddress(addressToSave).toPromise();
+    return await this.setSavedAddress(savedAddress.ID);
+  }
+
+  private addShippingAndBillingOptionsOnAddress(address: BuyerAddress): BuyerAddress {
+    /* right now there is no distinction between billing and shipping addresses in the UI
+     this assummes these values will be set to true in all me addresses created at checkout*/
+    address.Shipping = true;
+    address.Billing = true;
+    return address;
   }
 
   private async setOneTimeAddress(address: BuyerAddress): Promise<Order> {

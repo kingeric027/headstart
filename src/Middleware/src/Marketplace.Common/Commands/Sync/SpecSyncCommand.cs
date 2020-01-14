@@ -5,29 +5,24 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
-using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
-    public class UserSyncCommand : SyncCommand, IWorkItemCommand
+    public class SpecSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public UserSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public SpecSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<User>();
+            var obj = wi.Current.ToObject<Spec>();
             try
             {
                 obj.ID = wi.RecordId;
-                // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time
-                // but the value is not null, and it's not a simple evaluation for a minimum. so i'm using the year = 1 because it works
-                if (obj.TermsAccepted != null && obj.TermsAccepted.Value.Year == 1)
-                    obj.TermsAccepted = DateTimeOffset.Now;
-                var response = await _oc.Users.CreateAsync(wi.ResourceId, obj, wi.Token);
+                var response = await _oc.Specs.CreateAsync(obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
@@ -65,15 +60,11 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<User>();
+            var obj = JObject.FromObject(wi.Current).ToObject<Spec>();
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
-                // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time
-                // but the value is not null, and it's not a simple evaluation for a minimum. so i'm using the year = 1 because it works
-                if (obj.TermsAccepted != null && obj.TermsAccepted.Value.Year == 1)
-                    obj.TermsAccepted = DateTimeOffset.Now;
-                var response = await _oc.Users.SaveAsync<User>(wi.ResourceId, wi.RecordId, obj, wi.Token);
+                var response = await _oc.Specs.SaveAsync<Spec>(wi.RecordId, (Spec)obj);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -90,14 +81,10 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialUser<OrchestrationUserXp>>();
+            var obj = JObject.FromObject(wi.Diff).ToObject<PartialSpec>();
             try
             {
-                // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time
-                // but the value is not null, and it's not a simple evaluation for a minimum. so i'm using the year = 1 because it works
-                if (obj.TermsAccepted != null && obj.TermsAccepted.Value.Year == 1)
-                    obj.TermsAccepted = DateTimeOffset.Now;
-                var response = await _oc.Users.PatchAsync(wi.ResourceId, wi.RecordId, obj, wi.Token);
+                var response = await _oc.Specs.PatchAsync(wi.RecordId, obj);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -121,7 +108,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Users.GetAsync(wi.ResourceId, wi.RecordId, wi.Token);
+                var response = await _oc.Specs.GetAsync(wi.RecordId);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
