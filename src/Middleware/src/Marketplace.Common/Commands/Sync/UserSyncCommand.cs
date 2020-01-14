@@ -9,21 +9,25 @@ using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
-    public class BuyerSyncCommand : SyncCommand, IWorkItemCommand
+    public class UserSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public BuyerSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public UserSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<Buyer>();
+            var obj = wi.Current.ToObject<User>();
             try
             {
                 obj.ID = wi.RecordId;
-                var response = await _oc.Buyers.CreateAsync(obj, wi.Token);
+                // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time
+                // but the value is not null, and it's not a simple evaluation for a minimum. so i'm using the year = 1 because it works
+                if (obj.TermsAccepted != null && obj.TermsAccepted.Value.Year == 1)
+                    obj.TermsAccepted = DateTimeOffset.Now;
+                var response = await _oc.Users.CreateAsync(wi.ResourceId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
@@ -61,11 +65,15 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<Buyer>();
+            var obj = JObject.FromObject(wi.Current).ToObject<User>();
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
-                var response = await _oc.Buyers.SaveAsync<Buyer>(wi.RecordId, obj, wi.Token);
+                // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time
+                // but the value is not null, and it's not a simple evaluation for a minimum. so i'm using the year = 1 because it works
+                if (obj.TermsAccepted != null && obj.TermsAccepted.Value.Year == 1)
+                    obj.TermsAccepted = DateTimeOffset.Now;
+                var response = await _oc.Users.SaveAsync<User>(wi.ResourceId, wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -82,10 +90,14 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialBuyer<OrchestrationBuyerXp>>();
+            var obj = JObject.FromObject(wi.Diff).ToObject<PartialUser>();
             try
             {
-                var response = await _oc.Buyers.PatchAsync(wi.RecordId, obj, wi.Token);
+                // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time
+                // but the value is not null, and it's not a simple evaluation for a minimum. so i'm using the year = 1 because it works
+                if (obj.TermsAccepted != null && obj.TermsAccepted.Value.Year == 1)
+                    obj.TermsAccepted = DateTimeOffset.Now;
+                var response = await _oc.Users.PatchAsync(wi.ResourceId, wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -109,7 +121,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Buyers.GetAsync(wi.RecordId, wi.Token);
+                var response = await _oc.Users.GetAsync(wi.ResourceId, wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
