@@ -9,21 +9,21 @@ using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
-    public class CostCenterSyncCommand : SyncCommand, IWorkItemCommand
+    public class BuyerSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public CostCenterSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public BuyerSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<CostCenter>();
+            var obj = wi.Current.ToObject<Buyer>();
             try
             {
                 obj.ID = wi.RecordId;
-                var response = await _oc.CostCenters.CreateAsync(wi.ResourceId, obj, wi.Token);
+                var response = await _oc.Buyers.CreateAsync(obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
@@ -61,11 +61,11 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<CostCenter>();
+            var obj = JObject.FromObject(wi.Current).ToObject<Buyer>();
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
-                var response = await _oc.CostCenters.SaveAsync<CostCenter>(wi.ResourceId, wi.RecordId, obj, wi.Token);
+                var response = await _oc.Buyers.SaveAsync<Buyer>(wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -82,10 +82,10 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialCostCenter<OrchestrationCostCenterXp>>();
+            var obj = JObject.FromObject(wi.Diff).ToObject<PartialBuyer>();
             try
             {
-                var response = await _oc.CostCenters.PatchAsync(wi.ResourceId, wi.RecordId, obj, wi.Token);
+                var response = await _oc.Buyers.PatchAsync(wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -109,7 +109,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.CostCenters.GetAsync(wi.ResourceId, wi.RecordId, wi.Token);
+                var response = await _oc.Buyers.GetAsync(wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
