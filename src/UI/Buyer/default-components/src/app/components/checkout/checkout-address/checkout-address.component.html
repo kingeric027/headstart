@@ -5,7 +5,8 @@
         class="btn btn-secondary mb-3 ml-2"
         (click)="useShippingAsBilling()">Use Shipping Address</button>
 <ocm-address-form [existingAddress]="selectedAddress"
-                  (formSubmitted)="saveAddress($event.detail.address, $event.detail.formDirty)"
+                  [showOptionToSave]="true"
+                  (formSubmitted)="saveAddress($event.detail.address, $event.detail.formDirty, $event.detail.shouldSaveAddress)"
                   [btnText]="'Save and Continue'">
 </ocm-address-form>
 <ocm-modal [state]="addressModal"
