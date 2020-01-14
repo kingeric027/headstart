@@ -19,28 +19,28 @@ namespace Marketplace.Common.Controllers
             _sendgridService = sendgridService;
         }
 
-        // BUYER EMAILS
-
-        [HttpPost, Route("ordersubmit")] // TESTED - WORKS
-        public async void HandleOrderSubmit([FromBody] WebhookPayloads.Orders.Submit payload)
+        // USING AN OC MESSAGE SENDER - NOT WEBHOOK
+        [HttpPost, Route("passwordreset")]
+        public async void HandleBuyerPasswordReset([FromBody] MessageNotification payload)
         {
-            Console.WriteLine("order submit received", payload);
-            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "Order Confirmation", "<h1>this is a test email for order submit</h1>");
+            await _sendgridService.SendSingleEmail("from", payload.Recipient.Email, "Password Reset", "<h1>this is a test email for password reset</h1>");
         }
 
-        [HttpPost, Route("ordersentforapproval")] // TO DO: TEST & FIND PROPER PAYLOAD
-        public async void HandleOrderSentForApproval([FromBody] JObject payload)
+        [HttpPost, Route("ordersubmit")]
+        public async void HandleOrderSubmit([FromBody] WebhookPayloads.Orders.Submit payload)
         {
-            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "order sent for approval test", "<h1>this is a test email for order sent for approval</h1>");
+            await _sendgridService.SendSingleEmail("from", "to", "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
+            await _sendgridService.SendSingleEmail("from", "to", "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to supplier receiving order
         }
 
         [HttpPost, Route("orderrequiresapproval")] // TO DO: TEST & FIND PROPER PAYLOAD
-        public async void HandleOrderRequiresApproval([FromBody] JObject payload)
+        public async void HandleOrderRequiresApproval(JObject payload)
         {
-            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "order requires approval test", "<h1>this is a test email for order requires approval</h1>");
+            await _sendgridService.SendSingleEmail("from", "to", "order sent for approval test", "<h1>this is a test email for order sent for approval</h1>"); // to buyer whose order needs approval
+            await _sendgridService.SendSingleEmail("from", "to", "order requires approval test", "<h1>this is a test email for order requires approval</h1>"); // to approver who needs to approve order
         }
 
-        [HttpPost, Route("orderapproved")] // TO DO: TEST & FIND PROPER PAYLOAD
+        [HttpPost, Route("orderapproved")] // TO DO: TEST
         public async void HandleOrderApproved([FromBody] WebhookPayloads.Orders.Approve payload)
         {
             await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "Order Approved", "<h1>this is a test email for order approved</h1>");
@@ -59,41 +59,55 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("orderdelivered")] // TO DO: TEST & FIND PROPER PAYLOAD
-        public async void HandleOrderDelivered([FromBody] JObject payload)
+        public async void HandleOrderDelivered(JObject payload)
         {
             await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "Order Delivered", "<h1>this is a test email for order delivered</h1>");
         }
 
-        [HttpPost, Route("newbuyeruser")] // TESTED - WORKS (STOPPED WORKING AFTER REFACTOR)
-        public async void HandleNewBuyerUser([FromBody] WebhookPayloads.Users.Create payload)
+        [HttpPost, Route("ordercancelled")] // TO DO: TEST 
+        public async void HandleOrderCancelled([FromBody] WebhookPayloads.Orders.Cancel payload)
         {
-            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "New Buyer User", "<h1>this is a test email for buyer user creation</h1>");
+            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "Order Cancelled", "<h1>this is a test email for order cancelled</h1>");
         }
 
-        // USING AN OC MESSAGE SENDER - NOT SENDGRID
-        [HttpPost, Route("passwordreset")]
-        public void HandleBuyerPasswordReset([FromBody] MessageNotification payload)
+        [HttpPost, Route("orderrefund")] // TO DO: TEST & FIND PROPER PAYLOAD
+        public async void HandleOrderRefund(JObject payload)
         {
+            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "Order Refunded", "<h1>this is a test email for order refunded</h1>");
         }
 
-        // MP MANAGER EMAILS
-
-        [HttpPost, Route("productcreated")] // TESTED - WORKS (STOPPED WORKING AFTER REFACTOR)
-        public async void HandleProductCreation([FromBody] JObject payload)
+        [HttpPost, Route("orderupdated")] // TO DO: TEST 
+        public async void HandleOrderUpdated([FromBody] WebhookPayloads.Orders.Patch payload)
         {
-            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "New Product Created", "<h1>this is a test email for product creation</h1>");
+            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "Order Updated", "<h1>this is a test email for order update</h1>");
         }
 
-        [HttpPost, Route("productupdate")] // TO DO: TEST
-        public async void HandleProductUpdate([FromBody] JObject payload)
+        [HttpPost, Route("newuser")]
+        public async void HandleNewUser([FromBody] WebhookPayloads.Users.Create payload)
         {
-            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "Product Updated", "<h1>this is a test email for product update</h1>");
+            await _sendgridService.SendSingleEmail("from", "to", "New Buyer User", "<h1>this is a test email for buyer user creation</h1>"); // to buyer - welcome email
+            await _sendgridService.SendSingleEmail("from", "to", "New Buyer User", "<h1>this is a test email for buyer user creation</h1>"); // to admin - new user registered on buyer site
         }
 
-        [HttpPost, Route("supplierupdated")] // TO DO: TEST
-        public async void HandleSupplierUpdate([FromBody] JObject payload)
+        [HttpPost, Route("productcreated")]
+        public async void HandleProductCreation([FromBody] WebhookPayloads.Products.Create payload)
         {
-            await _sendgridService.SendSingleEmail("scasey@four51.com", "scasey@four51.com", "Supplier Updated", "<h1>this is a test email for supplier update</h1>");
+            // to mp manager when a product is created
+            await _sendgridService.SendSingleEmail("from", "to", "New Product Created", "<h1>this is a test email for product creation</h1>");
+        }
+
+        [HttpPost, Route("productupdate")]
+        public async void HandleProductUpdate([FromBody] WebhookPayloads.Products.Patch payload)
+        {
+            // to mp manager when a product is updated
+            await _sendgridService.SendSingleEmail("from", "to", "Product Updated", "<h1>this is a test email for product update</h1>");
+        }
+
+        [HttpPost, Route("supplierupdated")]
+        public async void HandleSupplierUpdate([FromBody] WebhookPayloads.Suppliers.Patch payload)
+        {
+            // to mp manager when a supplier is updated
+            await _sendgridService.SendSingleEmail("from", "to", "Supplier Updated", "<h1>this is a test email for supplier update</h1>");
         }
     }
 }
