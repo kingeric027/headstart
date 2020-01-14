@@ -51,6 +51,11 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toSecondaryHeader: 'ApprovalRuleID',
     toImage: '',
   },
+  orders: {
+    toPrimaryHeader: 'FromUser.Username',
+    toSecondaryHeader: 'Status',
+    toImage: '',
+  },
 };
 
 export interface ResourceColumnConfiguration {
@@ -208,6 +213,21 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
       {
         path: 'ID',
         header: 'ID',
+        type: BASIC_STRING,
+      },
+    ],
+    imgPath: '',
+  },
+  orders: {
+    fields: [
+      {
+        path: 'FromUser.Username',
+        header: 'From User Username',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'Comments',
+        header: 'Comments',
         type: BASIC_STRING,
       },
     ],
