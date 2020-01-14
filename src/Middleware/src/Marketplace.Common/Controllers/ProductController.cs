@@ -19,7 +19,7 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route(""), MarketplaceUserAuth()]
         public async Task<MarketplaceProduct> PostProduct([FromBody] MarketplaceProduct obj)
         {
-            return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
+            return await Task.FromResult(new MarketplaceProduct());
         }
 
         [Route("{productID}"), HttpGet, MarketplaceUserAuth(ApiRole.ProductAdmin)]
