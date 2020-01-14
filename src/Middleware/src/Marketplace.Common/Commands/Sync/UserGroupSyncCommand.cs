@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Exceptions;
@@ -11,21 +9,21 @@ using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
-    public class PriceScheduleSyncCommand : SyncCommand, IWorkItemCommand
+    public class UserGroupSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public PriceScheduleSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public UserGroupSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<PriceSchedule>();
+            var obj = wi.Current.ToObject<UserGroup>();
             try
             {
                 obj.ID = wi.RecordId;
-                var response = await _oc.PriceSchedules.CreateAsync(obj, wi.Token);
+                var response = await _oc.UserGroups.CreateAsync(wi.ResourceId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
@@ -63,11 +61,11 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<PriceSchedule>();
+            var obj = JObject.FromObject(wi.Current).ToObject<UserGroup>();
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
-                var response = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(wi.RecordId, obj);
+                var response = await _oc.UserGroups.SaveAsync<UserGroup>(wi.ResourceId, wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -84,10 +82,10 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialPriceSchedule<OrchestrationPriceScheduleXp>>();
+            var obj = JObject.FromObject(wi.Diff).ToObject<PartialUserGroup>();
             try
             {
-                var response = await _oc.PriceSchedules.PatchAsync(wi.RecordId, obj);
+                var response = await _oc.UserGroups.PatchAsync(wi.ResourceId, wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -111,7 +109,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.PriceSchedules.GetAsync(wi.RecordId);
+                var response = await _oc.UserGroups.GetAsync(wi.ResourceId, wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)

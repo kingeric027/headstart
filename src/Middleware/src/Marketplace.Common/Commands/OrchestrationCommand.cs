@@ -22,7 +22,7 @@ namespace Marketplace.Common.Commands
         Task<JObject> CalculateDiff(WorkItem wi);
         Task<JObject> GetQueuedItem(string path);
         Task<JObject> GetCachedItem(string path);
-        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IOrchestrationObject;
+        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IMarketplaceObject;
     }
 
     public class OrchestrationCommand : IOrchestrationCommand
@@ -57,13 +57,17 @@ namespace Marketplace.Common.Commands
         //    _log = log;
         //}
 
-        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IOrchestrationObject
+        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IMarketplaceObject
         {
             try
             {
-                obj.Token = user.AccessToken;
-                obj.ClientId = user.ClientID;
-                await _blobQueue.Save(obj.BuildPath(resourceId), JsonConvert.SerializeObject(obj));
+                var orch = new OrchestrationObject<T>
+                {
+                    Token = user.AccessToken,
+                    ClientId = user.ClientID,
+                    Model = obj
+                };
+                await _blobQueue.Save(orch.BuildPath(resourceId), JsonConvert.SerializeObject(obj));
                 return await Task.FromResult(obj);
             }
             catch (ApiErrorException ex)
@@ -116,7 +120,8 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                return await _blobQueue.Get<JObject>(path);
+                var blob = await _blobQueue.Get<JObject>(path);
+                return blob.SelectToken("Model") as JObject;
             }
             catch (Exception ex)
             {
@@ -128,7 +133,8 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                return await _blobCache.Get<JObject>($"{path}");
+                var blob = await _blobCache.Get<JObject>($"{path}");
+                return blob.SelectToken("Model") as JObject;
             }
             catch (Exception)
             {
@@ -173,7 +179,7 @@ namespace Marketplace.Common.Commands
                 {
                     // cache exists, we want to force a PUT when xp has deleted properties because 
                     // it's the only way to delete the properties
-                    if (wi.Cache.HasDeletedXp(wi.Current.To<JObject>()))
+                    if (wi.Cache.HasDeletedXp(wi.Current))
                         return await Task.FromResult(Action.Update);
                     // otherwise we want to PATCH the existing object
                     return await Task.FromResult(Action.Patch);
