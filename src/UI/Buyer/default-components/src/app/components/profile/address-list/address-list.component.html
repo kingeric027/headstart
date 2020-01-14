@@ -37,6 +37,13 @@
               <!-- Action Buttons for SLOT in Generic List -->
               <div class="d-flex justify-content-between align-items-center"
                    *ngIf="address.Editable">
+                <!-- Make Default Address Button -->
+                <div class="icon-button ripple hover-btn"
+                     (click)="showEditAddress(address)">
+                  <div class="icon-wrapper">
+                    Make Default
+                  </div>
+                </div>
                 <!-- Edit Button -->
                 <div class="icon-button ripple hover-btn"
                      (click)="showEditAddress(address)">
