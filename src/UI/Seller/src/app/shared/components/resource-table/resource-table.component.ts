@@ -58,9 +58,9 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   isMyResource = false;
   alive = true;
   screenSize;
-  myResourceHeight: number = 450;
-  tableHeight: number = 450;
-  editResourceHeight: number = 450;
+  myResourceHeight = 450;
+  tableHeight = 450;
+  editResourceHeight = 450;
 
   constructor(
     private router: Router,
