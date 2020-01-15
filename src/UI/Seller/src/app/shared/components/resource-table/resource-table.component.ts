@@ -112,6 +112,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   selectedResourceID: string;
   @Input()
   resourceForm: FormGroup;
+  @Input()
+  shouldShowCreateNew = true;
 
   async ngOnInit() {
     this.determineViewingContext();
