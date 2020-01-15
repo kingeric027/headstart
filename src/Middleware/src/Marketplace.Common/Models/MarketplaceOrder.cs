@@ -13,9 +13,7 @@ namespace Marketplace.Common.Models
 
 	public class OrderXp
 	{
-		// TODO - this should serialize to an array of ShippingSelection objects. 
-		//  Dictionary key is ShipFromAddressID. This should enforce uniqueness. 
-		public IDictionary<string, ShippingSelection> ShippingSelections { get; set; }
+		public IEnumerable<ShippingSelection> ShippingSelections { get; set; }
 		public string AvalaraTaxTransactionCode { get; set; }
 	}
 }

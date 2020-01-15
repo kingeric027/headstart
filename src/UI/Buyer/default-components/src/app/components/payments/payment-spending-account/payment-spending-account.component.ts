@@ -1,16 +1,16 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { SpendingAccount, ListSpendingAccount, Payment, Order } from '@ordercloud/angular-sdk';
+import { SpendingAccount, ListSpendingAccount, Payment } from '@ordercloud/angular-sdk';
 import * as moment_ from 'moment';
 const moment = moment_;
 import { ModalState } from '../../../models/modal-state.class';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
 @Component({
   templateUrl: './payment-spending-account.component.html',
   styleUrls: ['./payment-spending-account.component.scss'],
 })
 export class OCMPaymentSpendingAccount implements OnInit {
-  order: Order;
+  order: MarketplaceOrder;
   @Input() payment: Payment;
   @Output() continue = new EventEmitter();
   spendingAccounts: ListSpendingAccount;
