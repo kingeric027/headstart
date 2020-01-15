@@ -50,8 +50,7 @@ namespace Marketplace.Common.Controllers
                 foreach (var supplier in uniqueSupplierList)
                 {
                     var supplierInfo = await _oc.Suppliers.GetAsync(supplier);
-                Console.WriteLine(supplierInfo.xp.Contacts[0].Email);
-                    //await _sendgridService.SendSingleEmail("noreply@four51.com", supplierInfo.xp.Contacts[0].Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to supplier receiving order
+                    await _sendgridService.SendSingleEmail("noreply@four51.com", supplierInfo.xp.Contacts[0].Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to supplier receiving order
                 }
 
             await _sendgridService.SendSingleEmail("noreply@four51.com", payload.Response.Body.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
