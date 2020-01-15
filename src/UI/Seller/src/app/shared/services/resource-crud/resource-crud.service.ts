@@ -231,7 +231,7 @@ export abstract class ResourceCrudService<ResourceType> {
       // placeholder conditional for getting the supplier order list page running
       // will need to integrate this with the filter on the order list page as a seller
       // user and potentially refactor later
-      return ['Incoming', options];
+      return ['Incoming', ...options];
     }
     if (this.secondaryResourceLevel) {
       const parentResourceID = this.getParentResourceID();
