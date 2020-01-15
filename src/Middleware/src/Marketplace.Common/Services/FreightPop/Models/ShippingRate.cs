@@ -7,7 +7,7 @@ namespace Marketplace.Common.Services.FreightPop
 	public class ShippingRate
 	{
 		public string Id { get; set; }
-		//public string QuoteId { get; set; } Why two IDs? And which whould we use?
+		public string QuoteId { get; set; } // What is this used for?
 		public string AccountName { get; set; }
 		public string Carrier { get; set; }
 		public string Currency { get; set; }

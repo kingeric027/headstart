@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
-import { Order, LineItem } from '@ordercloud/angular-sdk';
+import { LineItem } from '@ordercloud/angular-sdk';
 import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
 @Component({
   templateUrl: './mini-cart.component.html',
@@ -9,7 +9,7 @@ import { ShopperContextService } from 'marketplace';
 export class OCMMiniCart implements OnInit {
   @Output() navigate = new EventEmitter(); // to do, use context on pathChange instead?
   lineItems: LineItem[] = [];
-  order: Order = {};
+  order: MarketplaceOrder = {};
   maxLines = 5; // Limit the height for UI purposes
   faEllipsisH = faEllipsisH;
 

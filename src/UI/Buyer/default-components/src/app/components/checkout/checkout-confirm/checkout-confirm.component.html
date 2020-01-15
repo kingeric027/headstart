@@ -15,7 +15,7 @@
       </ocm-address-card>
     </div>
   </div>
-  <ocm-lineitem-table [lineItems]="lineItems"
+  <ocm-lineitem-table [lineItems]="lineItems?.Items"
                       [readOnly]="true">
   </ocm-lineitem-table>
   <form *ngIf="!anonEnabled"
