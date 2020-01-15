@@ -1,15 +1,15 @@
 import { Component, OnChanges, SimpleChanges, Output, EventEmitter, Input, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { get as _get } from 'lodash';
-import { Payment, Order } from '@ordercloud/angular-sdk';
-import { ShopperContextService } from 'marketplace';
+import { Payment } from '@ordercloud/angular-sdk';
+import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
 @Component({
   templateUrl: './payment-purchase-order.component.html',
   styleUrls: ['./payment-purchase-order.component.scss'],
 })
 export class OCMPaymentPurchaseOrder implements OnInit {
-  order: Order;
+  order: MarketplaceOrder;
   form: FormGroup;
   _payment: Payment;
   @Output() continue = new EventEmitter();

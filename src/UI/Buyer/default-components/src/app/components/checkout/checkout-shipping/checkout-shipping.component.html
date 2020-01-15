@@ -1,0 +1,16 @@
+<div *ngIf="shippingOptions">
+    <div *ngFor="let liGroup of liGroupedByShipFrom">
+        <ocm-lineitem-table [lineItems]="liGroup"
+                            [readOnly]="true">
+                            <ocm-shipping-selection-form [options]="getshippingOptions(liGroup)"
+                                                         [existingSelection]="getExistingSelection(liGroup)"
+                                                         (selectionChanged)="selectRate($event.detail)">
+                            </ocm-shipping-selection-form>
+        </ocm-lineitem-table>
+    </div>
+    <div class="d-flex justify-content-start align-items-center">
+    <button type="submit"
+            class="btn btn-primary btn-sm mr-2"
+            (click)="onContinueClicked()">Save and Continue</button>
+    </div>
+</div>

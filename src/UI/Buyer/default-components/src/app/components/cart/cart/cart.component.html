@@ -25,9 +25,11 @@
               (click)="toCheckout()">CHECKOUT</button>
     </div>
     <div class="col-lg-8">
-      <ocm-lineitem-table [lineItems]="lineItems"
-                          [readOnly]="false">
-      </ocm-lineitem-table>
+      <div *ngFor="let liGroup of liGroupedByShipFrom">
+        <ocm-lineitem-table [lineItems]="liGroup"
+                            [readOnly]="false">
+        </ocm-lineitem-table>
+      </div>
     </div>
   </div>
 </div>

@@ -18,9 +18,17 @@ namespace Orchestration.Tests
         }
 
         [Test, TestCaseSource(typeof(TypeFactory), nameof(TypeFactory.TestCases))]
-        public void build_path<T>(RecordType type, T obj) where T : IOrchestrationObject
+        public void build_path<T>(RecordType type, T obj) where T : IMarketplaceObject
         {
-            var path = obj.BuildPath("supplier");
+            // TODO: Address ID here
+            var model = new OrchestrationObject<T>()
+            {
+                ClientId = "fake",
+                //ID = obj.ID,
+                Token = "fake",
+                Model = obj
+            };
+            var path = model.BuildPath("supplier");
             Assert.AreEqual(path, $"supplier/{obj.Type().ToString().ToLower()}/id");
         }
 
@@ -32,7 +40,7 @@ namespace Orchestration.Tests
         }
 
         [Test, TestCaseSource(typeof(TypeFactory), nameof(TypeFactory.TestCases))]
-        public void test_type_deriver<T>(RecordType type, T obj) where T : IOrchestrationObject
+        public void test_type_deriver<T>(RecordType type, T obj) where T : IMarketplaceObject
         {
             Assert.AreEqual(type, obj.Type());
         }
@@ -44,55 +52,55 @@ namespace Orchestration.Tests
         {
             get
             {
-                yield return new TestCaseData(RecordType.Product, new OrchestrationProduct()
+                yield return new TestCaseData(RecordType.Product, new MarketplaceProduct()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.ProductFacet, new OrchestrationProductFacet()
+                yield return new TestCaseData(RecordType.ProductFacet, new MarketplaceProductFacet()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.SpecProductAssignment, new OrchestrationSpecProductAssignment()
+                yield return new TestCaseData(RecordType.SpecProductAssignment, new MarketplaceSpecProductAssignment()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.PriceSchedule, new OrchestrationPriceSchedule()
+                yield return new TestCaseData(RecordType.PriceSchedule, new MarketplacePriceSchedule()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.Spec, new OrchestrationSpec()
+                yield return new TestCaseData(RecordType.Spec, new Marketplace.Helpers.Models.MarketplaceSpec()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.SpecOption, new OrchestrationSpecOption()
+                yield return new TestCaseData(RecordType.SpecOption, new MarketplaceSpecOption()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.Buyer, new OrchestrationBuyer()
+                yield return new TestCaseData(RecordType.Buyer, new MarketplaceBuyer()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.User, new OrchestrationUser()
+                yield return new TestCaseData(RecordType.User, new MarketplaceUser()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.UserGroup, new OrchestrationUserGroup()
+                yield return new TestCaseData(RecordType.UserGroup, new MarketplaceUserGroup()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.UserGroupAssignment, new OrchestrationUserGroupAssignment()
+                yield return new TestCaseData(RecordType.UserGroupAssignment, new MarketplaceUserGroupAssignment()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.CostCenter, new OrchestrationCostCenter()
+                yield return new TestCaseData(RecordType.CostCenter, new BaseCostCenter()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.Address, new OrchestrationAddress()
+                yield return new TestCaseData(RecordType.Address, new Marketplace.Helpers.Models.MarketplaceAddress()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.AddressAssignment, new OrchestrationAddressAssignment()
+                yield return new TestCaseData(RecordType.AddressAssignment, new MarketplaceAddressAssignment()
                 {
                     ID = "id"
                 });

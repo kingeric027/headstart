@@ -13,6 +13,6 @@ namespace Marketplace.Common.Models
 	{
 		public string SupplierID { get; set; }
 		public string ShipFromAddressID { get; set; }
-		public IEnumerable<ShippingRate> Quotes { get; set; }
+		public IEnumerable<ShippingRate> Rates { get; set; }
 	}
 }

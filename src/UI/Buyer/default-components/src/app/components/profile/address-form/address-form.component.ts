@@ -11,31 +11,33 @@ import { GeographyConfig } from '../../../config/geography.class';
   templateUrl: './address-form.component.html',
   styleUrls: ['./address-form.component.scss'],
 })
-export class OMCAddressForm implements OnInit {
+export class OCMAddressForm implements OnInit {
   private ExistingAddress: BuyerAddress = {};
   @Input() btnText: string;
+  @Input() showOptionToSave = false;
   @Output() formDismissed = new EventEmitter();
   @Output()
-  formSubmitted = new EventEmitter<{ address: Address; formDirty: boolean }>();
+  formSubmitted = new EventEmitter<{ address: Address; formDirty: boolean, shouldSaveAddress: boolean }>();
   stateOptions: string[] = [];
   countryOptions: { label: string; abbreviation: string }[];
   addressForm: FormGroup;
+  shouldSaveAddressForm: FormGroup;
 
   constructor() {
     this.countryOptions = GeographyConfig.getCountries();
   }
 
   ngOnInit() {
-    this.setForm();
+    this.setForms();
   }
 
   @Input() set existingAddress(address: BuyerAddress) {
     this.ExistingAddress = address || {};
-    this.setForm();
+    this.setForms();
     this.addressForm.markAsPristine();
   }
 
-  setForm() {
+  setForms() {
     this.addressForm = new FormGroup({
       FirstName: new FormControl(this.ExistingAddress.FirstName || '', [Validators.required, ValidateName]),
       LastName: new FormControl(this.ExistingAddress.LastName || '', [Validators.required, ValidateName]),
@@ -47,6 +49,9 @@ export class OMCAddressForm implements OnInit {
       Phone: new FormControl(this.ExistingAddress.Phone || '', ValidatePhone),
       Country: new FormControl(this.ExistingAddress.Country || 'US', Validators.required),
       ID: new FormControl(this.ExistingAddress.ID || ''),
+    });
+    this.shouldSaveAddressForm = new FormGroup({
+      shouldSaveAddress: new FormControl(false)
     });
     this.onCountryChange();
   }
@@ -64,10 +69,11 @@ export class OMCAddressForm implements OnInit {
     if (this.addressForm.status === 'INVALID') {
       return;
     }
+
     this.formSubmitted.emit({
       address: this.addressForm.value,
       formDirty: this.addressForm.dirty,
-    });
+      shouldSaveAddress: this.shouldSaveAddressForm.controls.shouldSaveAddress.value   });
   }
   dismissForm() {
     this.formDismissed.emit();

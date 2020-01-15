@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Order, ListPayment, ListLineItem } from '@ordercloud/angular-sdk';
+import { 
+  ListPayment, ListLineItem } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-confirm.component.html',
@@ -9,7 +10,7 @@ import { ShopperContextService } from 'marketplace';
 })
 export class OCMCheckoutConfirm implements OnInit {
   form: FormGroup;
-  order: Order;
+  order: MarketplaceOrder;
   payments: ListPayment;
   lineItems: ListLineItem;
   anonEnabled: boolean;

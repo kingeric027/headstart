@@ -26,19 +26,19 @@ namespace Orchestration.Tests
             Assert.IsTrue(prop != null);
         }
 
-        [Test]
-        public void ensure_spec_ui_xp_required()
-        {
-            var prop = typeof(OrchestrationSpecXp)
-                .GetProperty("UI")?
-                .GetCustomAttributes(typeof(RequiredAttribute), false);
-            Assert.IsTrue(prop != null);
-        }
+        //[Test]
+        //public void ensure_spec_ui_xp_required()
+        //{
+        //    var prop = typeof(OrchestrationSpecXp)
+        //        .GetProperty("UI")?
+        //        .GetCustomAttributes(typeof(RequiredAttribute), false);
+        //    Assert.IsTrue(prop != null);
+        //}
 
         [Test]
         public void ensure_base_orchestration_object_id_required()
         {
-            var obj = typeof(IOrchestrationObject);
+            var obj = typeof(IMarketplaceObject);
             var types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => obj.IsAssignableFrom(p));
