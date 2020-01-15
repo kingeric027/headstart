@@ -7,6 +7,8 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { OrderService } from '@app-seller/shared/services/order/order.service';
 
 function createOrderForm(order: Order) {
+  // more fields will be added in the future, this is just to ensure that there is a
+  // form so that we can get the list functionality working
   return new FormGroup({
     Comments: new FormControl(order.Comments),
   });
