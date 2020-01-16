@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Order } from '@ordercloud/angular-sdk';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import { OrderDetails, ShopperContextService } from 'marketplace';
+import { OrderDetails, ShopperContextService, MarketplaceOrder } from 'marketplace';
 
 @Component({
   templateUrl: './order-detail.component.html',
   styleUrls: ['./order-detail.component.scss'],
 })
 export class OCMOrderDetails implements OnInit {
-  order: Order;
+  order: MarketplaceOrder;
   orderDetails: OrderDetails;
   approvalVersion: boolean;
   faCube = faCube;
@@ -28,7 +27,7 @@ export class OCMOrderDetails implements OnInit {
     return this.context.currentUser.favoriteOrderIDs.includes(orderID);
   }
 
-  toggleFavorite(order: Order) {
+  toggleFavorite(order: MarketplaceOrder) {
     const newValue = !this.isFavorite(order.ID);
     this.context.currentUser.setIsFavoriteOrder(newValue, order.ID);
   }

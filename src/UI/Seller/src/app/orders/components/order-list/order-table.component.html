@@ -5,15 +5,23 @@
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
                           [resourceForm]="resourceForm"
+                          [shouldShowCreateNew]="false"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
+                          (applyFilters)="applyFilters()"
                           (resourceSelected)="selectResource($event)">
-  <app-product-edit class="resource-edit"
-                    *ngIf="resourceForm"
-                    [resourceForm]="resourceForm"
-                    (updateResource)="updateResource($event)"
-                    [supplierAddresses]="supplierAddresses"></app-product-edit>
+
+  <!-- filter component -->
+  <!-- <form class="d-flex flex-column filters"
+        [formGroup]="filterForm">
+    filter component will go here when implemented for orders
+  </form> -->
+
+  <!-- edit user -->
+  <div class="resource-edit">
+    resource edit component will go here
+  </div>
 </resource-table-component>

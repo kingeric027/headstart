@@ -116,6 +116,8 @@ import { OCMCreditCardIcon } from './components/payments/credit-card-icon/credit
 import { OCMCreditCardDisplay } from './components/payments/credit-card-display/credit-card-display.component';
 import { OCMCreditCardForm } from './components/payments/credit-card-form/credit-card-form.component';
 import { OCMProfileForm } from './components/profile/profile-form/profile-form.component';
+import { OCMCheckoutShipping } from './components/checkout/checkout-shipping/checkout-shipping.component';
+import { OCMShippingSelectionForm } from './components/checkout/shipping-selection-form/shipping-selection-form.component';
 
 const components = [
   OCMCategoryDropdown,
@@ -184,6 +186,8 @@ const components = [
   SpecFormSelectComponent,
   SpecFormTextAreaComponent,
   OCMSupplierList,
+  OCMCheckoutShipping,
+  OCMShippingSelectionForm
 ];
 
 @NgModule({
@@ -291,6 +295,8 @@ export class AppModule {
     this.buildWebComponent(OCMCheckoutAddress, 'ocm-checkout-address');
     this.buildWebComponent(OCMCheckoutPayment, 'ocm-checkout-payment');
     this.buildWebComponent(OCMCheckout, 'ocm-checkout');
+    this.buildWebComponent(OCMCheckoutShipping, 'ocm-checkout-shipping');
+    this.buildWebComponent(OCMShippingSelectionForm, 'ocm-shipping-selection-form');
     this.buildWebComponent(OCMPaymentMethodManagement, 'ocm-payment-method-management');
     this.buildWebComponent(OCMProfile, 'ocm-profile');
 

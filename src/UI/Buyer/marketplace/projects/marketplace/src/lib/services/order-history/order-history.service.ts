@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { OcOrderService, Order, ListPromotion, ListPayment, OrderApproval, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
+import { OcOrderService, ListPromotion, ListPayment, OrderApproval, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
 import { uniqBy as _uniqBy } from 'lodash';
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
-import { IOrderHistory, OrderReorderResponse, OrderDetails, ShipmentWithItems, ShipmentItemWithLineItem} from '../../shopper-context';
+import { IOrderHistory, OrderReorderResponse, OrderDetails, ShipmentWithItems, ShipmentItemWithLineItem, MarketplaceOrder, OrderXp} from '../../shopper-context';
 import { OrderFilterService } from './order-filter.service';
 
 @Injectable({
@@ -21,11 +21,11 @@ export class OrderHistoryService implements IOrderHistory {
     private ocLineItemService: OcLineItemService
   ) {}
 
-  async approveOrder(orderID: string = this.activeOrderID, Comments: string = '', AllowResubmit: boolean = false): Promise<Order> {
+  async approveOrder(orderID: string = this.activeOrderID, Comments: string = '', AllowResubmit: boolean = false): Promise<MarketplaceOrder> {
     return await this.ocOrderService.Approve('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 
-  async declineOrder(orderID: string = this.activeOrderID, Comments: string = '', AllowResubmit: boolean = false): Promise<Order> {
+  async declineOrder(orderID: string = this.activeOrderID, Comments: string = '', AllowResubmit: boolean = false): Promise<MarketplaceOrder> {
     return await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 

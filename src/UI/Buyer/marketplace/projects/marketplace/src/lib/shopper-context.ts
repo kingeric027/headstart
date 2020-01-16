@@ -56,12 +56,12 @@ export interface IOrderHistory {
     orderID?: string,
     Comments?: string,
     AllowResubmit?: boolean
-  ): Promise<Order>;
+  ): Promise<MarketplaceOrder>;
   declineOrder(
     orderID?: string,
     Comments?: string,
     AllowResubmit?: boolean
-  ): Promise<Order>;
+  ): Promise<MarketplaceOrder>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
@@ -106,8 +106,8 @@ export interface ICurrentUser {
 
 export interface ICurrentOrder {
   addToCartSubject: Subject<LineItem>;
-  get(): Order;
-  patch(order: Order): Promise<Order>;
+  get(): MarketplaceOrder;
+  patch(order: MarketplaceOrder): Promise<MarketplaceOrder>;
   getLineItems(): ListLineItem;
   submit(): Promise<void>;
 
@@ -119,12 +119,16 @@ export interface ICurrentOrder {
 
   listPayments(): Promise<ListPayment>;
   createPayment(payment: Payment): Promise<Payment>;
-  setBillingAddress(address: Address): Promise<Order>;
-  setShippingAddress(address: Address): Promise<Order>;
-  setBillingAddressByID(addressID: string): Promise<Order>;
-  setShippingAddressByID(addressID: string): Promise<Order>;
+  setBillingAddress(address: Address): Promise<MarketplaceOrder>;
+  setShippingAddress(address: Address): Promise<MarketplaceOrder>;
+  setBillingAddressByID(addressID: string): Promise<MarketplaceOrder>;
+  setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
 
-  onOrderChange(callback: (order: Order) => void): void;
+  getShippingRates(): Promise<ShippingOptions[]>;
+  selectShippingRate(selection: ShippingSelection): Promise<MarketplaceOrder>;
+  calculateTax(): Promise<MarketplaceOrder>;
+
+  onOrderChange(callback: (order: MarketplaceOrder) => void): void;
   onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
 }
 
@@ -174,6 +178,36 @@ export interface SupplierFilters {
   sortBy?: string;
   activeFilters?: any;
   search?: string;
+}
+
+export interface ShippingRate {
+  Id: string;
+  AccountName: string;
+  Carrier: string;
+  Currency: string;
+  DeliveryDate: Date;
+  DeliveryDays: number;
+  CarrierQuoteId: string;
+  Service: string;
+  TotalCost: number;
+}
+
+export interface ShippingSelection {
+  ShipFromAddressID: string;
+  SupplierID: string;
+  ShippingRateID: string;
+}
+
+export interface ShippingOptions {
+  SupplierID: string;
+  ShipFromAddressID: string;
+  Rates: ShippingRate[];
+}
+
+export interface MarketplaceOrder extends Order<OrderXp, any, any> { }
+export interface OrderXp {
+  ShippingSelections: ShippingSelection[];
+  AvalaraTaxTransactionCode: string;
 }
 
 export interface IAuthentication {
@@ -247,7 +281,7 @@ export interface OrderReorderResponse {
 }
 
 export interface OrderDetails {
-  order: Order;
+  order: MarketplaceOrder;
   lineItems: ListLineItem;
   promotions: ListPromotion;
   payments: ListPayment;
