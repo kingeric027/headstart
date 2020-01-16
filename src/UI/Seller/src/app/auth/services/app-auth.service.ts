@@ -12,7 +12,7 @@ import { isUndefined as _isUndefined } from 'lodash';
 import { AppStateService } from '@app-seller/shared/services/app-state/app-state.service';
 import * as jwtDecode from 'jwt-decode';
 import { DecodedOrderCloudToken } from '@app-seller/shared';
-import { SELLER, SUPPLIER } from '@app-seller/shared/models/ordercloud-user.types';
+import { SELLER, SUPPLIER, OrderCloudUserType } from '@app-seller/shared/models/ordercloud-user.types';
 
 export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possible';
 @Injectable({
@@ -77,8 +77,8 @@ export class AppAuthService {
     return roles;
   }
 
-  getOrdercloudUserType(): string {
-    let usrtype = this.getOrdercloudUserTypeFromToken();
+  getOrdercloudUserType(): OrderCloudUserType {
+    let usrtype = this.getUsrTypeFromToken();
     const OrdercloudUserType = usrtype === 'admin' ? SELLER : SUPPLIER;
     return OrdercloudUserType;
   }
@@ -88,7 +88,7 @@ export class AppAuthService {
     return decodedToken.role;
   }
 
-  getOrdercloudUserTypeFromToken(): string {
+  getUsrTypeFromToken(): string {
     const decodedToken: DecodedOrderCloudToken = this.getDecodedToken();
     return decodedToken.usrtype;
   }
