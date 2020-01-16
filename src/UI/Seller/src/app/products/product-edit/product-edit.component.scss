@@ -21,3 +21,17 @@
 .quill-container {
     height: 400px;
 }
+
+.dropzone {
+    background-image: url("../../../assets/FileUploadCircle.png");
+    background-repeat: no-repeat;
+    background-size: 100px;
+    background-position: center;
+    min-height: 200px;
+    min-width: 400px;
+    display: table;
+    width: 100%;
+    background-color: #d8e9f5 !important;
+    opacity: 0.8;
+    border: 2px dashed rgb(141, 194, 231);
+}

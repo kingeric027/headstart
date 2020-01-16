@@ -4,6 +4,7 @@ import { FormGroup } from '@angular/forms';
 import { Address, ListAddress, OcSupplierAddressService, MeUser } from '@ordercloud/angular-sdk';
 import { SupplierAddressService } from '@app-seller/shared/services/supplier/supplier-address.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -19,6 +20,7 @@ export class ProductEditComponent implements OnInit {
   hasVariations = false;
   @Input()
   supplierAddresses: ListAddress;
+  files: FileHandle[] = [];
 
   constructor(
     private supplierAddressService: SupplierAddressService,
@@ -38,5 +40,19 @@ export class ProductEditComponent implements OnInit {
 
   updateResourceFromEvent(event: any, field: string): void {
     this.updateResource.emit({ value: event.target.value, field });
+  }
+
+  // Image uploading functions
+  filesDropped(files: FileHandle[]): void {
+    console.group();
+    console.log('FILES DROPPED');
+    console.log(files);
+    console.groupEnd();
+    this.files = files;
+  }
+
+  upload(): void {
+    console.log('upload');
+    //get image upload file obj;
   }
 }
