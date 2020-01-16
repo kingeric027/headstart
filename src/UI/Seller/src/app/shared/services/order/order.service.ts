@@ -12,8 +12,4 @@ export class OrderService extends ResourceCrudService<Order> {
   constructor(router: Router, activatedRoute: ActivatedRoute, ocOrderService: OcOrderService) {
     super(router, activatedRoute, ocOrderService, '/orders', 'orders');
   }
-
-  emptyResource = {
-    Comments: '',
-  };
 }

@@ -6,14 +6,6 @@ import { SellerUserService } from '@app-seller/shared/services/seller-user/selle
 import { FormControl, FormGroup } from '@angular/forms';
 import { OrderService } from '@app-seller/shared/services/order/order.service';
 
-function createOrderForm(order: Order) {
-  // more fields will be added in the future, this is just to ensure that there is a
-  // form so that we can get the list functionality working
-  return new FormGroup({
-    Comments: new FormControl(order.Comments),
-  });
-}
-
 @Component({
   selector: 'app-order-table',
   templateUrl: './order-table.component.html',
@@ -27,6 +19,6 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
     activatedroute: ActivatedRoute,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, orderService, router, activatedroute, ngZone, createOrderForm);
+    super(changeDetectorRef, orderService, router, activatedroute, ngZone);
   }
 }
