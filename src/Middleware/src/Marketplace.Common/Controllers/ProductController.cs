@@ -14,8 +14,8 @@ namespace Marketplace.Common.Controllers
     [Route("product")]
     public class ProductController : BaseController
     {
-        private readonly IMarketplaceProductCrudCommand _command;
-        public ProductController(AppSettings settings, IMarketplaceProductCrudCommand command) : base(settings)
+        private readonly IMarketplaceProductCommand _command;
+        public ProductController(AppSettings settings, IMarketplaceProductCommand command) : base(settings)
         {
             _command = command;
         }

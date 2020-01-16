@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -69,6 +70,16 @@ namespace Marketplace.Common.Mappers.Crud
         public static PartialProduct Map(Partial<MarketplaceProduct> mProduct)
         {
             return mProduct.Values.ToObject<PartialProduct>();
+        }
+
+        public static Marketplace.Helpers.Models.ListPage<MarketplaceProduct> Map(OrderCloud.SDK.ListPage<Product> ocProducts)
+        {
+            var list = new Marketplace.Helpers.Models.ListPage<MarketplaceProduct>
+            {
+                Items = ocProducts.Items.Select(Map).ToList(),
+                Meta = ListPageMetaMapper.MapListFrom(ocProducts.Meta)
+            };
+            return list;
         }
     }
 }
