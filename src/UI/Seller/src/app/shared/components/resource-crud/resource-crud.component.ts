@@ -68,7 +68,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   subscribeToResources() {
-    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
+    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
       this.resourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
@@ -83,7 +83,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   subscribeToOptions() {
-    this.ocService.optionsSubject.pipe(takeWhile(() => this.alive)).subscribe(options => {
+    this.ocService.optionsSubject.pipe(takeWhile(() => this.alive)).subscribe((options) => {
       this.resourceOptions = options;
       this.setFilterForm();
       this.changeDetectorRef.detectChanges();
@@ -91,7 +91,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   subscribeToResourceSelection() {
-    this.activatedRoute.params.subscribe(params => {
+    this.activatedRoute.params.subscribe((params) => {
       if (this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
         const resourceIDSelected =
@@ -249,7 +249,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   setFilterForm() {
     const formGroup = {};
     if (this.filterConfig && this.filterConfig.Filters) {
-      this.filterConfig.Filters.forEach(filter => {
+      this.filterConfig.Filters.forEach((filter) => {
         const value = (this.resourceOptions.filters && this.resourceOptions.filters[filter.Path]) || '';
         formGroup[filter.Path] = new FormControl(value);
       });
