@@ -61,7 +61,7 @@
       <!-- /sub resource dropdown -->
     </div>
     <div class="col-md-3 col-sm-7 d-flex justify-content-start align-items-center"
-         *ngIf="!isCreatingNew">
+         *ngIf="!isCreatingNew && shouldShowCreateNew">
       <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
       <button class="btn btn-block brand-button--orange"
               routerLink="/{{_ocService.route}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new">

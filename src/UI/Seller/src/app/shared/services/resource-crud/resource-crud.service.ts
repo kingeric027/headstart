@@ -120,9 +120,7 @@ export abstract class ResourceCrudService<ResourceType> {
   private async listWithStatusIndicator(options: Options): Promise<ListResource<ResourceType>> {
     try {
       this.resourceRequestStatus.next(this.getFetchStatus(options));
-      const resourceResponse = await this.ocService
-        .List(...this.appendParentIDToCallArgsIfSubResource([options]))
-        .toPromise();
+      const resourceResponse = await this.ocService.List(...this.createListArgs([options])).toPromise();
       this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
       return resourceResponse;
     } catch (error) {
@@ -221,19 +219,25 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   getResourceById(resourceID: string): Promise<any> {
-    return this.ocService.Get(...this.appendParentIDToCallArgsIfSubResource([resourceID])).toPromise();
+    return this.ocService.Get(...this.createListArgs([resourceID])).toPromise();
   }
 
-  appendParentIDToCallArgsIfSubResource(nonParentIDArgs: any[]) {
+  createListArgs(options: any[]) {
     /* ordercloud services follow a patter where the paramters to a function (Save, Create, List)
       are the nearly the same for all resource. However, sub resources (supplier users, buyer payment methods, etc...)
       have the parent resource ID as the first paramter before the expected argument
     */
+    if (this.primaryResourceLevel === 'orders') {
+      // placeholder conditional for getting the supplier order list page running
+      // will need to integrate this with the filter on the order list page as a seller
+      // user and potentially refactor later
+      return ['Incoming', ...options];
+    }
     if (this.secondaryResourceLevel) {
       const parentResourceID = this.getParentResourceID();
-      return [parentResourceID, ...nonParentIDArgs];
+      return [parentResourceID, ...options];
     } else {
-      return [...nonParentIDArgs];
+      return [...options];
     }
   }
 
@@ -249,9 +253,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async updateResource(resource: any): Promise<any> {
-    const newResource = await this.ocService
-      .Save(...this.appendParentIDToCallArgsIfSubResource([resource.ID, resource]))
-      .toPromise();
+    const newResource = await this.ocService.Save(...this.createListArgs([resource.ID, resource])).toPromise();
     const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
     this.resourceSubject.value.Items[resourceIndex] = newResource;
     this.resourceSubject.next(this.resourceSubject.value);
@@ -259,18 +261,14 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async deleteResource(resourceID: string): Promise<null> {
-    const newResource = await this.ocService
-      .Delete(...this.appendParentIDToCallArgsIfSubResource([resourceID]))
-      .toPromise();
+    const newResource = await this.ocService.Delete(...this.createListArgs([resourceID])).toPromise();
     this.resourceSubject.value.Items = this.resourceSubject.value.Items.filter((i: any) => i.ID !== resourceID);
     this.resourceSubject.next(this.resourceSubject.value);
     return;
   }
 
   async createNewResource(resource: any): Promise<any> {
-    const newResource = await this.ocService
-      .Create(...this.appendParentIDToCallArgsIfSubResource([resource]))
-      .toPromise();
+    const newResource = await this.ocService.Create(...this.createListArgs([resource])).toPromise();
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;

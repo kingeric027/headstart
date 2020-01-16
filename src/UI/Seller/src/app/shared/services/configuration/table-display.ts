@@ -51,6 +51,11 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toSecondaryHeader: 'ApprovalRuleID',
     toImage: '',
   },
+  orders: {
+    toPrimaryHeader: 'FromUser.Username',
+    toSecondaryHeader: 'Status',
+    toImage: '',
+  },
 };
 
 export interface ResourceColumnConfiguration {
@@ -81,6 +86,8 @@ export interface ResourceConfigurationDictionary {
 
 export const STRING_WITH_IMAGE = 'STRING_WITH_IMAGE';
 export const BASIC_STRING = 'BASIC_STRING';
+export const DATE_TIME = 'DATE_TIME';
+export const CURRENCY = 'CURRENCY';
 
 export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
   products: {
@@ -208,6 +215,46 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
       {
         path: 'ID',
         header: 'ID',
+        type: BASIC_STRING,
+      },
+    ],
+    imgPath: '',
+  },
+  orders: {
+    fields: [
+      {
+        path: 'FromUser.Username',
+        header: 'From User Username',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'ID',
+        header: 'ID',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'LineItemCount',
+        header: '# of Line Items',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'Total',
+        header: 'Total Amount (USD)',
+        type: CURRENCY,
+      },
+      {
+        path: 'DateSubmitted',
+        header: 'Time Submitted',
+        type: DATE_TIME,
+      },
+      {
+        path: 'Status',
+        header: 'Status',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'Comments',
+        header: 'Comments',
         type: BASIC_STRING,
       },
     ],

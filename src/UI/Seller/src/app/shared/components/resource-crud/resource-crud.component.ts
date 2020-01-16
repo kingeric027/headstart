@@ -195,7 +195,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   copyResource(resource: any) {
-    console.log(resource);
     return JSON.parse(JSON.stringify(resource));
   }
 
