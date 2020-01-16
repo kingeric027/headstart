@@ -6,6 +6,9 @@ export const ocAppConfig: AppConfig = {
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
   scope: [
+    // 'AdminAddressReader' is just for reading admin addresses as a seller user on product create/edti
+    // Will need to be updated to 'AdminAddressAdmin' when seller address create is implemented
+    'AdminAddressReader',
     'MeAddressAdmin',
     'MeAdmin',
     'BuyerUserAdmin',

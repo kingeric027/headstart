@@ -97,7 +97,7 @@
                   (change)="updateResourceFromEvent($event, 'ShipFromAddressID')">
             <option disabled
                     [ngValue]="null">Choose an address</option>
-            <option *ngFor="let address of supplierAddresses?.Items"
+            <option *ngFor="let address of addresses?.Items"
                     [ngValue]="address.ID">{{address.AddressName}}</option>
           </select>
         </div>

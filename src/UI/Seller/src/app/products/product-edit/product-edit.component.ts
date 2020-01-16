@@ -1,10 +1,11 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit } from '@angular/core';
 import { get as _get } from 'lodash';
 import { FormGroup } from '@angular/forms';
-import { Address, ListAddress, OcSupplierAddressService, MeUser } from '@ordercloud/angular-sdk';
+import { Address, ListAddress, OcSupplierAddressService, MeUser, OcAdminAddressService } from '@ordercloud/angular-sdk';
 import { SupplierAddressService } from '@app-seller/shared/services/supplier/supplier-address.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
+import { UserContext } from '@app-seller/config/user-context';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -19,23 +20,26 @@ export class ProductEditComponent implements OnInit {
   updateResource = new EventEmitter<any>();
   hasVariations = false;
   @Input()
-  supplierAddresses: ListAddress;
+  addresses: ListAddress;
   files: FileHandle[] = [];
 
   constructor(
     private supplierAddressService: SupplierAddressService,
     private currentUserService: CurrentUserService,
-    private ocSupplierAddressService: OcSupplierAddressService
+    private ocSupplierAddressService: OcSupplierAddressService,
+    private ocAdminAddressService: OcAdminAddressService
   ) {}
 
   ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
-    this.getSupplierAddresses();
+    this.getAddresses();
   }
 
-  async getSupplierAddresses(): Promise<void> {
-    const user: MeUser = await this.currentUserService.getUser();
-    this.supplierAddresses = await this.ocSupplierAddressService.List(user.Supplier.ID).toPromise();
+  async getAddresses(): Promise<void> {
+    const context: UserContext = await this.currentUserService.getUserContext();
+    context.Me.Supplier
+      ? (this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise())
+      : (this.addresses = await this.ocAdminAddressService.List().toPromise());
   }
 
   updateResourceFromEvent(event: any, field: string): void {
@@ -44,15 +48,10 @@ export class ProductEditComponent implements OnInit {
 
   // Image uploading functions
   filesDropped(files: FileHandle[]): void {
-    console.group();
-    console.log('FILES DROPPED');
-    console.log(files);
-    console.groupEnd();
     this.files = files;
   }
 
   upload(): void {
-    console.log('upload');
-    //get image upload file obj;
+    console.log(`UPLOAD ${this.files} to blob`);
   }
 }

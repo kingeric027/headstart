@@ -12,6 +12,7 @@ import { isUndefined as _isUndefined } from 'lodash';
 import { AppStateService } from '@app-seller/shared/services/app-state/app-state.service';
 import * as jwtDecode from 'jwt-decode';
 import { DecodedOrderCloudToken } from '@app-seller/shared';
+import { SELLER, SUPPLIER } from '@app-seller/shared/models/ordercloud-user.types';
 
 export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possible';
 @Injectable({
@@ -37,7 +38,7 @@ export class AppAuthService {
   refresh(): Observable<void> {
     this.fetchingRefreshToken = true;
     return this.fetchRefreshToken().pipe(
-      tap((token) => {
+      tap(token => {
         this.ocTokenService.SetAccess(token);
         this.refreshToken.next(token);
         this.appStateService.isLoggedIn.next(true);
@@ -57,22 +58,39 @@ export class AppAuthService {
     );
   }
 
-  getUserRoles(): string[] {
+  getDecodedToken() {
     const userToken = this.ocTokenService.GetAccess();
-    return this.getRolesFromToken(userToken);
-  }
-
-  getRolesFromToken(token: string): string[] {
     let decodedToken: DecodedOrderCloudToken;
     try {
-      decodedToken = jwtDecode(token);
+      decodedToken = jwtDecode(userToken);
     } catch (e) {
       decodedToken = null;
     }
     if (!decodedToken) {
-      throw new Error('decoded jwt was null when attempting to get user type');
+      throw new Error('decoded jwt was null when attempting to get user roles');
     }
+    return decodedToken;
+  }
+
+  getUserRoles(): string[] {
+    const roles = this.getRolesFromToken();
+    return roles;
+  }
+
+  getOrdercloudUserType(): string {
+    let usrtype = this.getOrdercloudUserTypeFromToken();
+    const OrdercloudUserType = usrtype === 'admin' ? SELLER : SUPPLIER;
+    return OrdercloudUserType;
+  }
+
+  getRolesFromToken(): string[] {
+    const decodedToken: DecodedOrderCloudToken = this.getDecodedToken();
     return decodedToken.role;
+  }
+
+  getOrdercloudUserTypeFromToken(): string {
+    const decodedToken: DecodedOrderCloudToken = this.getDecodedToken();
+    return decodedToken.usrtype;
   }
 
   fetchToken(): Observable<string> {
@@ -87,9 +105,9 @@ export class AppAuthService {
     const refreshToken = this.ocTokenService.GetRefresh();
     if (refreshToken) {
       return this.ocAuthService.RefreshToken(refreshToken, this.appConfig.clientID).pipe(
-        map((authResponse) => authResponse.access_token),
-        tap((token) => this.ocTokenService.SetAccess(token)),
-        catchError((error) => {
+        map(authResponse => authResponse.access_token),
+        tap(token => this.ocTokenService.SetAccess(token)),
+        catchError(error => {
           return throwError(error);
         })
       );
@@ -100,7 +118,7 @@ export class AppAuthService {
   logout(): Observable<any> {
     const cookiePrefix = this.appConfig.appname.replace(/ /g, '_').toLowerCase();
     const appCookieNames = _keys(this.cookieService.getAll());
-    appCookieNames.forEach((cookieName) => {
+    appCookieNames.forEach(cookieName => {
       if (cookieName.indexOf(cookiePrefix) > -1) {
         this.cookieService.remove(cookieName);
       }
