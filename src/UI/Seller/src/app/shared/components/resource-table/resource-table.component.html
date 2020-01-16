@@ -33,7 +33,7 @@
   <!-- /Page Title -->
   <!-- Filter Bar -->
   <div *ngIf="!isMyResource"
-       class="row additional-item-edit-resource additional-item-table">
+       class="row py-2 border-top border-bottom additional-item-edit-resource additional-item-table">
     <div *ngIf="parentResourceService"
          class="col-lg-3 col-md-4 col-sm-5 parent-resources">
       <!-- parent resource dropdown -->
@@ -189,7 +189,7 @@
               <button class="btn brand-button"
                       (click)="handleSelectResource({})">
                 <fa-icon [icon]="faChevronLeft"></fa-icon>
-                back
+                Back
               </button>
               <h3 class="d-inline-block ml-5 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>
@@ -220,17 +220,23 @@
                              [ngStyle]="{'height.px': editResourceHeight}">
             <ng-content select=".resource-edit">
             </ng-content>
+          </perfect-scrollbar>
+          <div class="d-flex justify-content-between align-items-center py-2 additional-item-edit-resource">
             <delete-confirm-modal-component *ngIf="!isCreatingNew"
+                                            buttonText="Delete {{_currentResourceNameSingular | titlecase}}"
                                             (deleteConfirmed)="handleDelete($event)">
             </delete-confirm-modal-component>
-            <button class="btn btn-primary"
-                    type="submit"
-                    [disabled]="resourceForm.status === 'INVALID' || !areChanges"
-                    (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
-            <button class="btn brand-button ml-3"
-                    (click)="handleDiscardChanges()"
-                    *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
-          </perfect-scrollbar>
+            <div>
+              <button *ngIf="areChanges"
+                      class="btn btn-primary"
+                      type="submit"
+                      [disabled]="resourceForm.status === 'INVALID'"
+                      (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
+              <button class="btn brand-button ml-3"
+                      (click)="handleDiscardChanges()"
+                      *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+            </div>
+          </div>
         </div>
       </ng-template>
     </div>

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -8,6 +8,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class DeleteConfirmModal {
   closeResult: string;
+  @Input()
+  buttonText: string;
   @Output()
   deleteConfirmed = new EventEmitter();
   constructor(private modalService: NgbModal) {}
@@ -15,7 +17,7 @@ export class DeleteConfirmModal {
   open(content) {
     this.modalService
       .open(content, { ariaLabelledBy: 'delete-confirm-modal' })
-      .result.then((result) => {
+      .result.then(result => {
         this.deleteConfirmed.emit(null);
       })
       .catch(() => {});
