@@ -1,4 +1,5 @@
 import { Product } from '@ordercloud/angular-sdk';
+import { MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 
 export const IMAGE_HOST_URL = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
 export const PLACEHOLDER_URL = 'http://placehold.it/300x300';
@@ -11,10 +12,17 @@ export function getProductMainImageUrlOrPlaceholder(product: Product) {
 
 export function getProductImageUrls(product: Product): string[] {
   const images = (product.xp && product.xp.Images) || [];
-  const result = images.map(img => {
+  const result = images.map((img) => {
     return img.Url.replace('{u}', IMAGE_HOST_URL);
   });
 
   //remove undefined values
-  return result.filter(r => r);
+  return result.filter((r) => r);
+}
+
+export function addImgHostUrlToProductImages(images: MarketPlaceProductImage[]) {
+  return images.map((img) => {
+    img.Url = img.Url.replace('{u}', IMAGE_HOST_URL);
+    return img;
+  });
 }

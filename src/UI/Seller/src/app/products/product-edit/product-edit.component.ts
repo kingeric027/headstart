@@ -1,14 +1,18 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { get as _get } from 'lodash';
-import { ListAddress, OcSupplierAddressService, MeUser } from '@ordercloud/angular-sdk';
 import { SupplierAddressService } from '@app-seller/shared/services/supplier/supplier-address.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
+import { UserContext } from '@app-seller/config/user-context';
+import { ListAddress, OcSupplierAddressService, OcAdminAddressService, MeUser } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { MarketPlaceProduct, MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
-import { ProductService } from '@app-seller/shared/services/product/product.service';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
+import { ProductService } from '@app-seller/shared/services/product/product.service';
+import { addImgHostUrlToProductImages } from '@app-seller/shared/services/product/product-image.helper';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -17,7 +21,6 @@ import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api
 export class ProductEditComponent implements OnInit {
   _marketPlaceProduct: MarketPlaceProduct;
   _marketPlaceProductUpdated: MarketPlaceProduct;
-  files = [];
   @Input()
   productForm: FormGroup;
   @Input()
@@ -32,39 +35,52 @@ export class ProductEditComponent implements OnInit {
   filterConfig;
   @Output()
   updateResource = new EventEmitter<any>();
-  hasVariations = false;
   @Input()
-  supplierAddresses: ListAddress;
+  addresses: ListAddress;
   @Input()
   isCreatingNew: boolean;
 
-  async getSupplierAddresses(): Promise<void> {
-    const user: MeUser = await this.currentUserService.getUser();
-    if (user.Supplier) {
-      this.supplierAddresses = await this.ocSupplierAddressService.List(user.Supplier.ID).toPromise();
-    }
-  }
+  hasVariations = false;
+  files: FileHandle[] = [];
+  filesForBlob: {};
 
   constructor(
     private router: Router,
     private supplierAddressService: SupplierAddressService,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
+    private ocAdminAddressService: OcAdminAddressService,
     private productService: ProductService,
-    private middleware: MiddlewareAPIService
+    private middleware: MiddlewareAPIService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
-    this.getSupplierAddresses();
     this.checkIfCreatingNew();
+    this.getAddresses();
+  }
+
+  async getAddresses(): Promise<void> {
+    const context: UserContext = await this.currentUserService.getUserContext();
+    context.Me.Supplier
+      ? (this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise())
+      : (this.addresses = await this.ocAdminAddressService.List().toPromise());
+  }
+
+  getProductImages(marketPlaceProduct: MarketPlaceProduct): void {
+    addImgHostUrlToProductImages(marketPlaceProduct.xp.Images).map((image) => {
+      this.files.push({ ExistingImage: image, File: null, Url: image.Url });
+    });
   }
 
   private async handleSelectedProductChange(product: Product): Promise<void> {
     const marketPlaceProduct = await this.productService.getMarketPlaceProductByID(product.ID);
     this._marketPlaceProduct = marketPlaceProduct;
+    console.log(this._marketPlaceProduct, 'within handleSelectedProductChange');
     this._marketPlaceProductUpdated = marketPlaceProduct;
     this.createProductForm(marketPlaceProduct);
+    this.getProductImages(marketPlaceProduct);
     this.checkIfCreatingNew();
   }
 
@@ -105,6 +121,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   updateProduct() {
+    return console.log(this._marketPlaceProductUpdated);
     this.productService.updateMarketPlaceProduct(this._marketPlaceProductUpdated);
   }
 
@@ -126,9 +143,38 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
-  filesDropped(event) {
-    const file = event[0].file;
-    debugger;
-    this.middleware.uploadProductImage(file, 'd1nwNNzAsk2Y5JH3gij6qg', 1);
+  manualFileUpload(event): void {
+    for (let i = 0; i < event.target.files.length; i++) {
+      const File = event.target.files[i];
+      const Url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(File));
+      this.files.push({ File, Url, ExistingImage: null });
+    }
+    this.constructBlobObject(this.files);
+  }
+
+  // Image uploading functions
+  filesDropped(files: FileHandle[]): void {
+    this.files = [...this.files, ...files];
+    this.constructBlobObject(this.files);
+  }
+
+  removeFile(fileToRemove: FileHandle, i: number) {
+    this.files[i].Delete = true;
+    this.constructBlobObject(this.files);
+  }
+
+  constructBlobObject(files: FileHandle[]): void {
+    const filesToUpload = [],
+      filesToDelete = [];
+    files.forEach((file, i) => {
+      file.Index = i;
+      !file.ExistingImage && filesToUpload.push(file);
+      file.Delete && filesToDelete.push(file);
+    });
+    this.filesForBlob = {
+      Delete: filesToDelete,
+      Upload: filesToUpload,
+    };
+    this._marketPlaceProductUpdated.xp.Data;
   }
 }

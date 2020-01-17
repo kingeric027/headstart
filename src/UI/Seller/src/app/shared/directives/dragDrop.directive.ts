@@ -1,9 +1,13 @@
 import { Directive, HostBinding, HostListener, Output, EventEmitter } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { MarketPlaceProductImage } from '../models/MarketPlaceProduct.interface';
 
 export interface FileHandle {
-  file: File;
-  url: SafeUrl;
+  ExistingImage: MarketPlaceProductImage;
+  File: File;
+  Url: SafeUrl;
+  Index?: number;
+  Delete?: boolean;
 }
 
 @Directive({
@@ -45,12 +49,12 @@ export class DragDirective {
     evt.stopPropagation();
     this.background = '#eee';
 
-    let files: FileHandle[] = [];
-    for (let i = 0; i < evt.dataTransfer.files.length; i++) {
-      const file = evt.dataTransfer.files[i];
-      const url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
-      files.push({ file, url });
-    }
+    const files: FileHandle[] = [];
+    Array.from(evt.dataTransfer.files).map((file) => {
+      const File = file;
+      const Url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(File));
+      files.push({ File, Url, ExistingImage: null });
+    });
     if (files.length > 0) {
       this.files.emit(files);
     }

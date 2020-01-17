@@ -179,22 +179,25 @@
         <p class="font-italic">Drag and Drop or upload your product images to display on the buyer site.</p>
       </div>
       <div class="col-md-7">
-        <div *ngIf="!files.length"
-             class="col-12 rmpm dropzone"
-             appDrag
-             (files)="filesDropped($event)">
-        </div>
         <!--droped image preview-->
-        <div class="d-flex justify-content-start align-items-center">
-          <div *ngFor="let file of files"
+        <div class="d-flex justify-content-start align-items-center flex-wrap">
+          <div *ngFor="let file of files; let i = index"
                class="mr-2">
-            <img *ngIf="file"
-                 [src]="file.url"
+            <img *ngIf="file && !file.Delete"
+                 [id]="i"
+                 [src]="file.Url"
                  width="auto"
-                 height="100px">
+                 height="100px"
+                 (click)="removeFile(file, i)">
+          </div>
+          <div class="rmpm dropzone"
+               appDrag
+               (files)="filesDropped($event)">
+            <input type="file"
+                   (change)="manualFileUpload($event)"
+                   multiple>
           </div>
         </div>
-
         <button *ngIf="files.length"
                 class="btn brand-button mt-2"
                 type="button"
