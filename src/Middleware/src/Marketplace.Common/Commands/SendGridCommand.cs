@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 namespace Marketplace.Common.Commands
 {
 
-	public interface IOrderSubmitCommand
+	public interface ISendgridCommand
 	{
 		Task SendSupplierEmails(string orderID);
 	}
-	public class OrderSubmitCommand : IOrderSubmitCommand
+	public class SendGridCommand : ISendgridCommand
     {
 		private readonly ISendgridService _sendgridService;
 		private readonly IOrderCloudClient _oc;
 
-		public OrderSubmitCommand(AppSettings settings, ISendgridService sendgridService)
+		public SendGridCommand(AppSettings settings, ISendgridService sendgridService)
 		{
 			_sendgridService = sendgridService;
 			_oc = new OrderCloudClient(new OrderCloudClientConfig()
