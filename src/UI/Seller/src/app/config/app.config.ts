@@ -3,7 +3,8 @@ import { environment } from '../../environments/environment';
 
 export const ocAppConfig: AppConfig = {
   appname: 'OrderCloud Admin',
-  marketplaceID: 'SEB',
+  marketplaceID: 'seb',
+  cmsUrl: 'https://marketplaceqa.blob.core.windows.net',
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
   scope: [
@@ -87,6 +88,8 @@ export interface AppConfig {
    * base path to middleware
    */
   middlewareUrl: string;
+
+  cmsUrl: string;
 
   marketplaceID: string;
 

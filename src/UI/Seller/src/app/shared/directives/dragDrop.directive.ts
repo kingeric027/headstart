@@ -15,7 +15,7 @@ export interface FileHandle {
 })
 export class DragDirective {
   @Output()
-  files = new EventEmitter<any>();
+  files = new EventEmitter<FileHandle[]>();
 
   @HostBinding('style.background-color')
   private background = '#f5fcff';
@@ -52,6 +52,7 @@ export class DragDirective {
     const files: FileHandle[] = [];
     Array.from(evt.dataTransfer.files).map((file) => {
       const File = file;
+      debugger;
       const Url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(File));
       files.push({ File, Url, ExistingImage: null });
     });

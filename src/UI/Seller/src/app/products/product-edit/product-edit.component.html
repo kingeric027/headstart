@@ -192,16 +192,12 @@
           </div>
           <div class="rmpm dropzone"
                appDrag
-               (files)="filesDropped($event)">
+               (files)="addFiles($event)">
             <input type="file"
                    (change)="manualFileUpload($event)"
                    multiple>
           </div>
         </div>
-        <button *ngIf="files.length"
-                class="btn brand-button mt-2"
-                type="button"
-                (click)="upload()">{{files.length > 1 ? 'Upload Images' : 'Upload Image'}}</button>
       </div>
     </div>
     <!-- /Product Images -->
