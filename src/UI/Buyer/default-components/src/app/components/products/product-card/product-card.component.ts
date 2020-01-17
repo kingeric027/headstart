@@ -55,7 +55,7 @@ export class OCMProductCard {
     this.context.currentUser.setIsFavoriteProduct(isFavorite, this._product.ID);
   }
 
-  setQuantity(qty: number) {
-    this.quantity = qty;
+  setQuantity(event: any) {
+    this.quantity = event.qty;
   }
 }
