@@ -221,7 +221,8 @@
             <ng-content select=".resource-edit">
             </ng-content>
           </perfect-scrollbar>
-          <div class="d-flex justify-content-between align-items-center py-2 additional-item-edit-resource">
+          <div *ngIf="shouldShowResourceActions"
+               class="d-flex justify-content-between align-items-center py-2 additional-item-edit-resource">
             <delete-confirm-modal-component *ngIf="!isCreatingNew"
                                             buttonText="Delete {{_currentResourceNameSingular | titlecase}}"
                                             (deleteConfirmed)="handleDelete($event)">

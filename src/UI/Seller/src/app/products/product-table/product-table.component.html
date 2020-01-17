@@ -5,6 +5,7 @@
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
                           [resourceForm]="resourceForm"
+                          [shouldShowResourceActions]="false"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
@@ -12,8 +13,6 @@
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
   <app-product-edit class="resource-edit"
-                    *ngIf="resourceForm"
-                    [resourceForm]="resourceForm"
-                    (updateResource)="updateResource($event)"
-                    [addresses]="addresses"></app-product-edit>
+                    [addresses]="addresses"
+                    [orderCloudProduct]="resourceInSelection"></app-product-edit>
 </resource-table-component>

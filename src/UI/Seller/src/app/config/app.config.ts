@@ -18,6 +18,11 @@ export const ocAppConfig: AppConfig = {
     'Shopper',
     'CategoryReader',
     'ProductAdmin',
+
+    // adding this for product editing and creation on the front end
+    // this logic may be moved to the backend in the future and this might not be required
+    'PriceScheduleAdmin',
+
     'SupplierReader',
     'SupplierAddressReader',
     'BuyerAdmin',

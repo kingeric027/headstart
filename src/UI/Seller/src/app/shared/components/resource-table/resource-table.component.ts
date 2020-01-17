@@ -114,6 +114,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   resourceForm: FormGroup;
   @Input()
   shouldShowCreateNew = true;
+  @Input()
+  shouldShowResourceActions = true;
 
   async ngOnInit() {
     this.determineViewingContext();
@@ -157,7 +159,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.router.events
       .pipe(takeWhile(() => this.alive))
       // only need to set the breadcrumbs on nav end events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
         this.setBreadCrumbs();
       });
@@ -170,7 +172,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   private setParentResourceSelectionSubscription() {
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
-      .subscribe(async params => {
+      .subscribe(async (params) => {
         await this.redirectToFirstParentIfNeeded();
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
@@ -183,7 +185,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   private setListRequestStatusSubscription() {
-    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe(requestStatus => {
+    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe((requestStatus) => {
       this.requestStatus = requestStatus;
       this.changeDetectorRef.detectChanges();
     });
@@ -200,8 +202,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     // in the future breadcrumb logic might need to be more complicated than this
     const urlPieces = this.router.url
       .split('/')
-      .filter(p => p)
-      .map(p => {
+      .filter((p) => p)
+      .map((p) => {
         if (p.includes('?')) {
           return p.slice(0, p.indexOf('?'));
         } else {
