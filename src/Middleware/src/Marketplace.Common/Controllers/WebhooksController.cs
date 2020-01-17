@@ -3,10 +3,7 @@ using Marketplace.Common.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
-using System;
-using OrderCloud.SDK;
-using System.Collections.Generic;
-using System.Linq;
+using Marketplace.Common.Commands;
 
 namespace Marketplace.Common.Controllers
 {
@@ -15,18 +12,13 @@ namespace Marketplace.Common.Controllers
 
         private readonly AppSettings _settings;
         private readonly ISendgridService _sendgridService;
-        private readonly IOrderCloudClient _oc;
+        private readonly IOrderSubmitCommand _orderSubmitCommand;
 
-        public WebhooksController(AppSettings settings, ISendgridService sendgridService) : base(settings)
+        public WebhooksController(AppSettings settings, ISendgridService sendgridService, IOrderSubmitCommand orderSubmitCommand) : base(settings)
         {
-            _oc = new OrderCloudClient(new OrderCloudClientConfig()
-            {
-                ClientId = "2234C6E1-8FA5-41A2-8A7F-A560C6BA44D8",
-                ClientSecret = "z08ibzgsb337ln8EzJx5efI1VKxqdqeBW0IB7p1SJaygloJ4J9uZOtPu1Aql",
-                Roles = new[] { ApiRole.FullAccess }
-            });
             _settings = settings;
             _sendgridService = sendgridService;
+            _orderSubmitCommand = orderSubmitCommand;
         }
 
         // USING AN OC MESSAGE SENDER - NOT WEBHOOK
@@ -39,20 +31,7 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route("ordersubmit")]
         public async void HandleOrderSubmit([FromBody] WebhookPayloads.Orders.Submit payload)
         {
-            List<string> SupplierList = new List<string>();
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, payload.Response.Body.ID);
-
-                foreach (var item in lineItems.Items)
-                {
-                    SupplierList.Add(item.SupplierID);
-                }
-                var uniqueSupplierList = SupplierList.Distinct().ToList();
-                foreach (var supplier in uniqueSupplierList)
-                {
-                    var supplierInfo = await _oc.Suppliers.GetAsync(supplier);
-                    await _sendgridService.SendSingleEmail("noreply@four51.com", supplierInfo.xp.Contacts[0].Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to supplier receiving order
-                }
-
+            await _orderSubmitCommand.SendSupplierEmails(payload.Response.Body.ID);
             await _sendgridService.SendSingleEmail("noreply@four51.com", payload.Response.Body.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
         }
 
