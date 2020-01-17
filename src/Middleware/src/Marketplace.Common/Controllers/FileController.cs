@@ -18,15 +18,15 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[HttpPost, Route("images/product/{productID}/{index}")]
-		public async Task UploadProductImages(IFormFile file, string marketplaceID, string fileName, string index)
+		public async Task UploadProductImages(IFormFile file, string marketplaceID, string productID, string index)
 		{
-			await _content.UploadProductImage(file, marketplaceID, fileName, index);
+			await _content.UploadProductImage(file, marketplaceID, productID, index);
 		}
 
 		[HttpDelete, Route("images/product/{productID}/{index}")]
-		public async Task DeleteProductImages(IFormFile file, string marketplaceID, string fileName, string index)
+		public async Task DeleteProductImages(IFormFile file, string marketplaceID, string productID, string index)
 		{
-			await _content.DeleteProductImage(marketplaceID, fileName, index);
+			await _content.DeleteProductImage(marketplaceID, productID, index);
 		}
 	}
 }

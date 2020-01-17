@@ -8,6 +8,7 @@ import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct
 import { Router } from '@angular/router';
 import { ProductService } from '@app-seller/shared/services/product/product.service';
 import { Product } from '@ordercloud/angular-sdk';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -16,6 +17,7 @@ import { Product } from '@ordercloud/angular-sdk';
 export class ProductEditComponent implements OnInit {
   _marketPlaceProduct: MarketPlaceProduct;
   _marketPlaceProductUpdated: MarketPlaceProduct;
+  files = [];
   @Input()
   productForm: FormGroup;
   @Input()
@@ -48,7 +50,8 @@ export class ProductEditComponent implements OnInit {
     private supplierAddressService: SupplierAddressService,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
-    private productService: ProductService
+    private productService: ProductService,
+    private middleware: MiddlewareAPIService
   ) {}
 
   ngOnInit() {
@@ -121,5 +124,11 @@ export class ProductEditComponent implements OnInit {
     } else {
       this._marketPlaceProductUpdated = { ...this._marketPlaceProductUpdated, [field]: event.target.value };
     }
+  }
+
+  filesDropped(event) {
+    const file = event[0].file;
+    debugger;
+    this.middleware.uploadProductImage(file, 'd1nwNNzAsk2Y5JH3gij6qg', 1);
   }
 }
