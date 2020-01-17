@@ -6,10 +6,12 @@ import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { UserContext } from '@app-seller/config/user-context';
 import { ListAddress, OcSupplierAddressService, OcAdminAddressService, MeUser } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { MarketPlaceProduct, MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { ProductService } from '@app-seller/shared/services/product/product.service';
+import { addImgHostUrlToProductImages } from '@app-seller/shared/services/product/product-image.helper';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -39,6 +41,7 @@ export class ProductEditComponent implements OnInit {
 
   hasVariations = false;
   files: FileHandle[] = [];
+  filesForBlob: {};
 
   constructor(
     private router: Router,
@@ -46,7 +49,8 @@ export class ProductEditComponent implements OnInit {
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
     private ocAdminAddressService: OcAdminAddressService,
-    private productService: ProductService
+    private productService: ProductService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -62,11 +66,19 @@ export class ProductEditComponent implements OnInit {
       : (this.addresses = await this.ocAdminAddressService.List().toPromise());
   }
 
+  getProductImages(marketPlaceProduct: MarketPlaceProduct): void {
+    addImgHostUrlToProductImages(marketPlaceProduct.xp.Images).map(image => {
+      this.files.push({ ExistingImage: image, File: null, Url: image.Url });
+    });
+  }
+
   private async handleSelectedProductChange(product: Product): Promise<void> {
     const marketPlaceProduct = await this.productService.getMarketPlaceProductByID(product.ID);
     this._marketPlaceProduct = marketPlaceProduct;
+    console.log(this._marketPlaceProduct, 'within handleSelectedProductChange');
     this._marketPlaceProductUpdated = marketPlaceProduct;
     this.createProductForm(marketPlaceProduct);
+    this.getProductImages(marketPlaceProduct);
     this.checkIfCreatingNew();
   }
 
@@ -107,6 +119,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   updateProduct() {
+    return console.log(this._marketPlaceProductUpdated);
     this.productService.updateMarketPlaceProduct(this._marketPlaceProductUpdated);
   }
 
@@ -128,12 +141,38 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
-  // Image uploading functions
-  filesDropped(files: FileHandle[]): void {
-    this.files = files;
+  manualFileUpload(event): void {
+    for (let i = 0; i < event.target.files.length; i++) {
+      const File = event.target.files[i];
+      const Url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(File));
+      this.files.push({ File, Url, ExistingImage: null });
+    }
+    this.constructBlobObject(this.files);
   }
 
-  upload(): void {
-    console.log(`UPLOAD ${this.files} to blob`);
+  // Image uploading functions
+  filesDropped(files: FileHandle[]): void {
+    this.files = [...this.files, ...files];
+    this.constructBlobObject(this.files);
+  }
+
+  removeFile(fileToRemove: FileHandle, i: number) {
+    this.files[i].Delete = true;
+    this.constructBlobObject(this.files);
+  }
+
+  constructBlobObject(files: FileHandle[]): void {
+    let filesToUpload = [],
+      filesToDelete = [];
+    files.forEach((file, i) => {
+      file.Index = i;
+      !file.ExistingImage && filesToUpload.push(file);
+      file.Delete && filesToDelete.push(file);
+    });
+    this.filesForBlob = {
+      Delete: filesToDelete,
+      Upload: filesToUpload,
+    };
+    this._marketPlaceProductUpdated.xp.Data;
   }
 }
