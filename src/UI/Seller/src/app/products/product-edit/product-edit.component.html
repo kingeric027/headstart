@@ -112,7 +112,7 @@
             <option disabled
                     [ngValue]="null">Choose an address</option>
             <option *ngFor="let address of addresses?.Items"
-                    [ngValue]="address.ID">{{address.AddressName}}</option>
+                    [value]="address.ID">{{address.AddressName}}</option>
           </select>
         </div>
         <div class="form-row">
