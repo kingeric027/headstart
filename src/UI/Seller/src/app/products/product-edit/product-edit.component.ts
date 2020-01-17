@@ -6,6 +6,7 @@ import { SupplierAddressService } from '@app-seller/shared/services/supplier/sup
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { UserContext } from '@app-seller/config/user-context';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -27,7 +28,8 @@ export class ProductEditComponent implements OnInit {
     private supplierAddressService: SupplierAddressService,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
-    private ocAdminAddressService: OcAdminAddressService
+    private ocAdminAddressService: OcAdminAddressService,
+    private middleware: MiddlewareAPIService
   ) {}
 
   ngOnInit() {

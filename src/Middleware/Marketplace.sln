@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestration.Tests", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.API", "src\Marketplace.API\Marketplace.API.csproj", "{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Helpers", "..\..\..\oc-marketplace-helpers.OliverHeywood\src\Marketplace.Helpers\Marketplace.Helpers.csproj", "{C881F9C2-5A5D-418D-AAB0-6506B600AA4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C881F9C2-5A5D-418D-AAB0-6506B600AA4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C881F9C2-5A5D-418D-AAB0-6506B600AA4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C881F9C2-5A5D-418D-AAB0-6506B600AA4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C881F9C2-5A5D-418D-AAB0-6506B600AA4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,6 +3,7 @@ import { environment } from '../../environments/environment';
 
 export const ocAppConfig: AppConfig = {
   appname: 'OrderCloud Admin',
+  marketplaceID: 'SEB',
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
   scope: [
@@ -81,6 +82,8 @@ export interface AppConfig {
    * base path to middleware
    */
   middlewareUrl: string;
+
+  marketplaceID: string;
 
   /**
    * An array of security roles that will be requested upon login.

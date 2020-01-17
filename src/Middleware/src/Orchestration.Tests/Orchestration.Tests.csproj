@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\oc-marketplace-helpers.OliverHeywood\src\Marketplace.Helpers\Marketplace.Helpers.csproj" />
     <ProjectReference Include="..\Marketplace.Common\Marketplace.Common.csproj" />
   </ItemGroup>
 
