@@ -21,9 +21,12 @@ export class MiddlewareAPIService {
   }
 
   async uploadProductImage(file: File, productID: string, index: number): Promise<void> {
-    const form = new FormData().append('file', file);
     await this.http
-      .post(`${this.baseUrl}/${this.marketplaceID}/images/product/${productID}/${index}`, form, this.headers)
+      .post(
+        `${this.baseUrl}/${this.marketplaceID}/images/product/${productID}/${index}`,
+        this.formify(file),
+        this.headers
+      )
       .toPromise();
   }
 
@@ -31,5 +34,11 @@ export class MiddlewareAPIService {
     await this.http
       .delete(`${this.baseUrl}/${this.marketplaceID}/images/product/${productID}/${index}`, this.headers)
       .toPromise();
+  }
+
+  private formify(file: File): FormData {
+    const form = new FormData();
+    form.append('file', file);
+    return form;
   }
 }
