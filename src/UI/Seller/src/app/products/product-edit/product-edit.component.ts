@@ -161,7 +161,7 @@ export class ProductEditComponent implements OnInit {
     const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
       return {
         File: file,
-        Url: this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(File)),
+        Url: this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file)),
         ExistingImage: null,
       };
     });
@@ -172,10 +172,13 @@ export class ProductEditComponent implements OnInit {
     this.files = [...this.files, ...files];
     this.constructBlobObject(this.files);
     const newFiles = files.map(this.mapFromFileHandle);
+    this._marketPlaceProductUpdated.xp = this._marketPlaceProductUpdated.xp || {};
+    this._marketPlaceProductUpdated.xp.Images = this._marketPlaceProductUpdated.xp.Images || []; // hate this shit
     this._marketPlaceProductUpdated.xp.Images.push(...newFiles);
   }
 
   removeFile(fileToRemove: FileHandle, indexToRemove: number) {
+    debugger;
     this.files[indexToRemove].Delete = true;
     // remove item from this._marketPlaceProductUpdated.xp.Images array
     this._marketPlaceProductUpdated.xp.Images = this._marketPlaceProductUpdated.xp.Images.filter(
