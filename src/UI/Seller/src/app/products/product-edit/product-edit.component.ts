@@ -11,9 +11,9 @@ import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { ProductService } from '@app-seller/shared/services/product/product.service';
-import { addImgHostUrlToProductImages } from '@app-seller/shared/services/product/product-image.helper';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -42,9 +42,7 @@ export class ProductEditComponent implements OnInit {
   isCreatingNew: boolean;
 
   hasVariations = false;
-  files: FileHandle[] = [];
-  filesToDelete: FileHandle[] = [];
-  filesToUpload: FileHandle[] = [];
+  images: MarketPlaceProductImage[] = [];
 
   constructor(
     private router: Router,
@@ -71,20 +69,13 @@ export class ProductEditComponent implements OnInit {
       : (this.addresses = await this.ocAdminAddressService.List().toPromise());
   }
 
-  getProductImages(marketPlaceProduct: MarketPlaceProduct): void {
-    const images = (marketPlaceProduct.xp && marketPlaceProduct.xp.Images) || [];
-    this.files = addImgHostUrlToProductImages(images).map((image) => {
-      return { ExistingImage: image, File: null, Url: image.Url };
-    });
-  }
-
   private async handleSelectedProductChange(product: Product): Promise<void> {
     const marketPlaceProduct = await this.productService.getMarketPlaceProductByID(product.ID);
     this._marketPlaceProduct = marketPlaceProduct;
     console.log(this._marketPlaceProduct, 'within handleSelectedProductChange');
     this._marketPlaceProductUpdated = marketPlaceProduct;
     this.createProductForm(marketPlaceProduct);
-    this.getProductImages(marketPlaceProduct);
+    this.images = ReplaceHostUrls(product);
     this.checkIfCreatingNew();
   }
 
@@ -113,7 +104,6 @@ export class ProductEditComponent implements OnInit {
   }
 
   handleSave() {
-    this.updateImageStorage();
     if (this.isCreatingNew) {
       this.createNewProduct();
     } else {
@@ -127,16 +117,6 @@ export class ProductEditComponent implements OnInit {
 
   updateProduct() {
     this.productService.updateMarketPlaceProduct(this._marketPlaceProductUpdated);
-  }
-
-  updateImageStorage() {
-    this.filesToUpload.forEach(async (file: FileHandle) => {
-      await this.middleware.uploadProductImage(file.File, this._marketPlaceProductUpdated.ID, file.Index);
-    });
-
-    this.filesToDelete.forEach(async (file: FileHandle) => {
-      await this.middleware.deleteProductImage(this._marketPlaceProductUpdated.ID, file.Index);
-    });
   }
 
   updateResourceFromEvent(event: any, field: string): void {
@@ -159,50 +139,18 @@ export class ProductEditComponent implements OnInit {
 
   manualFileUpload(event): void {
     const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
-      return {
-        File: file,
-        Url: this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file)),
-        ExistingImage: null,
-      };
+      return { File: file, Url: null };
     });
     this.addFiles(files);
   }
 
-  addFiles(files: FileHandle[]) {
-    this.files = [...this.files, ...files];
-    this.constructBlobObject(this.files);
-    const newFiles = files.map(this.mapFromFileHandle);
-    this._marketPlaceProductUpdated.xp = this._marketPlaceProductUpdated.xp || {};
-    this._marketPlaceProductUpdated.xp.Images = this._marketPlaceProductUpdated.xp.Images || []; // hate this shit
-    this._marketPlaceProductUpdated.xp.Images.push(...newFiles);
+  async addFiles(files: FileHandle[]) {
+    for (const file of files) {
+      await this.middleware.uploadProductImage(file.File, this._marketPlaceProduct.ID);
+    }
   }
 
-  removeFile(fileToRemove: FileHandle, indexToRemove: number) {
-    debugger;
-    this.files[indexToRemove].Delete = true;
-    // remove item from this._marketPlaceProductUpdated.xp.Images array
-    this._marketPlaceProductUpdated.xp.Images = this._marketPlaceProductUpdated.xp.Images.filter(
-      (img, i) => i !== indexToRemove
-    );
-    this.constructBlobObject(this.files);
+  async removeFile(imgUrl: string) {
+    await this.middleware.deleteProductImage(this._marketPlaceProduct.ID, imgUrl);
   }
-
-  constructBlobObject(files: FileHandle[]): void {
-    files.forEach((file, i) => {
-      file.Index = i;
-      if (!file.ExistingImage) this.filesToUpload.push(file);
-      if (file.Delete) this.filesToDelete.push(file);
-    });
-  }
-
-  mapFromFileHandle = (fileHandle: FileHandle): MarketPlaceProductImage => {
-    const productID = this._marketPlaceProduct.ID;
-    const marketplaceID = this.appConfig.marketplaceID;
-    const cmsUrl = this.appConfig.cmsUrl;
-    return {
-      Id: null,
-      Url: `${cmsUrl}/images/${marketplaceID}/products/${productID}-${fileHandle.Index}`,
-      Tags: [],
-    };
-  };
 }

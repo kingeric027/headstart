@@ -181,14 +181,13 @@
       <div class="col-md-7">
         <!--droped image preview-->
         <div class="d-flex justify-content-start align-items-center flex-wrap">
-          <div *ngFor="let file of files; let i = index"
+          <div *ngFor="let image of images; let i = index"
                class="mr-2">
-            <img *ngIf="file && !file.Delete"
-                 [id]="i"
-                 [src]="file.Url"
+            <img [id]="i"
+                 [src]="image.Url"
                  width="auto"
                  height="100px"
-                 (click)="removeFile(file, i)">
+                 (click)="removeFile(image.Url)">
           </div>
           <label class="rmpm dropzone"
                  for="upload"

@@ -1,6 +1,8 @@
 ﻿using Marketplace.Common.Services;
+using Marketplace.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,16 +19,16 @@ namespace Marketplace.Common.Controllers
 			_content = content;
 		}
 
-		[HttpPost, Route("images/product/{productID}/{index}")]
-		public async Task UploadProductImages(IFormFile file, string marketplaceID, string productID, string index)
+		[HttpPost, Route("images/product/{productID}"), MarketplaceUserAuth]
+		public async Task<Product> UploadProductImages(IFormFile file, string marketplaceID, string productID)
 		{
-			await _content.UploadProductImage(file, marketplaceID, productID, index);
+			return await _content.UploadProductImage(file, marketplaceID, productID, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpDelete, Route("images/product/{productID}/{index}")]
-		public async Task DeleteProductImages(IFormFile file, string marketplaceID, string productID, string index)
+		[HttpDelete, Route("images/product/{productID}/{fileName}"), MarketplaceUserAuth]
+		public async Task<Product> DeleteProductImages(string marketplaceID, string productID, string fileName)
 		{
-			await _content.DeleteProductImage(marketplaceID, productID, index);
+			return await _content.DeleteProductImage(marketplaceID, productID, fileName, VerifiedUserContext.AccessToken);
 		}
 	}
 }

@@ -10,19 +10,17 @@ export function getProductMainImageUrlOrPlaceholder(product: Product) {
   return imgUrls.length ? imgUrls[0] : PLACEHOLDER_URL;
 }
 
-export function getProductImageUrls(product: Product): string[] {
+export function ReplaceHostUrls(product: Product): MarketPlaceProductImage[] {
   const images = (product.xp && product.xp.Images) || [];
-  const result = images.map((img) => {
-    return img.Url.replace('{u}', IMAGE_HOST_URL);
-  });
-
-  //remove undefined values
-  return result.filter((r) => r);
+  return images.map((img) => ReplaceHostUrl(img));
 }
 
-export function addImgHostUrlToProductImages(images: MarketPlaceProductImage[]) {
-  return images.map((img) => {
-    img.Url = img.Url.replace('{u}', IMAGE_HOST_URL);
-    return img;
-  });
+function getProductImageUrls(product: Product): string[] {
+  return ReplaceHostUrls(product)
+    .map((image) => image.Url)
+    .filter((url) => url);
+}
+
+function ReplaceHostUrl(img: MarketPlaceProductImage): MarketPlaceProductImage {
+  return { ...img, Url: img.Url.replace('{u}', IMAGE_HOST_URL) };
 }

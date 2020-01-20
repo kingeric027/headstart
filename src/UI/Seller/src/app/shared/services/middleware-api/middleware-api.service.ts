@@ -23,13 +23,14 @@ export class MiddlewareAPIService {
     this.marketplaceID = this.appConfig.marketplaceID;
   }
 
-  async uploadProductImage(file: File, productID: string, index: number): Promise<void> {
-    const url = `${this.baseUrl}/${this.marketplaceID}/images/product/${productID}/${index}`;
+  async uploadProductImage(file: File, productID: string): Promise<void> {
+    const url = `${this.baseUrl}/${this.marketplaceID}/images/product/${productID}`;
     await this.http.post(url, this.formify(file), this.headers).toPromise();
   }
 
-  async deleteProductImage(productID: string, index: number): Promise<void> {
-    const url = `${this.baseUrl}/${this.marketplaceID}/images/product/${productID}/${index}`;
+  async deleteProductImage(productID: string, imageUrl: string): Promise<void> {
+    const imageName = imageUrl.split('/').slice(-1)[0];
+    const url = `${this.baseUrl}/${this.marketplaceID}/images/product/${productID}/${imageName}`;
     await this.http.delete(url, this.headers).toPromise();
   }
 

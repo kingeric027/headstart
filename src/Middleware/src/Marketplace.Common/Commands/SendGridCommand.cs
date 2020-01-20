@@ -1,4 +1,5 @@
-﻿using Marketplace.Common.Services;
+﻿using Marketplace.Common.Helpers;
+using Marketplace.Common.Services;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +20,8 @@ namespace Marketplace.Common.Commands
 		public SendGridCommand(AppSettings settings, ISendgridService sendgridService)
 		{
 			_sendgridService = sendgridService;
-			_oc = new OrderCloudClient(new OrderCloudClientConfig()
-			{
-				ClientId = "2234C6E1-8FA5-41A2-8A7F-A560C6BA44D8",
-				ClientSecret = "z08ibzgsb337ln8EzJx5efI1VKxqdqeBW0IB7p1SJaygloJ4J9uZOtPu1Aql",
-				Roles = new[] { ApiRole.FullAccess }
-			});
+			_oc = OcFactory.GetSEBAdmin();
+
 		}
 		public async Task SendSupplierEmails(string orderID)
 		{

@@ -3,11 +3,8 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { MarketPlaceProductImage } from '../models/MarketPlaceProduct.interface';
 
 export interface FileHandle {
-  ExistingImage: MarketPlaceProductImage;
   File: File;
   Url: SafeUrl;
-  Index?: number;
-  Delete?: boolean;
 }
 
 @Directive({
@@ -52,9 +49,8 @@ export class DragDirective {
     const files: FileHandle[] = [];
     Array.from(evt.dataTransfer.files).map((file) => {
       const File = file;
-      debugger;
       const Url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(File));
-      files.push({ File, Url, ExistingImage: null });
+      files.push({ File, Url });
     });
     if (files.length > 0) {
       this.files.emit(files);
