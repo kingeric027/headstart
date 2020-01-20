@@ -35,7 +35,6 @@ export class OCMAddressList implements OnInit {
   }
 
   showAddAddress() {
-    console.log('show');
     this.currentAddress = null;
     this.showCreateAddressForm = true;
   }
