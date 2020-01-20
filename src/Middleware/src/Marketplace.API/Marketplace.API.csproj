@@ -10,12 +10,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Marketplace.Helpers" Version="0.0.12" />
+    <PackageReference Include="Marketplace.Helpers" Version="0.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\oc-marketplace-helpers.OliverHeywood\src\Marketplace.Helpers\Marketplace.Helpers.csproj" />
     <ProjectReference Include="..\Marketplace.Common\Marketplace.Common.csproj" />
   </ItemGroup>
 
