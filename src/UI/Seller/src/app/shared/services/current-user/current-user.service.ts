@@ -1,8 +1,9 @@
 import { Injectable, Inject } from '@angular/core';
-import { User, Supplier, OcMeService, OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';
+import { User, Supplier, OcMeService, OcAuthService, OcTokenService, MeUser } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 import { AppAuthService } from '@app-seller/auth/services/app-auth.service';
 import { AppStateService } from '../app-state/app-state.service';
+import { UserContext } from '@app-seller/config/user-context';
 
 @Injectable({
   providedIn: 'root',
@@ -37,8 +38,24 @@ export class CurrentUserService {
     this.me = await this.ocMeService.Get().toPromise();
   }
 
-  async getUser(): Promise<User> {
+  async getUser(): Promise<MeUser> {
     return this.me ? this.me : await this.ocMeService.Get().toPromise();
+  }
+
+  async getUserContext(): Promise<UserContext> {
+    const UserContext: UserContext = await this.constructUserContext();
+    return UserContext;
+  }
+
+  async constructUserContext(): Promise<UserContext> {
+    const me: MeUser = await this.getUser();
+    const userType = await this.appAuthService.getOrdercloudUserType();
+    const userRoles = await this.appAuthService.getUserRoles();
+    return {
+      Me: me,
+      UserType: userType,
+      UserRoles: userRoles,
+    };
   }
 
   getCompany(): Supplier {

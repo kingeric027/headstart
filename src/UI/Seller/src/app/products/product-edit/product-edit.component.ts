@@ -1,13 +1,19 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, Inject } from '@angular/core';
 import { get as _get } from 'lodash';
-import { ListAddress, OcSupplierAddressService, MeUser } from '@ordercloud/angular-sdk';
 import { SupplierAddressService } from '@app-seller/shared/services/supplier/supplier-address.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
+import { UserContext } from '@app-seller/config/user-context';
+import { ListAddress, OcSupplierAddressService, OcAdminAddressService, MeUser } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { MarketPlaceProduct, MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
-import { ProductService } from '@app-seller/shared/services/product/product.service';
 import { Product } from '@ordercloud/angular-sdk';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
+import { ProductService } from '@app-seller/shared/services/product/product.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -30,38 +36,49 @@ export class ProductEditComponent implements OnInit {
   filterConfig;
   @Output()
   updateResource = new EventEmitter<any>();
-  hasVariations = false;
   @Input()
-  supplierAddresses: ListAddress;
+  addresses: ListAddress;
   @Input()
   isCreatingNew: boolean;
 
-  async getSupplierAddresses(): Promise<void> {
-    const user: MeUser = await this.currentUserService.getUser();
-    if (user.Supplier) {
-      this.supplierAddresses = await this.ocSupplierAddressService.List(user.Supplier.ID).toPromise();
-    }
-  }
+  hasVariations = false;
+  images: MarketPlaceProductImage[] = [];
 
   constructor(
     private router: Router,
     private supplierAddressService: SupplierAddressService,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
-    private productService: ProductService
+    private ocAdminAddressService: OcAdminAddressService,
+    private productService: ProductService,
+    private middleware: MiddlewareAPIService,
+    private sanitizer: DomSanitizer,
+    @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
   ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
-    this.getSupplierAddresses();
     this.checkIfCreatingNew();
+    this.getAddresses();
+  }
+
+  async getAddresses(): Promise<void> {
+    const context: UserContext = await this.currentUserService.getUserContext();
+    context.Me.Supplier
+      ? (this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise())
+      : (this.addresses = await this.ocAdminAddressService.List().toPromise());
   }
 
   private async handleSelectedProductChange(product: Product): Promise<void> {
     const marketPlaceProduct = await this.productService.getMarketPlaceProductByID(product.ID);
-    this._marketPlaceProduct = marketPlaceProduct;
-    this._marketPlaceProductUpdated = marketPlaceProduct;
-    this.createProductForm(marketPlaceProduct);
+    this.refreshProductData(marketPlaceProduct);
+  }
+
+  refreshProductData(product: MarketPlaceProduct) {
+    this._marketPlaceProduct = product;
+    this._marketPlaceProductUpdated = product;
+    this.createProductForm(product);
+    this.images = ReplaceHostUrls(product);
     this.checkIfCreatingNew();
   }
 
@@ -121,5 +138,25 @@ export class ProductEditComponent implements OnInit {
     } else {
       this._marketPlaceProductUpdated = { ...this._marketPlaceProductUpdated, [field]: event.target.value };
     }
+  }
+
+  manualFileUpload(event): void {
+    const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
+      return { File: file, Url: null };
+    });
+    this.addFiles(files);
+  }
+
+  async addFiles(files: FileHandle[]) {
+    let product;
+    for (const file of files) {
+      product = await this.middleware.uploadProductImage(file.File, this._marketPlaceProduct.ID);
+    }
+    this.refreshProductData(product);
+  }
+
+  async removeFile(imgUrl: string) {
+    const product = await this.middleware.deleteProductImage(this._marketPlaceProduct.ID, imgUrl);
+    this.refreshProductData(product);
   }
 }

@@ -220,19 +220,24 @@
                              [ngStyle]="{'height.px': editResourceHeight}">
             <ng-content select=".resource-edit">
             </ng-content>
-            <span *ngIf="shouldShowResourceActions">
-              <delete-confirm-modal-component *ngIf="!isCreatingNew"
-                                              (deleteConfirmed)="handleDelete($event)">
-              </delete-confirm-modal-component>
-              <button class="btn btn-primary"
+          </perfect-scrollbar>
+          <div *ngIf="shouldShowResourceActions"
+               class="d-flex justify-content-between align-items-center py-2 additional-item-edit-resource">
+            <delete-confirm-modal-component *ngIf="!isCreatingNew"
+                                            buttonText="Delete {{_currentResourceNameSingular | titlecase}}"
+                                            (deleteConfirmed)="handleDelete($event)">
+            </delete-confirm-modal-component>
+            <div>
+              <button *ngIf="areChanges"
+                      class="btn btn-primary"
                       type="submit"
-                      [disabled]="resourceForm?.status === 'INVALID' || !areChanges"
+                      [disabled]="resourceForm.status === 'INVALID'"
                       (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
               <button class="btn brand-button ml-3"
                       (click)="handleDiscardChanges()"
                       *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
-            </span>
-          </perfect-scrollbar>
+            </div>
+          </div>
         </div>
       </ng-template>
     </div>

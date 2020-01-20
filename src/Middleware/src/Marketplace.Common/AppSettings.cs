@@ -33,6 +33,7 @@ namespace Marketplace.Common
         public string ConnectionString { get; set; }
         public string QueueName { get; set; }
         public string CacheName { get; set; }
+		public string HostUrl { get; set; }
     }
 
     public class CosmosSettings

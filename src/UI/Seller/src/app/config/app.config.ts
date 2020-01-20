@@ -3,9 +3,14 @@ import { environment } from '../../environments/environment';
 
 export const ocAppConfig: AppConfig = {
   appname: 'OrderCloud Admin',
+  marketplaceID: 'seb',
+  cmsUrl: 'https://marketplaceqa.blob.core.windows.net',
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
   scope: [
+    // 'AdminAddressReader' is just for reading admin addresses as a seller user on product create/edti
+    // Will need to be updated to 'AdminAddressAdmin' when seller address create is implemented
+    'AdminAddressReader',
     'MeAddressAdmin',
     'MeAdmin',
     'BuyerUserAdmin',
@@ -83,6 +88,10 @@ export interface AppConfig {
    * base path to middleware
    */
   middlewareUrl: string;
+
+  cmsUrl: string;
+
+  marketplaceID: string;
 
   /**
    * An array of security roles that will be requested upon login.

@@ -12,7 +12,7 @@ export type ObjectStatus = DRAFT | PUBLISHED;
 // model in the C# product
 // making all non-product fields optional right now, could change later
 
-export interface MarketPlaceProduct extends Product {
+export interface MarketPlaceProduct extends Product<MarketPlaceProductXp> {
   Shipping?: ProductShipping;
   PriceSchedule?: PriceSchedule;
   HasVariants?: boolean;
@@ -31,4 +31,14 @@ interface ProductShipping {
 interface UnitOfMeasure {
   Qty: number;
   Unit: string;
+}
+
+interface MarketPlaceProductXp {
+  Data: any;
+  Images: MarketPlaceProductImage[];
+}
+
+export interface MarketPlaceProductImage {
+  Url: string;
+  Tags: string[];
 }
