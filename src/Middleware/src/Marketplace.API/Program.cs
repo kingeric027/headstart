@@ -55,6 +55,8 @@ namespace Marketplace.API
                     .Inject<IOrchestrationLogCommand>()
                     .Inject<IEnvironmentSeedCommand>()
 					.Inject<ISupplierCategoryConfigQuery>()
+					.Inject<ISendgridService>()
+					.Inject<ISendgridCommand>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                     .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
             }
