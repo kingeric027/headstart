@@ -112,7 +112,7 @@
             <option disabled
                     [ngValue]="null">Choose an address</option>
             <option *ngFor="let address of addresses?.Items"
-                    [ngValue]="address.ID">{{address.AddressName}}</option>
+                    [value]="address.ID">{{address.AddressName}}</option>
           </select>
         </div>
         <div class="form-row">
@@ -190,13 +190,16 @@
                  height="100px"
                  (click)="removeFile(file, i)">
           </div>
-          <div class="rmpm dropzone"
-               appDrag
-               (files)="addFiles($event)">
-            <input type="file"
-                   (change)="manualFileUpload($event)"
-                   multiple>
-          </div>
+          <label class="rmpm dropzone"
+                 for="upload"
+                 appDrag
+                 (files)="addFiles($event)">
+          </label>
+          <input class="d-none"
+                 id="upload"
+                 type="file"
+                 (change)="manualFileUpload($event)"
+                 multiple>
         </div>
       </div>
     </div>
