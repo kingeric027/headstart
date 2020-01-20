@@ -63,11 +63,11 @@ namespace Marketplace.Common.Services
 
 		public async Task<Product> DeleteProductImage(string marketplaceID, string productID, string fileName, string token)
 		{
-			var product = await _oc.Products.GetAsync(productID, token);
+			var product = await _oc.Products.GetAsync<Product<ProductXp>>(productID, token);
 			var blobName = GetProductImageName(marketplaceID, fileName);
 			_blob.Delete(blobName);
 
-			var Images = ((List<dynamic>)product.xp.Images).Where(img => img.Url.EndsWith(fileName));
+			var Images = product.xp.Images.Where(img => !img.Url.EndsWith(fileName));
 
 			return await _oc.Products.PatchAsync(productID, new PartialProduct() { xp = new { Images }}, token);
 		}
@@ -77,7 +77,7 @@ namespace Marketplace.Common.Services
 		private string GetProductImageURL(string blobName) => $"{_settings.BlobSettings.HostUrl}/images/{blobName}";
 	}
 
-	// TODO - move to nuget
+	// TODO - move to nuget shared models
 	public class ProductXp
 	{
 		public List<ProductImage> Images { get; set; }

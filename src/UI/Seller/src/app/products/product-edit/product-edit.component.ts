@@ -71,10 +71,13 @@ export class ProductEditComponent implements OnInit {
 
   private async handleSelectedProductChange(product: Product): Promise<void> {
     const marketPlaceProduct = await this.productService.getMarketPlaceProductByID(product.ID);
-    this._marketPlaceProduct = marketPlaceProduct;
-    console.log(this._marketPlaceProduct, 'within handleSelectedProductChange');
-    this._marketPlaceProductUpdated = marketPlaceProduct;
-    this.createProductForm(marketPlaceProduct);
+    this.refreshProductData(marketPlaceProduct);
+  }
+
+  refreshProductData(product: MarketPlaceProduct) {
+    this._marketPlaceProduct = product;
+    this._marketPlaceProductUpdated = product;
+    this.createProductForm(product);
     this.images = ReplaceHostUrls(product);
     this.checkIfCreatingNew();
   }
@@ -145,12 +148,15 @@ export class ProductEditComponent implements OnInit {
   }
 
   async addFiles(files: FileHandle[]) {
+    let product;
     for (const file of files) {
-      await this.middleware.uploadProductImage(file.File, this._marketPlaceProduct.ID);
+      product = await this.middleware.uploadProductImage(file.File, this._marketPlaceProduct.ID);
     }
+    this.refreshProductData(product);
   }
 
   async removeFile(imgUrl: string) {
-    await this.middleware.deleteProductImage(this._marketPlaceProduct.ID, imgUrl);
+    const product = await this.middleware.deleteProductImage(this._marketPlaceProduct.ID, imgUrl);
+    this.refreshProductData(product);
   }
 }

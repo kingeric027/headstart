@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -23,15 +24,15 @@ export class MiddlewareAPIService {
     this.marketplaceID = this.appConfig.marketplaceID;
   }
 
-  async uploadProductImage(file: File, productID: string): Promise<void> {
+  async uploadProductImage(file: File, productID: string): Promise<MarketPlaceProduct> {
     const url = `${this.baseUrl}/${this.marketplaceID}/images/product/${productID}`;
-    await this.http.post(url, this.formify(file), this.headers).toPromise();
+    return await this.http.post(url, this.formify(file), this.headers).toPromise();
   }
 
-  async deleteProductImage(productID: string, imageUrl: string): Promise<void> {
+  async deleteProductImage(productID: string, imageUrl: string): Promise<MarketPlaceProduct> {
     const imageName = imageUrl.split('/').slice(-1)[0];
     const url = `${this.baseUrl}/${this.marketplaceID}/images/product/${productID}/${imageName}`;
-    await this.http.delete(url, this.headers).toPromise();
+    return await this.http.delete(url, this.headers).toPromise();
   }
 
   private formify(file: File): FormData {
