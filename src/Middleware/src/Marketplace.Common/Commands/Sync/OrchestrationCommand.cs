@@ -69,7 +69,7 @@ namespace Marketplace.Common.Commands
                     ID = obj.ID,
                     Model = obj
                 };
-                await _blobQueue.Save(orch.BuildPath(resourceId), JsonConvert.SerializeObject(obj));
+                await _blobQueue.Save(orch.BuildPath(resourceId), JsonConvert.SerializeObject(orch));
                 return await Task.FromResult(obj);
             }
             catch (ApiErrorException ex)
