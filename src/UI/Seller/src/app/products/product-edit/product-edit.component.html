@@ -182,12 +182,21 @@
         <!--droped image preview-->
         <div class="d-flex justify-content-start align-items-center flex-wrap">
           <div *ngFor="let image of images; let i = index"
-               class="mr-2">
-            <img [id]="i"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
                  [src]="image.Url"
                  width="auto"
-                 height="100px"
-                 (click)="removeFile(image.Url)">
+                 height="100px">
+            <div class="product-img-delete btn-group clearfix text-center position-absolute position-bottom position-left position-right mb-xs-1 child-hover-show-md-up animated is-dragging-hide">
+              <button title="Delete photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="delete"
+                      (click)="removeFile(image.Url)">
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+            </div>
           </div>
           <label class="rmpm dropzone"
                  for="upload"
