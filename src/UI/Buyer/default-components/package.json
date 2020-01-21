@@ -6,8 +6,10 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "start": "ng serve --prod",
-    "build": "ng build --prod",
+    "start-qa": "ng serve --configuration=qa",
+    "build-qa": "ng build --configuration=qa",
+    "start-demo": "ng serve --configuration=demo",
+    "build-demo": "ng build --configuration=demo",
     "preinstall": "npm run build-marketplace",
     "build-marketplace": "cd ../marketplace && ng build"
   },

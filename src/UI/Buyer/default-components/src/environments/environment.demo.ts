@@ -1,14 +1,14 @@
 // This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
+// `ng build --configuration=demo` replaces `environment.ts` with `environment.demo.ts`.
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
   hostedApp: false,
-  appname: 'Marketplace Local',
+  appname: 'Marketplace Demo',
   clientID: '26B45BD1-5D02-489D-A60E-3B37C852606C',
   marketplaceID: 'SEB',
-  baseUrl: 'http://localhost:4200',
-  middlewareUrl: 'http://localhost:51100',
+  baseUrl: 'http://marketplace-buyer-ui-qa.azurewebsites.net/',
+  middlewareUrl: 'https://marketplace-api-qa.azurewebsites.net',
   cmsUrl: 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product',
   ssoLink: 'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
 };
