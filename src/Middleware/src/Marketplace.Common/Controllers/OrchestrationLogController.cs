@@ -17,9 +17,9 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, Route("product")]
-        public async Task<dynamic> GetProductLogs(ListArgs<OrchestrationLog> listArgs)
+        public async Task<dynamic> GetProductLogs(MarketplaceListArgs<OrchestrationLog> marketplaceListArgs)
         {
-            return await _command.GetProductLogs(listArgs);
+            return await _command.GetProductLogs(marketplaceListArgs);
         }
     }
 }
