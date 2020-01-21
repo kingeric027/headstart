@@ -14,6 +14,7 @@ import { ProductService } from '@app-seller/shared/services/product/product.serv
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -43,6 +44,7 @@ export class ProductEditComponent implements OnInit {
 
   hasVariations = false;
   images: MarketPlaceProductImage[] = [];
+  faTrash = faTrash;
 
   constructor(
     private router: Router,
