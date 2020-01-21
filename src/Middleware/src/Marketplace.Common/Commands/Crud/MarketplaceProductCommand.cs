@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Common.Mappers.Crud;
+using Marketplace.Common.Mappers;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
@@ -10,11 +10,12 @@ namespace Marketplace.Common.Commands.Crud
     public interface IMarketplaceProductCommand
     {
         Task<MarketplaceProduct> Get(string id, VerifiedUserContext user);
+        Task<MarketplaceListPage<MarketplaceProduct>> List(MarketplaceListArgs<MarketplaceProduct> args, VerifiedUserContext user);
         Task<MarketplaceProduct> Post(MarketplaceProduct product, VerifiedUserContext user);
+        Task<MarketplaceProduct> Put(string id, MarketplaceProduct product, VerifiedUserContext user);
         Task<MarketplaceProduct> Patch(Partial<MarketplaceProduct> product, string id, VerifiedUserContext user);
         Task Delete(string id, VerifiedUserContext user);
 
-        Task<Marketplace.Helpers.Models.ListPage<MarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
     }
 
     public class MarketplaceProductCommand : IMarketplaceProductCommand
@@ -35,7 +36,7 @@ namespace Marketplace.Common.Commands.Crud
             return MarketplaceProductMapper.Map(ocProduct);
         }
 
-        public async Task<Marketplace.Helpers.Models.ListPage<MarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
+        public async Task<MarketplaceListPage<MarketplaceProduct>> List(MarketplaceListArgs<MarketplaceProduct> args, VerifiedUserContext user)
         {
             var list = await _oc.Products.ListAsync(filters: args, accessToken: user.AccessToken);
             return MarketplaceProductMapper.Map(list);
@@ -45,6 +46,13 @@ namespace Marketplace.Common.Commands.Crud
         {
             var model = MarketplaceProductMapper.Map(product);
             var p = await _oc.Products.CreateAsync(model, user.AccessToken);
+            return MarketplaceProductMapper.Map(p);
+        }
+
+        public async Task<MarketplaceProduct> Put(string id, MarketplaceProduct product, VerifiedUserContext user)
+        {
+            var model = MarketplaceProductMapper.Map(product);
+            var p = await _oc.Products.SaveAsync(id, model, user.AccessToken);
             return MarketplaceProductMapper.Map(p);
         }
 

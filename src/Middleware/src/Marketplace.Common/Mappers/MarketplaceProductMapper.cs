@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using Dynamitey;
-using Marketplace.Helpers.Extensions;
 using Marketplace.Helpers.Mappers;
 using Marketplace.Helpers.Models;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Mappers.Crud
+namespace Marketplace.Common.Mappers
 {
     public static class MarketplaceProductMapper
     {
+        // pattern: <Target Object> Map(<Reference Object>)
         public static Product Map(MarketplaceProduct mProduct)
         {
             var ocProduct = new Product()
@@ -59,11 +51,13 @@ namespace Marketplace.Common.Mappers.Crud
                 ShipLength = ocProduct.ShipLength,
                 ShipWeight = ocProduct.ShipWeight,
                 ShipWidth = ocProduct.ShipWidth,
+                Status = MapperHelper.TryGetXp(ocProduct.xp, "Status"),
                 Note = MapperHelper.TryGetXp(ocProduct.xp, "Note"),
                 UnitOfMeasure = MapperHelper.TryGetXp(ocProduct.xp, "UnitOfMeasure"),
-                IntegrationData = MapperHelper.TryGetXp(ocProduct.xp, "Data")
+                IntegrationData = MapperHelper.TryGetXp(ocProduct.xp, "Data"),
+                Facets = MapperHelper.TryFacetXp(ocProduct.xp)
             };
-            
+
             return mProduct;
         }
 
@@ -72,9 +66,9 @@ namespace Marketplace.Common.Mappers.Crud
             return mProduct.Values.ToObject<PartialProduct>();
         }
 
-        public static Marketplace.Helpers.Models.ListPage<MarketplaceProduct> Map(OrderCloud.SDK.ListPage<Product> ocProducts)
+        public static MarketplaceListPage<MarketplaceProduct> Map(ListPage<Product> ocProducts)
         {
-            var list = new Marketplace.Helpers.Models.ListPage<MarketplaceProduct>
+            var list = new MarketplaceListPage<MarketplaceProduct>
             {
                 Items = ocProducts.Items.Select(Map).ToList(),
                 Meta = ListPageMetaMapper.MapListFrom(ocProducts.Meta)

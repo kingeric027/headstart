@@ -22,7 +22,7 @@ namespace Marketplace.Common.Queries
             _store = store;
         }
 
-        public async Task<ListPage<OrchestrationLog>> List(IListArgs args)
+        public async Task<MarketplaceListPage<OrchestrationLog>> List(IMarketplaceListArgs args)
         {
             var query = _store.Query()
                 .Search(args)

@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.API", "src\Mark
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Helpers", "..\..\..\oc-marketplace-helpers.steve.davis\src\Marketplace.Helpers\Marketplace.Helpers.csproj", "{6E849789-8548-42DC-86FC-6C0C30379E81}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Helpers.Tests", "..\..\..\oc-marketplace-helpers.steve.davis\src\Marketplace.Helpers.Test\Marketplace.Helpers.Tests.csproj", "{095AE63A-AF27-4EAC-8D03-821A473C9C8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{6E849789-8548-42DC-86FC-6C0C30379E81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E849789-8548-42DC-86FC-6C0C30379E81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E849789-8548-42DC-86FC-6C0C30379E81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{095AE63A-AF27-4EAC-8D03-821A473C9C8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{095AE63A-AF27-4EAC-8D03-821A473C9C8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{095AE63A-AF27-4EAC-8D03-821A473C9C8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{095AE63A-AF27-4EAC-8D03-821A473C9C8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
