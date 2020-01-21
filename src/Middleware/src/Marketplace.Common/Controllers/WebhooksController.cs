@@ -3,7 +3,6 @@ using Marketplace.Common.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
-using Marketplace.Common.Commands;
 
 namespace Marketplace.Common.Controllers
 {
@@ -12,13 +11,11 @@ namespace Marketplace.Common.Controllers
 
         private readonly AppSettings _settings;
         private readonly ISendgridService _sendgridService;
-        private readonly ISendgridCommand _sendgridCommand;
 
-        public WebhooksController(AppSettings settings, ISendgridService sendgridService, ISendgridCommand sendgridCommand) : base(settings)
+        public WebhooksController(AppSettings settings, ISendgridService sendgridService) : base(settings)
         {
             _settings = settings;
             _sendgridService = sendgridService;
-            _sendgridCommand = sendgridCommand;
         }
 
         // USING AN OC MESSAGE SENDER - NOT WEBHOOK
@@ -31,7 +28,7 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route("ordersubmit")]
         public async void HandleOrderSubmit([FromBody] WebhookPayloads.Orders.Submit payload)
         {
-            await _sendgridCommand.SendSupplierEmails(payload.Response.Body.ID);
+            await _sendgridService.SendSupplierEmails(payload.Response.Body.ID);
             await _sendgridService.SendSingleEmail("noreply@four51.com", payload.Response.Body.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
         }
 
