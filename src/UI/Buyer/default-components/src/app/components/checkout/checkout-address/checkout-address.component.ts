@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
 import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
-import { ModalState } from '../../../models/modal-state.class';
 import { ShopperContextService } from 'marketplace';
 
 @Component({
@@ -11,17 +10,16 @@ export class OCMCheckoutAddress implements OnInit {
   @Input() addressType: 'Shipping' | 'Billing';
   @Output() continue = new EventEmitter();
   isAnon: boolean;
-  addressModal = ModalState.Closed;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
   order: Order;
   lineItems: ListLineItem;
-  resultsPerPage = 8;
   requestOptions: { page?: number; search?: string } = {
     page: undefined,
     search: undefined,
   };
   usingShippingAsBilling = false;
+  showAddAddressForm = false;
 
   constructor(private context: ShopperContextService) {}
 
@@ -41,8 +39,10 @@ export class OCMCheckoutAddress implements OnInit {
     this.updateRequestOptions({ page: undefined, search: undefined });
   }
 
-  openAddressModal() {
-    this.addressModal = ModalState.Open;
+  toggleShowAddressForm(event) {
+    this.showAddAddressForm = event.target.value === 'new';
+    const selectedAddress = this.existingAddresses.Items.find(address => event.target.value === address.ID);
+    this.existingAddressSelected(selectedAddress);
   }
 
   updateRequestOptions(options: { page?: number; search?: string }) {
@@ -53,13 +53,12 @@ export class OCMCheckoutAddress implements OnInit {
   private async getSavedAddresses() {
     const filters = {};
     filters[this.addressType] = true;
-    const options = { filters, ...this.requestOptions, pageSize: this.resultsPerPage };
+    const options = { filters, ...this.requestOptions };
     this.existingAddresses = await this.context.myResources.ListAddresses(options).toPromise();
   }
 
   existingAddressSelected(address: BuyerAddress) {
     this.selectedAddress = address;
-    this.addressModal = ModalState.Open;
   }
 
   useShippingAsBilling() {
@@ -69,6 +68,7 @@ export class OCMCheckoutAddress implements OnInit {
 
     this.usingShippingAsBilling = true;
     this.selectedAddress = this.lineItems.Items[0].ShippingAddress;
+    this.saveAddress(this.selectedAddress, false, false);
   }
 
   async saveAddress(address: Address, formDirty: boolean, shouldSaveAddress: boolean) {
