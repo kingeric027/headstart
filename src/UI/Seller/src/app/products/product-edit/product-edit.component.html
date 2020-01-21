@@ -188,20 +188,52 @@
                  [src]="image.Url"
                  width="auto"
                  height="100px">
-            <div class="product-img-delete btn-group clearfix text-center position-absolute position-bottom position-left position-right mb-xs-1 child-hover-show-md-up animated is-dragging-hide">
+            <div class="product-img-delete text-center">
               <button title="Delete photo"
                       class="btn btn-light btn-group-item"
                       data-ui="action-btn"
                       data-action="delete"
-                      (click)="removeFile(image.Url)">
+                      (click)="open(content)">
+
                 <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+              <ng-template #content
+                           let-modal
+                           class="confirm-modal">
+                <confirm-modal modalTitle="Delete Image?"
+                               description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
+                  <button type="button"
+                          class="btn btn-link text-dark"
+                          (click)="modal.dismiss()">Cancel</button>
+                  <button type="button"
+                          class="btn brand-button--danger"
+                          (click)="removeFile(image.Url)"
+                          (click)="modal.dismiss()">Yes, Delete</button>
+                </confirm-modal>
+              </ng-template>
+            </div>
+          </div>
+          <div *ngFor="let image of files; let i = index"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
+                 [src]="image.Url"
+                 width="auto"
+                 height="100px">
+            <div class="product-img-delete text-center">
+              <button title="Un-stage photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="unstage"
+                      (click)="unStage(i)">
+                <fa-icon [icon]="faTimes"></fa-icon>
               </button>
             </div>
           </div>
           <label class="rmpm dropzone"
                  for="upload"
                  appDrag
-                 (files)="addFiles($event)">
+                 (files)="stageFiles($event)">
           </label>
           <input class="d-none"
                  id="upload"

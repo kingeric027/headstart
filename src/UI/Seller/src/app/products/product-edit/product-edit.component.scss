@@ -47,6 +47,10 @@
         }
     }
     .product-img-delete {
+        @include media-breakpoint-down(sm) {
+            // Display action buttons on mobile
+            opacity: 1;
+          }
         transition: 200ms all ease;
         opacity: 0;
         position: absolute;

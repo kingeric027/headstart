@@ -14,7 +14,8 @@ import { ProductService } from '@app-seller/shared/services/product/product.serv
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -44,7 +45,9 @@ export class ProductEditComponent implements OnInit {
 
   hasVariations = false;
   images: MarketPlaceProductImage[] = [];
+  files: FileHandle[];
   faTrash = faTrash;
+  faTimes = faTimes;
 
   constructor(
     private router: Router,
@@ -55,6 +58,7 @@ export class ProductEditComponent implements OnInit {
     private productService: ProductService,
     private middleware: MiddlewareAPIService,
     private sanitizer: DomSanitizer,
+    private modalService: NgbModal,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
@@ -116,12 +120,16 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
-  createNewProduct() {
-    this.productService.createNewMarketPlaceProduct(this._marketPlaceProductUpdated);
+  async createNewProduct() {
+    const product = await this.productService.createNewMarketPlaceProduct(this._marketPlaceProductUpdated);
+    await this.addFiles(this.files, product.ID);
+    this.refreshProductData(product);
+    this.router.navigateByUrl(`/products/${product.ID}`);
   }
 
-  updateProduct() {
-    this.productService.updateMarketPlaceProduct(this._marketPlaceProductUpdated);
+  async updateProduct() {
+    const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductUpdated);
+    this.addFiles(this.files, product.ID);
   }
 
   updateResourceFromEvent(event: any, field: string): void {
@@ -144,21 +152,38 @@ export class ProductEditComponent implements OnInit {
 
   manualFileUpload(event): void {
     const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
-      return { File: file, Url: null };
+      const Url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
+      return { File: file, Url: Url };
     });
-    this.addFiles(files);
+    this.stageFiles(files);
   }
 
-  async addFiles(files: FileHandle[]) {
+  stageFiles(files: FileHandle[]) {
+    this.files = files;
+  }
+
+  async addFiles(files: FileHandle[], productID: string) {
     let product;
     for (const file of files) {
-      product = await this.middleware.uploadProductImage(file.File, this._marketPlaceProduct.ID);
+      product = await this.middleware.uploadProductImage(file.File, productID);
     }
+    this.files = [];
+    // Only need the `|| {}` to account for creating new product where this._marketPlaceProduct doesn't exist yet.
+    product = Object.assign(this._marketPlaceProduct || {}, product);
     this.refreshProductData(product);
   }
 
   async removeFile(imgUrl: string) {
-    const product = await this.middleware.deleteProductImage(this._marketPlaceProduct.ID, imgUrl);
+    let product = await this.middleware.deleteProductImage(this._marketPlaceProduct.ID, imgUrl);
+    product = Object.assign(this._marketPlaceProduct, product);
     this.refreshProductData(product);
+  }
+
+  unStage(index: number) {
+    this.files.splice(index, 1);
+  }
+
+  async open(content) {
+    await this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
   }
 }

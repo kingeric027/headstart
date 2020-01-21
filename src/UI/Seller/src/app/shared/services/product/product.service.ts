@@ -43,6 +43,7 @@ export class ProductService extends ResourceCrudService<Product> {
     const newPriceSchedule = await this.ocPriceScheduleService.Create(marketPlaceProduct.PriceSchedule).toPromise();
     marketPlaceProduct.DefaultPriceScheduleID = newPriceSchedule.ID;
     const newProduct = await this.ocProductsService.Create(marketPlaceProduct).toPromise();
+    marketPlaceProduct.ID = newProduct.ID;
 
     // assignment of the price schedule to the product cannot be made until after the
     // product is assigned to the catalog, which will not be done until the supplier

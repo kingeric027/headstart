@@ -40,6 +40,7 @@ import { ReactiveQuillComponent } from './components/reactive-quill-editor/react
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 import { RequestStatus } from './components/request-status/request-status.component';
 import { DragDirective } from './directives/dragDrop.directive';
+import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
 
 @NgModule({
   imports: [
@@ -94,6 +95,7 @@ import { DragDirective } from './directives/dragDrop.directive';
     ReactiveQuillComponent,
     FormControlErrorDirective,
     DragDirective,
+    ConfirmModal,
   ],
   declarations: [
     SearchComponent,
@@ -116,6 +118,7 @@ import { DragDirective } from './directives/dragDrop.directive';
     ReactiveQuillComponent,
     FormControlErrorDirective,
     DragDirective,
+    ConfirmModal,
   ],
 })
 export class SharedModule {
