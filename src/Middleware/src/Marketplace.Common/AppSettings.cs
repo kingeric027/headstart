@@ -19,6 +19,7 @@ namespace Marketplace.Common
         public BlobSettings BlobSettings { get; set; }
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
+        public string SendgridApiKey { get; set; }
     }
 
     public class OrderCloudSettings
@@ -32,6 +33,7 @@ namespace Marketplace.Common
         public string ConnectionString { get; set; }
         public string QueueName { get; set; }
         public string CacheName { get; set; }
+		public string HostUrl { get; set; }
     }
 
     public class CosmosSettings

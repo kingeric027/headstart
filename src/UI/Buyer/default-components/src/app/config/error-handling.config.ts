@@ -38,6 +38,8 @@ export class AppErrorHandler extends ErrorHandler {
       } else {
         message = e.Message;
       }
+    } else if (ex.error && ex.error.Message) {
+      message = ex.error.Message;
     } else if (ex && ex.error && ex.error.error_description) {
       message = ex.error.error_description;
     } else if (ex.error) {

@@ -12,6 +12,6 @@ namespace Marketplace.Common.Models
 		[Required]
 		public string ShipFromAddressID { get; set; }
 		[Required]
-		public string ShippingQuoteID { get; set; }
+		public string ShippingRateID { get; set; }
 	}
 }
