@@ -1,5 +1,6 @@
-<div class="container-fluid resource-edit">
-  <form [formGroup]="resourceForm">
+<div *ngIf="productForm"
+     class="container-fluid resource-edit">
+  <form [formGroup]="productForm">
     <!-- Product Details -->
     <div class="row pt-3">
       <div class="col-md-5">
@@ -15,7 +16,7 @@
                  showErrors
                  aria-describedby="Name"
                  maxlength="100"
-                 [resourceForm]="resourceForm"
+                 [resourceForm]="productForm"
                  formControlName="Name"
                  (input)="updateResourceFromEvent($event, 'Name')"
                  placeholder="Enter Name">
@@ -23,7 +24,7 @@
         <div class="form-group">
           <label for="Description">Description</label>
           <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
-                                           [formControlForText]="resourceForm?.controls.Description"
+                                           [formControlForText]="productForm?.controls.Description"
                                            resourceField="Description"
                                            pathOnResource="Description"
                                            (resourceUpdated)="updateResource.emit($event)">
@@ -37,10 +38,23 @@
                  showErrors
                  aria-describedby="Quantity Multiplier"
                  min="1"
-                 [resourceForm]="resourceForm"
+                 [resourceForm]="productForm"
                  formControlName="QuantityMultiplier"
                  (input)="updateResourceFromEvent($event, 'QuantityMultiplier')"
                  placeholder="Quantity Multiplier">
+        </div>
+        <div class="form-group">
+          <label for="Price">Price</label>
+          <input type="number"
+                 class="form-control"
+                 id="Price"
+                 showErrors
+                 aria-describedby="Price"
+                 min="1"
+                 [resourceForm]="productForm"
+                 formControlName="Price"
+                 (input)="updateResourceFromEvent($event, 'Price')"
+                 placeholder="Price (USD)">
         </div>
       </div>
     </div>
@@ -97,8 +111,8 @@
                   (change)="updateResourceFromEvent($event, 'ShipFromAddressID')">
             <option disabled
                     [ngValue]="null">Choose an address</option>
-            <option *ngFor="let address of supplierAddresses?.Items"
-                    [ngValue]="address.ID">{{address.AddressName}}</option>
+            <option *ngFor="let address of addresses?.Items"
+                    [value]="address.ID">{{address.AddressName}}</option>
           </select>
         </div>
         <div class="form-row">
@@ -110,7 +124,7 @@
                    showErrors
                    aria-describedby="Ship Height"
                    maxlength="100"
-                   [resourceForm]="resourceForm"
+                   [resourceForm]="productForm"
                    formControlName="ShipHeight"
                    (input)="updateResourceFromEvent($event, 'ShipHeight')"
                    placeholder="Enter Ship Height">
@@ -122,7 +136,7 @@
                    id="ShipWidth"
                    showErrors
                    aria-describedby="Ship Width"
-                   [resourceForm]="resourceForm"
+                   [resourceForm]="productForm"
                    formControlName="ShipWidth"
                    (input)="updateResourceFromEvent($event, 'ShipWidth')"
                    placeholder="Ship Width">
@@ -137,7 +151,7 @@
                    showErrors
                    aria-describedby="Ship Length"
                    maxlength="100"
-                   [resourceForm]="resourceForm"
+                   [resourceForm]="productForm"
                    formControlName="ShipLength"
                    (input)="updateResourceFromEvent($event, 'ShipLength')"
                    placeholder="Enter Ship Length">
@@ -149,7 +163,7 @@
                    id="ShipWeight"
                    showErrors
                    aria-describedby="Ship Weight"
-                   [resourceForm]="resourceForm"
+                   [resourceForm]="productForm"
                    formControlName="ShipWeight"
                    (input)="updateResourceFromEvent($event, 'ShipWeight')"
                    placeholder="Ship Weight">
@@ -158,5 +172,40 @@
       </div>
     </div>
     <!-- /Shipping Information -->
+    <!-- Product Images -->
+    <div class="row pt-3 mt-5 border-top">
+      <div class="col-md-5">
+        <h5>Product Images</h5>
+        <p class="font-italic">Drag and Drop or upload your product images to display on the buyer site.</p>
+      </div>
+      <div class="col-md-7">
+        <!--droped image preview-->
+        <div class="d-flex justify-content-start align-items-center flex-wrap">
+          <div *ngFor="let image of images; let i = index"
+               class="mr-2">
+            <img [id]="i"
+                 [src]="image.Url"
+                 width="auto"
+                 height="100px"
+                 (click)="removeFile(image.Url)">
+          </div>
+          <label class="rmpm dropzone"
+                 for="upload"
+                 appDrag
+                 (files)="addFiles($event)">
+          </label>
+          <input class="d-none"
+                 id="upload"
+                 type="file"
+                 (change)="manualFileUpload($event)"
+                 multiple>
+        </div>
+      </div>
+    </div>
+    <!-- /Product Images -->
   </form>
+  <button class="btn btn-primary"
+          type="submit"
+          (click)="handleSave()"
+          [disabled]="productForm?.status==='INVALID'">{{isCreatingNew ? 'Create New Product for Approval' : 'Save Updates for Approval'}}</button>
 </div>
