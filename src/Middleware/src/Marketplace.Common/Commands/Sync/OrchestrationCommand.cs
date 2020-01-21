@@ -66,6 +66,7 @@ namespace Marketplace.Common.Commands
                 {
                     Token = user.AccessToken,
                     ClientId = user.ClientID,
+                    ID = obj.ID,
                     Model = obj
                 };
                 await _blobQueue.Save(orch.BuildPath(resourceId), JsonConvert.SerializeObject(obj));
