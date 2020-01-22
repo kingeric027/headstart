@@ -29,7 +29,9 @@ namespace Marketplace.Common.Mappers
                 {
                     mProduct.Status,
                     mProduct.Note,
-                    mProduct.UnitOfMeasure
+                    mProduct.UnitOfMeasure,
+                    mProduct.Images,
+                    mProduct.HasVariants
                 }
             };
             return ocProduct;
@@ -55,7 +57,8 @@ namespace Marketplace.Common.Mappers
                 Note = MapperHelper.TryGetXp(ocProduct.xp, "Note"),
                 UnitOfMeasure = MapperHelper.TryGetXp(ocProduct.xp, "UnitOfMeasure"),
                 IntegrationData = MapperHelper.TryGetXp(ocProduct.xp, "Data"),
-                Facets = MapperHelper.TryFacetXp(ocProduct.xp)
+                Facets = MapperHelper.TryFacetXp(ocProduct.xp),
+                Images = MapperHelper.TryGetXp(ocProduct.xp, "Images")
             };
 
             return mProduct;

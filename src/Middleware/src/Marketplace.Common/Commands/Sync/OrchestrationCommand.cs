@@ -123,7 +123,8 @@ namespace Marketplace.Common.Commands
             try
             {
                 var blob = await _blobQueue.Get<JObject>(path);
-                return blob.SelectToken("Model") as JObject;
+                //return blob.SelectToken("Model") as JObject;
+                return blob;
             }
             catch (Exception ex)
             {
@@ -136,7 +137,8 @@ namespace Marketplace.Common.Commands
             try
             {
                 var blob = await _blobCache.Get<JObject>($"{path}");
-                return blob.SelectToken("Model") as JObject;
+                //return blob.SelectToken("Model") as JObject;
+                return blob;
             }
             catch (Exception)
             {
