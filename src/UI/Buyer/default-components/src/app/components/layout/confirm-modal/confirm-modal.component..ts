@@ -1,5 +1,4 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, Input } from '@angular/core';
 
 @Component({
     templateUrl: './confirm-modal.component.html',
