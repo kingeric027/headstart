@@ -21,6 +21,11 @@ namespace Marketplace.Common
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
         public string SendgridApiKey { get; set; }
+        public FreightPopSettings FreightPopSettings { get; set; }
+    }
+    public class FreightPopSettings
+    {
+        public string BaseUrl { get; set; }
     }
 
 	public class OrderCloudSettings
