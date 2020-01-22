@@ -9,7 +9,11 @@
     "test": "ng test --code-coverage",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "precommit": "lint-staged --config ./lint-staged.config.js"
+    "precommit": "lint-staged --config ./lint-staged.config.js",
+    "serve-qa": "ng serve --configuration=qa",
+    "build-qa": "ng build --configuration=qa",
+    "serve-demo": "ng serve --configuration=demo",
+    "build-demo": "ng build --configuration=demo"
   },
   "private": true,
   "dependencies": {
