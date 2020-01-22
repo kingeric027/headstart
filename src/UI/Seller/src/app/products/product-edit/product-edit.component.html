@@ -111,8 +111,8 @@
                   (change)="updateResourceFromEvent($event, 'ShipFromAddressID')">
             <option disabled
                     [ngValue]="null">Choose an address</option>
-            <option *ngFor="let address of supplierAddresses?.Items"
-                    [ngValue]="address.ID">{{address.AddressName}}</option>
+            <option *ngFor="let address of addresses?.Items"
+                    [value]="address.ID">{{address.AddressName}}</option>
           </select>
         </div>
         <div class="form-row">
@@ -172,6 +172,78 @@
       </div>
     </div>
     <!-- /Shipping Information -->
+    <!-- Product Images -->
+    <div class="row pt-3 mt-5 border-top">
+      <div class="col-md-5">
+        <h5>Product Images</h5>
+        <p class="font-italic">Drag and Drop or upload your product images to display on the buyer site.</p>
+      </div>
+      <div class="col-md-7">
+        <!--droped image preview-->
+        <div class="d-flex justify-content-start align-items-center flex-wrap">
+          <div *ngFor="let image of images; let i = index"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
+                 [src]="image.Url"
+                 width="auto"
+                 height="100px">
+            <div class="product-img-delete text-center">
+              <button title="Delete photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="delete"
+                      (click)="open(content)">
+
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+              <ng-template #content
+                           let-modal
+                           class="confirm-modal">
+                <confirm-modal modalTitle="Delete Image?"
+                               description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
+                  <button type="button"
+                          class="btn btn-link text-dark"
+                          (click)="modal.dismiss()">Cancel</button>
+                  <button type="button"
+                          class="btn brand-button--danger"
+                          (click)="removeFile(image.Url)"
+                          (click)="modal.dismiss()">Yes, Delete</button>
+                </confirm-modal>
+              </ng-template>
+            </div>
+          </div>
+          <div *ngFor="let image of files; let i = index"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
+                 [src]="image.Url"
+                 width="auto"
+                 height="100px">
+            <div class="product-img-delete text-center">
+              <button title="Un-stage photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="unstage"
+                      (click)="unStage(i)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            </div>
+          </div>
+          <label class="rmpm dropzone"
+                 for="upload"
+                 appDrag
+                 (files)="stageFiles($event)">
+          </label>
+          <input class="d-none"
+                 id="upload"
+                 type="file"
+                 (change)="manualFileUpload($event)"
+                 multiple>
+        </div>
+      </div>
+    </div>
+    <!-- /Product Images -->
   </form>
   <button class="btn btn-primary"
           type="submit"

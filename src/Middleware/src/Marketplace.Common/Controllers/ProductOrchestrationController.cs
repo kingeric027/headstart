@@ -7,6 +7,7 @@ using Marketplace.Helpers;
 
 namespace Marketplace.Common.Controllers
 {
+    [Route("orchestration")]
     public class ProductOrchestrationController : BaseController
     {
         private readonly IOrchestrationCommand _command;

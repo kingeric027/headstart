@@ -1,5 +1,6 @@
 ﻿using Marketplace.Common.Exceptions;
 using Marketplace.Common.Extensions;
+using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
@@ -30,13 +31,7 @@ namespace Marketplace.Common.Commands
 
 		public OrderCheckoutCommand(AppSettings settings, IAvataxService avatax, IFreightPopService freightPop, IMockShippingCacheService shippingCache)
 		{
-			// TODO - this authentication needs to be completely different. It needs to work accross ordercloud orgs. 
-			_oc = new OrderCloudClient(new OrderCloudClientConfig()
-			{
-				ClientId = "2234C6E1-8FA5-41A2-8A7F-A560C6BA44D8",
-				ClientSecret = "z08ibzgsb337ln8EzJx5efI1VKxqdqeBW0IB7p1SJaygloJ4J9uZOtPu1Aql",
-				Roles = new[] { ApiRole.FullAccess }
-			});
+			_oc = OcFactory.GetSEBAdmin();
 			_avatax = avatax;
 			_freightPop = freightPop;
 			_shippingCache = shippingCache;
