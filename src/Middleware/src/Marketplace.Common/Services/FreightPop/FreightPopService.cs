@@ -26,13 +26,8 @@ namespace Marketplace.Common.Services
 			_appSettings = appSettings;
 			AuthenticateAync();
 		}
-		
-		private IFlurlRequest Get(string resource)
-		{
-			return _flurl.Request($"{_appSettings.FreightPopSettings.BaseUrl}/{resource}")
-				.WithHeader("Authorization", $"Bearer {accessToken}");
-		}
-		private IFlurlRequest Post(string resource)
+
+		private IFlurlRequest MakeRequest(string resource)
 		{
 			return _flurl.Request($"{_appSettings.FreightPopSettings.BaseUrl}/{resource}")
 				.WithHeader("Authorization", $"Bearer {accessToken}");
@@ -49,62 +44,9 @@ namespace Marketplace.Common.Services
 		}
 		public async Task<Response<GetRatesData>> GetRatesAsync(RateRequestBody rateRequestBody)
 		{
-			// troubleshoot how to convert the type back to the generic with freightPOP Response type
-			
-			var rateRequestResponse = await Get("rate/getRates").PostJsonAsync(rateRequestBody).ReceiveJson<Response<GetRatesData>>();
+			var rateRequestResponse = await MakeRequest("rate/getRates").PostJsonAsync(rateRequestBody).ReceiveJson<Response<GetRatesData>>();
 			return rateRequestResponse;
 		}
-			//public async Task<FreightPopResponse<GetRatesData>> GetRatesAsync(Address shipFrom, Address shipTo, IEnumerable<LineItem> items)
-			//{
-			//	// fake, static data.In the correct format though.
-			//	// TODO - use real endpoint
-			//	return new FreightPopResponse<GetRatesData>
-			//	{
-			//		Code = 200,
-			//		Message = "Success",
-			//		Data = new GetRatesData()
-			//		{
-			//			ErrorMessages = new string[] { },
-			//			Rates = new[] {
-			//				new ShippingRate() {
-			//						Id = "12345",
-			//						CarrierQuoteId = "sample string 7",
-			//						AccountName = "sample string 2",
-			//						DeliveryDays = 1,
-			//						DeliveryDate = DateTime.Parse("2020-01-03T08:03:18.0552937-08:00"),
-			//						TotalCost = 10.0M,
-			//						Currency = "USD",
-			//						Carrier = "Fedex",
-			//						Service = "Priority Air"
-			//				},
-			//				new ShippingRate()
-			//				{
-			//						Id = "34567",
-			//						CarrierQuoteId = "sample string 7",
-			//						AccountName = "sample string 2",
-			//						DeliveryDays = 2,
-			//						DeliveryDate = DateTime.Parse("2020-01-03T08:03:18.0552937-08:00"),
-			//						TotalCost = 6.0M,
-			//						Currency = "USD",
-			//						Carrier = "UPS",
-			//						Service = "Air Elite"
-			//				},
-			//				new ShippingRate()
-			//				{
-			//						Id = "56789",
-			//						CarrierQuoteId = "sample string 7",
-			//						AccountName = "sample string 2",
-			//						DeliveryDays = 3,
-			//						DeliveryDate = DateTime.Parse("2020-01-03T08:03:18.0552937-08:00"),
-			//						TotalCost = 4.0M,
-			//						Currency = "USD",
-			//						Carrier = "Unites State Postal Service",
-			//						Service = "Ground"
-			//				},
-			//			}
-			//		}
-			//	};
-			//}
-		}
 	}
+}
 
