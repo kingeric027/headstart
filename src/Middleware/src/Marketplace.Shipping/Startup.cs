@@ -30,9 +30,9 @@ namespace Marketplace.Shipping
             services
                 .ConfigureWebApiServices(_settings, "v1", "Marketplace API")
                 .Inject<IFlurlClient>()
+                .Inject<IOCShippingIntegration>()
                 .Inject<IFreightPopService>()
                 .Inject<IProposedShipmentCommand>()
-                .Inject<IOCShippingIntegration>()
                 .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
         }
 

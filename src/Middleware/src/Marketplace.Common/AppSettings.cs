@@ -26,6 +26,8 @@ namespace Marketplace.Common
     public class FreightPopSettings
     {
         public string BaseUrl { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
     }
 
 	public class OrderCloudSettings
