@@ -1,16 +1,9 @@
-﻿using Avalara.AvaTax.RestClient;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Models;
-using Marketplace.Common.Services;
-using Marketplace.Common.Services.FreightPop;
+﻿using Marketplace.Common.Commands;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Marketplace.Common.Controllers
