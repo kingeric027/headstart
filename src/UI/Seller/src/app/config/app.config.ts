@@ -2,9 +2,9 @@ import { InjectionToken } from '@angular/core';
 import { environment } from '../../environments/environment';
 
 export const ocAppConfig: AppConfig = {
-  appname: 'OrderCloud Admin',
-  marketplaceID: 'seb',
-  cmsUrl: 'https://marketplaceqa.blob.core.windows.net',
+  appname: environment.appname,
+  marketplaceID: environment.marketplaceID,
+  cmsUrl: environment.cmsUrl,
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
   scope: [
