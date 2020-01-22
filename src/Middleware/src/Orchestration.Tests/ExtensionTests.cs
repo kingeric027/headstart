@@ -24,7 +24,7 @@ namespace Orchestration.Tests
             var model = new OrchestrationObject<T>()
             {
                 ClientId = "fake",
-                //ID = obj.ID,
+                ID = obj.ID,
                 Token = "fake",
                 Model = obj
             };
