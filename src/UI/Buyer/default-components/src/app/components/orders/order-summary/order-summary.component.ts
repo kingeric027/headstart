@@ -10,9 +10,6 @@ export class OCMOrderSummary {
   @Input() order: MarketplaceOrder;
 
   displayTax() {
-    if (!this.order.xp || !this.order.xp.AvalaraTaxTransactionCode) {
-      return 'Calculated during checkout';
-    }
     return new CurrencyPipe('en-US').transform(this.order.TaxCost);
   }
 

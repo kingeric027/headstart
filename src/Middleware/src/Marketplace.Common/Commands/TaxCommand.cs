@@ -3,6 +3,7 @@ using Marketplace.Common.Extensions;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.FreightPop;
 using Marketplace.Helpers;
 using OrderCloud.SDK;
 using System;
@@ -18,7 +19,7 @@ namespace Marketplace.Common.Commands
 		Task<MarketplaceOrder> ApplyTaxEstimate(string orderID);
 	}
 
-	public class TaxCommand
+	public class TaxCommand: ITaxCommand
 	{
 		private readonly IOrderCloudClient _oc;
 		private readonly IMockShippingCacheService _shippingCache;
@@ -39,10 +40,12 @@ namespace Marketplace.Common.Commands
 			var inValid = ListShipmentsWithoutSelection(order, items.Items);
 			Require.That(inValid.Count() == 0, Exceptions.ErrorCodes.Checkout.MissingShippingSelection, new MissingShippingSelectionError(inValid));
 
-			var shippingSelection = await order.xp.ShippingSelections.SelectAsync(async selection =>
+			var shippingSelection = new Dictionary<string, ShippingRate>();
+			foreach (var selection in order.xp.ShippingSelections)
 			{
-				return await _shippingCache.GetSavedShippingRateAsync(orderID, selection.ShippingRateID);
-			});
+				var rate = await _shippingCache.GetSavedShippingRateAsync(orderID, selection.ShippingRateID);
+				shippingSelection.Add(selection.ShipFromAddressID, rate);
+			}
 
 			var taxOrder = new TaxableOrder() { Order = order, Lines = items.Items, ShippingRates = shippingSelection };
 
