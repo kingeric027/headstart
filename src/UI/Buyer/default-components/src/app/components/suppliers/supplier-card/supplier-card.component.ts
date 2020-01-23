@@ -12,6 +12,6 @@ export class OCMSupplierCard {
   constructor(private context: ShopperContextService) {}
 
   shopSupplier(supplier: Supplier) {
-    this.context.router.toProductList({ activeFacets: { Supplier: supplier.Name } });
+    this.context.router.toProductList({ activeFacets: { Supplier: supplier.Name.toLocaleLowerCase() } });
   }
 }
