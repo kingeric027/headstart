@@ -35,10 +35,12 @@ namespace Marketplace.Orchestration
                 var wi = new WorkItem(path)
                 {
                     Cache = await context.CallActivityAsync<JObject>("GetCachedItem", path),
-                    Current = await context.CallActivityAsync<JObject>("GetQueuedItem", path)
+                    //Current = await context.CallActivityAsync<JObject>("GetQueuedItem", path)
                 };
-                wi.Token = wi.Current["Token"].ToString();
-                wi.ClientId = wi.Current["ClientId"].ToString();
+                var queue = await context.CallActivityAsync<JObject>("GetQueuedItem", path);
+                wi.Current = queue["Model"] as JObject;
+                wi.Token = queue["Token"].ToString();
+                wi.ClientId = queue["ClientId"].ToString();
                 wi.Diff = await context.CallActivityAsync<JObject>("CalculateDiff", wi);
                 wi.Action = await context.CallActivityAsync<Action>("DetermineAction", wi);
 
