@@ -16,19 +16,19 @@ namespace Marketplace.Common.Controllers
 	[Route("orders/{orderID}/shipping")]
 	public class ShippingController: BaseController
 	{
-		private readonly IOrderCheckoutCommand _checkoutCommand;
+		private readonly IShippingCommand _shippingCommand;
 		private readonly IMockShippingCacheService _shippingCache; 
 
 		// Needs more authentication. These methods should only work for a specific user's orders.
-		public ShippingController(AppSettings settings, IOrderCheckoutCommand command, IMockShippingCacheService shippingCache) : base(settings) {
-			_checkoutCommand = command;
+		public ShippingController(AppSettings settings, IShippingCommand shippingCommand, IMockShippingCacheService shippingCache) : base(settings) {
+			_shippingCommand = shippingCommand;
 			_shippingCache = shippingCache;
 		}
 
 		[HttpPost, Route("generate-rates"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<IEnumerable<ShippingOptions>> GenerateShippingRatesAsync(string orderID)
 		{
-			return await _checkoutCommand.GenerateShippingRatesAsync(orderID);
+			return await _shippingCommand.GenerateShippingRatesAsync(orderID);
 		}
 
 		[HttpGet, Route("rate/{rateID}"), MarketplaceUserAuth(ApiRole.Shopper)]
@@ -40,7 +40,7 @@ namespace Marketplace.Common.Controllers
 		[HttpPut, Route("select"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, [FromBody] ShippingSelection shippingSelection)
 		{
-			return await _checkoutCommand.SetShippingSelectionAsync(orderID, shippingSelection);
+			return await _shippingCommand.SetShippingSelectionAsync(orderID, shippingSelection);
 		}
 	}
 }
