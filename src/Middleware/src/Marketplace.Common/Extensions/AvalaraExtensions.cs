@@ -24,30 +24,32 @@ namespace Marketplace.Common.Extensions
 			return trans.WithLine(line.lineAmount ?? 0, 1, line.taxCode, null, line.itemCode, line.customerUsageType, line.lineNumber);
 		}
 
-		public static TransactionBuilder WithLineItem(this TransactionBuilder trans, LineItem lineItem)
+		public static TransactionBuilder WithLine(this TransactionBuilder trans, TransactionLineModel line, Address shipFrom, Address shipTo)
 		{
-			return trans.WithLine(new TransactionLineModel()
-				{
-					lineAmount = lineItem.LineTotal,
-					taxCode = null,
-					itemCode = lineItem.ProductID,
-					customerUsageType = null,
-					lineNumber = lineItem.ID
-				}) // The two addresses below apply to this line item
-				.WithLineShipFrom(lineItem.ShipFromAddress)
-				.WithLineShipTo(lineItem.ShippingAddress);
+			return trans.WithLine(line).WithLineShipFrom(shipFrom).WithLineShipTo(shipTo);
 		}
 
-		public static TransactionBuilder WithShippingRate(this TransactionBuilder trans, ShippingRate rate)
+		public static TransactionBuilder WithLineItem(this TransactionBuilder trans, LineItem lineItem, ShippingRate rate)
 		{
-			return trans.WithLine(new TransactionLineModel()
-				{
-					lineAmount = rate.TotalCost,
-					taxCode = "FR",
-					itemCode = rate.Id,
-					customerUsageType = null,
-					lineNumber = null
-				});
+			var line = new TransactionLineModel()
+			{
+				lineAmount = lineItem.LineTotal,
+				taxCode = null,
+				itemCode = lineItem.ProductID,
+				customerUsageType = null,
+				lineNumber = lineItem.ID
+			};
+			var shipping = new TransactionLineModel()
+			{
+				lineAmount = rate.TotalCost,
+				taxCode = "FR",
+				itemCode = rate.Id,
+				customerUsageType = null,
+				lineNumber = null
+			};
+			return trans
+				.WithLine(line, lineItem.ShipFromAddress, lineItem.ShippingAddress)
+				.WithLine(shipping, lineItem.ShipFromAddress, lineItem.ShippingAddress);
 		}
 	}
 }

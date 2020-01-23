@@ -16,19 +16,19 @@ namespace Marketplace.Common.Controllers
 	public class TaxTransactionController: BaseController
 	{
 		private readonly IAvataxService _taxService;
-		private readonly IOrderCheckoutCommand _checkoutCommand;
+		private readonly ITaxCommand _taxCommand;
 
-		public TaxTransactionController(AppSettings settings, IAvataxService taxService, IOrderCheckoutCommand checkoutCommand) : base(settings) 
+		public TaxTransactionController(AppSettings settings, IAvataxService taxService, ITaxCommand taxCommand) : base(settings) 
 		{
 			_taxService = taxService;
-			_checkoutCommand = checkoutCommand;	
+			_taxCommand = taxCommand;	
 		}
 
 		// Needs more authentication. These methods should only work for a specific user's orders.
 		[HttpPost, Route(""), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<MarketplaceOrder> ApplyTaxEstimate(string orderID)
 		{
-			return await _checkoutCommand.ApplyTaxEstimate(orderID);
+			return await _taxCommand.ApplyTaxEstimate(orderID);
 		}
 	}
 }

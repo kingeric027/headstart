@@ -32,7 +32,9 @@ namespace Marketplace.Common.Services
 
 		public AvataxService(AppSettings settings)
 		{
-			var env = settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;
+			//var env = settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;
+			var env = AvaTaxEnvironment.Production;
+
 			_avaTax = new AvaTaxClient("four51 marketplace", "v1", settings.Env.ToString(), env)
 					.WithSecurity(settings.AvalaraSettings.AccountID, settings.AvalaraSettings.LicenseKey);
 		}
@@ -51,8 +53,8 @@ namespace Marketplace.Common.Services
 		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, TaxableOrder taxableOrder)
 		{
 			var trans = new TransactionBuilder(_avaTax, companyCode, docType, GetCustomerCode(taxableOrder));
-			foreach (var line in taxableOrder.Lines) trans.WithLineItem(line);
-			foreach (var rate in taxableOrder.ShippingRates) trans.WithShippingRate(rate);
+			//foreach (var line in taxableOrder.Lines) trans.WithLineItem(line);
+			//foreach (var rate in taxableOrder.ShippingRates) trans.WithShippingRate(rate);
 
 			return await trans.CreateAsync();
 		}

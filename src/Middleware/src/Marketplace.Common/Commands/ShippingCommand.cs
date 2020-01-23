@@ -15,49 +15,23 @@ using ErrorCodes = Marketplace.Common.Exceptions.ErrorCodes;
 
 namespace Marketplace.Common.Commands
 {
-	public interface IOrderCheckoutCommand
+	public interface IShippingCommand
 	{
 		Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, ShippingSelection shippingSelection);
-		Task<MarketplaceOrder> ApplyTaxEstimate(string orderID);
 		Task<IEnumerable<ShippingOptions>> GenerateShippingRatesAsync(string orderID);
 	}
 
-	public class OrderCheckoutCommand : IOrderCheckoutCommand
+	public class ShippingCommand : IShippingCommand
 	{
 		private readonly IOrderCloudClient _oc;
 		private readonly IFreightPopService _freightPop;
 		private readonly IMockShippingCacheService _shippingCache;
-		private readonly IAvataxService _avatax;
 
-		public OrderCheckoutCommand(AppSettings settings, IAvataxService avatax, IFreightPopService freightPop, IMockShippingCacheService shippingCache)
+		public ShippingCommand(IFreightPopService freightPop, IMockShippingCacheService shippingCache)
 		{
 			_oc = OcFactory.GetSEBAdmin();
-			_avatax = avatax;
 			_freightPop = freightPop;
 			_shippingCache = shippingCache;
-		}
-
-		public async Task<MarketplaceOrder> ApplyTaxEstimate(string orderID)
-		{	
-			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
-			var items = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
-
-			var inValid = ListShipmentsWithoutSelection(order, items.Items);
-			Require.That(inValid.Count() == 0, ErrorCodes.Checkout.MissingShippingSelection, new MissingShippingSelectionError(inValid));
-
-			var shippingSelection = await order.xp.ShippingSelections.SelectAsync(async selection =>
-			{
-				return await _shippingCache.GetSavedShippingRateAsync(orderID, selection.ShippingRateID);
-			});
-
-			var taxOrder = new TaxableOrder() { Order = order, Lines = items.Items, ShippingRates = shippingSelection };
-
-			var totalTax = await _avatax.GetTaxEstimateAsync(taxOrder);
-			
-			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()
-			{
-				TaxCost = totalTax
-			});
 		}
 
 		public async Task<IEnumerable<ShippingOptions>> GenerateShippingRatesAsync(string orderID)
@@ -101,13 +75,6 @@ namespace Marketplace.Common.Commands
 					ShippingSelections = selections.Values.ToArray()
 				}
 			});
-		}
-
-		private IEnumerable<string> ListShipmentsWithoutSelection(MarketplaceOrder order, IList<LineItem> items)
-		{
-			var shipFromAddressIDs = items.GroupBy(li => li.ShipFromAddressID).Select(group => group.Key);
-			var selections = order.xp.ShippingSelections.Select(sel => sel.ShipFromAddressID);
-			return shipFromAddressIDs.Except(selections);
 		}
 	}
 }
