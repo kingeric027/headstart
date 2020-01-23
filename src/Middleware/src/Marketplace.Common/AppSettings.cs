@@ -23,6 +23,12 @@ namespace Marketplace.Common
         public string SendgridApiKey { get; set; }
     }
 
+	public class OrderCloudSettings
+	{
+		public string AuthUrl { get; set; }
+		public string ApiUrl { get; set; }
+	}
+
 	public class AvalaraSettings
 	{
 		public int AccountID { get; set; }
@@ -35,12 +41,6 @@ namespace Marketplace.Common
         public string CacheName { get; set; }
 		public string HostUrl { get; set; }
     }
-
-	public class OrderCloudSettings
-	{
-		public string AuthUrl { get; set; }
-		public string ApiUrl { get; set; }
-	}
 
 	public class CosmosSettings
 	{
