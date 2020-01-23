@@ -1,5 +1,6 @@
-<div class="container-fluid resource-edit">
-  <form [formGroup]="resourceForm">
+<div *ngIf="productForm"
+     class="container-fluid resource-edit">
+  <form [formGroup]="productForm">
     <!-- Product Details -->
     <div class="row pt-3">
       <div class="col-md-5">
@@ -15,7 +16,7 @@
                  showErrors
                  aria-describedby="Name"
                  maxlength="100"
-                 [resourceForm]="resourceForm"
+                 [resourceForm]="productForm"
                  formControlName="Name"
                  (input)="updateResourceFromEvent($event, 'Name')"
                  placeholder="Enter Name">
@@ -23,7 +24,7 @@
         <div class="form-group">
           <label for="Description">Description</label>
           <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
-                                           [formControlForText]="resourceForm?.controls.Description"
+                                           [formControlForText]="productForm?.controls.Description"
                                            resourceField="Description"
                                            pathOnResource="Description"
                                            (resourceUpdated)="updateResource.emit($event)">
@@ -37,17 +38,30 @@
                  showErrors
                  aria-describedby="Quantity Multiplier"
                  min="1"
-                 [resourceForm]="resourceForm"
+                 [resourceForm]="productForm"
                  formControlName="QuantityMultiplier"
                  (input)="updateResourceFromEvent($event, 'QuantityMultiplier')"
                  placeholder="Quantity Multiplier">
+        </div>
+        <div class="form-group">
+          <label for="Price">Price</label>
+          <input type="number"
+                 class="form-control"
+                 id="Price"
+                 showErrors
+                 aria-describedby="Price"
+                 min="1"
+                 [resourceForm]="productForm"
+                 formControlName="Price"
+                 (input)="updateResourceFromEvent($event, 'Price')"
+                 placeholder="Price (USD)">
         </div>
       </div>
     </div>
     <!-- /Product Details -->
 
-    <!-- Product Variations -->
-    <div class="row pt-3 mt-5 border-top">
+    <!-- Product Variations TODO: NOT MVP -->
+    <!-- <div class="row pt-3 mt-5 border-top">
       <div class="col-md-5">
         <h5>Product Variations</h5>
         <p class="font-italic">Does your product come in different varieties? Add them here.</p>
@@ -76,7 +90,7 @@
                   (click)="hasVariations = false">Cancel variations</button>
         </div>
       </div>
-    </div>
+    </div> -->
     <!-- /Product Variations -->
 
     <!-- Shipping Information -->
@@ -86,6 +100,21 @@
         <p class="font-italic">Provide accurate shipping weight and dimensions for the most accurate shipping estimates.</p>
       </div>
       <div class="col-md-7">
+        <!-- TODO: Waiting on platform change to accomodate for Supplier Addresses being saved on `ShipFromAddressID` -->
+        <div class="form-group">
+          <label for="ShipFromAddressID">Which location will this product ship from?</label>
+          <select type="dropdown"
+                  class="form-control"
+                  formControlName="ShipFromAddressID"
+                  id="ShipFromAddressID"
+                  aria-describedby="Ship From Address ID"
+                  (change)="updateResourceFromEvent($event, 'ShipFromAddressID')">
+            <option disabled
+                    [ngValue]="null">Choose an address</option>
+            <option *ngFor="let address of addresses?.Items"
+                    [value]="address.ID">{{address.AddressName}}</option>
+          </select>
+        </div>
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="ShipHeight">Ship Height</label>
@@ -95,7 +124,7 @@
                    showErrors
                    aria-describedby="Ship Height"
                    maxlength="100"
-                   [resourceForm]="resourceForm"
+                   [resourceForm]="productForm"
                    formControlName="ShipHeight"
                    (input)="updateResourceFromEvent($event, 'ShipHeight')"
                    placeholder="Enter Ship Height">
@@ -107,7 +136,7 @@
                    id="ShipWidth"
                    showErrors
                    aria-describedby="Ship Width"
-                   [resourceForm]="resourceForm"
+                   [resourceForm]="productForm"
                    formControlName="ShipWidth"
                    (input)="updateResourceFromEvent($event, 'ShipWidth')"
                    placeholder="Ship Width">
@@ -122,7 +151,7 @@
                    showErrors
                    aria-describedby="Ship Length"
                    maxlength="100"
-                   [resourceForm]="resourceForm"
+                   [resourceForm]="productForm"
                    formControlName="ShipLength"
                    (input)="updateResourceFromEvent($event, 'ShipLength')"
                    placeholder="Enter Ship Length">
@@ -134,7 +163,7 @@
                    id="ShipWeight"
                    showErrors
                    aria-describedby="Ship Weight"
-                   [resourceForm]="resourceForm"
+                   [resourceForm]="productForm"
                    formControlName="ShipWeight"
                    (input)="updateResourceFromEvent($event, 'ShipWeight')"
                    placeholder="Ship Weight">
@@ -143,5 +172,81 @@
       </div>
     </div>
     <!-- /Shipping Information -->
+    <!-- Product Images -->
+    <div class="row pt-3 mt-5 border-top">
+      <div class="col-md-5">
+        <h5>Product Images</h5>
+        <p class="font-italic">Drag and Drop or upload your product images to display on the buyer site.</p>
+      </div>
+      <div class="col-md-7">
+        <!--droped image preview-->
+        <div class="d-flex justify-content-start align-items-center flex-wrap">
+          <div *ngFor="let image of images; let i = index"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
+                 [src]="image.Url"
+                 width="auto"
+                 height="100px">
+            <div class="product-img-delete text-center">
+              <button title="Delete photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="delete"
+                      (click)="open(content)">
+
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+              <ng-template #content
+                           let-modal
+                           class="confirm-modal">
+                <confirm-modal modalTitle="Delete Image?"
+                               description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
+                  <button type="button"
+                          class="btn btn-link text-dark"
+                          (click)="modal.dismiss()">Cancel</button>
+                  <button type="button"
+                          class="btn brand-button--danger"
+                          (click)="removeFile(image.Url)"
+                          (click)="modal.dismiss()">Yes, Delete</button>
+                </confirm-modal>
+              </ng-template>
+            </div>
+          </div>
+          <div *ngFor="let image of files; let i = index"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
+                 [src]="image.Url"
+                 width="auto"
+                 height="100px">
+            <div class="product-img-delete text-center">
+              <button title="Un-stage photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="unstage"
+                      (click)="unStage(i)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            </div>
+          </div>
+          <label class="rmpm dropzone"
+                 for="upload"
+                 appDrag
+                 (files)="stageFiles($event)">
+          </label>
+          <input class="d-none"
+                 id="upload"
+                 type="file"
+                 (change)="manualFileUpload($event)"
+                 multiple>
+        </div>
+      </div>
+    </div>
+    <!-- /Product Images -->
   </form>
+  <button class="btn btn-primary"
+          type="submit"
+          (click)="handleSave()"
+          [disabled]="productForm?.status==='INVALID'">{{isCreatingNew ? 'Create New Product for Approval' : 'Save Updates for Approval'}}</button>
 </div>

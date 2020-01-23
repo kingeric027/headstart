@@ -2,10 +2,15 @@ import { InjectionToken } from '@angular/core';
 import { environment } from '../../environments/environment';
 
 export const ocAppConfig: AppConfig = {
-  appname: 'OrderCloud Admin',
+  appname: environment.appname,
+  marketplaceID: environment.marketplaceID,
+  cmsUrl: environment.cmsUrl,
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
   scope: [
+    // 'AdminAddressReader' is just for reading admin addresses as a seller user on product create/edti
+    // Will need to be updated to 'AdminAddressAdmin' when seller address create is implemented
+    'AdminAddressReader',
     'MeAddressAdmin',
     'MeAdmin',
     'BuyerUserAdmin',
@@ -15,6 +20,11 @@ export const ocAppConfig: AppConfig = {
     'Shopper',
     'CategoryReader',
     'ProductAdmin',
+
+    // adding this for product editing and creation on the front end
+    // this logic may be moved to the backend in the future and this might not be required
+    'PriceScheduleAdmin',
+
     'SupplierReader',
     'SupplierAddressReader',
     'BuyerAdmin',
@@ -78,6 +88,10 @@ export interface AppConfig {
    * base path to middleware
    */
   middlewareUrl: string;
+
+  cmsUrl: string;
+
+  marketplaceID: string;
 
   /**
    * An array of security roles that will be requested upon login.

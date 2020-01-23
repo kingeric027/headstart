@@ -76,7 +76,7 @@ import { OCMCheckoutPayment } from './components/checkout/checkout-payment/check
 import { OCMCheckoutAddress } from './components/checkout/checkout-address/checkout-address.component';
 import { OCMPaymentSpendingAccount } from './components/payments/payment-spending-account/payment-spending-account.component';
 import { OCMPaymentPurchaseOrder } from './components/payments/payment-purchase-order/payment-purchase-order.component';
-import { OMCAddressForm } from './components/profile/address-form/address-form.component';
+import { OCMAddressForm } from './components/profile/address-form/address-form.component';
 import { OCMGenericList } from './components/layout/generic-list/generic-list.component';
 import { OCMAddressList } from './components/profile/address-list/address-list.component';
 import { OCMChangePasswordForm } from './components/profile/change-password-form/change-password-form.component';
@@ -115,6 +115,7 @@ import { OCMAddressCard } from './components/profile/address-card/address-card.c
 import { OCMCreditCardIcon } from './components/payments/credit-card-icon/credit-card-icon.component';
 import { OCMCreditCardDisplay } from './components/payments/credit-card-display/credit-card-display.component';
 import { OCMCreditCardForm } from './components/payments/credit-card-form/credit-card-form.component';
+import { OCMProfileForm } from './components/profile/profile-form/profile-form.component';
 import { OCMCheckoutShipping } from './components/checkout/checkout-shipping/checkout-shipping.component';
 import { OCMShippingSelectionForm } from './components/checkout/shipping-selection-form/shipping-selection-form.component';
 
@@ -158,7 +159,8 @@ const components = [
   OCMChangePasswordForm,
   OCMAddressList,
   OCMGenericList,
-  OMCAddressForm,
+  OCMAddressForm,
+  OCMProfileForm,
   OCMCheckoutConfirm,
   OCMPaymentPurchaseOrder,
   OCMPaymentSpendingAccount,
@@ -283,7 +285,8 @@ export class AppModule {
     this.buildWebComponent(OCMChangePasswordForm, 'ocm-change-password');
     this.buildWebComponent(OCMAddressList, 'ocm-address-list');
     this.buildWebComponent(OCMGenericList, 'ocm-generic-list');
-    this.buildWebComponent(OMCAddressForm, 'ocm-address-form');
+    this.buildWebComponent(OCMAddressForm, 'ocm-address-form');
+    this.buildWebComponent(OCMProfileForm, 'ocm-profile-form');
 
     // Alot of these checkout components will be completely re-done
     this.buildWebComponent(OCMCheckoutConfirm, 'ocm-checkout-confirm');
@@ -294,7 +297,6 @@ export class AppModule {
     this.buildWebComponent(OCMCheckout, 'ocm-checkout');
     this.buildWebComponent(OCMCheckoutShipping, 'ocm-checkout-shipping');
     this.buildWebComponent(OCMShippingSelectionForm, 'ocm-shipping-selection-form');
-
     this.buildWebComponent(OCMPaymentMethodManagement, 'ocm-payment-method-management');
     this.buildWebComponent(OCMProfile, 'ocm-profile');
 
@@ -306,7 +308,6 @@ export class AppModule {
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
     this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
-    this.buildWebComponent(OCMShippingSelectionForm, 'ocm-shipping-selection-form');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {

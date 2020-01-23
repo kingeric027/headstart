@@ -1,4 +1,4 @@
-<table class="table table-hover resource-table border">
+<table class="table table-hover resource-table">
   <thead>
     <tr>
       <th *ngFor="let header of headers"
@@ -14,6 +14,12 @@
       <td *ngFor="let cell of row.cells">
         <span *ngIf="cell.type === 'BASIC_STRING'">
           {{cell.value}}
+        </span>
+        <span *ngIf="cell.type === 'DATE_TIME'">
+          {{cell.value | date: 'short'}}
+        </span>
+        <span *ngIf="cell.type === 'CURRENCY'">
+          {{cell.value | currency: 'USD'}}
         </span>
         <div class="d-flex"
              *ngIf="cell.type === 'STRING_WITH_IMAGE'">

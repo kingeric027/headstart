@@ -9,6 +9,7 @@ using Marketplace.Helpers.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Commands;
+using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services;
@@ -54,7 +55,9 @@ namespace Marketplace.API
                     .Inject<IOrchestrationCommand>()
                     .Inject<IOrchestrationLogCommand>()
                     .Inject<IEnvironmentSeedCommand>()
+                    .Inject<IMarketplaceProductCommand>()
 					.Inject<ISupplierCategoryConfigQuery>()
+					.Inject<ISendgridService>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                     .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
             }

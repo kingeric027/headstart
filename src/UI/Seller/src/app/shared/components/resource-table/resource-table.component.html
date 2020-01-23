@@ -61,7 +61,7 @@
       <!-- /sub resource dropdown -->
     </div>
     <div class="col-md-3 col-sm-7 d-flex justify-content-start align-items-center"
-         *ngIf="!isCreatingNew">
+         *ngIf="!isCreatingNew && shouldShowCreateNew">
       <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
       <button class="btn btn-block brand-button--orange"
               routerLink="/{{_ocService.route}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new">
@@ -220,17 +220,24 @@
                              [ngStyle]="{'height.px': editResourceHeight}">
             <ng-content select=".resource-edit">
             </ng-content>
+          </perfect-scrollbar>
+          <div *ngIf="shouldShowResourceActions"
+               class="d-flex justify-content-between align-items-center py-2 additional-item-edit-resource">
             <delete-confirm-modal-component *ngIf="!isCreatingNew"
+                                            buttonText="Delete {{_currentResourceNameSingular | titlecase}}"
                                             (deleteConfirmed)="handleDelete($event)">
             </delete-confirm-modal-component>
-            <button class="btn btn-primary"
-                    type="submit"
-                    [disabled]="resourceForm.status === 'INVALID' || !areChanges"
-                    (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
-            <button class="btn brand-button ml-3"
-                    (click)="handleDiscardChanges()"
-                    *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
-          </perfect-scrollbar>
+            <div>
+              <button *ngIf="areChanges"
+                      class="btn btn-primary"
+                      type="submit"
+                      [disabled]="resourceForm.status === 'INVALID'"
+                      (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
+              <button class="btn brand-button ml-3"
+                      (click)="handleDiscardChanges()"
+                      *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+            </div>
+          </div>
         </div>
       </ng-template>
     </div>

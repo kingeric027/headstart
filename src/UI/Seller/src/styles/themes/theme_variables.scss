@@ -10,7 +10,7 @@ $blue:              #007bff;
 $indigo:            #490dff;
 $purple:            #490dff;
 $pink:              #d10ce8;
-$red:               #a51700;
+$red:               #e70d05;
 $orange:            #ce600a;
 $yellow:            #f6a914;
 $green:             #28a745;
@@ -76,11 +76,13 @@ $light:             $gray-100;
 $medium:            $gray-700;
 $dark:              $gray-800;
 $primary-dark:      $navy-700;
+$primary-light:      $navy-300;
 
 $theme-colors: (
   'primary': $navy-500,        
   'secondary': $orange-500,
-  'primary-dark': $primary-dark
+  'primary-dark': $primary-dark,
+  'primary-light': $primary-light
 );
 
 // Body

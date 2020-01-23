@@ -9,7 +9,11 @@
     "test": "ng test --code-coverage",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "precommit": "lint-staged --config ./lint-staged.config.js"
+    "precommit": "lint-staged --config ./lint-staged.config.js",
+    "serve-qa": "ng serve --configuration=qa",
+    "build-qa": "ng build --configuration=qa",
+    "serve-demo": "ng serve --configuration=demo",
+    "build-demo": "ng build --configuration=demo"
   },
   "private": true,
   "dependencies": {
@@ -31,7 +35,7 @@
     "@nguniversal/express-engine": "^7.0.2",
     "@ngx-progressbar/core": "^5.2.1",
     "@ngx-progressbar/http": "^5.2.1",
-    "@ordercloud/angular-sdk": "0.0.1-26",
+    "@ordercloud/angular-sdk": "0.0.1-28",
     "@types/lodash": "^4.14.91",
     "@types/moment": "^2.13.0",
     "angular-fontawesome": "^1.0.0",

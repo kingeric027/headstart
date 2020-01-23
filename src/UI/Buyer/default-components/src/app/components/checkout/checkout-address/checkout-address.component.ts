@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
-import { ListBuyerAddress, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
-import { ModalState } from '../../../models/modal-state.class';
-import { ShopperContextService, MarketplaceOrder } from 'marketplace';
+import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-address.component.html',
@@ -11,17 +10,16 @@ export class OCMCheckoutAddress implements OnInit {
   @Input() addressType: 'Shipping' | 'Billing';
   @Output() continue = new EventEmitter();
   isAnon: boolean;
-  addressModal = ModalState.Closed;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
-  order: MarketplaceOrder;
+  order: Order;
   lineItems: ListLineItem;
-  resultsPerPage = 8;
   requestOptions: { page?: number; search?: string } = {
     page: undefined,
     search: undefined,
   };
   usingShippingAsBilling = false;
+  showAddAddressForm = false;
 
   constructor(private context: ShopperContextService) {}
 
@@ -41,8 +39,10 @@ export class OCMCheckoutAddress implements OnInit {
     this.updateRequestOptions({ page: undefined, search: undefined });
   }
 
-  openAddressModal() {
-    this.addressModal = ModalState.Open;
+  toggleShowAddressForm(event) {
+    this.showAddAddressForm = event.target.value === 'new';
+    const selectedAddress = this.existingAddresses.Items.find(address => event.target.value === address.ID);
+    this.existingAddressSelected(selectedAddress);
   }
 
   updateRequestOptions(options: { page?: number; search?: string }) {
@@ -53,13 +53,12 @@ export class OCMCheckoutAddress implements OnInit {
   private async getSavedAddresses() {
     const filters = {};
     filters[this.addressType] = true;
-    const options = { filters, ...this.requestOptions, pageSize: this.resultsPerPage };
+    const options = { filters, ...this.requestOptions };
     this.existingAddresses = await this.context.myResources.ListAddresses(options).toPromise();
   }
 
   existingAddressSelected(address: BuyerAddress) {
     this.selectedAddress = address;
-    this.addressModal = ModalState.Open;
   }
 
   useShippingAsBilling() {
@@ -69,9 +68,10 @@ export class OCMCheckoutAddress implements OnInit {
 
     this.usingShippingAsBilling = true;
     this.selectedAddress = this.lineItems.Items[0].ShippingAddress;
+    this.saveAddress(this.selectedAddress, false, false);
   }
 
-  async saveAddress(address: Address, formDirty: boolean) {
+  async saveAddress(address: Address, formDirty: boolean, shouldSaveAddress: boolean) {
     // TODO: make bellow line better
     const setOneTimeAddress =
       this.isAnon ||
@@ -79,10 +79,14 @@ export class OCMCheckoutAddress implements OnInit {
       (this.usingShippingAsBilling && !this.order.ShippingAddressID) ||
       !address.ID ||
       address.ID === '';
-    if (setOneTimeAddress) {
-      this.order = await this.setOneTimeAddress(address);
+    if (shouldSaveAddress) {
+      this.order = await this.saveAndSetAddress(address);
     } else {
-      this.order = await this.setSavedAddress(address.ID);
+      if (setOneTimeAddress) {
+        this.order = await this.setOneTimeAddress(address);
+      } else {
+        this.order = await this.setSavedAddress(address.ID);
+      }
     }
     if (this.addressType === 'Shipping') {
       this.lineItems.Items[0].ShippingAddress = address;
@@ -92,7 +96,21 @@ export class OCMCheckoutAddress implements OnInit {
     this.continue.emit();
   }
 
-  private async setOneTimeAddress(address: BuyerAddress): Promise<MarketplaceOrder> {
+  private async saveAndSetAddress(address: BuyerAddress): Promise<Order> {
+    const addressToSave = this.addShippingAndBillingOptionsOnAddress(address);
+    const savedAddress = await this.context.myResources.CreateAddress(addressToSave).toPromise();
+    return await this.setSavedAddress(savedAddress.ID);
+  }
+
+  private addShippingAndBillingOptionsOnAddress(address: BuyerAddress): BuyerAddress {
+    /* right now there is no distinction between billing and shipping addresses in the UI
+     this assummes these values will be set to true in all me addresses created at checkout*/
+    address.Shipping = true;
+    address.Billing = true;
+    return address;
+  }
+
+  private async setOneTimeAddress(address: BuyerAddress): Promise<Order> {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     address.ID = null;
@@ -103,7 +121,7 @@ export class OCMCheckoutAddress implements OnInit {
     }
   }
 
-  private async setSavedAddress(addressID: string): Promise<MarketplaceOrder> {
+  private async setSavedAddress(addressID: string): Promise<Order> {
     if (this.addressType === 'Shipping') {
       return await this.context.currentOrder.setShippingAddressByID(addressID);
     } else if (this.addressType === 'Billing') {
