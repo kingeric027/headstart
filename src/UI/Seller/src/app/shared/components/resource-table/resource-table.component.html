@@ -76,6 +76,8 @@
                           [searchTermInput]="searchTerm"
                           (searched)="searchedResources($event)">
         </search-component>
+        <ng-content class="w-100"
+                    select=".orderDirection"></ng-content>
         <div class="filter-controls">
           <div class="icon-button ripple"
                placement="{{screenSize === 'xs' && 'sm' && 'md' ? 'left' : 'bottom'}}"

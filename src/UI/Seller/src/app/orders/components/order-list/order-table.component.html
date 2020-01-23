@@ -19,7 +19,19 @@
         [formGroup]="filterForm">
     filter component will go here when implemented for orders
   </form> -->
-
+  <div class="orderDirection btn-group"
+       *ngIf="shouldShowOrderToggle"
+       role="group"
+       aria-label="order direction selector">
+    <button type="button"
+            class="btn btn-secondary"
+            [ngClass]="{'active': buttonType === 'Incoming'}"
+            (click)="setOrderDirection('Incoming')">Buyer Orders</button>
+    <button type="button"
+            class="btn btn-secondary"
+            [ngClass]="{'active': buttonType === 'Outgoing'}"
+            (click)="setOrderDirection('Outgoing')">Supplier Purchase Orders</button>
+  </div>
   <!-- edit user -->
   <div class="resource-edit">
     resource edit component will go here

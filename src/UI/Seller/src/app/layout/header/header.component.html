@@ -43,6 +43,7 @@
                class="dropdown-menu"
                aria-labelledby="navbarDropdown">
             <a [routerLink]="route.route"
+               [queryParams]="route.queryParams"
                (click)="isCollapsed = !isCollapsed"
                class="dropdown-item"
                *ngFor="let route of nav.subRoutes">{{ route.title }}</a>
@@ -53,6 +54,7 @@
         <!-- Single Level Nav Items -->
         <a *ngIf="!nav.subRoutes"
            [routerLink]="nav.route"
+           [queryParams]="nav.queryParams"
            (click)="isCollapsed = !isCollapsed"
            [ngClass]="{'active' : nav.title === activeTitle}"
            class="nav-link">{{ nav.title }}
