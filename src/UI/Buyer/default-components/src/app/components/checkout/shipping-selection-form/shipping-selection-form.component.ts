@@ -4,7 +4,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
   templateUrl: './shipping-selection-form.component.html',
-  styleUrls: ['./shipping-selection-form.component.scss']
+  styleUrls: ['./shipping-selection-form.component.scss'],
 })
 export class OCMShippingSelectionForm implements OnInit {
   @Input() options: ShippingOptions;
@@ -15,21 +15,21 @@ export class OCMShippingSelectionForm implements OnInit {
 
   form: FormGroup;
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
     this.form = new FormGroup({ rateID: new FormControl(null) });
   }
 
   setSelectedRate(selection: ShippingSelection) {
-    this.form.setValue({ rateID: selection.ShippingRateID });
+    this.form.setValue({ rateID: selection && selection.ShippingRateID });
   }
 
   onFormChanges() {
     this.selectionChanged.emit({
       ShipFromAddressID: this.options.ShipFromAddressID,
-      SupplierID: this.options.SupplierID, 
-      ShippingRateID: this.form.value.rateID
+      SupplierID: this.options.SupplierID,
+      ShippingRateID: this.form.value.rateID,
     });
   }
 }
