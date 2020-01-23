@@ -49,6 +49,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
   areChanges: boolean;
+  dataSaved = false;
   parentResources: ListResource<any>;
   requestStatus: RequestStatus;
   selectedParentResourceName = 'Fetching Data';
@@ -230,6 +231,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   handleSave() {
     this.changesSaved.emit(null);
+    this.dataSaved = true;
   }
 
   handleDelete() {
