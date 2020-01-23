@@ -1,51 +1,56 @@
-﻿using Marketplace.Common.Commands;
+﻿using System;
+using System.Threading.Tasks;
+using Marketplace.Common.Commands.Crud;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
-using System.Threading.Tasks;
 
 namespace Marketplace.Common.Controllers
 {
-    [Route("products")]
+    [Route("product")]
     public class ProductController : BaseController
     {
-        private readonly IOrchestrationCommand _command;
-        public ProductController(AppSettings settings, IOrchestrationCommand command) : base(settings)
+        private readonly IMarketplaceProductCommand _command;
+        public ProductController(AppSettings settings, IMarketplaceProductCommand command) : base(settings)
         {
             _command = command;
         }
-        #region CRUD
-        [HttpPost, Route(""), MarketplaceUserAuth()]
-        public async Task<MarketplaceProduct> PostProduct([FromBody] MarketplaceProduct obj)
+
+        [HttpGet, Route("{id}"), MarketplaceUserAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
+        public async Task<MarketplaceProduct> Get(string id)
         {
-            return await Task.FromResult(new MarketplaceProduct());
+            return await _command.Get(id, VerifiedUserContext);
         }
 
-        [Route("{productID}"), HttpGet, MarketplaceUserAuth(ApiRole.ProductAdmin)]
-        public string Get(string productID)
+        [HttpGet, MarketplaceUserAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
+        public async Task<MarketplaceListPage<MarketplaceProduct>> List(MarketplaceListArgs<MarketplaceProduct> args)
         {
-            return $"Successful `GET /product/{productID}`";
+            return await _command.List(args, VerifiedUserContext);
         }
 
-        [Route("{productID}"), HttpPut, MarketplaceUserAuth(ApiRole.ProductAdmin)]
-        // Need to be changed to Partial
-        public string Put(string productID, MarketplaceProduct product)
+        [HttpPost, MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        public async Task<MarketplaceProduct> Post([FromBody] MarketplaceProduct obj)
         {
-            return $"Successful `PUT /product/{productID}` with a body of {product}";
-        }
-        // Need to be changed to Partial
-        [Route("{productID}"), HttpPatch, MarketplaceUserAuth(ApiRole.ProductAdmin)]
-        public string Patch(string productID, MarketplaceProduct product)
-        {
-            return $"Successful `PATCH /product/{productID}` with body of {product}";
+            return await _command.Post(obj, this.VerifiedUserContext);
         }
 
-        [Route("{productID}"), HttpDelete, MarketplaceUserAuth(ApiRole.ProductAdmin)]
-        public string Delete(string productID)
+        [HttpPut, Route("{id}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        public async Task<MarketplaceProduct> Put([FromBody] MarketplaceProduct obj, string id)
         {
-            return $"Successful `DELETE /product/{productID}`";
+            return await _command.Put(id, obj, this.VerifiedUserContext);
         }
-        #endregion
+
+        [HttpPatch, Route("{id}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        public async Task<MarketplaceProduct> Patch([FromBody] Partial<MarketplaceProduct> obj, string id)
+        {
+            return await _command.Patch(obj, id, this.VerifiedUserContext);
+        }
+
+        [HttpDelete, Route("{id}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        public async Task Delete(string id)
+        {
+            await _command.Delete(id, VerifiedUserContext);
+        }
     }
 }

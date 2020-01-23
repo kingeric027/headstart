@@ -66,9 +66,10 @@ namespace Marketplace.Common.Commands
                 {
                     Token = user.AccessToken,
                     ClientId = user.ClientID,
+                    ID = obj.ID,
                     Model = obj
                 };
-                await _blobQueue.Save(orch.BuildPath(resourceId), JsonConvert.SerializeObject(obj));
+                await _blobQueue.Save(orch.BuildPath(resourceId), JsonConvert.SerializeObject(orch));
                 return await Task.FromResult(obj);
             }
             catch (ApiErrorException ex)
@@ -122,7 +123,8 @@ namespace Marketplace.Common.Commands
             try
             {
                 var blob = await _blobQueue.Get<JObject>(path);
-                return blob.SelectToken("Model") as JObject;
+                //return blob.SelectToken("Model") as JObject;
+                return blob;
             }
             catch (Exception ex)
             {
@@ -135,7 +137,8 @@ namespace Marketplace.Common.Commands
             try
             {
                 var blob = await _blobCache.Get<JObject>($"{path}");
-                return blob.SelectToken("Model") as JObject;
+                //return blob.SelectToken("Model") as JObject;
+                return blob;
             }
             catch (Exception)
             {

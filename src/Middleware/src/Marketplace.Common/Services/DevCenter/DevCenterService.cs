@@ -8,7 +8,7 @@ namespace Marketplace.Common.Services.DevCenter
 {
     public interface IDevCenterService
     {
-        Task<ListPage<DevAccessibleCompany>> GetOrganizations(int ownerDevId, string token);
+        Task<MarketplaceListPage<DevAccessibleCompany>> GetOrganizations(int ownerDevId, string token);
         Task<DevCenterUser> GetMe(string token);
         Task<ImpersonationToken> Impersonate(int id, string token);
         Task<AdminCompany> PostOrganization(Organization org, string token);
@@ -41,11 +41,11 @@ namespace Marketplace.Common.Services.DevCenter
             return user;
         }
 
-        public async Task<ListPage<DevAccessibleCompany>> GetOrganizations(int ownerDevId, string token)
+        public async Task<MarketplaceListPage<DevAccessibleCompany>> GetOrganizations(int ownerDevId, string token)
         {
             var orgs = await this.Get("me/DevAccessibleCompanies", token)
                 .SetQueryParam("OwnerDevID", ownerDevId)
-                .GetJsonAsync<ListPage<DevAccessibleCompany>>();
+                .GetJsonAsync<MarketplaceListPage<DevAccessibleCompany>>();
             return orgs;
         }
 
