@@ -2,6 +2,7 @@
 using System.Linq;
 using Marketplace.Helpers.Mappers;
 using Marketplace.Helpers.Models;
+using Microsoft.Azure.Documents.SystemFunctions;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Mappers
@@ -9,64 +10,65 @@ namespace Marketplace.Common.Mappers
     public static class MarketplaceProductMapper
     {
         // pattern: <Target Object> Map(<Reference Object>)
-        public static Product Map(MarketplaceProduct mProduct)
+        public static Product Map(MarketplaceProduct m)
         {
-            var ocProduct = new Product()
+            var oc = new Product()
             {
-                Active = mProduct.Active,
-                AutoForward = mProduct.AutoForward,
-                ID = mProduct.ID,
-                DefaultPriceScheduleID = mProduct.DefaultPriceScheduleID,
-                DefaultSupplierID = mProduct.DefaultSupplierID,
-                Description = mProduct.Description,
-                Name = mProduct.Name,
-                QuantityMultiplier = mProduct.QuantityMultiplier,
-                ShipHeight = mProduct.ShipHeight,
-                ShipLength = mProduct.ShipLength,
-                ShipWeight = mProduct.ShipWeight,
-                ShipWidth = mProduct.ShipWidth,
+                Active = m.Active,
+                AutoForward = m.AutoForward,
+                ID = m.ID,
+                DefaultPriceScheduleID = m.DefaultPriceScheduleID,
+                DefaultSupplierID = m.DefaultSupplierID,
+                Description = m.Description,
+                Name = m.Name,
+                QuantityMultiplier = m.QuantityMultiplier,
+                ShipHeight = m.ShipHeight,
+                ShipLength = m.ShipLength,
+                ShipWeight = m.ShipWeight,
+                ShipWidth = m.ShipWidth,
                 xp = new
                 {
-                    mProduct.Status,
-                    mProduct.Note,
-                    mProduct.UnitOfMeasure,
-                    mProduct.Images,
-                    mProduct.HasVariants
+                    m.Status,
+                    m.Note,
+                    m.UnitOfMeasure,
+                    m.Images,
+                    m.HasVariants,
+                    m.Facets
                 }
             };
-            return ocProduct;
+            return oc;
         }
 
-        public static MarketplaceProduct Map(Product ocProduct)
+        public static MarketplaceProduct Map(Product oc)
         {
-            var mProduct = new MarketplaceProduct()
+            var m = new MarketplaceProduct()
             {
-                Active = ocProduct.Active,
-                AutoForward = ocProduct.AutoForward,
-                ID = ocProduct.ID,
-                DefaultPriceScheduleID = ocProduct.DefaultPriceScheduleID,
-                DefaultSupplierID = ocProduct.DefaultSupplierID,
-                Description = ocProduct.Description,
-                Name = ocProduct.Name,
-                QuantityMultiplier = ocProduct.QuantityMultiplier,
-                ShipHeight = ocProduct.ShipHeight,
-                ShipLength = ocProduct.ShipLength,
-                ShipWeight = ocProduct.ShipWeight,
-                ShipWidth = ocProduct.ShipWidth,
-                Status = MapperHelper.TryGetXp(ocProduct.xp, "Status"),
-                Note = MapperHelper.TryGetXp(ocProduct.xp, "Note"),
-                UnitOfMeasure = MapperHelper.TryGetXp(ocProduct.xp, "UnitOfMeasure"),
-                IntegrationData = MapperHelper.TryGetXp(ocProduct.xp, "Data"),
-                Facets = MapperHelper.TryFacetXp(ocProduct.xp),
-                Images = MapperHelper.TryGetXp(ocProduct.xp, "Images")
+                Active = oc.Active,
+                AutoForward = oc.AutoForward,
+                ID = oc.ID,
+                DefaultPriceScheduleID = oc.DefaultPriceScheduleID,
+                DefaultSupplierID = oc.DefaultSupplierID,
+                Description = oc.Description,
+                Name = oc.Name,
+                QuantityMultiplier = oc.QuantityMultiplier,
+                ShipHeight = oc.ShipHeight,
+                ShipLength = oc.ShipLength,
+                ShipWeight = oc.ShipWeight,
+                ShipWidth = oc.ShipWidth,
+                Status = oc.xp != null ? MapperHelper.TryGetXp(oc.xp, "Status") : null,
+                Note = oc.xp != null ? MapperHelper.TryGetXp(oc.xp, "Note") : null,
+                UnitOfMeasure = oc.xp != null ? MapperHelper.TryGetXp(oc.xp, "UnitOfMeasure") : null,
+                IntegrationData = oc.xp != null ? MapperHelper.TryGetXp(oc.xp, "Data") : null,
+                Facets = oc.xp != null ? MapperHelper.TryFacetXp(oc.xp) : null,
+                Images = oc.xp != null ? MapperHelper.TryGetXp(oc.xp, "Images") : null
             };
 
-            return mProduct;
+            return m;
         }
 
-        public static PartialProduct Map(Partial<MarketplaceProduct> mProduct)
+        public static PartialProduct Map(Partial<MarketplaceProduct> m)
         {
-            return mProduct.Values.ToObject<PartialProduct>();
+            return m.Values.ToObject<PartialProduct>();
         }
 
         public static MarketplaceListPage<MarketplaceProduct> Map(ListPage<Product> ocProducts)

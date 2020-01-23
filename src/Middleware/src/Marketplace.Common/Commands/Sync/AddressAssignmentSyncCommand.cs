@@ -2,8 +2,10 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Exceptions;
+using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -18,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<AddressAssignment>();
+            var obj = MarketplaceAddressAssignmentMapper.Map(wi.Current.ToObject<MarketplaceAddressAssignment>());
             try
             {
                 await _oc.Addresses.SaveAssignmentAsync(wi.ResourceId, obj, wi.Token);
@@ -59,7 +61,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<AddressAssignment>();
+            var obj = MarketplaceAddressAssignmentMapper.Map(JObject.FromObject(wi.Current).ToObject<MarketplaceAddressAssignment>());
             try
             {
                 await _oc.Addresses.SaveAssignmentAsync(wi.ResourceId, obj, wi.Token);
@@ -79,7 +81,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<AddressAssignment>();
+            var obj = MarketplaceAddressAssignmentMapper.Map(JObject.FromObject(wi.Current).ToObject<AddressAssignment>());
             try
             {
                 await _oc.Addresses.SaveAssignmentAsync(wi.ResourceId, obj, wi.Token);
