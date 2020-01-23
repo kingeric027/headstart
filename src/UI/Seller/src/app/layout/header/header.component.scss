@@ -21,6 +21,16 @@
         }
     }
 }
+
+.logout {
+    color: rgba(255, 255, 255, 0.75);
+    opacity: 0.75;
+    &:hover {
+        color: white;
+        text-decoration: none;
+    }
+}
+
 // TODO: Fix for single level nav items
 // .active-nav-group {
 //     @include media-breakpoint-up(md) {
