@@ -76,7 +76,7 @@
                           [searchTermInput]="searchTerm"
                           (searched)="searchedResources($event)">
         </search-component>
-        <div class="filter-controls">
+        <div class="d-flex justify-content-start align-items-center">
           <div class="icon-button ripple"
                placement="{{screenSize === 'xs' && 'sm' && 'md' ? 'left' : 'bottom'}}"
                [ngbPopover]="filters"
@@ -96,9 +96,9 @@
             </fa-layers>
           </div>
           <div *ngIf="activeFilterCount > 0"
-               class="icon-button ripple">
-            <fa-icon [icon]="faTimes"
-                     (click)="clearAllFilters()"></fa-icon>
+               class="icon-button ripple"
+               (click)="clearAllFilters()">
+            <fa-icon [icon]="faTimes"></fa-icon>
           </div>
         </div>
       </div>
@@ -106,7 +106,7 @@
       <ng-template #filters>
         <div>
           <ng-content select=".filters"></ng-content>
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex justify-content-between align-items-center mt-2">
             <button (click)="closePopover()"
                     class="btn btn-sm btn-link text-dark">Cancel</button>
             <button (click)="handleApplyFilters()"
@@ -184,7 +184,7 @@
           </perfect-scrollbar>
         </div>
         <div class="col-md-9 col-sm-12">
-          <div class="pt-3 pb-3 d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
+          <div class="pt-3 pb-3 border-bottom d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
             <span class="d-flex flex-row justify-content-start">
               <button class="btn brand-button"
                       (click)="handleSelectResource({})">
