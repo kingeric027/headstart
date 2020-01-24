@@ -14,6 +14,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { AppStateService } from '@app-seller/shared';
 import { getHeaderConfig, MPRoute } from './header.config';
 import { AppAuthService } from '@app-seller/auth';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'layout-header',
@@ -21,6 +22,7 @@ import { AppAuthService } from '@app-seller/auth';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
+  user = {};
   isCollapsed = true;
   faBoxOpen = faBoxOpen;
   faUser = faUser;
@@ -37,13 +39,19 @@ export class HeaderComponent implements OnInit {
     private router: Router,
     private appStateService: AppStateService,
     private appAuthService: AppAuthService,
+    private currentUserService: CurrentUserService,
     @Inject(applicationConfiguration) protected appConfig: AppConfig
   ) { }
 
   ngOnInit() {
     this.headerConfig = getHeaderConfig(this.appAuthService.getUserRoles(), this.appAuthService.getOrdercloudUserType());
+    this.getCurrentUser();
     this.subscribeToRouteEvents();
     this.urlChange(this.router.url);
+  }
+
+  async getCurrentUser() {
+    this.user = await this.currentUserService.getUser();
   }
 
   subscribeToRouteEvents() {
