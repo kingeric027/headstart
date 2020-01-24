@@ -17,7 +17,8 @@ namespace Marketplace.Common.Controllers
 			_shippingCommand = shippingCommand;
 		}
 
-		[HttpGet, Route("{orderId}"), MarketplaceUserAuth(ApiRole.Shopper)]
+		// investigate why ApiRole.Shopper auth is failing for shoppers
+		[HttpGet, Route("{orderId}"), MarketplaceUserAuth(ApiRole.SupplierReader)]
 		public async Task<MarketplaceListPage<ProposedShipment>> List(string orderId)
 		{
 			var shippingRateResponse = await _shippingCommand.ListProposedShipments(orderId, VerifiedUserContext);

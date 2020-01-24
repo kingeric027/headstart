@@ -124,8 +124,8 @@ export interface ICurrentOrder {
   setBillingAddressByID(addressID: string): Promise<MarketplaceOrder>;
   setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
 
-  getShippingRates(): Promise<ShippingOptions[]>;
-  selectShippingRate(selection: ShippingSelection): Promise<MarketplaceOrder>;
+  getProposedShipments(): Promise<ProposedShipment[]>;
+  selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder>;
   calculateTax(): Promise<MarketplaceOrder>;
 
   onOrderChange(callback: (order: MarketplaceOrder) => void): void;
@@ -192,21 +192,34 @@ export interface ShippingRate {
   TotalCost: number;
 }
 
-export interface ShippingSelection {
+export interface ProposedShipmentSelection {
+  // tentative model pending platform implementation
   ShipFromAddressID: string;
   SupplierID: string;
-  ShippingRateID: string;
+  ProposedShipmentOptionID: string;
+  Rate: number;
 }
 
-export interface ShippingOptions {
-  SupplierID: string;
-  ShipFromAddressID: string;
-  Rates: ShippingRate[];
+export interface ProposedShipment {
+  ProposedShipmentItems: ProposedShipmentItem[];
+  ProposedShipmentOptions: ProposedShipmentOption[];
+}
+
+export interface ProposedShipmentItem {
+  LineItemID: string;
+  Quantity: number;
+}
+
+export interface ProposedShipmentOption {
+  ID: string;
+  Name: string;
+  DeliveryDays: number;
+  Cost: number;
 }
 
 export interface MarketplaceOrder extends Order<OrderXp, any, any> { }
 export interface OrderXp {
-  ShippingSelections: ShippingSelection[];
+  ProposedShipmentSelections: ProposedShipmentSelection[];
   AvalaraTaxTransactionCode: string;
 }
 
