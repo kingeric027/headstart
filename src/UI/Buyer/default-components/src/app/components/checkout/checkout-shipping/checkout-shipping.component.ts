@@ -16,10 +16,10 @@ export class OCMCheckoutShipping implements OnInit {
   constructor(private context: ShopperContextService) {}
 
   async ngOnInit() {
-    this.order = this.context.currentOrder.get();
+    // placeholder to patch the shipping selections to an empty array
+    this.order = await this.context.currentOrder.patch({ xp: { AvalaraTaxTransactionCode: '', ProposedShipmentSelections: [] }});
     this.lineItems = this.context.currentOrder.getLineItems().Items;
     this.proposedShipments = await this.context.currentOrder.getProposedShipments();
-    this.liGroupedByShipFrom = Object.values(this.liGroups);
   }
 
   async onContinueClicked() {
@@ -39,10 +39,10 @@ export class OCMCheckoutShipping implements OnInit {
     // based on the shipfromaddressID
     const supplierID = this.getSupplierID(proposedShipment);
     const shipFromAddressID = this.getShipFromAddressID(proposedShipment);
-    if (!this.order.xp) return '';
-    const proposedShipmentSelection =this.order.xp.ProposedShipmentSelections
+    if (!this.order.xp) return null;
+    const proposedShipmentSelection = this.order.xp.ProposedShipmentSelections
       .find(selection => selection.ShipFromAddressID === shipFromAddressID && selection.SupplierID === supplierID);
-    return proposedShipmentSelection && proposedShipmentSelection.ProposedShipmentOptionID || '';
+    return proposedShipmentSelection && proposedShipmentSelection.ProposedShipmentOptionID || null;
   }
 
   getSupplierID(proposedShipment: ProposedShipment): string {
@@ -57,17 +57,7 @@ export class OCMCheckoutShipping implements OnInit {
     return firstLineItem.ShipFromAddressID;
   }
 
-  selectRate(selection: ProposedShipmentSelection) {
-    this.context.currentOrder.selectShippingRate(selection);
-    const proposedShipmentSelections = this.order.xp && this.order.xp.ProposedShipmentSelections || [];
-    const proposedShipmentSelectionsFiltered = 
-      proposedShipmentSelections.filter(p => p.SupplierID !== selection.SupplierID || p.ShipFromAddressID !== selection.ShipFromAddressID);
-    const partialOrder = {
-      xp: {
-        ...this.order.xp,
-        ProposedShipmentSelections: [...proposedShipmentSelectionsFiltered, selection]
-      }
-    }
-    this.context.currentOrder.patch(partialOrder);
+  async selectRate(selection: ProposedShipmentSelection) {
+    this.order = await this.context.currentOrder.selectShippingRate(selection);
   }
 }

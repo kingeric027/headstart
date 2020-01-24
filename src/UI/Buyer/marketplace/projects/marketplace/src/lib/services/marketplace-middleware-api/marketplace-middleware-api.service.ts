@@ -44,7 +44,7 @@ export class MarketplaceMiddlewareApiService {
 
   selectShippingRate(orderID: string, selection: ProposedShipmentSelection): Promise<MarketplaceOrder> {
     return this.http.put<MarketplaceOrder>(
-      `${this.baseUrl}/orders/${orderID}/shipping/select`, selection, this.generateHeaders())
+      `${this.baseUrl}/proposedshipment/${orderID}/select`, selection, this.generateHeaders())
     .toPromise();
   }
 
