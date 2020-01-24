@@ -67,7 +67,7 @@
   </div>
 
   <div
-      class="user"
+      class="current-user nav-item dropdown cursor-pointer"
       ngbDropdown>
 
       <a class="nav-link navbarDropdown"
@@ -81,7 +81,8 @@
         <div class="dropdown-menu account-dropdown-alignment"
               aria-labelledby="user-dropdown"
               ngbDropdownMenu>
-        <span class="dropdown-item">Dropdown Test</span>
+        <h6 class="dropdown-header">Seller org name</h6>
+        <div class="dropdown-divider"></div>
          <a class="dropdown-item"
        (click)="logout()"
        href="/login">
