@@ -68,16 +68,14 @@
         Create New {{_currentResourceNameSingular | titlecase}}
       </button>
     </div>
-    <div class="col-lg-4 col-md-4">
+    <div class="col-lg-10 col-md-10">
       <!-- Resource Search -->
-      <div class="mr-2 d-flex justify-content-between align-items-center">
-        <search-component class="mr-3 w-100"
+      <div class="mr-2 d-flex align-items-center">
+        <search-component class="mr-2 w-50"
                           [placeholderText]="'Search ' + _currentResourceNamePlural"
                           [searchTermInput]="searchTerm"
                           (searched)="searchedResources($event)">
         </search-component>
-        <ng-content class="w-100"
-                    select=".orderDirection"></ng-content>
         <div class="filter-controls">
           <div class="icon-button ripple"
                placement="{{screenSize === 'xs' && 'sm' && 'md' ? 'left' : 'bottom'}}"
@@ -103,6 +101,7 @@
                      (click)="clearAllFilters()"></fa-icon>
           </div>
         </div>
+        <ng-content select=".orderDirection"></ng-content>
       </div>
       <!-- ngContent for filters popover -->
       <ng-template #filters>

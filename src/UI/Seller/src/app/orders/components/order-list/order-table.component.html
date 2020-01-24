@@ -19,17 +19,17 @@
         [formGroup]="filterForm">
     filter component will go here when implemented for orders
   </form> -->
-  <div class="orderDirection btn-group"
+  <div class="orderDirection btn-group ml-4"
        *ngIf="shouldShowOrderToggle"
        role="group"
        aria-label="order direction selector">
     <button type="button"
             class="btn btn-secondary"
-            [ngClass]="{'active': buttonType === 'Incoming'}"
+            [ngClass]="{'active': activeOrderDirectionButton === 'Incoming'}"
             (click)="setOrderDirection('Incoming')">Buyer Orders</button>
     <button type="button"
             class="btn btn-secondary"
-            [ngClass]="{'active': buttonType === 'Outgoing'}"
+            [ngClass]="{'active': activeOrderDirectionButton === 'Outgoing'}"
             (click)="setOrderDirection('Outgoing')">Supplier Purchase Orders</button>
   </div>
   <!-- edit user -->
