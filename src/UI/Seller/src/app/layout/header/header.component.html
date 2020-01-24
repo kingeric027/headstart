@@ -62,32 +62,32 @@
         <!-- /Single Level Nav Items -->
       </li>
     </ul>
+
+
   </div>
-  <!-- <div class="nav-link dropdown-toggle text-nowrap"
-        id="account-dropdown"
-        ngbDropdownToggle>
-    <fa-icon [icon]="faUserCircle"></fa-icon>
-      <span class="d-none d-md-inline">
-       Account
-      </span>
-  </div> -->
-  <div class="nav-link dropdown-toggle text-nowrap"
-        id="account-dropdown"
-        >
-    <fa-icon [icon]="faUserCircle"></fa-icon>
-    <span class="d-none d-md-inline">
-      Account
-    </span>
-  </div>
-  <div class="hello">
-    <fa-icon [icon]="faUserCircle"></fa-icon>
-    {{ user?.FirstName }}
-  </div>
-  <div>
-    <a class="logout"
+
+  <div
+      class="user"
+      ngbDropdown>
+
+      <a class="nav-link navbarDropdown"
+          data-toggle="dropdown"
+          ngbDropdownToggle
+          aria-haspopup="true"
+          aria-expanded="false">
+      <fa-icon [icon]="faUserCircle"></fa-icon>
+      {{ user?.FirstName }} {{ user?.LastName }}
+      </a>
+        <div class="dropdown-menu account-dropdown-alignment"
+              aria-labelledby="user-dropdown"
+              ngbDropdownMenu>
+        <span class="dropdown-item">Dropdown Test</span>
+         <a class="dropdown-item"
        (click)="logout()"
        href="/login">
         <fa-icon [icon]="faSignOutAlt"></fa-icon> Logout
-    </a>
+        </a>
+        </div>
+
   </div>
 </nav>
