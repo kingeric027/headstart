@@ -33,6 +33,7 @@ namespace Marketplace.Common
 	{
 		public int AccountID { get; set; }
 		public string LicenseKey { get; set; }
+		public string CompanyCode { get; set; }
 	}
     public class BlobSettings
     {
