@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Marketplace.Common
 {
-    public enum AppEnvironment { Local, Qa, Prod}
+	public enum AppEnvironment { Local, Qa, Prod }
 
     //public interface IAppSettings
     //{
@@ -15,6 +15,7 @@ namespace Marketplace.Common
     //}
     public class AppSettings // : IAppSettings
     {
+		public AvalaraSettings AvalaraSettings { get; set; }
         public AppEnvironment Env { get; set; }
         public BlobSettings BlobSettings { get; set; }
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
@@ -22,12 +23,17 @@ namespace Marketplace.Common
         public string SendgridApiKey { get; set; }
     }
 
-    public class OrderCloudSettings
-    {
-        public string AuthUrl { get; set; }
-        public string ApiUrl { get; set; }
-    }
+	public class OrderCloudSettings
+	{
+		public string AuthUrl { get; set; }
+		public string ApiUrl { get; set; }
+	}
 
+	public class AvalaraSettings
+	{
+		public int AccountID { get; set; }
+		public string LicenseKey { get; set; }
+	}
     public class BlobSettings
     {
         public string ConnectionString { get; set; }
@@ -36,10 +42,10 @@ namespace Marketplace.Common
 		public string HostUrl { get; set; }
     }
 
-    public class CosmosSettings
-    {
-        public string PrimaryKey { get; set; }
-        public string EndpointUri { get; set; }
-        public string DatabaseName { get; set; }
-    }
+	public class CosmosSettings
+	{
+		public string PrimaryKey { get; set; }
+		public string EndpointUri { get; set; }
+		public string DatabaseName { get; set; }
+	}
 }

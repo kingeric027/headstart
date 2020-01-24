@@ -79,7 +79,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<UserGroupAssignment>();
+            var obj = JObject.FromObject(wi.Current).ToObject<UserGroupAssignment>();
             try
             {
                 await _oc.UserGroups.SaveUserAssignmentAsync(wi.ResourceId, obj, wi.Token);
