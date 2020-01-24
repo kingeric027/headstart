@@ -1,5 +1,8 @@
 <div *ngIf="productForm"
      class="container-fluid resource-edit">
+  <product-catalog-assignments-component *ngIf="_marketPlaceProduct && userContext?.UserType === 'SELLER'"
+                                         [product]="_marketPlaceProduct">
+  </product-catalog-assignments-component>
   <form [formGroup]="productForm">
     <!-- Product Details -->
     <div class="row pt-3">
@@ -18,7 +21,7 @@
                  maxlength="100"
                  [resourceForm]="productForm"
                  formControlName="Name"
-                 (input)="updateResourceFromEvent($event, 'Name')"
+                 (input)="updateResourceFromEvent($event.field, 'Name')"
                  placeholder="Enter Name">
         </div>
         <div class="form-group">
@@ -27,7 +30,7 @@
                                            [formControlForText]="productForm?.controls.Description"
                                            resourceField="Description"
                                            pathOnResource="Description"
-                                           (resourceUpdated)="updateResource.emit($event)">
+                                           (resourceUpdated)="updateResourceFromFieldValue($event.field, $event.value)">
           </reactive-quill-editor-component>
         </div>
         <div class="form-group">
@@ -45,16 +48,22 @@
         </div>
         <div class="form-group">
           <label for="Price">Price</label>
-          <input type="number"
-                 class="form-control"
-                 id="Price"
-                 showErrors
-                 aria-describedby="Price"
-                 min="1"
-                 [resourceForm]="productForm"
-                 formControlName="Price"
-                 (input)="updateResourceFromEvent($event, 'Price')"
-                 placeholder="Price (USD)">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">$</span>
+            </div>
+            <input type="number"
+                   class="form-control currency"
+                   id="Price"
+                   showErrors
+                   aria-describedby="Price"
+                   min="1"
+                   step="0.01"
+                   [resourceForm]="productForm"
+                   formControlName="Price"
+                   (input)="updateResourceFromEvent($event, 'Price')"
+                   placeholder="Price (USD)">
+          </div>
         </div>
       </div>
     </div>
