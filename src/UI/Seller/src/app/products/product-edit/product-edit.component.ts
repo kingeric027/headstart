@@ -1,10 +1,9 @@
 import { Component, Input, Output, EventEmitter, OnInit, Inject } from '@angular/core';
 import { get as _get } from 'lodash';
-import { SupplierAddressService } from '@app-seller/shared/services/supplier/supplier-address.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { UserContext } from '@app-seller/config/user-context';
-import { ListAddress, OcSupplierAddressService, OcAdminAddressService, MeUser } from '@ordercloud/angular-sdk';
+import { ListAddress, OcSupplierAddressService, OcAdminAddressService } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MarketPlaceProduct, MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
@@ -22,8 +21,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./product-edit.component.scss'],
 })
 export class ProductEditComponent implements OnInit {
-  _marketPlaceProduct: MarketPlaceProduct;
-  _marketPlaceProductUpdated: MarketPlaceProduct;
   @Input()
   productForm: FormGroup;
   @Input()
@@ -43,15 +40,17 @@ export class ProductEditComponent implements OnInit {
   @Input()
   isCreatingNew: boolean;
 
+  userContext = {};
   hasVariations = false;
   images: MarketPlaceProductImage[] = [];
   files: FileHandle[];
   faTrash = faTrash;
   faTimes = faTimes;
+  _marketPlaceProduct: MarketPlaceProduct;
+  _marketPlaceProductUpdated: MarketPlaceProduct;
 
   constructor(
     private router: Router,
-    private supplierAddressService: SupplierAddressService,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
     private ocAdminAddressService: OcAdminAddressService,
@@ -62,10 +61,11 @@ export class ProductEditComponent implements OnInit {
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
     this.checkIfCreatingNew();
     this.getAddresses();
+    this.userContext = await this.currentUserService.getUserContext();
   }
 
   async getAddresses(): Promise<void> {
@@ -146,9 +146,18 @@ export class ProductEditComponent implements OnInit {
         },
       };
     } else {
-      this._marketPlaceProductUpdated = { ...this._marketPlaceProductUpdated, [field]: event.target.value };
+      this.updateResourceFromFieldValue(field, event.target.value);
+      // this._marketPlaceProductUpdated = { ...this._marketPlaceProductUpdated, [field]: event.target.value };
     }
   }
+
+  updateResourceFromFieldValue(field: string, value: any) {
+    this._marketPlaceProductUpdated = { ...this._marketPlaceProductUpdated, [field]: value };
+  }
+
+  /******************************************
+   *  **** PRODUCT IMAGE UPLOAD FUNCTIONS ****
+   * ******************************************/
 
   manualFileUpload(event): void {
     const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {

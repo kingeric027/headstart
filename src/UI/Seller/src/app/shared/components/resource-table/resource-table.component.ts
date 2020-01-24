@@ -8,10 +8,11 @@ import {
   OnDestroy,
   NgZone,
   AfterViewChecked,
+  OnChanges,
 } from '@angular/core';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
-import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faChevronLeft, faHome, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { takeWhile, filter } from 'rxjs/operators';
@@ -34,10 +35,11 @@ interface BreadCrumb {
     '(window:resize)': 'ngAfterViewChecked()',
   },
 })
-export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class ResourceTableComponent implements OnInit, OnChanges, OnDestroy, AfterViewChecked {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
+  faTimes = faTimes;
   faHome = faHome;
   faChevronLeft = faChevronLeft;
   searchTerm = '';
@@ -61,6 +63,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   myResourceHeight = 450;
   tableHeight = 450;
   editResourceHeight = 450;
+  activeFilterCount = 0;
 
   constructor(
     private router: Router,
@@ -123,6 +126,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.screenSize = getScreenSizeBreakPoint();
   }
 
+  ngOnChanges() {
+    this.activeFilterCount = Object.keys(this._ocService.optionsSubject.value.filters).length;
+  }
+
   ngAfterViewChecked() {
     this.setPsHeights();
     this.changeDetectorRef.detectChanges();
@@ -159,7 +166,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.router.events
       .pipe(takeWhile(() => this.alive))
       // only need to set the breadcrumbs on nav end events
-      .pipe(filter((event) => event instanceof NavigationEnd))
+      .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         this.setBreadCrumbs();
       });
@@ -172,7 +179,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   private setParentResourceSelectionSubscription() {
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
-      .subscribe(async (params) => {
+      .subscribe(async params => {
         await this.redirectToFirstParentIfNeeded();
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
@@ -185,7 +192,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   private setListRequestStatusSubscription() {
-    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe((requestStatus) => {
+    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe(requestStatus => {
       this.requestStatus = requestStatus;
       this.changeDetectorRef.detectChanges();
     });
@@ -202,8 +209,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     // in the future breadcrumb logic might need to be more complicated than this
     const urlPieces = this.router.url
       .split('/')
-      .filter((p) => p)
-      .map((p) => {
+      .filter(p => p)
+      .map(p => {
         if (p.includes('?')) {
           return p.slice(0, p.indexOf('?'));
         } else {
