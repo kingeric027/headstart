@@ -15,8 +15,8 @@ namespace Marketplace.Common.Services.FreightPop
         public string Service { get; set; }
         
         // what is list cost?
-        public float ListCost { get; set; }
-        public float TotalCost { get; set; }
+        public decimal ListCost { get; set; }
+        public decimal TotalCost { get; set; }
     }
 
 }

@@ -1,4 +1,5 @@
 ﻿using Marketplace.Common.Commands;
+using Marketplace.Common.Models;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
@@ -23,6 +24,13 @@ namespace Marketplace.Common.Controllers
 		{
 			var shippingRateResponse = await _shippingCommand.ListProposedShipments(orderId, VerifiedUserContext);
 			return shippingRateResponse;
+		}
+
+		[HttpPut, Route("{orderId}/select"), MarketplaceUserAuth(ApiRole.SupplierReader)]
+		public async Task<MarketplaceOrder> Select(string orderId, [FromBody] ProposedShipmentSelection proposedShipmentSelection)
+		{
+			var marketplaceOrder = await _shippingCommand.SetShippingSelectionAsync(orderId, proposedShipmentSelection);
+			return marketplaceOrder;
 		}
 	}
 }
