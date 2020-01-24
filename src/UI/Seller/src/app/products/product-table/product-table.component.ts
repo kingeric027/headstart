@@ -19,4 +19,17 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
   ) {
     super(changeDetectorRef, productService, router, activatedRoute, ngZone);
   }
+
+  filterConfig = {
+    id: 'SEB',
+    timeStamp: '0001-01-01T00:00:00+00:00',
+    MarketplaceName: 'Self Esteem Brands',
+    Filters: [
+      {
+        Display: 'Status',
+        Path: 'xp.Data.Status',
+        Values: ['Draft', 'Published'],
+      },
+    ],
+  };
 }

@@ -11,8 +11,28 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          (applyFilters)="applyFilters()">
+
+  <!-- filter component -->
+  <form *ngIf="filterForm"
+        class="d-flex flex-column filters"
+        [formGroup]="filterForm">
+    <div *ngFor="let filter of filterConfig.Filters"
+         class="group">
+      <label>{{filter.Display}}</label>
+      <select class="form-control input-sm"
+              type="select"
+              required
+              [formControlName]="filter.Path">
+        <option *ngFor="let option of filter.Values"
+                value="{{option}}">{{option}}</option>
+      </select>
+    </div>
+  </form>
+
   <app-product-edit class="resource-edit"
                     [addresses]="addresses"
-                    [orderCloudProduct]="resourceInSelection"></app-product-edit>
+                    [orderCloudProduct]="resourceInSelection">
+  </app-product-edit>
 </resource-table-component>
