@@ -37,6 +37,15 @@
     margin-right: 10px;
 }
 
+.user {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.account-dropdown-alignment {
+    right: 0;
+    left: auto;
+  }
+
 // TODO: Fix for single level nav items
 // .active-nav-group {
 //     @include media-breakpoint-up(md) {
