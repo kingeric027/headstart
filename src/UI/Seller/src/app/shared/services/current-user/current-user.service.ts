@@ -65,9 +65,9 @@ export class CurrentUserService {
     return me.Supplier ? true : false;
   }
 
-  async getSupplierOrg(): Promise<Supplier> {
+  async getSupplierOrg(): Promise<Supplier ['Name']> {
     const me = await this.getUser();
     const supplier = await this.ocSupplierService.Get(me.Supplier.ID).toPromise();
-    return supplier;
+    return supplier.Name;
   }
 }
