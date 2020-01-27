@@ -1,4 +1,9 @@
 $square-thumb-side: 70px;
+/* ngx-image-zoom has a bug that doesn't allow you to set max size of thumbnail or full-size images.
+ This is a workaround */
+::ng-deep .ngxImageZoomContainer > img{
+  max-height: 450px!important;
+}
 .gallery-container {
   padding-top: 10px;
   padding-bottom: 10px;
