@@ -46,8 +46,8 @@ export class ProductEditComponent implements OnInit {
   files: FileHandle[];
   faTrash = faTrash;
   faTimes = faTimes;
-  _marketPlaceProduct: MarketPlaceProduct;
-  _marketPlaceProductUpdated: MarketPlaceProduct;
+  _marketPlaceProductStatic: MarketPlaceProduct;
+  _marketPlaceProductEditable: MarketPlaceProduct;
 
   constructor(
     private router: Router,
@@ -81,8 +81,8 @@ export class ProductEditComponent implements OnInit {
   }
 
   refreshProductData(product: MarketPlaceProduct) {
-    this._marketPlaceProduct = product;
-    this._marketPlaceProductUpdated = product;
+    this._marketPlaceProductStatic = product;
+    this._marketPlaceProductEditable = product;
     this.createProductForm(product);
     this.images = ReplaceHostUrls(product);
     this.checkIfCreatingNew();
@@ -112,6 +112,12 @@ export class ProductEditComponent implements OnInit {
     });
   }
 
+  checkForChanges() {
+    this.areChanges =
+      JSON.stringify(this._marketPlaceProductEditable) !== JSON.stringify(this._marketPlaceProductStatic);
+    console.log(this.areChanges);
+  }
+
   handleSave() {
     if (this.isCreatingNew) {
       this.createNewProduct();
@@ -121,38 +127,38 @@ export class ProductEditComponent implements OnInit {
   }
 
   async createNewProduct() {
-    const product = await this.productService.createNewMarketPlaceProduct(this._marketPlaceProductUpdated);
+    const product = await this.productService.createNewMarketPlaceProduct(this._marketPlaceProductEditable);
     await this.addFiles(this.files, product.ID);
     this.refreshProductData(product);
     this.router.navigateByUrl(`/products/${product.ID}`);
   }
 
   async updateProduct() {
-    const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductUpdated);
+    const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductEditable);
     this.addFiles(this.files, product.ID);
   }
 
   updateResourceFromEvent(event: any, field: string): void {
     if (field === 'Price') {
       // placeholder for just handling a single price
-      this._marketPlaceProductUpdated = {
-        ...this._marketPlaceProductUpdated,
+      this._marketPlaceProductEditable = {
+        ...this._marketPlaceProductEditable,
 
         // this will overwrite all existing price breaks with the price
         // when more robust price setting is creating this should be changed
         PriceSchedule: {
-          ...this._marketPlaceProductUpdated,
+          ...this._marketPlaceProductEditable,
           PriceBreaks: [{ Price: event.target.value, Quantity: 1 }],
         },
       };
     } else {
       this.updateResourceFromFieldValue(field, event.target.value);
-      // this._marketPlaceProductUpdated = { ...this._marketPlaceProductUpdated, [field]: event.target.value };
+      // this._marketPlaceProductEditable = { ...this._marketPlaceProductEditable, [field]: event.target.value };
     }
   }
 
   updateResourceFromFieldValue(field: string, value: any) {
-    this._marketPlaceProductUpdated = { ...this._marketPlaceProductUpdated, [field]: value };
+    this._marketPlaceProductEditable = { ...this._marketPlaceProductEditable, [field]: value };
   }
 
   /******************************************
@@ -177,14 +183,14 @@ export class ProductEditComponent implements OnInit {
       product = await this.middleware.uploadProductImage(file.File, productID);
     }
     this.files = [];
-    // Only need the `|| {}` to account for creating new product where this._marketPlaceProduct doesn't exist yet.
-    product = Object.assign(this._marketPlaceProduct || {}, product);
+    // Only need the `|| {}` to account for creating new product where this._marketPlaceProductStatic doesn't exist yet.
+    product = Object.assign(this._marketPlaceProductStatic || {}, product);
     this.refreshProductData(product);
   }
 
   async removeFile(imgUrl: string) {
-    let product = await this.middleware.deleteProductImage(this._marketPlaceProduct.ID, imgUrl);
-    product = Object.assign(this._marketPlaceProduct, product);
+    let product = await this.middleware.deleteProductImage(this._marketPlaceProductStatic.ID, imgUrl);
+    product = Object.assign(this._marketPlaceProductStatic, product);
     this.refreshProductData(product);
   }
 
