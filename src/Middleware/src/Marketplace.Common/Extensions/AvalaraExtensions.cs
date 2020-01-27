@@ -48,6 +48,7 @@ namespace Marketplace.Common.Extensions
 			{
 				lineAmount = rate,
 				taxCode = "FR",
+				// replace this itemCode with the proposedshipment ID when this is being generated from the platform
 				itemCode = shipFrom.ID,
 				customerUsageType = null,
 				lineNumber = null

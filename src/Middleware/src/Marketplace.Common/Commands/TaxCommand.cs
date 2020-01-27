@@ -32,6 +32,9 @@ namespace Marketplace.Common.Commands
 
 		public async Task<MarketplaceOrder> ApplyTaxEstimate(string orderID)
 		{
+			/* once the platform proposed shipment functionality is complete
+			 * this section will be rewritten and the rate will not be stored on the order */
+
 			// change back to marketplace order once the model is updated
 			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
 			var items = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
