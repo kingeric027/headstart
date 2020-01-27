@@ -23,6 +23,7 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 })
 export class HeaderComponent implements OnInit {
   user = {};
+  company = {};
   isCollapsed = true;
   faBoxOpen = faBoxOpen;
   faUser = faUser;
@@ -52,6 +53,7 @@ export class HeaderComponent implements OnInit {
 
   async getCurrentUser() {
     this.user = await this.currentUserService.getUser();
+    this.company = await this.currentUserService.getCompany();
   }
 
   subscribeToRouteEvents() {
