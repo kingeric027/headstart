@@ -30,8 +30,12 @@
       </select>
     </div>
   </form>
-
-  <app-product-edit class="resource-edit"
+  <app-product-view *ngIf="userContext?.UserType === 'SELLER'"
+                    class="resource-edit"
+                    [orderCloudProduct]="resourceInSelection">
+  </app-product-view>
+  <app-product-edit *ngIf="userContext?.UserType === 'SUPPLIER'"
+                    class="resource-edit"
                     [addresses]="addresses"
                     [orderCloudProduct]="resourceInSelection">
   </app-product-edit>
