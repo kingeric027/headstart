@@ -1,8 +1,5 @@
 <div *ngIf="productForm"
      class="container-fluid resource-edit">
-  <product-catalog-assignments-component *ngIf="_marketPlaceProduct && userContext?.UserType === 'SELLER'"
-                                         [product]="_marketPlaceProduct">
-  </product-catalog-assignments-component>
   <form [formGroup]="productForm">
     <!-- Product Details -->
     <div class="row pt-3">
@@ -109,7 +106,6 @@
         <p class="font-italic">Provide accurate shipping weight and dimensions for the most accurate shipping estimates.</p>
       </div>
       <div class="col-md-7">
-        <!-- TODO: Waiting on platform change to accomodate for Supplier Addresses being saved on `ShipFromAddressID` -->
         <div class="form-group">
           <label for="ShipFromAddressID">Which location will this product ship from?</label>
           <select type="dropdown"

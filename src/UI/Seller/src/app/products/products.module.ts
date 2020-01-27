@@ -6,9 +6,10 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ProductTableComponent } from './product-table/product-table.component';
 import { ProductEditComponent } from './product-edit/product-edit.component';
 import { ProductCatalogAssignments } from './product-catalog-assignments/product-catalog-assignments.component';
+import { ProductViewComponent } from './product-view/product-view.component';
 
 @NgModule({
   imports: [SharedModule, ProductsRoutingModule, PerfectScrollbarModule],
-  declarations: [ProductTableComponent, ProductEditComponent, ProductCatalogAssignments],
+  declarations: [ProductTableComponent, ProductEditComponent, ProductViewComponent, ProductCatalogAssignments],
 })
 export class ProductsModule {}
