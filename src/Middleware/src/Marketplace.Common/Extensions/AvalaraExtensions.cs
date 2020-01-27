@@ -42,13 +42,14 @@ namespace Marketplace.Common.Extensions
 			return trans.WithLine(line, lineItem.ShipFromAddress, lineItem.ShippingAddress);
 		}
 
-		public static TransactionBuilder WithShippingRate(this TransactionBuilder trans, ShippingRate rate, Address shipFrom, Address shipTo)
+		public static TransactionBuilder WithShippingRate(this TransactionBuilder trans, decimal rate, Address shipFrom, Address shipTo)
 		{
 			var shipping = new TransactionLineModel()
 			{
-				lineAmount = rate.TotalCost,
+				lineAmount = rate,
 				taxCode = "FR",
-				itemCode = rate.Id,
+				// replace this itemCode with the proposedshipment ID when this is being generated from the platform
+				itemCode = shipFrom.ID,
 				customerUsageType = null,
 				lineNumber = null
 			};

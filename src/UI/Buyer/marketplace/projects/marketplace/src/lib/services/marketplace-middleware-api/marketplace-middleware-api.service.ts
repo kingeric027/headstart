@@ -1,13 +1,7 @@
-import { Injectable } from "@angular/core";
-import { HttpHeaders, HttpClient } from "@angular/common/http";
-import { OcTokenService } from "@ordercloud/angular-sdk";
-import {
-  SupplierCategoryConfig,
-  ShippingSelection,
-  ShippingOptions,
-  MarketplaceOrder,
-  AppConfig
-} from "../../shopper-context";
+import { Injectable } from '@angular/core';
+import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { OcTokenService } from '@ordercloud/angular-sdk';
+import { SupplierCategoryConfig, MarketplaceOrder, AppConfig, ProposedShipment, ProposedShipmentSelection } from '../../shopper-context';
 
 @Injectable({
   providedIn: "root"
@@ -42,27 +36,16 @@ export class MarketplaceMiddlewareApiService {
       .toPromise();
   }
 
-  generateShippingRates(orderID: string): Promise<ShippingOptions[]> {
-    return this.http
-      .post<ShippingOptions[]>(
-        `${this.baseUrl}/orders/${orderID}/shipping/generate-rates`,
-        {},
-        this.generateHeaders()
-      )
-      .toPromise();
+  getProposedShipments(orderID: string): Promise<ProposedShipment[]> {
+    return this.http.get<ProposedShipment[]>(
+      `${this.baseUrl}/proposedshipment/${orderID}`, this.generateHeaders())
+    .toPromise();
   }
 
-  selectShippingRate(
-    orderID: string,
-    selection: ShippingSelection
-  ): Promise<MarketplaceOrder> {
-    return this.http
-      .put<MarketplaceOrder>(
-        `${this.baseUrl}/orders/${orderID}/shipping/select`,
-        selection,
-        this.generateHeaders()
-      )
-      .toPromise();
+  selectShippingRate(orderID: string, selection: ProposedShipmentSelection): Promise<MarketplaceOrder> {
+    return this.http.put<MarketplaceOrder>(
+      `${this.baseUrl}/proposedshipment/${orderID}/select`, selection, this.generateHeaders())
+    .toPromise();
   }
 
   calculateTax(orderID: string): Promise<MarketplaceOrder> {
