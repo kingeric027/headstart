@@ -1,0 +1,105 @@
+import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { Buyer, OcBuyerService, ProductCatalogAssignment, OcCatalogService } from '@ordercloud/angular-sdk';
+import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { ProductService } from '@app-seller/shared/services/product/product.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+
+@Component({
+  selector: 'product-catalog-assignments-component',
+  templateUrl: './product-catalog-assignments.component.html',
+  styleUrls: ['./product-catalog-assignments.component.scss'],
+})
+export class ProductCatalogAssignments implements OnInit, OnChanges {
+  @Input()
+  product: MarketPlaceProduct;
+  buyers: Buyer[];
+  add: ProductCatalogAssignment[];
+  del: ProductCatalogAssignment[];
+  _productCatalogAssignmentsStatic: ProductCatalogAssignment[];
+  _productCatalogAssignmentsEditable: ProductCatalogAssignment[];
+  areChanges = false;
+  requestedUserConfirmation: boolean = false;
+  faExclamationCircle = faExclamationCircle;
+
+  constructor(
+    private ocBuyerService: OcBuyerService,
+    private ocCatalogService: OcCatalogService,
+    private productService: ProductService
+  ) {}
+
+  async ngOnInit() {
+    this.getBuyers();
+    this.getProductCatalogAssignments(this.product);
+  }
+
+  ngOnChanges() {
+    this.getProductCatalogAssignments(this.product);
+  }
+
+  requestUserConfirmation() {
+    this.requestedUserConfirmation = true;
+  }
+
+  async getBuyers(): Promise<void> {
+    const buyers = await this.ocBuyerService.List().toPromise();
+    this.buyers = buyers.Items;
+  }
+
+  async getProductCatalogAssignments(product: MarketPlaceProduct): Promise<void> {
+    const productCatalogAssignments = await this.ocCatalogService
+      .ListProductAssignments({ productID: product && product.ID })
+      .toPromise();
+    this._productCatalogAssignmentsStatic = productCatalogAssignments.Items;
+    this._productCatalogAssignmentsEditable = productCatalogAssignments.Items;
+  }
+
+  toggleProductCatalogAssignment(buyer: Buyer) {
+    if (this.isAssigned(buyer)) {
+      this._productCatalogAssignmentsEditable = this._productCatalogAssignmentsEditable.filter(
+        productAssignemnt => productAssignemnt.CatalogID !== buyer.ID
+      );
+    } else {
+      const newProductCatalogAssignment = {
+        ProductID: this.product.ID,
+        CatalogID: buyer.ID,
+      };
+      this._productCatalogAssignmentsEditable = [
+        ...this._productCatalogAssignmentsEditable,
+        newProductCatalogAssignment,
+      ];
+    }
+    this.checkForProductCatalogAssignmentChanges();
+  }
+
+  isAssigned(buyer: Buyer) {
+    return (
+      this._productCatalogAssignmentsEditable &&
+      this._productCatalogAssignmentsEditable.some(productAssignment => productAssignment.CatalogID === buyer.ID)
+    );
+  }
+
+  checkForProductCatalogAssignmentChanges() {
+    this.add = this._productCatalogAssignmentsEditable.filter(
+      assignment => !JSON.stringify(this._productCatalogAssignmentsStatic).includes(assignment.CatalogID)
+    );
+    this.del = this._productCatalogAssignmentsStatic.filter(
+      assignment => !JSON.stringify(this._productCatalogAssignmentsEditable).includes(assignment.CatalogID)
+    );
+    this.areChanges = this.add.length > 0 || this.del.length > 0;
+    if (!this.areChanges) this.requestedUserConfirmation = false;
+  }
+
+  discardProductCatalogAssignmentChanges() {
+    this._productCatalogAssignmentsEditable = this._productCatalogAssignmentsStatic;
+    this.checkForProductCatalogAssignmentChanges();
+  }
+
+  async executeProductCatalogAssignmentRequests(): Promise<void> {
+    this.requestedUserConfirmation = false;
+    await this.productService.updateProductCatalogAssignments(this.add, this.del);
+    await this.getProductCatalogAssignments(this.product);
+    this.checkForProductCatalogAssignmentChanges();
+  }
+}

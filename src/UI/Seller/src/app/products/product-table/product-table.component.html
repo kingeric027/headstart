@@ -1,18 +1,24 @@
 <resource-table-component [resourceList]="resourceList"
-                          [resourceOptions]="resourceOptions"
                           [selectedResourceID]="selectedResourceID"
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
                           [resourceForm]="resourceForm"
                           [shouldShowResourceActions]="false"
+                          [filterConfig]="filterConfig"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
-  <app-product-edit class="resource-edit"
+  <app-product-view *ngIf="userContext?.UserType === 'SELLER'"
+                    class="resource-edit"
+                    [orderCloudProduct]="resourceInSelection">
+  </app-product-view>
+  <app-product-edit *ngIf="userContext?.UserType === 'SUPPLIER'"
+                    class="resource-edit"
                     [addresses]="addresses"
-                    [orderCloudProduct]="resourceInSelection"></app-product-edit>
+                    [orderCloudProduct]="resourceInSelection">
+  </app-product-edit>
 </resource-table-component>

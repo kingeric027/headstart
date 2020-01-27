@@ -30,7 +30,7 @@ export class ReactiveQuillComponent {
 
   setQuillChangeEvent() {
     if (this._formControlForText) {
-      this.quillChangeSubscription = this._formControlForText.valueChanges.subscribe((newFormValue) => {
+      this.quillChangeSubscription = this._formControlForText.valueChanges.subscribe(newFormValue => {
         this.resourceUpdated.emit({ field: this.pathOnResource, value: newFormValue });
       });
     }

@@ -4,11 +4,10 @@ import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { cloneDeep as _cloneDeep } from 'lodash';
 import {
   OcProductService,
-  ListProduct,
   Product,
   OcPriceScheduleService,
-  PriceSchedule,
   OcCatalogService,
+  ProductCatalogAssignment,
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 import { MarketPlaceProduct, PUBLISHED } from '@app-seller/shared/models/MarketPlaceProduct.interface';
@@ -64,5 +63,24 @@ export class ProductService extends ResourceCrudService<Product> {
 
     // mocking the return value of the create marketplace product route
     return marketPlaceProduct;
+  }
+
+  async updateProductCatalogAssignments(
+    add: ProductCatalogAssignment[],
+    del: ProductCatalogAssignment[]
+  ): Promise<void> {
+    const addRequests = add.map(newAssignment => this.addProductCatalogAssignment(newAssignment));
+    const deleteRequests = del.map(assignmentToRemove => this.removeProductCatalogAssignment(assignmentToRemove));
+    await Promise.all([...addRequests, ...deleteRequests]);
+  }
+
+  addProductCatalogAssignment(assignment: ProductCatalogAssignment): Promise<void> {
+    return this.ocCatalogService
+      .SaveProductAssignment({ CatalogID: assignment.CatalogID, ProductID: assignment.ProductID })
+      .toPromise();
+  }
+
+  removeProductCatalogAssignment(assignment: ProductCatalogAssignment) {
+    return this.ocCatalogService.DeleteProductAssignment(assignment.CatalogID, assignment.ProductID).toPromise();
   }
 }
