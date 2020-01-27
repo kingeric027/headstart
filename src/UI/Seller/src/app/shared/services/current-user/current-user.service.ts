@@ -60,11 +60,9 @@ export class CurrentUserService {
     };
   }
 
-  async getCompany(): Supplier {
-    const me = await this.getUser();
+  async getCompany(): Promise<Supplier> {
+    const me = await this.ocMeService.Get().toPromise();
     const supplier = await this.ocSupplierService.Get(me.Supplier.ID).toPromise();
-    return supplier.Name;
-    // SELLER
-    // return;
+    return supplier;
   }
 }
