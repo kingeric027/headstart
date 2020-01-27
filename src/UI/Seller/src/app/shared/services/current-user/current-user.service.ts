@@ -60,8 +60,13 @@ export class CurrentUserService {
     };
   }
 
+  async isSupplierUser() {
+    const me = await this.getUser();
+    return me.Supplier ? true : false;
+  }
+
   async getSupplierOrg(): Promise<Supplier> {
-    const me = await this.ocMeService.Get().toPromise();
+    const me = await this.getUser();
     const supplier = await this.ocSupplierService.Get(me.Supplier.ID).toPromise();
     return supplier;
   }
