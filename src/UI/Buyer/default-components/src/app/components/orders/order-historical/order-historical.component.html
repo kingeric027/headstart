@@ -1,39 +1,42 @@
-<div class="row mb-5" *ngIf="order">
-    <div class="col-6">
-        <ocm-address-card *ngIf="lineItems.Items[0].ShippingAddress"
-                        [address]="lineItems.Items[0].ShippingAddress"
-                        addressTitle="Shipping Address">
-        </ocm-address-card>
-        <ocm-address-card [address]="order.BillingAddress"
-                        addressTitle="Billing Address"
-                        *ngIf="order?.BillingAddress">
-        </ocm-address-card>
+<div class="row mb-5"
+     *ngIf="order">
+  <div class="col-6">
+    <ocm-address-card *ngIf="lineItems.Items[0].ShippingAddress"
+                      [address]="lineItems.Items[0].ShippingAddress"
+                      addressTitle="Shipping Address">
+    </ocm-address-card>
+    <ocm-address-card [address]="order.BillingAddress"
+                      addressTitle="Billing Address"
+                      *ngIf="order?.BillingAddress">
+    </ocm-address-card>
+  </div>
+  <div class="col-6">
+    <div *ngIf="order.Comments"
+         class="alert alert-secondary small">
+      <strong>Comments: </strong> {{order.Comments}}
     </div>
-    <div class="col-6">
-        <div *ngIf="order.Comments"
-            class="alert alert-secondary small">
-        <strong>Comments: </strong> {{order.Comments}}
-        </div>
-        <strong>Subtotal</strong> <span class="float-right">{{order.Subtotal | currency}}</span><br>
-        <strong>Shipping</strong> <span class="float-right">{{order.ShippingCost | currency}}</span><br>
-        <strong>Tax</strong> <span class="float-right">{{order.TaxCost | currency}}</span><br>
-        <div *ngIf="order.PromotionDiscount">
-        <strong class="text-danger">Promo Discount</strong> <span class="float-right text-danger">-{{order.PromotionDiscount | currency}}</span>
-        </div>
-        <hr>
-        <div class="text-right lead"><b class="float-left">Total:</b><span class="order-total">{{order.Total | currency}}</span></div>
-        <hr>
-        <ocm-payment-list *ngIf="payments"
-                        [payments]="payments"></ocm-payment-list>
-        <hr>
-        <ul>
-        <li *ngFor="let approval of approvals">
-            {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} on {{ approval.DateCreated | date: 'short' }}
-            <div><small *ngIf="approval.Comments">"{{ approval.Comments }}"</small></div>
-        </li>
-        </ul>
+    <strong>Subtotal</strong> <span class="float-right">{{order.Subtotal | currency}}</span><br>
+    <strong>Shipping</strong> <span class="float-right">{{order.ShippingCost | currency}}</span><br>
+    <strong>Tax</strong> <span class="float-right">{{order.TaxCost | currency}}</span><br>
+    <div *ngIf="order.PromotionDiscount">
+      <strong class="text-danger">Promo Discount</strong> <span class="float-right text-danger">-{{order.PromotionDiscount | currency}}</span>
     </div>
+    <hr>
+    <div class="text-right lead"><b class="float-left">Total:</b><span class="order-total">{{order.Total | currency}}</span></div>
+    <hr>
+    <ocm-payment-list *ngIf="payments"
+                      [payments]="payments"></ocm-payment-list>
+    <hr>
+    <ul>
+      <li *ngFor="let approval of approvals">
+        {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} on {{ approval.DateCreated | date: 'short' }}
+        <div><small *ngIf="approval.Comments">"{{ approval.Comments }}"</small></div>
+      </li>
+    </ul>
+  </div>
 </div>
-<ocm-lineitem-table [lineItems]="lineItems?.Items"
-                    [readOnly]="true">
-</ocm-lineitem-table>
+<div *ngFor="let liGroup of liGroupedByShipFrom">
+  <ocm-lineitem-table [lineItems]="liGroup"
+                      [readOnly]="true">
+  </ocm-lineitem-table>
+</div>
