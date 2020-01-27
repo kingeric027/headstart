@@ -87,8 +87,8 @@ export abstract class ResourceCrudService<ResourceType> {
 
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
-    const { sortBy, search, ...filters } = params;
-    this.optionsSubject.next({ sortBy, search, filters });
+    const { sortBy, search, OrderDirection, ...filters } = params;
+    this.optionsSubject.next({ sortBy, search, filters, OrderDirection });
   }
 
   // Used to update the URL
@@ -99,7 +99,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async listResources(pageNumber = 1, searchText = '') {
     if (this.shouldListResources()) {
-      const { sortBy, search, filters } = this.optionsSubject.value;
+      const { sortBy, search, filters, OrderDirection } = this.optionsSubject.value;
       const options = {
         page: pageNumber,
         // allows a list call to pass in a search term that will not appear in the query params
@@ -108,7 +108,7 @@ export abstract class ResourceCrudService<ResourceType> {
         pageSize: this.itemsPerPage,
         filters,
       };
-      const resourceResponse = await this.listWithStatusIndicator(options);
+      const resourceResponse = await this.listWithStatusIndicator(options, OrderDirection);
       if (pageNumber === 1) {
         this.setNewResources(resourceResponse);
       } else {
@@ -117,10 +117,13 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
-  private async listWithStatusIndicator(options: Options): Promise<ListResource<ResourceType>> {
+  private async listWithStatusIndicator(
+    options: Options,
+    orderDirection: string = ''
+  ): Promise<ListResource<ResourceType>> {
     try {
       this.resourceRequestStatus.next(this.getFetchStatus(options));
-      const resourceResponse = await this.ocService.List(...this.createListArgs([options])).toPromise();
+      const resourceResponse = await this.ocService.List(...this.createListArgs([options], orderDirection)).toPromise();
       this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
       return resourceResponse;
     } catch (error) {
@@ -222,7 +225,7 @@ export abstract class ResourceCrudService<ResourceType> {
     return this.ocService.Get(...this.createListArgs([resourceID])).toPromise();
   }
 
-  createListArgs(options: any[]) {
+  createListArgs(options: any[], orderDirection: string = '') {
     /* ordercloud services follow a patter where the paramters to a function (Save, Create, List)
       are the nearly the same for all resource. However, sub resources (supplier users, buyer payment methods, etc...)
       have the parent resource ID as the first paramter before the expected argument
@@ -231,7 +234,7 @@ export abstract class ResourceCrudService<ResourceType> {
       // placeholder conditional for getting the supplier order list page running
       // will need to integrate this with the filter on the order list page as a seller
       // user and potentially refactor later
-      return ['Incoming', ...options];
+      return [orderDirection || 'Incoming', ...options];
     }
     if (this.secondaryResourceLevel) {
       const parentResourceID = this.getParentResourceID();

@@ -11,6 +11,19 @@
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
+  <div class="actionBar btn-group ml-4 w-75"
+       *ngIf="shouldShowOrderToggle"
+       role="group"
+       aria-label="order direction selector">
+    <button type="button"
+            class="btn btn-secondary"
+            [ngClass]="{'active': activeOrderDirectionButton === 'Incoming'}"
+            (click)="setOrderDirection('Incoming')">Buyer Orders</button>
+    <button type="button"
+            class="btn btn-secondary"
+            [ngClass]="{'active': activeOrderDirectionButton === 'Outgoing'}"
+            (click)="setOrderDirection('Outgoing')">Supplier Purchase Orders</button>
+  </div>
   <!-- edit user -->
   <div class="resource-edit">
     resource edit component will go here
