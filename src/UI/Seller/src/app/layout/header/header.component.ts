@@ -23,7 +23,6 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 })
 export class HeaderComponent implements OnInit {
   user: MeUser;
-  supplierOrg: Supplier;
   organizationName: string;
   isSupplierUser: boolean;
   isCollapsed = true;
@@ -60,8 +59,7 @@ export class HeaderComponent implements OnInit {
   }
 
   async getSupplierOrg() {
-    this.supplierOrg = await this.currentUserService.getSupplierOrg();
-    this.organizationName = this.supplierOrg.Name;
+    this.organizationName = await this.currentUserService.getSupplierOrg();
   }
 
   subscribeToRouteEvents() {
