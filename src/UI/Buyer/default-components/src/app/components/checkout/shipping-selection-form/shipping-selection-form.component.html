@@ -1,13 +1,8 @@
-<form [formGroup]="form"
-      class="p-3">
-  <select class="custom-select"
-          formControlName="rateID"
-          (change)="onFormChanges()">
-    <option disabled
-            [ngValue]="null">Choose a shipping option...</option>
-    <option [ngValue]="rate.Id"
-            *ngFor="let rate of options?.Rates">
-      {{ rate.Carrier }} {{ rate.Service }} ({{ rate.TotalCost | currency }})
-    </option>
-  </select>
-</form>
+<form [formGroup]="form" class="p-3">
+    <select class="custom-select" formControlName="proposedShipmentOptionID" (change)="onFormChanges()">
+      <option [ngValue]="null" disabled>Choose a shipping option...</option>
+      <option [ngValue]="proposedShipmentOption.ID" *ngFor="let proposedShipmentOption of proposedShipment?.ProposedShipmentOptions">
+          {{ proposedShipmentOption.Name }} {{ proposedShipmentOption.Cost | currency }}
+      </option>
+    </select>
+  </form>

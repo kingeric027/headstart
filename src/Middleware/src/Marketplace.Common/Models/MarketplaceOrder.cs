@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Marketplace.Common.Models;
+using Marketplace.Common.Services.ShippingIntegration;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 
@@ -13,7 +14,7 @@ namespace Marketplace.Common.Models
 
 	public class OrderXp
 	{
-		public IEnumerable<ShippingSelection> ShippingSelections { get; set; }
+		public IEnumerable<ProposedShipmentSelection> ProposedShipmentSelections { get; set; }
 		public string AvalaraTaxTransactionCode { get; set; }
 	}
 }

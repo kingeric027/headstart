@@ -8,14 +8,24 @@ import { MarketplaceOrder } from 'marketplace';
 })
 export class OCMOrderSummary {
   @Input() order: MarketplaceOrder;
+  @Input() checkoutPanel = '';
 
   displayTax() {
+    if (this.checkoutPanel === 'cart') {
+      return 'Calculated during checkout';
+    }
+    if (this.checkoutPanel === 'shippingAddress' || this.checkoutPanel === 'shippingSelection') {
+      return 'Pending selections';
+    }
     return new CurrencyPipe('en-US').transform(this.order.TaxCost);
   }
 
   displayShipping() {
-    if (!this.order.xp || this.order.xp.ShippingSelections.length === 0) {
+    if (this.checkoutPanel === 'cart') {
       return 'Calculated during checkout';
+    }
+    if (this.checkoutPanel === 'shippingAddress' || this.checkoutPanel === 'shippingSelection') {
+      return 'Pending selections';
     }
     return new CurrencyPipe('en-US').transform(this.order.ShippingCost);
   }

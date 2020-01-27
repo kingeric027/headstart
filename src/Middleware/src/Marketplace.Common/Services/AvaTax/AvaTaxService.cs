@@ -71,7 +71,7 @@ namespace Marketplace.Common.Services
 			return await _avaTax.CommitTransactionAsync(companyCode, transactionCode, DocumentType.SalesInvoice, "", model);
 		}
 
-		private string GetCustomerCode(Order order)
+		private string GetCustomerCode(OrderCloud.SDK.Order order)
 		{
 			return order.FromCompanyID;
 		}
