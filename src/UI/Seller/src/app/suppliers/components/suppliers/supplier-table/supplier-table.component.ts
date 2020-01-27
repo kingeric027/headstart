@@ -63,6 +63,9 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
     this.router = router;
   }
 
+  // these are custom filters for SEB that should be moved out of this code and into
+  // external storage in the future, filters that apply to all of marketplace
+  // can also be added to this before passing into the resource table
   filterConfig = {
     id: 'SEB',
     timeStamp: '0001-01-01T00:00:00+00:00',

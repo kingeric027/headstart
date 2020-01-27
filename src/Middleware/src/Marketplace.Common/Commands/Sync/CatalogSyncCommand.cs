@@ -2,8 +2,10 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Exceptions;
+using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -18,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<Catalog>();
+            var obj = MarketplaceCatalogMapper.Map(wi.Current.ToObject<MarketplaceCatalog>());
             try
             {
                 await _oc.Catalogs.CreateAsync(obj, wi.Token);
@@ -59,7 +61,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<Catalog>();
+            var obj = MarketplaceCatalogMapper.Map(JObject.FromObject(wi.Current).ToObject<MarketplaceCatalog>());
             try
             {
                 await _oc.Catalogs.SaveAsync<Catalog>(wi.RecordId, obj, wi.Token);
@@ -79,7 +81,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialCatalog>();
+            var obj = MarketplaceCatalogMapper.Map(JObject.FromObject(wi.Diff).ToObject<PartialCatalog>());
             try
             {
                 await _oc.Catalogs.PatchAsync<Catalog>(wi.RecordId, obj, wi.Token);

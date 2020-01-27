@@ -79,7 +79,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<ProductCatalogAssignment>();
+            var obj = JObject.FromObject(wi.Current).ToObject<ProductCatalogAssignment>();
             try
             {
                 await _oc.Catalogs.SaveProductAssignmentAsync(obj, wi.Token);

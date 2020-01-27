@@ -61,7 +61,7 @@
     .fa-layers-counter {
       height: 1.5em;
       top: -10px;
-      right: -12px;
+      right: -11px;
       font-size: 45px;
       background-color: $primary;
     }
@@ -99,10 +99,6 @@
     }
   }
 }
-
-.resource-title-container {
-  border-bottom: 1px solid rgba($gray-900, 0.1);
-} 
 
 .resource-name {
   font-size: 22px;

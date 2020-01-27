@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { LineItem } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { get as _get, map as _map, without as _without } from 'lodash';
-import { ShopperContextService, LineItemWithProduct, ShippingRate, ShippingOptions } from 'marketplace';
+import { ShopperContextService, LineItemWithProduct, ShippingRate } from 'marketplace';
 import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
