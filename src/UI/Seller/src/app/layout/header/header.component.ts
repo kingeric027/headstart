@@ -9,7 +9,7 @@ import {
   faSitemap,
   faUserCircle,
 } from '@fortawesome/free-solid-svg-icons';
-import { OcTokenService } from '@ordercloud/angular-sdk';
+import { MeUser, Supplier, OcTokenService } from '@ordercloud/angular-sdk';
 import { Router, NavigationEnd } from '@angular/router';
 import { AppStateService } from '@app-seller/shared';
 import { getHeaderConfig, MPRoute } from './header.config';
@@ -22,8 +22,9 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-  user = {};
-  company = {};
+  user: MeUser;
+  supplierOrg: Supplier;
+  sellerOrg: string;
   isCollapsed = true;
   faBoxOpen = faBoxOpen;
   faUser = faUser;
@@ -53,7 +54,11 @@ export class HeaderComponent implements OnInit {
 
   async getCurrentUser() {
     this.user = await this.currentUserService.getUser();
-    this.company = await this.currentUserService.getCompany();
+    this.user.Supplier ? this.getSupplierOrg() : (this.sellerOrg = this.appConfig.sellerName);
+  }
+
+  async getSupplierOrg() {
+    this.supplierOrg = await this.currentUserService.getSupplierOrg();
   }
 
   subscribeToRouteEvents() {
