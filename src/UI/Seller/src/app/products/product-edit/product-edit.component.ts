@@ -112,12 +112,6 @@ export class ProductEditComponent implements OnInit {
     });
   }
 
-  checkForChanges() {
-    this.areChanges =
-      JSON.stringify(this._marketPlaceProductEditable) !== JSON.stringify(this._marketPlaceProductStatic);
-    console.log(this.areChanges);
-  }
-
   handleSave() {
     if (this.isCreatingNew) {
       this.createNewProduct();

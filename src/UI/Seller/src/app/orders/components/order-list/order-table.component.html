@@ -1,5 +1,4 @@
 <resource-table-component [resourceList]="resourceList"
-                          [resourceOptions]="resourceOptions"
                           [selectedResourceID]="selectedResourceID"
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
@@ -11,15 +10,7 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (applyFilters)="applyFilters()"
                           (resourceSelected)="selectResource($event)">
-
-  <!-- filter component -->
-  <!-- <form class="d-flex flex-column filters"
-        [formGroup]="filterForm">
-    filter component will go here when implemented for orders
-  </form> -->
-
   <!-- edit user -->
   <div class="resource-edit">
     resource edit component will go here

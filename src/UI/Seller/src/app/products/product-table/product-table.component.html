@@ -1,35 +1,17 @@
 <resource-table-component [resourceList]="resourceList"
-                          [resourceOptions]="resourceOptions"
                           [selectedResourceID]="selectedResourceID"
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
                           [resourceForm]="resourceForm"
                           [shouldShowResourceActions]="false"
+                          [filterConfig]="filterConfig"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)"
-                          (applyFilters)="applyFilters()">
-
-  <!-- filter component -->
-  <form *ngIf="filterForm"
-        class="d-flex flex-column filters"
-        [formGroup]="filterForm">
-    <div *ngFor="let filter of filterConfig.Filters"
-         class="group">
-      <label>{{filter.Display}}</label>
-      <select class="form-control input-sm"
-              type="select"
-              required
-              [formControlName]="filter.Path">
-        <option *ngFor="let option of filter.Values"
-                value="{{option}}">{{option}}</option>
-      </select>
-    </div>
-  </form>
+                          (resourceSelected)="selectResource($event)">
   <app-product-view *ngIf="userContext?.UserType === 'SELLER'"
                     class="resource-edit"
                     [orderCloudProduct]="resourceInSelection">

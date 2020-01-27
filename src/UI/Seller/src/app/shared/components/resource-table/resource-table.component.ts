@@ -8,7 +8,6 @@ import {
   OnDestroy,
   NgZone,
   AfterViewChecked,
-  OnChanges,
 } from '@angular/core';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
@@ -18,8 +17,13 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { takeWhile, filter } from 'rxjs/operators';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
-import { FormGroup } from '@angular/forms';
-import { ListResource, Options, RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { FormGroup, FormControl } from '@angular/forms';
+import {
+  ListResource,
+  Options,
+  RequestStatus,
+  FilterDictionary,
+} from '@app-seller/shared/services/resource-crud/resource-crud.types';
 import { getScreenSizeBreakPoint, getPsHeight } from '@app-seller/shared/services/dom.helper';
 
 interface BreadCrumb {
@@ -35,7 +39,7 @@ interface BreadCrumb {
     '(window:resize)': 'ngAfterViewChecked()',
   },
 })
-export class ResourceTableComponent implements OnInit, OnChanges, OnDestroy, AfterViewChecked {
+export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
@@ -43,7 +47,7 @@ export class ResourceTableComponent implements OnInit, OnChanges, OnDestroy, Aft
   faHome = faHome;
   faChevronLeft = faChevronLeft;
   searchTerm = '';
-  _resourceOptions: Options;
+  resourceOptions: Options;
   _resourceInSelection: any;
   _updatedResource: any;
   _selectedResourceID: string;
@@ -65,6 +69,7 @@ export class ResourceTableComponent implements OnInit, OnChanges, OnDestroy, Aft
   tableHeight = 450;
   editResourceHeight = 450;
   activeFilterCount = 0;
+  filterForm: FormGroup;
 
   constructor(
     private router: Router,
@@ -95,8 +100,6 @@ export class ResourceTableComponent implements OnInit, OnChanges, OnDestroy, Aft
   changesDiscarded: EventEmitter<any> = new EventEmitter();
   @Output()
   resourceSelected: EventEmitter<any> = new EventEmitter();
-  @Output()
-  applyFilters: EventEmitter<any> = new EventEmitter();
   @Input()
   set updatedResource(value: any) {
     this._updatedResource = value;
@@ -108,12 +111,9 @@ export class ResourceTableComponent implements OnInit, OnChanges, OnDestroy, Aft
     this.checkForChanges();
   }
   @Input()
-  set resourceOptions(value: Options) {
-    this._resourceOptions = value;
-    this.searchTerm = (value && value.search) || '';
-  }
-  @Input()
   selectedResourceID: string;
+  @Input()
+  filterConfig: any;
   @Input()
   resourceForm: FormGroup;
   @Input()
@@ -124,16 +124,38 @@ export class ResourceTableComponent implements OnInit, OnChanges, OnDestroy, Aft
   async ngOnInit() {
     this.determineViewingContext();
     this.initializeSubscriptions();
+    this.setFilterForm();
+    this.subscribeToOptions();
     this.screenSize = getScreenSizeBreakPoint();
-  }
-
-  ngOnChanges() {
-    this.activeFilterCount = Object.keys(this._ocService.optionsSubject.value.filters).length;
   }
 
   ngAfterViewChecked() {
     this.setPsHeights();
     this.changeDetectorRef.detectChanges();
+  }
+
+  subscribeToOptions() {
+    this._ocService.optionsSubject.pipe(takeWhile(() => this.alive)).subscribe(options => {
+      this.resourceOptions = options;
+      this.searchTerm = (options && options.search) || '';
+      this.activeFilterCount = Object.keys(options.filters).length;
+      this.setFilterForm();
+      this.changeDetectorRef.detectChanges();
+    });
+  }
+
+  applyFilters() {
+    this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
+  }
+
+  removeFieldsWithNoValue(formValues: FilterDictionary) {
+    const values = { ...formValues };
+    Object.entries(values).forEach(([key, value]) => {
+      if (!value) {
+        delete values[key];
+      }
+    });
+    return values;
   }
 
   setPsHeights() {
@@ -228,6 +250,21 @@ export class ResourceTableComponent implements OnInit, OnChanges, OnDestroy, Aft
     this.changeDetectorRef.detectChanges();
   }
 
+  setFilterForm() {
+    const formGroup = {};
+    if (this.filterConfig && this.filterConfig.Filters) {
+      this.filterConfig.Filters.forEach(filter => {
+        const value = this.getSelectedFilterValue(filter.Path);
+        formGroup[filter.Path] = new FormControl(value);
+      });
+      this.filterForm = new FormGroup(formGroup);
+    }
+  }
+
+  getSelectedFilterValue(pathOfFilter: string) {
+    return (this.resourceOptions && this.resourceOptions.filters && this.resourceOptions.filters[pathOfFilter]) || '';
+  }
+
   searchedResources(event) {
     this.searched.emit(event);
   }
@@ -265,7 +302,7 @@ export class ResourceTableComponent implements OnInit, OnChanges, OnDestroy, Aft
 
   handleApplyFilters() {
     this.closePopover();
-    this.applyFilters.emit(null);
+    this.applyFilters();
   }
 
   clearAllFilters() {

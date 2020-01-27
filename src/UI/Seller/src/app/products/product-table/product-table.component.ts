@@ -28,10 +28,9 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
     this.userContext = await currentUserService.getUserContext();
   }
 
+  // static filters that should apply to all marketplace orgs, custom filters for specific applications can be
+  // added to the filterconfig passed into the resourcetable in the future
   filterConfig = {
-    id: 'SEB',
-    timeStamp: '0001-01-01T00:00:00+00:00',
-    MarketplaceName: 'Self Esteem Brands',
     Filters: [
       {
         Display: 'Status',
