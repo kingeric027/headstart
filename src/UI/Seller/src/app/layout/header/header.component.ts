@@ -38,10 +38,10 @@ export class HeaderComponent implements OnInit {
     private appStateService: AppStateService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) protected appConfig: AppConfig
-  ) {}
+  ) { }
 
   ngOnInit() {
-    this.headerConfig = getHeaderConfig(this.appAuthService.getUserRoles());
+    this.headerConfig = getHeaderConfig(this.appAuthService.getUserRoles(), this.appAuthService.getOrdercloudUserType());
     this.subscribeToRouteEvents();
     this.urlChange(this.router.url);
   }

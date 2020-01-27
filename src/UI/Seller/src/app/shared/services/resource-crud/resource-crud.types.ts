@@ -5,6 +5,7 @@ export interface Options {
   sortBy?: string;
   search?: string;
   filters?: FilterDictionary;
+  OrderDirection?: string;
 }
 
 export interface FilterDictionary {
