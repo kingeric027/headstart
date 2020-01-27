@@ -9,7 +9,7 @@ import {
   faSitemap,
   faUserCircle,
 } from '@fortawesome/free-solid-svg-icons';
-import { MeUser, Supplier, OcTokenService } from '@ordercloud/angular-sdk';
+import { MeUser, OcTokenService } from '@ordercloud/angular-sdk';
 import { Router, NavigationEnd } from '@angular/router';
 import { AppStateService } from '@app-seller/shared';
 import { getHeaderConfig, MPRoute } from './header.config';
