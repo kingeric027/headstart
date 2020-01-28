@@ -34,14 +34,14 @@
     <div class="pb-3">
       <button [disabled]="!areChanges"
               class="btn btn-link"
-              (click)="discardProductCatalogAssignmentChanges()">{{areChanges ? 'Cancel' : 'No Changes'}}</button>
+              (click)="discardProductPartyPriceScheduleAssignmentChanges()">{{areChanges ? 'Cancel' : 'No Changes'}}</button>
       <button *ngIf="areChanges && !requestedUserConfirmation"
               [disabled]="!areChanges || requestedUserConfirmation"
               class="btn brand-button"
               (click)="requestUserConfirmation()">{{requestedUserConfirmation ? 'Pending Confirmation' : 'Save Changes'}}</button>
       <button *ngIf="requestedUserConfirmation && areChanges"
               class="btn btn-primary"
-              (click)="executeProductCatalogAssignmentRequests()">Confirm</button>
+              (click)="executeProductPartyPriceScheduleAssignmentRequests()">Confirm</button>
       <div *ngIf="areChanges && requestedUserConfirmation"
            class="mt-3 pb-3 border-top">
         <div class="p-4 border-radius border-primary bg-light">
