@@ -7,6 +7,7 @@ using Marketplace.Common.Models;
 using OrderCloud.SDK;
 using Marketplace.Helpers.Models;
 using Marketplace.Helpers.Extensions;
+using CreditCardValidator;
 
 namespace Orchestration.Tests
 {
@@ -15,6 +16,16 @@ namespace Orchestration.Tests
         [SetUp]
         public void Setup()
         {
+        }
+
+        [Test]
+        public void to_credit_card_display_test()
+        {
+            var visa = "4444333322221111".ToCreditCardDisplay();
+            Assert.AreEqual("1111", visa);
+
+            var amex = "373485467448025".ToCreditCardDisplay();
+            Assert.AreEqual("8025", amex);
         }
 
         [Test, TestCaseSource(typeof(TypeFactory), nameof(TypeFactory.TestCases))]
