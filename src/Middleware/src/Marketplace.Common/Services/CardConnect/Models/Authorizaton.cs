@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-
+﻿
 namespace Marketplace.Common.Services.CardConnect.Models
 {
 
     public class AuthorizationRequest
     {
-        [Required]
         public string merchid { get; set; }
         public string orderid { get; set; }
-        [Required]
         public string account { get; set; }
-        [Required]
         public string expiry { get; set; }
-        [Required]
         public string amount { get; set; }
         public string currency { get; set; }
         public string name { get; set; }

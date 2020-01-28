@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Mappers.CardConnect;
 using Marketplace.Common.Models.CardConnect;
@@ -9,7 +7,6 @@ using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
-using ApiError = Marketplace.Helpers.Exceptions.Models.ApiError;
 
 namespace Marketplace.Common.Commands.CardConnect
 {
@@ -20,6 +17,7 @@ namespace Marketplace.Common.Commands.CardConnect
         Task<CreditCard> TokenizeAndSave(string buyerID, CreditCardToken card, VerifiedUserContext user);
         Task<Payment> AuthorizePayment(CreditCardPayment payment, VerifiedUserContext user);
     }
+
     public class CreditCardCommand : ICreditCardCommand
     {
         private readonly ICardConnectService _card;
@@ -56,7 +54,7 @@ namespace Marketplace.Common.Commands.CardConnect
             var cc = await _oc.Me.GetCreditCardAsync<BuyerCreditCard>(payment.CreditCardID, user.AccessToken);
             Require.That(cc.Token != null, new ErrorCode("Invalid credit card token", 400, "Credit card must have valid authorization token"));
             
-            var orderlist = await _oc.Me.ListOrdersAsync<Order>(builder => builder.AddFilter(o => o.ID == payment.OrderID));
+            var orderlist = await _oc.Me.ListOrdersAsync<Order>(builder => builder.AddFilter(o => o.ID == payment.OrderID), accessToken: user.AccessToken);
             if (orderlist.Meta.TotalCount == 0) 
                 throw new ApiErrorException(new ErrorCode("Required", 404, "Unable to find Order"), payment.OrderID);
             var order = orderlist.Items.First();
@@ -88,7 +86,7 @@ namespace Marketplace.Common.Commands.CardConnect
 
             var call = await _card.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment));
             var p = await _oc.Payments.CreateAsync(OrderDirection.Outgoing, order.ID, CardConnectMapper.Map(call, payment), user.AccessToken);
-            var trans = await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, p.ID,
+            var trans = await _oc.Payments.CreateTransactionAsync(OrderDirection.Outgoing, order.ID, p.ID,
                 CardConnectMapper.Map(order, p, call), user.AccessToken);
             return trans;
         }

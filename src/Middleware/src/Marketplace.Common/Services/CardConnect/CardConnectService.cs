@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Flurl.Http;
 using Marketplace.Common.Mappers.CardConnect;
-using Marketplace.Common.Models.CardConnect;
 using Marketplace.Common.Services.CardConnect.Models;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Exceptions.Models;
-using Marketplace.Helpers.Extensions;
 
 namespace Marketplace.Common.Services.CardConnect
 {

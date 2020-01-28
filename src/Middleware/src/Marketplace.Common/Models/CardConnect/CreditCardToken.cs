@@ -1,5 +1,7 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Models.CardConnect
@@ -20,7 +22,8 @@ namespace Marketplace.Common.Models.CardConnect
         [System.ComponentModel.DataAnnotations.Required]
         public string OrderID { get; set; }
         [System.ComponentModel.DataAnnotations.Required]
-        public string Direction { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public OrderDirection Direction { get; set; }
         [System.ComponentModel.DataAnnotations.Required]
         public double Amount { get; set; }
         [System.ComponentModel.DataAnnotations.Required]

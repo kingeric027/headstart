@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models.CardConnect;
 using Marketplace.Common.Services.CardConnect.Models;
@@ -79,7 +77,7 @@ namespace Marketplace.Common.Mappers.CardConnect
                 country = order.BillingAddress.Country,
                 currency = payment.Currency,
                 cvv2 = payment.CVV,
-                expiry = $"{card.ExpirationDate.Value:0:MMYYYY}",
+                expiry = $"{card.ExpirationDate.Value:MMyyyy}",
                 merchid = payment.MerchantID,
                 orderid = order.ID,
                 postal = order.BillingAddress.Zip,
@@ -117,39 +115,39 @@ namespace Marketplace.Common.Mappers.CardConnect
             return p;
         }
 
-        public static CreditCardAuthorization Map(AuthorizationResponse response, CreditCardAuthorization request)
-        {
-            var cc = new CreditCardAuthorization()
-            {
-                Token = response.token,
-                Status = response.respstat.ToResponseStatus(),
-                Amount = response.amount,
-                Account = response.account,
-                CVV = request.CVV,
-                ReferenceNumber = response.retref,
-                ExpirationDate = response.expiry,
-                MerchantID = response.merchid,
-                ResponseCode = response.respcode,
-                ResponseText = response.resptext,
-                ResponseProcessor = response.respproc,
-                AVSResponseCode = response.avsresp,
-                CVVResponseCode = response.cvvresp.ToCvvResponse(),
-                BinType = response.bintype.ToBinType(),
-                AuthorizationCode = response.authcode,
-                Receipt = response.receipt,
-                CommercialCard = response.commcard == "Y",
-                OrderID = request.OrderID,
-                Currency = request.Currency,
-                CardHolderName = request.CardHolderName,
-                CardHolderEmail = request.CardHolderEmail,
-                Address = request.Address,
-                City = request.City,
-                Region = request.Region,
-                Country = request.Country,
-                PostalCode = request.PostalCode
-            };
-            return cc;
-        }
+        //public static CreditCardAuthorization Map(AuthorizationResponse response, CreditCardAuthorization request)
+        //{
+        //    var cc = new CreditCardAuthorization()
+        //    {
+        //        Token = response.token,
+        //        Status = response.respstat.ToResponseStatus(),
+        //        Amount = response.amount,
+        //        Account = response.account,
+        //        CVV = request.CVV,
+        //        ReferenceNumber = response.retref,
+        //        ExpirationDate = response.expiry,
+        //        MerchantID = response.merchid,
+        //        ResponseCode = response.respcode,
+        //        ResponseText = response.resptext,
+        //        ResponseProcessor = response.respproc,
+        //        AVSResponseCode = response.avsresp,
+        //        CVVResponseCode = response.cvvresp.ToCvvResponse(),
+        //        BinType = response.bintype.ToBinType(),
+        //        AuthorizationCode = response.authcode,
+        //        Receipt = response.receipt,
+        //        CommercialCard = response.commcard == "Y",
+        //        OrderID = request.OrderID,
+        //        Currency = request.Currency,
+        //        CardHolderName = request.CardHolderName,
+        //        CardHolderEmail = request.CardHolderEmail,
+        //        Address = request.Address,
+        //        City = request.City,
+        //        Region = request.Region,
+        //        Country = request.Country,
+        //        PostalCode = request.PostalCode
+        //    };
+        //    return cc;
+        //}
     }
 
     public static class CreditCardAuthorizationExtensions

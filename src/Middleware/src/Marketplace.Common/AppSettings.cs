@@ -22,6 +22,7 @@ namespace Marketplace.Common
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
         public string SendgridApiKey { get; set; }
         public FreightPopSettings FreightPopSettings { get; set; }
+        public CardConnectSettings CardConnectSettings { get; set; } = new CardConnectSettings();
     }
     public class FreightPopSettings
     {
@@ -56,4 +57,11 @@ namespace Marketplace.Common
 		public string EndpointUri { get; set; }
 		public string DatabaseName { get; set; }
 	}
+
+    public class CardConnectSettings
+    {
+        public string Site { get; set; }
+        public string BaseUrl { get; set; }
+        public string Authorization { get; set; }
+    }
 }
