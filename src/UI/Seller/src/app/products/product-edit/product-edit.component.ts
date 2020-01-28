@@ -96,8 +96,8 @@ export class ProductEditComponent implements OnInit {
 
   createProductForm(marketPlaceProduct: MarketPlaceProduct) {
     this.productForm = new FormGroup({
-      Name: new FormControl(marketPlaceProduct.Name, Validators.required),
-      Description: new FormControl(marketPlaceProduct.Description),
+      Name: new FormControl(marketPlaceProduct.Name, [Validators.required, Validators.maxLength(100)]),
+      Description: new FormControl(marketPlaceProduct.Description, Validators.maxLength(1000)),
       Inventory: new FormControl(marketPlaceProduct.Inventory),
       QuantityMultiplier: new FormControl(marketPlaceProduct.QuantityMultiplier),
       ShipFromAddressID: new FormControl(marketPlaceProduct.ShipFromAddressID),
@@ -129,7 +129,8 @@ export class ProductEditComponent implements OnInit {
 
   async updateProduct() {
     const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductEditable);
-    this.addFiles(this.files, product.ID);
+    console.log(this.files);
+    if (this.files) this.addFiles(this.files, product.ID);
   }
 
   updateResourceFromEvent(event: any, field: string): void {
@@ -146,6 +147,7 @@ export class ProductEditComponent implements OnInit {
         },
       };
     } else {
+      console.log(event);
       this.updateResourceFromFieldValue(field, event.target.value);
       // this._marketPlaceProductEditable = { ...this._marketPlaceProductEditable, [field]: event.target.value };
     }
