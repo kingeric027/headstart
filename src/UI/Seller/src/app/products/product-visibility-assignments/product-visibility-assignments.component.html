@@ -16,12 +16,12 @@
       <tbody>
         <tr class="cursor-pointer"
             *ngFor="let buyer of buyers"
-            (click)="toggleProductCatalogAssignment(buyer)">
+            (click)="toggleProductPartyPriceScheduleAssignment(buyer)">
           <td class="d-flex justify-content-start align-items-center">
             <label class="switch mb-0">
               <input class="form-check-input"
                      type="checkbox"
-                     (click)="toggleProductCatalogAssignment(buyer)"
+                     (click)="toggleProductPartyPriceScheduleAssignment(buyer)"
                      [checked]="isAssigned(buyer)">
               <span class="slider round"></span>
             </label>

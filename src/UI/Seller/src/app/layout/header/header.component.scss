@@ -22,14 +22,18 @@
     }
 }
 
-.logout {
-    color: rgba(255, 255, 255, 0.75);
-    opacity: 0.75;
+.current-user {
+    color: rgba(255, 255, 255, 0.50);
     &:hover {
-        color: white;
+        color: rgba(255, 255, 255, 0.75);
         text-decoration: none;
     }
 }
+
+.account-dropdown-alignment {
+    right: 0;
+    left: auto;
+  }
 
 // TODO: Fix for single level nav items
 // .active-nav-group {

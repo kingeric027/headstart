@@ -60,7 +60,7 @@
       </div>
       <!-- /sub resource dropdown -->
     </div>
-    <div class="col-md-3 col-sm-7 d-flex justify-content-start align-items-center"
+    <div class="col-lg-2 col-md-1 col-sm-7 d-flex justify-content-start align-items-center"
          *ngIf="!isCreatingNew && shouldShowCreateNew">
       <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
       <button class="btn btn-block brand-button--orange"
@@ -68,40 +68,48 @@
         Create New {{_currentResourceNameSingular | titlecase}}
       </button>
     </div>
-    <div class="col-lg-7 col-md-7">
+    <div [ngClass]="{'col-lg-7 col-md-7': parentResourceService, 'col-lg-10 col-md-10': !parentResourceService && !isCreatingNew && shouldShowCreateNew, 'col-lg-12': !parentResourceService && !shouldShowCreateNew}">
       <!-- Resource Search -->
-      <div class="mr-2 d-flex justify-content-between align-items-center">
-        <search-component class="w-100"
-                          [placeholderText]="'Search ' + _currentResourceNamePlural"
-                          [searchTermInput]="searchTerm"
-                          (searched)="searchedResources($event)">
-        </search-component>
-        <div class="d-flex justify-content-start align-items-center">
-          <div class="icon-button ripple"
-               placement="{{screenSize === 'xs' && 'sm' && 'md' ? 'left' : 'bottom'}}"
-               [ngbPopover]="filters"
-               autoClose="outside"
-               triggers="manual"
-               #popover="ngbPopover"
-               (click)="openPopover()"
-               popoverTitle="Filter">
-            <fa-layers class="fa-layers fa-fw">
-              <fa-icon [icon]="faFilter">
-              </fa-icon>
-              <fa-layers-counter *ngIf="activeFilterCount && activeFilterCount > 0"
-                                 class="badge__counter--large"
-                                 style="background: gray"
-                                 [content]="activeFilterCount">
-              </fa-layers-counter>
-            </fa-layers>
+      <div class="mr-2">
+        <div class="row">
+          <div class="col-md-5 d-flex align-items-center">
+            <search-component class="w-100"
+                              [placeholderText]="'Search ' + _currentResourceNamePlural"
+                              [searchTermInput]="searchTerm"
+                              (searched)="searchedResources($event)">
+            </search-component>
           </div>
-          <div *ngIf="activeFilterCount > 0"
-               class="icon-button ripple"
-               (click)="clearAllFilters()">
-            <fa-icon [icon]="faTimes"></fa-icon>
+          <div class="col-md-1 d-flex align-items-center">
+            <div class="d-flex justify-content-start align-items-center">
+              <div class="icon-button ripple"
+                   placement="{{screenSize === 'xs' && 'sm' && 'md' ? 'left' : 'bottom'}}"
+                   [ngbPopover]="filters"
+                   autoClose="outside"
+                   triggers="manual"
+                   #popover="ngbPopover"
+                   (click)="openPopover()"
+                   popoverTitle="Filter">
+                <fa-layers class="fa-layers fa-fw">
+                  <fa-icon [icon]="faFilter">
+                  </fa-icon>
+                  <fa-layers-counter *ngIf="activeFilterCount && activeFilterCount > 0"
+                                     class="badge__counter--large"
+                                     style="background: gray"
+                                     [content]="activeFilterCount">
+                  </fa-layers-counter>
+                </fa-layers>
+              </div>
+              <div *ngIf="activeFilterCount > 0"
+                   class="icon-button ripple"
+                   (click)="clearAllFilters()">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 d-flex align-items-center">
+            <ng-content select=".actionBar"></ng-content>
           </div>
         </div>
-        <ng-content select=".actionBar"></ng-content>
       </div>
       <!-- ngContent for filters popover -->
       <ng-template #filters>
@@ -157,6 +165,7 @@
       <div *ngIf="(selectedResourceID || isCreatingNew) && !isMyResource"
            class="row resource-table-container">
         <div class="col-3 p-0 d-md-block d-none">
+
           <perfect-scrollbar style="width: 100%;"
                              [ngStyle]="{'height.px': tableHeight}"
                              (psYReachEnd)="handleScrollEnd()"

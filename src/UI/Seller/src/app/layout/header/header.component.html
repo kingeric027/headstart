@@ -62,12 +62,33 @@
         <!-- /Single Level Nav Items -->
       </li>
     </ul>
+
+
   </div>
-  <div>
-    <a class="logout"
+
+  <div
+      class="current-user nav-item dropdown cursor-pointer"
+      ngbDropdown>
+
+      <a class="nav-link navbarDropdown"
+          data-toggle="dropdown"
+          ngbDropdownToggle
+          aria-haspopup="true"
+          aria-expanded="false">
+      <fa-icon [icon]="faUserCircle"></fa-icon>
+      {{ user?.FirstName }} {{ user?.LastName }}
+      </a>
+        <div class="dropdown-menu account-dropdown-alignment"
+              aria-labelledby="user-dropdown"
+              ngbDropdownMenu>
+        <h6 class="dropdown-header">{{ organizationName }}</h6>
+        <div class="dropdown-divider"></div>
+         <a class="dropdown-item"
        (click)="logout()"
        href="/login">
         <fa-icon [icon]="faSignOutAlt"></fa-icon> Logout
-    </a>
+        </a>
+        </div>
+
   </div>
 </nav>
