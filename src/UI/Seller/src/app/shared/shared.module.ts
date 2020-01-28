@@ -95,6 +95,7 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     ReactiveQuillComponent,
     FormControlErrorDirective,
     DragDirective,
+    DeleteConfirmModal,
     ConfirmModal,
   ],
   declarations: [
