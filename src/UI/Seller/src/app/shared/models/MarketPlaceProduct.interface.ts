@@ -39,6 +39,6 @@ interface MarketPlaceProductXp {
 }
 
 export interface MarketPlaceProductImage {
-  Url: string;
+  URL: string;
   Tags: string[];
 }

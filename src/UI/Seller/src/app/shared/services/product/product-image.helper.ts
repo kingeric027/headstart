@@ -12,15 +12,15 @@ export function getProductMainImageUrlOrPlaceholder(product: Product) {
 
 export function ReplaceHostUrls(product: Product): MarketPlaceProductImage[] {
   const images = (product.xp && product.xp.Images) || [];
-  return images.map((img) => ReplaceHostUrl(img));
+  return images.map(img => ReplaceHostUrl(img));
 }
 
 function getProductImageUrls(product: Product): string[] {
   return ReplaceHostUrls(product)
-    .map((image) => image.Url)
-    .filter((url) => url);
+    .map(image => image.URL)
+    .filter(url => url);
 }
 
 function ReplaceHostUrl(img: MarketPlaceProductImage): MarketPlaceProductImage {
-  return { ...img, Url: img.Url.replace('{u}', IMAGE_HOST_URL) };
+  return { ...img, URL: img.URL.replace('{u}', IMAGE_HOST_URL) };
 }

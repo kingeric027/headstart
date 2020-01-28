@@ -6,6 +6,7 @@
                           [resourceForm]="resourceForm"
                           [shouldShowResourceActions]="false"
                           [filterConfig]="filterConfig"
+                          [shouldShowCreateNew]="userContext?.UserType !== 'SELLER'"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
