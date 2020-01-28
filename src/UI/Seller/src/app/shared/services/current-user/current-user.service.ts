@@ -1,9 +1,10 @@
 import { Injectable, Inject } from '@angular/core';
-import { User, Supplier, OcMeService, OcAuthService, OcTokenService, MeUser } from '@ordercloud/angular-sdk';
+import { User, Supplier, OcMeService, OcAuthService, OcTokenService, MeUser, OcSupplierService } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
-import { AppAuthService } from '@app-seller/auth/services/app-auth.service';
+import { AppAuthService, TokenRefreshAttemptNotPossible } from '@app-seller/auth/services/app-auth.service';
 import { AppStateService } from '../app-state/app-state.service';
 import { UserContext } from '@app-seller/config/user-context';
+import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +17,8 @@ export class CurrentUserService {
     @Inject(applicationConfiguration) private appConfig: AppConfig,
     private ocTokenService: OcTokenService,
     private appAuthService: AppAuthService,
-    private appStateService: AppStateService
+    private appStateService: AppStateService,
+    private ocSupplierService: OcSupplierService
   ) {}
 
   async login(username: string, password: string, rememberMe: boolean) {
@@ -58,7 +60,14 @@ export class CurrentUserService {
     };
   }
 
-  getCompany(): Supplier {
-    return;
+  async isSupplierUser() {
+    const me = await this.getUser();
+    return me.Supplier ? true : false;
+  }
+
+  async getSupplierOrg(): Promise<Supplier ['Name']> {
+    const me = await this.getUser();
+    const supplier = await this.ocSupplierService.Get(me.Supplier.ID).toPromise();
+    return supplier.Name;
   }
 }

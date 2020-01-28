@@ -2,11 +2,13 @@ import { InjectionToken } from '@angular/core';
 import { environment } from '../../environments/environment';
 
 export const ocAppConfig: AppConfig = {
-  appname: 'OrderCloud Admin',
-  marketplaceID: 'seb',
-  cmsUrl: 'https://marketplaceqa.blob.core.windows.net',
+  appname: environment.appname,
+  marketplaceID: environment.marketplaceID,
+  cmsUrl: environment.cmsUrl,
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
+  //sellerName is being hard-coded until this is available to store in OrderCloud
+  sellerName: 'SEB Seller',
   scope: [
     // 'AdminAddressReader' is just for reading admin addresses as a seller user on product create/edti
     // Will need to be updated to 'AdminAddressAdmin' when seller address create is implemented
@@ -92,6 +94,9 @@ export interface AppConfig {
   cmsUrl: string;
 
   marketplaceID: string;
+
+  //sellerName is being hard-coded until this is available to store in OrderCloud
+  sellerName: string;
 
   /**
    * An array of security roles that will be requested upon login.

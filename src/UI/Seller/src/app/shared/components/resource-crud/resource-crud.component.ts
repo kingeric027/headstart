@@ -11,7 +11,6 @@ import { ListResource, Options, FilterDictionary } from '@app-seller/shared/serv
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
   resourceList: ListResource<ResourceType> = { Meta: {}, Items: [] };
-  resourceOptions: Options = {};
 
   // empty string if no resource is selected
   selectedResourceID = '';
@@ -25,7 +24,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   createForm: (resource: any) => FormGroup;
 
   ocService: ResourceCrudService<ResourceType>;
-  filterForm: FormGroup;
   filterConfig: any = {};
   router: Router;
   isCreatingNew: boolean;
@@ -60,15 +58,13 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   ngOnInit() {
     this.determineViewingContext();
-    this.setFilterForm();
     this.subscribeToResources();
-    this.subscribeToOptions();
     this.subscribeToResourceSelection();
     this.setForm(this.updatedResource);
   }
 
   subscribeToResources() {
-    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
+    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
       this.resourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
@@ -82,16 +78,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  subscribeToOptions() {
-    this.ocService.optionsSubject.pipe(takeWhile(() => this.alive)).subscribe((options) => {
-      this.resourceOptions = options;
-      this.setFilterForm();
-      this.changeDetectorRef.detectChanges();
-    });
-  }
-
   subscribeToResourceSelection() {
-    this.activatedRoute.params.subscribe((params) => {
+    this.activatedRoute.params.subscribe(params => {
       if (this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
         const resourceIDSelected =
@@ -230,31 +218,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   async createNewResource() {
     const newResource = await this.ocService.createNewResource(this.updatedResource);
     this.selectResource(newResource);
-  }
-
-  applyFilters() {
-    this.ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
-  }
-
-  removeFieldsWithNoValue(formValues: FilterDictionary) {
-    const values = { ...formValues };
-    Object.entries(values).forEach(([key, value]) => {
-      if (!value) {
-        delete values[key];
-      }
-    });
-    return values;
-  }
-
-  setFilterForm() {
-    const formGroup = {};
-    if (this.filterConfig && this.filterConfig.Filters) {
-      this.filterConfig.Filters.forEach((filter) => {
-        const value = (this.resourceOptions.filters && this.resourceOptions.filters[filter.Path]) || '';
-        formGroup[filter.Path] = new FormControl(value);
-      });
-      this.filterForm = new FormGroup(formGroup);
-    }
   }
 
   ngOnDestroy() {

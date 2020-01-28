@@ -18,7 +18,7 @@
                  maxlength="100"
                  [resourceForm]="productForm"
                  formControlName="Name"
-                 (input)="updateResourceFromEvent($event, 'Name')"
+                 (input)="updateResourceFromEvent($event.field, 'Name')"
                  placeholder="Enter Name">
         </div>
         <div class="form-group">
@@ -27,7 +27,7 @@
                                            [formControlForText]="productForm?.controls.Description"
                                            resourceField="Description"
                                            pathOnResource="Description"
-                                           (resourceUpdated)="updateResource.emit($event)">
+                                           (resourceUpdated)="updateResourceFromFieldValue($event.field, $event.value)">
           </reactive-quill-editor-component>
         </div>
         <div class="form-group">
@@ -45,16 +45,22 @@
         </div>
         <div class="form-group">
           <label for="Price">Price</label>
-          <input type="number"
-                 class="form-control"
-                 id="Price"
-                 showErrors
-                 aria-describedby="Price"
-                 min="1"
-                 [resourceForm]="productForm"
-                 formControlName="Price"
-                 (input)="updateResourceFromEvent($event, 'Price')"
-                 placeholder="Price (USD)">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">$</span>
+            </div>
+            <input type="number"
+                   class="form-control currency"
+                   id="Price"
+                   showErrors
+                   aria-describedby="Price"
+                   min="1"
+                   step="0.01"
+                   [resourceForm]="productForm"
+                   formControlName="Price"
+                   (input)="updateResourceFromEvent($event, 'Price')"
+                   placeholder="Price (USD)">
+          </div>
         </div>
       </div>
     </div>
@@ -100,7 +106,6 @@
         <p class="font-italic">Provide accurate shipping weight and dimensions for the most accurate shipping estimates.</p>
       </div>
       <div class="col-md-7">
-        <!-- TODO: Waiting on platform change to accomodate for Supplier Addresses being saved on `ShipFromAddressID` -->
         <div class="form-group">
           <label for="ShipFromAddressID">Which location will this product ship from?</label>
           <select type="dropdown"
@@ -182,17 +187,58 @@
         <!--droped image preview-->
         <div class="d-flex justify-content-start align-items-center flex-wrap">
           <div *ngFor="let image of images; let i = index"
-               class="mr-2">
-            <img [id]="i"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
                  [src]="image.Url"
                  width="auto"
-                 height="100px"
-                 (click)="removeFile(image.Url)">
+                 height="100px">
+            <div class="product-img-delete text-center">
+              <button title="Delete photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="delete"
+                      (click)="open(content)">
+
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+              <ng-template #content
+                           let-modal
+                           class="confirm-modal">
+                <confirm-modal modalTitle="Delete Image?"
+                               description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
+                  <button type="button"
+                          class="btn btn-link text-dark"
+                          (click)="modal.dismiss()">Cancel</button>
+                  <button type="button"
+                          class="btn brand-button--danger"
+                          (click)="removeFile(image.Url)"
+                          (click)="modal.dismiss()">Yes, Delete</button>
+                </confirm-modal>
+              </ng-template>
+            </div>
+          </div>
+          <div *ngFor="let image of files; let i = index"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
+                 [src]="image.Url"
+                 width="auto"
+                 height="100px">
+            <div class="product-img-delete text-center">
+              <button title="Un-stage photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="unstage"
+                      (click)="unStage(i)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            </div>
           </div>
           <label class="rmpm dropzone"
                  for="upload"
                  appDrag
-                 (files)="addFiles($event)">
+                 (files)="stageFiles($event)">
           </label>
           <input class="d-none"
                  id="upload"

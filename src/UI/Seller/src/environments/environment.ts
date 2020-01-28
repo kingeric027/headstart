@@ -3,7 +3,10 @@
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 
 export const environment = {
-  production: false,
+  hostedApp: false,
   clientID: 'F1631510-F165-4278-A4EB-E655C5AC2E06',
-  middlewareUrl: 'https://marketplace-admin-ui-qa.azurewebsites.net',
+  middlewareUrl: 'https://marketplace-api-qa.azurewebsites.net',
+  appname: 'Marketplace Admin Local',
+  marketplaceID: 'seb',
+  cmsUrl: 'https://marketplaceqa.blob.core.windows.net',
 };

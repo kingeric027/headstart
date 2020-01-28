@@ -11,14 +11,19 @@ import {
 } from '@angular/core';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { EventEmitter } from '@angular/core';
-import { faFilter, faChevronLeft, faHome } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faChevronLeft, faHome, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { takeWhile, filter } from 'rxjs/operators';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
-import { FormGroup } from '@angular/forms';
-import { ListResource, Options, RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { FormGroup, FormControl } from '@angular/forms';
+import {
+  ListResource,
+  Options,
+  RequestStatus,
+  FilterDictionary,
+} from '@app-seller/shared/services/resource-crud/resource-crud.types';
 import { getScreenSizeBreakPoint, getPsHeight } from '@app-seller/shared/services/dom.helper';
 
 interface BreadCrumb {
@@ -38,10 +43,11 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   faFilter = faFilter;
+  faTimes = faTimes;
   faHome = faHome;
   faChevronLeft = faChevronLeft;
   searchTerm = '';
-  _resourceOptions: Options;
+  resourceOptions: Options;
   _resourceInSelection: any;
   _updatedResource: any;
   _selectedResourceID: string;
@@ -49,6 +55,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
   areChanges: boolean;
+  dataSaved = false;
   parentResources: ListResource<any>;
   requestStatus: RequestStatus;
   selectedParentResourceName = 'Fetching Data';
@@ -61,6 +68,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   myResourceHeight = 450;
   tableHeight = 450;
   editResourceHeight = 450;
+  activeFilterCount = 0;
+  filterForm: FormGroup;
 
   constructor(
     private router: Router,
@@ -91,8 +100,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   changesDiscarded: EventEmitter<any> = new EventEmitter();
   @Output()
   resourceSelected: EventEmitter<any> = new EventEmitter();
-  @Output()
-  applyFilters: EventEmitter<any> = new EventEmitter();
   @Input()
   set updatedResource(value: any) {
     this._updatedResource = value;
@@ -104,12 +111,9 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.checkForChanges();
   }
   @Input()
-  set resourceOptions(value: Options) {
-    this._resourceOptions = value;
-    this.searchTerm = (value && value.search) || '';
-  }
-  @Input()
   selectedResourceID: string;
+  @Input()
+  filterConfig: any;
   @Input()
   resourceForm: FormGroup;
   @Input()
@@ -120,12 +124,38 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   async ngOnInit() {
     this.determineViewingContext();
     this.initializeSubscriptions();
+    this.setFilterForm();
+    this.subscribeToOptions();
     this.screenSize = getScreenSizeBreakPoint();
   }
 
   ngAfterViewChecked() {
     this.setPsHeights();
     this.changeDetectorRef.detectChanges();
+  }
+
+  subscribeToOptions() {
+    this._ocService.optionsSubject.pipe(takeWhile(() => this.alive)).subscribe(options => {
+      this.resourceOptions = options;
+      this.searchTerm = (options && options.search) || '';
+      this.activeFilterCount = Object.keys(options.filters).length;
+      this.setFilterForm();
+      this.changeDetectorRef.detectChanges();
+    });
+  }
+
+  applyFilters() {
+    this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
+  }
+
+  removeFieldsWithNoValue(formValues: FilterDictionary) {
+    const values = { ...formValues };
+    Object.entries(values).forEach(([key, value]) => {
+      if (!value) {
+        delete values[key];
+      }
+    });
+    return values;
   }
 
   setPsHeights() {
@@ -159,7 +189,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.router.events
       .pipe(takeWhile(() => this.alive))
       // only need to set the breadcrumbs on nav end events
-      .pipe(filter((event) => event instanceof NavigationEnd))
+      .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         this.setBreadCrumbs();
       });
@@ -172,7 +202,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   private setParentResourceSelectionSubscription() {
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
-      .subscribe(async (params) => {
+      .subscribe(async params => {
         await this.redirectToFirstParentIfNeeded();
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
@@ -185,7 +215,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   private setListRequestStatusSubscription() {
-    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe((requestStatus) => {
+    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe(requestStatus => {
       this.requestStatus = requestStatus;
       this.changeDetectorRef.detectChanges();
     });
@@ -202,8 +232,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     // in the future breadcrumb logic might need to be more complicated than this
     const urlPieces = this.router.url
       .split('/')
-      .filter((p) => p)
-      .map((p) => {
+      .filter(p => p)
+      .map(p => {
         if (p.includes('?')) {
           return p.slice(0, p.indexOf('?'));
         } else {
@@ -220,6 +250,21 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.changeDetectorRef.detectChanges();
   }
 
+  setFilterForm() {
+    const formGroup = {};
+    if (this.filterConfig && this.filterConfig.Filters) {
+      this.filterConfig.Filters.forEach(filter => {
+        const value = this.getSelectedFilterValue(filter.Path);
+        formGroup[filter.Path] = new FormControl(value);
+      });
+      this.filterForm = new FormGroup(formGroup);
+    }
+  }
+
+  getSelectedFilterValue(pathOfFilter: string) {
+    return (this.resourceOptions && this.resourceOptions.filters && this.resourceOptions.filters[pathOfFilter]) || '';
+  }
+
   searchedResources(event) {
     this.searched.emit(event);
   }
@@ -230,6 +275,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   handleSave() {
     this.changesSaved.emit(null);
+    this.dataSaved = true;
   }
 
   handleDelete() {
@@ -256,7 +302,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   handleApplyFilters() {
     this.closePopover();
-    this.applyFilters.emit(null);
+    this.applyFilters();
   }
 
   clearAllFilters() {

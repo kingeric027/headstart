@@ -60,7 +60,7 @@
       </div>
       <!-- /sub resource dropdown -->
     </div>
-    <div class="col-md-3 col-sm-7 d-flex justify-content-start align-items-center"
+    <div class="col-lg-2 col-md-1 col-sm-7 d-flex justify-content-start align-items-center"
          *ngIf="!isCreatingNew && shouldShowCreateNew">
       <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
       <button class="btn btn-block brand-button--orange"
@@ -68,45 +68,69 @@
         Create New {{_currentResourceNameSingular | titlecase}}
       </button>
     </div>
-    <div class="col-lg-4 col-md-4">
+    <div [ngClass]="{'col-lg-7 col-md-7': parentResourceService, 'col-lg-10 col-md-10': !parentResourceService && !isCreatingNew && shouldShowCreateNew, 'col-lg-12': !parentResourceService && !shouldShowCreateNew}">
       <!-- Resource Search -->
-      <div class="mr-2 d-flex justify-content-between align-items-center">
-        <search-component class="mr-3 w-100"
-                          [placeholderText]="'Search ' + _currentResourceNamePlural"
-                          [searchTermInput]="searchTerm"
-                          (searched)="searchedResources($event)">
-        </search-component>
-        <div class="filter-controls">
-          <div class="icon-button ripple"
-               placement="{{screenSize === 'xs' && 'sm' && 'md' ? 'left' : 'bottom'}}"
-               [ngbPopover]="filters"
-               autoClose="outside"
-               triggers="manual"
-               #popover="ngbPopover"
-               (click)="openPopover()"
-               popoverTitle="Filter">
-            <fa-layers class="fa-layers fa-fw">
-              <fa-icon [icon]="faFilter">
-              </fa-icon>
-              <fa-layers-counter *ngIf="activeFilterCount && activeFilterCount > 0"
-                                 class="badge__counter--large"
-                                 style="background: gray"
-                                 [content]="activeFilterCount">
-              </fa-layers-counter>
-            </fa-layers>
+      <div class="mr-2">
+        <div class="row">
+          <div class="col-md-5 d-flex align-items-center">
+            <search-component class="w-100"
+                              [placeholderText]="'Search ' + _currentResourceNamePlural"
+                              [searchTermInput]="searchTerm"
+                              (searched)="searchedResources($event)">
+            </search-component>
           </div>
-          <div *ngIf="activeFilterCount > 0"
-               class="icon-button ripple">
-            <fa-icon [icon]="faTimes"
-                     (click)="clearAllFilters()"></fa-icon>
+          <div class="col-md-1 d-flex align-items-center">
+            <div class="d-flex justify-content-start align-items-center">
+              <div class="icon-button ripple"
+                   placement="{{screenSize === 'xs' && 'sm' && 'md' ? 'left' : 'bottom'}}"
+                   [ngbPopover]="filters"
+                   autoClose="outside"
+                   triggers="manual"
+                   #popover="ngbPopover"
+                   (click)="openPopover()"
+                   popoverTitle="Filter">
+                <fa-layers class="fa-layers fa-fw">
+                  <fa-icon [icon]="faFilter">
+                  </fa-icon>
+                  <fa-layers-counter *ngIf="activeFilterCount && activeFilterCount > 0"
+                                     class="badge__counter--large"
+                                     style="background: gray"
+                                     [content]="activeFilterCount">
+                  </fa-layers-counter>
+                </fa-layers>
+              </div>
+              <div *ngIf="activeFilterCount > 0"
+                   class="icon-button ripple"
+                   (click)="clearAllFilters()">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 d-flex align-items-center">
+            <ng-content select=".actionBar"></ng-content>
           </div>
         </div>
       </div>
       <!-- ngContent for filters popover -->
       <ng-template #filters>
         <div>
-          <ng-content select=".filters"></ng-content>
-          <div class="d-flex justify-content-between align-items-center">
+          <!-- filter component -->
+          <!-- <form *ngIf="filterForm" -->
+          <form class="d-flex flex-column filters"
+                [formGroup]="filterForm">
+            <div *ngFor="let filter of filterConfig?.Filters"
+                 class="group">
+              <label>{{filter.Display}}</label>
+              <select class="form-control input-sm"
+                      type="select"
+                      required
+                      [formControlName]="filter.Path">
+                <option *ngFor="let option of filter.Values"
+                        value="{{option}}">{{option}}</option>
+              </select>
+            </div>
+          </form>
+          <div class="d-flex justify-content-between align-items-center mt-2">
             <button (click)="closePopover()"
                     class="btn btn-sm btn-link text-dark">Cancel</button>
             <button (click)="handleApplyFilters()"
@@ -141,6 +165,7 @@
       <div *ngIf="(selectedResourceID || isCreatingNew) && !isMyResource"
            class="row resource-table-container">
         <div class="col-3 p-0 d-md-block d-none">
+
           <perfect-scrollbar style="width: 100%;"
                              [ngStyle]="{'height.px': tableHeight}"
                              (psYReachEnd)="handleScrollEnd()"
@@ -184,7 +209,7 @@
           </perfect-scrollbar>
         </div>
         <div class="col-md-9 col-sm-12">
-          <div class="pt-3 pb-3 d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
+          <div class="pt-3 pb-3 border-bottom d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
             <span class="d-flex flex-row justify-content-start">
               <button class="btn brand-button"
                       (click)="handleSelectResource({})">
@@ -231,7 +256,7 @@
               <button *ngIf="areChanges"
                       class="btn btn-primary"
                       type="submit"
-                      [disabled]="resourceForm.status === 'INVALID'"
+                      [disabled]="resourceForm.status === 'INVALID' || dataSaved"
                       (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
               <button class="btn brand-button ml-3"
                       (click)="handleDiscardChanges()"

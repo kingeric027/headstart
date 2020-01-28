@@ -1,5 +1,4 @@
 <resource-table-component [resourceList]="resourceList"
-                          [resourceOptions]="resourceOptions"
                           [selectedResourceID]="selectedResourceID"
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
@@ -11,15 +10,20 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (applyFilters)="applyFilters()"
                           (resourceSelected)="selectResource($event)">
-
-  <!-- filter component -->
-  <!-- <form class="d-flex flex-column filters"
-        [formGroup]="filterForm">
-    filter component will go here when implemented for orders
-  </form> -->
-
+  <div class="actionBar btn-group w-50"
+       *ngIf="shouldShowOrderToggle"
+       role="group"
+       aria-label="order direction selector">
+    <button type="button"
+            class="btn btn-outline-primary btn-sm"
+            [ngClass]="{'active': activeOrderDirectionButton === 'Incoming'}"
+            (click)="setOrderDirection('Incoming')">Incoming Buyer Orders</button>
+    <button type="button"
+            class="btn btn-outline-primary btn-sm"
+            [ngClass]="{'active': activeOrderDirectionButton === 'Outgoing'}"
+            (click)="setOrderDirection('Outgoing')">Outgoing Supplier Orders</button>
+  </div>
   <!-- edit user -->
   <div class="resource-edit">
     resource edit component will go here

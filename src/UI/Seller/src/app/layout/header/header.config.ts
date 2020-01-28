@@ -1,12 +1,17 @@
 import { HeaderNav } from './header.component';
+import { FilterDictionary } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { SELLER, SUPPLIER } from '@app-seller/shared/models/ordercloud-user.types';
 
 // ! included to ensure no overlap with ordercloud ids as this in invalid in ids
 export const REDIRECT_TO_FIRST_PARENT = '!';
 
 export interface MPRoute {
   rolesWithAccess: string[];
+  // this allows the routes to be narrowed based upon OC user type
+  orderCloudUserTypesWithAccess?: string[];
   title: string;
   route: string;
+  queryParams?: FilterDictionary;
 
   // if subroutes are included, itesms will display in a dropdown
   subRoutes?: MPRoute[];
@@ -51,15 +56,23 @@ const ProductNavGrouping: MPRoute = {
 };
 
 //Orders
-const AllOrders: MPRoute = {
-  rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdming'],
-  title: 'All Orders',
+const BuyerOrders: MPRoute = {
+  rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdmin'],
+  title: 'Incoming Buyer Orders',
   route: '/orders',
+  queryParams: { OrderDirection: 'Incoming' },
 };
 
-const OpenOrders: MPRoute = {
+const SupplierPurchaseOrders: MPRoute = {
+  rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdmin'],
+  title: 'Outgoing Supplier Orders',
+  route: '/orders',
+  queryParams: { OrderDirection: 'Outgoing' },
+};
+
+const Orders: MPRoute = {
   rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdming'],
-  title: 'Open Orders',
+  title: 'Orders',
   route: '/orders',
 };
 
@@ -81,11 +94,20 @@ const CancelledOrders: MPRoute = {
   route: '/orders',
 };
 
-const OrderNavGrouping: MPRoute = {
+const SellerOrderNavGrouping: MPRoute = {
   rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdming'],
   title: 'Orders',
   route: '/orders',
-  subRoutes: [AllOrders, OpenOrders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders],
+  orderCloudUserTypesWithAccess: [SELLER],
+  subRoutes: [BuyerOrders, SupplierPurchaseOrders],
+};
+
+const SupplierOrderNavGrouping: MPRoute = {
+  rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdming'],
+  title: 'Orders',
+  route: '/orders',
+  orderCloudUserTypesWithAccess: [SUPPLIER],
+  subRoutes: [Orders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders],
 };
 
 //Buyers
@@ -178,7 +200,8 @@ const PublicProfile = {
 
 const AllNavGroupings: MPRoute[] = [
   ProductNavGrouping,
-  OrderNavGrouping,
+  SupplierOrderNavGrouping,
+  SellerOrderNavGrouping,
   BuyerNavGrouping,
   SupplierNavGrouping,
   SellerUsers,
@@ -187,19 +210,25 @@ const AllNavGroupings: MPRoute[] = [
   PublicProfile,
 ];
 
-export const getHeaderConfig = (userRoles: string[]): MPRoute[] => {
-  const navGroupingsApplicableToUser = AllNavGroupings.filter(navGrouping => {
-    return navGrouping.rolesWithAccess.some(role => userRoles.includes(role));
-  });
+export const getHeaderConfig = (userRoles: string[], orderCloudUserType: string): MPRoute[] => {
+  const navGroupingsApplicableToUser = filterOutNavGroupings(AllNavGroupings, userRoles, orderCloudUserType);
   return navGroupingsApplicableToUser.map(navGrouping => {
     if (!navGrouping.subRoutes) {
       return navGrouping;
     } else {
-      const routesApplicableToUser = navGrouping.subRoutes.filter(subRoute => {
-        return subRoute.rolesWithAccess.some(role => userRoles.includes(role));
-      });
+      const routesApplicableToUser = filterOutNavGroupings(navGrouping.subRoutes, userRoles, orderCloudUserType);
       navGrouping.subRoutes = routesApplicableToUser;
       return navGrouping;
     }
+  });
+};
+
+const filterOutNavGroupings = (navGroupings: MPRoute[], userRoles: string[], orderCloudUserType: string): MPRoute[] => {
+  return navGroupings.filter(navGrouping => {
+    return (
+      navGrouping.rolesWithAccess.some(role => userRoles.includes(role)) &&
+      (!navGrouping.orderCloudUserTypesWithAccess ||
+        navGrouping.orderCloudUserTypesWithAccess.includes(orderCloudUserType))
+    );
   });
 };

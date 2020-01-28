@@ -4,11 +4,11 @@ import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { cloneDeep as _cloneDeep } from 'lodash';
 import {
   OcProductService,
-  ListProduct,
   Product,
   OcPriceScheduleService,
-  PriceSchedule,
   OcCatalogService,
+  ProductCatalogAssignment,
+  ProductAssignment,
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 import { MarketPlaceProduct, PUBLISHED } from '@app-seller/shared/models/MarketPlaceProduct.interface';
@@ -43,6 +43,7 @@ export class ProductService extends ResourceCrudService<Product> {
     const newPriceSchedule = await this.ocPriceScheduleService.Create(marketPlaceProduct.PriceSchedule).toPromise();
     marketPlaceProduct.DefaultPriceScheduleID = newPriceSchedule.ID;
     const newProduct = await this.ocProductsService.Create(marketPlaceProduct).toPromise();
+    marketPlaceProduct.ID = newProduct.ID;
 
     // assignment of the price schedule to the product cannot be made until after the
     // product is assigned to the catalog, which will not be done until the supplier
@@ -63,5 +64,43 @@ export class ProductService extends ResourceCrudService<Product> {
 
     // mocking the return value of the create marketplace product route
     return marketPlaceProduct;
+  }
+
+  async updateProductCatalogAssignments(add: ProductAssignment[], del: ProductAssignment[]): Promise<void> {
+    const addRequests = add.map(newAssignment => this.addProductCatalogAssignment(newAssignment));
+    const deleteRequests = del.map(assignmentToRemove => this.removeProductCatalogAssignment(assignmentToRemove));
+    await Promise.all([...addRequests, ...deleteRequests]);
+  }
+
+  addProductCatalogAssignment(assignment: ProductAssignment): Promise<void> {
+    return this.ocCatalogService
+      .SaveProductAssignment({ CatalogID: assignment.BuyerID, ProductID: assignment.ProductID })
+      .toPromise();
+  }
+
+  removeProductCatalogAssignment(assignment: ProductAssignment) {
+    return this.ocCatalogService.DeleteProductAssignment(assignment.BuyerID, assignment.ProductID).toPromise();
+  }
+
+  async updateProductPartyPriceScheduleAssignments(add: ProductAssignment[], del: ProductAssignment[]): Promise<void> {
+    const addRequests = add.map(newAssignment => this.addProductPartyPriceScheduleAssignment(newAssignment));
+    const deleteRequests = del.map(assignmentToRemove => {
+      return this.removeProductPartyPriceScheduleAssignment(assignmentToRemove);
+    });
+    await Promise.all([...addRequests, ...deleteRequests]);
+  }
+
+  addProductPartyPriceScheduleAssignment(assignment: ProductAssignment): Promise<void> {
+    return this.ocProductsService
+      .SaveAssignment({
+        ProductID: assignment.ProductID,
+        BuyerID: assignment.BuyerID,
+        PriceScheduleID: assignment.PriceScheduleID,
+      })
+      .toPromise();
+  }
+
+  removeProductPartyPriceScheduleAssignment(assignment: ProductAssignment): Promise<void> {
+    return this.ocProductsService.DeleteAssignment(assignment.ProductID, assignment.BuyerID).toPromise();
   }
 }

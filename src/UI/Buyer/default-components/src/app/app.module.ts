@@ -33,6 +33,7 @@ import {
   NgbDatepickerModule,
   NgbAccordionModule,
   NgbDateAdapter,
+  NgbModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormControlErrorDirective } from './directives/form-control-errors.directive';
 import { CreditCardInputDirective } from './directives/credit-card-input.directive';
@@ -48,7 +49,6 @@ import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
-import { OCMReorder } from './components/orders/re-order/re-order.component';
 import { OCMOrderApproval } from './components/orders/order-approval/order-approval.component';
 import { OCMOrderShipments } from './components/orders/order-shipments/order-shipments.component';
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
@@ -118,6 +118,7 @@ import { OCMCreditCardForm } from './components/payments/credit-card-form/credit
 import { OCMProfileForm } from './components/profile/profile-form/profile-form.component';
 import { OCMCheckoutShipping } from './components/checkout/checkout-shipping/checkout-shipping.component';
 import { OCMShippingSelectionForm } from './components/checkout/shipping-selection-form/shipping-selection-form.component';
+import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.component.';
 
 const components = [
   OCMCategoryDropdown,
@@ -172,7 +173,6 @@ const components = [
   OCMProfileNav,
   OCMOrderDetails,
   OCMAppFooter,
-  OCMReorder,
   OCMOrderApproval,
   OCMOrderShipments,
   OCMOrderHistorical,
@@ -187,7 +187,8 @@ const components = [
   SpecFormTextAreaComponent,
   OCMSupplierList,
   OCMCheckoutShipping,
-  OCMShippingSelectionForm
+  OCMShippingSelectionForm,
+  ConfirmModal
 ];
 
 @NgModule({
@@ -230,6 +231,7 @@ const components = [
     NgProgressModule,
     NgProgressHttpModule,
     BrowserAnimationsModule,
+    NgbModule,
   ],
   providers: [
     { provide: AppConfig, useValue: ocAppConfig },
@@ -302,12 +304,12 @@ export class AppModule {
 
     this.buildWebComponent(OCMOrderDetails, 'ocm-order-details');
     this.buildWebComponent(OCMAppFooter, 'ocm-app-footer');
-    this.buildWebComponent(OCMReorder, 'ocm-reorder');
     this.buildWebComponent(OCMOrderApproval, 'ocm-order-approval');
     this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
     this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
+    this.buildWebComponent(ConfirmModal, 'confirm-modal');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string) {
