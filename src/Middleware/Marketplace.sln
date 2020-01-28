@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestration.Tests", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.API", "src\Marketplace.API\Marketplace.API.csproj", "{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.CardConnect", "src\Marketplace.CardConnect\Marketplace.CardConnect.csproj", "{E05A0AAF-8E9C-417E-B49C-DA8EF34BB0D9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Shipping", "src\Marketplace.Shipping\Marketplace.Shipping.csproj", "{D0CC704C-3BD0-4197-A87A-539380E1F379}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E05A0AAF-8E9C-417E-B49C-DA8EF34BB0D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E05A0AAF-8E9C-417E-B49C-DA8EF34BB0D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E05A0AAF-8E9C-417E-B49C-DA8EF34BB0D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E05A0AAF-8E9C-417E-B49C-DA8EF34BB0D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0CC704C-3BD0-4197-A87A-539380E1F379}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0CC704C-3BD0-4197-A87A-539380E1F379}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0CC704C-3BD0-4197-A87A-539380E1F379}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0CC704C-3BD0-4197-A87A-539380E1F379}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

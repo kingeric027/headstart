@@ -10,7 +10,7 @@
     <div class="row flex-lg-row-reverse"
          *ngIf="order.LineItemCount">
       <div class="col-lg-3">
-        <ocm-order-summary [order]="order"></ocm-order-summary>
+        <ocm-order-summary [order]="order" [checkoutPanel]="currentPanel"></ocm-order-summary>
       </div>
       <div class="col-lg-9">
         <ngb-accordion [closeOthers]="true"

@@ -18,7 +18,7 @@ import { isUndefined as _isUndefined, get as _get } from 'lodash';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { listAll } from '../../functions/listAll';
-import { ICurrentOrder, AppConfig, ShippingRate, ShippingSelection, ShippingOptions, MarketplaceOrder } from '../../shopper-context';
+import { ICurrentOrder, AppConfig, ShippingRate, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection } from '../../shopper-context';
 import { MarketplaceMiddlewareApiService } from '../marketplace-middleware-api/marketplace-middleware-api.service';
 
 @Injectable({
@@ -186,11 +186,11 @@ export class CurrentOrderService implements ICurrentOrder {
 
   // Integration Methods
 
-  async getShippingRates(): Promise<ShippingOptions[]> {
-    return await this.middlewareApi.generateShippingRates(this.order.ID);
+  async getProposedShipments(): Promise<ProposedShipment[]> {
+    return await this.middlewareApi.getProposedShipments(this.order.ID);
   }
 
-  async selectShippingRate(selection: ShippingSelection): Promise<MarketplaceOrder> {
+  async selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder> {
     return (this.order = await this.middlewareApi.selectShippingRate(this.order.ID, selection));
   }
 

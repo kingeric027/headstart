@@ -1,9 +1,11 @@
-<div *ngIf="shippingOptions">
-    <div *ngFor="let liGroup of liGroupedByShipFrom">
-        <ocm-lineitem-table [lineItems]="liGroup"
+<div *ngIf="proposedShipments">
+    <div *ngFor="let proposedShipment of proposedShipments.Items">
+        <ocm-lineitem-table [lineItems]="getLineItemsForProposedShipment(proposedShipment)"
                             [readOnly]="true">
-                            <ocm-shipping-selection-form [options]="getshippingOptions(liGroup)"
-                                                         [existingSelection]="getExistingSelection(liGroup)"
+                            <ocm-shipping-selection-form [proposedShipment]="proposedShipment"
+                                                         [supplierID]="getSupplierID(proposedShipment)"
+                                                         [shipFromAddressID]="getShipFromAddressID(proposedShipment)"
+                                                         [selectedProposedShipmentOptionID]="getExistingSelectionID(proposedShipment)"
                                                          (selectionChanged)="selectRate($event.detail)">
                             </ocm-shipping-selection-form>
         </ocm-lineitem-table>
