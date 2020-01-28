@@ -510,3 +510,6 @@ samples/client/petstore/elixir/mix.lock
 /resources/94121e0a-ca2d-44ad-a901-7812fcff4266.json
 /resources/82c66a5b-65a2-4acf-99cf-35d234b448d1.json
 /resources/335d1322-22f5-45a1-a430-676c6c420587.json
+
+# Added Manually 
+**/appsettings.Development.json
