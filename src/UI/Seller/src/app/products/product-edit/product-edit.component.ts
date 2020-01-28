@@ -3,7 +3,12 @@ import { get as _get } from 'lodash';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { UserContext } from '@app-seller/config/user-context';
-import { ListAddress, OcSupplierAddressService, OcAdminAddressService } from '@ordercloud/angular-sdk';
+import {
+  ListAddress,
+  OcSupplierAddressService,
+  OcAdminAddressService,
+  OcProductService,
+} from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MarketPlaceProduct, MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
@@ -43,16 +48,19 @@ export class ProductEditComponent implements OnInit {
   userContext = {};
   hasVariations = false;
   images: MarketPlaceProductImage[] = [];
-  files: FileHandle[];
+  files: FileHandle[] = [];
   faTrash = faTrash;
   faTimes = faTimes;
   _marketPlaceProductStatic: MarketPlaceProduct;
   _marketPlaceProductEditable: MarketPlaceProduct;
+  areChanges = false;
+  dataSaved = false;
 
   constructor(
     private router: Router,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
+    private ocProductService: OcProductService,
     private ocAdminAddressService: OcAdminAddressService,
     private productService: ProductService,
     private middleware: MiddlewareAPIService,
@@ -86,6 +94,7 @@ export class ProductEditComponent implements OnInit {
     this.createProductForm(product);
     this.images = ReplaceHostUrls(product);
     this.checkIfCreatingNew();
+    this.checkForChanges();
   }
 
   private checkIfCreatingNew() {
@@ -96,8 +105,8 @@ export class ProductEditComponent implements OnInit {
 
   createProductForm(marketPlaceProduct: MarketPlaceProduct) {
     this.productForm = new FormGroup({
-      Name: new FormControl(marketPlaceProduct.Name, Validators.required),
-      Description: new FormControl(marketPlaceProduct.Description),
+      Name: new FormControl(marketPlaceProduct.Name, [Validators.required, Validators.maxLength(100)]),
+      Description: new FormControl(marketPlaceProduct.Description, Validators.maxLength(1000)),
       Inventory: new FormControl(marketPlaceProduct.Inventory),
       QuantityMultiplier: new FormControl(marketPlaceProduct.QuantityMultiplier),
       ShipFromAddressID: new FormControl(marketPlaceProduct.ShipFromAddressID),
@@ -115,9 +124,21 @@ export class ProductEditComponent implements OnInit {
   handleSave() {
     if (this.isCreatingNew) {
       this.createNewProduct();
+      this.dataSaved = true;
     } else {
       this.updateProduct();
     }
+  }
+
+  async handleDelete($event): Promise<void> {
+    await this.ocProductService.Delete(this._marketPlaceProductStatic.ID).toPromise();
+    this.router.navigateByUrl('/products');
+  }
+
+  handleDiscardChanges(): void {
+    this.files = [];
+    this._marketPlaceProductEditable = this._marketPlaceProductStatic;
+    this.refreshProductData(this._marketPlaceProductStatic);
   }
 
   async createNewProduct() {
@@ -129,7 +150,7 @@ export class ProductEditComponent implements OnInit {
 
   async updateProduct() {
     const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductEditable);
-    this.addFiles(this.files, product.ID);
+    if (this.files) this.addFiles(this.files, product.ID);
   }
 
   updateResourceFromEvent(event: any, field: string): void {
@@ -141,10 +162,11 @@ export class ProductEditComponent implements OnInit {
         // this will overwrite all existing price breaks with the price
         // when more robust price setting is creating this should be changed
         PriceSchedule: {
-          ...this._marketPlaceProductEditable,
-          PriceBreaks: [{ Price: event.target.value, Quantity: 1 }],
+          ...this._marketPlaceProductEditable.PriceSchedule,
+          PriceBreaks: [{ Quantity: 1, Price: Number(event.target.value) }],
         },
       };
+      this.checkForChanges();
     } else {
       this.updateResourceFromFieldValue(field, event.target.value);
       // this._marketPlaceProductEditable = { ...this._marketPlaceProductEditable, [field]: event.target.value };
@@ -152,7 +174,22 @@ export class ProductEditComponent implements OnInit {
   }
 
   updateResourceFromFieldValue(field: string, value: any) {
+    if (
+      field === 'QuantityMultiplier' ||
+      field === 'ShipHeight' ||
+      field === 'ShipWidth' ||
+      field === 'ShipLength' ||
+      field === 'ShipWeight'
+    )
+      value = Number(value);
     this._marketPlaceProductEditable = { ...this._marketPlaceProductEditable, [field]: value };
+    this.checkForChanges();
+  }
+
+  checkForChanges(): void {
+    this.areChanges =
+      JSON.stringify(this._marketPlaceProductEditable) !== JSON.stringify(this._marketPlaceProductStatic) ||
+      this.files.length > 0;
   }
 
   /******************************************
@@ -169,6 +206,7 @@ export class ProductEditComponent implements OnInit {
 
   stageFiles(files: FileHandle[]) {
     this.files = files;
+    this.checkForChanges();
   }
 
   async addFiles(files: FileHandle[], productID: string) {
@@ -190,6 +228,7 @@ export class ProductEditComponent implements OnInit {
 
   unStage(index: number) {
     this.files.splice(index, 1);
+    this.checkForChanges();
   }
 
   async open(content) {
