@@ -51,7 +51,6 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
       .toPromise();
     this._productPartyPriceScheduleAssignmentsStatic = productPartyPriceScheduleAssignments.Items;
     this._productPartyPriceScheduleAssignmentsEditable = productPartyPriceScheduleAssignments.Items;
-    console.log(this._productPartyPriceScheduleAssignmentsEditable);
   }
 
   toggleProductPartyPriceScheduleAssignment(buyer: Buyer) {
@@ -85,16 +84,12 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
   }
 
   checkForProductPartyPriceScheduleAssignmentChanges() {
-    console.log('Editable', this._productPartyPriceScheduleAssignmentsEditable);
-    console.log('Static', this._productPartyPriceScheduleAssignmentsStatic);
     this.add = this._productPartyPriceScheduleAssignmentsEditable.filter(
       assignment => !JSON.stringify(this._productPartyPriceScheduleAssignmentsStatic).includes(assignment.BuyerID)
     );
     this.del = this._productPartyPriceScheduleAssignmentsStatic.filter(
       assignment => !JSON.stringify(this._productPartyPriceScheduleAssignmentsEditable).includes(assignment.BuyerID)
     );
-    console.log('To Add', this.add);
-    console.log('To Del', this.del);
     this.areChanges = this.add.length > 0 || this.del.length > 0;
     if (!this.areChanges) this.requestedUserConfirmation = false;
   }
