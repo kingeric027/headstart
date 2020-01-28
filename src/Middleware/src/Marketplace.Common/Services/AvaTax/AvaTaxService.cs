@@ -28,12 +28,12 @@ namespace Marketplace.Common.Services
 	public class AvataxService : IAvataxService
 	{
 		private readonly AvaTaxClient _avaTax;
-		private readonly string companyCode = "Four51";
+		private readonly string _companyCode;
 
 		public AvataxService(AppSettings settings)
 		{
-			//var env = settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;
-			var env = AvaTaxEnvironment.Production;
+			_companyCode = settings.AvalaraSettings.CompanyCode;
+			var env = settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;
 
 			_avaTax = new AvaTaxClient("four51 marketplace", "v1", settings.Env.ToString(), env)
 					.WithSecurity(settings.AvalaraSettings.AccountID, settings.AvalaraSettings.LicenseKey);
@@ -52,7 +52,7 @@ namespace Marketplace.Common.Services
 
 		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, TaxableOrder taxableOrder)
 		{
-			var trans = new TransactionBuilder(_avaTax, companyCode, docType, GetCustomerCode(taxableOrder.Order));
+			var trans = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(taxableOrder.Order));
 			var shipments = taxableOrder.Lines.GroupBy(line => line.ShipFromAddressID); 
 			foreach (var shipment in shipments)
 			{
@@ -68,7 +68,7 @@ namespace Marketplace.Common.Services
 		public async Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode)
 		{
 			var model = new CommitTransactionModel() { commit = true };
-			return await _avaTax.CommitTransactionAsync(companyCode, transactionCode, DocumentType.SalesInvoice, "", model);
+			return await _avaTax.CommitTransactionAsync(_companyCode, transactionCode, DocumentType.SalesInvoice, "", model);
 		}
 
 		private string GetCustomerCode(OrderCloud.SDK.Order order)
