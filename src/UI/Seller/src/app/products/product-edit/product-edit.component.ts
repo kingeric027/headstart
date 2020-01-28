@@ -54,6 +54,7 @@ export class ProductEditComponent implements OnInit {
   _marketPlaceProductStatic: MarketPlaceProduct;
   _marketPlaceProductEditable: MarketPlaceProduct;
   areChanges = false;
+  dataSaved = false;
 
   constructor(
     private router: Router,
@@ -123,6 +124,7 @@ export class ProductEditComponent implements OnInit {
   handleSave() {
     if (this.isCreatingNew) {
       this.createNewProduct();
+      this.dataSaved = true;
     } else {
       this.updateProduct();
     }
