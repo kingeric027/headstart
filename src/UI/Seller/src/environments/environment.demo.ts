@@ -5,7 +5,7 @@
 export const environment = {
   hostedApp: false,
   appname: 'Marketplace Admin Demo',
-  clientID: 'F1631510-F165-4278-A4EB-E655C5AC2E06',
+  clientID: '1FF8EA5D-7666-44AF-AFC5-EBD38DB94108',
   middlewareUrl: 'https://marketplace-api-demo.azurewebsites.net',
   marketplaceID: 'seb',
   cmsUrl: 'https://mkpldemo.blob.core.windows.net',
