@@ -19,6 +19,7 @@ namespace Marketplace.Common
         public BlobSettings BlobSettings { get; set; }
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
+        public CardConnectSettings CardConnectSettings { get; set; } = new CardConnectSettings();
         public string SendgridApiKey { get; set; }
     }
 
@@ -41,5 +42,12 @@ namespace Marketplace.Common
         public string PrimaryKey { get; set; }
         public string EndpointUri { get; set; }
         public string DatabaseName { get; set; }
+    }
+
+    public class CardConnectSettings
+    {
+        public string Authorization { get; set; }
+        public string BaseUrl { get; set; }
+        public string Site { get; set; }
     }
 }
