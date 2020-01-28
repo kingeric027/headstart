@@ -17,10 +17,10 @@ export function ReplaceHostUrls(product: Product): MarketPlaceProductImage[] {
 
 function getProductImageUrls(product: Product): string[] {
   return ReplaceHostUrls(product)
-    .map((image) => image.Url)
+    .map((image) => image.URL)
     .filter((url) => url);
 }
 
 function ReplaceHostUrl(img: MarketPlaceProductImage): MarketPlaceProductImage {
-  return { ...img, Url: img.Url.replace('{u}', IMAGE_HOST_URL) };
+  return { ...img, URL: img.URL.replace('{u}', IMAGE_HOST_URL) };
 }
