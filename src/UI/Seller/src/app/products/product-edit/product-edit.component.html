@@ -190,7 +190,7 @@
                class="product-img-wrapper mr-2">
             <img class="product-img"
                  [id]="i"
-                 [src]="image.Url"
+                 [src]="image.URL"
                  width="auto"
                  height="100px">
             <div class="product-img-delete text-center">
@@ -213,7 +213,7 @@
                           (click)="modal.dismiss()">Cancel</button>
                   <button type="button"
                           class="btn brand-button--danger"
-                          (click)="removeFile(image.Url)"
+                          (click)="removeFile(image.URL)"
                           (click)="modal.dismiss()">Yes, Delete</button>
                 </confirm-modal>
               </ng-template>
@@ -223,7 +223,7 @@
                class="product-img-wrapper mr-2">
             <img class="product-img"
                  [id]="i"
-                 [src]="image.Url"
+                 [src]="image.URL"
                  width="auto"
                  height="100px">
             <div class="product-img-delete text-center">
