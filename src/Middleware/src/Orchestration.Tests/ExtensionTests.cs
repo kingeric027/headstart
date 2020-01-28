@@ -22,10 +22,10 @@ namespace Orchestration.Tests
         public void to_credit_card_display_test()
         {
             var visa = "4444333322221111".ToCreditCardDisplay();
-            Assert.AreEqual("Visa ending in 1111", visa);
+            Assert.AreEqual("1111", visa);
 
             var amex = "373485467448025".ToCreditCardDisplay();
-            Assert.AreEqual("AmericanExpress ending in 8025", amex);
+            Assert.AreEqual("8025", amex);
         }
 
         [Test, TestCaseSource(typeof(TypeFactory), nameof(TypeFactory.TestCases))]
