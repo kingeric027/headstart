@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Marketplace.Common
 {
-	public enum AppEnvironment { Local, Qa, Prod }
+	public enum AppEnvironment { Qa, Demo, Prod }
 
     //public interface IAppSettings
     //{
