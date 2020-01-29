@@ -4,7 +4,6 @@ import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
 import {
   map as _map,
   without as _without,
-  uniqBy as _uniq,
   some as _some,
   find as _find,
   difference as _difference,
@@ -13,6 +12,7 @@ import {
 } from 'lodash';
 import { SpecFormService } from '../spec-form/spec-form.service';
 import { ShopperContextService } from 'marketplace';
+import { getImageUrls } from 'src/app/services/images.helpers';
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -33,7 +33,7 @@ export class OCMProductDetails implements OnInit {
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
-  note = "Placeholder for supplier message associated with specific product";
+  note = 'Placeholder for supplier message associated with specific product';
   specLength: number;
 
   constructor(private formService: SpecFormService, private context: ShopperContextService) {
@@ -114,16 +114,8 @@ export class OCMProductDetails implements OnInit {
       : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
   }
 
-  // TODO - we need a unified getImageUrl() function
   getImageUrls(): string[] {
-    const images =
-      _uniq(this._product.xp.Images, (img: any) => {
-        return img.Url;
-      }) || [];
-    const result = _map(images, img => {
-      return img.Url.replace('{u}', this.context.appSettings.cmsUrl);
-    });
-    return _without(result, undefined) as string[];
+    return getImageUrls(this._product);
   }
 
   isFavorite(): boolean {
