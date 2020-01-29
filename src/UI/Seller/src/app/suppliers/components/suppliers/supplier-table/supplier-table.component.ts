@@ -43,6 +43,7 @@ function createSupplierForm(supplier: Supplier) {
       (_get(supplier, 'xp.Contacts') && _get(supplier, 'xp.Contacts')[0].Phone) || ''
     ),
     Categories: new FormControl(_get(supplier, 'xp.Categories', []), ValidateSupplierCategorySelection),
+    Active: new FormControl(supplier.Active),
   });
 }
 
