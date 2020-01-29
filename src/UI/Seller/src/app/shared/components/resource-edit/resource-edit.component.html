@@ -23,26 +23,16 @@
            placeholder="Enter {{field.field}}">
   </div>
   <div *ngIf="field.type === 'boolean'">
-    <table>
-      <thead>
-        <tr>{{field.field}}</tr>
-      </thead>
-      <tbody>
-        <tr (click)="handleUpdateResource($event, 'boolean')">
-          <td>
-            <label class="switch mb-0"
-                   for="{{field.field}}">
-              <input type="checkbox"
-                     class="form-check-input"
-                     id="{{field.field}}"
-                     [checked]="_resource[field.field]"
-                     aria-describedby="field.field"
-                     (input)="handleUpdateResource($event, 'boolean')">
-              <span class="slider round cursor-pointer"></span>
-            </label>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <p class="mb-1">{{field.field}}</p>
+    <label class="switch mb-0"
+           for="{{field.field}}">
+      <input type="checkbox"
+             class="form-check-input"
+             id="{{field.field}}"
+             [checked]="_resource[field.field]"
+             aria-describedby="field.field"
+             (input)="handleUpdateResource($event, 'boolean')">
+      <span class="slider round cursor-pointer"></span>
+    </label>
   </div>
 </div>
