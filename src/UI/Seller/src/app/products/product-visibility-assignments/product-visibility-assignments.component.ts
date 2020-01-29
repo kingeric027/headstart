@@ -101,7 +101,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
 
   async executeProductPartyPriceScheduleAssignmentRequests(): Promise<void> {
     this.requestedUserConfirmation = false;
-    await this.productService.updateProductPartyPriceScheduleAssignments(this.add, this.del);
+    await this.productService.updateProductCatalogAssignments(this.add, this.del);
     await this.productService.updateProductPartyPriceScheduleAssignments(this.add, this.del);
     await this.getProductPartyPriceScheduleAssignments(this.product);
     this.checkForProductPartyPriceScheduleAssignmentChanges();
