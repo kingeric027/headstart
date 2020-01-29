@@ -23,10 +23,6 @@ export class OCMLineitemTable implements OnInit {
     this.liGroupedByShipFrom = Object.values(this.liGroups);
   }
 
-  groupLineItemsByShipFrom(lis: ListLineItemWithProduct) {
-    return Object.values(_groupBy(lis.Items, li => li.ShipFromAddressID));
-  }
-
   removeLineItem(lineItemID: string) {
     this.context.currentOrder.removeFromCart(lineItemID);
   }
