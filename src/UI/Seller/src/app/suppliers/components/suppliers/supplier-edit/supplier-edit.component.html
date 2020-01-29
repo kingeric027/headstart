@@ -79,6 +79,21 @@
                                             (selectionsChanged)="updateResource.emit($event)">
         </supplier-category-select-component>
       </div>
+      <div class="form-group">
+        <p class="mb-1">Active</p>
+        <label class="switch mb-0"
+               for="Active">
+          <input type="checkbox"
+                 class="form-check-input"
+                 id="Active"
+                 showErrors
+                 [resourceForm]="resourceForm"
+                 aria-describedby="Active"
+                 formControlName="Active"
+                 (input)="updateResourceFromEvent($event, 'Active')">
+          <span class="slider round cursor-pointer"></span>
+        </label>
+      </div>
     </div>
   </form>
 </div>
