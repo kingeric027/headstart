@@ -93,8 +93,8 @@ export abstract class ResourceCrudService<ResourceType> {
 
   // Used to update the URL
   mapToUrlQueryParams(options: Options): Params {
-    const { sortBy, search, filters } = options;
-    return { sortBy, search, ...filters };
+    const { sortBy, search, filters, OrderDirection } = options;  
+    return { sortBy, search, ...filters, OrderDirection };
   }
 
   async listResources(pageNumber = 1, searchText = '') {
@@ -294,7 +294,7 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
-  private patchFilterState(patch: Options) {
+  patchFilterState(patch: Options) {
     const activeOptions = { ...this.optionsSubject.value, ...patch };
     const queryParams = this.mapToUrlQueryParams(activeOptions);
     this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()

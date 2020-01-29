@@ -31,7 +31,7 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
     });
   }
   setOrderDirection(direction: string) {
-    this.orderService.addFilters({ OrderDirection: direction });
+    this.orderService.setOrderDirection(direction);
   }
 
   private readFromUrlQueryParams(params: Params): void {
