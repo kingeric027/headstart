@@ -1,9 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { LineItem } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { get as _get, map as _map, without as _without } from 'lodash';
 import { ShopperContextService, LineItemWithProduct, ShippingRate } from 'marketplace';
-import { FormGroup, FormControl } from '@angular/forms';
+import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
@@ -33,16 +32,9 @@ export class OCMLineitemTable implements OnInit {
     }
   }
 
-  // TODO - we need a unified getImageUrl() function
   getImageUrl(lineItemID: string) {
     const li = this.getLineItem(lineItemID);
-    const host = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
-    const images = li.Product.xp.Images || [];
-    const result = _map(images, img => {
-      return img.Url.replace('{u}', host);
-    });
-    const filtered = _without(result, undefined);
-    return filtered.length > 0 ? filtered[0] : 'http://placehold.it/300x300';
+    return getPrimaryImageUrl(li.Product);
   }
 
   getLineItem(lineItemID: string): LineItem {
