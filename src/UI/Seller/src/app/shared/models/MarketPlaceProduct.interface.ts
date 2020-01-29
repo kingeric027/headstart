@@ -34,10 +34,15 @@ interface UnitOfMeasure {
 }
 
 interface MarketPlaceProductXp {
+  TaxCode: MarketPlaceProductTaxCode;
   Data: any;
   Images: MarketPlaceProductImage[];
 }
 
+interface MarketPlaceProductTaxCode {
+  Name: string;
+  Code: string;
+}
 export interface MarketPlaceProductImage {
   URL: string;
   Tags: string[];

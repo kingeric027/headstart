@@ -117,6 +117,7 @@ export class ProductEditComponent implements OnInit {
       Price: new FormControl(_get(marketPlaceProduct, 'PriceSchedule.PriceBreaks[0].Price', null)),
       // SpecCount: new FormControl(marketPlaceProduct.SpecCount),
       // VariantCount: new FormControl(marketPlaceProduct.VariantCount),
+      TaxCode: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.Code', null)),
       xp: new FormControl(marketPlaceProduct.xp),
     });
   }
@@ -164,6 +165,18 @@ export class ProductEditComponent implements OnInit {
         PriceSchedule: {
           ...this._marketPlaceProductEditable.PriceSchedule,
           PriceBreaks: [{ Quantity: 1, Price: Number(event.target.value) }],
+        },
+      };
+      this.checkForChanges();
+    } else if (field === 'TaxCode') {
+      this._marketPlaceProductEditable = {
+        ...this._marketPlaceProductEditable,
+        xp: {
+          ...this._marketPlaceProductEditable.xp,
+          TaxCode: {
+            Name: event.target.options[event.target.selectedIndex].text,
+            Code: event.target.value,
+          },
         },
       };
       this.checkForChanges();

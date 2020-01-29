@@ -17,6 +17,8 @@
       <p>{{_marketPlaceProduct?.QuantityMultiplier}}</p>
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Default Price</label>
       <p>{{_marketPlaceProduct?.PriceSchedule?.PriceBreaks[0]?.Price | currency}}</p>
+      <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Tax Code</label>
+      <p>{{_marketPlaceProduct?.xp?.TaxCode?.Name || 'No tax code selection'}}</p>
     </div>
   </div>
   <!-- /Product Details -->
