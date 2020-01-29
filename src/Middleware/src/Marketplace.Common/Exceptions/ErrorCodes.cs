@@ -11,6 +11,7 @@ namespace Marketplace.Common.Exceptions
 		{
 			{ "Checkout.MissingShippingSelection", new  ErrorCode<MissingShippingSelectionError>("MissingShippingSelection", 404, "Cannot proceed until all shipping selections have been made.") },
 			{ "Checkout.InvalidShipFromAddress", new ErrorCode<InvalidShipFromAddressIDError>("InvalidShipFromAddress", 400, "This ShipFromAddressID does not match any products in the order") },
+			{ "Checkout.MissingProductDimensions", new ErrorCode<MissingProductDimensionsError>("MissingProductDimensions", 400, "Product dimensions are missing for a product") },
 		};
 
 		public static class Checkout
@@ -19,6 +20,8 @@ namespace Marketplace.Common.Exceptions
 			public static ErrorCode<MissingShippingSelectionError> MissingShippingSelection => All["Checkout.MissingShippingSelection"] as ErrorCode<MissingShippingSelectionError>;
 			/// <summary>This ShipFromAddressID does not exist on the order.</summary>
 			public static ErrorCode<InvalidShipFromAddressIDError> InvalidShipFromAddress => All["Checkout.InvalidShipFromAddress"] as ErrorCode<InvalidShipFromAddressIDError>;
+			/// <summary>Product dimensions are not set for a product on this order.</summary>
+			public static ErrorCode<MissingProductDimensionsError> MissingProductDimensions => All["Checkout.MissingProductDimensions"] as ErrorCode<MissingProductDimensionsError>;
 		}
 	}
 }

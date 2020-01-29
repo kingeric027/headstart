@@ -1,7 +1,9 @@
 ﻿using Flurl.Http;
+using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
+using Marketplace.Helpers;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -25,6 +27,9 @@ namespace Marketplace.Common.Services
 
         public async Task<List<ProposedShipment>> GetProposedShipmentsForSuperOrderAsync(SuperOrder superOrder)
         {
+            var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(superOrder);
+            Require.That(productIDsWithInvalidDimensions.Count == 0, Exceptions.ErrorCodes.Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
+
             var proposedShipmentRequests = ProposedShipmentRequestsMapper.Map(superOrder);
             proposedShipmentRequests = proposedShipmentRequests.Select(proposedShipmentRequest =>
             {
@@ -42,6 +47,17 @@ namespace Marketplace.Common.Services
             }
 
             return proposedShipments;
+        }
+
+        private List<string> GetProductsWithInvalidDimensions(SuperOrder superOrder)
+        {
+            return superOrder.LineItems.Where(lineItem =>
+            {
+                return !(lineItem.Product.ShipHeight > 0 &&
+                lineItem.Product.ShipLength > 0 &&
+                lineItem.Product.ShipWeight > 0 &&
+                lineItem.Product.ShipWidth > 0);
+            }).Select(lineItem => lineItem.Product.ID).ToList();
         }
     }
 }
