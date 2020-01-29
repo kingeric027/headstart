@@ -176,8 +176,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   handleUpdateResource(event: any, field: string) {
     const resourceUpdate = {
-      field: field,
-      value: event.target.value,
+      field,
+      value: field === "Active" ? event.target.checked : event.target.value,
     };
     this.updateResource(resourceUpdate);
   }
