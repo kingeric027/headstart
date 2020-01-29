@@ -6,6 +6,7 @@ export const getImageUrls = (product: Product): string[] => {
   let images = (product.xp && product.xp.Images) || [];
   images = _uniq(images, ((img: any) => img.Url));
   let urls: string[] = _map(images, img => {
+    if (!img.Url) return;
     return img.Url.replace('{u}', ocAppConfig.cmsUrl);
   });
   urls = _without(urls, undefined);

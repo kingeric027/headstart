@@ -5,7 +5,7 @@
 export const environment = {
   hostedApp: false,
   appname: 'Marketplace Local',
-  clientID: '26B45BD1-5D02-489D-A60E-3B37C852606C',
+  clientID: '3A5DD92D-0B04-4E62-B8AC-197ADF10FBC4',
   marketplaceID: 'SEB',
   baseUrl: 'https://localhost:4200',
   middlewareUrl: 'https://marketplace-api-qa.azurewebsites.net',
