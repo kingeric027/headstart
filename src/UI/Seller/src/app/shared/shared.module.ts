@@ -9,6 +9,7 @@ import {
   NgbPopoverModule,
   NgbDropdownModule,
   NgbModalModule,
+  NgbDatepickerModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
@@ -60,6 +61,7 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     NgbPaginationModule,
     NgbTabsetModule,
     NgbModalModule,
+    NgbDatepickerModule,
     QuillModule.forRoot(),
   ],
   exports: [

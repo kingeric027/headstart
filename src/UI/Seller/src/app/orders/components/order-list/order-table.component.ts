@@ -44,14 +44,17 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
         Display: 'Status',
         Path: 'Status',
         Values: ['Open', 'AwaitingApproval', 'Completed', 'Declined', 'Canceled'],
+        Type: 'Dropdown'
       },
       {
         Display: 'From Date',
         Path: 'from',
+        Type: 'DateFilter'
       },
       {
         Display: 'To Date',
         Path: 'to',
+        Type: 'DateFilter'
       },
     ],
   };
