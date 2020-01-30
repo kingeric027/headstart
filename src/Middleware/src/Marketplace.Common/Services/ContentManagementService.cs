@@ -42,13 +42,13 @@ namespace Marketplace.Common.Services
 			if (product?.xp?.Images == null)
 				product.xp = new ProductXp { Images = new List<ProductImage>() };
 
-			var index = product.xp.Images.Select(img => Int32.Parse(img.Url.Split('-').Last())).DefaultIfEmpty(0).Max() + 1;
+			var index = product.xp.Images.Select(img => Int32.Parse(img.URL.Split('-').Last())).DefaultIfEmpty(0).Max() + 1;
 			var blobName = GetProductImageName(marketplaceID, productID, index);
 			_blob.Save(blobName, file);
 
 			product.xp.Images.Add(new ProductImage()
 			{
-				Url = GetProductImageURL(blobName),
+				URL = GetProductImageURL(blobName),
 			});
 
 			var partial = new PartialProduct()
@@ -67,7 +67,7 @@ namespace Marketplace.Common.Services
 			var blobName = GetProductImageName(marketplaceID, fileName);
 			_blob.Delete(blobName);
 
-			var Images = product.xp.Images.Where(img => !img.Url.EndsWith(fileName));
+			var Images = product.xp.Images.Where(img => !img.URL.EndsWith(fileName));
 
 			return await _oc.Products.PatchAsync(productID, new PartialProduct() { xp = new { Images }}, token);
 		}
@@ -85,6 +85,6 @@ namespace Marketplace.Common.Services
 
 	public class ProductImage
 	{
-		public string Url { get; set; }
+		public string URL { get; set; }
 	}
 }

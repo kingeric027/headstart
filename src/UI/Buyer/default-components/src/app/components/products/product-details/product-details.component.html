@@ -8,8 +8,8 @@
       <div class="pb-3 border-bottom border-medium">
         <small><a href="javascript:;"
              (click)="setActiveSupplier(_product?.xp.Facets?.supplier[0])">{{_product?.xp.Facets?.supplier[0]}}</a></small>
-        <h1 class="h3 my-0">{{ _product.xp.Facets?.manufacturer[0]}} {{ _product.Name }}
-        </h1>
+          <h1 class="h3 my-0">{{ _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
+            </h1>
         <ocm-toggle-favorite title="Favorite"
                              (click)="$event.stopPropagation()"
                              [favorite]="isFavorite()"

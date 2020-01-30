@@ -3,12 +3,14 @@
                     [payments]="payments"></ocm-payment-list>
   <div class="row">
     <div class="col-6">
+      <small class="font-weight-bold text-muted text-uppercase">Ship to:</small>
       <ocm-address-card *ngIf="lineItems.Items[0].ShippingAddress"
                         [address]="lineItems.Items[0].ShippingAddress"
                         addressTitle="Shipping Address">
       </ocm-address-card>
     </div>
     <div class="col-6">
+      <small class="font-weight-bold text-muted text-uppercase">Bill to:</small>
       <ocm-address-card [address]="order.BillingAddress"
                         addressTitle="Billing Address"
                         *ngIf="order?.BillingAddress">

@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ViewEncapsulation, OnChanges, ChangeDetectorR
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
 import { ShopperContextService } from 'marketplace';
+import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
   templateUrl: './product-card.component.html',
@@ -36,15 +37,8 @@ export class OCMProductCard {
     this.context.currentOrder.addToCart({ ProductID: this._product.ID, Quantity: this.quantity });
   }
 
-  // TODO - we need a unified getImageUrl() function
   getImageUrl() {
-    const host = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
-    const images = this._product.xp.Images || [];
-    const result = _map(images, img => {
-      return img.Url.replace('{u}', host);
-    });
-    const filtered = _without(result, undefined);
-    return filtered.length > 0 ? filtered[0] : 'http://placehold.it/300x300';
+    return getPrimaryImageUrl(this._product);
   }
 
   toDetails() {

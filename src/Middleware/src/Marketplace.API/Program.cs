@@ -9,10 +9,12 @@ using Marketplace.Helpers.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Commands;
+using Marketplace.Common.Commands.CardConnect;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.CardConnect;
 using Marketplace.Helpers;
 namespace Marketplace.API
 {
@@ -20,8 +22,12 @@ namespace Marketplace.API
 	{
 		public static void Main(string[] args)
 		{
+			// Links to an Azure App Configuration resource that holds the app settings.
+			// Set this in your visual studio Env Variables.
+			var connectionString = Environment.GetEnvironmentVariable("APP_CONFIG_CONNECTION"); 
+
 			Marketplace.Helpers.WebHostBuilder
-				.CreateWebHostBuilder<Startup, AppSettings>(args)
+				.CreateWebHostBuilder<Startup, AppSettings>(args, connectionString)
 				.Build()
 				.Run();
 		}
@@ -60,6 +66,8 @@ namespace Marketplace.API
 					.Inject<ITaxCommand>()
 					.Inject<ISupplierCategoryConfigQuery>()
 					.Inject<ISendgridService>()
+                    .Inject<ICardConnectService>()
+                    .Inject<ICreditCardCommand>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                     .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
             }

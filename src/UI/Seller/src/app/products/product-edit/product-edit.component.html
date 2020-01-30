@@ -190,7 +190,7 @@
                class="product-img-wrapper mr-2">
             <img class="product-img"
                  [id]="i"
-                 [src]="image.Url"
+                 [src]="image.URL"
                  width="auto"
                  height="100px">
             <div class="product-img-delete text-center">
@@ -213,7 +213,7 @@
                           (click)="modal.dismiss()">Cancel</button>
                   <button type="button"
                           class="btn brand-button--danger"
-                          (click)="removeFile(image.Url)"
+                          (click)="removeFile(image.URL)"
                           (click)="modal.dismiss()">Yes, Delete</button>
                 </confirm-modal>
               </ng-template>
@@ -223,7 +223,7 @@
                class="product-img-wrapper mr-2">
             <img class="product-img"
                  [id]="i"
-                 [src]="image.Url"
+                 [src]="image.URL"
                  width="auto"
                  height="100px">
             <div class="product-img-delete text-center">
@@ -251,8 +251,22 @@
     </div>
     <!-- /Product Images -->
   </form>
-  <button class="btn btn-primary"
-          type="submit"
-          (click)="handleSave()"
-          [disabled]="productForm?.status==='INVALID'">{{isCreatingNew ? 'Create New Product for Approval' : 'Save Updates for Approval'}}</button>
+  <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
+  <div *ngIf="userContext?.UserType === 'SUPPLIER'"
+       class="d-flex justify-content-between align-items-center py-2">
+    <delete-confirm-modal-component *ngIf="!isCreatingNew"
+                                    buttonText="Delete Product"
+                                    (deleteConfirmed)="handleDelete($event)">
+    </delete-confirm-modal-component>
+    <div>
+      <button *ngIf="areChanges"
+              class="btn btn-primary"
+              type="submit"
+              [disabled]="productForm?.status === 'INVALID' || dataSaved"
+              (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
+      <button class="btn brand-button ml-3"
+              (click)="handleDiscardChanges()"
+              *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+    </div>
+  </div>
 </div>

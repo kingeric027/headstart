@@ -4,7 +4,7 @@
 
 export const environment = {
   hostedApp: false,
-  clientID: 'F1631510-F165-4278-A4EB-E655C5AC2E06',
+  clientID: '1FF8EA5D-7666-44AF-AFC5-EBD38DB94108',
   middlewareUrl: 'https://marketplace-api-qa.azurewebsites.net',
   appname: 'Marketplace Admin Local',
   marketplaceID: 'seb',
