@@ -115,3 +115,26 @@
       align-items: center;
   }
 }
+.form-group.hidden {
+  width: 0;
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+.custom-day {
+  text-align: center;
+  padding: 0.185rem 0.25rem;
+  display: inline-block;
+  height: 2rem;
+  width: 2rem;
+}
+.custom-day.focused {
+  background-color: rgba($gray-900, 0.1);
+}
+.custom-day.range, .custom-day:hover {
+  background-color: $navy-300;
+  color: white;
+}
+.custom-day.faded {
+  background-color: $navy-300;
+}

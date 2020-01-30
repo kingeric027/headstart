@@ -42,18 +42,16 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
     Filters: [
       {
         Display: 'Status',
-        Path: '.Status',
-        Values: ['!Unsubmitted', 'Unsubmitted'],
+        Path: 'Status',
+        Values: ['Open', 'AwaitingApproval', 'Completed', 'Declined', 'Canceled'],
       },
       {
         Display: 'From Date',
-        Path: '.DateSubmitted',
-        Values: ['From Date'],
+        Path: 'from',
       },
       {
         Display: 'To Date',
-        Path: '.DateSubmitted',
-        Values: ['To Date'],
+        Path: 'to',
       },
     ],
   };

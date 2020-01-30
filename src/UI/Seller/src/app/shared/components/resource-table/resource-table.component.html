@@ -122,19 +122,49 @@
                  class="group">
               <label>{{filter.Display}}</label>
               <select class="form-control input-sm"
+                      *ngIf="filter.Path !== 'to' && filter.Path !== 'from'"
                       type="select"
                       required
                       [formControlName]="filter.Path">
                 <ng-container *ngFor="let option of filter.Values">
-                  <option *ngIf="isFilterHTML(option)"
-                          value="{{option}}"
-                          [innerHTML]="option"></option>
-                </ng-container>
-                <ng-container *ngFor="let option of filter.Values">
-                  <option *ngIf="!isFilterHTML(option)"
-                          value="{{option}}">{{option}}</option>
+                  <option value="{{option}}">{{option}}</option>
                 </ng-container>
               </select>
+              <div class="input-group"
+                   *ngIf="filter.Path === 'from'">
+                <input class="form-control"
+                       placeholder="yyyy-mm-dd"
+                       name="dpFrom"
+                       [formControlName]="filter.Path"
+                       ngbDatepicker
+                       #dFrom="ngbDatepicker">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-primary calendar"
+                          (click)="dFrom.toggle()"
+                          type="button">
+                    <fa-icon [icon]="faCalendar"
+                             id="calendar-addon-from"></fa-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="input-group"
+                   *ngIf="filter.Path === 'to'">
+                <input class="form-control"
+                       placeholder="yyyy-mm-dd"
+                       name="dpTo"
+                       [formControlName]="filter.Path"
+                       ngbDatepicker
+                       minDate="today"
+                       #dTo="ngbDatepicker">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-primary calendar"
+                          (click)="dTo.toggle()"
+                          type="button">
+                    <fa-icon [icon]="faCalendar"
+                             id="calendar-addon-from"></fa-icon>
+                  </button>
+                </div>
+              </div>
             </div>
           </form>
           <div class="d-flex justify-content-between align-items-center mt-2">
