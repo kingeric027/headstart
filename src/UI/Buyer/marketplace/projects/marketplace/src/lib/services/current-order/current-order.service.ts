@@ -19,7 +19,7 @@ import { TokenHelperService } from '../token-helper/token-helper.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { listAll } from '../../functions/listAll';
 import { ICurrentOrder, AppConfig, ShippingRate, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection } from '../../shopper-context';
-import { MarketplaceMiddlewareApiService } from '../marketplace-middleware-api/marketplace-middleware-api.service';
+import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -41,7 +41,7 @@ export class CurrentOrderService implements ICurrentOrder {
     private tokenHelper: TokenHelperService,
     private ocPaymentService: OcPaymentService,
     private paymentHelper: PaymentHelperService,
-    private middlewareApi: MarketplaceMiddlewareApiService,
+    private middlewareApi: MiddlewareApiService,
     private appConfig: AppConfig
   ) {}
 

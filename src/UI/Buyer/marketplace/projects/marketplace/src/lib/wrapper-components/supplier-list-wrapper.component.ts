@@ -4,7 +4,7 @@ import { ListSupplier } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { SupplierCategoryConfig } from '../shopper-context';
-import { MarketplaceMiddlewareApiService } from '../services/marketplace-middleware-api/marketplace-middleware-api.service';
+import { MiddlewareApiService } from '../services/middleware-api/middleware-api.service';
 
 @Component({
   template: `
@@ -21,7 +21,7 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private marketplaceMiddlewareApiService: MarketplaceMiddlewareApiService,
+    private middleware: MiddlewareApiService,
     public context: ShopperContextService
   ) {}
 
@@ -38,7 +38,7 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
   }
 
   private getSupplierCategories = async () => {
-    this.supplierCategoryConfig = await this.marketplaceMiddlewareApiService.getMarketplaceSupplierCategories(
+    this.supplierCategoryConfig = await this.middleware.getMarketplaceSupplierCategories(
       this.context.appSettings.marketplaceID
     );
   }

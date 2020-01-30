@@ -36,6 +36,5 @@ namespace Marketplace.Common.Models.CardConnect
         public string CVV { get; set; }
         [System.ComponentModel.DataAnnotations.Required]
         public string MerchantID { get; set; }
-
     }
 }
