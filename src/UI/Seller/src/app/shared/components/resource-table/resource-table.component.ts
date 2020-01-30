@@ -144,6 +144,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     });
   }
 
+  isFilterHTML(value: string) {
+    return value.split('')[0] === '<';
+  }
+
   applyFilters() {
     this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
   }

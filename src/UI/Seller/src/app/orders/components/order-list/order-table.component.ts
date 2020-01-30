@@ -38,4 +38,23 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
     const { OrderDirection } = params;
     this.activeOrderDirectionButton = OrderDirection;
   }
+  filterConfig = {
+    Filters: [
+      {
+        Display: 'Status',
+        Path: '.Status',
+        Values: ['!Unsubmitted', 'Unsubmitted'],
+      },
+      {
+        Display: 'From Date',
+        Path: '.DateSubmitted',
+        Values: ['From Date'],
+      },
+      {
+        Display: 'To Date',
+        Path: '.DateSubmitted',
+        Values: ['To Date'],
+      },
+    ],
+  };
 }

@@ -125,8 +125,15 @@
                       type="select"
                       required
                       [formControlName]="filter.Path">
-                <option *ngFor="let option of filter.Values"
-                        value="{{option}}">{{option}}</option>
+                <ng-container *ngFor="let option of filter.Values">
+                  <option *ngIf="isFilterHTML(option)"
+                          value="{{option}}"
+                          [innerHTML]="option"></option>
+                </ng-container>
+                <ng-container *ngFor="let option of filter.Values">
+                  <option *ngIf="!isFilterHTML(option)"
+                          value="{{option}}">{{option}}</option>
+                </ng-container>
               </select>
             </div>
           </form>
