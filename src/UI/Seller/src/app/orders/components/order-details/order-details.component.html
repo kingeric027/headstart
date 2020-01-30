@@ -1,1 +1,134 @@
-<p>order-details works!</p>
+<div class="order-details-container">
+
+<div class="container">
+  <!-- <ocm-profile-nav> -->
+   <div *ngIf="_order">
+    Line Item ID: {{_lineItems[0] && _lineItems[0].ID}}
+      <div class="pb-2 mt-4 mb-2">
+        <h2> <span class="text-muted">Order #:</span> {{_order.ID}}</h2>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div>Status:
+            <!--<ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon>--> {{_order.Status}}
+          </div>
+          <small class="float-left">Submitted on {{_order.DateSubmitted | date: 'short'}}</small>
+         </div>
+       </div>
+       <hr>
+       <div class="row mb-5"
+       *ngIf="_order">
+    <div class="col-6">
+        <div *ngIf="_lineItems[0]">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <span class="text-muted">Shipping Address</span>
+                    <p class="mb-0 text-capitalize font-weight-bold">{{_lineItems[0].ShippingAddress.Street1}}<span *ngIf="_lineItems[0].ShippingAddress.Street2">, {{_lineItems[0].ShippingAddress.Street2}}</span></p>
+                    <p class="mb-0 text-capitalize font-weight-bold">{{_lineItems[0].ShippingAddress.City}}, {{_lineItems[0].ShippingAddress.State}} {{_lineItems[0].ShippingAddress.Zip}}</p>
+                    <small class="mb-0">{{getFullName(_lineItems[0].ShippingAddress)}}
+                        <span> | {{_lineItems[0].ShippingAddress.Phone}}</span>
+                    </small>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <span class="text-muted">Billing Address</span>
+                    <p class="mb-0 text-capitalize font-weight-bold">{{_order.BillingAddress.Street1}}<span *ngIf="_order.BillingAddress.Street2">, {{_order.BillingAddress.Street2}}</span></p>
+                    <p class="mb-0 text-capitalize font-weight-bold">{{_order.BillingAddress.City}}, {{_order.BillingAddress.State}} {{_order.BillingAddress.Zip}}</p>
+                    <small class="mb-0">{{getFullName(_order.BillingAddress)}}
+                        <span> | {{_order.BillingAddress.Phone}}</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+      <!-- <ocm-address-card *ngIf="lineItems.Items[0].ShippingAddress"
+                        [address]="lineItems.Items[0].ShippingAddress"
+                        addressTitle="Shipping Address">
+      </ocm-address-card>
+      <ocm-address-card [address]="order.BillingAddress"
+                        addressTitle="Billing Address"
+                        *ngIf="order?.BillingAddress">
+      </ocm-address-card> -->
+    </div>
+    <div class="col-6">
+      <div *ngIf="_order.Comments"
+           class="alert alert-secondary small">
+        <strong>Comments: </strong> {{_order.Comments}}
+      </div>
+      <strong>Subtotal</strong> <span class="float-right">{{_order.Subtotal | currency}}</span><br>
+      <strong>Shipping</strong> <span class="float-right">{{_order.ShippingCost | currency}}</span><br>
+      <strong>Tax</strong> <span class="float-right">{{_order.TaxCost | currency}}</span><br>
+      <div *ngIf="_order.PromotionDiscount">
+        <strong class="text-danger">Promo Discount</strong> <span class="float-right text-danger">-{{_order.PromotionDiscount | currency}}</span>
+      </div>
+      <hr>
+      <div class="text-right lead"><b class="float-left">Total:</b><span class="_order-total">{{_order.Total | currency}}</span></div>
+      <hr>
+
+      <div class="lead">
+          <b>Payments</b>
+      </div>
+      <div class="mb-4" *ngFor="let payment of _payments?.Items">
+        <span *ngIf="payment.type === 'CreditCard'">
+            <strong>
+                CARD ending in {{ payment.Details.PartialAccountNumber }}
+            </strong>
+        </span>
+      </div>
+
+
+      <!-- <ocm-payment-list *ngIf="payments"
+                        [payments]="payments"></ocm-payment-list> -->
+      <hr>
+      <!-- <ul>
+        <li *ngFor="let approval of approvals">
+          {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} on {{ approval.DateCreated | date: 'short' }}
+          <div><small *ngIf="approval.Comments">"{{ approval.Comments }}"</small></div>
+        </li>
+      </ul> -->
+    </div>
+  </div>
+  <!-- <div *ngFor="let liGroup of liGroupedByShipFrom">
+     <ocm-lineitem-table [lineItems]="liGroup"
+                        [readOnly]="true">
+    </ocm-lineitem-table>
+  </div> -->
+
+
+
+
+  
+
+            <!--
+        <ocm-order-approval *ngIf="approvalVersion"
+                            class="float-right"
+                            [orderID]='order.ID'></ocm-order-approval>
+      </div>
+    </div>
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item">
+        <button class="btn btn-link nav-link"
+                (click)="toDetails()">
+          <fa-icon [icon]="faCube"></fa-icon>
+          Details
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="btn btn-link nav-link"
+                (click)="toShipments()">
+          <fa-icon [icon]="faTruck"></fa-icon>
+          Shipments
+        </button>
+      </li>
+    </ul>
+
+    <ocm-order-historical *ngIf="orderDetails && showDetails()"
+                          [orderDetails]="orderDetails"></ocm-order-historical>
+    <ocm-order-shipments *ngIf="showShipments()"></ocm-order-shipments>-->
+    </div>
+</div>
+
+
+
+</div>

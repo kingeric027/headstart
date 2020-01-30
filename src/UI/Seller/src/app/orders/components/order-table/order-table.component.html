@@ -1,0 +1,29 @@
+<resource-table-component [resourceList]="resourceList"
+                          [selectedResourceID]="selectedResourceID"
+                          [updatedResource]="updatedResource"
+                          [resourceInSelection]="resourceInSelection"
+                          [ocService]="ocService"
+                          [resourceForm]="resourceForm"
+                          [shouldShowCreateNew]="false"
+                          (searched)="searchResources($event)"
+                          (hitScrollEnd)="handleScrollEnd()"
+                          (changesSaved)="saveUpdates()"
+                          (changesDiscarded)="discardChanges()"
+                          (resourceDelete)="deleteResource()"
+                          (resourceSelected)="selectResource($event)">
+  <div class="actionBar btn-group w-50"
+       *ngIf="shouldShowOrderToggle"
+       role="group"
+       aria-label="order direction selector">
+    <button type="button"
+            class="btn btn-outline-primary btn-sm"
+            [ngClass]="{'active': activeOrderDirectionButton === 'Incoming'}"
+            (click)="setOrderDirection('Incoming')">Incoming Buyer Orders</button>
+    <button type="button"
+            class="btn btn-outline-primary btn-sm"
+            [ngClass]="{'active': activeOrderDirectionButton === 'Outgoing'}"
+            (click)="setOrderDirection('Outgoing')">Outgoing Supplier Orders</button>
+  </div>
+  <app-order-details class="resource-edit" [order]="resourceInSelection">
+  </app-order-details>
+</resource-table-component>
