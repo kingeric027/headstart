@@ -1,10 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { LineItem } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy, map as _map, without as _without } from 'lodash';
-import { ListLineItemWithProduct, ShopperContextService } from 'marketplace';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { ShopperContextService, LineItemWithProduct, ShippingRate } from 'marketplace';
+import { ShopperContextService } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
