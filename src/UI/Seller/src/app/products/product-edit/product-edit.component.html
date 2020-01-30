@@ -22,6 +22,19 @@
                  placeholder="Enter Name">
         </div>
         <div class="form-group">
+          <label for="ID">Product ID</label>
+          <input type="text"
+                 class="form-control"
+                 id="ID"
+                 showErrors
+                 aria-describedby="ID"
+                 maxlength="100"
+                 [resourceForm]="productForm"
+                 formControlName="ID"
+                 (input)="updateResourceFromEvent($event, 'ID')"
+                 placeholder="Enter Product ID">
+        </div>
+        <div class="form-group">
           <label for="Description">Description</label>
           <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
                                            [formControlForText]="productForm?.controls.Description"

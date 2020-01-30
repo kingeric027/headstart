@@ -67,7 +67,7 @@ export class ProductEditComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private modalService: NgbModal,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  ) { }
 
   async ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
@@ -106,6 +106,7 @@ export class ProductEditComponent implements OnInit {
   createProductForm(marketPlaceProduct: MarketPlaceProduct) {
     this.productForm = new FormGroup({
       Name: new FormControl(marketPlaceProduct.Name, [Validators.required, Validators.maxLength(100)]),
+      ID: new FormControl(marketPlaceProduct.ID),
       Description: new FormControl(marketPlaceProduct.Description, Validators.maxLength(1000)),
       Inventory: new FormControl(marketPlaceProduct.Inventory),
       QuantityMultiplier: new FormControl(marketPlaceProduct.QuantityMultiplier),
