@@ -21,7 +21,8 @@
                  (input)="updateResourceFromEvent($event, 'Name')"
                  placeholder="Enter Name">
         </div>
-        <div class="form-group">
+        <div class="form-group"
+             *ngIf="isCreatingNew">
           <label for="ID">Product ID</label>
           <input type="text"
                  class="form-control"
@@ -33,6 +34,13 @@
                  formControlName="ID"
                  (input)="updateResourceFromEvent($event, 'ID')"
                  placeholder="Enter Product ID">
+        </div>
+        <div class="form-group"
+             *ngIf="!isCreatingNew && _marketPlaceProductStatic">
+          <label for="ID">Product ID</label>
+          <input class="form-control"
+                 value="{{_marketPlaceProductStatic.ID}}"
+                 disabled>
         </div>
         <div class="form-group">
           <label for="Description">Description</label>
