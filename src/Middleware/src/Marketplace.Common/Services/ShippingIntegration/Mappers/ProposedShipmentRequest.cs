@@ -11,23 +11,10 @@ namespace Marketplace.Common.Services.ShippingIntegration
         {
     
                 var proposedShipmentItems = obj.Select(lineItem => ProposedShipmentItemMapper.Map(lineItem)).ToList();
-
-                var firstLineItem = obj[0];
-                var shipToAddress = firstLineItem.ShippingAddress;
-                var shipFromAddress = firstLineItem.ShipFromAddress;
-
                 return new ProposedShipmentRequest
                 {
                     ProposedShipmentItems = proposedShipmentItems,
-                    RateRequestBody = new RateRequestBody
-                    {
-                        ConsigneeAddress = RateAddressMapper.Map(shipToAddress),
-                        ShipperAddress = RateAddressMapper.Map(shipFromAddress),
-                        Items = obj.Select(lineItem =>
-                        {
-                            return RateItemMapper.Map(lineItem);
-                        }).ToList()
-                    }
+                    RateRequestBody = RateRequestBodyMapper.Map(obj),
                 };
         }
     }
