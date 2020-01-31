@@ -1,5 +1,4 @@
 ﻿using Marketplace.Common.Exceptions;
-using Marketplace.Common.Extensions;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Services;
@@ -7,6 +6,7 @@ using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +17,7 @@ namespace Marketplace.Common.Commands
     {
         Task<MarketplaceListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext);
         Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, ProposedShipmentSelection selection);
+        Task<AddressValidationPrewebhookResponse> IsValidAddressInFreightPopAsync(Address address);
     }
     public class ProposedShipmentCommand : IProposedShipmentCommand
     {
@@ -77,6 +78,27 @@ namespace Marketplace.Common.Commands
                     ProposedShipmentSelections = selections.Values.ToArray()
                 }
             });
+        }
+
+        public async Task<AddressValidationPrewebhookResponse> IsValidAddressInFreightPopAsync(Address address)
+        {
+            var validResponse = new AddressValidationPrewebhookResponse  { proceed = true };
+            var inValidResponse = new AddressValidationPrewebhookResponse  { proceed = false, body = "Address invalid, please try again" };
+            var rateRequestBody = AddressValidationRateRequestMapper.Map(address);
+            try
+            {
+                var ratesResponse = await _freightPopService.GetRatesAsync(rateRequestBody);
+                if(ratesResponse.Data.ErrorMessages.Count > 0)
+                {
+                    return inValidResponse;
+                } else
+                {
+                    return validResponse;
+                }
+            } catch (Exception ex)
+            {
+                return inValidResponse;
+            }
         }
     }
 }

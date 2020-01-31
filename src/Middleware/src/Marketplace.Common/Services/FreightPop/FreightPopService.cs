@@ -24,7 +24,6 @@ namespace Marketplace.Common.Services
 		{
 			_flurl = flurl;
 			_appSettings = appSettings;
-			AuthenticateAync();
 		}
 
 		private IFlurlRequest MakeRequest(string resource)
@@ -44,6 +43,8 @@ namespace Marketplace.Common.Services
 		}
 		public async Task<Response<GetRatesData>> GetRatesAsync(RateRequestBody rateRequestBody)
 		{
+			// temporarily here to prevent auth issues with transient
+			await AuthenticateAync();
 			var rateRequestResponse = await MakeRequest("rate/getRates").PostJsonAsync(rateRequestBody).ReceiveJson<Response<GetRatesData>>();
 			return rateRequestResponse;
 		}
