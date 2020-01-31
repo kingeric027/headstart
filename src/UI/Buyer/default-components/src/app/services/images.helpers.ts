@@ -4,14 +4,14 @@ import { Product } from 'marketplace';
 
 export const getImageUrls = (product: Product): string[] => {
   let images = (product.xp && product.xp.Images) || [];
-  images = _uniq(images, ((img: any) => img.Url));
+  images = _uniq(images, ((img: any) => img.URL));
   let urls: string[] = _map(images, img => {
-    if (!img.Url) return;
-    return img.Url.replace('{u}', ocAppConfig.cmsUrl);
+    if (!img.URL) return;
+    return img.URL.replace('{u}', ocAppConfig.cmsUrl);
   });
   urls = _without(urls, undefined);
   if (urls.length === 0) urls.push('http://placehold.it/300x300');
-  return urls; 
+  return urls;
 };
 
 export const getPrimaryImageUrl = (product: Product): string => {
