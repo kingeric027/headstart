@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { MarketPlaceProduct, MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
 import { ProductService } from '@app-seller/shared/services/product/product.service';
-import { OcSupplierService, Product } from '@ordercloud/angular-sdk';
+import { OcSupplierService, Product, Supplier } from '@ordercloud/angular-sdk';
 
 @Component({
   selector: 'app-product-view',
@@ -12,7 +12,7 @@ import { OcSupplierService, Product } from '@ordercloud/angular-sdk';
 export class ProductViewComponent {
   images: MarketPlaceProductImage[] = [];
   _marketPlaceProduct: MarketPlaceProduct;
-  supplier: any;
+  supplier: Supplier;
 
   @Input()
   set orderCloudProduct(product: Product) {
