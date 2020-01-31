@@ -12,6 +12,7 @@ function createSellerUserForm(user: User) {
     FirstName: new FormControl(user.FirstName, Validators.required),
     LastName: new FormControl(user.LastName, Validators.required),
     Email: new FormControl(user.Email, [Validators.required, ValidateEmail]),
+    Active: new FormControl(user.Active),
   });
 }
 
