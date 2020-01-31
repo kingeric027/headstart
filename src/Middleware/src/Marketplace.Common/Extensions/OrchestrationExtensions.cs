@@ -9,7 +9,7 @@ namespace Marketplace.Common.Extensions
     {
         public static string BuildPath<T>(this OrchestrationObject<T> obj, string resourceId, string clientId) where T : IMarketplaceObject
         {
-            return $"{clientId}/{resourceId}/{obj.Model.Type()}/{obj.ID}".ToLower();
+            return $"{resourceId}/{clientId}/{obj.Model.Type()}/{obj.ID}".ToLower();
         }
 
         public static RecordType Type(this IMarketplaceObject obj)

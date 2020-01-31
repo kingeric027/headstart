@@ -14,7 +14,7 @@ namespace Orchestration.Tests
         {
         }
 
-        [TestCase("fast/product/id.json")]
+        [TestCase("fast/guid/product/id.json")]
         public void construct_workitem(string path)
         {
             var wi = new WorkItem(path);

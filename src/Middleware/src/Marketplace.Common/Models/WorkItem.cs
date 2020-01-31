@@ -15,8 +15,8 @@ namespace Marketplace.Common.Models
         {
             var split = path.Split("/");
             this.ResourceId = split[0];
-            this.RecordId = split[2].Replace(".json", "");
-            switch (split[1])
+            this.RecordId = split[split.Length - 1].Replace(".json", "");
+            switch (split[2])
             {
                 case "product":
                     this.RecordType = RecordType.Product;
