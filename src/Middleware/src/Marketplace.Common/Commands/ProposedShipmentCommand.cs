@@ -17,7 +17,7 @@ namespace Marketplace.Common.Commands
     {
         Task<MarketplaceListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext);
         Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, ProposedShipmentSelection selection);
-        Task<AddressValidationPrewebhookResponse> IsValidAddressInFreightPopAsync(Address address);
+        Task<PrewebhookResponseWithError> IsValidAddressInFreightPopAsync(Address address);
     }
     public class ProposedShipmentCommand : IProposedShipmentCommand
     {
@@ -80,10 +80,10 @@ namespace Marketplace.Common.Commands
             });
         }
 
-        public async Task<AddressValidationPrewebhookResponse> IsValidAddressInFreightPopAsync(Address address)
+        public async Task<PrewebhookResponseWithError> IsValidAddressInFreightPopAsync(Address address)
         {
-            var validResponse = new AddressValidationPrewebhookResponse  { proceed = true };
-            var inValidResponse = new AddressValidationPrewebhookResponse  { proceed = false, body = "Address invalid, please try again" };
+            var validResponse = new PrewebhookResponseWithError { proceed = true };
+            var inValidResponse = new PrewebhookResponseWithError { proceed = false, body = "Address invalid, please try again" };
             var rateRequestBody = AddressValidationRateRequestMapper.Map(address);
             try
             {

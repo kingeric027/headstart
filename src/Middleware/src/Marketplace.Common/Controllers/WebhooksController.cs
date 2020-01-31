@@ -115,7 +115,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("validateaddresspostput")]
-        public async Task<AddressValidationPrewebhookResponse> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Create payload)
+        public async Task<PrewebhookResponseWithError> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Create payload)
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
             var address = payload.Request.Body;

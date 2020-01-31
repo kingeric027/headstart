@@ -1,15 +1,15 @@
 ﻿using Marketplace.Helpers.Models;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Marketplace.Common.Models
 {
-    public class AddressValidationPrewebhookResponse
+    public class PrewebhookResponseWithError : WebhookResponse
     {
-        public bool proceed { get; set; }
-
-        // body is an abitrary addition to the prewebhook response which displays on the front end in a toastr
+        // in the future consider a more robust error response format
+        // this could affect front end displays of errors from prewebhooks
         public string body { get; set; }
     }
 }
