@@ -1,30 +1,14 @@
-import {
-  Component,
-  Input,
-  Output,
-  ViewChild,
-  OnInit,
-  ChangeDetectorRef,
-  OnDestroy,
-  NgZone,
-  AfterViewChecked,
-} from '@angular/core';
-import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { EventEmitter } from '@angular/core';
-import { faFilter, faChevronLeft, faHome, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { takeWhile, filter } from 'rxjs/operators';
-import { singular } from 'pluralize';
+import { AfterViewChecked, ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
-import { FormGroup, FormControl } from '@angular/forms';
-import {
-  ListResource,
-  Options,
-  RequestStatus,
-  FilterDictionary,
-} from '@app-seller/shared/services/resource-crud/resource-crud.types';
-import { getScreenSizeBreakPoint, getPsHeight } from '@app-seller/shared/services/dom.helper';
+import { getPsHeight, getScreenSizeBreakPoint } from '@app-seller/shared/services/dom.helper';
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { FilterDictionary, ListResource, Options, RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { faCalendar, faChevronLeft, faFilter, faHome, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { NgbDateStruct, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { singular } from 'pluralize';
+import { filter, takeWhile } from 'rxjs/operators';
 
 interface BreadCrumb {
   displayText: string;
@@ -46,6 +30,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   faTimes = faTimes;
   faHome = faHome;
   faChevronLeft = faChevronLeft;
+  faCalendar = faCalendar;
   searchTerm = '';
   resourceOptions: Options;
   _resourceInSelection: any;
@@ -76,7 +61,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
     ngZone: NgZone
-  ) {}
+  ) {
+  }
 
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
@@ -144,8 +130,22 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     });
   }
 
+  isFilterHTML(value: string) {
+    return value.split('')[0] === '<';
+  }
+
   applyFilters() {
+    if (typeof this.filterForm.value['from'] === 'object') {
+      this.filterForm.value['from'] = this.transformDate(this.filterForm.value['from']);
+    } if (typeof this.filterForm.value['to'] === 'object') {
+      this.filterForm.value['to'] = this.transformDate(this.filterForm.value['to']);
+    }
     this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
+    console.log(this.filterForm.value);
+  }
+
+  transformDate(date: NgbDateStruct) {
+    return date.month + '-' + date.day + '-' + date.year;
   }
 
   removeFieldsWithNoValue(formValues: FilterDictionary) {
@@ -316,4 +316,5 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   ngOnDestroy() {
     this.alive = false;
   }
+
 }

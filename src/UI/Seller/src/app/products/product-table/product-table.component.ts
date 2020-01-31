@@ -36,6 +36,7 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
         Display: 'Status',
         Path: 'xp.Data.Status',
         Values: ['Draft', 'Published'],
+        Type: 'Dropdown'
       },
     ],
   };
