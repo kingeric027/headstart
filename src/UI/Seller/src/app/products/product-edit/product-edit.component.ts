@@ -20,6 +20,8 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
 import { faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -66,8 +68,9 @@ export class ProductEditComponent implements OnInit {
     private middleware: MiddlewareAPIService,
     private sanitizer: DomSanitizer,
     private modalService: NgbModal,
+    private toasterService: ToastrService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  ) { }
 
   async ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
@@ -106,6 +109,7 @@ export class ProductEditComponent implements OnInit {
   createProductForm(marketPlaceProduct: MarketPlaceProduct) {
     this.productForm = new FormGroup({
       Name: new FormControl(marketPlaceProduct.Name, [Validators.required, Validators.maxLength(100)]),
+      ID: new FormControl(marketPlaceProduct.ID),
       Description: new FormControl(marketPlaceProduct.Description, Validators.maxLength(1000)),
       Inventory: new FormControl(marketPlaceProduct.Inventory),
       QuantityMultiplier: new FormControl(marketPlaceProduct.QuantityMultiplier),
@@ -121,10 +125,14 @@ export class ProductEditComponent implements OnInit {
     });
   }
 
-  handleSave() {
+  async handleSave() {
     if (this.isCreatingNew) {
-      this.createNewProduct();
-      this.dataSaved = true;
+      try {
+        await this.createNewProduct();
+        this.dataSaved = true;
+      } catch {
+        this.toasterService.error(`A product with that ID already exists`);
+      }
     } else {
       this.updateProduct();
     }
