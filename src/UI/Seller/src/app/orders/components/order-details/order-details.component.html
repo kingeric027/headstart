@@ -1,3 +1,4 @@
+<!-- TODO: Componentize into smaller chunks (Order Details, Address, Payment, Line Item) -->
 <div class="container float-left">
    <div *ngIf="_order">
       <div class="pb-2 mt-4 mb-2">
@@ -5,8 +6,7 @@
       </div>
       <div class="row">
         <div class="col-md-6">
-          <div>Status:
-            <!--<ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon>--> {{_order.Status}}
+          <div>Status: {{_order.Status}}
           </div>
           <small class="float-left">Submitted on {{_order.DateSubmitted | date: 'short'}}</small>
          </div>
@@ -38,14 +38,6 @@
                 </div>
             </div>
         </div>
-      <!-- <ocm-address-card *ngIf="lineItems.Items[0].ShippingAddress"
-                        [address]="lineItems.Items[0].ShippingAddress"
-                        addressTitle="Shipping Address">
-      </ocm-address-card>
-      <ocm-address-card [address]="order.BillingAddress"
-                        addressTitle="Billing Address"
-                        *ngIf="order?.BillingAddress">
-      </ocm-address-card> -->
     </div>
     <div class="col-6">
       <div *ngIf="_order.Comments"
@@ -83,21 +75,8 @@
         <span class="float-right">-{{payment.Amount | currency}}</span>
         <hr>
       </div>
-
-
-      <!-- <ocm-payment-list *ngIf="payments"
-                        [payments]="payments"></ocm-payment-list> -->
-      <!-- <ul>
-        <li *ngFor="let approval of approvals">
-          {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} on {{ approval.DateCreated | date: 'short' }}
-          <div><small *ngIf="approval.Comments">"{{ approval.Comments }}"</small></div>
-        </li>
-      </ul> -->
     </div>
   </div>
-
-  <!-- Beginning the line item table -->
-
   <div *ngIf="_liGroupedByShipFrom?.length > 0">
       <div class="card border shadow-sm mb-4"
             *ngFor="let liGroup of _liGroupedByShipFrom">
@@ -176,51 +155,6 @@
             </div>
         </div>
     </div>
-</div>
-
-  <!-- Ending the line item table -->
-
-
-
-
-
-
-  <!-- <div *ngFor="let liGroup of liGroupedByShipFrom">
-     <ocm-lineitem-table [lineItems]="liGroup"
-                        [readOnly]="true">
-    </ocm-lineitem-table>
-  </div> -->
-
-
-
-
-  
-
-            <!--
-        <ocm-order-approval *ngIf="approvalVersion"
-                            class="float-right"
-                            [orderID]='order.ID'></ocm-order-approval>
-      </div>
-    </div>
-    <ul class="nav nav-tabs mb-3">
-      <li class="nav-item">
-        <button class="btn btn-link nav-link"
-                (click)="toDetails()">
-          <fa-icon [icon]="faCube"></fa-icon>
-          Details
-        </button>
-      </li>
-      <li class="nav-item">
-        <button class="btn btn-link nav-link"
-                (click)="toShipments()">
-          <fa-icon [icon]="faTruck"></fa-icon>
-          Shipments
-        </button>
-      </li>
-    </ul>
-
-    <ocm-order-historical *ngIf="orderDetails && showDetails()"
-                          [orderDetails]="orderDetails"></ocm-order-historical>
-    <ocm-order-shipments *ngIf="showShipments()"></ocm-order-shipments>-->
-    </div>
+   </div>
+ </div>
 </div>
