@@ -110,7 +110,7 @@ namespace Marketplace.Common.Commands
             if (wi.Cache == null) await Task.CompletedTask;
             try
             {
-                await _blobCache.Save($"{wi.ResourceId.ToLower()}/{wi.RecordType.ToString().ToLower()}/{wi.RecordId}", wi.Cache);
+                await _blobCache.Save($"{wi.ResourceId.ToLower()}/{wi.ClientId}/{wi.RecordType.ToString().ToLower()}/{wi.RecordId}", wi.Cache);
             }
             catch (Exception ex)
             {
