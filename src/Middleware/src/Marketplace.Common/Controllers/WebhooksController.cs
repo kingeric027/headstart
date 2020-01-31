@@ -121,5 +121,33 @@ namespace Marketplace.Common.Controllers
             var address = payload.Request.Body;
             return await _proposedShipmentCommand.IsValidAddressInFreightPopAsync(address);
         }
+
+        [HttpPost, Route("validateselleraddresspatch")]
+        public async Task<PrewebhookResponseWithError> ValidateSellerAddressPatch([FromBody] WebhookPayloads.AdminAddresses.Patch payload)
+        // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
+        {
+            return await _proposedShipmentCommand.GetExpectedNewSellerAddressAndValidateInFreightPop(payload);
+        }
+
+        [HttpPost, Route("validatesupplieraddresspatch")]
+        public async Task<PrewebhookResponseWithError> ValidateSupplierAddressPostPut([FromBody] WebhookPayloads.SupplierAddresses.Patch payload)
+        // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
+        {
+            return await _proposedShipmentCommand.GetExpectedNewSupplierAddressAndValidateInFreightPop(payload);
+        }
+
+        [HttpPost, Route("validatemeaddresspatch")]
+        public async Task<PrewebhookResponseWithError> ValidateMeAddressPostPut([FromBody] WebhookPayloads.Me.PatchAddress payload)
+        // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
+        {
+            return await _proposedShipmentCommand.GetExpectedNewMeAddressAndValidateInFreightPop(payload);
+        }
+
+        [HttpPost, Route("validatebuyeraddresspatch")]
+        public async Task<PrewebhookResponseWithError> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Patch payload)
+        // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
+        {
+            return await _proposedShipmentCommand.GetExpectedNewBuyerAddressAndValidateInFreightPop(payload);
+        }
     }
 }
