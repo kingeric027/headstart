@@ -27,7 +27,6 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
     activatedroute.queryParams.subscribe(params => {
       if (this.router.url.startsWith('/orders')) {
         this.readFromUrlQueryParams(params);
-        console.log(this.orderService);
       }
     });
   }
