@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Order, LineItem, OcLineItemService, ListPayment, OcPaymentService } from '@ordercloud/angular-sdk';
+import { Order, LineItem, OcLineItemService, OcPaymentService, Payment } from '@ordercloud/angular-sdk';
 import { Address } from '@ordercloud/angular-sdk';
 
 @Component({
@@ -10,7 +10,7 @@ import { Address } from '@ordercloud/angular-sdk';
 export class OrderDetailsComponent implements OnInit {
   _order: Order = {};
   _lineItems: LineItem[] = [];
-  _payments;
+  _payments: Payment[] = [];
   @Input()
   set order(order: Order) {
     if (Object.keys(order).length) {
