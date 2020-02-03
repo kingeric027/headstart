@@ -205,11 +205,14 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   async updateExitingResource() {
+    // dataIsSaving indicator is used in the resource table to conditionally tell the
+    // submit button to disable
     try {
       this.dataIsSaving = true;
       const updatedResource = await this.ocService.updateResource(this.updatedResource);
       this.resourceInSelection = this.copyResource(updatedResource);
       this.setUpdatedResourceAndResourceForm(updatedResource);
+      this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
       throw ex;
@@ -223,13 +226,16 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   async createNewResource() {
+    // dataIsSaving indicator is used in the resource table to conditionally tell the
+    // submit button to disable
     try {
       this.dataIsSaving = true;
       const newResource = await this.ocService.createNewResource(this.updatedResource);
       this.selectResource(newResource);
+      this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
-      throw ex;      
+      throw ex;
     }
   }
 
