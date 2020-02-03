@@ -77,7 +77,7 @@ export class ProductEditComponent implements OnInit {
     private modalService: NgbModal,
     private toasterService: ToastrService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) { }
+  ) {}
 
   async ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
@@ -282,10 +282,13 @@ export class ProductEditComponent implements OnInit {
     await this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
   }
 
+  getTaxCodeCategory(taxCode: string): string {
+    return taxCode === 'FR000000' ? taxCode.substr(0, 2) : taxCode.substr(0, 1);
+  }
+
   async handleTaxCodeCategorySelection(event): Promise<void> {
     this.handleUpdateProduct(event, 'xp.TaxCodeCategory');
-    const taxCategory =
-      event.target.value === 'FR000000' ? event.target.value.substr(0, 2) : event.target.value.substr(0, 1);
+    const taxCategory = this.getTaxCodeCategory(event.target.value);
     const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, '', 1, 100);
     this.taxCodes = avalaraTaxCodes;
   }
@@ -295,9 +298,7 @@ export class ProductEditComponent implements OnInit {
     const taxCategory =
       this._marketPlaceProductEditable &&
       this._marketPlaceProductEditable.xp &&
-      this._marketPlaceProductEditable.xp.TaxCodeCategory === 'FR000000'
-        ? this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 2)
-        : this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 1);
+      this.getTaxCodeCategory(this._marketPlaceProductEditable.xp.TaxCodeCategory);
     const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, searchTerm, 1, 100);
     this.taxCodes = avalaraTaxCodes;
   }
@@ -310,9 +311,7 @@ export class ProductEditComponent implements OnInit {
       const taxCategory =
         this._marketPlaceProductEditable &&
         this._marketPlaceProductEditable.xp &&
-        this._marketPlaceProductEditable.xp.TaxCodeCategory === 'FR000000'
-          ? this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 2)
-          : this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 1);
+        this.getTaxCodeCategory(this._marketPlaceProductEditable.xp.TaxCodeCategory);
       const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, searchTerm, nextPageNumber, 100);
       this.taxCodes = {
         Meta: avalaraTaxCodes.Meta,
