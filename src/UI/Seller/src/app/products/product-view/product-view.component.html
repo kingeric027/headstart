@@ -19,6 +19,9 @@
       <p>{{_marketPlaceProduct?.QuantityMultiplier}}</p>
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Default Price</label>
       <p>{{_marketPlaceProduct?.PriceSchedule?.PriceBreaks[0]?.Price | currency}}</p>
+      <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Tax Code</label>
+      <p *ngIf="_marketPlaceProduct?.xp?.TaxCode">{{_marketPlaceProduct?.xp?.TaxCode?.TaxCode}}: {{_marketPlaceProduct?.xp?.TaxCode?.Description}}</p>
+      <p *ngIf="!_marketPlaceProduct?.xp?.TaxCode">No Tax Code</p>
     </div>
   </div>
   <!-- /Product Details -->

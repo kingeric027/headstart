@@ -18,7 +18,7 @@
                  maxlength="100"
                  [resourceForm]="productForm"
                  formControlName="Name"
-                 (input)="updateResourceFromEvent($event, 'Name')"
+                 (input)="handleUpdateProduct($event, 'Name')"
                  placeholder="Enter Name">
         </div>
         <div class="form-group"
@@ -61,7 +61,7 @@
                  min="1"
                  [resourceForm]="productForm"
                  formControlName="QuantityMultiplier"
-                 (input)="updateResourceFromEvent($event, 'QuantityMultiplier')"
+                 (input)="handleUpdateProduct($event, 'QuantityMultiplier', 'number')"
                  placeholder="Quantity Multiplier">
         </div>
         <div class="form-group">
@@ -79,10 +79,18 @@
                    step="0.01"
                    [resourceForm]="productForm"
                    formControlName="Price"
-                   (input)="updateResourceFromEvent($event, 'Price')"
+                   (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
                    placeholder="Price (USD)">
           </div>
         </div>
+        <product-tax-code-select-component [productForm]="productForm"
+                                           [marketPlaceProductEditable]="_marketPlaceProductEditable"
+                                           [taxCodes]="taxCodes"
+                                           (handleTaxCodeCategorySelection)="handleTaxCodeCategorySelection($event)"
+                                           (handleTaxCodeSelection)="handleUpdateProduct($event, 'xp.TaxCode')"
+                                           (handleTaxCodesSearched)="searchTaxCodes($event)"
+                                           (onScrollEnd)="handleScrollEnd($event)">
+        </product-tax-code-select-component>
       </div>
     </div>
     <!-- /Product Details -->
@@ -134,7 +142,7 @@
                   formControlName="ShipFromAddressID"
                   id="ShipFromAddressID"
                   aria-describedby="Ship From Address ID"
-                  (change)="updateResourceFromEvent($event, 'ShipFromAddressID')">
+                  (change)="handleUpdateProduct($event, 'ShipFromAddressID')">
             <option disabled
                     [ngValue]="null">Choose an address</option>
             <option *ngFor="let address of addresses?.Items"
@@ -152,7 +160,7 @@
                    maxlength="100"
                    [resourceForm]="productForm"
                    formControlName="ShipHeight"
-                   (input)="updateResourceFromEvent($event, 'ShipHeight')"
+                   (input)="handleUpdateProduct($event, 'ShipHeight', 'number')"
                    placeholder="Enter Ship Height">
           </div>
           <div class="form-group col-md-6">
@@ -164,7 +172,7 @@
                    aria-describedby="Ship Width"
                    [resourceForm]="productForm"
                    formControlName="ShipWidth"
-                   (input)="updateResourceFromEvent($event, 'ShipWidth')"
+                   (input)="handleUpdateProduct($event, 'ShipWidth', 'number')"
                    placeholder="Ship Width">
           </div>
         </div>
@@ -179,7 +187,7 @@
                    maxlength="100"
                    [resourceForm]="productForm"
                    formControlName="ShipLength"
-                   (input)="updateResourceFromEvent($event, 'ShipLength')"
+                   (input)="handleUpdateProduct($event, 'ShipLength', 'number')"
                    placeholder="Enter Ship Length">
           </div>
           <div class="form-group col-md-6">
@@ -191,7 +199,7 @@
                    aria-describedby="Ship Weight"
                    [resourceForm]="productForm"
                    formControlName="ShipWeight"
-                   (input)="updateResourceFromEvent($event, 'ShipWeight')"
+                   (input)="handleUpdateProduct($event, 'ShipWeight', 'number')"
                    placeholder="Ship Weight">
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { get as _get } from 'lodash';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
@@ -10,7 +10,11 @@ import {
   OcProductService,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MarketPlaceProduct, MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import {
+  MarketPlaceProduct,
+  MarketPlaceProductImage,
+  MarketPlaceProductTaxCode,
+} from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
@@ -20,8 +24,8 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
 import { faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 import { ToastrService } from 'ngx-toastr';
-
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -57,8 +61,11 @@ export class ProductEditComponent implements OnInit {
   _marketPlaceProductEditable: MarketPlaceProduct;
   areChanges = false;
   dataSaved = false;
+  taxCodeCategorySelected = false;
+  taxCodes: ListResource<MarketPlaceProductTaxCode>;
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
@@ -70,7 +77,7 @@ export class ProductEditComponent implements OnInit {
     private modalService: NgbModal,
     private toasterService: ToastrService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) { }
+  ) {}
 
   async ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
@@ -91,11 +98,31 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(marketPlaceProduct);
   }
 
-  refreshProductData(product: MarketPlaceProduct) {
+  async refreshProductData(product: MarketPlaceProduct) {
     this._marketPlaceProductStatic = product;
     this._marketPlaceProductEditable = product;
+    if (
+      this._marketPlaceProductEditable &&
+      this._marketPlaceProductEditable.xp &&
+      this._marketPlaceProductEditable.xp.TaxCode &&
+      this._marketPlaceProductEditable.xp.TaxCode.Category
+    ) {
+      const taxCategory =
+        this._marketPlaceProductEditable.xp.TaxCode.Category === 'FR000000'
+          ? this._marketPlaceProductEditable.xp.TaxCode.Category.substr(0, 2)
+          : this._marketPlaceProductEditable.xp.TaxCode.Category.substr(0, 1);
+      const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, '', 1, 100);
+      this.taxCodes = avalaraTaxCodes;
+    } else {
+      this.taxCodes = { Meta: {}, Items: [] };
+    }
     this.createProductForm(product);
     this.images = ReplaceHostUrls(product);
+    this.taxCodeCategorySelected =
+      (this._marketPlaceProductEditable &&
+        this._marketPlaceProductEditable.xp &&
+        this._marketPlaceProductEditable.xp.TaxCode &&
+        this._marketPlaceProductEditable.xp.TaxCode.Category) !== null;
     this.checkIfCreatingNew();
     this.checkForChanges();
   }
@@ -121,6 +148,8 @@ export class ProductEditComponent implements OnInit {
       Price: new FormControl(_get(marketPlaceProduct, 'PriceSchedule.PriceBreaks[0].Price', null)),
       // SpecCount: new FormControl(marketPlaceProduct.SpecCount),
       // VariantCount: new FormControl(marketPlaceProduct.VariantCount),
+      TaxCodeCategory: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.Category', null)),
+      TaxCode: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.Code', null)),
       xp: new FormControl(marketPlaceProduct.xp),
     });
   }
@@ -158,38 +187,61 @@ export class ProductEditComponent implements OnInit {
 
   async updateProduct() {
     const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductEditable);
+    this._marketPlaceProductStatic = product;
+    this._marketPlaceProductEditable = product;
     if (this.files) this.addFiles(this.files, product.ID);
   }
 
-  updateResourceFromEvent(event: any, field: string): void {
-    if (field === 'Price') {
-      // placeholder for just handling a single price
-      this._marketPlaceProductEditable = {
-        ...this._marketPlaceProductEditable,
-
-        // this will overwrite all existing price breaks with the price
-        // when more robust price setting is creating this should be changed
-        PriceSchedule: {
-          ...this._marketPlaceProductEditable.PriceSchedule,
-          PriceBreaks: [{ Quantity: 1, Price: Number(event.target.value) }],
-        },
-      };
-      this.checkForChanges();
-    } else {
-      this.updateResourceFromFieldValue(field, event.target.value);
-      // this._marketPlaceProductEditable = { ...this._marketPlaceProductEditable, [field]: event.target.value };
+  updateProductResource(productUpdate: any) {
+    /* 
+    * TODO:
+    * This function is used to dynamically update deeply nested objects
+    * It is currently used in two places, but will likely soon become
+    * obsolete when the product edit component gets refactored.
+    */
+    const piecesOfField = productUpdate.field.split('.');
+    const depthOfField = piecesOfField.length;
+    const updateProductResourceCopy = this.copyProductResource(this._marketPlaceProductEditable);
+    switch (depthOfField) {
+      case 4:
+        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
+          productUpdate.value;
+        break;
+      case 3:
+        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]] = productUpdate.value;
+        break;
+      case 2:
+        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]] = productUpdate.value;
+        break;
+      default:
+        updateProductResourceCopy[piecesOfField[0]] = productUpdate.value;
+        break;
     }
+    this._marketPlaceProductEditable = updateProductResourceCopy;
+    this.checkForChanges();
   }
 
+  handleUpdateProduct(event: any, field: string, typeOfValue?: string) {
+    console.log(event, field, typeOfValue);
+    const productUpdate = {
+      field,
+      value:
+        field === 'Active'
+          ? event.target.checked
+          : typeOfValue === 'number'
+            ? Number(event.target.value)
+            : event.target.value,
+    };
+    this.updateProductResource(productUpdate);
+    console.log('new', this._marketPlaceProductEditable);
+  }
+
+  copyProductResource(product: any) {
+    return JSON.parse(JSON.stringify(product));
+  }
+
+  // Used only for Product.Description coming out of quill editor (no 'event.target'.)
   updateResourceFromFieldValue(field: string, value: any) {
-    if (
-      field === 'QuantityMultiplier' ||
-      field === 'ShipHeight' ||
-      field === 'ShipWidth' ||
-      field === 'ShipLength' ||
-      field === 'ShipWeight'
-    )
-      value = Number(value);
     this._marketPlaceProductEditable = { ...this._marketPlaceProductEditable, [field]: value };
     this.checkForChanges();
   }
@@ -241,5 +293,41 @@ export class ProductEditComponent implements OnInit {
 
   async open(content) {
     await this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
+  }
+
+  async handleTaxCodeCategorySelection(event): Promise<void> {
+    // TODO: This is a temporary fix to accomodate for data not having xp.TaxCode yet
+    if (
+      this._marketPlaceProductEditable &&
+      this._marketPlaceProductEditable.xp &&
+      !this._marketPlaceProductEditable.xp.TaxCode
+    ) {
+      this._marketPlaceProductEditable.xp.TaxCode = { Category: '', Code: '', Description: '' };
+    }
+    this.handleUpdateProduct(event, 'xp.TaxCode.Category');
+    const avalaraTaxCodes = await this.middleware.listTaxCodes(event.target.value, '', 1, 100);
+    this.taxCodes = avalaraTaxCodes;
+  }
+
+  async searchTaxCodes(searchTerm: string) {
+    if (searchTerm === undefined) searchTerm = '';
+    const taxCodeCategory = this._marketPlaceProductEditable.xp.TaxCode.Category;
+    const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCodeCategory, searchTerm, 1, 100);
+    this.taxCodes = avalaraTaxCodes;
+  }
+
+  async handleScrollEnd(searchTerm: string) {
+    if (searchTerm === undefined) searchTerm = '';
+    const totalPages = this.taxCodes.Meta.TotalPages;
+    const nextPageNumber = this.taxCodes.Meta.Page + 1;
+    if (totalPages > nextPageNumber) {
+      const taxCodeCategory = this._marketPlaceProductEditable.xp.TaxCode.Category;
+      const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCodeCategory, searchTerm, nextPageNumber, 100);
+      this.taxCodes = {
+        Meta: avalaraTaxCodes.Meta,
+        Items: [...this.taxCodes.Items, ...avalaraTaxCodes.Items],
+      };
+      this.changeDetectorRef.detectChanges();
+    }
   }
 }
