@@ -258,8 +258,8 @@ export class ProductEditComponent implements OnInit {
 
   manualFileUpload(event): void {
     const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
-      const Url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
-      return { File: file, Url: Url };
+      const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
+      return { File: file, URL: URL };
     });
     this.stageFiles(files);
   }
