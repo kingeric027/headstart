@@ -27,6 +27,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   filterConfig: any = {};
   router: Router;
   isCreatingNew: boolean;
+  dataIsSaving = false;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -64,7 +65,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   subscribeToResources() {
-    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
+    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
       this.resourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
@@ -79,7 +80,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   subscribeToResourceSelection() {
-    this.activatedRoute.params.subscribe(params => {
+    this.activatedRoute.params.subscribe((params) => {
       if (this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
         const resourceIDSelected =
@@ -177,7 +178,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   handleUpdateResource(event: any, field: string) {
     const resourceUpdate = {
       field,
-      value: field === "Active" ? event.target.checked : event.target.value,
+      value: field === 'Active' ? event.target.checked : event.target.value,
     };
     this.updateResource(resourceUpdate);
   }
@@ -204,9 +205,15 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   async updateExitingResource() {
-    const updatedResource = await this.ocService.updateResource(this.updatedResource);
-    this.resourceInSelection = this.copyResource(updatedResource);
-    this.setUpdatedResourceAndResourceForm(updatedResource);
+    try {
+      this.dataIsSaving = true;
+      const updatedResource = await this.ocService.updateResource(this.updatedResource);
+      this.resourceInSelection = this.copyResource(updatedResource);
+      this.setUpdatedResourceAndResourceForm(updatedResource);
+    } catch (ex) {
+      this.dataIsSaving = false;
+      throw ex;
+    }
   }
 
   setUpdatedResourceAndResourceForm(updatedResource: any) {
@@ -216,8 +223,14 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   async createNewResource() {
-    const newResource = await this.ocService.createNewResource(this.updatedResource);
-    this.selectResource(newResource);
+    try {
+      this.dataIsSaving = true;
+      const newResource = await this.ocService.createNewResource(this.updatedResource);
+      this.selectResource(newResource);
+    } catch (ex) {
+      this.dataIsSaving = false;
+      throw ex;      
+    }
   }
 
   ngOnDestroy() {
