@@ -1,0 +1,33 @@
+<form [formGroup]="productForm">
+  <div class="form-row">
+    <div class="form-group col-6">
+      <label for="TaxCodeCategory">Tax Category</label>
+      <select type="dropdown"
+              class="form-control"
+              id="TaxCodeCategory"
+              aria-describedby="Tax code category"
+              (change)="onTaxCodeCategorySelection($event)"
+              formControlName="TaxCodeCategory"
+              placeholder="Which category best describes this product?">
+        <option default
+                disabled
+                [ngValue]="null">Which category best describes this product?</option>
+        <!-- These are the 5 'parent' tax categories.  They are always consistent. -->
+        <option value="D0000000">Digital Goods</option>
+        <option value="FR000000">Freight</option>
+        <option value="P0000000">Tangible Personal Property (TPP)</option>
+        <option value="S0000000">Services</option>
+        <option value="O0000000">Other</option>
+      </select>
+    </div>
+    <div class="form-group col-6">
+      <product-tax-code-select-dropdown class="btn-block resource-btn mr-1 mb-1"
+                                        [taxCodes]="taxCodes"
+                                        [marketPlaceProductEditable]="marketPlaceProductEditable"
+                                        (taxCodesSearched)="onTaxCodesSearched($event)"
+                                        (onScrollEnd)="handleScrollEnd($event)"
+                                        (onSelectTaxCode)="handleSelectTaxCode($event)">
+      </product-tax-code-select-dropdown>
+    </div>
+  </div>
+</form>

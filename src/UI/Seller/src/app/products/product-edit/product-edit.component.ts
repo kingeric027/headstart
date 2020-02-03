@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { get as _get } from 'lodash';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
@@ -10,7 +10,11 @@ import {
   OcProductService,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MarketPlaceProduct, MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import {
+  MarketPlaceProduct,
+  MarketPlaceProductImage,
+  MarketPlaceProductTaxCode,
+} from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
@@ -20,6 +24,7 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
 import { faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -55,8 +60,11 @@ export class ProductEditComponent implements OnInit {
   _marketPlaceProductEditable: MarketPlaceProduct;
   areChanges = false;
   dataSaved = false;
+  taxCodeCategorySelected = false;
+  taxCodes: ListResource<MarketPlaceProductTaxCode>;
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
@@ -88,11 +96,26 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(marketPlaceProduct);
   }
 
-  refreshProductData(product: MarketPlaceProduct) {
+  async refreshProductData(product: MarketPlaceProduct) {
     this._marketPlaceProductStatic = product;
     this._marketPlaceProductEditable = product;
+    if (
+      this._marketPlaceProductEditable &&
+      this._marketPlaceProductEditable.xp &&
+      this._marketPlaceProductEditable.xp.TaxCodeCategory
+    ) {
+      const taxCategory =
+        this._marketPlaceProductEditable.xp.TaxCodeCategory === 'FR000000'
+          ? this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 2)
+          : this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 1);
+      const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, '', 1, 100);
+      this.taxCodes = avalaraTaxCodes;
+    } else {
+      this.taxCodes = { Meta: {}, Items: [] };
+    }
     this.createProductForm(product);
     this.images = ReplaceHostUrls(product);
+    this.taxCodeCategorySelected = this._marketPlaceProductEditable.xp.TaxCodeCategory !== null;
     this.checkIfCreatingNew();
     this.checkForChanges();
   }
@@ -117,7 +140,8 @@ export class ProductEditComponent implements OnInit {
       Price: new FormControl(_get(marketPlaceProduct, 'PriceSchedule.PriceBreaks[0].Price', null)),
       // SpecCount: new FormControl(marketPlaceProduct.SpecCount),
       // VariantCount: new FormControl(marketPlaceProduct.VariantCount),
-      TaxCode: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.Code', null)),
+      TaxCodeCategory: new FormControl(_get(marketPlaceProduct, 'xp.TaxCodeCategory', null)),
+      TaxCode: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.TaxCode', null)),
       xp: new FormControl(marketPlaceProduct.xp),
     });
   }
@@ -151,50 +175,53 @@ export class ProductEditComponent implements OnInit {
 
   async updateProduct() {
     const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductEditable);
+    this._marketPlaceProductStatic = product;
+    this._marketPlaceProductEditable = product;
     if (this.files) this.addFiles(this.files, product.ID);
   }
 
-  updateResourceFromEvent(event: any, field: string): void {
-    if (field === 'Price') {
-      // placeholder for just handling a single price
-      this._marketPlaceProductEditable = {
-        ...this._marketPlaceProductEditable,
-
-        // this will overwrite all existing price breaks with the price
-        // when more robust price setting is creating this should be changed
-        PriceSchedule: {
-          ...this._marketPlaceProductEditable.PriceSchedule,
-          PriceBreaks: [{ Quantity: 1, Price: Number(event.target.value) }],
-        },
-      };
-      this.checkForChanges();
-    } else if (field === 'TaxCode') {
-      this._marketPlaceProductEditable = {
-        ...this._marketPlaceProductEditable,
-        xp: {
-          ...this._marketPlaceProductEditable.xp,
-          TaxCode: {
-            Name: event.target.options[event.target.selectedIndex].text,
-            Code: event.target.value,
-          },
-        },
-      };
-      this.checkForChanges();
-    } else {
-      this.updateResourceFromFieldValue(field, event.target.value);
-      // this._marketPlaceProductEditable = { ...this._marketPlaceProductEditable, [field]: event.target.value };
+  updateProductResource(productUpdate: any) {
+    const piecesOfField = productUpdate.field.split('.');
+    const depthOfField = piecesOfField.length;
+    const updateProductResourceCopy = this.copyProductResource(this._marketPlaceProductEditable);
+    switch (depthOfField) {
+      case 4:
+        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
+          productUpdate.value;
+        break;
+      case 3:
+        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]] = productUpdate.value;
+        break;
+      case 2:
+        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]] = productUpdate.value;
+        break;
+      default:
+        updateProductResourceCopy[piecesOfField[0]] = productUpdate.value;
+        break;
     }
+    this._marketPlaceProductEditable = updateProductResourceCopy;
+    this.checkForChanges();
   }
 
+  handleUpdateProduct(event: any, field: string, typeOfValue?: string) {
+    const productUpdate = {
+      field,
+      value:
+        field === 'Active'
+          ? event.target.checked
+          : typeOfValue === 'number'
+            ? Number(event.target.value)
+            : event.target.value,
+    };
+    this.updateProductResource(productUpdate);
+  }
+
+  copyProductResource(product: any) {
+    return JSON.parse(JSON.stringify(product));
+  }
+
+  // Used only for Product.Description coming out of quill editor (no 'event.target'.)
   updateResourceFromFieldValue(field: string, value: any) {
-    if (
-      field === 'QuantityMultiplier' ||
-      field === 'ShipHeight' ||
-      field === 'ShipWidth' ||
-      field === 'ShipLength' ||
-      field === 'ShipWeight'
-    )
-      value = Number(value);
     this._marketPlaceProductEditable = { ...this._marketPlaceProductEditable, [field]: value };
     this.checkForChanges();
   }
@@ -246,5 +273,45 @@ export class ProductEditComponent implements OnInit {
 
   async open(content) {
     await this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
+  }
+
+  async handleTaxCodeCategorySelection(event): Promise<void> {
+    this.handleUpdateProduct(event, 'xp.TaxCodeCategory');
+    const taxCategory =
+      event.target.value === 'FR000000' ? event.target.value.substr(0, 2) : event.target.value.substr(0, 1);
+    const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, '', 1, 100);
+    this.taxCodes = avalaraTaxCodes;
+  }
+
+  async searchTaxCodes(searchTerm: string) {
+    if (searchTerm === undefined) searchTerm = '';
+    const taxCategory =
+      this._marketPlaceProductEditable &&
+      this._marketPlaceProductEditable.xp &&
+      this._marketPlaceProductEditable.xp.TaxCodeCategory === 'FR000000'
+        ? this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 2)
+        : this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 1);
+    const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, searchTerm, 1, 100);
+    this.taxCodes = avalaraTaxCodes;
+  }
+
+  async handleScrollEnd(searchTerm: string) {
+    if (searchTerm === undefined) searchTerm = '';
+    const totalPages = this.taxCodes.Meta.TotalPages;
+    const nextPageNumber = this.taxCodes.Meta.Page + 1;
+    if (totalPages > nextPageNumber) {
+      const taxCategory =
+        this._marketPlaceProductEditable &&
+        this._marketPlaceProductEditable.xp &&
+        this._marketPlaceProductEditable.xp.TaxCodeCategory === 'FR000000'
+          ? this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 2)
+          : this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 1);
+      const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, searchTerm, nextPageNumber, 100);
+      this.taxCodes = {
+        Meta: avalaraTaxCodes.Meta,
+        Items: [...this.taxCodes.Items, ...avalaraTaxCodes.Items],
+      };
+      this.changeDetectorRef.detectChanges();
+    }
   }
 }

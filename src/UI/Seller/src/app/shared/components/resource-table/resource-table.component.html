@@ -74,6 +74,7 @@
         <div class="row">
           <div class="col-md-5 d-flex align-items-center">
             <search-component class="w-100"
+                              id="product-search"
                               [placeholderText]="'Search ' + _currentResourceNamePlural"
                               [searchTermInput]="searchTerm"
                               (searched)="searchedResources($event)">
@@ -242,6 +243,7 @@
       <ng-template #editUnwrapped>
         <div>
           <perfect-scrollbar style="width: 100%;"
+                             id="resource-edit-scroll"
                              [ngStyle]="{'height.px': editResourceHeight}">
             <ng-content select=".resource-edit">
             </ng-content>

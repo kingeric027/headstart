@@ -2,7 +2,8 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { MarketPlaceProduct, MarketPlaceProductTaxCode } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { ListResource } from '../resource-crud/resource-crud.types';
 
 @Injectable({
   providedIn: 'root',
@@ -39,5 +40,12 @@ export class MiddlewareAPIService {
     const form = new FormData();
     form.append('file', file);
     return form;
+  }
+
+  async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
+    const url = `${
+      this.baseUrl
+    }/taxcodes?taxCategory=${taxCategory}&search=${search}&pageSize=${pageSize}&page=${page}`;
+    return await this.http.get(url, this.headers).toPromise();
   }
 }
