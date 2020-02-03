@@ -142,6 +142,9 @@ namespace Marketplace.Common.Commands
 
         private Address GetExpectedNewAddress(Address patch, Address existingAddress)
         {
+
+            // todo: add test for this function 
+
             var patchType = patch.GetType();
             var propertiesInPatch = patchType.GetProperties();
             foreach (var property in propertiesInPatch)
