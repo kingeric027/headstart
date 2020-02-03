@@ -10,12 +10,13 @@ namespace Marketplace.Common.Mappers.Avalara
 {
     public static class TaxCodeMapper
     {
-        public static List<MarketplaceTaxCode> Map(FetchResult<TaxCodeModel> taxCodeList)
+        public static List<MarketplaceTaxCode> Map(FetchResult<TaxCodeModel> taxCodeList, string category)
         {
             return taxCodeList.value
                 .Select(taxCode => new MarketplaceTaxCode
                 {
-                    TaxCode = taxCode.taxCode,
+                    Category = category,
+                    Code = taxCode.taxCode,
                     Description = taxCode.description
                 }).ToList();
         }
@@ -26,12 +27,19 @@ namespace Marketplace.Common.Mappers.Avalara
             {
                 Meta = new MarketplaceListPageMeta
                 {
-                    Page = skip / top == 0 ? 1 : skip / top,
+                    Page = skip / top == 0 ? 1 : (skip / top) + 1,
                     PageSize = 100,
                     TotalCount = avataxCodes.count,
                 },
                 Items = taxCodeList
             };
+        }
+
+        public static (int, int) Map(int page, int pageSize)
+        {
+            var top = pageSize;
+            var skip =  page > 1 ? (page - 1) * pageSize : 0;
+            return (top, skip);
         }
     }
 }

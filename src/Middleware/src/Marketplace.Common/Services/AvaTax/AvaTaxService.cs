@@ -46,14 +46,13 @@ namespace Marketplace.Common.Services
 		public async Task<MarketplaceListPage<MarketplaceTaxCode>> ListTaxCodesAsync(MarketplaceListArgs<TaxCodeModel> marketplaceListArgs)
 		{
 			var taxCategory = marketplaceListArgs.Filters[0].Values[0].Term;
+			var taxCategorySearch = marketplaceListArgs.Filters[0].Values[0].Term.Trim('0');
 			var search = marketplaceListArgs.Search;
-			var avataxQuery = search != "" ? $"isActive eq true and taxCode startsWith '{taxCategory}' and (taxCode contains '{search}' OR description contains '{search}')" : $"isActive eq true and taxCode startsWith '{taxCategory}'";
-			var top = marketplaceListArgs.PageSize;
-			var skip = marketplaceListArgs.Page > 1 ? marketplaceListArgs.Page * top : 0;
+			var avataxQuery = search != "" ? $"isActive eq true and taxCode startsWith '{taxCategorySearch}' and (taxCode contains '{search}' OR description contains '{search}')" : $"isActive eq true and taxCode startsWith '{taxCategorySearch}'";
+			var (top, skip) = TaxCodeMapper.Map(marketplaceListArgs.Page, marketplaceListArgs.PageSize);
 			var avataxCodes = await _avaTax.ListTaxCodesAsync(avataxQuery, top, skip, null);
-			var marketplaceTaxCodeList = TaxCodeMapper.Map(avataxCodes);
-			MarketplaceListPage<MarketplaceTaxCode> MarketplaceTaxCodeListPage = TaxCodeMapper.Map(avataxCodes, marketplaceTaxCodeList, top, skip); ;
-			return MarketplaceTaxCodeListPage;
+			var marketplaceTaxCodeList = TaxCodeMapper.Map(avataxCodes, taxCategory);
+			return TaxCodeMapper.Map(avataxCodes, marketplaceTaxCodeList, top, skip);
 		}
 
 		public async Task<decimal> GetTaxEstimateAsync(TaxableOrder taxableOrder)
