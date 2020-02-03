@@ -188,6 +188,12 @@ export class ProductEditComponent implements OnInit {
   }
 
   updateProductResource(productUpdate: any) {
+    /* 
+    * TODO:
+    * This function is used to dynamically update deeply nested objects
+    * It is currently used in two places, but will likely soon become
+    * obsolete when the product edit component gets refactored.
+    */
     const piecesOfField = productUpdate.field.split('.');
     const depthOfField = piecesOfField.length;
     const updateProductResourceCopy = this.copyProductResource(this._marketPlaceProductEditable);
