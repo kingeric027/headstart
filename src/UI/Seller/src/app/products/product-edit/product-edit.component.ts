@@ -104,12 +104,13 @@ export class ProductEditComponent implements OnInit {
     if (
       this._marketPlaceProductEditable &&
       this._marketPlaceProductEditable.xp &&
-      this._marketPlaceProductEditable.xp.TaxCodeCategory
+      this._marketPlaceProductEditable.xp.TaxCode &&
+      this._marketPlaceProductEditable.xp.TaxCode.Category
     ) {
       const taxCategory =
-        this._marketPlaceProductEditable.xp.TaxCodeCategory === 'FR000000'
-          ? this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 2)
-          : this._marketPlaceProductEditable.xp.TaxCodeCategory.substr(0, 1);
+        this._marketPlaceProductEditable.xp.TaxCode.Category === 'FR000000'
+          ? this._marketPlaceProductEditable.xp.TaxCode.Category.substr(0, 2)
+          : this._marketPlaceProductEditable.xp.TaxCode.Category.substr(0, 1);
       const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, '', 1, 100);
       this.taxCodes = avalaraTaxCodes;
     } else {
@@ -117,7 +118,11 @@ export class ProductEditComponent implements OnInit {
     }
     this.createProductForm(product);
     this.images = ReplaceHostUrls(product);
-    this.taxCodeCategorySelected = this._marketPlaceProductEditable.xp.TaxCodeCategory !== null;
+    this.taxCodeCategorySelected =
+      (this._marketPlaceProductEditable &&
+        this._marketPlaceProductEditable.xp &&
+        this._marketPlaceProductEditable.xp.TaxCode &&
+        this._marketPlaceProductEditable.xp.TaxCode.Category) !== null;
     this.checkIfCreatingNew();
     this.checkForChanges();
   }
@@ -143,8 +148,8 @@ export class ProductEditComponent implements OnInit {
       Price: new FormControl(_get(marketPlaceProduct, 'PriceSchedule.PriceBreaks[0].Price', null)),
       // SpecCount: new FormControl(marketPlaceProduct.SpecCount),
       // VariantCount: new FormControl(marketPlaceProduct.VariantCount),
-      TaxCodeCategory: new FormControl(_get(marketPlaceProduct, 'xp.TaxCodeCategory', null)),
-      TaxCode: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.TaxCode', null)),
+      TaxCodeCategory: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.Category', null)),
+      TaxCode: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.Code', null)),
       xp: new FormControl(marketPlaceProduct.xp),
     });
   }
@@ -217,6 +222,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   handleUpdateProduct(event: any, field: string, typeOfValue?: string) {
+    console.log(event, field, typeOfValue);
     const productUpdate = {
       field,
       value:
@@ -227,6 +233,7 @@ export class ProductEditComponent implements OnInit {
             : event.target.value,
     };
     this.updateProductResource(productUpdate);
+    console.log('new', this._marketPlaceProductEditable);
   }
 
   copyProductResource(product: any) {
@@ -288,24 +295,24 @@ export class ProductEditComponent implements OnInit {
     await this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
   }
 
-  getTaxCodeCategory(taxCode: string): string {
-    return taxCode === 'FR000000' ? taxCode.substr(0, 2) : taxCode.substr(0, 1);
-  }
-
   async handleTaxCodeCategorySelection(event): Promise<void> {
-    this.handleUpdateProduct(event, 'xp.TaxCodeCategory');
-    const taxCategory = this.getTaxCodeCategory(event.target.value);
-    const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, '', 1, 100);
+    // TODO: This is a temporary fix to accomodate for data not having xp.TaxCode yet
+    if (
+      this._marketPlaceProductEditable &&
+      this._marketPlaceProductEditable.xp &&
+      !this._marketPlaceProductEditable.xp.TaxCode
+    ) {
+      this._marketPlaceProductEditable.xp.TaxCode = { Category: '', Code: '', Description: '' };
+    }
+    this.handleUpdateProduct(event, 'xp.TaxCode.Category');
+    const avalaraTaxCodes = await this.middleware.listTaxCodes(event.target.value, '', 1, 100);
     this.taxCodes = avalaraTaxCodes;
   }
 
   async searchTaxCodes(searchTerm: string) {
     if (searchTerm === undefined) searchTerm = '';
-    const taxCategory =
-      this._marketPlaceProductEditable &&
-      this._marketPlaceProductEditable.xp &&
-      this.getTaxCodeCategory(this._marketPlaceProductEditable.xp.TaxCodeCategory);
-    const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, searchTerm, 1, 100);
+    const taxCodeCategory = this._marketPlaceProductEditable.xp.TaxCode.Category;
+    const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCodeCategory, searchTerm, 1, 100);
     this.taxCodes = avalaraTaxCodes;
   }
 
@@ -314,11 +321,8 @@ export class ProductEditComponent implements OnInit {
     const totalPages = this.taxCodes.Meta.TotalPages;
     const nextPageNumber = this.taxCodes.Meta.Page + 1;
     if (totalPages > nextPageNumber) {
-      const taxCategory =
-        this._marketPlaceProductEditable &&
-        this._marketPlaceProductEditable.xp &&
-        this.getTaxCodeCategory(this._marketPlaceProductEditable.xp.TaxCodeCategory);
-      const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, searchTerm, nextPageNumber, 100);
+      const taxCodeCategory = this._marketPlaceProductEditable.xp.TaxCode.Category;
+      const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCodeCategory, searchTerm, nextPageNumber, 100);
       this.taxCodes = {
         Meta: avalaraTaxCodes.Meta,
         Items: [...this.taxCodes.Items, ...avalaraTaxCodes.Items],
