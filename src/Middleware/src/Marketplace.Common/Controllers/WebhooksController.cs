@@ -1,8 +1,11 @@
-﻿using Marketplace.Common.Models;
+﻿using Marketplace.Common.Commands;
+using Marketplace.Common.Models;
 using Marketplace.Common.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
+using System;
+using System.Threading.Tasks;
 
 namespace Marketplace.Common.Controllers
 {
@@ -11,11 +14,13 @@ namespace Marketplace.Common.Controllers
 
         private readonly AppSettings _settings;
         private readonly ISendgridService _sendgridService;
+        private readonly IProposedShipmentCommand _proposedShipmentCommand;
 
-        public WebhooksController(AppSettings settings, ISendgridService sendgridService) : base(settings)
+        public WebhooksController(AppSettings settings, ISendgridService sendgridService, IProposedShipmentCommand proposedShipmentCommand) : base(settings)
         {
             _settings = settings;
             _sendgridService = sendgridService;
+            _proposedShipmentCommand = proposedShipmentCommand;
         }
 
         // USING AN OC MESSAGE SENDER - NOT WEBHOOK
@@ -107,6 +112,14 @@ namespace Marketplace.Common.Controllers
         {
             // to mp manager when a supplier is updated
             await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "Supplier Updated", "<h1>this is a test email for supplier update</h1>");
+        }
+
+        [HttpPost, Route("validateaddresspostput")]
+        public async Task<PrewebhookResponseWithError> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Create payload)
+        // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
+        {
+            var address = payload.Request.Body;
+            return await _proposedShipmentCommand.IsValidAddressInFreightPopAsync(address);
         }
     }
 }

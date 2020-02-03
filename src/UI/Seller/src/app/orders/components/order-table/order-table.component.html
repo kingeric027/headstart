@@ -5,6 +5,7 @@
                           [ocService]="ocService"
                           [resourceForm]="resourceForm"
                           [shouldShowCreateNew]="false"
+                          [filterConfig]="filterConfig"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
@@ -24,8 +25,6 @@
             [ngClass]="{'active': activeOrderDirectionButton === 'Outgoing'}"
             (click)="setOrderDirection('Outgoing')">Outgoing Supplier Orders</button>
   </div>
-  <!-- edit user -->
-  <div class="resource-edit">
-    resource edit component will go here
-  </div>
+  <app-order-details class="resource-edit" [order]="resourceInSelection">
+  </app-order-details>
 </resource-table-component>

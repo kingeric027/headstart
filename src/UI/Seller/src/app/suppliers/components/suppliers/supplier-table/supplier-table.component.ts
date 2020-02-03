@@ -76,6 +76,7 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
         Display: 'Vendor Level',
         Path: 'xp.Categories.VendorLevel',
         Values: ['PREFERRED', 'DESIGNATED', 'MANDATED', 'EXCLUSIVE DESIGNATED'],
+        Type: 'Dropdown'
       },
       {
         Display: 'Service Category',
@@ -161,6 +162,7 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
           'Wax',
           'Wipes and Cleaning Supplies',
         ],
+        Type: 'Dropdown'
       },
     ],
   };

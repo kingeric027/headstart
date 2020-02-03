@@ -65,7 +65,6 @@ export class OCMAddressList implements OnInit {
   }
 
   addressFormSubmitted(address: BuyerAddress) {
-    this.showCreateAddressForm = false;
     window.scrollTo(0, null);
     if (this.currentAddress) {
       this.updateAddress(address);
@@ -73,32 +72,34 @@ export class OCMAddressList implements OnInit {
       this.addAddress(address);
     }
   }
-
+  
   private async addAddress(address: BuyerAddress) {
     address.Shipping = true;
     address.Billing = true;
     const newAddress = await this.context.myResources.CreateAddress(address).toPromise();
     this.addresses.Items = [...this.addresses.Items, newAddress];
+    this.showCreateAddressForm = false;
     this.refresh();
   }
-
+  
   private async updateAddress(address: BuyerAddress): Promise<any> {
     address.ID = this.currentAddress.ID;
     await this.context.myResources.PatchAddress(address.ID, address).toPromise();
+    this.showCreateAddressForm = false;
     this.refresh();
   }
-
+  
   async deleteAddress(address: BuyerAddress) {
     this.areYouSureModal = ModalState.Closed;
     await this.context.myResources.DeleteAddress(address.ID).toPromise();
     this.addresses.Items = this.addresses.Items.filter(a => a.ID !== address.ID);
   }
-
+  
   updateRequestOptions(newOptions: { page?: number; search?: string }) {
     this.requestOptions = Object.assign(this.requestOptions, newOptions);
     this.reloadAddresses();
   }
-
+  
   private async reloadAddresses() {
     const addresses = await this.context.myResources.ListAddresses(this.requestOptions).toPromise();
     this.addresses = addresses;
