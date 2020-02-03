@@ -33,7 +33,7 @@ export class OCMProductDetails implements OnInit {
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
-  note = 'Placeholder for supplier message associated with specific product';
+  supplierNote: string;
   specLength: number;
 
   constructor(private formService: SpecFormService, private context: ShopperContextService) {
@@ -50,6 +50,7 @@ export class OCMProductDetails implements OnInit {
     this._product = value;
     this.isOrderable = !!this._product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
+    this.supplierNote = this._product.xp.Note;
   }
 
   ngOnInit() {
