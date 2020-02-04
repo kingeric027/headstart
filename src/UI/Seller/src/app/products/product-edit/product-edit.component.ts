@@ -234,7 +234,6 @@ export class ProductEditComponent implements OnInit {
             : event.target.value,
     };
     this.updateProductResource(productUpdate);
-    console.log('new', this._marketPlaceProductEditable);
   }
 
   copyProductResource(product: any) {
