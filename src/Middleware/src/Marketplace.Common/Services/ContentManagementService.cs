@@ -22,29 +22,31 @@ namespace Marketplace.Common.Services
 
 	public class ContentManagementService : IContentManagementService
 	{
-		private readonly BlobService _blob;
 		private readonly AppSettings _settings;
 		private readonly IOrderCloudClient _oc;
+		private readonly IBlobService _blob;
 
-		public ContentManagementService(AppSettings settings) {
+		public ContentManagementService(AppSettings settings, IOrderCloudClient oc, IBlobService blob) {
 			_settings = settings;
-			_oc = OcFactory.GetSEBAdmin();
-			_blob = new BlobService(new BlobServiceConfig() {
-				ConnectionString = settings.BlobSettings.ConnectionString,
-				Container = "images"
-			});
+            _oc = oc;
+			_blob = blob;
+			// TODO: move this down to where we're injecting this service
+			//_blob = new BlobService(new BlobServiceConfig() {
+			//	ConnectionString = settings.BlobSettings.ConnectionString,
+			//	Container = "images"
+			//});
 		}
 
 		public async Task<Product> UploadProductImage(IFormFile file, string marketplaceID, string productID, string token)
 		{
 			var product = await _oc.Products.GetAsync<Product<ProductXp>>(productID, token);
 
-			if (product?.xp?.Images == null)
+			if (product.xp?.Images == null)
 				product.xp = new ProductXp { Images = new List<ProductImage>() };
 
-			var index = product.xp.Images.Select(img => Int32.Parse(img.URL.Split('-').Last())).DefaultIfEmpty(0).Max() + 1;
+			var index = product.xp.Images.Select(img => int.Parse(img.Url.Split('-').Last())).DefaultIfEmpty(0).Max() + 1;
 			var blobName = GetProductImageName(marketplaceID, productID, index);
-			_blob.Save(blobName, file);
+			await _blob.Save(blobName, file);
 
 			product.xp.Images.Add(new ProductImage()
 			{
