@@ -3,6 +3,7 @@
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
+                          [dataIsSaving]="dataIsSaving"
                           [resourceForm]="resourceForm"
                           [shouldShowCreateNew]="false"
                           [filterConfig]="filterConfig"
@@ -25,6 +26,7 @@
             [ngClass]="{'active': activeOrderDirectionButton === 'Outgoing'}"
             (click)="setOrderDirection('Outgoing')">Outgoing Supplier Orders</button>
   </div>
-  <app-order-details class="resource-edit" [order]="resourceInSelection">
+  <app-order-details class="resource-edit"
+                     [order]="resourceInSelection">
   </app-order-details>
 </resource-table-component>
