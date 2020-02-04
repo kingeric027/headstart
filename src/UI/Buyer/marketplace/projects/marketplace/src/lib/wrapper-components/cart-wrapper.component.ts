@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ListLineItem, Product, OcProductService, OcMeService } from '@ordercloud/angular-sdk';
+import { ListLineItem, OcMeService, Product } from '@ordercloud/angular-sdk';
 import { CurrentOrderService } from '../services/current-order/current-order.service';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { ListLineItemWithProduct, LineItemWithProduct, MarketplaceOrder } from '../shopper-context';
+import { ListLineItemWithProduct, MarketplaceOrder } from '../shopper-context';
 
 @Component({
   template: `
@@ -18,7 +18,7 @@ export class CartWrapperComponent implements OnInit {
     private currentOrder: CurrentOrderService,
     private ocMeService: OcMeService,
     public context: ShopperContextService // used in template
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.currentOrder.onOrderChange(this.setOrder);

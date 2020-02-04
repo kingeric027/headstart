@@ -39,9 +39,10 @@ interface MarketPlaceProductXp {
   Images: MarketPlaceProductImage[];
 }
 
-interface MarketPlaceProductTaxCode {
-  Name: string;
+export interface MarketPlaceProductTaxCode {
+  Category: string;
   Code: string;
+  Description: string;
 }
 export interface MarketPlaceProductImage {
   URL: string;

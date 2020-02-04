@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { LineItem } from '@ordercloud/angular-sdk';
+import { groupBy as _groupBy, map as _map, without as _without } from 'lodash';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { ShopperContextService, LineItemWithProduct, ShippingRate } from 'marketplace';
+import { ShopperContextService } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
@@ -10,12 +11,18 @@ import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 })
 export class OCMLineitemTable implements OnInit {
   closeIcon = faTimes;
-  @Input() lineItems: LineItem[] | LineItemWithProduct[] = [];
+  @Input() lineItems: LineItem[];
   @Input() readOnly: boolean;
- 
-  constructor(private context: ShopperContextService) {}
+  liGroupedByShipFrom: LineItem[][];
+  liGroups: any;
 
-  ngOnInit() {}
+  constructor(private context: ShopperContextService) { }
+
+  async ngOnInit() {
+    await this.lineItems;
+    this.liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
+    this.liGroupedByShipFrom = Object.values(this.liGroups);
+  }
 
   removeLineItem(lineItemID: string) {
     this.context.currentOrder.removeFromCart(lineItemID);
@@ -39,9 +46,5 @@ export class OCMLineitemTable implements OnInit {
 
   getLineItem(lineItemID: string): LineItem {
     return this.lineItems.find(li => li.ID === lineItemID);
-  }
-
-  getShipFromAddressID(): string {
-    return this.lineItems[0].ShipFromAddressID; 
   }
 }

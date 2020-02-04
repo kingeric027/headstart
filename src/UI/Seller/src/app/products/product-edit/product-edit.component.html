@@ -18,8 +18,29 @@
                  maxlength="100"
                  [resourceForm]="productForm"
                  formControlName="Name"
-                 (input)="updateResourceFromEvent($event, 'Name')"
+                 (input)="handleUpdateProduct($event, 'Name')"
                  placeholder="Enter Name">
+        </div>
+        <div class="form-group"
+             *ngIf="isCreatingNew">
+          <label for="ID">Product ID</label>
+          <input type="text"
+                 class="form-control"
+                 id="ID"
+                 showErrors
+                 aria-describedby="ID"
+                 maxlength="100"
+                 [resourceForm]="productForm"
+                 formControlName="ID"
+                 (input)="updateResourceFromEvent($event, 'ID')"
+                 placeholder="Enter Product ID">
+        </div>
+        <div class="form-group"
+             *ngIf="!isCreatingNew && _marketPlaceProductStatic">
+          <label for="ID">Product ID</label>
+          <input class="form-control"
+                 value="{{_marketPlaceProductStatic.ID}}"
+                 disabled>
         </div>
         <div class="form-group">
           <label for="Description">Description</label>
@@ -40,7 +61,7 @@
                  min="1"
                  [resourceForm]="productForm"
                  formControlName="QuantityMultiplier"
-                 (input)="updateResourceFromEvent($event, 'QuantityMultiplier')"
+                 (input)="handleUpdateProduct($event, 'QuantityMultiplier', 'number')"
                  placeholder="Quantity Multiplier">
         </div>
         <div class="form-group">
@@ -58,29 +79,18 @@
                    step="0.01"
                    [resourceForm]="productForm"
                    formControlName="Price"
-                   (input)="updateResourceFromEvent($event, 'Price')"
+                   (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
                    placeholder="Price (USD)">
           </div>
         </div>
-        <div class="form-group">
-          <label for="TaxCode">Tax Code</label>
-          <select type="dropdown"
-                  class="form-control"
-                  id="TaxCode"
-                  aria-describedby="Tax code"
-                  formControlName="TaxCode"
-                  (change)="updateResourceFromEvent($event, 'TaxCode')"
-                  placeholder="Choose the tax code for this product">
-            <option default
-                    disabled
-                    [ngValue]="null">Choose the tax code for this product</option>
-            <option value="PC040100">Clothing & related products - General</option>
-            <option value="PC040101">Clothing & related products - Aprons - household</option>
-            <option value="PC040103">Clothing & related products - Athletic supporters</option>
-            <option value="PC040105">Clothing & related products - Bandanas</option>
-            <option value="PC040106">Clothing & related products - Bathing suits and caps</option>
-          </select>
-        </div>
+        <product-tax-code-select-component [productForm]="productForm"
+                                           [marketPlaceProductEditable]="_marketPlaceProductEditable"
+                                           [taxCodes]="taxCodes"
+                                           (handleTaxCodeCategorySelection)="handleTaxCodeCategorySelection($event)"
+                                           (handleTaxCodeSelection)="handleUpdateProduct($event, 'xp.TaxCode')"
+                                           (handleTaxCodesSearched)="searchTaxCodes($event)"
+                                           (onScrollEnd)="handleScrollEnd($event)">
+        </product-tax-code-select-component>
       </div>
     </div>
     <!-- /Product Details -->
@@ -132,7 +142,7 @@
                   formControlName="ShipFromAddressID"
                   id="ShipFromAddressID"
                   aria-describedby="Ship From Address ID"
-                  (change)="updateResourceFromEvent($event, 'ShipFromAddressID')">
+                  (change)="handleUpdateProduct($event, 'ShipFromAddressID')">
             <option disabled
                     [ngValue]="null">Choose an address</option>
             <option *ngFor="let address of addresses?.Items"
@@ -150,7 +160,7 @@
                    maxlength="100"
                    [resourceForm]="productForm"
                    formControlName="ShipHeight"
-                   (input)="updateResourceFromEvent($event, 'ShipHeight')"
+                   (input)="handleUpdateProduct($event, 'ShipHeight', 'number')"
                    placeholder="Enter Ship Height">
           </div>
           <div class="form-group col-md-6">
@@ -162,7 +172,7 @@
                    aria-describedby="Ship Width"
                    [resourceForm]="productForm"
                    formControlName="ShipWidth"
-                   (input)="updateResourceFromEvent($event, 'ShipWidth')"
+                   (input)="handleUpdateProduct($event, 'ShipWidth', 'number')"
                    placeholder="Ship Width">
           </div>
         </div>
@@ -177,7 +187,7 @@
                    maxlength="100"
                    [resourceForm]="productForm"
                    formControlName="ShipLength"
-                   (input)="updateResourceFromEvent($event, 'ShipLength')"
+                   (input)="handleUpdateProduct($event, 'ShipLength', 'number')"
                    placeholder="Enter Ship Length">
           </div>
           <div class="form-group col-md-6">
@@ -189,7 +199,7 @@
                    aria-describedby="Ship Weight"
                    [resourceForm]="productForm"
                    formControlName="ShipWeight"
-                   (input)="updateResourceFromEvent($event, 'ShipWeight')"
+                   (input)="handleUpdateProduct($event, 'ShipWeight', 'number')"
                    placeholder="Ship Weight">
           </div>
         </div>
