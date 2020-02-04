@@ -13,7 +13,7 @@ using NSubstitute;
 using OrderCloud.SDK;
 using Marketplace.Helpers.Services;
 
-namespace Marketplace.Tests.Tests
+namespace Marketplace.Tests
 {
 
     // NOTE: in order for these tests to pass container "images" must exist

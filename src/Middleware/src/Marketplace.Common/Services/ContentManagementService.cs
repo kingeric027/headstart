@@ -44,7 +44,7 @@ namespace Marketplace.Common.Services
 			if (product.xp?.Images == null)
 				product.xp = new ProductXp { Images = new List<ProductImage>() };
 
-			var index = product.xp.Images.Select(img => int.Parse(img.Url.Split('-').Last())).DefaultIfEmpty(0).Max() + 1;
+			var index = product.xp.Images.Select(img => int.Parse(img.URL.Split('-').Last())).DefaultIfEmpty(0).Max() + 1;
 			var blobName = GetProductImageName(marketplaceID, productID, index);
 			await _blob.Save(blobName, file);
 

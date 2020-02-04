@@ -18,7 +18,7 @@ namespace Marketplace.Tests.Mocks
                     {
                         new ProductImage()
                         {
-                            Url = "mock-image-url.png"
+                            URL = "mock-image-url.png"
                         }
                     }
                 }
