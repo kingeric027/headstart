@@ -50,6 +50,7 @@ export class ProductEditComponent implements OnInit {
   addresses: ListAddress;
   @Input()
   isCreatingNew: boolean;
+  @Input() dataIsSaving = false;
 
   userContext = {};
   hasVariations = false;
