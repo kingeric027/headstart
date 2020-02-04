@@ -36,10 +36,10 @@ export class ProductEditComponent implements OnInit {
   productForm: FormGroup;
   @Input()
   set orderCloudProduct(product: Product) {
-    if (Object.keys(product).length) {
+    if (product.ID) {
       this.handleSelectedProductChange(product);
     } else {
-      this.createProductForm({});
+      this.createProductForm(this.productService.emptyResource);
     }
   }
   @Input()
@@ -202,7 +202,9 @@ export class ProductEditComponent implements OnInit {
     */
     const piecesOfField = productUpdate.field.split('.');
     const depthOfField = piecesOfField.length;
-    const updateProductResourceCopy = this.copyProductResource(this._marketPlaceProductEditable);
+    const updateProductResourceCopy = this.copyProductResource(
+      this._marketPlaceProductEditable || this.productService.emptyResource
+    );
     switch (depthOfField) {
       case 4:
         updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
@@ -223,7 +225,6 @@ export class ProductEditComponent implements OnInit {
   }
 
   handleUpdateProduct(event: any, field: string, typeOfValue?: string) {
-    console.log(event, field, typeOfValue);
     const productUpdate = {
       field,
       value:
@@ -234,7 +235,6 @@ export class ProductEditComponent implements OnInit {
             : event.target.value,
     };
     this.updateProductResource(productUpdate);
-    console.log('new', this._marketPlaceProductEditable);
   }
 
   copyProductResource(product: any) {

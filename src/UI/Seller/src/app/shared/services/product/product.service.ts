@@ -7,11 +7,10 @@ import {
   Product,
   OcPriceScheduleService,
   OcCatalogService,
-  ProductCatalogAssignment,
   ProductAssignment,
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '../resource-crud/resource-crud.service';
-import { MarketPlaceProduct, PUBLISHED } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -103,4 +102,41 @@ export class ProductService extends ResourceCrudService<Product> {
   removeProductPartyPriceScheduleAssignment(assignment: ProductAssignment): Promise<void> {
     return this.ocProductsService.DeleteAssignment(assignment.ProductID, assignment.BuyerID).toPromise();
   }
+
+  emptyResource = {
+    ID: null,
+    Name: null,
+    Description: null,
+    QuantityMultiplier: null,
+    Shipping: {
+      ShipWeight: null,
+      ShipHeight: null,
+      ShipWidth: null,
+      ShipLength: null,
+    },
+    PriceSchedule: {
+      PriceBreaks: [
+        {
+          Quantity: 1,
+          Price: 0,
+        },
+      ],
+    },
+    HasVariants: null,
+    Notes: null,
+    UnitOfMeasure: null,
+    Status: null,
+    ShipFromAddressID: null,
+    Inventory: null,
+    DefaultSupplierID: null,
+    xp: {
+      TaxCode: {
+        Category: null,
+        Code: null,
+        Description: null,
+      },
+      Data: {},
+      Images: [],
+    },
+  };
 }
