@@ -12,7 +12,8 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [shouldShowResourceActions]="false">
   <div class="actionBar btn-group w-50"
        *ngIf="shouldShowOrderToggle"
        role="group"
