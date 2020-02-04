@@ -5,7 +5,7 @@ export const IMAGE_HOST_URL = 'https://s3.dualstack.us-east-1.amazonaws.com/stat
 export const PLACEHOLDER_URL = 'http://placehold.it/300x300';
 export const PRODUCT_IMAGE_PATH_STRATEGY = 'PRODUCT_IMAGE_PATH_STRATEGY';
 
-export function getProductMainImageUrlOrPlaceholder(product: Product) {
+export function getProductMainImageUrlOrPlaceholder(product: Product): string {
   const imgUrls = getProductImageUrls(product);
   return imgUrls.length ? imgUrls[0] : PLACEHOLDER_URL;
 }
