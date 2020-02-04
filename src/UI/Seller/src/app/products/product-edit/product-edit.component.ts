@@ -36,10 +36,10 @@ export class ProductEditComponent implements OnInit {
   productForm: FormGroup;
   @Input()
   set orderCloudProduct(product: Product) {
-    if (Object.keys(product).length) {
+    if (product.ID) {
       this.handleSelectedProductChange(product);
     } else {
-      this.createProductForm({});
+      this.createProductForm(this.productService.emptyResource);
     }
   }
   @Input()
@@ -201,7 +201,9 @@ export class ProductEditComponent implements OnInit {
     */
     const piecesOfField = productUpdate.field.split('.');
     const depthOfField = piecesOfField.length;
-    const updateProductResourceCopy = this.copyProductResource(this._marketPlaceProductEditable);
+    const updateProductResourceCopy = this.copyProductResource(
+      this._marketPlaceProductEditable || this.productService.emptyResource
+    );
     switch (depthOfField) {
       case 4:
         updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
@@ -222,7 +224,6 @@ export class ProductEditComponent implements OnInit {
   }
 
   handleUpdateProduct(event: any, field: string, typeOfValue?: string) {
-    console.log(event, field, typeOfValue);
     const productUpdate = {
       field,
       value:
@@ -258,8 +259,8 @@ export class ProductEditComponent implements OnInit {
 
   manualFileUpload(event): void {
     const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
-      const Url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
-      return { File: file, Url: Url };
+      const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
+      return { File: file, URL: URL };
     });
     this.stageFiles(files);
   }
