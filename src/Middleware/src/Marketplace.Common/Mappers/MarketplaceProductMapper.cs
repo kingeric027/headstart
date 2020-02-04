@@ -2,7 +2,6 @@
 using System.Linq;
 using Marketplace.Helpers.Mappers;
 using Marketplace.Helpers.Models;
-using Microsoft.Azure.Documents.SystemFunctions;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Mappers
@@ -33,7 +32,8 @@ namespace Marketplace.Common.Mappers
                     m.UnitOfMeasure,
                     m.Images,
                     m.HasVariants,
-                    m.Facets
+                    m.Facets,
+                    m.Tax
                 }
             };
             return oc;
@@ -60,7 +60,8 @@ namespace Marketplace.Common.Mappers
                 UnitOfMeasure = oc.xp != null ? MapperHelper.TryGetXp(oc.xp, "UnitOfMeasure") : null,
                 IntegrationData = oc.xp != null ? MapperHelper.TryGetXp(oc.xp, "Data") : null,
                 Facets = oc.xp != null ? MapperHelper.TryFacetXp(oc.xp) : null,
-                Images = oc.xp != null ? MapperHelper.TryGetXp(oc.xp, "Images") : null
+                Images = oc.xp != null ? MapperHelper.TryGetXp(oc.xp, "Images") : null,
+                Tax = oc.xp != null ? MapperHelper.TryGetXp(oc.xp, "Tax") : null
             };
 
             return m;

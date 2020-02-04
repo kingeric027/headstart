@@ -146,6 +146,7 @@ export class ProductEditComponent implements OnInit {
       ShipLength: new FormControl(marketPlaceProduct.ShipLength, Validators.required),
       ShipWeight: new FormControl(marketPlaceProduct.ShipWeight, Validators.required),
       Price: new FormControl(_get(marketPlaceProduct, 'PriceSchedule.PriceBreaks[0].Price', null)),
+      Note: new FormControl(_get(marketPlaceProduct, 'xp.Note'), Validators.maxLength(140)),
       // SpecCount: new FormControl(marketPlaceProduct.SpecCount),
       // VariantCount: new FormControl(marketPlaceProduct.VariantCount),
       TaxCodeCategory: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.Category', null)),

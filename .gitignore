@@ -295,3 +295,4 @@ tests/TestData/output/*
 src/UI/Buyer/container-app/dist
 src/UI/Buyer/src/environments/environment.ts
 *.code-workspace
+src/Middleware/ngrok.exe

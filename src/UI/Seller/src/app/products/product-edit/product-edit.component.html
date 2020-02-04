@@ -52,6 +52,19 @@
           </reactive-quill-editor-component>
         </div>
         <div class="form-group">
+          <label for="Note">Product Message</label>
+          <input type="text"
+                 class="form-control"
+                 id="Note"
+                 showErrors
+                 aria-describedby="Note"
+                 maxlength="140"
+                 [resourceForm]="productForm"
+                 formControlName="Note"
+                 (input)="handleUpdateProduct($event, 'xp.Note')"
+                 placeholder="(Optional) Enter a note about this product">
+        </div>
+        <div class="form-group">
           <label for="QuantityMultiplier">Quantity Multiplier</label>
           <input type="number"
                  class="form-control"
