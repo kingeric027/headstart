@@ -50,7 +50,7 @@ export class OCMProductDetails implements OnInit {
     this._product = value;
     this.isOrderable = !!this._product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
-    this.supplierNote = this._product && this._product.xp.Note;
+    this.supplierNote = this._product.xp && this._product.xp.Note;
   }
 
   ngOnInit() {
