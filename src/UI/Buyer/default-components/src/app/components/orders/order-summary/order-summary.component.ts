@@ -29,4 +29,11 @@ export class OCMOrderSummary {
     }
     return new CurrencyPipe('en-US').transform(this.order.ShippingCost);
   }
+
+  displayTotal() {
+    if (this.checkoutPanel === 'cart') {
+      return new CurrencyPipe('en-US').transform(this.order.Subtotal);
+    }
+    return new CurrencyPipe('en-US').transform(this.order.Total);
+  }
 }
