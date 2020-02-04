@@ -60,7 +60,6 @@ export class ProductEditComponent implements OnInit {
   _marketPlaceProductStatic: MarketPlaceProduct;
   _marketPlaceProductEditable: MarketPlaceProduct;
   areChanges = false;
-  dataSaved = false;
   taxCodeCategorySelected = false;
   taxCodes: ListResource<MarketPlaceProductTaxCode>;
 
@@ -77,7 +76,7 @@ export class ProductEditComponent implements OnInit {
     private modalService: NgbModal,
     private toasterService: ToastrService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  ) { }
 
   async ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
@@ -159,7 +158,6 @@ export class ProductEditComponent implements OnInit {
     if (this.isCreatingNew) {
       try {
         await this.createNewProduct();
-        this.dataSaved = true;
       } catch {
         this.toasterService.error(`A product with that ID already exists`);
       }

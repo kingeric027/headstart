@@ -304,7 +304,7 @@
       <button *ngIf="areChanges"
               class="btn btn-primary"
               type="submit"
-              [disabled]="productForm?.status === 'INVALID' || dataSaved"
+              [disabled]="productForm?.status === 'INVALID'"
               (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
       <button class="btn brand-button ml-3"
               (click)="handleDiscardChanges()"
