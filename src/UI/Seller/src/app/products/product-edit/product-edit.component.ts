@@ -50,7 +50,8 @@ export class ProductEditComponent implements OnInit {
   addresses: ListAddress;
   @Input()
   isCreatingNew: boolean;
-  @Input() dataIsSaving = false;
+  @Input()
+  dataIsSaving = false;
 
   userContext = {};
   hasVariations = false;
@@ -61,6 +62,7 @@ export class ProductEditComponent implements OnInit {
   _marketPlaceProductStatic: MarketPlaceProduct;
   _marketPlaceProductEditable: MarketPlaceProduct;
   areChanges = false;
+  dataSaved = false;
   taxCodeCategorySelected = false;
   taxCodes: ListResource<MarketPlaceProductTaxCode>;
 
@@ -159,6 +161,7 @@ export class ProductEditComponent implements OnInit {
     if (this.isCreatingNew) {
       try {
         await this.createNewProduct();
+        this.dataSaved = true;
       } catch {
         this.toasterService.error(`A product with that ID already exists`);
       }
