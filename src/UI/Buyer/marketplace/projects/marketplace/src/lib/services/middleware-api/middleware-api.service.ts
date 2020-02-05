@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { OcTokenService, BuyerCreditCard } from '@ordercloud/angular-sdk';
+import { OcTokenService, BuyerCreditCard, Payment } from '@ordercloud/angular-sdk';
 import { SupplierCategoryConfig, MarketplaceOrder, AppConfig, ProposedShipment, ProposedShipmentSelection, CreditCardToken } from '../../shopper-context';
 
 @Injectable({
@@ -62,4 +62,17 @@ export class MiddlewareApiService {
     return this.http.post<MarketplaceOrder>(`${this.baseUrl}/me/creditcards`, card, this.generateHeaders())
       .toPromise();
   }
+
+  authOnlyCreditCard(orderID: string, creditCardID: string, cvv: string): Promise<Payment> {
+    const ccPayment = {
+      OrderId: orderID,
+      CreditCardID: creditCardID,
+      Currency: 'USD',
+      CVV: cvv,
+      MerchantID: this.appSettings.cardConnectMerchantID
+    };
+    return this.http.post<Payment>(`${this.baseUrl}/me/payments`, ccPayment, this.generateHeaders())
+      .toPromise();
+  }
+
 }

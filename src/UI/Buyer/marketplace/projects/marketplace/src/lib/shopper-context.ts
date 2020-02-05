@@ -136,6 +136,7 @@ export interface ICurrentOrder {
   getProposedShipments(): Promise<ProposedShipment[]>;
   selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder>;
   calculateTax(): Promise<MarketplaceOrder>;
+  authOnlyCreditCard(cardID: string, cvv: string): Promise<Payment>;
 
   onOrderChange(callback: (order: MarketplaceOrder) => void): void;
   onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
@@ -349,7 +350,7 @@ export class AppConfig {
    * [learn more](https://developer.ordercloud.io/documentation/platform-guides/authentication/anonymous-shopping)
    */
   anonymousShoppingEnabled: boolean;
-
+  cardConnectMerchantID: string;
   baseUrl: string;
   /**
    * base path to middleware

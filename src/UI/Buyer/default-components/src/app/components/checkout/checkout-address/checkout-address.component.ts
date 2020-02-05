@@ -1,32 +1,31 @@
 import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
 import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-address.component.html',
   styleUrls: ['./checkout-address.component.scss'],
 })
 export class OCMCheckoutAddress implements OnInit {
-  @Input() addressType: 'Shipping' | 'Billing';
-  @Output() continue = new EventEmitter();
-  isAnon: boolean;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
-  order: Order;
-  lineItems: ListLineItem;
   requestOptions: { page?: number; search?: string } = {
     page: undefined,
     search: undefined,
   };
   usingShippingAsBilling = false;
   showAddAddressForm = false;
+  
+  @Input() addressType: 'Shipping' | 'Billing';
+  @Input() isAnon: boolean;
+  @Input() order: MarketplaceOrder;
+  @Input() lineItems: ListLineItem;
+  @Output() continue = new EventEmitter();
 
   constructor(private context: ShopperContextService) {}
 
-  ngOnInit() {
-    this.isAnon = this.context.currentUser.isAnonymous;
-    this.order = this.context.currentOrder.get();
-    this.lineItems = this.context.currentOrder.getLineItems();
+  async ngOnInit() {
+    await this.order, await this.lineItems;
     if (!this.isAnon) {
       this.getSavedAddresses();
     }
