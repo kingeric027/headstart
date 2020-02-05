@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter, Input, ChangeDetectorRef } fro
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { CreditCardToken } from 'marketplace';
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe';
+import { ValidateCreditCard } from 'src/app/validators/validators';
 
 @Component({
   templateUrl: './credit-card-form.component.html',
@@ -45,7 +46,7 @@ export class OCMCreditCardForm implements OnInit {
       cardholderName = '';
     }
     this.cardForm = this.formBuilder.group({
-      CardNumber: [cardNumber, Validators.required],
+      CardNumber: [cardNumber, [Validators.required, ValidateCreditCard]],
       CardholderName: [cardholderName, Validators.required],
       expMonth: [expMonth, Validators.required],
       expYear: [expYear, Validators.required],
