@@ -54,7 +54,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   editResourceHeight = 450;
   activeFilterCount = 0;
   filterForm: FormGroup;
-  dataSaved = false;
 
   constructor(
     private router: Router,
@@ -272,7 +271,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   handleSave() {
     this.changesSaved.emit(null);
-    this.dataSaved = true;
   }
 
   handleDelete() {

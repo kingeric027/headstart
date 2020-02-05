@@ -50,8 +50,7 @@ export class ProductEditComponent implements OnInit {
   addresses: ListAddress;
   @Input()
   isCreatingNew: boolean;
-  @Input()
-  dataIsSaving = false;
+  @Input() dataIsSaving = false;
 
   userContext = {};
   hasVariations = false;
@@ -62,7 +61,6 @@ export class ProductEditComponent implements OnInit {
   _marketPlaceProductStatic: MarketPlaceProduct;
   _marketPlaceProductEditable: MarketPlaceProduct;
   areChanges = false;
-  dataSaved = false;
   taxCodeCategorySelected = false;
   taxCodes: ListResource<MarketPlaceProductTaxCode>;
 
@@ -161,7 +159,6 @@ export class ProductEditComponent implements OnInit {
     if (this.isCreatingNew) {
       try {
         await this.createNewProduct();
-        this.dataSaved = true;
       } catch {
         this.toasterService.error(`A product with that ID already exists`);
       }
@@ -182,17 +179,21 @@ export class ProductEditComponent implements OnInit {
   }
 
   async createNewProduct() {
+    this.dataIsSaving = true;
     const product = await this.productService.createNewMarketPlaceProduct(this._marketPlaceProductEditable);
     await this.addFiles(this.files, product.ID);
     this.refreshProductData(product);
     this.router.navigateByUrl(`/products/${product.ID}`);
+    this.dataIsSaving = false;
   }
 
   async updateProduct() {
+    this.dataIsSaving = true;
     const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductEditable);
     this._marketPlaceProductStatic = product;
     this._marketPlaceProductEditable = product;
     if (this.files) this.addFiles(this.files, product.ID);
+    this.dataIsSaving = false;
   }
 
   updateProductResource(productUpdate: any) {
