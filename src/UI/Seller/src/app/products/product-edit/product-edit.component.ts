@@ -157,11 +157,7 @@ export class ProductEditComponent implements OnInit {
 
   async handleSave() {
     if (this.isCreatingNew) {
-      try {
-        await this.createNewProduct();
-      } catch {
-        this.toasterService.error(`A product with that ID already exists`);
-      }
+      await this.createNewProduct();
     } else {
       this.updateProduct();
     }
@@ -179,21 +175,35 @@ export class ProductEditComponent implements OnInit {
   }
 
   async createNewProduct() {
-    this.dataIsSaving = true;
-    const product = await this.productService.createNewMarketPlaceProduct(this._marketPlaceProductEditable);
-    await this.addFiles(this.files, product.ID);
-    this.refreshProductData(product);
-    this.router.navigateByUrl(`/products/${product.ID}`);
-    this.dataIsSaving = false;
+    try {
+      this.dataIsSaving = true;
+      const product = await this.productService.createNewMarketPlaceProduct(this._marketPlaceProductEditable);
+      await this.addFiles(this.files, product.ID);
+      this.refreshProductData(product);
+      this.router.navigateByUrl(`/products/${product.ID}`);
+      this.dataIsSaving = false;
+    } catch (ex) {
+      this.dataIsSaving = false;
+      if (ex.error && ex.error.Errors && ex.error.Errors.some(e => e.ErrorCode === "IdExists")) {
+        this.toasterService.error(`A product with that ID already exists`);
+      } else {
+        throw ex;
+      }
+    }
   }
 
   async updateProduct() {
-    this.dataIsSaving = true;
-    const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductEditable);
-    this._marketPlaceProductStatic = product;
-    this._marketPlaceProductEditable = product;
-    if (this.files) this.addFiles(this.files, product.ID);
-    this.dataIsSaving = false;
+    try {
+      this.dataIsSaving = true;
+      const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductEditable);
+      this._marketPlaceProductStatic = product;
+      this._marketPlaceProductEditable = product;
+      if (this.files) this.addFiles(this.files, product.ID);
+      this.dataIsSaving = false;
+    } catch (ex) {
+      this.dataIsSaving = false;
+      throw ex;
+    }
   }
 
   updateProductResource(productUpdate: any) {
