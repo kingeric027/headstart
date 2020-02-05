@@ -135,6 +135,7 @@
                    *ngIf="filter.Type === 'DateFilter'">
                 <input class="form-control"
                        placeholder="yyyy-mm-dd"
+                       value="{{filter.Path === 'from' ? fromDate : toDate}}"
                        name="datePicker"
                        [formControlName]="filter.Path"
                        ngbDatepicker

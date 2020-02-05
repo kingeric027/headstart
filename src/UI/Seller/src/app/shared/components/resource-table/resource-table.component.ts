@@ -55,7 +55,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   editResourceHeight = 450;
   activeFilterCount = 0;
   filterForm: FormGroup;
-
+  fromDate: string;
+  toDate: string;
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -132,22 +133,29 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     });
   }
 
-  isFilterHTML(value: string) {
-    return value.split('')[0] === '<';
-  }
-
   applyFilters() {
     if (typeof this.filterForm.value['from'] === 'object') {
-      this.filterForm.value['from'] = this.transformDate(this.filterForm.value['from']);
+      this.filterForm.value['from'] = this.transformDateForFilter(this.filterForm.value['from'], 'from');
     } if (typeof this.filterForm.value['to'] === 'object') {
-      this.filterForm.value['to'] = this.transformDate(this.filterForm.value['to']);
+      this.filterForm.value['to'] = this.transformDateForFilter(this.filterForm.value['to'], 'to');
     }
     this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
-    console.log(this.filterForm.value);
   }
 
-  transformDate(date: NgbDateStruct) {
-    return date.month + '-' + date.day + '-' + date.year;
+  transformDateForUser(date: NgbDateStruct) {
+    let month = date.month.toString().length === 1 ? '0' + date.month : date.month;
+    let day = date.day.toString().length === 1 ? '0' + date.day : date.day;
+    return date.year + '-' + month + '-' + day;
+  }
+  // date format for NgbDatepicker is different than date format used for filters
+  transformDateForFilter(date: NgbDateStruct, direction: string) {
+    if (direction === 'from') {
+      this.fromDate = this.transformDateForUser(date);
+      return date.month + '-' + date.day + '-' + date.year;
+    } else if (direction === 'to') {
+      this.toDate = this.transformDateForUser(date);
+      return date.month + '-' + date.day + '-' + date.year;
+    }
   }
 
   removeFieldsWithNoValue(formValues: FilterDictionary) {
@@ -309,6 +317,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   clearAllFilters() {
     this._ocService.clearAllFilters();
+    this.toDate = '';
+    this.fromDate = '';
   }
 
   checkForChanges() {
