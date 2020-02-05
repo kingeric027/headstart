@@ -7,15 +7,18 @@ import { MarketplaceOrder } from 'marketplace';
   styleUrls: ['./order-summary.component.scss'],
 })
 export class OCMOrderSummary implements OnChanges {
-  shippingSelected: boolean = false;
+  shippingSelected: boolean;
   orderLocalVar: MarketplaceOrder;
   @Input() order: MarketplaceOrder;
   @Input() checkoutPanel = '';
 
+  //If the user has selected a shipping option, the shipping selected property should be true.
   ngOnChanges() {
-    if (this.orderLocalVar.ShippingCost !== 0 && this.shippingSelected !== true) {
-      this.shippingSelected = true;
-    };
+    if (this.orderLocalVar) {
+      if (this.orderLocalVar.ShippingCost !== 0 && this.shippingSelected !== true) {
+        this.shippingSelected = true;
+      };
+    }
   }
 
   displayTax() {
@@ -44,13 +47,9 @@ export class OCMOrderSummary implements OnChanges {
   }
 
   displayTotal() {
-    if (this.checkoutPanel === 'cart') {
-      return new CurrencyPipe('en-US').transform(this.order.Subtotal);
-    }
-    if (this.checkoutPanel === 'shippingAddress' && !this.shippingSelected) {
-      return new CurrencyPipe('en-US').transform(this.order.Subtotal);
-    }
-    if (this.checkoutPanel === 'shippingSelection' && !this.shippingSelected) {
+    if (this.checkoutPanel === 'cart' ||
+        this.checkoutPanel === 'shippingAddress' && !this.shippingSelected ||
+        this.checkoutPanel === 'shippingSelection' && !this.shippingSelected) {
       return new CurrencyPipe('en-US').transform(this.order.Subtotal);
     }
     return new CurrencyPipe('en-US').transform(this.order.Total);
