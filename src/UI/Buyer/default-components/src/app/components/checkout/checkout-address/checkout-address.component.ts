@@ -29,6 +29,7 @@ export class OCMCheckoutAddress implements OnInit {
   constructor(private context: ShopperContextService) {}
 
   async ngOnInit() {
+    // TODO - we need to investigate this pattern and see if its something we can rely on.
     await this.order, await this.lineItems;
     if (!this.isAnon) {
       this.getSavedAddresses();
