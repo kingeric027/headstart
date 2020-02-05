@@ -11,7 +11,6 @@
           [formGroup]="cardForm"
           name="CardForm"
           class="add-card-form">
-
       <div class="form-group d-flex justify-content-between mb-0">
         <div class="form-group card-number mr-2 flex-fill">
           <label class="sr-only"
@@ -48,7 +47,7 @@
         </div>
       </div>
       <div class="form-group d-flex justify-content-between mb-0">
-        <div class="form-group card-name mr-2 flex-fill">
+        <div class="form-group card-name flex-fill">
           <label class="sr-only"
                  for="name">Name on Card</label>
           <input type="text"
@@ -58,19 +57,6 @@
                  showErrors
                  placeholder="Name on Card"
                  autocomplete="off" />
-        </div>
-        <div class="form-group flex-fill">
-          <label class="sr-only"
-                for="cvv">CVV</label>
-          <input type="text"
-                formControlName="SecurityCode"
-                class="form-control"
-                id="cvv"
-                placeholder="CVV"
-                showErrors
-                maxlength="4"
-                appCreditCardCVV
-                autocomplete="off" />
         </div>
       </div>
       <button type="submit"

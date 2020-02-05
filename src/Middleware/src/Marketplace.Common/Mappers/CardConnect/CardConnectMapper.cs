@@ -100,21 +100,6 @@ namespace Marketplace.Common.Mappers.CardConnect
             return t;
         }
 
-        public static Payment Map(AuthorizationResponse response, CreditCardPayment payment)
-        {
-            var p = new Payment()
-            {
-                Accepted = response.respstat == "A",
-                Amount = response.amount,
-                ID = response.retref,
-                DateCreated = DateTime.Now,
-                CreditCardID = payment.CreditCardID,
-                Description = $"{response.authcode} {response.resptext}",
-                Type = PaymentType.CreditCard
-            };
-            return p;
-        }
-
         //public static CreditCardAuthorization Map(AuthorizationResponse response, CreditCardAuthorization request)
         //{
         //    var cc = new CreditCardAuthorization()
