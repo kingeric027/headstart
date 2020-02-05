@@ -2,6 +2,10 @@ import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angu
 import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
 import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
+// TODO - Make this component "Dumb" by removing the dependence on context service 
+// and instead have it use inputs and outputs to interact with the CheckoutComponent.
+// Goal is to get all the checkout logic and state into one component. 
+
 @Component({
   templateUrl: './checkout-address.component.html',
   styleUrls: ['./checkout-address.component.scss'],
