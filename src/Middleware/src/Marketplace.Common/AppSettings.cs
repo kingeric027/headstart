@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -37,7 +37,9 @@ namespace Marketplace.Common
 	{
 		public string AuthUrl { get; set; }
 		public string ApiUrl { get; set; }
-	}
+        public string ClientID { get; set; }
+        public string ClientSecret { get; set; }
+    }
 
 	public class AvalaraSettings
 	{

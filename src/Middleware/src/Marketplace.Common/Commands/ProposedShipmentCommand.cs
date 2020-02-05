@@ -32,10 +32,10 @@ namespace Marketplace.Common.Commands
         private readonly IOCShippingIntegration _ocShippingIntegration;
         private readonly PrewebhookResponseWithError validResponse = new PrewebhookResponseWithError { proceed = true };
         private readonly PrewebhookResponseWithError inValidResponse = new PrewebhookResponseWithError { proceed = false, body = "Address invalid, please try again" };
-        public ProposedShipmentCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration)
+        public ProposedShipmentCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, IOrderCloudClient ocClient)
         {
             _freightPopService = freightPopService;
-            _oc = OcFactory.GetSEBAdmin();
+            _oc = ocClient;
             _ocShippingIntegration = ocShippingIntegration;
         }
 

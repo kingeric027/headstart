@@ -51,11 +51,10 @@ namespace Marketplace.API
 					_settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
                 var sdk = new OrderCloudClient(new OrderCloudClientConfig
                 {
-					// TODO: move these to AppSettings
-                    ApiUrl = "https://api.ordercloud.io",
-                    AuthUrl = "https://auth.ordercloud.io",
-                    ClientId = "2234C6E1-8FA5-41A2-8A7F-A560C6BA44D8",
-                    ClientSecret = "z08ibzgsb337ln8EzJx5efI1VKxqdqeBW0IB7p1SJaygloJ4J9uZOtPu1Aql",
+                    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    ClientId = _settings.OrderCloudSettings.ClientID,
+                    ClientSecret = _settings.OrderCloudSettings.ClientSecret,
                     Roles = new[]
                     {
                         ApiRole.FullAccess
