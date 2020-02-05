@@ -17,7 +17,6 @@ import { ResetPasswordWrapperComponent } from './wrapper-components/reset-passwo
 import { FeaturedProductsResolver } from './resolves/features-products.resolve';
 import { MeListBuyerAddressResolver } from './resolves/me.resolve';
 import { MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
-import { AuthNetCreditCardService } from './services/authorize-net/authorize-net.service';
 import { AuthService } from './services/auth/auth.service';
 import { CurrentOrderService } from './services/current-order/current-order.service';
 import { CurrentUserService } from './services/current-user/current-user.service';
@@ -32,6 +31,7 @@ import { CommonModule } from '@angular/common';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
 import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipments-wrapper.component';
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
+import { CreditCardService } from './services/credit-card/credit-card.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -46,8 +46,8 @@ import { SupplierListWrapperComponent } from './wrapper-components/supplier-list
     MeListSpecsResolver,
     MeListRelatedProductsResolver,
 
-    AuthNetCreditCardService,
     AuthService,
+    CreditCardService,
     CurrentOrderService,
     CurrentUserService,
     OrderHistoryService,

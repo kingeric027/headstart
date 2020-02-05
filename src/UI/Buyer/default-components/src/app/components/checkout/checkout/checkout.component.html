@@ -51,7 +51,10 @@
             </ng-template>
             <ng-template ngbPanelContent>
               <ocm-checkout-address [addressType]="'Shipping'"
-                                    (continue)="toSection('shippingSelection')"></ocm-checkout-address>
+                                    [isAnon]="isAnon"
+                                    [order]="order"
+                                    [lineItems]="lineItems"
+                                    (continue)="doneWithShipToAddress()"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="shippingSelection">
@@ -62,19 +65,12 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-shipping (continue)="toSection('billingAddress')"></ocm-checkout-shipping>
-            </ng-template>
-          </ngb-panel>
-          <ngb-panel id="billingAddress">
-            <ng-template ngbPanelTitle>
-              <a class="link-text"> Billing Address </a>
-              <fa-icon class="float-right text-success"
-                       *ngIf="getValidation('billingAddress')"
-                       [icon]="faCheck"></fa-icon>
-            </ng-template>
-            <ng-template ngbPanelContent>
-              <ocm-checkout-address [addressType]="'Billing'"
-                                    (continue)="toSection('payment')"></ocm-checkout-address>
+              <ocm-checkout-shipping [order]="order"
+                                     [lineItems]="lineItems"
+                                     [proposedShipments]="proposedShipments"
+                                     (selectShipRate)="onSelectShipRate($event.detail)"       
+                                     (continue)="doneWithShippingRates()">
+              </ocm-checkout-shipping>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="payment">
@@ -85,7 +81,26 @@
                        [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-payment (continue)="toSection('confirm')"></ocm-checkout-payment>
+              <ocm-checkout-payment [isAnon]="isAnon"
+                                    [order]="order"
+                                    [cards]="cards"
+                                    (cardSelected)="onCardSelected($event.detail)">
+              </ocm-checkout-payment>
+            </ng-template>
+          </ngb-panel>
+          <ngb-panel id="billingAddress">
+            <ng-template ngbPanelTitle>
+              <a class="link-text">Credit Card Billing Address </a>
+              <fa-icon class="float-right text-success"
+                       *ngIf="getValidation('billingAddress')"
+                       [icon]="faCheck"></fa-icon>
+            </ng-template>
+            <ng-template ngbPanelContent>
+              <ocm-checkout-address [addressType]="'Billing'"
+                                    [isAnon]="isAnon"
+                                    [order]="order"
+                                    [lineItems]="lineItems"
+                                    (continue)="toSection('confirm')"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="confirm">
@@ -93,7 +108,12 @@
               <a class="link-text"> Confirm </a>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-confirm></ocm-checkout-confirm>
+              <ocm-checkout-confirm [isAnon]="isAnon"
+                                    [order]="order"
+                                    [lineItems]="lineItems"
+                                    [payments]="payments"
+                                    (submitOrderWithComment)="submitOrderWithComment($event.detail)">
+              </ocm-checkout-confirm>
             </ng-template>
           </ngb-panel>
         </ngb-accordion>

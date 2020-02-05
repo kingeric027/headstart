@@ -22,11 +22,6 @@ namespace Marketplace.Common.Models.CardConnect
         [System.ComponentModel.DataAnnotations.Required]
         public string OrderID { get; set; }
         [System.ComponentModel.DataAnnotations.Required]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public OrderDirection Direction { get; set; }
-        [System.ComponentModel.DataAnnotations.Required]
-        public double Amount { get; set; }
-        [System.ComponentModel.DataAnnotations.Required]
         public string CreditCardID { get; set; }
         [MinLength(3, ErrorMessage = "Invalid currency specified: Must be 3 digit code. Ex: USD or CAD")]
         [MaxLength(3, ErrorMessage = "Invalid currency specified: Must be 3 digit code. Ex: USD or CAD")]
@@ -36,6 +31,5 @@ namespace Marketplace.Common.Models.CardConnect
         public string CVV { get; set; }
         [System.ComponentModel.DataAnnotations.Required]
         public string MerchantID { get; set; }
-
     }
 }

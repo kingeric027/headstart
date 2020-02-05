@@ -1,35 +1,25 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { groupBy as _groupBy } from 'lodash';
-import { ShopperContextService, LineItem, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection } from 'marketplace';
+import { ShopperContextService, LineItem, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection, ListLineItem } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-shipping.component.html',
   styleUrls: ['./checkout-shipping.component.scss']
 })
 export class OCMCheckoutShipping implements OnInit {
+  @Input() proposedShipments: ProposedShipment[] = null;
+  @Input() order: MarketplaceOrder;
+  @Input() lineItems: ListLineItem;
+  @Output() selectShipRate = new EventEmitter<ProposedShipmentSelection>();
   @Output() continue = new EventEmitter();
 
-  order: MarketplaceOrder;
-  lineItems: LineItem[];
-  proposedShipments: ProposedShipment[] = null;
+  constructor() {}
 
-  constructor(private context: ShopperContextService) {}
-
-  async ngOnInit() {
-    // placeholder to patch the shipping selections to an empty array
-    this.order = await this.context.currentOrder.patch({ xp: { AvalaraTaxTransactionCode: '', ProposedShipmentSelections: [] }});
-    this.lineItems = this.context.currentOrder.getLineItems().Items;
-    this.proposedShipments = await this.context.currentOrder.getProposedShipments();
-  }
-
-  async onContinueClicked() {
-    await this.context.currentOrder.calculateTax();
-    this.continue.emit();
-  }
+  ngOnInit() {}
 
   getLineItemsForProposedShipment(proposedShipment: ProposedShipment): LineItem[] {
     return proposedShipment.ProposedShipmentItems.map(proposedShipmentItem => {
-      return this.lineItems.find(li => li.ID === proposedShipmentItem.LineItemID);
+      return this.lineItems.Items.find(li => li.ID === proposedShipmentItem.LineItemID);
     });
   }
 
@@ -47,17 +37,21 @@ export class OCMCheckoutShipping implements OnInit {
 
   getSupplierID(proposedShipment: ProposedShipment): string {
     const firstLineItemID = proposedShipment.ProposedShipmentItems[0].LineItemID;
-    const firstLineItem = this.lineItems.find(lineItem => lineItem.ID === firstLineItemID);
+    const firstLineItem = this.lineItems.Items.find(lineItem => lineItem.ID === firstLineItemID);
     return firstLineItem.SupplierID;
   }
 
   getShipFromAddressID(proposedShipment: ProposedShipment): string {
     const firstLineItemID = proposedShipment.ProposedShipmentItems[0].LineItemID;
-    const firstLineItem = this.lineItems.find(lineItem => lineItem.ID === firstLineItemID);
+    const firstLineItem = this.lineItems.Items.find(lineItem => lineItem.ID === firstLineItemID);
     return firstLineItem.ShipFromAddressID;
   }
 
-  async selectRate(selection: ProposedShipmentSelection) {
-    this.order = await this.context.currentOrder.selectShippingRate(selection);
+  selectRate(selection: ProposedShipmentSelection) {
+    this.selectShipRate.emit(selection);
+  }
+
+  onContinueClicked() {
+    this.continue.emit();
   }
 }
