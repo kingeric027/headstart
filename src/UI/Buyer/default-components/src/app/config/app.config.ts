@@ -21,9 +21,5 @@ export const ocAppConfig: AppConfig = {
     'PasswordReset',
     'SupplierReader',
     'SupplierAddressReader',
-    // TODO - remove. In the platform, to create a payment with a saved credit card,
-    // you need both access to the credit card and OrderAdmin. Don't go live with OrderAdmin
-    // still on this list haha. 
-    'OrderAdmin'
   ]
 };
