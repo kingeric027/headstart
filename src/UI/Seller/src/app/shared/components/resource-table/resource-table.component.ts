@@ -40,7 +40,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
   areChanges: boolean;
-  dataSaved = false;
   parentResources: ListResource<any>;
   requestStatus: RequestStatus;
   selectedParentResourceName = 'Fetching Data';
@@ -132,10 +131,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     });
   }
 
-  isFilterHTML(value: string) {
-    return value.split('')[0] === '<';
-  }
-
   applyFilters() {
     if (typeof this.filterForm.value['from'] === 'object') {
       this.filterForm.value['from'] = this.transformDate(this.filterForm.value['from']);
@@ -143,7 +138,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       this.filterForm.value['to'] = this.transformDate(this.filterForm.value['to']);
     }
     this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
-    console.log(this.filterForm.value);
   }
 
   transformDate(date: NgbDateStruct) {
@@ -277,7 +271,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   handleSave() {
     this.changesSaved.emit(null);
-    this.dataSaved = true;
   }
 
   handleDelete() {
