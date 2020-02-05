@@ -19,6 +19,7 @@ export const ocAppConfig: AppConfig = {
     'Shopper', 
     'BuyerReader',
     'PasswordReset',
-    'SupplierReader'
+    'SupplierReader',
+    'OrderAdmin'   // TODO - remove
   ]
 };

@@ -86,8 +86,8 @@ namespace Marketplace.Common.Commands.CardConnect
             }
 
             var call = await _card.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment));
-            var p = await _privilegedOC.Payments.CreateAsync(OrderDirection.Outgoing, order.ID, CardConnectMapper.Map(call, payment));
-            var trans = await _privilegedOC.Payments.CreateTransactionAsync(OrderDirection.Outgoing, order.ID, p.ID,
+            var p = await _oc.Payments.CreateAsync(OrderDirection.Outgoing, order.ID, CardConnectMapper.Map(call, payment), user.AccessToken);
+            var trans = await _privilegedOC.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, p.ID,
                 CardConnectMapper.Map(order, p, call));
             return trans;
         }
