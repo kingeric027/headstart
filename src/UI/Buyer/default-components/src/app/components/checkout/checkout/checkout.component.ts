@@ -1,7 +1,7 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
-import { ShopperContextService, MarketplaceOrder } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder, ListPayment, ListLineItem, BuyerCreditCard, ProposedShipmentSelection, ProposedShipment, ListBuyerCreditCard } from 'marketplace';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -9,8 +9,13 @@ import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 })
 export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
-  order: MarketplaceOrder;
   isAnon: boolean;
+  order: MarketplaceOrder;
+  lineItems: ListLineItem;
+  payments: ListPayment;
+  cards: ListBuyerCreditCard;
+  selectedCard: { cardID: string, cvv: string };
+  proposedShipments: ProposedShipment[] = [];
   currentPanel: string;
   faCheck = faCheck;
   sections: any = [
@@ -27,11 +32,11 @@ export class OCMCheckout implements OnInit {
       valid: false,
     },
     {
-      id: 'billingAddress',
+      id: 'payment',
       valid: false,
     },
     {
-      id: 'payment',
+      id: 'billingAddress',
       valid: false,
     },
     {
@@ -42,11 +47,44 @@ export class OCMCheckout implements OnInit {
 
   constructor(private context: ShopperContextService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.context.currentOrder.onOrderChange(order => (this.order = order));
+    this.order = this.context.currentOrder.get();
+    this.lineItems = this.context.currentOrder.getLineItems();
     this.isAnon = this.context.currentUser.isAnonymous;
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
     this.setValidation('login', !this.isAnon);
+  }
+
+  async doneWithShipToAddress() {
+    this.proposedShipments = await this.context.currentOrder.getProposedShipments();
+    this.toSection('shippingSelection');
+  }
+
+  async onSelectShipRate(selection: ProposedShipmentSelection) {
+    await this.context.currentOrder.selectShippingRate(selection);
+  }
+
+  async doneWithShippingRates() {
+    await this.context.currentOrder.calculateTax();
+    this.cards = await this.context.creditCards.List();
+    this.toSection('payment');
+  }
+
+  async onCardSelected(card: { cardID: string, cvv: string}) {
+    this.selectedCard = card;
+    this.payments = await this.context.currentOrder.listPayments();
+    this.toSection('billingAddress');
+  }
+
+  async submitOrderWithComment(comment: string): Promise<void> {
+    const orderID = this.order.ID;
+    await this.context.currentOrder.patch({ Comments: comment });
+    await this.context.currentOrder.authOnlyCreditCard(this.selectedCard.cardID, this.selectedCard.cvv);
+    await this.context.currentOrder.submit();
+
+    // todo: "Order Submitted Successfully" message
+    this.context.router.toMyOrderDetails(orderID);
   }
 
   getValidation(id: string) {

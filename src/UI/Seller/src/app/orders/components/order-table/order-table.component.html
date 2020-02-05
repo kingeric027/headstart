@@ -3,6 +3,7 @@
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
+                          [dataIsSaving]="dataIsSaving"
                           [resourceForm]="resourceForm"
                           [shouldShowCreateNew]="false"
                           [filterConfig]="filterConfig"
@@ -11,7 +12,8 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [shouldShowResourceActions]="false">
   <div class="actionBar btn-group w-50"
        *ngIf="shouldShowOrderToggle"
        role="group"
@@ -25,6 +27,7 @@
             [ngClass]="{'active': activeOrderDirectionButton === 'Outgoing'}"
             (click)="setOrderDirection('Outgoing')">Outgoing Supplier Orders</button>
   </div>
-  <app-order-details class="resource-edit" [order]="resourceInSelection">
+  <app-order-details class="resource-edit"
+                     [order]="resourceInSelection">
   </app-order-details>
 </resource-table-component>
