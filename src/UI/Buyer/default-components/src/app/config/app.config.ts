@@ -10,7 +10,7 @@ export const ocAppConfig: AppConfig = {
   cmsUrl: environment.cmsUrl,
   ssoLink: environment.ssoLink,
   anonymousShoppingEnabled: false,
-  cardConnectMerchantID: '840000000052',
+  cardConnectMerchantID: '840000000052', // TODO - look for somewhere else to put this.
   scope: [
     'MeAddressAdmin',
     'MeAdmin',
