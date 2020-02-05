@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Order, LineItem, OcLineItemService, OcPaymentService, Payment } from '@ordercloud/angular-sdk';
 import { Address } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from'lodash';
-import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
+import { ReplaceHostUrls, getProductMainImageUrlOrPlaceholder } from '@app-seller/shared/services/product/product-image.helper';
 import { MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 
 @Component({
@@ -43,8 +43,7 @@ export class OrderDetailsComponent {
 
   getImageUrl(lineItem: LineItem) {
     const product = lineItem.Product;
-    const images = ReplaceHostUrls(product);
-    return images[0].URL;
+    return getProductMainImageUrlOrPlaceholder(product);
   }
 
   getFullName(address: Address) {

@@ -1,10 +1,5 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import {
-  IsValidPerLuhnAlgorithm,
-  IsValidLength,
-  IsValidCardType,
-  RemoveSpacesFrom,
-} from '../services/credit-card/credit-card.service';
+import { removeSpacesFrom, isValidLength, isValidPerLuhnAlgorithm } from '../services/card-validation.helper';
 
 export const ErrorDictionary = {
   name: `Name can only contain characters Aa-Zz 0-9 - ' .`,
@@ -19,7 +14,6 @@ export const ErrorDictionary = {
     one letter and one number. Password can also include special characters.`,
   creditCardNumber: 'Card number is invalid',
   creditCardLength: 'Card length is invalid',
-  creditCardType: 'We only accept Visa, MasterCard, and Discover',
 };
 
 // only alphanumic and space . '
@@ -144,16 +138,20 @@ export function DateValidator(
   return { DateError: true };
 }
 
+// Credit Card Validation
+
 export function ValidateCreditCard(
   control: AbstractControl
 ): ValidationErrors | null {
-  const cardNumber = RemoveSpacesFrom(control.value);
+  const cardNumber = removeSpacesFrom(control.value);
   if (!control.value) {
     return null;
   }
 
-  if (!IsValidLength(cardNumber)) return { creditCardLength: true };
-  if (!IsValidCardType(cardNumber)) return { creditCardType: true };
-  if (!IsValidPerLuhnAlgorithm(cardNumber)) return { creditCardNumber: true };
+  if (!isValidLength(cardNumber)) return { creditCardLength: true };
+  if (!isValidPerLuhnAlgorithm(cardNumber)) return { creditCardNumber: true };
   return null;
 }
+
+
+

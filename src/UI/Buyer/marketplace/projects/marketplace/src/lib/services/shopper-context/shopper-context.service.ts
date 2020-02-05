@@ -6,10 +6,10 @@ import { ProductFilterService } from '../product-filter/product-filter.service';
 import { AuthService } from '../auth/auth.service';
 import { OcMeService } from '@ordercloud/angular-sdk';
 import { OrderHistoryService } from '../order-history/order-history.service';
-import { AuthNetCreditCardService } from '../authorize-net/authorize-net.service';
 import { IShopperContext, AppConfig } from '../../shopper-context';
 import { SupplierFilterService } from '../supplier-filter/supplier-filter.service';
 import { ProductCategoriesService } from '../product-categories/product-categories.service';
+import { CreditCardService } from '../credit-card/credit-card.service';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +24,7 @@ export class ShopperContextService implements IShopperContext {
     public authentication: AuthService,
     public myResources: OcMeService,
     public orderHistory: OrderHistoryService,
-    public creditCards: AuthNetCreditCardService,
+    public creditCards: CreditCardService,
     public appSettings: AppConfig,
     public categories: ProductCategoriesService
   ) {}

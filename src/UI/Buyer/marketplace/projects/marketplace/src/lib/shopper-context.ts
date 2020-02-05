@@ -18,11 +18,12 @@ import {
   Shipment,
   ShipmentItem,
   BuyerProduct,
-  Category
-} from "@ordercloud/angular-sdk";
-import { Observable, Subject, BehaviorSubject } from "rxjs";
+  Category,
+  ListBuyerCreditCard
+} from '@ordercloud/angular-sdk';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
-export * from "@ordercloud/angular-sdk";
+export * from '@ordercloud/angular-sdk';
 
 export interface IShopperContext {
   router: IRouter;
@@ -45,8 +46,16 @@ export interface ICategories {
 }
 
 export interface ICreditCards {
-  CreateSavedCard(card: AuthNetCreditCard): Promise<CreateCardResponse>;
-  DeleteSavedCard(cardID: string): Promise<void>;
+  Save(card: CreditCardToken): Promise<BuyerCreditCard>;
+  Delete(cardID: string): Promise<void>;
+  List(): Promise<ListBuyerCreditCard>;
+}
+
+export interface CreditCardToken {
+  AccountNumber: string;
+  ExpirationDate: string; // MMYY or MMYYY
+  CardholderName: string;
+  CardType?: string;
 }
 
 export interface IOrderHistory {
@@ -127,6 +136,7 @@ export interface ICurrentOrder {
   getProposedShipments(): Promise<ProposedShipment[]>;
   selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder>;
   calculateTax(): Promise<MarketplaceOrder>;
+  authOnlyCreditCard(cardID: string, cvv: string): Promise<Payment>;
 
   onOrderChange(callback: (order: MarketplaceOrder) => void): void;
   onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
@@ -266,26 +276,21 @@ export interface OrderFilters {
 }
 
 export enum OrderStatus {
-  AllSubmitted = "!Unsubmitted",
-  Unsubmitted = "Unsubmitted",
-  AwaitingApproval = "AwaitingApproval",
-  Declined = "Declined",
-  Open = "Open",
-  Completed = "Completed",
-  Canceled = "Canceled"
+  AllSubmitted = '!Unsubmitted',
+  Unsubmitted = 'Unsubmitted',
+  AwaitingApproval = 'AwaitingApproval',
+  Declined = 'Declined',
+  Open = 'Open',
+  Completed = 'Completed',
+  Canceled = 'Canceled'
 }
 
-export interface AuthNetCreditCard {
+export interface CreditCard {
   CardholderName: string;
   CardNumber: string;
   ExpirationDate: string;
   SecurityCode: string;
   ID?: string;
-}
-
-export interface CreateCardResponse {
-  ResponseBody: BuyerCreditCard;
-  ResponseHttpStatusCode: number;
 }
 
 export interface OrderReorderResponse {
@@ -345,7 +350,7 @@ export class AppConfig {
    * [learn more](https://developer.ordercloud.io/documentation/platform-guides/authentication/anonymous-shopping)
    */
   anonymousShoppingEnabled: boolean;
-
+  cardConnectMerchantID: string;
   baseUrl: string;
   /**
    * base path to middleware
@@ -383,7 +388,7 @@ export interface DecodedOCToken {
    * helpful for identifying user types in an app
    * that may have both types
    */
-  usrtype: "admin" | "buyer";
+  usrtype: 'admin' | 'buyer';
 
   /**
    * list of security profile roles that this user

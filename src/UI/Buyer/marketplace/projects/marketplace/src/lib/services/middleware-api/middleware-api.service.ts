@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { OcTokenService } from '@ordercloud/angular-sdk';
-import { SupplierCategoryConfig, MarketplaceOrder, AppConfig, ProposedShipment, ProposedShipmentSelection } from '../../shopper-context';
+import { OcTokenService, BuyerCreditCard, Payment } from '@ordercloud/angular-sdk';
+import { SupplierCategoryConfig, MarketplaceOrder, AppConfig, ProposedShipment, ProposedShipmentSelection, CreditCardToken } from '../../shopper-context';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
-export class MarketplaceMiddlewareApiService {
+export class MiddlewareApiService {
   readonly baseUrl: string;
   constructor(
     private ocTokenService: OcTokenService,
@@ -19,7 +19,7 @@ export class MarketplaceMiddlewareApiService {
   generateHeaders() {
     return {
       headers: new HttpHeaders({
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${this.ocTokenService.GetAccess()}`
       })
     };
@@ -57,4 +57,22 @@ export class MarketplaceMiddlewareApiService {
       )
       .toPromise();
   }
+
+  saveMeCreditCard(card: CreditCardToken): Promise<BuyerCreditCard> {
+    return this.http.post<MarketplaceOrder>(`${this.baseUrl}/me/creditcards`, card, this.generateHeaders())
+      .toPromise();
+  }
+
+  authOnlyCreditCard(orderID: string, creditCardID: string, cvv: string): Promise<Payment> {
+    const ccPayment = {
+      OrderId: orderID,
+      CreditCardID: creditCardID,
+      Currency: 'USD',
+      CVV: cvv,
+      MerchantID: this.appSettings.cardConnectMerchantID
+    };
+    return this.http.post<Payment>(`${this.baseUrl}/me/payments`, ccPayment, this.generateHeaders())
+      .toPromise();
+  }
+
 }

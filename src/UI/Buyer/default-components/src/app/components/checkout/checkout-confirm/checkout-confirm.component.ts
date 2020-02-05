@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { 
   ListPayment, ListLineItem } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
@@ -10,34 +10,23 @@ import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 })
 export class OCMCheckoutConfirm implements OnInit {
   form: FormGroup;
-  order: MarketplaceOrder;
-  payments: ListPayment;
-  lineItems: ListLineItem;
-  anonEnabled: boolean;
   isSubmittingOrder = false; // prevent double-click submits
-
+  
+  @Input() isAnon: boolean;
+  @Input() order: MarketplaceOrder;
+  @Input() lineItems: ListLineItem;
+  @Input() payments: ListPayment;
+  @Output() submitOrderWithComment = new EventEmitter<string>();
+  
   constructor(private context: ShopperContextService) {}
-
+  
   async ngOnInit() {
     this.form = new FormGroup({ comments: new FormControl('') });
-    this.anonEnabled = this.context.appSettings.anonymousShoppingEnabled;
-    this.order = this.context.currentOrder.get();
-    this.lineItems = this.context.currentOrder.getLineItems();
-    this.payments = await this.context.currentOrder.listPayments();
   }
 
-  async saveCommentsAndSubmitOrder() {
+  saveCommentsAndSubmitOrder() {
     this.isSubmittingOrder = true;
     const Comments = this.form.get('comments').value;
-    const orderID = this.context.currentOrder.get().ID;
-    await this.context.currentOrder.patch({ Comments });
-    try {
-      await this.context.currentOrder.submit();
-    } catch (ex) {
-      throw new Error(ex);
-    }
-
-    // todo: "Order Submitted Successfully" message
-    this.context.router.toMyOrderDetails(orderID);
+    this.submitOrderWithComment.emit(Comments);
   }
 }

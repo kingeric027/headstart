@@ -12,6 +12,7 @@ import {
   Payment,
   OcPaymentService,
   LineItem,
+  BuyerCreditCard,
 } from '@ordercloud/angular-sdk';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { isUndefined as _isUndefined, get as _get } from 'lodash';
@@ -19,12 +20,13 @@ import { TokenHelperService } from '../token-helper/token-helper.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { listAll } from '../../functions/listAll';
 import { ICurrentOrder, AppConfig, ShippingRate, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection } from '../../shopper-context';
-import { MarketplaceMiddlewareApiService } from '../marketplace-middleware-api/marketplace-middleware-api.service';
+import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CurrentOrderService implements ICurrentOrder {
+  private readonly DefaultOrder: MarketplaceOrder = { xp: { AvalaraTaxTransactionCode: '', ProposedShipmentSelections: [] }};
   private readonly DefaultLineItems: ListLineItem = {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
@@ -41,7 +43,7 @@ export class CurrentOrderService implements ICurrentOrder {
     private tokenHelper: TokenHelperService,
     private ocPaymentService: OcPaymentService,
     private paymentHelper: PaymentHelperService,
-    private middlewareApi: MarketplaceMiddlewareApiService,
+    private middlewareApi: MiddlewareApiService,
     private appConfig: AppConfig
   ) {}
 
@@ -127,7 +129,7 @@ export class CurrentOrderService implements ICurrentOrder {
     } else if (this.appConfig.anonymousShoppingEnabled) {
       this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
     } else {
-      this.order = await this.ocOrderService.Create('outgoing', {}).toPromise();
+      this.order = await this.ocOrderService.Create('outgoing', this.DefaultOrder).toPromise();
     }
     if (this.order.DateCreated) {
       this.lineItems = await listAll(this.ocLineItemService, this.ocLineItemService.List, 'outgoing', this.order.ID);
@@ -196,6 +198,10 @@ export class CurrentOrderService implements ICurrentOrder {
 
   async calculateTax(): Promise<MarketplaceOrder> {
     return (this.order = await this.middlewareApi.calculateTax(this.order.ID));
+  }
+
+  async authOnlyCreditCard(cardID: string, cvv: string): Promise<Payment> {
+    return await this.middlewareApi.authOnlyCreditCard(this.order.ID, cardID, cvv);
   }
 
   // Private Methods

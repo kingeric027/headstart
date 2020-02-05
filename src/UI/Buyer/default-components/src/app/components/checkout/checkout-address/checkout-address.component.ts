@@ -1,32 +1,37 @@
 import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
 import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder } from 'marketplace';
+
+// TODO - Make this component "Dumb" by removing the dependence on context service 
+// and instead have it use inputs and outputs to interact with the CheckoutComponent.
+// Goal is to get all the checkout logic and state into one component. 
 
 @Component({
   templateUrl: './checkout-address.component.html',
   styleUrls: ['./checkout-address.component.scss'],
 })
 export class OCMCheckoutAddress implements OnInit {
-  @Input() addressType: 'Shipping' | 'Billing';
-  @Output() continue = new EventEmitter();
-  isAnon: boolean;
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
-  order: Order;
-  lineItems: ListLineItem;
   requestOptions: { page?: number; search?: string } = {
     page: undefined,
     search: undefined,
   };
   usingShippingAsBilling = false;
   showAddAddressForm = false;
+  
+  @Input() addressType: 'Shipping' | 'Billing';
+  @Input() isAnon: boolean;
+  @Input() order: MarketplaceOrder;
+  @Input() lineItems: ListLineItem;
+  @Output() continue = new EventEmitter();
 
   constructor(private context: ShopperContextService) {}
 
-  ngOnInit() {
-    this.isAnon = this.context.currentUser.isAnonymous;
-    this.order = this.context.currentOrder.get();
-    this.lineItems = this.context.currentOrder.getLineItems();
+  async ngOnInit() {
+    // TODO - we need to investigate this pattern and see if its something we can rely on.
+    // These are not promises. They are just inputs that are not set when ngOnInit fires.
+    await this.order, await this.lineItems;
     if (!this.isAnon) {
       this.getSavedAddresses();
     }
