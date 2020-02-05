@@ -111,13 +111,17 @@ export class CurrentOrderService implements ICurrentOrder {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);
   }
 
-  async createCCPayment(cardID: string): Promise<Payment> {
+  async createCCPayment(card: BuyerCreditCard): Promise<Payment> {
     return await this.createPayment({
       Amount : this.order.Total,
       DateCreated: new Date().toDateString(),
       Accepted: false,
       Type: 'CreditCard',
-      CreditCardID: cardID,
+      CreditCardID: card.ID,
+      xp: {
+        partialAccountNumber: card.PartialAccountNumber,
+        cardType: card.CardType
+      }
     });
   }
 

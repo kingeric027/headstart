@@ -17,13 +17,13 @@ export class OCMCheckoutPayment implements OnInit {
   @Input() cards: ListBuyerCreditCard;
   @Input() isAnon: boolean;
   @Input() order: MarketplaceOrder;
-  @Output() cardSelected = new EventEmitter<{cardID: string, cvv: string}>();
+  @Output() cardSelected = new EventEmitter<{card: BuyerCreditCard, cvv: string}>();
   
   constructor() {}
   
   ngOnInit() {}
 
-  onCardSelected(card: {cardID: string, cvv: string}) {
+  onCardSelected(card: {card: BuyerCreditCard, cvv: string}) {
     this.cardSelected.emit(card);
   }
 }

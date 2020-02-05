@@ -128,7 +128,7 @@ export interface ICurrentOrder {
 
   listPayments(): Promise<ListPayment>;
   createPayment(payment: Payment): Promise<Payment>;
-  createCCPayment(cardID: string): Promise<Payment>;
+  createCCPayment(card: BuyerCreditCard): Promise<Payment>;
 
   setBillingAddress(address: Address): Promise<MarketplaceOrder>;
   setShippingAddress(address: Address): Promise<MarketplaceOrder>;

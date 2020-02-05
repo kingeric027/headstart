@@ -14,7 +14,7 @@ export class OCMCheckout implements OnInit {
   lineItems: ListLineItem;
   payments: ListPayment;
   cards: ListBuyerCreditCard;
-  selectedCard: { cardID: string, cvv: string };
+  selectedCard: { card: BuyerCreditCard, cvv: string };
   proposedShipments: ProposedShipment[] = [];
   currentPanel: string;
   faCheck = faCheck;
@@ -71,9 +71,9 @@ export class OCMCheckout implements OnInit {
     this.toSection('payment');
   }
 
-  async onCardSelected(card: { cardID: string, cvv: string}) {
+  async onCardSelected(card: { card: BuyerCreditCard, cvv: string}) {
     this.selectedCard = card;
-    await this.context.currentOrder.createCCPayment(card.cardID);
+    await this.context.currentOrder.createCCPayment(card.card);
     this.payments = await this.context.currentOrder.listPayments();
     this.toSection('billingAddress');
   }
@@ -81,7 +81,7 @@ export class OCMCheckout implements OnInit {
   async submitOrderWithComment(comment: string): Promise<void> {
     const orderID = this.order.ID;
     await this.context.currentOrder.patch({ Comments: comment });
-    await this.context.currentOrder.authOnlyCreditCard(this.selectedCard.cardID, this.selectedCard.cvv);
+    await this.context.currentOrder.authOnlyCreditCard(this.selectedCard.card.ID, this.selectedCard.cvv);
     await this.context.currentOrder.submit();
 
     // todo: "Order Submitted Successfully" message
