@@ -30,6 +30,7 @@ export class OCMCheckoutAddress implements OnInit {
 
   async ngOnInit() {
     // TODO - we need to investigate this pattern and see if its something we can rely on.
+    // These are not promises. They are just inputs that are not set when ngOnInit fires.
     await this.order, await this.lineItems;
     if (!this.isAnon) {
       this.getSavedAddresses();
