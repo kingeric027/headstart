@@ -1,6 +1,6 @@
 ﻿using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.ShippingIntegration
+namespace Marketplace.Common.Services.ShippingIntegration.Models
 {
 	// tentative model for a shipping selection, this will be a OrderCloud property with a full shipping integration
 	public class ProposedShipmentSelection

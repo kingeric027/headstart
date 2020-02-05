@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Marketplace.Common.Services.AvaTax;
 
 namespace Marketplace.Common.Controllers
 {

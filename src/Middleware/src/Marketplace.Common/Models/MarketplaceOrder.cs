@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Marketplace.Common.Models;
 using Marketplace.Common.Services.ShippingIntegration;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 

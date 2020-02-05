@@ -1,9 +1,8 @@
-﻿using OrderCloud.SDK;
-using Marketplace.Common.Services.FreightPop;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Marketplace.Common.Services.FreightPop.Models;
+using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.ShippingIntegration
+namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {
     public static class AddressValidationRateRequestMapper
     {

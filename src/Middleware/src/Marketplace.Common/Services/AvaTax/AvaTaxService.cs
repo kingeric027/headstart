@@ -1,24 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Avalara.AvaTax.RestClient;
+using Marketplace.Common.Extensions;
+using Marketplace.Common.Mappers.Avalara;
+using Marketplace.Common.Services.AvaTax.Models;
+using Marketplace.Helpers;
+using Marketplace.Helpers.Models;
 
-namespace Marketplace.Common.Services
+namespace Marketplace.Common.Services.AvaTax
 {
-	using Avalara.AvaTax.RestClient;
-    using Marketplace.Common.Extensions;
-    using Marketplace.Common.Mappers.Avalara;
-    using Marketplace.Common.Models;
-    using Marketplace.Common.Services.AvaTax.Models;
-    using Marketplace.Common.Services.FreightPop;
-    using Marketplace.Helpers;
-    using Marketplace.Helpers.Models;
-    using OrderCloud.SDK;
-	using System;
-	using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-	public interface IAvataxService
+    public interface IAvataxService
 	{
 		// Use this before checkout. No records will be saved in avalara.
 		Task<decimal> GetTaxEstimateAsync(TaxableOrder taxableOrder);

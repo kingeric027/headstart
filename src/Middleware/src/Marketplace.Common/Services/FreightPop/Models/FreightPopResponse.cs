@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Marketplace.Common.Services.FreightPop
+﻿namespace Marketplace.Common.Services.FreightPop.Models
 {
 	public class FreightPopResponse<TData>
 	{

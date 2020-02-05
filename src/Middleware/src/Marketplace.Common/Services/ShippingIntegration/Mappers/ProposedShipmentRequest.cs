@@ -1,9 +1,9 @@
-﻿using Marketplace.Common.Services.FreightPop;
-using OrderCloud.SDK;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Marketplace.Common.Services.ShippingIntegration.Models;
+using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.ShippingIntegration
+namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {
     public static class ProposedShipmentRequestMapper
     {

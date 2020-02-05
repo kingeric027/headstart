@@ -1,14 +1,8 @@
-﻿using Flurl.Http;
-using Marketplace.Common.Models;
-using Marketplace.Common.Services.FreightPop;
-using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Flurl.Http;
+using Marketplace.Common.Services.FreightPop.Models;
 
-namespace Marketplace.Common.Services
+namespace Marketplace.Common.Services.FreightPop
 {
 	public interface IFreightPopService
 	{

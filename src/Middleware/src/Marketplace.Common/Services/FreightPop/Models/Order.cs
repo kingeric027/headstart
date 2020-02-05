@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Marketplace.Common.Services.FreightPop
+namespace Marketplace.Common.Services.FreightPop.Models
 {
 
     public class Order

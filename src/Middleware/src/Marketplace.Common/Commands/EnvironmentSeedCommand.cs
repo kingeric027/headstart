@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.DevCenter;
+using Marketplace.Common.Services.DevCenter.Models;
 using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
 

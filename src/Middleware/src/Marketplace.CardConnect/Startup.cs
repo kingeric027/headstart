@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Flurl.Http;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.CardConnect;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Helpers;

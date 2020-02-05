@@ -6,6 +6,8 @@ using Flurl.Http;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.FreightPop;
+using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
 using Microsoft.AspNetCore.Builder;

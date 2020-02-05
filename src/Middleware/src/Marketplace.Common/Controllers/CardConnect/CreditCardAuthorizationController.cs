@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Marketplace.Common.Commands.CardConnect;
+using Marketplace.Common.Commands;
 using Marketplace.Common.Models.CardConnect;
 using Marketplace.Helpers;
 using Microsoft.AspNetCore.Mvc;

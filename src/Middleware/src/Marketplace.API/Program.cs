@@ -9,12 +9,14 @@ using Marketplace.Helpers.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.CardConnect;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services.CardConnect;
+using Marketplace.Common.Services.FreightPop;
+using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Helpers;
 namespace Marketplace.API
 {

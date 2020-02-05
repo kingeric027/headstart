@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Avalara.AvaTax.RestClient;
+using Marketplace.Common.Services.AvaTax;
 
 namespace Marketplace.Common.Controllers.Avalara
 {

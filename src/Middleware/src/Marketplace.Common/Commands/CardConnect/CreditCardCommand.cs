@@ -8,7 +8,7 @@ using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands.CardConnect
+namespace Marketplace.Common.Commands
 {
     public interface ICreditCardCommand
     {
