@@ -120,6 +120,7 @@ import { OCMCheckoutShipping } from './components/checkout/checkout-shipping/che
 import { OCMShippingSelectionForm } from './components/checkout/shipping-selection-form/shipping-selection-form.component';
 import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.component.';
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
+import { AllAsterisksPipe } from './pipes/all-asterisks.pipe';
 
 const components = [
   OCMCategoryDropdown,
@@ -207,6 +208,7 @@ const components = [
     PaymentMethodDisplayPipe,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
+    AllAsterisksPipe,
     ...components,
   ],
   imports: [

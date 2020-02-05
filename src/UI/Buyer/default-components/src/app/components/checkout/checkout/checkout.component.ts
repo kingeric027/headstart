@@ -73,6 +73,7 @@ export class OCMCheckout implements OnInit {
 
   async onCardSelected(card: { cardID: string, cvv: string}) {
     this.selectedCard = card;
+    await this.context.currentOrder.createCCPayment(card.cardID);
     this.payments = await this.context.currentOrder.listPayments();
     this.toSection('billingAddress');
   }

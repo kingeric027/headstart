@@ -111,6 +111,16 @@ export class CurrentOrderService implements ICurrentOrder {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);
   }
 
+  async createCCPayment(cardID: string): Promise<Payment> {
+    return await this.createPayment({
+      Amount : this.order.Total,
+      DateCreated: new Date().toDateString(),
+      Accepted: false,
+      Type: 'CreditCard',
+      CreditCardID: cardID,
+    });
+  }
+
   async createPayment(payment: Payment): Promise<Payment> {
     await this.deleteExistingPayments(); // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
     return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
