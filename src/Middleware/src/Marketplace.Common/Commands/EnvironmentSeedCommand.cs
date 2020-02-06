@@ -35,8 +35,8 @@ namespace Marketplace.Common.Commands
             // at this point everything we do is as impersonation of the admin user on a new token
             var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
             await this.PatchDefaultApiClients(impersonation.access_token);
-            await this.CreateSuppliers(user, impersonation.access_token);
             await this.CreateMarketPlaceRoles(impersonation.access_token);
+            await this.CreateSuppliers(user, impersonation.access_token);
             //await this.ConfigureBuyers(impersonation.access_token);
         }
 
@@ -78,6 +78,33 @@ namespace Marketplace.Common.Commands
                     Description = "Integrations",
                     Name = "Integration Group"
                 }, token);
+                var accountAdminUserGroup = await _oc.SupplierUserGroups.CreateAsync(key, new UserGroup()
+                {
+                    ID = $"{key}AccountAdmin",
+                    Name = $"{key} Account Admin",
+                    xp =
+                    {
+                        Type = "UserPermissions"
+                    }
+                }, token);
+                var orderAdminUserGroup = await _oc.SupplierUserGroups.CreateAsync(key, new UserGroup()
+                {
+                    ID = $"{key}OrderAdmin",
+                    Name = $"{key} Order Admin",
+                    xp =
+                    {
+                        Type = "UserPermissions"
+                    }
+                }, token);
+                var productAdminUserGroup = await _oc.SupplierUserGroups.CreateAsync(key, new UserGroup()
+                {
+                    ID = $"{key}ProductAdmin",
+                    Name = $"{key} Product Admin",
+                    xp =
+                    {
+                        Type = "UserPermissions"
+                    }
+                }, token);
                 var supplierUser = await _oc.SupplierUsers.CreateAsync(key, new User()
                 {
                     Active = true,
@@ -117,6 +144,47 @@ namespace Marketplace.Common.Commands
                     UserGroupID = userGroup.ID,
                     SecurityProfileID = profile.ID
                 }, token);
+                var accountAdminMpSecurityProfiles = new List<string>
+                {
+                    "MPMeSupplierAddressAdmin",
+                    "MPMeSupplierUserAdmin"
+                };
+                foreach (string securityProfile in accountAdminMpSecurityProfiles)
+                {
+                    await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+                    {
+                        SupplierID = supplier.ID,
+                        UserGroupID = accountAdminUserGroup.ID,
+                        SecurityProfileID = securityProfile
+                    }, token);
+                };
+                var orderAdminMpSecurityProfiles = new List<string>
+                {
+                    "MPOrderAdmin",
+                    "MPShipmentAdmin"
+                };
+                foreach (string securityProfile in orderAdminMpSecurityProfiles)
+                {
+                    await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+                    {
+                        SupplierID = supplier.ID,
+                        UserGroupID = orderAdminUserGroup.ID,
+                        SecurityProfileID = securityProfile
+                    }, token);
+                };
+                var productAdminMpSecurityProfiles = new List<string>
+                {
+                    "MPMeProductAdmin",
+                };
+                foreach (string securityProfile in productAdminMpSecurityProfiles)
+                {
+                    await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+                    {
+                        SupplierID = supplier.ID,
+                        UserGroupID = productAdminUserGroup.ID,
+                        SecurityProfileID = securityProfile
+                    }, token);
+                };
             }
         }
 
