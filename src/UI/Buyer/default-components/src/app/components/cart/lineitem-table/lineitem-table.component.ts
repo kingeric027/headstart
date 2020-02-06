@@ -24,26 +24,30 @@ export class OCMLineitemTable implements OnInit {
     await this.lineItems;
     this.liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(this.liGroups);
-    await this.getSuppliers();
+    this.supplierInfo = await this.getSupplierInfo();
+    this.supplierAddresses = await this.getSupplierAddresses();
   }
 
-  getSuppliers() {
+  getSupplierInfo() {
+    let infoArray = [];
     this.liGroupedByShipFrom.forEach(async group => {
-      let address = await this.ocSupplierAddressService.Get(group[0].SupplierID, group[0].ShipFromAddressID).toPromise();
-      let info = await this.ocSupplierService.Get(group[0].SupplierID).toPromise();
-      this.supplierAddresses.push(address);
-      this.supplierInfo.push(info);
+      if (group[0] && group[0].SupplierID) {
+        let info = await this.ocSupplierService.Get(group[0].SupplierID).toPromise();
+        infoArray.push(info);
+      }
     });
+    return infoArray;
   }
 
-  formatPhoneNumber(supplierPhone: string) {
-    var cleaned = ('' + supplierPhone).replace(/\D/g, '')
-    var match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/)
-    if (match) {
-      var intlCode = (match[1] ? '+1 ' : '')
-      return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('')
-    }
-    return null
+  getSupplierAddresses() {
+    let addresses = [];
+    this.liGroupedByShipFrom.forEach(async group => {
+      if (group[0] && group[0].SupplierID && group[0].ShipFromAddressID) {
+        let address = await this.ocSupplierAddressService.Get(group[0].SupplierID, group[0].ShipFromAddressID).toPromise();
+        addresses.push(address);
+      }
+    });
+    return addresses;
   }
 
   removeLineItem(lineItemID: string) {

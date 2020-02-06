@@ -16,8 +16,8 @@
             {{supplierAddresses[i].Zip}}
           </small>
           <small class="text-muted"
-                 *ngIf="supplierInfo[i].xp && supplierInfo[i].xp.Contacts">
-            {{formatPhoneNumber(supplierInfo[i].xp.Contacts[0].Phone)}} | {{supplierInfo[i].xp.Contacts[0].Email}}
+                 *ngIf="supplierInfo[i]?.xp && supplierInfo[i].xp.Contacts">
+            {{ supplierInfo[i].xp.Contacts[0].Phone | phoneFormat }} | {{ supplierInfo[i].xp.Contacts[0].Email }}
           </small>
         </div>
       </div>
@@ -45,7 +45,8 @@
     <div class="flex-none">
       <div *ngFor="let li of liGroup; let i = index">
         <div class="m-2 row align-items-center">
-          <div class="col-sm-7">
+          <div class="col-sm-7"
+               *ngIf="li">
             <div class="row align-items-sm-center">
               <div class="col-3 p-0">
                 <img class="img-thumbnail"
