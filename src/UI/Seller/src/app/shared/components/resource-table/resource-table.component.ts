@@ -135,27 +135,25 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   applyFilters() {
     if (typeof this.filterForm.value['from'] === 'object') {
-      this.filterForm.value['from'] = this.transformDateForFilter(this.filterForm.value['from'], 'from');
+      const fromDate = this.filterForm.value['from'];
+      this.fromDate = this.transformDateForUser(fromDate);
+      this.filterForm.value['from'] = this.transformDateForFilter(fromDate);
     } if (typeof this.filterForm.value['to'] === 'object') {
-      this.filterForm.value['to'] = this.transformDateForFilter(this.filterForm.value['to'], 'to');
+      const toDate = this.filterForm.value['to'];
+      this.toDate = this.transformDateForUser(toDate);
+      this.filterForm.value['to'] = this.transformDateForFilter(toDate);
     }
     this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
   }
-
+  // date format for NgbDatepicker is different than date format used for filters
   transformDateForUser(date: NgbDateStruct) {
     let month = date.month.toString().length === 1 ? '0' + date.month : date.month;
     let day = date.day.toString().length === 1 ? '0' + date.day : date.day;
     return date.year + '-' + month + '-' + day;
   }
-  // date format for NgbDatepicker is different than date format used for filters
-  transformDateForFilter(date: NgbDateStruct, direction: string) {
-    if (direction === 'from') {
-      this.fromDate = this.transformDateForUser(date);
-      return date.month + '-' + date.day + '-' + date.year;
-    } else if (direction === 'to') {
-      this.toDate = this.transformDateForUser(date);
-      return date.month + '-' + date.day + '-' + date.year;
-    }
+
+  transformDateForFilter(date: NgbDateStruct) {
+    return date.month + '-' + date.day + '-' + date.year;
   }
 
   removeFieldsWithNoValue(formValues: FilterDictionary) {
