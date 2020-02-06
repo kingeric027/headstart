@@ -34,6 +34,7 @@ const PendingProducts: MPRoute = {
   rolesWithAccess: ['MPPRoductAdmin', 'MPProductReader', 'MPMeProductAdmin'],
   title: 'Pending Products',
   route: '/products',
+  queryParams: { Status: 'Draft' }
 };
 
 const Promotions: MPRoute = {

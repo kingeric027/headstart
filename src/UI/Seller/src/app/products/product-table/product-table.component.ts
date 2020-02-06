@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef, NgZone, OnInit, AfterViewChecked } from '
 import { Product } from '@ordercloud/angular-sdk';
 import { ProductService } from '@app-seller/shared/services/product/product.service';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 @Component({
@@ -34,7 +34,7 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
     Filters: [
       {
         Display: 'Status',
-        Path: 'xp.Data.Status',
+        Path: 'xp.Status',
         Values: ['Draft', 'Published'],
         Type: 'Dropdown'
       },
