@@ -24,17 +24,23 @@ namespace Marketplace.Common.Commands
         private readonly IFreightPopService _freightPopService;
         private readonly IOrderCloudClient _oc;
         private readonly IOCShippingIntegration _ocShippingIntegration;
-        public OrderCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration)
+        private readonly ITaxCommand _taxCommand;
+        public OrderCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, ITaxCommand taxCommand)
         {
             _freightPopService = freightPopService;
             _oc = OcFactory.GetSEBAdmin();
             _ocShippingIntegration = ocShippingIntegration;
+            _taxCommand = taxCommand;
         }
 
         public async Task HandleBuyerOrderSubmit(string orderId)
         {
+            var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderId);
+            await _taxCommand.HandleTransactionCreation(buyerOrder);
+            
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderId);
-            await ImportSupplierOrdersIntoFreightPop(orderSplitResult.OutgoingOrders);
+            var supplierOrders = orderSplitResult.OutgoingOrders;
+            await ImportSupplierOrdersIntoFreightPop(supplierOrders);
 
             // do other order submit actions here
         }
