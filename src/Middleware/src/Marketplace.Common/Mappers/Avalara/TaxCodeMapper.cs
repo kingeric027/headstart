@@ -1,5 +1,6 @@
 ﻿using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Services.AvaTax.Models;
+using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using System;
 using System.Collections.Generic;
@@ -21,25 +22,41 @@ namespace Marketplace.Common.Mappers.Avalara
                 }).ToList();
         }
 
-        public static MarketplaceListPage<MarketplaceTaxCode> Map(FetchResult<TaxCodeModel> avataxCodes, List<MarketplaceTaxCode> taxCodeList, int top, int skip)
+        public static MarketplaceListPage<MarketplaceTaxCode> Map(FetchResult<TaxCodeModel> codes, TaxCodeListArgs args)
         {
-            return new MarketplaceListPage<MarketplaceTaxCode>
-            {
-                Meta = new MarketplaceListPageMeta
-                {
-                    Page = skip / top == 0 ? 1 : (skip / top) + 1,
-                    PageSize = 100,
-                    TotalCount = avataxCodes.count,
-                },
-                Items = taxCodeList
-            };
-        }
+			var items = codes.value.Select(code => new MarketplaceTaxCode 
+			{
+				Category = args.CodeCategory,
+				Code = code.taxCode,
+				Description = code.description
+			}).ToList();
+			var listPage = new MarketplaceListPage<MarketplaceTaxCode>
+			{
+				Items = items,
+				Meta = new MarketplaceListPageMeta
+				{
+					Page = args.Skip / args.Top == 0 ? 1 : (args.Skip / args.Top) + 1,
+					PageSize = 100,
+					TotalCount = codes.count,
+				}
+			};
+			return listPage;
+		}
 
-        public static (int, int) Map(int page, int pageSize)
-        {
-            var top = pageSize;
-            var skip =  page > 1 ? (page - 1) * pageSize : 0;
-            return (top, skip);
+		public static TaxCodeListArgs Map(MarketplaceListArgs<TaxCodeModel> source)
+		{
+			var taxCategory = source.Filters[0].Values[0].Term;
+			var taxCategorySearch = taxCategory.Trim('0');
+			var search = source.Search;
+			var filter = search != "" ? $"isActive eq true and taxCode startsWith '{taxCategorySearch}' and (taxCode contains '{search}' OR description contains '{search}')" : $"isActive eq true and taxCode startsWith '{taxCategorySearch}'";
+			return new TaxCodeListArgs()
+			{
+				Filter = filter,
+				Top = source.PageSize,
+				Skip = source.Page > 1 ? (source.Page - 1) * source.PageSize : 0,
+				CodeCategory = taxCategory,
+				OrderBy = null
+			};
         }
     }
 }
