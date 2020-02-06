@@ -7,6 +7,7 @@ import { MarketplaceOrder } from 'marketplace';
   styleUrls: ['./order-summary.component.scss'],
 })
 export class OCMOrderSummary {
+  shippingSelected: boolean;
   @Input() order: MarketplaceOrder;
   @Input() checkoutPanel = '';
 
@@ -14,7 +15,7 @@ export class OCMOrderSummary {
     if (this.checkoutPanel === 'cart') {
       return 'Calculated during checkout';
     }
-    if (this.checkoutPanel === 'shippingAddress' || this.checkoutPanel === 'shippingSelection') {
+    if (this.checkoutPanel === 'shippingAddress' && !this.shippingSelected || this.checkoutPanel === 'shippingSelection' && !this.shippingSelected) {
       return 'Pending selections';
     }
     return new CurrencyPipe('en-US').transform(this.order.TaxCost);
@@ -24,9 +25,19 @@ export class OCMOrderSummary {
     if (this.checkoutPanel === 'cart') {
       return 'Calculated during checkout';
     }
-    if (this.checkoutPanel === 'shippingAddress' || this.checkoutPanel === 'shippingSelection') {
+    if (this.checkoutPanel === 'shippingAddress' && !this.shippingSelected || this.checkoutPanel === 'shippingSelection' && !this.shippingSelected) {
       return 'Pending selections';
     }
+    this.shippingSelected = true;
     return new CurrencyPipe('en-US').transform(this.order.ShippingCost);
+  }
+
+  displayTotal() {
+    if (this.checkoutPanel === 'cart' ||
+        this.checkoutPanel === 'shippingAddress' && !this.shippingSelected ||
+        this.checkoutPanel === 'shippingSelection' && !this.shippingSelected) {
+      return new CurrencyPipe('en-US').transform(this.order.Subtotal);
+    }
+    return new CurrencyPipe('en-US').transform(this.order.Total);
   }
 }
