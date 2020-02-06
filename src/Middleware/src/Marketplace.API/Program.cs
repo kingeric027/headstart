@@ -17,6 +17,7 @@ using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
+using Marketplace.Common.Services.Zoho;
 using Marketplace.Helpers;
 namespace Marketplace.API
 {
@@ -54,6 +55,7 @@ namespace Marketplace.API
 					.ConfigureWebApiServices(_settings, "v1", "Marketplace API")
                     .Inject<IDevCenterService>()
                     .Inject<IFlurlClient>()
+                    .Inject<IZohoClient>()
                     .Inject<ISyncCommand>()
 					.Inject<IAvataxService>()
 					.Inject<IFreightPopService>()

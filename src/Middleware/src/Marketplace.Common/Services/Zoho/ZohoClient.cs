@@ -6,6 +6,9 @@ using Flurl;
 using Flurl.Http;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Common.Services.Zoho.Service;
+using Marketplace.Helpers.Exceptions;
+using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Models;
 using ZohoOrganization = Marketplace.Common.Services.Zoho.Models.ZohoOrganization;
 
 
@@ -21,14 +24,16 @@ namespace Marketplace.Common.Services.Zoho
         Task<ZohoContactPerson> GetOrCreateContactPerson(ZohoContact zohoContact, ZohoContactPerson person);
         Task<ZohoSalesorder> GetSalesOrder(string id);
         Task<ZohoItemList> SearchLineItem(string search);
+        Task<dynamic> RequestToken(string code);
+        Task<dynamic> Auth();
     }
 
     public class ZohoClient : IZohoClient
     {
         private readonly ZohoBooks _zoho;
-        private readonly IAppSettings _settings;
+        private readonly AppSettings _settings;
 
-        public ZohoClient(IAppSettings settings)
+        public ZohoClient(AppSettings settings)
         {
             _settings = settings;
             _zoho = new ZohoBooks();
@@ -38,6 +43,38 @@ namespace Marketplace.Common.Services.Zoho
         {
             _zoho.initialize(token, id);
             return this;
+        }
+
+        public async Task<dynamic> RequestToken(string code)
+        {
+            var request = await "https://accounts.zoho.com/oauth/v2/token"
+                .SetQueryParam("code", code)
+                .SetQueryParam("client_id", "1000.9BTEOO38B36J41SW6XGHA027P6IU3H")
+                .SetQueryParam("client_secret", "43623d92d1c14dc145691ca9b60e35f40ce40c8ea0")
+                .SetQueryParam("grant_type", "authorization_code")
+                .SetQueryParam("redirect_uri", "https://a110fb7f.ngrok.io/zoho/token")
+                .GetJsonAsync();
+            return request;
+        }
+
+        public async Task<dynamic> Auth()
+        {
+            try
+            {
+                var request = await "https://accounts.zoho.com/oauth/v2/auth"
+                    .SetQueryParam("scope", "ZohoBooks.fullaccess.all")
+                    .SetQueryParam("client_id", "1000.9BTEOO38B36J41SW6XGHA027P6IU3H")
+                    .SetQueryParam("response_type", "code")
+                    .SetQueryParam("redirect_uri", "https://a110fb7f.ngrok.io/zoho/token")
+                    .SetQueryParam("access_type", "offline")
+                    .SetQueryParam("prompt", "none")
+                    .GetAsync();
+                return request;
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new ApiErrorException(new ErrorCode(ex.Call.Response.StatusCode.ToString(), 500, ex.Message), ex);
+            }
         }
 
         public async Task<string> GetToken(string email, string password)
