@@ -81,7 +81,7 @@ namespace Marketplace.Tests
 
             return new TestSetup()
             {
-                contentManagementService = new ContentManagementService(settings, ocClient, blob),
+                contentManagementService = new ContentManagementService(settings, ocClient),
                 settings = settings,
                 occlient =  ocClient,
                 blob = blob

@@ -26,15 +26,15 @@ namespace Marketplace.Common.Services
 		private readonly IOrderCloudClient _oc;
 		private readonly IBlobService _blob;
 
-		public ContentManagementService(AppSettings settings, IOrderCloudClient oc, IBlobService blob) {
+		public ContentManagementService(AppSettings settings, IOrderCloudClient oc) {
 			_settings = settings;
             _oc = oc;
-			_blob = blob;
 			// TODO: move this down to where we're injecting this service
-			//_blob = new BlobService(new BlobServiceConfig() {
-			//	ConnectionString = settings.BlobSettings.ConnectionString,
-			//	Container = "images"
-			//});
+			_blob = new BlobService(new BlobServiceConfig()
+			{
+				ConnectionString = settings.BlobSettings.ConnectionString,
+				Container = "images"
+			});
 		}
 
 		public async Task<Product> UploadProductImage(IFormFile file, string marketplaceID, string productID, string token)
