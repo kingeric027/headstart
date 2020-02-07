@@ -63,7 +63,19 @@ export class MiddlewareApiService {
       .toPromise();
   }
 
-  authOnlyCreditCard(orderID: string, creditCardID: string, cvv: string): Promise<Payment> {
+  authOnlyCreditCard(orderID: string, card: CreditCardToken, cvv: string): Promise<Payment> {
+    const ccPayment = {
+      OrderId: orderID,
+      CreditCardDetails: card,
+      Currency: 'USD',
+      CVV: cvv,
+      MerchantID: this.appSettings.cardConnectMerchantID
+    };
+    return this.http.post<Payment>(`${this.baseUrl}/me/payments`, ccPayment, this.generateHeaders())
+      .toPromise();
+  }
+
+  authOnlySavedCreditCard(orderID: string, creditCardID: string, cvv: string): Promise<Payment> {
     const ccPayment = {
       OrderId: orderID,
       CreditCardID: creditCardID,
@@ -74,5 +86,4 @@ export class MiddlewareApiService {
     return this.http.post<Payment>(`${this.baseUrl}/me/payments`, ccPayment, this.generateHeaders())
       .toPromise();
   }
-
 }
