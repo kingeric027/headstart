@@ -10,6 +10,7 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
+using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services;
@@ -56,6 +57,7 @@ namespace Marketplace.API
                     .Inject<IDevCenterService>()
                     .Inject<IFlurlClient>()
                     .Inject<IZohoClient>()
+                    .Inject<IZohoCommand>()
                     .Inject<ISyncCommand>()
 					.Inject<IAvataxService>()
 					.Inject<IFreightPopService>()
