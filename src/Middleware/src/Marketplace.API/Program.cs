@@ -20,6 +20,8 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Helpers;
+using Marketplace.Models;
+
 namespace Marketplace.API
 {
 	public static class Program

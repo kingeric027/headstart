@@ -9,6 +9,7 @@ using Marketplace.Common.Services.CardConnect;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
+using Marketplace.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

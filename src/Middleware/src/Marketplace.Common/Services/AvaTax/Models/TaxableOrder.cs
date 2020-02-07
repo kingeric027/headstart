@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Marketplace.Common.Models;
+using Marketplace.Models;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.AvaTax.Models

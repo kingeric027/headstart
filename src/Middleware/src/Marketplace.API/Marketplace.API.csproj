@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\oc-marketplace-helpers.steve.davis\src\Marketplace.Helpers\Marketplace.Helpers.csproj" />
     <ProjectReference Include="..\Marketplace.Common\Marketplace.Common.csproj" />
+    <ProjectReference Include="..\Marketplace.Models\Marketplace.Models.csproj" />
   </ItemGroup>
 
 </Project>

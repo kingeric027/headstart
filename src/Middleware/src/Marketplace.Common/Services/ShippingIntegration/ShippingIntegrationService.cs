@@ -6,6 +6,7 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
@@ -13,9 +14,10 @@ namespace Marketplace.Common.Services.ShippingIntegration
     {
         Task<List<ProposedShipment>> GetProposedShipmentsForSuperOrderAsync(SuperOrder superOrder);
     }
-    class OCShippingIntegration : IOCShippingIntegration
+
+    public class OCShippingIntegration : IOCShippingIntegration
     {
-        IFreightPopService _freightPopService;
+        readonly IFreightPopService _freightPopService;
         public OCShippingIntegration(IFreightPopService freightPopService)
         {
             _freightPopService = freightPopService;
@@ -24,7 +26,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
         public async Task<List<ProposedShipment>> GetProposedShipmentsForSuperOrderAsync(SuperOrder superOrder)
         {
             var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(superOrder);
-            Require.That(productIDsWithInvalidDimensions.Count == 0, Exceptions.ErrorCodes.Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
+            Require.That(productIDsWithInvalidDimensions.Count == 0, ErrorCodes.Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
 
             var proposedShipmentRequests = ProposedShipmentRequestsMapper.Map(superOrder);
             proposedShipmentRequests = proposedShipmentRequests.Select(proposedShipmentRequest =>
@@ -36,24 +38,15 @@ namespace Marketplace.Common.Services.ShippingIntegration
             var tasks = proposedShipmentRequests.Select(p => p.RateResponseTask);
             await Task.WhenAll(tasks);
 
-            var proposedShipments = new List<ProposedShipment>();
-            foreach(var proposedShipmentRequest in proposedShipmentRequests)
-            {
-                proposedShipments.Add(ProposedShipmentMapper.Map(proposedShipmentRequest));
-            }
-
-            return proposedShipments;
+            return proposedShipmentRequests.Select(proposedShipmentRequest => ProposedShipmentMapper.Map(proposedShipmentRequest)).ToList();
         }
 
-        private List<string> GetProductsWithInvalidDimensions(SuperOrder superOrder)
+        private static List<string> GetProductsWithInvalidDimensions(SuperOrder superOrder)
         {
-            return superOrder.LineItems.Where(lineItem =>
-            {
-                return !(lineItem.Product.ShipHeight > 0 &&
-                lineItem.Product.ShipLength > 0 &&
-                lineItem.Product.ShipWeight > 0 &&
-                lineItem.Product.ShipWidth > 0);
-            }).Select(lineItem => lineItem.Product.ID).ToList();
+            return superOrder.LineItems.Where(lineItem => !(lineItem.Product.ShipHeight > 0 &&
+                                                            lineItem.Product.ShipLength > 0 &&
+                                                            lineItem.Product.ShipWeight > 0 &&
+                                                            lineItem.Product.ShipWidth > 0)).Select(lineItem => lineItem.Product.ID).ToList();
         }
     }
 }

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Version>0.0.1</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>OrderCloud</Authors>
+    <Company>Four51, Inc.</Company>
+    <Description>Models and Related Resources for Marketplace</Description>
+    <PackageProjectUrl>https://ordercloud.io/</PackageProjectUrl>
+    <PackageIconUrl>https://ordercloud.io/wp-content/uploads/2018/01/oc-circle-logo-2018.png</PackageIconUrl>
+    <RepositoryUrl>https://ordercloud.visualstudio.com/OC-Marketplace/_git/oc-marketplace</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>ordercloud</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OrderCloud.SDK" Version="0.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\oc-marketplace-helpers.steve.davis\src\Marketplace.Helpers\Marketplace.Helpers.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Net;
 using System.Threading.Tasks;
 using Flurl.Http.Testing;
 using Marketplace.Common;
 using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Mappers.CardConnect;
-using Marketplace.Common.Models;
-using Marketplace.Common.Models.CardConnect;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Common.Services.CardConnect.Models;
 using Marketplace.Common.Services.Zoho;
-using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Helpers.Exceptions;
+using Marketplace.Models;
+using Marketplace.Models.Misc;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
 using NUnit.Framework;
@@ -164,35 +162,35 @@ namespace Orchestration.Tests
         }
     }
 
-    public class ZohoTests
-    {
-        private readonly Mocks _mocks = new Mocks();
-        [SetUp]
-        public void Setup()
-        {
+    //public class ZohoTests
+    //{
+    //    private readonly Mocks _mocks = new Mocks();
+    //    [SetUp]
+    //    public void Setup()
+    //    {
 
-        }
+    //    }
 
-        [Test]
-        public async Task zoho_order_test()
-        {
-            var settings = Substitute.For<AppSettings>();
-            settings.ZohoSettings = new ZohoSettings()
-            {
-                AuthToken = "90f15d12b441726b50524c79acbe8e12",
-                OrgID = "708539139"
-            };
-            settings.OrderCloudSettings = new OrderCloudSettings()
-            {
-                ClientSecret = "d576450ca8f89967eea0d3477544ea4bee60af051a5c173be09db08c562b",
-                ClientID = "97349A89-E279-45BE-A072-83DF8F7043F4",
-                AuthUrl = "https://auth.ordercloud.io",
-                ApiUrl = "https://api.ordercloud.io"
-            };
-            var command = new ZohoCommand(settings, new ZohoClient(settings), new OrderCloudClient());
-            await command.ReceiveBuyerOrder(_mocks.WebhookOrder.Response.Body);
-        }
-    }
+    //    [Test]
+    //    public async Task zoho_order_test()
+    //    {
+    //        var settings = Substitute.For<AppSettings>();
+    //        settings.ZohoSettings = new ZohoSettings()
+    //        {
+    //            AuthToken = "90f15d12b441726b50524c79acbe8e12",
+    //            OrgID = "708539139"
+    //        };
+    //        settings.OrderCloudSettings = new OrderCloudSettings()
+    //        {
+    //            ClientSecret = "d576450ca8f89967eea0d3477544ea4bee60af051a5c173be09db08c562b",
+    //            ClientID = "97349A89-E279-45BE-A072-83DF8F7043F4",
+    //            AuthUrl = "https://auth.ordercloud.io",
+    //            ApiUrl = "https://api.ordercloud.io"
+    //        };
+    //        var command = new ZohoCommand(settings, new ZohoClient(settings), new OrderCloudClient());
+    //        await command.ReceiveBuyerOrder(_mocks.WebhookOrder.Response.Body);
+    //    }
+    //}
 
     public class CardConnectTests
     {

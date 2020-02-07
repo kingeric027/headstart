@@ -10,6 +10,7 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
+using Marketplace.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

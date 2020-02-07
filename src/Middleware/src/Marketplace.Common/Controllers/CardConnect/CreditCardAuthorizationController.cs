@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Marketplace.Common.Commands;
-using Marketplace.Common.Models.CardConnect;
-using Marketplace.Helpers;
+using Marketplace.Models;
+using Marketplace.Models.Misc;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 

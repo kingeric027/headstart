@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Marketplace.Common.Mappers;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
+using Marketplace.Models;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.Crud
@@ -10,10 +11,10 @@ namespace Marketplace.Common.Commands.Crud
     public interface IMarketplaceProductCommand
     {
         Task<MarketplaceProduct> Get(string id, VerifiedUserContext user);
-        Task<MarketplaceListPage<MarketplaceProduct>> List(MarketplaceListArgs<MarketplaceProduct> args, VerifiedUserContext user);
+        Task<ListPage<MarketplaceProduct>> List(MarketplaceListArgs<MarketplaceProduct> args, VerifiedUserContext user);
         Task<MarketplaceProduct> Post(MarketplaceProduct product, VerifiedUserContext user);
         Task<MarketplaceProduct> Put(string id, MarketplaceProduct product, VerifiedUserContext user);
-        Task<MarketplaceProduct> Patch(Partial<MarketplaceProduct> product, string id, VerifiedUserContext user);
+        Task<PartialMarketplaceProduct> Patch(PartialMarketplaceProduct product, string id, VerifiedUserContext user);
         Task Delete(string id, VerifiedUserContext user);
 
     }
@@ -32,35 +33,27 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task<MarketplaceProduct> Get(string id, VerifiedUserContext user)
         {
-            var ocProduct = await _oc.Products.GetAsync(id, user.AccessToken);
-            return MarketplaceProductMapper.Map(ocProduct);
+            return await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
         }
 
-        public async Task<MarketplaceListPage<MarketplaceProduct>> List(MarketplaceListArgs<MarketplaceProduct> args, VerifiedUserContext user)
+        public async Task<ListPage<MarketplaceProduct>> List(MarketplaceListArgs<MarketplaceProduct> args, VerifiedUserContext user)
         {
-            var list = await _oc.Products.ListAsync(filters: args, accessToken: user.AccessToken);
-            return MarketplaceProductMapper.Map(list);
+            return await _oc.Products.ListAsync<MarketplaceProduct>(filters: args, accessToken: user.AccessToken);
         }
 
         public async Task<MarketplaceProduct> Post(MarketplaceProduct product, VerifiedUserContext user)
         {
-            var model = MarketplaceProductMapper.Map(product);
-            var p = await _oc.Products.CreateAsync(model, user.AccessToken);
-            return MarketplaceProductMapper.Map(p);
+            return await _oc.Products.CreateAsync<MarketplaceProduct>(product, user.AccessToken);
         }
 
         public async Task<MarketplaceProduct> Put(string id, MarketplaceProduct product, VerifiedUserContext user)
         {
-            var model = MarketplaceProductMapper.Map(product);
-            var p = await _oc.Products.SaveAsync(id, model, user.AccessToken);
-            return MarketplaceProductMapper.Map(p);
+            return await _oc.Products.SaveAsync<MarketplaceProduct>(id, product, user.AccessToken);
         }
 
-        public async Task<MarketplaceProduct> Patch(Partial<MarketplaceProduct> product, string id, VerifiedUserContext user)
+        public async Task<PartialMarketplaceProduct> Patch(PartialMarketplaceProduct product, string id, VerifiedUserContext user)
         {
-            var model = MarketplaceProductMapper.Map(product);
-            var p = await _oc.Products.PatchAsync(id, model, user.AccessToken);
-            return MarketplaceProductMapper.Map(p);
+            return await _oc.Products.PatchAsync<PartialMarketplaceProduct>(id, product, user.AccessToken);
         }
 
         public async Task Delete(string id, VerifiedUserContext user)

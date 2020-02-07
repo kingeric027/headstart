@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Mappers.CardConnect;
-using Marketplace.Common.Models.CardConnect;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Models;
+using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands

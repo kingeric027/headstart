@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\oc-marketplace-helpers.steve.davis\src\Marketplace.Helpers\Marketplace.Helpers.csproj" />
+    <ProjectReference Include="..\Marketplace.Models\Marketplace.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +40,10 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\..\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\newtonsoft.json\9.0.1\lib\netstandard1.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
   </ItemGroup>
 
 </Project>

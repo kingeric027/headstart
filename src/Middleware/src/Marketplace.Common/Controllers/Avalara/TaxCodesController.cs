@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Services.AvaTax;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Controllers.Avalara
 {
