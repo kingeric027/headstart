@@ -20,7 +20,7 @@ import {
   BuyerProduct,
   Category,
   ListBuyerCreditCard,
-  Supplier
+  Supplier,
 } from '@ordercloud/angular-sdk';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
@@ -75,7 +75,7 @@ export interface IOrderHistory {
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
   getSupplierInfo(liGroupedByShipFrom: LineItem[][]): Supplier[];
-  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]): Supplier[];
+  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]): Address[];
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
 }
 
