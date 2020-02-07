@@ -25,10 +25,10 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudClient _oc;
         private readonly IOCShippingIntegration _ocShippingIntegration;
         private readonly ITaxCommand _taxCommand;
-        public OrderCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, ITaxCommand taxCommand)
+        public OrderCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, ITaxCommand taxCommand, IOrderCloudClient oc)
         {
             _freightPopService = freightPopService;
-            _oc = OcFactory.GetSEBAdmin();
+			_oc = oc;
             _ocShippingIntegration = ocShippingIntegration;
             _taxCommand = taxCommand;
         }
