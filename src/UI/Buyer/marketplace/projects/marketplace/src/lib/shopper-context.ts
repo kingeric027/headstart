@@ -19,7 +19,8 @@ import {
   ShipmentItem,
   BuyerProduct,
   Category,
-  ListBuyerCreditCard
+  ListBuyerCreditCard,
+  Supplier
 } from '@ordercloud/angular-sdk';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
@@ -73,6 +74,8 @@ export interface IOrderHistory {
   ): Promise<MarketplaceOrder>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
+  getSupplierInfo(liGroupedByShipFrom: LineItem[][]): Supplier[];
+  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]): Supplier[];
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
 }
 
