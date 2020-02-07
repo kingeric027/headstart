@@ -26,7 +26,7 @@ namespace Marketplace.Common.Commands.CardConnect
         private readonly IOrderCloudClient _oc;
 		private readonly IOrderCloudClient _privilegedOC;
 
-		public CreditCardCommand(AppSettings settings, ICardConnectService card)
+		public CreditCardCommand(AppSettings settings, ICardConnectService card, IOrderCloudClient oc)
         {
             _card = card;
             _settings = settings;
@@ -35,7 +35,7 @@ namespace Marketplace.Common.Commands.CardConnect
                 ApiUrl = "https://api.ordercloud.io",
                 AuthUrl = "https://auth.ordercloud.io"
             });
-			_privilegedOC = OcFactory.GetSEBAdmin();
+			_privilegedOC = oc;
 		}
 
         public async Task<CreditCard> TokenizeAndSave(string buyerID, CreditCardToken card, VerifiedUserContext user)
