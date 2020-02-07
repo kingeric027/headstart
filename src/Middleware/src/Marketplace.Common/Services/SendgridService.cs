@@ -20,9 +20,9 @@ namespace Marketplace.Common.Services
         private readonly AppSettings _settings;
         private readonly IOrderCloudClient _oc;
 
-        public SendgridService(AppSettings settings)
+        public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
-            _oc = OcFactory.GetSEBAdmin();
+            _oc = ocClient;
             _settings = settings;
         }
         public async Task SendSingleEmail(string from, string to, string subject, string htmlContent)

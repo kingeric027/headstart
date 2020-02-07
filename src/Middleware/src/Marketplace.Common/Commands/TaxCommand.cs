@@ -25,9 +25,9 @@ namespace Marketplace.Common.Commands
 		private readonly IOrderCloudClient _oc;
 		private readonly IAvataxService _avatax;
 
-		public TaxCommand(IAvataxService avatax)
+		public TaxCommand(IAvataxService avatax, IOrderCloudClient ocClient)
 		{
-			_oc = OcFactory.GetSEBAdmin();
+			_oc = ocClient;
 			_avatax = avatax;
 		}
 

@@ -28,7 +28,7 @@ namespace Marketplace.Common.Mappers.Avalara
                 Meta = new MarketplaceListPageMeta
                 {
                     Page = skip / top == 0 ? 1 : (skip / top) + 1,
-                    PageSize = 100,
+                    PageSize = top,
                     TotalCount = avataxCodes.count,
                 },
                 Items = taxCodeList
@@ -38,7 +38,7 @@ namespace Marketplace.Common.Mappers.Avalara
         public static (int, int) Map(int page, int pageSize)
         {
             var top = pageSize;
-            var skip =  page > 1 ? (page - 1) * pageSize : 0;
+            var skip =  (page - 1) * pageSize;
             return (top, skip);
         }
     }

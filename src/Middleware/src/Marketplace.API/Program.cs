@@ -16,6 +16,8 @@ using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Helpers;
+using OrderCloud.SDK;
+
 namespace Marketplace.API
 {
 	public static class Program
@@ -47,9 +49,20 @@ namespace Marketplace.API
 			{
 				var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
 					_settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
-
+                var sdk = new OrderCloudClient(new OrderCloudClientConfig
+                {
+                    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    ClientId = _settings.OrderCloudSettings.ClientID,
+                    ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                    Roles = new[]
+                    {
+                        ApiRole.FullAccess
+                    }
+                });
 				services
 					.ConfigureWebApiServices(_settings, "v1", "Marketplace API")
+                    .Inject<IAppSettings>()
                     .Inject<IDevCenterService>()
                     .Inject<IFlurlClient>()
                     .Inject<ISyncCommand>()
@@ -66,6 +79,7 @@ namespace Marketplace.API
 					.Inject<ITaxCommand>()
 					.Inject<ISupplierCategoryConfigQuery>()
 					.Inject<ISendgridService>()
+                    .AddTransient<IOrderCloudClient>(s => sdk)
                     .Inject<ICardConnectService>()
                     .Inject<ICreditCardCommand>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
