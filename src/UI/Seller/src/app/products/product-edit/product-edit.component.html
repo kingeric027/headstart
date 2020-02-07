@@ -170,7 +170,7 @@
                    id="ShipHeight"
                    showErrors
                    aria-describedby="Ship Height"
-                   maxlength="100"
+                   oninput="this.value = Math.abs(this.value)"
                    [resourceForm]="productForm"
                    formControlName="ShipHeight"
                    (input)="handleUpdateProduct($event, 'ShipHeight', 'number')"
@@ -183,6 +183,7 @@
                    id="ShipWidth"
                    showErrors
                    aria-describedby="Ship Width"
+                   oninput="this.value = Math.abs(this.value)"
                    [resourceForm]="productForm"
                    formControlName="ShipWidth"
                    (input)="handleUpdateProduct($event, 'ShipWidth', 'number')"
@@ -197,7 +198,7 @@
                    id="ShipLength"
                    showErrors
                    aria-describedby="Ship Length"
-                   maxlength="100"
+                   oninput="this.value = Math.abs(this.value)"
                    [resourceForm]="productForm"
                    formControlName="ShipLength"
                    (input)="handleUpdateProduct($event, 'ShipLength', 'number')"
@@ -210,6 +211,7 @@
                    id="ShipWeight"
                    showErrors
                    aria-describedby="Ship Weight"
+                   oninput="this.value = Math.abs(this.value)"
                    [resourceForm]="productForm"
                    formControlName="ShipWeight"
                    (input)="handleUpdateProduct($event, 'ShipWeight', 'number')"
