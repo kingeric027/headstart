@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { LineItem } from '@ordercloud/angular-sdk';
-import { groupBy as _groupBy, map as _map, without as _without } from 'lodash';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { Address, LineItem, Supplier } from '@ordercloud/angular-sdk';
+import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
@@ -13,6 +13,8 @@ export class OCMLineitemTable implements OnInit {
   closeIcon = faTimes;
   @Input() lineItems: LineItem[];
   @Input() readOnly: boolean;
+  supplierInfo: Supplier[] = [];
+  supplierAddresses: Address[] = [];
   liGroupedByShipFrom: LineItem[][];
   liGroups: any;
 
@@ -22,6 +24,8 @@ export class OCMLineitemTable implements OnInit {
     await this.lineItems;
     this.liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(this.liGroups);
+    this.supplierInfo = await this.context.orderHistory.getSupplierInfo(this.liGroupedByShipFrom);
+    this.supplierAddresses = await this.context.orderHistory.getSupplierAddresses(this.liGroupedByShipFrom);
   }
 
   removeLineItem(lineItemID: string) {
