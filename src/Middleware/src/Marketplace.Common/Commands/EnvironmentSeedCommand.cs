@@ -242,7 +242,151 @@ namespace Marketplace.Common.Commands
               {
                 new WebhookRoute() { Route = "v1/suppliers/{supplierID}/addresses/{addressID}", Verb = "PATCH" }
               }
-            }
+            },
+            new Webhook() {
+              Name = "Order Approved",
+              Description = "Triggers email letting user know the order was approved.",
+              Url = "/orderapproved",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/approve", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Order Declined",
+              Description = "Triggers email letting user know the order was declined.",
+              Url = "/orderdeclined",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/decline", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Order Shipped",
+              Description = "Triggers email letting user know the order was shipped.",
+              Url = "/ordershipped",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/ship", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Order Cancelled",
+              Description = "Triggers email letting user know the order has been cancelled.",
+              Url = "/ordercancelled",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/cancel", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Order Updated",
+              Description = "Triggers email letting user know the order has been updated.",
+              Url = "/orderupdated",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}", Verb = "PATCH" }
+              }
+            },
+            new Webhook() {
+              Name = "New User",
+              Description = "Triggers an email welcoming the buyer user.  Triggers an email letting admin know about the new buyer user.",
+              Url = "/newuser",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/buyers/{buyerID}/users", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Product Created",
+              Description = "Triggers email to user with details of newly created product.",
+              Url = "/productcreated",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/products", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Product Update",
+              Description = "Triggers email to user indicating that a product has been updated.",
+              Url = "/productupdate",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/products/{productID}", Verb = "PATCH" }
+              }
+            },
+            new Webhook() {
+              Name = "Supplier Updated",
+              Description = "Triggers email letting user know the supplier has been updated.",
+              Url = "/supplierupdated",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/suppliers/{supplierID}", Verb = "PATCH" }
+              }
+            },
         };
         public async Task CreateWebhooks(string accessToken, string baseURL)
         {
