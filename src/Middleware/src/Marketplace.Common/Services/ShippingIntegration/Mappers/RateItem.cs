@@ -1,7 +1,7 @@
-﻿using OrderCloud.SDK;
-using Marketplace.Common.Services.FreightPop;
+﻿using Marketplace.Common.Services.FreightPop.Models;
+using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.ShippingIntegration
+namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {
     public static class RateItemMapper
     {

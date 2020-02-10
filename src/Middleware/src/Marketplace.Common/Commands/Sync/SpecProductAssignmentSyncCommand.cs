@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
-using Marketplace.Helpers.Models;
+using Marketplace.Models;
+using Marketplace.Models.Exceptions;
+using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = MarketplaceSpecProductAssignmentMapper.Map(wi.Current.ToObject<MarketplaceSpecProductAssignment>());
+            var obj = wi.Current.ToObject<MarketplaceSpecProductAssignment>();
             try
             {
                 await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);
@@ -61,7 +61,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = MarketplaceSpecProductAssignmentMapper.Map(JObject.FromObject(wi.Current).ToObject<MarketplaceSpecProductAssignment>());
+            var obj = JObject.FromObject(wi.Current).ToObject<MarketplaceSpecProductAssignment>();
             try
             {
                 await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);
@@ -81,7 +81,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = MarketplaceSpecProductAssignmentMapper.Map(JObject.FromObject(wi.Current).ToObject<SpecProductAssignment>());
+            var obj = JObject.FromObject(wi.Current).ToObject<SpecProductAssignment>();
             try
             {
                 await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);

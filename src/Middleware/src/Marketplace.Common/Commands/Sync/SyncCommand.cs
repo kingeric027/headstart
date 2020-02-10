@@ -2,12 +2,10 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
+using Marketplace.Models.Misc;
 using OrderCloud.SDK;
-using Action = Marketplace.Common.Models.Action;
-using ApiRole = OrderCloud.SDK.ApiRole;
+using Action = Marketplace.Models.Misc.Action;
 
 namespace Marketplace.Common.Commands
 {

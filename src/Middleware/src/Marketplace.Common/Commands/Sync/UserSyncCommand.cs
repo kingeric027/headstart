@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
-using Marketplace.Helpers.Models;
+using Marketplace.Models;
+using Marketplace.Models.Exceptions;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.Commands
 {
@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = MarketplaceUserMapper.Map(wi.Current.ToObject<MarketplaceUser>());
+            var obj = wi.Current.ToObject<MarketplaceUser>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -66,7 +66,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = MarketplaceUserMapper.Map(JObject.FromObject(wi.Current).ToObject<MarketplaceUser>());
+            var obj = JObject.FromObject(wi.Current).ToObject<MarketplaceUser>();
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
@@ -91,7 +91,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = MarketplaceUserMapper.Map(JObject.FromObject(wi.Diff).ToObject<PartialUser>());
+            var obj = JObject.FromObject(wi.Diff).ToObject<PartialUser>();
             try
             {
                 // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Azure.WebJobs;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Exceptions;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
+using Marketplace.Models.Exceptions;
+using Marketplace.Models.Misc;
+using Action = Marketplace.Models.Misc.Action;
 
 namespace Marketplace.Common.Models
 {
