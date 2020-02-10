@@ -1,12 +1,8 @@
 ﻿using Marketplace.Common.Commands;
-using Marketplace.Common.Models;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Models;
+using Marketplace.Models;
+using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Marketplace.Common.Controllers
@@ -16,15 +12,19 @@ namespace Marketplace.Common.Controllers
     {
         
         private readonly IMarketplaceSupplierCommand _command;
-        public SupplierController(IMarketplaceSupplierCommand command, AppSettings settings) : base(settings)
+        private readonly IOrderCloudClient _oc;
+        public SupplierController(IMarketplaceSupplierCommand command, IOrderCloudClient oc, AppSettings settings) : base(settings)
         {
             _command = command;
+            _oc = oc;
         }
 
         [HttpPost, MarketplaceUserAuth(ApiRole.SupplierAdmin)]
         public async Task<MarketplaceSupplier> Create([FromBody] MarketplaceSupplier supplier)
         {
-            return await _command.Create(supplier, VerifiedUserContext);
+            // ocAuth is the token for the organization that is specified in the AppSettings
+            var ocAuth = await _oc.AuthenticateAsync();
+            return await _command.Create(supplier, VerifiedUserContext, ocAuth.AccessToken);
         } 
     }
 }
