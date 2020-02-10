@@ -7,7 +7,18 @@ using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
 namespace Marketplace.Common.Models
 {
-    public enum MessageType
+	public class MessageNotification
+	{
+		public string BuyerID { get; set; }
+		public string UserToken { get; set; }
+		public User Recipient { get; set; }
+		public MessageType MessageType { get; set; }
+		public string[] CCRecipient { get; set; }
+		public MessageConfigData ConfigData { get; set; }
+		public MessageEventBody EventBody { get; set; }
+	}
+
+	public enum MessageType
     {
         OrderDeclined,
         OrderSubmitted,
@@ -20,16 +31,7 @@ namespace Marketplace.Common.Models
         OrderSubmittedForYourApprovalHasBeenDeclined,
         NewUserInvitation
     }
-    public class MessageNotification
-    {
-        public string BuyerID { get; set; }
-        public string UserToken { get; set; }
-        public User Recipient { get; set; }
-        public MessageType MessageType { get; set; }
-        public string[] CCRecipient { get; set; }
-        public MessageConfigData ConfigData { get; set; }
-        public MessageEventBody EventBody { get; set; }
-    }
+
     public class MessageEventBody
     {
         public string Username { get; set; }
