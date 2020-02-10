@@ -1,14 +1,26 @@
-﻿using Marketplace.Models.Controllers;
+﻿using Marketplace.Helpers.Models;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Marketplace.Common.Controllers
 {
-    public class BaseController : MarketplaceController
-    {
+	[EnableCors("marketplacecors")]
+	[Produces("application/json")]
+	public class BaseController : Controller
+	{
+		public VerifiedUserContext VerifiedUserContext;
 		public AppSettings Settings;
 
 		public BaseController(AppSettings settings)
 		{
 			Settings = settings;
+		}
+
+		public override void OnActionExecuting(ActionExecutingContext context)
+		{
+			VerifiedUserContext = new VerifiedUserContext(User);
+			base.OnActionExecuting(context);
 		}
 	}
 }
