@@ -15,10 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Shipping", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.CardConnect", "src\Marketplace.CardConnect\Marketplace.CardConnect.csproj", "{8AE1D292-C943-4148-9109-A6B69BA8195B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Helpers", "..\..\..\oc-marketplace-helpers.steve.davis\src\Marketplace.Helpers\Marketplace.Helpers.csproj", "{702D7E4F-CCE4-4667-B740-0CDB8EFBAABE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Models", "src\Marketplace.Models\Marketplace.Models.csproj", "{28110DC6-20FF-412C-8AB7-F4EDA71C754D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,14 +45,6 @@ Global
 		{8AE1D292-C943-4148-9109-A6B69BA8195B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AE1D292-C943-4148-9109-A6B69BA8195B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AE1D292-C943-4148-9109-A6B69BA8195B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{702D7E4F-CCE4-4667-B740-0CDB8EFBAABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{702D7E4F-CCE4-4667-B740-0CDB8EFBAABE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{702D7E4F-CCE4-4667-B740-0CDB8EFBAABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{702D7E4F-CCE4-4667-B740-0CDB8EFBAABE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{28110DC6-20FF-412C-8AB7-F4EDA71C754D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{28110DC6-20FF-412C-8AB7-F4EDA71C754D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{28110DC6-20FF-412C-8AB7-F4EDA71C754D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{28110DC6-20FF-412C-8AB7-F4EDA71C754D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
