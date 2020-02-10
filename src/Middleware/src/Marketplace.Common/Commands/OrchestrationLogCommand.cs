@@ -1,15 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Helpers;
-using Marketplace.Helpers.Models;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
 {
     public interface IOrchestrationLogCommand
     {
-        Task<MarketplaceListPage<OrchestrationLog>> GetProductLogs(MarketplaceListArgs<OrchestrationLog> marketplaceListArgs);
+        Task<ListPage<OrchestrationLog>> GetProductLogs(ListArgs<OrchestrationLog> marketplaceListArgs);
     }
 
     public class OrchestrationLogCommand : IOrchestrationLogCommand
@@ -23,7 +22,7 @@ namespace Marketplace.Common.Commands
             _log = log;
         }
 
-        public async Task<MarketplaceListPage<OrchestrationLog>> GetProductLogs(MarketplaceListArgs<OrchestrationLog> marketplaceListArgs)
+        public async Task<ListPage<OrchestrationLog>> GetProductLogs(ListArgs<OrchestrationLog> marketplaceListArgs)
         {
             var logs = await _log.List(marketplaceListArgs);
             return logs;

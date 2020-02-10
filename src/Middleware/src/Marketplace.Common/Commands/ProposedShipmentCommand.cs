@@ -1,8 +1,5 @@
-﻿using Marketplace.Common.Exceptions;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Mappers;
+﻿using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
-using Marketplace.Common.Services;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
@@ -10,14 +7,19 @@ using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
+using Marketplace.Common.Services.FreightPop;
+using Marketplace.Common.Services.ShippingIntegration.Mappers;
+using Marketplace.Common.Services.ShippingIntegration.Models;
+using Marketplace.Models;
+using Marketplace.Models.Exceptions;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Commands
 {
     public interface IProposedShipmentCommand
     {
-        Task<MarketplaceListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext);
+        Task<ListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext);
         Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, ProposedShipmentSelection selection);
         Task<PrewebhookResponseWithError> IsValidAddressInFreightPopAsync(Address address);
         Task<PrewebhookResponseWithError> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload);
@@ -32,14 +34,14 @@ namespace Marketplace.Common.Commands
         private readonly IOCShippingIntegration _ocShippingIntegration;
         private readonly PrewebhookResponseWithError validResponse = new PrewebhookResponseWithError { proceed = true };
         private readonly PrewebhookResponseWithError inValidResponse = new PrewebhookResponseWithError { proceed = false, body = "Address invalid, please try again" };
-        public ProposedShipmentCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration)
+        public ProposedShipmentCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, IOrderCloudClient ocClient)
         {
             _freightPopService = freightPopService;
-            _oc = OcFactory.GetSEBAdmin();
+            _oc = ocClient;
             _ocShippingIntegration = ocShippingIntegration;
         }
 
-        public async Task<MarketplaceListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext)
+        public async Task<ListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext)
         {
             var order = await _oc.Orders.GetAsync(OrderDirection.Outgoing, orderId, userContext.AccessToken);
 
@@ -53,10 +55,10 @@ namespace Marketplace.Common.Commands
 
             var proposedShipments = await _ocShippingIntegration.GetProposedShipmentsForSuperOrderAsync(superOrder);
 
-            return new MarketplaceListPage<ProposedShipment>()
+            return new ListPage<ProposedShipment>()
             {
                 Items = proposedShipments,
-                Meta = new MarketplaceListPageMeta
+                Meta = new ListPageMeta
                 {
                     Page = 1,
                     PageSize = 100,
@@ -71,7 +73,7 @@ namespace Marketplace.Common.Commands
             var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
 
             var exists = lineItems.Items.Any(li => li.ShipFromAddressID == selection.ShipFromAddressID);
-            Require.That(exists, Exceptions.ErrorCodes.Checkout.InvalidShipFromAddress, new InvalidShipFromAddressIDError(selection.ShipFromAddressID));
+            Require.That(exists, Marketplace.Models.ErrorCodes.Checkout.InvalidShipFromAddress, new InvalidShipFromAddressIDError(selection.ShipFromAddressID));
 
             var selections = order.xp?.ProposedShipmentSelections?.ToDictionary(s => s.ShipFromAddressID) ?? new Dictionary<string, ProposedShipmentSelection> { };
             selections[selection.ShipFromAddressID] = selection;
@@ -107,6 +109,20 @@ namespace Marketplace.Common.Commands
             }
         }
 
+        public async Task<PrewebhookResponseWithError> IsValidAddressInFreightPopAsync(BuyerAddress address)
+        {
+            var rateRequestBody = AddressValidationRateRequestMapper.Map(address);
+            try
+            {
+                var ratesResponse = await _freightPopService.GetRatesAsync(rateRequestBody);
+                return ratesResponse.Data.ErrorMessages.Count > 0 ? inValidResponse : validResponse;
+            }
+            catch (Exception ex)
+            {
+                return inValidResponse;
+            }
+        }
+
         public async Task<PrewebhookResponseWithError> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload)
         {
             var existingAddress = await _oc.AdminAddresses.GetAsync(payload.RouteParams.AddressID);
@@ -127,7 +143,7 @@ namespace Marketplace.Common.Commands
         {
             var userToken = payload.UserToken;
             var existingAddress = await _oc.Me.GetAddressAsync(payload.RouteParams.AddressID, userToken);
-            var expectedNewAddress = GetExpectedNewAddress(AddressMapper.Map(payload.Request.Body), AddressMapper.Map(existingAddress));
+            var expectedNewAddress = GetExpectedNewAddress(payload.Request.Body, existingAddress);
             var ratesResponse = await IsValidAddressInFreightPopAsync(expectedNewAddress);
             return ratesResponse;
         }
@@ -138,6 +154,24 @@ namespace Marketplace.Common.Commands
             var expectedNewAddress = GetExpectedNewAddress(payload.Request.Body, existingAddress);
             var ratesResponse = await IsValidAddressInFreightPopAsync(expectedNewAddress);
             return ratesResponse;
+        }
+
+        private BuyerAddress GetExpectedNewAddress(BuyerAddress patch, BuyerAddress existingAddress)
+        {
+
+            // todo: add test for this function 
+
+            var patchType = patch.GetType();
+            var propertiesInPatch = patchType.GetProperties();
+            foreach (var property in propertiesInPatch)
+            {
+                var patchValue = property.GetValue(patch);
+                if (patchValue != null)
+                {
+                    property.SetValue(existingAddress, patchValue, null);
+                }
+            }
+            return existingAddress;
         }
 
         private Address GetExpectedNewAddress(Address patch, Address existingAddress)

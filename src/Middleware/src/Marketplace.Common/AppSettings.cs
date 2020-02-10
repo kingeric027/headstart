@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,14 +6,16 @@ namespace Marketplace.Common
 {
 	public enum AppEnvironment { Qa, Demo, Prod }
 
-    //public interface IAppSettings
-    //{
-    //    AppEnvironment Env { get; set; }
-    //    BlobSettings BlobSettings { get; set; }
-    //    CosmosSettings CosmosSettings { get; set; }
-    //    OrderCloudSettings OrderCloudSettings { get; set; }
-    //}
-    public class AppSettings // : IAppSettings
+    public interface IAppSettings
+    {
+        AppEnvironment Env { get; }
+        BlobSettings BlobSettings { get; }
+        CosmosSettings CosmosSettings { get;}
+        OrderCloudSettings OrderCloudSettings { get; }
+        string SendgridApiKey { get; }
+    }
+
+    public class AppSettings : IAppSettings
     {
 		public AvalaraSettings AvalaraSettings { get; set; }
         public AppEnvironment Env { get; set; }
@@ -23,7 +25,15 @@ namespace Marketplace.Common
         public string SendgridApiKey { get; set; }
         public FreightPopSettings FreightPopSettings { get; set; }
         public CardConnectSettings CardConnectSettings { get; set; } = new CardConnectSettings();
+        public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
     }
+
+    public class ZohoSettings
+    {
+        public string AuthToken { get; set; }
+        public string OrgID { get; set; }
+    }
+
     public class FreightPopSettings
     {
         public string BaseUrl { get; set; }
@@ -35,7 +45,9 @@ namespace Marketplace.Common
 	{
 		public string AuthUrl { get; set; }
 		public string ApiUrl { get; set; }
-	}
+        public string ClientID { get; set; }
+        public string ClientSecret { get; set; }
+    }
 
 	public class AvalaraSettings
 	{

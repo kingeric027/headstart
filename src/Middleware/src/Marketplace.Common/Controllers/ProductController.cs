@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Helpers;
-using Marketplace.Helpers.Models;
+using Marketplace.Models;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 
@@ -24,7 +23,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, MarketplaceUserAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
-        public async Task<MarketplaceListPage<MarketplaceProduct>> List(MarketplaceListArgs<MarketplaceProduct> args)
+        public async Task<ListPage<MarketplaceProduct>> List(ListArgs<MarketplaceProduct> args)
         {
             return await _command.List(args, VerifiedUserContext);
         }
@@ -42,7 +41,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPatch, Route("{id}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceProduct> Patch([FromBody] Partial<MarketplaceProduct> obj, string id)
+        public async Task<PartialMarketplaceProduct> Patch([FromBody] PartialMarketplaceProduct obj, string id)
         {
             return await _command.Patch(obj, id, this.VerifiedUserContext);
         }

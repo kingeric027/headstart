@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
-using OrderCloud.SDK;
-using Marketplace.Helpers.Models;
 using Marketplace.Helpers.Extensions;
-using CreditCardValidator;
+using Marketplace.Models;
+using Marketplace.Models.Misc;
+using Marketplace.Models.Orchestration;
 
 namespace Orchestration.Tests
 {
@@ -39,8 +38,8 @@ namespace Orchestration.Tests
                 Token = "fake",
                 Model = obj
             };
-            var path = model.BuildPath("supplier", "clientId");
-            Assert.AreEqual(path, $"clientid/supplier/{obj.Type().ToString().ToLower()}/id");
+            var path = model.BuildPath("supplierid", "clientid");
+            Assert.AreEqual(path, $"supplierid/clientid/{obj.Type().ToString().ToLower()}/id");
         }
 
         [Test]
@@ -79,7 +78,7 @@ namespace Orchestration.Tests
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.Spec, new Marketplace.Helpers.Models.MarketplaceSpec()
+                yield return new TestCaseData(RecordType.Spec, new MarketplaceSpec()
                 {
                     ID = "id"
                 });
@@ -103,11 +102,11 @@ namespace Orchestration.Tests
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.CostCenter, new BaseCostCenter()
+                yield return new TestCaseData(RecordType.CostCenter, new MarketplaceCostCenter()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.Address, new Marketplace.Helpers.Models.MarketplaceAddress()
+                yield return new TestCaseData(RecordType.Address, new MarketplaceAddress()
                 {
                     ID = "id"
                 });

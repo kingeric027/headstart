@@ -9,13 +9,20 @@ using Marketplace.Helpers.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.CardConnect;
 using Marketplace.Common.Commands.Crud;
+using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services.CardConnect;
+using Marketplace.Common.Services.FreightPop;
+using Marketplace.Common.Services.ShippingIntegration;
+using Marketplace.Common.Services.Zoho;
 using Marketplace.Helpers;
+using Marketplace.Models;
+using OrderCloud.SDK;
+
 namespace Marketplace.API
 {
 	public static class Program
@@ -47,11 +54,24 @@ namespace Marketplace.API
 			{
 				var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
 					_settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
-
+                var sdk = new OrderCloudClient(new OrderCloudClientConfig
+                {
+                    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    ClientId = _settings.OrderCloudSettings.ClientID,
+                    ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                    Roles = new[]
+                    {
+                        ApiRole.FullAccess
+                    }
+                });
 				services
 					.ConfigureWebApiServices(_settings, "v1", "Marketplace API")
+                    .Inject<IAppSettings>()
                     .Inject<IDevCenterService>()
                     .Inject<IFlurlClient>()
+                    .Inject<IZohoClient>()
+                    .Inject<IZohoCommand>()
                     .Inject<ISyncCommand>()
 					.Inject<IAvataxService>()
 					.Inject<IFreightPopService>()
@@ -66,6 +86,7 @@ namespace Marketplace.API
 					.Inject<ITaxCommand>()
 					.Inject<ISupplierCategoryConfigQuery>()
 					.Inject<ISendgridService>()
+                    .AddTransient<IOrderCloudClient>(s => sdk)
                     .Inject<ICardConnectService>()
                     .Inject<ICreditCardCommand>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Models;
@@ -17,7 +16,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, Route("product")]
-        public async Task<dynamic> GetProductLogs(MarketplaceListArgs<OrchestrationLog> marketplaceListArgs)
+        public async Task<dynamic> GetProductLogs(ListArgs<OrchestrationLog> marketplaceListArgs)
         {
             return await _command.GetProductLogs(marketplaceListArgs);
         }

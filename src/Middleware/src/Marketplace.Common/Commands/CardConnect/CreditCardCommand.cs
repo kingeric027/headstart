@@ -2,14 +2,14 @@
 using System.Threading.Tasks;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Mappers.CardConnect;
-using Marketplace.Common.Models.CardConnect;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Models;
+using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands.CardConnect
+namespace Marketplace.Common.Commands
 {
     public interface ICreditCardCommand
     {
@@ -26,7 +26,7 @@ namespace Marketplace.Common.Commands.CardConnect
         private readonly IOrderCloudClient _oc;
 		private readonly IOrderCloudClient _privilegedOC;
 
-		public CreditCardCommand(AppSettings settings, ICardConnectService card)
+		public CreditCardCommand(AppSettings settings, ICardConnectService card, IOrderCloudClient oc)
         {
             _card = card;
             _settings = settings;
@@ -35,7 +35,7 @@ namespace Marketplace.Common.Commands.CardConnect
                 ApiUrl = "https://api.ordercloud.io",
                 AuthUrl = "https://auth.ordercloud.io"
             });
-			_privilegedOC = OcFactory.GetSEBAdmin();
+			_privilegedOC = oc;
 		}
 
         public async Task<CreditCard> TokenizeAndSave(string buyerID, CreditCardToken card, VerifiedUserContext user)

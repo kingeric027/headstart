@@ -1,15 +1,13 @@
-﻿using Marketplace.Common.Services.FreightPop;
+﻿using System.Collections.Generic;
+using Marketplace.Models;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Marketplace.Common.Models
+namespace Marketplace.Common.Services.AvaTax.Models
 {
 	public class TaxableOrder
 	{
 		public MarketplaceOrder Order { get; set; }
-		public IEnumerable<LineItem> Lines { get; set; }
+		public IList<LineItem> Lines { get; set; }
 		// Keys are ShipFromAddressIDs
 		public IDictionary<string, decimal> ShippingRates { get; set; }
 	}

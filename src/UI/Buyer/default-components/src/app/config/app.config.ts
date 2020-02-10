@@ -3,7 +3,7 @@ import { environment } from 'src/environments/environment';
 
 export const ocAppConfig: AppConfig = {
   appname: environment.appname,
-  clientID:  environment.clientID,
+  clientID: environment.clientID,
   marketplaceID: environment.marketplaceID,
   baseUrl: environment.baseUrl,
   middlewareUrl: environment.middlewareUrl,
@@ -16,9 +16,10 @@ export const ocAppConfig: AppConfig = {
     'MeAdmin',
     'MeCreditCardAdmin',
     'MeXpAdmin',
-    'Shopper', 
+    'Shopper',
     'BuyerReader',
     'PasswordReset',
     'SupplierReader',
+    'SupplierAddressReader',
   ]
 };
