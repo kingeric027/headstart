@@ -69,17 +69,17 @@ export class ProductFilterService implements IProductFilters {
 
   async listProducts(): Promise < ListProduct > {
     const { page, sortBy, search, categoryID, showOnlyFavorites, activeFacets = {} } = this.activeFiltersSubject.value;
-    const facets = _transform(activeFacets, (result, value, key: any) => (result[`xp.Facets.${key.toLocaleLowerCase()}`] = value), {});
+    // const facets = _transform(activeFacets, (result, value, key: any) => (result[`xp.Facets.${key.toLocaleLowerCase()}`] = value), {});
     const favorites = this.currentUser.favoriteProductIDs.join('|') || undefined;
     return await this.ocMeService.ListProducts({
       categoryID,
       page,
       search,
       sortBy,
-      filters: {
-        ...facets,
-        ID: showOnlyFavorites ? favorites : undefined,
-      },
+      // filters: {
+      //   ...facets,
+      //   ID: showOnlyFavorites ? favorites : undefined,
+      // },
     }).toPromise();
   }
 

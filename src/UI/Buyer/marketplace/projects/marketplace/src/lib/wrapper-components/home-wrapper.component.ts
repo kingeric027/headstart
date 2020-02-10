@@ -15,6 +15,6 @@ export class HomeWrapperComponent implements OnInit {
   constructor(private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
 
   ngOnInit() {
-    this.featuredProducts = this.activatedRoute.snapshot.data.featuredProducts;
+    // this.featuredProducts = this.activatedRoute.snapshot.data.featuredProducts;
   }
 }

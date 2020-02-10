@@ -12,7 +12,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 {
     public interface IOCShippingIntegration
     {
-        Task<List<ProposedShipment>> GetProposedShipmentsForSuperOrderAsync(SuperOrder superOrder);
+        Task<List<ProposedShipment>> GetRates(OrderCalculation orderCalculation);
     }
 
     public class OCShippingIntegration : IOCShippingIntegration
@@ -23,12 +23,12 @@ namespace Marketplace.Common.Services.ShippingIntegration
             _freightPopService = freightPopService;
         }
 
-        public async Task<List<ProposedShipment>> GetProposedShipmentsForSuperOrderAsync(SuperOrder superOrder)
+        public async Task<List<ProposedShipment>> GetRates(OrderCalculation orderCalculation)
         {
-            var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(superOrder);
-            Require.That(productIDsWithInvalidDimensions.Count == 0, ErrorCodes.Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
+            var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(orderCalculation.LineItems);
+            Require.That(productIDsWithInvalidDimensions.Count == 0, Exceptions.ErrorCodes.Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
 
-            var proposedShipmentRequests = ProposedShipmentRequestsMapper.Map(superOrder);
+            var proposedShipmentRequests = ProposedShipmentRequestsMapper.Map(orderCalculation);
             proposedShipmentRequests = proposedShipmentRequests.Select(proposedShipmentRequest =>
             {
                 proposedShipmentRequest.RateResponseTask = _freightPopService.GetRatesAsync(proposedShipmentRequest.RateRequestBody);
@@ -41,12 +41,15 @@ namespace Marketplace.Common.Services.ShippingIntegration
             return proposedShipmentRequests.Select(proposedShipmentRequest => ProposedShipmentMapper.Map(proposedShipmentRequest)).ToList();
         }
 
-        private static List<string> GetProductsWithInvalidDimensions(SuperOrder superOrder)
+        private List<string> GetProductsWithInvalidDimensions(IList<LineItem> lineItems)
         {
-            return superOrder.LineItems.Where(lineItem => !(lineItem.Product.ShipHeight > 0 &&
-                                                            lineItem.Product.ShipLength > 0 &&
-                                                            lineItem.Product.ShipWeight > 0 &&
-                                                            lineItem.Product.ShipWidth > 0)).Select(lineItem => lineItem.Product.ID).ToList();
+            return lineItems.Where(lineItem =>
+            {
+                return !(lineItem.Product.ShipHeight > 0 &&
+                lineItem.Product.ShipLength > 0 &&
+                lineItem.Product.ShipWeight > 0 &&
+                lineItem.Product.ShipWidth > 0);
+            }).Select(lineItem => lineItem.Product.ID).ToList();
         }
     }
 }

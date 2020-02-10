@@ -15,7 +15,7 @@ import { MarketplaceModule, AppConfig } from 'marketplace';
 import { createCustomElement } from '@angular/elements';
 import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
-import { OrderCloudModule } from '@ordercloud/angular-sdk';
+import { OrderCloudModule, Configuration } from '@ordercloud/angular-sdk';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -119,6 +119,10 @@ import { OCMShippingSelectionForm } from './components/checkout/shipping-selecti
 import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.component.';
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
 
+function getSdkConfig() {
+  return new Configuration({basePath: 'https://sandboxapi.ordercloud.io/v1', authPath: 'https://sandboxauth.ordercloud.io/oauth/token'});
+}
+
 const components = [
   OCMCategoryDropdown,
   OCMProductCard,
@@ -212,7 +216,8 @@ const components = [
     MarketplaceModule,
     AppRoutingModule,
     HttpClientModule,
-    OrderCloudModule.forRoot(OcSDKConfig),
+    OrderCloudModule.forRoot(getSdkConfig),
+    // OrderCloudModule.forRoot({basePath: 'https://sandboxapi.ordercloud.io/v1'}),
     CookieModule.forRoot(),
     ToastrModule.forRoot(),
     NgxImageZoomModule,

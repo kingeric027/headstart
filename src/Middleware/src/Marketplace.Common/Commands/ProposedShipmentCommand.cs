@@ -49,15 +49,15 @@ namespace Marketplace.Common.Commands
         {
             var order = await _oc.Orders.GetAsync(OrderDirection.Outgoing, orderId, userContext.AccessToken);
 
-            // update to accomodate lots of lineitems
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, orderId, accessToken: userContext.AccessToken);
-            var superOrder = new SuperOrder
-            {
-                Order = order,
-                LineItems = lineItems.Items.ToList(),
-            };
+        //    // update to accomodate lots of lineitems
+        //    var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, orderId, accessToken: userContext.AccessToken);
+        //    var superOrder = new SuperOrder
+        //    {
+        //        Order = order,
+        //        LineItems = lineItems.Items.ToList(),
+        //    };
 
-            var proposedShipments = await _ocShippingIntegration.GetProposedShipmentsForSuperOrderAsync(superOrder);
+        //    var proposedShipments = await _ocShippingIntegration.GetProposedShipmentsForSuperOrderAsync(superOrder);
 
             return new ListPage<ProposedShipment>()
             {

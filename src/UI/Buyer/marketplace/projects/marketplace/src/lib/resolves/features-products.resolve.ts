@@ -8,6 +8,6 @@ export class FeaturedProductsResolver implements Resolve<BuyerProduct> {
   constructor(private service: OcMeService) {}
 
   resolve(): Observable<ListBuyerProduct> | Promise<ListBuyerProduct> | any {
-    return this.service.ListProducts({ filters: { 'xp.Featured': true } as any });
+    return this.service.ListProducts();
   }
 }
