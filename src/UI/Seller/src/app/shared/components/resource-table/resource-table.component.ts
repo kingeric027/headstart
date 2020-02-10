@@ -40,7 +40,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
   areChanges: boolean;
-  dataSaved = false;
   parentResources: ListResource<any>;
   requestStatus: RequestStatus;
   selectedParentResourceName = 'Fetching Data';
@@ -55,7 +54,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   editResourceHeight = 450;
   activeFilterCount = 0;
   filterForm: FormGroup;
-
+  fromDate: string;
+  toDate: string;
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -106,6 +106,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   shouldShowCreateNew = true;
   @Input()
   shouldShowResourceActions = true;
+  @Input()
+  dataIsSaving = false;
 
   async ngOnInit() {
     this.determineViewingContext();
@@ -130,21 +132,26 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     });
   }
 
-  isFilterHTML(value: string) {
-    return value.split('')[0] === '<';
-  }
-
   applyFilters() {
     if (typeof this.filterForm.value['from'] === 'object') {
-      this.filterForm.value['from'] = this.transformDate(this.filterForm.value['from']);
+      const fromDate = this.filterForm.value['from'];
+      this.fromDate = this.transformDateForUser(fromDate);
+      this.filterForm.value['from'] = this.transformDateForFilter(fromDate);
     } if (typeof this.filterForm.value['to'] === 'object') {
-      this.filterForm.value['to'] = this.transformDate(this.filterForm.value['to']);
+      const toDate = this.filterForm.value['to'];
+      this.toDate = this.transformDateForUser(toDate);
+      this.filterForm.value['to'] = this.transformDateForFilter(toDate);
     }
     this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
-    console.log(this.filterForm.value);
+  }
+  // date format for NgbDatepicker is different than date format used for filters
+  transformDateForUser(date: NgbDateStruct) {
+    let month = date.month.toString().length === 1 ? '0' + date.month : date.month;
+    let day = date.day.toString().length === 1 ? '0' + date.day : date.day;
+    return date.year + '-' + month + '-' + day;
   }
 
-  transformDate(date: NgbDateStruct) {
+  transformDateForFilter(date: NgbDateStruct) {
     return date.month + '-' + date.day + '-' + date.year;
   }
 
@@ -275,7 +282,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   handleSave() {
     this.changesSaved.emit(null);
-    this.dataSaved = true;
   }
 
   handleDelete() {
@@ -307,6 +313,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   clearAllFilters() {
     this._ocService.clearAllFilters();
+    this.toDate = '';
+    this.fromDate = '';
   }
 
   checkForChanges() {

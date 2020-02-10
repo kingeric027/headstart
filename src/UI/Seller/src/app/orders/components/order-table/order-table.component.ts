@@ -12,7 +12,8 @@ import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
   styleUrls: ['./order-table.component.scss'],
 })
 export class OrderTableComponent extends ResourceCrudComponent<Order> {
-  shouldShowOrderToggle = false;
+  isListPage: boolean;
+  shouldShowOrderToggle: boolean = false;
   activeOrderDirectionButton: string;
   constructor(
     private orderService: OrderService,
@@ -29,9 +30,16 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
         this.readFromUrlQueryParams(params);
       }
     });
+    activatedroute.params.subscribe(params => {
+      this.isListPage = !Boolean(params.orderID);
+    })
   }
   setOrderDirection(direction: string) {
-    this.orderService.setOrderDirection(direction);
+    if (this.isListPage) {
+      this.orderService.setOrderDirection(direction);
+    } else {
+      this.router.navigate(['/orders'], { queryParams: { OrderDirection: direction } });
+    }
   }
 
   private readFromUrlQueryParams(params: Params): void {

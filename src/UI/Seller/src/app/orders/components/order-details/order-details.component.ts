@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Order, LineItem, OcLineItemService, OcPaymentService, Payment } from '@ordercloud/angular-sdk';
 import { Address } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from'lodash';
-import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
+import { getProductMainImageUrlOrPlaceholder } from '@app-seller/shared/services/product/product-image.helper';
 import { MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 
 @Component({
@@ -18,6 +18,7 @@ export class OrderDetailsComponent {
   _liGroups: any;
   images: MarketPlaceProductImage[] = [];
   orderDirection: string;
+  cardType: string;
 
   @Input()
   set order(order: Order) {
@@ -41,10 +42,17 @@ export class OrderDetailsComponent {
     this._liGroupedByShipFrom = Object.values(this._liGroups);
   }
 
+  setCardType(payment) {
+    if (!payment.xp.cardType || payment.xp.cardType === null) {
+      return 'Card';
+    }
+    this.cardType = payment.xp.cardType.charAt(0).toUpperCase() + payment.xp.cardType.slice(1);
+    return this.cardType;
+  }
+    
   getImageUrl(lineItem: LineItem) {
     const product = lineItem.Product;
-    const images = ReplaceHostUrls(product);
-    return images[0].URL;
+    return getProductMainImageUrlOrPlaceholder(product);
   }
 
   getFullName(address: Address) {

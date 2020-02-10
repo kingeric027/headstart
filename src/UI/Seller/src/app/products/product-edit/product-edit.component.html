@@ -32,7 +32,7 @@
                  maxlength="100"
                  [resourceForm]="productForm"
                  formControlName="ID"
-                 (input)="updateResourceFromEvent($event, 'ID')"
+                 (input)="handleUpdateProduct($event, 'ID')"
                  placeholder="Enter Product ID">
         </div>
         <div class="form-group"
@@ -50,6 +50,19 @@
                                            pathOnResource="Description"
                                            (resourceUpdated)="updateResourceFromFieldValue($event.field, $event.value)">
           </reactive-quill-editor-component>
+        </div>
+        <div class="form-group">
+          <label for="Note">Product Message</label>
+          <input type="text"
+                 class="form-control"
+                 id="Note"
+                 showErrors
+                 aria-describedby="Note"
+                 maxlength="140"
+                 [resourceForm]="productForm"
+                 formControlName="Note"
+                 (input)="handleUpdateProduct($event, 'xp.Note')"
+                 placeholder="(Optional) Enter a note about this product">
         </div>
         <div class="form-group">
           <label for="QuantityMultiplier">Quantity Multiplier</label>
@@ -291,7 +304,7 @@
       <button *ngIf="areChanges"
               class="btn btn-primary"
               type="submit"
-              [disabled]="productForm?.status === 'INVALID' || dataSaved"
+              [disabled]="productForm?.status === 'INVALID' || dataIsSaving"
               (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
       <button class="btn brand-button ml-3"
               (click)="handleDiscardChanges()"

@@ -3,6 +3,7 @@
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
+                          [dataIsSaving]="dataIsSaving"
                           [resourceForm]="resourceForm"
                           [shouldShowResourceActions]="false"
                           [filterConfig]="filterConfig"
@@ -19,6 +20,7 @@
   </app-product-view>
   <app-product-edit *ngIf="userContext?.UserType === 'SUPPLIER'"
                     class="resource-edit"
+                    [dataIsSaving]="dataIsSaving"
                     [addresses]="addresses"
                     [orderCloudProduct]="resourceInSelection">
   </app-product-edit>

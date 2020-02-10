@@ -20,9 +20,9 @@ namespace Marketplace.Common.Services
         private readonly AppSettings _settings;
         private readonly IOrderCloudClient _oc;
 
-        public SendgridService(AppSettings settings)
+        public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
-            _oc = OcFactory.GetSEBAdmin();
+            _oc = ocClient;
             _settings = settings;
         }
         public async Task SendSingleEmail(string from, string to, string subject, string htmlContent)
@@ -35,16 +35,22 @@ namespace Marketplace.Common.Services
         }
         public async Task SendSupplierEmails(string orderID)
         {
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
-            lineItems.Items
-                .Select(item => item.SupplierID)
-                    .Distinct()
-                    .ToList()
-                    .ForEach(async supplier =>
-                    {
-                        Supplier supplierInfo = await _oc.Suppliers.GetAsync(supplier);
-                        await SendSingleEmail("noreply@four51.com", supplierInfo.xp.Contacts[0].Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>");
-                    });
+            try
+            {
+                var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
+                lineItems.Items
+                    .Select(item => item.SupplierID)
+                        .Distinct()
+                        .ToList()
+                        .ForEach(async supplier =>
+                        {
+                            Supplier supplierInfo = await _oc.Suppliers.GetAsync(supplier);
+                            await SendSingleEmail("noreply@four51.com", supplierInfo.xp.Contacts[0].Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>");
+                        });
+            } catch (Exception)
+            {
+                // preventing supplierInfo xp null reference exceptions temporarily
+            }
         }
     }
 }

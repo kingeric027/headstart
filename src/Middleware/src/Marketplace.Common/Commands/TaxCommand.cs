@@ -15,6 +15,7 @@ namespace Marketplace.Common.Commands
 	public interface ITaxCommand
 	{
 		Task<MarketplaceOrder> ApplyTaxEstimate(string orderID);
+		Task HandleTransactionCreation(MarketplaceOrder buyerOrder);
 	}
 
 	public class TaxCommand: ITaxCommand
@@ -22,9 +23,9 @@ namespace Marketplace.Common.Commands
 		private readonly IOrderCloudClient _oc;
 		private readonly IAvataxService _avatax;
 
-		public TaxCommand(IAvataxService avatax)
+		public TaxCommand(IAvataxService avatax, IOrderCloudClient ocClient)
 		{
-			_oc = OcFactory.GetSEBAdmin();
+			_oc = ocClient;
 			_avatax = avatax;
 		}
 
@@ -35,21 +36,36 @@ namespace Marketplace.Common.Commands
 
 			// change back to marketplace order once the model is updated
 			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
-			var items = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
-
-			var inValid = ListShipmentsWithoutSelection(order, items.Items).ToList();
+			var taxableOrder = await GetTaxableOrder(order);
+			var inValid = ListShipmentsWithoutSelection(order, taxableOrder.Lines);
             Require.That(!inValid.Any(), ErrorCodes.Checkout.MissingShippingSelection, new MissingShippingSelectionError(inValid));
 
+			var totalTax = await _avatax.GetTaxEstimateAsync(taxableOrder);
+
 			var shippingSelection = order.xp.ProposedShipmentSelections.ToDictionary(selection => selection.ShipFromAddressID, selection => selection.Rate);
-
-            var taxOrder = new TaxableOrder() { Order = order, Lines = items.Items, ShippingRates = shippingSelection};
-
-			var totalTax = await _avatax.GetTaxEstimateAsync(taxOrder);
-
 			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()
 			{
 				TaxCost = totalTax
 			});
+		}
+
+		public async Task HandleTransactionCreation(MarketplaceOrder buyerOrder)
+		{
+			var taxableOrder = await GetTaxableOrder(buyerOrder);
+			await _avatax.CreateTransactionAsync(taxableOrder);
+		}
+
+		private async Task<TaxableOrder> GetTaxableOrder(MarketplaceOrder order)
+		{
+			var items = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID);
+			
+			var shippingSelection = new Dictionary<string, decimal>();
+			foreach (var selection in order.xp.ProposedShipmentSelections)
+			{
+				shippingSelection.Add(selection.ShipFromAddressID, selection.Rate);
+			}
+
+			return new TaxableOrder() { Order = order, Lines = items.Items, ShippingRates = shippingSelection };
 		}
 
 		private static IEnumerable<string> ListShipmentsWithoutSelection(MarketplaceOrder order, IList<LineItem> items)

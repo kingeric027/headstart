@@ -222,7 +222,8 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   getResourceById(resourceID: string): Promise<any> {
-    return this.ocService.Get(...this.createListArgs([resourceID])).toPromise();
+    const orderDirection = this.optionsSubject.value.OrderDirection;
+    return this.ocService.Get(...this.createListArgs([resourceID], orderDirection)).toPromise();
   }
 
   createListArgs(options: any[], orderDirection: string = '') {

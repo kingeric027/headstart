@@ -17,14 +17,16 @@ namespace Marketplace.Common.Services
 
 	public class ContentManagementService : IContentManagementService
 	{
-		private readonly BlobService _blob;
 		private readonly AppSettings _settings;
 		private readonly IOrderCloudClient _oc;
+		private readonly IBlobService _blob;
 
-		public ContentManagementService(AppSettings settings) {
+		public ContentManagementService(AppSettings settings, IOrderCloudClient oc) {
 			_settings = settings;
-			_oc = OcFactory.GetSEBAdmin();
-			_blob = new BlobService(new BlobServiceConfig() {
+            _oc = oc;
+			// TODO: move this down to where we're injecting this service
+			_blob = new BlobService(new BlobServiceConfig()
+			{
 				ConnectionString = settings.BlobSettings.ConnectionString,
 				Container = "images"
 			});
@@ -34,6 +36,10 @@ namespace Marketplace.Common.Services
 		{
 			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
 			var index = product.xp.Images?.Select(img => int.Parse(img.URL.Split('-').Last())).DefaultIfEmpty(0).Max() + 1;
+			if (product.xp?.Images == null)
+				product.xp = new ProductXp { Images = new List<ProductImage>() };
+
+			var index = product.xp.Images.Select(img => int.Parse(img.URL.Split('-').Last())).DefaultIfEmpty(0).Max() + 1;
 			var blobName = GetProductImageName(marketplaceID, productID, index);
 			await _blob.Save(blobName, file);
 

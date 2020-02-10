@@ -101,7 +101,6 @@ namespace Marketplace.Common.Commands
                     AllowAnySupplier = false,
                     AllowSeller = false,
                     IsAnonBuyer = false,
-
                 }, token);
                 await _oc.SupplierUserGroups.SaveUserAssignmentAsync(key, new UserGroupAssignment()
                 {

@@ -10,8 +10,7 @@
           </div>
           <select class="custom-select"
                   id="paymentMethodSelectId"
-                  formControlName="selectedPaymentMethod"
-                  (change)="selectPaymentMethod(null)">
+                  formControlName="selectedPaymentMethod">
             <option *ngFor="let method of availablePaymentMethods"
                     [ngValue]="method">
               {{ method | paymentMethodDisplay }}
@@ -22,13 +21,14 @@
     </form>
   </div>
 </div>
-<ocm-payment-purchase-order *ngIf="selectedPaymentMethod === 'PurchaseOrder'"
+<!-- <ocm-payment-purchase-order *ngIf="selectedPaymentMethod === 'PurchaseOrder'"
                             [payment]="existingPayment"
                             (continue)="onContinueClicked()">
 </ocm-payment-purchase-order>
 <ocm-payment-spending-account *ngIf="selectedPaymentMethod === 'SpendingAccount'"
                               [payment]="existingPayment"
-                              (continue)="onContinueClicked()">></ocm-payment-spending-account>
-<ocm-credit-card-form *ngIf="selectedPaymentMethod === 'CreditCard'"
-                      [submitText]="'Use'"
-                      (formSubmitted)="addCard($event.detail)"></ocm-credit-card-form>
+                              (continue)="onContinueClicked()">></ocm-payment-spending-account> -->
+<ocm-payment-credit-card *ngIf="selectedPaymentMethod === 'CreditCard'"
+                          [cards]="cards"
+                          (cardSelected)="onCardSelected($event.detail)">
+</ocm-payment-credit-card>

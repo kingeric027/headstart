@@ -39,6 +39,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
 import { CreditCardInputDirective } from './directives/credit-card-input.directive';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
+import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { ChildCategoryPipe } from './pipes/category-children.pipe';
 import { CreditCardFormatPipe } from './pipes/credit-card-format.pipe';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
@@ -119,6 +120,7 @@ import { OCMProfileForm } from './components/profile/profile-form/profile-form.c
 import { OCMCheckoutShipping } from './components/checkout/checkout-shipping/checkout-shipping.component';
 import { OCMShippingSelectionForm } from './components/checkout/shipping-selection-form/shipping-selection-form.component';
 import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.component.';
+import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
 
 const components = [
   OCMCategoryDropdown,
@@ -188,7 +190,8 @@ const components = [
   OCMSupplierList,
   OCMCheckoutShipping,
   OCMShippingSelectionForm,
-  ConfirmModal
+  ConfirmModal,
+  OCMPaymentCreditCard
 ];
 
 @NgModule({
@@ -200,6 +203,7 @@ const components = [
     SpecFieldDirective,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
+    PhoneFormatPipe,
     ChildCategoryPipe,
     CreditCardFormatPipe,
     PaymentMethodDisplayPipe,
@@ -294,6 +298,7 @@ export class AppModule {
     this.buildWebComponent(OCMCheckoutConfirm, 'ocm-checkout-confirm');
     this.buildWebComponent(OCMPaymentSpendingAccount, 'ocm-payment-spending-account');
     this.buildWebComponent(OCMPaymentPurchaseOrder, 'ocm-payment-purchase-order');
+    this.buildWebComponent(OCMPaymentCreditCard, 'ocm-payment-credit-card');
     this.buildWebComponent(OCMCheckoutAddress, 'ocm-checkout-address');
     this.buildWebComponent(OCMCheckoutPayment, 'ocm-checkout-payment');
     this.buildWebComponent(OCMCheckout, 'ocm-checkout');

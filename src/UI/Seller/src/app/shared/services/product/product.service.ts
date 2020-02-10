@@ -7,11 +7,11 @@ import {
   Product,
   OcPriceScheduleService,
   OcCatalogService,
-  ProductCatalogAssignment,
   ProductAssignment,
+  ProductCatalogAssignment,
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '../resource-crud/resource-crud.service';
-import { MarketPlaceProduct, PUBLISHED } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -72,35 +72,50 @@ export class ProductService extends ResourceCrudService<Product> {
     await Promise.all([...addRequests, ...deleteRequests]);
   }
 
-  addProductCatalogAssignment(assignment: ProductAssignment): Promise<void> {
+  addProductCatalogAssignment(assignment: ProductCatalogAssignment): Promise<void> {
     return this.ocCatalogService
-      .SaveProductAssignment({ CatalogID: assignment.BuyerID, ProductID: assignment.ProductID })
+      .SaveProductAssignment({ CatalogID: assignment.CatalogID, ProductID: assignment.ProductID })
       .toPromise();
   }
 
-  removeProductCatalogAssignment(assignment: ProductAssignment) {
-    return this.ocCatalogService.DeleteProductAssignment(assignment.BuyerID, assignment.ProductID).toPromise();
+  removeProductCatalogAssignment(assignment: ProductCatalogAssignment) {
+    return this.ocCatalogService.DeleteProductAssignment(assignment.CatalogID, assignment.ProductID).toPromise();
   }
 
-  async updateProductPartyPriceScheduleAssignments(add: ProductAssignment[], del: ProductAssignment[]): Promise<void> {
-    const addRequests = add.map(newAssignment => this.addProductPartyPriceScheduleAssignment(newAssignment));
-    const deleteRequests = del.map(assignmentToRemove => {
-      return this.removeProductPartyPriceScheduleAssignment(assignmentToRemove);
-    });
-    await Promise.all([...addRequests, ...deleteRequests]);
-  }
-
-  addProductPartyPriceScheduleAssignment(assignment: ProductAssignment): Promise<void> {
-    return this.ocProductsService
-      .SaveAssignment({
-        ProductID: assignment.ProductID,
-        BuyerID: assignment.BuyerID,
-        PriceScheduleID: assignment.PriceScheduleID,
-      })
-      .toPromise();
-  }
-
-  removeProductPartyPriceScheduleAssignment(assignment: ProductAssignment): Promise<void> {
-    return this.ocProductsService.DeleteAssignment(assignment.ProductID, assignment.BuyerID).toPromise();
-  }
+  emptyResource = {
+    ID: null,
+    Name: null,
+    Description: null,
+    QuantityMultiplier: null,
+    Shipping: {
+      ShipWeight: null,
+      ShipHeight: null,
+      ShipWidth: null,
+      ShipLength: null,
+    },
+    PriceSchedule: {
+      PriceBreaks: [
+        {
+          Quantity: 1,
+          Price: 0,
+        },
+      ],
+    },
+    HasVariants: null,
+    Notes: null,
+    UnitOfMeasure: null,
+    Status: null,
+    ShipFromAddressID: null,
+    Inventory: null,
+    DefaultSupplierID: null,
+    xp: {
+      TaxCode: {
+        Category: null,
+        Code: null,
+        Description: null,
+      },
+      Data: {},
+      Images: [],
+    },
+  };
 }

@@ -1,4 +1,5 @@
 <div *ngIf="lineItems">
+  <!-- Currently, payments are not created until submit. This will likely change in the future. -->
   <ocm-payment-list *ngIf="payments"
                     [payments]="payments"></ocm-payment-list>
   <div class="row">
@@ -20,7 +21,7 @@
   <ocm-lineitem-table [lineItems]="lineItems?.Items"
                       [readOnly]="true">
   </ocm-lineitem-table>
-  <form *ngIf="!anonEnabled"
+  <form *ngIf="!isAnon"
         novalidate
         [formGroup]="form">
     <textarea type="text"

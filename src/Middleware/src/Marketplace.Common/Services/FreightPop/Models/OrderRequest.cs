@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Marketplace.Common.Services.FreightPop.Models
 {
 
-    public class Order
+    public class OrderRequest
     {
+        [Required]
         public string OrderNumber { get; set; }
         public Carrier Carrier { get; set; }
-        public ShipmentItem[] Items { get; set; }
         public PaymentTerm PaymentTerm { get; set; }
+        [Required]
         public AccountDetails ThirdPartyAccountInfo { get; set; }
         public DateTime ShipDate { get; set; }
+        [Required]
+        public List<ShipmentItem> Items { get; set; }
+        [Required]
         public OrderAddress ShipperAddress { get; set; }
         public OrderAddress ReturnAddress { get; set; }
         public bool IncludeReturnLabel { get; set; }
+        [Required]
         public OrderAddress ConsigneeAddress { get; set; }
         public string Reference1 { get; set; }
         public string Reference2 { get; set; }
@@ -24,6 +30,7 @@ namespace Marketplace.Common.Services.FreightPop.Models
         public string Reference6 { get; set; }
         public List<ProductDetail> ProductDetails { get; set; }
         public string ITN { get; set; }
+        [Required]
         public AdditionalDetails AdditionalDetails { get; set; }
         // sales order, invoice, etc...
         public string OrderType { get; set; }

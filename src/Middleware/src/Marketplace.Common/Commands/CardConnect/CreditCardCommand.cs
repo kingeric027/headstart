@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Helpers;
 using Marketplace.Common.Mappers.CardConnect;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Helpers;
@@ -23,8 +24,9 @@ namespace Marketplace.Common.Commands
         private readonly ICardConnectService _card;
         private readonly AppSettings _settings;
         private readonly IOrderCloudClient _oc;
+		private readonly IOrderCloudClient _privilegedOC;
 
-        public CreditCardCommand(AppSettings settings, ICardConnectService card)
+		public CreditCardCommand(AppSettings settings, ICardConnectService card, IOrderCloudClient oc)
         {
             _card = card;
             _settings = settings;
@@ -33,7 +35,8 @@ namespace Marketplace.Common.Commands
                 ApiUrl = "https://api.ordercloud.io",
                 AuthUrl = "https://auth.ordercloud.io"
             });
-        }
+			_privilegedOC = oc;
+		}
 
         public async Task<CreditCard> TokenizeAndSave(string buyerID, CreditCardToken card, VerifiedUserContext user)
         {
@@ -53,13 +56,15 @@ namespace Marketplace.Common.Commands
         {
             var cc = await _oc.Me.GetCreditCardAsync<BuyerCreditCard>(payment.CreditCardID, user.AccessToken);
             Require.That(cc.Token != null, new ErrorCode("Invalid credit card token", 400, "Credit card must have valid authorization token"));
-            
-            var orderlist = await _oc.Me.ListOrdersAsync<Order>(builder => builder.AddFilter(o => o.ID == payment.OrderID), accessToken: user.AccessToken);
-            if (orderlist.Meta.TotalCount == 0) 
-                throw new ApiErrorException(new ErrorCode("Required", 404, "Unable to find Order"), payment.OrderID);
-            var order = orderlist.Items.First();
 
-            Require.That(!order.IsSubmitted, new ErrorCode("Invalid Order Status", 400, "Order has already been submitted"));
+			var order = await _privilegedOC.Orders.GetAsync(OrderDirection.Incoming, payment.OrderID);
+
+			var paymentlist = await _privilegedOC.Payments.ListAsync<Payment>(OrderDirection.Incoming, payment.OrderID, builder => builder.AddFilter(p => p.CreditCardID == payment.CreditCardID));
+			if (paymentlist.Meta.TotalCount == 0)
+				throw new ApiErrorException(new ErrorCode("Required", 404, $"Unable to find Payment on Order {payment.OrderID} with CreditCardID {payment.CreditCardID}"), payment.OrderID);
+			var ocPayment = paymentlist.Items.First();
+
+			Require.That(!order.IsSubmitted, new ErrorCode("Invalid Order Status", 400, "Order has already been submitted"));
             Require.That(order.BillingAddress != null || order.BillingAddressID != null, new ErrorCode("Invalid Bill Address", 400, "Order must supply valid billing address for credit card verification"));
 
             if (order.BillingAddress == null)
@@ -85,9 +90,9 @@ namespace Marketplace.Common.Commands
             }
 
             var call = await _card.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment));
-            var p = await _oc.Payments.CreateAsync(OrderDirection.Outgoing, order.ID, CardConnectMapper.Map(call, payment), user.AccessToken);
-            var trans = await _oc.Payments.CreateTransactionAsync(OrderDirection.Outgoing, order.ID, p.ID,
-                CardConnectMapper.Map(order, p, call), user.AccessToken);
+			ocPayment = await _privilegedOC.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true });
+            var trans = await _privilegedOC.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID,
+                CardConnectMapper.Map(order, ocPayment, call));
             return trans;
         }
     }

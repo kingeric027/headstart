@@ -4,7 +4,7 @@ import { MarketPlaceProductImage } from '../models/MarketPlaceProduct.interface'
 
 export interface FileHandle {
   File: File;
-  Url: SafeUrl;
+  URL: SafeUrl;
 }
 
 @Directive({
@@ -47,10 +47,10 @@ export class DragDirective {
     this.background = '#eee';
 
     const files: FileHandle[] = [];
-    Array.from(evt.dataTransfer.files).map((file) => {
+    Array.from(evt.dataTransfer.files).map(file => {
       const File = file;
-      const Url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(File));
-      files.push({ File, Url });
+      const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(File));
+      files.push({ File, URL });
     });
     if (files.length > 0) {
       this.files.emit(files);

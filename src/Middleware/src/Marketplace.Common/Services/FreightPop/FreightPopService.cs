@@ -6,6 +6,7 @@ namespace Marketplace.Common.Services.FreightPop
 {
 	public interface IFreightPopService
 	{
+		Task<Response<dynamic>> ImportOrderAsync(List<OrderRequest> orderRequestBody);
 		Task<Response<GetRatesData>> GetRatesAsync(RateRequestBody rateRequestBody);
 	}
 
@@ -41,6 +42,14 @@ namespace Marketplace.Common.Services.FreightPop
 			await AuthenticateAync();
 			var rateRequestResponse = await MakeRequest("rate/getRates").PostJsonAsync(rateRequestBody).ReceiveJson<Response<GetRatesData>>();
 			return rateRequestResponse;
+		}
+
+		public async Task<Response<dynamic>> ImportOrderAsync(List<OrderRequest> orderRequestBody)
+		{
+			// temporarily here to prevent auth issues with transient
+			await AuthenticateAync();
+			var orderRequestResponse = await MakeRequest("order/ImportOrder").PostJsonAsync(orderRequestBody).ReceiveJson<Response<dynamic>>();
+			return orderRequestResponse;
 		}
 	}
 }

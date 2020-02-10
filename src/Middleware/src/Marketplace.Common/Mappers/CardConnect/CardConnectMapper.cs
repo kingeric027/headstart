@@ -70,7 +70,7 @@ namespace Marketplace.Common.Mappers.CardConnect
                 name = $"{order.BillingAddress.FirstName} {order.BillingAddress.LastName}",
                 account = card.Token,
                 address = order.BillingAddress.Street1,
-                amount = payment.Amount.ToString(CultureInfo.InvariantCulture),
+                amount = order.Total.ToString(CultureInfo.InvariantCulture),
                 //capture = auth.capture,
                 //bin = auth.bin,
                 city = order.BillingAddress.City,
@@ -98,21 +98,6 @@ namespace Marketplace.Common.Mappers.CardConnect
                 Type = payment.Type.ToString()
             };
             return t;
-        }
-
-        public static Payment Map(AuthorizationResponse response, CreditCardPayment payment)
-        {
-            var p = new Payment()
-            {
-                Accepted = response.respstat == "A",
-                Amount = response.amount,
-                ID = response.retref,
-                DateCreated = DateTime.Now,
-                CreditCardID = payment.CreditCardID,
-                Description = $"{response.authcode} {response.resptext}",
-                Type = PaymentType.CreditCard
-            };
-            return p;
         }
 
         //public static CreditCardAuthorization Map(AuthorizationResponse response, CreditCardAuthorization request)
