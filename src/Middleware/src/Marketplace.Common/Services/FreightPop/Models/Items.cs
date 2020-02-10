@@ -35,14 +35,14 @@ namespace Marketplace.Common.Services.FreightPop
     {
         public InnerPieces InnerPieces { get; set; }
         public string Description { get; set; }
-        public float FreightClass { get; set; }
-        public float Height { get; set; }
-        public float Length { get; set; }
+        public decimal FreightClass { get; set; }
+        public decimal Height { get; set; }
+        public decimal Length { get; set; }
         public PackageType PackageType { get; set; }
         public int Quantity { get; set; }
-        public float Weight { get; set; }
+        public decimal Weight { get; set; }
         public Unit Unit { get; set; }
-        public float Width { get; set; }
+        public decimal Width { get; set; }
         public string PackageId { get; set; }
     }
     public class InnerPieces

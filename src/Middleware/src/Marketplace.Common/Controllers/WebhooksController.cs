@@ -15,11 +15,13 @@ namespace Marketplace.Common.Controllers
         private readonly AppSettings _settings;
         private readonly ISendgridService _sendgridService;
         private readonly IProposedShipmentCommand _proposedShipmentCommand;
+        private readonly IOrderCommand _orderCommand;
 
-        public WebhooksController(AppSettings settings, ISendgridService sendgridService, IProposedShipmentCommand proposedShipmentCommand) : base(settings)
+        public WebhooksController(AppSettings settings, ISendgridService sendgridService, IProposedShipmentCommand proposedShipmentCommand, IOrderCommand orderCommand) : base(settings)
         {
             _settings = settings;
             _sendgridService = sendgridService;
+            _orderCommand = orderCommand;
             _proposedShipmentCommand = proposedShipmentCommand;
         }
 
@@ -33,6 +35,7 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route("ordersubmit")]
         public async void HandleOrderSubmit([FromBody] WebhookPayloads.Orders.Submit payload)
         {
+            await _orderCommand.HandleBuyerOrderSubmit(payload.Response.Body.ID);
             await _sendgridService.SendSupplierEmails(payload.Response.Body.ID);
             await _sendgridService.SendSingleEmail("noreply@four51.com", payload.Response.Body.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
         }

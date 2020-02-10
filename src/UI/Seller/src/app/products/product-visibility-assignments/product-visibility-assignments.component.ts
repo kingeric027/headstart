@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnChanges } from '@angular/core';
-import { Buyer, OcBuyerService, ProductAssignment, OcProductService } from '@ordercloud/angular-sdk';
+import { Buyer, OcBuyerService, ProductAssignment, ProductCatalogAssignment, OcCatalogService } from '@ordercloud/angular-sdk';
 import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { ProductService } from '@app-seller/shared/services/product/product.service';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
@@ -15,25 +15,25 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
   buyers: Buyer[];
   add: ProductAssignment[];
   del: ProductAssignment[];
-  _productPartyPriceScheduleAssignmentsStatic: ProductAssignment[];
-  _productPartyPriceScheduleAssignmentsEditable: ProductAssignment[];
+  _productCatalogAssignmentsStatic: ProductCatalogAssignment[];
+  _productCatalogAssignmentsEditable: ProductCatalogAssignment[];
   areChanges = false;
   requestedUserConfirmation: boolean = false;
   faExclamationCircle = faExclamationCircle;
 
   constructor(
     private ocBuyerService: OcBuyerService,
-    private ocProductService: OcProductService,
+    private ocCatalogService: OcCatalogService,
     private productService: ProductService
   ) {}
 
   async ngOnInit() {
     this.getBuyers();
-    this.getProductPartyPriceScheduleAssignments(this.product);
+    this.getProductCatalogAssignments(this.product);
   }
 
   ngOnChanges() {
-    this.getProductPartyPriceScheduleAssignments(this.product);
+    this.getProductCatalogAssignments(this.product);
   }
 
   requestUserConfirmation() {
@@ -45,65 +45,61 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
     this.buyers = buyers.Items;
   }
 
-  async getProductPartyPriceScheduleAssignments(product: MarketPlaceProduct): Promise<void> {
-    const productPartyPriceScheduleAssignments = await this.ocProductService
-      .ListAssignments({ productID: product && product.ID })
+  async getProductCatalogAssignments(product: MarketPlaceProduct): Promise<void> {
+    const productCatalogAssignments = await this.ocCatalogService
+      .ListProductAssignments({ productID: product && product.ID })
       .toPromise();
-    this._productPartyPriceScheduleAssignmentsStatic = productPartyPriceScheduleAssignments.Items;
-    this._productPartyPriceScheduleAssignmentsEditable = productPartyPriceScheduleAssignments.Items;
+    this._productCatalogAssignmentsStatic = productCatalogAssignments.Items;
+    this._productCatalogAssignmentsEditable = productCatalogAssignments.Items;
   }
 
-  toggleProductPartyPriceScheduleAssignment(buyer: Buyer) {
+  toggleProductCatalogAssignment(buyer: Buyer) {
     if (this.isAssigned(buyer)) {
-      this._productPartyPriceScheduleAssignmentsEditable = this._productPartyPriceScheduleAssignmentsEditable.filter(
-        productAssignemnt => productAssignemnt.BuyerID !== buyer.ID
+      this._productCatalogAssignmentsEditable = this._productCatalogAssignmentsEditable.filter(
+        productAssignment => productAssignment.CatalogID !== buyer.DefaultCatalogID
       );
     } else {
-      const newProductPartyPriceScheduleAssignment = {
+      const newProductCatalogAssignment = {
+        CatalogID: buyer.DefaultCatalogID,
         ProductID: this.product.ID,
-        BuyerID: buyer.ID,
-        UserID: null,
-        UserGroupID: null,
-        PriceScheduleID: this.product.DefaultPriceScheduleID,
       };
-      this._productPartyPriceScheduleAssignmentsEditable = [
-        ...this._productPartyPriceScheduleAssignmentsEditable,
-        newProductPartyPriceScheduleAssignment,
+      this._productCatalogAssignmentsEditable = [
+        ...this._productCatalogAssignmentsEditable,
+        newProductCatalogAssignment,
       ];
     }
-    this.checkForProductPartyPriceScheduleAssignmentChanges();
+    this.checkForProductCatalogAssignmentChanges();
   }
 
   isAssigned(buyer: Buyer) {
     return (
-      this._productPartyPriceScheduleAssignmentsEditable &&
-      this._productPartyPriceScheduleAssignmentsEditable.some(
-        productAssignment => productAssignment.BuyerID === buyer.ID
+      this._productCatalogAssignmentsEditable &&
+      this._productCatalogAssignmentsEditable.some(
+        productAssignment => productAssignment.CatalogID === buyer.DefaultCatalogID
       )
     );
   }
 
-  checkForProductPartyPriceScheduleAssignmentChanges() {
-    this.add = this._productPartyPriceScheduleAssignmentsEditable.filter(
-      assignment => !JSON.stringify(this._productPartyPriceScheduleAssignmentsStatic).includes(assignment.BuyerID)
+  checkForProductCatalogAssignmentChanges() {
+    this.add = this._productCatalogAssignmentsEditable.filter(
+      assignment => !JSON.stringify(this._productCatalogAssignmentsStatic).includes(assignment.CatalogID)
     );
-    this.del = this._productPartyPriceScheduleAssignmentsStatic.filter(
-      assignment => !JSON.stringify(this._productPartyPriceScheduleAssignmentsEditable).includes(assignment.BuyerID)
+    this.del = this._productCatalogAssignmentsStatic.filter(
+      assignment => !JSON.stringify(this._productCatalogAssignmentsEditable).includes(assignment.CatalogID)
     );
     this.areChanges = this.add.length > 0 || this.del.length > 0;
     if (!this.areChanges) this.requestedUserConfirmation = false;
   }
 
-  discardProductPartyPriceScheduleAssignmentChanges() {
-    this._productPartyPriceScheduleAssignmentsEditable = this._productPartyPriceScheduleAssignmentsStatic;
-    this.checkForProductPartyPriceScheduleAssignmentChanges();
+  discardProductCatalogAssignmentChanges() {
+    this._productCatalogAssignmentsEditable = this._productCatalogAssignmentsStatic;
+    this.checkForProductCatalogAssignmentChanges();
   }
 
-  async executeProductPartyPriceScheduleAssignmentRequests(): Promise<void> {
+  async executeProductCatalogAssignmentRequests(): Promise<void> {
     this.requestedUserConfirmation = false;
     await this.productService.updateProductCatalogAssignments(this.add, this.del);
-    await this.productService.updateProductPartyPriceScheduleAssignments(this.add, this.del);
-    await this.getProductPartyPriceScheduleAssignments(this.product);
-    this.checkForProductPartyPriceScheduleAssignmentChanges();
+    await this.getProductCatalogAssignments(this.product);
+    this.checkForProductCatalogAssignmentChanges();
   }
 }
