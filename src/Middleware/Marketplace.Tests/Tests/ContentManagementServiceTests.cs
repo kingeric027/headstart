@@ -12,6 +12,7 @@ using NUnit.Framework;
 using NSubstitute;
 using OrderCloud.SDK;
 using Marketplace.Helpers.Services;
+using Marketplace.Models;
 
 namespace Marketplace.Tests
 {
