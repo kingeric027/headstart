@@ -38,8 +38,8 @@ namespace Orchestration.Tests
                 Token = "fake",
                 Model = obj
             };
-            var path = model.BuildPath("supplier", "clientId");
-            Assert.AreEqual(path, $"clientid/supplier/{obj.Type().ToString().ToLower()}/id");
+            var path = model.BuildPath("supplierid", "clientid");
+            Assert.AreEqual(path, $"supplierid/clientid/{obj.Type().ToString().ToLower()}/id");
         }
 
         [Test]

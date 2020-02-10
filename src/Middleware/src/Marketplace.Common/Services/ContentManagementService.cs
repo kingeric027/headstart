@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Helpers.Services;
@@ -35,7 +36,6 @@ namespace Marketplace.Common.Services
 		public async Task<Product> UploadProductImage(IFormFile file, string marketplaceID, string productID, string token)
 		{
 			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
-			var index = product.xp.Images?.Select(img => int.Parse(img.URL.Split('-').Last())).DefaultIfEmpty(0).Max() + 1;
 			if (product.xp?.Images == null)
 				product.xp = new ProductXp { Images = new List<ProductImage>() };
 
