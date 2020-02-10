@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +6,7 @@ using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.DevCenter.Models;
 using Marketplace.Helpers.Models;
 using Marketplace.Models.Misc;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -44,19 +45,7 @@ namespace Marketplace.Common.Commands
             //await this.ConfigureBuyers(impersonation.access_token);
         }
 
-        private async Task ConfigureBuyers(string token)
-        {
-            //foreach (var (key, value) in _seed.Suppliers)
-            //{
-            //    await _oc.Catalogs.SaveAssignmentAsync(new CatalogAssignment()
-            //    {
-            //        BuyerID = "Default_Marketplace_Buyer",
-            //        CatalogID = key,
-            //        ViewAllCategories = true,
-            //        ViewAllProducts = true
-            //    }, token);
-            //}
-        }
+        //private async Task ConfigureBuyers(string token) {}
 
         private async Task CreateSuppliers(VerifiedUserContext user, string token)
         {
@@ -71,11 +60,10 @@ namespace Marketplace.Common.Commands
             // Create Suppliers and necessary user groups and security profile assignments
             foreach (MarketplaceSupplier supplier in _seed.Suppliers)
             {
-                // TODO: FAILS IN HERE BECAUSE OF DEV CENTER ROLE, NOT SUPPLIER ADMIN ROLE
-                await _command.Create(supplier, user);
+                await _command.Create(supplier, user, token);
             }
 
-            //Add xp index for SupplierUserGroup.xp.Type
+           //Add xp index for SupplierUserGroup.xp.Type
            await _oc.XpIndices.PutAsync(new XpIndex
             {
                 ThingType = XpThingType.UserGroup,

@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Marketplace.Models.Models.Marketplace;
+using System.Collections.Generic;
 
 namespace Marketplace.Models.Misc
 {
     public class EnvironmentSeed
     {
-        public Dictionary<string, string> Suppliers { get; set; }
+        public List<MarketplaceSupplier> Suppliers { get; set; }
     }
 }
