@@ -143,13 +143,13 @@ namespace Orchestration.Tests
                                 {
                                     'SupplierID': 'FASTPlatform',
                                     'ShipFromAddressID': 'Fast-Warehouse-MN',
-                                    'ShippingRateID': null,
+                                    'ProposedShipmentOptionID': null,
                                     'Rate': 19.02
                                 },
                                 {
                                     'SupplierID': 'ApparelCo',
                                     'ShipFromAddressID': 'ApparelCo-Warehouse-MN',
-                                    'ShippingRateID': null,
+                                    'ProposedShipmentOptionID': null,
                                     'Rate': 8.81
                                 }
                             ]
