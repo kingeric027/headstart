@@ -37,7 +37,7 @@ export class OCMPaymentSpendingAccount implements OnInit {
     const now = moment().format('YYYY-MM-DD');
     const filters = { StartDate: `<${now}|!*`, EndDate: `>${now}|!*` };
     const options = { filters, ...this.requestOptions, pageSize: this.resultsPerPage };
-    return await this.context.myResources.ListSpendingAccounts(options).toPromise();
+    // return await this.context.myResources.ListSpendingAccounts(options).toPromise();
   }
 
   getSavedSpendingAccount(accounts: ListSpendingAccount): SpendingAccount {

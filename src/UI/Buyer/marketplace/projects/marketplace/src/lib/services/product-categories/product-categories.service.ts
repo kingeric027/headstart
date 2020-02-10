@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
-import { ICategories } from '../../shopper-context';
 import { OcMeService, Category } from '@ordercloud/angular-sdk';
 import { listAll } from '../../functions/listAll';
+
+export interface ICategories {
+    activeID: string;
+    all: Category[];
+    breadCrumbs: Category[];
+  }
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({

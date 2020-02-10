@@ -1,10 +1,22 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
-import { OrderStatus, OrderFilters, IOrderFilters } from '../../shopper-context';
+import { OrderStatus, OrderFilters } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { OcMeService, ListOrder } from '@ordercloud/angular-sdk';
 import { filter } from 'rxjs/operators';
+
+export interface IOrderFilters {
+  activeFiltersSubject: BehaviorSubject<OrderFilters>;
+  toPage(pageNumber: number): void;
+  sortBy(field: string): void;
+  searchBy(searchTerm: string): void;
+  clearSearch(): void;
+  filterByFavorites(showOnlyFavorites: boolean): void;
+  filterByStatus(status: OrderStatus): void;
+  filterByDateSubmitted(fromDate: string, toDate: string): void;
+  clearAllFilters(): void;
+}
 
 @Injectable({
   providedIn: 'root',
