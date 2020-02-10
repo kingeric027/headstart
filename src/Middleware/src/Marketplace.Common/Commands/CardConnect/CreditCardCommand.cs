@@ -2,14 +2,14 @@
 using System.Threading.Tasks;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Mappers.CardConnect;
-using Marketplace.Common.Models.CardConnect;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Models;
+using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands.CardConnect
+namespace Marketplace.Common.Commands
 {
     public interface ICreditCardCommand
     {

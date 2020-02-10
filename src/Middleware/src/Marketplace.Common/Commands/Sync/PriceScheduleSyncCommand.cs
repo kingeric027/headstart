@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
-using Marketplace.Helpers.Models;
+using Marketplace.Models;
+using Marketplace.Models.Exceptions;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.Commands
 {
@@ -22,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = MarketplacePriceScheduleMapper.Map(wi.Current.ToObject<MarketplacePriceSchedule>());
+            var obj = wi.Current.ToObject<MarketplacePriceSchedule>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -64,7 +62,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = MarketplacePriceScheduleMapper.Map(JObject.FromObject(wi.Current).ToObject<MarketplacePriceSchedule>());
+            var obj = JObject.FromObject(wi.Current).ToObject<MarketplacePriceSchedule>();
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
@@ -85,7 +83,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = MarketplacePriceScheduleMapper.Map(JObject.FromObject(wi.Diff).ToObject<PartialPriceSchedule>());
+            var obj = JObject.FromObject(wi.Diff).ToObject<PartialPriceSchedule>();
             try
             {
                 var response = await _oc.PriceSchedules.PatchAsync(wi.RecordId, obj, wi.Token);

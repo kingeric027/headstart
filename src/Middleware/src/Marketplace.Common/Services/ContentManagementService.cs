@@ -1,16 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
 using Marketplace.Helpers.Services;
 using Marketplace.Common.Helpers;
 using System.Linq;
-using Dynamitey;
-using Marketplace.Common.Exceptions;
-using Marketplace.Helpers.Models;
+using Marketplace.Models;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Services
 {
@@ -39,8 +35,7 @@ namespace Marketplace.Common.Services
 
 		public async Task<Product> UploadProductImage(IFormFile file, string marketplaceID, string productID, string token)
 		{
-			var product = await _oc.Products.GetAsync<Product<ProductXp>>(productID, token);
-
+			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
 			if (product.xp?.Images == null)
 				product.xp = new ProductXp { Images = new List<ProductImage>() };
 
@@ -48,7 +43,7 @@ namespace Marketplace.Common.Services
 			var blobName = GetProductImageName(marketplaceID, productID, index);
 			await _blob.Save(blobName, file);
 
-			product.xp.Images.Add(new ProductImage()
+			product.xp?.Images?.Add(new ProductImage()
 			{
 				URL = GetProductImageURL(blobName),
 			});
@@ -57,7 +52,7 @@ namespace Marketplace.Common.Services
 			{
 				xp = new
 				{
-					product.xp.Images,
+					product.xp.Images
 				}
 			};
 			return await _oc.Products.PatchAsync(productID, partial, token);
@@ -65,9 +60,9 @@ namespace Marketplace.Common.Services
 
 		public async Task<Product> DeleteProductImage(string marketplaceID, string productID, string fileName, string token)
 		{
-			var product = await _oc.Products.GetAsync<Product<ProductXp>>(productID, token);
+			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
 			var blobName = GetProductImageName(marketplaceID, fileName);
-			_blob.Delete(blobName);
+			await _blob.Delete(blobName);
 
 			var Images = product.xp.Images.Where(img => !img.URL.EndsWith(fileName));
 
@@ -75,18 +70,7 @@ namespace Marketplace.Common.Services
 		}
 
 		private string GetProductImageName(string mkplID, string imgName) => $"{mkplID}/products/{imgName}";
-		private string GetProductImageName(string mkplID, string prodId, int i) => $"{mkplID}/products/{prodId}-{i}";
+		private string GetProductImageName(string mkplID, string prodId, int? i) => $"{mkplID}/products/{prodId}-{i}";
 		private string GetProductImageURL(string blobName) => $"{_settings.BlobSettings.HostUrl}/images/{blobName}";
-	}
-
-	// TODO - move to nuget shared models
-	public class ProductXp
-	{
-		public List<ProductImage> Images { get; set; }
-	}
-
-	public class ProductImage
-	{
-		public string URL { get; set; }
 	}
 }

@@ -1,10 +1,8 @@
-﻿using Marketplace.Common.Services.FreightPop;
+﻿using System.Collections.Generic;
+using Marketplace.Models;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Marketplace.Common.Models
+namespace Marketplace.Common.Services.AvaTax.Models
 {
 	public class TaxableOrder
 	{

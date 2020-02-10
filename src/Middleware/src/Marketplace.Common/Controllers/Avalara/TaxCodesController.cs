@@ -1,15 +1,12 @@
 ﻿using Marketplace.Common.Commands;
-using Marketplace.Common.Services;
 using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Helpers;
-using Marketplace.Helpers.Models;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Avalara.AvaTax.RestClient;
+using Marketplace.Common.Services.AvaTax;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Controllers.Avalara
 {
@@ -26,7 +23,7 @@ namespace Marketplace.Common.Controllers.Avalara
         }
 
         [HttpGet, Route(""), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceListPage<MarketplaceTaxCode>> GetTaxCodes(MarketplaceListArgs<TaxCodeModel> marketplaceListArgs)
+        public async Task<ListPage<MarketplaceTaxCode>> GetTaxCodes(ListArgs<TaxCodeModel> marketplaceListArgs)
         {
             return await _taxService.ListTaxCodesAsync(marketplaceListArgs);
         }

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
-using Marketplace.Helpers.Models;
+using Marketplace.Models;
+using Marketplace.Models.Exceptions;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.Commands
 {
@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = MarketplaceCostCenterMapper.Map(wi.Current.ToObject<MarketplaceCostCenter>());
+            var obj = wi.Current.ToObject<MarketplaceCostCenter>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -62,7 +62,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = MarketplaceCostCenterMapper.Map(JObject.FromObject(wi.Current).ToObject<MarketplaceCostCenter>());
+            var obj = JObject.FromObject(wi.Current).ToObject<MarketplaceCostCenter>();
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
@@ -83,7 +83,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = MarketplaceCostCenterMapper.Map(JObject.FromObject(wi.Diff).ToObject<PartialCostCenter>());
+            var obj = JObject.FromObject(wi.Diff).ToObject<PartialCostCenter>();
             try
             {
                 var response = await _oc.CostCenters.PatchAsync(wi.ResourceId, wi.RecordId, obj, wi.Token);
