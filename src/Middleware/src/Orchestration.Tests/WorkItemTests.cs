@@ -1,9 +1,8 @@
 using System.Collections;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Models;
-using WorkItem = Marketplace.Common.Models.WorkItem;
+using Marketplace.Models.Exceptions;
+using Marketplace.Models.Misc;
 
 namespace Orchestration.Tests
 {

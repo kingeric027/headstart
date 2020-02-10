@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.FreightPop;
-using OrderCloud.SDK;
+using Marketplace.Common.Services.FreightPop.Models;
 
-namespace Marketplace.Common.Services.ShippingIntegration
+namespace Marketplace.Common.Services.ShippingIntegration.Models
 {
 	// tentative model for a propsed shipments
 	public class ProposedShipmentItem

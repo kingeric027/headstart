@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using Marketplace.Common.Extensions;
-using Marketplace.Common.Models.CardConnect;
 using Marketplace.Common.Services.CardConnect.Models;
 using Marketplace.Helpers.Extensions;
+using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Mappers.CardConnect

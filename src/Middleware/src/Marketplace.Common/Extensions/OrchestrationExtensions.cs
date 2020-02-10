@@ -1,6 +1,7 @@
-﻿using Marketplace.Common.Models;
-using Marketplace.Helpers.Exceptions;
-using Marketplace.Helpers.Models;
+﻿using Marketplace.Helpers.Exceptions;
+using Marketplace.Models;
+using Marketplace.Models.Misc;
+using Marketplace.Models.Orchestration;
 using ErrorCodes = Marketplace.Helpers.Exceptions.ErrorCodes;
 
 namespace Marketplace.Common.Extensions
@@ -32,7 +33,7 @@ namespace Marketplace.Common.Extensions
                     return RecordType.Buyer;
                 case nameof(MarketplaceAddress):
                     return RecordType.Address;
-                case nameof(BaseCostCenter):
+                case nameof(MarketplaceCostCenter):
                     return RecordType.CostCenter;
                 case nameof(MarketplaceUser):
                     return RecordType.User;

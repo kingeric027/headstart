@@ -6,6 +6,8 @@ using NUnit.Framework;
 using Marketplace.Common.Models;
 using OrderCloud.SDK;
 using Marketplace.Helpers.Models;
+using Marketplace.Models;
+using Marketplace.Models.Extended;
 
 namespace Orchestration.Tests
 {

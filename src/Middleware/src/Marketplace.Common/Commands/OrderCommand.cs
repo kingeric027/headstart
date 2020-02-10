@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Marketplace.Common.Services.FreightPop;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Commands
 {

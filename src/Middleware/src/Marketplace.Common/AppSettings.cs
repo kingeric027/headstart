@@ -25,7 +25,15 @@ namespace Marketplace.Common
         public string SendgridApiKey { get; set; }
         public FreightPopSettings FreightPopSettings { get; set; }
         public CardConnectSettings CardConnectSettings { get; set; } = new CardConnectSettings();
+        public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
     }
+
+    public class ZohoSettings
+    {
+        public string AuthToken { get; set; }
+        public string OrgID { get; set; }
+    }
+
     public class FreightPopSettings
     {
         public string BaseUrl { get; set; }

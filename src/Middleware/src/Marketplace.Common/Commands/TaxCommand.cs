@@ -1,16 +1,14 @@
 ﻿using Marketplace.Common.Exceptions;
-using Marketplace.Common.Extensions;
 using Marketplace.Common.Helpers;
-using Marketplace.Common.Models;
-using Marketplace.Common.Services;
-using Marketplace.Common.Services.FreightPop;
 using Marketplace.Helpers;
 using OrderCloud.SDK;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Marketplace.Common.Services.AvaTax;
+using Marketplace.Common.Services.AvaTax.Models;
+using Marketplace.Models;
+using ErrorCodes = Marketplace.Models.ErrorCodes;
 
 namespace Marketplace.Common.Commands
 {
@@ -40,10 +38,11 @@ namespace Marketplace.Common.Commands
 			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
 			var taxableOrder = await GetTaxableOrder(order);
 			var inValid = ListShipmentsWithoutSelection(order, taxableOrder.Lines);
-			Require.That(inValid.Count() == 0 || inValid == null, Exceptions.ErrorCodes.Checkout.MissingShippingSelection, new MissingShippingSelectionError(inValid));
+            Require.That(!inValid.Any(), ErrorCodes.Checkout.MissingShippingSelection, new MissingShippingSelectionError(inValid));
 
 			var totalTax = await _avatax.GetTaxEstimateAsync(taxableOrder);
 
+			var shippingSelection = order.xp.ProposedShipmentSelections.ToDictionary(selection => selection.ShipFromAddressID, selection => selection.Rate);
 			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()
 			{
 				TaxCost = totalTax
@@ -69,7 +68,7 @@ namespace Marketplace.Common.Commands
 			return new TaxableOrder() { Order = order, Lines = items.Items, ShippingRates = shippingSelection };
 		}
 
-		private IEnumerable<string> ListShipmentsWithoutSelection(MarketplaceOrder order, IList<LineItem> items)
+		private static IEnumerable<string> ListShipmentsWithoutSelection(MarketplaceOrder order, IList<LineItem> items)
 		{
 			var shipFromAddressIDs = items.GroupBy(li => li.ShipFromAddressID).Select(group => group.Key);
 			var selections = order.xp.ProposedShipmentSelections.Select(sel => sel.ShipFromAddressID);

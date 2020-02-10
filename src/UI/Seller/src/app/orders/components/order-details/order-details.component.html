@@ -61,9 +61,9 @@
           <b>Payments</b>
       </div>
       <div class="mb-4" *ngFor="let payment of _payments">
-        <span *ngIf="payment.type === 'CreditCard'">
+        <span *ngIf="payment.Type === 'CreditCard'">
             <strong>
-                CARD ending in {{ payment.Details.PartialAccountNumber }}
+                {{ setCardType(payment) }} ending in {{ payment.xp.partialAccountNumber }}
             </strong>
         </span>
         <span *ngIf="payment.Type === 'PurchaseOrder'">

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Marketplace.Common.Services.FreightPop
+namespace Marketplace.Common.Services.FreightPop.Models
 {
     public class ShippingRate
     {

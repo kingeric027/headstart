@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Controllers
 {
