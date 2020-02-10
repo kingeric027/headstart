@@ -9,7 +9,7 @@ namespace Marketplace.Models.Extended
         [Required]
         public string ShipFromAddressID { get; set; }
         [Required]
-        public string ShippingRateID { get; set; }
+        public string ProposedShipmentOptionID { get; set; }
         public decimal Rate { get; set; }
     }
 }
