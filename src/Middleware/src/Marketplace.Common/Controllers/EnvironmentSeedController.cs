@@ -19,9 +19,9 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("seed"), DevCenterUserAuth()]
-        public async Task Seed([FromBody] EnvironmentSeed obj)
+        public async Task Seed([FromBody] EnvironmentSeed suppliers)
         {
-            await _command.Seed(obj, this.VerifiedUserContext);
+            await _command.Seed(suppliers, this.VerifiedUserContext);
         }
     }
 }

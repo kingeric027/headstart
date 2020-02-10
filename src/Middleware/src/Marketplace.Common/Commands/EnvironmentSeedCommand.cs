@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.DevCenter;
 using Marketplace.Helpers.Models;
+using Marketplace.Common.Services.DevCenter;
+using Marketplace.Common.Models;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -18,12 +19,14 @@ namespace Marketplace.Common.Commands
         private readonly AppSettings _settings;
         private readonly IDevCenterService _dev;
         private EnvironmentSeed _seed;
+        private readonly IMarketplaceSupplierCommand _command;
 
-        public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev)
+        public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand command)
         {
             _settings = settings;
             _oc = oc;
             _dev = dev;
+            _command = command;
         }
 
         public async Task Seed(EnvironmentSeed seed, VerifiedUserContext user)
@@ -42,16 +45,16 @@ namespace Marketplace.Common.Commands
 
         private async Task ConfigureBuyers(string token)
         {
-            foreach (var (key, value) in _seed.Suppliers)
-            {
-                await _oc.Catalogs.SaveAssignmentAsync(new CatalogAssignment()
-                {
-                    BuyerID = "Default_Marketplace_Buyer",
-                    CatalogID = key,
-                    ViewAllCategories = true,
-                    ViewAllProducts = true
-                }, token);
-            }
+            //foreach (var (key, value) in _seed.Suppliers)
+            //{
+            //    await _oc.Catalogs.SaveAssignmentAsync(new CatalogAssignment()
+            //    {
+            //        BuyerID = "Default_Marketplace_Buyer",
+            //        CatalogID = key,
+            //        ViewAllCategories = true,
+            //        ViewAllProducts = true
+            //    }, token);
+            //}
         }
 
         private async Task CreateSuppliers(VerifiedUserContext user, string token)
@@ -64,128 +67,19 @@ namespace Marketplace.Common.Commands
                 Roles = new List<ApiRole>() { ApiRole.FullAccess }
             }, token);
 
-            foreach (var (key, value) in _seed.Suppliers)
+            // Create Suppliers and necessary user groups and security profile assignments
+            foreach (MarketplaceSupplier supplier in _seed.Suppliers)
             {
-                var supplier = await _oc.Suppliers.CreateAsync(new Supplier()
-                {
-                    Active = true,
-                    ID = key,
-                    Name = value,
-                    xp = { }
-                }, token);
-                var userGroup = await _oc.SupplierUserGroups.CreateAsync(key, new UserGroup()
-                {
-                    Description = "Integrations",
-                    Name = "Integration Group"
-                }, token);
-                var accountAdminUserGroup = await _oc.SupplierUserGroups.CreateAsync(key, new UserGroup()
-                {
-                    ID = $"{key}AccountAdmin",
-                    Name = $"{key} Account Admin",
-                    xp =
-                    {
-                        Type = "UserPermissions"
-                    }
-                }, token);
-                var orderAdminUserGroup = await _oc.SupplierUserGroups.CreateAsync(key, new UserGroup()
-                {
-                    ID = $"{key}OrderAdmin",
-                    Name = $"{key} Order Admin",
-                    xp =
-                    {
-                        Type = "UserPermissions"
-                    }
-                }, token);
-                var productAdminUserGroup = await _oc.SupplierUserGroups.CreateAsync(key, new UserGroup()
-                {
-                    ID = $"{key}ProductAdmin",
-                    Name = $"{key} Product Admin",
-                    xp =
-                    {
-                        Type = "UserPermissions"
-                    }
-                }, token);
-                var supplierUser = await _oc.SupplierUsers.CreateAsync(key, new User()
-                {
-                    Active = true,
-                    Email = user.Email,
-                    FirstName = "Integration",
-                    LastName = "Developer",
-                    Password = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-                    Username = $"dev_{supplier.ID}"
-                }, token);
-                var apiClient = await _oc.ApiClients.CreateAsync(new ApiClient()
-                {
-                    AppName = $"Integration Client {value}",
-                    Active = true,
-                    DefaultContextUserName = supplierUser.Username,
-                    ClientSecret = "d576450ca8f89967eea0d3477544ea4bee60af051a5c173be09db08c562b", // _settings.OrderCloudSettings.ClientSecret,
-                    AccessTokenDuration = 600,
-                    RefreshTokenDuration = 43200,
-                    AllowAnyBuyer = false,
-                    AllowAnySupplier = false,
-                    AllowSeller = false,
-                    IsAnonBuyer = false,
-                }, token);
-                await _oc.SupplierUserGroups.SaveUserAssignmentAsync(key, new UserGroupAssignment()
-                {
-                    UserID = supplierUser.ID,
-                    UserGroupID = userGroup.ID
-                }, token);
-                await _oc.ApiClients.SaveAssignmentAsync(new ApiClientAssignment()
-                {
-                    ApiClientID = apiClient.ID,
-                    SupplierID = supplier.ID
-                }, token);
-                await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-                {
-                    //UserID = user.ID,
-                    SupplierID = supplier.ID,
-                    UserGroupID = userGroup.ID,
-                    SecurityProfileID = profile.ID
-                }, token);
-                var accountAdminMpSecurityProfiles = new List<string>
-                {
-                    "MPMeSupplierAddressAdmin",
-                    "MPMeSupplierUserAdmin"
-                };
-                foreach (string securityProfile in accountAdminMpSecurityProfiles)
-                {
-                    await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-                    {
-                        SupplierID = supplier.ID,
-                        UserGroupID = accountAdminUserGroup.ID,
-                        SecurityProfileID = securityProfile
-                    }, token);
-                };
-                var orderAdminMpSecurityProfiles = new List<string>
-                {
-                    "MPOrderAdmin",
-                    "MPShipmentAdmin"
-                };
-                foreach (string securityProfile in orderAdminMpSecurityProfiles)
-                {
-                    await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-                    {
-                        SupplierID = supplier.ID,
-                        UserGroupID = orderAdminUserGroup.ID,
-                        SecurityProfileID = securityProfile
-                    }, token);
-                };
-                var productAdminMpSecurityProfiles = new List<string>
-                {
-                    "MPMeProductAdmin",
-                };
-                foreach (string securityProfile in productAdminMpSecurityProfiles)
-                {
-                    await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-                    {
-                        SupplierID = supplier.ID,
-                        UserGroupID = productAdminUserGroup.ID,
-                        SecurityProfileID = securityProfile
-                    }, token);
-                };
+                // TODO: FAILS IN HERE BECAUSE OF DEV CENTER ROLE, NOT SUPPLIER ADMIN ROLE
+                await _command.Create(supplier, user);
             }
+
+            //Add xp index for SupplierUserGroup.xp.Type
+           await _oc.XpIndices.PutAsync(new XpIndex
+            {
+                ThingType = XpThingType.UserGroup,
+                Key = "Type"
+            }, token);
         }
 
         private async Task PatchDefaultApiClients(string token)

@@ -57,7 +57,7 @@ namespace Marketplace.API
 					.Inject<IFreightPopService>()
 					.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
 					.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
-                    .Inject<IOrchestrationCommand>()
+					.Inject<IOrchestrationCommand>()
                     .Inject<IOrchestrationLogCommand>()
 					.Inject<IOCShippingIntegration>()
 					.Inject<IProposedShipmentCommand>()
@@ -68,6 +68,7 @@ namespace Marketplace.API
 					.Inject<ISendgridService>()
                     .Inject<ICardConnectService>()
                     .Inject<ICreditCardCommand>()
+					.Inject<IMarketplaceSupplierCommand>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                     .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
             }
