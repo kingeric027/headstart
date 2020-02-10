@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Marketplace.Common.Mappers;
+﻿using System.Threading.Tasks;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using Marketplace.Models;
@@ -11,7 +9,7 @@ namespace Marketplace.Common.Commands.Crud
     public interface IMarketplaceProductCommand
     {
         Task<MarketplaceProduct> Get(string id, VerifiedUserContext user);
-        Task<ListPage<MarketplaceProduct>> List(MarketplaceListArgs<MarketplaceProduct> args, VerifiedUserContext user);
+        Task<ListPage<MarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
         Task<MarketplaceProduct> Post(MarketplaceProduct product, VerifiedUserContext user);
         Task<MarketplaceProduct> Put(string id, MarketplaceProduct product, VerifiedUserContext user);
         Task<PartialMarketplaceProduct> Patch(PartialMarketplaceProduct product, string id, VerifiedUserContext user);
@@ -36,7 +34,7 @@ namespace Marketplace.Common.Commands.Crud
             return await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
         }
 
-        public async Task<ListPage<MarketplaceProduct>> List(MarketplaceListArgs<MarketplaceProduct> args, VerifiedUserContext user)
+        public async Task<ListPage<MarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
         {
             return await _oc.Products.ListAsync<MarketplaceProduct>(filters: args, accessToken: user.AccessToken);
         }

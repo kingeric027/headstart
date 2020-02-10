@@ -5,7 +5,7 @@ using Marketplace.Common.Extensions;
 using Marketplace.Common.Mappers.Avalara;
 using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Helpers;
-using Marketplace.Helpers.Models;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.AvaTax
 {
@@ -18,7 +18,7 @@ namespace Marketplace.Common.Services.AvaTax
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
 		// When should we do this? On order complete (When the credit card is charged) ? 
 		Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode);
-		Task<MarketplaceListPage<MarketplaceTaxCode>> ListTaxCodesAsync(MarketplaceListArgs<TaxCodeModel> marketplaceListArgs);
+		Task<ListPage<MarketplaceTaxCode>> ListTaxCodesAsync(ListArgs<TaxCodeModel> marketplaceListArgs);
 	}
 
 	public class AvataxService : IAvataxService
@@ -34,7 +34,7 @@ namespace Marketplace.Common.Services.AvaTax
 			_avaTax = new AvaTaxClient("four51 marketplace", "v1", settings.Env.ToString(), env)
 					.WithSecurity(settings.AvalaraSettings.AccountID, settings.AvalaraSettings.LicenseKey);
 		}
-		public async Task<MarketplaceListPage<MarketplaceTaxCode>> ListTaxCodesAsync(MarketplaceListArgs<TaxCodeModel> marketplaceListArgs)
+		public async Task<ListPage<MarketplaceTaxCode>> ListTaxCodesAsync(ListArgs<TaxCodeModel> marketplaceListArgs)
 		{
 			var taxCategory = marketplaceListArgs.Filters[0].Values[0].Term;
 			var taxCategorySearch = marketplaceListArgs.Filters[0].Values[0].Term.Trim('0');

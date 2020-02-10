@@ -19,7 +19,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IProposedShipmentCommand
     {
-        Task<MarketplaceListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext);
+        Task<ListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext);
         Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, ProposedShipmentSelection selection);
         Task<PrewebhookResponseWithError> IsValidAddressInFreightPopAsync(Address address);
         Task<PrewebhookResponseWithError> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload);
@@ -41,7 +41,7 @@ namespace Marketplace.Common.Commands
             _ocShippingIntegration = ocShippingIntegration;
         }
 
-        public async Task<MarketplaceListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext)
+        public async Task<ListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext)
         {
             var order = await _oc.Orders.GetAsync(OrderDirection.Outgoing, orderId, userContext.AccessToken);
 
@@ -55,10 +55,10 @@ namespace Marketplace.Common.Commands
 
             var proposedShipments = await _ocShippingIntegration.GetProposedShipmentsForSuperOrderAsync(superOrder);
 
-            return new MarketplaceListPage<ProposedShipment>()
+            return new ListPage<ProposedShipment>()
             {
                 Items = proposedShipments,
-                Meta = new MarketplaceListPageMeta
+                Meta = new ListPageMeta
                 {
                     Page = 1,
                     PageSize = 100,

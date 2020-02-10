@@ -1,10 +1,8 @@
 ﻿using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Services.AvaTax.Models;
-using Marketplace.Helpers.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Mappers.Avalara
 {
@@ -21,11 +19,11 @@ namespace Marketplace.Common.Mappers.Avalara
                 }).ToList();
         }
 
-        public static MarketplaceListPage<MarketplaceTaxCode> Map(FetchResult<TaxCodeModel> avataxCodes, List<MarketplaceTaxCode> taxCodeList, int top, int skip)
+        public static ListPage<MarketplaceTaxCode> Map(FetchResult<TaxCodeModel> avataxCodes, List<MarketplaceTaxCode> taxCodeList, int top, int skip)
         {
-            return new MarketplaceListPage<MarketplaceTaxCode>
+            return new ListPage<MarketplaceTaxCode>
             {
-                Meta = new MarketplaceListPageMeta
+                Meta = new ListPageMeta
                 {
                     Page = skip / top == 0 ? 1 : (skip / top) + 1,
                     PageSize = 100,
