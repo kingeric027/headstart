@@ -49,6 +49,22 @@ namespace Marketplace.Common.Commands
 			});
 		}
 
+		public async Task<MarketplaceOrder> ApplyTaxEstimateOrderCalc(string orderID)
+		{
+			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+			var taxableOrder = await GetTaxableOrder(order);
+			var inValid = ListShipmentsWithoutSelection(order, taxableOrder.Lines);
+			Require.That(!inValid.Any(), ErrorCodes.Checkout.MissingShippingSelection, new MissingShippingSelectionError(inValid));
+
+			var totalTax = await _avatax.GetTaxEstimateAsync(taxableOrder);
+
+			var shippingSelection = order.xp.ProposedShipmentSelections.ToDictionary(selection => selection.ShipFromAddressID, selection => selection.Rate);
+			return await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID, new PartialOrder()
+			{
+				TaxCost = totalTax
+			});
+		}
+
 		public async Task HandleTransactionCreation(MarketplaceOrder buyerOrder)
 		{
 			var taxableOrder = await GetTaxableOrder(buyerOrder);
