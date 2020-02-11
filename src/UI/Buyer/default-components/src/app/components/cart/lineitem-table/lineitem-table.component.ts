@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Address, LineItem, Supplier } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
@@ -9,7 +9,7 @@ import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
   templateUrl: './lineitem-table.component.html',
   styleUrls: ['./lineitem-table.component.scss'],
 })
-export class OCMLineitemTable implements OnInit {
+export class OCMLineitemTable implements OnInit, OnChanges {
   closeIcon = faTimes;
   @Input() lineItems: LineItem[];
   @Input() readOnly: boolean;
@@ -26,6 +26,11 @@ export class OCMLineitemTable implements OnInit {
     this.liGroupedByShipFrom = Object.values(this.liGroups);
     this.supplierInfo = await this.context.orderHistory.getSupplierInfo(this.liGroupedByShipFrom);
     this.supplierAddresses = await this.context.orderHistory.getSupplierAddresses(this.liGroupedByShipFrom);
+  }
+
+  async ngOnChanges() {
+    this.liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
+    this.liGroupedByShipFrom = Object.values(this.liGroups);
   }
 
   removeLineItem(lineItemID: string) {
@@ -45,7 +50,9 @@ export class OCMLineitemTable implements OnInit {
 
   getImageUrl(lineItemID: string) {
     const li = this.getLineItem(lineItemID);
-    return getPrimaryImageUrl(li.Product);
+    if (li && li.Product) {
+      return getPrimaryImageUrl(li.Product);
+    }
   }
 
   getLineItem(lineItemID: string): LineItem {
