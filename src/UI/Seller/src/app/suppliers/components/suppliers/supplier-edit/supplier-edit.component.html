@@ -1,98 +1,120 @@
-<div class="resource-edit">
+<div class="container-fluid resource-edit">
   <form [formGroup]="resourceForm">
-    <div class="form-group">
-      <div class="form-group">
-        <label for="Name">Name</label>
-        <input type="text"
-               class="form-control"
-               id="Name"
-               showErrors
-               aria-describedby="Name"
-               maxlength="100"
-               [resourceForm]="resourceForm"
-               formControlName="Name"
-               (input)="updateResourceFromEvent($event, 'Name')"
-               placeholder="Enter Name">
+    <div class="row pt-3">
+      <div class="col-md-5">
+        <h5>Supplier Details</h5>
+        <p>This is the basic details of the supplier.</p>
       </div>
-      <div class="form-group">
-        <label for="Logo URL">Logo URL</label>
-        <input type="text"
-               class="form-control"
-               id="Logo URL"
-               showErrors
-               [resourceForm]="resourceForm"
-               aria-describedby="Logo URL"
-               formControlName="LogoUrl"
-               (input)="updateResourceFromEvent($event, 'xp.LogoUrl')"
-               placeholder="Enter Logo URL">
-      </div>
-      <div class="form-group">
-        <label for="Description">Description</label>
-        <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
-                                         [formControlForText]="resourceForm?.controls.Description"
-                                         resourceField="Description"
-                                         pathOnResource="xp.Description"
-                                         (resourceUpdated)="updateResource.emit($event)">
-        </reactive-quill-editor-component>
-      </div>
-      <div class="form-group">
-        <label for="Primary Contact Name">Primary Contact Name</label>
-        <input type="text"
-               class="form-control"
-               id="Primary Contact Name"
-               showErrors
-               [resourceForm]="resourceForm"
-               aria-describedby="Primary Contact Name"
-               formControlName="PrimaryContactName"
-               (input)="updateResourceFromEvent($event, 'xp.Contacts.0.Name')"
-               placeholder="Enter Primary Contact Name">
-      </div>
-      <div class="form-group">
-        <label for="Primary Contact Name">Primary Contact Email</label>
-        <input type="text"
-               class="form-control"
-               id="Primary Contact Email"
-               showErrors
-               [resourceForm]="resourceForm"
-               aria-describedby="Primary Contact Email"
-               formControlName="PrimaryContactEmail"
-               (input)="updateResourceFromEvent($event, 'xp.Contacts.0.Email')"
-               placeholder="Enter Primary Contact Email">
-      </div>
-      <!-- no phone validation currently because this field has extraneous values that would break validation -->
-      <div class="form-group">
-        <label for="Primary Contact Phone">Primary Contact Phone</label>
-        <input type="text"
-               class="form-control"
-               showErrors
-               [resourceForm]="resourceForm"
-               id="Primary Contact Phone"
-               aria-describedby="Primary Contact Phone"
-               formControlName="PrimaryContactPhone"
-               (input)="updateResourceFromEvent($event, 'xp.Contacts.0.Phone')"
-               placeholder="Enter Primary Contact Phone">
-      </div>
-      <div class="form-group">
-        <label for="Category">Categories</label>
-        <supplier-category-select-component [categorySelectionsControl]="resourceForm?.controls.Categories"
-                                            [filterConfig]="filterConfig"
-                                            (selectionsChanged)="updateResource.emit($event)">
-        </supplier-category-select-component>
-      </div>
-      <div class="form-group">
-        <p class="mb-1">Active</p>
-        <label class="switch mb-0"
-               for="Active">
-          <input type="checkbox"
-                 class="form-check-input"
-                 id="Active"
+      <div class="col-md-7 form-group">
+        <div class="form-group">
+          <p class="mb-1">Active</p>
+          <label class="switch mb-0"
+                 for="Active">
+            <input type="checkbox"
+                   class="form-check-input"
+                   id="Active"
+                   showErrors
+                   [resourceForm]="resourceForm"
+                   aria-describedby="Active"
+                   formControlName="Active"
+                   (input)="updateResourceFromEvent($event, 'Active')">
+            <span class="slider round cursor-pointer"></span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="ID">ID</label>
+          <input type="text"
+                 class="form-control"
+                 id="ID"
+                 showErrors
+                 aria-describedby="ID"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="ID"
+                 (input)="updateResourceFromEvent($event, 'ID')"
+                 placeholder="Enter Optional ID">
+        </div>
+        <div class="form-group">
+          <label for="Name">Name</label>
+          <input type="text"
+                 class="form-control"
+                 id="Name"
+                 showErrors
+                 aria-describedby="Name"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="Name"
+                 (input)="updateResourceFromEvent($event, 'Name')"
+                 placeholder="Enter Name">
+        </div>
+        <div class="form-group">
+          <label for="Logo URL">Logo URL</label>
+          <input type="text"
+                 class="form-control"
+                 id="Logo URL"
                  showErrors
                  [resourceForm]="resourceForm"
-                 aria-describedby="Active"
-                 formControlName="Active"
-                 (input)="updateResourceFromEvent($event, 'Active')">
-          <span class="slider round cursor-pointer"></span>
-        </label>
+                 aria-describedby="Logo URL"
+                 formControlName="LogoUrl"
+                 (input)="updateResourceFromEvent($event, 'xp.Images.0.URL')"
+                 placeholder="Enter Logo URL">
+        </div>
+        <div class="form-group">
+          <label for="Description">Description</label>
+          <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
+                                           [formControlForText]="resourceForm?.controls.Description"
+                                           resourceField="Description"
+                                           pathOnResource="xp.Description"
+                                           (resourceUpdated)="updateResource.emit($event)">
+          </reactive-quill-editor-component>
+        </div>
+      </div>
+    </div>
+    <div class="row pt-3">
+      <div class="col-md-5">
+        <h5>Support Contact</h5>
+        <p>Information about your public facing support contact for questions from end buyers.</p>
+      </div>
+      <div class="col-md-7 form-group">
+        <div class="form-group">
+          <label for="Support Contact Name">Support Contact Name</label>
+          <input type="text"
+                 class="form-control"
+                 id="Support Contact Name"
+                 showErrors
+                 [resourceForm]="resourceForm"
+                 aria-describedby="Support Contact Name"
+                 formControlName="SupportContactName"
+                 (input)="updateResourceFromEvent($event, 'xp.SupportContact.Name')"
+                 placeholder="Enter Support Contact Name">
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="Support Contact Name">Support Contact Email</label>
+            <input type="text"
+                   class="form-control"
+                   id="Support Contact Email"
+                   showErrors
+                   [resourceForm]="resourceForm"
+                   aria-describedby="Support Contact Email"
+                   formControlName="SupportContactEmail"
+                   (input)="updateResourceFromEvent($event, 'xp.SupportContact.Email')"
+                   placeholder="Enter Support Contact Email">
+          </div>
+          <!-- no phone validation currently because this field has extraneous values that would break validation -->
+          <div class="form-group col-md-6">
+            <label for="Support Contact Phone">Support Contact Phone</label>
+            <input type="text"
+                   class="form-control"
+                   showErrors
+                   [resourceForm]="resourceForm"
+                   id="Support Contact Phone"
+                   aria-describedby="Support Contact Phone"
+                   formControlName="SupportContactPhone"
+                   (input)="updateResourceFromEvent($event, 'xp.SupportContact.Phone')"
+                   placeholder="Enter Support Contact Phone">
+          </div>
+        </div>
       </div>
     </div>
   </form>
