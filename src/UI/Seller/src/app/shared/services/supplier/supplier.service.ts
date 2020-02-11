@@ -22,7 +22,6 @@ export class SupplierService extends ResourceCrudService<Supplier> {
   ) {
     super(router, activatedRoute, ocSupplierService, '/suppliers', 'suppliers', SUPPLIER_SUB_RESOURCE_LIST);
     this.ocSupplierService = ocSupplierService;
-    super.createNewResource = this.createNewResource;
   }
 
   emptyResource = {
@@ -34,7 +33,7 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     },
   };
 
-  async createNewResource(resource: any): Promise<Supplier> {
+  async createNewResource(resource: any): Promise<any> {
     const newSupplier = await this.middleware.createSupplier(resource);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newSupplier];
     this.resourceSubject.next(this.resourceSubject.value);
