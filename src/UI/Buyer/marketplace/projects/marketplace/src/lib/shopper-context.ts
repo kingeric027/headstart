@@ -8,6 +8,7 @@ import {
   Shipment,
   ShipmentItem,
   BuyerProduct,
+  Meta,
 } from '@ordercloud/angular-sdk';
 
 export * from '@ordercloud/angular-sdk';
@@ -46,6 +47,11 @@ export interface ProposedShipmentSelection {
   SupplierID: string;
   ProposedShipmentOptionID: string;
   Rate: number;
+}
+
+export interface ListProposedShipment {
+  Meta: Meta;
+  Items: ProposedShipment[];
 }
 
 export interface ProposedShipment {

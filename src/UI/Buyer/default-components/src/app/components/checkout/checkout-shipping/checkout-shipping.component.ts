@@ -1,13 +1,21 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { groupBy as _groupBy } from 'lodash';
-import { ShopperContextService, LineItem, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection, ListLineItem } from 'marketplace';
+import { ShopperContextService, LineItem, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection, ListLineItem, Meta, ListProposedShipment } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-shipping.component.html',
   styleUrls: ['./checkout-shipping.component.scss']
 })
 export class OCMCheckoutShipping implements OnInit {
-  @Input() proposedShipments: ProposedShipment[] = null;
+  _proposedShipments = null;
+  _lineItemsByProposedShipment = null;
+
+  @Input() set proposedShipments(value: ListProposedShipment) {
+    this._proposedShipments = value;
+    this._lineItemsByProposedShipment = value.Items.map(proposedShipment => {
+      return this.getLineItemsForProposedShipment(proposedShipment);
+    });
+  }
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListLineItem;
   @Output() selectShipRate = new EventEmitter<ProposedShipmentSelection>();

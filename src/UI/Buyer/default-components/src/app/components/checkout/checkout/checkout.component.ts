@@ -1,7 +1,7 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
-import { ShopperContextService, MarketplaceOrder, ListPayment, ListLineItem, BuyerCreditCard, ProposedShipmentSelection, ProposedShipment, ListBuyerCreditCard } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder, ListPayment, ListLineItem, BuyerCreditCard, ProposedShipmentSelection, ProposedShipment, ListBuyerCreditCard, Meta, ListProposedShipment } from 'marketplace';
 import { CheckoutCreditCardOutput } from '../../payments/payment-credit-card/payment-credit-card.component';
 
 @Component({
@@ -16,7 +16,7 @@ export class OCMCheckout implements OnInit {
   payments: ListPayment;
   cards: ListBuyerCreditCard;
   selectedCard: CheckoutCreditCardOutput;
-  proposedShipments: ProposedShipment[] = [];
+  proposedShipments: ListProposedShipment = null;
   currentPanel: string;
   faCheck = faCheck;
   sections: any = [
