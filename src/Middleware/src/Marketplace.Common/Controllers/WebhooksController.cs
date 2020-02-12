@@ -40,7 +40,7 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendSingleEmail("noreply@four51.com", payload.Response.Body.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
         }
 
-        [HttpPost, Route("orderrequiresapproval")] // TO DO: TEST & FIND PROPER PAYLOAD
+        [HttpPost, Route("orderrequiresapproval")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS
         public async void HandleOrderRequiresApproval(JObject payload)
         {
             await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "order sent for approval test", "<h1>this is a test email for order sent for approval</h1>"); // to buyer whose order needs approval
@@ -65,7 +65,7 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Shipped", "<h1>this is a test email for order shipped</h1>");
         }
 
-        [HttpPost, Route("orderdelivered")] // TO DO: TEST & FIND PROPER PAYLOAD
+        [HttpPost, Route("orderdelivered")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS
         public async void HandleOrderDelivered(JObject payload)
         {
             await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Delivered", "<h1>this is a test email for order delivered</h1>");
@@ -77,7 +77,7 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Cancelled", "<h1>this is a test email for order cancelled</h1>");
         }
 
-        [HttpPost, Route("orderrefund")] // TO DO: TEST & FIND PROPER PAYLOAD
+        [HttpPost, Route("orderrefund")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS
         public async void HandleOrderRefund(JObject payload)
         {
             await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Refunded", "<h1>this is a test email for order refunded</h1>");

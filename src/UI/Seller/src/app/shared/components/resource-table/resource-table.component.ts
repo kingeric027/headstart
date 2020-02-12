@@ -126,7 +126,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this._ocService.optionsSubject.pipe(takeWhile(() => this.alive)).subscribe(options => {
       this.resourceOptions = options;
       this.searchTerm = (options && options.search) || '';
-      this.activeFilterCount = Object.keys(options.filters).length;
+      this.activeFilterCount = options.filters ? Object.keys(options.filters).length : 0;
       this.setFilterForm();
       this.changeDetectorRef.detectChanges();
     });
