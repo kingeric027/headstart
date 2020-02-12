@@ -1,9 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.DevCenter;
+using Marketplace.Common.Services.DevCenter.Models;
 using Marketplace.Helpers.Models;
+using Marketplace.Models.Misc;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -18,12 +21,14 @@ namespace Marketplace.Common.Commands
         private readonly AppSettings _settings;
         private readonly IDevCenterService _dev;
         private EnvironmentSeed _seed;
+        private readonly IMarketplaceSupplierCommand _command;
 
-        public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev)
+        public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand command)
         {
             _settings = settings;
             _oc = oc;
             _dev = dev;
+            _command = command;
         }
 
         public async Task Seed(EnvironmentSeed seed, VerifiedUserContext user)
@@ -35,24 +40,13 @@ namespace Marketplace.Common.Commands
             // at this point everything we do is as impersonation of the admin user on a new token
             var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
             await this.PatchDefaultApiClients(impersonation.access_token);
-            await this.CreateSuppliers(user, impersonation.access_token);
+            await this.CreateWebhooks(impersonation.access_token, "https://marketplace-api-qa.azurewebsites.net");
             await this.CreateMarketPlaceRoles(impersonation.access_token);
+            await this.CreateSuppliers(user, impersonation.access_token);
             //await this.ConfigureBuyers(impersonation.access_token);
         }
 
-        private async Task ConfigureBuyers(string token)
-        {
-            foreach (var (key, value) in _seed.Suppliers)
-            {
-                await _oc.Catalogs.SaveAssignmentAsync(new CatalogAssignment()
-                {
-                    BuyerID = "Default_Marketplace_Buyer",
-                    CatalogID = key,
-                    ViewAllCategories = true,
-                    ViewAllProducts = true
-                }, token);
-            }
-        }
+        //private async Task ConfigureBuyers(string token) {}
 
         private async Task CreateSuppliers(VerifiedUserContext user, string token)
         {
@@ -64,60 +58,18 @@ namespace Marketplace.Common.Commands
                 Roles = new List<ApiRole>() { ApiRole.FullAccess }
             }, token);
 
-            foreach (var (key, value) in _seed.Suppliers)
+            // Create Suppliers and necessary user groups and security profile assignments
+            foreach (MarketplaceSupplier supplier in _seed.Suppliers)
             {
-                var supplier = await _oc.Suppliers.CreateAsync(new Supplier()
-                {
-                    Active = true,
-                    ID = key,
-                    Name = value,
-                    xp = { }
-                }, token);
-                var userGroup = await _oc.SupplierUserGroups.CreateAsync(key, new UserGroup()
-                {
-                    Description = "Integrations",
-                    Name = "Integration Group"
-                }, token);
-                var supplierUser = await _oc.SupplierUsers.CreateAsync(key, new User()
-                {
-                    Active = true,
-                    Email = user.Email,
-                    FirstName = "Integration",
-                    LastName = "Developer",
-                    Password = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-                    Username = $"dev_{supplier.ID}"
-                }, token);
-                var apiClient = await _oc.ApiClients.CreateAsync(new ApiClient()
-                {
-                    AppName = $"Integration Client {value}",
-                    Active = true,
-                    DefaultContextUserName = supplierUser.Username,
-                    ClientSecret = "d576450ca8f89967eea0d3477544ea4bee60af051a5c173be09db08c562b", // _settings.OrderCloudSettings.ClientSecret,
-                    AccessTokenDuration = 600,
-                    RefreshTokenDuration = 43200,
-                    AllowAnyBuyer = false,
-                    AllowAnySupplier = false,
-                    AllowSeller = false,
-                    IsAnonBuyer = false,
-                }, token);
-                await _oc.SupplierUserGroups.SaveUserAssignmentAsync(key, new UserGroupAssignment()
-                {
-                    UserID = supplierUser.ID,
-                    UserGroupID = userGroup.ID
-                }, token);
-                await _oc.ApiClients.SaveAssignmentAsync(new ApiClientAssignment()
-                {
-                    ApiClientID = apiClient.ID,
-                    SupplierID = supplier.ID
-                }, token);
-                await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-                {
-                    //UserID = user.ID,
-                    SupplierID = supplier.ID,
-                    UserGroupID = userGroup.ID,
-                    SecurityProfileID = profile.ID
-                }, token);
+                await _command.Create(supplier, user, token);
             }
+
+           //Add xp index for SupplierUserGroup.xp.Type
+           await _oc.XpIndices.PutAsync(new XpIndex
+            {
+                ThingType = XpThingType.UserGroup,
+                Key = "Type"
+            }, token);
         }
 
         private async Task PatchDefaultApiClients(string token)
@@ -134,6 +86,268 @@ namespace Marketplace.Common.Commands
             }, accessToken: token))
                 .ToList();
             await Task.WhenAll(tasks);
+        }
+
+        static readonly List<Webhook> DefaultWebhooks = new List<Webhook>() {
+            new Webhook() {
+              Name = "Buyer Patch Address Validation Pre-webhook",
+              Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
+              Url = "/validatebuyeraddresspatch",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = true,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/buyers/{buyerID}/addresses/{addressID}", Verb = "PATCH" }
+              }
+            },
+            new Webhook() {
+              Name = "Me Patch Address Validation Pre-webhook",
+              Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
+              Url = "/validatemeaddresspatch",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = true,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/me/addresses/{addressID}", Verb = "PATCH" }
+              }
+            },
+            new Webhook() {
+              Name = "Order Submit",
+              Description = "Takes Buyer Order, forwards order to suppliers, imports supplier orders into freight pop, imports information into zoho, avalara, and card connect",
+              Url = "/ordersubmit",
+              HashKey = "sadffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/submit", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Post and Put Address Validation Pre-webhook",
+              Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
+              Url = "/validateaddresspostput",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = true,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/addresses", Verb = "POST" },
+                new WebhookRoute() { Route = "v1/buyers/{buyerID}/addresses", Verb = "POST" },
+                new WebhookRoute() { Route = "v1/me/addresses", Verb = "POST" },
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/billto", Verb = "PUT" },
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/shipto", Verb = "PUT" },
+                new WebhookRoute() { Route = "v1/suppliers/{supplierID}/addresses/{addressID}", Verb = "PUT" },
+                new WebhookRoute() { Route = "v1/addresses/{addressID}", Verb = "PUT" },
+                new WebhookRoute() { Route = "v1/buyers/{buyerID}/addresses/{addressID}", Verb = "PUT" },
+                new WebhookRoute() { Route = "v1/me/addresses/{addressID}", Verb = "PUT" },
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/lineitems/{lineItemID}/shipto", Verb = "PUT" },
+                new WebhookRoute() { Route = "v1/suppliers/{supplierID}/addresses", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Seller Patch Address Validation Pre-webhook",
+              Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
+              Url = "/validateselleraddresspatch",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = true,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/addresses/{addressID}", Verb = "PATCH" }
+              }
+            },
+            new Webhook() {
+              Name = "Supplier Patch Address Validation Pre-webhook",
+              Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
+              Url = "/validatesupplieraddresspatch",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = true,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/suppliers/{supplierID}/addresses/{addressID}", Verb = "PATCH" }
+              }
+            },
+            new Webhook() {
+              Name = "Order Approved",
+              Description = "Triggers email letting user know the order was approved.",
+              Url = "/orderapproved",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/approve", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Order Declined",
+              Description = "Triggers email letting user know the order was declined.",
+              Url = "/orderdeclined",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/decline", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Order Shipped",
+              Description = "Triggers email letting user know the order was shipped.",
+              Url = "/ordershipped",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/ship", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Order Cancelled",
+              Description = "Triggers email letting user know the order has been cancelled.",
+              Url = "/ordercancelled",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/cancel", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Order Updated",
+              Description = "Triggers email letting user know the order has been updated.",
+              Url = "/orderupdated",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}", Verb = "PATCH" }
+              }
+            },
+            new Webhook() {
+              Name = "New User",
+              Description = "Triggers an email welcoming the buyer user.  Triggers an email letting admin know about the new buyer user.",
+              Url = "/newuser",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/buyers/{buyerID}/users", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Product Created",
+              Description = "Triggers email to user with details of newly created product.",
+              Url = "/productcreated",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/products", Verb = "POST" }
+              }
+            },
+            new Webhook() {
+              Name = "Product Update",
+              Description = "Triggers email to user indicating that a product has been updated.",
+              Url = "/productupdate",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/products/{productID}", Verb = "PATCH" }
+              }
+            },
+            new Webhook() {
+              Name = "Supplier Updated",
+              Description = "Triggers email letting user know the supplier has been updated.",
+              Url = "/supplierupdated",
+              HashKey = "asdffdsa",
+              ElevatedRoles =
+                new List<ApiRole>
+                {
+                    ApiRole.FullAccess
+                },
+              BeforeProcessRequest = false,
+              WebhookRoutes = new List<WebhookRoute>
+              {
+                new WebhookRoute() { Route = "v1/suppliers/{supplierID}", Verb = "PATCH" }
+              }
+            },
+        };
+        public async Task CreateWebhooks(string accessToken, string baseURL)
+        {
+            var apiClientResponse = await _oc.ApiClients.ListAsync(accessToken: accessToken);
+            foreach (Webhook webhook in DefaultWebhooks)
+            {
+                webhook.ApiClientIDs = apiClientResponse.Items.Select(apiClient => apiClient.ID).ToList();
+                webhook.Url = $"{baseURL}{webhook.Url}";
+                await _oc.Webhooks.CreateAsync(webhook, accessToken);
+            }
         }
 
         private async Task<AdminCompany> CreateOrganization(string token)

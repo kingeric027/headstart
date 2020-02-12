@@ -4,16 +4,13 @@ using System.Text;
 using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Mappers.Avalara;
-using Marketplace.Common.Models;
 using Marketplace.Common.Services.AvaTax.Models;
-using Marketplace.Common.Services.FreightPop;
 using Marketplace.Helpers;
-using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Services
+namespace Marketplace.Common.Services.AvaTax
 {
 	public interface IAvataxService
 	{
@@ -24,7 +21,7 @@ namespace Marketplace.Common.Services
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
 		// When should we do this? On order complete (When the credit card is charged) ? 
 		Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode);
-		Task<MarketplaceListPage<MarketplaceTaxCode>> ListTaxCodesAsync(MarketplaceListArgs<TaxCodeModel> marketplaceListArgs);
+		Task<ListPage<MarketplaceTaxCode>> ListTaxCodesAsync(ListArgs<TaxCodeModel> marketplaceListArgs);
 	}
 
 	public class AvataxService : IAvataxService
@@ -41,7 +38,7 @@ namespace Marketplace.Common.Services
 					.WithSecurity(settings.AvalaraSettings.AccountID, settings.AvalaraSettings.LicenseKey);
 		}
 
-		public async Task<MarketplaceListPage<MarketplaceTaxCode>> ListTaxCodesAsync(MarketplaceListArgs<TaxCodeModel> marketplaceListArgs)
+		public async Task<ListPage<MarketplaceTaxCode>> ListTaxCodesAsync(ListArgs<TaxCodeModel> marketplaceListArgs)
 		{
 			var args = TaxCodeMapper.Map(marketplaceListArgs);
 			var avataxCodes = await _avaTax.ListTaxCodesAsync(args.Filter, args.Top, args.Skip, args.OrderBy);
@@ -81,7 +78,7 @@ namespace Marketplace.Common.Services
 			return await _avaTax.CommitTransactionAsync(_companyCode, transactionCode, DocumentType.SalesInvoice, "", model);
 		}
 
-		private string GetCustomerCode(OrderCloud.SDK.Order order)
+		private string GetCustomerCode(Order order)
 		{
 			return order.FromCompanyID;
 		}

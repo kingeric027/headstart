@@ -2,8 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
-using Marketplace.Helpers.Models;
-using Marketplace.Helpers;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Controllers
 {
@@ -42,7 +41,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("{buyerId}/address"), MarketplaceUserAuth()]
-        public async Task<MarketplaceAddress> PostAddress([FromBody] MarketplaceAddress obj, string buyerId, string clientId)
+        public async Task<MarketplaceAddress> PostBillingAddress([FromBody] MarketplaceAddress obj, string buyerId, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId, clientId);
         }

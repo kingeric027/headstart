@@ -6,6 +6,7 @@ import * as moment_ from 'moment';
 const moment = moment_;
 import { ShopperContextService, CreditCardToken } from 'marketplace';
 import { ModalState } from 'src/app/models/modal-state.class';
+import { CreditCardFormOutput } from '../credit-card-form/credit-card-form.component';
 
 @Component({
   templateUrl: './payment-method-management.component.html',
@@ -37,7 +38,7 @@ export class OCMPaymentMethodManagement implements OnInit {
     const now = moment().format('YYYY-MM-DD');
     // TODO: Reconsider filter - it's not working.
     const dateFilter = { StartDate: `>${now}|!*`, EndDate: `<${now}|!*` };
-    this.accounts = await this.context.myResources.ListSpendingAccounts({ filters: undefined }).toPromise();
+    // this.accounts = await this.context.myResources.ListSpendingAccounts({ filters: undefined }).toPromise();
   }
 
   showAdd() {
@@ -60,8 +61,8 @@ export class OCMPaymentMethodManagement implements OnInit {
     this.showCardForm = false;
   }
 
-  async addCard(card: CreditCardToken) {
-    await this.context.creditCards.Save(card);
+  async addCard(output: CreditCardFormOutput) {
+    await this.context.currentUser.cards.Save(output.card);
     this.showCardForm = false;
     this.listCards();
   }
@@ -69,7 +70,7 @@ export class OCMPaymentMethodManagement implements OnInit {
   async deleteCard(card: BuyerCreditCard) {
     this.areYouSureModal = ModalState.Closed;
     this.cards.Items = this.cards.Items.filter(c => c.ID !== card.ID);
-    await this.context.creditCards.Delete(card.ID);
+    await this.context.currentUser.cards.Delete(card.ID);
   }
 
   updateRequestOptions(newOptions: { page?: number; search?: string }) {
@@ -78,6 +79,6 @@ export class OCMPaymentMethodManagement implements OnInit {
   }
 
   private async listCards() { 
-    this.cards = await this.context.creditCards.List();
+    this.cards = await this.context.currentUser.cards.List();
   }
 }

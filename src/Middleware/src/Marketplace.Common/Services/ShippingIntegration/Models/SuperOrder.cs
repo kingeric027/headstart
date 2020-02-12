@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.ShippingIntegration
+namespace Marketplace.Common.Services.ShippingIntegration.Models
 {
     public class SuperOrder
     {

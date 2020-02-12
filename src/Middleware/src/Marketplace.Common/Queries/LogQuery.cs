@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
-using Cosmonaut.Response;
-using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Helpers.Models;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Queries
 {
@@ -22,7 +21,7 @@ namespace Marketplace.Common.Queries
             _store = store;
         }
 
-        public async Task<MarketplaceListPage<OrchestrationLog>> List(IMarketplaceListArgs args)
+        public async Task<ListPage<OrchestrationLog>> List(IListArgs args)
         {
             var query = _store.Query()
                 .Search(args)

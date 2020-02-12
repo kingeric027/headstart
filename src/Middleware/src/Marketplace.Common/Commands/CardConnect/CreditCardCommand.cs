@@ -2,14 +2,14 @@
 using System.Threading.Tasks;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Mappers.CardConnect;
-using Marketplace.Common.Models.CardConnect;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Models;
+using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands.CardConnect
+namespace Marketplace.Common.Commands
 {
     public interface ICreditCardCommand
     {
@@ -26,7 +26,7 @@ namespace Marketplace.Common.Commands.CardConnect
         private readonly IOrderCloudClient _oc;
 		private readonly IOrderCloudClient _privilegedOC;
 
-		public CreditCardCommand(AppSettings settings, ICardConnectService card)
+		public CreditCardCommand(AppSettings settings, ICardConnectService card, IOrderCloudClient oc)
         {
             _card = card;
             _settings = settings;
@@ -35,26 +35,26 @@ namespace Marketplace.Common.Commands.CardConnect
                 ApiUrl = "https://api.ordercloud.io",
                 AuthUrl = "https://auth.ordercloud.io"
             });
-			_privilegedOC = OcFactory.GetSEBAdmin();
+			_privilegedOC = oc;
 		}
 
         public async Task<CreditCard> TokenizeAndSave(string buyerID, CreditCardToken card, VerifiedUserContext user)
         {
-            var auth = await _card.Tokenize(CardConnectMapper.Map(card));
-            var cc = await _oc.CreditCards.CreateAsync(buyerID, CreditCardMapper.Map(card, auth), user.AccessToken);
-            return cc;
+            return await _oc.CreditCards.CreateAsync(buyerID, await Tokenize(card), user.AccessToken);
         }
 
         public async Task<BuyerCreditCard> MeTokenizeAndSave(CreditCardToken card, VerifiedUserContext user)
         {
-            var auth = await _card.Tokenize(CardConnectMapper.Map(card));
-            var cc = await _oc.Me.CreateCreditCardAsync(BuyerCreditCardMapper.Map(card, auth), user.AccessToken);
-            return cc;
+			return await _oc.Me.CreateCreditCardAsync(await MeTokenize(card), user.AccessToken);
         }
 
-        public async Task<Payment> AuthorizePayment(CreditCardPayment payment, VerifiedUserContext user)
+		public async Task<Payment> AuthorizePayment(CreditCardPayment payment, VerifiedUserContext user)
         {
-            var cc = await _oc.Me.GetCreditCardAsync<BuyerCreditCard>(payment.CreditCardID, user.AccessToken);
+			Require.That(payment.CreditCardID != null || payment.CreditCardDetails != null, 
+				new ErrorCode("Missing credit card info", 400, "Must include CreditCardDetails or CreditCardID."));
+
+			var cc = await GetMeCardDetails(payment, user);
+
             Require.That(cc.Token != null, new ErrorCode("Invalid credit card token", 400, "Credit card must have valid authorization token"));
 
 			var order = await _privilegedOC.Orders.GetAsync(OrderDirection.Incoming, payment.OrderID);
@@ -95,5 +95,26 @@ namespace Marketplace.Common.Commands.CardConnect
                 CardConnectMapper.Map(order, ocPayment, call));
             return trans;
         }
-    }
+
+		private async Task<BuyerCreditCard> GetMeCardDetails(CreditCardPayment payment, VerifiedUserContext user)
+		{
+			if (payment.CreditCardID != null)
+			{
+				return await _oc.Me.GetCreditCardAsync<BuyerCreditCard>(payment.CreditCardID, user.AccessToken);
+			}
+			return await MeTokenize(payment.CreditCardDetails);
+		}
+
+		private async Task<BuyerCreditCard> MeTokenize(CreditCardToken card)
+		{
+			var auth = await _card.Tokenize(CardConnectMapper.Map(card));
+			return BuyerCreditCardMapper.Map(card, auth);
+		}
+
+		private async Task<CreditCard> Tokenize(CreditCardToken card)
+		{
+			var auth = await _card.Tokenize(CardConnectMapper.Map(card));
+			return CreditCardMapper.Map(card, auth);
+		}
+	}
 }

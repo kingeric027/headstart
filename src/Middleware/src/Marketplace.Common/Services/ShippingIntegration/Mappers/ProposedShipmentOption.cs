@@ -1,7 +1,7 @@
-﻿using Marketplace.Common.Services.FreightPop;
-using System.Linq;
+﻿using Marketplace.Common.Services.FreightPop.Models;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
-namespace Marketplace.Common.Services.ShippingIntegration
+namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {
     public static class ProposedShipmentOptionMapper
     {

@@ -39,6 +39,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
 import { CreditCardInputDirective } from './directives/credit-card-input.directive';
 import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 import { OrderStatusDisplayPipe } from './pipes/order-status-display.pipe';
+import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { ChildCategoryPipe } from './pipes/category-children.pipe';
 import { CreditCardFormatPipe } from './pipes/credit-card-format.pipe';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
@@ -202,6 +203,7 @@ const components = [
     SpecFieldDirective,
     ProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
+    PhoneFormatPipe,
     ChildCategoryPipe,
     CreditCardFormatPipe,
     PaymentMethodDisplayPipe,

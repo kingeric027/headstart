@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
-using Marketplace.Helpers.Models;
-using Marketplace.Helpers;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Controllers
 {

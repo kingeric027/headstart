@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.DevCenter
+namespace Marketplace.Common.Services.DevCenter.Models
 {
     public class DevAccessibleCompany
     {

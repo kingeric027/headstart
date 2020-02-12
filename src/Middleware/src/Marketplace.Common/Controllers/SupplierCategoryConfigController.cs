@@ -5,12 +5,13 @@ using Marketplace.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Controllers
 {
     public class SupplierCategoryConfigController : BaseController
     {
-        private ISupplierCategoryConfigQuery _query;
+        private readonly ISupplierCategoryConfigQuery _query;
 
         public SupplierCategoryConfigController(AppSettings settings, ISupplierCategoryConfigQuery query) : base(settings)
         {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Marketplace.Common.Services.DevCenter
+﻿namespace Marketplace.Common.Services.DevCenter.Models
 {
     public class ImpersonationToken
     {
