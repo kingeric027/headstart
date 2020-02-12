@@ -1,23 +1,23 @@
-<div *ngIf="liGroupedByShipFrom?.length > 0">
+<div *ngIf="liGroupedByShipFrom?.length > 0 && suppliers?.info.length > 0 && suppliers?.addresses.length > 0">
   <div class="card border shadow-sm mb-4"
        *ngFor="let liGroup of liGroupedByShipFrom; index as i">
     <div class="card-header p-3">
       <div class="row"
-           *ngIf="supplierAddresses[i] && supplierInfo[i]">
+           *ngIf="suppliers.addresses[i] && suppliers.info[i]">
         <div class="col">
           <h5 class="card-title mb-0">
-            {{supplierInfo[i].Name}}
+            {{suppliers.info[i].Name}}
           </h5>
         </div>
         <div class="d-flex flex-column justify-content-end pr-3">
-          <small class="text-muted">{{supplierAddresses[i].Street1}}
-            {{supplierAddresses[i].Street2}} | {{supplierAddresses[i].City}},
-            {{supplierAddresses[i].State}},
-            {{supplierAddresses[i].Zip}}
+          <small class="text-muted">{{suppliers.addresses[i].Street1}}
+            {{suppliers.addresses[i].Street2}} | {{suppliers.addresses[i].City}},
+            {{suppliers.addresses[i].State}},
+            {{suppliers.addresses[i].Zip}}
           </small>
           <small class="text-muted"
-                 *ngIf="supplierInfo[i]?.xp && supplierInfo[i].xp.Contacts">
-            {{ supplierInfo[i].xp.Contacts[0].Phone | phoneFormat }} | {{ supplierInfo[i].xp.Contacts[0].Email }}
+                 *ngIf="suppliers.info[i]?.xp && suppliers.info[i].xp.Contacts">
+            {{ suppliers.info[i].xp.Contacts[0].Phone | phoneFormat }} | {{ suppliers.info[i].xp.Contacts[0].Email }}
           </small>
         </div>
       </div>

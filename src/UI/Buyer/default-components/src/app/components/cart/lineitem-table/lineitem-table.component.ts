@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { Address, LineItem, Supplier } from '@ordercloud/angular-sdk';
+import { LineItem } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
@@ -15,19 +15,18 @@ export class OCMLineitemTable {
     this._lineItems = value;
     this.liGroups = _groupBy(value, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(this.liGroups);
-    this.getSupplierInfo(this.liGroupedByShipFrom);
+    this.getSupplierInfo(this.liGroups);
   }
   @Input() readOnly: boolean;
-  supplierInfo: Supplier[] = [];
-  supplierAddresses: Address[] = [];
+  suppliers: any;
   liGroupedByShipFrom: LineItem[][];
   liGroups: any;
   _lineItems = [];
+
   constructor(private context: ShopperContextService) { }
 
-  async getSupplierInfo(liGroupedByShipFrom: LineItem[][]) {
-    this.supplierInfo = await this.context.orderHistory.getSupplierInfo(liGroupedByShipFrom);
-    this.supplierAddresses = await this.context.orderHistory.getSupplierAddresses(liGroupedByShipFrom);
+  async getSupplierInfo(liGroups: any) {
+    this.suppliers = await this.context.orderHistory.getSupplierInfo(liGroups);
   }
 
   removeLineItem(lineItemID: string) {

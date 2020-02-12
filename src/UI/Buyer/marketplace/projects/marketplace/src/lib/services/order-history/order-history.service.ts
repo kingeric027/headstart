@@ -21,8 +21,7 @@ export interface IOrderHistory {
   ): Promise<MarketplaceOrder>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
-  getSupplierInfo(liGroupedByShipFrom: LineItem[][]): Supplier[];
-  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]): Address[];
+  getSupplierInfo(liGroups: any): any;
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
 }
 
@@ -81,26 +80,15 @@ export class OrderHistoryService implements IOrderHistory {
     return _uniqBy(approvals.Items, (x) => x.Comments);
   }
 
-  getSupplierInfo(liGroupedByShipFrom: LineItem[][]) {
-    const infoArray = [];
-    liGroupedByShipFrom.forEach(async group => {
-      if (group[0] && group[0].SupplierID) {
-        const info = await this.ocSupplierService.Get(group[0].SupplierID).toPromise();
-        infoArray.push(info);
-      }
+  getSupplierInfo(liGroups: any) {
+    const supplierInfo = { info: [], addresses: [] };
+    Object.keys(liGroups).forEach(async group => {
+      const info = await this.ocSupplierService.Get(liGroups[group][0].SupplierID).toPromise();
+      const address = await this.ocSupplierAddressService.Get(liGroups[group][0].SupplierID, liGroups[group][0].ShipFromAddressID).toPromise();
+      supplierInfo.info.push(info);
+      supplierInfo.addresses.push(address)
     });
-    return infoArray;
-  }
-
-  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]) {
-    const addresses = [];
-    liGroupedByShipFrom.forEach(async group => {
-      if (group[0] && group[0].SupplierID && group[0].ShipFromAddressID) {
-        const address = await this.ocSupplierAddressService.Get(group[0].SupplierID, group[0].ShipFromAddressID).toPromise();
-        addresses.push(address);
-      }
-    });
-    return addresses;
+    return supplierInfo;
   }
 
   async listShipments(orderID: string = this.activeOrderID): Promise<ShipmentWithItems[]> {
