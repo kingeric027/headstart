@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { OcTokenService } from '@ordercloud/angular-sdk';
+import { OcTokenService, Supplier } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { MarketPlaceProduct, MarketPlaceProductTaxCode } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { ListResource } from '../resource-crud/resource-crud.types';
@@ -47,5 +47,10 @@ export class MiddlewareAPIService {
       this.baseUrl
     }/taxcodes?taxCategory=${taxCategory}&search=${search}&pageSize=${pageSize}&page=${page}`;
     return await this.http.get(url, this.headers).toPromise();
+  }
+
+  async createSupplier(supplier: Supplier): Promise<Supplier> {
+    const url = `${this.baseUrl}/supplier`;
+    return await this.http.post(url, supplier, this.headers).toPromise();
   }
 }

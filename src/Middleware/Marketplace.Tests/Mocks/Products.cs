@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using Marketplace.Common.Services;
+using Marketplace.Models;
+using Marketplace.Models.Extended;
 using OrderCloud.SDK;
 
 namespace Marketplace.Tests.Mocks
