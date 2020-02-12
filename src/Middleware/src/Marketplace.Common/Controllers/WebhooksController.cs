@@ -11,7 +11,6 @@ namespace Marketplace.Common.Controllers
 {
     public class WebhooksController : BaseController
     {
-
         private readonly AppSettings _settings;
         private readonly ISendgridService _sendgridService;
         private readonly IProposedShipmentCommand _proposedShipmentCommand;

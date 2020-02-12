@@ -16,7 +16,7 @@ namespace Marketplace.Models.Misc
         public string CardType { get; set; }
     }
 
-	public abstract class CreditCardPayment
+	public class CreditCardPayment
 	{
 		[System.ComponentModel.DataAnnotations.Required]
 		public string OrderID { get; set; }

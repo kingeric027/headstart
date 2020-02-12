@@ -2,6 +2,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
 import { ShopperContextService, MarketplaceOrder, ListPayment, ListLineItem, BuyerCreditCard, ProposedShipmentSelection, ProposedShipment, ListBuyerCreditCard } from 'marketplace';
+import { CheckoutCreditCardOutput } from '../../payments/payment-credit-card/payment-credit-card.component';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -14,7 +15,7 @@ export class OCMCheckout implements OnInit {
   lineItems: ListLineItem;
   payments: ListPayment;
   cards: ListBuyerCreditCard;
-  selectedCard: { card: BuyerCreditCard, cvv: string };
+  selectedCard: CheckoutCreditCardOutput;
   proposedShipments: ProposedShipment[] = [];
   currentPanel: string;
   faCheck = faCheck;
@@ -71,9 +72,18 @@ export class OCMCheckout implements OnInit {
     this.toSection('payment');
   }
 
-  async onCardSelected(card: { card: BuyerCreditCard, cvv: string}) {
-    this.selectedCard = card;
-    await this.context.currentOrder.createCCPayment(card.card);
+  async onCardSelected(output: CheckoutCreditCardOutput) {
+    this.selectedCard = output;
+    if (output.savedCard) {
+      await this.context.currentOrder.createSavedCCPayment(output.savedCard);
+    } else {
+      // need to figure out how to use the platform. ran into creditCardID cannot be null.
+      // so for now I always save any credit card in OC.
+      // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
+      this.selectedCard.savedCard = await this.context.currentUser.cards.Save(output.newCard);
+      await this.context.currentOrder.createSavedCCPayment(this.selectedCard.savedCard);
+    }
+
     this.payments = await this.context.currentOrder.listPayments();
     this.toSection('billingAddress');
   }
@@ -81,7 +91,12 @@ export class OCMCheckout implements OnInit {
   async submitOrderWithComment(comment: string): Promise<void> {
     const orderID = this.order.ID;
     await this.context.currentOrder.patch({ Comments: comment });
-    await this.context.currentOrder.authOnlyCreditCard(this.selectedCard.card.ID, this.selectedCard.cvv);
+    // TODO - these auth calls probably need to be enforced in the middleware, not frontend.
+    if (this.selectedCard.savedCard) {
+      await this.context.currentOrder.authOnlySavedCreditCard(this.selectedCard.savedCard.ID, this.selectedCard.cvv);
+    } else {
+      await this.context.currentOrder.authOnlyOnetimeCreditCard(this.selectedCard.newCard, this.selectedCard.cvv);
+    }
     await this.context.currentOrder.submit();
 
     // todo: "Order Submitted Successfully" message

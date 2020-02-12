@@ -1,6 +1,13 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ListBuyerCreditCard, BuyerCreditCard } from 'marketplace';
+import { ListBuyerCreditCard, BuyerCreditCard, CreditCardToken } from 'marketplace';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { CreditCardFormOutput } from '../credit-card-form/credit-card-form.component';
+
+export interface CheckoutCreditCardOutput {
+  savedCard?: BuyerCreditCard;
+  newCard?: CreditCardToken;
+  cvv: string;
+}
 
 @Component({
   templateUrl: './payment-credit-card.component.html',
@@ -10,7 +17,7 @@ export class OCMPaymentCreditCard implements OnInit {
   showNewCCForm = false;
 
   @Input() cards: ListBuyerCreditCard; 
-  @Output() cardSelected = new EventEmitter<{card: BuyerCreditCard, cvv: string}>();
+  @Output() cardSelected = new EventEmitter<CheckoutCreditCardOutput>();
   form = new FormGroup({ 
     cardID: new FormControl(null, Validators.required), 
     cvv: new FormControl('', Validators.required) 
@@ -20,10 +27,10 @@ export class OCMPaymentCreditCard implements OnInit {
 
   ngOnInit() {}
 
-  submit(event) {
+  submit(output: CreditCardFormOutput) {
     const cardID = this.form.value.cardID;
-    const card = this.cards.Items.find(c => c.ID === cardID);
-    this.cardSelected.emit({ card, cvv: this.form.value.cvv });
+    const savedCard = this.cards.Items.find(c => c.ID === cardID);
+    this.cardSelected.emit({ savedCard, cvv: output.cvv, newCard: output.card });
   }
 
   toggleShowCCForm(event) {

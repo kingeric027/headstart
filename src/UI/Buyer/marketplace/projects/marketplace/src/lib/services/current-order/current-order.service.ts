@@ -19,7 +19,7 @@ import { isUndefined as _isUndefined, get as _get } from 'lodash';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { listAll } from '../../functions/listAll';
-import { AppConfig, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection } from '../../shopper-context';
+import { AppConfig, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection, CreditCardToken } from '../../shopper-context';
 import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
 
 export interface ICurrentOrder {
@@ -37,7 +37,8 @@ export interface ICurrentOrder {
 
   listPayments(): Promise<ListPayment>;
   createPayment(payment: Payment): Promise<Payment>;
-  createCCPayment(card: BuyerCreditCard): Promise<Payment>;
+  createSavedCCPayment(card: BuyerCreditCard): Promise<Payment>;
+  createOneTimeCCPayment(card: CreditCardToken): Promise<Payment>;
 
   setBillingAddress(address: Address): Promise<MarketplaceOrder>;
   setShippingAddress(address: Address): Promise<MarketplaceOrder>;
@@ -47,7 +48,8 @@ export interface ICurrentOrder {
   getProposedShipments(): Promise<ProposedShipment[]>;
   selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder>;
   calculateTax(): Promise<MarketplaceOrder>;
-  authOnlyCreditCard(cardID: string, cvv: string): Promise<Payment>;
+  authOnlyOnetimeCreditCard(card: CreditCardToken, cvv: string): Promise<Payment>;
+  authOnlySavedCreditCard(cardID: string, cvv: string): Promise<Payment>;
 
   onOrderChange(callback: (order: MarketplaceOrder) => void): void;
   onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
@@ -142,7 +144,7 @@ export class CurrentOrderService implements ICurrentOrder {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);
   }
 
-  async createCCPayment(card: BuyerCreditCard): Promise<Payment> {
+  async createSavedCCPayment(card: BuyerCreditCard): Promise<Payment> {
     return await this.createPayment({
       Amount : this.order.Total,
       DateCreated: new Date().toDateString(),
@@ -151,6 +153,22 @@ export class CurrentOrderService implements ICurrentOrder {
       CreditCardID: card.ID,
       xp: {
         partialAccountNumber: card.PartialAccountNumber,
+        cardType: card.CardType
+      }
+    });
+  }
+
+  async createOneTimeCCPayment(card: CreditCardToken): Promise<Payment> {
+    return await this.createPayment({
+      Amount : this.order.Total,
+      DateCreated: new Date().toDateString(),
+      Accepted: false,
+      Type: 'CreditCard',
+      CreditCardID: null,
+      xp: {
+        // This slice() is sooo crucial. Otherwise we would be storing creditcard numbers in xp.
+        // Which would be really really bad.
+        partialAccountNumber: card.AccountNumber.slice(-4),
         cardType: card.CardType
       }
     });
@@ -245,9 +263,14 @@ export class CurrentOrderService implements ICurrentOrder {
     return (this.order = await this.middlewareApi.calculateTax(this.order.ID));
   }
 
-  async authOnlyCreditCard(cardID: string, cvv: string): Promise<Payment> {
-    return await this.middlewareApi.authOnlyCreditCard(this.order.ID, cardID, cvv);
+  async authOnlyOnetimeCreditCard(card: CreditCardToken, cvv: string): Promise<Payment> {
+    return await this.middlewareApi.authOnlyCreditCard(this.order.ID, card, cvv);
   }
+
+  async authOnlySavedCreditCard(cardID: string, cvv: string): Promise<Payment> {
+    return await this.middlewareApi.authOnlySavedCreditCard(this.order.ID, cardID, cvv);
+  }
+
 
   // Private Methods
 

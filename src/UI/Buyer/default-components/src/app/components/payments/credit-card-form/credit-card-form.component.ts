@@ -3,6 +3,12 @@ import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms'
 import { CreditCardToken } from 'marketplace';
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe';
 import { ValidateCreditCard } from 'src/app/validators/validators';
+import { removeSpacesFrom } from 'src/app/services/card-validation.helper';
+
+export interface CreditCardFormOutput {
+  card: CreditCardToken;
+  cvv: string;
+}
 
 @Component({
   templateUrl: './credit-card-form.component.html',
@@ -11,7 +17,7 @@ import { ValidateCreditCard } from 'src/app/validators/validators';
 export class OCMCreditCardForm implements OnInit {
   constructor(private creditCardFormatPipe: CreditCardFormatPipe) {}
 
-  @Output() formSubmitted = new EventEmitter<CreditCardToken>();
+  @Output() formSubmitted = new EventEmitter<CreditCardFormOutput>();
   @Output() formDismissed = new EventEmitter();
   @Input() card: CreditCardToken;
   @Input() submitText: string;
@@ -36,7 +42,7 @@ export class OCMCreditCardForm implements OnInit {
   
   private _showCVV = false;
   private _showCardDetails = true;
-  cardForm: FormGroup = new FormGroup({});
+  cardForm = new FormGroup({});
   monthOptions = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
   yearOptions = this.getYearOptions();
 
@@ -47,9 +53,12 @@ export class OCMCreditCardForm implements OnInit {
 
   onSubmit() {
     this.formSubmitted.emit({
-      AccountNumber: this.cardForm.value.cardNumber,
-      CardholderName: this.cardForm.value.cardholderName,
-      ExpirationDate: `${this.cardForm.value.expMonth}${this.cardForm.value.expYear}`,
+      card: {
+        AccountNumber: removeSpacesFrom(this.cardForm.value.cardNumber || ''),
+        CardholderName: this.cardForm.value.cardholderName,
+        ExpirationDate: `${this.cardForm.value.expMonth}${this.cardForm.value.expYear}`,
+      },
+      cvv:  this.cardForm.value.cvv
     });
   }
 

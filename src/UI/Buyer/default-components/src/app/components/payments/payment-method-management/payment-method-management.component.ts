@@ -6,6 +6,7 @@ import * as moment_ from 'moment';
 const moment = moment_;
 import { ShopperContextService, CreditCardToken } from 'marketplace';
 import { ModalState } from 'src/app/models/modal-state.class';
+import { CreditCardFormOutput } from '../credit-card-form/credit-card-form.component';
 
 @Component({
   templateUrl: './payment-method-management.component.html',
@@ -60,8 +61,8 @@ export class OCMPaymentMethodManagement implements OnInit {
     this.showCardForm = false;
   }
 
-  async addCard(card: CreditCardToken) {
-    await this.context.currentUser.cards.Save(card);
+  async addCard(output: CreditCardFormOutput) {
+    await this.context.currentUser.cards.Save(output.card);
     this.showCardForm = false;
     this.listCards();
   }
