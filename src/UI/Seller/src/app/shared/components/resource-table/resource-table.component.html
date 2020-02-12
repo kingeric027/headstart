@@ -271,7 +271,7 @@
           <!-- TODO: 1/2 Abstract into component to be used anywhere using inputs and outputs -->
           <div *ngIf="shouldShowResourceActions"
                class="d-flex justify-content-between align-items-center py-2 additional-item-edit-resource">
-            <delete-confirm-modal-component *ngIf="!isCreatingNew"
+            <delete-confirm-modal-component *ngIf="!isCreatingNew && !isMyResource"
                                             buttonText="Delete {{_currentResourceNameSingular | titlecase}}"
                                             (deleteConfirmed)="handleDelete($event)">
             </delete-confirm-modal-component>
