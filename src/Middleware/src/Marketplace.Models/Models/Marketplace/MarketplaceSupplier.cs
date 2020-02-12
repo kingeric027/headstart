@@ -7,13 +7,13 @@ namespace Marketplace.Models.Models.Marketplace
 {
     public class MarketplaceSupplier : Supplier<SupplierXp>
     {
-        public string Description { get; set; }
-        public List<ProductImage> Images { get; set; } = new List<ProductImage>();
-        public Contact SupportContact { get; set; }
     }
 
     public class SupplierXp
     {
+        public string Description { get; set; }
+        public List<ProductImage> Images { get; set; } = new List<ProductImage>();
+        public Contact SupportContact { get; set; }
     }
 
     

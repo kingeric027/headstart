@@ -1,12 +1,10 @@
-﻿using Marketplace.Common.Mappers.Avalara;
+﻿
+using Marketplace.Common.Mappers.Avalara;
 using Marketplace.Common.Services.AvaTax.Models;
-using Marketplace.Helpers.Models;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Orchestration.Tests.Mocks;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using OrderCloud.SDK;
 
 namespace Marketplace.Tests
 {
@@ -30,9 +28,9 @@ namespace Marketplace.Tests
             var avalaraTaxCodesFromApiCall = TaxCodes.taxCodeObjectFromAvalaraFirstRecord();
             var marketplaceTaxCodesListFromMapper = TaxCodes.marketplaceTaxCodeListPageFirstRecord();
             var result = TaxCodeMapper.Map(avalaraTaxCodesFromApiCall, marketplaceTaxCodesListFromMapper, 1, 0);
-            var expectedResult = new MarketplaceListPage<MarketplaceTaxCode>
+            var expectedResult = new ListPage<MarketplaceTaxCode>
             {
-                Meta = new MarketplaceListPageMeta
+                Meta = new ListPageMeta
                 {
                     Page = 1,
                     PageSize = 1,
@@ -50,9 +48,9 @@ namespace Marketplace.Tests
             var avalaraTaxCodesFromApiCall = TaxCodes.taxCodeObjectFromAvalaraSecondRecord();
             var marketplaceTaxCodesListFromMapper = TaxCodes.marketplaceTaxCodeListPageSecondRecord();
             var result = TaxCodeMapper.Map(avalaraTaxCodesFromApiCall, marketplaceTaxCodesListFromMapper, 1, 1);
-            var expectedResult = new MarketplaceListPage<MarketplaceTaxCode>
+            var expectedResult = new ListPage<MarketplaceTaxCode>
             {
-                Meta = new MarketplaceListPageMeta
+                Meta = new ListPageMeta
                 {
                     Page = 2,
                     PageSize = 1,
@@ -70,9 +68,9 @@ namespace Marketplace.Tests
             var avalaraTaxCodesFromApiCall = TaxCodes.taxCodeObjectFromAvalaraAllRecords();
             var marketplaceTaxCodesListFromMapper = TaxCodes.marketplaceTaxCodeListPageAllRecords();
             var result = TaxCodeMapper.Map(avalaraTaxCodesFromApiCall, marketplaceTaxCodesListFromMapper, 100, 0);
-            var expectedResult = new MarketplaceListPage<MarketplaceTaxCode>
+            var expectedResult = new ListPage<MarketplaceTaxCode>
             {
-                Meta = new MarketplaceListPageMeta
+                Meta = new ListPageMeta
                 {
                     Page = 1,
                     PageSize = 100,

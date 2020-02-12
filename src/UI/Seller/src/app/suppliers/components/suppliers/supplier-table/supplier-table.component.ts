@@ -26,23 +26,22 @@ export interface SupplierCategoryConfig {
 
 function createSupplierForm(supplier: Supplier) {
   return new FormGroup({
+    ID: new FormControl({ value: supplier.ID, disabled: !this.isCreatingNew }),
     Name: new FormControl(supplier.Name, Validators.required),
-    LogoUrl: new FormControl(_get(supplier, 'xp.LogoUrl')),
+    LogoUrl: new FormControl(_get(supplier, 'xp.Images') && _get(supplier, 'xp.Images')[0].URL),
     Description: new FormControl(_get(supplier, 'xp.Description'), ValidateRichTextDescription),
-    WebSiteUrl: new FormControl(_get(supplier, 'xp.WebsiteUrl')),
     // need to figure out strucure of free string array
     // StaticContentLinks: new FormControl(_get(supplier, 'xp.StaticContentLinks'), Validators.required),
-    PrimaryContactName: new FormControl(
-      (_get(supplier, 'xp.Categories') && _get(supplier, 'xp.Contacts')[0].Name) || ''
+    SupportContactName: new FormControl(
+      (_get(supplier, 'xp.SupportContact') && _get(supplier, 'xp.SupportContact.Name')) || ''
     ),
-    PrimaryContactEmail: new FormControl(
-      (_get(supplier, 'xp.Contacts') && _get(supplier, 'xp.Contacts')[0].Email) || '',
+    SupportContactEmail: new FormControl(
+      (_get(supplier, 'xp.SupportContact') && _get(supplier, 'xp.SupportContact.Email')) || '',
       ValidateEmail
     ),
-    PrimaryContactPhone: new FormControl(
-      (_get(supplier, 'xp.Contacts') && _get(supplier, 'xp.Contacts')[0].Phone) || ''
+    SupportContactPhone: new FormControl(
+      (_get(supplier, 'xp.SupportContact') && _get(supplier, 'xp.SupportContact.Phone')) || ''
     ),
-    Categories: new FormControl(_get(supplier, 'xp.Categories', []), ValidateSupplierCategorySelection),
     Active: new FormControl(supplier.Active),
   });
 }
@@ -76,7 +75,7 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
         Display: 'Vendor Level',
         Path: 'xp.Categories.VendorLevel',
         Values: ['PREFERRED', 'DESIGNATED', 'MANDATED', 'EXCLUSIVE DESIGNATED'],
-        Type: 'Dropdown'
+        Type: 'Dropdown',
       },
       {
         Display: 'Service Category',
@@ -162,7 +161,7 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
           'Wax',
           'Wipes and Cleaning Supplies',
         ],
-        Type: 'Dropdown'
+        Type: 'Dropdown',
       },
     ],
   };
