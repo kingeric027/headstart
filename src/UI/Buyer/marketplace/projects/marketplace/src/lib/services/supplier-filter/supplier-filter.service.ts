@@ -1,17 +1,29 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
-import { Router, Params, ActivatedRoute } from "@angular/router";
-import { transform as _transform, pickBy as _pickBy } from "lodash";
-import { SupplierFilters, ISupplierFilters } from "../../shopper-context";
-import { OcSupplierService, ListSupplier } from "@ordercloud/angular-sdk";
-import { cloneDeep as _cloneDeep } from "lodash";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { Router, Params, ActivatedRoute } from '@angular/router';
+import { transform as _transform, pickBy as _pickBy } from 'lodash';
+import { SupplierFilters } from '../../shopper-context';
+import { OcSupplierService, ListSupplier } from '@ordercloud/angular-sdk';
+import { cloneDeep as _cloneDeep } from 'lodash';
+
+export interface ISupplierFilters {
+  activeFiltersSubject: BehaviorSubject<SupplierFilters>;
+  toPage(pageNumber: number): void;
+  sortBy(field: string): void;
+  searchBy(searchTerm: string): void;
+  clearSearch(): void;
+  toSupplier(supplierID: string): void;
+  clearAllFilters(): void;
+  hasFilters(): boolean;
+  filterByFields(filter: any): void;
+}
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class SupplierFilterService implements ISupplierFilters {
-  private readonly nonFilterQueryParams = ["page", "sortBy", "search"];
+  private readonly nonFilterQueryParams = ['page', 'sortBy', 'search'];
 
   public activeFiltersSubject: BehaviorSubject<
     SupplierFilters
@@ -23,7 +35,7 @@ export class SupplierFilterService implements ISupplierFilters {
     private activatedRoute: ActivatedRoute
   ) {
     this.activatedRoute.queryParams.subscribe(params => {
-      if (this.router.url.startsWith("/suppliers")) {
+      if (this.router.url.startsWith('/suppliers')) {
         this.readFromUrlQueryParams(params);
       } else {
         this.activeFiltersSubject.next(this.getDefaultParms());

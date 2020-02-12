@@ -2,9 +2,32 @@ import { Injectable } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { ProductFilterService } from '../product-filter/product-filter.service';
 import { filter, map } from 'rxjs/operators';
-import { IRouter, ProductFilters, OrderFilters, SupplierFilters, OrderStatus } from '../../shopper-context';
+import { ProductFilters, OrderFilters, SupplierFilters, OrderStatus } from '../../shopper-context';
 import { OrderFilterService } from '../order-history/order-filter.service';
 import { SupplierFilterService } from '../supplier-filter/supplier-filter.service';
+
+export interface IRouter {
+  getActiveUrl(): string;
+  onUrlChange(callback: (path: string) => void): void;
+  toProductDetails(productID: string): void;
+  toProductList(options?: ProductFilters): void;
+  toSupplierList(options?: SupplierFilters): void;
+  toCheckout(): void;
+  toHome(): void;
+  toCart(): void;
+  toLogin(): void;
+  toRegister(): void;
+  toForgotPassword(): void;
+  toMyProfile(): void;
+  toMyAddresses(): void;
+  toMyPaymentMethods(): void;
+  toMyOrders(): void;
+  toMyOrderDetails(orderID: string): void;
+  toOrdersToApprove(): void;
+  toOrderToAppoveDetails(orderID: string): void;
+  toChangePassword(): void;
+  toRoute(path: string): void;
+}
 
 @Injectable({
   providedIn: 'root',

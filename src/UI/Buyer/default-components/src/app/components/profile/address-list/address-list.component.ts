@@ -76,7 +76,7 @@ export class OCMAddressList implements OnInit {
   private async addAddress(address: BuyerAddress) {
     address.Shipping = true;
     address.Billing = true;
-    const newAddress = await this.context.myResources.CreateAddress(address).toPromise();
+    const newAddress = await this.context.currentUser.addresses.create(address);
     this.addresses.Items = [...this.addresses.Items, newAddress];
     this.showCreateAddressForm = false;
     this.refresh();
@@ -84,14 +84,14 @@ export class OCMAddressList implements OnInit {
   
   private async updateAddress(address: BuyerAddress): Promise<any> {
     address.ID = this.currentAddress.ID;
-    await this.context.myResources.PatchAddress(address.ID, address).toPromise();
+    await this.context.currentUser.addresses.edit(address.ID, address);
     this.showCreateAddressForm = false;
     this.refresh();
   }
   
   async deleteAddress(address: BuyerAddress) {
     this.areYouSureModal = ModalState.Closed;
-    await this.context.myResources.DeleteAddress(address.ID).toPromise();
+    await this.context.currentUser.addresses.delete(address.ID);
     this.addresses.Items = this.addresses.Items.filter(a => a.ID !== address.ID);
   }
   
@@ -101,7 +101,7 @@ export class OCMAddressList implements OnInit {
   }
   
   private async reloadAddresses() {
-    const addresses = await this.context.myResources.ListAddresses(this.requestOptions).toPromise();
+    const addresses = await this.context.currentUser.addresses.list(this.requestOptions);
     this.addresses = addresses;
   }
 }

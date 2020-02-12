@@ -17,7 +17,24 @@ import {
 import { CookieService } from 'ngx-cookie';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { CurrentOrderService } from '../current-order/current-order.service';
-import { IAuthentication, AppConfig } from '../../shopper-context';
+import { AppConfig } from '../../shopper-context';
+
+export interface IAuthentication {
+  profiledLogin(
+    username: string,
+    password: string,
+    rememberMe: boolean
+  ): Promise<AccessToken>;
+  logout(): Promise<void>;
+  validateCurrentPasswordAndChangePassword(
+    newPassword: string,
+    currentPassword: string
+  ): Promise<void>;
+  anonymousLogin(): Promise<AccessToken>;
+  forgotPasssword(email: string): Promise<any>;
+  register(me: MeUser): Promise<any>;
+  resetPassword(code: string, config: PasswordReset): Promise<any>;
+}
 
 @Injectable({
   providedIn: 'root',

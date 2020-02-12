@@ -19,8 +19,39 @@ import { isUndefined as _isUndefined, get as _get } from 'lodash';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { listAll } from '../../functions/listAll';
-import { ICurrentOrder, AppConfig, ShippingRate, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection } from '../../shopper-context';
+import { AppConfig, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection } from '../../shopper-context';
 import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
+
+export interface ICurrentOrder {
+  addToCartSubject: Subject<LineItem>;
+  get(): MarketplaceOrder;
+  patch(order: MarketplaceOrder): Promise<MarketplaceOrder>;
+  getLineItems(): ListLineItem;
+  submit(): Promise<void>;
+
+  addToCart(lineItem: LineItem): Promise<LineItem>;
+  addManyToCart(lineItem: LineItem[]): Promise<LineItem[]>;
+  setQuantityInCart(lineItemID: string, newQuantity: number): Promise<LineItem>;
+  removeFromCart(lineItemID: string): Promise<void>;
+  emptyCart(): Promise<void>;
+
+  listPayments(): Promise<ListPayment>;
+  createPayment(payment: Payment): Promise<Payment>;
+  createCCPayment(card: BuyerCreditCard): Promise<Payment>;
+
+  setBillingAddress(address: Address): Promise<MarketplaceOrder>;
+  setShippingAddress(address: Address): Promise<MarketplaceOrder>;
+  setBillingAddressByID(addressID: string): Promise<MarketplaceOrder>;
+  setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
+
+  getProposedShipments(): Promise<ProposedShipment[]>;
+  selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder>;
+  calculateTax(): Promise<MarketplaceOrder>;
+  authOnlyCreditCard(cardID: string, cvv: string): Promise<Payment>;
+
+  onOrderChange(callback: (order: MarketplaceOrder) => void): void;
+  onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
+}
 
 @Injectable({
   providedIn: 'root',
