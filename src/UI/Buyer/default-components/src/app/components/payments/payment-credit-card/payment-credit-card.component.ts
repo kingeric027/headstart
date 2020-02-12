@@ -7,6 +7,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./payment-credit-card.component.scss']
 })
 export class OCMPaymentCreditCard implements OnInit {
+  showNewCCForm = false;
+
   @Input() cards: ListBuyerCreditCard; 
   @Output() cardSelected = new EventEmitter<{card: BuyerCreditCard, cvv: string}>();
   form = new FormGroup({ 
@@ -18,9 +20,13 @@ export class OCMPaymentCreditCard implements OnInit {
 
   ngOnInit() {}
 
-  submit() {
+  submit(event) {
     const cardID = this.form.value.cardID;
     const card = this.cards.Items.find(c => c.ID === cardID);
     this.cardSelected.emit({ card, cvv: this.form.value.cvv });
+  }
+
+  toggleShowCCForm(event) {
+    this.showNewCCForm = event.target.value === 'new';
   }
 }
