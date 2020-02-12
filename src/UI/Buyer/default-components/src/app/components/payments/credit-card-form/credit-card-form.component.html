@@ -1,4 +1,5 @@
-<div class="row align-items-center">
+<div *ngIf="_showCardDetails"
+    class="row align-items-center">
   <div class="col-12">
     <label class="small text-muted"
            for="accepted-cards">Accepting All Major Credit Cards</label>
@@ -11,58 +12,76 @@
           [formGroup]="cardForm"
           name="CardForm"
           class="add-card-form">
-      <div class="form-group d-flex justify-content-between mb-0">
-        <div class="form-group card-number mr-2 flex-fill">
-          <label class="sr-only"
-                 for="cardNumber">Card Number</label>
-          <input type="text"
-                 formControlName="CardNumber"
-                 class="form-control"
-                 id="cardNumber"
-                 placeholder="Card Number"
-                 autofocus="true"
-                 showErrors
-                 appCreditCardInput
-                 autocomplete="off" />
+      <div *ngIf="_showCardDetails">
+        <div class="form-group d-flex justify-content-between mb-0">
+          <div class="form-group card-number mr-2 flex-fill">
+            <label class="sr-only"
+                  for="cardNumber">Card Number</label>
+            <input type="text"
+                  formControlName="cardNumber"
+                  class="form-control"
+                  id="cardNumber"
+                  placeholder="Card Number"
+                  autofocus="true"
+                  showErrors
+                  appCreditCardInput
+                  autocomplete="off" />
+          </div>
+          <div class="form-group mr-2 flex-fill">
+            <label class="sr-only"
+                  for="month">Expiration Month</label>
+            <select formControlName="expMonth"
+                    class="custom-select"
+                    id="state">
+              <option *ngFor="let month of monthOptions"
+                      [value]="month">{{ month }}</option>
+            </select>
+          </div>
+          <div class="form-group flex-fill">
+            <label class="sr-only"
+                  for="year">Expiration Year</label>
+            <select formControlName="expYear"
+                    class="custom-select"
+                    id="state">
+              <option *ngFor="let year of yearOptions"
+                      [value]="year.slice(-2)">{{ year }}</option>
+            </select>
+          </div>
         </div>
-        <div class="form-group mr-2 flex-fill">
-          <label class="sr-only"
-                 for="month">Expiration Month</label>
-          <select formControlName="expMonth"
-                  class="custom-select"
-                  id="state">
-            <option *ngFor="let month of monthOptions"
-                    [value]="month">{{ month }}</option>
-          </select>
-        </div>
-        <div class="form-group flex-fill">
-          <label class="sr-only"
-                 for="year">Expiration Year</label>
-          <select formControlName="expYear"
-                  class="custom-select"
-                  id="state">
-            <option *ngFor="let year of yearOptions"
-                    [value]="year.slice(-2)">{{ year }}</option>
-          </select>
+        <div class="form-group d-flex justify-content-between mb-0">
+          <div class="form-group card-name flex-fill">
+            <label class="sr-only"
+                  for="name">Name on Card</label>
+            <input type="text"
+                  formControlName="cardholderName"
+                  class="form-control"
+                  id="name"
+                  showErrors
+                  placeholder="Name on Card"
+                  autocomplete="off" />
+          </div>
         </div>
       </div>
-      <div class="form-group d-flex justify-content-between mb-0">
+      <div *ngIf="_showCVV"
+          class="form-group d-flex justify-content-between mb-0">
         <div class="form-group card-name flex-fill">
           <label class="sr-only"
-                 for="name">Name on Card</label>
-          <input type="text"
-                 formControlName="CardholderName"
-                 class="form-control"
-                 id="name"
-                 showErrors
-                 placeholder="Name on Card"
-                 autocomplete="off" />
-        </div>
-      </div>
+                for="CVV">CVV</label>
+              <input type="text"
+                  formControlName="cvv"
+                  class="form-control w-25"
+                  id="CVV"
+                  type="password"
+                  placeholder="CVV"
+                  autocomplete="off"
+                  showErrors />
+            </div>
+          </div>
       <button type="submit"
               class="btn btn-primary btn-block-xs"
-              [disabled]="!cardForm.valid">{{ submitText }} Card</button>
+              [disabled]="!cardForm.valid">{{ submitText }}</button>
       <button (click)="dismissForm()"
+              *ngIf="!_showCVV"
               class="btn btn-link text-danger"
               type="button">Cancel</button>
     </form>

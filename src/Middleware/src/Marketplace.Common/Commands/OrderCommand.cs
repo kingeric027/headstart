@@ -21,6 +21,7 @@ namespace Marketplace.Common.Commands
     {
         Task HandleBuyerOrderSubmit(string orderId);
     }
+
     public class OrderCommand : IOrderCommand
     {
         private readonly IFreightPopService _freightPopService;

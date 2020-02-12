@@ -24,7 +24,7 @@
     <div class="row">
       <div class="col-lg-6 d-lg-none d-block mb-3"
            *ngIf="showCardForm">
-        <ocm-credit-card-form [submitText]="'Add'"
+        <ocm-credit-card-form [submitText]="'Add Card'"
                               (formSubmitted)="addCard($event.detail)"
                               (formDismissed)="dismissEditAddressForm()">
         </ocm-credit-card-form>
@@ -51,7 +51,7 @@
       <!-- Display the Card Form on Desktop View (lg+) -->
       <div class="col-lg-6 d-none d-lg-block border-left"
            *ngIf="showCardForm">
-        <ocm-credit-card-form [submitText]="'Add'"
+        <ocm-credit-card-form [submitText]="'Add Card'"
                               (formSubmitted)="addCard($event.detail)"
                               (formDismissed)="dismissAddCardForm()">
         </ocm-credit-card-form>

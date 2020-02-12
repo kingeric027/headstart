@@ -59,7 +59,7 @@ export class OCMCheckoutAddress implements OnInit {
     const filters = {};
     filters[this.addressType] = true;
     const options = { filters, ...this.requestOptions };
-    this.existingAddresses = await this.context.myResources.ListAddresses(options).toPromise();
+    this.existingAddresses = await this.context.currentUser.addresses.list(options);
   }
 
   existingAddressSelected(address: BuyerAddress) {
@@ -103,7 +103,7 @@ export class OCMCheckoutAddress implements OnInit {
 
   private async saveAndSetAddress(address: BuyerAddress): Promise<Order> {
     const addressToSave = this.addShippingAndBillingOptionsOnAddress(address);
-    const savedAddress = await this.context.myResources.CreateAddress(addressToSave).toPromise();
+    const savedAddress = await this.context.currentUser.addresses.create(addressToSave);
     return await this.setSavedAddress(savedAddress.ID);
   }
 

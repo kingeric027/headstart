@@ -1,22 +1,20 @@
 <form class="form-group" [formGroup]="form">
-    <select formControlName="cardID" class="form-control my-2" id="selectCard">
-    <option disabled [value]="null">Choose from your saved credit cards</option>
-    <option *ngFor="let card of cards?.Items" [value]="card.ID">
-        <ocm-credit-card-display class="col-12 my-2" [card]="card"></ocm-credit-card-display>
+    <select formControlName="cardID" 
+            (change)="toggleShowCCForm($event)"
+            class="form-control my-2" 
+            id="selectCard">
+    <option disabled 
+            [value]="null">Choose from your saved credit cards</option>
+    <option *ngFor="let card of cards?.Items" 
+            [value]="card.ID">
+        <ocm-credit-card-display class="col-12 my-2" 
+                                 [card]="card"></ocm-credit-card-display>
     </option>
+    <option value="new">Add a new Credit Card</option>
     </select>
-    <label class="sr-only"
-        for="CVV">CVV</label>
-    <input type="text"
-        formControlName="cvv"
-        class="form-control w-25"
-        id="CVV"
-        type="password"
-        placeholder="CVV"
-        autocomplete="off"
-        showErrors />
-    <button type="submit"
-            [disabled]="!form.valid"
-            (click)="submit()"
-            class="btn btn-primary btn-sm mr-2 mt-3">Save and Continue</button>
+    <ocm-credit-card-form [submitText]="'Save and Continue'"
+                        [showCVV]="true"
+                        [showCardDetails]="showNewCCForm"
+                        (formSubmitted)="submit($event.detail)">
+    </ocm-credit-card-form>
 </form>

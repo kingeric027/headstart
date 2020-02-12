@@ -1,8 +1,13 @@
-import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BuyerCreditCard, OcTokenService, ListBuyerCreditCard, OcCreditCardService, OcMeService } from '@ordercloud/angular-sdk';
-import { ICreditCards, AppConfig, CreditCardToken } from '../../shopper-context';
+import { Injectable } from '@angular/core';
+import { BuyerCreditCard, ListBuyerCreditCard, OcMeService } from '@ordercloud/angular-sdk';
+import { CreditCardToken } from '../../shopper-context';
 import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
+
+export interface ICreditCards {
+  Save(card: CreditCardToken): Promise<BuyerCreditCard>;
+  Delete(cardID: string): Promise<void>;
+  List(): Promise<ListBuyerCreditCard>;
+}
 
 @Injectable({
   providedIn: 'root',

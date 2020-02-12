@@ -2,7 +2,24 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MeUser, OcMeService, User } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
-import { ICurrentUser } from '../../shopper-context';
+import { CurrentUserAddressService, ICurrentUserAddress } from './address.service';
+import { ICreditCards, CreditCardService } from './credit-card.service';
+
+export interface ICurrentUser {
+  favoriteProductIDs: string[];
+  favoriteOrderIDs: string[];
+  isAnonymous: boolean;
+  addresses: ICurrentUserAddress;
+  cards: ICreditCards;
+  get(): MeUser;
+  patch(user: MeUser): Promise<MeUser>;
+  onUserChange(callback: (user: User) => void): void; // TODO - replace all these onChange functions with real Observables. More powerful
+  onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void;
+  onFavoriteProductsChange(callback: (productIDs: string[]) => void): void;
+  setIsFavoriteProduct(isFav: boolean, productID: string): void;
+  onFavoriteOrdersChange(callback: (orderIDs: string[]) => void): void;
+  setIsFavoriteOrder(isFav: boolean, orderID: string): void;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +37,8 @@ export class CurrentUserService implements ICurrentUser {
   constructor(
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
+    public addresses: CurrentUserAddressService,
+    public cards: CreditCardService
   ) {}
 
   async reset(): Promise<void> {
@@ -106,3 +125,5 @@ export class CurrentUserService implements ICurrentUser {
     this.patch({ xp: { [XpFieldName]: favorites } });
   }
 }
+
+

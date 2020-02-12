@@ -1,10 +1,30 @@
 import { Injectable } from '@angular/core';
-import { OcOrderService, ListPromotion, ListPayment, OrderApproval, OcLineItemService, OcMeService, LineItem, OcSupplierService, OcSupplierAddressService } from '@ordercloud/angular-sdk';
+import { OcOrderService, ListPromotion, ListPayment, OrderApproval, OcLineItemService, OcMeService, LineItem, OcSupplierService, OcSupplierAddressService, Supplier, Address } from '@ordercloud/angular-sdk';
 import { uniqBy as _uniqBy } from 'lodash';
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
-import { IOrderHistory, OrderReorderResponse, OrderDetails, ShipmentWithItems, ShipmentItemWithLineItem, MarketplaceOrder, OrderXp } from '../../shopper-context';
-import { OrderFilterService } from './order-filter.service';
+import { OrderReorderResponse, OrderDetails, ShipmentWithItems, ShipmentItemWithLineItem, MarketplaceOrder } from '../../shopper-context';
+import { OrderFilterService, IOrderFilters } from './order-filter.service';
+
+export interface IOrderHistory {
+  activeOrderID: string;
+  filters: IOrderFilters;
+  approveOrder(
+    orderID?: string,
+    Comments?: string,
+    AllowResubmit?: boolean
+  ): Promise<MarketplaceOrder>;
+  declineOrder(
+    orderID?: string,
+    Comments?: string,
+    AllowResubmit?: boolean
+  ): Promise<MarketplaceOrder>;
+  validateReorder(orderID?: string): Promise<OrderReorderResponse>;
+  getOrderDetails(orderID?: string): Promise<OrderDetails>;
+  getSupplierInfo(liGroupedByShipFrom: LineItem[][]): Supplier[];
+  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]): Address[];
+  listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -62,10 +82,10 @@ export class OrderHistoryService implements IOrderHistory {
   }
 
   getSupplierInfo(liGroupedByShipFrom: LineItem[][]) {
-    let infoArray = [];
+    const infoArray = [];
     liGroupedByShipFrom.forEach(async group => {
       if (group[0] && group[0].SupplierID) {
-        let info = await this.ocSupplierService.Get(group[0].SupplierID).toPromise();
+        const info = await this.ocSupplierService.Get(group[0].SupplierID).toPromise();
         infoArray.push(info);
       }
     });
@@ -73,10 +93,10 @@ export class OrderHistoryService implements IOrderHistory {
   }
 
   getSupplierAddresses(liGroupedByShipFrom: LineItem[][]) {
-    let addresses = [];
+    const addresses = [];
     liGroupedByShipFrom.forEach(async group => {
       if (group[0] && group[0].SupplierID && group[0].ShipFromAddressID) {
-        let address = await this.ocSupplierAddressService.Get(group[0].SupplierID, group[0].ShipFromAddressID).toPromise();
+        const address = await this.ocSupplierAddressService.Get(group[0].SupplierID, group[0].ShipFromAddressID).toPromise();
         addresses.push(address);
       }
     });

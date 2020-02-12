@@ -1,15 +1,25 @@
-import { CurrentOrderService } from '../current-order/current-order.service';
-import { CurrentUserService } from '../current-user/current-user.service';
-import { Injectable, Inject } from '@angular/core';
-import { RouteService } from '../route/route.service';
-import { ProductFilterService } from '../product-filter/product-filter.service';
-import { AuthService } from '../auth/auth.service';
-import { OcMeService } from '@ordercloud/angular-sdk';
-import { OrderHistoryService } from '../order-history/order-history.service';
-import { IShopperContext, AppConfig } from '../../shopper-context';
-import { SupplierFilterService } from '../supplier-filter/supplier-filter.service';
-import { ProductCategoriesService } from '../product-categories/product-categories.service';
-import { CreditCardService } from '../credit-card/credit-card.service';
+import { CurrentOrderService, ICurrentOrder } from '../current-order/current-order.service';
+import { CurrentUserService, ICurrentUser } from '../current-user/current-user.service';
+import { Injectable } from '@angular/core';
+import { RouteService, IRouter } from '../route/route.service';
+import { ProductFilterService, IProductFilters } from '../product-filter/product-filter.service';
+import { AuthService, IAuthentication } from '../auth/auth.service';
+import { OrderHistoryService, IOrderHistory } from '../order-history/order-history.service';
+import { AppConfig } from '../../shopper-context';
+import { SupplierFilterService, ISupplierFilters } from '../supplier-filter/supplier-filter.service';
+import { ProductCategoriesService, ICategories } from '../product-categories/product-categories.service';
+
+export interface IShopperContext {
+  router: IRouter;
+  currentUser: ICurrentUser;
+  currentOrder: ICurrentOrder;
+  productFilters: IProductFilters;
+  categories: ICategories;
+  supplierFilters: ISupplierFilters;
+  authentication: IAuthentication;
+  orderHistory: IOrderHistory;
+  appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
+}
 
 @Injectable({
   providedIn: 'root',
@@ -22,9 +32,7 @@ export class ShopperContextService implements IShopperContext {
     public productFilters: ProductFilterService,
     public supplierFilters: SupplierFilterService,
     public authentication: AuthService,
-    public myResources: OcMeService,
     public orderHistory: OrderHistoryService,
-    public creditCards: CreditCardService,
     public appSettings: AppConfig,
     public categories: ProductCategoriesService
   ) {}
