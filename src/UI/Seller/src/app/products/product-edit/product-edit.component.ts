@@ -318,10 +318,16 @@ export class ProductEditComponent implements OnInit {
     ) {
       this._marketPlaceProductEditable.xp.TaxCode = { Category: '', Code: '', Description: '' };
     }
+    this.resetTaxCodeAndDescription();
     this.handleUpdateProduct(event, 'xp.TaxCode.Category');
     this._marketPlaceProductEditable.xp.TaxCode.Code = '';
     const avalaraTaxCodes = await this.middleware.listTaxCodes(event.target.value, '', 1, 100);
     this.taxCodes = avalaraTaxCodes;
+  }
+  // Reset TaxCode Code and Description if a new TaxCode Category is selected
+  resetTaxCodeAndDescription(): void {
+    this.handleUpdateProduct({ target: { value: null } }, 'xp.TaxCode.Code');
+    this.handleUpdateProduct({ target: { value: null } }, 'xp.TaxCode.Description');
   }
 
   async searchTaxCodes(searchTerm: string) {
