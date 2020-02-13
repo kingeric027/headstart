@@ -12,4 +12,10 @@
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
+    <div class="resource-edit">
+        <resource-edit-component resourceType="Category"
+                                (updateResource)="updateResource($event)"
+                                [resource]="updatedResource">
+        </resource-edit-component>
+    </div>
 </resource-table-component>
