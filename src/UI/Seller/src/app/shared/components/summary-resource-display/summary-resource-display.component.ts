@@ -5,6 +5,9 @@ import {
   getProductMainImageUrlOrPlaceholder,
   PLACEHOLDER_URL,
 } from '@app-seller/shared/services/product/product-image.helper';
+import {
+  faChevronDown,
+} from '@fortawesome/free-solid-svg-icons';
 import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/services/configuration/table-display';
 
 @Component({
@@ -18,6 +21,8 @@ export class SummaryResourceDisplay implements OnChanges {
   _imgPath = '';
   _shouldShowImage = false;
   _isNewPlaceHolder = false;
+  _isExpandable = false;
+  faChevronDown = faChevronDown;
 
   @Input()
   resourceType: any;
@@ -42,6 +47,7 @@ export class SummaryResourceDisplay implements OnChanges {
     this._secondaryHeader = this.getValueOnExistingResource(resource, 'toSecondaryHeader');
     this._shouldShowImage = !!SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY[this.resourceType]['toImage'];
     this._imgPath = this.getValueOnExistingResource(resource, 'toImage') || PLACEHOLDER_URL;
+    this._isExpandable = !!SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY[this.resourceType]['toExpandable'];
   }
 
   getValueOnExistingResource(value: any, valueType: string) {
