@@ -220,6 +220,21 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     ],
     imgPath: '',
   },
+  categories: {
+    fields: [
+      {
+        path: 'Name',
+        header: 'Name',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'ID',
+        header: 'ID',
+        type: BASIC_STRING,
+      },
+    ],
+    imgPath: '',
+  },
   orders: {
     fields: [
       {

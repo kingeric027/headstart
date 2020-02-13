@@ -5,7 +5,7 @@ import { cloneDeep as _cloneDeep } from 'lodash';
 import { OcBuyerService, Buyer } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 
-export const BUYER_SUB_RESOURCE_LIST = ['users', 'locations', 'payments', 'approvals'];
+export const BUYER_SUB_RESOURCE_LIST = ['users', 'locations', 'payments', 'approvals', 'categories'];
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
