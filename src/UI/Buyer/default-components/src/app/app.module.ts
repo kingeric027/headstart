@@ -20,7 +20,6 @@ import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { TreeModule } from 'angular-tree-component';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
 import { OCMCategoryDropdown } from './components/layout/category-dropdown/category-dropdown.component';
 import {
@@ -223,7 +222,6 @@ const components = [
     ReactiveFormsModule,
     FormsModule,
     FontAwesomeModule,
-    TreeModule,
     NgbCarouselModule,
     NgbCollapseModule,
     NgbTooltipModule,

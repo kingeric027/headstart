@@ -40,8 +40,8 @@ export class OCMCreditCardForm implements OnInit {
     this._showCardDetails = value;
   }
   
-  private _showCVV = false;
-  private _showCardDetails = true;
+  _showCVV = false;
+  _showCardDetails = true;
   cardForm = new FormGroup({});
   monthOptions = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
   yearOptions = this.getYearOptions();

@@ -23,6 +23,7 @@ export class OCMAddressList implements OnInit {
   resultsPerPage = 8;
   areYouSureModal = ModalState.Closed;
   showCreateAddressForm = false;
+  isLoading = false;
 
   constructor(private context: ShopperContextService) {}
 
@@ -101,7 +102,8 @@ export class OCMAddressList implements OnInit {
   }
   
   private async reloadAddresses() {
-    const addresses = await this.context.currentUser.addresses.list(this.requestOptions);
-    this.addresses = addresses;
+    this.isLoading = true;
+    this.addresses = await this.context.currentUser.addresses.list(this.requestOptions);
+    this.isLoading = false;
   }
 }

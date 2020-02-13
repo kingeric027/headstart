@@ -15,6 +15,7 @@ export class OCMQuantityInput implements OnInit {
 
   form: FormGroup;
   isQtyRestricted = false;
+  restrictedQuantities: number[] = [];
   errorMsg = '';
   inventory: number;
   min: number;
@@ -36,6 +37,7 @@ export class OCMQuantityInput implements OnInit {
     this.inventory = this.getInventory(product);
     this.min = this.minQty(product);
     this.max = this.maxQty(product);
+    this.restrictedQuantities = product.PriceSchedule.PriceBreaks.map(b => b.Quantity);
     if (this.inventory < this.min) {
       this.errorMsg = 'Out of stock.';
       this.disabled = true;

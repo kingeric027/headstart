@@ -55,6 +55,10 @@ export class OCMOrderDetails implements OnInit {
     this.subView = 'details';
   }
 
+  toAllOrders() {
+    this.context.router.toMyOrders();
+  }
+
   showShipments(): boolean {
     return this.subView === 'shipments';
   }
