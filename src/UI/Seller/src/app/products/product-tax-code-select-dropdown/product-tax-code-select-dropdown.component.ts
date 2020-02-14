@@ -4,6 +4,8 @@ import {
   MarketPlaceProduct,
   SuperMarketplaceProduct,
 } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { Component, Input, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
+import { MarketPlaceProductTaxCode, MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { faFilter, faHome } from '@fortawesome/free-solid-svg-icons';
 import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
@@ -31,9 +33,16 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
   searchTerm = '';
   productTaxCodeSelectDropdownHeight: number = 250;
 
-  ngOnChanges(changes) {
-    // To clear tax code search term when switching products
-    if (changes.superMarketplaceProductEditable) this.searchTerm = '';
+  ngOnChanges(changes: SimpleChanges) {
+    if (
+      changes &&
+      changes.marketPlaceProductEditable &&
+      changes.marketPlaceProductEditable.previousValue &&
+      changes.marketPlaceProductEditable.currentValue &&
+      changes.marketPlaceProductEditable.previousValue.ID !== changes.marketPlaceProductEditable.currentValue.ID
+    ) {
+      this.searchTerm = '';
+    }
   }
 
   searchedTaxCodes(searchText: any) {
