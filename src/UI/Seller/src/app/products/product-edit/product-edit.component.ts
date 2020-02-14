@@ -331,14 +331,14 @@ export class ProductEditComponent implements OnInit {
     }
     this.resetTaxCodeAndDescription();
     this.handleUpdateProduct(event, 'Product.xp.Tax.Category');
-    this._marketPlaceProductEditable.xp.TaxCode.Code = '';
+    this._superMarketplaceProductEditable.Product.xp.Tax.Code = '';
     const avalaraTaxCodes = await this.middleware.listTaxCodes(event.target.value, '', 1, 100);
     this.taxCodes = avalaraTaxCodes;
   }
   // Reset TaxCode Code and Description if a new TaxCode Category is selected
   resetTaxCodeAndDescription(): void {
-    this.handleUpdateProduct({ target: { value: null } }, 'xp.TaxCode.Code');
-    this.handleUpdateProduct({ target: { value: null } }, 'xp.TaxCode.Description');
+    this.handleUpdateProduct({ target: { value: null } }, 'Product.xp.Tax.Code');
+    this.handleUpdateProduct({ target: { value: null } }, 'Product.xp.Tax.Description');
   }
 
   async searchTaxCodes(searchTerm: string) {
