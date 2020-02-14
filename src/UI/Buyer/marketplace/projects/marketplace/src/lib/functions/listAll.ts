@@ -32,8 +32,8 @@ export async function listAll<T = any>(
   filtersObj.page = 1;
   filtersObj.pageSize = 100;
 
-  const result1 = (await listFunc(...listArgs, filtersObj).toPromise()) as ListPage<T>;
-  const additionalPages = range(2, result1.Meta.TotalPages + 1);
+  const result1 = (await listFunc(...listArgs, filtersObj).toPromise());
+  const additionalPages = range(2, result1?.Meta.TotalPages + 1);
 
   const requests = additionalPages.map((page: number) => listFunc(...listArgs, { ...filtersObj, page }).toPromise());
   const results: ListPage<T>[] = await Promise.all(requests);

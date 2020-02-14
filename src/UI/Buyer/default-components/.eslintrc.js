@@ -42,6 +42,7 @@ module.exports = {
         "@typescript-eslint/no-var-requires": "off",
         "@typescript-eslint/prefer-for-of": "error",
         "@typescript-eslint/prefer-function-type": "error",
+        "@typescript-eslint/unbound-method": "off",
         "@typescript-eslint/prefer-namespace-keyword": "error",
         "@typescript-eslint/quotes": [
             "error",
