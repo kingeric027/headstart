@@ -279,7 +279,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   stageFiles(files: FileHandle[]) {
-    this.files.length ? (this.files = [...this.files, ...files]) : (this.files = files);
+    this.files = this.files.concat(files);
     this.checkForChanges();
   }
 
