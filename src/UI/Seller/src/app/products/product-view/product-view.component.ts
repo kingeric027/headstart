@@ -34,7 +34,7 @@ export class ProductViewComponent {
 
   private async handleSelectedProductChange(product: Product): Promise<void> {
     const superMarketplaceProduct = await this.middleware.getSuperMarketplaceProductByID(product.ID);
-    this.supplier = await this.ocSupplierService.Get(superMarketplaceProduct['OwnerID']).toPromise();
+    this.supplier = await this.ocSupplierService.Get(superMarketplaceProduct.Product['OwnerID']).toPromise();
     this.refreshProductData(superMarketplaceProduct);
   }
 
