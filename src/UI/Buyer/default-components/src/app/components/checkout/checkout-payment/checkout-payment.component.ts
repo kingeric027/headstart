@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
-import { Payment, ListBuyerCreditCard, BuyerCreditCard } from '@ordercloud/angular-sdk';
+import {  ListBuyerCreditCard } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ShopperContextService, MarketplaceOrder } from 'marketplace';
+import {  MarketplaceOrder } from 'marketplace';
 import { CheckoutCreditCardOutput } from '../../payments/payment-credit-card/payment-credit-card.component';
 
 @Component({
@@ -22,9 +22,9 @@ export class OCMCheckoutPayment implements OnInit {
   
   constructor() {}
   
-  ngOnInit() {}
+  ngOnInit(): void {}
 
-  onCardSelected(card: CheckoutCreditCardOutput) {
+  onCardSelected(card: CheckoutCreditCardOutput): void {
     this.cardSelected.emit(card);
   }
 }

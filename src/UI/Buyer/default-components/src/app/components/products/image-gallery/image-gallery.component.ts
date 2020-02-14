@@ -10,7 +10,7 @@ export class OCMImageGallery implements OnInit {
   @Input() imgUrls: string[] = [];
 
   // gallerySize can be changed and the component logic + behavior will all work. However, the UI may look wonky.
-  private readonly gallerySize = 5;
+  readonly gallerySize = 5;
   selectedIndex = 0;
   startIndex = 0;
   endIndex = this.gallerySize - 1;
@@ -22,11 +22,11 @@ export class OCMImageGallery implements OnInit {
     this.onResize();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     fromEvent(window, 'resize').subscribe(() => this.onResize());
   }
 
-  onResize() {
+  onResize(): void {
     // this.isResponsiveView = window.innerWidth > 900;
     this.isResponsiveView = true;
   }
@@ -43,7 +43,7 @@ export class OCMImageGallery implements OnInit {
     return this.imgUrls.slice(this.startIndex, this.endIndex + 1);
   }
 
-  forward() {
+  forward(): void {
     this.selectedIndex++;
     if (this.selectedIndex > Math.min(this.endIndex, this.imgUrls.length - 1)) {
       // move images over one
@@ -58,7 +58,7 @@ export class OCMImageGallery implements OnInit {
     }
   }
 
-  backward() {
+  backward(): void {
     this.selectedIndex--;
     if (this.selectedIndex < this.startIndex) {
       // move images over one

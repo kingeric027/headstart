@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, OnChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ShopperContextService } from 'marketplace';
 import { ToastrService } from 'ngx-toastr';
@@ -16,7 +16,7 @@ export class OCMLogin implements OnInit {
 
   constructor(private context: ShopperContextService, private toasterService: ToastrService) {}
 
-  ngOnInit() {
+  ngOnInit(): void  {
     this.ssoLink = this.context.appSettings.ssoLink;
     this.appName = this.context.appSettings.appname;
     this.isAnon = this.context.currentUser.isAnonymous;
@@ -27,14 +27,14 @@ export class OCMLogin implements OnInit {
     });
   }
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     const username = this.form.get('username').value;
     const password = this.form.get('password').value;
     const rememberMe = this.form.get('rememberMe').value;
     try {
       await this.context.authentication.profiledLogin(username, password, rememberMe);
     } catch {
-      this.toasterService.error(`Invalid Login Credentials`);
+      this.toasterService.error('Invalid Login Credentials');
     }
   }
 

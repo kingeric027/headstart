@@ -1,6 +1,5 @@
-import { Component, Input, OnInit, ViewEncapsulation, OnChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
-import { find as _find, get as _get, map as _map, without as _without } from 'lodash';
 import { ShopperContextService } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
@@ -33,15 +32,15 @@ export class OCMProductCard {
     this.cdr.detectChanges(); // TODO - remove. Solve another way.
   }
 
-  addToCart() {
+  addToCart(): void {
     this.context.currentOrder.addToCart({ ProductID: this._product.ID, Quantity: this.quantity });
   }
 
-  getImageUrl() {
+  getImageUrl(): string {
     return getPrimaryImageUrl(this._product);
   }
 
-  toDetails() {
+  toDetails(): void {
     this.context.router.toProductDetails(this._product.ID);
   }
 
@@ -49,7 +48,7 @@ export class OCMProductCard {
     this.context.currentUser.setIsFavoriteProduct(isFavorite, this._product.ID);
   }
 
-  setQuantity(event: any) {
+  setQuantity(event: any): void {
     this.quantity = event.qty;
   }
 }

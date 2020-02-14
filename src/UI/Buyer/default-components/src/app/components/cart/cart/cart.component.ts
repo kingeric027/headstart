@@ -11,15 +11,15 @@ export class OCMCart {
 
   constructor(private context: ShopperContextService) { }
 
-  toProductList() {
+  toProductList(): void {
     this.context.router.toProductList();
   }
 
-  toCheckout() {
+  toCheckout(): void {
     this.context.router.toCheckout();
   }
 
-  emptyCart() {
+  emptyCart(): void {
     this.context.currentOrder.emptyCart();
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { OrderStatus, OrderFilters, ShopperContextService } from 'marketplace';
 import { takeWhile } from 'rxjs/operators';
@@ -35,7 +35,7 @@ export class OCMOrderStatusFilter implements OnInit, OnDestroy {
     this.context.orderHistory.filters.filterByStatus(status);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
   }
 }

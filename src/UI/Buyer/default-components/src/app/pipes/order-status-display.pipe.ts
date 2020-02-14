@@ -15,7 +15,7 @@ export class OrderStatusDisplayPipe implements PipeTransform {
     [OrderStatus.Canceled]: 'Canceled',
   };
 
-  transform(status: OrderStatus) {
+  transform(status: OrderStatus): string {
     if (!status) {
       return null;
     }

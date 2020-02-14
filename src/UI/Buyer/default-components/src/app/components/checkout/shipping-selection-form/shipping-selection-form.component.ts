@@ -19,23 +19,24 @@ export class OCMShippingSelectionForm implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.form = new FormGroup({ rateID: new FormControl(null) });
     this.form = new FormGroup({ proposedShipmentOptionID: new FormControl(null) });
   }
 
-  setSelectedRate(selectedProposedShipmentOptionID: string) {
+  setSelectedRate(selectedProposedShipmentOptionID: string): void {
     this.form.setValue({ proposedShipmentOptionID: selectedProposedShipmentOptionID });
   }
 
-  onFormChanges() {
+  onFormChanges(): void {
     const selectedProposedShipmentOptionID = this.form.value.proposedShipmentOptionID;
+    const rate = this.proposedShipment.ProposedShipmentOptions
+      .find(proposedShipment => proposedShipment.ID === selectedProposedShipmentOptionID).Cost
     this.selectionChanged.emit({
       SupplierID: this.supplierID,
       ShipFromAddressID: this.shipFromAddressID,
       ProposedShipmentOptionID: selectedProposedShipmentOptionID,
-      Rate: this.proposedShipment.ProposedShipmentOptions
-        .find(proposedShipment => proposedShipment.ID === selectedProposedShipmentOptionID).Cost
+      Rate: rate
     });
   }
 }

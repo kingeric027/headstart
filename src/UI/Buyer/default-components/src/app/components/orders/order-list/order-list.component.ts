@@ -21,7 +21,7 @@ export class OCMOrderList {
 
   constructor(private context: ShopperContextService) {}
 
-  updateSort(selectedSortBy) {
+  updateSort(selectedSortBy): void {
     let sortBy;
     switch (this.sortBy) {
       case selectedSortBy:
@@ -41,15 +41,15 @@ export class OCMOrderList {
     this.changedPage.emit(page);
   }
 
-  isFavorite(orderID: string) {
+  isFavorite(orderID: string): boolean {
     return this.context.currentUser.favoriteOrderIDs.includes(orderID);
   }
 
-  setIsFavorite(isFav: boolean, orderID: string) {
+  setIsFavorite(isFav: boolean, orderID: string): void {
     this.context.currentUser.setIsFavoriteOrder(isFav, orderID);
   }
 
-  toOrderDetails(orderID: string) {
+  toOrderDetails(orderID: string): void {
     this.context.router.toMyOrderDetails(orderID);
   }
 }

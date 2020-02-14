@@ -21,8 +21,8 @@ export interface IOrderHistory {
   ): Promise<MarketplaceOrder>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
-  getSupplierInfo(liGroupedByShipFrom: LineItem[][]): Supplier[];
-  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]): Address[];
+  getSupplierInfo(liGroupedByShipFrom: LineItem[][]): Promise<Supplier[]>;
+  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]): Promise<Address[]>;
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
 }
 
@@ -44,11 +44,11 @@ export class OrderHistoryService implements IOrderHistory {
 
   ) { }
 
-  async approveOrder(orderID: string = this.activeOrderID, Comments: string = '', AllowResubmit: boolean = false): Promise<MarketplaceOrder> {
+  async approveOrder(orderID: string = this.activeOrderID, Comments = '', AllowResubmit = false): Promise<MarketplaceOrder> {
     return await this.ocOrderService.Approve('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 
-  async declineOrder(orderID: string = this.activeOrderID, Comments: string = '', AllowResubmit: boolean = false): Promise<MarketplaceOrder> {
+  async declineOrder(orderID: string = this.activeOrderID, Comments = '', AllowResubmit = false): Promise<MarketplaceOrder> {
     return await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 
@@ -67,42 +67,24 @@ export class OrderHistoryService implements IOrderHistory {
     return { order: res[0], lineItems: res[1], promotions: res[2], payments: res[3], approvals: res[4] };
   }
 
-  private async getPromotions(orderID: string): Promise<ListPromotion> {
-    return this.ocOrderService.ListPromotions('outgoing', orderID).toPromise();
-  }
-
-  private async getPayments(orderID: string): Promise<ListPayment> {
-    return this.paymentHelper.ListPaymentsOnOrder(orderID);
-  }
-
-  private async getApprovals(orderID: string): Promise<OrderApproval[]> {
-    const approvals = await this.ocOrderService.ListApprovals('outgoing', orderID).toPromise();
-    approvals.Items = approvals.Items.filter((x) => x.Approver);
-    return _uniqBy(approvals.Items, (x) => x.Comments);
-  }
-
-  getSupplierInfo(liGroupedByShipFrom: LineItem[][]) {
-    const infoArray = [];
-    liGroupedByShipFrom.forEach(async group => {
-      if (group[0] && group[0].SupplierID) {
-        const info = await this.ocSupplierService.Get(group[0].SupplierID).toPromise();
-        infoArray.push(info);
+  
+  async getSupplierInfo(liGroupedByShipFrom: LineItem[][]): Promise<Supplier[]> {
+    const suppliers = await Promise.all(liGroupedByShipFrom.map(group => {
+      if (group.length && group[0]?.SupplierID) {
+        return this.ocSupplierService.Get(group[0].SupplierID).toPromise();
       }
-    });
-    return infoArray;
+    }));
+    return suppliers
   }
-
-  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]) {
-    const addresses = [];
-    liGroupedByShipFrom.forEach(async group => {
-      if (group[0] && group[0].SupplierID && group[0].ShipFromAddressID) {
-        const address = await this.ocSupplierAddressService.Get(group[0].SupplierID, group[0].ShipFromAddressID).toPromise();
-        addresses.push(address);
+  
+  async getSupplierAddresses(liGroupedByShipFrom: LineItem[][]): Promise<Address[]> {
+    const addresses = await Promise.all(liGroupedByShipFrom.map(group => {
+      if (group.length && group[0]?.SupplierID && group[0]?.ShipFromAddressID) {
+        return this.ocSupplierAddressService.Get(group[0].SupplierID, group[0].ShipFromAddressID).toPromise();
       }
-    });
+    }));
     return addresses;
   }
-
   async listShipments(orderID: string = this.activeOrderID): Promise<ShipmentWithItems[]> {
     const [lineItems, shipments] = await Promise.all([
       this.ocLineItemService.List('outgoing', orderID).toPromise(),
@@ -119,5 +101,19 @@ export class OrderHistoryService implements IOrderHistory {
       return shipment;
     });
     return shipments.Items as ShipmentWithItems[];
+  }
+  
+  private async getPromotions(orderID: string): Promise<ListPromotion> {
+    return this.ocOrderService.ListPromotions('outgoing', orderID).toPromise();
+  }
+
+  private async getPayments(orderID: string): Promise<ListPayment> {
+    return this.paymentHelper.ListPaymentsOnOrder(orderID);
+  }
+
+  private async getApprovals(orderID: string): Promise<OrderApproval[]> {
+    const approvals = await this.ocOrderService.ListApprovals('outgoing', orderID).toPromise();
+    approvals.Items = approvals.Items.filter((x) => x.Approver);
+    return _uniqBy(approvals.Items, (x) => x.Comments);
   }
 }

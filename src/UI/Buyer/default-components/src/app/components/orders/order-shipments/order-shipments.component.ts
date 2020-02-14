@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { find as _find } from 'lodash';
 import { ShipmentWithItems, ShopperContextService } from 'marketplace';
 
 @Component({
@@ -12,7 +11,7 @@ export class OCMOrderShipments implements OnInit {
 
   constructor(private context: ShopperContextService) {}
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.shipments = await this.context.orderHistory.listShipments();
     this.selectedShipment = this.shipments[0];
   }
