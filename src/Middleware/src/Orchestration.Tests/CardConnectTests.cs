@@ -7,7 +7,6 @@ using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Mappers.CardConnect;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Common.Services.CardConnect.Models;
-using Marketplace.Common.Services.Zoho;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
@@ -23,51 +22,82 @@ namespace Orchestration.Tests
     {
         public MarketplaceOrder MarketplaceOrder { get; set; }
         public WebhookPayloads.Orders.Submit WebhookOrder { get; set; }
+        public OrderSplitResult SplitOrders { get; set; }
 
         public Mocks()
         {
             this.MarketplaceOrder = JObject.Parse(@"{
-                'ID': 'XD0J6GR9f0Gyp3I6u9RphQ',
-                'FromUser': {
-                    'ID': 'scaseybuyer',
-                    'Username': 'scaseybuyer',
-                    'Password': null,
-                    'FirstName': 'Sydney',
-                    'LastName': 'Casey',
-                    'Email': 'scasey@four51.com',
-                    'Phone': '',
-                    'TermsAccepted': '2018-01-01T06:00:00+00:00',
-                    'Active': true,
-                    'xp': { },
-                    'AvailableRoles': null,
-                    'DateCreated': '2020-02-05T22:30:52.59+00:00',
-                    'PasswordLastSetDate': '2020-02-05T22:30:52.593+00:00'
-                },
-                'FromCompanyID': 'Default_Marketplace_Buyer',
-                'ToCompanyID': 'KrRmq3vC8EeME-srD_dXCw',
-                'FromUserID': 'scaseybuyer',
-                'BillingAddressID': null,
-                'BillingAddress': null,
-                'ShippingAddressID': null,
-                'Comments': null,
-                'LineItemCount': 1,
-                'Status': 'Unsubmitted',
-                'DateCreated': '2020-02-06T20:32:14.193+00:00',
-                'DateSubmitted': null,
-                'DateApproved': null,
-                'DateDeclined': null,
-                'DateCanceled': null,
-                'DateCompleted': null,
-                'Subtotal': 14.45,
-                'ShippingCost': 0,
-                'TaxCost': 0,
-                'PromotionDiscount': 0,
-                'Total': 14.45,
-                'IsSubmitted': false,
+              'ID': 'RJg-ODINq0SY_CmJ8VoCvQ',
+              'FromUser': {
+                'ID': 'tIDpKXtFN0SH8rPbLmeu3w',
+                'Username': 'erosen-buyer',
+                'Password': null,
+                'FirstName': 'Edmund',
+                'LastName': 'Rosen',
+                'Email': 'erosen@four51.com',
+                'Phone': null,
+                'TermsAccepted': null,
+                'Active': true,
                 'xp': {
-                    'AvalaraTaxTransactionCode': '',
-                    'ProposedShipmentSelections': []
-                }
+                  'FavoriteProducts': [
+                    'ss000b70487500',
+                    'ss000b07787500',
+                    '0a-test-product-dj',
+                    'ss000b13587350',
+                    'sanmar01123781'
+                  ]
+                },
+                'AvailableRoles': null,
+                'DateCreated': '2020-01-29T23:01:05.627+00:00',
+                'PasswordLastSetDate': '2020-01-29T23:01:05.663+00:00'
+              },
+              'FromCompanyID': 'Default_Marketplace_Buyer',
+              'ToCompanyID': 'KrRmq3vC8EeME-srD_dXCw',
+              'FromUserID': 'tIDpKXtFN0SH8rPbLmeu3w',
+              'BillingAddressID': 'LZ5Ex1C6xESBLTl2ZtFApQ',
+              'BillingAddress': {
+                'ID': 'LZ5Ex1C6xESBLTl2ZtFApQ',
+                'DateCreated': null,
+                'CompanyName': null,
+                'FirstName': 'ewrgweg',
+                'LastName': 'wregwegw',
+                'Street1': '2529 Garfield Ave',
+                'Street2': '',
+                'City': 'Minneapolis',
+                'State': 'PA',
+                'Zip': '19406',
+                'Country': 'US',
+                'Phone': '',
+                'AddressName': null,
+                'xp': null
+              },
+              'ShippingAddressID': 'T385pqwKbUqOG2iBAIDCzw',
+              'Comments': '',
+              'LineItemCount': 2,
+              'Status': 'Open',
+              'DateCreated': '2020-02-10T19:21:27.45+00:00',
+              'DateSubmitted': '2020-02-10T19:25:02.133+00:00',
+              'DateApproved': null,
+              'DateDeclined': null,
+              'DateCanceled': null,
+              'DateCompleted': null,
+              'Subtotal': 1918.56,
+              'ShippingCost': 759.2,
+              'TaxCost': 214.9,
+              'PromotionDiscount': 0,
+              'Total': 2892.66,
+              'IsSubmitted': true,
+              'xp': {
+                'AvalaraTaxTransactionCode': '',
+                'ProposedShipmentSelections': [
+                  {
+                    'SupplierID': 'FASTPlatform',
+                    'ShipFromAddressID': 'Fast-Warehouse-MN',
+                    'ProposedShipmentOptionID': 'FedexParcel-983b3727-c7ef-4701-bbf0-a6f3e86985c8',
+                    'Rate': 759.2
+                  }
+                ]
+              }
             }").ToObject<MarketplaceOrder>();
             this.WebhookOrder = JObject.Parse(@"{
                 'Route': 'v1/orders/{direction}/{orderID}/submit',
@@ -159,38 +189,125 @@ namespace Orchestration.Tests
                 },
                 'ConfigData': []
             }").ToObject<WebhookPayloads.Orders.Submit>();
+            this.SplitOrders = JObject.Parse(@"{
+            'OutgoingOrders': [{
+              'ID': 'MnuJ7e9660K_3N6I2swiIg',
+              'FromUser': {
+	            'ID': 'uYoQe2OcuEWeWV857Li8yQ',
+	            'Username': 'Default_Admin',
+	            'Password': null,
+	            'FirstName': null,
+	            'LastName': null,
+	            'Email': 'serlleruser@nomail.com',
+	            'Phone': null,
+	            'TermsAccepted': null,
+	            'Active': true,
+	            'xp': null,
+	            'AvailableRoles': null,
+	            'DateCreated': '2020-01-23T14:48:54.88+00:00',
+	            'PasswordLastSetDate': '2020-01-29T22:38:15.68+00:00'
+              },
+              'FromCompanyID': 'KrRmq3vC8EeME-srD_dXCw',
+              'ToCompanyID': 'ApparelCo',
+              'FromUserID': 'uYoQe2OcuEWeWV857Li8yQ',
+              'BillingAddressID': null,
+              'BillingAddress': null,
+              'ShippingAddressID': null,
+              'Comments': null,
+              'LineItemCount': 1,
+              'Status': 'Open',
+              'DateCreated': '2020-02-06T16:41:57.257+00:00',
+              'DateSubmitted': '2020-02-06T16:41:57.557+00:00',
+              'DateApproved': null,
+              'DateDeclined': null,
+              'DateCanceled': null,
+              'DateCompleted': null,
+              'Subtotal': 7.8,
+              'ShippingCost': 0,
+              'TaxCost': 0,
+              'PromotionDiscount': 0,
+              'Total': 7.8,
+              'IsSubmitted': true,
+              'xp': null
+            },
+            {
+              'ID': '5xL6LVYOvU-1fkgUYjV6uA',
+              'FromUser': {
+	            'ID': 'uYoQe2OcuEWeWV857Li8yQ',
+	            'Username': 'Default_Admin',
+	            'Password': null,
+	            'FirstName': null,
+	            'LastName': null,
+	            'Email': 'serlleruser@nomail.com',
+	            'Phone': null,
+	            'TermsAccepted': null,
+	            'Active': true,
+	            'xp': null,
+	            'AvailableRoles': null,
+	            'DateCreated': '2020-01-23T14:48:54.88+00:00',
+	            'PasswordLastSetDate': '2020-01-29T22:38:15.68+00:00'
+              },
+              'FromCompanyID': 'KrRmq3vC8EeME-srD_dXCw',
+              'ToCompanyID': 'ApparelCo',
+              'FromUserID': 'uYoQe2OcuEWeWV857Li8yQ',
+              'BillingAddressID': null,
+              'BillingAddress': null,
+              'ShippingAddressID': null,
+              'Comments': null,
+              'LineItemCount': 3,
+              'Status': 'Open',
+              'DateCreated': '2020-02-06T16:35:29.787+00:00',
+              'DateSubmitted': '2020-02-06T16:35:29.913+00:00',
+              'DateApproved': null,
+              'DateDeclined': null,
+              'DateCanceled': null,
+              'DateCompleted': null,
+              'Subtotal': 47.32,
+              'ShippingCost': 0,
+              'TaxCost': 0,
+              'PromotionDiscount': 0,
+              'Total': 47.32,
+              'IsSubmitted': true,
+              'xp': null
+            }],
+            'RemainingLineItemIDs': []
+            }").ToObject<OrderSplitResult>();
         }
     }
 
-    //public class ZohoTests
-    //{
-    //    private readonly Mocks _mocks = new Mocks();
-    //    [SetUp]
-    //    public void Setup()
-    //    {
+    public class ZohoTests
+    {
+        private readonly Mocks _mocks = new Mocks();
+        [SetUp]
+        public void Setup()
+        {
 
-    //    }
+        }
 
-    //    [Test]
-    //    public async Task zoho_order_test()
-    //    {
-    //        var settings = Substitute.For<AppSettings>();
-    //        settings.ZohoSettings = new ZohoSettings()
-    //        {
-    //            AuthToken = "90f15d12b441726b50524c79acbe8e12",
-    //            OrgID = "708539139"
-    //        };
-    //        settings.OrderCloudSettings = new OrderCloudSettings()
-    //        {
-    //            ClientSecret = "d576450ca8f89967eea0d3477544ea4bee60af051a5c173be09db08c562b",
-    //            ClientID = "97349A89-E279-45BE-A072-83DF8F7043F4",
-    //            AuthUrl = "https://auth.ordercloud.io",
-    //            ApiUrl = "https://api.ordercloud.io"
-    //        };
-    //        var command = new ZohoCommand(settings, new ZohoClient(settings), new OrderCloudClient());
-    //        await command.ReceiveBuyerOrder(_mocks.WebhookOrder.Response.Body);
-    //    }
-    //}
+        [Test]
+        public async Task zoho_order_test()
+        {
+            var settings = Substitute.For<AppSettings>();
+            settings.ZohoSettings = new ZohoSettings()
+            {
+                AuthToken = "90f15d12b441726b50524c79acbe8e12",
+                OrgID = "708539139"
+            };
+            settings.OrderCloudSettings = new OrderCloudSettings()
+            {
+                ClientSecret = "d576450ca8f89967eea0d3477544ea4bee60af051a5c173be09db08c562b",
+                ClientID = "97349A89-E279-45BE-A072-83DF8F7043F4",
+                AuthUrl = "https://auth.ordercloud.io",
+                ApiUrl = "https://api.ordercloud.io"
+            };
+            var command = new ZohoCommand(settings);
+            var zContact = await command.CreateOrUpdate(_mocks.MarketplaceOrder);
+            Assert.IsTrue(zContact.contact_name != null);
+            //var contact = await command.ListAsync(new ZohoFilter() { Key = "name", Value = "Default Marketplace Buyer" });
+            //var contacts = await command.ListAsync();
+            //await command.ReceiveBuyerOrder(_mocks.MarketplaceOrder);
+        }
+    }
 
     public class CardConnectTests
     {
