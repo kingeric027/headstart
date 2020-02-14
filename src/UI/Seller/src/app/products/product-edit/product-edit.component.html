@@ -18,7 +18,7 @@
                  maxlength="100"
                  [resourceForm]="productForm"
                  formControlName="Name"
-                 (input)="handleUpdateProduct($event, 'Name')"
+                 (input)="handleUpdateProduct($event, 'Product.Name')"
                  placeholder="Enter Name">
         </div>
         <div class="form-group"
@@ -32,14 +32,14 @@
                  maxlength="100"
                  [resourceForm]="productForm"
                  formControlName="ID"
-                 (input)="handleUpdateProduct($event, 'ID')"
+                 (input)="handleUpdateProduct($event, 'Product.ID')"
                  placeholder="Enter Product ID">
         </div>
         <div class="form-group"
-             *ngIf="!isCreatingNew && _marketPlaceProductStatic">
+             *ngIf="!isCreatingNew && _superMarketplaceProductStatic">
           <label for="ID">Product ID</label>
           <input class="form-control"
-                 value="{{_marketPlaceProductStatic.ID}}"
+                 value="{{_superMarketplaceProductStatic.Product.ID}}"
                  disabled>
         </div>
         <div class="form-group">
@@ -61,7 +61,7 @@
                  maxlength="140"
                  [resourceForm]="productForm"
                  formControlName="Note"
-                 (input)="handleUpdateProduct($event, 'xp.Note')"
+                 (input)="handleUpdateProduct($event, 'Product.xp.Note')"
                  placeholder="(Optional) Enter a note about this product">
         </div>
         <div class="form-group">
@@ -74,7 +74,7 @@
                  min="1"
                  [resourceForm]="productForm"
                  formControlName="QuantityMultiplier"
-                 (input)="handleUpdateProduct($event, 'QuantityMultiplier', 'number')"
+                 (input)="handleUpdateProduct($event, 'Product.QuantityMultiplier', 'number')"
                  placeholder="Quantity Multiplier">
         </div>
         <div class="form-group">
@@ -97,10 +97,10 @@
           </div>
         </div>
         <product-tax-code-select-component [productForm]="productForm"
-                                           [marketPlaceProductEditable]="_marketPlaceProductEditable"
+                                           [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
                                            [taxCodes]="taxCodes"
                                            (handleTaxCodeCategorySelection)="handleTaxCodeCategorySelection($event)"
-                                           (handleTaxCodeSelection)="handleUpdateProduct($event, 'xp.TaxCode')"
+                                           (handleTaxCodeSelection)="handleUpdateProduct($event, 'Product.xp.Tax')"
                                            (handleTaxCodesSearched)="searchTaxCodes($event)"
                                            (onScrollEnd)="handleScrollEnd($event)">
         </product-tax-code-select-component>
@@ -155,7 +155,7 @@
                   formControlName="ShipFromAddressID"
                   id="ShipFromAddressID"
                   aria-describedby="Ship From Address ID"
-                  (change)="handleUpdateProduct($event, 'ShipFromAddressID')">
+                  (change)="handleUpdateProduct($event, 'Product.ShipFromAddressID')">
             <option disabled
                     [ngValue]="null">Choose an address</option>
             <option *ngFor="let address of addresses?.Items"
@@ -172,7 +172,7 @@
                    aria-describedby="Ship Height"
                    [resourceForm]="productForm"
                    formControlName="ShipHeight"
-                   (input)="handleUpdateProduct($event, 'ShipHeight', 'number')"
+                   (input)="handleUpdateProduct($event, 'Product.ShipHeight', 'number')"
                    placeholder="Enter Ship Height">
           </div>
           <div class="form-group col-md-6">
@@ -184,7 +184,7 @@
                    aria-describedby="Ship Width"
                    [resourceForm]="productForm"
                    formControlName="ShipWidth"
-                   (input)="handleUpdateProduct($event, 'ShipWidth', 'number')"
+                   (input)="handleUpdateProduct($event, 'Product.ShipWidth', 'number')"
                    placeholder="Ship Width">
           </div>
         </div>
@@ -198,7 +198,7 @@
                    aria-describedby="Ship Length"
                    [resourceForm]="productForm"
                    formControlName="ShipLength"
-                   (input)="handleUpdateProduct($event, 'ShipLength', 'number')"
+                   (input)="handleUpdateProduct($event, 'Product.ShipLength', 'number')"
                    placeholder="Enter Ship Length">
           </div>
           <div class="form-group col-md-6">
@@ -210,7 +210,7 @@
                    aria-describedby="Ship Weight"
                    [resourceForm]="productForm"
                    formControlName="ShipWeight"
-                   (input)="handleUpdateProduct($event, 'ShipWeight', 'number')"
+                   (input)="handleUpdateProduct($event, 'Product.ShipWeight', 'number')"
                    placeholder="Ship Weight">
           </div>
         </div>
@@ -303,7 +303,7 @@
               class="btn btn-primary"
               type="submit"
               [disabled]="productForm?.status === 'INVALID' || dataIsSaving"
-              (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
+              (click)="handleSave()">{{dataIsSaving ? 'Saving...' : !isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
       <button class="btn brand-button ml-3"
               (click)="handleDiscardChanges()"
               *ngIf="areChanges && !isCreatingNew">Discard Changes</button>

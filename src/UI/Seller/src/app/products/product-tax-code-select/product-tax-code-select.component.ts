@@ -1,6 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { MarketPlaceProductTaxCode, MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import {
+  MarketPlaceProductTaxCode,
+  MarketPlaceProduct,
+  SuperMarketplaceProduct,
+} from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 
 @Component({
@@ -12,7 +16,7 @@ export class ProductTaxCodeSelect {
   @Input()
   productForm: FormGroup;
   @Input()
-  marketPlaceProductEditable: MarketPlaceProduct;
+  superMarketplaceProductEditable: SuperMarketplaceProduct;
   @Input()
   taxCodes: ListResource<MarketPlaceProductTaxCode>;
   @Output()

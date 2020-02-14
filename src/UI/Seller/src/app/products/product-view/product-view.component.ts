@@ -3,6 +3,7 @@ import { MarketPlaceProduct, MarketPlaceProductImage } from '@app-seller/shared/
 import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
 import { ProductService } from '@app-seller/shared/services/product/product.service';
 import { OcSupplierService, Product, Supplier } from '@ordercloud/angular-sdk';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 @Component({
   selector: 'app-product-view',
@@ -21,12 +22,16 @@ export class ProductViewComponent {
     }
   }
 
-  constructor(private productService: ProductService, private ocSupplierService: OcSupplierService) { }
+  constructor(
+    private productService: ProductService,
+    private ocSupplierService: OcSupplierService,
+    private middleware: MiddlewareAPIService
+  ) {}
 
   private async handleSelectedProductChange(product: Product): Promise<void> {
-    const marketPlaceProduct = await this.productService.getMarketPlaceProductByID(product.ID);
-    this.supplier = await this.ocSupplierService.Get(marketPlaceProduct['OwnerID']).toPromise();
-    this.refreshProductData(marketPlaceProduct);
+    const superMarketplaceProduct = await this.middleware.getSuperMarketplaceProductByID(product.ID);
+    this.supplier = await this.ocSupplierService.Get(superMarketplaceProduct['OwnerID']).toPromise();
+    this.refreshProductData(superMarketplaceProduct);
   }
 
   refreshProductData(product: MarketPlaceProduct) {

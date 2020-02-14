@@ -12,13 +12,18 @@ export type ObjectStatus = DRAFT | PUBLISHED;
 // model in the C# product
 // making all non-product fields optional right now, could change later
 
-export interface MarketPlaceProduct extends Product<MarketPlaceProductXp> {
+export interface MarketPlaceProduct extends Product<MarketplaceProductXp> {
   Shipping?: ProductShipping;
   PriceSchedule?: PriceSchedule;
   HasVariants?: boolean;
   Notes?: string;
   UnitOfMeasure?: UnitOfMeasure;
   Status?: ObjectStatus;
+}
+
+export interface SuperMarketplaceProduct {
+  Product: Product<MarketplaceProductXp>;
+  PriceSchedule: PriceSchedule;
 }
 
 interface ProductShipping {
@@ -33,10 +38,27 @@ interface UnitOfMeasure {
   Unit: string;
 }
 
-interface MarketPlaceProductXp {
-  TaxCode: MarketPlaceProductTaxCode;
-  Data: any;
+interface TaxProperties {
+  Category: string;
+  Code: string;
+  Description: string;
+}
+
+interface FacetDictionary {
+  [key: string]: string[];
+}
+
+interface MarketplaceProductXp {
+  // DO NOT DELETE //
+  IntegrationData: any;
+  Facets: FacetDictionary;
   Images: MarketPlaceProductImage[];
+  // DO NOT DELETE //
+  Status: ObjectStatus;
+  HasVariants: boolean;
+  Note: string;
+  Tax: TaxProperties;
+  UnitOfMeasure: UnitOfMeasure;
 }
 
 export interface MarketPlaceProductTaxCode {
@@ -46,5 +68,5 @@ export interface MarketPlaceProductTaxCode {
 }
 export interface MarketPlaceProductImage {
   URL: string;
-  Tags: string[];
+  Tag: string[];
 }
