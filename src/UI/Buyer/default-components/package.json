@@ -4,14 +4,13 @@
   "scripts": {
     "ng": "ng",
     "test": "ng test",
-    "lint": "ng lint",
     "e2e": "ng e2e",
     "serve-qa": "ng serve --configuration=qa",
     "build-qa": "ng build --configuration=qa",
     "serve-demo": "ng serve --configuration=demo",
     "build-demo": "ng build --configuration=demo",
     "preinstall": "npm run build-marketplace",
-    "eslint": "eslint src/**/*.ts",
+    "lint": "eslint src/**/*.ts",
     "build-marketplace": "cd ../marketplace && ng build"
   },
   "private": true,
