@@ -28,7 +28,6 @@ import { CacheInterceptor } from '@app-seller/auth/interceptors/cache/cache-inte
 
 // error handler config
 import { AppErrorHandler } from './config/error-handling.config';
-import { FormControlErrorDirective } from './shared/directives/form-control-errors.directive';
 
 @NgModule({
   declarations: [AppComponent],
