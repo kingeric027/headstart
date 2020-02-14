@@ -9,13 +9,14 @@ import { ValidateName, ValidateEmail, ValidatePhone } from '../../../validators/
   styleUrls: ['./profile-form.component.scss'],
 })
 export class OCMProfileForm implements OnInit {
-  private _me: MeUser = {};
   @Output() formDismissed = new EventEmitter();
   @Output()
   formSubmitted = new EventEmitter<{ me: MeUser }>();
   profileForm: FormGroup;
 
-  ngOnInit() {
+  private _me: MeUser = {};
+
+  ngOnInit(): void {
     this.setForm();
   }
 
@@ -25,7 +26,7 @@ export class OCMProfileForm implements OnInit {
     this.profileForm.markAsPristine();
   }
 
-  setForm() {
+  setForm(): void {
     this.profileForm = new FormGroup({
       FirstName: new FormControl(this._me.FirstName || '', [Validators.required, ValidateName]),
       LastName: new FormControl(this._me.LastName || '', [Validators.required, ValidateName]),
@@ -35,14 +36,14 @@ export class OCMProfileForm implements OnInit {
     });
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.profileForm.status === 'INVALID') {
       return;
     }
     this.formSubmitted.emit({ me: this.profileForm.value });
   }
 
-  dismissForm() {
+  dismissForm(): void {
     this.formDismissed.emit();
   }
 }

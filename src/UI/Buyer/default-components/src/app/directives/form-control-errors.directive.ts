@@ -1,4 +1,4 @@
-import { Directive, Self, ElementRef, OnInit, Renderer } from '@angular/core';
+import { Directive, Self, ElementRef, OnInit, Renderer2 } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { fromEvent } from 'rxjs';
 import { ErrorDictionary } from '../validators/validators';
@@ -7,20 +7,20 @@ import { ErrorDictionary } from '../validators/validators';
   selector: '[showErrors]',
 })
 export class FormControlErrorDirective implements OnInit {
-  constructor(@Self() private control: NgControl, private el: ElementRef, private renderer: Renderer) {}
+  constructor(@Self() private control: NgControl, private el: ElementRef, private renderer: Renderer2) {}
 
   errorSpan: HTMLElement;
 
   ngOnInit() {
     this.errorSpan = this.renderer.createElement(this.el.nativeElement.parentNode, 'span');
-    this.renderer.setElementAttribute(this.errorSpan, 'class', 'error-message');
+    this.renderer.setAttribute(this.errorSpan, 'class', 'error-message');
     (this.control as any).update.subscribe(this.displayErrorMsg);
     fromEvent(this.el.nativeElement.form, 'submit').subscribe(this.displayErrorMsg);
   }
 
   displayErrorMsg = () => {
     this.errorSpan.innerHTML = this.getErrorMsg(this.control);
-  };
+  }
 
   getErrorMsg(control: NgControl) {
     if (!control.errors) return '';

@@ -47,7 +47,7 @@ export class OCMAppHeader implements OnInit {
   faHome = faHome;
   faBars = faBars;
 
-  constructor(private context: ShopperContextService) { }
+  constructor(public context: ShopperContextService) { }
 
   async ngOnInit() {
     this.screenSize = getScreenSizeBreakPoint();

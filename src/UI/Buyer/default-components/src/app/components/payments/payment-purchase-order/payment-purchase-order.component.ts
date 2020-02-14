@@ -28,7 +28,7 @@ export class OCMPaymentPurchaseOrder implements OnInit {
 
   getPONumber(payment: Payment): string {
     if (!payment || !payment.xp || !payment.xp.PONumber) return '';
-    return payment.xp.PONumber;
+    return payment?.xp.PONumber;
   }
 
   async saveAndContinue() {
