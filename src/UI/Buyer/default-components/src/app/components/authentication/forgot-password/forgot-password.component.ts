@@ -23,3 +23,4 @@ export class OCMForgotPassword implements OnInit {
     await this.context.authentication.forgotPasssword(email);
   }
 }
+
