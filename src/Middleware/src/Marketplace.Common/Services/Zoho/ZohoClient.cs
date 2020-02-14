@@ -28,9 +28,8 @@ namespace Marketplace.Common.Services.Zoho
             InitResources();
         }
 
-        internal IFlurlRequest Request(params object[] segments) => ApiClient
+        internal IFlurlRequest Request(object[] segments) => ApiClient
             .Request(segments)
-            .WithHeader("Content-Type", "multipart/form-data; boundary=--------------------------884679394228147704963496")
             .SetQueryParam("authtoken", Config.AuthToken)
             .SetQueryParam("organization_id", Config.OrganizationID)
             .ConfigureRequest(settings =>
@@ -44,6 +43,28 @@ namespace Marketplace.Common.Services.Zoho
                 });
             });
 
+        internal IFlurlRequest Put(object obj, object[] segments) => WriteRequest(obj, segments);
+        internal IFlurlRequest Post(object obj, object[] segments) => WriteRequest(obj, segments);
+
+        private IFlurlRequest WriteRequest(object obj, object[] segments) =>  ApiClient
+            .Request(segments)
+            .SetQueryParam("authtoken", Config.AuthToken)
+            .SetQueryParam("organization_id", Config.OrganizationID)
+            .SetQueryParam("JSONString", JsonConvert.SerializeObject(obj, new JsonSerializerSettings()
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.None
+            }))
+            .ConfigureRequest(settings =>
+            {
+                settings.JsonSerializer = new NewtonsoftJsonSerializer(new JsonSerializerSettings
+                {
+                    Formatting = Formatting.Indented,
+                    NullValueHandling = NullValueHandling.Ignore,
+                    MissingMemberHandling = MissingMemberHandling.Ignore,
+                    DefaultValueHandling = DefaultValueHandling.Ignore
+                });
+            });
     }
 
     public partial class ZohoClient : IZohoClient

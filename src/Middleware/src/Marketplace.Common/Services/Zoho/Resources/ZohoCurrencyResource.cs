@@ -21,12 +21,12 @@ namespace Marketplace.Common.Services.Zoho.Resources
 
     public class ZohoCurrencyResource : ZohoResource, IZohoCurrencyResource
     {
-        internal ZohoCurrencyResource(ZohoClient client) : base(client) { }
+        internal ZohoCurrencyResource(ZohoClient client) : base(client, "currency", "settings", "currencies") { }
 
         public Task<ZohoListCurrencyList> ListAsync(params ZohoFilter[] filters) => ListAsync<ZohoListCurrencyList>(filters);
         public Task<TZohoCurrencyList> ListAsync<TZohoCurrencyList>(params ZohoFilter[] filters) where TZohoCurrencyList : ZohoListCurrencyList
         {
-            return Request("settings", "currencies")
+            return Get()
                 .SetQueryParams(filters?.Select(f => new KeyValuePair<string,object>(f.Key, f.Value)))
                 .GetJsonAsync<TZohoCurrencyList>();
         }
@@ -34,18 +34,18 @@ namespace Marketplace.Common.Services.Zoho.Resources
         public Task<ZohoCurrency> GetAsync(string id) => GetAsync<ZohoCurrency>(id);
         
         public Task<TZohoCurrency> GetAsync<TZohoCurrency>(string id) where TZohoCurrency : ZohoCurrency =>
-            Request("settings", "currencies", id).GetJsonAsync<TZohoCurrency>();
+            Get(id).GetJsonAsync<TZohoCurrency>();
         
         public Task<ZohoCurrency> SaveAsync(ZohoCurrency currency) => SaveAsync<ZohoCurrency>(currency);
         public Task<TZohoCurrency> SaveAsync<TZohoCurrency>(TZohoCurrency currency) where TZohoCurrency : ZohoCurrency =>
         
-            Request("settings", "currencies", currency.currency_id).PutJsonAsync(currency).ReceiveJson<TZohoCurrency>();
+            Get(currency.currency_id).PutJsonAsync(currency).ReceiveJson<TZohoCurrency>();
         
         public Task<ZohoCurrency> CreateAsync(ZohoCurrency contact) => SaveAsync<ZohoCurrency>(contact);
         
         public Task<TZohoCurrency> CreateAsync<TZohoCurrency>(TZohoCurrency contact) where TZohoCurrency : ZohoCurrency =>
-            Request("settings", "currencies").PostJsonAsync(contact).ReceiveJson<TZohoCurrency>();
+            Get().PostJsonAsync(contact).ReceiveJson<TZohoCurrency>();
         
-        public Task DeleteAsync(string id) => Request("settings", "currencies", id).DeleteAsync();
+        public Task DeleteAsync(string id) => Get(id).DeleteAsync();
     }
 }

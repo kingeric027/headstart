@@ -19,8 +19,6 @@ using Marketplace.Common.Services.CardConnect;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.Zoho;
-using Marketplace.Common.Services.Zohoz;
-using Marketplace.Helpers;
 using Marketplace.Models;
 using OrderCloud.SDK;
 
