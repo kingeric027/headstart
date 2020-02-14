@@ -12,7 +12,7 @@ namespace Marketplace.Common.Commands.Zoho
 {
     public interface IZohoCommand
     {
-        Task<ZohoContact> CreateOrUpdate(MarketplaceOrder order);
+        Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrder order);
     }
 
     public class ZohoCommand : IZohoCommand
@@ -39,19 +39,13 @@ namespace Marketplace.Common.Commands.Zoho
             });
         }
 
-        public async Task<ZohoListContactList> ListAsync(params ZohoFilter[] filters)
+        public async Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrder order)
         {
-            var contact = await _zoho.Contacts.ListAsync(filters);
-            return contact;
+            var contact = await CreateOrUpdate<ZohoContact>(order);
+            return await Task.FromResult(new ZohoSalesOrder());
         }
 
-        public async Task<ZohoContact> GetAsync()
-        {
-            var contact = await _zoho.Contacts.GetAsync("");
-            return contact;
-        }
-
-        public async Task<ZohoContact> CreateOrUpdate(MarketplaceOrder order)
+        private async Task<ZohoContact> CreateOrUpdate<T>(MarketplaceOrder order) where T : ZohoContact
         {
             var ocBuyer = await _oc.Buyers.GetAsync<MarketplaceBuyer>(order.FromCompanyID);
             // eventually add a filter to get the primary contact user

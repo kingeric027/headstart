@@ -24,12 +24,9 @@ namespace Marketplace.Common.Services.Zoho.Resources
         internal ZohoContactResource(ZohoClient client) : base(client, "contact", "contacts") { }
 
         public Task<ZohoListContactList> ListAsync(params ZohoFilter[] filters) => ListAsync<ZohoListContactList>(filters);
-        public Task<TZohoContactList> ListAsync<TZohoContactList>(params ZohoFilter[] filters) where TZohoContactList : ZohoListContactList
-        {
-            return Get()
+        public Task<TZohoContactList> ListAsync<TZohoContactList>(params ZohoFilter[] filters) where TZohoContactList : ZohoListContactList => Get()
                 .SetQueryParams(filters?.Select(f => new KeyValuePair<string, object>(f.Key, f.Value)))
                 .GetJsonAsync<TZohoContactList>();
-        }
 
         public Task<ZohoContact> GetAsync(string id) => GetAsync<ZohoContact>(id);
         
