@@ -1,5 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { MarketPlaceProduct, MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import {
+  MarketPlaceProduct,
+  MarketPlaceProductImage,
+  SuperMarketplaceProduct,
+} from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { ReplaceHostUrls } from '@app-seller/shared/services/product/product-image.helper';
 import { ProductService } from '@app-seller/shared/services/product/product.service';
 import { OcSupplierService, Product, Supplier } from '@ordercloud/angular-sdk';
@@ -12,7 +16,7 @@ import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api
 })
 export class ProductViewComponent {
   images: MarketPlaceProductImage[] = [];
-  _marketPlaceProduct: MarketPlaceProduct;
+  _superMarketplaceProduct: SuperMarketplaceProduct;
   supplier: Supplier;
 
   @Input()
@@ -34,8 +38,8 @@ export class ProductViewComponent {
     this.refreshProductData(superMarketplaceProduct);
   }
 
-  refreshProductData(product: MarketPlaceProduct) {
-    this._marketPlaceProduct = product;
-    this.images = ReplaceHostUrls(product);
+  refreshProductData(product: SuperMarketplaceProduct) {
+    this._superMarketplaceProduct = product;
+    this.images = ReplaceHostUrls(product.Product);
   }
 }
