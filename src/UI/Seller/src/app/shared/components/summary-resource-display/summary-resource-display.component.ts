@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { singular } from 'pluralize';
 import {
   PRODUCT_IMAGE_PATH_STRATEGY,
@@ -12,7 +12,7 @@ import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/servi
   templateUrl: './summary-resource-display.component.html',
   styleUrls: ['./summary-resource-display.component.scss'],
 })
-export class SummaryResourceDisplay {
+export class SummaryResourceDisplay implements OnChanges {
   _primaryHeader = '';
   _secondaryHeader = '';
   _imgPath = '';
@@ -27,8 +27,12 @@ export class SummaryResourceDisplay {
     this.setDisplayValuesForPlaceholder();
   }
   @Input()
-  set resource(value: any) {
-    this.setDisplayValuesForResource(value);
+  resource: any;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.resourceType && changes.resourceType.firstChange) {
+      this.setDisplayValuesForResource(changes.resource.currentValue);
+    }
   }
 
   setDisplayValuesForResource(resource: any) {
@@ -46,7 +50,7 @@ export class SummaryResourceDisplay {
         return getProductMainImageUrlOrPlaceholder(value);
       } else {
         let currentObject = value;
-        piecesOfPath.forEach((piece) => {
+        piecesOfPath.forEach(piece => {
           currentObject = currentObject && currentObject[piece];
         });
         return currentObject;
