@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Exceptions;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
 using Marketplace.Models;
+using Marketplace.Models.Exceptions;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {

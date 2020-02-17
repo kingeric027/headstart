@@ -1,6 +1,4 @@
-﻿using Marketplace.Common.Exceptions;
-using Marketplace.Common.Helpers;
-using Marketplace.Helpers;
+﻿using Marketplace.Helpers;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +6,7 @@ using System.Threading.Tasks;
 using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Models;
+using Marketplace.Models.Exceptions;
 using ErrorCodes = Marketplace.Models.ErrorCodes;
 
 namespace Marketplace.Common.Commands

@@ -1,70 +1,26 @@
-﻿namespace Marketplace.Common.Services.Zoho.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Marketplace.Common.Services.Zoho.Models
 {
-    /// <summary>
-    /// Used to define the model object of ZohoDefaultTemplates.
-    /// </summary>
     public class ZohoDefaultTemplates
     {
-        /// <summary>
-        /// Gets or sets the invoice_template_id.
-        /// </summary>
-        /// <value>The invoice_template_id.</value>
         public string invoice_template_id { get; set; }
-        /// <summary>
-        /// Gets or sets the invoice_template_name.
-        /// </summary>
-        /// <value>The invoice_template_name.</value>
-        public string invoice_template_name { get; set; }
-        /// <summary>
-        /// Gets or sets the estimate_template_id.
-        /// </summary>
-        /// <value>The estimate_template_id.</value>
         public string estimate_template_id { get; set; }
-        /// <summary>
-        /// Gets or sets the estimate_template_name.
-        /// </summary>
-        /// <value>The estimate_template_name.</value>
-        public string estimate_template_name { get; set; }
-        /// <summary>
-        /// Gets or sets the creditnote_template_id.
-        /// </summary>
-        /// <value>The creditnote_template_id.</value>
         public string creditnote_template_id { get; set; }
-        /// <summary>
-        /// Gets or sets the creditnote_template_name.
-        /// </summary>
-        /// <value>The creditnote_template_name.</value>
-        public string creditnote_template_name { get; set; }
-        /// <summary>
-        /// Gets or sets the invoice_email_template_id.
-        /// </summary>
-        /// <value>The invoice_email_template_id.</value>
+        public string purchaseorder_template_id { get; set; }
+        public string salesorder_template_id { get; set; }
+        public string retainerinvoice_template_id { get; set; }
+        public string paymentthankyou_template_id { get; set; }
+        public string retainerinvoice_paymentthankyou_template_id { get; set; }
         public string invoice_email_template_id { get; set; }
-        /// <summary>
-        /// Gets or sets the invoice_email_template_name.
-        /// </summary>
-        /// <value>The invoice_email_template_name.</value>
-        public string invoice_email_template_name { get; set; }
-        /// <summary>
-        /// Gets or sets the estimate_email_template_id.
-        /// </summary>
-        /// <value>The estimate_email_template_id.</value>
         public string estimate_email_template_id { get; set; }
-        /// <summary>
-        /// Gets or sets the estimate_email_template_name.
-        /// </summary>
-        /// <value>The estimate_email_template_name.</value>
-        public string estimate_email_template_name { get; set; }
-        /// <summary>
-        /// Gets or sets the creditnote_email_template_id.
-        /// </summary>
-        /// <value>The creditnote_email_template_id.</value>
         public string creditnote_email_template_id { get; set; }
-        /// <summary>
-        /// Gets or sets the creditnote_email_template_name.
-        /// </summary>
-        /// <value>The creditnote_email_template_name.</value>
-        public string creditnote_email_template_name { get; set; }
+        public string purchaseorder_email_template_id { get; set; }
+        public string salesorder_email_template_id { get; set; }
+        public string retainerinvoice_email_template_id { get; set; }
+        public string paymentthankyou_email_template_id { get; set; }
+        public string retainerinvoice_paymentthankyou_email_template_id { get; set; }
     }
-
 }
