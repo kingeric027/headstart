@@ -54,7 +54,7 @@ export class OCMSpecForm {
       const ctrl = this.createControl(control);
       group.addControl(control.name, ctrl);
       // tslint:disable-next-line:no-string-literal
-      group.controls.ctrls.push(ctrl);
+      (group.controls.ctrls as any).push(ctrl);
     });
     return group;
   }

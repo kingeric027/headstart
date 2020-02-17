@@ -242,7 +242,7 @@ const components = [
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: Record<string, any>) {
+  constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: any) {
     this.buildWebComponent(OCMProfileNav, 'ocm-profile-nav');
     this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
     this.buildWebComponent(OCMProductCard, 'ocm-product-card');
