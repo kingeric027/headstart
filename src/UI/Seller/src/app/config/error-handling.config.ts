@@ -40,8 +40,8 @@ export class AppErrorHandler extends ErrorHandler {
       }
     } else if (ex?.error && ex?.error['error_description']) {
       message = ex.error['error_description'];
-    } else if (ex?.error && ex?.error[0]) {
-      message = ex?.error[0]?.Message;
+    } else if (ex?.error?.[0]) {
+      message = ex?.error?.[0]?.Message;
     } else if (ex.message) {
       message = ex.message;
     } else {
