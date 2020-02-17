@@ -6,6 +6,7 @@ using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
 using Marketplace.Models;
+using Marketplace.Models.Exceptions;
 using OrderCloud.SDK;
 using static Marketplace.Models.ErrorCodes;
 
