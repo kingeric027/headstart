@@ -34,7 +34,7 @@ export class OCMCheckoutAddress implements OnInit {
     }
     // shipping address is defined at the line item level
     this.selectedAddress =
-      this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress;
+      this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems?.Items[0].ShippingAddress;
   }
 
   clearRequestOptions(): void {
@@ -60,7 +60,7 @@ export class OCMCheckoutAddress implements OnInit {
     if (this.addressType === 'Shipping') return;
 
     this.usingShippingAsBilling = true;
-    this.selectedAddress = this.lineItems.Items[0].ShippingAddress;
+    this.selectedAddress = this.lineItems?.Items[0].ShippingAddress;
     this.saveAddress(this.selectedAddress, false, false);
   }
 
