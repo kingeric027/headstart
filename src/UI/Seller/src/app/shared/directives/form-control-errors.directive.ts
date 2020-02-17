@@ -4,7 +4,7 @@ import { ErrorDictionary } from '../../../app/validators/validators';
 import { fromEvent } from 'rxjs';
 
 @Directive({
-  selector: 'showErrors',
+  selector: '[showErrors]',
 })
 export class FormControlErrorDirective implements OnInit {
   constructor(@Self() private control: NgControl, private el: ElementRef, private renderer: Renderer2) {}
@@ -29,7 +29,8 @@ export class FormControlErrorDirective implements OnInit {
   }
 
   initializeSubscriptions() {
-    this.errorSpan = this.renderer.createElement(this.el.nativeElement.parentNode, 'span');
+    this.errorSpan = this.renderer.createElement('span');
+    this.renderer.appendChild(this.el.nativeElement.parentNode, this.errorSpan);
     this.renderer.setAttribute(this.errorSpan, 'class', 'error-message');
     (this.control as any).update.subscribe(this.displayErrorMsg);
   }
@@ -41,7 +42,7 @@ export class FormControlErrorDirective implements OnInit {
   getErrorMsg(control: NgControl) {
     if (!control.errors) return '';
     let controlErrors = Object.keys(control.errors);
-    if (control.value) controlErrors = controlErrors.filter((x) => x !== 'required');
+    if (control.value) controlErrors = controlErrors.filter(x => x !== 'required');
     if (controlErrors.length === 0) return '';
     return ErrorDictionary[controlErrors[0]];
   }
