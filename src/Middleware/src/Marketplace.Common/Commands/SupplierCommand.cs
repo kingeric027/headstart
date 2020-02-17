@@ -113,7 +113,8 @@ namespace Marketplace.Common.Commands
             var accountAdminMpSecurityProfiles = new List<string>
             {
                 "MPMeSupplierAddressAdmin",
-                "MPMeSupplierUserAdmin"
+                "MPMeSupplierUserAdmin",
+                "MPMeSupplierUserGroupAdmin"
             };
             // => Order Admin
             var orderAdminMpSecurityProfiles = new List<string>

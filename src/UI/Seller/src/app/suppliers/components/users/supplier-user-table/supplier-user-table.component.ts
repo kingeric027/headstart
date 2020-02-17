@@ -23,6 +23,7 @@ function createSupplierUserForm(user: User) {
   styleUrls: ['./supplier-user-table.component.scss'],
 })
 export class SupplierUserTableComponent extends ResourceCrudComponent<User> {
+  supplierID: string;
   constructor(
     private supplierUserService: SupplierUserService,
     changeDetectorRef: ChangeDetectorRef,
@@ -32,5 +33,6 @@ export class SupplierUserTableComponent extends ResourceCrudComponent<User> {
     ngZone: NgZone
   ) {
     super(changeDetectorRef, supplierUserService, router, activatedroute, ngZone, createSupplierUserForm);
+    this.supplierID = this.supplierUserService.getParentResourceID();
   }
 }
