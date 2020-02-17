@@ -1,7 +1,6 @@
-import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
-import { get as _get } from 'lodash';
 import { BuyerProduct } from '@ordercloud/angular-sdk';
 
 @Component({
@@ -26,7 +25,7 @@ export class OCMQuantityInput implements OnInit {
     this.init(value);
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.form = new FormGroup({
       quantity: new FormControl(1, [Validators.required]),
     });
@@ -56,7 +55,7 @@ export class OCMQuantityInput implements OnInit {
     });
   }
 
-  emit(qty: number) {
+  emit(qty: number): void {
     this.qtyChange.emit({ qty, valid: this.validateQty(qty) });
   }
 
@@ -84,17 +83,11 @@ export class OCMQuantityInput implements OnInit {
   }
 
   minQty(product: BuyerProduct): number {
-    if (product.PriceSchedule && product.PriceSchedule.MinQuantity) {
-      return product.PriceSchedule.MinQuantity;
-    }
-    return 1;
+    return product.PriceSchedule?.MinQuantity || 1
   }
 
   maxQty(product: BuyerProduct): number {
-    if (product.PriceSchedule && product.PriceSchedule.MaxQuantity != null) {
-      return product.PriceSchedule.MaxQuantity;
-    }
-    return Infinity;
+    return product.PriceSchedule?.MaxQuantity || Infinity
   }
 
   getInventory(product: BuyerProduct): number {

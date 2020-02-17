@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MeUser } from '@ordercloud/angular-sdk';
 import {
@@ -21,7 +21,7 @@ export class OCMRegister implements OnInit {
   constructor(private context: ShopperContextService) {}
 
   // TODO: validation isn't working
-  ngOnInit() {
+  ngOnInit(): void {
     this.appName = this.context.appSettings.appname;
     this.form = new FormGroup({
       Username: new FormControl('', Validators.required),
@@ -35,7 +35,7 @@ export class OCMRegister implements OnInit {
   }
   
   // TODO: requires anonymous token, but not checked for here
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     const me: MeUser = this.form.value;
     me.Active = true;
     await this.context.authentication.register(me);

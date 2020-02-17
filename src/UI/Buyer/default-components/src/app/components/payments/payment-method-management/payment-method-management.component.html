@@ -57,20 +57,6 @@
         </ocm-credit-card-form>
       </div>
     </div>
-    <div class="row mt-3">
-      <h2 *ngIf="accounts?.Items.length"
-          class="col-6 h3 text-secondary">Assigned Spending Accounts</h2>
-      <div class="col-6">
-        <!-- Insert buttons here -->
-      </div>
-      <div class="col-12 mt-3"
-           *ngFor="let account of accounts?.Items">
-        <div class="border border-radius shadow-sm p-4">
-          <div><strong>{{ account.Name }}</strong></div>
-          <div>Balance: <b class="text-success">{{ account.Balance | currency }}</b></div>
-        </div>
-      </div>
-    </div>
     <div *ngIf="isLoading">
       <ocm-loading-layout height="335px"
                           width="100%"

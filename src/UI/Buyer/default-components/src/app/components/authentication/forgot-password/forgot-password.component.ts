@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, OnChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ShopperContextService } from 'marketplace';
 
@@ -13,12 +13,12 @@ export class OCMForgotPassword implements OnInit {
 
   constructor(private context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.appName = this.context.appSettings.appname;
     this.form = new FormGroup({ email: new FormControl('') });
   }
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     const email = this.form.get('email').value;
     await this.context.authentication.forgotPasssword(email);
   }

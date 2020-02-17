@@ -11,7 +11,7 @@ export class OCMOrderSummary {
   @Input() order: MarketplaceOrder;
   @Input() checkoutPanel = '';
 
-  displayTax() {
+  displayTax(): string {
     if (this.checkoutPanel === 'cart') {
       return 'Calculated during checkout';
     }
@@ -21,7 +21,7 @@ export class OCMOrderSummary {
     return new CurrencyPipe('en-US').transform(this.order.TaxCost);
   }
 
-  displayShipping() {
+  displayShipping(): string {
     if (this.checkoutPanel === 'cart') {
       return 'Calculated during checkout';
     }
@@ -32,7 +32,7 @@ export class OCMOrderSummary {
     return new CurrencyPipe('en-US').transform(this.order.ShippingCost);
   }
 
-  displayTotal() {
+  displayTotal(): string {
     if (this.checkoutPanel === 'cart' ||
         this.checkoutPanel === 'shippingAddress' && !this.shippingSelected ||
         this.checkoutPanel === 'shippingSelection' && !this.shippingSelected) {

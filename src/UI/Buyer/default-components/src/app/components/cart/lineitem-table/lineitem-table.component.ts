@@ -15,7 +15,7 @@ export class OCMLineitemTable {
     this._lineItems = value;
     this.liGroups = _groupBy(value, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(this.liGroups);
-    this.getSupplierInfo(this.liGroupedByShipFrom);
+    this.setSupplierInfo(this.liGroupedByShipFrom);
   }
   @Input() readOnly: boolean;
   supplierInfo: Supplier[] = [];
@@ -25,31 +25,29 @@ export class OCMLineitemTable {
   _lineItems = [];
   constructor(private context: ShopperContextService) { }
 
-  async getSupplierInfo(liGroupedByShipFrom: LineItem[][]) {
+  async setSupplierInfo(liGroupedByShipFrom: LineItem[][]): Promise<void> {
     this.supplierInfo = await this.context.orderHistory.getSupplierInfo(liGroupedByShipFrom);
     this.supplierAddresses = await this.context.orderHistory.getSupplierAddresses(liGroupedByShipFrom);
   }
 
-  removeLineItem(lineItemID: string) {
+  removeLineItem(lineItemID: string): void {
     this.context.currentOrder.removeFromCart(lineItemID);
   }
 
-  toProductDetails(productID: string) {
+  toProductDetails(productID: string): void {
     this.context.router.toProductDetails(productID);
   }
 
-  changeQuantity(lineItemID: string, event: { qty: number; valid: boolean }) {
+  changeQuantity(lineItemID: string, event: { qty: number; valid: boolean }): void {
     if (event.valid) {
       this.getLineItem(lineItemID).Quantity = event.qty;
       this.context.currentOrder.setQuantityInCart(lineItemID, event.qty);
     }
   }
 
-  getImageUrl(lineItemID: string) {
+  getImageUrl(lineItemID: string): string {
     const li = this.getLineItem(lineItemID);
-    if (li && li.Product) {
-      return getPrimaryImageUrl(li.Product);
-    }
+    return getPrimaryImageUrl(li?.Product);
   }
 
   getLineItem(lineItemID: string): LineItem {

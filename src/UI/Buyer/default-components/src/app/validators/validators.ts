@@ -2,14 +2,14 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { removeSpacesFrom, isValidLength, isValidPerLuhnAlgorithm } from '../services/card-validation.helper';
 
 export const ErrorDictionary = {
-  name: `Name can only contain characters Aa-Zz 0-9 - ' .`,
+  name: 'Name can only contain characters Aa-Zz 0-9 - \' .',
   phone: 'Phone can only contain 20 numbers or "-" chars (no spaces)',
   zip: 'Zip Code is invalid',
   DateError: 'Enter date of the form mm-dd-yyyy',
   date: 'Enter date of the form mm-dd-yyyy',
   required: 'This field is required',
   email: 'Please enter a valid email',
-  ocMatchFields: `Passwords don't match`,
+  ocMatchFields: 'Passwords don\'t match',
   strongPassword: `Password must be at least eight characters long and include at least 
     one letter and one number. Password can also include special characters.`,
   creditCardNumber: 'Card number is invalid',

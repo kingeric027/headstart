@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, OnChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 
 // angular libs
@@ -22,7 +22,7 @@ export class OCMResetPassword implements OnInit {
 
   constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     // TODO - figure out how to access url.
     // const urlParams = this.activatedRoute.snapshot.queryParams;
     // this.username = urlParams['user'];
@@ -34,7 +34,7 @@ export class OCMResetPassword implements OnInit {
     });
   }
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     if (this.form.status === 'INVALID') {
       return;
     }

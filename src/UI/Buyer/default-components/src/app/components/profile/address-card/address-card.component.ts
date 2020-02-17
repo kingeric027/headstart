@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { Address } from '@ordercloud/angular-sdk';
 
 @Component({
@@ -6,16 +6,12 @@ import { Address } from '@ordercloud/angular-sdk';
   styleUrls: ['./address-card.component.scss'],
   encapsulation: ViewEncapsulation.ShadowDom,
 })
-export class OCMAddressCard implements OnChanges {
+export class OCMAddressCard {
   @Input() address: Address = {};
   @Input() highlight?: boolean;
 
-  ngOnChanges() {
-    this.address['FullName'] = this.getFullName(this.address);
-  }
-
   // make into pipe?
-  getFullName(address: Address) {
+  getFullName(address: Address): string {
     const fullName = `${address.FirstName || ''} ${address.LastName || ''}`;
     return fullName.trim();
   }
