@@ -221,7 +221,6 @@ export class ProductEditComponent implements OnInit {
     const updateProductResourceCopy = this.copyProductResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
     );
-    console.log(updateProductResourceCopy);
     switch (depthOfField) {
       case 4:
         updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
