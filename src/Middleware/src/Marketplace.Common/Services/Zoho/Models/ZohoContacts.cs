@@ -3,12 +3,11 @@ using Newtonsoft.Json;
 
 namespace Marketplace.Common.Services.Zoho.Models
 {
-    public class ZohoListContactList : ZohoListResponse
+    public class ZohoContactList : ZohoListResponse
     {
         [JsonProperty(PropertyName = "contacts")]
         public List<ZohoContact> Items { get; set; }
     }
-
 
     public class ZohoContact
     {
@@ -19,6 +18,8 @@ namespace Marketplace.Common.Services.Zoho.Models
         public string contact_type { get; set; }
         public bool is_portal_enabled { get; set; }
         public string currency_id { get; set; }
+        public string currency_code { get; set; } // added during order mapping
+        public string currency_symbol { get; set; } // added during order mapping
         public int payment_terms { get; set; }
         public string payment_terms_label { get; set; }
         public string notes { get; set; }

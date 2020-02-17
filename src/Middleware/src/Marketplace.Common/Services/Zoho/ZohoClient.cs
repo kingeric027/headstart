@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using Flurl.Http;
+﻿using Flurl.Http;
 using Flurl.Http.Configuration;
 using Marketplace.Common.Services.Zoho.Resources;
 using Newtonsoft.Json;
@@ -12,6 +9,8 @@ namespace Marketplace.Common.Services.Zoho
     {
         IZohoContactResource Contacts { get; }
         IZohoCurrencyResource Currencies { get; }
+        IZohoItemResource Items { get; }
+        IZohoSalesOrderResource SalesOrders { get; }
     }
     public partial class ZohoClient
     {
@@ -73,9 +72,13 @@ namespace Marketplace.Common.Services.Zoho
         {
             Contacts = new ZohoContactResource(this);
             Currencies = new ZohoCurrencyResource(this);
+            Items = new ZohoItemResource(this);
+            SalesOrders = new ZohoSalesOrderResource(this);
         }
 
         public IZohoContactResource Contacts { get; private set; }
         public IZohoCurrencyResource Currencies { get; private set; }
+        public IZohoItemResource Items { get; private set; }
+        public IZohoSalesOrderResource SalesOrders { get; private set; }
     }
 }

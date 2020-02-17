@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Mappers.Zoho;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Helpers;
+using Marketplace.Helpers.Exceptions;
 using Marketplace.Models;
 using OrderCloud.SDK;
+using ErrorCodes = Marketplace.Models.ErrorCodes;
 
 namespace Marketplace.Common.Commands.Zoho
 {
@@ -41,16 +44,84 @@ namespace Marketplace.Common.Commands.Zoho
 
         public async Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrder order)
         {
-            var contact = await CreateOrUpdate<ZohoContact>(order);
-            return await Task.FromResult(new ZohoSalesOrder());
+            try
+            {
+                // TODO: accomodate possibility of more than 100 line items
+                var lineitems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID, pageSize: 100);
+
+                // Step 1: Create contact (customer) in Zoho
+                var contact = await CreateOrUpdateContact(order);
+
+                // Step 2: Create or update Items from LineItems/Products on Order
+                var items = await CreateOrUpdateLineItems(order, lineitems);
+
+                // Step 3: Create item for shipments
+                items.AddRange(await ApplyShipping(order));
+
+                // Step 4: create sales order with all objects from above
+                var salesOrder =
+                    await _zoho.SalesOrders.CreateAsync(ZohoSalesOrderMapper.Map(order, items.ToList(), contact,
+                        lineitems));
+
+                return salesOrder;
+            }
+            //TODO: evaluate if more specific throw type would be better for handling in command
+            catch (Exception ex)
+            {
+                throw new ApiErrorException(ErrorCodes.All["ZohoIntegrationError"], ex.Message);
+            }
         }
 
-        private async Task<ZohoContact> CreateOrUpdate<T>(MarketplaceOrder order) where T : ZohoContact
+        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(MarketplaceOrder order, ListPage<LineItem> lineitems)
         {
+            // TODO: accomodate possibility of more than 100 line items
+            var products = await Throttler.RunAsync(lineitems.Items.Select(item => item.ProductID).ToList(), 100, 5,
+                s => _oc.Products.GetAsync<MarketplaceProduct>(s));
+
+            var zItems = await Throttler.RunAsync(products.ToList(), 100, 5, product => _zoho.Items.ListAsync(new ZohoFilter()
+            {
+                Key = "sku",
+                Value = product.ID
+            }));
+            var z_items = new Dictionary<string, ZohoLineItem>();
+            foreach (var list in zItems)
+                list.Items.ForEach(item => z_items.Add(item.sku, item));
+
+            var items = await Throttler.RunAsync(products.Select(p => p).ToList(), 100, 5, async product =>
+            {
+                var z_item = z_items.FirstOrDefault(z => z.Key == product.ID);
+                if (z_item.Key != null)
+                    return await _zoho.Items.SaveAsync(
+                        ZohoLineItemMapper.Map(z_item.Value, lineitems.Items.First(i => i.ProductID == product.ID), product));
+                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.Items.First(i => i.ProductID == product.ID), product));
+            });
+            return items.ToList();
+        }
+
+        private async Task<List<ZohoLineItem>> ApplyShipping(MarketplaceOrder order) {
+            //// Step 4: shipping must be added as lineitems on the order
+            var z_shipping = await _zoho.Items.ListAsync(new ZohoFilter() { Key = "sku", Value = "shipping"});
+            if (z_shipping.Items.Count != 0) return ZohoLineItemMapper.Map(order, z_shipping.Items.FirstOrDefault());
+            // doesn't exist so we need to create it. shouldn't happen very often
+            var new_shipping = await _zoho.Items.CreateAsync(new ZohoLineItem()
+            {
+                item_type = "sales_and_purchases",
+                name = $"Shipping Charge",
+                description = $"Shipping Charge",
+                sku = "shipping",
+                quantity = 1
+            });
+            return ZohoLineItemMapper.Map(order, new_shipping);
+        }
+
+        private async Task<ZohoContact> CreateOrUpdateContact(MarketplaceOrder order)
+        {
+            // as this routine evolves around model updates to avoid so much listing abstract this out into a routine for reuse
             var ocBuyer = await _oc.Buyers.GetAsync<MarketplaceBuyer>(order.FromCompanyID);
-            // eventually add a filter to get the primary contact user
+            // TODO: MODEL update ~ eventually add a filter to get the primary contact user
             var ocUsers = await _oc.Users.ListAsync<MarketplaceUser>(ocBuyer.ID);
-            // eventually we'll add a filter for the user group type that represents the location
+
+            // TODO: MODEL update ~ eventually we'll add a filter for the user group type that represents the location
             var ocGroupAssignments = await Throttler.RunAsync(ocUsers.Items, 100, 5, marketplaceUser => _oc.UserGroups.ListUserAssignmentsAsync(ocBuyer.ID, userID: marketplaceUser.ID, pageSize: 100));
             var ocGroupAssignmentList = new List<UserGroupAssignment>();
             foreach (var ocGroupAssignment in ocGroupAssignments)
@@ -58,12 +129,11 @@ namespace Marketplace.Common.Commands.Zoho
 
             var ocGroups = await Throttler.RunAsync(ocGroupAssignmentList, 100, 5,
                 assignment => _oc.UserGroups.GetAsync<MarketplaceUserGroup>(ocBuyer.ID, assignment.UserGroupID));
-            // TODO: make this use the Party property for currency
-            var currencies = await _zoho.Currencies.ListAsync(); 
-
+            // TODO: MODEL update ~ make this use the Party property for currency
             var addresses = await _oc.Addresses.ListAsync<MarketplaceAddress>(ocBuyer.ID);
+            var currencies = await _zoho.Currencies.ListAsync();
 
-            // right now we don't have actual groups set up for locations, so this isn't accurate or complete
+            // TODO: MODEL update ~ right now we don't have actual groups set up for locations, so this isn't accurate or complete
             var zContact = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = ocBuyer.Name });
             if (zContact.Items.Any())
             {
@@ -106,13 +176,6 @@ namespace Marketplace.Common.Commands.Zoho
     //            Roles = new[] { ApiRole.FullAccess }
     //        });
     //    }
-
-    
-
-    //    //private async Task<ZohoContactPerson> CreateOrUpdate()
-    //    //{
-
-    //    //}
 
     //    public async Task ReceiveBuyerOrder(MarketplaceOrder order)
     //    {

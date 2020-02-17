@@ -8,8 +8,8 @@ namespace Marketplace.Common.Services.Zoho.Resources
 {
     public interface IZohoContactResource
     {
-        Task<ZohoListContactList> ListAsync(params ZohoFilter[] filters);
-        Task<TZohoContactList> ListAsync<TZohoContactList>(params ZohoFilter[] filters) where TZohoContactList : ZohoListContactList;
+        Task<ZohoContactList> ListAsync(params ZohoFilter[] filters);
+        Task<TZohoContactList> ListAsync<TZohoContactList>(params ZohoFilter[] filters) where TZohoContactList : ZohoContactList;
         Task<ZohoContact> GetAsync(string id);
         Task<TZohoContact> GetAsync<TZohoContact>(string id) where TZohoContact : ZohoContact;
         Task<ZohoContact> SaveAsync(ZohoContact contact);
@@ -23,8 +23,8 @@ namespace Marketplace.Common.Services.Zoho.Resources
     {
         internal ZohoContactResource(ZohoClient client) : base(client, "contact", "contacts") { }
 
-        public Task<ZohoListContactList> ListAsync(params ZohoFilter[] filters) => ListAsync<ZohoListContactList>(filters);
-        public Task<TZohoContactList> ListAsync<TZohoContactList>(params ZohoFilter[] filters) where TZohoContactList : ZohoListContactList => Get()
+        public Task<ZohoContactList> ListAsync(params ZohoFilter[] filters) => ListAsync<ZohoContactList>(filters);
+        public Task<TZohoContactList> ListAsync<TZohoContactList>(params ZohoFilter[] filters) where TZohoContactList : ZohoContactList => Get()
                 .SetQueryParams(filters?.Select(f => new KeyValuePair<string, object>(f.Key, f.Value)))
                 .GetJsonAsync<TZohoContactList>();
 
@@ -39,7 +39,7 @@ namespace Marketplace.Common.Services.Zoho.Resources
             where TZohoContact : ZohoContact => 
             await Put<TZohoContact>(contact, contact.contact_id);
             
-        public Task<ZohoContact> CreateAsync(ZohoContact contact) => SaveAsync<ZohoContact>(contact);
+        public Task<ZohoContact> CreateAsync(ZohoContact contact) => CreateAsync<ZohoContact>(contact);
 
         public async Task<TZohoContact> CreateAsync<TZohoContact>(TZohoContact contact)
             where TZohoContact : ZohoContact =>

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
 
@@ -27,18 +28,22 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudClient _oc;
         private readonly IOCShippingIntegration _ocShippingIntegration;
         private readonly ITaxCommand _taxCommand;
-        public OrderCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, ITaxCommand taxCommand, IOrderCloudClient oc)
+        private readonly IZohoCommand _zoho;
+
+        public OrderCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, ITaxCommand taxCommand, IOrderCloudClient oc, IZohoCommand zoho)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
             _ocShippingIntegration = ocShippingIntegration;
             _taxCommand = taxCommand;
+            _zoho = zoho;
         }
 
         public async Task HandleBuyerOrderSubmit(string orderId)
         {
             var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderId);
             await _taxCommand.HandleTransactionCreation(buyerOrder);
+            await _zoho.CreateSalesOrder(buyerOrder);
             
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderId);
             var supplierOrders = orderSplitResult.OutgoingOrders;

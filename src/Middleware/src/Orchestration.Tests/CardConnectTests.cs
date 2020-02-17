@@ -301,8 +301,8 @@ namespace Orchestration.Tests
                 ApiUrl = "https://api.ordercloud.io"
             };
             var command = new ZohoCommand(settings);
-            var zContact = await command.CreateSalesOrder(_mocks.MarketplaceOrder);
-            Assert.IsTrue(zContact.contact_name != null);
+            var order = await command.CreateSalesOrder(_mocks.MarketplaceOrder);
+            Assert.IsTrue(order.salesorder_id != null);
             //var contact = await command.ListAsync(new ZohoFilter() { Key = "name", Value = "Default Marketplace Buyer" });
             //var contacts = await command.ListAsync();
             //await command.ReceiveBuyerOrder(_mocks.MarketplaceOrder);

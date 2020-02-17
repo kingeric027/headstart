@@ -41,7 +41,7 @@ namespace Marketplace.Common.Services.Zoho.Resources
         
             Get(currency.currency_id).PutJsonAsync(currency).ReceiveJson<TZohoCurrency>();
         
-        public Task<ZohoCurrency> CreateAsync(ZohoCurrency contact) => SaveAsync<ZohoCurrency>(contact);
+        public Task<ZohoCurrency> CreateAsync(ZohoCurrency contact) => CreateAsync<ZohoCurrency>(contact);
         
         public Task<TZohoCurrency> CreateAsync<TZohoCurrency>(TZohoCurrency contact) where TZohoCurrency : ZohoCurrency =>
             Get().PostJsonAsync(contact).ReceiveJson<TZohoCurrency>();
