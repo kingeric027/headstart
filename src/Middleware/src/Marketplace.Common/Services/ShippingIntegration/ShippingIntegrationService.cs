@@ -6,13 +6,14 @@ using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
 using Marketplace.Models;
-using Marketplace.Models.Exceptions;
+using OrderCloud.SDK;
+using static Marketplace.Models.ErrorCodes;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
     public interface IOCShippingIntegration
     {
-        Task<List<ProposedShipment>> GetRates(OrderCalculation orderCalculation);
+        Task<List<ProposedShipment>> GetRatesAsync(OrderCalculation orderCalculation);
     }
 
     public class OCShippingIntegration : IOCShippingIntegration
@@ -23,10 +24,10 @@ namespace Marketplace.Common.Services.ShippingIntegration
             _freightPopService = freightPopService;
         }
 
-        public async Task<List<ProposedShipment>> GetRates(OrderCalculation orderCalculation)
+        public async Task<List<ProposedShipment>> GetRatesAsync(OrderCalculation orderCalculation)
         {
             var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(orderCalculation.LineItems);
-            Require.That(productIDsWithInvalidDimensions.Count == 0, Exceptions.ErrorCodes.Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
+            Require.That(productIDsWithInvalidDimensions.Count == 0, Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
 
             var proposedShipmentRequests = ProposedShipmentRequestsMapper.Map(orderCalculation);
             proposedShipmentRequests = proposedShipmentRequests.Select(proposedShipmentRequest =>

@@ -2,6 +2,7 @@
 using System.Dynamic;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.FreightPop.Models;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Models
 {
