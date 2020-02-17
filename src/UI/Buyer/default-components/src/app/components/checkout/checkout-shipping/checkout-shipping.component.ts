@@ -43,6 +43,18 @@ export class OCMCheckoutShipping implements OnInit {
     return proposedShipmentSelection?.ProposedShipmentOptionID;
   }
 
+  getSupplierID(proposedShipment: ProposedShipment): string {
+    if (!this.order.xp) return null;
+    const line = this.getFirstLineItem(proposedShipment)
+    return line.SupplierID;
+  }
+
+  getShipFromAddressID(proposedShipment: ProposedShipment): string {
+    if (!this.order.xp) return null;
+    const line = this.getFirstLineItem(proposedShipment)
+    return line.ShipFromAddressID;
+  }
+
   getFirstLineItem(proposedShipment: ProposedShipment): LineItem {
     const firstLineItemID = proposedShipment.ProposedShipmentItems[0].LineItemID;
     return this.lineItems.Items.find(lineItem => lineItem.ID === firstLineItemID);
