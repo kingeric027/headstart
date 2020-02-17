@@ -12,6 +12,7 @@ using NUnit.Framework;
 using NSubstitute;
 using OrderCloud.SDK;
 using Marketplace.Helpers.Services;
+using Marketplace.Models;
 
 namespace Marketplace.Tests
 {
@@ -42,7 +43,7 @@ namespace Marketplace.Tests
             var result = await sut.UploadProductImage(file, marketplaceID, productID, token);
 
             // Assert
-            Assert.AreEqual("patched-product", result.ID);
+            Assert.AreEqual("patched-product", result.Product.ID);
             var blobfile = await setup.blob.Get(expectedBlobID);
             Assert.AreEqual(blobfile, "This is a mock file");
         }

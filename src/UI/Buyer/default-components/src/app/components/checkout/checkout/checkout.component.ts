@@ -1,7 +1,8 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
-import { ShopperContextService, MarketplaceOrder, ListPayment, ListLineItem, BuyerCreditCard, ProposedShipmentSelection, ProposedShipment, ListBuyerCreditCard } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder, ListPayment, ListLineItem, ProposedShipmentSelection, ListBuyerCreditCard, ListProposedShipment } from 'marketplace';
+import { CheckoutCreditCardOutput } from '../../payments/payment-credit-card/payment-credit-card.component';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -14,8 +15,8 @@ export class OCMCheckout implements OnInit {
   lineItems: ListLineItem;
   payments: ListPayment;
   cards: ListBuyerCreditCard;
-  selectedCard: { card: BuyerCreditCard, cvv: string };
-  proposedShipments: ProposedShipment[] = [];
+  selectedCard: CheckoutCreditCardOutput;
+  proposedShipments: ListProposedShipment = null;
   currentPanel: string;
   faCheck = faCheck;
   sections: any = [
@@ -47,7 +48,7 @@ export class OCMCheckout implements OnInit {
 
   constructor(private context: ShopperContextService) {}
 
-  async ngOnInit() {
+  ngOnInit(): void {
     this.context.currentOrder.onOrderChange(order => (this.order = order));
     this.order = this.context.currentOrder.get();
     this.lineItems = this.context.currentOrder.getLineItems();
@@ -56,24 +57,33 @@ export class OCMCheckout implements OnInit {
     this.setValidation('login', !this.isAnon);
   }
 
-  async doneWithShipToAddress() {
+  async doneWithShipToAddress(): Promise<void> {
     this.proposedShipments = await this.context.currentOrder.getProposedShipments();
     this.toSection('shippingSelection');
   }
 
-  async onSelectShipRate(selection: ProposedShipmentSelection) {
+  async onSelectShipRate(selection: ProposedShipmentSelection): Promise<void> {
     await this.context.currentOrder.selectShippingRate(selection);
   }
 
-  async doneWithShippingRates() {
+  async doneWithShippingRates(): Promise<void> {
     await this.context.currentOrder.calculateTax();
-    this.cards = await this.context.creditCards.List();
+    this.cards = await this.context.currentUser.cards.List();
     this.toSection('payment');
   }
 
-  async onCardSelected(card: { card: BuyerCreditCard, cvv: string}) {
-    this.selectedCard = card;
-    await this.context.currentOrder.createCCPayment(card.card);
+  async onCardSelected(output: CheckoutCreditCardOutput): Promise<void> {
+    this.selectedCard = output;
+    if (output.savedCard) {
+      await this.context.currentOrder.createSavedCCPayment(output.savedCard);
+    } else {
+      // need to figure out how to use the platform. ran into creditCardID cannot be null.
+      // so for now I always save any credit card in OC.
+      // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
+      this.selectedCard.savedCard = await this.context.currentUser.cards.Save(output.newCard);
+      await this.context.currentOrder.createSavedCCPayment(this.selectedCard.savedCard);
+    }
+
     this.payments = await this.context.currentOrder.listPayments();
     this.toSection('billingAddress');
   }
@@ -81,29 +91,34 @@ export class OCMCheckout implements OnInit {
   async submitOrderWithComment(comment: string): Promise<void> {
     const orderID = this.order.ID;
     await this.context.currentOrder.patch({ Comments: comment });
-    await this.context.currentOrder.authOnlyCreditCard(this.selectedCard.card.ID, this.selectedCard.cvv);
+    // TODO - these auth calls probably need to be enforced in the middleware, not frontend.
+    if (this.selectedCard.savedCard) {
+      await this.context.currentOrder.authOnlySavedCreditCard(this.selectedCard.savedCard.ID, this.selectedCard.cvv);
+    } else {
+      await this.context.currentOrder.authOnlyOnetimeCreditCard(this.selectedCard.newCard, this.selectedCard.cvv);
+    }
     await this.context.currentOrder.submit();
 
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(orderID);
   }
 
-  getValidation(id: string) {
+  getValidation(id: string): any {
     return this.sections.find(x => x.id === id).valid;
   }
 
-  setValidation(id: string, value: boolean) {
+  setValidation(id: string, value: boolean): void {
     this.sections.find(x => x.id === id).valid = value;
   }
 
-  toSection(id: string) {
+  toSection(id: string): void {
     const prevIdx = Math.max(this.sections.findIndex(x => x.id === id) - 1, 0);
     const prev = this.sections[prevIdx].id;
     this.setValidation(prev, true);
     this.accordian.toggle(id);
   }
 
-  beforeChange($event) {
+  beforeChange($event): any  {
     if (this.currentPanel === $event.panelId) {
       return $event.preventDefault();
     }

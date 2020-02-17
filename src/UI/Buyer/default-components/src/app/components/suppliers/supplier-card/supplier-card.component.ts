@@ -1,4 +1,4 @@
-import { Input, Component, OnInit } from '@angular/core';
+import { Input, Component } from '@angular/core';
 import { Supplier } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'marketplace';
 
@@ -11,7 +11,7 @@ export class OCMSupplierCard {
   
   constructor(private context: ShopperContextService) {}
 
-  shopSupplier(supplier: Supplier) {
+  shopSupplier(supplier: Supplier): void {
     this.context.router.toProductList({ activeFacets: { Supplier: supplier.Name.toLocaleLowerCase() } });
   }
 }

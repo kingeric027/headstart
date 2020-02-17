@@ -47,7 +47,6 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
               "vendorChunk": false,
               "budgets": [
@@ -75,7 +74,6 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
               "vendorChunk": false,
               "budgets": [

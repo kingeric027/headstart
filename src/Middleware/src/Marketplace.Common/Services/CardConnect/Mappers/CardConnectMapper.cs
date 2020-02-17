@@ -14,8 +14,8 @@ namespace Marketplace.Common.Mappers.CardConnect
         {
             var cc = new CreditCard()
             {
-                CardholderName = card.CardholderName,
                 CardType = card.CardType,
+                CardholderName = card.CardholderName,
                 ExpirationDate = card.ExpirationDate.ToDateTime(),
                 PartialAccountNumber = card.AccountNumber.ToCreditCardDisplay(),
                 Token = response.token

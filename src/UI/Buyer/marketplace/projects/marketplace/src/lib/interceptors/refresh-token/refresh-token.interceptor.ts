@@ -55,6 +55,6 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
   }
 
   isAuthError(error: any): boolean {
-    return error instanceof HttpErrorResponse && error.url.indexOf('ordercloud.io') > -1 && error.status === 401;
+    return error instanceof HttpErrorResponse && error.url.includes('ordercloud.io') && error.status === 401;
   }
 }

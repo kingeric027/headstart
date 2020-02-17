@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'card',
 })
 export class CreditCardFormatPipe implements PipeTransform {
-  transform(card: string) {
+  transform(card: string): string {
     if (!card) {
       return '';
     }

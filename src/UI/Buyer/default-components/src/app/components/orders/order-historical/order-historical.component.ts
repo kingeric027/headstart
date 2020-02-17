@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { OrderDetails, MarketplaceOrder } from 'marketplace';
-import { groupBy as _groupBy } from 'lodash';
 import { OrderApproval, ListLineItem, Promotion, ListPayment } from '@ordercloud/angular-sdk';
 
 @Component({

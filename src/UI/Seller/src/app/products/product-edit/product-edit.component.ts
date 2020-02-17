@@ -14,6 +14,7 @@ import {
   MarketPlaceProduct,
   MarketPlaceProductImage,
   MarketPlaceProductTaxCode,
+  SuperMarketplaceProduct,
 } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
@@ -50,7 +51,8 @@ export class ProductEditComponent implements OnInit {
   addresses: ListAddress;
   @Input()
   isCreatingNew: boolean;
-  @Input() dataIsSaving = false;
+  @Input()
+  dataIsSaving = false;
 
   userContext = {};
   hasVariations = false;
@@ -58,8 +60,8 @@ export class ProductEditComponent implements OnInit {
   files: FileHandle[] = [];
   faTrash = faTrash;
   faTimes = faTimes;
-  _marketPlaceProductStatic: MarketPlaceProduct;
-  _marketPlaceProductEditable: MarketPlaceProduct;
+  _superMarketplaceProductStatic: SuperMarketplaceProduct;
+  _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
   taxCodeCategorySelected = false;
   taxCodes: ListResource<MarketPlaceProductTaxCode>;
@@ -77,7 +79,7 @@ export class ProductEditComponent implements OnInit {
     private modalService: NgbModal,
     private toasterService: ToastrService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) { }
+  ) {}
 
   async ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
@@ -94,35 +96,28 @@ export class ProductEditComponent implements OnInit {
   }
 
   private async handleSelectedProductChange(product: Product): Promise<void> {
-    const marketPlaceProduct = await this.productService.getMarketPlaceProductByID(product.ID);
+    const marketPlaceProduct = await this.middleware.getSuperMarketplaceProductByID(product.ID);
     this.refreshProductData(marketPlaceProduct);
   }
 
-  async refreshProductData(product: MarketPlaceProduct) {
-    this._marketPlaceProductStatic = product;
-    this._marketPlaceProductEditable = product;
+  async refreshProductData(superProduct: SuperMarketplaceProduct) {
+    this._superMarketplaceProductStatic = superProduct;
+    this._superMarketplaceProductEditable = superProduct;
     if (
-      this._marketPlaceProductEditable &&
-      this._marketPlaceProductEditable.xp &&
-      this._marketPlaceProductEditable.xp.TaxCode &&
-      this._marketPlaceProductEditable.xp.TaxCode.Category
+      this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
     ) {
       const taxCategory =
-        this._marketPlaceProductEditable.xp.TaxCode.Category === 'FR000000'
-          ? this._marketPlaceProductEditable.xp.TaxCode.Category.substr(0, 2)
-          : this._marketPlaceProductEditable.xp.TaxCode.Category.substr(0, 1);
+        this._superMarketplaceProductEditable.Product.xp.Tax.Category === 'FR000000'
+          ? this._superMarketplaceProductEditable.Product.xp.Tax.Category.substr(0, 2)
+          : this._superMarketplaceProductEditable.Product.xp.Tax.Category.substr(0, 1);
       const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, '', 1, 100);
       this.taxCodes = avalaraTaxCodes;
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
     }
-    this.createProductForm(product);
-    this.images = ReplaceHostUrls(product);
-    this.taxCodeCategorySelected =
-      (this._marketPlaceProductEditable &&
-        this._marketPlaceProductEditable.xp &&
-        this._marketPlaceProductEditable.xp.TaxCode &&
-        this._marketPlaceProductEditable.xp.TaxCode.Category) !== null;
+    this.createProductForm(superProduct);
+    this.images = ReplaceHostUrls(superProduct.Product);
+    this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.checkIfCreatingNew();
     this.checkForChanges();
   }
@@ -133,25 +128,24 @@ export class ProductEditComponent implements OnInit {
     this.isCreatingNew = endUrl === '/new';
   }
 
-  createProductForm(marketPlaceProduct: MarketPlaceProduct) {
+  createProductForm(superMarketplaceProduct: SuperMarketplaceProduct) {
     this.productForm = new FormGroup({
-      Name: new FormControl(marketPlaceProduct.Name, [Validators.required, Validators.maxLength(100)]),
-      ID: new FormControl(marketPlaceProduct.ID),
-      Description: new FormControl(marketPlaceProduct.Description, Validators.maxLength(1000)),
-      Inventory: new FormControl(marketPlaceProduct.Inventory),
-      QuantityMultiplier: new FormControl(marketPlaceProduct.QuantityMultiplier),
-      ShipFromAddressID: new FormControl(marketPlaceProduct.ShipFromAddressID),
-      ShipHeight: new FormControl(marketPlaceProduct.ShipHeight, Validators.required),
-      ShipWidth: new FormControl(marketPlaceProduct.ShipWidth, Validators.required),
-      ShipLength: new FormControl(marketPlaceProduct.ShipLength, Validators.required),
-      ShipWeight: new FormControl(marketPlaceProduct.ShipWeight, Validators.required),
-      Price: new FormControl(_get(marketPlaceProduct, 'PriceSchedule.PriceBreaks[0].Price', null)),
-      Note: new FormControl(_get(marketPlaceProduct, 'xp.Note'), Validators.maxLength(140)),
-      // SpecCount: new FormControl(marketPlaceProduct.SpecCount),
-      // VariantCount: new FormControl(marketPlaceProduct.VariantCount),
-      TaxCodeCategory: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.Category', null)),
-      TaxCode: new FormControl(_get(marketPlaceProduct, 'xp.TaxCode.Code', null)),
-      xp: new FormControl(marketPlaceProduct.xp),
+      Name: new FormControl(superMarketplaceProduct.Product.Name, [Validators.required, Validators.maxLength(100)]),
+      ID: new FormControl(superMarketplaceProduct.Product.ID),
+      Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(1000)),
+      Inventory: new FormControl(superMarketplaceProduct.Product.Inventory),
+      QuantityMultiplier: new FormControl(superMarketplaceProduct.Product.QuantityMultiplier),
+      ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID),
+      ShipHeight: new FormControl(superMarketplaceProduct.Product.ShipHeight, [Validators.required, Validators.min(0)]),
+      ShipWidth: new FormControl(superMarketplaceProduct.Product.ShipWidth, [Validators.required, Validators.min(0)]),
+      ShipLength: new FormControl(superMarketplaceProduct.Product.ShipLength, [Validators.required, Validators.min(0)]),
+      ShipWeight: new FormControl(superMarketplaceProduct.Product.ShipWeight, [Validators.required, Validators.min(0)]),
+      Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null)),
+      Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
+      // SpecCount: new FormControl(superMarketplaceProduct.SpecCount),
+      // VariantCount: new FormControl(superMarketplaceProduct.VariantCount),
+      TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
+      TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
     });
   }
 
@@ -164,41 +158,37 @@ export class ProductEditComponent implements OnInit {
   }
 
   async handleDelete($event): Promise<void> {
-    await this.ocProductService.Delete(this._marketPlaceProductStatic.ID).toPromise();
+    await this.ocProductService.Delete(this._superMarketplaceProductStatic.Product.ID).toPromise();
     this.router.navigateByUrl('/products');
   }
 
   handleDiscardChanges(): void {
     this.files = [];
-    this._marketPlaceProductEditable = this._marketPlaceProductStatic;
-    this.refreshProductData(this._marketPlaceProductStatic);
+    this._superMarketplaceProductEditable = this._superMarketplaceProductStatic;
+    this.refreshProductData(this._superMarketplaceProductStatic);
   }
 
   async createNewProduct() {
     try {
-      this.dataIsSaving = true;
-      const product = await this.productService.createNewMarketPlaceProduct(this._marketPlaceProductEditable);
-      await this.addFiles(this.files, product.ID);
-      this.refreshProductData(product);
-      this.router.navigateByUrl(`/products/${product.ID}`);
-      this.dataIsSaving = false;
+    this.dataIsSaving = true;
+    const superProduct = await this.middleware.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
+    await this.addFiles(this.files, superProduct.Product.ID);
+    this.refreshProductData(superProduct);
+    this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
+    this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
-      if (ex.error && ex.error.Errors && ex.error.Errors.some(e => e.ErrorCode === "IdExists")) {
-        this.toasterService.error(`A product with that ID already exists`);
-      } else {
-        throw ex;
-      }
+      throw ex;
     }
   }
 
   async updateProduct() {
     try {
       this.dataIsSaving = true;
-      const product = await this.productService.updateMarketPlaceProduct(this._marketPlaceProductEditable);
-      this._marketPlaceProductStatic = product;
-      this._marketPlaceProductEditable = product;
-      if (this.files) this.addFiles(this.files, product.ID);
+      const superProduct = await this.middleware.updateMarketplaceProduct(this._superMarketplaceProductEditable);
+      this._superMarketplaceProductStatic = superProduct;
+      this._superMarketplaceProductEditable = superProduct;
+      if (this.files) this.addFiles(this.files, superProduct.Product.ID);
       this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
@@ -216,7 +206,7 @@ export class ProductEditComponent implements OnInit {
     const piecesOfField = productUpdate.field.split('.');
     const depthOfField = piecesOfField.length;
     const updateProductResourceCopy = this.copyProductResource(
-      this._marketPlaceProductEditable || this.productService.emptyResource
+      this._superMarketplaceProductEditable || this.productService.emptyResource
     );
     switch (depthOfField) {
       case 4:
@@ -233,7 +223,7 @@ export class ProductEditComponent implements OnInit {
         updateProductResourceCopy[piecesOfField[0]] = productUpdate.value;
         break;
     }
-    this._marketPlaceProductEditable = updateProductResourceCopy;
+    this._superMarketplaceProductEditable = updateProductResourceCopy;
     this.checkForChanges();
   }
 
@@ -256,13 +246,20 @@ export class ProductEditComponent implements OnInit {
 
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
   updateResourceFromFieldValue(field: string, value: any) {
-    this._marketPlaceProductEditable = { ...this._marketPlaceProductEditable, [field]: value };
+    const updateProductResourceCopy = this.copyProductResource(
+      this._superMarketplaceProductEditable || this.productService.emptyResource
+    );
+    updateProductResourceCopy.Product = {
+      ...updateProductResourceCopy.Product,
+      [field]: value,
+    };
+    this._superMarketplaceProductEditable = updateProductResourceCopy;
     this.checkForChanges();
   }
 
   checkForChanges(): void {
     this.areChanges =
-      JSON.stringify(this._marketPlaceProductEditable) !== JSON.stringify(this._marketPlaceProductStatic) ||
+      JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic) ||
       this.files.length > 0;
   }
 
@@ -279,25 +276,25 @@ export class ProductEditComponent implements OnInit {
   }
 
   stageFiles(files: FileHandle[]) {
-    this.files = files;
+    this.files = this.files.concat(files);
     this.checkForChanges();
   }
 
   async addFiles(files: FileHandle[], productID: string) {
-    let product;
+    let superProduct;
     for (const file of files) {
-      product = await this.middleware.uploadProductImage(file.File, productID);
+      superProduct = await this.middleware.uploadProductImage(file.File, productID);
     }
     this.files = [];
-    // Only need the `|| {}` to account for creating new product where this._marketPlaceProductStatic doesn't exist yet.
-    product = Object.assign(this._marketPlaceProductStatic || {}, product);
-    this.refreshProductData(product);
+    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
+    superProduct = Object.assign(this._superMarketplaceProductStatic || {}, superProduct);
+    this.refreshProductData(superProduct);
   }
 
   async removeFile(imgUrl: string) {
-    let product = await this.middleware.deleteProductImage(this._marketPlaceProductStatic.ID, imgUrl);
-    product = Object.assign(this._marketPlaceProductStatic, product);
-    this.refreshProductData(product);
+    let superProduct = await this.middleware.deleteProductImage(this._superMarketplaceProductStatic.Product.ID, imgUrl);
+    superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
+    this.refreshProductData(superProduct);
   }
 
   unStage(index: number) {
@@ -312,20 +309,27 @@ export class ProductEditComponent implements OnInit {
   async handleTaxCodeCategorySelection(event): Promise<void> {
     // TODO: This is a temporary fix to accomodate for data not having xp.TaxCode yet
     if (
-      this._marketPlaceProductEditable &&
-      this._marketPlaceProductEditable.xp &&
-      !this._marketPlaceProductEditable.xp.TaxCode
+      this._superMarketplaceProductEditable.Product &&
+      this._superMarketplaceProductEditable.Product.xp &&
+      !this._superMarketplaceProductEditable.Product.xp.Tax
     ) {
-      this._marketPlaceProductEditable.xp.TaxCode = { Category: '', Code: '', Description: '' };
+      this._superMarketplaceProductEditable.Product.xp.Tax = { Category: '', Code: '', Description: '' };
     }
-    this.handleUpdateProduct(event, 'xp.TaxCode.Category');
+    this.resetTaxCodeAndDescription();
+    this.handleUpdateProduct(event, 'Product.xp.Tax.Category');
+    this._superMarketplaceProductEditable.Product.xp.Tax.Code = '';
     const avalaraTaxCodes = await this.middleware.listTaxCodes(event.target.value, '', 1, 100);
     this.taxCodes = avalaraTaxCodes;
+  }
+  // Reset TaxCode Code and Description if a new TaxCode Category is selected
+  resetTaxCodeAndDescription(): void {
+    this.handleUpdateProduct({ target: { value: null } }, 'Product.xp.Tax.Code');
+    this.handleUpdateProduct({ target: { value: null } }, 'Product.xp.Tax.Description');
   }
 
   async searchTaxCodes(searchTerm: string) {
     if (searchTerm === undefined) searchTerm = '';
-    const taxCodeCategory = this._marketPlaceProductEditable.xp.TaxCode.Category;
+    const taxCodeCategory = this._superMarketplaceProductEditable.Product.xp.Tax.Category;
     const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCodeCategory, searchTerm, 1, 100);
     this.taxCodes = avalaraTaxCodes;
   }
@@ -335,7 +339,7 @@ export class ProductEditComponent implements OnInit {
     const totalPages = this.taxCodes.Meta.TotalPages;
     const nextPageNumber = this.taxCodes.Meta.Page + 1;
     if (totalPages > nextPageNumber) {
-      const taxCodeCategory = this._marketPlaceProductEditable.xp.TaxCode.Category;
+      const taxCodeCategory = this._superMarketplaceProductEditable.Product.xp.Tax.Category;
       const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCodeCategory, searchTerm, nextPageNumber, 100);
       this.taxCodes = {
         Meta: avalaraTaxCodes.Meta,

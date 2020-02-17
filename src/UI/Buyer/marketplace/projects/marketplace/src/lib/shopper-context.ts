@@ -1,190 +1,24 @@
 import {
   LineItem,
-  MeUser,
   Order,
   ListLineItem,
-  AccessToken,
-  PasswordReset,
-  User,
-  Address,
   ListPayment,
-  BuyerCreditCard,
-  OcMeService,
-  Payment,
   ListPromotion,
   OrderApproval,
-  Promotion,
-  ListShipment,
   Shipment,
   ShipmentItem,
   BuyerProduct,
-  Category,
-  ListBuyerCreditCard,
-  Supplier,
+  Meta,
 } from '@ordercloud/angular-sdk';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 export * from '@ordercloud/angular-sdk';
-
-export interface IShopperContext {
-  router: IRouter;
-  currentUser: ICurrentUser;
-  currentOrder: ICurrentOrder;
-  productFilters: IProductFilters;
-  categories: ICategories;
-  supplierFilters: ISupplierFilters;
-  authentication: IAuthentication;
-  orderHistory: IOrderHistory;
-  creditCards: ICreditCards;
-  myResources: OcMeService; // TODO - create our own, more limited interface here. Me.Patch(), for example, should not be allowed since it should always go through the current user service.
-  appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
-}
-
-export interface ICategories {
-  activeID: string;
-  all: Category[];
-  breadCrumbs: Category[];
-}
-
-export interface ICreditCards {
-  Save(card: CreditCardToken): Promise<BuyerCreditCard>;
-  Delete(cardID: string): Promise<void>;
-  List(): Promise<ListBuyerCreditCard>;
-}
+export * from './services/shopper-context/shopper-context.service';
 
 export interface CreditCardToken {
   AccountNumber: string;
   ExpirationDate: string; // MMYY or MMYYY
   CardholderName: string;
   CardType?: string;
-}
-
-export interface IOrderHistory {
-  activeOrderID: string;
-  filters: IOrderFilters;
-  approveOrder(
-    orderID?: string,
-    Comments?: string,
-    AllowResubmit?: boolean
-  ): Promise<MarketplaceOrder>;
-  declineOrder(
-    orderID?: string,
-    Comments?: string,
-    AllowResubmit?: boolean
-  ): Promise<MarketplaceOrder>;
-  validateReorder(orderID?: string): Promise<OrderReorderResponse>;
-  getOrderDetails(orderID?: string): Promise<OrderDetails>;
-  getSupplierInfo(liGroupedByShipFrom: LineItem[][]): Supplier[];
-  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]): Address[];
-  listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
-}
-
-export interface IRouter {
-  getActiveUrl(): string;
-  onUrlChange(callback: (path: string) => void): void;
-  toProductDetails(productID: string): void;
-  toProductList(options?: ProductFilters): void;
-  toSupplierList(options?: SupplierFilters): void;
-  toCheckout(): void;
-  toHome(): void;
-  toCart(): void;
-  toLogin(): void;
-  toRegister(): void;
-  toForgotPassword(): void;
-  toMyProfile(): void;
-  toMyAddresses(): void;
-  toMyPaymentMethods(): void;
-  toMyOrders(): void;
-  toMyOrderDetails(orderID: string): void;
-  toOrdersToApprove(): void;
-  toOrderToAppoveDetails(orderID: string): void;
-  toChangePassword(): void;
-  toRoute(path: string): void;
-}
-
-export interface ICurrentUser {
-  favoriteProductIDs: string[];
-  favoriteOrderIDs: string[];
-  isAnonymous: boolean;
-  get(): MeUser;
-  patch(user: MeUser): Promise<MeUser>;
-  onUserChange(callback: (user: User) => void): void; // TODO - replace all these onChange functions with real Observables. More powerful
-  onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void;
-  onFavoriteProductsChange(callback: (productIDs: string[]) => void): void;
-  setIsFavoriteProduct(isFav: boolean, productID: string): void;
-  onFavoriteOrdersChange(callback: (orderIDs: string[]) => void): void;
-  setIsFavoriteOrder(isFav: boolean, orderID: string): void;
-}
-
-export interface ICurrentOrder {
-  addToCartSubject: Subject<LineItem>;
-  get(): MarketplaceOrder;
-  patch(order: MarketplaceOrder): Promise<MarketplaceOrder>;
-  getLineItems(): ListLineItem;
-  submit(): Promise<void>;
-
-  addToCart(lineItem: LineItem): Promise<LineItem>;
-  addManyToCart(lineItem: LineItem[]): Promise<LineItem[]>;
-  setQuantityInCart(lineItemID: string, newQuantity: number): Promise<LineItem>;
-  removeFromCart(lineItemID: string): Promise<void>;
-  emptyCart(): Promise<void>;
-
-  listPayments(): Promise<ListPayment>;
-  createPayment(payment: Payment): Promise<Payment>;
-  createCCPayment(card: BuyerCreditCard): Promise<Payment>;
-
-  setBillingAddress(address: Address): Promise<MarketplaceOrder>;
-  setShippingAddress(address: Address): Promise<MarketplaceOrder>;
-  setBillingAddressByID(addressID: string): Promise<MarketplaceOrder>;
-  setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
-
-  getProposedShipments(): Promise<ProposedShipment[]>;
-  selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder>;
-  calculateTax(): Promise<MarketplaceOrder>;
-  authOnlyCreditCard(cardID: string, cvv: string): Promise<Payment>;
-
-  onOrderChange(callback: (order: MarketplaceOrder) => void): void;
-  onLineItemsChange(callback: (lineItems: ListLineItem) => void): void;
-}
-
-export interface IProductFilters {
-  activeFiltersSubject: BehaviorSubject<ProductFilters>;
-  toPage(pageNumber: number): void;
-  sortBy(field: string): void;
-  clearSort(): void;
-  searchBy(searchTerm: string): void;
-  clearSearch(): void;
-  filterByFacet(field: string, value: string, isFacet?: boolean): void;
-  clearFacetFilter(field: string): void;
-  filterByCategory(categoryID: string): void;
-  clearCategoryFilter(): void;
-  filterByFavorites(showOnlyFavorites: boolean): void;
-  clearAllFilters(): void;
-  hasFilters(): boolean;
-}
-
-export interface IOrderFilters {
-  activeFiltersSubject: BehaviorSubject<OrderFilters>;
-  toPage(pageNumber: number): void;
-  sortBy(field: string): void;
-  searchBy(searchTerm: string): void;
-  clearSearch(): void;
-  filterByFavorites(showOnlyFavorites: boolean): void;
-  filterByStatus(status: OrderStatus): void;
-  filterByDateSubmitted(fromDate: string, toDate: string): void;
-  clearAllFilters(): void;
-}
-
-export interface ISupplierFilters {
-  activeFiltersSubject: BehaviorSubject<SupplierFilters>;
-  toPage(pageNumber: number): void;
-  sortBy(field: string): void;
-  searchBy(searchTerm: string): void;
-  clearSearch(): void;
-  toSupplier(supplierID: string): void;
-  clearAllFilters(): void;
-  hasFilters(): boolean;
-  filterByFields(filter: any): void;
 }
 
 export interface SupplierFilters {
@@ -215,6 +49,11 @@ export interface ProposedShipmentSelection {
   Rate: number;
 }
 
+export interface ListProposedShipment {
+  Meta: Meta;
+  Items: ProposedShipment[];
+}
+
 export interface ProposedShipment {
   ProposedShipmentItems: ProposedShipmentItem[];
   ProposedShipmentOptions: ProposedShipmentOption[];
@@ -236,23 +75,6 @@ export interface MarketplaceOrder extends Order<OrderXp, any, any> { }
 export interface OrderXp {
   ProposedShipmentSelections: ProposedShipmentSelection[];
   AvalaraTaxTransactionCode: string;
-}
-
-export interface IAuthentication {
-  profiledLogin(
-    username: string,
-    password: string,
-    rememberMe: boolean
-  ): Promise<AccessToken>;
-  logout(): Promise<void>;
-  validateCurrentPasswordAndChangePassword(
-    newPassword: string,
-    currentPassword: string
-  ): Promise<void>;
-  anonymousLogin(): Promise<AccessToken>;
-  forgotPasssword(email: string): Promise<any>;
-  register(me: MeUser): Promise<any>;
-  resetPassword(code: string, config: PasswordReset): Promise<any>;
 }
 
 export interface ProductFilters {

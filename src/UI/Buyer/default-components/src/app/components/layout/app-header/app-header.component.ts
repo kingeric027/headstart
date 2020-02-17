@@ -1,5 +1,5 @@
 
-import { Component, ViewChild, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import {
   faSearch,
   faShoppingCart,
@@ -11,8 +11,8 @@ import {
   faBars
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { MeUser, LineItem, ListCategory, Category } from '@ordercloud/angular-sdk';
-import { tap, debounceTime, delay, takeWhile } from 'rxjs/operators';
+import { MeUser, LineItem, Category } from '@ordercloud/angular-sdk';
+import { takeWhile } from 'rxjs/operators';
 import { ProductFilters, ShopperContextService, MarketplaceOrder } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 
@@ -33,7 +33,7 @@ export class OCMAppHeader implements OnInit {
   activeCategoryID: string = undefined;
   categories: Category[] = [];
   screenSize = getScreenSizeBreakPoint();
-  showCategoryDropdown: Boolean = false;
+  showCategoryDropdown = false;
 
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
@@ -47,9 +47,9 @@ export class OCMAppHeader implements OnInit {
   faHome = faHome;
   faBars = faBars;
 
-  constructor(private context: ShopperContextService) { }
+  constructor(public context: ShopperContextService) { }
 
-  async ngOnInit() {
+  ngOnInit(): void {
     this.screenSize = getScreenSizeBreakPoint();
     this.categories = this.context.categories.all;
     this.appName = this.context.appSettings.appname;
@@ -63,21 +63,21 @@ export class OCMAppHeader implements OnInit {
     this.buildAddToCartListener();
   }
 
-  toggleCategoryDropdown(bool: boolean) {
+  toggleCategoryDropdown(bool: boolean): void {
     this.showCategoryDropdown = bool;
   }
 
-  clickOutsideCategoryDropdown(event) {
-    const clickIsOutside: boolean = !event.target.closest('.categoryDropdown');
+  clickOutsideCategoryDropdown(event): void {
+    const clickIsOutside = !event.target.closest('.categoryDropdown');
     if (clickIsOutside) { this.showCategoryDropdown = false; }
   }
 
-  handleFiltersChange = (filters: ProductFilters) => {
+  handleFiltersChange = (filters: ProductFilters): void => {
     this.searchTermForProducts = filters.search || '';
     this.activeCategoryID = this.context.categories.activeID;
   }
 
-  buildAddToCartListener() {
+  buildAddToCartListener(): void {
     let closePopoverTimeout;
     this.context.currentOrder.addToCartSubject.subscribe((li: LineItem) => {
       clearTimeout(closePopoverTimeout);
@@ -95,16 +95,16 @@ export class OCMAppHeader implements OnInit {
     });
   }
 
-  searchProducts(searchStr: string) {
+  searchProducts(searchStr: string): void {
     this.searchTermForProducts = searchStr;
     this.context.router.toProductList({ search: searchStr });
   }
 
-  logout() {
+  logout(): void {
     this.context.authentication.logout();
   }
 
-  closeMiniCart(event: MouseEvent, popover: NgbPopover) {
+  closeMiniCart(event: MouseEvent, popover: NgbPopover): void {
     const rect = this.cartIcon.nativeElement.getBoundingClientRect();
     // do not close if leaving through the bottom. That is handled by minicart itself
     if (event.y < rect.top + rect.height) {

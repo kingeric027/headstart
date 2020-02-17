@@ -13,7 +13,6 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
-import { TreeModule } from 'angular-tree-component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { SharedRoutingModule } from '@app-seller/shared/shared-routing.module';
@@ -22,7 +21,6 @@ import { SortColumnComponent } from '@app-seller/shared/components/sort-column/s
 import { CarouselSlideDisplayComponent } from '@app-seller/shared/components/carousel-slide-display/carousel-slide-display.component';
 import { UserFormComponent } from '@app-seller/shared/components/user-form/user-form.component';
 import { AddressFormComponent } from '@app-seller/shared/components/address-form/address-form.component';
-import { CategoryTableComponent } from './components/category-table/category-table.component';
 import { CategoryFormComponent } from './components/category-form/category-form.component';
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { ProductImagesComponent } from './components/product-images/product-images.component';
@@ -52,7 +50,6 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     ReactiveFormsModule,
 
     // 3rd party UI
-    TreeModule,
     FontAwesomeModule,
     FormsModule,
     PerfectScrollbarModule,
@@ -71,7 +68,6 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     ReactiveFormsModule,
 
     // 3rd party UI
-    TreeModule,
     FontAwesomeModule,
     NgbPaginationModule,
     NgbTabsetModule,
@@ -83,7 +79,6 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     CarouselSlideDisplayComponent,
     UserFormComponent,
     AddressFormComponent,
-    CategoryTableComponent,
     CategoryFormComponent,
     CategoryDetailsComponent,
     ResourceSelectDropdown,
@@ -106,7 +101,6 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     CarouselSlideDisplayComponent,
     UserFormComponent,
     AddressFormComponent,
-    CategoryTableComponent,
     CategoryFormComponent,
     CategoryDetailsComponent,
     ProductImagesComponent,

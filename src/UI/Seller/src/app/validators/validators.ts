@@ -11,6 +11,7 @@ export const ErrorDictionary = {
   DateError: 'Enter date of the form mm-dd-yyyy',
   date: 'Enter date of the form mm-dd-yyyy',
   required: 'This field is required',
+  min: 'Please enter a higher value',
   email: 'Please enter a valid email',
   ocMatchFields: `Passwords don't match`,
   strongPassword: `Password must be at least eight characters long and include at least 

@@ -28,14 +28,14 @@ export class SearchComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
+    this.previousSearchTerm = this.searchTermInput;
     if (this.searchTermInput !== null && this.searchTermInput !== undefined && this.form) {
-      this.previousSearchTerm = this.searchTermInput;
       this.form.setValue({ search: this.searchTermInput });
     }
   }
 
   buildForm() {
-    this.form = new FormGroup({ search: new FormControl('') });
+    this.form = new FormGroup({ search: new FormControl(this.searchTermInput) });
     this.onFormChanges();
   }
 

@@ -1,5 +1,5 @@
 // core services
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MarketplaceRoutingModule, MyOrdersWrapperComponent, OrdersToApproveWrapperComponent } from './marketplace-routing.module';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
@@ -31,7 +31,7 @@ import { CommonModule } from '@angular/common';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
 import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipments-wrapper.component';
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
-import { CreditCardService } from './services/credit-card/credit-card.service';
+import { CreditCardService } from './services/current-user/credit-card.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

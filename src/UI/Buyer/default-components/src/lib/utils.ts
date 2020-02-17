@@ -10,7 +10,7 @@
 
 import { ComponentFactoryResolver, Injector, Type } from '@angular/core';
 
-const matches = (() => {
+const matches = ((): any => {
   const elProto = Element.prototype as any;
   return (
     elProto.matches ||
@@ -33,7 +33,7 @@ export const scheduler = {
    */
   schedule(taskFn: () => void, delay: number): () => void {
     const id = setTimeout(taskFn, delay);
-    return () => clearTimeout(id);
+    return (): void => clearTimeout(id);
   },
 
   /**
@@ -56,7 +56,7 @@ export const scheduler = {
     }
 
     const id = window.requestAnimationFrame(taskFn);
-    return () => window.cancelAnimationFrame(id);
+    return (): void => window.cancelAnimationFrame(id);
   },
 };
 
@@ -120,7 +120,7 @@ export function strictEquals(value1: any, value2: any): boolean {
 }
 
 /** Gets a map of default set of attributes to observe and the properties they affect. */
-export function getDefaultAttributeToPropertyInputs(inputs: { propName: string; templateName: string }[]) {
+export function getDefaultAttributeToPropertyInputs(inputs: { propName: string; templateName: string }[]): any {
   const attributeToPropertyInputs: { [key: string]: string } = {};
   inputs.forEach(({ propName, templateName }) => {
     attributeToPropertyInputs[camelToDashCase(templateName)] = propName;

@@ -8,8 +8,6 @@ import { faCaretRight } from '@fortawesome/free-solid-svg-icons';
 	styleUrls: ['./category-dropdown.component.scss']
 })
 export class OCMCategoryDropdown {
-	constructor(private context: ShopperContextService) { }
-
 	faCaretRight = faCaretRight;
 
 	@Output() closeDropdown = new EventEmitter();
@@ -21,28 +19,29 @@ export class OCMCategoryDropdown {
 
 	parentCategories: Category[] = [];
 	subCategories: Category[] = [];
-	subSubCategories: Category[] = [];
+	subSubCategories: Category[] = []; // Intentionally restricted to three levels.
+
+	constructor(private context: ShopperContextService) { }
 
 	assignCategories(categories: Category[], level: string): any {
-		var parentCategories;
-		var subCategories = [];
-		var subSubCategories = [];
+		const subCategories = [];
+		const subSubCategories = [];
 
 		if (!categories || !level) return categories;
 
-		parentCategories = categories.filter(category => category.ParentID === null);
+		const parentCategories = categories.filter(category => category.ParentID === null);
 
 		categories.forEach(category => {
-			for (let i = 0; i < parentCategories.length; i++) {
-				if (parentCategories[i].ID === category.ParentID) {
+			for (const parentCategory of parentCategories) {
+				if (parentCategory.ID === category.ParentID) {
 					subCategories.push(category);
 				}
 			}
 		});
 
 		categories.forEach(category => {
-			for (let i = 0; i < subCategories.length; i++) {
-				if (subCategories[i].ID === category.ParentID) {
+			for (const subCategory of subCategories) {
+				if (subCategory.ID === category.ParentID) {
 					subSubCategories.push(category);
 				}
 			}
@@ -53,7 +52,7 @@ export class OCMCategoryDropdown {
 		else if (level === 'subSubCategory') return subSubCategories;
 	}
 
-	checkForChildren(category: Category): Boolean {
+	checkForChildren(category: Category): boolean {
 		return category.ChildCount > 0;
 	}
 

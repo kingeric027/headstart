@@ -29,24 +29,6 @@ import { isFunction, scheduler, strictEquals, isElement, matchesSelector } from 
 const DESTROY_DELAY = 10;
 
 /**
- * Factory that creates new ComponentNgElementStrategy instance. Gets the component factory with the
- * constructor's injector's factory resolver and passes that factory to each strategy.
- *
- * @publicApi
- */
-export class ComponentNgElementStrategyFactory implements NgElementStrategyFactory {
-  componentFactory: ComponentFactory<any>;
-
-  constructor(private component: Type<any>, private injector: Injector) {
-    this.componentFactory = injector.get(ComponentFactoryResolver).resolveComponentFactory(component);
-  }
-
-  create(injector: Injector) {
-    return new ComponentNgElementStrategy(this.componentFactory, injector);
-  }
-}
-
-/**
  * Creates and destroys a component ref using a component factory and handles change detection
  * in response to input changes.
  *
@@ -85,7 +67,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
    * Initializes a new component if one has not yet been created and cancels any scheduled
    * destruction.
    */
-  connect(element: HTMLElement) {
+  connect(element: HTMLElement): void {
     // If the element is marked to be destroyed, cancel the task since the component was reconnected
     if (this.scheduledDestroyFn !== null) {
       this.scheduledDestroyFn();
@@ -102,7 +84,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
    * Schedules the component to be destroyed after some small delay in case the element is just
    * being moved across the DOM.
    */
-  disconnect() {
+  disconnect(): void {
     // Return if there is no componentRef or the component is already scheduled for destruction
     if (!this.componentRef || this.scheduledDestroyFn !== null) {
       return;
@@ -112,7 +94,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
     // moved elsewhere in the DOM
     this.scheduledDestroyFn = scheduler.schedule(() => {
       if (this.componentRef) {
-        this.componentRef!.destroy();
+        this.componentRef.destroy();
         this.componentRef = null;
       }
     }, DESTROY_DELAY);
@@ -128,7 +110,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
       return this.initialInputValues.get(property);
     }
 
-    return (this.componentRef.instance as any)[property];
+    return (this.componentRef.instance)[property];
   }
 
   /**
@@ -146,7 +128,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
     }
 
     this.recordInputChange(property, value);
-    (this.componentRef.instance as any)[property] = value;
+    (this.componentRef.instance)[property] = value;
     this.scheduleDetectChanges();
   }
 
@@ -154,12 +136,12 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
    * Creates a new component through the component factory with the provided element host and
    * sets up its initial inputs, listens for outputs changes, and runs an initial change detection.
    */
-  protected initializeComponent(element: HTMLElement) {
+  protected initializeComponent(element: HTMLElement): void {
     const childInjector = Injector.create({ providers: [], parent: this.injector });
     const projectableNodes = extractProjectableNodes(element, this.componentFactory.ngContentSelectors);
     this.componentRef = this.componentFactory.create(childInjector, projectableNodes, element);
 
-    this.implementsOnChanges = isFunction(((this.componentRef.instance as any) as OnChanges).ngOnChanges);
+    this.implementsOnChanges = isFunction(((this.componentRef.instance) as OnChanges).ngOnChanges);
 
     this.initializeInputs();
     this.initializeOutputs();
@@ -188,7 +170,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
   /** Sets up listeners for the component's outputs so that the events stream emits the events. */
   protected initializeOutputs(): void {
     const eventEmitters = this.componentFactory.outputs.map(({ propName, templateName }) => {
-      const emitter = (this.componentRef!.instance as any)[propName] as EventEmitter<any>;
+      const emitter = (this.componentRef.instance)[propName] as EventEmitter<any>;
       return emitter.pipe(map((value: any) => ({ name: templateName, value })));
     });
 
@@ -205,7 +187,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
     // during ngOnChanges.
     const inputChanges = this.inputChanges;
     this.inputChanges = null;
-    ((this.componentRef!.instance as any) as OnChanges).ngOnChanges(inputChanges);
+    ((this.componentRef.instance) as OnChanges).ngOnChanges(inputChanges);
   }
 
   /**
@@ -258,7 +240,25 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
     }
 
     this.callNgOnChanges();
-    this.componentRef!.changeDetectorRef.detectChanges();
+    this.componentRef.changeDetectorRef.detectChanges();
+  }
+}
+
+/**
+ * Factory that creates new ComponentNgElementStrategy instance. Gets the component factory with the
+ * constructor's injector's factory resolver and passes that factory to each strategy.
+ *
+ * @publicApi
+ */
+export class ComponentNgElementStrategyFactory implements NgElementStrategyFactory {
+  componentFactory: ComponentFactory<any>;
+
+  constructor(private component: Type<any>, private injector: Injector) {
+    this.componentFactory = injector.get(ComponentFactoryResolver).resolveComponentFactory(component);
+  }
+
+  create(injector: Injector): ComponentNgElementStrategy {
+    return new ComponentNgElementStrategy(this.componentFactory, injector);
   }
 }
 

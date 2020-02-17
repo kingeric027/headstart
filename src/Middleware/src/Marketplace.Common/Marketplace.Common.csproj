@@ -9,8 +9,7 @@
     <PackageReference Include="Cosmonaut" Version="2.11.3" />
     <PackageReference Include="Cosmonaut.Extensions.Microsoft.DependencyInjection" Version="2.3.0" />
     <PackageReference Include="CreditCardValidator" Version="1.4.6" />
-    <PackageReference Include="Marketplace.Helpers" Version="0.0.20" />
-    <PackageReference Include="Marketplace.Models" Version="0.0.2" />
+    <PackageReference Include="Marketplace.Helpers" Version="0.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
@@ -41,6 +40,10 @@
 
   <ItemGroup>
     <Folder Include="Exceptions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Marketplace.Models\Marketplace.Models.csproj" />
   </ItemGroup>
 
 </Project>
