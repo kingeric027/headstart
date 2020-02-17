@@ -12,7 +12,8 @@ export class FormControlErrorDirective implements OnInit {
   constructor(@Self() private control: NgControl, private el: ElementRef, private renderer: Renderer2) {}
 
   ngOnInit(): void {
-    this.errorSpan = this.renderer.createElement(this.el.nativeElement.parentNode, 'span');
+    this.errorSpan = this.renderer.createElement('span');
+    this.renderer.appendChild(this.el.nativeElement.parentNode, this.errorSpan);
     this.renderer.setAttribute(this.errorSpan, 'class', 'error-message');
     (this.control as any).update.subscribe(this.displayErrorMsg);
     fromEvent(this.el.nativeElement.form, 'submit').subscribe(this.displayErrorMsg);
