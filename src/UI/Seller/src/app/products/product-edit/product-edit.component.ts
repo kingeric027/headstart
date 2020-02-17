@@ -104,10 +104,7 @@ export class ProductEditComponent implements OnInit {
     this._superMarketplaceProductStatic = superProduct;
     this._superMarketplaceProductEditable = superProduct;
     if (
-      this._superMarketplaceProductEditable.Product &&
-      this._superMarketplaceProductEditable.Product.xp &&
-      this._superMarketplaceProductEditable.Product.xp.Tax &&
-      this._superMarketplaceProductEditable.Product.xp.Tax.Category
+      this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
     ) {
       const taxCategory =
         this._superMarketplaceProductEditable.Product.xp.Tax.Category === 'FR000000'
@@ -120,11 +117,7 @@ export class ProductEditComponent implements OnInit {
     }
     this.createProductForm(superProduct);
     this.images = ReplaceHostUrls(superProduct.Product);
-    this.taxCodeCategorySelected =
-      (this._superMarketplaceProductEditable.Product &&
-        this._superMarketplaceProductEditable.Product.xp &&
-        this._superMarketplaceProductEditable.Product.xp.Tax &&
-        this._superMarketplaceProductEditable.Product.xp.Tax.Category) !== null;
+    this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.checkIfCreatingNew();
     this.checkForChanges();
   }

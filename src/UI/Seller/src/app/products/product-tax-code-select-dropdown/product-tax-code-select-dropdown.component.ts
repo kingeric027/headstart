@@ -33,10 +33,7 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (
-      changes &&
-      changes.superMarketplaceProductEditable &&
-      changes.superMarketplaceProductEditable.previousValue &&
-      changes.superMarketplaceProductEditable.currentValue &&
+      changes?.superMarketplaceProductEditable?.previousValue &&
       changes.superMarketplaceProductEditable.previousValue.Product.ID !==
         changes.superMarketplaceProductEditable.currentValue.Product.ID
     ) {
