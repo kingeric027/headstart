@@ -187,10 +187,12 @@ export class ProductEditComponent implements OnInit {
       this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
-      if (ex.error && ex.error.Errors && ex.error.Errors.some(e => e.ErrorCode === 'IdExists')) {
-        this.toasterService.error(`A product with that ID already exists`);
+      if (ex.error.Errors) {
+        ex?.error?.Errors?.forEach(error => {
+          this.toasterService.error(`${error.ErrorCode}: ${error.Message}`);
+        })
       } else {
-        throw ex;
+        this.toasterService.error(ex.error[0] ? `${ex.error[0].ErrorCode}: ${ex.error[0].Message}` : 'An error occured on the server.');
       }
     }
   }
