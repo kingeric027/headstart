@@ -1,4 +1,4 @@
-import { PRODUCT_IMAGE_PATH_STRATEGY } from '../product/product-image.helper';
+import { PRODUCT_IMAGE_PATH_STRATEGY } from '@app-seller/products/product-image.helper';
 
 export interface SummaryResourceInfoPaths {
   toPrimaryHeader: string;

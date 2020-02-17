@@ -388,7 +388,8 @@ namespace Marketplace.Common.Commands
             new SecurityProfile(){ Name = "MPSupplierAdmin", CustomRoles = { "MPSupplierAdmin" }, ID = "MPSupplierAdmin", Roles = { ApiRole.SupplierAdmin, ApiRole.SupplierUserAdmin, ApiRole.SupplierAddressAdmin } },
             new SecurityProfile(){ Name = "MPMeSupplierAddressAdmin", CustomRoles = { "MPMeSupplierAddressAdmin" }, ID = "MPMeSupplierAddressAdmin", Roles = { ApiRole.SupplierReader, ApiRole.SupplierAddressAdmin } },
             new SecurityProfile(){ Name = "MPMeSupplierUserAdmin", CustomRoles = { "MPMeSupplierUserAdmin" }, ID = "MPMeSupplierUserAdmin", Roles = { ApiRole.SupplierReader, ApiRole.SupplierUserAdmin } },
-        };
+			new SecurityProfile(){ Name = "MPReportReader", CustomRoles = { "MPReportReader" }, ID = "MPReportReader"},
+		};
         public async Task CreateMarketPlaceRoles(string accessToken)
         {
             foreach (SecurityProfile securityProfile in DefaultSecurityProfiles)

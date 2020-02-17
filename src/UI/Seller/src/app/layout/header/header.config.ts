@@ -28,14 +28,14 @@ const LiveProducts: MPRoute = {
   rolesWithAccess: ['MPPRoductAdmin', 'MPProductReader', 'MPMeProductAdmin'],
   title: 'Live Products',
   route: '/products',
-  queryParams: { 'xp.Status': 'Published' }
+  queryParams: { 'xp.Status': 'Published' },
 };
 
 const PendingProducts: MPRoute = {
   rolesWithAccess: ['MPPRoductAdmin', 'MPProductReader', 'MPMeProductAdmin'],
   title: 'Pending Products',
   route: '/products',
-  queryParams: { 'xp.Status': 'Draft' }
+  queryParams: { 'xp.Status': 'Draft' },
 };
 
 const Promotions: MPRoute = {
@@ -57,7 +57,7 @@ const ProductNavGrouping: MPRoute = {
   subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, Categories],
 };
 
-//Orders
+// Orders
 const BuyerOrders: MPRoute = {
   rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdmin'],
   title: 'Incoming Buyer Orders',
@@ -112,11 +112,11 @@ const SupplierOrderNavGrouping: MPRoute = {
   subRoutes: [Orders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders],
 };
 
-//Buyers
+// Buyers
 const AllBuyers: MPRoute = {
   rolesWithAccess: ['MPBuyerAdmin', 'MPBuyerReader'],
   title: 'All Buyers',
-  route: `/buyers`,
+  route: '/buyers',
 };
 
 const BuyerUsers: MPRoute = {
@@ -150,11 +150,11 @@ const BuyerNavGrouping = {
   subRoutes: [AllBuyers, BuyerUsers, BuyerPurchasingLocations, BuyerPaymentMethods, BuyerApprovalRules],
 };
 
-//Suppliers
+// Suppliers
 const AllSuppliers: MPRoute = {
   rolesWithAccess: ['MPSupplierAdmin'],
   title: 'All Suppliers',
-  route: `/suppliers`,
+  route: '/suppliers',
 };
 
 const SupplierUsers: MPRoute = {
@@ -176,10 +176,17 @@ const SupplierNavGrouping: MPRoute = {
   subRoutes: [AllSuppliers, SupplierUsers, SupplierLocations],
 };
 
-const ReportsRoute = {
+const OrchestionLogs = {
+  rolesWithAccess: ['MPReportReader'],
+  title: 'Orchestion Logs',
+  route: 'reports/orchestration-logs',
+};
+
+const ReportsNavGrouping = {
   rolesWithAccess: ['MPReportReader'],
   title: 'Reports',
   route: '/reports',
+  subRoutes: [OrchestionLogs],
 };
 
 const SellerUsers = {
@@ -206,8 +213,8 @@ const AllNavGroupings: MPRoute[] = [
   SellerOrderNavGrouping,
   BuyerNavGrouping,
   SupplierNavGrouping,
+  ReportsNavGrouping,
   SellerUsers,
-  ReportsRoute,
   Storefronts,
   PublicProfile,
 ];

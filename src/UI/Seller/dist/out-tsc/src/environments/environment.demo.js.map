@@ -1,0 +1,1 @@
+{"version":3,"file":"environment.demo.js","sourceRoot":"","sources":["../../../../src/environments/environment.demo.ts"],"names":[],"mappings":"AAAA,mFAAmF;AACnF,8FAA8F;AAC9F,yEAAyE;AAEzE,MAAM,CAAC,IAAM,WAAW,GAAG;IACzB,SAAS,EAAE,KAAK;IAChB,OAAO,EAAE,wBAAwB;IACjC,QAAQ,EAAE,sCAAsC;IAChD,aAAa,EAAE,gDAAgD;IAC/D,aAAa,EAAE,KAAK;IACpB,MAAM,EAAE,wCAAwC;CACjD,CAAC"}

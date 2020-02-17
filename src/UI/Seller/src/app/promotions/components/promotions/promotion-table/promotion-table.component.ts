@@ -1,8 +1,8 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { Promotion } from '@ordercloud/angular-sdk';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { PromotionService } from '@app-seller/shared/services/promotion/promotion.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { PromotionService } from '@app-seller/promotions/promotion.service';
 
 @Component({
   selector: 'app-promotion-table',

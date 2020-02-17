@@ -2,13 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { OcTokenService, Supplier } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import {
-  MarketPlaceProduct,
-  MarketPlaceProductTaxCode,
-  SuperMarketplaceProduct,
-  DRAFT,
-} from '@app-seller/shared/models/MarketPlaceProduct.interface';
-import { ListResource } from '../resource-crud/resource-crud.types';
+import { SuperMarketplaceProduct, DRAFT } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -62,12 +56,6 @@ export class MiddlewareAPIService {
     return await this.http.delete<SuperMarketplaceProduct>(url, this.headers).toPromise();
   }
 
-  private formify(file: File): FormData {
-    const form = new FormData();
-    form.append('file', file);
-    return form;
-  }
-
   async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
     const url = `${
       this.baseUrl
@@ -78,5 +66,11 @@ export class MiddlewareAPIService {
   async createSupplier(supplier: Supplier): Promise<Supplier> {
     const url = `${this.baseUrl}/supplier`;
     return await this.http.post(url, supplier, this.headers).toPromise();
+  }
+
+  private formify(file: File): FormData {
+    const form = new FormData();
+    form.append('file', file);
+    return form;
   }
 }
