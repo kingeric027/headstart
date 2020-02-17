@@ -18,17 +18,17 @@ export class OCMOrderHistory implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.context.orderHistory.filters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
   }
 
-  handleFiltersChange = (filters: OrderFilters) => {
+  handleFiltersChange = (filters: OrderFilters): void => {
     this.sortBy = filters.sortBy;
     this.showOnlyFavorites = filters.showOnlyFavorites;
     this.searchTerm = filters.search;
   }
 
-  async ngAfterViewInit() {
+  ngAfterViewInit(): void {
     if (!this.approvalVersion) {
       this.columns.push('Favorite');
     }
@@ -54,7 +54,7 @@ export class OCMOrderHistory implements OnInit, AfterViewInit, OnDestroy {
     this.context.orderHistory.filters.filterByFavorites(showOnlyFavorites);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
   }
 }

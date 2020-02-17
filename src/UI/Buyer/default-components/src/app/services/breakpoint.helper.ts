@@ -5,7 +5,7 @@ const map = {
   lg: 1199,
 };
 
-export const getScreenSizeBreakPoint = () => {
+export const getScreenSizeBreakPoint = (): string => {
   const innerWidth = window.innerWidth;
 
   if (innerWidth < map.xs) {

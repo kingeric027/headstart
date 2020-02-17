@@ -1,6 +1,6 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { ListFacet, ListFacetValue } from '@ordercloud/angular-sdk';
-import { each as _each, get as _get, xor as _xor } from 'lodash';
+import { get as _get, xor as _xor } from 'lodash';
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
 import { ProductFilters, ShopperContextService } from 'marketplace';
 import { takeWhile } from 'rxjs/operators';
@@ -13,12 +13,13 @@ export class OCMFacetMultiSelect implements OnDestroy {
   _facet: ListFacet;
   alive = true;
   checkboxArray: { facet: ListFacetValue; checked: boolean }[] = [];
-  private activeFacetValues: string[] = [];
   visibleFacetLength = 5;
   isCollapsed = false;
   faPlusSquare = faPlusSquare;
   faMinusSquare = faMinusSquare;
 
+  private activeFacetValues: string[] = [];
+  
   constructor(private context: ShopperContextService) {}
 
   @Input() set facet(value: ListFacet) {
@@ -28,22 +29,26 @@ export class OCMFacetMultiSelect implements OnDestroy {
       .subscribe(this.handleFiltersChange);
   }
 
-  toggleCollapsed() {
+  toggleCollapsed(): void {
     this.isCollapsed = !this.isCollapsed;
     if (this.isCollapsed) this.visibleFacetLength = 5;
   }
 
-  showAll() {
+  showAll(): void {
     this.visibleFacetLength = this._facet.Values.length;
   }
 
-  handleCheckBoxClick(facetValue: string) {
+  handleCheckBoxClick(facetValue: string): void {
     // remove if exists, add if doesn't
     this.activeFacetValues = _xor(this.activeFacetValues, [facetValue]);
     this.updateFilter(this.activeFacetValues);
   }
 
-  private handleFiltersChange = (filters: ProductFilters) => {
+  ngOnDestroy(): void {
+    this.alive = false;
+  }
+
+  private handleFiltersChange = (filters: ProductFilters): void => {
     const activeFacet = _get(filters.activeFacets, this._facet.Name, null);
     this.activeFacetValues = activeFacet ? activeFacet.split('|') : [];
     this.updateCheckBoxes(this.activeFacetValues);
@@ -57,14 +62,10 @@ export class OCMFacetMultiSelect implements OnDestroy {
     });
   }
 
-  private updateFilter(activeFacetValues: string[]) {
+  private updateFilter(activeFacetValues: string[]): void {
     // TODO - maybe all this joining and spliting should be done in the service?
     // Abstract out the way the filters work under the hood?
     const values = activeFacetValues.join('|');
     this.context.productFilters.filterByFacet(this._facet.Name, values);
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
   }
 }

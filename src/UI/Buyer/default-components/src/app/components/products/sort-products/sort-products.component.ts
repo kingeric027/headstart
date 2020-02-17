@@ -19,24 +19,24 @@ export class OCMProductSort implements OnInit, OnDestroy {
 
   constructor(private context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.form = new FormGroup({ sortBy: new FormControl(null) });
     this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(filters => {
       this.setForm(filters.sortBy);
     });
   }
 
-  private setForm(sortBy: string) {
-    sortBy = sortBy || null;
-    this.form.setValue({ sortBy });
-  }
-
-  sortStrategyChanged() {
+  sortStrategyChanged(): void {
     const sortValue = this.form.get('sortBy').value;
     this.context.productFilters.sortBy(sortValue);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
+  }
+
+  private setForm(sortBy: string): void {
+    sortBy = sortBy || null;
+    this.form.setValue({ sortBy });
   }
 }

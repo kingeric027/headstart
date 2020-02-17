@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormArray } from '@angular/forms';
+import { FormGroup, FormArray, AbstractControl } from '@angular/forms';
 import { FieldConfig } from '../field-config.interface';
 import { Field } from '../field.interface';
 import { specErrors } from '../errors';
@@ -39,11 +39,11 @@ export class SpecFormTextAreaComponent implements Field, OnInit {
 
   constructor() {}
 
-  ngOnInit() {
-    this.ctrls = <FormArray>this.group.get('ctrls');
+  ngOnInit(): void {
+    this.ctrls = this.group.get('ctrls') as FormArray;
   }
 
-  byIndex(index: number) {
+  byIndex(index: number): AbstractControl {
     return this.ctrls.at(index);
   }
 }

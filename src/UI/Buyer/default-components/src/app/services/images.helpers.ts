@@ -1,9 +1,9 @@
-import { get as _get, map as _map, without as _without, uniqBy as _uniq } from 'lodash';
+import { map as _map, without as _without, uniqBy as _uniq } from 'lodash';
 import { ocAppConfig } from '../config/app.config';
 import { Product } from 'marketplace';
 
 export const getImageUrls = (product: Product): string[] => {
-  let images = (product.xp && product.xp.Images) || [];
+  let images = (product?.xp?.Images) || [];
   images = _uniq(images, (img: any) => img.URL);
   let urls: string[] = _map(images, img => {
     if (!img.URL) return;

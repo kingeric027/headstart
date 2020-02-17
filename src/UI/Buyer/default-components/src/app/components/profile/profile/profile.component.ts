@@ -18,26 +18,27 @@ export class OCMProfile implements OnInit {
 
   constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.context.currentUser.onUserChange(this.handleUserChange);
   }
 
-  showEditProfile() {
+  showEditProfile(): void {
     this.showEditProfileForm = true;
   }
 
-  dismissProfileEditForm() {
+  dismissProfileEditForm(): void {
     this.showEditProfileForm = false;
   }
 
-  handleUserChange = (user: MeUser) => {
-    if (!user) return;
-    this.me = user;
+  handleUserChange = (user: MeUser): void => {
+    if (user) {
+      this.me = user;
+    }
   };
 
-  async profileFormSubmitted(me: MeUser) {
+  async profileFormSubmitted(me: MeUser): Promise<void> {
     this.showEditProfileForm = false;
     await this.context.currentUser.patch(me);
-    this.toasterService.success(`Profile Updated`);
+    this.toasterService.success('Profile Updated');
   }
 }

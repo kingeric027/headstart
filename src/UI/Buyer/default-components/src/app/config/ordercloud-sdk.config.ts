@@ -1,6 +1,6 @@
 import { Configuration } from '@ordercloud/angular-sdk';
 
-export function OcSDKConfig() {
+export function OcSDKConfig(): Configuration {
   return new Configuration({
     basePath: 'https://api.ordercloud.io/v1',
     authPath: 'https://auth.ordercloud.io/oauth/token',
