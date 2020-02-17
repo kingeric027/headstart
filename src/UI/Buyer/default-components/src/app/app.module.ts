@@ -189,6 +189,7 @@ const components = [
   OCMPaymentCreditCard
 ];
 
+// @dynamic
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   declarations: [
