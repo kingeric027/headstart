@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl, FormBuilder } from '@angular/forms';
+import { FormControl, FormBuilder, FormArray } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
 
@@ -63,7 +63,7 @@ export class OCMSpecForm {
     const c: FieldConfig[] = [];
     if (!this._specs || !this._specs.Items) return c;
     for (const spec of this._specs.Items) {
-      if (spec.xp && spec.xp.control === 'checkbox') {
+      if (spec?.xp?.control === 'checkbox') {
         c.push({
           type: 'checkbox',
           label: spec.Name,
@@ -72,7 +72,7 @@ export class OCMSpecForm {
           options: _map(spec.Options, 'Value'),
           validation: [Validators.nullValidator],
         });
-      } else if (spec.xp && spec.xp.control === 'range') {
+      } else if (spec?.xp?.control === 'range') {
         c.push({
           type: 'range',
           label: spec.Name,
@@ -86,14 +86,14 @@ export class OCMSpecForm {
             Validators.max(Math.max(..._map(spec.Options, (option: SpecOption) => +option.Value))),
           ],
         });
-      } else if (spec.Options.length === 1) {
+      } else if (spec?.Options.length === 1) {
         c.unshift({
           type: 'label',
           label: spec.Name,
           name: spec.Name.replace(/ /g, ''),
           options: _map(spec.Options, 'Value'),
         });
-      } else if (spec.Options.length > 1) {
+      } else if (spec?.Options.length > 1) {
         c.push({
           type: 'select',
           label: spec.Name,
