@@ -104,10 +104,7 @@ export class ProductEditComponent implements OnInit {
     this._superMarketplaceProductStatic = superProduct;
     this._superMarketplaceProductEditable = superProduct;
     if (
-      this._superMarketplaceProductEditable.Product &&
-      this._superMarketplaceProductEditable.Product.xp &&
-      this._superMarketplaceProductEditable.Product.xp.Tax &&
-      this._superMarketplaceProductEditable.Product.xp.Tax.Category
+      this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
     ) {
       const taxCategory =
         this._superMarketplaceProductEditable.Product.xp.Tax.Category === 'FR000000'
@@ -120,11 +117,7 @@ export class ProductEditComponent implements OnInit {
     }
     this.createProductForm(superProduct);
     this.images = ReplaceHostUrls(superProduct.Product);
-    this.taxCodeCategorySelected =
-      (this._superMarketplaceProductEditable.Product &&
-        this._superMarketplaceProductEditable.Product.xp &&
-        this._superMarketplaceProductEditable.Product.xp.Tax &&
-        this._superMarketplaceProductEditable.Product.xp.Tax.Category) !== null;
+    this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.checkIfCreatingNew();
     this.checkForChanges();
   }
@@ -177,21 +170,15 @@ export class ProductEditComponent implements OnInit {
 
   async createNewProduct() {
     try {
-      this.dataIsSaving = true;
-      const superProduct = await this.middleware.createNewSuperMarketplaceProduct(
-        this._superMarketplaceProductEditable
-      );
-      await this.addFiles(this.files, superProduct.Product.ID);
-      this.refreshProductData(superProduct);
-      this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
-      this.dataIsSaving = false;
+    this.dataIsSaving = true;
+    const superProduct = await this.middleware.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
+    await this.addFiles(this.files, superProduct.Product.ID);
+    this.refreshProductData(superProduct);
+    this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
+    this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
-      if (ex.error && ex.error.Errors && ex.error.Errors.some(e => e.ErrorCode === 'IdExists')) {
-        this.toasterService.error(`A product with that ID already exists`);
-      } else {
-        throw ex;
-      }
+      throw ex;
     }
   }
 
@@ -221,7 +208,6 @@ export class ProductEditComponent implements OnInit {
     const updateProductResourceCopy = this.copyProductResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
     );
-    console.log(updateProductResourceCopy);
     switch (depthOfField) {
       case 4:
         updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
