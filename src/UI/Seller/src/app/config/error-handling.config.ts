@@ -23,7 +23,6 @@ export class AppErrorHandler extends ErrorHandler {
    * but continue exection of code
    */
   public displayError(ex: any): void {
-    console.log('exception from AppErrorHandler', ex);
     if (ex.rejection) {
       ex = ex.rejection;
     }
