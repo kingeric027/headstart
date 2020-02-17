@@ -4,7 +4,7 @@ import { ErrorDictionary } from '../../../app/validators/validators';
 import { fromEvent } from 'rxjs';
 
 @Directive({
-  selector: '[showErrors]',
+  selector: 'showErrors',
 })
 export class FormControlErrorDirective implements OnInit {
   constructor(@Self() private control: NgControl, private el: ElementRef, private renderer: Renderer2) {}
