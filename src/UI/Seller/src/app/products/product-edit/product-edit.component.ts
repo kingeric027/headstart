@@ -177,23 +177,15 @@ export class ProductEditComponent implements OnInit {
 
   async createNewProduct() {
     try {
-      this.dataIsSaving = true;
-      const superProduct = await this.middleware.createNewSuperMarketplaceProduct(
-        this._superMarketplaceProductEditable
-      );
-      await this.addFiles(this.files, superProduct.Product.ID);
-      this.refreshProductData(superProduct);
-      this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
-      this.dataIsSaving = false;
+    this.dataIsSaving = true;
+    const superProduct = await this.middleware.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
+    await this.addFiles(this.files, superProduct.Product.ID);
+    this.refreshProductData(superProduct);
+    this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
+    this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
-      if (ex.error.Errors) {
-        ex?.error?.Errors?.forEach(error => {
-          this.toasterService.error(`${error.ErrorCode}: ${error.Message}`);
-        })
-      } else {
-        this.toasterService.error(ex.error[0] ? `${ex.error[0].ErrorCode}: ${ex.error[0].Message}` : 'An error occured on the server.');
-      }
+      throw ex;
     }
   }
 
