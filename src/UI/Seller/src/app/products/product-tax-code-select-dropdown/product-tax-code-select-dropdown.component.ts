@@ -1,5 +1,9 @@
 import { Component, Input, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
-import { MarketPlaceProductTaxCode, MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import {
+  MarketPlaceProductTaxCode,
+  MarketPlaceProduct,
+  SuperMarketplaceProduct,
+} from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { faFilter, faHome } from '@fortawesome/free-solid-svg-icons';
 import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
@@ -13,7 +17,7 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
   @Input()
   taxCodes: ListResource<MarketPlaceProductTaxCode>;
   @Input()
-  marketPlaceProductEditable: MarketPlaceProduct;
+  superMarketplaceProductEditable: SuperMarketplaceProduct;
 
   @Output()
   taxCodesSearched = new EventEmitter<any>();
@@ -30,10 +34,11 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (
       changes &&
-      changes.marketPlaceProductEditable &&
-      changes.marketPlaceProductEditable.previousValue &&
-      changes.marketPlaceProductEditable.currentValue &&
-      changes.marketPlaceProductEditable.previousValue.ID !== changes.marketPlaceProductEditable.currentValue.ID
+      changes.superMarketplaceProductEditable &&
+      changes.superMarketplaceProductEditable.previousValue &&
+      changes.superMarketplaceProductEditable.currentValue &&
+      changes.superMarketplaceProductEditable.previousValue.Product.ID !==
+        changes.superMarketplaceProductEditable.currentValue.Product.ID
     ) {
       this.searchTerm = '';
     }
