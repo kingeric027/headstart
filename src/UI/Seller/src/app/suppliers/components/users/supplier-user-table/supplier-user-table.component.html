@@ -15,9 +15,9 @@
   <app-supplier-user-edit class="resource-edit"
                           *ngIf="resourceForm"
                           [resourceForm]="resourceForm"
-                          [supplierID]="supplierID"
                           [resourceInSelection]="resourceInSelection"
                           [filterConfig]="filterConfig"
-                          (updateResource)="updateResource($event)">
+                          (updateResource)="updateResource($event)"
+                          (userGroupAssignments)="captureUserGroupAssignments($event)">
   </app-supplier-user-edit>
 </resource-table-component>

@@ -1,25 +1,34 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { Buyer, OcBuyerService, ProductAssignment, ProductCatalogAssignment, OcCatalogService, User, SecurityProfile, SecurityProfileAssignment, OcSecurityProfileService, MeUser, UserGroup, UserGroupAssignment, OcUserGroupService, OcSupplierUserGroupService, OcSupplierUserService } from '@ordercloud/angular-sdk';
-import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { User, MeUser, UserGroup, UserGroupAssignment, OcSupplierUserGroupService, OcSupplierUserService } from '@ordercloud/angular-sdk';
 import { ProductService } from '@app-seller/shared/services/product/product.service';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { Router } from '@angular/router';
+import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
 
 @Component({
   selector: 'supplier-user-permissions-assignments-component',
   templateUrl: './supplier-user-permissions-assignments.component.html',
   styleUrls: ['./supplier-user-permissions-assignments.component.scss'],
 })
-export class SupplierUserPermissionsAssignments implements OnChanges {
-  @Input() user: MeUser;
-  @Input() set supplierID(ID: string) {
-    console.log('supplierID', ID)
-    this.getSupplierUserGroups(ID);
+export class SupplierUserPermissionsAssignments {
+  @Input() set user(user: User) {
+    this.supplierID = this.supplierService.getParentResourceID();
+    this.supplierID !== '!' && this.getSupplierUserGroups(this.supplierID);
+    if (user?.ID) {
+      this.userID = user.ID
+      this.getSupplierUserGroupAssignments(user.ID, this.supplierID);
+    }
   };
+  @Input() isCreatingNew: boolean;
+  @Output() assignmentsToAdd = new EventEmitter<UserGroupAssignment[]>();
+
+  supplierID: string;
+  userID: string;
   supplierUserGroups: UserGroup[];
   add: UserGroupAssignment[];
   del: UserGroupAssignment[];
-  _supplierUserUserGroupAssignmentsStatic: UserGroupAssignment[];
-  _supplierUserUserGroupAssignmentsEditable: UserGroupAssignment[];
+  _supplierUserUserGroupAssignmentsStatic: UserGroupAssignment[] = [];
+  _supplierUserUserGroupAssignmentsEditable: UserGroupAssignment[] = [];
   areChanges = false;
   requestedUserConfirmation: boolean = false;
   faExclamationCircle = faExclamationCircle;
@@ -27,7 +36,9 @@ export class SupplierUserPermissionsAssignments implements OnChanges {
   constructor(
     private ocSupplierUserGroupService: OcSupplierUserGroupService,
     private ocSupplierUserService: OcSupplierUserService,
-    private productService: ProductService
+    private productService: ProductService,
+    private supplierService: SupplierService,
+    router: Router,
   ) {}
 
   private readonly options = {
@@ -35,11 +46,6 @@ export class SupplierUserPermissionsAssignments implements OnChanges {
       "xp.Type": "UserPermissions"
     }
   };
-
-  ngOnChanges(changes: SimpleChanges) {
-    console.log(changes.user, changes.supplierID)
-    // this.getSupplierUserGroupAssignments(this.user);
-  }
 
   requestUserConfirmation() {
     this.requestedUserConfirmation = true;
@@ -50,64 +56,79 @@ export class SupplierUserPermissionsAssignments implements OnChanges {
     this.supplierUserGroups = groups.Items;
   }
 
-  async getSupplierUserGroupAssignments(user: MeUser): Promise<void> {
-    console.log('USER',user)
+  async getSupplierUserGroupAssignments(userID: any, supplierID: any): Promise<void> {
     const supplierUserGroupAssignments = await this.ocSupplierUserGroupService
-      .ListUserAssignments(this.supplierID, { userID: user.ID})
+      .ListUserAssignments(supplierID, { userID: userID})
       .toPromise();
     this._supplierUserUserGroupAssignmentsStatic = supplierUserGroupAssignments.Items;
     this._supplierUserUserGroupAssignmentsEditable = supplierUserGroupAssignments.Items;
   }
 
-  toggleSupplierUserSecurityProfileAssignment(user: MeUser) {
-    if (this.isAssigned(user)) {
+  toggleSupplierUserUserGroupAssignment(userGroup: UserGroup): void {
+    if (this.isAssigned(userGroup)) {
       this._supplierUserUserGroupAssignmentsEditable = this._supplierUserUserGroupAssignmentsEditable.filter(
-        securityProfileAssignment => securityProfileAssignment.UserID !== user.ID
+        groupAssignment => groupAssignment.UserGroupID !== userGroup.ID
       );
     } else {
-      const newSupplierUserSecurityProfileAssignment = {
-        SupplierID: user.Supplier?.ID,
-        UserID: user.ID,
-        SecurityProfileID: ''
+      const newSupplierUserUserGroupAssignment = {
+        UserID: this.userID,
+        UserGroupID: userGroup.ID
       };
       this._supplierUserUserGroupAssignmentsEditable = [
         ...this._supplierUserUserGroupAssignmentsEditable,
-        newSupplierUserSecurityProfileAssignment,
+        newSupplierUserUserGroupAssignment,
       ];
     }
-    this.checkForSupplierUserSecurityProfileAssignmentChanges();
+    this.checkForSupplierUserUserGroupAssignmentChanges();
   }
 
-  isAssigned(user: MeUser) {
+  addSupplierUserUserGroupAssignment(userGroup: UserGroup): void {
+    if (this.isAssigned(userGroup)) {
+      this._supplierUserUserGroupAssignmentsEditable = this._supplierUserUserGroupAssignmentsEditable.filter(
+        groupAssignment => groupAssignment.UserGroupID !== userGroup.ID
+      );
+    } else {
+      const newSupplierUserUserGroupAssignment = {
+        UserID: 'PENDING',
+        UserGroupID: userGroup.ID
+      };
+      this._supplierUserUserGroupAssignmentsEditable = [
+        ...this._supplierUserUserGroupAssignmentsEditable,
+        newSupplierUserUserGroupAssignment,
+      ];
+    }
+    this.checkForSupplierUserUserGroupAssignmentChanges();
+  }
+
+  isAssigned(userGroup: UserGroup) {
     return (
-      this._supplierUserUserGroupAssignmentsEditable &&
-      this._supplierUserUserGroupAssignmentsEditable.some(
-        securityProfileAssignment => securityProfileAssignment.UserID === user.ID
+      this._supplierUserUserGroupAssignmentsEditable?.some(
+        groupAssignment => groupAssignment.UserGroupID === userGroup.ID
       )
     );
   }
 
-  checkForSupplierUserSecurityProfileAssignmentChanges() {
+  checkForSupplierUserUserGroupAssignmentChanges() {
     this.add = this._supplierUserUserGroupAssignmentsEditable.filter(
-      assignment => !JSON.stringify(this._supplierUserUserGroupAssignmentsStatic).includes(assignment.UserID)
+      assignment => !JSON.stringify(this._supplierUserUserGroupAssignmentsStatic).includes(assignment.UserGroupID)
     );
     this.del = this._supplierUserUserGroupAssignmentsStatic.filter(
-      assignment => !JSON.stringify(this._supplierUserUserGroupAssignmentsEditable).includes(assignment.UserID)
+      assignment => !JSON.stringify(this._supplierUserUserGroupAssignmentsEditable).includes(assignment.UserGroupID)
     );
     this.areChanges = this.add.length > 0 || this.del.length > 0;
     if (!this.areChanges) this.requestedUserConfirmation = false;
+    if (this.isCreatingNew) this.assignmentsToAdd.emit(this.add);
   }
 
-  discardSupplierUserSecurityProfileAssignmentChanges() {
+  discardSupplierUserUserGroupAssignmentChanges() {
     this._supplierUserUserGroupAssignmentsEditable = this._supplierUserUserGroupAssignmentsStatic;
-    this.checkForSupplierUserSecurityProfileAssignmentChanges();
+    this.checkForSupplierUserUserGroupAssignmentChanges();
   }
 
-  async executeSupplierUserSecurityProfileAssignmentRequests(): Promise<void> {
+  async executeSupplierUserUserGroupAssignmentRequests(): Promise<void> {
     this.requestedUserConfirmation = false;
-    // TODO: execute the security profile assignment updates here
-    // await this.supplierUserService.updatesupplierUserGroupAssignments(this.add, this.del);
-    await this.getSupplierUserGroupAssignments(this.user);
-    this.checkForSupplierUserSecurityProfileAssignmentChanges();
+    await this.supplierService.updateSupplierUserUserGroupAssignments(this.supplierID, this.add, this.del);
+    await this.getSupplierUserGroupAssignments(this.userID, this.supplierID);
+    this.checkForSupplierUserUserGroupAssignmentChanges();
   }
 }
