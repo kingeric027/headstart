@@ -66,7 +66,7 @@ export const ocAppConfig: AppConfig = {
     'MPMeSupplierAdmin',
     'MPMeSupplierAddressAdmin',
     'MPMeSupplierUserAdmin',
-    'MPMeSupplierUserGroupAdmin',
+    'MPSupplierUserGroupAdmin',
   ],
 };
 
