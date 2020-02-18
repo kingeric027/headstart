@@ -66,7 +66,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         private decimal SumProposedShipmentCosts(OrderCalculation orderCalculation)
         {
-            return orderCalculation.ProposedShipmentRatesResponse.Select(proposedShipment =>
+            return orderCalculation.ProposedShipmentRatesResponse.ProposedShipments.Select(proposedShipment =>
             {
                 return proposedShipment.ProposedShipmentOptions
                 .First(proposedShipmentOption => proposedShipmentOption.ID == proposedShipment.SelectedProposedShipmentOptionID).Cost;

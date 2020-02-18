@@ -115,15 +115,19 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 		public dynamic ConfigData { get; set; }
 	}
 
+	public class ProposedShipmentRatesResponse
+	{
+		/// <summary>Proposed shipments of the order calculation.</summary> 
+		public IList<ProposedShipment> ProposedShipments { get; set; }
+	}
 	public class OrderCalculation : OrderCloudModel
 	{
 		/// <summary>Order of the order calculation.</summary> 
 		public Order Order { get => GetProp<Order>("Order"); set => SetProp<Order>("Order", value); }
 		/// <summary>Line items of the order calculation.</summary> 
 		public IList<LineItem> LineItems { get => GetProp<IList<LineItem>>("LineItems", new List<LineItem>()); set => SetProp<IList<LineItem>>("LineItems", value); }
-		/// <summary>Proposed shipments of the order calculation.</summary> 
-		public IList<ProposedShipment> ProposedShipmentRatesResponse { get => GetProp<IList<ProposedShipment>>("ProposedShipments", new List<ProposedShipment>()); set => SetProp<IList<ProposedShipment>>("ProposedShipments", value); }
 		/// <summary>Order calculate response of the order calculation.</summary> 
+		public ProposedShipmentRatesResponse ProposedShipmentRatesResponse;
 		public OrderCalculateResponse OrderCalculateResponse { get => GetProp<OrderCalculateResponse>("OrderCalculateResponse"); set => SetProp<OrderCalculateResponse>("OrderCalculateResponse", value); }
 	}
 }
