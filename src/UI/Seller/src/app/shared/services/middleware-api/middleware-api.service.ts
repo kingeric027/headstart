@@ -3,6 +3,9 @@ import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { OcTokenService, Supplier } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { SuperMarketplaceProduct, DRAFT } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { OrchestrationLog } from '@app-seller/reports/models/orchestration-log';
+import { ListPage } from './listPage.interface';
+import { ListArgs } from './listArgs.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -66,6 +69,22 @@ export class MiddlewareAPIService {
   async createSupplier(supplier: Supplier): Promise<Supplier> {
     const url = `${this.baseUrl}/supplier`;
     return await this.http.post(url, supplier, this.headers).toPromise();
+  }
+
+  async listOrchestrationLogs(args: ListArgs): Promise<ListPage<OrchestrationLog>> {
+    return await this.list(`${this.baseUrl}/orchestration/logs`, args);
+  }
+
+  private list<T>(url: string, args: ListArgs): Promise<T> {
+    url = this.addUrlParams(url, args.filters);
+    delete args.filters;
+    url = this.addUrlParams(url, args);
+    return this.http.get<T>(url, this.headers).toPromise();
+  }
+
+  private addUrlParams(baseUrl: string, object: Record<string, any>): string {
+    const fields = Object.entries(object);
+    return fields.reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}?`);
   }
 
   private formify(file: File): FormData {

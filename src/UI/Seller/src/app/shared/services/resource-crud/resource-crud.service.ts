@@ -2,9 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import {
-  ListResource,
   Options,
-  FilterDictionary,
   RequestStatus,
   SUCCESSFUL_WITH_ITEMS,
   ERROR,
@@ -14,11 +12,14 @@ import {
   SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
 } from './resource-crud.types';
+import { ListPage } from '../middleware-api/listPage.interface';
+import { ListFilters } from '../middleware-api/listArgs.interface';
 
 export abstract class ResourceCrudService<ResourceType> {
-  public resourceSubject: BehaviorSubject<ListResource<ResourceType>> = new BehaviorSubject<ListResource<ResourceType>>(
-    { Meta: {}, Items: [] }
-  );
+  public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
+    Meta: {},
+    Items: [],
+  });
   public resourceRequestStatus: BehaviorSubject<RequestStatus> = new BehaviorSubject<RequestStatus>(GETTING_NEW_ITEMS);
   public optionsSubject: BehaviorSubject<Options> = new BehaviorSubject<Options>({});
 
@@ -59,6 +60,12 @@ export abstract class ResourceCrudService<ResourceType> {
       }
     });
   }
+
+  // Can Override
+  async list(args: any[]): Promise<ListPage<ResourceType>> {
+    return await this.ocService.List(...args).toPromise();
+  }
+
   async getMyResource(): Promise<any> {
     console.log('get my resource for this resource not defined');
     return await Promise.resolve('');
@@ -102,7 +109,7 @@ export abstract class ResourceCrudService<ResourceType> {
     // return isSubsequentPage || !areCurrentlyItems ? GETTING_NEW_ITEMS : REFRESHING_ITEMS;
   }
 
-  getSucessStatus(options: Options, resourceResponse: ListResource<ResourceType>): RequestStatus {
+  getSucessStatus(options: Options, resourceResponse: ListPage<ResourceType>): RequestStatus {
     const areFilters = this.areFiltersOnOptions(options);
     const areItems = !!resourceResponse.Items.length;
     if (areItems) return SUCCESSFUL_WITH_ITEMS;
@@ -198,7 +205,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
-    const resourceInList = this.resourceSubject.value.Items.find(i => (i as any).ID === resourceID);
+    const resourceInList = this.resourceSubject.value.Items.find((i: any) => i.ID === resourceID);
     if (resourceInList) {
       return resourceInList;
     } else {
@@ -230,11 +237,11 @@ export abstract class ResourceCrudService<ResourceType> {
     return newResource;
   }
 
-  setNewResources(resourceResponse: ListResource<ResourceType>): void {
+  setNewResources(resourceResponse: ListPage<ResourceType>): void {
     this.resourceSubject.next(resourceResponse);
   }
 
-  addResources(resourceResponse: ListResource<ResourceType>): void {
+  addResources(resourceResponse: ListPage<ResourceType>): void {
     this.resourceSubject.next({
       Meta: resourceResponse.Meta,
       Items: [...this.resourceSubject.value.Items, ...resourceResponse.Items],
@@ -265,7 +272,7 @@ export abstract class ResourceCrudService<ResourceType> {
     this.patchFilterState({ search: searchTerm || undefined });
   }
 
-  addFilters(newFilters: FilterDictionary): void {
+  addFilters(newFilters: ListFilters): void {
     const newFilterDictionary = { ...this.optionsSubject.value.filters, ...newFilters };
     this.patchFilterState({ filters: newFilterDictionary });
   }
@@ -329,10 +336,11 @@ export abstract class ResourceCrudService<ResourceType> {
     this.optionsSubject.next({ sortBy, search, filters, OrderDirection });
   }
 
-  private async listWithStatusIndicator(options: Options, orderDirection = ''): Promise<ListResource<ResourceType>> {
+  private async listWithStatusIndicator(options: Options, orderDirection = ''): Promise<ListPage<ResourceType>> {
     try {
       this.resourceRequestStatus.next(this.getFetchStatus(options));
-      const resourceResponse = await this.ocService.List(...this.createListArgs([options], orderDirection)).toPromise();
+      const args = this.createListArgs([options], orderDirection);
+      const resourceResponse = await this.list(args);
       this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
       return resourceResponse;
     } catch (error) {

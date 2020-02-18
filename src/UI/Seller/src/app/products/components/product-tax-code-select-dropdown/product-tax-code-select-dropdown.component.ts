@@ -1,12 +1,10 @@
 import { Component, Input, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import {
   MarketPlaceProductTaxCode,
-  MarketPlaceProduct,
   SuperMarketplaceProduct,
 } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { faFilter, faHome } from '@fortawesome/free-solid-svg-icons';
-import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 
 @Component({
   selector: 'product-tax-code-select-dropdown',
@@ -15,7 +13,7 @@ import { ListResource } from '@app-seller/shared/services/resource-crud/resource
 })
 export class ProductTaxCodeSelectDropdown implements OnChanges {
   @Input()
-  taxCodes: ListResource<MarketPlaceProductTaxCode>;
+  taxCodes: ListPage<MarketPlaceProductTaxCode>;
   @Input()
   superMarketplaceProductEditable: SuperMarketplaceProduct;
 
@@ -29,7 +27,7 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   searchTerm = '';
-  productTaxCodeSelectDropdownHeight: number = 250;
+  productTaxCodeSelectDropdownHeight = 250;
 
   ngOnChanges(changes: SimpleChanges) {
     if (

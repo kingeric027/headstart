@@ -8,6 +8,7 @@ using Marketplace.Common.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Helpers.Models;
+using Microsoft.Azure.Documents.Client;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Queries
@@ -23,7 +24,7 @@ namespace Marketplace.Common.Queries
 
         public async Task<ListPage<OrchestrationLog>> List(IListArgs args)
         {
-            var query = _store.Query()
+            var query = _store.Query(new FeedOptions() { EnableCrossPartitionQuery = true })
                 .Search(args)
                 .Filter(args)
                 .Sort(args);

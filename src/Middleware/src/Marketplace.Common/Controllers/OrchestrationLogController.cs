@@ -6,7 +6,7 @@ using Marketplace.Helpers;
 
 namespace Marketplace.Common.Controllers
 {
-    [Route("logs")]
+    [Route("orchestration/logs")]
     public class OrchestrationLogController : BaseController
     {
         private readonly IOrchestrationLogCommand _command;
@@ -15,10 +15,10 @@ namespace Marketplace.Common.Controllers
             _command = command;
         }
 
-        [HttpGet, Route("product")]
-        public async Task<dynamic> GetProductLogs(ListArgs<OrchestrationLog> marketplaceListArgs)
+        [HttpGet, Route("")]
+        public async Task<dynamic> List(ListArgs<OrchestrationLog> args)
         {
-            return await _command.GetProductLogs(marketplaceListArgs);
+            return await _command.List(args);
         }
     }
 }

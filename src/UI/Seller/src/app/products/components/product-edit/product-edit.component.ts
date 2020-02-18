@@ -22,10 +22,10 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
+import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
@@ -63,7 +63,7 @@ export class ProductEditComponent implements OnInit {
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
   taxCodeCategorySelected = false;
-  taxCodes: ListResource<MarketPlaceProductTaxCode>;
+  taxCodes: ListPage<MarketPlaceProductTaxCode>;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,

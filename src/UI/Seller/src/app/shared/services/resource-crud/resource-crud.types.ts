@@ -1,20 +1,7 @@
-import { Meta } from '@ordercloud/angular-sdk';
+import { ListArgs } from '../middleware-api/listArgs.interface';
 
-export interface Options {
-  page?: number;
-  sortBy?: string;
-  search?: string;
-  filters?: FilterDictionary;
+export interface Options extends ListArgs {
   OrderDirection?: string;
-}
-
-export interface FilterDictionary {
-  [filterKey: string]: string;
-}
-
-export interface ListResource<ResourceType> {
-  Meta: Meta;
-  Items: ResourceType[];
 }
 
 export const GETTING_NEW_ITEMS = 'GETTING_NEW_ITEMS';

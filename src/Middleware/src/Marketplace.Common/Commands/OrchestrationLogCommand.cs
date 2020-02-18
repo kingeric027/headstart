@@ -8,7 +8,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IOrchestrationLogCommand
     {
-        Task<ListPage<OrchestrationLog>> GetProductLogs(ListArgs<OrchestrationLog> marketplaceListArgs);
+        Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> marketplaceListArgs);
     }
 
     public class OrchestrationLogCommand : IOrchestrationLogCommand
@@ -22,7 +22,7 @@ namespace Marketplace.Common.Commands
             _log = log;
         }
 
-        public async Task<ListPage<OrchestrationLog>> GetProductLogs(ListArgs<OrchestrationLog> marketplaceListArgs)
+        public async Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> marketplaceListArgs)
         {
             var logs = await _log.List(marketplaceListArgs);
             return logs;

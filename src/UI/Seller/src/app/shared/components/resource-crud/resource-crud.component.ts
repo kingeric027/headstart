@@ -5,11 +5,11 @@ import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
-import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
-  resourceList: ListResource<ResourceType> = { Meta: {}, Items: [] };
+  resourceList: ListPage<ResourceType> = { Meta: {}, Items: [] };
 
   // empty string if no resource is selected
   selectedResourceID = '';

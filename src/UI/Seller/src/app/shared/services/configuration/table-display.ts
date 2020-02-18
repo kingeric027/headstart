@@ -260,4 +260,14 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     ],
     imgPath: '',
   },
+  orchestrationLogs: {
+    fields: [
+      {
+        path: 'id',
+        header: 'ID',
+        type: BASIC_STRING,
+      },
+    ],
+    imgPath: '',
+  },
 };

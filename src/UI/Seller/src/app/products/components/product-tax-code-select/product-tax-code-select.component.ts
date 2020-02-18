@@ -2,10 +2,9 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import {
   MarketPlaceProductTaxCode,
-  MarketPlaceProduct,
   SuperMarketplaceProduct,
 } from '@app-seller/shared/models/MarketPlaceProduct.interface';
-import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 
 @Component({
   selector: 'product-tax-code-select-component',
@@ -18,7 +17,7 @@ export class ProductTaxCodeSelect {
   @Input()
   superMarketplaceProductEditable: SuperMarketplaceProduct;
   @Input()
-  taxCodes: ListResource<MarketPlaceProductTaxCode>;
+  taxCodes: ListPage<MarketPlaceProductTaxCode>;
   @Output()
   handleTaxCodeCategorySelection = new EventEmitter<any>();
   @Output()
@@ -33,7 +32,7 @@ export class ProductTaxCodeSelect {
   }
 
   handleSelectTaxCode(taxCodeSelection: MarketPlaceProductTaxCode): void {
-    let event = {
+    const event = {
       target: {
         value: taxCodeSelection,
       },
