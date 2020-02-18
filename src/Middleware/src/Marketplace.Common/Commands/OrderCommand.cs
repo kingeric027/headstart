@@ -33,8 +33,13 @@ namespace Marketplace.Common.Commands
         public async Task HandleBuyerOrderSubmit(string orderId)
         {
             var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderId);
+<<<<<<< refs/remotes/origin/dev
             await _taxCommand.HandleTransactionCreation(buyerOrder);
             var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrder);
+=======
+            //await _taxCommand.HandleTransactionCreation(buyerOrder);
+            await _zoho.CreateSalesOrder(buyerOrder);
+>>>>>>> order calculate in shipping integration wip
             
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderId);
             var supplierOrders = orderSplitResult.OutgoingOrders;

@@ -20,10 +20,10 @@ namespace Marketplace.Common.Controllers
 		}
 
 		// Needs more authentication. These methods should only work for a specific user's orders.
-		[HttpPost, Route(""), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<MarketplaceOrder> ApplyTaxEstimate(string orderID)
-		{
-			return await _taxCommand.ApplyTaxEstimate(orderID);
-		}
+		//[HttpPost, Route(""), MarketplaceUserAuth(ApiRole.Shopper)]
+		//public async Task<MarketplaceOrder> ApplyTaxEstimate(string orderID)
+		//{
+		//	return await _taxCommand.ApplyTaxEstimate(orderID);
+		//}
 	}
 }

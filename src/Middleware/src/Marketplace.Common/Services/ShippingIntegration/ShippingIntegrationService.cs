@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
@@ -14,18 +15,21 @@ namespace Marketplace.Common.Services.ShippingIntegration
 {
     public interface IOCShippingIntegration
     {
-        Task<List<ProposedShipment>> GetRatesAsync(OrderCalculation orderCalculation);
+        Task<ProposedShipmentResponse> GetRatesAsync(OrderCalculation orderCalculation);
+        Task<OrderCalculateResponse> CalculateOrder(OrderCalculation orderCalculation);
     }
 
     public class OCShippingIntegration : IOCShippingIntegration
     {
         readonly IFreightPopService _freightPopService;
-        public OCShippingIntegration(IFreightPopService freightPopService)
+        private readonly IAvataxService _avatax;
+        public OCShippingIntegration(IFreightPopService freightPopService, IAvataxService avatax)
         {
             _freightPopService = freightPopService;
+            _avatax = avatax;
         }
 
-        public async Task<List<ProposedShipment>> GetRatesAsync(OrderCalculation orderCalculation)
+        public async Task<ProposedShipmentResponse> GetRatesAsync(OrderCalculation orderCalculation)
         {
             var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(orderCalculation.LineItems);
             Require.That(productIDsWithInvalidDimensions.Count == 0, Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
@@ -40,7 +44,33 @@ namespace Marketplace.Common.Services.ShippingIntegration
             var tasks = proposedShipmentRequests.Select(p => p.RateResponseTask);
             await Task.WhenAll(tasks);
 
-            return proposedShipmentRequests.Select(proposedShipmentRequest => ProposedShipmentMapper.Map(proposedShipmentRequest)).ToList();
+            var proposedShipments = proposedShipmentRequests.Select(proposedShipmentRequest => ProposedShipmentMapper.Map(proposedShipmentRequest)).ToList();
+            return new ProposedShipmentResponse()
+            {
+                ProposedShipments = proposedShipments
+            };
+        }
+
+        public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculation orderCalculation)
+        {
+            var totalTax = await _avatax.GetTaxEstimateAsync(orderCalculation);
+            var totalShippingCost = SumProposedShipmentCosts(orderCalculation);
+
+            return new OrderCalculateResponse
+            {
+                TaxTotal = totalTax,
+                ShippingTotal = totalShippingCost,
+            };
+
+        }
+
+        private decimal SumProposedShipmentCosts(OrderCalculation orderCalculation)
+        {
+            return orderCalculation.ProposedShipmentRatesResponse.Select(proposedShipment =>
+            {
+                return proposedShipment.ProposedShipmentOptions
+                .First(proposedShipmentOption => proposedShipmentOption.ID == proposedShipment.SelectedProposedShipmentOptionID).Cost;
+            }).Sum();
         }
 
         private List<string> GetProductsWithInvalidDimensions(IList<LineItem> lineItems)

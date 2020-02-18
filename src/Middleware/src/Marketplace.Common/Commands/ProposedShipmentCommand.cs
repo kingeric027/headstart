@@ -61,12 +61,12 @@ namespace Marketplace.Common.Commands
 
             return new ListPage<ProposedShipment>()
             {
-                Items = proposedShipments,
+                Items = new List<ProposedShipment>(),
                 Meta = new ListPageMeta
                 {
                     Page = 1,
                     PageSize = 100,
-                    TotalCount = proposedShipments.Count(),
+                    TotalCount = 0,
                 }
             };
         }

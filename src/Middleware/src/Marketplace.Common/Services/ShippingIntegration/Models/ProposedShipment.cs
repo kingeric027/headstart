@@ -9,9 +9,15 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 
 	public class ProposedShipmentRequest
 	{
+		public string ID { get; set; }
 		public List<ProposedShipmentItem> ProposedShipmentItems { get; set; }
 		public RateRequestBody RateRequestBody { get; set; }
 		public Task<Response<GetRatesData>> RateResponseTask { get; set; }
+	}
+
+	public class ProposedShipmentResponse
+	{
+		public List<ProposedShipment> ProposedShipments { get; set; }
 	}
 
 	// tentative model for a propsed shipments
@@ -106,6 +112,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 	public class OrderCalculationRequest
 	{
 		public OrderCalculation OrderCalculation { get; set; }
+		public dynamic ConfigData { get; set; }
 	}
 
 	public class OrderCalculation : OrderCloudModel
@@ -115,7 +122,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 		/// <summary>Line items of the order calculation.</summary> 
 		public IList<LineItem> LineItems { get => GetProp<IList<LineItem>>("LineItems", new List<LineItem>()); set => SetProp<IList<LineItem>>("LineItems", value); }
 		/// <summary>Proposed shipments of the order calculation.</summary> 
-		public IList<ProposedShipment> ProposedShipments { get => GetProp<IList<ProposedShipment>>("ProposedShipments", new List<ProposedShipment>()); set => SetProp<IList<ProposedShipment>>("ProposedShipments", value); }
+		public IList<ProposedShipment> ProposedShipmentRatesResponse { get => GetProp<IList<ProposedShipment>>("ProposedShipments", new List<ProposedShipment>()); set => SetProp<IList<ProposedShipment>>("ProposedShipments", value); }
 		/// <summary>Order calculate response of the order calculation.</summary> 
 		public OrderCalculateResponse OrderCalculateResponse { get => GetProp<OrderCalculateResponse>("OrderCalculateResponse"); set => SetProp<OrderCalculateResponse>("OrderCalculateResponse", value); }
 	}

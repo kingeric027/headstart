@@ -6,6 +6,7 @@ using Flurl.Http;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Helpers;
@@ -34,6 +35,7 @@ namespace Marketplace.Shipping
                 .ConfigureWebApiServices(_settings, "v1", "Marketplace API")
                 .Inject<IFlurlClient>()
                 .Inject<IOCShippingIntegration>()
+                .Inject<IAvataxService>()
                 .Inject<IFreightPopService>()
                 .Inject<IProposedShipmentCommand>()
                 .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");

@@ -13,6 +13,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
                 var proposedShipmentItems = obj.Select(lineItem => ProposedShipmentItemMapper.Map(lineItem)).ToList();
                 return new ProposedShipmentRequest
                 {
+                    ID = obj[0].ShipFromAddressID,
                     ProposedShipmentItems = proposedShipmentItems,
                     RateRequestBody = RateRequestBodyMapper.Map(obj),
                 };
