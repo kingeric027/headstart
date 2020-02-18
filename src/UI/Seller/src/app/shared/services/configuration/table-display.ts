@@ -239,11 +239,6 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
   categories: {
     fields: [
       {
-        path: 'ListOrder',
-        header: 'Order',
-        type: BASIC_STRING,
-      },
-      {
         path: 'Name',
         header: 'Name',
         type: BASIC_STRING,

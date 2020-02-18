@@ -7,13 +7,17 @@
     </div>
     <div class="p-2">
     <span class="ml-3 d-flex flex-column justify-content-center">
-      <div class="h6">{{_primaryHeader}}</div>
-      <div>{{_secondaryHeader}}</div>
+      <div class="h6" 
+          [style.marginLeft.px]="getIndent()">{{_primaryHeader}}</div>
+      <div [style.marginLeft.px]="getIndent()">{{_secondaryHeader}}</div>
       <div>{{isNewPlaceHolder}}</div>
     </span>
     </div>
     <div *ngIf="_isExpandable" class="ml-auto p-2 align-self-center">
-      <button ngbDropdownItem>
-        <fa-icon [icon]="faChevronDown"></fa-icon>
+      <button ngbDropdownItem
+              (click)="toggleNestedResources()"  
+      >
+        <fa-icon *ngIf="!_isResourceExpanded" [icon]="faChevronDown"></fa-icon>
+        <fa-icon *ngIf="_isResourceExpanded" [icon]="faChevronUp"></fa-icon>
       </button>
   </div>

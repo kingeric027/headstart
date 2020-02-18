@@ -216,7 +216,10 @@
                     [ngClass]="{'selected-resource': selectedResourceID === resource.ID}">
                   <td>
                     <summary-resource-display-component [resource]="resource"
-                                                        [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel">
+                                                        [resourceList]="resourceList"
+                                                        [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel"
+                                                        [resourceID]="selectedParentResourceID"
+>
                     </summary-resource-display-component>
                   </td>
                 </tr>
