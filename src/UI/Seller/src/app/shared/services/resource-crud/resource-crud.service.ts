@@ -123,7 +123,6 @@ export abstract class ResourceCrudService<ResourceType> {
   ): Promise<ListResource<ResourceType>> {
     try {
       this.resourceRequestStatus.next(this.getFetchStatus(options));
-      // options.filters.depth = 'all'; //NEED TO PASS OPTIONS.FILTERS TO CHANGE API CALLS
       const resourceResponse = await this.ocService.List(...this.createListArgs([options], orderDirection)).toPromise();
       this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
       return resourceResponse;
