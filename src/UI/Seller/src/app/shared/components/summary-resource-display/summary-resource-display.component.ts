@@ -44,6 +44,10 @@ export class SummaryResourceDisplay implements OnChanges {
   set resource(value: any) {
     this._resource = value;
   }
+  @Input()
+  set parentResourceID(value: any) {
+    this._parentResourceID = value;
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.resourceType?.firstChange) {
@@ -52,11 +56,6 @@ export class SummaryResourceDisplay implements OnChanges {
     if (changes.resource?.firstChange) {
       this.setDisplayValuesForResource(changes.resource.currentValue);
     }
-  }
-
-  @Input()
-  set parentResourceID(value: any) {
-    this._parentResourceID = value;
   }
 
   constructor(private ocCategoryService: OcCategoryService) {}
@@ -104,7 +103,6 @@ export class SummaryResourceDisplay implements OnChanges {
 
   //Further indent display of subsequent categorical tiers
   getIndent() {
-
     let depthCount = -1;
     return !this._resource?.ParentID ? 0 : this.getResourceDepth(this._resource, depthCount);
   }
