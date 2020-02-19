@@ -17,16 +17,16 @@ export class OCMOrderApproval  implements OnInit {
 
   constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.form = new FormGroup({ comments: new FormControl('') });
   }
 
-  openModal(approved: boolean) {
+  openModal(approved: boolean): void {
     this.approved = approved;
     this.approveModal = ModalState.Open;
   }
 
-  async submitReview() {
+  async submitReview(): Promise<void> {
     const comments = this.form.value.comments;
     if (this.approved) {
       await this.context.orderHistory.approveOrder(this.orderID, comments);

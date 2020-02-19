@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Marketplace.Common.Helpers;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -35,22 +36,22 @@ namespace Marketplace.Common.Services
         }
         public async Task SendSupplierEmails(string orderID)
         {
-            try
-            {
-                var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
-                lineItems.Items
-                    .Select(item => item.SupplierID)
-                        .Distinct()
-                        .ToList()
-                        .ForEach(async supplier =>
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
+            lineItems.Items
+                .Select(item => item.SupplierID)
+                    .Distinct()
+                    .ToList()
+                    .ForEach(async supplier =>
+                    {
+                        MarketplaceSupplier supplierInfo = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplier);
+
+                        // the email that will be sent a notification of the email for the supplier may not be found on xp.Supportcontact in the future
+                        var emailRecipient = supplierInfo.xp.SupportContact.Email;
+                        if (emailRecipient.Length > 0)
                         {
-                            Supplier supplierInfo = await _oc.Suppliers.GetAsync(supplier);
-                            await SendSingleEmail("noreply@four51.com", supplierInfo.xp.Contacts[0].Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>");
-                        });
-            } catch (Exception)
-            {
-                // preventing supplierInfo xp null reference exceptions temporarily
-            }
+                            await SendSingleEmail("noreply@four51.com", emailRecipient, "Order Confirmation", "<h1>this is a test email for order submit</h1>");
+                        }
+                    });
         }
     }
 }

@@ -19,13 +19,13 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[HttpPost, Route("images/product/{productID}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-		public async Task<Product> UploadProductImages(IFormFile file, string marketplaceID, string productID)
+		public async Task<SuperMarketplaceProduct> UploadProductImages(IFormFile file, string marketplaceID, string productID)
 		{
 			return await _content.UploadProductImage(file, marketplaceID, productID, VerifiedUserContext.AccessToken);
 		}
 
 		[HttpDelete, Route("images/product/{productID}/{fileName}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-		public async Task<Product> DeleteProductImages(string marketplaceID, string productID, string fileName)
+		public async Task<SuperMarketplaceProduct> DeleteProductImages(string marketplaceID, string productID, string fileName)
 		{
 			return await _content.DeleteProductImage(marketplaceID, productID, fileName, VerifiedUserContext.AccessToken);
 		}

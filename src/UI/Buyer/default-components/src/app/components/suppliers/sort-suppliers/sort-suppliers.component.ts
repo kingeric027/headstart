@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { takeWhile } from 'rxjs/operators';
 import { ShopperContextService } from 'marketplace';
@@ -15,29 +15,29 @@ export class OCMSupplierSort implements OnInit, OnDestroy {
 
   constructor(private context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.form = new FormGroup({ sortBy: new FormControl(null) });
     this.context.supplierFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(filters => {
       this.setForm(filters.sortBy);
     });
   }
 
-  private setForm(sortBy: string) {
-    sortBy = sortBy || null;
-    this.form.setValue({ sortBy });
-  }
-
-  sortStrategyChanged() {
+  sortStrategyChanged(): void {
     const sortValue = this.form.get('sortBy').value;
     this.context.supplierFilters.sortBy(sortValue);
     this.closePopoverEvent.emit();
   }
 
-  cancelFilters() {
+  cancelFilters(): void {
     this.closePopoverEvent.emit();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
+  }
+
+  private setForm(sortBy: string): void {
+    sortBy = sortBy || null;
+    this.form.setValue({ sortBy });
   }
 }

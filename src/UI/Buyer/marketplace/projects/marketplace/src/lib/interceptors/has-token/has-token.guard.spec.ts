@@ -108,12 +108,12 @@ describe('HasTokenGuard', () => {
   describe('isTokenValid', () => {
     it('should return false if token does not exist', () => {
       mockAccessToken = null;
-      const isTokenValid = guard['isTokenValid']();
+      const isTokenValid = guard.isTokenValid();
       expect(isTokenValid).toBe(false);
     });
     it('it should return false if token can not be parsed', () => {
       mockAccessToken = 'cant_parse_this_hammertime';
-      const isTokenValid = guard['isTokenValid']();
+      const isTokenValid = guard.isTokenValid();
       expect(isTokenValid).toBe(false);
     });
     describe('expiration time', () => {
@@ -123,7 +123,7 @@ describe('HasTokenGuard', () => {
         const lessThanCurrentTime =
           'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c3IiOiJhbm9uX3VzZXIiLCJjaWQiOiI4MDIxODkzNi0zNTBiLTQxMDUtYTFmYy05NjJhZjAyM2Q2NjYiLCJvcmRlcmlkIjoiSVlBSnFOWVVpRVdyTy1Lei1TalpqUSIsInVzcnR5cGUiOiJidXllciIsInJvbGUiOlsiQnV5ZXJSZWFkZXIiLCJNZUFkbWluIiwiTWVDcmVkaXRDYXJkQWRtaW4iLCJNZUFkZHJlc3NBZG1pbiIsIk1lWHBBZG1pbiIsIlBhc3N3b3JkUmVzZXQiLCJTaGlwbWVudFJlYWRlciIsIlNob3BwZXIiLCJBZGRyZXNzUmVhZGVyIl0sImlzcyI6Imh0dHBzOi8vYXV0aC5vcmRlcmNsb3VkLmlvIiwiYXVkIjoiaHR0cHM6Ly9hcGkub3JkZXJjbG91ZC5pbyIsImV4cCI6MTUyNjQ5NzYyMCwibmJmIjoxNTI2NDkyOTQzfQ.W1GyDrOUyRxs8GZSiW0jk__37Cv98t2A_u7AK2PaMtU';
         mockAccessToken = lessThanCurrentTime;
-        const isTokenValid = guard['isTokenValid']();
+        const isTokenValid = guard.isTokenValid();
         expect(isTokenValid).toBe(false);
       });
       it('should return true if expiresIn time is greater than current time', () => {
@@ -132,7 +132,7 @@ describe('HasTokenGuard', () => {
         const greaterThanCurrentTime =
           'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c3IiOiJhbm9uX3VzZXIiLCJjaWQiOiI4MDIxODkzNi0zNTBiLTQxMDUtYTFmYy05NjJhZjAyM2Q2NjYiLCJvcmRlcmlkIjoiSVlBSnFOWVVpRVdyTy1Lei1TalpqUSIsInVzcnR5cGUiOiJidXllciIsInJvbGUiOlsiQnV5ZXJSZWFkZXIiLCJNZUFkbWluIiwiTWVDcmVkaXRDYXJkQWRtaW4iLCJNZUFkZHJlc3NBZG1pbiIsIk1lWHBBZG1pbiIsIlBhc3N3b3JkUmVzZXQiLCJTaGlwbWVudFJlYWRlciIsIlNob3BwZXIiLCJBZGRyZXNzUmVhZGVyIl0sImlzcyI6Imh0dHBzOi8vYXV0aC5vcmRlcmNsb3VkLmlvIiwiYXVkIjoiaHR0cHM6Ly9hcGkub3JkZXJjbG91ZC5pbyIsImV4cCI6MTUyNjQ5NzYyMSwibmJmIjoxNTI2NDkyOTQzfQ.EQ587x_hiCLu0hW6zTp-XxcXDUZdJjB5wFYC_RYqsf0';
         mockAccessToken = greaterThanCurrentTime;
-        const isTokenValid = guard['isTokenValid']();
+        const isTokenValid = guard.isTokenValid();
         expect(isTokenValid).toBe(true);
       });
     });

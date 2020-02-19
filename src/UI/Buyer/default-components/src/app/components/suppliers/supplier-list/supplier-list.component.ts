@@ -1,5 +1,5 @@
-import { Component, Input, OnChanges, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { ListSupplier, Supplier } from '@ordercloud/angular-sdk';
+import { Component, Input, OnChanges, ViewChild, OnDestroy } from '@angular/core';
+import { ListSupplier } from '@ordercloud/angular-sdk';
 import { faTimes, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -33,11 +33,11 @@ export class OCMSupplierList implements OnChanges, OnDestroy {
       .subscribe(this.handleFiltersChange);
   }
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     this.activeFilterCount = Object.keys(this.context.supplierFilters.activeFiltersSubject.value.activeFilters).length;
   }
 
-  setForm() {
+  setForm(): void {
     const formGroup = {};
     this._supplierCategoryConfig.Filters.forEach(filter => {
       formGroup[filter.Path] = new FormControl('');
@@ -45,16 +45,7 @@ export class OCMSupplierList implements OnChanges, OnDestroy {
     this.filterForm = new FormGroup(formGroup);
   }
 
-  private handleFiltersChange = (filters: SupplierFilters) => {
-    if (filters.activeFilters) {
-      this.searchTermForSuppliers = filters.search || '';
-      this._supplierCategoryConfig.Filters.forEach(filter => {
-        this.filterForm.controls[filter.Path].setValue(filters.activeFilters[filter.Path]);
-      });
-    }
-  }
-
-  searchSuppliers(searchStr: string) {
+  searchSuppliers(searchStr: string): void {
     this.searchTermForSuppliers = searchStr;
     this.context.supplierFilters.searchBy(searchStr);
   }
@@ -64,7 +55,7 @@ export class OCMSupplierList implements OnChanges, OnDestroy {
     window.scrollTo(0, null);
   }
 
-  applyFilters() {
+  applyFilters(): void {
     const filters = {};
     this._supplierCategoryConfig.Filters.forEach(filter => {
       filters[filter.Path] = this.filterForm.value[filter.Path];
@@ -73,19 +64,28 @@ export class OCMSupplierList implements OnChanges, OnDestroy {
     this.popover.close();
   }
 
-  clearFilters() {
+  clearFilters(): void {
     this.context.supplierFilters.clearAllFilters();
   }
 
-  openPopover() {
+  openPopover(): void {
     this.popover.open();
   }
 
-  closePopover() {
+  closePopover(): void {
     this.popover.close();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
+  }
+
+  private handleFiltersChange = (filters: SupplierFilters): void => {
+    if (filters.activeFilters) {
+      this.searchTermForSuppliers = filters.search || '';
+      this._supplierCategoryConfig.Filters.forEach(filter => {
+        this.filterForm.controls[filter.Path].setValue(filters.activeFilters[filter.Path]);
+      });
+    }
   }
 }

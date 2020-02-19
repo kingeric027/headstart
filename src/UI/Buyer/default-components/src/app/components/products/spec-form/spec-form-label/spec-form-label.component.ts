@@ -24,5 +24,5 @@ export class SpecFormLabelComponent implements Field, OnInit {
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 }

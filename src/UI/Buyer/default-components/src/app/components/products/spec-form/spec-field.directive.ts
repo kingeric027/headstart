@@ -24,7 +24,7 @@ export class SpecFieldDirective implements Field, OnChanges, OnInit {
 
   constructor(private resolver: ComponentFactoryResolver, private container: ViewContainerRef) {}
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     if (this.component) {
       this.component.instance.config = this.config;
       this.component.instance.group = this.group;
@@ -32,7 +32,7 @@ export class SpecFieldDirective implements Field, OnChanges, OnInit {
     }
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (!this.components[this.config.type]) {
       const supportedTypes = Object.keys(this.components).join(', ');
       throw new Error(

@@ -18,7 +18,7 @@
             [attr.disabled]="disabled ? '' : null"
             formControlName="quantity"
             id="quantity">
-      <option *ngFor="let qty of limits.restrictedQuantities"
+      <option *ngFor="let qty of restrictedQuantities"
               [value]="qty">
         {{ qty }}
       </option>

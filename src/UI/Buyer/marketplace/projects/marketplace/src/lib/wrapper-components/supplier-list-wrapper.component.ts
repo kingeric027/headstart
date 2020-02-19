@@ -25,7 +25,7 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
     public context: ShopperContextService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.suppliers = this.activatedRoute.snapshot.data.products;
     this.getSupplierCategories();
     this.context.supplierFilters.activeFiltersSubject
@@ -33,16 +33,18 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
       .subscribe(this.handleFiltersChange);
   }
 
-  private handleFiltersChange = async () => {
+  ngOnDestroy(): void {
+    this.alive = false;
+  }
+
+  private handleFiltersChange = async (): Promise<void> => {
     this.suppliers = await this.context.supplierFilters.listSuppliers();
   }
 
-  private getSupplierCategories = async () => {
+  private getSupplierCategories = async (): Promise<void> => {
     this.supplierCategoryConfig = await this.middleware.getMarketplaceSupplierCategories(
       this.context.appSettings.marketplaceID
     );
   }
-  ngOnDestroy() {
-    this.alive = false;
-  }
+
 }

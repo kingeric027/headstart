@@ -1,6 +1,6 @@
 <div class="container-fluid">
-  <product-visibility-assignments-component *ngIf="_marketPlaceProduct"
-                                            [product]="_marketPlaceProduct">
+  <product-visibility-assignments-component *ngIf="_superMarketplaceProduct"
+                                            [product]="_superMarketplaceProduct.Product">
   </product-visibility-assignments-component>
   <!-- Product Details -->
   <div class="row pt-3">
@@ -10,18 +10,18 @@
     </div>
     <div class="col-md-7">
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Name</label>
-      <p>{{_marketPlaceProduct?.Name}}</p>
+      <p>{{_superMarketplaceProduct?.Product?.Name}}</p>
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Supplier</label>
       <p>{{supplier?.Name}}</p>
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Description</label>
-      <p [innerHtml]="_marketPlaceProduct?.Description"></p>
+      <p [innerHtml]="_superMarketplaceProduct?.Product?.Description"></p>
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Quantity Multiplier</label>
-      <p>{{_marketPlaceProduct?.QuantityMultiplier}}</p>
+      <p>{{_superMarketplaceProduct?.Product?.QuantityMultiplier}}</p>
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Default Price</label>
-      <p>{{_marketPlaceProduct?.PriceSchedule?.PriceBreaks[0]?.Price | currency}}</p>
+      <p>{{_superMarketplaceProduct?.PriceSchedule?.PriceBreaks[0]?.Price | currency}}</p>
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Tax Code</label>
-      <p *ngIf="_marketPlaceProduct?.xp?.TaxCode">{{_marketPlaceProduct?.xp?.TaxCode?.TaxCode}}: {{_marketPlaceProduct?.xp?.TaxCode?.Description}}</p>
-      <p *ngIf="!_marketPlaceProduct?.xp?.TaxCode">No Tax Code</p>
+      <p *ngIf="_superMarketplaceProduct?.Product?.xp?.Tax">{{_superMarketplaceProduct?.Product?.xp?.Tax?.Code}}: {{_superMarketplaceProduct?.Product?.xp?.Tax?.Description}}</p>
+      <p *ngIf="!_superMarketplaceProduct?.Product?.xp?.Tax">No Tax Code</p>
     </div>
   </div>
   <!-- /Product Details -->
@@ -33,25 +33,25 @@
     </div>
     <div class="col-md-7">
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Ship-From Address</label>
-      <p>{{_marketPlaceProduct?.ShipFromAddressID}}</p>
+      <p>{{_superMarketplaceProduct?.Product?.ShipFromAddressID}}</p>
       <div class="row">
         <div class="col-md-6">
           <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Ship Height</label>
-          <p>{{_marketPlaceProduct?.ShipHeight}}</p>
+          <p>{{_superMarketplaceProduct?.Product?.ShipHeight}}</p>
         </div>
         <div class="col-md-6">
           <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Ship Width</label>
-          <p>{{_marketPlaceProduct?.ShipWidth}}</p>
+          <p>{{_superMarketplaceProduct?.Product?.ShipWidth}}</p>
         </div>
       </div>
       <div class="row">
         <div class="col-md-6">
           <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Ship Length</label>
-          <p>{{_marketPlaceProduct?.ShipLength}}</p>
+          <p>{{_superMarketplaceProduct?.Product?.ShipLength}}</p>
         </div>
         <div class="col-md-6">
           <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Ship Weight</label>
-          <p>{{_marketPlaceProduct?.ShipWeight}}</p>
+          <p>{{_superMarketplaceProduct?.Product?.ShipWeight}}</p>
         </div>
       </div>
     </div>

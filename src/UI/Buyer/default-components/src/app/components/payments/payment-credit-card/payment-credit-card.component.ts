@@ -11,29 +11,29 @@ export interface CheckoutCreditCardOutput {
 
 @Component({
   templateUrl: './payment-credit-card.component.html',
-  styleUrls: ['./payment-credit-card.component.scss']
+  styleUrls: ['./payment-credit-card.component.scss'],
 })
 export class OCMPaymentCreditCard implements OnInit {
   showNewCCForm = false;
 
-  @Input() cards: ListBuyerCreditCard; 
+  @Input() cards: ListBuyerCreditCard;
   @Output() cardSelected = new EventEmitter<CheckoutCreditCardOutput>();
-  form = new FormGroup({ 
-    cardID: new FormControl(null, Validators.required), 
-    cvv: new FormControl('', Validators.required) 
+  form = new FormGroup({
+    cardID: new FormControl(null, Validators.required),
+    cvv: new FormControl('', Validators.required),
   });
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 
-  submit(output: CreditCardFormOutput) {
+  submit(output: CreditCardFormOutput): void {
     const cardID = this.form.value.cardID;
     const savedCard = this.cards.Items.find(c => c.ID === cardID);
     this.cardSelected.emit({ savedCard, cvv: output.cvv, newCard: output.card });
   }
 
-  toggleShowCCForm(event) {
+  toggleShowCCForm(event): void {
     this.showNewCCForm = event.target.value === 'new';
   }
 }

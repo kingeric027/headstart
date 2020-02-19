@@ -1,5 +1,5 @@
 // core services
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MarketplaceRoutingModule, MyOrdersWrapperComponent, OrdersToApproveWrapperComponent } from './marketplace-routing.module';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';

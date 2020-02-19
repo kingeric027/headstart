@@ -19,7 +19,7 @@ export class OCMOrderDetails implements OnInit {
 
   constructor(private context: ShopperContextService, private modalService: NgbModal) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.orderDetails = await this.context.orderHistory.getOrderDetails();
     this.order = this.orderDetails.order;
     const url = this.context.router.getActiveUrl();
@@ -27,9 +27,9 @@ export class OCMOrderDetails implements OnInit {
     this.validateReorder(this.order.ID);
   }
 
-  async open(content) {
+  open(content: HTMLTemplateElement): void {
     if (this.reorderResponse) {
-      await this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
+      this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
     }
   }
 
@@ -42,17 +42,21 @@ export class OCMOrderDetails implements OnInit {
     return this.context.currentUser.favoriteOrderIDs.includes(orderID);
   }
 
-  toggleFavorite(order: MarketplaceOrder) {
+  toggleFavorite(order: MarketplaceOrder): void {
     const newValue = !this.isFavorite(order.ID);
     this.context.currentUser.setIsFavoriteOrder(newValue, order.ID);
   }
 
-  toShipments() {
+  toShipments(): void {
     this.subView = 'shipments';
   }
 
-  toDetails() {
+  toDetails(): void {
     this.subView = 'details';
+  }
+
+  toAllOrders(): void {
+    this.context.router.toMyOrders();
   }
 
   showShipments(): boolean {
@@ -65,16 +69,16 @@ export class OCMOrderDetails implements OnInit {
 
   updateMessage(response: OrderReorderResponse): void {
     if (response.InvalidLi.length && !response.ValidLi.length) {
-      this.message.string = `None of the line items on this order are available for reorder.`;
+      this.message.string = 'None of the line items on this order are available for reorder.';
       this.message.classType = 'danger';
       return;
     }
     if (response.InvalidLi.length && response.ValidLi.length) {
-      this.message.string = `<strong>Warning</strong> The following line items are not available for reorder, clicking add to cart will <strong>only</strong> add valid line items.`;
+      this.message.string = '<strong>Warning</strong> The following line items are not available for reorder, clicking add to cart will <strong>only</strong> add valid line items.';
       this.message.classType = 'warning';
       return;
     }
-    this.message.string = `All line items are valid to reorder`;
+    this.message.string = 'All line items are valid to reorder';
     this.message.classType = 'success';
   }
 

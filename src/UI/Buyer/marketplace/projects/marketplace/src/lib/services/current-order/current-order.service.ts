@@ -19,7 +19,7 @@ import { isUndefined as _isUndefined, get as _get } from 'lodash';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { listAll } from '../../functions/listAll';
-import { AppConfig, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection, CreditCardToken } from '../../shopper-context';
+import { AppConfig, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection, CreditCardToken, ListProposedShipment } from '../../shopper-context';
 import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
 
 export interface ICurrentOrder {
@@ -45,7 +45,7 @@ export interface ICurrentOrder {
   setBillingAddressByID(addressID: string): Promise<MarketplaceOrder>;
   setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
 
-  getProposedShipments(): Promise<ProposedShipment[]>;
+  getProposedShipments(): Promise<ListProposedShipment>;
   selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder>;
   calculateTax(): Promise<MarketplaceOrder>;
   authOnlyOnetimeCreditCard(card: CreditCardToken, cvv: string): Promise<Payment>;
@@ -251,7 +251,7 @@ export class CurrentOrderService implements ICurrentOrder {
 
   // Integration Methods
 
-  async getProposedShipments(): Promise<ProposedShipment[]> {
+  async getProposedShipments(): Promise<ListProposedShipment> {
     return await this.middlewareApi.getProposedShipments(this.order.ID);
   }
 
