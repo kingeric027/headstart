@@ -371,7 +371,7 @@ namespace Marketplace.Common.Commands
 
 
         static readonly List<SecurityProfile> DefaultSecurityProfiles = new List<SecurityProfile>() {
-            new SecurityProfile(){ Name = "MPMeProductAdmin", CustomRoles = { "MPMeProductAdmin" }, ID = "MPMeProductAdmin", Roles = { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin, ApiRole.InventoryAdmin } },
+            new SecurityProfile(){ Name = "MPMeProductAdmin", CustomRoles = { "MPMeProductAdmin" }, ID = "MPMeProductAdmin", Roles = { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin, ApiRole.InventoryAdmin, ApiRole.SupplierAddressReader } },
             new SecurityProfile(){ Name = "MPMeProductReader", CustomRoles = { "MPMeProductReader" }, ID = "MPMeProductReader", Roles = { ApiRole.ProductReader, ApiRole.PriceScheduleReader } },
             new SecurityProfile(){ Name = "MPProductAdmin", CustomRoles = { "MPProductAdmin" }, ID = "MPProductAdmin", Roles = { ApiRole.ProductReader, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin } },
             new SecurityProfile(){ Name = "MPProductReader", CustomRoles = { "MPProductReader" }, ID = "MPProductReader", Roles = { ApiRole.ProductReader, ApiRole.CatalogReader, ApiRole.ProductFacetReader} },
