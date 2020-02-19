@@ -3,6 +3,7 @@ using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
 using Marketplace.Helpers.Models;
 using Marketplace.Models.Models.Marketplace;
+using Marketplace.Models.Models.Misc;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -110,53 +111,53 @@ namespace Marketplace.Common.Commands
             }, token);
             // Define Marketplace Security Profiles for each Supplier User Group
             // => Account Admin
-            var accountAdminMpSecurityProfiles = new List<string>
+            var accountAdminMpSecurityProfiles = new List<CustomRole>
             {
-                "MPMeSupplierAddressAdmin",
-                "MPMeSupplierUserAdmin",
-                "MPMeSupplierUserGroupAdmin"
-            };
+				CustomRole.MPMeSupplierAddressAdmin,
+				CustomRole.MPMeSupplierUserAdmin,
+				CustomRole.MPSupplierUserGroupAdmin
+			};
             // => Order Admin
-            var orderAdminMpSecurityProfiles = new List<string>
+            var orderAdminMpSecurityProfiles = new List<CustomRole>
             {
-                "MPOrderAdmin",
-                "MPShipmentAdmin"
+				CustomRole.MPOrderAdmin,
+				CustomRole.MPShipmentAdmin,
             };
             // => Product Admin
-            var productAdminMpSecurityProfiles = new List<string>
+            var productAdminMpSecurityProfiles = new List<CustomRole>
             {
-                "MPMeProductAdmin",
+                CustomRole.MPMeProductAdmin,
             };
             // Assign the new supplier's user groups to each of these security profiles
             // => Account Admin to respective security profiles
-            foreach (string securityProfile in accountAdminMpSecurityProfiles)
+            foreach (var securityProfile in accountAdminMpSecurityProfiles)
             {
                 await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
                 {
                     SupplierID = ocSupplierID,
                     UserGroupID = accountAdminUserGroup.ID,
-                    SecurityProfileID = securityProfile
+                    SecurityProfileID = securityProfile.ToString()
                 }, token);
             };
             // => Order Admin to respective security profiles
-            foreach (string securityProfile in orderAdminMpSecurityProfiles)
+            foreach (var securityProfile in orderAdminMpSecurityProfiles)
             {
                 await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
                 {
                     SupplierID = ocSupplierID,
                     UserGroupID = orderAdminUserGroup.ID,
-                    SecurityProfileID = securityProfile
-                }, token);
+                    SecurityProfileID = securityProfile.ToString()
+				}, token);
             };
             // => Product Admin to respecitve security profiles
-            foreach (string securityProfile in productAdminMpSecurityProfiles)
+            foreach (var securityProfile in productAdminMpSecurityProfiles)
             {
                 await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
                 {
                     SupplierID = ocSupplierID,
                     UserGroupID = productAdminUserGroup.ID,
-                    SecurityProfileID = securityProfile
-                }, token);
+                    SecurityProfileID = securityProfile.ToString()
+				}, token);
             };
             return supplier;
         }
