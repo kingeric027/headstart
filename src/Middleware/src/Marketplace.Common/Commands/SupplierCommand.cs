@@ -15,6 +15,7 @@ namespace Marketplace.Common.Commands
     public interface IMarketplaceSupplierCommand
     {
         Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token);
+        Task<MarketplaceSupplier> GetMySupplier(string supplierID, string token);
     }
     public class MarketplaceSupplierCommand : IMarketplaceSupplierCommand
     {
@@ -25,6 +26,10 @@ namespace Marketplace.Common.Commands
         {
             _settings = settings;
             _oc = oc;
+        }
+        public async Task<MarketplaceSupplier> GetMySupplier(string supplierID, string token)
+        {
+            return await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID, token);
         }
         public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token)
         {
