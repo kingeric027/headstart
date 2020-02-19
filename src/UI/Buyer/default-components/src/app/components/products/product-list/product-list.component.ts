@@ -1,7 +1,6 @@
-import { Component, Input, OnChanges, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { ListBuyerProduct, ListFacet, Category } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { isEmpty as _isEmpty, each as _each } from 'lodash';
 import { ProductFilters, ShopperContextService } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { takeWhile } from 'rxjs/operators';
@@ -20,11 +19,11 @@ export class OCMProductList implements OnInit, OnDestroy {
   showingFavoritesOnly = false;
   closeIcon = faTimes;
   numberOfItemsInPagination = 10;
-  searchTermForProducts = "";
+  searchTermForProducts = '';
 
   constructor(private context: ShopperContextService) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
     this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
     if (getScreenSizeBreakPoint() === 'xs') {
@@ -34,14 +33,7 @@ export class OCMProductList implements OnInit, OnDestroy {
     }
   }
 
-  private handleFiltersChange = async (filters: ProductFilters) => {
-    this.showingFavoritesOnly = filters.showOnlyFavorites;
-    this.hasFilters = this.context.productFilters.hasFilters();
-    this.categoryCrumbs = this.context.categories.breadCrumbs;
-    this.searchTermForProducts = filters.search;
-  }
-
-  clearAllFilters() {
+  clearAllFilters(): void {
     this.context.productFilters.clearAllFilters();
   }
 
@@ -49,7 +41,7 @@ export class OCMProductList implements OnInit, OnDestroy {
     this.context.productFilters.toPage(page);
   }
 
-  toggleFilterByFavorites() {
+  toggleFilterByFavorites(): void {
     this.context.productFilters.filterByFavorites(!this.showingFavoritesOnly);
   }
 
@@ -61,7 +53,14 @@ export class OCMProductList implements OnInit, OnDestroy {
     this.context.productFilters.filterByCategory(categoryID);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
+  }
+
+  private handleFiltersChange = (filters: ProductFilters): void => {
+    this.showingFavoritesOnly = filters.showOnlyFavorites;
+    this.hasFilters = this.context.productFilters.hasFilters();
+    this.categoryCrumbs = this.context.categories.breadCrumbs;
+    this.searchTermForProducts = filters.search;
   }
 }

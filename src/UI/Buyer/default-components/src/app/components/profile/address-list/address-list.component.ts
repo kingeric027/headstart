@@ -27,45 +27,40 @@ export class OCMAddressList implements OnInit {
 
   constructor(private context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.reloadAddresses();
   }
 
-  reset() {
+  reset(): void {
     this.currentAddress = {};
   }
 
-  showAddAddress() {
+  showAddAddress(): void {
     this.currentAddress = null;
     this.showCreateAddressForm = true;
   }
 
-  showEditAddress(address: BuyerAddress) {
+  showEditAddress(address: BuyerAddress): void {
     this.currentAddress = address;
     this.showCreateAddressForm = true;
   }
 
-  showAreYouSure(address: BuyerAddress) {
+  showAreYouSure(address: BuyerAddress): void {
     this.currentAddress = address;
     this.areYouSureModal = ModalState.Open;
   }
 
-  closeAreYouSure() {
+  closeAreYouSure(): void {
     this.currentAddress = null;
     this.areYouSureModal = ModalState.Closed;
   }
 
-  dismissEditAddressForm() {
+  dismissEditAddressForm(): void {
     this.currentAddress = null;
     this.showCreateAddressForm = false;
   }
 
-  protected refresh() {
-    this.currentAddress = null;
-    this.reloadAddresses();
-  }
-
-  addressFormSubmitted(address: BuyerAddress) {
+  addressFormSubmitted(address: BuyerAddress): void {
     window.scrollTo(0, null);
     if (this.currentAddress) {
       this.updateAddress(address);
@@ -73,8 +68,25 @@ export class OCMAddressList implements OnInit {
       this.addAddress(address);
     }
   }
+
+  async deleteAddress(address: BuyerAddress): Promise<void> {
+    this.areYouSureModal = ModalState.Closed;
+    await this.context.currentUser.addresses.delete(address.ID);
+    this.addresses.Items = this.addresses.Items.filter(a => a.ID !== address.ID);
+  }
   
-  private async addAddress(address: BuyerAddress) {
+  updateRequestOptions(newOptions: { page?: number; search?: string }): void {
+    this.requestOptions = Object.assign(this.requestOptions, newOptions);
+    this.reloadAddresses();
+  }
+  
+
+  protected refresh(): void {
+    this.currentAddress = null;
+    this.reloadAddresses();
+  }
+
+  private async addAddress(address: BuyerAddress): Promise<void> {
     address.Shipping = true;
     address.Billing = true;
     const newAddress = await this.context.currentUser.addresses.create(address);
@@ -90,18 +102,7 @@ export class OCMAddressList implements OnInit {
     this.refresh();
   }
   
-  async deleteAddress(address: BuyerAddress) {
-    this.areYouSureModal = ModalState.Closed;
-    await this.context.currentUser.addresses.delete(address.ID);
-    this.addresses.Items = this.addresses.Items.filter(a => a.ID !== address.ID);
-  }
-  
-  updateRequestOptions(newOptions: { page?: number; search?: string }) {
-    this.requestOptions = Object.assign(this.requestOptions, newOptions);
-    this.reloadAddresses();
-  }
-  
-  private async reloadAddresses() {
+  private async reloadAddresses(): Promise<void> {
     this.isLoading = true;
     this.addresses = await this.context.currentUser.addresses.list(this.requestOptions);
     this.isLoading = false;

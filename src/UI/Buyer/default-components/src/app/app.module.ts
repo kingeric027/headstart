@@ -74,8 +74,6 @@ import { OCMOrderDetails } from './components/orders/order-detail/order-detail.c
 import { OCMPaymentMethodManagement } from './components/payments/payment-method-management/payment-method-management.component';
 import { OCMCheckoutPayment } from './components/checkout/checkout-payment/checkout-payment.component';
 import { OCMCheckoutAddress } from './components/checkout/checkout-address/checkout-address.component';
-import { OCMPaymentSpendingAccount } from './components/payments/payment-spending-account/payment-spending-account.component';
-import { OCMPaymentPurchaseOrder } from './components/payments/payment-purchase-order/payment-purchase-order.component';
 import { OCMAddressForm } from './components/profile/address-form/address-form.component';
 import { OCMGenericList } from './components/layout/generic-list/generic-list.component';
 import { OCMAddressList } from './components/profile/address-list/address-list.component';
@@ -164,8 +162,6 @@ const components = [
   OCMAddressForm,
   OCMProfileForm,
   OCMCheckoutConfirm,
-  OCMPaymentPurchaseOrder,
-  OCMPaymentSpendingAccount,
   OCMCheckoutAddress,
   OCMCheckoutPayment,
   OCMCheckout,
@@ -193,6 +189,7 @@ const components = [
   OCMPaymentCreditCard
 ];
 
+// @dynamic
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   declarations: [
@@ -246,7 +243,7 @@ const components = [
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: any) {
     this.buildWebComponent(OCMProfileNav, 'ocm-profile-nav');
     this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
     this.buildWebComponent(OCMProductCard, 'ocm-product-card');
@@ -294,8 +291,6 @@ export class AppModule {
 
     // Alot of these checkout components will be completely re-done
     this.buildWebComponent(OCMCheckoutConfirm, 'ocm-checkout-confirm');
-    this.buildWebComponent(OCMPaymentSpendingAccount, 'ocm-payment-spending-account');
-    this.buildWebComponent(OCMPaymentPurchaseOrder, 'ocm-payment-purchase-order');
     this.buildWebComponent(OCMPaymentCreditCard, 'ocm-payment-credit-card');
     this.buildWebComponent(OCMCheckoutAddress, 'ocm-checkout-address');
     this.buildWebComponent(OCMCheckoutPayment, 'ocm-checkout-payment');
@@ -315,7 +310,7 @@ export class AppModule {
     this.buildWebComponent(ConfirmModal, 'confirm-modal');
   }
 
-  buildWebComponent(angularComponent, htmlTagName: string) {
+  buildWebComponent(angularComponent, htmlTagName: string): void {
     const component = createCustomElement(angularComponent, {
       injector: this.injector,
       // See this issue for why this Factory, copied from Angular/elements source code is included.

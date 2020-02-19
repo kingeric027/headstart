@@ -17,39 +17,23 @@ export class OCMSearch implements OnInit, OnChanges, OnDestroy {
   form: FormGroup;
   previousSearchTerm = '';
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.buildForm();
   }
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     if (this.searchTermInput !== null && this.searchTermInput !== undefined) {
       this.previousSearchTerm = this.searchTermInput;
       this.form.setValue({ search: this.searchTermInput });
     }
   }
 
-  buildForm() {
+  buildForm(): void {
     this.form = new FormGroup({ search: new FormControl('') });
     this.onFormChanges();
   }
 
-  private onFormChanges() {
-    this.form.controls.search.valueChanges
-      .pipe(
-        filter(searchTerm => {
-          const userTriggered = this.form.dirty;
-          return searchTerm !== this.previousSearchTerm && userTriggered;
-        }),
-        debounceTime(500),
-        takeWhile(() => this.alive)
-      )
-      .subscribe(searchTerm => {
-        this.previousSearchTerm = searchTerm;
-        this.search();
-      });
-  }
-
-  search() {
+  search(): void {
     this.form.markAsPristine();
     // emit as undefined if empty string so sdk ignores parameter completely
     this.searched.emit(this.getCurrentSearchTerm() || undefined);
@@ -68,7 +52,23 @@ export class OCMSearch implements OnInit, OnChanges, OnDestroy {
     this.form.setValue({ search: '' });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
+  }
+
+  private onFormChanges(): void {
+    this.form.controls.search.valueChanges
+      .pipe(
+        filter(searchTerm => {
+          const userTriggered = this.form.dirty;
+          return searchTerm !== this.previousSearchTerm && userTriggered;
+        }),
+        debounceTime(500),
+        takeWhile(() => this.alive)
+      )
+      .subscribe(searchTerm => {
+        this.previousSearchTerm = searchTerm;
+        this.search();
+      });
   }
 }

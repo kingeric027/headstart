@@ -30,7 +30,6 @@ namespace Orchestration.Tests
         [Test, TestCaseSource(typeof(TypeFactory), nameof(TypeFactory.TestCases))]
         public void build_path<T>(RecordType type, T obj) where T : IMarketplaceObject
         {
-            // TODO: Address ID here
             var model = new OrchestrationObject<T>()
             {
                 ClientId = "fake",

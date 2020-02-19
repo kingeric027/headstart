@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'shipperTracking',
 })
 export class ShipperTrackingPipe implements PipeTransform {
-  transform(trackingNumber: string, shipper: string) {
+  transform(trackingNumber: string, shipper: string): string {
     if (!trackingNumber || !shipper) {
       return;
     }
@@ -28,11 +28,11 @@ export class ShipperTrackingPipe implements PipeTransform {
   name: 'shipperTrackingSupported',
 })
 export class ShipperTrackingSupportedPipe implements PipeTransform {
-  transform(shipper: string) {
+  transform(shipper: string): boolean {
     if (!shipper) {
       return false;
     }
     const supportedShippers = ['ups', 'usps', 'fedex'];
-    return supportedShippers.indexOf(shipper.toLowerCase()) > -1;
+    return supportedShippers.includes(shipper.toLowerCase());
   }
 }

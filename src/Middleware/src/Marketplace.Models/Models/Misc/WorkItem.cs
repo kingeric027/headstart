@@ -1,5 +1,4 @@
-﻿using Marketplace.Common.Exceptions;
-using Marketplace.Models.Exceptions;
+﻿using Marketplace.Models.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;

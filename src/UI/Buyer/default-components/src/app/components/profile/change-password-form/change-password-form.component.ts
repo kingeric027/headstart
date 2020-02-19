@@ -17,11 +17,11 @@ export class OCMChangePasswordForm implements OnInit {
 
   constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.setForm();
   }
 
-  setForm() {
+  setForm(): void {
     this.form = new FormGroup({
       currentPassword: new FormControl('', Validators.required),
       newPassword: new FormControl('', [Validators.required, ValidateStrongPassword]),
@@ -29,16 +29,16 @@ export class OCMChangePasswordForm implements OnInit {
     });
   }
 
-  resetFormValues() {
+  resetFormValues(): void {
     this.form.controls.currentPassword.setValue('');
     this.form.controls.newPassword.setValue('');
     this.form.controls.confirmNewPassword.setValue('');
   }
 
-  async updatePassword() {
+  async updatePassword(): Promise<void> {
     const { newPassword, currentPassword } = this.form.value;
     await this.context.authentication.validateCurrentPasswordAndChangePassword(newPassword, currentPassword);
-    this.toasterService.success(`Password Changed`);
+    this.toasterService.success('Password Changed');
     this.resetFormValues();
   }
 }

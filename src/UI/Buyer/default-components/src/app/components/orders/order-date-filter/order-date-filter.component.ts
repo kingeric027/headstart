@@ -18,7 +18,7 @@ export class OCMOrderDateFilter implements OnInit, OnDestroy {
 
   constructor(private datePipe: DatePipe, private context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.form = new FormGroup({
       fromDate: new FormControl(null as Date, DateValidator),
       toDate: new FormControl(null as Date, DateValidator),
@@ -27,13 +27,27 @@ export class OCMOrderDateFilter implements OnInit, OnDestroy {
     this.context.orderHistory.filters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handlefiltersChange);
   }
 
-  handlefiltersChange = (filters: OrderFilters) => {
+  handlefiltersChange = (filters: OrderFilters): void => {
     const fromDate = this.inverseFormatDate(filters.fromDate);
     const toDate = this.inverseFormatDate(filters.toDate);
     this.form.setValue({ fromDate, toDate });
   }
+  
+  clearToDate(): void {
+    this.form.get('toDate').setValue(null);
+    this.doFilter();
+  }
 
-  private onFormChanges() {
+  clearFromDate(): void {
+    this.form.get('fromDate').setValue(null);
+    this.doFilter();
+  }
+
+  ngOnDestroy(): void {
+    this.alive = false;
+  }
+
+  private onFormChanges(): void {
     this.form.valueChanges
       .pipe(
         debounceTime(500),
@@ -44,23 +58,12 @@ export class OCMOrderDateFilter implements OnInit, OnDestroy {
       });
   }
 
-  private doFilter() {
-    if (this.form.get('fromDate').invalid || this.form.get('toDate').invalid) {
-      return;
-    }
+  private doFilter(): void {
+    if (this.form.get('fromDate').invalid || this.form.get('toDate').invalid) return;
+
     const fromDate: Date = this.form.get('fromDate').value;
     const toDate: Date = this.form.get('toDate').value;
     this.context.orderHistory.filters.filterByDateSubmitted(this.formatDate(fromDate), this.formatDate(toDate));
-  }
-
-  clearToDate() {
-    this.form.get('toDate').setValue(null);
-    this.doFilter();
-  }
-
-  clearFromDate() {
-    this.form.get('fromDate').setValue(null);
-    this.doFilter();
   }
 
   private formatDate(date: Date): string {
@@ -69,9 +72,5 @@ export class OCMOrderDateFilter implements OnInit, OnDestroy {
 
   private inverseFormatDate(date: string): Date {
     return date ? new Date(date) : null;
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
   }
 }

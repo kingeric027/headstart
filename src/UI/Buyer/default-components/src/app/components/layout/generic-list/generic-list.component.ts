@@ -13,8 +13,6 @@ export class OCMGenericList {
    *
    *  Right now it includes functionality for searching and paginating a list of objects, for example, addresses.
    */
-  constructor() {}
-
   // Information about pagination
   @Input() meta: Meta;
 
@@ -26,4 +24,6 @@ export class OCMGenericList {
     page?: number;
     search?: string;
   }>();
+
+  constructor() {}
 }

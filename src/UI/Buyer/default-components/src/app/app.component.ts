@@ -10,16 +10,16 @@ import { ShopperContextService } from 'marketplace';
     <ng-progress></ng-progress>
   `,
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit { 
+  showHeader = false;
+  // TODO: this shouln't have hard coded routes. its gross.
+  hiddenRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+  
   constructor(public context: ShopperContextService) {}
 
-  showHeader = false;
-  hiddenRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
-
-  // TODO: this shouln't have hard coded routes. its gross.
-  ngOnInit() {
+  ngOnInit(): void {
     this.context.router.onUrlChange(url => {
-      this.showHeader = !this.hiddenRoutes.some(el => url.indexOf(el) > -1);
+      this.showHeader = !this.hiddenRoutes.some(el => url.includes(el));
     });
   }
 }

@@ -10,7 +10,7 @@ export class OCMCreditCardIcon implements OnChanges {
   @Input() cardType: string;
   @Input() size: string;
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     if (!this.cardType) return;
     this.cardIcon = this.setCardIcon(this.cardType);
   }
