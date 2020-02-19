@@ -24,13 +24,15 @@ export class SummaryResourceDisplay implements OnChanges {
   @Input()
   set isNewPlaceHolder(value: boolean) {
     this._isNewPlaceHolder = value;
-    this.setDisplayValuesForPlaceholder();
   }
   @Input()
   resource: any;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.resourceType && changes.resourceType.firstChange) {
+    if (changes.resourceType?.firstChange) {
+      this.setDisplayValuesForPlaceholder();
+    }
+    if (changes.resource?.firstChange) {
       this.setDisplayValuesForResource(changes.resource.currentValue);
     }
   }

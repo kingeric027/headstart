@@ -2,8 +2,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SupplierTableComponent } from './components/suppliers/supplier-table/supplier-table.component';
-import { SupplierUserTableComponent } from './components/users/user-table/supplier-user-table.component';
 import { SupplierLocationTableComponent } from './components/locations/supplier-location-table/supplier-location-table.component';
+import { SupplierUserTableComponent } from './components/users/supplier-user-table/supplier-user-table.component';
 
 const routes: Routes = [
   { path: '', component: SupplierTableComponent },
