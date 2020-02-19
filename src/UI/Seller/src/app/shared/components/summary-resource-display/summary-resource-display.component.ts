@@ -11,6 +11,7 @@ import { PLACEHOLDER_URL, PRODUCT_IMAGE_PATH_STRATEGY, getProductMainImageUrlOrP
   styleUrls: ['./summary-resource-display.component.scss'],
 })
 export class SummaryResourceDisplay implements OnChanges {
+  isLoading = false;
   _primaryHeader = '';
   _secondaryHeader = '';
   _imgPath = '';
@@ -116,6 +117,7 @@ export class SummaryResourceDisplay implements OnChanges {
       if (this._resource.children) {
         this._resource.children.forEach(item => this._resourceList.splice(++index, 0, item));
       } else {
+        this.isLoading = true;
         const options = { filters: { ParentID: this._resource.ID } };
         const categoryResponse = await this.ocCategoryService.List(this._parentResourceID, options).toPromise();
         categoryResponse.Items.forEach(item => this._resourceList.splice(++index, 0, item));
@@ -123,6 +125,7 @@ export class SummaryResourceDisplay implements OnChanges {
         this._resource.children = categoryResponse.Items;
       }
       this._isResourceExpanded = true;
+      this.isLoading = false;
     } else {
       // Retrieve children that will no longer be expanded, to prevent repeat API calls.
       const allChildren = this.getAllChildren(this._resource);
