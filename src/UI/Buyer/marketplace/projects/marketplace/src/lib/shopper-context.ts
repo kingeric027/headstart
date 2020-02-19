@@ -9,6 +9,8 @@ import {
   ShipmentItem,
   BuyerProduct,
   Meta,
+  Supplier,
+  Address,
 } from '@ordercloud/angular-sdk';
 
 export * from '@ordercloud/angular-sdk';
@@ -19,6 +21,11 @@ export interface CreditCardToken {
   ExpirationDate: string; // MMYY or MMYYY
   CardholderName: string;
   CardType?: string;
+}
+
+export interface LineItemGroupSupplier {
+  supplier: Supplier;
+  shipFrom: Address;
 }
 
 export interface SupplierFilters {
@@ -71,7 +78,7 @@ export interface ProposedShipmentOption {
   Cost: number;
 }
 
-export interface MarketplaceOrder extends Order<OrderXp, any, any> { }
+export type MarketplaceOrder = Order<OrderXp, any, any>
 export interface OrderXp {
   ProposedShipmentSelections: ProposedShipmentSelection[];
   AvalaraTaxTransactionCode: string;
