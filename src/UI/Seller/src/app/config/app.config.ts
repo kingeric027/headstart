@@ -43,6 +43,7 @@ export const ocAppConfig: AppConfig = {
     'CreditCardAdmin',
     'SupplierAdmin',
     'SupplierUserAdmin',
+    'SupplierUserGroupAdmin',
     'SupplierAddressAdmin',
     'AdminUserAdmin',
 
@@ -66,6 +67,7 @@ export const ocAppConfig: AppConfig = {
     'MPMeSupplierAdmin',
     'MPMeSupplierAddressAdmin',
     'MPMeSupplierUserAdmin',
+    'MPSupplierUserGroupAdmin',
   ],
 };
 

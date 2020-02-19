@@ -69,6 +69,12 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   filterForm: FormGroup;
   fromDate: string;
   toDate: string;
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private changeDetectorRef: ChangeDetectorRef,
+    ngZone: NgZone
+  ) {}
 
   @Input()
   resourceList: ListPage<any> = { Meta: {}, Items: [] };
@@ -115,14 +121,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   dataIsSaving = false;
 
-  constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef,
-    ngZone: NgZone
-  ) {}
-
-  ngOnInit() {
+  async ngOnInit() {
     this.determineViewingContext();
     this.initializeSubscriptions();
     this.setFilterForm();
@@ -189,6 +188,88 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.isMyResource = this.router.url.startsWith('/my-');
   }
 
+  private async initializeSubscriptions() {
+    await this.redirectToFirstParentIfNeeded();
+    this.setUrlSubscription();
+    this.setParentResourceSelectionSubscription();
+    this.setListRequestStatusSubscription();
+    this._ocService.listResources();
+  }
+
+  private async redirectToFirstParentIfNeeded() {
+    if (this.parentResourceService) {
+      if (this.parentResourceService.getParentResourceID() === REDIRECT_TO_FIRST_PARENT) {
+        await this.parentResourceService.listResources();
+        this._ocService.selectParentResource(this.parentResourceService.resourceSubject.value.Items[0]);
+      }
+    }
+  }
+
+  private setUrlSubscription() {
+    this.router.events
+      .pipe(takeWhile(() => this.alive))
+      // only need to set the breadcrumbs on nav end events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.setBreadCrumbs();
+      });
+    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
+      this.setBreadCrumbs();
+      this.checkIfCreatingNew();
+    });
+  }
+
+  private setParentResourceSelectionSubscription() {
+    this.activatedRoute.params
+      .pipe(takeWhile(() => this.parentResourceService && this.alive))
+      .subscribe(async params => {
+        await this.redirectToFirstParentIfNeeded();
+        const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
+        const parentResourceID = params[parentIDParamName];
+        this.selectedParentResourceID = parentResourceID;
+        if (params && parentResourceID) {
+          const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
+          if (parentResource) this.selectedParentResourceName = parentResource.Name;
+        }
+      });
+  }
+
+  private setListRequestStatusSubscription() {
+    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe(requestStatus => {
+      this.requestStatus = requestStatus;
+      this.changeDetectorRef.detectChanges();
+    });
+  }
+
+  private checkIfCreatingNew() {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
+    this.isCreatingNew = endUrl === '/new';
+  }
+
+  private setBreadCrumbs() {
+    // basically we are just taking off the portion of the url after the selected route piece
+    // in the future breadcrumb logic might need to be more complicated than this
+    const urlPieces = this.router.url
+      .split('/')
+      .filter(p => p)
+      .map(p => {
+        if (p.includes('?')) {
+          return p.slice(0, p.indexOf('?'));
+        } else {
+          return p;
+        }
+      });
+    this.breadCrumbs = urlPieces.map((piece, index) => {
+      const route = `/${urlPieces.slice(0, index + 1).join('/')}`;
+      return {
+        displayText: piece,
+        route,
+      };
+    });
+    this.changeDetectorRef.detectChanges();
+  }
+
   setFilterForm() {
     const formGroup = {};
     if (this.filterConfig && this.filterConfig.Filters) {
@@ -253,89 +334,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.areChanges = JSON.stringify(this._updatedResource) !== JSON.stringify(this._resourceInSelection);
   }
 
+  getSaveBtnText(): string {
+    if (this.dataIsSaving) return 'Saving...';
+    if (this.isCreatingNew) return 'Create';
+    if (!this.isCreatingNew) return 'Save Changes';
+  }
+
   ngOnDestroy() {
     this.alive = false;
-  }
-
-  private setParentResourceSelectionSubscription() {
-    this.activatedRoute.params
-      .pipe(takeWhile(() => this.parentResourceService && this.alive))
-      .subscribe(async params => {
-        await this.redirectToFirstParentIfNeeded();
-        const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
-        const parentResourceID = params[parentIDParamName];
-        this.selectedParentResourceID = parentResourceID;
-        if (params && parentResourceID) {
-          const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
-          if (parentResource) this.selectedParentResourceName = parentResource.Name;
-        }
-      });
-  }
-
-  private setListRequestStatusSubscription() {
-    this._ocService.resourceRequestStatus.pipe(takeWhile(() => this.alive)).subscribe(requestStatus => {
-      this.requestStatus = requestStatus;
-      this.changeDetectorRef.detectChanges();
-    });
-  }
-
-  private checkIfCreatingNew() {
-    const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
-  }
-
-  private setBreadCrumbs() {
-    // basically we are just taking off the portion of the url after the selected route piece
-    // in the future breadcrumb logic might need to be more complicated than this
-    const urlPieces = this.router.url
-      .split('/')
-      .filter(p => p)
-      .map(p => {
-        if (p.includes('?')) {
-          return p.slice(0, p.indexOf('?'));
-        } else {
-          return p;
-        }
-      });
-    this.breadCrumbs = urlPieces.map((piece, index) => {
-      const route = `/${urlPieces.slice(0, index + 1).join('/')}`;
-      return {
-        displayText: piece,
-        route,
-      };
-    });
-    this.changeDetectorRef.detectChanges();
-  }
-
-  private async initializeSubscriptions() {
-    await this.redirectToFirstParentIfNeeded();
-    this.setUrlSubscription();
-    this.setParentResourceSelectionSubscription();
-    this.setListRequestStatusSubscription();
-    this._ocService.listResources();
-  }
-
-  private async redirectToFirstParentIfNeeded() {
-    if (this.parentResourceService) {
-      if (this.parentResourceService.getParentResourceID() === REDIRECT_TO_FIRST_PARENT) {
-        await this.parentResourceService.listResources();
-        this._ocService.selectParentResource(this.parentResourceService.resourceSubject.value.Items[0]);
-      }
-    }
-  }
-
-  private setUrlSubscription() {
-    this.router.events
-      .pipe(takeWhile(() => this.alive))
-      // only need to set the breadcrumbs on nav end events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.setBreadCrumbs();
-      });
-    this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
-      this.setBreadCrumbs();
-      this.checkIfCreatingNew();
-    });
   }
 }

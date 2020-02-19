@@ -348,4 +348,10 @@ export class ProductEditComponent implements OnInit {
       this.changeDetectorRef.detectChanges();
     }
   }
+
+  getSaveBtnText(): string {
+    if (this.dataIsSaving) return 'Saving...';
+    if (this.isCreatingNew) return 'Create';
+    if (!this.isCreatingNew) return 'Save Changes';
+  }
 }

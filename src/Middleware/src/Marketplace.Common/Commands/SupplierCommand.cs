@@ -40,28 +40,28 @@ namespace Marketplace.Common.Commands
             var accountAdminUserGroup = await _oc.SupplierUserGroups.CreateAsync(ocSupplierID, new UserGroup()
             {
                 ID = $"{ocSupplierID}AccountAdmin",
-                Name = $"{ocSupplierID} Account Admin",
+                Name = $"Account Admin",
                 xp =
                     {
-                        Type = "UserPermissions"
+                        Type = "UserPermissions",
                     }
             }, token);
             var orderAdminUserGroup = await _oc.SupplierUserGroups.CreateAsync(ocSupplierID, new UserGroup()
             {
                 ID = $"{ocSupplierID}OrderAdmin",
-                Name = $"{ocSupplierID} Order Admin",
+                Name = $"Order Admin",
                 xp =
                     {
-                        Type = "UserPermissions"
+                        Type = "UserPermissions",
                     }
             }, token);
             var productAdminUserGroup = await _oc.SupplierUserGroups.CreateAsync(ocSupplierID, new UserGroup()
             {
                 ID = $"{ocSupplierID}ProductAdmin",
-                Name = $"{ocSupplierID} Product Admin",
+                Name = $"Product Admin",
                 xp =
                     {
-                        Type = "UserPermissions"
+                        Type = "UserPermissions",
                     }
             }, token);
             // Create Integrations Supplier User
@@ -113,7 +113,8 @@ namespace Marketplace.Common.Commands
             var accountAdminMpSecurityProfiles = new List<string>
             {
                 "MPMeSupplierAddressAdmin",
-                "MPMeSupplierUserAdmin"
+                "MPMeSupplierUserAdmin",
+                "MPMeSupplierUserGroupAdmin"
             };
             // => Order Admin
             var orderAdminMpSecurityProfiles = new List<string>
