@@ -6,10 +6,7 @@ import {
   PLACEHOLDER_URL,
 } from '@app-seller/shared/services/product/product-image.helper';
 import { OcCategoryService } from '@ordercloud/angular-sdk';
-import {
-  faChevronDown,
-  faChevronUp
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/services/configuration/table-display';
 
 @Component({
@@ -29,7 +26,7 @@ export class SummaryResourceDisplay implements OnChanges {
   _isResourceExpanded: boolean;
   _resource: any;
   _resourceList: any;
-  _resourceID: any = '';
+  _parentResourceID: any = '';
 
   @Input()
   set resourceList(value: any) {
@@ -53,20 +50,18 @@ export class SummaryResourceDisplay implements OnChanges {
     }
   }
   @Input()
-  set resourceID(value: any) {
-    this._resourceID = value;
+  set parentResourceID(value: any) {
+    this._parentResourceID = value;
   }
 
-  constructor(
-    private ocCategoryService: OcCategoryService
-    ) {}
+  constructor(private ocCategoryService: OcCategoryService) {}
 
   setDisplayValuesForResource(resource: any) {
     this._primaryHeader = this.getValueOnExistingResource(resource, 'toPrimaryHeader');
     this._secondaryHeader = this.getValueOnExistingResource(resource, 'toSecondaryHeader');
     this._shouldShowImage = !!SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY[this.resourceType]['toImage'];
     this._imgPath = this.getValueOnExistingResource(resource, 'toImage') || PLACEHOLDER_URL;
-    this._isExpandable = resource.ChildCount > 0;   
+    this._isExpandable = resource.ChildCount > 0;
   }
 
   getValueOnExistingResource(value: any, valueType: string) {
@@ -102,6 +97,7 @@ export class SummaryResourceDisplay implements OnChanges {
     }
   }
 
+  //Further indent display of subsequent categorical tiers
   getIndent() {
     let depthCount = -1;
     return !this._resource.ParentID ? 0 : this.getResourceDepth(this._resource, depthCount);
@@ -109,41 +105,49 @@ export class SummaryResourceDisplay implements OnChanges {
 
   getResourceDepth(resource, depthCount) {
     depthCount++;
-    let parentResource = this._resourceList.Items.find(item => item.ID === resource.ParentID);
+    let parentResource = this._resourceList.find(item => item.ID === resource.ParentID);
     return resource.ParentID ? this.getResourceDepth(parentResource, depthCount) : depthCount * 10;
   }
 
-  // FOR HUMOR
-
-  // getIndent() {
-  //   console.log('the RESOURCE', this._resource);
-  //   if (this._resource.ParentID === null) {
-  //     return 0;
-  //   }
-  //   return this.getResourceDepth(this._resource)
-  // }
-
-  // getResourceDepth(resource) {
-  //   if (resource.ParentID) {
-  //     this._resourceDepth++;
-  //     this.getResourceDepth(resource.ParentID);
-  //   }
-  //   return this._resourceDepth * 10;
-  // }
-
   async toggleNestedResources() {
-    const options = { filters: { 'ParentID': this._resource.ID } };
-    const categoryResponse = await this.ocCategoryService.List(this._resourceID, options).toPromise();
-    let index = this._resourceList.Items.indexOf(this._resource);
+    let index = this._resourceList.indexOf(this._resource);
     if (!this._isResourceExpanded) {
-      categoryResponse.Items.forEach(item => this._resourceList.Items.splice(++index, 0, item));
+      //Prevent another API call if it's already been made.
+      if (this._resource.children) {
+        this._resource.children.forEach(item => this._resourceList.splice(++index, 0, item));
+      } else {
+        const options = { filters: { ParentID: this._resource.ID } };
+        const categoryResponse = await this.ocCategoryService.List(this._parentResourceID, options).toPromise();
+        categoryResponse.Items.forEach(item => this._resourceList.splice(++index, 0, item));
+        //Attach category response to new children property
+        this._resource.children = categoryResponse.Items;
+      }
       this._isResourceExpanded = true;
     } else {
-      const collapseBreakPointObject = this._resourceList.Items.find((item, i) => i > index && item.ParentID === this._resourceList.Items[index].ParentID) || 0;
-      const identifyCollapseBreakPointIndex = this._resourceList.Items.findIndex(item => item === collapseBreakPointObject);
-      const numberToCollapse = identifyCollapseBreakPointIndex !== -1 ? identifyCollapseBreakPointIndex - index - 1 : this._resourceList.Items.length - 1;
-      this._resourceList.Items.splice(++index, numberToCollapse);
+      //Retrieve children that will no longer be expanded, to prevent repeat API calls.
+      const allChildren = this.getAllChildren(this._resource);
+      const collapseBreakPointObject = this._resourceList.find(
+        (item, i) => i > index && !allChildren.includes(item)
+      );
+      const collapseBreakPointIndex = this._resourceList.findIndex(item => item === collapseBreakPointObject);
+      const numberToCollapse =
+        collapseBreakPointIndex !== -1 ? collapseBreakPointIndex - index - 1 : this._resourceList.length - 1;
+      this._resourceList.splice(++index, numberToCollapse);
       this._isResourceExpanded = false;
     }
   }
+
+  //Retrieve all children, grandchild, etc. that will need to be collapsed.
+  getAllChildren(resource) {
+    const children = resource.children;
+    if (children) {
+      const nextChildren = [];
+      children.forEach(child => this.getAllChildren(child).forEach(nextChild => nextChildren.push(nextChild)));
+      const allChildren = children.concat(nextChildren);
+      return allChildren;
+    } else {
+      return [];
+    }
+  }
+
 }
