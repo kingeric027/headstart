@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from '@app-seller/shared';
-import { ReportListComponent } from './components/report-list/report-list.component';
 import { ReportsRoutingModule } from './reports-routing.module';
+import { OrchestrationLogsTableComponent } from './components/orchestration-logs-table/orchestration-logs-table.component';
 
 @NgModule({
   imports: [SharedModule, ReportsRoutingModule],
-  declarations: [ReportListComponent],
+  declarations: [OrchestrationLogsTableComponent],
 })
 export class ReportsModule {}

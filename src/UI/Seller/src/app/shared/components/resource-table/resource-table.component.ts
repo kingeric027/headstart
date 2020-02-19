@@ -15,16 +15,13 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { getPsHeight, getScreenSizeBreakPoint } from '@app-seller/shared/services/dom.helper';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import {
-  FilterDictionary,
-  ListResource,
-  Options,
-  RequestStatus,
-} from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { Options, RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 import { faCalendar, faChevronLeft, faFilter, faHome, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbDateStruct, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { singular } from 'pluralize';
 import { filter, takeWhile } from 'rxjs/operators';
+import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
+import { ListFilters } from '@app-seller/shared/services/middleware-api/listArgs.interface';
 
 interface BreadCrumb {
   displayText: string;
@@ -56,7 +53,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
   areChanges: boolean;
-  parentResources: ListResource<any>;
+  parentResources: ListPage<any>;
   requestStatus: RequestStatus;
   selectedParentResourceName = 'Fetching Data';
   selectedParentResourceID = '';
@@ -80,7 +77,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   ) {}
 
   @Input()
-  resourceList: ListResource<any> = { Meta: {}, Items: [] };
+  resourceList: ListPage<any> = { Meta: {}, Items: [] };
   @Input()
   set ocService(service: ResourceCrudService<any>) {
     this._ocService = service;
@@ -148,22 +145,22 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   applyFilters() {
-    if (typeof this.filterForm.value['from'] === 'object') {
-      const fromDate = this.filterForm.value['from'];
+    if (typeof this.filterForm.value.from === 'object') {
+      const fromDate = this.filterForm.value.from;
       this.fromDate = this.transformDateForUser(fromDate);
-      this.filterForm.value['from'] = this.transformDateForFilter(fromDate);
+      this.filterForm.value.from = this.transformDateForFilter(fromDate);
     }
-    if (typeof this.filterForm.value['to'] === 'object') {
-      const toDate = this.filterForm.value['to'];
+    if (typeof this.filterForm.value.to === 'object') {
+      const toDate = this.filterForm.value.to;
       this.toDate = this.transformDateForUser(toDate);
-      this.filterForm.value['to'] = this.transformDateForFilter(toDate);
+      this.filterForm.value.to = this.transformDateForFilter(toDate);
     }
     this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
   }
   // date format for NgbDatepicker is different than date format used for filters
   transformDateForUser(date: NgbDateStruct) {
-    let month = date.month.toString().length === 1 ? '0' + date.month : date.month;
-    let day = date.day.toString().length === 1 ? '0' + date.day : date.day;
+    const month = date.month.toString().length === 1 ? '0' + date.month : date.month;
+    const day = date.day.toString().length === 1 ? '0' + date.day : date.day;
     return date.year + '-' + month + '-' + day;
   }
 
@@ -171,7 +168,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     return date.month + '-' + date.day + '-' + date.year;
   }
 
-  removeFieldsWithNoValue(formValues: FilterDictionary) {
+  removeFieldsWithNoValue(formValues: ListFilters) {
     const values = { ...formValues };
     Object.entries(values).forEach(([key, value]) => {
       if (!value) {

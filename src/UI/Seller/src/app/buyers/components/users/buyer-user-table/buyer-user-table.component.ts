@@ -2,10 +2,10 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { User } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
-import { BuyerUserService } from '@app-seller/shared/services/buyer/buyer-user.service';
-import { BuyerService } from '@app-seller/shared/services/buyer/buyer.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ValidateEmail } from '@app-seller/validators/validators';
+import { BuyerUserService } from '../buyer-user.service';
+import { BuyerService } from '../../buyers/buyer.service';
 
 function createBuyerUserForm(user: User) {
   return new FormGroup({

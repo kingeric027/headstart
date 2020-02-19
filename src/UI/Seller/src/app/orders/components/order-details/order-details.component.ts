@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { Order, LineItem, OcLineItemService, OcPaymentService, Payment } from '@ordercloud/angular-sdk';
 import { Address } from '@ordercloud/angular-sdk';
-import { groupBy as _groupBy } from'lodash';
-import { getProductMainImageUrlOrPlaceholder } from '@app-seller/shared/services/product/product-image.helper';
+import { groupBy as _groupBy } from 'lodash';
 import { MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 
 @Component({
   selector: 'app-order-details',
@@ -26,21 +26,7 @@ export class OrderDetailsComponent {
       this.handleSelectedOrderChange(order);
     }
   }
-  constructor(
-    private ocLineItemService: OcLineItemService,
-    private ocPaymentService: OcPaymentService
-    ) {}
-
-  private async handleSelectedOrderChange(order: Order): Promise<void> {
-    this._order = order;
-    this.getIncomingOrOutgoing();
-    const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, order.ID).toPromise();
-    this._lineItems = lineItemsResponse.Items;
-    const paymentsResponse = await this.ocPaymentService.List(this.orderDirection, order.ID).toPromise();
-    this._payments = paymentsResponse.Items;
-    this._liGroups = _groupBy(this._lineItems, li => li.ShipFromAddressID);
-    this._liGroupedByShipFrom = Object.values(this._liGroups);
-  }
+  constructor(private ocLineItemService: OcLineItemService, private ocPaymentService: OcPaymentService) {}
 
   setCardType(payment) {
     if (!payment.xp.cardType || payment.xp.cardType === null) {
@@ -49,7 +35,7 @@ export class OrderDetailsComponent {
     this.cardType = payment.xp.cardType.charAt(0).toUpperCase() + payment.xp.cardType.slice(1);
     return this.cardType;
   }
-    
+
   getImageUrl(lineItem: LineItem) {
     const product = lineItem.Product;
     return getProductMainImageUrlOrPlaceholder(product);
@@ -62,8 +48,17 @@ export class OrderDetailsComponent {
 
   getIncomingOrOutgoing() {
     const url = window.location.href;
-    url.includes('Outgoing') ? this.orderDirection = 'Outgoing' : this.orderDirection = 'Incoming';
+    url.includes('Outgoing') ? (this.orderDirection = 'Outgoing') : (this.orderDirection = 'Incoming');
   }
 
+  private async handleSelectedOrderChange(order: Order): Promise<void> {
+    this._order = order;
+    this.getIncomingOrOutgoing();
+    const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, order.ID).toPromise();
+    this._lineItems = lineItemsResponse.Items;
+    const paymentsResponse = await this.ocPaymentService.List(this.orderDirection, order.ID).toPromise();
+    this._payments = paymentsResponse.Items;
+    this._liGroups = _groupBy(this._lineItems, li => li.ShipFromAddressID);
+    this._liGroupedByShipFrom = Object.values(this._liGroups);
+  }
 }
-

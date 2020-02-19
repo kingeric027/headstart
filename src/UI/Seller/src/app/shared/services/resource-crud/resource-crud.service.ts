@@ -1,14 +1,8 @@
 import { BehaviorSubject } from 'rxjs';
-import { Router, Params, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { transform as _transform, pickBy as _pickBy } from 'lodash';
-import { cloneDeep as _cloneDeep, uniqBy as _uniqBy } from 'lodash';
-import { Meta } from '@ordercloud/angular-sdk';
-import { filter, takeWhile } from 'rxjs/operators';
+import { Router, Params, ActivatedRoute } from '@angular/router';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import {
-  ListResource,
   Options,
-  FilterDictionary,
   RequestStatus,
   SUCCESSFUL_WITH_ITEMS,
   ERROR,
@@ -18,14 +12,16 @@ import {
   SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
 } from './resource-crud.types';
+import { ListPage } from '../middleware-api/listPage.interface';
+import { ListFilters } from '../middleware-api/listArgs.interface';
 
 export abstract class ResourceCrudService<ResourceType> {
-  public resourceSubject: BehaviorSubject<ListResource<ResourceType>> = new BehaviorSubject<ListResource<ResourceType>>(
-    { Meta: {}, Items: [] }
-  );
+  public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
+    Meta: {},
+    Items: [],
+  });
   public resourceRequestStatus: BehaviorSubject<RequestStatus> = new BehaviorSubject<RequestStatus>(GETTING_NEW_ITEMS);
   public optionsSubject: BehaviorSubject<Options> = new BehaviorSubject<Options>({});
-  private itemsPerPage = 100;
 
   route = '';
   primaryResourceLevel = '';
@@ -34,6 +30,8 @@ export abstract class ResourceCrudService<ResourceType> {
   subResourceList: string[];
   emptyResource: any = {};
 
+  private itemsPerPage = 100;
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -41,7 +39,7 @@ export abstract class ResourceCrudService<ResourceType> {
     route: string,
     primaryResourceLevel: string,
     subResourceList: string[] = [],
-    secondaryResourceLevel: string = ''
+    secondaryResourceLevel = ''
   ) {
     this.route = route;
     this.primaryResourceLevel = primaryResourceLevel;
@@ -56,48 +54,24 @@ export abstract class ResourceCrudService<ResourceType> {
         this.optionsSubject.next({});
       }
     });
-    this.optionsSubject.subscribe(value => {
+    this.optionsSubject.subscribe((options: Options) => {
       if (this.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         this.listResources();
       }
     });
   }
+
+  // Can Override
+  async list(args: any[]): Promise<ListPage<ResourceType>> {
+    return await this.ocService.List(...args).toPromise();
+  }
+
   async getMyResource(): Promise<any> {
     console.log('get my resource for this resource not defined');
+    return await Promise.resolve('');
   }
 
-  private isOnRelatedRoute(): boolean {
-    const isOnSubResource =
-      this.subResourceList &&
-      this.subResourceList.some(subResource => {
-        return this.router.url.includes(`/${subResource}`);
-      });
-    const isOnBaseRoute = this.router.url.includes(this.route);
-    const isOnRelatedSubResource = this.router.url.includes(`/${this.secondaryResourceLevel}`);
-    if (!isOnBaseRoute) {
-      return false;
-    } else if (isOnSubResource && this.secondaryResourceLevel && isOnRelatedSubResource) {
-      return true;
-    } else if (!isOnSubResource && !this.secondaryResourceLevel) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  // Handle URL updates
-  private readFromUrlQueryParams(params: Params): void {
-    const { sortBy, search, OrderDirection, ...filters } = params;
-    this.optionsSubject.next({ sortBy, search, filters, OrderDirection });
-  }
-
-  // Used to update the URL
-  mapToUrlQueryParams(options: Options): Params {
-    const { sortBy, search, filters, OrderDirection } = options;  
-    return { sortBy, search, ...filters, OrderDirection };
-  }
-
-  async listResources(pageNumber = 1, searchText = '') {
+  async listResources(pageNumber = 1, searchText = ''): Promise<void> {
     if (this.shouldListResources()) {
       const { sortBy, search, filters, OrderDirection } = this.optionsSubject.value;
       const options = {
@@ -117,22 +91,7 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
-  private async listWithStatusIndicator(
-    options: Options,
-    orderDirection: string = ''
-  ): Promise<ListResource<ResourceType>> {
-    try {
-      this.resourceRequestStatus.next(this.getFetchStatus(options));
-      const resourceResponse = await this.ocService.List(...this.createListArgs([options], orderDirection)).toPromise();
-      this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
-      return resourceResponse;
-    } catch (error) {
-      this.resourceRequestStatus.next(ERROR);
-      throw error;
-    }
-  }
-
-  getFetchStatus(options: Options) {
+  getFetchStatus(options: Options): RequestStatus {
     const isSubsequentPage = options.page > 1;
     const areCurrentlyItems = this.resourceSubject.value.Items.length;
     // will not want to show a loading indicator in certain situations so this
@@ -150,14 +109,14 @@ export abstract class ResourceCrudService<ResourceType> {
     // return isSubsequentPage || !areCurrentlyItems ? GETTING_NEW_ITEMS : REFRESHING_ITEMS;
   }
 
-  getSucessStatus(options: Options, resourceResponse: ListResource<ResourceType>) {
+  getSucessStatus(options: Options, resourceResponse: ListPage<ResourceType>): RequestStatus {
     const areFilters = this.areFiltersOnOptions(options);
     const areItems = !!resourceResponse.Items.length;
     if (areItems) return SUCCESSFUL_WITH_ITEMS;
     return areFilters ? SUCCESSFUL_NO_ITEMS_WITH_FILTERS : SUCCESSFUL_NO_ITEMS_NO_FILTERS;
   }
 
-  shouldListResources() {
+  shouldListResources(): boolean {
     if (!this.secondaryResourceLevel) {
       // for primary resources list if on the route
       return this.router.url.startsWith(this.route);
@@ -167,7 +126,7 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
-  constructResourceURLs(resourceID: string = ''): string[] {
+  constructResourceURLs(resourceID = ''): string[] {
     const newUrlPieces = [];
     newUrlPieces.push(this.route);
     if (this.secondaryResourceLevel) {
@@ -180,7 +139,7 @@ export abstract class ResourceCrudService<ResourceType> {
     return newUrlPieces;
   }
 
-  selectParentResource(resource: any) {
+  selectParentResource(resource: any): void {
     const newUrl = this.updateUrlForUpdatedParent(resource);
     this.router.navigateByUrl(newUrl);
 
@@ -191,7 +150,7 @@ export abstract class ResourceCrudService<ResourceType> {
     });
   }
 
-  updateUrlForUpdatedParent(resource: any) {
+  updateUrlForUpdatedParent(resource: any): string {
     const queryParams = this.router.url.split('?')[1];
     let newUrl = `${this.primaryResourceLevel}/${resource.ID}/${this.secondaryResourceLevel}`;
     if (queryParams) {
@@ -200,7 +159,7 @@ export abstract class ResourceCrudService<ResourceType> {
     return newUrl;
   }
 
-  constructNewRouteInformation(resourceID: string = ''): any[] {
+  constructNewRouteInformation(resourceID = ''): any[] {
     let newUrl = '';
     const queryParams = this.activatedRoute.snapshot.queryParams;
 
@@ -215,7 +174,7 @@ export abstract class ResourceCrudService<ResourceType> {
     return [newUrl, queryParams];
   }
 
-  getParentResourceID() {
+  getParentResourceID(): string {
     const urlPieces = this.router.url.split('/');
     const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}`);
     return urlPieces[indexOfParent + 1];
@@ -226,7 +185,7 @@ export abstract class ResourceCrudService<ResourceType> {
     return this.ocService.Get(...this.createListArgs([resourceID], orderDirection)).toPromise();
   }
 
-  createListArgs(options: any[], orderDirection: string = '') {
+  createListArgs(options: any[], orderDirection = ''): any[] {
     /* ordercloud services follow a patter where the paramters to a function (Save, Create, List)
       are the nearly the same for all resource. However, sub resources (supplier users, buyer payment methods, etc...)
       have the parent resource ID as the first paramter before the expected argument
@@ -246,7 +205,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
-    const resourceInList = this.resourceSubject.value.Items.find(i => (i as any).ID === resourceID);
+    const resourceInList = this.resourceSubject.value.Items.find((i: any) => i.ID === resourceID);
     if (resourceInList) {
       return resourceInList;
     } else {
@@ -265,7 +224,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async deleteResource(resourceID: string): Promise<null> {
-    const newResource = await this.ocService.Delete(...this.createListArgs([resourceID])).toPromise();
+    await this.ocService.Delete(...this.createListArgs([resourceID])).toPromise();
     this.resourceSubject.value.Items = this.resourceSubject.value.Items.filter((i: any) => i.ID !== resourceID);
     this.resourceSubject.next(this.resourceSubject.value);
     return;
@@ -278,47 +237,47 @@ export abstract class ResourceCrudService<ResourceType> {
     return newResource;
   }
 
-  setNewResources(resourceResponse: ListResource<ResourceType>) {
+  setNewResources(resourceResponse: ListPage<ResourceType>): void {
     this.resourceSubject.next(resourceResponse);
   }
 
-  addResources(resourceResponse: ListResource<ResourceType>) {
+  addResources(resourceResponse: ListPage<ResourceType>): void {
     this.resourceSubject.next({
       Meta: resourceResponse.Meta,
       Items: [...this.resourceSubject.value.Items, ...resourceResponse.Items],
     });
   }
 
-  getNextPage() {
+  getNextPage(): void {
     if (this.resourceSubject.value.Meta && this.resourceSubject.value.Meta.Page) {
       this.listResources(this.resourceSubject.value.Meta.Page + 1);
     }
   }
 
-  patchFilterState(patch: Options) {
+  patchFilterState(patch: Options): void {
     const activeOptions = { ...this.optionsSubject.value, ...patch };
     const queryParams = this.mapToUrlQueryParams(activeOptions);
     this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
   }
 
-  toPage(pageNumber: number) {
+  toPage(pageNumber: number): void {
     this.patchFilterState({ page: pageNumber || undefined });
   }
 
-  sortBy(field: string) {
+  sortBy(field: string): void {
     this.patchFilterState({ sortBy: field || undefined });
   }
 
-  searchBy(searchTerm: string) {
+  searchBy(searchTerm: string): void {
     this.patchFilterState({ search: searchTerm || undefined });
   }
 
-  addFilters(newFilters: FilterDictionary) {
+  addFilters(newFilters: ListFilters): void {
     const newFilterDictionary = { ...this.optionsSubject.value.filters, ...newFilters };
     this.patchFilterState({ filters: newFilterDictionary });
   }
 
-  removeFilters(filtersToRemove: string[]) {
+  removeFilters(filtersToRemove: string[]): void {
     const newFilterDictionary = { ...this.optionsSubject.value.filters };
     filtersToRemove.forEach(filter => {
       if (newFilterDictionary[filter]) {
@@ -328,19 +287,19 @@ export abstract class ResourceCrudService<ResourceType> {
     this.patchFilterState({ filters: newFilterDictionary });
   }
 
-  clearSort() {
+  clearSort(): void {
     this.sortBy(undefined);
   }
 
-  clearSearch() {
+  clearSearch(): void {
     this.searchBy(undefined);
   }
 
-  clearAllFilters() {
+  clearAllFilters(): void {
     this.patchFilterState({ filters: {} });
   }
 
-  clearResources() {
+  clearResources(): void {
     this.resourceSubject.next({ Meta: {}, Items: [] });
   }
 
@@ -363,5 +322,49 @@ export abstract class ResourceCrudService<ResourceType> {
           return !!value;
         }))
     );
+  }
+
+  // Used to update the URL
+  mapToUrlQueryParams(options: Options): Params {
+    const { sortBy, search, filters, OrderDirection } = options;
+    return { sortBy, search, ...filters, OrderDirection };
+  }
+
+  // Handle URL updates
+  private readFromUrlQueryParams(params: Params): void {
+    const { sortBy, search, OrderDirection, ...filters } = params;
+    this.optionsSubject.next({ sortBy, search, filters, OrderDirection });
+  }
+
+  private async listWithStatusIndicator(options: Options, orderDirection = ''): Promise<ListPage<ResourceType>> {
+    try {
+      this.resourceRequestStatus.next(this.getFetchStatus(options));
+      const args = this.createListArgs([options], orderDirection);
+      const resourceResponse = await this.list(args);
+      this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
+      return resourceResponse;
+    } catch (error) {
+      this.resourceRequestStatus.next(ERROR);
+      throw error;
+    }
+  }
+
+  private isOnRelatedRoute(): boolean {
+    const isOnSubResource =
+      this.subResourceList &&
+      this.subResourceList.some(subResource => {
+        return this.router.url.includes(`/${subResource}`);
+      });
+    const isOnBaseRoute = this.router.url.includes(this.route);
+    const isOnRelatedSubResource = this.router.url.includes(`/${this.secondaryResourceLevel}`);
+    if (!isOnBaseRoute) {
+      return false;
+    } else if (isOnSubResource && this.secondaryResourceLevel && isOnRelatedSubResource) {
+      return true;
+    } else if (!isOnSubResource && !this.secondaryResourceLevel) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

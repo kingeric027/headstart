@@ -110,6 +110,10 @@ const MPMeSupplierUserAdmin: MPRole = {
   RoleName: 'MPMeSupplierUserAdmin',
   OrderCloudRoles: ['SupplierReader', 'SupplierUserAdmin'],
 };
+const MPReportReader: MPRole = {
+  RoleName: 'MPReportReader',
+  OrderCloudRoles: [],
+};
 const AllMPRoles = [
   MPMeProductAdmin,
   MPMeProductReader,
@@ -129,6 +133,7 @@ const AllMPRoles = [
   MPMeSupplierAdmin,
   MPMeSupplierAddressAdmin,
   MPMeSupplierUserAdmin,
+  MPReportReader,
 ];
 interface UserType {
   Name: string;

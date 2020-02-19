@@ -16,109 +16,111 @@ namespace Marketplace.Common.Commands
     {
 		Task<ImpersonationToken> Seed(EnvironmentSeed seed, VerifiedUserContext user);
     }
-    public class EnvironmentSeedCommand : IEnvironmentSeedCommand
-    {
-        private readonly IOrderCloudClient _oc;
-        private readonly AppSettings _settings;
-        private readonly IDevCenterService _dev;
-        private EnvironmentSeed _seed;
-        private readonly IMarketplaceSupplierCommand _command;
+	public class EnvironmentSeedCommand : IEnvironmentSeedCommand
+	{
+		private readonly IOrderCloudClient _oc;
+		private readonly AppSettings _settings;
+		private readonly IDevCenterService _dev;
+		private EnvironmentSeed _seed;
+		private readonly IMarketplaceSupplierCommand _command;
 
-        public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand command)
-        {
-            _settings = settings;
-            _oc = oc;
-            _dev = dev;
-            _command = command;
-        }
+		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand command)
+		{
+			_settings = settings;
+			_oc = oc;
+			_dev = dev;
+			_command = command;
+		}
 
-        public async Task<ImpersonationToken> Seed(EnvironmentSeed seed, VerifiedUserContext user)
-        {
-            _seed = seed;
-            var org = await this.CreateOrganization(user.AccessToken);
-            var company = await _dev.GetOrganizations(org.OwnerDevID, user.AccessToken);
+		public async Task<ImpersonationToken> Seed(EnvironmentSeed seed, VerifiedUserContext user)
+		{
+			_seed = seed;
+			var org = await this.CreateOrganization(user.AccessToken);
+			var company = await _dev.GetOrganizations(org.OwnerDevID, user.AccessToken);
 
-            // at this point everything we do is as impersonation of the admin user on a new token
-            var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
-            await this.PatchDefaultApiClients(impersonation.access_token);
-            await this.CreateWebhooks(impersonation.access_token, "https://marketplace-api-qa.azurewebsites.net");
-            await this.CreateMarketPlaceRoles(impersonation.access_token);
-            await this.CreateSuppliers(user, impersonation.access_token);
+			// at this point everything we do is as impersonation of the admin user on a new token
+			var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
+			await this.PatchDefaultApiClients(impersonation.access_token);
+			await this.CreateWebhooks(impersonation.access_token, "https://marketplace-api-qa.azurewebsites.net");
+			await this.CreateMarketPlaceRoles(impersonation.access_token);
+			await this.CreateSuppliers(user, impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
 			return impersonation;
-        }
+		}
 
-        //private async Task ConfigureBuyers(string token) {}
+		//private async Task ConfigureBuyers(string token) {}
 
-        private async Task CreateSuppliers(VerifiedUserContext user, string token)
-        {
-            var profile = await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
-            {
-                CustomRoles = new List<string>(),
-                ID = "supplierIntegration",
-                Name = "Supplier Integration Security Profile",
-                Roles = new List<ApiRole>() { ApiRole.FullAccess }
-            }, token);
+		private async Task CreateSuppliers(VerifiedUserContext user, string token)
+		{
+			var profile = await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
+			{
+				CustomRoles = new List<string>(),
+				ID = "supplierIntegration",
+				Name = "Supplier Integration Security Profile",
+				Roles = new List<ApiRole>() { ApiRole.FullAccess }
+			}, token);
 
-            // Create Suppliers and necessary user groups and security profile assignments
-            foreach (MarketplaceSupplier supplier in _seed.Suppliers)
-            {
-                await _command.Create(supplier, user, token);
-            }
+			// Create Suppliers and necessary user groups and security profile assignments
+			foreach (MarketplaceSupplier supplier in _seed.Suppliers)
+			{
+				await _command.Create(supplier, user, token);
+			}
 
-           //Add xp index for SupplierUserGroup.xp.Type
-           await _oc.XpIndices.PutAsync(new XpIndex
-            {
-                ThingType = XpThingType.UserGroup,
-                Key = "Type"
-            }, token);
-        }
+			//Add xp index for SupplierUserGroup.xp.Type
+			await _oc.XpIndices.PutAsync(new XpIndex
+			{
+				ThingType = XpThingType.UserGroup,
+				Key = "Type"
+			}, token);
+		}
 
-        private async Task PatchDefaultApiClients(string token)
-        {
-            var list = await _oc.ApiClients.ListAsync(accessToken: token);
-            var tasks = list.Items.Select(client => _oc.ApiClients.PatchAsync(client.ID, new PartialApiClient()
-            {
-                Active = true,
-                AllowAnyBuyer = client.AppName.Contains("Buyer"),
-                AllowAnySupplier = client.AppName.Contains("Admin"),
-                AllowSeller = client.AppName.Contains("Admin"),
-                AccessTokenDuration = 600,
-                RefreshTokenDuration = 43200,
-            }, accessToken: token))
-                .ToList();
-            await Task.WhenAll(tasks);
-        }
+		private async Task PatchDefaultApiClients(string token)
+		{
+			var list = await _oc.ApiClients.ListAsync(accessToken: token);
+			var tasks = list.Items.Select(client => _oc.ApiClients.PatchAsync(client.ID, new PartialApiClient()
+			{
+				Active = true,
+				AllowAnyBuyer = client.AppName.Contains("Buyer"),
+				AllowAnySupplier = client.AppName.Contains("Admin"),
+				AllowSeller = client.AppName.Contains("Admin"),
+				AccessTokenDuration = 600,
+				RefreshTokenDuration = 43200,
+			}, accessToken: token))
+				.ToList();
+			await Task.WhenAll(tasks);
+		}
 
-        public async Task CreateWebhooks(string accessToken, string baseURL)
-        {
-            var apiClientResponse = await _oc.ApiClients.ListAsync(accessToken: accessToken);
-            foreach (Webhook webhook in DefaultWebhooks)
-            {
-                webhook.ApiClientIDs = apiClientResponse.Items.Select(apiClient => apiClient.ID).ToList();
-                webhook.Url = $"{baseURL}{webhook.Url}";
-                await _oc.Webhooks.CreateAsync(webhook, accessToken);
-            }
-        }
 
-        private async Task<AdminCompany> CreateOrganization(string token)
-        {
-            var org = new Organization()
-            {
-                Name = $"Marketplace.Print {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}",
-                Active = true,
-                BuyerID = "Default_Marketplace_Buyer",
-                BuyerApiClientName = $"Default Marketplace Buyer UI",
-                BuyerName = $"Default Marketplace Buyer",
-                BuyerUserName = $"Default_Buyer",
-                BuyerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-                SellerApiClientName = $"Default Marketplace Admin UI",
-                SellerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-                SellerUserName = $"Default_Admin"
-            };
-            var request = await _dev.PostOrganization(org, token);
-            return request;
-        }
+		public async Task CreateWebhooks(string accessToken, string baseURL)
+		{
+
+			var apiClientResponse = await _oc.ApiClients.ListAsync(accessToken: accessToken);
+			foreach (Webhook webhook in DefaultWebhooks)
+			{
+				webhook.ApiClientIDs = apiClientResponse.Items.Select(apiClient => apiClient.ID).ToList();
+				webhook.Url = $"{baseURL}{webhook.Url}";
+				await _oc.Webhooks.CreateAsync(webhook, accessToken);
+			}
+		}
+
+		private async Task<AdminCompany> CreateOrganization(string token)
+		{
+			var org = new Organization()
+			{
+				Name = $"Marketplace.Print {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}",
+				Active = true,
+				BuyerID = "Default_Marketplace_Buyer",
+				BuyerApiClientName = $"Default Marketplace Buyer UI",
+				BuyerName = $"Default Marketplace Buyer",
+				BuyerUserName = $"Default_Buyer",
+				BuyerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
+				SellerApiClientName = $"Default Marketplace Admin UI",
+				SellerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
+				SellerUserName = $"Default_Admin"
+			};
+			var request = await _dev.PostOrganization(org, token);
+			return request;
+		}
 
 		public async Task CreateMarketPlaceRoles(string accessToken)
 		{
@@ -150,6 +152,7 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeSupplierAddressAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierAddressAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeSupplierUserAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierUserAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPSupplierUserGroupAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierUserGroupAdmin } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPReportReader },
 		};
 
 		static readonly List<Webhook> DefaultWebhooks = new List<Webhook>() {

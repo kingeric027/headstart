@@ -6,8 +6,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
-import { ListResource } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 import { getPsHeight } from '@app-seller/shared/services/dom.helper';
+import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 
 @Component({
   selector: 'resource-select-dropdown-component',
@@ -22,19 +22,19 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy, AfterViewCheck
   searchTerm = '';
   selectedParentResourceName = 'Fetching Data';
   alive = true;
-  resourceSelectDropdownHeight: number = 450;
+  resourceSelectDropdownHeight = 450;
+
+  @Input()
+  ocService: ResourceCrudService<any>;
+  @Input()
+  parentService: ResourceCrudService<any>;
+  parentResourceList: ListPage<any> = { Meta: {}, Items: [] };
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
-
-  @Input()
-  ocService: ResourceCrudService<any>;
-  @Input()
-  parentService: ResourceCrudService<any>;
-  parentResourceList: ListResource<any> = { Meta: {}, Items: [] };
 
   ngOnInit() {
     this.setParentResourceSubscription();

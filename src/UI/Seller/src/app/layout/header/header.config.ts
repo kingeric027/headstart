@@ -1,6 +1,5 @@
-import { HeaderNav } from './header.component';
-import { FilterDictionary } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 import { SELLER, SUPPLIER } from '@app-seller/shared/models/ordercloud-user.types';
+import { ListFilters } from '@app-seller/shared/services/middleware-api/listArgs.interface';
 
 // ! included to ensure no overlap with ordercloud ids as this in invalid in ids
 export const REDIRECT_TO_FIRST_PARENT = '!';
@@ -11,7 +10,7 @@ export interface MPRoute {
   orderCloudUserTypesWithAccess?: string[];
   title: string;
   route: string;
-  queryParams?: FilterDictionary;
+  queryParams?: ListFilters;
 
   // if subroutes are included, itesms will display in a dropdown
   subRoutes?: MPRoute[];
@@ -28,14 +27,14 @@ const LiveProducts: MPRoute = {
   rolesWithAccess: ['MPPRoductAdmin', 'MPProductReader', 'MPMeProductAdmin'],
   title: 'Live Products',
   route: '/products',
-  queryParams: { 'xp.Status': 'Published' }
+  queryParams: { 'xp.Status': 'Published' },
 };
 
 const PendingProducts: MPRoute = {
   rolesWithAccess: ['MPPRoductAdmin', 'MPProductReader', 'MPMeProductAdmin'],
   title: 'Pending Products',
   route: '/products',
-  queryParams: { 'xp.Status': 'Draft' }
+  queryParams: { 'xp.Status': 'Draft' },
 };
 
 const Promotions: MPRoute = {
@@ -57,7 +56,7 @@ const ProductNavGrouping: MPRoute = {
   subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, Categories],
 };
 
-//Orders
+// Orders
 const BuyerOrders: MPRoute = {
   rolesWithAccess: ['MPOrderAdmin', 'MPOrderReader', 'MPShipmentAdmin'],
   title: 'Incoming Buyer Orders',
@@ -112,11 +111,11 @@ const SupplierOrderNavGrouping: MPRoute = {
   subRoutes: [Orders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders],
 };
 
-//Buyers
+// Buyers
 const AllBuyers: MPRoute = {
   rolesWithAccess: ['MPBuyerAdmin', 'MPBuyerReader'],
   title: 'All Buyers',
-  route: `/buyers`,
+  route: '/buyers',
 };
 
 const BuyerUsers: MPRoute = {
@@ -143,18 +142,24 @@ const BuyerApprovalRules: MPRoute = {
   route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/approvals`,
 };
 
+const BuyerCategories: MPRoute = {
+  rolesWithAccess: ['MPBuyerAdmin', 'MPBuyerReader'],
+  title: 'Categories',
+  route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/categories`,
+};
+
 const BuyerNavGrouping = {
   rolesWithAccess: ['MPBuyerAdmin', 'MPBuyerReader'],
   title: 'Buyers',
   route: '/buyers',
-  subRoutes: [AllBuyers, BuyerUsers, BuyerPurchasingLocations, BuyerPaymentMethods, BuyerApprovalRules],
+  subRoutes: [AllBuyers, BuyerUsers, BuyerPurchasingLocations, BuyerPaymentMethods, BuyerApprovalRules, BuyerCategories],
 };
 
-//Suppliers
+// Suppliers
 const AllSuppliers: MPRoute = {
   rolesWithAccess: ['MPSupplierAdmin'],
   title: 'All Suppliers',
-  route: `/suppliers`,
+  route: '/suppliers',
 };
 
 const SupplierUsers: MPRoute = {
@@ -176,10 +181,17 @@ const SupplierNavGrouping: MPRoute = {
   subRoutes: [AllSuppliers, SupplierUsers, SupplierLocations],
 };
 
-const ReportsRoute = {
+const OrchestionLogs = {
+  rolesWithAccess: ['MPReportReader'],
+  title: 'Orchestion Logs',
+  route: 'reports/logs',
+};
+
+const ReportsNavGrouping = {
   rolesWithAccess: ['MPReportReader'],
   title: 'Reports',
   route: '/reports',
+  subRoutes: [OrchestionLogs],
 };
 
 const SellerUsers = {
@@ -206,8 +218,8 @@ const AllNavGroupings: MPRoute[] = [
   SellerOrderNavGrouping,
   BuyerNavGrouping,
   SupplierNavGrouping,
+  ReportsNavGrouping,
   SellerUsers,
-  ReportsRoute,
   Storefronts,
   PublicProfile,
 ];

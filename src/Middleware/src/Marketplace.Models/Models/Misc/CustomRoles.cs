@@ -24,6 +24,7 @@ namespace Marketplace.Models.Models.Misc
 		MPSupplierAdmin, 
 		MPMeSupplierAddressAdmin,
 		MPMeSupplierUserAdmin,
-		MPSupplierUserGroupAdmin
+		MPSupplierUserGroupAdmin,
+		MPReportReader
 	}
 }

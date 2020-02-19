@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Models;
 using Marketplace.Helpers;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers
 {
-    [Route("logs")]
+    [Route("orchestration/logs")]
     public class OrchestrationLogController : BaseController
     {
         private readonly IOrchestrationLogCommand _command;
@@ -15,10 +16,10 @@ namespace Marketplace.Common.Controllers
             _command = command;
         }
 
-        [HttpGet, Route("product")]
-        public async Task<dynamic> GetProductLogs(ListArgs<OrchestrationLog> marketplaceListArgs)
+        [HttpGet, Route("")]
+        public async Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> args)
         {
-            return await _command.GetProductLogs(marketplaceListArgs);
+            return await _command.List(args);
         }
     }
 }
