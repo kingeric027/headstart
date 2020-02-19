@@ -2,9 +2,9 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Order } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { OrderService } from '@app-seller/shared/services/order/order.service';
 import { AppAuthService } from '@app-seller/auth/services/app-auth.service';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
+import { OrderService } from '@app-seller/orders/order.service';
 
 @Component({
   selector: 'app-order-table',
@@ -13,7 +13,7 @@ import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 })
 export class OrderTableComponent extends ResourceCrudComponent<Order> {
   isListPage: boolean;
-  shouldShowOrderToggle: boolean = false;
+  shouldShowOrderToggle = false;
   activeOrderDirectionButton: string;
   constructor(
     private orderService: OrderService,
@@ -32,7 +32,7 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
     });
     activatedroute.params.subscribe(params => {
       this.isListPage = !Boolean(params.orderID);
-    })
+    });
   }
   setOrderDirection(direction: string) {
     if (this.isListPage) {
@@ -52,17 +52,17 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
         Display: 'Status',
         Path: 'Status',
         Values: ['Open', 'AwaitingApproval', 'Completed', 'Declined', 'Canceled'],
-        Type: 'Dropdown'
+        Type: 'Dropdown',
       },
       {
         Display: 'From Date',
         Path: 'from',
-        Type: 'DateFilter'
+        Type: 'DateFilter',
       },
       {
         Display: 'To Date',
         Path: 'to',
-        Type: 'DateFilter'
+        Type: 'DateFilter',
       },
     ],
   };

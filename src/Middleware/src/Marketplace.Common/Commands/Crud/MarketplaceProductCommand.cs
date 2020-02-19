@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using Marketplace.Models;
@@ -8,11 +10,10 @@ namespace Marketplace.Common.Commands.Crud
 {
     public interface IMarketplaceProductCommand
     {
-        Task<MarketplaceProduct> Get(string id, VerifiedUserContext user);
-        Task<ListPage<MarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
-        Task<MarketplaceProduct> Post(MarketplaceProduct product, VerifiedUserContext user);
-        Task<MarketplaceProduct> Put(string id, MarketplaceProduct product, VerifiedUserContext user);
-        Task<PartialMarketplaceProduct> Patch(PartialMarketplaceProduct product, string id, VerifiedUserContext user);
+        Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user);
+        Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
+        Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct product, VerifiedUserContext user);
+        Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct product, VerifiedUserContext user);
         Task Delete(string id, VerifiedUserContext user);
 
     }
@@ -29,29 +30,58 @@ namespace Marketplace.Common.Commands.Crud
             });
         }
 
-        public async Task<MarketplaceProduct> Get(string id, VerifiedUserContext user)
+        public async Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user)
         {
-            return await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
+            var _product =  await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
+            var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.DefaultPriceScheduleID, user.AccessToken);
+            return new SuperMarketplaceProduct
+            {
+                Product = _product,
+                PriceSchedule = _priceSchedule
+            };
         }
 
-        public async Task<ListPage<MarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
+        public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
         {
-            return await _oc.Products.ListAsync<MarketplaceProduct>(filters: args, accessToken: user.AccessToken);
+            var _productsList =  await _oc.Products.ListAsync<MarketplaceProduct>(filters: args, accessToken: user.AccessToken);
+            var _superProductsList = new List<SuperMarketplaceProduct> { };
+            foreach (MarketplaceProduct product in _productsList.Items)
+            {
+                var priceSchedule = await _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
+                _superProductsList.Add(new SuperMarketplaceProduct
+                {
+                    Product = product,
+                    PriceSchedule = priceSchedule
+                });
+            }
+            return new ListPage<SuperMarketplaceProduct>
+            {
+                Meta = _productsList.Meta,
+                Items = _superProductsList
+            };
         }
 
-        public async Task<MarketplaceProduct> Post(MarketplaceProduct product, VerifiedUserContext user)
+        public async Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct superProduct, VerifiedUserContext user)
         {
-            return await _oc.Products.CreateAsync<MarketplaceProduct>(product, user.AccessToken);
+            var _priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
+            superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
+            var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(superProduct.Product, user.AccessToken);
+            return new SuperMarketplaceProduct
+            {
+                Product = _product,
+                PriceSchedule = _priceSchedule
+            };
         }
 
-        public async Task<MarketplaceProduct> Put(string id, MarketplaceProduct product, VerifiedUserContext user)
+        public async Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct superProduct, VerifiedUserContext user)
         {
-            return await _oc.Products.SaveAsync<MarketplaceProduct>(id, product, user.AccessToken);
-        }
-
-        public async Task<PartialMarketplaceProduct> Patch(PartialMarketplaceProduct product, string id, VerifiedUserContext user)
-        {
-            return await _oc.Products.PatchAsync<PartialMarketplaceProduct>(id, product, user.AccessToken);
+            var _updatedPriceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
+            var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
+            return new SuperMarketplaceProduct
+            {
+                Product = _updatedProduct,
+                PriceSchedule = _updatedPriceSchedule
+            };
         }
 
         public async Task Delete(string id, VerifiedUserContext user)

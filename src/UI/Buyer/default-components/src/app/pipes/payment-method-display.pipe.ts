@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'paymentMethodDisplay',
 })
 export class PaymentMethodDisplayPipe implements PipeTransform {
-  transform(method: string) {
+  transform(method: string): string {
     if (!method) {
       return null;
     }

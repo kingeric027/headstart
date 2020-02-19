@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { faPhone, faQuestionCircle, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import { ShopperContextService } from 'marketplace';
 
@@ -13,15 +13,15 @@ export class OCMAppFooter {
 
   constructor(private context: ShopperContextService) {}
 
-  toTermsAndConditions() {
+  toTermsAndConditions(): void {
     this.context.router.toRoute('/terms-and-conditions');
   }
 
-  toSupport() {
+  toSupport(): void {
     this.context.router.toRoute('/support');
   }
 
-  toFAQ() {
+  toFAQ(): void {
     this.context.router.toRoute('/faq');
   }
 }

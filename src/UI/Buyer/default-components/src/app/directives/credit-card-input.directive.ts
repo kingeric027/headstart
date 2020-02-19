@@ -6,24 +6,24 @@ export class CreditCardInputDirective {
   constructor(private el: ElementRef, private creditCardFormat: CreditCardFormatPipe) {}
 
   @HostListener('keyup')
-  keyUp() {
+  keyUp(): void {
     this.format();
   }
 
   // Cap the length of the field at 14 characters - 10 numbers plus 4 characters
   @HostListener('keydown', ['$event'])
-  keyDown(event: KeyboardEvent) {
+  keyDown(event: KeyboardEvent): void {
     const key = event.keyCode;
     if (!this.allowedKeys(key) && this.el.nativeElement.value.length >= 23 && key !== 65) {
       event.preventDefault();
     }
   }
 
-  format() {
+  format(): void {
     this.el.nativeElement.value = this.creditCardFormat.transform(this.el.nativeElement.value);
   }
 
-  allowedKeys(key) {
+  allowedKeys(key: number): boolean {
     if (!key) {
       return true;
     }

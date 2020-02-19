@@ -1,12 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl, FormBuilder } from '@angular/forms';
+import { FormControl, FormBuilder, FormArray } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
-import { map as _map, find as _find, minBy as _minBy, sortBy as _sortBy } from 'lodash';
+import { map as _map, find as _find } from 'lodash';
 
 import { FieldConfig } from './field-config.interface';
-import { ListBuyerSpec, BuyerProduct, SpecOption } from '@ordercloud/angular-sdk';
+import { ListBuyerSpec, SpecOption } from '@ordercloud/angular-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
-import { ShopperContextService } from 'marketplace';
 
 @Component({
   template: `
@@ -37,7 +36,7 @@ export class OCMSpecForm {
     this.init();
   }
 
-  init() {
+  init(): void {
     this.config = this.createFieldConfig();
     this.form = this.createGroup();
     this.form.valueChanges.subscribe(() => {
@@ -47,7 +46,7 @@ export class OCMSpecForm {
     this.handleChange();
   }
 
-  createGroup() {
+  createGroup(): FormGroup {
     const group = this.fb.group({
       ctrls: this.fb.array([]),
     });
@@ -55,7 +54,7 @@ export class OCMSpecForm {
       const ctrl = this.createControl(control);
       group.addControl(control.name, ctrl);
       // tslint:disable-next-line:no-string-literal
-      group.controls['ctrls']['push'](ctrl);
+      (group.controls.ctrls as any).push(ctrl);
     });
     return group;
   }
@@ -64,7 +63,7 @@ export class OCMSpecForm {
     const c: FieldConfig[] = [];
     if (!this._specs || !this._specs.Items) return c;
     for (const spec of this._specs.Items) {
-      if (spec.xp && spec.xp.control === 'checkbox') {
+      if (spec?.xp?.control === 'checkbox') {
         c.push({
           type: 'checkbox',
           label: spec.Name,
@@ -73,28 +72,28 @@ export class OCMSpecForm {
           options: _map(spec.Options, 'Value'),
           validation: [Validators.nullValidator],
         });
-      } else if (spec.xp && spec.xp.control === 'range') {
+      } else if (spec?.xp?.control === 'range') {
         c.push({
           type: 'range',
           label: spec.Name,
           name: spec.Name.replace(/ /g, ''),
           value: spec.DefaultValue,
-          min: Math.min.apply(Math, _map(spec.Options, (option: SpecOption) => +option.Value)),
-          max: Math.max.apply(Math, _map(spec.Options, (option: SpecOption) => +option.Value)),
+          min: Math.min(..._map(spec.Options, (option: SpecOption) => +option.Value)),
+          max: Math.max(..._map(spec.Options, (option: SpecOption) => +option.Value)),
           validation: [
             spec.Required ? Validators.required : Validators.nullValidator,
-            Validators.min(Math.min.apply(Math, _map(spec.Options, (option: SpecOption) => +option.Value))),
-            Validators.max(Math.max.apply(Math, _map(spec.Options, (option: SpecOption) => +option.Value))),
+            Validators.min(Math.min(..._map(spec.Options, (option: SpecOption) => +option.Value))),
+            Validators.max(Math.max(..._map(spec.Options, (option: SpecOption) => +option.Value))),
           ],
         });
-      } else if (spec.Options.length === 1) {
+      } else if (spec?.Options.length === 1) {
         c.unshift({
           type: 'label',
           label: spec.Name,
           name: spec.Name.replace(/ /g, ''),
           options: _map(spec.Options, 'Value'),
         });
-      } else if (spec.Options.length > 1) {
+      } else if (spec?.Options.length > 1) {
         c.push({
           type: 'select',
           label: spec.Name,
@@ -125,7 +124,7 @@ export class OCMSpecForm {
     return new FormControl({ disabled, value }, validation);
   }
 
-  handleChange() {
+  handleChange(): void {
     this.specFormChange.emit({
       type: 'Change',
       valid: this.form.valid,

@@ -12,8 +12,8 @@ namespace Marketplace.Common.Services
 {
 	public interface IContentManagementService
 	{
-		Task<Product> UploadProductImage(IFormFile files, string marketplaceID, string productID, string token);
-		Task<Product> DeleteProductImage(string marketplaceID, string productID, string fileName, string token);
+		Task<SuperMarketplaceProduct> UploadProductImage(IFormFile files, string marketplaceID, string productID, string token);
+		Task<SuperMarketplaceProduct> DeleteProductImage(string marketplaceID, string productID, string fileName, string token);
 	}
 
 	public class ContentManagementService : IContentManagementService
@@ -33,7 +33,7 @@ namespace Marketplace.Common.Services
 			});
 		}
 
-		public async Task<Product> UploadProductImage(IFormFile file, string marketplaceID, string productID, string token)
+		public async Task<SuperMarketplaceProduct> UploadProductImage(IFormFile file, string marketplaceID, string productID, string token)
 		{
 			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
 			if (product.xp?.Images == null)
@@ -55,10 +55,16 @@ namespace Marketplace.Common.Services
 					product.xp.Images
 				}
 			};
-			return await _oc.Products.PatchAsync(productID, partial, token);
+			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, partial, token);
+			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
+			return new SuperMarketplaceProduct
+			{
+				Product = _patchedProduct,
+				PriceSchedule = _priceSchedule
+			};
 		}
 
-		public async Task<Product> DeleteProductImage(string marketplaceID, string productID, string fileName, string token)
+		public async Task<SuperMarketplaceProduct> DeleteProductImage(string marketplaceID, string productID, string fileName, string token)
 		{
 			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
 			var blobName = GetProductImageName(marketplaceID, fileName);
@@ -66,7 +72,13 @@ namespace Marketplace.Common.Services
 
 			var Images = product.xp.Images.Where(img => !img.URL.EndsWith(fileName));
 
-			return await _oc.Products.PatchAsync(productID, new PartialProduct() { xp = new { Images }}, token);
+			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { xp = new { Images }}, token);
+			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
+			return new SuperMarketplaceProduct
+			{
+				Product = _patchedProduct,
+				PriceSchedule = _priceSchedule
+			};
 		}
 
 		private string GetProductImageName(string mkplID, string imgName) => $"{mkplID}/products/{imgName}";

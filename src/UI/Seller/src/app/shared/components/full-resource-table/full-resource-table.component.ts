@@ -1,17 +1,15 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {
-  PRODUCT_IMAGE_PATH_STRATEGY,
-  getProductMainImageUrlOrPlaceholder,
-  PLACEHOLDER_URL,
-} from '@app-seller/shared/services/product/product-image.helper';
-import {
   FULL_TABLE_RESOURCE_DICTIONARY,
-  ResourceCell,
-  ResourceColumnConfiguration,
   ResourceRow,
   ResourceConfiguration,
 } from '@app-seller/shared/services/configuration/table-display';
 import { RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import {
+  PRODUCT_IMAGE_PATH_STRATEGY,
+  getProductMainImageUrlOrPlaceholder,
+  PLACEHOLDER_URL,
+} from '@app-seller/products/product-image.helper';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -43,11 +41,11 @@ export class FullResourceTableComponent {
   }
 
   getHeaders(resources: any[]): string[] {
-    return FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].fields.map((r) => r.header);
+    return FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].fields.map(r => r.header);
   }
 
   getRows(resources: any[]): ResourceRow[] {
-    return resources.map((resource) => {
+    return resources.map(resource => {
       return this.createResourceRow(resource);
     });
   }
@@ -59,7 +57,7 @@ export class FullResourceTableComponent {
   createResourceRow(resource: any): ResourceRow {
     const resourceConfiguration = FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType];
     const fields = resourceConfiguration.fields;
-    const resourceCells = fields.map((fieldConfiguration) => {
+    const resourceCells = fields.map(fieldConfiguration => {
       return {
         type: fieldConfiguration.type,
         value: this.getValueOnExistingResource(resource, fieldConfiguration.path),
@@ -90,7 +88,7 @@ export class FullResourceTableComponent {
     const piecesOfPath = path.split('.');
     if (path) {
       let currentObject = value;
-      piecesOfPath.forEach((piece) => {
+      piecesOfPath.forEach(piece => {
         currentObject = currentObject && currentObject[piece];
       });
       return currentObject;

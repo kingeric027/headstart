@@ -33,9 +33,6 @@ namespace Marketplace.Tests
             var token = "mockToken";
             var expectedBlobID = $"{marketplaceID}/products/{productID}-1";
             await setup.blob.Delete(expectedBlobID); // TODO: this should be moved to a SetUp() method once BlobService can list https://github.com/nunit/docs/wiki/SetUp-and-TearDown
-
-            setup.occlient.Products.GetAsync<Product<ProductXp>>("mockProductID", "mockToken")
-                .Returns(Task.FromResult(new Product<ProductXp>()));
             var file = GetMockFile();
 
             // Act
@@ -43,7 +40,7 @@ namespace Marketplace.Tests
             var result = await sut.UploadProductImage(file, marketplaceID, productID, token);
 
             // Assert
-            Assert.AreEqual("patched-product", result.ID);
+            Assert.AreEqual("patched-product", result.Product.ID);
             var blobfile = await setup.blob.Get(expectedBlobID);
             Assert.AreEqual(blobfile, "This is a mock file");
         }
@@ -67,10 +64,10 @@ namespace Marketplace.Tests
             var ocClient = ocSub ?? Substitute.For<IOrderCloudClient>();
             if (ocSub == null)
             {
-                ocClient.Products.GetAsync<Product<ProductXp>>("mockProductID", "mockToken")
+                ocClient.Products.GetAsync<MarketplaceProduct>("mockProductID", "mockToken")
                     .Returns(Task.FromResult(Mocks.Products.ProductWithOneImage()));
 
-                ocClient.Products.PatchAsync("mockProductID", Arg.Any<PartialProduct>(), "mockToken")
+                ocClient.Products.PatchAsync<MarketplaceProduct>("mockProductID", Arg.Any<PartialProduct>(), "mockToken")
                     .Returns(Task.FromResult(Mocks.Products.PatchResponse()));
             }
 

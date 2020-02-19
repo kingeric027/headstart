@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Helpers;
 using Marketplace.Models.Misc;
+using Marketplace.Common.Services.DevCenter.Models;
 
 namespace Marketplace.Common.Controllers
 {
@@ -16,9 +17,9 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("seed"), DevCenterUserAuth()]
-        public async Task Seed([FromBody] EnvironmentSeed suppliers)
+        public async Task<ImpersonationToken> Seed([FromBody] EnvironmentSeed suppliers)
         {
-            await _command.Seed(suppliers, this.VerifiedUserContext);
+            return await _command.Seed(suppliers, this.VerifiedUserContext);
         }
     }
 }

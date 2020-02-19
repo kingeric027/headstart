@@ -1,8 +1,16 @@
-﻿namespace Marketplace.Common.Services.Zoho.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Newtonsoft.Json;
+
+namespace Marketplace.Common.Services.Zoho.Models
 {
-    /// <summary>
-    /// Class ZohoCurrency.
-    /// </summary>
+    public class ZohoListCurrencyList : ZohoListResponse
+    {
+        [JsonProperty(PropertyName = "currencies")]
+        public List<ZohoCurrency> Items { get; set; }
+    }
+
     public class ZohoCurrency
     {
         /// <summary>
@@ -50,6 +58,6 @@
         /// </summary>
         /// <value>The effective_date.</value>
         public string effective_date { get; set; }
-        
+
     }
 }

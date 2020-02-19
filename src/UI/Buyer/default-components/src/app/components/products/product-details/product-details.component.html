@@ -45,7 +45,7 @@
                 <button class="btn btn-block btn-primary mb-3"
                         type="submit"
                         [disabled]="!specFormService.event?.valid || !qtyValid"
-                        (click)="addToCart($event)">
+                        (click)="addToCart()">
                   Add to Cart
                   <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
                 </button>

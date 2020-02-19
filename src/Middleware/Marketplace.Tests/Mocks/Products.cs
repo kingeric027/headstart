@@ -10,9 +10,9 @@ namespace Marketplace.Tests.Mocks
 {
     public static class Products
     {
-        public static Product<ProductXp> ProductWithOneImage()
+        public static MarketplaceProduct ProductWithOneImage()
         {
-            return new Product<ProductXp>()
+            return new MarketplaceProduct()
             {
                 xp = new ProductXp()
                 {
@@ -20,16 +20,16 @@ namespace Marketplace.Tests.Mocks
                     {
                         new ProductImage()
                         {
-                            URL = "mock-image-url.png"
+                            URL = "mock-image-url-0"
                         }
                     }
                 }
             };
         }
 
-        public static Product PatchResponse()
+        public static MarketplaceProduct PatchResponse()
         {
-            var product = new Product();
+            var product = new MarketplaceProduct();
             product.ID = "patched-product";
             return product;
         }

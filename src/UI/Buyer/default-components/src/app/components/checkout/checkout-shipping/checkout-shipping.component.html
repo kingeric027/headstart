@@ -1,6 +1,6 @@
-<div *ngIf="proposedShipments">
-    <div *ngFor="let proposedShipment of proposedShipments.Items">
-        <ocm-lineitem-table [lineItems]="getLineItemsForProposedShipment(proposedShipment)"
+<div *ngIf="_proposedShipments">
+    <div *ngFor="let proposedShipment of _proposedShipments.Items; let i = index">
+        <ocm-lineitem-table [lineItems]="_lineItemsByProposedShipment[i]"
                             [readOnly]="true">
                             <ocm-shipping-selection-form [proposedShipment]="proposedShipment"
                                                          [supplierID]="getSupplierID(proposedShipment)"

@@ -1,7 +1,6 @@
 import { Component, ChangeDetectorRef, NgZone, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Supplier } from '@ordercloud/angular-sdk';
-import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { get as _get } from 'lodash';
@@ -11,6 +10,7 @@ import {
   ValidatePhone,
   ValidateSupplierCategorySelection,
 } from '@app-seller/validators/validators';
+import { SupplierService } from '../supplier.service';
 
 export interface SupplierCategoryConfigFilters {
   Display: string;

@@ -7,7 +7,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers
 {
-    [Route("product")]
+    [Route("products")]
     public class ProductController : BaseController
     {
         private readonly IMarketplaceProductCommand _command;
@@ -17,33 +17,27 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, Route("{id}"), MarketplaceUserAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
-        public async Task<MarketplaceProduct> Get(string id)
+        public async Task<SuperMarketplaceProduct> Get(string id)
         {
             return await _command.Get(id, VerifiedUserContext);
         }
 
         [HttpGet, MarketplaceUserAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
-        public async Task<ListPage<MarketplaceProduct>> List(ListArgs<MarketplaceProduct> args)
+        public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args)
         {
             return await _command.List(args, VerifiedUserContext);
         }
 
         [HttpPost, MarketplaceUserAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceProduct> Post([FromBody] MarketplaceProduct obj)
+        public async Task<SuperMarketplaceProduct> Post([FromBody] SuperMarketplaceProduct obj)
         {
             return await _command.Post(obj, this.VerifiedUserContext);
         }
 
         [HttpPut, Route("{id}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceProduct> Put([FromBody] MarketplaceProduct obj, string id)
+        public async Task<SuperMarketplaceProduct> Put([FromBody] SuperMarketplaceProduct obj, string id)
         {
             return await _command.Put(id, obj, this.VerifiedUserContext);
-        }
-
-        [HttpPatch, Route("{id}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-        public async Task<PartialMarketplaceProduct> Patch([FromBody] PartialMarketplaceProduct obj, string id)
-        {
-            return await _command.Patch(obj, id, this.VerifiedUserContext);
         }
 
         [HttpDelete, Route("{id}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]

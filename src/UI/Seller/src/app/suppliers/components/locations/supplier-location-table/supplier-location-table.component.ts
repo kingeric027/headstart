@@ -2,10 +2,10 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Address } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
-import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
-import { SupplierAddressService } from '@app-seller/shared/services/supplier/supplier-address.service';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { ValidatePhone, ValidateUSZip } from '@app-seller/validators/validators';
+import { SupplierAddressService } from '../supplier-address.service';
+import { SupplierService } from '../../suppliers/supplier.service';
 
 function createSupplierLocationForm(supplierLocation: Address) {
   return new FormGroup({

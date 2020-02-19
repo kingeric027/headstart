@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
 import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
@@ -28,55 +28,43 @@ export class OCMCheckoutAddress implements OnInit {
 
   constructor(private context: ShopperContextService) {}
 
-  async ngOnInit() {
-    // TODO - we need to investigate this pattern and see if its something we can rely on.
-    // These are not promises. They are just inputs that are not set when ngOnInit fires.
-    await this.order, await this.lineItems;
+  ngOnInit(): void {
     if (!this.isAnon) {
       this.getSavedAddresses();
     }
     // shipping address is defined at the line item level
     this.selectedAddress =
-      this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems.Items[0].ShippingAddress;
+      this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems?.Items[0].ShippingAddress;
   }
 
-  clearRequestOptions() {
+  clearRequestOptions(): void {
     this.updateRequestOptions({ page: undefined, search: undefined });
   }
 
-  toggleShowAddressForm(event) {
+  toggleShowAddressForm(event): void {
     this.showAddAddressForm = event.target.value === 'new';
     const selectedAddress = this.existingAddresses.Items.find(address => event.target.value === address.ID);
     this.existingAddressSelected(selectedAddress);
   }
 
-  updateRequestOptions(options: { page?: number; search?: string }) {
+  updateRequestOptions(options: { page?: number; search?: string }): void {
     this.requestOptions = options;
     this.getSavedAddresses();
   }
 
-  private async getSavedAddresses() {
-    const filters = {};
-    filters[this.addressType] = true;
-    const options = { filters, ...this.requestOptions };
-    this.existingAddresses = await this.context.currentUser.addresses.list(options);
-  }
-
-  existingAddressSelected(address: BuyerAddress) {
+  existingAddressSelected(address: BuyerAddress): void {
     this.selectedAddress = address;
   }
 
-  useShippingAsBilling() {
-    if (this.addressType === 'Shipping') {
-      return;
-    }
+  useShippingAsBilling(): void {
+    if (this.addressType === 'Shipping') return;
 
     this.usingShippingAsBilling = true;
-    this.selectedAddress = this.lineItems.Items[0].ShippingAddress;
+    this.selectedAddress = this.lineItems?.Items[0].ShippingAddress;
     this.saveAddress(this.selectedAddress, false, false);
   }
 
-  async saveAddress(address: Address, formDirty: boolean, shouldSaveAddress: boolean) {
+  async saveAddress(address: Address, formDirty: boolean, shouldSaveAddress: boolean): Promise<void> {
     // TODO: make bellow line better
     const setOneTimeAddress =
       this.isAnon ||
@@ -99,6 +87,13 @@ export class OCMCheckoutAddress implements OnInit {
       // this.context.currentOrder.lineItems = this.lineItems;
     }
     this.continue.emit();
+  }
+
+  private async getSavedAddresses(): Promise<void> {
+    const filters = {};
+    filters[this.addressType] = true;
+    const options = { filters, ...this.requestOptions };
+    this.existingAddresses = await this.context.currentUser.addresses.list(options);
   }
 
   private async saveAndSetAddress(address: BuyerAddress): Promise<Order> {

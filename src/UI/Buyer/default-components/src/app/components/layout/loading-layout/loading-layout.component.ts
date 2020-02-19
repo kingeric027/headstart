@@ -16,7 +16,7 @@ export class OCMLoadingLayout implements OnInit {
   divsToRender: Array<any> = []; // used to loop over in html to generate x number of divs (rows)
   bootstrapColumns: number; // used to calculate the proper html class for bootstrap columns
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.columnsToRender = new Array(this.columns);
     this.divsToRender = new Array(this.rows);
     this.bootstrapColumns = Math.round(12 / this.columnsToRender.length);

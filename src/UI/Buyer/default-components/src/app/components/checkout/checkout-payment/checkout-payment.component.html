@@ -21,13 +21,6 @@
     </form>
   </div>
 </div>
-<!-- <ocm-payment-purchase-order *ngIf="selectedPaymentMethod === 'PurchaseOrder'"
-                            [payment]="existingPayment"
-                            (continue)="onContinueClicked()">
-</ocm-payment-purchase-order>
-<ocm-payment-spending-account *ngIf="selectedPaymentMethod === 'SpendingAccount'"
-                              [payment]="existingPayment"
-                              (continue)="onContinueClicked()">></ocm-payment-spending-account> -->
 <ocm-payment-credit-card *ngIf="selectedPaymentMethod === 'CreditCard'"
                           [cards]="cards"
                           (cardSelected)="onCardSelected($event.detail)">

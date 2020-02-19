@@ -3,7 +3,7 @@ import { OcOrderService, ListPromotion, ListPayment, OrderApproval, OcLineItemSe
 import { uniqBy as _uniqBy } from 'lodash';
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
-import { OrderReorderResponse, OrderDetails, ShipmentWithItems, ShipmentItemWithLineItem, MarketplaceOrder } from '../../shopper-context';
+import { OrderReorderResponse, OrderDetails, ShipmentWithItems, ShipmentItemWithLineItem, MarketplaceOrder, LineItemGroupSupplier } from '../../shopper-context';
 import { OrderFilterService, IOrderFilters } from './order-filter.service';
 
 export interface IOrderHistory {
@@ -21,8 +21,7 @@ export interface IOrderHistory {
   ): Promise<MarketplaceOrder>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
-  getSupplierInfo(liGroupedByShipFrom: LineItem[][]): Supplier[];
-  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]): Address[];
+  getLineItemSuppliers(liGroups: LineItem[][]): Promise<LineItemGroupSupplier[]>;
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
 }
 
@@ -44,11 +43,11 @@ export class OrderHistoryService implements IOrderHistory {
 
   ) { }
 
-  async approveOrder(orderID: string = this.activeOrderID, Comments: string = '', AllowResubmit: boolean = false): Promise<MarketplaceOrder> {
+  async approveOrder(orderID: string = this.activeOrderID, Comments = '', AllowResubmit = false): Promise<MarketplaceOrder> {
     return await this.ocOrderService.Approve('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 
-  async declineOrder(orderID: string = this.activeOrderID, Comments: string = '', AllowResubmit: boolean = false): Promise<MarketplaceOrder> {
+  async declineOrder(orderID: string = this.activeOrderID, Comments = '', AllowResubmit = false): Promise<MarketplaceOrder> {
     return await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 
@@ -67,40 +66,15 @@ export class OrderHistoryService implements IOrderHistory {
     return { order: res[0], lineItems: res[1], promotions: res[2], payments: res[3], approvals: res[4] };
   }
 
-  private async getPromotions(orderID: string): Promise<ListPromotion> {
-    return this.ocOrderService.ListPromotions('outgoing', orderID).toPromise();
-  }
-
-  private async getPayments(orderID: string): Promise<ListPayment> {
-    return this.paymentHelper.ListPaymentsOnOrder(orderID);
-  }
-
-  private async getApprovals(orderID: string): Promise<OrderApproval[]> {
-    const approvals = await this.ocOrderService.ListApprovals('outgoing', orderID).toPromise();
-    approvals.Items = approvals.Items.filter((x) => x.Approver);
-    return _uniqBy(approvals.Items, (x) => x.Comments);
-  }
-
-  getSupplierInfo(liGroupedByShipFrom: LineItem[][]) {
-    const infoArray = [];
-    liGroupedByShipFrom.forEach(async group => {
-      if (group[0] && group[0].SupplierID) {
-        const info = await this.ocSupplierService.Get(group[0].SupplierID).toPromise();
-        infoArray.push(info);
-      }
-    });
-    return infoArray;
-  }
-
-  getSupplierAddresses(liGroupedByShipFrom: LineItem[][]) {
-    const addresses = [];
-    liGroupedByShipFrom.forEach(async group => {
-      if (group[0] && group[0].SupplierID && group[0].ShipFromAddressID) {
-        const address = await this.ocSupplierAddressService.Get(group[0].SupplierID, group[0].ShipFromAddressID).toPromise();
-        addresses.push(address);
-      }
-    });
-    return addresses;
+  async getLineItemSuppliers(liGroups: LineItem[][]): Promise<LineItemGroupSupplier[]> {
+    const suppliers: LineItemGroupSupplier[] = [];
+    for(const group of liGroups) {
+      const line = group[0];
+      const supplier = await this.ocSupplierService.Get(line.SupplierID).toPromise();
+      const shipFrom = await this.ocSupplierAddressService.Get(line.SupplierID, line.ShipFromAddressID).toPromise();
+      suppliers.push({ supplier, shipFrom })
+    };
+    return suppliers;
   }
 
   async listShipments(orderID: string = this.activeOrderID): Promise<ShipmentWithItems[]> {
@@ -119,5 +93,19 @@ export class OrderHistoryService implements IOrderHistory {
       return shipment;
     });
     return shipments.Items as ShipmentWithItems[];
+  }
+  
+  private async getPromotions(orderID: string): Promise<ListPromotion> {
+    return this.ocOrderService.ListPromotions('outgoing', orderID).toPromise();
+  }
+
+  private async getPayments(orderID: string): Promise<ListPayment> {
+    return this.paymentHelper.ListPaymentsOnOrder(orderID);
+  }
+
+  private async getApprovals(orderID: string): Promise<OrderApproval[]> {
+    const approvals = await this.ocOrderService.ListApprovals('outgoing', orderID).toPromise();
+    approvals.Items = approvals.Items.filter((x) => x.Approver);
+    return _uniqBy(approvals.Items, (x) => x.Comments);
   }
 }

@@ -216,7 +216,10 @@
                     [ngClass]="{'selected-resource': selectedResourceID === resource.ID}">
                   <td>
                     <summary-resource-display-component [resource]="resource"
-                                                        [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel">
+                                                        [resourceList]="resourceList.Items"
+                                                        [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel"
+                                                        [parentResourceID]="selectedParentResourceID"
+>
                     </summary-resource-display-component>
                   </td>
                 </tr>
@@ -280,7 +283,7 @@
                       class="btn btn-primary"
                       type="submit"
                       [disabled]="resourceForm?.status === 'INVALID' || dataIsSaving"
-                      (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
+                      (click)="handleSave()">{{getSaveBtnText()}}</button>
               <button class="btn brand-button ml-3"
                       (click)="handleDiscardChanges()"
                       *ngIf="areChanges && !isCreatingNew">Discard Changes</button>

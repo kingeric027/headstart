@@ -1,4 +1,4 @@
-import { map as _map, find as _find, minBy as _minBy, sortBy as _sortBy } from 'lodash';
+import { find as _find, sortBy as _sortBy } from 'lodash';
 import { SpecFormEvent } from './spec-form-values.interface';
 import { PriceBreak, SpecOption, BuyerSpec, ListBuyerSpec, LineItemSpec } from '@ordercloud/angular-sdk';
 import { Injectable } from '@angular/core';
@@ -65,7 +65,7 @@ export class SpecFormService {
   }
 
   private getSpec(specs: ListBuyerSpec, value: any): BuyerSpec {
-    return _find(specs.Items, item => item.Name.replace(/ /g, '') === value) as BuyerSpec;
+    return _find(specs.Items, item => item.Name.replace(/ /g, '') === value);
   }
 
   private getOption(spec: BuyerSpec, value: any): SpecOption {
@@ -73,7 +73,7 @@ export class SpecFormService {
       return null;
     }
     if (typeof value === 'boolean') {
-      return spec.Options[value ? 1 : 0] as SpecOption;
+      return spec.Options[value ? 1 : 0];
     }
 
     if (spec.xp && spec.xp.control === 'range') {
@@ -88,6 +88,6 @@ export class SpecFormService {
       return o as SpecOption;
     }
 
-    return _find(spec.Options, o => o.Value === value) as SpecOption;
+    return _find(spec.Options, o => o.Value === value);
   }
 }
