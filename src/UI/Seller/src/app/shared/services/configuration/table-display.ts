@@ -260,11 +260,31 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     ],
     imgPath: '',
   },
-  orchestrationLogs: {
+  logs: {
     fields: [
       {
-        path: 'id',
-        header: 'ID',
+        path: 'timeStamp',
+        header: 'Time Stamp',
+        type: DATE_TIME,
+      },
+      {
+        path: 'Action',
+        header: 'Action',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'RecordType',
+        header: 'Record Type',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'RecordId',
+        header: 'Record ID',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'Level',
+        header: 'Result',
         type: BASIC_STRING,
       },
     ],

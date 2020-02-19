@@ -71,20 +71,23 @@ export class MiddlewareAPIService {
     return await this.http.post(url, supplier, this.headers).toPromise();
   }
 
-  async listOrchestrationLogs(args: ListArgs): Promise<ListPage<OrchestrationLog>> {
+  async listOrchestrationLogs(args: ListArgs = {}): Promise<ListPage<OrchestrationLog>> {
     return await this.list(`${this.baseUrl}/orchestration/logs`, args);
   }
 
-  private list<T>(url: string, args: ListArgs): Promise<T> {
+  private list<T>(url: string, args: ListArgs = {}): Promise<T> {
     url = this.addUrlParams(url, args.filters);
     delete args.filters;
     url = this.addUrlParams(url, args);
     return this.http.get<T>(url, this.headers).toPromise();
   }
 
-  private addUrlParams(baseUrl: string, object: Record<string, any>): string {
+  private addUrlParams(baseUrl: string, object: Record<string, any> = {}): string {
     const fields = Object.entries(object);
-    return fields.reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}?`);
+    const url = fields
+      .filter(([key, value]) => value)
+      .reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}?`);
+    return url.replace(/[?&]+$/g, ''); // remove trailling & or ?
   }
 
   private formify(file: File): FormData {

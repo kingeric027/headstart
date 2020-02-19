@@ -178,7 +178,7 @@ const SupplierNavGrouping: MPRoute = {
 const OrchestionLogs = {
   rolesWithAccess: ['MPReportReader'],
   title: 'Orchestion Logs',
-  route: 'reports/orchestration-logs',
+  route: 'reports/logs',
 };
 
 const ReportsNavGrouping = {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Models;
 using Marketplace.Helpers;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers
 {
@@ -16,7 +17,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, Route("")]
-        public async Task<dynamic> List(ListArgs<OrchestrationLog> args)
+        public async Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> args)
         {
             return await _command.List(args);
         }
