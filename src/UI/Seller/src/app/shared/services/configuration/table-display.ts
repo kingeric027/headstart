@@ -1,4 +1,4 @@
-import { PRODUCT_IMAGE_PATH_STRATEGY } from '../product/product-image.helper';
+import { PRODUCT_IMAGE_PATH_STRATEGY } from '@app-seller/products/product-image.helper';
 
 export interface SummaryResourceInfoPaths {
   toPrimaryHeader: string;
@@ -291,6 +291,36 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
       {
         path: 'Comments',
         header: 'Comments',
+        type: BASIC_STRING,
+      },
+    ],
+    imgPath: '',
+  },
+  logs: {
+    fields: [
+      {
+        path: 'timeStamp',
+        header: 'Time Stamp',
+        type: DATE_TIME,
+      },
+      {
+        path: 'Action',
+        header: 'Action',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'RecordType',
+        header: 'Record Type',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'RecordId',
+        header: 'Record ID',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'Level',
+        header: 'Result',
         type: BASIC_STRING,
       },
     ],

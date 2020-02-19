@@ -7,7 +7,7 @@ export const ocAppConfig: AppConfig = {
   cmsUrl: environment.cmsUrl,
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
-  //sellerName is being hard-coded until this is available to store in OrderCloud
+  // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: 'SEB Seller',
   scope: [
     // 'AdminAddressReader' is just for reading admin addresses as a seller user on product create/edti
@@ -62,6 +62,7 @@ export const ocAppConfig: AppConfig = {
     'MPBuyerAdmin',
     'MPBuyerReader',
     'MPSellerAdmin',
+    'MPReportReader',
     'MPSupplierAdmin',
     'MPMeSupplierAdmin',
     'MPMeSupplierAddressAdmin',
@@ -97,7 +98,7 @@ export interface AppConfig {
 
   marketplaceID: string;
 
-  //sellerName is being hard-coded until this is available to store in OrderCloud
+  // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: string;
 
   /**

@@ -1,9 +1,9 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { User, MeUser, UserGroup, UserGroupAssignment, OcSupplierUserGroupService, OcSupplierUserService } from '@ordercloud/angular-sdk';
-import { ProductService } from '@app-seller/shared/services/product/product.service';
+import { User, UserGroup, UserGroupAssignment, OcSupplierUserGroupService, OcSupplierUserService } from '@ordercloud/angular-sdk';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
-import { SupplierService } from '@app-seller/shared/services/supplier/supplier.service';
+import { ProductService } from '@app-seller/products/product.service';
+import { SupplierService } from '../suppliers/supplier.service';
 
 @Component({
   selector: 'supplier-user-permissions-assignments-component',
@@ -30,7 +30,7 @@ export class SupplierUserPermissionsAssignments {
   _supplierUserUserGroupAssignmentsStatic: UserGroupAssignment[] = [];
   _supplierUserUserGroupAssignmentsEditable: UserGroupAssignment[] = [];
   areChanges = false;
-  requestedUserConfirmation: boolean = false;
+  requestedUserConfirmation = false;
   faExclamationCircle = faExclamationCircle;
 
   constructor(
@@ -43,7 +43,7 @@ export class SupplierUserPermissionsAssignments {
 
   private readonly options = {
     filters: {
-      "xp.Type": "UserPermissions"
+      'xp.Type': 'UserPermissions'
     }
   };
 
@@ -58,7 +58,7 @@ export class SupplierUserPermissionsAssignments {
 
   async getSupplierUserGroupAssignments(userID: any, supplierID: any): Promise<void> {
     const supplierUserGroupAssignments = await this.ocSupplierUserGroupService
-      .ListUserAssignments(supplierID, { userID: userID})
+      .ListUserAssignments(supplierID, { userID})
       .toPromise();
     this._supplierUserUserGroupAssignmentsStatic = supplierUserGroupAssignments.Items;
     this._supplierUserUserGroupAssignmentsEditable = supplierUserGroupAssignments.Items;
