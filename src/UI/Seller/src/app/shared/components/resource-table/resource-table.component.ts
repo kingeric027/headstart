@@ -1,10 +1,26 @@
-import { AfterViewChecked, ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewChecked,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { getPsHeight, getScreenSizeBreakPoint } from '@app-seller/shared/services/dom.helper';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { FilterDictionary, ListResource, Options, RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import {
+  FilterDictionary,
+  ListResource,
+  Options,
+  RequestStatus,
+} from '@app-seller/shared/services/resource-crud/resource-crud.types';
 import { faCalendar, faChevronLeft, faFilter, faHome, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbDateStruct, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { singular } from 'pluralize';
@@ -61,8 +77,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
     ngZone: NgZone
-  ) {
-  }
+  ) {}
 
   @Input()
   resourceList: ListResource<any> = { Meta: {}, Items: [] };
@@ -137,7 +152,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       const fromDate = this.filterForm.value['from'];
       this.fromDate = this.transformDateForUser(fromDate);
       this.filterForm.value['from'] = this.transformDateForFilter(fromDate);
-    } if (typeof this.filterForm.value['to'] === 'object') {
+    }
+    if (typeof this.filterForm.value['to'] === 'object') {
       const toDate = this.filterForm.value['to'];
       this.toDate = this.transformDateForUser(toDate);
       this.filterForm.value['to'] = this.transformDateForFilter(toDate);
@@ -321,8 +337,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.areChanges = JSON.stringify(this._updatedResource) !== JSON.stringify(this._resourceInSelection);
   }
 
+  getSaveBtnText(): string {
+    if (this.dataIsSaving) return 'Saving...';
+    if (this.isCreatingNew) return 'Create';
+    if (!this.isCreatingNew) return 'Save Changes';
+  }
+
   ngOnDestroy() {
     this.alive = false;
   }
-
 }

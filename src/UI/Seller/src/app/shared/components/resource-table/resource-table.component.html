@@ -280,7 +280,7 @@
                       class="btn btn-primary"
                       type="submit"
                       [disabled]="resourceForm?.status === 'INVALID' || dataIsSaving"
-                      (click)="handleSave()">{{dataIsSaving ? 'Saving ...' : !isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
+                      (click)="handleSave()">{{getSaveBtnText()}}</button>
               <button class="btn brand-button ml-3"
                       (click)="handleDiscardChanges()"
                       *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
