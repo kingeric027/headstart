@@ -30,10 +30,9 @@ namespace Marketplace.Common.Commands
         }
         public async Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user, string token)
         {
-            var ocSupplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID, token);
-            Require.That(ocSupplier.ID == user.SupplierID,
-                new ErrorCode("Unauthorized", 401, $"You are not authorized to view {supplierID}."));
-            return ocSupplier;
+            Require.That(supplierID == user.SupplierID,
+                new ErrorCode("Unauthorized", 401, $"You are only authorized to view {user.SupplierID}."));
+            return await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID, token);
         }
         public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token)
         {
