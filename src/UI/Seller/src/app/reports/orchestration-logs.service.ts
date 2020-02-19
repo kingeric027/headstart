@@ -5,6 +5,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { OrchestrationLog } from './models/orchestration-log';
 import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
+import { ListArgs } from '@app-seller/shared/services/middleware-api/listArgs.interface';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -23,8 +24,9 @@ export class OrchestrationLogsService extends ResourceCrudService<OrchestrationL
   }
 
   async list(args: any[]): Promise<ListPage<OrchestrationLog>> {
-    if (!this.middleware) return; // TODO - why is this undefined?
-    // TODO - pass in args
-    return await this.middleware.listOrchestrationLogs(args[0]);
+    if (!this.middleware) return { Items: [], Meta: {} }; // TODO - why is service sometimes not defined?
+    const listArgs: ListArgs = args[0];
+    listArgs.sortBy = listArgs.sortBy || '!timeStamp';
+    return await this.middleware.listOrchestrationLogs(listArgs);
   }
 }
