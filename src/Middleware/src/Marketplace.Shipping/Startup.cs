@@ -37,7 +37,6 @@ namespace Marketplace.Shipping
                 .Inject<IOCShippingIntegration>()
                 .Inject<IAvataxService>()
                 .Inject<IFreightPopService>()
-                .Inject<IProposedShipmentCommand>()
                 .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
         }
 

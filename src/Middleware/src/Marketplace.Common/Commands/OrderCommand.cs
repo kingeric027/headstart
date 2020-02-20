@@ -40,19 +40,9 @@ namespace Marketplace.Common.Commands
         {
             // should as much order submit logic to use the order calculation model as makes sense
             // so that we do not need to go get the line items and shipping information multiple times
-            var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderId);
-<<<<<<< refs/remotes/origin/dev
-<<<<<<< refs/remotes/origin/dev
-            await _taxCommand.HandleTransactionCreation(buyerOrder);
-            var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrder);
-=======
-            //await _taxCommand.HandleTransactionCreation(buyerOrder);
-=======
             var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, orderId);
             await _avatax.CreateTransactionAsync(buyerOrderCalculation);
->>>>>>> remove tax command and use order calculation model and oc sandbox servic
-            await _zoho.CreateSalesOrder(buyerOrder);
->>>>>>> order calculate in shipping integration wip
+            await _zoho.CreateSalesOrder(buyerOrderCalculation);
             
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderId);
             var supplierOrders = orderSplitResult.OutgoingOrders;

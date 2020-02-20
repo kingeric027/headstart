@@ -2,6 +2,7 @@
 using System.Dynamic;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.FreightPop.Models;
+using Marketplace.Models;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Models
@@ -123,7 +124,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 	public class OrderCalculation : OrderCloudModel
 	{
 		/// <summary>Order of the order calculation.</summary> 
-		public Order Order { get => GetProp<Order>("Order"); set => SetProp<Order>("Order", value); }
+		public MarketplaceOrder Order { get => GetProp<MarketplaceOrder>("Order"); set => SetProp<MarketplaceOrder>("Order", value); }
 		/// <summary>Line items of the order calculation.</summary> 
 		public IList<LineItem> LineItems { get => GetProp<IList<LineItem>>("LineItems", new List<LineItem>()); set => SetProp<IList<LineItem>>("LineItems", value); }
 		/// <summary>Order calculate response of the order calculation.</summary> 

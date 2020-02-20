@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
@@ -180,19 +181,25 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static List<ZohoLineItem> Map(MarketplaceOrder order, ZohoLineItem shipping)
+        public static List<ZohoLineItem> Map(OrderCalculation orderCalculation, ZohoLineItem shipping)
         {
-            return order.xp.ProposedShipmentSelections.Select(s => new ZohoLineItem()
-            {
-                item_id = shipping.item_id,
-                item_type = "sales_and_purchases",
-                name = $"{shipping.name} for {s.SupplierID}",
-                rate = decimal.ToDouble(s.Rate),
-                description = $"{shipping.description} for {s.SupplierID}",
-                sku = shipping.sku,
-                quantity = 1
-                //TODO: MODEL ~ Avalara integration evaluation
-                //avatax_tax_code = "FR"
+            return orderCalculation.ProposedShipmentRatesResponse.ProposedShipments.Select(proposedShipment => {
+                var choosenProposedShipmentSelection = proposedShipment.ProposedShipmentOptions.First(proposedShipmentOption => proposedShipmentOption.ID == proposedShipment.SelectedProposedShipmentOptionID);
+                var supplierIDOfShipment = orderCalculation.LineItems.First(lineItem => lineItem.ID == proposedShipment.ProposedShipmentItems.First().LineItemID);
+                return new ZohoLineItem()
+                {
+                    item_id = shipping.item_id,
+                    item_type = "sales_and_purchases",
+
+                    // need to figure out how to set supplier ID here
+                    name = $"{shipping.name} for {supplierIDOfShipment}",
+                    rate = decimal.ToDouble(choosenProposedShipmentSelection.Cost),
+                    description = $"{shipping.description} for {supplierIDOfShipment}",
+                    sku = shipping.sku,
+                    quantity = 1
+                    //TODO: MODEL ~ Avalara integration evaluation
+                    //avatax_tax_code = "FR"
+                };
             }).ToList();
         }
     }
@@ -227,7 +234,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoSalesOrderMapper
     {
-        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, ListPage<MarketplaceLineItem> lineitems)
+        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, IList<LineItem> lineitems)
         {
             return new ZohoSalesOrder()
             {
@@ -248,8 +255,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     return new ZohoLineItem()
                     {
                         item_id = item.item_id,
-                        quantity = lineitems.Items.FirstOrDefault(li => li.ProductID == item.sku)?.Quantity,
-                        rate = decimal.ToDouble(lineitems.Items.FirstOrDefault(li => li.ProductID == item.sku).UnitPrice.Value)
+                        quantity = lineitems.FirstOrDefault(li => li.ProductID == item.sku)?.Quantity,
+                        rate = decimal.ToDouble(lineitems.FirstOrDefault(li => li.ProductID == item.sku).UnitPrice.Value)
                     };
                 }).ToList(),
                 tax_total = decimal.ToDouble(order.TaxCost),

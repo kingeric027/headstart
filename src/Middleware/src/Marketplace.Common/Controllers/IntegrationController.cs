@@ -16,29 +16,11 @@ namespace Marketplace.Common.Controllers
 {
 	public class IntegrationController: BaseController
 	{
-		private readonly IProposedShipmentCommand _shippingCommand;
 		private readonly IOCShippingIntegration _OCShippingIntegration;
-		public IntegrationController(AppSettings settings, IProposedShipmentCommand shippingCommand, IOCShippingIntegration OCShippingIntegration) : base(settings) 
+		public IntegrationController(AppSettings settings, IOCShippingIntegration OCShippingIntegration) : base(settings) 
 		{
-			_shippingCommand = shippingCommand;
 			_OCShippingIntegration = OCShippingIntegration;
 		}
-
-		//// investigate why ApiRole.Shopper auth is failing for shoppers
-		//[HttpGet, Route("{orderId}"), MarketplaceUserAuth(ApiRole.SupplierReader)]
-		//public async Task<MarketplaceListPage<ProposedShipment>> List(string orderId)
-		//{
-		//	var shippingRateResponse = await _shippingCommand.ListProposedShipments(orderId, VerifiedUserContext);
-		//	return shippingRateResponse;
-		//}
-
-		//[HttpPut, Route("{orderId}/select"), MarketplaceUserAuth(ApiRole.SupplierReader)]
-		//public async Task<MarketplaceOrder> Select(string orderId, [FromBody] ProposedShipmentSelection proposedShipmentSelection)
-		//{
-		//	var marketplaceOrder = await _shippingCommand.SetShippingSelectionAsync(orderId, proposedShipmentSelection);
-		//	return marketplaceOrder;
-		//}
-
 
 		// todo auth on this endpoint
 		[Route("shippingrates")]

@@ -50,7 +50,7 @@ namespace Marketplace.Common.Services
 		{
 			await AuthenticateAync();
             return await _flurl.Request($"{_settings.OrderCloudSettings.ApiUrl}/v1/orders/{orderDirection}/{orderID}/CalculateOrder")
-                .WithHeader("Authorization", $"Bearer {accessToken}").GetAsync().ReceiveJson<OrderCalculation>()
+                .WithHeader("Authorization", $"Bearer {accessToken}").GetAsync().ReceiveJson<OrderCalculation>();
 		}
 	}
 }
