@@ -80,7 +80,7 @@ namespace Marketplace.API
 					.Inject<IOrchestrationCommand>()
                     .Inject<IOrchestrationLogCommand>()
 					.Inject<IOCShippingIntegration>()
-					.Inject<IProposedShipmentCommand>()
+					.Inject<IAddressValidationCommand>()
 					.Inject<IEnvironmentSeedCommand>()
                     .Inject<IMarketplaceProductCommand>()
 					.Inject<ITaxCommand>()
