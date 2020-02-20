@@ -8,6 +8,10 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services
 {
+
+    /// <summary>
+    /// this is a temporary service that should be removed when shipping integration is in production order cloud and this is available in the sdk more easily
+    /// </summary>
     public interface IOrderCloudSandboxService
     {
         Task<OrderCalculation> GetOrderCalculation(OrderDirection orderDirection, string orderID);
