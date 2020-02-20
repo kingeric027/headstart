@@ -2,19 +2,76 @@
 using System.Linq;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Models;
-using Microsoft.EntityFrameworkCore.Internal;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Mappers.Zoho
+namespace Marketplace.Common.Services.Zoho.Mappers
 {
     public static class ZohoContactMapper
     {
+        public static ZohoContact Map(MarketplaceSupplier supplier, MarketplaceAddress address, User user, ZohoCurrency currency)
+        {
+            return new ZohoContact()
+            {
+                company_name = supplier.ID,
+                contact_name = supplier.Name,
+                contact_type = "vendor",
+                billing_address = ZohoAddressMapper.Map(address),
+                shipping_address = ZohoAddressMapper.Map(address),
+                contact_persons = new List<ZohoContactPerson>()
+                {
+                    new ZohoContactPerson()
+                    {
+                        email = user.Email,
+                        first_name = user.FirstName,
+                        last_name = user.LastName,
+                        phone = user.Phone,
+                        is_primary_contact = true
+                    }
+                },
+                currency_id = currency.currency_id
+                //TODO: Evaluate model concerns with Avalara integration
+                //avatax_use_code = "use code",
+                //avatax_exempt_no = "exempt no"
+            };
+        }
+
+        public static ZohoContact Map(ZohoContact contact, MarketplaceSupplier supplier, MarketplaceAddress address, User user, ZohoCurrency currency)
+        {
+            return new ZohoContact()
+            {
+                contact_id = contact.contact_id,
+                company_name = supplier.ID,
+                contact_name = supplier.Name,
+                contact_type = "vendor",
+                billing_address = ZohoAddressMapper.Map(address),
+                shipping_address = ZohoAddressMapper.Map(address),
+                contact_persons = contact.contact_persons = (contact.contact_persons != null && contact.contact_persons.Any(c => c.email == user.Email))
+                    ? new List<ZohoContactPerson>()
+                    {
+                        new ZohoContactPerson()
+                        {
+                            email = user.Email,
+                            first_name = user.FirstName,
+                            last_name = user.LastName,
+                            is_primary_contact = false,
+                            phone = user.Phone
+                        }
+                    } : null,
+                currency_id = currency.currency_id
+                //TODO: Evaluate model concerns with Avalara integration
+                //avatax_use_code = "use code",
+                //avatax_exempt_no = "exempt no"
+            };
+        }
+
         public static ZohoContact Map(MarketplaceBuyer buyer, MarketplaceUser user, MarketplaceUserGroup group, ZohoCurrency currency, MarketplaceAddress address)
         {
             return new ZohoContact()
             {
                 company_name = buyer.ID,
                 contact_name = buyer.Name,
+                contact_type = "customer",
                 billing_address = ZohoAddressMapper.Map(address),
                 shipping_address = ZohoAddressMapper.Map(address),
                 contact_persons = new List<ZohoContactPerson>()
@@ -40,6 +97,7 @@ namespace Marketplace.Common.Mappers.Zoho
         {
             contact.company_name = buyer.ID;
             contact.contact_name = buyer.Name;
+            contact.contact_type = "customer";
             contact.billing_address = ZohoAddressMapper.Map(address);
             contact.shipping_address = ZohoAddressMapper.Map(address);
             contact.tax_authority_id = contact.tax_authority_id;
@@ -75,7 +133,7 @@ namespace Marketplace.Common.Mappers.Zoho
                 purchase_description = $"{product.Name} from {item.SupplierID}", // debug removal
                 description = $"{product.Name} from {item.SupplierID}",
                 sku = product.ID, // debug removal
-                unit = product.xp.UnitOfMeasure.Unit, // debug removal
+                unit = product.xp?.UnitOfMeasure?.Unit, // debug removal
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value * .5M),
                 product_type = "goods", //TODO: MODEL ~ evaluate // debug removal
                 is_taxable = true //TODO: MODEL ~ evaluate with Tax authority
@@ -104,7 +162,7 @@ namespace Marketplace.Common.Mappers.Zoho
                 purchase_description = $"{product.Name} from {item.SupplierID}", // debug removal
                 description = $"{product.Name} from {item.SupplierID}",
                 sku = product.ID, // debug removal
-                unit = product.xp.UnitOfMeasure.Unit, // debug removal
+                unit = product.xp?.UnitOfMeasure?.Unit, // debug removal
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value * .5M),
                 product_type = "goods", //TODO: MODEL ~ evaluate // debug removal
                 is_taxable = true //TODO: MODEL ~ evaluate with Tax authority
@@ -135,6 +193,34 @@ namespace Marketplace.Common.Mappers.Zoho
                 //TODO: MODEL ~ Avalara integration evaluation
                 //avatax_tax_code = "FR"
             }).ToList();
+        }
+    }
+
+    public static class ZohoPurchaseOrderMapper
+    {
+        public static ZohoPurchaseOrder Map(ZohoSalesOrder salesorder, Order order, List<ZohoLineItem> items, ListPage<LineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor) {
+            var po = new ZohoPurchaseOrder()
+            {
+                //delivery_address = delivery_address,
+                line_items = items.Select(p => new ZohoLineItem()
+                {
+                    account_id = p.purchase_account_id,
+                    item_id = p.item_id,
+                    description = p.description,
+                    rate = decimal.ToDouble(lineitems.Items.FirstOrDefault(l => l.ProductID == p.sku).UnitPrice.Value),
+                    quantity = lineitems.Items.FirstOrDefault(l => l.ProductID == p.sku)?.Quantity
+                }).ToList(),
+                salesorder_id = salesorder.salesorder_id,
+                reference_number = salesorder.reference_number,
+                sub_total = decimal.ToDouble(order.Subtotal),
+                tax_total = decimal.ToDouble(order.TaxCost),
+                total = decimal.ToDouble(order.Total),
+                //vendor_name = vendor.contact_name,
+                vendor_id = vendor.contact_id,
+                //contact_persons = vendor.contact_persons != null ? new List<string>() { vendor.contact_persons.FirstOrDefault()?.contact_person_id } : null,
+                delivery_customer_id = salesorder.customer_id
+            };
+            return po;
         }
     }
 
