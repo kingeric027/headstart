@@ -6,6 +6,7 @@ namespace Marketplace.Common.Services.Zoho.Models
 {
     public class ZohoContactPerson
     {
+        public string contact_person_id { get; set; }
         public string salutation { get; set; }
         public string first_name { get; set; }
         public string last_name { get; set; }

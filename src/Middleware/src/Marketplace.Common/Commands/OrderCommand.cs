@@ -34,7 +34,7 @@ namespace Marketplace.Common.Commands
         {
             var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderId);
             await _taxCommand.HandleTransactionCreation(buyerOrder);
-            await _zoho.CreateSalesOrder(buyerOrder);
+            var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrder);
             
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderId);
             var supplierOrders = orderSplitResult.OutgoingOrders;
