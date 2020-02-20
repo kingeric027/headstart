@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
+using Marketplace.Common.Services.AvaTax;
+using Marketplace.Common.Services;
 
 namespace Marketplace.Common.Commands
 {
@@ -18,26 +20,37 @@ namespace Marketplace.Common.Commands
         private readonly IFreightPopService _freightPopService;
         private readonly IOrderCloudClient _oc;
         private readonly IOCShippingIntegration _ocShippingIntegration;
-        private readonly ITaxCommand _taxCommand;
-        private readonly IZohoCommand _zoho;
 
-        public OrderCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, ITaxCommand taxCommand, IOrderCloudClient oc, IZohoCommand zoho)
+        // temporary service until we get updated sdk
+        private readonly IOrderCloudSandboxService _ocSandboxService;
+        private readonly IZohoCommand _zoho;
+        private readonly IAvataxService _avatax;
+
+        public OrderCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, IAvataxService avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
             _ocShippingIntegration = ocShippingIntegration;
-            _taxCommand = taxCommand;
+            _avatax = avatax;
             _zoho = zoho;
+            _ocSandboxService = orderCloudSandboxService;
         }
 
         public async Task HandleBuyerOrderSubmit(string orderId)
         {
+            // should as much order submit logic to use the order calculation model as makes sense
+            // so that we do not need to go get the line items and shipping information multiple times
             var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderId);
+<<<<<<< refs/remotes/origin/dev
 <<<<<<< refs/remotes/origin/dev
             await _taxCommand.HandleTransactionCreation(buyerOrder);
             var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrder);
 =======
             //await _taxCommand.HandleTransactionCreation(buyerOrder);
+=======
+            var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, orderId);
+            await _avatax.CreateTransactionAsync(buyerOrderCalculation);
+>>>>>>> remove tax command and use order calculation model and oc sandbox servic
             await _zoho.CreateSalesOrder(buyerOrder);
 >>>>>>> order calculate in shipping integration wip
             
@@ -65,6 +78,5 @@ namespace Marketplace.Common.Commands
             var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItems.Items, supplier, supplierAddress);
             await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
         }
-
     }
 }

@@ -16,7 +16,7 @@ namespace Marketplace.Common.Services.AvaTax
 	public interface IAvataxService
 	{
 		// Use this before checkout. No records will be saved in avalara.
-		Task<decimal> GetTaxEstimateAsync(OrderCalculation taxableOrder);
+		Task<decimal> GetTaxEstimateAsync(OrderCalculation orderCalculation);
 		// Use this during submit.
 		Task<TransactionModel> CreateTransactionAsync(OrderCalculation taxableOrder);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
