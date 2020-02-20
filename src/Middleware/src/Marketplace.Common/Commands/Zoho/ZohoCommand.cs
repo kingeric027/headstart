@@ -83,7 +83,8 @@ namespace Marketplace.Common.Commands.Zoho
             try
             {
                 // TODO: accomodate possibility of more than 100 line items
-                var lineitems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, order.ID, pageSize: 100);
+                // could be replaced by order calculation in the future which should have all of the line items and remove this worry
+                var lineitems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID, pageSize: 100);
 
                 // Step 1: Create contact (customer) in Zoho
                 var contact = await CreateOrUpdateContact(order);
