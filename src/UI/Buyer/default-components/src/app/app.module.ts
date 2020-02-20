@@ -119,10 +119,6 @@ import { OCMShippingSelectionForm } from './components/checkout/shipping-selecti
 import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.component.';
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
 
-function getSdkConfig() {
-  return new Configuration({basePath: 'https://sandboxapi.ordercloud.io/v1', authPath: 'https://sandboxauth.ordercloud.io/oauth/token'});
-}
-
 const components = [
   OCMCategoryDropdown,
   OCMProductCard,
@@ -216,8 +212,7 @@ const components = [
     MarketplaceModule,
     AppRoutingModule,
     HttpClientModule,
-    OrderCloudModule.forRoot(getSdkConfig),
-    // OrderCloudModule.forRoot({basePath: 'https://sandboxapi.ordercloud.io/v1'}),
+    OrderCloudModule.forRoot(OcSDKConfig),
     CookieModule.forRoot(),
     ToastrModule.forRoot(),
     NgxImageZoomModule,
