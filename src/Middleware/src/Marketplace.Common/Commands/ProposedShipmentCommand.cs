@@ -14,6 +14,7 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Exceptions;
 using Marketplace.Models.Extended;
+using Marketplace.Common.Services;
 
 namespace Marketplace.Common.Commands
 {
@@ -21,25 +22,28 @@ namespace Marketplace.Common.Commands
     {
         Task<ListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext);
         Task<MarketplaceOrder> SetShippingSelectionAsync(string orderID, ProposedShipmentSelection selection);
-        Task<PrewebhookResponseWithError> IsValidAddressInFreightPopAsync(Address address);
-        Task<PrewebhookResponseWithError> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload);
-        Task<PrewebhookResponseWithError> GetExpectedNewSupplierAddressAndValidateInFreightPop(WebhookPayloads.SupplierAddresses.Patch payload);
-        Task<PrewebhookResponseWithError> GetExpectedNewMeAddressAndValidateInFreightPop(WebhookPayloads.Me.PatchAddress payload);
-        Task<PrewebhookResponseWithError> GetExpectedNewBuyerAddressAndValidateInFreightPop(WebhookPayloads.Addresses.Patch payload);
+        Task<WebhookResponse> IsValidAddressInFreightPopAsync(Address address);
+        Task<WebhookResponse> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload);
+        Task<WebhookResponse> GetExpectedNewSupplierAddressAndValidateInFreightPop(WebhookPayloads.SupplierAddresses.Patch payload);
+        Task<WebhookResponse> GetExpectedNewMeAddressAndValidateInFreightPop(WebhookPayloads.Me.PatchAddress payload);
+        Task<WebhookResponse> GetExpectedNewBuyerAddressAndValidateInFreightPop(WebhookPayloads.Addresses.Patch payload);
     }
     public class ProposedShipmentCommand : IProposedShipmentCommand
     {
         private readonly IFreightPopService _freightPopService;
         private readonly IOrderCloudClient _oc;
         private readonly IOCShippingIntegration _ocShippingIntegration;
-        private readonly PrewebhookResponseWithError validResponse = new PrewebhookResponseWithError { proceed = true };
-        private readonly PrewebhookResponseWithError inValidResponse = new PrewebhookResponseWithError { proceed = false, body = "Address invalid, please try again" };
-        public ProposedShipmentCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, IOrderCloudClient ocClient)
+		private readonly ISmartyStreetsService _smartyStreets;
+		private readonly WebhookResponse validResponse = new WebhookResponse { proceed = true };
+		private readonly AddressValidationPreWebhookError inValidResponse; 
+        public ProposedShipmentCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, IOrderCloudClient ocClient, ISmartyStreetsService smartyStreets)
         {
             _freightPopService = freightPopService;
             _oc = ocClient;
             _ocShippingIntegration = ocShippingIntegration;
-        }
+			_smartyStreets = smartyStreets;
+			inValidResponse = new AddressValidationPreWebhookError(_smartyStreets.GetSuggestedAddresses(null));
+		}
 
         public async Task<ListPage<ProposedShipment>> ListProposedShipments(string orderId, VerifiedUserContext userContext)
         {
@@ -90,7 +94,7 @@ namespace Marketplace.Common.Commands
             });
         }
 
-        public async Task<PrewebhookResponseWithError> IsValidAddressInFreightPopAsync(Address address)
+        public async Task<WebhookResponse> IsValidAddressInFreightPopAsync(Address address)
         {
             var rateRequestBody = AddressValidationRateRequestMapper.Map(address);
             try
@@ -109,7 +113,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        public async Task<PrewebhookResponseWithError> IsValidAddressInFreightPopAsync(BuyerAddress address)
+        public async Task<WebhookResponse> IsValidAddressInFreightPopAsync(BuyerAddress address)
         {
             var rateRequestBody = AddressValidationRateRequestMapper.Map(address);
             try
@@ -123,7 +127,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        public async Task<PrewebhookResponseWithError> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload)
+        public async Task<WebhookResponse> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload)
         {
             var existingAddress = await _oc.AdminAddresses.GetAsync(payload.RouteParams.AddressID);
             var expectedNewAddress = GetExpectedNewAddress(payload.Request.Body, existingAddress);
@@ -131,7 +135,7 @@ namespace Marketplace.Common.Commands
             return ratesResponse;
         }
 
-        public async Task<PrewebhookResponseWithError> GetExpectedNewSupplierAddressAndValidateInFreightPop(WebhookPayloads.SupplierAddresses.Patch payload)
+        public async Task<WebhookResponse> GetExpectedNewSupplierAddressAndValidateInFreightPop(WebhookPayloads.SupplierAddresses.Patch payload)
         {
             var existingAddress = await _oc.SupplierAddresses.GetAsync(payload.RouteParams.SupplierID, payload.RouteParams.AddressID);
             var expectedNewAddress = GetExpectedNewAddress(payload.Request.Body, existingAddress);
@@ -139,7 +143,7 @@ namespace Marketplace.Common.Commands
             return ratesResponse;
         }
 
-        public async Task<PrewebhookResponseWithError> GetExpectedNewMeAddressAndValidateInFreightPop(WebhookPayloads.Me.PatchAddress payload)
+        public async Task<WebhookResponse> GetExpectedNewMeAddressAndValidateInFreightPop(WebhookPayloads.Me.PatchAddress payload)
         {
             var userToken = payload.UserToken;
             var existingAddress = await _oc.Me.GetAddressAsync(payload.RouteParams.AddressID, userToken);
@@ -148,7 +152,7 @@ namespace Marketplace.Common.Commands
             return ratesResponse;
         }
 
-        public async Task<PrewebhookResponseWithError> GetExpectedNewBuyerAddressAndValidateInFreightPop(WebhookPayloads.Addresses.Patch payload)
+        public async Task<WebhookResponse> GetExpectedNewBuyerAddressAndValidateInFreightPop(WebhookPayloads.Addresses.Patch payload)
         {
             var existingAddress = await _oc.Addresses.GetAsync(payload.RouteParams.BuyerID, payload.RouteParams.AddressID);
             var expectedNewAddress = GetExpectedNewAddress(payload.Request.Body, existingAddress);
