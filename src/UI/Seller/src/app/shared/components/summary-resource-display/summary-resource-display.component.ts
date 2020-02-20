@@ -105,8 +105,8 @@ export class SummaryResourceDisplay implements OnChanges {
 
   getResourceDepth(resource, depthCount) {
     depthCount++;
-    const parentResource = this._resourceList.find(item => item.ID === resource.ParentID);
-    return resource.ParentID ? this.getResourceDepth(parentResource, depthCount) : depthCount * 10;
+    const parentResource = this._resourceList.find(item => item.ID === resource?.ParentID);
+    return resource?.ParentID ? this.getResourceDepth(parentResource, depthCount) : depthCount * 10;
   }
 
   async toggleNestedResources() {
