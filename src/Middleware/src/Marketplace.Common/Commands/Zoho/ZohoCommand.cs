@@ -18,6 +18,7 @@ namespace Marketplace.Common.Commands.Zoho
     public interface IZohoCommand
     {
         Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrder order);
+        Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, OrderSplitResult orders);
     }
 
     public class ZohoCommand : IZohoCommand
