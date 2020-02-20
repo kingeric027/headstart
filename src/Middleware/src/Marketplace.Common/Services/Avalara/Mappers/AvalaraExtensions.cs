@@ -1,5 +1,6 @@
 ﻿using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Services.FreightPop;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -29,12 +30,12 @@ namespace Marketplace.Common.Extensions
 			return trans.WithLine(line).WithLineShipFrom(shipFrom).WithLineShipTo(shipTo);
 		}
 
-		public static TransactionBuilder WithLineItem(this TransactionBuilder trans, LineItem lineItem)
+		public static TransactionBuilder WithLineItem(this TransactionBuilder trans, MarketplaceLineItem lineItem)
 		{
 			var line = new TransactionLineModel()
 			{
 				lineAmount = lineItem.LineTotal,
-				taxCode = null,
+				taxCode = lineItem.Product.xp.Tax.Code,
 				itemCode = lineItem.ProductID,
 				customerUsageType = null,
 				lineNumber = lineItem.ID

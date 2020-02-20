@@ -8,6 +8,7 @@ using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Models;
 using Marketplace.Models.Exceptions;
 using ErrorCodes = Marketplace.Models.ErrorCodes;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Commands
 {
@@ -56,7 +57,7 @@ namespace Marketplace.Common.Commands
 
 		private async Task<TaxableOrder> GetTaxableOrder(MarketplaceOrder order)
 		{
-			var items = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID);
+			var items = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, order.ID);
 			
 			var shippingSelection = new Dictionary<string, decimal>();
 			foreach (var selection in order.xp.ProposedShipmentSelections)
@@ -67,7 +68,7 @@ namespace Marketplace.Common.Commands
 			return new TaxableOrder() { Order = order, Lines = items.Items, ShippingRates = shippingSelection };
 		}
 
-		private static IEnumerable<string> ListShipmentsWithoutSelection(MarketplaceOrder order, IList<LineItem> items)
+		private static IEnumerable<string> ListShipmentsWithoutSelection(MarketplaceOrder order, IList<MarketplaceLineItem> items)
 		{
 			var shipFromAddressIDs = items.GroupBy(li => li.ShipFromAddressID).Select(group => group.Key);
 			var selections = order.xp.ProposedShipmentSelections.Select(sel => sel.ShipFromAddressID);

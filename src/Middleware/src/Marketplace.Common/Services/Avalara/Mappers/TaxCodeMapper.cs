@@ -25,7 +25,7 @@ namespace Marketplace.Common.Mappers.Avalara
 				Items = items,
 				Meta = new ListPageMeta
 				{
-					Page = args.Skip / args.Top == 0 ? 1 : (args.Skip / args.Top) + 1,
+					Page = (int)Math.Ceiling((double)args.Skip / args.Top) + 1,
 					PageSize = 100,
 					TotalCount = codes.count,
 				}
@@ -35,7 +35,7 @@ namespace Marketplace.Common.Mappers.Avalara
 
 		public static TaxCodeListArgs Map(ListArgs<TaxCodeModel> source)
 		{
-			var taxCategory = source.Filters[0].Values[0].Term;
+			var taxCategory = source?.Filters?[0]?.Values?[0]?.Term ?? "";
 			var taxCategorySearch = taxCategory.Trim('0');
 			var search = source.Search;
 			var filter = search != "" ? $"isActive eq true and taxCode startsWith '{taxCategorySearch}' and (taxCode contains '{search}' OR description contains '{search}')" : $"isActive eq true and taxCode startsWith '{taxCategorySearch}'";

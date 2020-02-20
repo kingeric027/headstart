@@ -19,7 +19,7 @@ namespace Marketplace.Common.Services.AvaTax
 		// Use this during submit.
 		Task<TransactionModel> CreateTransactionAsync(TaxableOrder taxableOrder);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
-		// When should we do this? On order complete (When the credit card is charged) ? 
+		// When should we do this? 
 		Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode);
 		Task<ListPage<MarketplaceTaxCode>> ListTaxCodesAsync(ListArgs<TaxCodeModel> marketplaceListArgs);
 	}

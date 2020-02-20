@@ -8,6 +8,7 @@ using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Models;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using ErrorCodes = Marketplace.Models.ErrorCodes;
 
@@ -47,7 +48,7 @@ namespace Marketplace.Common.Commands.Zoho
             try
             {
                 // TODO: accomodate possibility of more than 100 line items
-                var lineitems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID, pageSize: 100);
+                var lineitems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, order.ID, pageSize: 100);
 
                 // Step 1: Create contact (customer) in Zoho
                 var contact = await CreateOrUpdateContact(order);
@@ -72,7 +73,7 @@ namespace Marketplace.Common.Commands.Zoho
             }
         }
 
-        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(MarketplaceOrder order, ListPage<LineItem> lineitems)
+        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(MarketplaceOrder order, ListPage<MarketplaceLineItem> lineitems)
         {
             // TODO: accomodate possibility of more than 100 line items
             var products = await Throttler.RunAsync(lineitems.Items.Select(item => item.ProductID).ToList(), 100, 5,

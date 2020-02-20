@@ -2,6 +2,7 @@
 using System.Linq;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Models;
+using Marketplace.Models.Models.Marketplace;
 using Microsoft.EntityFrameworkCore.Internal;
 using OrderCloud.SDK;
 
@@ -64,7 +65,7 @@ namespace Marketplace.Common.Mappers.Zoho
 
     public static class ZohoLineItemMapper
     {
-        public static ZohoLineItem Map(LineItem item, MarketplaceProduct product)
+        public static ZohoLineItem Map(MarketplaceLineItem item, MarketplaceProduct product)
         {
             // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()
@@ -92,7 +93,7 @@ namespace Marketplace.Common.Mappers.Zoho
             };
         }
 
-        public static ZohoLineItem Map(ZohoLineItem zItem, LineItem item, MarketplaceProduct product)
+        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, MarketplaceProduct product)
         {
             // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()
@@ -140,7 +141,7 @@ namespace Marketplace.Common.Mappers.Zoho
 
     public static class ZohoSalesOrderMapper
     {
-        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, ListPage<LineItem> lineitems)
+        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, ListPage<MarketplaceLineItem> lineitems)
         {
             return new ZohoSalesOrder()
             {
