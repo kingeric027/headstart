@@ -66,11 +66,12 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         private decimal SumProposedShipmentCosts(OrderCalculation orderCalculation)
         {
-            return orderCalculation.ProposedShipmentRatesResponse.ProposedShipments.Select(proposedShipment =>
+            var selectedProposedShipmentOptions = orderCalculation.ProposedShipmentRatesResponse.ProposedShipments.Select(proposedShipment =>
             {
                 return proposedShipment.ProposedShipmentOptions
                 .First(proposedShipmentOption => proposedShipmentOption.ID == proposedShipment.SelectedProposedShipmentOptionID).Cost;
-            }).Sum();
+            });
+            return selectedProposedShipmentOptions.Sum();
         }
 
         private List<string> GetProductsWithInvalidDimensions(IList<LineItem> lineItems)
