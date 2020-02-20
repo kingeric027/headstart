@@ -1,7 +1,7 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
-import { ShopperContextService, MarketplaceOrder, ListPayment, ListLineItem, ProposedShipmentSelection, ListBuyerCreditCard, ListProposedShipment } from 'marketplace';
+import { ShopperContextService, MarketplaceOrder, ListPayment, ListLineItem, ListBuyerCreditCard, ShipmentPreference, ProposedShipment } from 'marketplace';
 import { CheckoutCreditCardOutput } from '../../payments/payment-credit-card/payment-credit-card.component';
 
 @Component({
@@ -16,7 +16,7 @@ export class OCMCheckout implements OnInit {
   payments: ListPayment;
   cards: ListBuyerCreditCard;
   selectedCard: CheckoutCreditCardOutput;
-  proposedShipments: ListProposedShipment = null;
+  proposedShipments: ProposedShipment[] = null;
   currentPanel: string;
   faCheck = faCheck;
   sections: any = [
@@ -58,16 +58,17 @@ export class OCMCheckout implements OnInit {
   }
 
   async doneWithShipToAddress(): Promise<void> {
-    this.proposedShipments = await this.context.currentOrder.getProposedShipments();
+    const calculateRatesResponse = await this.context.currentOrder.getProposedShipments();
+    this.proposedShipments = calculateRatesResponse.ProposedShipmentRatesResponse.ProposedShipments;
     this.toSection('shippingSelection');
   }
 
-  async onSelectShipRate(selection: ProposedShipmentSelection): Promise<void> {
+  async onSelectShipRate(selection: ShipmentPreference): Promise<void> {
     await this.context.currentOrder.selectShippingRate(selection);
   }
 
   async doneWithShippingRates(): Promise<void> {
-    await this.context.currentOrder.calculateTax();
+    await this.context.currentOrder.calculateOrder();
     this.cards = await this.context.currentUser.cards.List();
     this.toSection('payment');
   }

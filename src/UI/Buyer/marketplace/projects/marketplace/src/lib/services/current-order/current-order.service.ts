@@ -19,8 +19,10 @@ import { isUndefined as _isUndefined, get as _get } from 'lodash';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { listAll } from '../../functions/listAll';
-import { AppConfig, MarketplaceOrder, ProposedShipment, ProposedShipmentSelection, CreditCardToken, ListProposedShipment } from '../../shopper-context';
+import { AppConfig, MarketplaceOrder, CreditCardToken } from '../../shopper-context';
 import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
+import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
+import { ShipmentPreference, OrderCalculation } from '../ordercloud-sandbox/ordercloud-sandbox.models';
 
 export interface ICurrentOrder {
   addToCartSubject: Subject<LineItem>;
@@ -45,9 +47,9 @@ export interface ICurrentOrder {
   setBillingAddressByID(addressID: string): Promise<MarketplaceOrder>;
   setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
 
-  getProposedShipments(): Promise<ListProposedShipment>;
-  selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder>;
-  calculateTax(): Promise<MarketplaceOrder>;
+  getProposedShipments(): Promise<OrderCalculation>;
+  selectShippingRate(selection: ShipmentPreference): Promise<MarketplaceOrder>;
+  calculateOrder(): Promise<MarketplaceOrder>;
   authOnlyOnetimeCreditCard(card: CreditCardToken, cvv: string): Promise<Payment>;
   authOnlySavedCreditCard(cardID: string, cvv: string): Promise<Payment>;
 
@@ -59,7 +61,7 @@ export interface ICurrentOrder {
   providedIn: 'root',
 })
 export class CurrentOrderService implements ICurrentOrder {
-  private readonly DefaultOrder: MarketplaceOrder = { xp: { AvalaraTaxTransactionCode: '', ProposedShipmentSelections: [] }};
+  private readonly DefaultOrder: MarketplaceOrder = { xp: { AvalaraTaxTransactionCode: '' }};
   private readonly DefaultLineItems: ListLineItem = {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
@@ -77,7 +79,8 @@ export class CurrentOrderService implements ICurrentOrder {
     private ocPaymentService: OcPaymentService,
     private paymentHelper: PaymentHelperService,
     private middlewareApi: MiddlewareApiService,
-    private appConfig: AppConfig
+    private appConfig: AppConfig,
+    private orderCloudSandBoxService: OrderCloudSandboxService
   ) {}
 
   onOrderChange(callback: (order: MarketplaceOrder) => void) {
@@ -103,7 +106,7 @@ export class CurrentOrderService implements ICurrentOrder {
   async patchLineItem(lineItemID: string, patch: LineItem): Promise<LineItem> {
     const existingLI = this.lineItems.Items.find((li) => li.ID === lineItemID);
     Object.assign(existingLI, patch);
-    Object.assign(this.order, this.calculateOrder());
+    Object.assign(this.order, this.calculateOrderDisplay());
     return await this.ocLineItemService.Patch('outgoing', this.order.ID, lineItemID, patch).toPromise();
   }
 
@@ -217,7 +220,7 @@ export class CurrentOrderService implements ICurrentOrder {
 
   async removeFromCart(lineItemID: string): Promise<void> {
     this.lineItems.Items = this.lineItems.Items.filter((li) => li.ID !== lineItemID);
-    Object.assign(this.order, this.calculateOrder());
+    Object.assign(this.order, this.calculateOrderDisplay());
     try {
       await this.ocLineItemService.Delete('outgoing', this.order.ID, lineItemID).toPromise();
     } finally {
@@ -241,7 +244,7 @@ export class CurrentOrderService implements ICurrentOrder {
   async emptyCart(): Promise<void> {
     const ID = this.order.ID;
     this.lineItems = this.DefaultLineItems;
-    Object.assign(this.order, this.calculateOrder());
+    Object.assign(this.order, this.calculateOrderDisplay());
     try {
       await this.ocOrderService.Delete('outgoing', ID).toPromise();
     } finally {
@@ -249,20 +252,25 @@ export class CurrentOrderService implements ICurrentOrder {
     }
   }
 
+  // order cloud sandbox service methods, to be replaced by updated sdk in the future
+  async getProposedShipments(): Promise<OrderCalculation> {
+    return await this.orderCloudSandBoxService.calculateShippingOptions(this.order.ID);
+  }
+
+  async selectShippingRate(selection: ShipmentPreference): Promise<MarketplaceOrder> {
+    const orderCalculation = await this.orderCloudSandBoxService.selectShippingRate(this.order.ID, selection);
+    this.order = orderCalculation.Order;
+    return this.order;
+  }
+  
+  async calculateOrder(): Promise<MarketplaceOrder> {
+    const orderCalculation = await this.orderCloudSandBoxService.calculateOrder(this.order.ID);
+    this.order = await orderCalculation.Order;
+    return this.order;
+  }
+  
+
   // Integration Methods
-
-  async getProposedShipments(): Promise<ListProposedShipment> {
-    return await this.middlewareApi.getProposedShipments(this.order.ID);
-  }
-
-  async selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder> {
-    return (this.order = await this.middlewareApi.selectShippingRate(this.order.ID, selection));
-  }
-
-  async calculateTax(): Promise<MarketplaceOrder> {
-    return (this.order = await this.middlewareApi.calculateTax(this.order.ID));
-  }
-
   async authOnlyOnetimeCreditCard(card: CreditCardToken, cvv: string): Promise<Payment> {
     return await this.middlewareApi.authOnlyCreditCard(this.order.ID, card, cvv);
   }
@@ -300,7 +308,7 @@ export class CurrentOrderService implements ICurrentOrder {
         lineItem = await this.setQuantityInCart(existingLI.ID, lineItem.Quantity + existingLI.Quantity);
       } else {
         this.lineItems.Items.push(lineItem);
-        Object.assign(this.order, this.calculateOrder());
+        Object.assign(this.order, this.calculateOrderDisplay());
         lineItem = await this.ocLineItemService.Create('outgoing', this.order.ID, lineItem).toPromise();
       }
       return lineItem;
@@ -309,7 +317,7 @@ export class CurrentOrderService implements ICurrentOrder {
     }
   }
 
-  private calculateOrder(): MarketplaceOrder {
+  private calculateOrderDisplay(): MarketplaceOrder {
     const LineItemCount = this.lineItems.Items.length;
     this.lineItems.Items.forEach((li) => {
       li.LineTotal = li.Quantity * li.UnitPrice;

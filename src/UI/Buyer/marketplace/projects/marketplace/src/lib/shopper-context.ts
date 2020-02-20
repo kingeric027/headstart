@@ -15,6 +15,7 @@ import {
 
 export * from '@ordercloud/angular-sdk';
 export * from './services/shopper-context/shopper-context.service';
+export * from '../../src/lib/services/ordercloud-sandbox/ordercloud-sandbox.models';
 
 export interface CreditCardToken {
   AccountNumber: string;
@@ -78,9 +79,8 @@ export interface ProposedShipmentOption {
   Cost: number;
 }
 
-export type MarketplaceOrder = Order<OrderXp, any, any>
+export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
 export interface OrderXp {
-  ProposedShipmentSelections: ProposedShipmentSelection[];
   AvalaraTaxTransactionCode: string;
 }
 
