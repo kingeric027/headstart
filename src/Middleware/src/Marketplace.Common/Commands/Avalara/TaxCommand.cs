@@ -52,7 +52,12 @@ namespace Marketplace.Common.Commands
 		public async Task HandleTransactionCreation(MarketplaceOrder buyerOrder)
 		{
 			var taxableOrder = await GetTaxableOrder(buyerOrder);
-			await _avatax.CreateTransactionAsync(taxableOrder);
+			var transaction = await _avatax.CreateTransactionAsync(taxableOrder);
+			await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, buyerOrder.ID, new PartialOrder()
+			{
+				TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
+				xp = { AvalaraTaxTransactionCode = transaction.code }
+			});
 		}
 
 		private async Task<TaxableOrder> GetTaxableOrder(MarketplaceOrder order)
