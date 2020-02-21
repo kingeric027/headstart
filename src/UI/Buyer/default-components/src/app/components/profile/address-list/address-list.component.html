@@ -16,6 +16,9 @@
                 (click)="closeAreYouSure()">Cancel</button>
       </div>
     </ocm-modal>
+    <div *ngIf="suggestedAddresses">
+      <address-suggestion [suggestedAddresses]="suggestedAddresses"></address-suggestion>
+    </div>
     <div class="row">
       <!-- Display the address form on mobile (md-) -->
       <div class="col-lg-6 d-lg-none d-block mb-3"
