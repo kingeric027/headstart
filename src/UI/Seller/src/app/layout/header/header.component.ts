@@ -60,11 +60,11 @@ export class HeaderComponent implements OnInit {
   async getCurrentUser() {
     this.user = await this.currentUserService.getUser();
     this.isSupplierUser = await this.currentUserService.isSupplierUser();
-    this.isSupplierUser ? this.getSupplierOrg(this.user.Supplier?.ID) : (this.organizationName = this.appConfig.sellerName);
+    this.isSupplierUser ? this.getSupplierOrg() : (this.organizationName = this.appConfig.sellerName);
   }
 
-  async getSupplierOrg(supplierID: string) {
-    const mySupplier = await this.currentUserService.getSupplierOrg(supplierID);
+  async getSupplierOrg() {
+    const mySupplier = await this.currentUserService.getMySupplier();
     this.organizationName = mySupplier.Name;
   }
 

@@ -19,7 +19,8 @@ import { MiddlewareAPIService } from '../middleware-api/middleware-api.service';
   providedIn: 'root',
 })
 export class CurrentUserService {
-  me: User;
+  me: MeUser;
+  mySupplier: Supplier;
   constructor(
     private ocMeService: OcMeService,
     private ocAuthService: OcAuthService,
@@ -48,10 +49,16 @@ export class CurrentUserService {
     this.ocTokenService.SetAccess(accessToken.access_token);
     this.appStateService.isLoggedIn.next(true);
     this.me = await this.ocMeService.Get().toPromise();
+    this.mySupplier = await this.middleware.getMySupplier(this.me.Supplier.ID);
   }
 
   async getUser(): Promise<MeUser> {
     return this.me ? this.me : await this.ocMeService.Get().toPromise();
+  }
+
+  async getMySupplier(): Promise<Supplier> {
+    const me = await this.getUser();
+    return this.mySupplier ? this.mySupplier : await this.middleware.getMySupplier(me.Supplier.ID);
   }
 
   async getUserContext(): Promise<UserContext> {
@@ -73,9 +80,5 @@ export class CurrentUserService {
   async isSupplierUser() {
     const me = await this.getUser();
     return me.Supplier ? true : false;
-  }
-
-  async getSupplierOrg(supplierID: string): Promise<Supplier> {
-    return await this.middleware.getMySupplier(supplierID);
   }
 }
