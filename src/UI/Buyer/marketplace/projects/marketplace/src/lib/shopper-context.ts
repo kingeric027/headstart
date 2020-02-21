@@ -49,36 +49,6 @@ export interface ShippingRate {
   TotalCost: number;
 }
 
-export interface ProposedShipmentSelection {
-  // tentative model pending platform implementation
-  ShipFromAddressID: string;
-  SupplierID: string;
-  ProposedShipmentOptionID: string;
-  Rate: number;
-}
-
-export interface ListProposedShipment {
-  Meta: Meta;
-  Items: ProposedShipment[];
-}
-
-export interface ProposedShipment {
-  ProposedShipmentItems: ProposedShipmentItem[];
-  ProposedShipmentOptions: ProposedShipmentOption[];
-}
-
-export interface ProposedShipmentItem {
-  LineItemID: string;
-  Quantity: number;
-}
-
-export interface ProposedShipmentOption {
-  ID: string;
-  Name: string;
-  DeliveryDays: number;
-  Cost: number;
-}
-
 export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
 export interface OrderXp {
   AvalaraTaxTransactionCode: string;
