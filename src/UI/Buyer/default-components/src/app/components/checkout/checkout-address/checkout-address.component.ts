@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
+import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address, ListAddress } from '@ordercloud/angular-sdk';
 import { ShopperContextService, MarketplaceOrder } from 'marketplace';
 
 // TODO - Make this component "Dumb" by removing the dependence on context service 
@@ -19,14 +19,14 @@ export class OCMCheckoutAddress implements OnInit {
   };
   usingShippingAsBilling = false;
   showAddAddressForm = false;
-  
+  suggestedAddresses: ListAddress;
   @Input() addressType: 'Shipping' | 'Billing';
   @Input() isAnon: boolean;
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListLineItem;
   @Output() continue = new EventEmitter();
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService) { }
 
   ngOnInit(): void {
     if (!this.isAnon) {
@@ -66,27 +66,31 @@ export class OCMCheckoutAddress implements OnInit {
 
   async saveAddress(address: Address, formDirty: boolean, shouldSaveAddress: boolean): Promise<void> {
     // TODO: make bellow line better
-    const setOneTimeAddress =
-      this.isAnon ||
-      formDirty ||
-      (this.usingShippingAsBilling && !this.order.ShippingAddressID) ||
-      !address.ID ||
-      address.ID === '';
-    if (shouldSaveAddress) {
-      this.order = await this.saveAndSetAddress(address);
-    } else {
-      if (setOneTimeAddress) {
-        this.order = await this.setOneTimeAddress(address);
+    try {
+      const setOneTimeAddress =
+        this.isAnon ||
+        formDirty ||
+        (this.usingShippingAsBilling && !this.order.ShippingAddressID) ||
+        !address.ID ||
+        address.ID === '';
+      if (shouldSaveAddress) {
+        this.order = await this.saveAndSetAddress(address);
       } else {
-        this.order = await this.setSavedAddress(address.ID);
+        if (setOneTimeAddress) {
+          this.order = await this.setOneTimeAddress(address);
+        } else {
+          this.order = await this.setSavedAddress(address.ID);
+        }
       }
+      if (this.addressType === 'Shipping') {
+        this.lineItems.Items[0].ShippingAddress = address;
+        // TODO - handle this.
+        // this.context.currentOrder.lineItems = this.lineItems;
+      }
+      this.continue.emit();
+    } catch (ex) {
+      this.suggestedAddresses = ex.error.Errors[0].Data.Body.SuggestedValidAddresses;
     }
-    if (this.addressType === 'Shipping') {
-      this.lineItems.Items[0].ShippingAddress = address;
-      // TODO - handle this.
-      // this.context.currentOrder.lineItems = this.lineItems;
-    }
-    this.continue.emit();
   }
 
   private async getSavedAddresses(): Promise<void> {

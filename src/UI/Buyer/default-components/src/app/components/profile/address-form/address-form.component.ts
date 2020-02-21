@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 
 // 3rd party
-import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
+import { BuyerAddress, Address, ListAddress } from '@ordercloud/angular-sdk';
 
 import { ValidateName, ValidateUSZip, ValidatePhone } from '../../../validators/validators';
 import { GeographyConfig } from '../../../config/geography.class';
@@ -21,9 +21,8 @@ export class OCMAddressForm implements OnInit {
   countryOptions: { label: string; abbreviation: string }[];
   addressForm: FormGroup;
   shouldSaveAddressForm: FormGroup;
-  
   private ExistingAddress: BuyerAddress = {};
-  
+
   constructor() {
     this.countryOptions = GeographyConfig.getCountries();
   }
@@ -72,7 +71,7 @@ export class OCMAddressForm implements OnInit {
     this.formSubmitted.emit({
       address: this.addressForm.value,
       formDirty: this.addressForm.dirty,
-      shouldSaveAddress: this.shouldSaveAddressForm.controls.shouldSaveAddress.value   
+      shouldSaveAddress: this.shouldSaveAddressForm.controls.shouldSaveAddress.value
     });
   }
 

@@ -1,5 +1,8 @@
-<div *ngIf="suggestedAddresses">
-  <div *ngFor="let address of suggestedAddresses">
-    {{address.Street1}}
-  </div>
+<div class="border border-radius p-2 mt-2"
+     *ngIf="suggestedAddresses">
+  <p>Suggested Addresses</p>
+  <select>
+    <option *ngFor="let address of suggestedAddresses">{{address.Street1}} {{address.Street2}} {{address.City}} {{address.State}} {{address.Zip}} {{address.Country}}</option>
+  </select>
+
 </div>
