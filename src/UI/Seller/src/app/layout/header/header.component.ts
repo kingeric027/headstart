@@ -64,7 +64,7 @@ export class HeaderComponent implements OnInit {
   }
 
   async getSupplierOrg(supplierID: string) {
-    const mySupplier = await this.middleware.getMySupplier(supplierID);
+    const mySupplier = await this.currentUserService.getSupplierOrg(supplierID);
     this.organizationName = mySupplier.Name;
   }
 

@@ -5,7 +5,7 @@
 export const environment = {
   hostedApp: false,
   clientID: '1FF8EA5D-7666-44AF-AFC5-EBD38DB94108',
-  middlewareUrl: 'https://localhost:44384',
+  middlewareUrl: 'https://localhost:44336',
   appname: 'Marketplace Admin Local',
   marketplaceID: 'seb',
   cmsUrl: 'https://marketplaceqa.blob.core.windows.net',
