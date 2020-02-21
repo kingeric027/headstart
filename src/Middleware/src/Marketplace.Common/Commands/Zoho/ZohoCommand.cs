@@ -20,6 +20,7 @@ namespace Marketplace.Common.Commands.Zoho
     public interface IZohoCommand
     {
         Task<ZohoSalesOrder> CreateSalesOrder(OrderCalculation orderCalculation);
+        Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, OrderSplitResult orders);
     }
 
     public class ZohoCommand : IZohoCommand
@@ -44,6 +45,39 @@ namespace Marketplace.Common.Commands.Zoho
                 GrantType = GrantType.ClientCredentials,
                 Roles = new[] { ApiRole.FullAccess }
             });
+        }
+
+        public async Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, OrderSplitResult orders)
+        {
+            try
+            {
+                var results = new List<ZohoPurchaseOrder>();
+                foreach (var order in orders.OutgoingOrders)
+                {
+                    var delivery_address = z_order.shipping_address; //TODO: this is not good enough. Might even need to go back to SaleOrder and split out by delivery address
+                    var supplier = await _oc.Suppliers.GetAsync(order.ToCompanyID);
+                    // TODO: accomodate possibility of more than 100 line items
+                    var lineitems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, order.ID, pageSize: 100);
+
+                    // Step 1: Create contact (customer) in Zoho
+                    var contact = await CreateOrUpdateVendor(order);
+
+                    // Step 2: Create or update Items from LineItems/Products on Order
+                    var items = await CreateOrUpdateLineItems(lineitems);
+
+                    // Step 3: Create item for shipments
+                    //items.AddRange(await ApplyShipping(order)); do we need shipping here?
+                    var purchase_order = await _zoho.PurchaseOrders.CreateAsync(
+                        ZohoPurchaseOrderMapper.Map(z_order, order, items, lineitems, delivery_address, contact));
+                    results.Add(purchase_order);
+                }
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new ApiErrorException(ErrorCodes.All["ZohoIntegrationError"], ex.Message);
+            }
         }
 
         public async Task<ZohoSalesOrder> CreateSalesOrder(OrderCalculation orderCalculation)
@@ -71,6 +105,32 @@ namespace Marketplace.Common.Commands.Zoho
             {
                 throw new ApiErrorException(ErrorCodes.All["ZohoIntegrationError"], ex.Message);
             }
+        }
+
+        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(ListPage<LineItem> lineitems)
+        {
+            // TODO: accomodate possibility of more than 100 line items
+            var products = await Throttler.RunAsync(lineitems.Items.Select(item => item.ProductID).ToList(), 100, 5,
+                s => _oc.Products.GetAsync<MarketplaceProduct>(s));
+
+            var zItems = await Throttler.RunAsync(products.ToList(), 100, 5, product => _zoho.Items.ListAsync(new ZohoFilter()
+            {
+                Key = "sku",
+                Value = product.ID
+            }));
+            var z_items = new Dictionary<string, ZohoLineItem>();
+            foreach (var list in zItems)
+                list.Items.ForEach(item => z_items.Add(item.sku, item));
+
+            var items = await Throttler.RunAsync(products.Select(p => p).ToList(), 100, 5, async product =>
+            {
+                var z_item = z_items.FirstOrDefault(z => z.Key == product.ID);
+                if (z_item.Key != null)
+                    return await _zoho.Items.SaveAsync(
+                        ZohoLineItemMapper.Map(z_item.Value, lineitems.Items.First(i => i.ProductID == product.ID), product));
+                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.Items.First(i => i.ProductID == product.ID), product));
+            });
+            return items.ToList();
         }
 
         private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(MarketplaceOrder order, IList<LineItem> lineitems)

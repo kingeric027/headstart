@@ -42,12 +42,11 @@ namespace Marketplace.Common.Commands
             // so that we do not need to go get the line items and shipping information multiple times
             var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, orderId);
             await _avatax.CreateTransactionAsync(buyerOrderCalculation);
-            await _zoho.CreateSalesOrder(buyerOrderCalculation);
+            var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderCalculation);
             
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderId);
             var supplierOrders = orderSplitResult.OutgoingOrders;
             await ImportSupplierOrdersIntoFreightPop(supplierOrders);
-            // do other order submit actions here
             await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
         }
 
