@@ -11,7 +11,7 @@
         class="selectable-row"
         [ngClass]="{'selected-resource':selectedIndex === index}"
         select="table-body-row">
-      <td *ngFor="let cell of row.cells">
+      <td class="align-middle" *ngFor="let cell of row.cells">
         <span *ngIf="cell.type === 'BASIC_STRING'">
           {{cell.value}}
         </span>
@@ -31,6 +31,12 @@
             <div class="h6">{{cell.value}}</div>
           </span>
         </div>
+        <span *ngIf="cell.type === 'COPY_OBJECT'">
+         <button class="btn btn-light"
+                (click)="copyObject(row.resource)">
+                <fa-icon [icon]="faCopy"></fa-icon>
+        </button>
+        </span>
       </td>
     </tr>
   </tbody>
