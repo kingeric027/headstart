@@ -55,7 +55,7 @@ namespace Marketplace.Common.Commands.Zoho
                     var delivery_address = z_order.shipping_address; //TODO: this is not good enough. Might even need to go back to SaleOrder and split out by delivery address
                     var supplier = await _oc.Suppliers.GetAsync(order.ToCompanyID);
                     // TODO: accomodate possibility of more than 100 line items
-                    var lineitems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, order.ID, pageSize: 100);
+                    var lineitems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, order.ID, pageSize: 100);
 
                     // Step 1: Create contact (customer) in Zoho
                     var contact = await CreateOrUpdateVendor(order);
@@ -83,7 +83,7 @@ namespace Marketplace.Common.Commands.Zoho
             try
             {
                 // TODO: accomodate possibility of more than 100 line items
-                var lineitems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID, pageSize: 100);
+                var lineitems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, order.ID, pageSize: 100);
 
                 // Step 1: Create contact (customer) in Zoho
                 var contact = await CreateOrUpdateContact(order);
@@ -108,10 +108,10 @@ namespace Marketplace.Common.Commands.Zoho
             }
         }
 
-        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(ListPage<LineItem> lineitems)
-        {
-            // TODO: accomodate possibility of more than 100 line items
-            var products = await Throttler.RunAsync(lineitems.Items.Select(item => item.ProductID).ToList(), 100, 5,
+        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(ListPage<MarketplaceLineItem> lineitems)
+		{
+			// TODO: accomodate possibility of more than 100 line items
+			var products = await Throttler.RunAsync(lineitems.Items.Select(item => item.ProductID).ToList(), 100, 5,
                 s => _oc.Products.GetAsync<MarketplaceProduct>(s));
 
             var zItems = await Throttler.RunAsync(products.ToList(), 100, 5, product => _zoho.Items.ListAsync(new ZohoFilter()

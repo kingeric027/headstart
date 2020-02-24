@@ -1,22 +1,25 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Mappers.Avalara;
 using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Helpers;
 using OrderCloud.SDK;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Marketplace.Common.Services.AvaTax
 {
-    public interface IAvataxService
+	public interface IAvataxService
 	{
 		// Use this before checkout. No records will be saved in avalara.
 		Task<decimal> GetTaxEstimateAsync(TaxableOrder taxableOrder);
 		// Use this during submit.
 		Task<TransactionModel> CreateTransactionAsync(TaxableOrder taxableOrder);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
-		// When should we do this? On order complete (When the credit card is charged) ? 
+		// When should we do this? 
 		Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode);
 		Task<ListPage<MarketplaceTaxCode>> ListTaxCodesAsync(ListArgs<TaxCodeModel> marketplaceListArgs);
 	}
@@ -34,16 +37,13 @@ namespace Marketplace.Common.Services.AvaTax
 			_avaTax = new AvaTaxClient("four51 marketplace", "v1", settings.Env.ToString(), env)
 					.WithSecurity(settings.AvalaraSettings.AccountID, settings.AvalaraSettings.LicenseKey);
 		}
+
 		public async Task<ListPage<MarketplaceTaxCode>> ListTaxCodesAsync(ListArgs<TaxCodeModel> marketplaceListArgs)
 		{
-			var taxCategory = marketplaceListArgs.Filters[0].Values[0].Term;
-			var taxCategorySearch = marketplaceListArgs.Filters[0].Values[0].Term.Trim('0');
-			var search = marketplaceListArgs.Search;
-			var avataxQuery = search != "" ? $"isActive eq true and taxCode startsWith '{taxCategorySearch}' and (taxCode contains '{search}' OR description contains '{search}')" : $"isActive eq true and taxCode startsWith '{taxCategorySearch}'";
-			var (top, skip) = TaxCodeMapper.Map(marketplaceListArgs.Page, marketplaceListArgs.PageSize);
-			var avataxCodes = await _avaTax.ListTaxCodesAsync(avataxQuery, top, skip, null);
-			var marketplaceTaxCodeList = TaxCodeMapper.Map(avataxCodes, taxCategory);
-			return TaxCodeMapper.Map(avataxCodes, marketplaceTaxCodeList, top, skip);
+			var args = TaxCodeMapper.Map(marketplaceListArgs);
+			var avataxCodes = await _avaTax.ListTaxCodesAsync(args.Filter, args.Top, args.Skip, args.OrderBy);
+			var codeList = TaxCodeMapper.Map(avataxCodes, args);
+			return codeList;
 		}
 
 		public async Task<decimal> GetTaxEstimateAsync(TaxableOrder taxableOrder)
@@ -78,7 +78,7 @@ namespace Marketplace.Common.Services.AvaTax
 			return await _avaTax.CommitTransactionAsync(_companyCode, transactionCode, DocumentType.SalesInvoice, "", model);
 		}
 
-		private string GetCustomerCode(OrderCloud.SDK.Order order)
+		private string GetCustomerCode(Order order)
 		{
 			return order.FromCompanyID;
 		}
