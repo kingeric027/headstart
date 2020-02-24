@@ -21,4 +21,33 @@ export class OrchestrationLogsTableComponent extends ResourceCrudComponent<Orche
   ) {
     super(changeDetectorRef, service, router, activatedRoute, ngZone);
   }
+
+  filterConfig = {
+    Filters: [
+      {
+        Display: 'Logs On/Before',
+        Path: 'timeStamp',
+        Type: 'DateFilter',
+      },
+      // TO-DO - UPDATE MIDDLEWARE TO ACCEPT BOTH A FROM AND TO DATE
+      {
+        Display: 'Record Type',
+        Path: 'RecordType',
+        Values: ['Catalog', 'PriceSchedule', 'Product', 'ProductFacet', 'Spec', 'SpecOption', 'SpecProductAssignment', 'User'],
+        Type: 'Dropdown',
+      },
+      {
+        Display: 'Action',
+        Path: 'Action',
+        Values: ['Create', 'Delete', 'Get', 'Ignore', 'Update'],
+        Type: 'Dropdown',
+      },
+      {
+        Display: 'Result',
+        Path: 'Level',
+        Values: ['Error', 'Success', 'Warn'],
+        Type: 'Dropdown',
+      },
+    ],
+  };
 }

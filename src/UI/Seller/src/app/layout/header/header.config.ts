@@ -181,9 +181,9 @@ const SupplierNavGrouping: MPRoute = {
   subRoutes: [AllSuppliers, SupplierUsers, SupplierLocations],
 };
 
-const OrchestionLogs = {
+const OrchestrationLogs = {
   rolesWithAccess: ['MPReportReader'],
-  title: 'Orchestion Logs',
+  title: 'Orchestration Logs',
   route: 'reports/logs',
 };
 
@@ -191,7 +191,7 @@ const ReportsNavGrouping = {
   rolesWithAccess: ['MPReportReader'],
   title: 'Reports',
   route: '/reports',
-  subRoutes: [OrchestionLogs],
+  subRoutes: [OrchestrationLogs],
 };
 
 const SellerUsers = {

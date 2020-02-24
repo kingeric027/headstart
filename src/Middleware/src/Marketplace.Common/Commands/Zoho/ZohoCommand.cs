@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Mappers.Zoho;
 using Marketplace.Common.Services.Zoho;
+using Marketplace.Common.Services.Zoho.Mappers;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
+using Marketplace.Helpers.Extensions;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
@@ -17,6 +18,7 @@ namespace Marketplace.Common.Commands.Zoho
     public interface IZohoCommand
     {
         Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrder order);
+        Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, OrderSplitResult orders);
     }
 
     public class ZohoCommand : IZohoCommand
@@ -43,6 +45,39 @@ namespace Marketplace.Common.Commands.Zoho
             });
         }
 
+        public async Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, OrderSplitResult orders)
+        {
+            try
+            {
+                var results = new List<ZohoPurchaseOrder>();
+                foreach (var order in orders.OutgoingOrders)
+                {
+                    var delivery_address = z_order.shipping_address; //TODO: this is not good enough. Might even need to go back to SaleOrder and split out by delivery address
+                    var supplier = await _oc.Suppliers.GetAsync(order.ToCompanyID);
+                    // TODO: accomodate possibility of more than 100 line items
+                    var lineitems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, order.ID, pageSize: 100);
+
+                    // Step 1: Create contact (customer) in Zoho
+                    var contact = await CreateOrUpdateVendor(order);
+
+                    // Step 2: Create or update Items from LineItems/Products on Order
+                    var items = await CreateOrUpdateLineItems(lineitems);
+
+                    // Step 3: Create item for shipments
+                    //items.AddRange(await ApplyShipping(order)); do we need shipping here?
+                    var purchase_order = await _zoho.PurchaseOrders.CreateAsync(
+                        ZohoPurchaseOrderMapper.Map(z_order, order, items, lineitems, delivery_address, contact));
+                    results.Add(purchase_order);
+                }
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new ApiErrorException(ErrorCodes.All["ZohoIntegrationError"], ex.Message);
+            }
+        }
+
         public async Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrder order)
         {
             try
@@ -54,7 +89,7 @@ namespace Marketplace.Common.Commands.Zoho
                 var contact = await CreateOrUpdateContact(order);
 
                 // Step 2: Create or update Items from LineItems/Products on Order
-                var items = await CreateOrUpdateLineItems(order, lineitems);
+                var items = await CreateOrUpdateLineItems(lineitems);
 
                 // Step 3: Create item for shipments
                 items.AddRange(await ApplyShipping(order));
@@ -73,10 +108,10 @@ namespace Marketplace.Common.Commands.Zoho
             }
         }
 
-        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(MarketplaceOrder order, ListPage<MarketplaceLineItem> lineitems)
-        {
-            // TODO: accomodate possibility of more than 100 line items
-            var products = await Throttler.RunAsync(lineitems.Items.Select(item => item.ProductID).ToList(), 100, 5,
+        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(ListPage<MarketplaceLineItem> lineitems)
+		{
+			// TODO: accomodate possibility of more than 100 line items
+			var products = await Throttler.RunAsync(lineitems.Items.Select(item => item.ProductID).ToList(), 100, 5,
                 s => _oc.Products.GetAsync<MarketplaceProduct>(s));
 
             var zItems = await Throttler.RunAsync(products.ToList(), 100, 5, product => _zoho.Items.ListAsync(new ZohoFilter()
@@ -115,7 +150,35 @@ namespace Marketplace.Common.Commands.Zoho
             return ZohoLineItemMapper.Map(order, new_shipping);
         }
 
-        private async Task<ZohoContact> CreateOrUpdateContact(MarketplaceOrder order)
+        private async Task<ZohoContact> CreateOrUpdateVendor(Order order)
+        {
+            var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(order.ToCompanyID);
+            var addresses = await _oc.SupplierAddresses.ListAsync<MarketplaceAddress>(order.ToCompanyID);
+            var users = await _oc.SupplierUsers.ListAsync(order.ToCompanyID);
+            var currencies = await _zoho.Currencies.ListAsync();
+            var vendor = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = supplier.Name });
+            if (vendor.Items.Any())
+            {
+                return await _zoho.Contacts.SaveAsync<ZohoContact>(
+                    ZohoContactMapper.Map(
+                        vendor.Items.FirstOrDefault(),
+                        supplier,
+                        addresses.Items.FirstOrDefault(),
+                        users.Items.FirstOrDefault(),
+                        currencies.Items.FirstOrDefault(c => c.currency_code == "USD")));
+            }
+            else
+            {
+                return await _zoho.Contacts.CreateAsync<ZohoContact>(
+                    ZohoContactMapper.Map(
+                        supplier,
+                        addresses.Items.FirstOrDefault(),
+                        users.Items.FirstOrDefault(),
+                        currencies.Items.FirstOrDefault(c => c.currency_code == "USD")));
+            }
+        }
+
+        private async Task<ZohoContact> CreateOrUpdateContact(Order order)
         {
             // as this routine evolves around model updates to avoid so much listing abstract this out into a routine for reuse
             var ocBuyer = await _oc.Buyers.GetAsync<MarketplaceBuyer>(order.FromCompanyID);

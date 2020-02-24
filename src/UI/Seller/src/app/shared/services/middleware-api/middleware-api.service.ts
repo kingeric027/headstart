@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { OcTokenService, Supplier } from '@ordercloud/angular-sdk';
+import { OcTokenService, Supplier, Buyer } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { SuperMarketplaceProduct, DRAFT } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { OrchestrationLog } from '@app-seller/reports/models/orchestration-log';
@@ -71,6 +71,11 @@ export class MiddlewareAPIService {
     return await this.http.post(url, supplier, this.headers).toPromise();
   }
 
+  async createBuyer(buyer: Buyer): Promise<Supplier> {
+    const url = `${this.baseUrl}/buyer`;
+    return await this.http.post(url, buyer, this.headers).toPromise();
+  }
+
   async listOrchestrationLogs(args: ListArgs = {}): Promise<ListPage<OrchestrationLog>> {
     return await this.list(`${this.baseUrl}/orchestration/logs`, args);
   }
@@ -83,10 +88,11 @@ export class MiddlewareAPIService {
   }
 
   private addUrlParams(baseUrl: string, object: Record<string, any> = {}): string {
+    const symbol = baseUrl.includes('?') ? '&' : '?';
     const fields = Object.entries(object);
     const url = fields
       .filter(([key, value]) => value)
-      .reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}?`);
+      .reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}${symbol}`);
     return url.replace(/[?&]+$/g, ''); // remove trailling & or ?
   }
 
@@ -94,5 +100,10 @@ export class MiddlewareAPIService {
     const form = new FormData();
     form.append('file', file);
     return form;
+  }
+
+  async getMySupplier(supplierID: string): Promise<Supplier> {
+    const url = `${this.baseUrl}/supplier/me/${supplierID}`;
+    return await this.http.get(url, this.headers).toPromise();
   }
 }
