@@ -232,7 +232,20 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async createNewResource(resource: any): Promise<any> {
+    if (resource.ParentID) {
+      const parentResourceID = this.getParentResourceID();
+      const parentOfResource = await this.ocService.Get(parentResourceID, resource.ParentID).toPromise();
+      if (parentOfResource) {
+        const grandparentOfResource = await this.ocService.Get(parentResourceID, parentOfResource.ParentID).toPromise();
+        if (grandparentOfResource) {
+          if (grandparentOfResource.ParentID !== null) {
+            return;
+          }
+        }
+      }
+    }
     const newResource = await this.ocService.Create(...this.createListArgs([resource])).toPromise();
+    console.log('the new resource', newResource);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;
