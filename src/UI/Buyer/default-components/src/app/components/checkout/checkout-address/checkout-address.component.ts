@@ -115,17 +115,17 @@ export class OCMCheckoutAddress implements OnInit {
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     address.ID = null;
     if (this.addressType === 'Shipping') {
-      return await this.context.currentOrder.setShippingAddress(address);
+      return await this.context.order.checkout.setShippingAddress(address);
     } else if (this.addressType === 'Billing') {
-      return await this.context.currentOrder.setBillingAddress(address);
+      return await this.context.order.checkout.setBillingAddress(address);
     }
   }
 
   private async setSavedAddress(addressID: string): Promise<Order> {
     if (this.addressType === 'Shipping') {
-      return await this.context.currentOrder.setShippingAddressByID(addressID);
+      return await this.context.order.checkout.setShippingAddressByID(addressID);
     } else if (this.addressType === 'Billing') {
-      return await this.context.currentOrder.setBillingAddressByID(addressID);
+      return await this.context.order.checkout.setBillingAddressByID(addressID);
     }
   }
 }

@@ -30,7 +30,7 @@ export class OCMLineitemTable {
   }
 
   removeLineItem(lineItemID: string): void {
-    this.context.currentOrder.removeFromCart(lineItemID);
+    this.context.order.cart.remove(lineItemID);
   }
 
   toProductDetails(productID: string): void {
@@ -40,7 +40,7 @@ export class OCMLineitemTable {
   changeQuantity(lineItemID: string, event: { qty: number; valid: boolean }): void {
     if (event.valid) {
       this.getLineItem(lineItemID).Quantity = event.qty;
-      this.context.currentOrder.setQuantityInCart(lineItemID, event.qty);
+      this.context.order.cart.setQuantity(lineItemID, event.qty);
     }
   }
 

@@ -53,7 +53,7 @@ export class OCMAppHeader implements OnInit {
     this.screenSize = getScreenSizeBreakPoint();
     this.categories = this.context.categories.all;
     this.appName = this.context.appSettings.appname;
-    this.context.currentOrder.onOrderChange(order => (this.order = order));
+    this.context.order.onChange(order => (this.order = order));
     this.context.currentUser.onIsAnonymousChange(isAnon => (this.anonymous = isAnon));
     this.context.currentUser.onUserChange(user => (this.user = user));
     this.context.productFilters.activeFiltersSubject
@@ -79,7 +79,7 @@ export class OCMAppHeader implements OnInit {
 
   buildAddToCartListener(): void {
     let closePopoverTimeout;
-    this.context.currentOrder.addToCartSubject.subscribe((li: LineItem) => {
+    this.context.order.cart.onAdd.subscribe((li: LineItem) => {
       clearTimeout(closePopoverTimeout);
       if (li) {
         this.popover.ngbPopover = `Added ${li.Quantity} items to Cart`;

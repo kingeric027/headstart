@@ -18,7 +18,6 @@ import { FeaturedProductsResolver } from './resolves/features-products.resolve';
 import { MeListBuyerAddressResolver } from './resolves/me.resolve';
 import { MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
 import { AuthService } from './services/auth/auth.service';
-import { CurrentOrderService } from './services/current-order/current-order.service';
 import { CurrentUserService } from './services/current-user/current-user.service';
 import { OrderHistoryService } from './services/order-history/order-history.service';
 import { PaymentHelperService } from './services/payment-helper/payment-helper.service';
@@ -32,6 +31,7 @@ import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-w
 import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipments-wrapper.component';
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
 import { CreditCardService } from './services/current-user/credit-card.service';
+import { CurrentOrderService } from './services/order/order.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

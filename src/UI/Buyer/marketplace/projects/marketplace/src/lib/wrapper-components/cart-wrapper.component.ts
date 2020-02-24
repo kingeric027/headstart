@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ListLineItem, OcMeService, Product } from '@ordercloud/angular-sdk';
-import { CurrentOrderService } from '../services/current-order/current-order.service';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { ListLineItemWithProduct, MarketplaceOrder } from '../shopper-context';
+import { CurrentOrderService } from '../services/order/order.service';
 
 @Component({
   template: `
@@ -20,9 +20,9 @@ export class CartWrapperComponent implements OnInit {
     public context: ShopperContextService // used in template
   ) { }
 
-  ngOnInit() {
-    this.currentOrder.onOrderChange(this.setOrder);
-    this.currentOrder.onLineItemsChange(this.setLineItems);
+  ngOnInit(): void {
+    this.currentOrder.onChange(this.setOrder);
+    this.currentOrder.cart.onChange(this.setLineItems);
   }
 
   setOrder = (order: MarketplaceOrder): void => {
@@ -38,7 +38,7 @@ export class CartWrapperComponent implements OnInit {
 
   async updateProductCache(productIDs: string[]): Promise<void> {
     const cachedIDs = this.productCache.map(p => p.ID);
-    const toAdd = productIDs.filter(id => cachedIDs.indexOf(id) === -1);
+    const toAdd = productIDs.filter(id => !cachedIDs.includes(id));
     this.productCache = [...this.productCache, ... await this.requestProducts(toAdd)];
   }
 

@@ -16,8 +16,8 @@ export class OCMMiniCart implements OnInit {
   constructor(private context: ShopperContextService) {}
 
   ngOnInit(): void {
-    this.order = this.context.currentOrder.get();
-    this.lineItems = this.context.currentOrder.getLineItems().Items;
+    this.order = this.context.order.get();
+    this.lineItems = this.context.order.cart.get().Items;
   }
 
   toFullCart(): void {

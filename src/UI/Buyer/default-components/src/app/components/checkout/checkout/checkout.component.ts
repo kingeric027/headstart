@@ -49,25 +49,25 @@ export class OCMCheckout implements OnInit {
   constructor(private context: ShopperContextService) {}
 
   ngOnInit(): void {
-    this.context.currentOrder.onOrderChange(order => (this.order = order));
-    this.order = this.context.currentOrder.get();
-    this.lineItems = this.context.currentOrder.getLineItems();
+    this.context.order.onChange(order => (this.order = order));
+    this.order = this.context.order.get();
+    this.lineItems = this.context.order.cart.get();
     this.isAnon = this.context.currentUser.isAnonymous;
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
     this.setValidation('login', !this.isAnon);
   }
 
   async doneWithShipToAddress(): Promise<void> {
-    this.proposedShipments = await this.context.currentOrder.getProposedShipments();
+    this.proposedShipments = await this.context.order.checkout.getProposedShipments();
     this.toSection('shippingSelection');
   }
 
   async onSelectShipRate(selection: ProposedShipmentSelection): Promise<void> {
-    await this.context.currentOrder.selectShippingRate(selection);
+    await this.context.order.checkout.selectShippingRate(selection);
   }
 
   async doneWithShippingRates(): Promise<void> {
-    await this.context.currentOrder.calculateTax();
+    await this.context.order.checkout.calculateTax();
     this.cards = await this.context.currentUser.cards.List();
     this.toSection('payment');
   }
@@ -75,29 +75,29 @@ export class OCMCheckout implements OnInit {
   async onCardSelected(output: CheckoutCreditCardOutput): Promise<void> {
     this.selectedCard = output;
     if (output.savedCard) {
-      await this.context.currentOrder.createSavedCCPayment(output.savedCard);
+      await this.context.order.checkout.createSavedCCPayment(output.savedCard);
     } else {
       // need to figure out how to use the platform. ran into creditCardID cannot be null.
       // so for now I always save any credit card in OC.
       // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
       this.selectedCard.savedCard = await this.context.currentUser.cards.Save(output.newCard);
-      await this.context.currentOrder.createSavedCCPayment(this.selectedCard.savedCard);
+      await this.context.order.checkout.createSavedCCPayment(this.selectedCard.savedCard);
     }
 
-    this.payments = await this.context.currentOrder.listPayments();
+    this.payments = await this.context.order.checkout.listPayments();
     this.toSection('billingAddress');
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
     const orderID = this.order.ID;
-    await this.context.currentOrder.patch({ Comments: comment });
+    await this.context.order.checkout.addComment(comment);
     // TODO - these auth calls probably need to be enforced in the middleware, not frontend.
     if (this.selectedCard.savedCard) {
-      await this.context.currentOrder.authOnlySavedCreditCard(this.selectedCard.savedCard.ID, this.selectedCard.cvv);
+      await this.context.order.checkout.authOnlySavedCreditCard(this.selectedCard.savedCard.ID, this.selectedCard.cvv);
     } else {
-      await this.context.currentOrder.authOnlyOnetimeCreditCard(this.selectedCard.newCard, this.selectedCard.cvv);
+      await this.context.order.checkout.authOnlyOnetimeCreditCard(this.selectedCard.newCard, this.selectedCard.cvv);
     }
-    await this.context.currentOrder.submit();
+    await this.context.order.checkout.submit();
 
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(orderID);

@@ -6,22 +6,23 @@ import { isUndefined as _isUndefined } from 'lodash';
 import { MarketplaceOrder } from '../../shopper-context';
 
 export interface ICart {
+    onAdd: Subject<LineItem>;
     get(): ListLineItem;
     add(lineItem: LineItem): Promise<LineItem>;
     remove(lineItemID: string): Promise<void>;
     setQuantity(lineItemID: string, newQuantity: number): Promise<LineItem>;
     addMany(lineItem: LineItem[]): Promise<LineItem[]>;
     empty(): Promise<void>;
+    onChange(callback: (lineItems: ListLineItem) => void): void;
 }
-
 
 @Injectable({
     providedIn: 'root',
 })
 export class CartService implements ICart {
-    public addToCartSubject = new Subject<LineItem>(); // need to make available as observable
+    public onAdd = new Subject<LineItem>(); // need to make available as observable
+    public onChange = this.state.onLineItemsChange;
     private initializingOrder = false;
-
 
     constructor(
         private ocOrderService: OcOrderService,
@@ -92,7 +93,7 @@ export class CartService implements ICart {
     // if line item exists simply update quantity, else create
     const existingLI = this.lineItems.Items.find((li) => this.LineItemsMatch(li, lineItem));
 
-    this.addToCartSubject.next(lineItem);
+    this.onAdd.next(lineItem);
     try {
       if (existingLI) {
         lineItem = await this.setQuantity(existingLI.ID, lineItem.Quantity + existingLI.Quantity);

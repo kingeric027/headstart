@@ -33,7 +33,7 @@ export class OCMProductCard {
   }
 
   addToCart(): void {
-    this.context.currentOrder.addToCart({ ProductID: this._product.ID, Quantity: this.quantity });
+    this.context.order.cart.add({ ProductID: this._product.ID, Quantity: this.quantity });
   }
 
   getImageUrl(): string {

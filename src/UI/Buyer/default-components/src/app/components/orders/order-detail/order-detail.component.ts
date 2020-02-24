@@ -86,6 +86,6 @@ export class OCMOrderDetails implements OnInit {
     const items = this.reorderResponse.ValidLi.map(li => {
       return { ProductID: li.Product.ID, Quantity: li.Quantity, Specs: li.Specs };
     });
-    await this.context.currentOrder.addManyToCart(items);
+    await this.context.order.cart.addMany(items);
   }
 }
