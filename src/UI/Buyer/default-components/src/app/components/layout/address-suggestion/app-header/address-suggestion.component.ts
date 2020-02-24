@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ShopperContextService, ListAddress } from 'marketplace';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { BuyerAddress, ListBuyerAddress, ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './address-suggestion.component.html',
@@ -7,9 +7,16 @@ import { ShopperContextService, ListAddress } from 'marketplace';
 })
 
 export class OCMAddressSuggestion implements OnInit {
-  @Input() suggestedAddresses: ListAddress;
+  @Input() suggestedAddresses: ListBuyerAddress;
+  @Output() selectedAddress = new EventEmitter<BuyerAddress>();
+  activeAddress: BuyerAddress;
   constructor(public context: ShopperContextService) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
+  }
+
+  setActiveAddress(address) {
+    this.activeAddress = address;
+    this.selectedAddress.emit(address);
   }
 }

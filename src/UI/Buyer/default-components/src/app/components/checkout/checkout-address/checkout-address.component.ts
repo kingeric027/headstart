@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address, ListAddress } from '@ordercloud/angular-sdk';
-import { ShopperContextService, MarketplaceOrder } from 'marketplace';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Address, BuyerAddress, ListBuyerAddress, ListLineItem, Order } from '@ordercloud/angular-sdk';
+import { MarketplaceOrder, ShopperContextService } from 'marketplace';
+import { ToastrService } from 'ngx-toastr';
 
 // TODO - Make this component "Dumb" by removing the dependence on context service 
 // and instead have it use inputs and outputs to interact with the CheckoutComponent.
@@ -19,14 +20,14 @@ export class OCMCheckoutAddress implements OnInit {
   };
   usingShippingAsBilling = false;
   showAddAddressForm = false;
-  suggestedAddresses: ListAddress;
+  suggestedAddresses: ListBuyerAddress;
   @Input() addressType: 'Shipping' | 'Billing';
   @Input() isAnon: boolean;
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListLineItem;
   @Output() continue = new EventEmitter();
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService, private toasterService: ToastrService) { }
 
   ngOnInit(): void {
     if (!this.isAnon) {
@@ -89,7 +90,19 @@ export class OCMCheckoutAddress implements OnInit {
       }
       this.continue.emit();
     } catch (ex) {
-      this.suggestedAddresses = ex.error.Errors[0].Data.Body.SuggestedValidAddresses;
+      ex.error.Errors.forEach(err => {
+        if (err.ErrorCode === "blocked by web hook") {
+          err.Data.Body.SuggestedValidAddresses.forEach(suggestion => {
+            suggestion.Shipping = true;
+            suggestion.billing = true;
+            suggestion.FirstName = address.FirstName;
+            suggestion.LastName = address.LastName;
+            suggestion.Phone = address.Phone;
+          });
+          this.suggestedAddresses = err.Data.Body.SuggestedValidAddresses;
+        }
+      });
+      this.toasterService.error('Invalid Address');
     }
   }
 

@@ -2,8 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 
 // 3rd party
-import { BuyerAddress, Address, ListAddress } from '@ordercloud/angular-sdk';
-
+import { BuyerAddress, Address, ListBuyerAddress } from '@ordercloud/angular-sdk';
 import { ValidateName, ValidateUSZip, ValidatePhone } from '../../../validators/validators';
 import { GeographyConfig } from '../../../config/geography.class';
 
@@ -13,6 +12,7 @@ import { GeographyConfig } from '../../../config/geography.class';
 })
 export class OCMAddressForm implements OnInit {
   @Input() btnText: string;
+  @Input() suggestedAddresses: ListBuyerAddress;
   @Input() showOptionToSave = false;
   @Output() formDismissed = new EventEmitter();
   @Output()
@@ -22,6 +22,7 @@ export class OCMAddressForm implements OnInit {
   addressForm: FormGroup;
   shouldSaveAddressForm: FormGroup;
   private ExistingAddress: BuyerAddress = {};
+  selectedAddress: BuyerAddress;
 
   constructor() {
     this.countryOptions = GeographyConfig.getCountries();
@@ -65,11 +66,14 @@ export class OCMAddressForm implements OnInit {
     }
   }
 
+  useSuggestedAddress(event) {
+    this.selectedAddress = event.detail;
+  }
+
   onSubmit(): void {
     if (this.addressForm.status === 'INVALID') return;
-
     this.formSubmitted.emit({
-      address: this.addressForm.value,
+      address: this.selectedAddress ? this.selectedAddress : this.addressForm.value,
       formDirty: this.addressForm.dirty,
       shouldSaveAddress: this.shouldSaveAddressForm.controls.shouldSaveAddress.value
     });

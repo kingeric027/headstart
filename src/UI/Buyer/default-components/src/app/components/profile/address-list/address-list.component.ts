@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { ListBuyerAddress, BuyerAddress, ListAddress } from '@ordercloud/angular-sdk';
-import { faTrashAlt, faEdit } from '@fortawesome/free-regular-svg-icons';
-import { ModalState } from '../../../models/modal-state.class';
+import { faEdit, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
+import { faArrowLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { BuyerAddress, ListBuyerAddress } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'marketplace';
+import { ToastrService } from 'ngx-toastr';
+import { ModalState } from '../../../models/modal-state.class';
 
 @Component({
   templateUrl: './address-list.component.html',
@@ -24,8 +25,8 @@ export class OCMAddressList implements OnInit {
   areYouSureModal = ModalState.Closed;
   showCreateAddressForm = false;
   isLoading = false;
-  suggestedAddresses: ListAddress;
-  constructor(private context: ShopperContextService) { }
+  suggestedAddresses: ListBuyerAddress;
+  constructor(private context: ShopperContextService, private toasterService: ToastrService) { }
 
   ngOnInit(): void {
     this.reloadAddresses();
@@ -58,6 +59,7 @@ export class OCMAddressList implements OnInit {
   dismissEditAddressForm(): void {
     this.currentAddress = null;
     this.showCreateAddressForm = false;
+    this.suggestedAddresses = null;
   }
 
   addressFormSubmitted(address: BuyerAddress): void {
@@ -86,6 +88,21 @@ export class OCMAddressList implements OnInit {
     this.reloadAddresses();
   }
 
+  getSuggestedAddresses(ex, address) {
+    ex.error.Errors.forEach(err => {
+      if (err.ErrorCode === "blocked by web hook") {
+        err.Data.Body.SuggestedValidAddresses.forEach(suggestion => {
+          suggestion.Shipping = true;
+          suggestion.Billing = true;
+          suggestion.FirstName = address.FirstName;
+          suggestion.LastName = address.LastName;
+          suggestion.Phone = address.Phone;
+        });
+        this.suggestedAddresses = err.Data.Body.SuggestedValidAddresses;
+      }
+    });
+  }
+
   private async addAddress(address: BuyerAddress): Promise<void> {
     try {
       address.Shipping = true;
@@ -93,10 +110,11 @@ export class OCMAddressList implements OnInit {
       const newAddress = await this.context.currentUser.addresses.create(address);
       this.addresses.Items = [...this.addresses.Items, newAddress];
       this.showCreateAddressForm = false;
+      this.suggestedAddresses = null;
       this.refresh();
     } catch (ex) {
-      this.suggestedAddresses = ex.error.Errors[0].Data.Body.SuggestedValidAddresses;
-      throw ex;
+      this.getSuggestedAddresses(ex, address)
+      this.toasterService.error('Invalid Address')
     }
   }
 
@@ -105,10 +123,11 @@ export class OCMAddressList implements OnInit {
       address.ID = this.currentAddress.ID;
       await this.context.currentUser.addresses.edit(address.ID, address);
       this.showCreateAddressForm = false;
+      this.suggestedAddresses = null;
       this.refresh();
     } catch (ex) {
-      this.suggestedAddresses = ex.error.Errors[0].Data.Body.SuggestedValidAddresses;
-      throw ex;
+      this.getSuggestedAddresses(ex, address)
+      this.toasterService.error('Invalid Address')
     }
   }
 
