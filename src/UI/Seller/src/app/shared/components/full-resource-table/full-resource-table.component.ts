@@ -10,6 +10,8 @@ import {
   getProductMainImageUrlOrPlaceholder,
   PLACEHOLDER_URL,
 } from '@app-seller/products/product-image.helper';
+import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -20,6 +22,8 @@ export class FullResourceTableComponent {
   headers = [];
   rows = [];
   numberOfColumns = 1;
+  faCopy = faCopy;
+  objectPreviewText: string;
   _resourceList = { Meta: {}, Items: [] };
 
   @Input()
@@ -33,6 +37,10 @@ export class FullResourceTableComponent {
   }
   @Output()
   resourceSelected = new EventEmitter();
+
+  constructor(
+    private toastrService: ToastrService
+  ) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
     this.headers = this.getHeaders(resources);
@@ -68,6 +76,24 @@ export class FullResourceTableComponent {
       cells: resourceCells,
       imgPath: resourceConfiguration.imgPath ? this.getImage(resource, resourceConfiguration) : '',
     };
+  }
+
+  copyObject(resource: any) {
+    this.toastrService.success(null, 'Copied to clipboard!', {
+      disableTimeOut: false,
+      closeButton: true,
+      tapToDismiss: true,
+    });
+    let copy = document.createElement("textarea");
+    document.body.appendChild(copy);
+    copy.value = JSON.stringify(resource);
+    copy.select();
+    document.execCommand("copy");
+    document.body.removeChild(copy);
+  }
+
+  previewObject(resource: any) {
+    this.objectPreviewText = JSON.stringify(resource);
   }
 
   getImage(resource: any, resourceConfiguration: ResourceConfiguration): string {

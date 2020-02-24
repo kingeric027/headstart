@@ -104,6 +104,7 @@ export const STRING_WITH_IMAGE = 'STRING_WITH_IMAGE';
 export const BASIC_STRING = 'BASIC_STRING';
 export const DATE_TIME = 'DATE_TIME';
 export const CURRENCY = 'CURRENCY';
+export const COPY_OBJECT = 'COPY_OBJECT';
 
 export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
   products: {
@@ -322,6 +323,11 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         path: 'Level',
         header: 'Result',
         type: BASIC_STRING,
+      },
+      {
+        path: 'Copy',
+        header: 'Copy',
+        type: COPY_OBJECT,
       },
     ],
     imgPath: '',
