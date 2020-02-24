@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Address, BuyerAddress, ListBuyerAddress, ListLineItem, Order } from '@ordercloud/angular-sdk';
 import { MarketplaceOrder, ShopperContextService } from 'marketplace';
 import { ToastrService } from 'ngx-toastr';
-
+import { getSuggestedAddresses } from '../../../services/address-suggestion.helper';
 // TODO - Make this component "Dumb" by removing the dependence on context service 
 // and instead have it use inputs and outputs to interact with the CheckoutComponent.
 // Goal is to get all the checkout logic and state into one component. 
@@ -90,18 +90,7 @@ export class OCMCheckoutAddress implements OnInit {
       }
       this.continue.emit();
     } catch (ex) {
-      ex.error.Errors.forEach(err => {
-        if (err.ErrorCode === "blocked by web hook") {
-          err.Data.Body.SuggestedValidAddresses.forEach(suggestion => {
-            suggestion.Shipping = true;
-            suggestion.billing = true;
-            suggestion.FirstName = address.FirstName;
-            suggestion.LastName = address.LastName;
-            suggestion.Phone = address.Phone;
-          });
-          this.suggestedAddresses = err.Data.Body.SuggestedValidAddresses;
-        }
-      });
+      this.suggestedAddresses = getSuggestedAddresses(ex, address);
       this.toasterService.error('Invalid Address');
     }
   }

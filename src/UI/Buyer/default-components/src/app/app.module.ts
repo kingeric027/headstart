@@ -54,7 +54,7 @@ import { OCMOrderShipments } from './components/orders/order-shipments/order-shi
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
 import { OCMOrderHistorical } from './components/orders/order-historical/order-historical.component';
 import { OCMOrderHistory } from './components/orders/order-history/order-history.component';
-import { OCMAddressSuggestion } from './components/layout/address-suggestion/app-header/address-suggestion.component'
+import { OCMAddressSuggestion } from './components/layout/address-suggestions/address-suggestion.component'
 import { SpecFieldDirective } from './components/products/spec-form/spec-field.directive';
 import { SpecFormCheckboxComponent } from './components/products/spec-form/spec-form-checkbox/spec-form-checkbox.component';
 import { SpecFormInputComponent } from './components/products/spec-form/spec-form-input/spec-form-input.component';
