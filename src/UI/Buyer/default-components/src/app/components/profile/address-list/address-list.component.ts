@@ -5,6 +5,7 @@ import { BuyerAddress, ListBuyerAddress } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from 'marketplace';
 import { ToastrService } from 'ngx-toastr';
 import { ModalState } from '../../../models/modal-state.class';
+import { getSuggestedAddresses } from '../../../services/address-suggestion.helper';
 
 @Component({
   templateUrl: './address-list.component.html',
@@ -88,21 +89,6 @@ export class OCMAddressList implements OnInit {
     this.reloadAddresses();
   }
 
-  getSuggestedAddresses(ex, address) {
-    ex.error.Errors.forEach(err => {
-      if (err.ErrorCode === "blocked by web hook") {
-        err.Data.Body.SuggestedValidAddresses.forEach(suggestion => {
-          suggestion.Shipping = true;
-          suggestion.Billing = true;
-          suggestion.FirstName = address.FirstName;
-          suggestion.LastName = address.LastName;
-          suggestion.Phone = address.Phone;
-        });
-        this.suggestedAddresses = err.Data.Body.SuggestedValidAddresses;
-      }
-    });
-  }
-
   private async addAddress(address: BuyerAddress): Promise<void> {
     try {
       address.Shipping = true;
@@ -113,7 +99,7 @@ export class OCMAddressList implements OnInit {
       this.suggestedAddresses = null;
       this.refresh();
     } catch (ex) {
-      this.getSuggestedAddresses(ex, address)
+      this.suggestedAddresses = getSuggestedAddresses(ex, address)
       this.toasterService.error('Invalid Address')
     }
   }
@@ -126,7 +112,7 @@ export class OCMAddressList implements OnInit {
       this.suggestedAddresses = null;
       this.refresh();
     } catch (ex) {
-      this.getSuggestedAddresses(ex, address)
+      this.suggestedAddresses = getSuggestedAddresses(ex, address)
       this.toasterService.error('Invalid Address')
     }
   }
