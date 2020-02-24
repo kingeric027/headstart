@@ -157,92 +157,106 @@
     <!-- /Product Details -->
 
     <!-- Product Variations -->
-    <div *ngIf="_superMarketplaceProductEditable?.Specs"
-         class="row pt-3 mt-5 border-top">
-      <div class="col-md-12">
-        <h5>Product Options</h5>
+    <!-- Spec Configuration -->
+    <div class="row pt-3 mt-5 border-top"
+         id="product-options">
+      <div class="col-md-5">
+        <h5>Product Variations</h5>
         <p class="font-italic">Does your product come in different varieties? Add the options here.</p>
       </div>
+      <div class="col-md-7">
+        <button *ngIf="!editSpecs && !_superMarketplaceProductEditable?.Specs"
+                [disabled]="!_superMarketplaceProductEditable?.Product?.ID"
+                class="btn btn-outline-dark"
+                (click)="toggleEditSpecs()">
+          Configure Variations
+        </button>
+        <button *ngIf="!editSpecs && _superMarketplaceProductEditable?.Specs"
+                class="btn btn-outline-dark"
+                (click)="toggleEditSpecs()">
+          <fa-icon [icon]="faCog"></fa-icon> Edit Variations
+        </button>
+        <button *ngIf="editSpecs"
+                class="btn btn-outline-dark"
+                (click)="mockVariants()">Save Changes</button>
+      </div>
     </div>
-    <div class="row pt-3">
-      <div class="col-md-12">
-        <!-- <div class="row"
+    <div class="row pt-3 position-relative product-variations"
+         [ngClass]="{'hidden': !editSpecs}">
+      <!-- <div class="variant-overlay"
+           *ngIf="!editSpecs"><span>Click 'Edit Variations' above to edit Product Variations</span>
+      </div> -->
+      <div class="col-md-5">
+        <div class="form-group">
+          <label for="AddVariation">Add Variation</label>
+          <div class="input-group">
+            <input type="text"
+                   class="form-control"
+                   id="AddVariation"
+                   placeholder="Name the variation">
+            <div class="input-group-append">
+              <button class="btn btn-outline-dark"
+                      (click)="addVariation()">+ Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-7"
+           *ngIf="_superMarketplaceProductEditable?.Specs">
+        <div class="product-spec row"
              *ngFor="let spec of _superMarketplaceProductEditable?.Specs">
           <div class="col-md-5">
-            <p>{{spec.Name}}</p>
-            <div class="form-group">
-              <label class="check-container"
-                     for="{{spec.ID}}PriceMarkup">
-                <p class="check-label">Prices vary depending on {{spec.Name | lowercase}}</p>
-                <input type="checkbox"
-                       class="form-check-input"
-                       id="{{spec.ID}}PriceMarkup"
-                       [checked]="pricesVary(spec?.Options)"
-                       [disabled]="_superMarketplaceProductEditable?.Variants">
-                <span class="checkmark cursor-pointer"></span>
-              </label>
-            </div>
+            <h5 class="font-weight-bold">{{spec.Name}}</h5>
+            <button class="btn btn-link text-danger"
+                    (click)="removeSpec(spec)">Delete</button>
           </div>
           <div class="col-md-7">
-            <p class="p-1 border border-dark rounded"
-               *ngFor="let opt of spec.Options">{{opt.Value}}</p>
-          </div>
-        </div> -->
-        <div class="card shadow-sm"
-             style="width: 32rem"
-             *ngFor="let spec of _superMarketplaceProductEditable?.Specs">
-          <div class="card-header">
-            <h6>{{spec.Name}}</h6>
-          </div>
-          <div class="card-body">
             <div class="form-group">
-              <label class="check-container"
-                     for="{{spec.ID}}PriceMarkup">
-                <p class="check-label">Prices vary depending on {{spec.Name | lowercase}}</p>
-                <input type="checkbox"
-                       class="form-check-input"
-                       id="{{spec.ID}}PriceMarkup"
-                       [checked]="pricesVary(spec?.Options)"
-                       [disabled]="_superMarketplaceProductEditable?.Variants">
-                <span class="checkmark cursor-pointer"></span>
-              </label>
+              <label for="{{spec.ID}}">Add Option</label>
+              <div class="input-group">
+                <input class="form-control"
+                       id="{{spec.ID}}"
+                       type="text"
+                       maxlength="20"
+                       placeholder="Option Name">
+                <input class="form-control"
+                       id="{{spec.ID}}Markup"
+                       type="number"
+                       placeholder="Price Markup">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-dark"
+                          (click)="addSpecOption(spec)">+ Add</button>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="card-footer">
-            <div *ngFor="let opt of spec.Options"
-                 class="spec-option p-2 border-medium rounded d-flex justify-content-between align-items-center">
-              <p>{{opt.Value}}</p>
-              <p>Delete</p>
+            <div class="btn-group mr-2 mb-2"
+                 *ngFor="let opt of spec.Options">
+              <button disabled
+                      class="btn btn-outline-dark">
+                {{opt.Value}}
+              </button>
+              <button disabled
+                      class="btn btn-outline-dark">
+                {{!opt.PriceMarkup ? 0 : opt.PriceMarkup | currency }}
+              </button>
+              <button (click)="removeSpecOption(spec, opt)"
+                      class="btn btn-outline-danger">X</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div *ngIf="_superMarketplaceProductEditable?.Variants"
-         class="row pt-3 mt-5 border-top">
-      <div class="col-md-12">
-        <h5>Product Variations</h5>
-        <p class="font-italic">Configure the SKU's for your product variations here.</p>
+    <!-- / Spec Configuration -->
+    <!-- Variant Matrix -->
+    <div class="row pt-3 position-relative"
+         *ngIf="_superMarketplaceProductEditable?.Variants">
+      <div class="variant-overlay"
+           *ngIf="editSpecs"><span>Pending Changes. Press 'Save' above to continue editing product SKU's.</span>
       </div>
-    </div>
-    <div class="row pt-3">
       <div class="col-md-12">
         <div class="variation-form-container mt-3 p-3 border-radius shadow">
-          <!-- <div class="form-group">
-            <label for="VariationType">Add a variation</label>
-            <select type="dropdown"
-                    class="form-control"
-                    id="VariationType"
-                    aria-describedby="Variation type"
-                    placeholder="Choose variation type">
-              <option default
-                      disabled>Choose a variation type</option>
-              <option>Color</option>
-              <option>Size</option>
-              <option>Height</option>
-            </select>
-          </div> -->
-          <perfect-scrollbar style="width: 100%; height: 400px;">
+          <perfect-scrollbar ps-show-always
+                             style="width: 100%; height: 400px;">
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -256,7 +270,8 @@
                 <tr class="cursor-pointer"
                     *ngFor="let variant of _superMarketplaceProductEditable?.Variants">
                   <td *ngFor="let specValue of variant.xp?.SpecValues">
-                    {{specValue.SpecName}}
+                    {{specValue.SpecName}} <span class="font-weight-bold"
+                          *ngIf="specValue.PriceMarkup">(+{{specValue.PriceMarkup | currency}})</span>
                   </td>
                   <td>
                     <div class="input-group-sm">
@@ -273,6 +288,8 @@
         </div>
       </div>
     </div>
+
+    <!-- / Variant Matrix -->
     <!-- /Product Variations -->
 
     <!-- Shipping Information -->
@@ -508,6 +525,7 @@
     </div>
     <!-- /Product Documents -->
   </form>
+
   <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
   <div *ngIf="userContext?.UserType === 'SUPPLIER'"
        class="d-flex justify-content-between align-items-center py-2">

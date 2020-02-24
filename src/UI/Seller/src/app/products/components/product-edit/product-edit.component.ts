@@ -25,7 +25,7 @@ import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCog } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
@@ -69,6 +69,7 @@ export class ProductEditComponent implements OnInit {
   files: FileHandle[] = [];
   faTrash = faTrash;
   faTimes = faTimes;
+  faCog = faCog;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
@@ -76,6 +77,7 @@ export class ProductEditComponent implements OnInit {
   taxCodes: ListPage<TaxCodes>;
   productType: string;
   productVariations: any;
+  editSpecs: boolean = false;
   fileType: string;
   imageFiles: FileHandle[] = [];
   staticContentFiles: FileHandle[] = [];
@@ -408,18 +410,145 @@ export class ProductEditComponent implements OnInit {
     return await MarketplaceSDK.TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
   }
 
-  pricesVary = (specOptions: SpecOption[]): boolean => specOptions.some(opt => opt.PriceMarkup);
-
   quantitiesVary = (variants: any): boolean => variants.some(variant => variant.Inventory);
 
   getTotalMarkup = (specOptions: VariantXpSpecValues[]): number => {
     let totalMarkup = 0;
-    console.log(specOptions)
     if (specOptions) {
-      console.log('counting')
-      specOptions.forEach(opt => (totalMarkup = totalMarkup + opt.PriceMarkup) ?? opt.PriceMarkup)
+      specOptions.forEach(opt => opt.PriceMarkup ? totalMarkup = +totalMarkup + +opt.PriceMarkup : 0);
     }
     // specOptions.forEach(opt => totalMarkup + opt.PriceMarkup);
     return totalMarkup;
+  }
+  addVariation(): void {
+    const updateProductResourceCopy = this.copyProductResource(
+      this._superMarketplaceProductEditable || this.productService.emptyResource
+    );
+    let input = (document.getElementById('AddVariation') as any)
+    let name = input.value;
+    input.value = '';
+    const newSpec = [{
+      ID: `${this._superMarketplaceProductEditable.Product.ID}${name.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, "")}`,
+      Name: name,
+      AllowOpenText: false,
+      DefinesVariant: true,
+      ListOrder: (this._superMarketplaceProductEditable.Specs?.length || 0) + 1,
+      Options: []
+    }]
+    updateProductResourceCopy.Specs = [
+      ...newSpec,
+      ...(updateProductResourceCopy.Specs || []),
+    ];
+    this._superMarketplaceProductEditable = updateProductResourceCopy;
+  }
+  addSpecOption(spec: Spec): void {
+    const updateProductResourceCopy = this.copyProductResource(
+      this._superMarketplaceProductEditable || this.productService.emptyResource
+    );
+    let input = (document.getElementById(`${spec.ID}`) as any)
+    let markup = (document.getElementById(`${spec.ID}Markup`) as any).value;
+    let optionValue = input.value;
+    const newOption = [{
+      ID: optionValue.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, ""),
+      Value: optionValue,
+      ListOrder: (spec as any).Options.length + 1,
+      IsOpenText: false,
+      PriceMarkupType: markup ? 1 : "NoMarkup",
+      PriceMarkup: markup,
+      xp: null
+    }]
+    let selectedSpec = updateProductResourceCopy.Specs.find(s => s.ID === spec.ID)
+    updateProductResourceCopy.Specs.filter(s => s.ID !== selectedSpec.ID)
+    selectedSpec.Options = [
+      ...newOption,
+      ...selectedSpec.Options,
+    ];
+    updateProductResourceCopy.Specs.concat(selectedSpec)
+    this._superMarketplaceProductEditable = updateProductResourceCopy;
+  };
+
+  removeSpecOption(spec: Spec, option: SpecOption): void {
+    const updateProductResourceCopy = this.copyProductResource(
+      this._superMarketplaceProductEditable || this.productService.emptyResource
+    );
+    let selectedSpec = updateProductResourceCopy.Specs.find(s => s.ID === spec.ID)
+    // remove selected spec from spec array
+    updateProductResourceCopy.Specs.filter(s => s.ID !== selectedSpec.ID)
+    selectedSpec.Options = selectedSpec.Options = selectedSpec.Options.filter(o => o.ID !== option.ID);
+    updateProductResourceCopy.Specs.concat(selectedSpec)
+    console.log(updateProductResourceCopy.Specs)
+    this._superMarketplaceProductEditable = updateProductResourceCopy;
+  };
+
+  removeSpec(spec: Spec): void {
+    const updateProductResourceCopy = this.copyProductResource(
+      this._superMarketplaceProductEditable || this.productService.emptyResource
+    );
+    updateProductResourceCopy.Specs = updateProductResourceCopy.Specs.filter(s => s.ID !== spec.ID);
+    this._superMarketplaceProductEditable = updateProductResourceCopy;
+    console.log(this._superMarketplaceProductEditable)
+  }
+
+  saveSpecChanges(): void {
+    this.mockVariants();
+    this.toggleEditSpecs();
+  }
+
+  mockVariants(): void {
+    const updateProductResourceCopy = this.copyProductResource(
+      this._superMarketplaceProductEditable || this.productService.emptyResource
+    );
+    updateProductResourceCopy.Variants = this.generateVariantsFromCurrentSpecs();
+    this._superMarketplaceProductEditable = updateProductResourceCopy;
+    this.toggleEditSpecs();
+  }
+
+  generateVariantsFromCurrentSpecs(): Variant[] {
+    const firstSpec = this._superMarketplaceProductEditable.Specs[0];
+    let variants = this.createVariantsForFirstSpec(firstSpec);
+    for (var i = 1; i < this._superMarketplaceProductEditable.Specs.length; i++) {
+      variants = this.combineSpecOptions(variants, this._superMarketplaceProductEditable.Specs[i])
+    }
+    return variants;
+  };
+
+  createVariantsForFirstSpec(spec: Spec): Variant[] {
+    return (spec as any).Options.map(opt => {
+      return {
+        ID: `${this._superMarketplaceProductEditable.Product.ID}-${opt.ID}`,
+        Name: `${this._superMarketplaceProductEditable.Product.ID} ${opt.Value}`,
+        Active: true,
+        xp: {
+          SpecValues:[{
+            SpecName: opt.Value,
+            PriceMarkup: opt.PriceMarkup
+          }]
+        }
+      }
+    })
+  }
+
+  combineSpecOptions(workingVariantList: Variant[], spec: Spec): Variant[] {
+    let newVariantList = [];
+    workingVariantList.forEach(variant => {
+      (spec as any).Options.forEach(opt => {
+        newVariantList.push({
+          ID: `${variant.ID}-${opt.ID}`,
+          Name: `${variant.Name} ${opt.Value}`,
+          Active: true,
+          xp: {
+            SpecValues:[...variant.xp.SpecValues, {
+              SpecName: opt.Value,
+              PriceMarkup: opt.PriceMarkup
+            }]
+          }
+        })
+      })
+    })
+    return newVariantList;
+  }
+
+  toggleEditSpecs(): void {
+    this.editSpecs = !this.editSpecs;
   }
 }
