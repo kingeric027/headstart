@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Flurl.Http.Testing;
@@ -102,175 +103,161 @@ namespace Orchestration.Tests
     //        this.WebhookOrder = JObject.Parse(@"{
     //            'Route': 'v1/orders/{direction}/{orderID}/submit',
     //            'RouteParams': {
-    //                        'direction': 'outgoing',
-    //                'orderID': 'LfMJE74kvUOWrCiNpyI2-Q'
+    //                'direction': 'outgoing',
+    //                'orderID': '1_PM1aJGkEerIDqE3sIQyg'
     //            },
     //            'Verb': 'POST',
-    //            'Date': '2020-02-06T22:39:49.2779142+00:00',
-    //            'LogID': 'd947fcb9-10e1-4c3b-befe-d1496a64a6cb',
+    //            'Date': '2020-02-18T19:58:00.5145745+00:00',
+    //            'LogID': 'dbc9507b-cb56-40dc-86e2-28efea0f096f',
     //            'UserToken': null,
     //            'Request': {
-    //                        'Body': { },
-    //                'Headers': 'Connection: Keep-Alive\r\nContent-Length: 0\r\nAccept: application/json\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9\r\ntokenClaims(from authorization): usr: bhickey@four51.com,cid: 3a5dd92d-0b04-4e62-b8ac-197adf10fbc4,u: 2633253,usrtype: buyer,role: MeAddressAdmin,role: MeAdmin,role: MeCreditCardAdmin,role: MeXpAdmin,role: Shopper,role: SupplierReader,iss: https://auth.ordercloud.io,aud: https://api.ordercloud.io,exp: 1581064641,nbf: 1581028641\r\nHost: api.ordercloud.io\r\nMax-Forwards: 10\r\nReferer: https://marketplace-buyer-ui-qa.azurewebsites.net/checkout\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36\r\nSec-Fetch-Dest: empty\r\nOrigin: https://marketplace-buyer-ui-qa.azurewebsites.net\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-Mode: cors\r\nX-WAWS-Unencoded-URL: /v1/orders/outgoing/LfMJE74kvUOWrCiNpyI2-Q/submit\r\nCLIENT-IP: 207.225.155.218:56234\r\nX-ARR-LOG-ID: e34feccb-0af9-4a2a-9122-ce38ed2f2593\r\nDISGUISED-HOST: api.ordercloud.io\r\nX-SITE-DEPLOYMENT-ID: ordercloud-api__3c42\r\nWAS-DEFAULT-HOSTNAME: ordercloud-api.azurewebsites.net\r\nX-Original-URL: /v1/orders/outgoing/LfMJE74kvUOWrCiNpyI2-Q/submit\r\nX-Forwarded-For: 207.225.155.218:56234\r\nX-ARR-SSL: 2048|256|C=US, S=Arizona, L=Scottsdale, O=\'GoDaddy.com, Inc.\', OU=http://certs.godaddy.com/repository/, CN=Go Daddy Secure Certificate Authority - G2|OU=Domain Control Validated, CN=*.ordercloud.io\r\nX-Forwarded-Proto: https\r\nX-AppService-Proto: https\r\n'
+    //                'Body': {},
+    //                'Headers': 'Connection: Keep-Alive\r\nContent-Length: 0\r\nAccept: application/json, text/plain, */*\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9\r\ntokenClaims(from authorization): usr: Default_Buyer,cid: 7febc4e1-14c5-4050-b509-48e29794a584,imp: 1018,u: 2629734,usrtype: buyer,role: MeAddressAdmin,role: MeAdmin,role: MeCreditCardAdmin,role: MeXpAdmin,role: ProductFacetReader,role: Shopper,role: SupplierAddressReader,role: SupplierReader,iss: https://auth.ordercloud.io,aud: https://api.ordercloud.io,exp: 1582084636,nbf: 1582055836\r\nHost: api.ordercloud.io\r\nMax-Forwards: 10\r\nReferer: https://developer.ordercloud.io/console\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36\r\nSec-Fetch-Dest: empty\r\nDNT: 1\r\nConsoleLog: true\r\nOrigin: https://developer.ordercloud.io\r\nSec-Fetch-Site: same-site\r\nSec-Fetch-Mode: cors\r\nX-WAWS-Unencoded-URL: /v1/orders/outgoing/1_PM1aJGkEerIDqE3sIQyg/submit\r\nCLIENT-IP: 207.225.155.218:53319\r\nX-ARR-LOG-ID: 00ab516f-649b-425d-9d26-03fc8942a46a\r\nDISGUISED-HOST: api.ordercloud.io\r\nX-SITE-DEPLOYMENT-ID: ordercloud-api\r\nWAS-DEFAULT-HOSTNAME: ordercloud-api.azurewebsites.net\r\nX-Original-URL: /v1/orders/outgoing/1_PM1aJGkEerIDqE3sIQyg/submit\r\nX-Forwarded-For: 207.225.155.218:53319\r\nX-ARR-SSL: 2048|256|C=US, S=Arizona, L=Scottsdale, O=\'GoDaddy.com, Inc.\', OU=http://certs.godaddy.com/repository/, CN=Go Daddy Secure Certificate Authority - G2|OU=Domain Control Validated, CN=*.ordercloud.io\r\nX-Forwarded-Proto: https\r\nX-AppService-Proto: https\r\n'
     //            },
     //            'Response': {
-    //                        'Body': {
-    //                            'ID': 'LfMJE74kvUOWrCiNpyI2-Q',
+    //                'Body': {
+    //                    'ID': '1_PM1aJGkEerIDqE3sIQyg',
     //                    'FromUser': {
-    //                                'ID': 'Zfa0q5nMIEaQkAXymPRBGQ',
-    //                        'Username': 'bhickey@four51.com',
+    //                        'ID': 'UFWFO-k47kacGAJDB7Xtlw',
+    //                        'Username': 'Default_Buyer',
     //                        'Password': '***',
-    //                        'FirstName': 'Bill',
-    //                        'LastName': 'Hickey',
-    //                        'Email': 'bhickey@four51.com',
+    //                        'FirstName': 'BuyerFirstName',
+    //                        'LastName': 'BuyerLastName',
+    //                        'Email': 'buyeruser@noemail.com',
     //                        'Phone': null,
     //                        'TermsAccepted': null,
     //                        'Active': true,
     //                        'xp': null,
     //                        'AvailableRoles': null,
-    //                        'DateCreated': '2020-01-28T22:19:51.1+00:00',
-    //                        'PasswordLastSetDate': '2020-01-28T22:20:37.48+00:00'
+    //                        'DateCreated': '2020-01-23T14:48:54.723+00:00',
+    //                        'PasswordLastSetDate': '2020-01-23T14:48:54.733+00:00'
     //                    },
     //                    'FromCompanyID': 'Default_Marketplace_Buyer',
     //                    'ToCompanyID': 'KrRmq3vC8EeME-srD_dXCw',
-    //                    'FromUserID': 'Zfa0q5nMIEaQkAXymPRBGQ',
-    //                    'BillingAddressID': '1DXEx_8ISUysib2GjjRf2A',
+    //                    'FromUserID': 'UFWFO-k47kacGAJDB7Xtlw',
+    //                    'BillingAddressID': '0df_HhldQU-u8V349X_d2g',
     //                    'BillingAddress': {
-    //                                'ID': '1DXEx_8ISUysib2GjjRf2A',
+    //                        'ID': '0df_HhldQU-u8V349X_d2g',
     //                        'DateCreated': null,
     //                        'CompanyName': null,
-    //                        'FirstName': 'asdf',
-    //                        'LastName': 'fasd',
-    //                        'Street1': 'asdf',
-    //                        'Street2': '',
-    //                        'City': 'fsda',
-    //                        'State': 'PA',
+    //                        'FirstName': 'Bill',
+    //                        'LastName': 'Osteraas',
+    //                        'Street1': '110 N 5th St',
+    //                        'Street2': 'Floor 2',
+    //                        'City': 'Minneapolis',
+    //                        'State': 'MN',
     //                        'Zip': '19406',
     //                        'Country': 'US',
-    //                        'Phone': '',
+    //                        'Phone': '16024058666',
     //                        'AddressName': null,
     //                        'xp': null
     //                    },
-    //                    'ShippingAddressID': '99PF2PX_RkSPwrY3ZMMcUw',
-    //                    'Comments': '',
-    //                    'LineItemCount': 3,
+    //                    'ShippingAddressID': '0df_HhldQU-u8V349X_d2g',
+    //                    'Comments': 'Zoho integration mock',
+    //                    'LineItemCount': 2,
     //                    'Status': 'Open',
-    //                    'DateCreated': '2020-02-06T22:38:05.56+00:00',
-    //                    'DateSubmitted': '2020-02-06T22:39:49.34+00:00',
+    //                    'DateCreated': '2020-02-18T19:57:31.797+00:00',
+    //                    'DateSubmitted': '2020-02-18T19:58:00.593+00:00',
     //                    'DateApproved': null,
     //                    'DateDeclined': null,
     //                    'DateCanceled': null,
     //                    'DateCompleted': null,
-    //                    'Subtotal': 39.79,
-    //                    'ShippingCost': 27.83,
-    //                    'TaxCost': 5.33,
+    //                    'Subtotal': 32.9,
+    //                    'ShippingCost': 0,
+    //                    'TaxCost': 0,
     //                    'PromotionDiscount': 0,
-    //                    'Total': 72.95,
+    //                    'Total': 32.9,
     //                    'IsSubmitted': true,
-    //                    'xp': {
-    //                                'AvalaraTaxTransactionCode': '',
-    //                        'ProposedShipmentSelections': [
-    //                            {
-    //                                'SupplierID': 'FASTPlatform',
-    //                                'ShipFromAddressID': 'Fast-Warehouse-MN',
-    //                                'ProposedShipmentOptionID': null,
-    //                                'Rate': 19.02
-    //                            },
-    //                            {
-    //                                'SupplierID': 'ApparelCo',
-    //                                'ShipFromAddressID': 'ApparelCo-Warehouse-MN',
-    //                                'ProposedShipmentOptionID': null,
-    //                                'Rate': 8.81
-    //                            }
-    //                        ]
-    //                    }
+    //                    'xp': null
     //                },
-    //                'Headers': 'Server: Microsoft-IIS/10.0\r\nX-oc-logid: d947fcb9-10e1-4c3b-befe-d1496a64a6cb\r\nAccess-Control-Allow-Origin: https://marketplace-buyer-ui-qa.azurewebsites.net\r\nAccess-Control-Allow-Credentials: true\r\nLocation: https://api.ordercloud.io/v1/orders/outgoing/LfMJE74kvUOWrCiNpyI2-Q/LfMJE74kvUOWrCiNpyI2-Q\r\nContent-Length: 1551\r\nCache-Control: private\r\nX-AspNet-Version: 4.0.30319\r\nContent-Type: application/json; charset=utf-8\r\n'
+    //                'Headers': 'Server: Microsoft-IIS/10.0\r\nX-oc-logid: dbc9507b-cb56-40dc-86e2-28efea0f096f\r\nAccess-Control-Allow-Origin: https://developer.ordercloud.io\r\nAccess-Control-Allow-Credentials: true\r\nLocation: https://api.ordercloud.io/v1/orders/outgoing/1_PM1aJGkEerIDqE3sIQyg/1_PM1aJGkEerIDqE3sIQyg\r\nContent-Length: 1246\r\nCache-Control: private\r\nX-AspNet-Version: 4.0.30319\r\nContent-Type: application/json; charset=utf-8\r\n'
     //            },
-    //            'ConfigData': []
+    //            'ConfigData': {}
     //        }").ToObject<WebhookPayloads.Orders.Submit>();
     //        this.SplitOrders = JObject.Parse(@"{
-    //        'OutgoingOrders': [{
-    //          'ID': 'MnuJ7e9660K_3N6I2swiIg',
-    //          'FromUser': {
-	   //         'ID': 'uYoQe2OcuEWeWV857Li8yQ',
-	   //         'Username': 'Default_Admin',
-	   //         'Password': null,
-	   //         'FirstName': null,
-	   //         'LastName': null,
-	   //         'Email': 'serlleruser@nomail.com',
-	   //         'Phone': null,
-	   //         'TermsAccepted': null,
-	   //         'Active': true,
-	   //         'xp': null,
-	   //         'AvailableRoles': null,
-	   //         'DateCreated': '2020-01-23T14:48:54.88+00:00',
-	   //         'PasswordLastSetDate': '2020-01-29T22:38:15.68+00:00'
-    //          },
-    //          'FromCompanyID': 'KrRmq3vC8EeME-srD_dXCw',
-    //          'ToCompanyID': 'ApparelCo',
-    //          'FromUserID': 'uYoQe2OcuEWeWV857Li8yQ',
-    //          'BillingAddressID': null,
-    //          'BillingAddress': null,
-    //          'ShippingAddressID': null,
-    //          'Comments': null,
-    //          'LineItemCount': 1,
-    //          'Status': 'Open',
-    //          'DateCreated': '2020-02-06T16:41:57.257+00:00',
-    //          'DateSubmitted': '2020-02-06T16:41:57.557+00:00',
-    //          'DateApproved': null,
-    //          'DateDeclined': null,
-    //          'DateCanceled': null,
-    //          'DateCompleted': null,
-    //          'Subtotal': 7.8,
-    //          'ShippingCost': 0,
-    //          'TaxCost': 0,
-    //          'PromotionDiscount': 0,
-    //          'Total': 7.8,
-    //          'IsSubmitted': true,
-    //          'xp': null
-    //        },
-    //        {
-    //          'ID': '5xL6LVYOvU-1fkgUYjV6uA',
-    //          'FromUser': {
-	   //         'ID': 'uYoQe2OcuEWeWV857Li8yQ',
-	   //         'Username': 'Default_Admin',
-	   //         'Password': null,
-	   //         'FirstName': null,
-	   //         'LastName': null,
-	   //         'Email': 'serlleruser@nomail.com',
-	   //         'Phone': null,
-	   //         'TermsAccepted': null,
-	   //         'Active': true,
-	   //         'xp': null,
-	   //         'AvailableRoles': null,
-	   //         'DateCreated': '2020-01-23T14:48:54.88+00:00',
-	   //         'PasswordLastSetDate': '2020-01-29T22:38:15.68+00:00'
-    //          },
-    //          'FromCompanyID': 'KrRmq3vC8EeME-srD_dXCw',
-    //          'ToCompanyID': 'ApparelCo',
-    //          'FromUserID': 'uYoQe2OcuEWeWV857Li8yQ',
-    //          'BillingAddressID': null,
-    //          'BillingAddress': null,
-    //          'ShippingAddressID': null,
-    //          'Comments': null,
-    //          'LineItemCount': 3,
-    //          'Status': 'Open',
-    //          'DateCreated': '2020-02-06T16:35:29.787+00:00',
-    //          'DateSubmitted': '2020-02-06T16:35:29.913+00:00',
-    //          'DateApproved': null,
-    //          'DateDeclined': null,
-    //          'DateCanceled': null,
-    //          'DateCompleted': null,
-    //          'Subtotal': 47.32,
-    //          'ShippingCost': 0,
-    //          'TaxCost': 0,
-    //          'PromotionDiscount': 0,
-    //          'Total': 47.32,
-    //          'IsSubmitted': true,
-    //          'xp': null
-    //        }],
-    //        'RemainingLineItemIDs': []
+    //          'OutgoingOrders': [
+    //            {
+    //              'ID': 'XN5oGuqFbUmFm9UbmZoXWg',
+    //              'FromUser': {
+    //                'ID': 'uYoQe2OcuEWeWV857Li8yQ',
+    //                'Username': 'Default_Admin',
+    //                'Password': null,
+    //                'FirstName': null,
+    //                'LastName': null,
+    //                'Email': 'serlleruser@nomail.com',
+    //                'Phone': null,
+    //                'TermsAccepted': null,
+    //                'Active': true,
+    //                'xp': null,
+    //                'AvailableRoles': null,
+    //                'DateCreated': '2020-01-23T14:48:54.88+00:00',
+    //                'PasswordLastSetDate': '2020-01-29T22:38:15.68+00:00'
+    //              },
+    //              'FromCompanyID': 'KrRmq3vC8EeME-srD_dXCw',
+    //              'ToCompanyID': 'FASTPlatform',
+    //              'FromUserID': 'uYoQe2OcuEWeWV857Li8yQ',
+    //              'BillingAddressID': null,
+    //              'BillingAddress': null,
+    //              'ShippingAddressID': '0df_HhldQU-u8V349X_d2g',
+    //              'Comments': null,
+    //              'LineItemCount': 1,
+    //              'Status': 'Open',
+    //              'DateCreated': '2020-02-18T21:52:18.98+00:00',
+    //              'DateSubmitted': '2020-02-18T21:52:19.1+00:00',
+    //              'DateApproved': null,
+    //              'DateDeclined': null,
+    //              'DateCanceled': null,
+    //              'DateCompleted': null,
+    //              'Subtotal': 21.4,
+    //              'ShippingCost': 0,
+    //              'TaxCost': 0,
+    //              'PromotionDiscount': 0,
+    //              'Total': 21.4,
+    //              'IsSubmitted': true,
+    //              'xp': null
+    //            },
+    //            {
+    //              'ID': 'Kkmb1guSck6lpZQqS296hw',
+    //              'FromUser': {
+    //                'ID': 'uYoQe2OcuEWeWV857Li8yQ',
+    //                'Username': 'Default_Admin',
+    //                'Password': null,
+    //                'FirstName': null,
+    //                'LastName': null,
+    //                'Email': 'serlleruser@nomail.com',
+    //                'Phone': null,
+    //                'TermsAccepted': null,
+    //                'Active': true,
+    //                'xp': null,
+    //                'AvailableRoles': null,
+    //                'DateCreated': '2020-01-23T14:48:54.88+00:00',
+    //                'PasswordLastSetDate': '2020-01-29T22:38:15.68+00:00'
+    //              },
+    //              'FromCompanyID': 'KrRmq3vC8EeME-srD_dXCw',
+    //              'ToCompanyID': 'ApparelCo',
+    //              'FromUserID': 'uYoQe2OcuEWeWV857Li8yQ',
+    //              'BillingAddressID': null,
+    //              'BillingAddress': null,
+    //              'ShippingAddressID': '0df_HhldQU-u8V349X_d2g',
+    //              'Comments': null,
+    //              'LineItemCount': 1,
+    //              'Status': 'Open',
+    //              'DateCreated': '2020-02-18T21:52:19.497+00:00',
+    //              'DateSubmitted': '2020-02-18T21:52:19.603+00:00',
+    //              'DateApproved': null,
+    //              'DateDeclined': null,
+    //              'DateCanceled': null,
+    //              'DateCompleted': null,
+    //              'Subtotal': 11.5,
+    //              'ShippingCost': 0,
+    //              'TaxCost': 0,
+    //              'PromotionDiscount': 0,
+    //              'Total': 11.5,
+    //              'IsSubmitted': true,
+    //              'xp': null
+    //            }
+    //          ],
+    //          'RemainingLineItemIDs': []
     //        }").ToObject<OrderSplitResult>();
     //    }
     //}
@@ -300,12 +287,67 @@ namespace Orchestration.Tests
     //            AuthUrl = "https://auth.ordercloud.io",
     //            ApiUrl = "https://api.ordercloud.io"
     //        };
+
+    //        #region Create OC Order
+    //        //var oc = new OrderCloudClient(new OrderCloudClientConfig()
+    //        //{
+    //        //    ApiUrl = settings.OrderCloudSettings.ApiUrl,
+    //        //    AuthUrl = settings.OrderCloudSettings.AuthUrl,
+    //        //    ClientSecret = settings.OrderCloudSettings.ClientSecret,
+    //        //    ClientId = settings.OrderCloudSettings.ClientID,
+    //        //    GrantType = GrantType.ClientCredentials,
+    //        //    Roles = new [] { ApiRole.Shopper }
+    //        //});
+    //        //var token = await oc.AuthenticateAsync();
+    //        //// submit an order to trigger webhook
+    //        //var oc_order = await oc.Orders.CreateAsync(OrderDirection.Outgoing, new MarketplaceOrder()
+    //        //{
+    //        //    BillingAddressID = "0df_HhldQU-u8V349X_d2g",
+    //        //    ShippingAddressID = "0df_HhldQU-u8V349X_d2g",
+    //        //    Comments = "Zoho integration mock"
+    //        //});
+
+    //        //await oc.LineItems.CreateAsync(OrderDirection.Outgoing, oc_order.ID, new LineItem()
+    //        //{
+    //        //    ID = "fast_lineitem",
+    //        //    ProductID = "L0708695142349",
+    //        //    Quantity = 2,
+    //        //    //ShipFromAddressID = "Fast-Warehouse-MN",
+    //        //    Specs = new List<LineItemSpec>()
+    //        //    {
+    //        //        new LineItemSpec() { Name = "logo", SpecID = "fast_logo_id", Value = "logo_id"},
+    //        //        new LineItemSpec() { Name = "color", SpecID = "fast_color_l0708695142349", OptionID = "fast_l0708695142349_wwy"},
+    //        //        new LineItemSpec() { Name = "size", SpecID = "fast_size_l0708695142349", OptionID = "fast_l0708695142349_med"},
+    //        //        new LineItemSpec() { Name = "decoration", SpecID = "fast_decoration_method", OptionID = "digital_vinyl_1d1dada1-5a5e-48af-9537-743ea861e290"},
+    //        //        new LineItemSpec() { Name = "type", SpecID = "fast_decoration_type", OptionID = "name_b90c7bd1-fd1c-40b3-b6b8-79e6a45ab49a"},
+    //        //        new LineItemSpec() { Name = "imprint", SpecID = "fast_imprint_location", OptionID = "above_the_pocket_3736c6cb-e78f-4ed4-a3ff-70d514fbcf69"}
+    //        //    }
+    //        //});
+
+    //        //await oc.LineItems.CreateAsync(OrderDirection.Outgoing, oc_order.ID, new LineItem()
+    //        //{
+    //        //    ID = "apparelco_lineitem",
+    //        //    ProductID = "sp724841371777",
+    //        //    Quantity = 2,
+    //        //    //ShipFromAddressID = "ApparelCo-Warehouse-MN",
+    //        //    Specs = new List<LineItemSpec>()
+    //        //    {
+    //        //        new LineItemSpec() { Name = "logo", SpecID = "fast_logo_id", Value = "logo_id"},
+    //        //        new LineItemSpec() { Name = "color", SpecID = "fast_color_sp724841371777", OptionID = "fast_sp724841371777_burgundy"},
+    //        //        new LineItemSpec() { Name = "size", SpecID = "fast_size_sp724841371777", OptionID = "fast_sp724841371777_xl"},
+    //        //        new LineItemSpec() { Name = "decoration", SpecID = "fast_decoration_method", OptionID = "digital_vinyl_0cfdee85-7186-42c9-9a82-6840d2459b4c"},
+    //        //        new LineItemSpec() { Name = "type", SpecID = "fast_decoration_type", OptionID = "logo_0bfb0f67-1ec2-4028-aba8-bf4622a6625e"},
+    //        //        new LineItemSpec() { Name = "imprint", SpecID = "fast_imprint_location", OptionID = "yoke_f57bb350-54bf-4ac2-a5d7-2c21c5669d07"}
+    //        //    }
+    //        //});
+
+    //        // await oc.Orders.SubmitAsync(OrderDirection.Outgoing, oc_order.ID);
+    //        #endregion 
     //        var command = new ZohoCommand(settings);
+
     //        var order = await command.CreateSalesOrder(_mocks.MarketplaceOrder);
-    //        Assert.IsTrue(order.salesorder_id != null);
-    //        //var contact = await command.ListAsync(new ZohoFilter() { Key = "name", Value = "Default Marketplace Buyer" });
-    //        //var contacts = await command.ListAsync();
-    //        //await command.ReceiveBuyerOrder(_mocks.MarketplaceOrder);
+    //        var purchase_orders = await command.CreatePurchaseOrder(order, _mocks.SplitOrders);
+    //        Assert.IsTrue(purchase_orders.Count > 0);
     //    }
     //}
 

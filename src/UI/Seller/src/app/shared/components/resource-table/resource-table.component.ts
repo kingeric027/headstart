@@ -155,6 +155,11 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       this.toDate = this.transformDateForUser(toDate);
       this.filterForm.value.to = this.transformDateForFilter(toDate);
     }
+    if (typeof this.filterForm.value.timeStamp === 'object') {
+      const timeStamp = this.transformDateForUser(this.filterForm.value.timeStamp);
+      this.toDate = timeStamp + 'T23:59:59.999Z'; //Since user selects a date, include all times in that day
+      this.filterForm.value.timeStamp = '<=' + this.toDate;
+    }
     this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
   }
   // date format for NgbDatepicker is different than date format used for filters

@@ -74,6 +74,7 @@ namespace Marketplace.API
                     .Inject<ISyncCommand>()
 					.Inject<IAvataxService>()
 					.Inject<IFreightPopService>()
+					.Inject<ISmartyStreetsService>()
 					.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
 					.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
 					.Inject<IOrchestrationCommand>()

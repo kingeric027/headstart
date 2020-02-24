@@ -11,6 +11,7 @@ namespace Marketplace.Common.Services.Zoho
         IZohoCurrencyResource Currencies { get; }
         IZohoItemResource Items { get; }
         IZohoSalesOrderResource SalesOrders { get; }
+        IZohoPurchaseOrderResource PurchaseOrders { get;  }
     }
     public partial class ZohoClient
     {
@@ -74,11 +75,13 @@ namespace Marketplace.Common.Services.Zoho
             Currencies = new ZohoCurrencyResource(this);
             Items = new ZohoItemResource(this);
             SalesOrders = new ZohoSalesOrderResource(this);
+            PurchaseOrders = new ZohoPurchaseOrderResource(this);
         }
 
         public IZohoContactResource Contacts { get; private set; }
         public IZohoCurrencyResource Currencies { get; private set; }
         public IZohoItemResource Items { get; private set; }
         public IZohoSalesOrderResource SalesOrders { get; private set; }
+        public IZohoPurchaseOrderResource PurchaseOrders { get; private set; }
     }
 }

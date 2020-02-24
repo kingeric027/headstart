@@ -83,10 +83,11 @@ export class MiddlewareAPIService {
   }
 
   private addUrlParams(baseUrl: string, object: Record<string, any> = {}): string {
+    const symbol = baseUrl.includes('?') ? '&' : '?';
     const fields = Object.entries(object);
     const url = fields
       .filter(([key, value]) => value)
-      .reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}?`);
+      .reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}${symbol}`);  
     return url.replace(/[?&]+$/g, ''); // remove trailling & or ?
   }
 
