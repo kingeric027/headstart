@@ -8,11 +8,8 @@ import { MiddlewareApiService } from '../services/middleware-api/middleware-api.
 
 @Component({
   template: `
-    <ocm-supplier-list
-      [suppliers]="suppliers"
-      [supplierCategoryConfig]="supplierCategoryConfig"
-    ></ocm-supplier-list>
-  `
+    <ocm-supplier-list [suppliers]="suppliers" [supplierCategoryConfig]="supplierCategoryConfig"></ocm-supplier-list>
+  `,
 })
 export class SupplierListWrapperComponent implements OnInit, OnDestroy {
   suppliers: ListSupplier;
@@ -39,12 +36,11 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
 
   private handleFiltersChange = async (): Promise<void> => {
     this.suppliers = await this.context.supplierFilters.listSuppliers();
-  }
+  };
 
   private getSupplierCategories = async (): Promise<void> => {
     this.supplierCategoryConfig = await this.middleware.getMarketplaceSupplierCategories(
       this.context.appSettings.marketplaceID
     );
-  }
-
+  };
 }

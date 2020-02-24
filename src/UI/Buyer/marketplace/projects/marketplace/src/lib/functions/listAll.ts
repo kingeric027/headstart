@@ -32,11 +32,11 @@ export async function listAll<T = any>(
   filtersObj.page = 1;
   filtersObj.pageSize = 100;
 
-  const result1 = (await listFunc(...listArgs, filtersObj).toPromise());
+  const result1 = await listFunc(...listArgs, filtersObj).toPromise();
   const additionalPages = range(2, result1?.Meta.TotalPages + 1);
 
   const requests = additionalPages.map((page: number) => listFunc(...listArgs, { ...filtersObj, page }).toPromise());
   const results: ListPage<T>[] = await Promise.all(requests);
   // combine and flatten items for all list calls
-  return { Items: flatten([result1, ...results].map((r) => r.Items)), Meta: result1.Meta };
+  return { Items: flatten([result1, ...results].map(r => r.Items)), Meta: result1.Meta };
 }

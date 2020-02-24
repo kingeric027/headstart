@@ -18,7 +18,7 @@ export class CartWrapperComponent implements OnInit {
     private currentOrder: CurrentOrderService,
     private ocMeService: OcMeService,
     public context: ShopperContextService // used in template
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.currentOrder.onChange(this.setOrder);
@@ -27,19 +27,19 @@ export class CartWrapperComponent implements OnInit {
 
   setOrder = (order: MarketplaceOrder): void => {
     this.order = order;
-  }
+  };
 
   setLineItems = async (items: ListLineItem): Promise<void> => {
     // TODO - this requests all the products on navigation to the cart.
     // Fewer requests could be acomplished by moving this logic to the cart service so it runs only once.
     await this.updateProductCache(items.Items.map(li => li.ProductID));
     this.lineItems = this.mapToLineItemsWithProduct(items);
-  }
+  };
 
   async updateProductCache(productIDs: string[]): Promise<void> {
     const cachedIDs = this.productCache.map(p => p.ID);
     const toAdd = productIDs.filter(id => !cachedIDs.includes(id));
-    this.productCache = [...this.productCache, ... await this.requestProducts(toAdd)];
+    this.productCache = [...this.productCache, ...(await this.requestProducts(toAdd))];
   }
 
   mapToLineItemsWithProduct(lis: ListLineItem): ListLineItemWithProduct {
