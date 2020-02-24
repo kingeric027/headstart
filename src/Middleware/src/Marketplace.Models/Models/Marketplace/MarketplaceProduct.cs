@@ -11,6 +11,8 @@ namespace Marketplace.Models
         public MarketplaceProduct Product { get; set; }
         public PriceSchedule PriceSchedule { get; set; }
         public string ID { get; set; }
+        public IList<Spec> Specs { get; set; }
+        public IList<Variant> Variants { get; set; }
     }
 
     public class PartialMarketplaceProduct : PartialProduct<ProductXp>

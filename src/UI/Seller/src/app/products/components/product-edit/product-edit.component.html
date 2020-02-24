@@ -156,41 +156,123 @@
     </div>
     <!-- /Product Details -->
 
-    <!-- Product Variations TODO: NOT MVP -->
-    <!-- <div class="
-                  row
-                  pt-3
-                  mt-5
-                  border-top">
-            <div class="col-md-5">
-              <h5>Product Variations</h5>
-              <p class="font-italic">Does your product come in different varieties? Add them here.</p>
+    <!-- Product Variations -->
+    <div *ngIf="_superMarketplaceProductEditable?.Specs"
+         class="row pt-3 mt-5 border-top">
+      <div class="col-md-12">
+        <h5>Product Options</h5>
+        <p class="font-italic">Does your product come in different varieties? Add the options here.</p>
+      </div>
+    </div>
+    <div class="row pt-3">
+      <div class="col-md-12">
+        <!-- <div class="row"
+             *ngFor="let spec of _superMarketplaceProductEditable?.Specs">
+          <div class="col-md-5">
+            <p>{{spec.Name}}</p>
+            <div class="form-group">
+              <label class="check-container"
+                     for="{{spec.ID}}PriceMarkup">
+                <p class="check-label">Prices vary depending on {{spec.Name | lowercase}}</p>
+                <input type="checkbox"
+                       class="form-check-input"
+                       id="{{spec.ID}}PriceMarkup"
+                       [checked]="pricesVary(spec?.Options)"
+                       [disabled]="_superMarketplaceProductEditable?.Variants">
+                <span class="checkmark cursor-pointer"></span>
+              </label>
             </div>
-            <div class="col-md-7">
-              <button *ngIf="!hasVariations"
-                      class="btn btn-outline-dark"
-                      (click)="hasVariations = true">Add Variations</button>
-              <div *ngIf="hasVariations"
-                   class="variation-form-container">
-                <div class="form-group">
-                  <label for="VariationType">Add a variation</label>
-                  <select type="dropdown"
-                          class="form-control"
-                          id="VariationType"
-                          aria-describedby="Variation type"
-                          placeholder="Choose variation type">
-                    <option default
-                            disabled>Choose a variation type</option>
-                    <option>Color</option>
-                    <option>Size</option>
-                    <option>Height</option>
-                  </select>
-                </div>
-                <button class="btn btn-link text-danger"
-                        (click)="hasVariations = false">Cancel variations</button>
-              </div>
-            </div>
+          </div>
+          <div class="col-md-7">
+            <p class="p-1 border border-dark rounded"
+               *ngFor="let opt of spec.Options">{{opt.Value}}</p>
+          </div>
         </div> -->
+        <div class="card shadow-sm"
+             style="width: 32rem"
+             *ngFor="let spec of _superMarketplaceProductEditable?.Specs">
+          <div class="card-header">
+            <h6>{{spec.Name}}</h6>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="check-container"
+                     for="{{spec.ID}}PriceMarkup">
+                <p class="check-label">Prices vary depending on {{spec.Name | lowercase}}</p>
+                <input type="checkbox"
+                       class="form-check-input"
+                       id="{{spec.ID}}PriceMarkup"
+                       [checked]="pricesVary(spec?.Options)"
+                       [disabled]="_superMarketplaceProductEditable?.Variants">
+                <span class="checkmark cursor-pointer"></span>
+              </label>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div *ngFor="let opt of spec.Options"
+                 class="spec-option p-2 border-medium rounded d-flex justify-content-between align-items-center">
+              <p>{{opt.Value}}</p>
+              <p>Delete</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="_superMarketplaceProductEditable?.Variants"
+         class="row pt-3 mt-5 border-top">
+      <div class="col-md-12">
+        <h5>Product Variations</h5>
+        <p class="font-italic">Configure the SKU's for your product variations here.</p>
+      </div>
+    </div>
+    <div class="row pt-3">
+      <div class="col-md-12">
+        <div class="variation-form-container mt-3 p-3 border-radius shadow">
+          <!-- <div class="form-group">
+            <label for="VariationType">Add a variation</label>
+            <select type="dropdown"
+                    class="form-control"
+                    id="VariationType"
+                    aria-describedby="Variation type"
+                    placeholder="Choose variation type">
+              <option default
+                      disabled>Choose a variation type</option>
+              <option>Color</option>
+              <option>Size</option>
+              <option>Height</option>
+            </select>
+          </div> -->
+          <perfect-scrollbar style="width: 100%; height: 400px;">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th *ngFor="let spec of _superMarketplaceProductEditable?.Specs"
+                      scope="col">{{spec.Name}}</th>
+                  <th scope="col">SKU</th>
+                  <th scope="col">Total Markup</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="cursor-pointer"
+                    *ngFor="let variant of _superMarketplaceProductEditable?.Variants">
+                  <td *ngFor="let specValue of variant.xp?.SpecValues">
+                    {{specValue.SpecName}}
+                  </td>
+                  <td>
+                    <div class="input-group-sm">
+                      <input class="form-control input-sm"
+                             type="text"
+                             [value]="variant?.ID">
+                    </div>
+                  </td>
+                  <td>{{getTotalMarkup(variant.xp?.SpecValues) | currency}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </perfect-scrollbar>
+        </div>
+      </div>
+    </div>
     <!-- /Product Variations -->
 
     <!-- Shipping Information -->

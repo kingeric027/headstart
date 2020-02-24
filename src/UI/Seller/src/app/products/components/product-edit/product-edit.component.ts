@@ -8,8 +8,18 @@ import {
   OcSupplierAddressService,
   OcAdminAddressService,
   OcProductService,
+  Variant,
+  Spec,
+  SpecOption,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import {
+  MarketPlaceProductImage,
+  MarketPlaceProductTaxCode,
+  SuperMarketplaceProduct,
+  VariantXp,
+  VariantXpSpecValues,
+} from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
@@ -55,6 +65,7 @@ export class ProductEditComponent implements OnInit {
   userContext = {};
   hasVariations = false;
   images: ProductImage[] = [];
+  images: MarketPlaceProductImage[] = [];
   files: FileHandle[] = [];
   faTrash = faTrash;
   faTimes = faTimes;
@@ -64,6 +75,7 @@ export class ProductEditComponent implements OnInit {
   taxCodeCategorySelected = false;
   taxCodes: ListPage<TaxCodes>;
   productType: string;
+  productVariations: any;
   fileType: string;
   imageFiles: FileHandle[] = [];
   staticContentFiles: FileHandle[] = [];
@@ -394,5 +406,20 @@ export class ProductEditComponent implements OnInit {
 
   private async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
     return await MarketplaceSDK.TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
+  }
+
+  pricesVary = (specOptions: SpecOption[]): boolean => specOptions.some(opt => opt.PriceMarkup);
+
+  quantitiesVary = (variants: any): boolean => variants.some(variant => variant.Inventory);
+
+  getTotalMarkup = (specOptions: VariantXpSpecValues[]): number => {
+    let totalMarkup = 0;
+    console.log(specOptions)
+    if (specOptions) {
+      console.log('counting')
+      specOptions.forEach(opt => (totalMarkup = totalMarkup + opt.PriceMarkup) ?? opt.PriceMarkup)
+    }
+    // specOptions.forEach(opt => totalMarkup + opt.PriceMarkup);
+    return totalMarkup;
   }
 }
