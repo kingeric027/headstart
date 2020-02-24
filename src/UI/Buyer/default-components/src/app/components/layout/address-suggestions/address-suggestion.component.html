@@ -1,0 +1,11 @@
+<div *ngIf="suggestedAddresses">
+  <p>Suggested Addresses</p>
+  <div class="btn-group btn-group-toggle"
+       role="group">
+    <button *ngFor="let address of suggestedAddresses"
+            type="button"
+            class="btn btn-outline-secondary"
+            [ngClass]="{'active': activeAddress === address}"
+            (click)="setActiveAddress(address)">{{address.FirstName}} {{address.LastName}} {{address.Street1}} {{address.Street2}} {{address.City}} {{address.State}} {{address.Zip}} {{address.Country}} {{address.Phone}}</button>
+  </div>
+</div>
