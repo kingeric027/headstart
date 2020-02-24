@@ -24,10 +24,10 @@ namespace Marketplace.Tests
 		}
 
 		[Test]
-		[TestCase(0, 1, 1, 1)]
-		[TestCase(1, 1, 2, 1)]
-		[TestCase(100, 1, 101, 2)]
-		public void map_avalara_list_args_to_oc(int skip, int top, int page, int totalCount)
+		[TestCase(0, 1, 1)]
+		[TestCase(1, 1, 2)]
+		[TestCase(100, 1, 101)]
+		public void map_avalara_list_args_to_oc(int skip, int top, int page)
 		{
 			var avalaraTaxCodesFromApiCall = TaxCodes.taxCodeObjectFromAvalaraFirstRecord();
 			var args = new TaxCodeListArgs() { Skip = skip, Top = top };
@@ -36,7 +36,7 @@ namespace Marketplace.Tests
 			{
 				Page = page,
 				PageSize = 100,
-				TotalCount = totalCount,
+				TotalCount = 1,
 			};
 			Assert.AreEqual(expectedMeta.Page, result.Meta.Page);
 			Assert.AreEqual(expectedMeta.PageSize, result.Meta.PageSize);
