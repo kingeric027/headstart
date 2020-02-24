@@ -32,8 +32,8 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
-                ApiUrl = "https://api.ordercloud.io",
-                AuthUrl = "https://auth.ordercloud.io"
+                ApiUrl = settings.OrderCloudSettings.ApiUrl,
+                AuthUrl = settings.OrderCloudSettings.AuthUrl
             });
 			_privilegedOC = oc;
 		}

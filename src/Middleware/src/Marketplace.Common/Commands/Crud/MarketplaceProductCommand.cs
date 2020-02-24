@@ -25,8 +25,8 @@ namespace Marketplace.Common.Commands.Crud
         {
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
-                ApiUrl = "https://api.ordercloud.io",
-                AuthUrl = "https://auth.ordercloud.io",
+                ApiUrl = settings.OrderCloudSettings.ApiUrl,
+                AuthUrl = settings.OrderCloudSettings.AuthUrl,
             });
         }
 

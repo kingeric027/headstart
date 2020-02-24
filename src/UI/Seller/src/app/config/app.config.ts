@@ -7,6 +7,9 @@ export const ocAppConfig: AppConfig = {
   cmsUrl: environment.cmsUrl,
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
+  orderCloudApiUrl: environment.orderCloudApiUrl,
+  orderCloudAuthUrl: environment.orderCloudAuthUrl,
+  orderCloudApiVersion: environment.orderCloudApiVersion,
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: 'SEB Seller',
   scope: [
@@ -107,5 +110,10 @@ export interface AppConfig {
    * To learn more about these roles and the security profiles that comprise them
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
+
+  orderCloudApiUrl: string;
+  orderCloudAuthUrl: string;
+  orderCloudApiVersion: string;
+
   scope: string[];
 }

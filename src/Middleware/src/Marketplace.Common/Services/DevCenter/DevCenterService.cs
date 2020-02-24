@@ -21,7 +21,7 @@ namespace Marketplace.Common.Services.DevCenter
         public DevCenterService(AppSettings settings)
         {
             _settings = settings;
-            _client = new FlurlClient("https://api.ordercloud.io");
+            _client = new FlurlClient(settings.OrderCloudSettings.ApiUrl);
         }
 
         private IFlurlRequest Get(string resource, string token)
