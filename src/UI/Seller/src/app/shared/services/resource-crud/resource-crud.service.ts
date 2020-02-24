@@ -234,21 +234,25 @@ export abstract class ResourceCrudService<ResourceType> {
   async createNewResource(resource: any): Promise<any> {
     if (resource.ParentID) {
       const parentResourceID = this.getParentResourceID();
-      const parentOfResource = await this.ocService.Get(parentResourceID, resource.ParentID).toPromise();
-      if (parentOfResource) {
-        const grandparentOfResource = await this.ocService.Get(parentResourceID, parentOfResource.ParentID).toPromise();
-        if (grandparentOfResource) {
-          if (grandparentOfResource.ParentID !== null) {
-            return;
-          }
-        }
+      let numberOfChecks = 0;
+      const validDepth = await this.checkForDepth(parentResourceID, resource.ParentID, numberOfChecks);
+      if (!validDepth) {
+        throw {message: 'Categories may only exist at the parent, sub-level, or sub-sub-level.'}
       }
     }
     const newResource = await this.ocService.Create(...this.createListArgs([resource])).toPromise();
-    console.log('the new resource', newResource);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;
+  }
+  
+  async checkForDepth (parentResourceID, resourceParentID, numberOfChecks) {
+    numberOfChecks++;
+    if (numberOfChecks === 3) {
+      return false;
+    }
+    const parentOfResource = await this.ocService.Get(parentResourceID, resourceParentID).toPromise();
+    return !parentOfResource.ParentID ? true : await this.checkForDepth(parentResourceID, parentOfResource.ParentID, numberOfChecks);
   }
 
   setNewResources(resourceResponse: ListPage<ResourceType>): void {

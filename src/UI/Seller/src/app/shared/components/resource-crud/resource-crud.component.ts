@@ -224,14 +224,9 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     try {
       this.dataIsSaving = true;
       const newResource = await this.ocService.createNewResource(this.updatedResource);
-      console.log('what is the new resource', newResource);
-      if (newResource === 'no') {
-        console.log('hitting unique error');
-      }
       this.selectResource(newResource);
       this.dataIsSaving = false;
     } catch (ex) {
-      console.log('ex is', ex);
       this.dataIsSaving = false;
       throw ex;
     }
