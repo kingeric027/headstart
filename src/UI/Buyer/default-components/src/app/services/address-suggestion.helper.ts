@@ -1,6 +1,6 @@
 import { BuyerAddress, ListBuyerAddress } from 'marketplace';
 
-export const getSuggestedAddresses = (ex, address: BuyerAddress) => {
+export const getSuggestedAddresses = (ex, address: BuyerAddress): ListBuyerAddress => {
     let suggestedAddresses: ListBuyerAddress;
     ex.error.Errors.forEach(err => {
         if (err.ErrorCode === "blocked by web hook") {
