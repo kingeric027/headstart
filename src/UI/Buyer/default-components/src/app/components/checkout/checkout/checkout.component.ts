@@ -1,8 +1,17 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
-import { ShopperContextService, MarketplaceOrder, ListPayment, ListLineItem, ProposedShipmentSelection, ListBuyerCreditCard, ListProposedShipment } from 'marketplace';
+import {
+  ShopperContextService,
+  MarketplaceOrder,
+  ListPayment,
+  ListLineItem,
+  ProposedShipmentSelection,
+  ListBuyerCreditCard,
+  ListProposedShipment,
+} from 'marketplace';
 import { CheckoutCreditCardOutput } from '../../payments/payment-credit-card/payment-credit-card.component';
+import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -19,6 +28,7 @@ export class OCMCheckout implements OnInit {
   proposedShipments: ListProposedShipment = null;
   currentPanel: string;
   faCheck = faCheck;
+  checkout: CheckoutService = this.context.order.checkout;
   sections: any = [
     {
       id: 'login',
@@ -58,16 +68,16 @@ export class OCMCheckout implements OnInit {
   }
 
   async doneWithShipToAddress(): Promise<void> {
-    this.proposedShipments = await this.context.order.checkout.getProposedShipments();
+    this.proposedShipments = await this.checkout.getProposedShipments();
     this.toSection('shippingSelection');
   }
 
   async onSelectShipRate(selection: ProposedShipmentSelection): Promise<void> {
-    await this.context.order.checkout.selectShippingRate(selection);
+    await this.checkout.selectShippingRate(selection);
   }
 
   async doneWithShippingRates(): Promise<void> {
-    await this.context.order.checkout.calculateTax();
+    await this.checkout.calculateTax();
     this.cards = await this.context.currentUser.cards.List();
     this.toSection('payment');
   }
@@ -75,29 +85,29 @@ export class OCMCheckout implements OnInit {
   async onCardSelected(output: CheckoutCreditCardOutput): Promise<void> {
     this.selectedCard = output;
     if (output.savedCard) {
-      await this.context.order.checkout.createSavedCCPayment(output.savedCard);
+      await this.checkout.createSavedCCPayment(output.savedCard);
     } else {
       // need to figure out how to use the platform. ran into creditCardID cannot be null.
       // so for now I always save any credit card in OC.
       // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
       this.selectedCard.savedCard = await this.context.currentUser.cards.Save(output.newCard);
-      await this.context.order.checkout.createSavedCCPayment(this.selectedCard.savedCard);
+      await this.checkout.createSavedCCPayment(this.selectedCard.savedCard);
     }
 
-    this.payments = await this.context.order.checkout.listPayments();
+    this.payments = await this.checkout.listPayments();
     this.toSection('billingAddress');
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
     const orderID = this.order.ID;
-    await this.context.order.checkout.addComment(comment);
+    await this.checkout.addComment(comment);
     // TODO - these auth calls probably need to be enforced in the middleware, not frontend.
     if (this.selectedCard.savedCard) {
-      await this.context.order.checkout.authOnlySavedCreditCard(this.selectedCard.savedCard.ID, this.selectedCard.cvv);
+      await this.checkout.authOnlySavedCreditCard(this.selectedCard.savedCard.ID, this.selectedCard.cvv);
     } else {
-      await this.context.order.checkout.authOnlyOnetimeCreditCard(this.selectedCard.newCard, this.selectedCard.cvv);
+      await this.checkout.authOnlyOnetimeCreditCard(this.selectedCard.newCard, this.selectedCard.cvv);
     }
-    await this.context.order.checkout.submit();
+    await this.checkout.submit();
 
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(orderID);
@@ -118,7 +128,7 @@ export class OCMCheckout implements OnInit {
     this.accordian.toggle(id);
   }
 
-  beforeChange($event): any  {
+  beforeChange($event): any {
     if (this.currentPanel === $event.panelId) {
       return $event.preventDefault();
     }
