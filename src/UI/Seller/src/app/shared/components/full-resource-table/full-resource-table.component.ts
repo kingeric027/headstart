@@ -23,6 +23,7 @@ export class FullResourceTableComponent {
   rows = [];
   numberOfColumns = 1;
   faCopy = faCopy;
+  objectPreviewText: string;
   _resourceList = { Meta: {}, Items: [] };
 
   @Input()
@@ -89,6 +90,10 @@ export class FullResourceTableComponent {
     copy.select();
     document.execCommand("copy");
     document.body.removeChild(copy);
+  }
+
+  previewObject(resource: any) {
+    this.objectPreviewText = JSON.stringify(resource);
   }
 
   getImage(resource: any, resourceConfiguration: ResourceConfiguration): string {

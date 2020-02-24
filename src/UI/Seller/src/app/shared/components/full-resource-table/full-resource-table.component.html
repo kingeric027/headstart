@@ -33,6 +33,8 @@
         </div>
         <span *ngIf="cell.type === 'COPY_OBJECT'">
          <button class="btn btn-light"
+                title="{{objectPreviewText}}"
+                (mouseover)="previewObject(row.resource)"
                 (click)="copyObject(row.resource)">
                 <fa-icon [icon]="faCopy"></fa-icon>
         </button>
