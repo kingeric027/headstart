@@ -15,6 +15,7 @@ import { AppStateService } from '@app-seller/shared';
 import { getHeaderConfig, MPRoute } from './header.config';
 import { AppAuthService } from '@app-seller/auth';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 @Component({
   selector: 'layout-header',
@@ -42,6 +43,7 @@ export class HeaderComponent implements OnInit {
     private appStateService: AppStateService,
     private appAuthService: AppAuthService,
     private currentUserService: CurrentUserService,
+    private middleware: MiddlewareAPIService,
     @Inject(applicationConfiguration) protected appConfig: AppConfig
   ) {}
 
@@ -62,7 +64,8 @@ export class HeaderComponent implements OnInit {
   }
 
   async getSupplierOrg() {
-    this.organizationName = await this.currentUserService.getSupplierOrg();
+    const mySupplier = await this.currentUserService.getMySupplier();
+    this.organizationName = mySupplier.Name;
   }
 
   subscribeToRouteEvents() {

@@ -1,16 +1,26 @@
 import { Injectable, Inject } from '@angular/core';
-import { User, Supplier, OcMeService, OcAuthService, OcTokenService, MeUser, OcSupplierService } from '@ordercloud/angular-sdk';
+import {
+  User,
+  Supplier,
+  OcMeService,
+  OcAuthService,
+  OcTokenService,
+  MeUser,
+  OcSupplierService,
+} from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 import { AppAuthService, TokenRefreshAttemptNotPossible } from '@app-seller/auth/services/app-auth.service';
 import { AppStateService } from '../app-state/app-state.service';
 import { UserContext } from '@app-seller/config/user-context';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
+import { MiddlewareAPIService } from '../middleware-api/middleware-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CurrentUserService {
-  me: User;
+  me: MeUser;
+  mySupplier: Supplier;
   constructor(
     private ocMeService: OcMeService,
     private ocAuthService: OcAuthService,
@@ -18,7 +28,8 @@ export class CurrentUserService {
     private ocTokenService: OcTokenService,
     private appAuthService: AppAuthService,
     private appStateService: AppStateService,
-    private ocSupplierService: OcSupplierService
+    private ocSupplierService: OcSupplierService,
+    private middleware: MiddlewareAPIService
   ) {}
 
   async login(username: string, password: string, rememberMe: boolean) {
@@ -38,10 +49,16 @@ export class CurrentUserService {
     this.ocTokenService.SetAccess(accessToken.access_token);
     this.appStateService.isLoggedIn.next(true);
     this.me = await this.ocMeService.Get().toPromise();
+    this.mySupplier = await this.middleware.getMySupplier(this.me.Supplier.ID);
   }
 
   async getUser(): Promise<MeUser> {
     return this.me ? this.me : await this.ocMeService.Get().toPromise();
+  }
+
+  async getMySupplier(): Promise<Supplier> {
+    const me = await this.getUser();
+    return this.mySupplier ? this.mySupplier : await this.middleware.getMySupplier(me.Supplier.ID);
   }
 
   async getUserContext(): Promise<UserContext> {
@@ -63,11 +80,5 @@ export class CurrentUserService {
   async isSupplierUser() {
     const me = await this.getUser();
     return me.Supplier ? true : false;
-  }
-
-  async getSupplierOrg(): Promise<Supplier ['Name']> {
-    const me = await this.getUser();
-    const supplier = await this.ocSupplierService.Get(me.Supplier.ID).toPromise();
-    return supplier.Name;
   }
 }

@@ -96,4 +96,9 @@ export class MiddlewareAPIService {
     form.append('file', file);
     return form;
   }
+
+  async getMySupplier(supplierID: string): Promise<Supplier> {
+    const url = `${this.baseUrl}/supplier/me/${supplierID}`;
+    return await this.http.get(url, this.headers).toPromise();
+  }
 }

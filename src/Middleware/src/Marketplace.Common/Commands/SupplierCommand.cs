@@ -1,6 +1,7 @@
 ﻿using Marketplace.Common.Helpers;
 using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
+using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using Marketplace.Models.Models.Marketplace;
 using Marketplace.Models.Models.Misc;
@@ -15,6 +16,7 @@ namespace Marketplace.Common.Commands
     public interface IMarketplaceSupplierCommand
     {
         Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token);
+        Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user, string token);
     }
     public class MarketplaceSupplierCommand : IMarketplaceSupplierCommand
     {
@@ -25,6 +27,12 @@ namespace Marketplace.Common.Commands
         {
             _settings = settings;
             _oc = oc;
+        }
+        public async Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user, string token)
+        {
+            Require.That(supplierID == user.SupplierID,
+                new ErrorCode("Unauthorized", 401, $"You are only authorized to view {user.SupplierID}."));
+            return await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID, token);
         }
         public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token)
         {
