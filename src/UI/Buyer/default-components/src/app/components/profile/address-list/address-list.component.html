@@ -64,6 +64,7 @@
            *ngIf="showCreateAddressForm">
         <ocm-address-form (formSubmitted)="addressFormSubmitted($event.detail.address)"
                           [existingAddress]="currentAddress"
+                          [suggestedAddresses]="suggestedAddresses"
                           [btnText]="currentAddress ? 'Save Changes' : 'Create Address'"
                           (formDismissed)="dismissEditAddressForm()">
         </ocm-address-form>
@@ -79,8 +80,5 @@
                         [columns]="3"
                         [isLoading]="isLoading"></ocm-loading-layout>
 
-  </div>
-  <div *ngIf="suggestedAddresses">
-    <address-suggestion [suggestedAddresses]="suggestedAddresses"></address-suggestion>
   </div>
 </ocm-profile-nav>

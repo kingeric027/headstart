@@ -1,8 +1,11 @@
-<div class="border border-radius p-2 mt-2"
-     *ngIf="suggestedAddresses">
+<div *ngIf="suggestedAddresses">
   <p>Suggested Addresses</p>
-  <select>
-    <option *ngFor="let address of suggestedAddresses">{{address.Street1}} {{address.Street2}} {{address.City}} {{address.State}} {{address.Zip}} {{address.Country}}</option>
-  </select>
-
+  <div class="btn-group btn-group-toggle"
+       role="group">
+    <button *ngFor="let address of suggestedAddresses"
+            type="button"
+            class="btn btn-outline-secondary"
+            [ngClass]="{'active': activeAddress === address}"
+            (click)="setActiveAddress(address)">{{address.FirstName}} {{address.LastName}} {{address.Street1}} {{address.Street2}} {{address.City}} {{address.State}} {{address.Zip}} {{address.Country}} {{address.Phone}}</button>
+  </div>
 </div>
