@@ -21,7 +21,7 @@ export interface ICart {
 })
 export class CartService implements ICart {
   public onAdd = new Subject<LineItem>(); // need to make available as observable
-  public onChange = this.state.onLineItemsChange;
+  public onChange = this.state.onLineItemsChange.bind(this.state);
   private initializingOrder = false;
 
   constructor(

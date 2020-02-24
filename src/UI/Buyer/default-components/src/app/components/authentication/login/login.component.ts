@@ -16,7 +16,7 @@ export class OCMLogin implements OnInit {
 
   constructor(private context: ShopperContextService, private toasterService: ToastrService) {}
 
-  ngOnInit(): void  {
+  ngOnInit(): void {
     this.ssoLink = this.context.appSettings.ssoLink;
     this.appName = this.context.appSettings.appname;
     this.isAnon = this.context.currentUser.isAnonymous;

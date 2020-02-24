@@ -1,6 +1,10 @@
 // core services
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { MarketplaceRoutingModule, MyOrdersWrapperComponent, OrdersToApproveWrapperComponent } from './marketplace-routing.module';
+import {
+  MarketplaceRoutingModule,
+  MyOrdersWrapperComponent,
+  OrdersToApproveWrapperComponent,
+} from './marketplace-routing.module';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
@@ -32,13 +36,13 @@ import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipm
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
 import { CreditCardService } from './services/current-user/credit-card.service';
 import { CurrentOrderService } from './services/order/order.service';
+import { CartService } from './services/order/cart.service';
+import { CheckoutService } from './services/order/checkout.service';
+import { OrderStateService } from './services/order/order-state.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [
-    MarketplaceRoutingModule,
-    CommonModule,
-  ],
+  imports: [MarketplaceRoutingModule, CommonModule],
   providers: [
     FeaturedProductsResolver,
     MeListBuyerAddressResolver,
@@ -56,6 +60,9 @@ import { CurrentOrderService } from './services/order/order.service';
     ReorderHelperService,
     RouteService,
     TokenHelperService,
+    CartService,
+    CheckoutService,
+    OrderStateService,
     ShopperContextService,
   ],
   declarations: [
@@ -76,9 +83,7 @@ import { CurrentOrderService } from './services/order/order.service';
     OrderShipmentsWrapperComponent,
     MyOrdersWrapperComponent,
     OrdersToApproveWrapperComponent,
-    SupplierListWrapperComponent
+    SupplierListWrapperComponent,
   ],
 })
 export class MarketplaceModule {}
-
-

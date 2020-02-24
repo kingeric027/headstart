@@ -17,8 +17,8 @@ export interface ICurrentOrder {
   providedIn: 'root',
 })
 export class CurrentOrderService implements ICurrentOrder {
-  onChange = this.state.onOrderChange;
-  reset = this.state.reset;
+  onChange = this.state.onOrderChange.bind(this.state);
+  reset = this.state.reset.bind(this.state);
 
   constructor(public cart: CartService, public checkout: CheckoutService, private state: OrderStateService) {}
 

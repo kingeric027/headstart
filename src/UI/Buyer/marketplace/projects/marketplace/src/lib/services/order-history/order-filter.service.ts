@@ -24,13 +24,15 @@ export interface IOrderFilters {
 export class OrderFilterService implements IOrderFilters {
   activeOrderID: string; // TODO - make this read-only in components
 
-  public activeFiltersSubject: BehaviorSubject<OrderFilters> = new BehaviorSubject<OrderFilters>(this.getDefaultParms());
+  public activeFiltersSubject: BehaviorSubject<OrderFilters> = new BehaviorSubject<OrderFilters>(
+    this.getDefaultParms()
+  );
 
   constructor(
     private ocMeService: OcMeService,
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {
     this.activatedRoute.queryParams
       .pipe(filter(() => this.router.url.startsWith('/profile/orders')))
@@ -65,7 +67,7 @@ export class OrderFilterService implements IOrderFilters {
     this.patchFilterState({
       fromDate: fromDate || undefined,
       toDate: toDate || undefined,
-      page: undefined
+      page: undefined,
     });
   }
 
@@ -78,7 +80,7 @@ export class OrderFilterService implements IOrderFilters {
     const status = params.status;
     const showOnlyFavorites = !!params.favorites;
     this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate });
-  }
+  };
 
   private getDefaultParms() {
     // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
@@ -114,11 +116,14 @@ export class OrderFilterService implements IOrderFilters {
     const from = fromDate ? `>${fromDate}` : undefined;
     const to = toDate ? `<${toDate}` : undefined;
     const favorites = this.currentUser.favoriteOrderIDs.join('|') || undefined;
-    return { page, search, sortBy,
+    return {
+      page,
+      search,
+      sortBy,
       filters: {
         ID: showOnlyFavorites ? favorites : undefined,
         Status: status,
-        DateSubmitted: [from, to].filter(x => x)
+        DateSubmitted: [from, to].filter(x => x),
       },
     };
   }

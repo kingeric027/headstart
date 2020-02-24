@@ -20,16 +20,9 @@ import { AppConfig } from '../../shopper-context';
 import { CurrentOrderService } from '../order/order.service';
 
 export interface IAuthentication {
-  profiledLogin(
-    username: string,
-    password: string,
-    rememberMe: boolean
-  ): Promise<AccessToken>;
+  profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
   logout(): Promise<void>;
-  validateCurrentPasswordAndChangePassword(
-    newPassword: string,
-    currentPassword: string
-  ): Promise<void>;
+  validateCurrentPasswordAndChangePassword(newPassword: string, currentPassword: string): Promise<void>;
   anonymousLogin(): Promise<AccessToken>;
   forgotPasssword(email: string): Promise<any>;
   register(me: MeUser): Promise<any>;
@@ -77,7 +70,7 @@ export class AuthService implements IAuthentication {
   refresh(): Observable<void> {
     this.fetchingRefreshToken = true;
     return from(this.refreshTokenLogin()).pipe(
-      tap((token) => {
+      tap(token => {
         this.refreshToken.next(token.access_token);
       }),
       catchError(() => {
@@ -118,7 +111,9 @@ export class AuthService implements IAuthentication {
   }
 
   async profiledLogin(userName: string, password: string, rememberMe = false): Promise<AccessToken> {
-    const creds = await this.ocAuthService.Login(userName, password, this.appConfig.clientID, this.appConfig.scope).toPromise();
+    const creds = await this.ocAuthService
+      .Login(userName, password, this.appConfig.clientID, this.appConfig.scope)
+      .toPromise();
     this.setToken(creds.access_token);
     if (rememberMe && creds.refresh_token) {
       /**
@@ -158,10 +153,11 @@ export class AuthService implements IAuthentication {
 
   async validateCurrentPasswordAndChangePassword(newPassword: string, currentPassword: string): Promise<void> {
     // reset password route does not require old password, so we are handling that here through a login
-    await this.ocAuthService.Login(this.currentUser.get().Username, currentPassword, this.appConfig.clientID, this.appConfig.scope).toPromise();
+    await this.ocAuthService
+      .Login(this.currentUser.get().Username, currentPassword, this.appConfig.clientID, this.appConfig.scope)
+      .toPromise();
     await this.ocMeService.ResetPasswordByToken({ NewPassword: newPassword }).toPromise();
   }
-
 
   async resetPassword(code: string, config: PasswordReset): Promise<any> {
     const reset = await this.ocPasswordResetService.ResetPasswordByVerificationCode(code, config).toPromise();
