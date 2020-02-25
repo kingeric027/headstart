@@ -88,24 +88,26 @@ namespace Marketplace.Common.Services.FreightPop.Models
         public string LineNumber { get; set; }
     }
     public enum DeliveryConfirmation {
-        NoSignature,
-        AdultSignature,
-        Signature
+        NoSignature = 1,
+        AdultSignature = 2,
+        Signature = 3
     }
 
     public enum CODPaymentType
     {
-        CustomerCheck,
-        CashierCheck,
-        CertifiedCheck,
-        MoneyOrder
+        CustomerCheck = 1,
+        CashierCheck = 2,
+        CertifiedCheck = 3,
+        MoneyOrder = 4
     }
     public enum PaymentTerm
     {
-        Recipient,
-        Sender,
-        ThirdParty
+        Recipient = 1,
+        Sender = 2,
+        ThirdParty = 3
     }
+
+    // 0 based unlike other enums in FreightPOP
     public enum OrderTransactionType { 
         Sales, 
         Purchasing
