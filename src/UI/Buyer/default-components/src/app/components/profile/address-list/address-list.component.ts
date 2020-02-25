@@ -83,7 +83,6 @@ export class OCMAddressList implements OnInit {
     this.reloadAddresses();
   }
 
-
   protected refresh(): void {
     this.currentAddress = null;
     this.reloadAddresses();
@@ -106,6 +105,8 @@ export class OCMAddressList implements OnInit {
 
   private async updateAddress(address: BuyerAddress): Promise<any> {
     try {
+      address.Shipping = true;
+      address.Billing = true;
       address.ID = this.currentAddress.ID;
       await this.context.currentUser.addresses.edit(address.ID, address);
       this.showCreateAddressForm = false;
