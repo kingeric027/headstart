@@ -8,6 +8,7 @@ using Marketplace.Common.Services.Zoho.Mappers;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
+using Marketplace.Helpers.Extensions;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
@@ -61,7 +62,7 @@ namespace Marketplace.Common.Commands.Zoho
                     var contact = await CreateOrUpdateVendor(order);
 
                     // Step 2: Create or update Items from LineItems/Products on Order
-                    var items = await CreateOrUpdateLineItems(lineitems);
+                    var items = await CreateOrUpdateLineItems(lineitems.Items);
 
                     // Step 3: Create item for shipments
                     //items.AddRange(await ApplyShipping(order)); do we need shipping here?
@@ -86,7 +87,7 @@ namespace Marketplace.Common.Commands.Zoho
                 var contact = await CreateOrUpdateContact(orderCalculation.Order);
 
                 // Step 2: Create or update Items from LineItems/Products on Order
-                var items = await CreateOrUpdateLineItems(orderCalculation.Order, orderCalculation.LineItems);
+                var items = await CreateOrUpdateLineItems(orderCalculation.LineItems);
 
                 // Step 3: Create item for shipments
                 items.AddRange(await ApplyShipping(orderCalculation));
@@ -105,10 +106,10 @@ namespace Marketplace.Common.Commands.Zoho
             }
         }
 
-        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(ListPage<MarketplaceLineItem> lineitems)
+        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(IList<MarketplaceLineItem> lineitems)
         {
             // TODO: accomodate possibility of more than 100 line items
-            var products = await Throttler.RunAsync(lineitems.Items.Select(item => item.ProductID).ToList(), 100, 5,
+            var products = await Throttler.RunAsync(lineitems.Select(item => item.ProductID).ToList(), 100, 5,
                 s => _oc.Products.GetAsync<MarketplaceProduct>(s));
 
             var zItems = await Throttler.RunAsync(products.ToList(), 100, 5, product => _zoho.Items.ListAsync(new ZohoFilter()
@@ -125,8 +126,8 @@ namespace Marketplace.Common.Commands.Zoho
                 var z_item = z_items.FirstOrDefault(z => z.Key == product.ID);
                 if (z_item.Key != null)
                     return await _zoho.Items.SaveAsync(
-                        ZohoLineItemMapper.Map(z_item.Value, lineitems.Items.First(i => i.ProductID == product.ID), product));
-                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.Items.First(i => i.ProductID == product.ID), product));
+                        ZohoLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == product.ID), product));
+                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.First(i => i.ProductID == product.ID), product));
             });
             return items.ToList();
         }
