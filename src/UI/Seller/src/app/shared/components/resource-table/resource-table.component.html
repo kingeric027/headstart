@@ -218,8 +218,7 @@
                     <summary-resource-display-component [resource]="resource"
                                                         [resourceList]="resourceList.Items"
                                                         [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel"
-                                                        [parentResourceID]="selectedParentResourceID"
->
+                                                        [parentResourceID]="selectedParentResourceID">
                     </summary-resource-display-component>
                   </td>
                 </tr>
@@ -253,6 +252,10 @@
           <div *ngIf="!isMyResource">
             <ng-content *ngTemplateOutlet="editUnwrapped">
             </ng-content>
+          </div>
+          <div *ngIf="suggestedAddresses?.length > 0">
+            <address-suggestion [suggestedAddresses]="suggestedAddresses">
+            </address-suggestion>
           </div>
         </div>
       </div>

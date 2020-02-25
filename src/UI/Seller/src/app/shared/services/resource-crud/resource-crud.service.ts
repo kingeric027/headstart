@@ -14,6 +14,7 @@ import {
 } from './resource-crud.types';
 import { ListPage } from '../middleware-api/listPage.interface';
 import { ListFilters } from '../middleware-api/listArgs.interface';
+import { BuyerAddress, ListBuyerAddress, ListAddress, Address } from '@ordercloud/angular-sdk';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
@@ -366,5 +367,19 @@ export abstract class ResourceCrudService<ResourceType> {
     } else {
       return false;
     }
+  }
+
+  getSuggestedAddresses(ex, address: Address): any {
+    let suggestedAddresses: ListAddress;
+    ex.error.Errors.forEach(err => {
+      if (err.ErrorCode === "blocked by web hook") {
+        err.Data.Body.SuggestedValidAddresses.forEach(suggestion => {
+          suggestion.CompanyName = address.CompanyName;
+          suggestion.AddressName = address.AddressName;
+        });
+      }
+      suggestedAddresses = err.Data.Body.SuggestedValidAddresses;
+    });
+    return suggestedAddresses;
   }
 }

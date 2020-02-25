@@ -22,6 +22,7 @@ import { singular } from 'pluralize';
 import { filter, takeWhile } from 'rxjs/operators';
 import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 import { ListFilters } from '@app-seller/shared/services/middleware-api/listArgs.interface';
+import { ListAddress } from '@ordercloud/angular-sdk';
 
 interface BreadCrumb {
   displayText: string;
@@ -74,7 +75,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
     ngZone: NgZone
-  ) {}
+  ) { }
 
   @Input()
   resourceList: ListPage<any> = { Meta: {}, Items: [] };
@@ -120,6 +121,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   shouldShowResourceActions = true;
   @Input()
   dataIsSaving = false;
+  @Input()
+  suggestedAddresses: ListAddress;
 
   async ngOnInit() {
     this.determineViewingContext();
@@ -299,6 +302,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   handleSave() {
+    console.log('resource table SAs', this.suggestedAddresses)
     this.changesSaved.emit(null);
   }
 
