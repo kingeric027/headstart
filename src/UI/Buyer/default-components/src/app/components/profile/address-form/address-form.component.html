@@ -2,7 +2,7 @@
       novalidate
       [formGroup]="addressForm"
       name="RegisterForm">
-  <div *ngIf="!suggestedAddresses">
+  <div *ngIf="!suggestedAddresses || suggestedAddresses?.length === 0">
     <div class="row">
       <div [hidden]="true"
            class="col-md-6 form-group">
@@ -151,7 +151,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="suggestedAddresses">
+  <div *ngIf="suggestedAddresses?.length > 0">
     <address-suggestion [suggestedAddresses]="suggestedAddresses"
                         (selectedAddress)="useSuggestedAddress($event)"></address-suggestion>
   </div>
