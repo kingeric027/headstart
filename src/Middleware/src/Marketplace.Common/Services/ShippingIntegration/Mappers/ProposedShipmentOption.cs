@@ -11,7 +11,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
             {
                 ID = obj.Id,
                 Name = obj.Service,
-                DeliveryDays = obj.DeliveryDays,
+                EstimatedDeliveryDays = obj.DeliveryDays,
                 Cost = (decimal)obj.TotalCost
             };
         }

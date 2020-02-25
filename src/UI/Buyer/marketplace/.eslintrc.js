@@ -43,10 +43,13 @@ module.exports = {
         "@typescript-eslint/prefer-for-of": "error",
         "@typescript-eslint/prefer-function-type": "error",
         "@typescript-eslint/unbound-method": "off",
+        "@typescript-eslint/member-ordering": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/prefer-namespace-keyword": "error",
         "@typescript-eslint/quotes": [
             "error",
-            "single"
+            "single",
+            "backtick"
         ],
         "@typescript-eslint/triple-slash-reference": "error",
         "@typescript-eslint/unified-signatures": "error",

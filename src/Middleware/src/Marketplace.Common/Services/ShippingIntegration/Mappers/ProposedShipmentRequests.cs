@@ -7,7 +7,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
     public static class ProposedShipmentRequestsMapper
     {
         // takes a super order, groups up the line items and returns a list of rate requests
-        public static List<ProposedShipmentRequest> Map(SuperOrder obj)
+        public static List<ProposedShipmentRequest> Map(OrderCalculation obj)
         {
             var proposedShipmentGroupings = obj.LineItems.GroupBy(li => li.ShipFromAddressID);
             return proposedShipmentGroupings.Select(proposedShipmentGrouping =>

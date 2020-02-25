@@ -9,6 +9,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
         {
             return new ProposedShipment
             {
+                ID = obj.ID,
                 ProposedShipmentItems = obj.ProposedShipmentItems,
                 ProposedShipmentOptions = obj.RateResponseTask.Result.Data.Rates.Select(rate => ProposedShipmentOptionMapper.Map(rate)).ToList()
             };

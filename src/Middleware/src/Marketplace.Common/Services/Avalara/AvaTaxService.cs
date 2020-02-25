@@ -5,6 +5,7 @@ using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Mappers.Avalara;
 using Marketplace.Common.Services.AvaTax.Models;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
 using OrderCloud.SDK;
 using System.Linq;
@@ -15,9 +16,9 @@ namespace Marketplace.Common.Services.AvaTax
 	public interface IAvataxService
 	{
 		// Use this before checkout. No records will be saved in avalara.
-		Task<decimal> GetTaxEstimateAsync(TaxableOrder taxableOrder);
+		Task<decimal> GetTaxEstimateAsync(OrderCalculation orderCalculation);
 		// Use this during submit.
-		Task<TransactionModel> CreateTransactionAsync(TaxableOrder taxableOrder);
+		Task<TransactionModel> CreateTransactionAsync(OrderCalculation taxableOrder);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
 		// When should we do this? 
 		Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode);
@@ -46,27 +47,33 @@ namespace Marketplace.Common.Services.AvaTax
 			return codeList;
 		}
 
-		public async Task<decimal> GetTaxEstimateAsync(TaxableOrder taxableOrder)
+		public async Task<decimal> GetTaxEstimateAsync(OrderCalculation orderCalculation)
 		{
-			var transaction = await CreateTransactionAsync(DocumentType.SalesOrder, taxableOrder);
+			var transaction = await CreateTransactionAsync(DocumentType.SalesOrder, orderCalculation);
 			return transaction.totalTax ?? 0;
 		}
 
-		public async Task<TransactionModel> CreateTransactionAsync(TaxableOrder taxableOrder)
+		public async Task<TransactionModel> CreateTransactionAsync(OrderCalculation orderCalculation)
 		{
-			return await CreateTransactionAsync(DocumentType.SalesInvoice, taxableOrder);
+			return await CreateTransactionAsync(DocumentType.SalesInvoice, orderCalculation);
 		}
 
-		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, TaxableOrder taxableOrder)
+		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderCalculation orderCalculation)
 		{
-			var trans = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(taxableOrder.Order));
-			var shipments = taxableOrder.Lines.GroupBy(line => line.ShipFromAddressID); 
-			foreach (var shipment in shipments)
+			var trans = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderCalculation.Order));
+			foreach (var proposedShipment in orderCalculation.ProposedShipmentRatesResponse.ProposedShipments)
 			{
-				taxableOrder.ShippingRates.TryGetValue(shipment.Key, out var shippingRate);
+				var selectedProposedShipment = proposedShipment.ProposedShipmentOptions.First(proposedShipmentOption => proposedShipmentOption.ID == proposedShipment.SelectedProposedShipmentOptionID);
+				var shippingRate = selectedProposedShipment.Cost;
+				var firstLineItemID = proposedShipment.ProposedShipmentItems.FirstOrDefault().LineItemID;
+				var firstLineItem = orderCalculation.LineItems.First(lineItem => lineItem.ID == firstLineItemID);
+				var shipFromAddress = firstLineItem.ShipFromAddress;
+				var shipToAddress = firstLineItem.ShippingAddress;
+
 				// This assumes the order has one ShipTo Address. Should change
-				trans.WithShippingRate(shippingRate, shipment.First().ShipFromAddress, shipment.First().ShippingAddress);
-				foreach (var line in shipment) trans.WithLineItem(line);
+				trans.WithShippingRate(shippingRate, shipFromAddress, shipToAddress);
+
+				foreach (var lineItem in orderCalculation.LineItems) trans.WithLineItem(lineItem);
 			}
 
 			return await trans.CreateAsync();
