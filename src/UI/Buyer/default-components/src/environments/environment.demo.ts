@@ -11,6 +11,9 @@ export const environment = {
   middlewareUrl: 'https://marketplace-api-demo.azurewebsites.net',
   cmsUrl: 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product',
   ssoLink: 'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
+  orderCloudApiUrl: 'https://api.ordercloud.io',
+  orderCloudAuthUrl: 'https://auth.ordercloud.io/oauth/token',
+  orderCloudApiVersion: 'v1',
 };
 
 /*

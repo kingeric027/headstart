@@ -9,6 +9,9 @@ export const ocAppConfig: AppConfig = {
   middlewareUrl: environment.middlewareUrl,
   cmsUrl: environment.cmsUrl,
   ssoLink: environment.ssoLink,
+  orderCloudApiUrl: environment.orderCloudApiUrl,
+  orderCloudAuthUrl: environment.orderCloudApiVersion,
+  orderCloudApiVersion: environment.orderCloudApiVersion,
   anonymousShoppingEnabled: false,
   cardConnectMerchantID: '840000000052', // TODO - look for somewhere else to put this.
   scope: [

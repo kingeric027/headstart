@@ -189,6 +189,10 @@ export class AppConfig {
   /**
    * base path to middleware
    */
+
+  orderCloudApiUrl: string;
+  orderCloudAuthUrl: string;
+  orderCloudApiVersion: string;
   middlewareUrl: string;
   /**
    * base path to CMS resources

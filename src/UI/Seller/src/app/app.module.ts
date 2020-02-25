@@ -17,7 +17,7 @@ import { AppRoutingModule } from '@app-seller/app-routing.module';
 import { LayoutModule } from '@app-seller/layout/layout.module';
 import { AuthModule } from '@app-seller/auth';
 
-//app component
+// app component
 import { AppComponent } from '@app-seller/app.component';
 
 // interceptors
