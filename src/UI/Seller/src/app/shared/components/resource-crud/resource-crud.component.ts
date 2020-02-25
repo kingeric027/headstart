@@ -7,7 +7,6 @@ import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 import { ListAddress } from '@ordercloud/angular-sdk';
-import { EventEmitter } from 'events';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -28,8 +27,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   router: Router;
   isCreatingNew: boolean;
   dataIsSaving = false;
-  @Output()
-  suggestedAddresses = new EventEmitter();
+  suggestedAddresses: ListAddress;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -210,10 +208,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
       this.setUpdatedResourceAndResourceForm(updatedResource);
       this.dataIsSaving = false;
     } catch (ex) {
-      const suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
-      this.suggestedAddresses.emit(suggestedAddresses);
+      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
       this.dataIsSaving = false;
-      console.log('resource crud SAs', this.suggestedAddresses)
       throw ex;
     }
   }
@@ -233,8 +229,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
       this.selectResource(newResource);
       this.dataIsSaving = false;
     } catch (ex) {
-      const suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
-      this.suggestedAddresses.emit(suggestedAddresses);
+      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
       this.dataIsSaving = false;
       throw ex;
     }
