@@ -7,6 +7,7 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
 using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Commands
 {
@@ -41,13 +42,22 @@ namespace Marketplace.Common.Commands
             // should as much order submit logic to use the order calculation model as makes sense
             // so that we do not need to go get the line items and shipping information multiple times
             var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, orderId);
-            await _avatax.CreateTransactionAsync(buyerOrderCalculation);
             var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderCalculation);
-            
+            await HandleTaxTransactionCreationAsync(buyerOrderCalculation);
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderId);
             var supplierOrders = orderSplitResult.OutgoingOrders;
             await ImportSupplierOrdersIntoFreightPop(supplierOrders);
             await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
+        }
+
+        private async Task HandleTaxTransactionCreationAsync(OrderCalculation orderCalculation)
+        {
+            var transaction = await _avatax.CreateTransactionAsync(orderCalculation);
+            await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderCalculation.Order.ID, new PartialOrder()
+            {
+                TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
+                xp = { AvalaraTaxTransactionCode = transaction.code }
+            });
         }
 
         private async Task ImportSupplierOrdersIntoFreightPop(IList<Order> supplierOrders)
