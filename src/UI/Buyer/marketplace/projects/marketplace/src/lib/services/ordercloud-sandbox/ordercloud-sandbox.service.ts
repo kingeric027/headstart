@@ -10,7 +10,7 @@ import { ShipmentPreference, OrderCalculation } from './ordercloud-sandbox.model
   providedIn: 'root'
 })
 export class OrderCloudSandboxService {
-  readonly baseUrl = `https://sandboxapi.ordercloud.io/v1`
+  readonly baseUrl = `https://stagingapi.ordercloud.io/v1`
   constructor(
     private ocTokenService: OcTokenService,
     private http: HttpClient,
