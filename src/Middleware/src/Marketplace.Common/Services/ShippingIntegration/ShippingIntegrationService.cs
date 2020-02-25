@@ -8,6 +8,7 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
 using Marketplace.Models;
 using Marketplace.Models.Exceptions;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using static Marketplace.Models.ErrorCodes;
 
@@ -74,7 +75,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
             return selectedProposedShipmentOptions.Sum();
         }
 
-        private List<string> GetProductsWithInvalidDimensions(IList<LineItem> lineItems)
+        private List<string> GetProductsWithInvalidDimensions(IList<MarketplaceLineItem> lineItems)
         {
             return lineItems.Where(lineItem =>
             {

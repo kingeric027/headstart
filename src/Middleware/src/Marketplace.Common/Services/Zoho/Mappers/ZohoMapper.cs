@@ -234,7 +234,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoSalesOrderMapper
     {
-        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, IList<LineItem> lineitems)
+        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, IList<MarketplaceLineItem> lineitems)
         {
             return new ZohoSalesOrder()
             {

@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Mappers.Zoho;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Common.Services.Zoho.Mappers;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
-using Marketplace.Helpers.Extensions;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
@@ -57,7 +55,7 @@ namespace Marketplace.Common.Commands.Zoho
                     var delivery_address = z_order.shipping_address; //TODO: this is not good enough. Might even need to go back to SaleOrder and split out by delivery address
                     var supplier = await _oc.Suppliers.GetAsync(order.ToCompanyID);
                     // TODO: accomodate possibility of more than 100 line items
-                    var lineitems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, order.ID, pageSize: 100);
+                    var lineitems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, order.ID, pageSize: 100);
 
                     // Step 1: Create contact (customer) in Zoho
                     var contact = await CreateOrUpdateVendor(order);
@@ -107,7 +105,7 @@ namespace Marketplace.Common.Commands.Zoho
             }
         }
 
-        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(ListPage<LineItem> lineitems)
+        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(ListPage<MarketplaceLineItem> lineitems)
         {
             // TODO: accomodate possibility of more than 100 line items
             var products = await Throttler.RunAsync(lineitems.Items.Select(item => item.ProductID).ToList(), 100, 5,
@@ -133,7 +131,7 @@ namespace Marketplace.Common.Commands.Zoho
             return items.ToList();
         }
 
-        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(MarketplaceOrder order, IList<LineItem> lineitems)
+        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(MarketplaceOrder order, IList<MarketplaceLineItem> lineitems)
         {
             // TODO: accomodate possibility of more than 100 line items
             var products = await Throttler.RunAsync(lineitems.Select(item => item.ProductID).ToList(), 100, 5,
