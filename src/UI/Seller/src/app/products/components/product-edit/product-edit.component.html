@@ -176,18 +176,8 @@
                 (click)="toggleEditSpecs()">
           <fa-icon [icon]="faCog"></fa-icon> Edit Variations
         </button>
-        <button *ngIf="editSpecs"
-                class="btn btn-outline-dark"
-                (click)="mockVariants()">Save Changes</button>
-      </div>
-    </div>
-    <div class="row pt-3 position-relative product-variations"
-         [ngClass]="{'hidden': !editSpecs}">
-      <!-- <div class="variant-overlay"
-           *ngIf="!editSpecs"><span>Click 'Edit Variations' above to edit Product Variations</span>
-      </div> -->
-      <div class="col-md-5">
-        <div class="form-group">
+        <div class="form-group add-variation"
+             *ngIf="editSpecs">
           <label for="AddVariation">Add Variation</label>
           <div class="input-group">
             <input type="text"
@@ -196,69 +186,92 @@
                    placeholder="Name the variation">
             <div class="input-group-append">
               <button class="btn btn-outline-dark"
-                      (click)="addVariation()">+ Add</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-7"
-           *ngIf="_superMarketplaceProductEditable?.Specs">
-        <div class="product-spec row"
-             *ngFor="let spec of _superMarketplaceProductEditable?.Specs">
-          <div class="col-md-5">
-            <h5 class="font-weight-bold">{{spec.Name}}</h5>
-            <button class="btn btn-link text-danger"
-                    (click)="removeSpec(spec)">Delete</button>
-          </div>
-          <div class="col-md-7">
-            <div class="form-group">
-              <label for="{{spec.ID}}">Add Option</label>
-              <div class="input-group">
-                <input class="form-control"
-                       id="{{spec.ID}}"
-                       type="text"
-                       maxlength="20"
-                       placeholder="Option Name">
-                <input class="form-control"
-                       id="{{spec.ID}}Markup"
-                       type="number"
-                       placeholder="Price Markup">
-                <div class="input-group-append">
-                  <button class="btn btn-outline-dark"
-                          (click)="addSpecOption(spec)">+ Add</button>
-                </div>
-              </div>
-            </div>
-            <div class="btn-group mr-2 mb-2"
-                 *ngFor="let opt of spec.Options">
-              <button disabled
-                      class="btn btn-outline-dark">
-                {{opt.Value}}
-              </button>
-              <button disabled
-                      class="btn btn-outline-dark">
-                {{!opt.PriceMarkup ? 0 : opt.PriceMarkup | currency }}
-              </button>
-              <button (click)="removeSpecOption(spec, opt)"
-                      class="btn btn-outline-danger">X</button>
+                      (click)="addVariation()">Add</button>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="row pt-3 position-relative product-variations"
+         [ngClass]="{'hidden': !editSpecs}">
+      <div class="col-md-12"
+           *ngIf="_superMarketplaceProductEditable?.Specs">
+        <div class="card-deck">
+          <div class="product-spec card p-2"
+               *ngFor="let spec of _superMarketplaceProductEditable?.Specs; let specIndex = index;">
+            <h5 class="ml-2">{{spec.Name}}</h5>
+            <table class="table table-sm table-hover">
+              <thead>
+                <tr>
+                  <th>Option</th>
+                  <th>Price Markup</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <input class="form-control"
+                           id="{{spec.ID}}"
+                           type="text"
+                           maxlength="20"
+                           placeholder="Option Name">
+                  </td>
+                  <td>
+                    <input class="form-control"
+                           id="{{spec.ID}}Markup"
+                           type="number"
+                           placeholder="Price Markup">
+                  </td>
+                  <td>
+                    <button class="btn btn-outline-dark"
+                            (click)="addSpecOption(spec, specIndex)">Add</button>
+                  </td>
+                </tr>
+                <tr *ngFor="let opt of spec.Options; let optionIndex = index">
+                  <td>{{opt.Value}}</td>
+                  <td>{{!opt.PriceMarkup ? 0 : opt.PriceMarkup | currency }}</td>
+                  <td>
+                    <div class="icon-button ripple hover-btn"
+                         (click)="removeSpecOption(specIndex, optionIndex)">
+                      <div class="icon-wrapper">
+                        <fa-icon class="text-danger"
+                                 [icon]="faTrash">
+                        </fa-icon>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="btn btn-link text-danger"
+                    (click)="removeSpec(spec)">Delete Variation</button>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end align-items-center mt-3">
+          <button *ngIf="editSpecs"
+                  (click)="handleDiscardSpecChanges()"
+                  class="btn btn-link text-dark">Cancel</button>
+          <button *ngIf="editSpecs"
+                  class="btn btn-outline-dark"
+                  [disabled]="!areSpecChanges"
+                  (click)="mockVariants()">{{areSpecChanges ? 'Save Changes' : 'No Changes'}}</button>
+        </div>
+      </div>
+    </div>
     <!-- / Spec Configuration -->
     <!-- Variant Matrix -->
-    <div class="row pt-3 position-relative"
+    <div class="row pt-3 position-relative product-variations"
          *ngIf="_superMarketplaceProductEditable?.Variants">
       <div class="variant-overlay"
-           *ngIf="editSpecs"><span>Pending Changes. Press 'Save' above to continue editing product SKU's.</span>
+           *ngIf="editSpecs"><span>Pending Variation Changes...</span>
       </div>
       <div class="col-md-12">
-        <div class="variation-form-container mt-3 p-3 border-radius shadow">
+        <div class="variation-form-container mt-3">
           <perfect-scrollbar ps-show-always
-                             style="width: 100%; height: 400px;">
+                             style="width: 100%; max-height: 400px;">
             <table class="table table-hover">
-              <thead>
+              <thead class="bg-light">
                 <tr>
                   <th *ngFor="let spec of _superMarketplaceProductEditable?.Specs"
                       scope="col">{{spec.Name}}</th>
@@ -268,7 +281,8 @@
               </thead>
               <tbody>
                 <tr class="cursor-pointer"
-                    *ngFor="let variant of _superMarketplaceProductEditable?.Variants">
+                    *ngFor="let variant of _superMarketplaceProductEditable?.Variants; let i = index"
+                    [id]="variant.ID">
                   <td *ngFor="let specValue of variant.xp?.SpecValues">
                     {{specValue.SpecName}} <span class="font-weight-bold"
                           *ngIf="specValue.PriceMarkup">(+{{specValue.PriceMarkup | currency}})</span>
@@ -277,7 +291,8 @@
                     <div class="input-group-sm">
                       <input class="form-control input-sm"
                              type="text"
-                             [value]="variant?.ID">
+                             (change)="updateSku($event, i)"
+                             [value]="variant?.xp?.NewID || variant?.ID">
                     </div>
                   </td>
                   <td>{{getTotalMarkup(variant.xp?.SpecValues) | currency}}</td>

@@ -73,6 +73,7 @@ export class ProductEditComponent implements OnInit {
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
+  areSpecChanges = false;
   taxCodeCategorySelected = false;
   taxCodes: ListPage<TaxCodes>;
   productType: string;
@@ -184,6 +185,12 @@ export class ProductEditComponent implements OnInit {
     this.staticContentFiles = [];
     this._superMarketplaceProductEditable = this._superMarketplaceProductStatic;
     this.refreshProductData(this._superMarketplaceProductStatic);
+  }
+
+  handleDiscardSpecChanges(): void {
+    this.editSpecs = !this.editSpecs;
+    this._superMarketplaceProductEditable.Specs = this._superMarketplaceProductStatic?.Specs;
+    this.checkForSpecChanges();
   }
 
   async createNewProduct() {
@@ -410,14 +417,11 @@ export class ProductEditComponent implements OnInit {
     return await MarketplaceSDK.TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
   }
 
-  quantitiesVary = (variants: any): boolean => variants.some(variant => variant.Inventory);
-
   getTotalMarkup = (specOptions: VariantXpSpecValues[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
       specOptions.forEach(opt => opt.PriceMarkup ? totalMarkup = +totalMarkup + +opt.PriceMarkup : 0);
     }
-    // specOptions.forEach(opt => totalMarkup + opt.PriceMarkup);
     return totalMarkup;
   }
   addVariation(): void {
@@ -435,49 +439,37 @@ export class ProductEditComponent implements OnInit {
       ListOrder: (this._superMarketplaceProductEditable.Specs?.length || 0) + 1,
       Options: []
     }]
-    updateProductResourceCopy.Specs = [
-      ...newSpec,
-      ...(updateProductResourceCopy.Specs || []),
-    ];
+    updateProductResourceCopy.Specs = updateProductResourceCopy.Specs.concat(newSpec);
     this._superMarketplaceProductEditable = updateProductResourceCopy;
+    this.checkForSpecChanges();
   }
-  addSpecOption(spec: Spec): void {
+  addSpecOption(spec: Spec, specIndex: number): void {
     const updateProductResourceCopy = this.copyProductResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
     );
     let input = (document.getElementById(`${spec.ID}`) as any)
     let markup = (document.getElementById(`${spec.ID}Markup`) as any).value;
-    let optionValue = input.value;
     const newOption = [{
-      ID: optionValue.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, ""),
-      Value: optionValue,
+      ID: input.value.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, ""),
+      Value: input.value,
       ListOrder: (spec as any).Options.length + 1,
       IsOpenText: false,
       PriceMarkupType: markup ? 1 : "NoMarkup",
       PriceMarkup: markup,
       xp: null
     }]
-    let selectedSpec = updateProductResourceCopy.Specs.find(s => s.ID === spec.ID)
-    updateProductResourceCopy.Specs.filter(s => s.ID !== selectedSpec.ID)
-    selectedSpec.Options = [
-      ...newOption,
-      ...selectedSpec.Options,
-    ];
-    updateProductResourceCopy.Specs.concat(selectedSpec)
+    updateProductResourceCopy.Specs[specIndex].Options = updateProductResourceCopy.Specs[specIndex].Options.concat(newOption);
     this._superMarketplaceProductEditable = updateProductResourceCopy;
+    this.checkForSpecChanges();
   };
 
-  removeSpecOption(spec: Spec, option: SpecOption): void {
+  removeSpecOption(specIndex: number, optionIndex: number): void {
     const updateProductResourceCopy = this.copyProductResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
     );
-    let selectedSpec = updateProductResourceCopy.Specs.find(s => s.ID === spec.ID)
-    // remove selected spec from spec array
-    updateProductResourceCopy.Specs.filter(s => s.ID !== selectedSpec.ID)
-    selectedSpec.Options = selectedSpec.Options = selectedSpec.Options.filter(o => o.ID !== option.ID);
-    updateProductResourceCopy.Specs.concat(selectedSpec)
-    console.log(updateProductResourceCopy.Specs)
+    updateProductResourceCopy.Specs[specIndex].Options.splice(optionIndex, 1);
     this._superMarketplaceProductEditable = updateProductResourceCopy;
+    this.checkForSpecChanges();
   };
 
   removeSpec(spec: Spec): void {
@@ -486,7 +478,7 @@ export class ProductEditComponent implements OnInit {
     );
     updateProductResourceCopy.Specs = updateProductResourceCopy.Specs.filter(s => s.ID !== spec.ID);
     this._superMarketplaceProductEditable = updateProductResourceCopy;
-    console.log(this._superMarketplaceProductEditable)
+    this.checkForSpecChanges();
   }
 
   saveSpecChanges(): void {
@@ -501,6 +493,7 @@ export class ProductEditComponent implements OnInit {
     updateProductResourceCopy.Variants = this.generateVariantsFromCurrentSpecs();
     this._superMarketplaceProductEditable = updateProductResourceCopy;
     this.toggleEditSpecs();
+    this.checkForChanges();
   }
 
   generateVariantsFromCurrentSpecs(): Variant[] {
@@ -513,6 +506,7 @@ export class ProductEditComponent implements OnInit {
   };
 
   createVariantsForFirstSpec(spec: Spec): Variant[] {
+    if (!spec) return;
     return (spec as any).Options.map(opt => {
       return {
         ID: `${this._superMarketplaceProductEditable.Product.ID}-${opt.ID}`,
@@ -550,5 +544,18 @@ export class ProductEditComponent implements OnInit {
 
   toggleEditSpecs(): void {
     this.editSpecs = !this.editSpecs;
+  }
+
+  checkForSpecChanges(): void {
+    this.areSpecChanges = JSON.stringify(this._superMarketplaceProductEditable?.Specs) !== JSON.stringify(this._superMarketplaceProductStatic?.Specs);
+  } 
+
+  updateSku($event: any, i: number): void {
+    const updateProductResourceCopy = this.copyProductResource(
+      this._superMarketplaceProductEditable || this.productService.emptyResource
+    );
+    updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, "");
+    this._superMarketplaceProductEditable = updateProductResourceCopy;
+    this.checkForChanges();
   }
 }
