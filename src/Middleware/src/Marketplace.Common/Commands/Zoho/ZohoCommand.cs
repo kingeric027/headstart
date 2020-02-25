@@ -131,32 +131,6 @@ namespace Marketplace.Common.Commands.Zoho
             return items.ToList();
         }
 
-        private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(MarketplaceOrder order, IList<MarketplaceLineItem> lineitems)
-        {
-            // TODO: accomodate possibility of more than 100 line items
-            var products = await Throttler.RunAsync(lineitems.Select(item => item.ProductID).ToList(), 100, 5,
-                s => _oc.Products.GetAsync<MarketplaceProduct>(s));
-
-            var zItems = await Throttler.RunAsync(products.ToList(), 100, 5, product => _zoho.Items.ListAsync(new ZohoFilter()
-            {
-                Key = "sku",
-                Value = product.ID
-            }));
-            var z_items = new Dictionary<string, ZohoLineItem>();
-            foreach (var list in zItems)
-                list.Items.ForEach(item => z_items.Add(item.sku, item));
-
-            var items = await Throttler.RunAsync(products.Select(p => p).ToList(), 100, 5, async product =>
-            {
-                var z_item = z_items.FirstOrDefault(z => z.Key == product.ID);
-                if (z_item.Key != null)
-                    return await _zoho.Items.SaveAsync(
-                        ZohoLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == product.ID), product));
-                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.First(i => i.ProductID == product.ID), product));
-            });
-            return items.ToList();
-        }
-
         private async Task<List<ZohoLineItem>> ApplyShipping(OrderCalculation orderCalculation) {
             //// Step 4: shipping must be added as lineitems on the order
             var z_shipping = await _zoho.Items.ListAsync(new ZohoFilter() { Key = "sku", Value = "shipping"});
