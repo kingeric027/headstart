@@ -17,7 +17,8 @@
   <div class="resource-edit">
     <form *ngIf="resourceForm"
           [formGroup]="resourceForm">
-      <div class="form-group">
+      <div *ngIf="!suggestedAddresses || suggestedAddresses.length === 0"
+           class="form-group">
         <div class="form-group">
           <label for="AddressName">Address Name</label>
           <input type="text"
@@ -122,6 +123,10 @@
                  (input)="handleUpdateResource($event, 'Country')"
                  placeholder="Enter Country Code">
         </div>
+      </div>
+      <div>
+        <address-suggestion (selectedAddress)="handleAddressSelect($event)"
+                            [suggestedAddresses]="suggestedAddresses"></address-suggestion>
       </div>
     </form>
   </div>
