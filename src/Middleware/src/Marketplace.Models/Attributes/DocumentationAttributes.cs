@@ -6,12 +6,11 @@ namespace Marketplace.Models.Attributes
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class MarketplaceSection : DocSection
     {
-        protected MarketplaceSection()
+        public MarketplaceSection()
         {
             
         }
         
-        //TODO: abstract out into custom projects?
         public class OrchestrationAttribute : DocSection { }
         /// <summary>
         /// Use on controllers to indicate that they belong in the Authentication section of the API reference docs.

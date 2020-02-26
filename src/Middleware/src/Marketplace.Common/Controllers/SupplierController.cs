@@ -4,9 +4,13 @@ using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
+using Marketplace.Helpers.SwaggerTools;
+using Marketplace.Models.Attributes;
 
 namespace Marketplace.Common.Controllers
 {
+    [DocComments("\"Suppliers\" represents Supplier in Marketplace")]
+    [MarketplaceSection.Suppliers(ListOrder = 1)]
     [Route("supplier")]
     public class SupplierController : BaseController
     {
@@ -19,6 +23,7 @@ namespace Marketplace.Common.Controllers
             _oc = oc;
         }
 
+        [DocName("POST Supplier")]
         [HttpPost, MarketplaceUserAuth(ApiRole.SupplierAdmin)]
         public async Task<MarketplaceSupplier> Create([FromBody] MarketplaceSupplier supplier)
         {
