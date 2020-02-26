@@ -673,11 +673,13 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "query",
-            "description": "Obj of the marketplace catalog.",
+            "name": "marketplaceCatalog",
+            "in": "body",
             "required": true,
-            "type": "object"
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceCatalog"
+            }
           }
         ],
         "security": [
@@ -712,11 +714,13 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "query",
-            "description": "Obj of the marketplace catalog assignment.",
+            "name": "marketplaceCatalogAssignment",
+            "in": "body",
             "required": true,
-            "type": "object"
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceCatalogAssignment"
+            }
           }
         ],
         "security": [
@@ -751,11 +755,13 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "query",
-            "description": "Obj of the marketplace price schedule.",
+            "name": "marketplacePriceSchedule",
+            "in": "body",
             "required": true,
-            "type": "object"
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplacePriceSchedule"
+            }
           }
         ],
         "security": [
@@ -790,11 +796,13 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "query",
-            "description": "Obj of the marketplace product.",
+            "name": "marketplaceProduct",
+            "in": "body",
             "required": true,
-            "type": "object"
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceProduct"
+            }
           }
         ],
         "security": [
@@ -829,11 +837,13 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "query",
-            "description": "Obj of the marketplace product assignment.",
+            "name": "marketplaceProductAssignment",
+            "in": "body",
             "required": true,
-            "type": "object"
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceProductAssignment"
+            }
           }
         ],
         "security": [
@@ -868,11 +878,13 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "query",
-            "description": "Obj of the marketplace product facet.",
+            "name": "marketplaceProductFacet",
+            "in": "body",
             "required": true,
-            "type": "object"
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceProductFacet"
+            }
           }
         ],
         "security": [
@@ -907,11 +919,13 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "query",
-            "description": "Obj of the marketplace spec.",
+            "name": "marketplaceSpec",
+            "in": "body",
             "required": true,
-            "type": "object"
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceSpec"
+            }
           }
         ],
         "security": [
@@ -946,11 +960,13 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "query",
-            "description": "Obj of the marketplace spec option.",
+            "name": "marketplaceSpecOption",
+            "in": "body",
             "required": true,
-            "type": "object"
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceSpecOption"
+            }
           }
         ],
         "security": [
@@ -985,11 +1001,13 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "query",
-            "description": "Obj of the marketplace spec product assignment.",
+            "name": "marketplaceSpecProductAssignment",
+            "in": "body",
             "required": true,
-            "type": "object"
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceSpecProductAssignment"
+            }
           }
         ],
         "security": [

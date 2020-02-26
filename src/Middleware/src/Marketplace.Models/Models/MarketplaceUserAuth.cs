@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Marketplace.Helpers.SwaggerTools;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
@@ -12,11 +13,6 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Models
 {
-    public interface IApiAuthAttribute
-    {
-        ApiRole[] ApiRoles { get; }
-    }
-
 	public class MarketplaceUserAuthAttribute : AuthorizeAttribute, IApiAuthAttribute
 	{
         public ApiRole[]  ApiRoles { get; }

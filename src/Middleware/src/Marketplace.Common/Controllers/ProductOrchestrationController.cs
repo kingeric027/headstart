@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
-using Marketplace.Common.Helpers.Tools;
+using Marketplace.Helpers.SwaggerTools;
 using Marketplace.Models;
 
 namespace Marketplace.Common.Controllers
