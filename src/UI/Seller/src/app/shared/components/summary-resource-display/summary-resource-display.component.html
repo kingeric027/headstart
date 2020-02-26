@@ -1,19 +1,14 @@
-  <div class="d-flex">
+  <div class="d-flex flex-row">
     <div *ngIf="_shouldShowImage" class="p-2">
     <img alt="Avatar"
          class="avatar rounded-circle"
          src="{{_imgPath}}"
          alt="">
     </div>
-    <div class="p-2">
-    <span class="ml-3 d-flex flex-column justify-content-center">
-      <div class="h6" 
-          [style.marginLeft.px]="getIndent()">{{_primaryHeader}}</div>
-      <div [style.marginLeft.px]="getIndent()">{{_secondaryHeader}}</div>
-      <div>{{isNewPlaceHolder}}</div>
-    </span>
+    <div *ngIf="!_isExpandable" class="align-self-center">
+      <!-- <fa-icon [icon]="faCircle"></fa-icon> -->
     </div>
-    <div *ngIf="_isExpandable" class="ml-auto p-2 align-self-center">
+    <div *ngIf="_isExpandable" class="align-self-center">
       <button *ngIf="!isLoading"
               ngbDropdownItem
               (click)="toggleNestedResources()"  
@@ -26,4 +21,22 @@
          <span class="sr-only">Loading...</span>
         </div>      
       </div>
+    </div>
+    <div class="p-2">
+    <span class="d-flex flex-column">
+      <div class="h6" 
+          [style.marginLeft.px]="getIndent()">{{_primaryHeader}}</div>
+      <div [style.marginLeft.px]="getIndent()">{{_secondaryHeader}}</div>
+      <div>{{isNewPlaceHolder}}</div>
+    </span>
+    </div>
+    <div *ngIf="!checkForParentCategory() && _depthCount !== 2" 
+          class="p-2 ml-auto align-self-center">
+      <button ngbDropdownItem
+              title="Add Sub-Category"
+              (click)="addNestedResource(_secondaryHeader)"
+      >
+        <fa-icon [icon]="faPlus"></fa-icon>
+      </button>
+    </div>
   </div>

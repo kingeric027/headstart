@@ -2,8 +2,9 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { singular } from 'pluralize';
 import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/services/configuration/table-display';
 import { OcCategoryService } from '@ordercloud/angular-sdk';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { PLACEHOLDER_URL, PRODUCT_IMAGE_PATH_STRATEGY, getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'summary-resource-display-component',
@@ -20,10 +21,12 @@ export class SummaryResourceDisplay implements OnChanges {
   _isExpandable = false;
   faChevronDown = faChevronDown;
   faChevronUp = faChevronUp;
+  faPlus = faPlus;
   _isResourceExpanded: boolean;
   _resource: any;
   _resourceList: any;
   _parentResourceID: any = '';
+  _depthCount: number;
 
   @Input()
   set resourceList(value: any) {
@@ -55,7 +58,10 @@ export class SummaryResourceDisplay implements OnChanges {
     }
   }
 
-  constructor(private ocCategoryService: OcCategoryService) {}
+  constructor(
+    private ocCategoryService: OcCategoryService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute) {}
 
   setDisplayValuesForResource(resource: any) {
     this._primaryHeader = this.getValueOnExistingResource(resource, 'toPrimaryHeader');
@@ -106,6 +112,7 @@ export class SummaryResourceDisplay implements OnChanges {
 
   getResourceDepth(resource, depthCount) {
     depthCount++;
+    this._depthCount = depthCount;
     const parentResource = this._resourceList.find(item => item.ID === resource?.ParentID);
     return resource?.ParentID ? this.getResourceDepth(parentResource, depthCount) : depthCount * 10;
   }
@@ -151,6 +158,17 @@ export class SummaryResourceDisplay implements OnChanges {
     } else {
       return [];
     }
+  }
+
+  addNestedResource(resource) {
+    this.router.navigate(['/buyers/anytimefitness/categories/new'], { queryParams: { ParentCategory: resource } });
+  }
+
+  checkForParentCategory() {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const splitUrl = routeUrl.split('/');
+    const endUrl = splitUrl[splitUrl.length - 1];
+    return endUrl.includes('?ParentCategory=' + this._resource?.ID);
   }
 
 }

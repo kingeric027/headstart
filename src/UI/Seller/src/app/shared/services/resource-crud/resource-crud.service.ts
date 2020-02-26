@@ -217,6 +217,14 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async updateResource(resource: any): Promise<any> {
+    if (resource.ParentID) {
+      const parentResourceID = this.getParentResourceID();
+      let numberOfChecks = 0;
+      const validDepth = await this.checkForDepth(parentResourceID, resource.ParentID, numberOfChecks);
+      if (!validDepth) {
+        throw {message: `The ${this.secondaryResourceLevel} cannot be saved this deep into a tree.  Please save this in a higher tier.`}
+      }
+    }
     const newResource = await this.ocService.Save(...this.createListArgs([resource.ID, resource])).toPromise();
     const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
     this.resourceSubject.value.Items[resourceIndex] = newResource;
@@ -237,7 +245,7 @@ export abstract class ResourceCrudService<ResourceType> {
       let numberOfChecks = 0;
       const validDepth = await this.checkForDepth(parentResourceID, resource.ParentID, numberOfChecks);
       if (!validDepth) {
-        throw {message: 'Categories may only exist at the parent, sub-level, or sub-sub-level.'}
+        throw {message: `The ${this.secondaryResourceLevel} cannot be created this deep into a tree.  Please create this in a higher tier.`}
       }
     }
     const newResource = await this.ocService.Create(...this.createListArgs([resource])).toPromise();

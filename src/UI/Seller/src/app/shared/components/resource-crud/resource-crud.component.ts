@@ -15,6 +15,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   selectedResourceID = '';
   updatedResource = {} as ResourceType;
   resourceInSelection = {} as ResourceType;
+  resourceToCreate = {} as any;
   resourceForm: FormGroup;
   isMyResource = false;
 
@@ -220,12 +221,20 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   async createNewResource(): Promise<void> {
     // dataIsSaving indicator is used in the resource table to conditionally tell the
     // submit button to disable
-    
+    this.resourceToCreate = this.updatedResource;
+    const routeUrl = this.router.routerState.snapshot.url;
+    const redirectUrl = routeUrl.split('/');
+    if (!this.resourceToCreate?.ParentID && routeUrl.includes('?')) {
+      const splitUrl = routeUrl.split('=');
+      const endUrl = splitUrl[splitUrl.length - 1];
+      this.resourceToCreate.ParentID = endUrl;
+    }
     try {
       this.dataIsSaving = true;
-      const newResource = await this.ocService.createNewResource(this.updatedResource);
+      const newResource = await this.ocService.createNewResource(this.resourceToCreate);
       this.selectResource(newResource);
       this.dataIsSaving = false;
+      this.router.navigate([`${redirectUrl[1]}/${redirectUrl[2]}/${redirectUrl[3]}`]);
     } catch (ex) {
       this.dataIsSaving = false;
       throw ex;
@@ -238,7 +247,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   private setIsCreatingNew(): void {
     const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
+    const splitUrl = routeUrl.split('/');
+    const endUrl = splitUrl[splitUrl.length - 1];
+    this.isCreatingNew = endUrl.includes('new');
   }
 }
