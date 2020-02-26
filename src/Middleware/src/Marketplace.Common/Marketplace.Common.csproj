@@ -18,6 +18,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
     <PackageReference Include="OrderCloud.SDK" Version="0.7.0" />
     <PackageReference Include="SendGrid" Version="9.12.5" />
+    <PackageReference Include="smartystreets-dotnet-sdk" Version="8.4.1" />
   </ItemGroup>
 
   <ItemGroup>

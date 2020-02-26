@@ -121,7 +121,7 @@ namespace Marketplace.Common.Controllers
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
             var address = payload.Request.Body;
-            return await _addressValidationCommand.IsValidAddressInFreightPopAsync(address);
+            return await _addressValidationCommand.IsValidAddressAsync(address);
         }
 
         [HttpPost, Route("validateselleraddresspatch")]
