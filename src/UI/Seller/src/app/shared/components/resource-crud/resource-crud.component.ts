@@ -183,7 +183,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     if (this.isCreatingNew) {
       this.createNewResource();
     } else {
-      this.updateExitingResource();
+      this.updateExistingResource();
     }
   }
 
@@ -196,7 +196,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.setUpdatedResourceAndResourceForm(this.resourceInSelection);
   }
 
-  async updateExitingResource(): Promise<void> {
+  async updateExistingResource(): Promise<void> {
     // dataIsSaving indicator is used in the resource table to conditionally tell the
     // submit button to disable
     try {
