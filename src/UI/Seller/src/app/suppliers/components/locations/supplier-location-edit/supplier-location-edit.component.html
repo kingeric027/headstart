@@ -117,13 +117,12 @@
       <div *ngIf="suggestedAddresses?.length > 0"
            class="col-md-5">
         <h5>Address Suggestions</h5>
-        <p>The address you've entered was invalid. Please choose from these suggested addresses or try to enter it again.</p>
+        <p>The address you've entered was invalid. Please choose from these suggested addresses or enter a valid address.</p>
       </div>
       <div class="col-md-7 form-group">
         <address-suggestion (selectedAddress)="handleAddressSelect($event)"
                             [suggestedAddresses]="suggestedAddresses"></address-suggestion>
       </div>
-
     </div>
   </form>
 </div>
