@@ -46,6 +46,11 @@ export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddr
     this.updatedResource = address;
   }
 
+  discardChanges(): void {
+    this.suggestedAddresses = null;
+    this.setUpdatedResourceAndResourceForm(this.resourceInSelection);
+  }
+
   async updateExistingResource(): Promise<void> {
     try {
       this.dataIsSaving = true;
