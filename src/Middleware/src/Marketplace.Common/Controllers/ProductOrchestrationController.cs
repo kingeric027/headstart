@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
 using Marketplace.Helpers.SwaggerTools;
 using Marketplace.Models;
+using Marketplace.Models.Attributes;
 
 namespace Marketplace.Common.Controllers
 {
     [DocComments("\"Orchestration\" represents objects exposed for orchestration control")]
-    [DocSection.Orchestration(ListOrder = 1)]
+    [MarketplaceSection.Orchestration(ListOrder = 1)]
     [Route("orchestration/{clientId}")]
     public class ProductOrchestrationController : BaseController
     {
