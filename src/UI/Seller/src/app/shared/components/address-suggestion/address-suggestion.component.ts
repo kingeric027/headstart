@@ -1,14 +1,17 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { ListBuyerAddress, BuyerAddress } from '@ordercloud/angular-sdk';
 
 @Component({
+    selector: 'address-suggestion',
     templateUrl: './address-suggestion.component.html',
     styleUrls: ['./address-suggestion.component.scss'],
 })
 
-export class OCMAddressSuggestion {
-    @Input() suggestedAddresses: ListBuyerAddress;
-    @Output() selectedAddress = new EventEmitter<BuyerAddress>();
+export class AddressSuggestionComponent {
+    @Input()
+    suggestedAddresses: ListBuyerAddress;
+    @Output()
+    selectedAddress = new EventEmitter<BuyerAddress>();
     activeAddress: BuyerAddress;
     constructor() { }
 

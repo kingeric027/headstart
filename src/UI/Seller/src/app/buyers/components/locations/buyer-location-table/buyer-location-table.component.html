@@ -1,7 +1,6 @@
 <resource-table-component [resourceList]="resourceList"
                           [selectedResourceID]="selectedResourceID"
                           [updatedResource]="updatedResource"
-                          [suggestedAddresses]="suggestedAddresses"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
                           [dataIsSaving]="dataIsSaving"
@@ -18,7 +17,8 @@
   <div class="resource-edit">
     <form *ngIf="resourceForm"
           [formGroup]="resourceForm">
-      <div class="form-group">
+      <div *ngIf="!suggestedAddresses"
+           class="form-group">
         <div class="form-group">
           <label for="AddressName">Address Name</label>
           <input type="text"
@@ -123,6 +123,10 @@
                  (input)="handleUpdateResource($event, 'Country')"
                  placeholder="Enter Country Code">
         </div>
+      </div>
+      <div>
+        <address-suggestion (selectedAddress)="handleAddressSelect($event)"
+                            [suggestedAddresses]="suggestedAddresses"></address-suggestion>
       </div>
     </form>
   </div>

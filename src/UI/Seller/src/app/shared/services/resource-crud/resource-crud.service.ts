@@ -374,6 +374,8 @@ export abstract class ResourceCrudService<ResourceType> {
     ex.error.Errors.forEach(err => {
       if (err.ErrorCode === "blocked by web hook") {
         err.Data.Body.SuggestedValidAddresses.forEach(suggestion => {
+          suggestion.ID = address.ID;
+          suggestion.DateCreated = address.DateCreated;
           suggestion.CompanyName = address.CompanyName;
           suggestion.AddressName = address.AddressName;
         });

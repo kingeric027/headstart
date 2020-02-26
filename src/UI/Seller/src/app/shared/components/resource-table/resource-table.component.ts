@@ -69,7 +69,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   filterForm: FormGroup;
   fromDate: string;
   toDate: string;
-  suggestedAddresses: any;
 
   constructor(
     private router: Router,

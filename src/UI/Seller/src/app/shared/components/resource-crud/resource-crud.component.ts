@@ -6,7 +6,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
-import { ListAddress } from '@ordercloud/angular-sdk';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -27,7 +26,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   router: Router;
   isCreatingNew: boolean;
   dataIsSaving = false;
-  suggestedAddresses: ListAddress;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -208,7 +206,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
       this.setUpdatedResourceAndResourceForm(updatedResource);
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
       this.dataIsSaving = false;
       throw ex;
     }
@@ -229,7 +226,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
       this.selectResource(newResource);
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
       this.dataIsSaving = false;
       throw ex;
     }

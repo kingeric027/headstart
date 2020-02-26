@@ -23,6 +23,7 @@ import { UserFormComponent } from '@app-seller/shared/components/user-form/user-
 import { AddressFormComponent } from '@app-seller/shared/components/address-form/address-form.component';
 import { CategoryFormComponent } from './components/category-form/category-form.component';
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
+import { AddressSuggestionComponent } from './components/address-suggestion/address-suggestion.component';
 import { ProductImagesComponent } from './components/product-images/product-images.component';
 import { ProductFormComponent } from './components/products-form/product-form.component';
 import { ResourceTableComponent } from './components/resource-table/resource-table.component';
@@ -79,6 +80,7 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     AddressFormComponent,
     CategoryFormComponent,
     CategoryDetailsComponent,
+    AddressSuggestionComponent,
     ResourceSelectDropdown,
     ProductImagesComponent,
     ProductFormComponent,
@@ -101,6 +103,7 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     AddressFormComponent,
     CategoryFormComponent,
     CategoryDetailsComponent,
+    AddressSuggestionComponent,
     ProductImagesComponent,
     ResourceSelectDropdown,
     ProductFormComponent,
