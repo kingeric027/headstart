@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Extensions;
-using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Helpers.Models;
 using Marketplace.Helpers.Exceptions;

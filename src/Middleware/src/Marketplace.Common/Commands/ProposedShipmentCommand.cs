@@ -1,5 +1,4 @@
 ﻿using Marketplace.Common.Helpers;
-using Marketplace.Common.Models;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
@@ -14,6 +13,7 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Exceptions;
 using Marketplace.Models.Extended;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.Commands
 {

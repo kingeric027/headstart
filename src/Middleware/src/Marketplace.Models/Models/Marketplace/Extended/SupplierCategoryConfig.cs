@@ -1,9 +1,8 @@
-﻿using Marketplace.Helpers.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Marketplace.Helpers.Models;
 
-namespace Marketplace.Common.Models
+namespace Marketplace.Models.Extended
 {
     public class SupplierCategoryConfig : ICosmosObject
     {

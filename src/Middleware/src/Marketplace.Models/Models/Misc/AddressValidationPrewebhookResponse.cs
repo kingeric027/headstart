@@ -1,10 +1,6 @@
-﻿using Marketplace.Helpers.Models;
-using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using OrderCloud.SDK;
 
-namespace Marketplace.Common.Models
+namespace Marketplace.Models.Misc
 {
     public class PrewebhookResponseWithError : WebhookResponse
     {

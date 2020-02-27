@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Models.Exceptions;
 using Marketplace.Models.Misc;
+using Marketplace.Models.Orchestration;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands

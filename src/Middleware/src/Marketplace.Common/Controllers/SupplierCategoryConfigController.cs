@@ -1,5 +1,4 @@
 ﻿using Cosmonaut;
-using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +7,7 @@ using System.Threading.Tasks;
 using Marketplace.Helpers.SwaggerTools;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Controllers
 {

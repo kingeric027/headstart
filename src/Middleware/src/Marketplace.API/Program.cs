@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Marketplace.Common;
 using Marketplace.Helpers.Models;
 using Marketplace.Helpers.Extensions;
-using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
@@ -20,6 +19,8 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Models;
+using Marketplace.Models.Extended;
+using Marketplace.Models.Orchestration;
 using OrderCloud.SDK;
 
 namespace Marketplace.API

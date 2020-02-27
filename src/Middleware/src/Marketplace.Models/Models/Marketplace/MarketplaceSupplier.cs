@@ -5,7 +5,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Models.Models.Marketplace
 {
-    public class MarketplaceSupplier : Supplier<SupplierXp>
+    public class MarketplaceSupplier : Supplier<SupplierXp>, IMarketplaceObject
     {
     }
 

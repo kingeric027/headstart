@@ -1,6 +1,5 @@
 ﻿using Marketplace.Common.Helpers;
 using Marketplace.Common.Mappers;
-using Marketplace.Common.Models;
 using Marketplace.Helpers.Models;
 using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;

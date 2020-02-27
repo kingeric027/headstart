@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
-using Marketplace.Common.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Helpers.Models;
+using Marketplace.Models.Orchestration;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Queries

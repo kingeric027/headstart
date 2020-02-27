@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using Marketplace.Common.Extensions;
-using Marketplace.Common.Models;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Models;
 using Marketplace.Models.Misc;

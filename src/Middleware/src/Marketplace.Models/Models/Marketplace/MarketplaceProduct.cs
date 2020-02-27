@@ -6,10 +6,11 @@ using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribut
 
 namespace Marketplace.Models
 {
-    public class SuperMarketplaceProduct
+    public class SuperMarketplaceProduct : IMarketplaceObject
     {
         public MarketplaceProduct Product { get; set; }
         public PriceSchedule PriceSchedule { get; set; }
+        public string ID { get; set; }
     }
 
     public class PartialMarketplaceProduct : PartialProduct<ProductXp>

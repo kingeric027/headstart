@@ -4,8 +4,8 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Models
 {
-	public class MarketplaceOrder : Order<OrderXp, UserXp, AddressXp>
-	{
+	public class MarketplaceOrder : Order<OrderXp, UserXp, AddressXp>, IMarketplaceObject
+    {
 		public IEnumerable<ProposedShipmentSelection> ShippingSelections { get; set; }
 		public string AvalaraTaxTransactionCode { get; set; }
 	}

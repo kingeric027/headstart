@@ -110,33 +110,6 @@
     }
   },
   "definitions": {
-    "CatalogXp": {
-      "type": "object",
-      "properties": {}
-    },
-    "Inventory": {
-      "type": "object",
-      "properties": {
-        "Enabled": {
-          "type": "boolean"
-        },
-        "NotificationPoint": {
-          "type": "integer"
-        },
-        "VariantLevelTracking": {
-          "type": "boolean"
-        },
-        "OrderCanExceed": {
-          "type": "boolean"
-        },
-        "QuantityAvailable": {
-          "type": "integer"
-        },
-        "LastUpdated": {
-          "type": "string"
-        }
-      }
-    },
     "ListFacet": {
       "type": "object",
       "properties": {
@@ -168,87 +141,45 @@
         }
       }
     },
-    "MarketplaceCatalog": {
+    "ListOrchestrationLog": {
       "type": "object",
       "properties": {
-        "xp": {
-          "$ref": "#/definitions/CatalogXp"
-        },
-        "ID": {
-          "type": "string"
-        },
-        "OwnerID": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "Description": {
-          "type": "string"
-        },
-        "Active": {
-          "type": "boolean"
-        },
-        "CategoryCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "MarketplaceCatalogAssignment": {
-      "type": "object",
-      "properties": {
-        "ID": {
-          "type": "string"
-        },
-        "CatalogID": {
-          "type": "string"
-        },
-        "BuyerID": {
-          "type": "string"
-        },
-        "ViewAllCategories": {
-          "type": "boolean"
-        },
-        "ViewAllProducts": {
-          "type": "boolean"
-        }
-      }
-    },
-    "MarketplacePriceSchedule": {
-      "type": "object",
-      "properties": {
-        "xp": {
-          "$ref": "#/definitions/PriceScheduleXp"
-        },
-        "ID": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "ApplyTax": {
-          "type": "boolean"
-        },
-        "ApplyShipping": {
-          "type": "boolean"
-        },
-        "MinQuantity": {
-          "type": "integer"
-        },
-        "MaxQuantity": {
-          "type": "integer"
-        },
-        "UseCumulativeQuantity": {
-          "type": "boolean"
-        },
-        "RestrictedQuantity": {
-          "type": "boolean"
-        },
-        "PriceBreaks": {
+        "Items": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/PriceBreak"
+            "$ref": "#/definitions/OrchestrationLog"
           }
+        },
+        "Meta": {
+          "$ref": "#/definitions/Meta"
+        }
+      }
+    },
+    "ListProposedShipment": {
+      "type": "object",
+      "properties": {
+        "Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProposedShipment"
+          }
+        },
+        "Meta": {
+          "$ref": "#/definitions/Meta"
+        }
+      }
+    },
+    "ListSuperMarketplaceProduct": {
+      "type": "object",
+      "properties": {
+        "Items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SuperMarketplaceProduct"
+          }
+        },
+        "Meta": {
+          "$ref": "#/definitions/Meta"
         }
       }
     },
@@ -311,136 +242,6 @@
         }
       }
     },
-    "MarketplaceProductAssignment": {
-      "type": "object",
-      "properties": {
-        "ID": {
-          "type": "string"
-        },
-        "ProductID": {
-          "type": "string"
-        },
-        "BuyerID": {
-          "type": "string"
-        },
-        "UserGroupID": {
-          "type": "string"
-        },
-        "PriceScheduleID": {
-          "type": "string"
-        }
-      }
-    },
-    "MarketplaceProductFacet": {
-      "type": "object",
-      "properties": {
-        "xp": {
-          "$ref": "#/definitions/ProductFacetXp"
-        },
-        "ID": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "XpPath": {
-          "type": "string"
-        },
-        "ListOrder": {
-          "type": "integer"
-        },
-        "MinCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "MarketplaceSpec": {
-      "type": "object",
-      "properties": {
-        "xp": {
-          "$ref": "#/definitions/SpecXp"
-        },
-        "ID": {
-          "type": "string"
-        },
-        "ListOrder": {
-          "type": "integer"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "DefaultValue": {
-          "type": "string"
-        },
-        "Required": {
-          "type": "boolean"
-        },
-        "AllowOpenText": {
-          "type": "boolean"
-        },
-        "DefaultOptionID": {
-          "type": "string"
-        },
-        "DefinesVariant": {
-          "type": "boolean"
-        },
-        "OptionCount": {
-          "type": "integer"
-        },
-        "Options": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/SpecOption"
-          }
-        }
-      }
-    },
-    "MarketplaceSpecOption": {
-      "type": "object",
-      "properties": {
-        "xp": {
-          "$ref": "#/definitions/SpecOptionXp"
-        },
-        "ID": {
-          "type": "string"
-        },
-        "Value": {
-          "type": "string"
-        },
-        "ListOrder": {
-          "type": "integer"
-        },
-        "IsOpenText": {
-          "type": "boolean"
-        },
-        "PriceMarkupType": {
-          "type": "string"
-        },
-        "PriceMarkup": {
-          "type": "number"
-        }
-      }
-    },
-    "MarketplaceSpecProductAssignment": {
-      "type": "object",
-      "properties": {
-        "ID": {
-          "type": "string"
-        },
-        "SpecID": {
-          "type": "string"
-        },
-        "ProductID": {
-          "type": "string"
-        },
-        "DefaultValue": {
-          "type": "string"
-        },
-        "DefaultOptionID": {
-          "type": "string"
-        }
-      }
-    },
     "Meta": {
       "type": "object",
       "properties": {
@@ -493,31 +294,34 @@
         }
       }
     },
-    "PriceBreak": {
+    "OrchestrationLog": {
       "type": "object",
       "properties": {
-        "Quantity": {
-          "type": "integer"
+        "id": {
+          "type": "string"
         },
-        "Price": {
-          "type": "number"
-        }
-      }
-    },
-    "PriceScheduleXp": {
-      "type": "object",
-      "properties": {}
-    },
-    "ProductFacetXp": {
-      "type": "object",
-      "properties": {
-        "Options": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "timeStamp": {
+          "type": "string"
         },
-        "ParentID": {
+        "ErrorType": {
+          "type": "string"
+        },
+        "Message": {
+          "type": "string"
+        },
+        "Level": {
+          "type": "string"
+        },
+        "ResourceId": {
+          "type": "string"
+        },
+        "RecordId": {
+          "type": "string"
+        },
+        "RecordType": {
+          "type": "string"
+        },
+        "Action": {
           "type": "string"
         }
       }
@@ -559,53 +363,48 @@
         }
       }
     },
-    "SpecOption": {
+    "ProposedShipment": {
+      "type": "object",
+      "properties": {
+        "ProposedShipmentItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProposedShipmentItem"
+          }
+        },
+        "ProposedShipmentOptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProposedShipmentOption"
+          }
+        }
+      }
+    },
+    "ProposedShipmentItem": {
+      "type": "object",
+      "properties": {
+        "LineItemID": {
+          "type": "string"
+        },
+        "Quantity": {
+          "type": "integer"
+        }
+      }
+    },
+    "ProposedShipmentOption": {
       "type": "object",
       "properties": {
         "ID": {
           "type": "string"
         },
-        "Value": {
+        "Name": {
           "type": "string"
         },
-        "ListOrder": {
+        "DeliveryDays": {
           "type": "integer"
         },
-        "IsOpenText": {
-          "type": "boolean"
-        },
-        "PriceMarkupType": {
-          "type": "string"
-        },
-        "PriceMarkup": {
+        "Cost": {
           "type": "number"
-        }
-      }
-    },
-    "SpecOptionXp": {
-      "type": "object",
-      "properties": {
-        "Description": {
-          "type": "string"
-        },
-        "SpecID": {
-          "type": "string"
-        }
-      }
-    },
-    "SpecUI": {
-      "type": "object",
-      "properties": {
-        "ControlType": {
-          "type": "string"
-        }
-      }
-    },
-    "SpecXp": {
-      "type": "object",
-      "properties": {
-        "UI": {
-          "$ref": "#/definitions/SpecUI"
         }
       }
     },
@@ -650,6 +449,462 @@
     }
   },
   "paths": {
+    "{marketplaceID}/images/product/{productID}": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SuperMarketplaceProduct"
+            }
+          }
+        },
+        "operationId": "Post",
+        "tags": [
+          "File"
+        ],
+        "parameters": [
+          {
+            "name": "marketplaceID",
+            "in": "path",
+            "description": "ID of the marketplace.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "productID",
+            "in": "path",
+            "description": "ID of the product.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "file",
+            "in": "query",
+            "description": "File of the super marketplace product.",
+            "required": true,
+            "type": "object"
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "ProductAdmin",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "{marketplaceID}/images/product/{productID}/{fileName}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SuperMarketplaceProduct"
+            }
+          }
+        },
+        "operationId": "Delete",
+        "tags": [
+          "File"
+        ],
+        "parameters": [
+          {
+            "name": "marketplaceID",
+            "in": "path",
+            "description": "ID of the marketplace.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "productID",
+            "in": "path",
+            "description": "ID of the product.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fileName",
+            "in": "path",
+            "description": "File name of the super marketplace product.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "ProductAdmin",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "marketplace/{marketplaceID}/supplier/category/config": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SupplierCategoryConfig"
+            }
+          }
+        },
+        "operationId": "Get",
+        "tags": [
+          "SupplierCategoryConfig"
+        ],
+        "parameters": [
+          {
+            "name": "marketplaceID",
+            "in": "path",
+            "description": "ID of the marketplace.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "SupplierReader",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "orchestration/{clientId}/{buyerId}/address": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceAddress"
+            }
+          }
+        },
+        "operationId": "PostAddress",
+        "tags": [
+          "UserOrchestration"
+        ],
+        "parameters": [
+          {
+            "name": "buyerId",
+            "in": "path",
+            "description": "Buyer id of the marketplace address.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client id of the marketplace address.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "marketplaceAddress",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceAddress"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "orchestration/{clientId}/{buyerId}/addressassignment": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceAddressAssignment"
+            }
+          }
+        },
+        "operationId": "PostAddressAssignment",
+        "tags": [
+          "UserOrchestration"
+        ],
+        "parameters": [
+          {
+            "name": "buyerId",
+            "in": "path",
+            "description": "Buyer id of the marketplace address assignment.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client id of the marketplace address assignment.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "marketplaceAddressAssignment",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceAddressAssignment"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "orchestration/{clientId}/{buyerId}/costcenter": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceCostCenter"
+            }
+          }
+        },
+        "operationId": "PostCostCenter",
+        "tags": [
+          "UserOrchestration"
+        ],
+        "parameters": [
+          {
+            "name": "buyerId",
+            "in": "path",
+            "description": "Buyer id of the marketplace cost center.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client id of the marketplace cost center.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "marketplaceCostCenter",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceCostCenter"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "orchestration/{clientId}/{buyerId}/user": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceUser"
+            }
+          }
+        },
+        "operationId": "PostUser",
+        "tags": [
+          "UserOrchestration"
+        ],
+        "parameters": [
+          {
+            "name": "buyerId",
+            "in": "path",
+            "description": "Buyer id of the marketplace user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client id of the marketplace user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "marketplaceUser",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceUser"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "orchestration/{clientId}/{buyerId}/usergroup": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceUserGroup"
+            }
+          }
+        },
+        "operationId": "PostUserGroup",
+        "tags": [
+          "UserOrchestration"
+        ],
+        "parameters": [
+          {
+            "name": "buyerId",
+            "in": "path",
+            "description": "Buyer id of the marketplace user group.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client id of the marketplace user group.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "marketplaceUserGroup",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceUserGroup"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "orchestration/{clientId}/{buyerId}/usergroupassignment": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceUserGroupAssignment"
+            }
+          }
+        },
+        "operationId": "PostUserGroupAssignment",
+        "tags": [
+          "UserOrchestration"
+        ],
+        "parameters": [
+          {
+            "name": "buyerId",
+            "in": "path",
+            "description": "Buyer id of the marketplace user group assignment.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client id of the marketplace user group assignment.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "marketplaceUserGroupAssignment",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceUserGroupAssignment"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "orchestration/{clientId}/buyer": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceBuyer"
+            }
+          }
+        },
+        "operationId": "PostBuyer",
+        "tags": [
+          "UserOrchestration"
+        ],
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client id of the marketplace buyer.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "marketplaceBuyer",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceBuyer"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
     "orchestration/{clientId}/catalog": {
       "post": {
         "responses": {
@@ -685,6 +940,7 @@
         "security": [
           {
             "oauth2": [
+              "CatalogAdmin",
               "FullAccess"
             ]
           }
@@ -726,6 +982,7 @@
         "security": [
           {
             "oauth2": [
+              "CatalogAdmin",
               "FullAccess"
             ]
           }
@@ -767,6 +1024,7 @@
         "security": [
           {
             "oauth2": [
+              "PriceScheduleAdmin",
               "FullAccess"
             ]
           }
@@ -808,6 +1066,7 @@
         "security": [
           {
             "oauth2": [
+              "ProductAdmin",
               "FullAccess"
             ]
           }
@@ -849,6 +1108,7 @@
         "security": [
           {
             "oauth2": [
+              "ProductAdmin",
               "FullAccess"
             ]
           }
@@ -890,6 +1150,7 @@
         "security": [
           {
             "oauth2": [
+              "ProductFacetAdmin",
               "FullAccess"
             ]
           }
@@ -931,6 +1192,7 @@
         "security": [
           {
             "oauth2": [
+              "ProductAdmin",
               "FullAccess"
             ]
           }
@@ -972,6 +1234,7 @@
         "security": [
           {
             "oauth2": [
+              "ProductAdmin",
               "FullAccess"
             ]
           }
@@ -1013,6 +1276,431 @@
         "security": [
           {
             "oauth2": [
+              "ProductAdmin",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "orchestration/logs": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ListOrchestrationLog"
+            }
+          }
+        },
+        "operationId": "List",
+        "tags": [
+          "OrchestrationLog"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Word or phrase to search for.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "searchOn",
+            "in": "query",
+            "description": "Comma-delimited list of fields to search on.",
+            "required": false,
+            "type": "string",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Comma-delimited list of fields to sort by.",
+            "required": false,
+            "type": "string",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page of results to return. Default: 1",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Number of results to return per page. Default: 20, max: 100.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'",
+            "required": false,
+            "type": "object"
+          }
+        ],
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "orders/{orderID}/tax-transaction": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceOrder"
+            }
+          }
+        },
+        "operationId": "ApplyTaxEstimate",
+        "tags": [
+          "TaxTransaction"
+        ],
+        "parameters": [
+          {
+            "name": "orderID",
+            "in": "path",
+            "description": "ID of the order.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "Shopper",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "products": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ListSuperMarketplaceProduct"
+            }
+          }
+        },
+        "operationId": "List",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Word or phrase to search for.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "searchOn",
+            "in": "query",
+            "description": "Comma-delimited list of fields to search on.",
+            "required": false,
+            "type": "string",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Comma-delimited list of fields to sort by.",
+            "required": false,
+            "type": "string",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page of results to return. Default: 1",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Number of results to return per page. Default: 20, max: 100.",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'",
+            "required": false,
+            "type": "object"
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "ProductAdmin",
+              "ProductReader",
+              "FullAccess"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SuperMarketplaceProduct"
+            }
+          }
+        },
+        "operationId": "Post",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "name": "superMarketplaceProduct",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SuperMarketplaceProduct"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "ProductAdmin",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "products/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SuperMarketplaceProduct"
+            }
+          }
+        },
+        "operationId": "Get",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the super marketplace product.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "ProductAdmin",
+              "ProductReader",
+              "FullAccess"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SuperMarketplaceProduct"
+            }
+          }
+        },
+        "operationId": "Put",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the super marketplace product.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "superMarketplaceProduct",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SuperMarketplaceProduct"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "ProductAdmin",
+              "FullAccess"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "operationId": "Delete",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the product.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "ProductAdmin",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "proposedshipment/{orderId}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ListProposedShipment"
+            }
+          }
+        },
+        "operationId": "List",
+        "tags": [
+          "ProposedShipment"
+        ],
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "Order id of the proposed shipment.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "SupplierReader",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "proposedshipment/{orderId}/select": {
+      "put": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceOrder"
+            }
+          }
+        },
+        "operationId": "Select",
+        "tags": [
+          "ProposedShipment"
+        ],
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "Order id of the proposed shipment selection.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "proposedShipmentSelection",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProposedShipmentSelection"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "SupplierReader",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "supplier": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "If ID is provided and an object with that ID already exists, a 409 (conflict) error is returned.",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceSupplier"
+            }
+          }
+        },
+        "operationId": "Create",
+        "tags": [
+          "Supplier"
+        ],
+        "parameters": [
+          {
+            "name": "marketplaceSupplier",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MarketplaceSupplier"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "SupplierAdmin",
               "FullAccess"
             ]
           }

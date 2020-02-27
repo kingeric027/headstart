@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using OrderCloud.SDK;
-namespace Marketplace.Common.Models
+﻿using OrderCloud.SDK;
+
+namespace Marketplace.Models.Misc
 {
 	public class MessageNotification
 	{

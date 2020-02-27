@@ -1,13 +1,14 @@
 ﻿using System;
-using Microsoft.Azure.WebJobs;
-using Newtonsoft.Json.Linq;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
+using Marketplace.Helpers.SwaggerTools;
 using Marketplace.Models.Exceptions;
 using Marketplace.Models.Misc;
+using Microsoft.Azure.WebJobs;
+using Newtonsoft.Json.Linq;
 using Action = Marketplace.Models.Misc.Action;
 
-namespace Marketplace.Common.Models
+namespace Marketplace.Models.Orchestration
 {
     public class OrchestrationLog : ICosmosObject
     {
@@ -58,8 +59,11 @@ namespace Marketplace.Common.Models
         public RecordType? RecordType { get; set; }
         [Sortable]
         public Action? Action { get; set; }
+        [DocIgnore]
         public JObject Current { get; set; }
+        [DocIgnore]
         public JObject Cache { get; set; }
+        [DocIgnore]
         public JObject Diff { get; set; }
     }
 }
