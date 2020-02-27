@@ -12,7 +12,7 @@ namespace Marketplace.Models
         public PriceSchedule PriceSchedule { get; set; }
         public string ID { get; set; }
         public IList<Spec> Specs { get; set; }
-        public IList<Variant> Variants { get; set; }
+        public IList<Variant<MarketplaceVariantXp>> Variants { get; set; }
     }
 
     public class PartialMarketplaceProduct : PartialProduct<ProductXp>
@@ -40,5 +40,17 @@ namespace Marketplace.Models
         public UnitOfMeasure UnitOfMeasure { get; set; } = new UnitOfMeasure();
         public ProductType ProductType { get; set; }
         public List<StaticContent> StaticContent { get; set; } = new List<StaticContent>();
+    }
+
+    public class MarketplaceVariantXp
+    {
+        public List<SpecValue> SpecValues { get; set; }
+        public string NewID { get; set; }
+    }
+
+    public class SpecValue
+    {
+        public string SpecName { get; set; }
+        public string PriceMarkup { get; set; }
     }
 }

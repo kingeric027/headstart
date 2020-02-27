@@ -63,10 +63,11 @@
     }
 }
 
-.variation-form-container {
+.product-table {
     border-radius: $border-radius;
     border: 1px solid hsl(230, 20%, 94%);
     box-shadow: 0 3px 0 hsl(230, 20%, 94%);
+    margin-bottom: 1.5rem;
 }
 
 .spec-option {
@@ -97,6 +98,7 @@
 }
 
 .product-variations {
+    position: relative;
     height: 100%;
     opacity: 100;
     transition: height 350ms ease-in-out, opacity 350ms ease-in-out;
@@ -110,12 +112,8 @@
     box-shadow: 0 2px 0 hsl(230, 20%, 94%);
     margin-bottom: 1.5rem;
     padding-top: 1rem;
-    &:last-of-type {
-        box-shadow: none;
-        margin-bottom: none;
-    }
     @include media-breakpoint-up(lg) {
-         max-width: 30%;
+        max-width: 30%;
     }
 }
 
@@ -127,6 +125,7 @@
 }
 .card-deck .card {
     display: block;
+    margin-bottom: 1rem;
     flex-basis: 100%; /* change this value for each breakpoint*/
     @include media-breakpoint-up(sm) {
         flex-basis: 75%;

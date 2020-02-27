@@ -66,6 +66,8 @@ export class ProductService extends ResourceCrudService<Product> {
       ],
       xp: {},
     },
+    Specs: [],
+    Variants: [],
   };
 
   constructor(

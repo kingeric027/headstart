@@ -62,6 +62,14 @@ export class ProductEditComponent implements OnInit {
   @Input()
   dataIsSaving = false;
 
+  get specsWithVariations() {
+    return this._superMarketplaceProductEditable?.Specs?.filter(s => s.DefinesVariant);
+  }
+
+  get specsWithoutVariations() {
+    return this._superMarketplaceProductEditable?.Specs?.filter(s => !s.DefinesVariant);
+  }
+  
   userContext = {};
   hasVariations = false;
   images: ProductImage[] = [];
@@ -189,7 +197,7 @@ export class ProductEditComponent implements OnInit {
 
   handleDiscardSpecChanges(): void {
     this.editSpecs = !this.editSpecs;
-    this._superMarketplaceProductEditable.Specs = this._superMarketplaceProductStatic?.Specs;
+    this._superMarketplaceProductEditable.Specs = this._superMarketplaceProductEditable?.Specs;
     this.checkForSpecChanges();
   }
 
@@ -424,23 +432,24 @@ export class ProductEditComponent implements OnInit {
     }
     return totalMarkup;
   }
-  addVariation(): void {
+  addSpec(): void {
     const updateProductResourceCopy = this.copyProductResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
     );
     let input = (document.getElementById('AddVariation') as any)
-    let name = input.value;
-    input.value = '';
+    let definesVariant = (document.getElementById(`DefinesVariant`) as any)
     const newSpec = [{
-      ID: `${this._superMarketplaceProductEditable.Product.ID}${name.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, "")}`,
-      Name: name,
+      ID: `${this._superMarketplaceProductEditable.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, "")}`,
+      Name: input.value,
       AllowOpenText: false,
-      DefinesVariant: true,
+      DefinesVariant: definesVariant.checked,
       ListOrder: (this._superMarketplaceProductEditable.Specs?.length || 0) + 1,
       Options: []
     }]
+    input.value = '';
     updateProductResourceCopy.Specs = updateProductResourceCopy.Specs.concat(newSpec);
     this._superMarketplaceProductEditable = updateProductResourceCopy;
+    console.log(updateProductResourceCopy.Specs)
     this.checkForSpecChanges();
   }
   addSpecOption(spec: Spec, specIndex: number): void {
@@ -481,11 +490,6 @@ export class ProductEditComponent implements OnInit {
     this.checkForSpecChanges();
   }
 
-  saveSpecChanges(): void {
-    this.mockVariants();
-    this.toggleEditSpecs();
-  }
-
   mockVariants(): void {
     const updateProductResourceCopy = this.copyProductResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
@@ -497,10 +501,11 @@ export class ProductEditComponent implements OnInit {
   }
 
   generateVariantsFromCurrentSpecs(): Variant[] {
-    const firstSpec = this._superMarketplaceProductEditable.Specs[0];
+    const specsDefiningVariants = this.specsWithVariations;
+    const firstSpec = specsDefiningVariants[0];
     let variants = this.createVariantsForFirstSpec(firstSpec);
-    for (var i = 1; i < this._superMarketplaceProductEditable.Specs.length; i++) {
-      variants = this.combineSpecOptions(variants, this._superMarketplaceProductEditable.Specs[i])
+    for (var i = 1; i < specsDefiningVariants.length; i++) {
+      variants = this.combineSpecOptions(variants, specsDefiningVariants[i])
     }
     return variants;
   };
