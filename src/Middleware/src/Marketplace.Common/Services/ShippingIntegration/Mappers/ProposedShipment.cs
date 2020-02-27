@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Mappers
@@ -11,7 +12,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
             {
                 ID = obj.ID,
                 ProposedShipmentItems = obj.ProposedShipmentItems,
-                ProposedShipmentOptions = obj.RateResponseTask.Result.Data.Rates.Select(rate => ProposedShipmentOptionMapper.Map(rate)).ToList()
+                ProposedShipmentOptions = ProposedShipmentOptionsMapper.Map(obj.RateResponseTask.Result.Data.Rates)
             };
         }
     }
