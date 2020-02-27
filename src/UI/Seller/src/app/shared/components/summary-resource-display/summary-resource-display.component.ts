@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { singular } from 'pluralize';
 import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/services/configuration/table-display';
 import { OcCategoryService } from '@ordercloud/angular-sdk';
-import { faChevronDown, faChevronUp, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { PLACEHOLDER_URL, PRODUCT_IMAGE_PATH_STRATEGY, getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
@@ -20,7 +20,7 @@ export class SummaryResourceDisplay implements OnChanges {
   _isNewPlaceHolder = false;
   _isExpandable = false;
   faChevronDown = faChevronDown;
-  faChevronUp = faChevronUp;
+  faChevronRight = faChevronRight;
   faPlus = faPlus;
   _isResourceExpanded: boolean;
   _resource: any;
@@ -114,7 +114,7 @@ export class SummaryResourceDisplay implements OnChanges {
     depthCount++;
     this._depthCount = depthCount;
     const parentResource = this._resourceList.find(item => item.ID === resource?.ParentID);
-    return resource?.ParentID ? this.getResourceDepth(parentResource, depthCount) : depthCount * 10;
+    return resource?.ParentID ? this.getResourceDepth(parentResource, depthCount) : depthCount * 15;
   }
 
   async toggleNestedResources() {
@@ -161,14 +161,19 @@ export class SummaryResourceDisplay implements OnChanges {
   }
 
   addNestedResource(resource) {
+    event.stopPropagation();
     this.router.navigate(['/buyers/anytimefitness/categories/new'], { queryParams: { ParentCategory: resource } });
+    // this.router.navigate([`/buyers/anytimefitness/categories/${this._resource.ID}`], { queryParams: { ParentCategory: resource } });
   }
 
-  checkForParentCategory() {
-    const routeUrl = this.router.routerState.snapshot.url;
-    const splitUrl = routeUrl.split('/');
-    const endUrl = splitUrl[splitUrl.length - 1];
-    return endUrl.includes('?ParentCategory=' + this._resource?.ID);
+  //Nested resources cannot be added beyond a third tier
+  isAtMaximumDepth() {
+    const parentOfResource = this._resource?.ParentID;
+    let parentOfParentOfResource;
+    if (parentOfResource) {
+      parentOfParentOfResource = this._resourceList.find(resource => resource.ID === parentOfResource);
+    }
+    parentOfParentOfResource = parentOfParentOfResource?.ParentID;
+    return (parentOfResource && parentOfParentOfResource);
   }
-
 }

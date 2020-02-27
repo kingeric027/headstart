@@ -697,6 +697,10 @@ export class ResourceEditComponent {
         xp: {},
       },
       properties: {
+        ParentID: {
+          type: 'string',
+          description: 'ID of the parent category.',
+        },
         ID: {
           type: 'string',
         },
@@ -717,10 +721,6 @@ export class ResourceEditComponent {
         Active: {
           type: 'boolean',
           description: 'If false, buyers cannot see this Category or any Categories or Products under it.',
-        },
-        ParentID: {
-          type: 'string',
-          description: 'ID of the parent category.',
         },
         ChildCount: {
           type: 'integer',
@@ -4449,7 +4449,7 @@ export class ResourceEditComponent {
     },
   };
   @Input()
-  set resource(value: any) {
+  set resource(value: any) { 
     this._resource = value;
     this.changeDetectorRef.detectChanges();
   }
@@ -4479,15 +4479,11 @@ export class ResourceEditComponent {
       .filter(r => r.field !== 'xp');
   }
 
-  getValueFromUrlParams() {
-    return this._params;
-  }
-
   checkForParent() {
     const routeUrl = this.router.routerState.snapshot.url;
     const splitUrl = routeUrl.split('/');
     const endUrl = splitUrl[splitUrl.length - 1];
-    let params = endUrl.includes('?ParentCategory') ? endUrl.split('=') : ''
+    let params = endUrl.includes('?ParentCategory') ? endUrl.split('=') : '';
     params = params[1] ? params[1] : '';
     this._params = params;
     return endUrl.includes('?ParentCategory');

@@ -253,7 +253,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     const splitUrl = routeUrl.split('/');
     const endUrl = splitUrl[splitUrl.length - 1];
     this.isCreatingNew = endUrl.includes('new');
-    this.isCreatingSubResource = endUrl.includes('ParentCategory');
+    this.isCreatingSubResource = endUrl.includes('new?');
   }
 
   private setBreadCrumbs() {

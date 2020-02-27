@@ -5,16 +5,20 @@
          src="{{_imgPath}}"
          alt="">
     </div>
-    <div *ngIf="!_isExpandable" class="align-self-center">
-      <!-- <fa-icon [icon]="faCircle"></fa-icon> -->
+    <div *ngIf="!_isExpandable && resourceType === 'categories' && !isAtMaximumDepth()" class="align-self-center category-buttons"
+          [style.marginLeft.px]="getIndent()">
     </div>
-    <div *ngIf="_isExpandable" class="align-self-center">
+    <div *ngIf="!_isExpandable && resourceType === 'categories' && isAtMaximumDepth()" class="align-self-center category-no-buttons">
+    </div>
+    <div *ngIf="_isExpandable && resourceType === 'categories'" 
+          class="align-self-center category-buttons"
+          [style.marginLeft.px]="getIndent()">
       <button *ngIf="!isLoading"
               ngbDropdownItem
               (click)="toggleNestedResources()"  
       >
-        <fa-icon *ngIf="!_isResourceExpanded" [icon]="faChevronDown"></fa-icon>
-        <fa-icon *ngIf="_isResourceExpanded" [icon]="faChevronUp"></fa-icon>
+        <fa-icon *ngIf="!_isResourceExpanded" [icon]="faChevronRight"></fa-icon>
+        <fa-icon *ngIf="_isResourceExpanded" [icon]="faChevronDown"></fa-icon>
       </button>
       <div *ngIf="isLoading" class="ml-auto p-2 align-self-center">
         <div class="spinner-border" role="status">
@@ -24,15 +28,16 @@
     </div>
     <div class="p-2">
     <span class="d-flex flex-column">
-      <div class="h6" 
-          [style.marginLeft.px]="getIndent()">{{_primaryHeader}}</div>
-      <div [style.marginLeft.px]="getIndent()">{{_secondaryHeader}}</div>
+      <div class="h6">{{_primaryHeader}}</div>
+      <div>{{_secondaryHeader}}</div>
       <div>{{isNewPlaceHolder}}</div>
     </span>
     </div>
-    <div *ngIf="!checkForParentCategory() && _depthCount !== 2" 
+    <div *ngIf="resourceType === 'categories' && !isAtMaximumDepth()" 
           class="p-2 ml-auto align-self-center">
-      <button ngbDropdownItem
+      <button
+              ngbDropdownItem
+              class="category-buttons"
               title="Add Sub-Category"
               (click)="addNestedResource(_secondaryHeader)"
       >
