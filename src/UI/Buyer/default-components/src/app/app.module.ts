@@ -15,7 +15,7 @@ import { MarketplaceModule, AppConfig } from 'marketplace';
 import { createCustomElement } from '@angular/elements';
 import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
-import { OrderCloudModule } from '@ordercloud/angular-sdk';
+import { OrderCloudModule, Configuration } from '@ordercloud/angular-sdk';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';

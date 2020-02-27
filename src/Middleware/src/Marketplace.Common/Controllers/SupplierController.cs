@@ -19,6 +19,14 @@ namespace Marketplace.Common.Controllers
             _oc = oc;
         }
 
+        [HttpGet, Route("me/{supplierID}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        public async Task<MarketplaceSupplier> GetMySupplier(string supplierID)
+        {
+            // ocAuth is the token for the organization that is specified in the AppSettings
+            var ocAuth = await _oc.AuthenticateAsync();
+            return await _command.GetMySupplier(supplierID, VerifiedUserContext, ocAuth.AccessToken);
+        }
+
         [HttpPost, MarketplaceUserAuth(ApiRole.SupplierAdmin)]
         public async Task<MarketplaceSupplier> Create([FromBody] MarketplaceSupplier supplier)
         {

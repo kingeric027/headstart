@@ -6,9 +6,9 @@ import {
   MarketplaceOrder,
   ListPayment,
   ListLineItem,
-  ProposedShipmentSelection,
   ListBuyerCreditCard,
-  ListProposedShipment,
+  ShipmentPreference,
+  ProposedShipment,
 } from 'marketplace';
 import { CheckoutCreditCardOutput } from '../../payments/payment-credit-card/payment-credit-card.component';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
@@ -25,7 +25,7 @@ export class OCMCheckout implements OnInit {
   payments: ListPayment;
   cards: ListBuyerCreditCard;
   selectedCard: CheckoutCreditCardOutput;
-  proposedShipments: ListProposedShipment = null;
+  proposedShipments: ProposedShipment[] = null;
   currentPanel: string;
   faCheck = faCheck;
   checkout: CheckoutService = this.context.order.checkout;
@@ -68,16 +68,17 @@ export class OCMCheckout implements OnInit {
   }
 
   async doneWithShipToAddress(): Promise<void> {
-    this.proposedShipments = await this.checkout.getProposedShipments();
+    const calculateRatesResponse = await this.checkout.getProposedShipments();
+    this.proposedShipments = calculateRatesResponse.ProposedShipmentRatesResponse.ProposedShipments;
     this.toSection('shippingSelection');
   }
 
-  async onSelectShipRate(selection: ProposedShipmentSelection): Promise<void> {
+  async onSelectShipRate(selection: ShipmentPreference): Promise<void> {
     await this.checkout.selectShippingRate(selection);
   }
 
   async doneWithShippingRates(): Promise<void> {
-    await this.checkout.calculateTax();
+    await this.checkout.calculateOrder();
     this.cards = await this.context.currentUser.cards.List();
     this.toSection('payment');
   }

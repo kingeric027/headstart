@@ -134,6 +134,7 @@ namespace Marketplace.Common.Commands
 		}
 
 		static readonly List<MarketplaceSecurityProfile> DefaultSecurityProfiles = new List<MarketplaceSecurityProfile>() {
+			// seller/supplier
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin, ApiRole.InventoryAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.PriceScheduleReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductAdmin, Roles = new[] { ApiRole.ProductReader, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin } },
@@ -153,6 +154,12 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeSupplierUserAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierUserAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPSupplierUserGroupAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierUserGroupAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPReportReader },
+			
+			// buyer
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPApprovalRuleAdmin , Roles = new[] { ApiRole.ApprovalRuleAdmin } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCreditCardAdmin  , Roles = new[] { ApiRole.MeCreditCardAdmin } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPAddressAdmin  , Roles = new[] { ApiRole.MeAddressAdmin, ApiRole.AddressAdmin } },
 		};
 
 		static readonly List<Webhook> DefaultWebhooks = new List<Webhook>() {

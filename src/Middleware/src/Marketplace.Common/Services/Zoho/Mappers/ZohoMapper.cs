@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
+using Microsoft.EntityFrameworkCore.Internal;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.Zoho.Mappers
@@ -122,7 +124,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoLineItemMapper
     {
-        public static ZohoLineItem Map(LineItem item, MarketplaceProduct product)
+        public static ZohoLineItem Map(MarketplaceLineItem item, MarketplaceProduct product)
         {
             // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()
@@ -150,7 +152,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoLineItem Map(ZohoLineItem zItem, LineItem item, MarketplaceProduct product)
+        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, MarketplaceProduct product)
         {
             // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()
@@ -179,26 +181,32 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static List<ZohoLineItem> Map(MarketplaceOrder order, ZohoLineItem shipping)
+        public static List<ZohoLineItem> Map(OrderCalculation orderCalculation, ZohoLineItem shipping)
         {
-            return order.xp.ProposedShipmentSelections.Select(s => new ZohoLineItem()
-            {
-                item_id = shipping.item_id,
-                item_type = "sales_and_purchases",
-                name = $"{shipping.name} for {s.SupplierID}",
-                rate = decimal.ToDouble(s.Rate),
-                description = $"{shipping.description} for {s.SupplierID}",
-                sku = shipping.sku,
-                quantity = 1
-                //TODO: MODEL ~ Avalara integration evaluation
-                //avatax_tax_code = "FR"
+            return orderCalculation.ProposedShipmentRatesResponse.ProposedShipments.Select(proposedShipment => {
+                var choosenProposedShipmentSelection = proposedShipment.ProposedShipmentOptions.First(proposedShipmentOption => proposedShipmentOption.ID == proposedShipment.SelectedProposedShipmentOptionID);
+                var supplierIDOfShipment = orderCalculation.LineItems.First(lineItem => lineItem.ID == proposedShipment.ProposedShipmentItems.First().LineItemID);
+                return new ZohoLineItem()
+                {
+                    item_id = shipping.item_id,
+                    item_type = "sales_and_purchases",
+
+                    // need to figure out how to set supplier ID here
+                    name = $"{shipping.name} for {supplierIDOfShipment}",
+                    rate = decimal.ToDouble(choosenProposedShipmentSelection.Cost),
+                    description = $"{shipping.description} for {supplierIDOfShipment}",
+                    sku = shipping.sku,
+                    quantity = 1
+                    //TODO: MODEL ~ Avalara integration evaluation
+                    //avatax_tax_code = "FR"
+                };
             }).ToList();
         }
     }
 
     public static class ZohoPurchaseOrderMapper
     {
-        public static ZohoPurchaseOrder Map(ZohoSalesOrder salesorder, Order order, List<ZohoLineItem> items, ListPage<LineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor) {
+        public static ZohoPurchaseOrder Map(ZohoSalesOrder salesorder, Order order, List<ZohoLineItem> items, ListPage<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor) {
             var po = new ZohoPurchaseOrder()
             {
                 //delivery_address = delivery_address,
@@ -226,7 +234,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoSalesOrderMapper
     {
-        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, ListPage<LineItem> lineitems)
+        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, IList<MarketplaceLineItem> lineitems)
         {
             return new ZohoSalesOrder()
             {
@@ -247,8 +255,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     return new ZohoLineItem()
                     {
                         item_id = item.item_id,
-                        quantity = lineitems.Items.FirstOrDefault(li => li.ProductID == item.sku)?.Quantity,
-                        rate = decimal.ToDouble(lineitems.Items.FirstOrDefault(li => li.ProductID == item.sku).UnitPrice.Value)
+                        quantity = lineitems.FirstOrDefault(li => li.ProductID == item.sku)?.Quantity,
+                        rate = decimal.ToDouble(lineitems.FirstOrDefault(li => li.ProductID == item.sku).UnitPrice.Value)
                     };
                 }).ToList(),
                 tax_total = decimal.ToDouble(order.TaxCost),

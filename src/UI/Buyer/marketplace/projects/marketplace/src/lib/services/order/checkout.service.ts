@@ -1,9 +1,4 @@
-import {
-  MarketplaceOrder,
-  CreditCardToken,
-  ListProposedShipment,
-  ProposedShipmentSelection,
-} from '../../shopper-context';
+import { MarketplaceOrder, CreditCardToken } from '../../shopper-context';
 import {
   ListPayment,
   Payment,
@@ -16,6 +11,8 @@ import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
 import { OrderStateService } from './order-state.service';
+import { OrderCalculation, ShipmentPreference } from '../ordercloud-sandbox/ordercloud-sandbox.models';
+import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
 
 export interface ICheckout {
   submit(): Promise<void>;
@@ -28,9 +25,9 @@ export interface ICheckout {
   setShippingAddress(address: Address): Promise<MarketplaceOrder>;
   setBillingAddressByID(addressID: string): Promise<MarketplaceOrder>;
   setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
-  getProposedShipments(): Promise<ListProposedShipment>;
-  selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder>;
-  calculateTax(): Promise<MarketplaceOrder>;
+  getProposedShipments(): Promise<OrderCalculation>;
+  selectShippingRate(selection: ShipmentPreference): Promise<MarketplaceOrder>;
+  calculateOrder(): Promise<MarketplaceOrder>;
   authOnlyOnetimeCreditCard(card: CreditCardToken, cvv: string): Promise<Payment>;
   authOnlySavedCreditCard(cardID: string, cvv: string): Promise<Payment>;
 }
@@ -44,7 +41,8 @@ export class CheckoutService implements ICheckout {
     private ocPaymentService: OcPaymentService,
     private paymentHelper: PaymentHelperService,
     private middlewareApi: MiddlewareApiService,
-    private state: OrderStateService
+    private state: OrderStateService,
+    private orderCloudSandBoxService: OrderCloudSandboxService
   ) {}
 
   async submit(): Promise<void> {
@@ -124,16 +122,21 @@ export class CheckoutService implements ICheckout {
   }
 
   // Integration Methods
-  async getProposedShipments(): Promise<ListProposedShipment> {
-    return await this.middlewareApi.getProposedShipments(this.order.ID);
+  // order cloud sandbox service methods, to be replaced by updated sdk in the future
+  async getProposedShipments(): Promise<OrderCalculation> {
+    return await this.orderCloudSandBoxService.calculateShippingOptions(this.order.ID);
   }
 
-  async selectShippingRate(selection: ProposedShipmentSelection): Promise<MarketplaceOrder> {
-    return (this.order = await this.middlewareApi.selectShippingRate(this.order.ID, selection));
+  async selectShippingRate(selection: ShipmentPreference): Promise<MarketplaceOrder> {
+    const orderCalculation = await this.orderCloudSandBoxService.selectShippingRate(this.order.ID, selection);
+    this.order = orderCalculation.Order;
+    return this.order;
   }
 
-  async calculateTax(): Promise<MarketplaceOrder> {
-    return (this.order = await this.middlewareApi.calculateTax(this.order.ID));
+  async calculateOrder(): Promise<MarketplaceOrder> {
+    const orderCalculation = await this.orderCloudSandBoxService.calculateOrder(this.order.ID);
+    this.order = await orderCalculation.Order;
+    return this.order;
   }
 
   async authOnlyOnetimeCreditCard(card: CreditCardToken, cvv: string): Promise<Payment> {

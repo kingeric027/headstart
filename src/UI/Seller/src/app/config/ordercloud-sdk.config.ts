@@ -1,14 +1,10 @@
-import { ocAppConfig } from '@app-seller/config/app.config';
 import { Configuration } from '@ordercloud/angular-sdk';
+import { environment } from '../../environments/environment';
 
-export function OcSDKConfig() {
-  const apiurl = 'https://api.ordercloud.io';
-  const apiVersion = 'v1';
-  const authUrl = 'https://auth.ordercloud.io/oauth/token';
-
+export const OcSDKConfig = (): Configuration => {
   return new Configuration({
-    basePath: `${apiurl}/${apiVersion}`,
-    authPath: authUrl,
-    cookiePrefix: ocAppConfig.appname.replace(/ /g, '_').toLowerCase(),
+    basePath: `${environment.orderCloudApiUrl}/${environment.orderCloudApiVersion}`,
+    authPath: `${environment.orderCloudAuthUrl}`,
+    cookiePrefix: environment.appname.replace(/ /g, '_').toLowerCase(),
   });
-}
+};

@@ -3,10 +3,13 @@
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 
 export const environment = {
-  hostedApp: false,
-  appname: 'Marketplace Admin Demo',
+  hostedApp: true,
   clientID: '1FF8EA5D-7666-44AF-AFC5-EBD38DB94108',
-  middlewareUrl: 'https://marketplace-api-demo.azurewebsites.net',
+  middlewareUrl: 'https://marketplace-api-qa.azurewebsites.net',
+  appname: 'Marketplace Admin Demo',
   marketplaceID: 'seb',
-  cmsUrl: 'https://mkpldemo.blob.core.windows.net',
+  cmsUrl: 'https://marketplaceqa.blob.core.windows.net',
+  orderCloudApiUrl: 'https://api.ordercloud.io',
+  orderCloudAuthUrl: 'https://auth.ordercloud.io/oauth/token',
+  orderCloudApiVersion: 'v1',
 };

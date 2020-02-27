@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ProposedShipment, ProposedShipmentSelection } from 'marketplace';
+import { ProposedShipment, ShipmentPreference } from 'marketplace';
 import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
@@ -7,13 +7,14 @@ import { FormGroup, FormControl } from '@angular/forms';
   styleUrls: ['./shipping-selection-form.component.scss'],
 })
 export class OCMShippingSelectionForm implements OnInit {
-  @Input() proposedShipment: ProposedShipment;
+  _proposedShipment: ProposedShipment;
+  @Input() set proposedShipment(value: ProposedShipment) {
+    this._proposedShipment = value;
+    this.setSelectedRate(value.SelectedProposedShipmentOptionID);
+  };
   @Input() shipFromAddressID: string;
   @Input() supplierID: string;
-  @Input() set selectedProposedShipmentOptionID(value: string) {
-    this.setSelectedRate(value);
-  }
-  @Output() selectionChanged = new EventEmitter<ProposedShipmentSelection>();
+  @Output() selectionChanged = new EventEmitter<ShipmentPreference>();
 
   form: FormGroup;
 
@@ -30,13 +31,9 @@ export class OCMShippingSelectionForm implements OnInit {
 
   onFormChanges(): void {
     const selectedProposedShipmentOptionID = this.form.value.proposedShipmentOptionID;
-    const rate = this.proposedShipment.ProposedShipmentOptions
-      .find(proposedShipment => proposedShipment.ID === selectedProposedShipmentOptionID).Cost
     this.selectionChanged.emit({
-      SupplierID: this.supplierID,
-      ShipFromAddressID: this.shipFromAddressID,
       ProposedShipmentOptionID: selectedProposedShipmentOptionID,
-      Rate: rate
+      ProposedShipmentID: this._proposedShipment.ID
     });
   }
 }
