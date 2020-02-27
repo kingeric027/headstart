@@ -1,24 +1,29 @@
 <div *ngIf="!isLoading">
-<button *ngIf="addressType && addressType === 'Billing'"
-        class="btn btn-secondary mb-3 ml-2"
-        (click)="useShippingAsBilling()">Use Shipping Address</button>
-<div class="form-group">
-  <label for="selectAddress">{{addressType && addressType === 'Shipping' ? 'Shipping' : 'Billing'}} Address</label>
-    <select (change)="toggleShowAddressForm($event)" class="form-control" id="selectAddress">
-      <option default disabled>Choose from your saved addresses, or choose to enter a new address</option>
-      <option *ngFor="let address of existingAddresses?.Items" [value]="address.ID">
+  <button *ngIf="addressType && addressType === 'Billing'"
+          class="btn btn-secondary mb-3 ml-2"
+          (click)="useShippingAsBilling()">Use Shipping Address</button>
+  <div class="form-group">
+    <label for="selectAddress">{{addressType}} Address</label>
+    <select (change)="toggleShowAddressForm($event)"
+            class="form-control"
+            id="selectAddress">
+      <option default
+              disabled>Choose from your saved addresses, or choose to enter a new address</option>
+      <option *ngFor="let address of existingAddresses?.Items"
+              [value]="address.ID">
         <span class="font-weight-bold">{{address.Street1}}<span *ngIf="address.Street2"> {{address.Street2}}</span>,
-         {{address.City}} {{address.State}} {{address.Zip}}</span>
+          {{address.City}} {{address.State}} {{address.Zip}}</span>
       </option>
       <option value="new">Add a New Address</option>
     </select>
     <button type="submit"
-    (click)="saveAddress(selectedAddress)"
-    class="btn btn-primary btn-sm mr-2 mt-3">Save and Continue</button>
-</div>
-<ocm-address-form *ngIf="showAddAddressForm" [existingAddress]="selectedAddress"
-                  [showOptionToSave]="true"
-                  (formSubmitted)="saveAddress($event.detail.address, $event.detail.formDirty, $event.detail.shouldSaveAddress)"
-                  [btnText]="'Save and Continue'">
-</ocm-address-form>
+            (click)="saveAddress(selectedAddress)"
+            class="btn btn-primary btn-sm mr-2 mt-3">Save and Continue</button>
+  </div>
+  <ocm-address-form *ngIf="showAddAddressForm"
+                    [existingAddress]="selectedAddress"
+                    [showOptionToSave]="true"
+                    (formSubmitted)="saveAddress($event.detail.address, $event.detail.formDirty, $event.detail.shouldSaveAddress)"
+                    [btnText]="'Save and Continue'">
+  </ocm-address-form>
 </div>

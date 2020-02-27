@@ -79,6 +79,11 @@ export interface OrderFilters {
   toDate?: string;
 }
 
+export enum OrderAddressType {
+  Billing = 'Billing',
+  Shipping = 'Shipping',
+}
+
 export enum OrderStatus {
   AllSubmitted = '!Unsubmitted',
   Unsubmitted = 'Unsubmitted',
@@ -86,7 +91,7 @@ export enum OrderStatus {
   Declined = 'Declined',
   Open = 'Open',
   Completed = 'Completed',
-  Canceled = 'Canceled'
+  Canceled = 'Canceled',
 }
 
 export interface CreditCard {

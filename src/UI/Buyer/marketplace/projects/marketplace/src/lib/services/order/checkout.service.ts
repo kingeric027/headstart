@@ -1,4 +1,4 @@
-import { MarketplaceOrder, CreditCardToken } from '../../shopper-context';
+import { MarketplaceOrder, CreditCardToken, OrderAddressType } from '../../shopper-context';
 import {
   ListPayment,
   Payment,
@@ -6,6 +6,7 @@ import {
   OcOrderService,
   OcPaymentService,
   Address,
+  BuyerAddress,
 } from '@ordercloud/angular-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
@@ -21,10 +22,8 @@ export interface ICheckout {
   createPayment(payment: Payment): Promise<Payment>;
   createSavedCCPayment(card: BuyerCreditCard): Promise<Payment>;
   createOneTimeCCPayment(card: CreditCardToken): Promise<Payment>;
-  setBillingAddress(address: Address): Promise<MarketplaceOrder>;
-  setShippingAddress(address: Address): Promise<MarketplaceOrder>;
-  setBillingAddressByID(addressID: string): Promise<MarketplaceOrder>;
-  setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
+  setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder>;
+  setAddress(type: OrderAddressType, address: BuyerAddress): Promise<MarketplaceOrder>;
   getProposedShipments(): Promise<OrderCalculation>;
   selectShippingRate(selection: ShipmentPreference): Promise<MarketplaceOrder>;
   calculateOrder(): Promise<MarketplaceOrder>;
@@ -54,27 +53,19 @@ export class CheckoutService implements ICheckout {
     return await this.patch({ Comments: comment });
   }
 
-  async setBillingAddress(address: Address): Promise<MarketplaceOrder> {
-    return (this.order = await this.ocOrderService.SetBillingAddress('outgoing', this.order.ID, address).toPromise());
-  }
-
-  async setShippingAddress(address: Address): Promise<MarketplaceOrder> {
-    return (this.order = await this.ocOrderService.SetShippingAddress('outgoing', this.order.ID, address).toPromise());
-  }
-
-  async setBillingAddressByID(addressID: string): Promise<MarketplaceOrder> {
-    try {
-      return await this.patch({ BillingAddressID: addressID });
-    } catch (ex) {
-      if (ex.error.Errors[0].ErrorCode === 'NotFound') {
-        throw Error('You no longer have access to this saved address. Please enter or select a different one.');
-      }
+  async setAddress(type: OrderAddressType, address: BuyerAddress): Promise<MarketplaceOrder> {
+    if (type === OrderAddressType.Billing) {
+      this.order = await this.ocOrderService.SetBillingAddress('outgoing', this.order.ID, address).toPromise();
+    } else if (type === OrderAddressType.Shipping) {
+      this.order = await this.ocOrderService.SetShippingAddress('outgoing', this.order.ID, address).toPromise();
     }
+    return this.order;
   }
 
-  async setShippingAddressByID(addressID: string): Promise<MarketplaceOrder> {
+  async setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder> {
+    const patch = { [`${type.toString()}AddressID`]: addressID };
     try {
-      return await this.patch({ ShippingAddressID: addressID });
+      return await this.patch(patch);
     } catch (ex) {
       if (ex.error.Errors[0].ErrorCode === 'NotFound') {
         throw Error('You no longer have access to this saved address. Please enter or select a different one.');
