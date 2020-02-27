@@ -148,9 +148,20 @@ namespace Marketplace.Common.Commands.Crud
             // Check if Variants differ
             var variantsAdded = requestVariants.Where(v => !existingVariants.Any(v2 => v2.ID == v.ID)).ToList();
             var variantsRemoved = existingVariants.Where(v => !requestVariants.Any(v2 => v2.ID == v.ID)).ToList();
+            // IF variants differ, then re-generate variants and re-patch IDs to match the user input.
             if (variantsAdded.Count > 0 || variantsRemoved.Count > 0)
             {
-                var stopper = "STOP";
+                // Generate Variants
+                await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: user.AccessToken);
+                // Patch Variants with the User Specified ID (SKU)
+                var createVariantRequests = superProduct.Variants.Select(variant =>
+                {
+                    var oldVariantID = variant.ID;
+                    variant.ID = variant.xp.NewID ?? variant.ID;
+                    variant.Name = variant.xp.NewID ?? variant.ID;
+                    return _oc.Products.SaveVariantAsync(id, oldVariantID, variant, accessToken: user.AccessToken);
+                });
+                await Task.WhenAll(createVariantRequests);
             };
             // List Variants
             var _variants = await _oc.Products.ListVariantsAsync<Variant<MarketplaceVariantXp>>(id, accessToken: user.AccessToken);
