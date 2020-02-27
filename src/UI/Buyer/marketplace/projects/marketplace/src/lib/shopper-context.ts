@@ -11,6 +11,7 @@ import {
   Meta,
   Supplier,
   Address,
+  BuyerCreditCard,
 } from '@ordercloud/angular-sdk';
 
 export * from '@ordercloud/angular-sdk';
@@ -184,6 +185,12 @@ export class AppConfig {
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
   scope: string[];
+}
+
+export interface CreditCardPayment {
+  SavedCard?: BuyerCreditCard;
+  NewCard?: CreditCardToken;
+  CVV: string;
 }
 
 export interface DecodedOCToken {

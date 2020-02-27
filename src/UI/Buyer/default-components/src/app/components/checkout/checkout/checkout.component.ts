@@ -9,8 +9,8 @@ import {
   ListBuyerCreditCard,
   ShipmentPreference,
   ProposedShipment,
+  CreditCardPayment,
 } from 'marketplace';
-import { CheckoutCreditCardOutput } from '../../payments/payment-credit-card/payment-credit-card.component';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 
 @Component({
@@ -24,7 +24,7 @@ export class OCMCheckout implements OnInit {
   lineItems: ListLineItem;
   payments: ListPayment;
   cards: ListBuyerCreditCard;
-  selectedCard: CheckoutCreditCardOutput;
+  selectedCard: CreditCardPayment;
   proposedShipments: ProposedShipment[] = null;
   currentPanel: string;
   faCheck = faCheck;
@@ -83,16 +83,16 @@ export class OCMCheckout implements OnInit {
     this.toSection('payment');
   }
 
-  async onCardSelected(output: CheckoutCreditCardOutput): Promise<void> {
+  async onCardSelected(output: CreditCardPayment): Promise<void> {
     this.selectedCard = output;
-    if (output.savedCard) {
-      await this.checkout.createSavedCCPayment(output.savedCard);
+    if (output.SavedCard) {
+      await this.checkout.createSavedCCPayment(output.SavedCard);
     } else {
       // need to figure out how to use the platform. ran into creditCardID cannot be null.
       // so for now I always save any credit card in OC.
       // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
-      this.selectedCard.savedCard = await this.context.currentUser.cards.Save(output.newCard);
-      await this.checkout.createSavedCCPayment(this.selectedCard.savedCard);
+      this.selectedCard.SavedCard = await this.context.currentUser.cards.Save(output.NewCard);
+      await this.checkout.createSavedCCPayment(this.selectedCard.SavedCard);
     }
 
     this.payments = await this.checkout.listPayments();
@@ -100,15 +100,9 @@ export class OCMCheckout implements OnInit {
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
-    const orderID = this.order.ID;
+    const orderID = this.order.ID; // submit() will reset this.order
     await this.checkout.addComment(comment);
-    // TODO - these auth calls probably need to be enforced in the middleware, not frontend.
-    if (this.selectedCard.savedCard) {
-      await this.checkout.authOnlySavedCreditCard(this.selectedCard.savedCard.ID, this.selectedCard.cvv);
-    } else {
-      await this.checkout.authOnlyOnetimeCreditCard(this.selectedCard.newCard, this.selectedCard.cvv);
-    }
-    await this.checkout.submit();
+    await this.checkout.submit(this.selectedCard);
 
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(orderID);

@@ -1,4 +1,4 @@
-import { MarketplaceOrder, CreditCardToken, OrderAddressType } from '../../shopper-context';
+import { MarketplaceOrder, CreditCardToken, OrderAddressType, CreditCardPayment } from '../../shopper-context';
 import {
   ListPayment,
   Payment,
@@ -16,19 +16,16 @@ import { OrderCalculation, ShipmentPreference } from '../ordercloud-sandbox/orde
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
 
 export interface ICheckout {
-  submit(): Promise<void>;
+  submit(card: CreditCardPayment): Promise<void>;
   addComment(comment: string): Promise<MarketplaceOrder>;
   listPayments(): Promise<ListPayment>;
-  createPayment(payment: Payment): Promise<Payment>;
   createSavedCCPayment(card: BuyerCreditCard): Promise<Payment>;
   createOneTimeCCPayment(card: CreditCardToken): Promise<Payment>;
-  setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder>;
   setAddress(type: OrderAddressType, address: BuyerAddress): Promise<MarketplaceOrder>;
+  setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder>;
   getProposedShipments(): Promise<OrderCalculation>;
   selectShippingRate(selection: ShipmentPreference): Promise<MarketplaceOrder>;
   calculateOrder(): Promise<MarketplaceOrder>;
-  authOnlyOnetimeCreditCard(card: CreditCardToken, cvv: string): Promise<Payment>;
-  authOnlySavedCreditCard(cardID: string, cvv: string): Promise<Payment>;
 }
 
 @Injectable({
@@ -44,7 +41,9 @@ export class CheckoutService implements ICheckout {
     private orderCloudSandBoxService: OrderCloudSandboxService
   ) {}
 
-  async submit(): Promise<void> {
+  async submit(card: CreditCardPayment): Promise<void> {
+    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.
+    await this.middlewareApi.authorizeCreditCard(this.order.ID, card);
     await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
     await this.state.reset();
   }
@@ -78,38 +77,13 @@ export class CheckoutService implements ICheckout {
   }
 
   async createSavedCCPayment(card: BuyerCreditCard): Promise<Payment> {
-    return await this.createPayment({
-      Amount: this.order.Total,
-      DateCreated: new Date().toDateString(),
-      Accepted: false,
-      Type: 'CreditCard',
-      CreditCardID: card.ID,
-      xp: {
-        partialAccountNumber: card.PartialAccountNumber,
-        cardType: card.CardType,
-      },
-    });
+    return await this.createCCPayment(card.PartialAccountNumber, card.CardType, card.ID);
   }
 
   async createOneTimeCCPayment(card: CreditCardToken): Promise<Payment> {
-    return await this.createPayment({
-      Amount: this.order.Total,
-      DateCreated: new Date().toDateString(),
-      Accepted: false,
-      Type: 'CreditCard',
-      CreditCardID: null,
-      xp: {
-        // This slice() is sooo crucial. Otherwise we would be storing creditcard numbers in xp.
-        // Which would be really really bad.
-        partialAccountNumber: card.AccountNumber.slice(-4),
-        cardType: card.CardType,
-      },
-    });
-  }
-
-  async createPayment(payment: Payment): Promise<Payment> {
-    await this.deleteExistingPayments(); // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
-    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
+    // This slice() is sooo crucial. Otherwise we would be storing creditcard numbers in xp.
+    // Which would be really really bad.
+    return await this.createCCPayment(card.AccountNumber.slice(-4), card.CardType, null);
   }
 
   // Integration Methods
@@ -130,15 +104,24 @@ export class CheckoutService implements ICheckout {
     return this.order;
   }
 
-  async authOnlyOnetimeCreditCard(card: CreditCardToken, cvv: string): Promise<Payment> {
-    return await this.middlewareApi.authOnlyCreditCard(this.order.ID, card, cvv);
-  }
-
-  async authOnlySavedCreditCard(cardID: string, cvv: string): Promise<Payment> {
-    return await this.middlewareApi.authOnlySavedCreditCard(this.order.ID, cardID, cvv);
-  }
-
   // Private Methods
+
+  private async createCCPayment(partialAccountNum: string, cardType: string, creditCardID: string): Promise<Payment> {
+    await this.deleteExistingPayments(); // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
+    const payment = {
+      Amount: this.order.Total,
+      DateCreated: new Date().toDateString(),
+      Accepted: false,
+      Type: 'CreditCard',
+      CreditCardID: creditCardID,
+      xp: {
+        partialAccountNumber: partialAccountNum,
+        cardType: cardType,
+      },
+    };
+    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
+  }
+
   private async deleteExistingPayments(): Promise<any[]> {
     const payments = await this.ocPaymentService.List('outgoing', this.order.ID).toPromise();
     const deleteAll = payments.Items.map(payment =>
