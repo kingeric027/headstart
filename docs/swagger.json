@@ -110,6 +110,36 @@
     }
   },
   "definitions": {
+    "AddressXp": {
+      "type": "object",
+      "properties": {}
+    },
+    "BuyerXp": {
+      "type": "object",
+      "properties": {}
+    },
+    "CatalogXp": {
+      "type": "object",
+      "properties": {}
+    },
+    "Contact": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Email": {
+          "type": "string"
+        },
+        "Phone": {
+          "type": "string"
+        }
+      }
+    },
+    "CostCenterXp": {
+      "type": "object",
+      "properties": {}
+    },
     "ListFacet": {
       "type": "object",
       "properties": {
@@ -183,6 +213,283 @@
         }
       }
     },
+    "MarketplaceAddress": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/AddressXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "DateCreated": {
+          "type": "string"
+        },
+        "CompanyName": {
+          "type": "string"
+        },
+        "FirstName": {
+          "type": "string"
+        },
+        "LastName": {
+          "type": "string"
+        },
+        "Street1": {
+          "type": "string"
+        },
+        "Street2": {
+          "type": "string"
+        },
+        "City": {
+          "type": "string"
+        },
+        "State": {
+          "type": "string"
+        },
+        "Zip": {
+          "type": "string"
+        },
+        "Country": {
+          "type": "string"
+        },
+        "Phone": {
+          "type": "string"
+        },
+        "AddressName": {
+          "type": "string"
+        }
+      }
+    },
+    "MarketplaceAddressAssignment": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "AddressID": {
+          "type": "string"
+        },
+        "UserID": {
+          "type": "string"
+        },
+        "UserGroupID": {
+          "type": "string"
+        },
+        "IsShipping": {
+          "type": "boolean"
+        },
+        "IsBilling": {
+          "type": "boolean"
+        }
+      }
+    },
+    "MarketplaceBuyer": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/BuyerXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "DefaultCatalogID": {
+          "type": "string"
+        },
+        "Active": {
+          "type": "boolean"
+        }
+      }
+    },
+    "MarketplaceCatalog": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/CatalogXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "OwnerID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "Active": {
+          "type": "boolean"
+        },
+        "CategoryCount": {
+          "type": "integer"
+        }
+      }
+    },
+    "MarketplaceCatalogAssignment": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "CatalogID": {
+          "type": "string"
+        },
+        "BuyerID": {
+          "type": "string"
+        },
+        "ViewAllCategories": {
+          "type": "boolean"
+        },
+        "ViewAllProducts": {
+          "type": "boolean"
+        }
+      }
+    },
+    "MarketplaceCostCenter": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/CostCenterXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string"
+        }
+      }
+    },
+    "MarketplaceOrder": {
+      "type": "object",
+      "properties": {
+        "ShippingSelections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProposedShipmentSelection"
+          }
+        },
+        "AvalaraTaxTransactionCode": {
+          "type": "string"
+        },
+        "xp": {
+          "$ref": "#/definitions/OrderXp"
+        },
+        "FromUser": {
+          "$ref": "#/definitions/User<UserXp>"
+        },
+        "BillingAddress": {
+          "$ref": "#/definitions/Address<AddressXp>"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "FromCompanyID": {
+          "type": "string"
+        },
+        "ToCompanyID": {
+          "type": "string"
+        },
+        "FromUserID": {
+          "type": "string"
+        },
+        "BillingAddressID": {
+          "type": "string"
+        },
+        "ShippingAddressID": {
+          "type": "string"
+        },
+        "Comments": {
+          "type": "string"
+        },
+        "LineItemCount": {
+          "type": "integer"
+        },
+        "Status": {
+          "type": "string"
+        },
+        "DateCreated": {
+          "type": "string"
+        },
+        "DateSubmitted": {
+          "type": "string"
+        },
+        "DateApproved": {
+          "type": "string"
+        },
+        "DateDeclined": {
+          "type": "string"
+        },
+        "DateCanceled": {
+          "type": "string"
+        },
+        "DateCompleted": {
+          "type": "string"
+        },
+        "Subtotal": {
+          "type": "number"
+        },
+        "ShippingCost": {
+          "type": "number"
+        },
+        "TaxCost": {
+          "type": "number"
+        },
+        "PromotionDiscount": {
+          "type": "number"
+        },
+        "Total": {
+          "type": "number"
+        },
+        "IsSubmitted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "MarketplacePriceSchedule": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/PriceScheduleXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "ApplyTax": {
+          "type": "boolean"
+        },
+        "ApplyShipping": {
+          "type": "boolean"
+        },
+        "MinQuantity": {
+          "type": "integer"
+        },
+        "MaxQuantity": {
+          "type": "integer"
+        },
+        "UseCumulativeQuantity": {
+          "type": "boolean"
+        },
+        "RestrictedQuantity": {
+          "type": "boolean"
+        },
+        "PriceBreaks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PriceBreak"
+          }
+        }
+      }
+    },
     "MarketplaceProduct": {
       "type": "object",
       "properties": {
@@ -238,6 +545,231 @@
           "$ref": "#/definitions/Inventory"
         },
         "DefaultSupplierID": {
+          "type": "string"
+        }
+      }
+    },
+    "MarketplaceProductAssignment": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "ProductID": {
+          "type": "string"
+        },
+        "BuyerID": {
+          "type": "string"
+        },
+        "UserGroupID": {
+          "type": "string"
+        },
+        "PriceScheduleID": {
+          "type": "string"
+        }
+      }
+    },
+    "MarketplaceProductFacet": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/ProductFacetXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "XpPath": {
+          "type": "string"
+        },
+        "ListOrder": {
+          "type": "integer"
+        },
+        "MinCount": {
+          "type": "integer"
+        }
+      }
+    },
+    "MarketplaceSpec": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/SpecXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "ListOrder": {
+          "type": "integer"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "DefaultValue": {
+          "type": "string"
+        },
+        "Required": {
+          "type": "boolean"
+        },
+        "AllowOpenText": {
+          "type": "boolean"
+        },
+        "DefaultOptionID": {
+          "type": "string"
+        },
+        "DefinesVariant": {
+          "type": "boolean"
+        },
+        "OptionCount": {
+          "type": "integer"
+        },
+        "Options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SpecOption"
+          }
+        }
+      }
+    },
+    "MarketplaceSpecOption": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/SpecOptionXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "string"
+        },
+        "ListOrder": {
+          "type": "integer"
+        },
+        "IsOpenText": {
+          "type": "boolean"
+        },
+        "PriceMarkupType": {
+          "type": "string"
+        },
+        "PriceMarkup": {
+          "type": "number"
+        }
+      }
+    },
+    "MarketplaceSpecProductAssignment": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "SpecID": {
+          "type": "string"
+        },
+        "ProductID": {
+          "type": "string"
+        },
+        "DefaultValue": {
+          "type": "string"
+        },
+        "DefaultOptionID": {
+          "type": "string"
+        }
+      }
+    },
+    "MarketplaceSupplier": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/SupplierXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Active": {
+          "type": "boolean"
+        }
+      }
+    },
+    "MarketplaceUser": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/UserXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Username": {
+          "type": "string"
+        },
+        "Password": {
+          "type": "string"
+        },
+        "FirstName": {
+          "type": "string"
+        },
+        "LastName": {
+          "type": "string"
+        },
+        "Email": {
+          "type": "string"
+        },
+        "Phone": {
+          "type": "string"
+        },
+        "TermsAccepted": {
+          "type": "string"
+        },
+        "Active": {
+          "type": "boolean"
+        },
+        "AvailableRoles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "DateCreated": {
+          "type": "string"
+        },
+        "PasswordLastSetDate": {
+          "type": "string"
+        }
+      }
+    },
+    "MarketplaceUserGroup": {
+      "type": "object",
+      "properties": {
+        "xp": {
+          "$ref": "#/definitions/UserGroupXp"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string"
+        }
+      }
+    },
+    "MarketplaceUserGroupAssignment": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "UserGroupID": {
+          "type": "string"
+        },
+        "UserID": {
           "type": "string"
         }
       }
@@ -326,6 +858,38 @@
         }
       }
     },
+    "OrderXp": {
+      "type": "object",
+      "properties": {
+        "ProposedShipmentSelections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProposedShipmentSelection"
+          }
+        },
+        "AvalaraTaxTransactionCode": {
+          "type": "string"
+        }
+      }
+    },
+    "PriceScheduleXp": {
+      "type": "object",
+      "properties": {}
+    },
+    "ProductFacetXp": {
+      "type": "object",
+      "properties": {
+        "Options": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ParentID": {
+          "type": "string"
+        }
+      }
+    },
     "ProductImage": {
       "type": "object",
       "properties": {
@@ -363,48 +927,115 @@
         }
       }
     },
-    "ProposedShipment": {
+    "ProposedShipmentSelection": {
       "type": "object",
       "properties": {
-        "ProposedShipmentItems": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ProposedShipmentItem"
-          }
-        },
-        "ProposedShipmentOptions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ProposedShipmentOption"
-          }
-        }
-      }
-    },
-    "ProposedShipmentItem": {
-      "type": "object",
-      "properties": {
-        "LineItemID": {
+        "SupplierID": {
           "type": "string"
         },
-        "Quantity": {
-          "type": "integer"
+        "ShipFromAddressID": {
+          "type": "string"
+        },
+        "ProposedShipmentOptionID": {
+          "type": "string"
+        },
+        "Rate": {
+          "type": "number"
         }
       }
     },
-    "ProposedShipmentOption": {
+    "SpecOptionXp": {
       "type": "object",
       "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "SpecID": {
+          "type": "string"
+        }
+      }
+    },
+    "SpecUI": {
+      "type": "object",
+      "properties": {
+        "ControlType": {
+          "type": "string"
+        }
+      }
+    },
+    "SpecXp": {
+      "type": "object",
+      "properties": {
+        "UI": {
+          "$ref": "#/definitions/SpecUI"
+        }
+      }
+    },
+    "SuperMarketplaceProduct": {
+      "type": "object",
+      "properties": {
+        "Product": {
+          "$ref": "#/definitions/MarketplaceProduct"
+        },
+        "PriceSchedule": {
+          "$ref": "#/definitions/PriceSchedule"
+        },
         "ID": {
           "type": "string"
-        },
-        "Name": {
+        }
+      }
+    },
+    "SupplierCategoriesFilter": {
+      "type": "object",
+      "properties": {
+        "Display": {
           "type": "string"
         },
-        "DeliveryDays": {
-          "type": "integer"
+        "Path": {
+          "type": "string"
         },
-        "Cost": {
-          "type": "number"
+        "Values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "SupplierCategoryConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "timeStamp": {
+          "type": "string"
+        },
+        "MarketplaceName": {
+          "type": "string"
+        },
+        "Filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SupplierCategoriesFilter"
+          }
+        }
+      }
+    },
+    "SupplierXp": {
+      "type": "object",
+      "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "Images": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProductImage"
+          }
+        },
+        "SupportContact": {
+          "$ref": "#/definitions/Contact"
         }
       }
     },
@@ -446,6 +1077,14 @@
           "type": "string"
         }
       }
+    },
+    "UserGroupXp": {
+      "type": "object",
+      "properties": {}
+    },
+    "UserXp": {
+      "type": "object",
+      "properties": {}
     }
   },
   "paths": {
