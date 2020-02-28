@@ -496,6 +496,7 @@ export class ProductEditComponent implements OnInit {
     );
     updateProductResourceCopy.Variants = this.generateVariantsFromCurrentSpecs();
     this._superMarketplaceProductEditable = updateProductResourceCopy;
+    console.log(this._superMarketplaceProductEditable.Variants);
     this.toggleEditSpecs();
     this.checkForChanges();
   }
@@ -519,7 +520,8 @@ export class ProductEditComponent implements OnInit {
         Active: true,
         xp: {
           SpecValues:[{
-            SpecName: opt.Value,
+            SpecName: spec.Name,
+            SpecOptionValue: opt.Value,
             PriceMarkup: opt.PriceMarkup
           }]
         }
@@ -537,7 +539,8 @@ export class ProductEditComponent implements OnInit {
           Active: true,
           xp: {
             SpecValues:[...variant.xp.SpecValues, {
-              SpecName: opt.Value,
+              SpecName: spec.Name,
+              SpecOptionValue: opt.Value,
               PriceMarkup: opt.PriceMarkup
             }]
           }

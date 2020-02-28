@@ -100,7 +100,7 @@ namespace Marketplace.Common.Commands.Crud
                 var oldVariantID = variant.ID;
                 variant.ID = variant.xp.NewID ?? variant.ID;
                 variant.Name = variant.xp.NewID ?? variant.ID;
-                return _oc.Products.SaveVariantAsync(_product.ID, oldVariantID, variant, accessToken: user.AccessToken);
+                return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = variant.ID, Name = variant.Name, xp = variant.xp }, accessToken: user.AccessToken);
             });
             await Task.WhenAll(createVariantRequests);
             // List Variants
@@ -119,16 +119,32 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct superProduct, VerifiedUserContext user)
         {
-            // Two spec lists to compare
-            IList<Spec> requestSpecs = superProduct.Specs;
-            IList<Variant<MarketplaceVariantXp>> requestVariants = superProduct.Variants;
+            // Two spec lists to compare (requestSpecs and existingSpecs)
+            IList<Spec> requestSpecs = superProduct.Specs.ToList();
             IList<Spec> existingSpecs = (await _oc.Products.ListSpecsAsync(id, accessToken: user.AccessToken)).Items.ToList();
+            // Two variant lists to compare (requestVariants and existingVariants)
+            IList<Variant<MarketplaceVariantXp>> requestVariants = superProduct.Variants;
             IList<Variant> existingVariants = (await _oc.Products.ListVariantsAsync(id, pageSize: 100, accessToken: user.AccessToken)).Items.ToList();
+            // Calculate differences in specs - specs to add, and specs to delete
             var specsToAdd = requestSpecs.Where(s => !existingSpecs.Any(s2 => s2.ID == s.ID)).ToList();
             var specsToDelete = existingSpecs.Where(s => !requestSpecs.Any(s2 => s2.ID == s.ID)).ToList();
-            // Create new specs
-            var addSpecRequests = specsToAdd.Select(spec => _oc.Specs.CreateAsync(spec, accessToken: user.AccessToken));
-            await Task.WhenAll(addSpecRequests);
+            // Get spec options to add -- WAIT ON THESE, RUN PARALLEL THE ADD AND DELETE SPEC REQUESTS
+            foreach (var rSpec in requestSpecs)
+            {
+                foreach (var eSpec in existingSpecs)
+                {
+                    if (rSpec.ID == eSpec.ID)
+                    {
+                        var optionsToAdd = rSpec.Options.Where(rso => !eSpec.Options.Any(eso => eso.ID == rso.ID)).Select(opt => _oc.Specs.CreateOptionAsync(rSpec.ID, opt, accessToken: user.AccessToken));
+                        var optionsToDelete = eSpec.Options.Where(eso => !rSpec.Options.Any(rso => rso.ID == eso.ID)).Select(opt => _oc.Specs.DeleteOptionAsync(rSpec.ID, opt.ID, accessToken: user.AccessToken));
+                        var allOptionRequests = optionsToDelete.Concat(optionsToAdd);
+                        await Task.WhenAll(allOptionRequests);
+                    }
+                };
+            };
+            // Create new specs and Delete removed specs
+            var allSpecRequests = specsToAdd.Select(spec => _oc.Specs.CreateAsync(spec, accessToken: user.AccessToken)).Concat(specsToDelete.Select(spec => _oc.Specs.DeleteAsync(spec.ID, accessToken: user.AccessToken)));
+            await Task.WhenAll(allSpecRequests);
             // Add spec options for new specs
             foreach (var spec in specsToAdd)
             {
@@ -138,33 +154,30 @@ namespace Marketplace.Common.Commands.Crud
             // Make assignments for the new specs
             var newSpecAssignments = specsToAdd.Select(spec => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = id, SpecID = spec.ID }, accessToken: user.AccessToken));
             await Task.WhenAll(newSpecAssignments);
-            // Delete removed specs
-            var removeSpecProductAssignments = specsToDelete.Select(spec => _oc.Specs.DeleteProductAssignmentAsync(spec.ID, id, accessToken: user.AccessToken));
-            await Task.WhenAll(removeSpecProductAssignments);
-            var deleteSpecRequests = specsToDelete.Select(spec => _oc.Specs.DeleteAsync(spec.ID, accessToken: user.AccessToken));
-            await Task.WhenAll(deleteSpecRequests);
-            var _updatedPriceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
-            var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
             // Check if Variants differ
-            var variantsAdded = requestVariants.Where(v => !existingVariants.Any(v2 => v2.ID == v.ID)).ToList();
-            var variantsRemoved = existingVariants.Where(v => !requestVariants.Any(v2 => v2.ID == v.ID)).ToList();
+            var variantsAdded = requestVariants.Any(v => !existingVariants.Any(v2 => v2.ID == v.ID));
+            var variantsRemoved = existingVariants.Any(v => !requestVariants.Any(v2 => v2.ID == v.ID));
             // IF variants differ, then re-generate variants and re-patch IDs to match the user input.
-            if (variantsAdded.Count > 0 || variantsRemoved.Count > 0)
+            if (variantsAdded || variantsRemoved)
             {
-                // Generate Variants
+                // Re-generate Variants
                 await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: user.AccessToken);
-                // Patch Variants with the User Specified ID (SKU)
+                // Patch NEW variants with the User Specified ID (Name,ID), and correct xp values (SKU)
                 var createVariantRequests = superProduct.Variants.Select(variant =>
                 {
                     var oldVariantID = variant.ID;
                     variant.ID = variant.xp.NewID ?? variant.ID;
                     variant.Name = variant.xp.NewID ?? variant.ID;
-                    return _oc.Products.SaveVariantAsync(id, oldVariantID, variant, accessToken: user.AccessToken);
+                    return _oc.Products.PatchVariantAsync(id, oldVariantID, new PartialVariant { ID = variant.ID, Name = variant.Name, xp = variant.xp }, accessToken: user.AccessToken);
                 });
                 await Task.WhenAll(createVariantRequests);
             };
+            // Update the Product PriceSchedule
+            var _updatedPriceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
+            // Update the Product itself
+            var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
             // List Variants
-            var _variants = await _oc.Products.ListVariantsAsync<Variant<MarketplaceVariantXp>>(id, accessToken: user.AccessToken);
+            var _variants = await _oc.Products.ListVariantsAsync<Variant<MarketplaceVariantXp>>(id, pageSize: 100, accessToken: user.AccessToken);
             // List Product Specs
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
             return new SuperMarketplaceProduct

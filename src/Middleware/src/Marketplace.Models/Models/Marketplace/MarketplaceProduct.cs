@@ -51,6 +51,7 @@ namespace Marketplace.Models
     public class SpecValue
     {
         public string SpecName { get; set; }
+        public string SpecOptionValue { get; set; }
         public string PriceMarkup { get; set; }
     }
 }
