@@ -105,17 +105,17 @@
                                            (onScrollEnd)="handleScrollEnd($event)">
         </product-tax-code-select-component>
         <div class="form-group">
-          <label for="Type">Product Type</label>
+          <label for="ProductType">Product Type</label>
           <select type="dropdown"
                   class="form-control"
-                  id="Type"
+                  id="ProductType"
                   aria-describedby="Product type"
-                  placeholder="Choose product type">
-            <option default
+                  placeholder="Choose product type"
+                  (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
+            <option selected="selected"
                     disabled>Choose a product type</option>
-            <option>Color</option>
-            <option>Size</option>
-            <option>Height</option>
+            <option value="Standard">Standard</option>
+            <option value="Quote">Quote</option>
           </select>
         </div>
       </div>
