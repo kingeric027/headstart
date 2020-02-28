@@ -12,117 +12,12 @@
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
-
-  <!-- edit supplier address -->
-  <div class="resource-edit">
-    <form *ngIf="resourceForm"
-          [formGroup]="resourceForm">
-      <div class="form-group">
-        <div class="form-group">
-          <label for="AddressName">Address Name</label>
-          <input type="text"
-                 class="form-control"
-                 id="AddressName"
-                 showErrors
-                 aria-describedby="Address Name"
-                 maxlength="100"
-                 [resourceForm]="resourceForm"
-                 formControlName="AddressName"
-                 (input)="handleUpdateResource($event, 'AddressName')"
-                 placeholder="Enter Address Name">
-        </div>
-        <div class="form-group">
-          <label for="Company Name">Company Name</label>
-          <input type="text"
-                 class="form-control"
-                 id="Company Name"
-                 showErrors
-                 aria-describedby="Company Name"
-                 maxlength="100"
-                 [resourceForm]="resourceForm"
-                 formControlName="CompanyName"
-                 (input)="handleUpdateResource($event, 'CompanyName')"
-                 placeholder="Enter Company Name">
-        </div>
-        <div class="form-group">
-          <label for="Street 1">Street 1</label>
-          <input type="text"
-                 class="form-control"
-                 id="Street 1"
-                 showErrors
-                 aria-describedby="Street 1"
-                 maxlength="100"
-                 [resourceForm]="resourceForm"
-                 formControlName="Street1"
-                 (input)="handleUpdateResource($event, 'Street1')"
-                 placeholder="Enter Street 1">
-        </div>
-        <div class="form-group">
-          <label for="Street2">Street 2</label>
-          <input type="text"
-                 class="form-control"
-                 id="Street 2"
-                 showErrors
-                 aria-describedby="Street 2"
-                 maxlength="100"
-                 [resourceForm]="resourceForm"
-                 formControlName="Street2"
-                 (input)="handleUpdateResource($event, 'Street 2')"
-                 placeholder="Enter Street 2">
-        </div>
-        <div class="form-group">
-          <label for="City">City</label>
-          <input type="text"
-                 class="form-control"
-                 id="City"
-                 showErrors
-                 aria-describedby="City"
-                 maxlength="100"
-                 [resourceForm]="resourceForm"
-                 formControlName="City"
-                 (input)="handleUpdateResource($event, 'City')"
-                 placeholder="Enter City">
-        </div>
-        <div class="form-group">
-          <label for="State">State</label>
-          <input type="text"
-                 class="form-control"
-                 id="State"
-                 showErrors
-                 maxlength="100"
-                 aria-describedby="State"
-                 [resourceForm]="resourceForm"
-                 formControlName="State"
-                 (input)="handleUpdateResource($event, 'State')"
-                 placeholder="Enter State">
-        </div>
-        <div class="form-group">
-          <label for="Zip">Zip</label>
-          <input type="text"
-                 class="form-control"
-                 id="Zip"
-                 showErrors
-                 maxlength="100"
-                 aria-describedby="Zip"
-                 [resourceForm]="resourceForm"
-                 formControlName="Zip"
-                 (input)="handleUpdateResource($event, 'Zip')"
-                 placeholder="Enter Zip">
-        </div>
-        <div class="form-group">
-          <label for="Country">Country Code</label>
-          <input type="text"
-                 class="form-control"
-                 id="CountryCode"
-                 showErrors
-                 aria-describedby="Country Code"
-                 maxlength="2"
-                 [resourceForm]="resourceForm"
-                 formControlName="Country"
-                 (input)="handleUpdateResource($event, 'Country')"
-                 placeholder="Enter Country Code">
-        </div>
-      </div>
-    </form>
-  </div>
+  <app-supplier-location-edit class="resource-edit"
+                              *ngIf="resourceForm"
+                              [resourceForm]="resourceForm"
+                              [suggestedAddresses]="suggestedAddresses"
+                              [filterConfig]="filterConfig"
+                              (updateResource)="updateResource($event)"
+                              (selectAddress)="handleAddressSelect($event)">
+  </app-supplier-location-edit>
 </resource-table-component>

@@ -1,0 +1,129 @@
+<div class="container-fluid resource-edit">
+  <form [formGroup]="resourceForm">
+    <div *ngIf="!suggestedAddresses || suggestedAddresses?.length === 0"
+         class="row pt-3">
+      <div class="col-md-5">
+        <h5>Address Details</h5>
+        <p>These are the details of this Buyer Purchasing Location</p>
+      </div>
+      <div class="col-md-7 form-group">
+        <div class="form-group">
+          <label for="AddressName">Address Name</label>
+          <input type="text"
+                 class="form-control"
+                 id="AddressName"
+                 showErrors
+                 aria-describedby="Address Name"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="AddressName"
+                 (input)="updateResourceFromEvent($event, 'AddressName')"
+                 placeholder="Enter Address Name">
+        </div>
+        <div class="form-group">
+          <label for="Company Name">Company Name</label>
+          <input type="text"
+                 class="form-control"
+                 id="Company Name"
+                 showErrors
+                 aria-describedby="Company Name"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="CompanyName"
+                 (input)="updateResourceFromEvent($event, 'CompanyName')"
+                 placeholder="Enter Company Name">
+        </div>
+        <div class="form-group">
+          <label for="Street 1">Street 1</label>
+          <input type="text"
+                 class="form-control"
+                 id="Street 1"
+                 showErrors
+                 aria-describedby="Street 1"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="Street1"
+                 (input)="updateResourceFromEvent($event, 'Street1')"
+                 placeholder="Enter Street 1">
+        </div>
+        <div class="form-group">
+          <label for="Street2">Street 2</label>
+          <input type="text"
+                 class="form-control"
+                 id="Street 2"
+                 showErrors
+                 aria-describedby="Street 2"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="Street2"
+                 (input)="updateResourceFromEvent($event, 'Street 2')"
+                 placeholder="Enter Street 2">
+        </div>
+        <div class="form-group">
+          <label for="City">City</label>
+          <input type="text"
+                 class="form-control"
+                 id="City"
+                 showErrors
+                 aria-describedby="City"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="City"
+                 (input)="updateResourceFromEvent($event, 'City')"
+                 placeholder="Enter City">
+        </div>
+        <div class="form-group">
+          <label for="State">State</label>
+          <input type="text"
+                 class="form-control"
+                 id="State"
+                 showErrors
+                 maxlength="100"
+                 aria-describedby="State"
+                 [resourceForm]="resourceForm"
+                 formControlName="State"
+                 (input)="updateResourceFromEvent($event, 'State')"
+                 placeholder="Enter State">
+        </div>
+        <div class="form-group">
+          <label for="Zip">Zip</label>
+          <input type="text"
+                 class="form-control"
+                 id="Zip"
+                 showErrors
+                 maxlength="100"
+                 aria-describedby="Zip"
+                 [resourceForm]="resourceForm"
+                 formControlName="Zip"
+                 (input)="updateResourceFromEvent($event, 'Zip')"
+                 placeholder="Enter Zip">
+        </div>
+        <div class="form-group">
+          <label for="Country">Country Code</label>
+          <input type="text"
+                 class="form-control"
+                 id="CountryCode"
+                 showErrors
+                 aria-describedby="Country Code"
+                 maxlength="2"
+                 [resourceForm]="resourceForm"
+                 formControlName="Country"
+                 (input)="updateResourceFromEvent($event, 'Country')"
+                 placeholder="Enter Country Code">
+        </div>
+      </div>
+    </div>
+    <div class="row pt-3">
+      <div *ngIf="suggestedAddresses?.length > 0"
+           class="col-md-5">
+        <h5>Address Suggestions</h5>
+        <p>The address you've entered was invalid. Please choose from these suggested addresses or enter a valid address.</p>
+      </div>
+      <div class="col-md-7 form-group">
+        <address-suggestion (selectedAddress)="handleAddressSelect($event)"
+                            [suggestedAddresses]="suggestedAddresses"></address-suggestion>
+      </div>
+
+    </div>
+  </form>
+</div>

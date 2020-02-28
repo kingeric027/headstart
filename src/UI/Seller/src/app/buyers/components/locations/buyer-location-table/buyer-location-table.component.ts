@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { BuyerAddress } from '@ordercloud/angular-sdk';
+import { BuyerAddress, ListAddress, Address } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ValidateUSZip, ValidatePhone } from '@app-seller/validators/validators';
@@ -27,6 +27,10 @@ function createBuyerLocationForm(supplierLocation: BuyerAddress) {
   styleUrls: ['./buyer-location-table.component.scss'],
 })
 export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddress> {
+
+  suggestedAddresses: ListAddress;
+  selectedAddress: Address;
+
   constructor(
     private buyerLocationService: BuyerLocationService,
     changeDetectorRef: ChangeDetectorRef,
@@ -36,5 +40,43 @@ export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddr
     ngZone: NgZone
   ) {
     super(changeDetectorRef, buyerLocationService, router, activatedroute, ngZone, createBuyerLocationForm);
+  }
+
+  handleAddressSelect(address) {
+    this.updatedResource = address;
+  }
+
+  discardChanges(): void {
+    this.suggestedAddresses = null;
+    this.setUpdatedResourceAndResourceForm(this.resourceInSelection);
+  }
+
+  async updateExistingResource(): Promise<void> {
+    try {
+      this.dataIsSaving = true;
+      const updatedResource = await this.ocService.updateResource(this.updatedResource);
+      this.resourceInSelection = this.copyResource(updatedResource);
+      this.setUpdatedResourceAndResourceForm(updatedResource);
+      this.suggestedAddresses = null;
+      this.dataIsSaving = false;
+    } catch (ex) {
+      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
+      this.dataIsSaving = false;
+      throw ex;
+    }
+  }
+
+  async createNewResource(): Promise<void> {
+    try {
+      this.dataIsSaving = true;
+      const newResource = await this.ocService.createNewResource(this.updatedResource);
+      this.selectResource(newResource);
+      this.suggestedAddresses = null;
+      this.dataIsSaving = false;
+    } catch (ex) {
+      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
+      this.dataIsSaving = false;
+      throw ex;
+    }
   }
 }

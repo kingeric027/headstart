@@ -70,8 +70,8 @@ namespace Marketplace.Common.Commands
 
             if (order.BillingAddress == null)
             {
-                var address = await _oc.Me.GetAddressAsync(order.BillingAddressID, user.AccessToken);
-                order.BillingAddress = new MarketplaceAddress()
+                var address = await _oc.Me.GetAddressAsync<MarketplaceAddressMeBuyer>(order.BillingAddressID, user.AccessToken);
+                order.BillingAddress = new MarketplaceAddressBuyer()
                 {
                     AddressName = address.AddressName,
                     City = address.City,
