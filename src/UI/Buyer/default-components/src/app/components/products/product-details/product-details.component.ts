@@ -46,7 +46,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   ngOnInit(): void {
-    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
+    this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
 
   onSpecFormChange(event): void {

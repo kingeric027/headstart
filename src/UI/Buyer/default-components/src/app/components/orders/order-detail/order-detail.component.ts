@@ -17,7 +17,7 @@ export class OCMOrderDetails implements OnInit {
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
 
-  constructor(private context: ShopperContextService, private modalService: NgbModal) { }
+  constructor(private context: ShopperContextService, private modalService: NgbModal) {}
 
   async ngOnInit(): Promise<void> {
     this.orderDetails = await this.context.orderHistory.getOrderDetails();
@@ -39,7 +39,7 @@ export class OCMOrderDetails implements OnInit {
   }
 
   isFavorite(orderID: string): boolean {
-    return this.context.currentUser.favoriteOrderIDs.includes(orderID);
+    return this.context.currentUser.get().FavoriteOrderIDs.includes(orderID);
   }
 
   toggleFavorite(order: MarketplaceOrder): void {
@@ -74,7 +74,8 @@ export class OCMOrderDetails implements OnInit {
       return;
     }
     if (response.InvalidLi.length && response.ValidLi.length) {
-      this.message.string = '<strong>Warning</strong> The following line items are not available for reorder, clicking add to cart will <strong>only</strong> add valid line items.';
+      this.message.string =
+        '<strong>Warning</strong> The following line items are not available for reorder, clicking add to cart will <strong>only</strong> add valid line items.';
       this.message.classType = 'warning';
       return;
     }

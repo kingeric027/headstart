@@ -115,7 +115,7 @@ export class OrderFilterService implements IOrderFilters {
     const { page, sortBy, search, showOnlyFavorites, status, fromDate, toDate } = this.activeFiltersSubject.value;
     const from = fromDate ? `>${fromDate}` : undefined;
     const to = toDate ? `<${toDate}` : undefined;
-    const favorites = this.currentUser.favoriteOrderIDs.join('|') || undefined;
+    const favorites = this.currentUser.get().FavoriteOrderIDs.join('|') || undefined;
     return {
       page,
       search,

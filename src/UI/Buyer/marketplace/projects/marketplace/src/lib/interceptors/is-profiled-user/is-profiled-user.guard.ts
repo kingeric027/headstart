@@ -9,6 +9,6 @@ export class IsProfiledUserGuard implements CanActivate {
   constructor(private currentUser: CurrentUserService) {}
 
   canActivate(): boolean {
-    return !this.currentUser.isAnonymous;
+    return !this.currentUser.isAnonymous();
   }
 }

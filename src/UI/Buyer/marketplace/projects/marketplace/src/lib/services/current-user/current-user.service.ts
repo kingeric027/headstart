@@ -5,19 +5,19 @@ import { TokenHelperService } from '../token-helper/token-helper.service';
 import { CurrentUserAddressService, ICurrentUserAddress } from './address.service';
 import { ICreditCards, CreditCardService } from './credit-card.service';
 
+export interface CurrentUser extends MeUser {
+  FavoriteProductIDs: string[];
+  FavoriteOrderIDs: string[];
+}
+
 export interface ICurrentUser {
-  favoriteProductIDs: string[];
-  favoriteOrderIDs: string[];
-  isAnonymous: boolean;
   addresses: ICurrentUserAddress;
   cards: ICreditCards;
-  get(): MeUser;
-  patch(user: MeUser): Promise<MeUser>;
-  onUserChange(callback: (user: User) => void): void; // TODO - replace all these onChange functions with real Observables. More powerful
-  onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void;
-  onFavoriteProductsChange(callback: (productIDs: string[]) => void): void;
+  get(): CurrentUser;
+  patch(user: MeUser): Promise<CurrentUser>;
+  onChange(callback: (user: CurrentUser) => void): void; // TODO - replace all these onChange functions with real Observables. More powerful
+  isAnonymous(): boolean;
   setIsFavoriteProduct(isFav: boolean, productID: string): void;
-  onFavoriteOrdersChange(callback: (orderIDs: string[]) => void): void;
   setIsFavoriteOrder(isFav: boolean, orderID: string): void;
 }
 
@@ -29,10 +29,8 @@ export class CurrentUserService implements ICurrentUser {
   private readonly favOrdersXP = 'FavoriteOrders';
   private readonly favProductsXP = 'FavoriteProducts';
 
-  private userSubject: BehaviorSubject<MeUser> = new BehaviorSubject<MeUser>(null);
-  private isAnonSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
-  private favoriteOrdersSubject: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
-  private favoriteProductsSubject: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  private isAnon: boolean = null;
+  private userSubject: BehaviorSubject<CurrentUser> = new BehaviorSubject<CurrentUser>(null);
 
   constructor(
     private ocMeService: OcMeService,
@@ -41,51 +39,27 @@ export class CurrentUserService implements ICurrentUser {
     public cards: CreditCardService
   ) {}
 
-  async reset(): Promise<void> {
-    this.isAnonymous = this.tokenHelper.isTokenAnonymous();
-    this.user = await this.ocMeService.Get().toPromise();
-  }
-
-  get isAnonymous(): boolean {
-    const anon = this.isAnonSubject.value;
-    return anon === null ? this.tokenHelper.isTokenAnonymous() : anon;
-  }
-
-  set isAnonymous(value: boolean) {
-    this.isAnonSubject.next(value);
-  }
-
-  get favoriteOrderIDs(): string[] {
-    return this.favoriteOrdersSubject.value;
-  }
-
-  get favoriteProductIDs(): string[] {
-    return this.favoriteProductsSubject.value;
-  }
-
-  private get user(): MeUser {
-    return this.userSubject.value;
-  }
-
-  private set user(value: MeUser) {
-    this.favoriteOrdersSubject.next(this.getFavorites(value, this.favOrdersXP));
-    this.favoriteProductsSubject.next(this.getFavorites(value, this.favProductsXP));
-    this.userSubject.next(value);
-  }
-
-  get(): MeUser {
+  get(): CurrentUser {
     return this.user;
   }
 
-  async patch(user: MeUser): Promise<MeUser> {
-    return (this.user = await this.ocMeService.Patch(user).toPromise());
+  async reset(): Promise<void> {
+    const user = await this.ocMeService.Get().toPromise();
+    this.isAnon = this.tokenHelper.isTokenAnonymous();
+    this.user = this.MapToCurrentUser(user);
   }
 
-  onIsAnonymousChange(callback: (isAnonymous: boolean) => void): void {
-    this.isAnonSubject.subscribe(callback);
+  async patch(user: MeUser): Promise<CurrentUser> {
+    const patched = await this.ocMeService.Patch(user).toPromise();
+    this.user = this.MapToCurrentUser(patched);
+    return this.user;
   }
 
-  onUserChange(callback: (user: User) => void) {
+  isAnonymous(): boolean {
+    return this.isAnon !== null ? this.isAnon : this.tokenHelper.isTokenAnonymous();
+  }
+
+  onChange(callback: (user: CurrentUser) => void) {
     this.userSubject.subscribe(callback);
   }
 
@@ -93,16 +67,23 @@ export class CurrentUserService implements ICurrentUser {
     this.setFavoriteValue(this.favProductsXP, isFav, productID);
   }
 
-  onFavoriteProductsChange(callback: (productIDs: string[]) => void) {
-    this.favoriteProductsSubject.subscribe(callback);
-  }
-
   setIsFavoriteOrder(isFav: boolean, orderID: string) {
     this.setFavoriteValue(this.favOrdersXP, isFav, orderID);
   }
 
-  onFavoriteOrdersChange(callback: (orderIDs: string[]) => void) {
-    this.favoriteOrdersSubject.subscribe(callback);
+  private MapToCurrentUser(user: MeUser): CurrentUser {
+    const currentUser = user as CurrentUser;
+    currentUser.FavoriteOrderIDs = this.getFavorites(user, this.favOrdersXP);
+    currentUser.FavoriteProductIDs = this.getFavorites(user, this.favProductsXP);
+    return currentUser;
+  }
+
+  private get user(): CurrentUser {
+    return this.userSubject.value;
+  }
+
+  private set user(value: CurrentUser) {
+    this.userSubject.next(value);
   }
 
   private getFavorites(user: User, XpFieldName: string): string[] {
@@ -120,10 +101,8 @@ export class CurrentUserService implements ICurrentUser {
     if (isFav) {
       favorites = [...favorites, ID];
     } else {
-      favorites = favorites.filter((x) => x !== ID);
+      favorites = favorites.filter(x => x !== ID);
     }
     this.patch({ xp: { [XpFieldName]: favorites } });
   }
 }
-
-

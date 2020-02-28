@@ -76,7 +76,7 @@ export class ProductFilterService implements IProductFilters {
       (result, value, key: any) => (result[`xp.Facets.${key.toLocaleLowerCase()}`] = value),
       {}
     );
-    const favorites = this.currentUser.favoriteProductIDs.join('|') || undefined;
+    const favorites = this.currentUser.get().FavoriteProductIDs.join('|') || undefined;
     return await this.ocMeService
       .ListProducts({
         categoryID,
