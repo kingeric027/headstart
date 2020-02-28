@@ -35,11 +35,7 @@ namespace Marketplace.Models
         public string Note { get; set; }
         public TaxProperties Tax { get; set; } = new TaxProperties();
         public UnitOfMeasure UnitOfMeasure { get; set; } = new UnitOfMeasure();
-        public IProductType ProductType { get; set; }
-        public enum IProductType
-        {
-            Standard,
-            Quote
-        } 
+        public ProductType ProductType { get; set; }
+
     }
 }
