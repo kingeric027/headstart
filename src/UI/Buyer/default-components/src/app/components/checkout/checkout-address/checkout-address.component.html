@@ -3,7 +3,7 @@
           class="btn btn-secondary mb-3 ml-2"
           (click)="useShippingAsBilling()">Use Shipping Address</button>
   <div class="form-group">
-    <label for="selectAddress">{{addressType && addressType === 'Shipping' ? 'Shipping' : 'Billing'}} Address</label>
+    <label for="selectAddress">{{addressType}} Address</label>
     <select (change)="toggleShowAddressForm($event)"
             class="form-control"
             id="selectAddress">

@@ -50,7 +50,7 @@
         <!-- /Mobile Profile Menu Items -->
       </ul>
       <div class="form-inline"
-           *ngIf="anonymous">
+           *ngIf="user.IsAnonymous">
         <a class="btn btn-sm btn-outline-dark"
            (click)="isCollapsed = !isCollapsed"
            (click)="context.router.toLogin()">Login</a>
@@ -59,7 +59,7 @@
            (click)="context.router.toRegister()">Register</a>
       </div>
       <ul class="navbar-nav"
-          *ngIf="!anonymous && screenSize !== 'xs' && screenSize !== 'sm'">
+          *ngIf="!user.IsAnonymous && screenSize !== 'xs' && screenSize !== 'sm'">
         <li class="nav-item dropdown cursor-pointer"
             ngbDropdown
             placement="bottom-right">

@@ -21,11 +21,13 @@ export class OCMProductList implements OnInit, OnDestroy {
   numberOfItemsInPagination = 10;
   searchTermForProducts = '';
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) {}
 
   ngOnInit(): void {
-    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
-    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
+    this.context.productFilters.activeFiltersSubject
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(this.handleFiltersChange);
+    this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
     if (getScreenSizeBreakPoint() === 'xs') {
       this.numberOfItemsInPagination = 3;
     } else if (getScreenSizeBreakPoint() === 'sm') {
@@ -62,5 +64,5 @@ export class OCMProductList implements OnInit, OnDestroy {
     this.hasFilters = this.context.productFilters.hasFilters();
     this.categoryCrumbs = this.context.categories.breadCrumbs;
     this.searchTermForProducts = filters.search;
-  }
+  };
 }

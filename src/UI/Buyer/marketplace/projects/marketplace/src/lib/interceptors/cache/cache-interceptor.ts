@@ -16,7 +16,7 @@ import { isPlatformBrowser } from '@angular/common';
   providedIn: 'root',
 })
 export class CacheInterceptor implements HttpInterceptor {
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Record<string, any>) {}
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const hasIE11 = false;
     if (isPlatformBrowser(this.platformId)) {

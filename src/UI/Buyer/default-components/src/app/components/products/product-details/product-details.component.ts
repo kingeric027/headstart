@@ -46,7 +46,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   ngOnInit(): void {
-    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
+    this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
 
   onSpecFormChange(event): void {
@@ -64,7 +64,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   addToCart(): void {
-    this.context.currentOrder.addToCart({
+    this.context.order.cart.add({
       ProductID: this._product.ID,
       Quantity: this.quantity,
       Specs: this.specFormService.getLineItemSpecs(this._specs),

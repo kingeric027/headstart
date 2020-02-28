@@ -10,7 +10,6 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
 })
 export class HomeWrapperComponent implements OnInit {
   featuredProducts: ListBuyerProduct;
-  favoriteProductIDs: string[];
 
   constructor(private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
 

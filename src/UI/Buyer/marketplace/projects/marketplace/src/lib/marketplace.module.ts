@@ -1,6 +1,10 @@
 // core services
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { MarketplaceRoutingModule, MyOrdersWrapperComponent, OrdersToApproveWrapperComponent } from './marketplace-routing.module';
+import {
+  MarketplaceRoutingModule,
+  MyOrdersWrapperComponent,
+  OrdersToApproveWrapperComponent,
+} from './marketplace-routing.module';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
@@ -18,7 +22,6 @@ import { FeaturedProductsResolver } from './resolves/features-products.resolve';
 import { MeListBuyerAddressResolver } from './resolves/me.resolve';
 import { MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
 import { AuthService } from './services/auth/auth.service';
-import { CurrentOrderService } from './services/current-order/current-order.service';
 import { CurrentUserService } from './services/current-user/current-user.service';
 import { OrderHistoryService } from './services/order-history/order-history.service';
 import { PaymentHelperService } from './services/payment-helper/payment-helper.service';
@@ -32,13 +35,14 @@ import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-w
 import { OrderShipmentsWrapperComponent } from './wrapper-components/order-shipments-wrapper.component';
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
 import { CreditCardService } from './services/current-user/credit-card.service';
+import { CurrentOrderService } from './services/order/order.service';
+import { CartService } from './services/order/cart.service';
+import { CheckoutService } from './services/order/checkout.service';
+import { OrderStateService } from './services/order/order-state.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [
-    MarketplaceRoutingModule,
-    CommonModule,
-  ],
+  imports: [MarketplaceRoutingModule, CommonModule],
   providers: [
     FeaturedProductsResolver,
     MeListBuyerAddressResolver,
@@ -56,6 +60,9 @@ import { CreditCardService } from './services/current-user/credit-card.service';
     ReorderHelperService,
     RouteService,
     TokenHelperService,
+    CartService,
+    CheckoutService,
+    OrderStateService,
     ShopperContextService,
   ],
   declarations: [
@@ -76,9 +83,7 @@ import { CreditCardService } from './services/current-user/credit-card.service';
     OrderShipmentsWrapperComponent,
     MyOrdersWrapperComponent,
     OrdersToApproveWrapperComponent,
-    SupplierListWrapperComponent
+    SupplierListWrapperComponent,
   ],
 })
 export class MarketplaceModule {}
-
-

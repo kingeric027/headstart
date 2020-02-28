@@ -11,6 +11,7 @@ import {
   Meta,
   Supplier,
   Address,
+  BuyerCreditCard,
 } from '@ordercloud/angular-sdk';
 
 export * from '@ordercloud/angular-sdk';
@@ -79,6 +80,11 @@ export interface OrderFilters {
   toDate?: string;
 }
 
+export enum OrderAddressType {
+  Billing = 'Billing',
+  Shipping = 'Shipping',
+}
+
 export enum OrderStatus {
   AllSubmitted = '!Unsubmitted',
   Unsubmitted = 'Unsubmitted',
@@ -86,7 +92,7 @@ export enum OrderStatus {
   Declined = 'Declined',
   Open = 'Open',
   Completed = 'Completed',
-  Canceled = 'Canceled'
+  Canceled = 'Canceled',
 }
 
 export interface CreditCard {
@@ -179,6 +185,12 @@ export class AppConfig {
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
   scope: string[];
+}
+
+export interface CreditCardPayment {
+  SavedCard?: BuyerCreditCard;
+  NewCard?: CreditCardToken;
+  CVV: string;
 }
 
 export interface DecodedOCToken {

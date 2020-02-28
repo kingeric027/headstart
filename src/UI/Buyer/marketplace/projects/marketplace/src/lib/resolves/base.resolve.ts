@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
 import { CurrentUserService } from '../services/current-user/current-user.service';
-import { CurrentOrderService } from '../services/current-order/current-order.service';
 import { ProductCategoriesService } from '../services/product-categories/product-categories.service';
+import { CurrentOrderService } from '../services/order/order.service';
 
 @Injectable({
   providedIn: 'root',

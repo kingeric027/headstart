@@ -1,4 +1,3 @@
-import { CurrentOrderService, ICurrentOrder } from '../current-order/current-order.service';
 import { CurrentUserService, ICurrentUser } from '../current-user/current-user.service';
 import { Injectable } from '@angular/core';
 import { RouteService, IRouter } from '../route/route.service';
@@ -8,11 +7,12 @@ import { OrderHistoryService, IOrderHistory } from '../order-history/order-histo
 import { AppConfig } from '../../shopper-context';
 import { SupplierFilterService, ISupplierFilters } from '../supplier-filter/supplier-filter.service';
 import { ProductCategoriesService, ICategories } from '../product-categories/product-categories.service';
+import { CurrentOrderService, ICurrentOrder } from '../order/order.service';
 
 export interface IShopperContext {
   router: IRouter;
   currentUser: ICurrentUser;
-  currentOrder: ICurrentOrder;
+  order: ICurrentOrder;
   productFilters: IProductFilters;
   categories: ICategories;
   supplierFilters: ISupplierFilters;
@@ -26,7 +26,7 @@ export interface IShopperContext {
 })
 export class ShopperContextService implements IShopperContext {
   constructor(
-    public currentOrder: CurrentOrderService,
+    public order: CurrentOrderService,
     public currentUser: CurrentUserService,
     public router: RouteService,
     public productFilters: ProductFilterService,

@@ -42,7 +42,7 @@ export class OCMOrderList {
   }
 
   isFavorite(orderID: string): boolean {
-    return this.context.currentUser.favoriteOrderIDs.includes(orderID);
+    return this.context.currentUser.get().FavoriteOrderIDs.includes(orderID);
   }
 
   setIsFavorite(isFav: boolean, orderID: string): void {

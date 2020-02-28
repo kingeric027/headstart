@@ -15,7 +15,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
   constructor(private appAuthService: AuthService) {}
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
-      catchError((error) => {
+      catchError(error => {
         // rethrow any non auth errors
         if (!this.isAuthError(error)) {
           return throwError(error);
@@ -30,8 +30,8 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
           const refreshToken = this.appAuthService.refreshToken.getValue();
           if (refreshToken || this.appAuthService.fetchingRefreshToken) {
             return this.appAuthService.refreshToken.pipe(
-              filter((token) => token !== ''),
-              flatMap((token) => {
+              filter(token => token !== ''),
+              flatMap(token => {
                 request = request.clone({
                   setHeaders: { Authorization: `Bearer ${token}` },
                 });
@@ -41,7 +41,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
           } else {
             // attempt refresh for new token
             return this.appAuthService.refresh().pipe(
-              flatMap((token) => {
+              flatMap(token => {
                 request = request.clone({
                   setHeaders: { Authorization: `Bearer ${token}` },
                 });
