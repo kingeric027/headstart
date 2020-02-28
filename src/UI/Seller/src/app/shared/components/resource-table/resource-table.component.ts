@@ -69,12 +69,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   filterForm: FormGroup;
   fromDate: string;
   toDate: string;
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
     ngZone: NgZone
-  ) {}
+  ) { }
 
   @Input()
   resourceList: ListPage<any> = { Meta: {}, Items: [] };

@@ -7,6 +7,7 @@ import { BuyerLocationTableComponent } from './components/locations/buyer-locati
 import { BuyerPaymentTableComponent } from './components/payments/buyer-payment-table/buyer-payment-table.component';
 import { BuyerApprovalTableComponent } from './components/approvals/buyer-approval-table/buyer-approval-table.component';
 import { BuyerCategoryTableComponent } from './components/categories/buyer-category-table/buyer-category-table.component';
+import { BuyerLocationEditComponent } from './components/locations/buyer-location-edit/buyer-location-edit.component';
 
 @NgModule({
   imports: [SharedModule, BuyersRoutingModule],
@@ -15,8 +16,9 @@ import { BuyerCategoryTableComponent } from './components/categories/buyer-categ
     BuyerCategoryTableComponent,
     BuyerApprovalTableComponent,
     BuyerLocationTableComponent,
+    BuyerLocationEditComponent,
     BuyerPaymentTableComponent,
     BuyerUserTableComponent,
   ],
 })
-export class BuyersModule {}
+export class BuyersModule { }
