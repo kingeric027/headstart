@@ -79,7 +79,7 @@ export class ProductEditComponent implements OnInit {
     private modalService: NgbModal,
     private toasterService: ToastrService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  ) { }
 
   async ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
@@ -142,6 +142,7 @@ export class ProductEditComponent implements OnInit {
       ShipWeight: new FormControl(superMarketplaceProduct.Product.ShipWeight, [Validators.required, Validators.min(0)]),
       Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null)),
       Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
+      Type: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Type')),
       // SpecCount: new FormControl(superMarketplaceProduct.SpecCount),
       // VariantCount: new FormControl(superMarketplaceProduct.VariantCount),
       TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
@@ -170,12 +171,12 @@ export class ProductEditComponent implements OnInit {
 
   async createNewProduct() {
     try {
-    this.dataIsSaving = true;
-    const superProduct = await this.middleware.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
-    await this.addFiles(this.files, superProduct.Product.ID);
-    this.refreshProductData(superProduct);
-    this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
-    this.dataIsSaving = false;
+      this.dataIsSaving = true;
+      const superProduct = await this.middleware.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
+      await this.addFiles(this.files, superProduct.Product.ID);
+      this.refreshProductData(superProduct);
+      this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
+      this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
       throw ex;
