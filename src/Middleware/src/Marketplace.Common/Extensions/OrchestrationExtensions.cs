@@ -31,7 +31,7 @@ namespace Marketplace.Common.Extensions
                     return RecordType.SpecProductAssignment;
                 case nameof(MarketplaceBuyer):
                     return RecordType.Buyer;
-                case nameof(MarketplaceAddress):
+                case nameof(MarketplaceAddressBuyer):
                     return RecordType.Address;
                 case nameof(MarketplaceCostCenter):
                     return RecordType.CostCenter;

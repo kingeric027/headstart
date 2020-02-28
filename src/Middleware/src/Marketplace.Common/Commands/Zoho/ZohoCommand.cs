@@ -151,7 +151,7 @@ namespace Marketplace.Common.Commands.Zoho
         private async Task<ZohoContact> CreateOrUpdateVendor(Order order)
         {
             var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(order.ToCompanyID);
-            var addresses = await _oc.SupplierAddresses.ListAsync<MarketplaceAddress>(order.ToCompanyID);
+            var addresses = await _oc.SupplierAddresses.ListAsync<MarketplaceAddressSupplier>(order.ToCompanyID);
             var users = await _oc.SupplierUsers.ListAsync(order.ToCompanyID);
             var currencies = await _zoho.Currencies.ListAsync();
             var vendor = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = supplier.Name });
@@ -192,7 +192,7 @@ namespace Marketplace.Common.Commands.Zoho
             var ocGroups = await Throttler.RunAsync(ocGroupAssignmentList, 100, 5,
                 assignment => _oc.UserGroups.GetAsync<MarketplaceUserGroup>(ocBuyer.ID, assignment.UserGroupID));
             // TODO: MODEL update ~ make this use the Party property for currency
-            var addresses = await _oc.Addresses.ListAsync<MarketplaceAddress>(ocBuyer.ID);
+            var addresses = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(ocBuyer.ID);
             var currencies = await _zoho.Currencies.ListAsync();
 
             // TODO: MODEL update ~ right now we don't have actual groups set up for locations, so this isn't accurate or complete
