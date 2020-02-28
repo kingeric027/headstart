@@ -33,7 +33,7 @@
       <div>{{isNewPlaceHolder}}</div>
     </span>
     </div>
-    <div *ngIf="resourceType === 'categories' && !isAtMaximumDepth()" 
+    <div *ngIf="this._resource && resourceType === 'categories' && !isAtMaximumDepth()" 
           class="p-2 ml-auto align-self-center">
       <button
               ngbDropdownItem

@@ -139,7 +139,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   selectResource(resource: any): void {
     const [newURL, queryParams] = this.ocService.constructNewRouteInformation(resource.ID || '');
-    this.navigate(newURL, { queryParams });
+    const queryType = Object.keys(queryParams);
+    queryType.includes('ParentCategory') ? this.navigate(newURL, {}) : this.navigate(newURL, { queryParams });
   }
 
   updateResource(resourceUpdate: any): void {

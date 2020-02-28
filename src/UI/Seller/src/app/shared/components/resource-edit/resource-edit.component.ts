@@ -8,6 +8,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class ResourceEditComponent {
   _resource: any;
+  _resourceType: any;
   _resourceFields: any[];
   _params: any;
 
@@ -4455,6 +4456,7 @@ export class ResourceEditComponent {
   }
   @Input()
   set resourceType(value: string) {
+    this._resourceType = value;
     this._resourceFields = this.buildResourceFields(value);
   }
   @Output()
@@ -4483,9 +4485,9 @@ export class ResourceEditComponent {
     const routeUrl = this.router.routerState.snapshot.url;
     const splitUrl = routeUrl.split('/');
     const endUrl = splitUrl[splitUrl.length - 1];
-    let params = endUrl.includes('?ParentCategory') ? endUrl.split('=') : '';
+    let params = endUrl.includes('new?') ? endUrl.split('=') : '';
     params = params[1] ? params[1] : '';
     this._params = params;
-    return endUrl.includes('?ParentCategory');
+    return endUrl.includes('new?');
   }
 }

@@ -315,9 +315,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   handleSelectResource(resource: any) {
-    const [newURL, queryParams] = this._ocService.constructNewRouteInformation(resource.ID || '');
-    this.router.navigate([newURL], { queryParams });
-    this.resourceSelected.emit(resource);
+    this.resourceSelected.emit(resource); 
   }
 
   openPopover() {

@@ -27,6 +27,7 @@ export class SummaryResourceDisplay implements OnChanges {
   _resourceList: any;
   _parentResourceID: any = '';
   _depthCount: number;
+  _isCreatingSubResource: boolean;
 
   @Input()
   set resourceList(value: any) {
@@ -47,6 +48,11 @@ export class SummaryResourceDisplay implements OnChanges {
   @Input()
   set parentResourceID(value: any) {
     this._parentResourceID = value;
+  }
+
+  @Input()
+  set isCreatingSubResource(value: any) {
+    this._isCreatingSubResource = value;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -98,7 +104,7 @@ export class SummaryResourceDisplay implements OnChanges {
   getValueOnPlaceHolderResource(valueType: string) {
     switch (valueType) {
       case 'toPrimaryHeader':
-        return `Your new ${singular(this.resourceType)}`;
+        return this._isCreatingSubResource ? `Your new sub-${singular(this.resourceType)}` : `Your new ${singular(this.resourceType)}`;
       default:
         return '';
     }
@@ -162,14 +168,18 @@ export class SummaryResourceDisplay implements OnChanges {
 
   addNestedResource(resource) {
     event.stopPropagation();
-    this.router.navigate(['/buyers/anytimefitness/categories/new'], { queryParams: { ParentCategory: resource } });
-    // this.router.navigate([`/buyers/anytimefitness/categories/${this._resource.ID}`], { queryParams: { ParentCategory: resource } });
+    const routeUrl = this.router.routerState.snapshot.url;
+    const splitUrl = routeUrl.split('/');
+    this.router.navigate([`${splitUrl[1]}/${splitUrl[2]}/${splitUrl[3]}/new`], { queryParams: { ParentCategory: resource } });
   }
 
   //Nested resources cannot be added beyond a third tier
   isAtMaximumDepth() {
     const parentOfResource = this._resource?.ParentID;
     let parentOfParentOfResource;
+    // if (this._resource === undefined) {
+    //   return true;
+    // }
     if (parentOfResource) {
       parentOfParentOfResource = this._resourceList.find(resource => resource.ID === parentOfResource);
     }

@@ -1,5 +1,5 @@
 <h4 class="mt-3"
-    *ngIf="checkForParent()">Add a SubCategory to {{_params}}</h4>
+    *ngIf="checkForParent()">Add a Sub-{{_resourceType}} to {{_params}}</h4>
 <div *ngFor="let field of _resourceFields">
        <div *ngIf="field.type === 'string' && field.field === 'ParentID' && _params"
        class="form-group">
