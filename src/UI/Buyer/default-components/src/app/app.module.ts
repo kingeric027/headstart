@@ -118,9 +118,11 @@ import { OCMCheckoutShipping } from './components/checkout/checkout-shipping/che
 import { OCMShippingSelectionForm } from './components/checkout/shipping-selection-form/shipping-selection-form.component';
 import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.component.';
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
+import { OCMQuoteRequestForm } from './components/products/quote-request-form/quote-request-form.component';
 
 const components = [
   OCMCategoryDropdown,
+  OCMQuoteRequestForm,
   OCMProductCard,
   OCMToggleFavorite,
   OCMQuantityInput,
@@ -268,6 +270,7 @@ export class AppModule {
     this.buildWebComponent(OCMMiniCart, 'ocm-mini-cart');
     this.buildWebComponent(OCMAppHeader, 'ocm-app-header');
     this.buildWebComponent(OCMCategoryDropdown, 'ocm-category-dropdown');
+    this.buildWebComponent(OCMQuoteRequestForm, 'ocm-quote-request-form')
 
     this.buildWebComponent(OCMPaymentList, 'ocm-payment-list');
     this.buildWebComponent(OCMAddressCard, 'ocm-address-card');
