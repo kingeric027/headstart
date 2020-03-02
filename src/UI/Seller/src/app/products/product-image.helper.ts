@@ -11,7 +11,7 @@ export function getProductMainImageUrlOrPlaceholder(product: Product): string {
 }
 
 export function ReplaceHostUrls(product: Product): MarketPlaceProductImage[] {
-  const images = (product.xp && product.xp.Images) || [];
+  const images = (product && product.xp && product.xp.Images) || [];
   return images.map(img => ReplaceHostUrl(img));
 }
 
