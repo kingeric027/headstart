@@ -1,5 +1,5 @@
 import { Component, Input, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
-import { ShopperContextService, MarketplaceProduct } from 'marketplace';
+import { ShopperContextService, MarketplaceProduct, ProductType } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
@@ -17,7 +17,7 @@ export class OCMProductCard {
   isViewOnlyProduct = true;
   hasSpecs = false;
 
-  constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) {}
+  constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) { }
 
   @Input() set product(value: MarketplaceProduct) {
     this._product = value;
@@ -44,6 +44,10 @@ export class OCMProductCard {
 
   setIsFavorite(isFavorite: boolean): void {
     this.context.currentUser.setIsFavoriteProduct(isFavorite, this._product.ID);
+  }
+
+  showAddToCart(): boolean {
+    return !this.isViewOnlyProduct && !this.hasSpecs && this._product.xp.ProductType !== ProductType.Quote;
   }
 
   setQuantity(event: any): void {
