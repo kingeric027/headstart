@@ -163,7 +163,13 @@
       <div class="col-md-5">
         <h5>Product Variations</h5>
         <p class="font-italic mb-0">Does your product come in different varieties? Add the options here.</p>
-        <p *ngIf="_superMarketplaceProductEditable?.Variants">This product has <span class="font-weight-bold">{{_superMarketplaceProductEditable?.Variants?.length}}</span> variations. (Limit 1500)</p>
+        <p class="mb-0"
+           *ngIf="_superMarketplaceProductEditable?.Variants">This product has <span [ngClass]="{'text-danger': !variantsValid}"
+                class="font-weight-bold">{{_superMarketplaceProductEditable?.Variants?.length}}</span> variations. (Limit 100)</p>
+        <p *ngIf="!variantsValid"
+           class="text-danger">
+          <fa-icon [icon]="faExclamationCircle"></fa-icon> This product exceeds the limit of 100 variations.
+        </p>
       </div>
       <div class="col-md-7">
         <button *ngIf="!editSpecs && !_superMarketplaceProductEditable?.Specs"
@@ -186,6 +192,7 @@
                  placeholder="Name the variation">
           <label class="check-container">SKUs vary based on this variation
             <input type="checkbox"
+                   [disabled]="!variantsValid || superMarketplaceProductEditable?.Variants.length === 100"
                    id="DefinesVariant">
             <span class="checkmark"></span>
           </label>
@@ -227,6 +234,7 @@
                   </td>
                   <td>
                     <button class="btn btn-outline-dark"
+                            [disabled]="superMarketplaceProductEditable?.Variants?.length === 100 || !variantsValid"
                             (click)="addSpecOption(spec, specIndex)">Add</button>
                   </td>
                 </tr>
@@ -256,8 +264,8 @@
                   class="btn btn-link text-dark">Cancel</button>
           <button *ngIf="editSpecs"
                   class="btn btn-outline-dark"
-                  [disabled]="!areSpecChanges"
-                  (click)="mockVariants()">{{areSpecChanges ? 'Save Changes' : 'No Changes'}}</button>
+                  [disabled]="!areSpecChanges || !variantsValid"
+                  (click)="toggleEditSpecs()">{{areSpecChanges ? 'Save Changes' : 'No Changes'}}</button>
         </div>
       </div>
     </div>
@@ -569,15 +577,19 @@
                                     buttonText="Delete Product"
                                     (deleteConfirmed)="handleDelete($event)">
     </delete-confirm-modal-component>
-    <div>
-      <button *ngIf="areChanges"
-              class="btn btn-primary"
-              type="submit"
-              [disabled]="productForm?.status === 'INVALID' || dataIsSaving"
-              (click)="handleSave()">{{getSaveBtnText()}}</button>
-      <button class="btn brand-button ml-3"
-              (click)="handleDiscardChanges()"
-              *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+    <div class="d-flex flex-column justify-content-end">
+      <p *ngIf="!variantsValid"
+         class="text-danger">There are problems with the product variations.</p>
+      <div>
+        <button *ngIf="areChanges"
+                class="btn btn-primary"
+                type="submit"
+                [disabled]="productForm?.status === 'INVALID' || !variantsValid || dataIsSaving"
+                (click)="handleSave()">{{getSaveBtnText()}}</button>
+        <button class="btn brand-button ml-3"
+                (click)="handleDiscardChanges()"
+                *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+      </div>
     </div>
   </div>
 </div>

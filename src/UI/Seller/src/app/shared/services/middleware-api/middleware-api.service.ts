@@ -27,7 +27,9 @@ export class MiddlewareAPIService {
   async createNewSuperMarketplaceProduct(
     superMarketplaceProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
+    const mySupplier = await this.getMySupplier(superMarketplaceProduct.Product.DefaultSupplierID);
     superMarketplaceProduct.Product.xp.Status = ObjectStatus.Draft;
+    superMarketplaceProduct.Product.xp.Facets.supplier = [mySupplier.Name];
     superMarketplaceProduct.Product.Active = true;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
     const url = `${this.baseUrl}/products`;

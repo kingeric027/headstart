@@ -95,14 +95,17 @@ namespace Marketplace.Common.Commands.Crud
             // Generate Variants
             await _oc.Products.GenerateVariantsAsync(_product.ID, accessToken: user.AccessToken);
             // Patch Variants with the User Specified ID(SKU)
-            var createVariantRequests = superProduct.Variants.Select(variant => 
+            if (superProduct.Variants.Any(v => v.xp.NewID != null))
             {
-                var oldVariantID = variant.ID;
-                variant.ID = variant.xp.NewID ?? variant.ID;
-                variant.Name = variant.xp.NewID ?? variant.ID;
-                return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = variant.ID, Name = variant.Name, xp = variant.xp }, accessToken: user.AccessToken);
-            });
-            await Task.WhenAll(createVariantRequests);
+                var createVariantRequests = superProduct.Variants.Select(variant => 
+                {
+                    var oldVariantID = variant.ID;
+                    variant.ID = variant.xp.NewID ?? variant.ID;
+                    variant.Name = variant.xp.NewID ?? variant.ID;
+                    return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = variant.ID, Name = variant.Name, xp = variant.xp }, accessToken: user.AccessToken);
+                });
+                await Task.WhenAll(createVariantRequests);
+            }
             // List Variants
             var _variants = await _oc.Products.ListVariantsAsync<Variant<MarketplaceVariantXp>>(_product.ID, accessToken: user.AccessToken);
             // List Product Specs
@@ -158,7 +161,7 @@ namespace Marketplace.Common.Commands.Crud
             var variantsAdded = requestVariants.Any(v => !existingVariants.Any(v2 => v2.ID == v.ID));
             var variantsRemoved = existingVariants.Any(v => !requestVariants.Any(v2 => v2.ID == v.ID));
             // IF variants differ, then re-generate variants and re-patch IDs to match the user input.
-            if (variantsAdded || variantsRemoved)
+            if (variantsAdded || variantsRemoved || requestVariants.Any(v => v.xp.NewID != null))
             {
                 // Re-generate Variants
                 await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: user.AccessToken);

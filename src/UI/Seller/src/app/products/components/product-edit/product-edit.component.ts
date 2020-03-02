@@ -9,7 +9,6 @@ import {
   OcAdminAddressService,
   OcProductService,
   Variant,
-  Spec,
   SpecOption,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -19,13 +18,14 @@ import {
   SuperMarketplaceProduct,
   VariantXp,
   VariantXpSpecValues,
+  Spec,
 } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCog, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
@@ -78,6 +78,7 @@ export class ProductEditComponent implements OnInit {
   faTrash = faTrash;
   faTimes = faTimes;
   faCog = faCog;
+  faExclamationCircle = faExclamationCircle;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
@@ -86,6 +87,7 @@ export class ProductEditComponent implements OnInit {
   taxCodes: ListPage<TaxCodes>;
   productType: string;
   productVariations: any;
+  variantsValid = true;
   editSpecs: boolean = false;
   fileType: string;
   imageFiles: FileHandle[] = [];
@@ -447,9 +449,8 @@ export class ProductEditComponent implements OnInit {
       Options: []
     }]
     input.value = '';
-    updateProductResourceCopy.Specs = updateProductResourceCopy.Specs.concat(newSpec);
+    updateProductResourceCopy.Specs = newSpec.concat(updateProductResourceCopy.Specs);
     this._superMarketplaceProductEditable = updateProductResourceCopy;
-    console.log(updateProductResourceCopy.Specs)
     this.checkForSpecChanges();
   }
   addSpecOption(spec: Spec, specIndex: number): void {
@@ -461,14 +462,15 @@ export class ProductEditComponent implements OnInit {
     const newOption = [{
       ID: input.value.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, ""),
       Value: input.value,
-      ListOrder: (spec as any).Options.length + 1,
+      ListOrder: spec.Options.length + 1,
       IsOpenText: false,
       PriceMarkupType: markup ? 1 : "NoMarkup",
       PriceMarkup: markup,
       xp: null
     }]
-    updateProductResourceCopy.Specs[specIndex].Options = updateProductResourceCopy.Specs[specIndex].Options.concat(newOption);
+    updateProductResourceCopy.Specs[specIndex].Options = newOption.concat(updateProductResourceCopy.Specs[specIndex].Options);
     this._superMarketplaceProductEditable = updateProductResourceCopy;
+    this.mockVariants();
     this.checkForSpecChanges();
   };
 
@@ -478,6 +480,7 @@ export class ProductEditComponent implements OnInit {
     );
     updateProductResourceCopy.Specs[specIndex].Options.splice(optionIndex, 1);
     this._superMarketplaceProductEditable = updateProductResourceCopy;
+    this.mockVariants();
     this.checkForSpecChanges();
   };
 
@@ -487,6 +490,7 @@ export class ProductEditComponent implements OnInit {
     );
     updateProductResourceCopy.Specs = updateProductResourceCopy.Specs.filter(s => s.ID !== spec.ID);
     this._superMarketplaceProductEditable = updateProductResourceCopy;
+    this.mockVariants();
     this.checkForSpecChanges();
   }
 
@@ -497,7 +501,7 @@ export class ProductEditComponent implements OnInit {
     updateProductResourceCopy.Variants = this.generateVariantsFromCurrentSpecs();
     this._superMarketplaceProductEditable = updateProductResourceCopy;
     console.log(this._superMarketplaceProductEditable.Variants);
-    this.toggleEditSpecs();
+    this.validateVariants();
     this.checkForChanges();
   }
 
@@ -513,7 +517,7 @@ export class ProductEditComponent implements OnInit {
 
   createVariantsForFirstSpec(spec: Spec): Variant[] {
     if (!spec) return;
-    return (spec as any).Options.map(opt => {
+    return spec.Options.map(opt => {
       return {
         ID: `${this._superMarketplaceProductEditable.Product.ID}-${opt.ID}`,
         Name: `${this._superMarketplaceProductEditable.Product.ID} ${opt.Value}`,
@@ -532,7 +536,7 @@ export class ProductEditComponent implements OnInit {
   combineSpecOptions(workingVariantList: Variant[], spec: Spec): Variant[] {
     let newVariantList = [];
     workingVariantList.forEach(variant => {
-      (spec as any).Options.forEach(opt => {
+      spec.Options.forEach(opt => {
         newVariantList.push({
           ID: `${variant.ID}-${opt.ID}`,
           Name: `${variant.Name} ${opt.Value}`,
@@ -565,5 +569,10 @@ export class ProductEditComponent implements OnInit {
     updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, "");
     this._superMarketplaceProductEditable = updateProductResourceCopy;
     this.checkForChanges();
+  }
+
+  validateVariants(): void {
+    this.variantsValid = this._superMarketplaceProductEditable.Variants.length <= 100;
+    console.log('valid variants?', this.variantsValid)
   }
 }
