@@ -1,13 +1,13 @@
-import { BuyerProduct } from '@ordercloud/angular-sdk';
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
 import { Component, Input } from '@angular/core';
+import { MarketplaceProduct } from 'marketplace';
 
 @Component({
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
 export class OCMHomePage {
-  @Input() featuredProducts: BuyerProduct[];
+  @Input() featuredProducts: MarketplaceProduct[];
   faBullhorn = faBullhorn;
 
   // TODO - this content may need to be managed externally somehow.

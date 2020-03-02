@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { OcTokenService, Supplier, Buyer } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { SuperMarketplaceProduct, DRAFT } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { SuperMarketplaceProduct, ObjectStatus } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { OrchestrationLog } from '@app-seller/reports/models/orchestration-log';
 import { ListPage } from './listPage.interface';
 import { ListArgs } from './listArgs.interface';
@@ -35,7 +35,7 @@ export class MiddlewareAPIService {
   async createNewSuperMarketplaceProduct(
     superMarketplaceProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
-    superMarketplaceProduct.Product.xp.Status = DRAFT;
+    superMarketplaceProduct.Product.xp.Status = ObjectStatus.Draft;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
     const url = `${this.baseUrl}/products`;
     return await this.http.post<SuperMarketplaceProduct>(url, superMarketplaceProduct, this.headers).toPromise();
@@ -43,7 +43,7 @@ export class MiddlewareAPIService {
 
   async updateMarketplaceProduct(superMarketplaceProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
     // TODO: Temporary while Product set doesn't reflect the current strongly typed Xp
-    superMarketplaceProduct.Product.xp.Status = DRAFT;
+    superMarketplaceProduct.Product.xp.Status = ObjectStatus.Draft;
     const url = `${this.baseUrl}/products/${superMarketplaceProduct.Product.ID}`;
     return await this.http.put<SuperMarketplaceProduct>(url, superMarketplaceProduct, this.headers).toPromise();
   }

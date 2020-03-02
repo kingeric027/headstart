@@ -1,31 +1,34 @@
 import { Injectable } from '@angular/core';
 import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
-import { OcMeService, ListBuyerProduct, BuyerProduct, ListBuyerSpec, BuyerSpec } from '@ordercloud/angular-sdk';
+import { OcMeService, ListBuyerSpec, BuyerSpec } from '@ordercloud/angular-sdk';
 import { each as _each } from 'lodash';
 import { Observable, of } from 'rxjs';
+import { MarketplaceProduct, ListMarketplaceProduct } from '../shopper-context';
 
 @Injectable()
-export class MeListRelatedProductsResolver implements Resolve<ListBuyerProduct> {
+export class MeListRelatedProductsResolver implements Resolve<ListMarketplaceProduct> {
   constructor(private service: OcMeService) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<Array<BuyerProduct>> | Promise<Array<BuyerProduct>> | any {
-    const product = route.parent.data.product as BuyerProduct;
-    if (!product.xp || !product.xp.RelatedProducts) {
-      return of([]);
-    }
-    const calls: Array<Promise<BuyerProduct>> = new Array<Promise<BuyerProduct>>();
-    product.xp.RelatedProducts.forEach((id: string) => {
-      calls.push(this.service.GetProduct(id).toPromise());
-    });
-    return Promise.all(calls);
+  resolve(
+    route: ActivatedRouteSnapshot
+  ): Observable<Array<MarketplaceProduct>> | Promise<Array<MarketplaceProduct>> | any {
+    // const product = route.parent.data.product as MarketplaceProduct;
+    // if (!product.xp || !product.xp.RelatedProducts) {
+    //   return of([]);
+    // }
+    // const calls: Array<Promise<MarketplaceProduct>> = new Array<Promise<MarketplaceProduct>>();
+    // product.xp.RelatedProducts.forEach((id: string) => {
+    //   calls.push(this.service.GetProduct(id).toPromise());
+    // });
+    //return Promise.all(calls);
   }
 }
 
 @Injectable()
-export class MeProductResolver implements Resolve<BuyerProduct> {
+export class MeProductResolver implements Resolve<MarketplaceProduct> {
   constructor(private service: OcMeService) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<BuyerProduct> | Promise<BuyerProduct> | any {
+  resolve(route: ActivatedRouteSnapshot): Observable<MarketplaceProduct> | Promise<MarketplaceProduct> | any {
     return this.service.GetProduct(route.params.productID);
   }
 }

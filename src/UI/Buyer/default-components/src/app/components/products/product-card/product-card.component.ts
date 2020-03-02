@@ -1,6 +1,5 @@
 import { Component, Input, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
-import { BuyerProduct } from '@ordercloud/angular-sdk';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceProduct } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
@@ -10,9 +9,8 @@ import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 })
 export class OCMProductCard {
   _isFavorite = false;
-  _product: BuyerProduct = {
+  _product: MarketplaceProduct = {
     PriceSchedule: {},
-    xp: { Images: [] },
   };
   quantity: number;
   shouldDisplayAddToCart = false;
@@ -21,7 +19,7 @@ export class OCMProductCard {
 
   constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) {}
 
-  @Input() set product(value: BuyerProduct)  {
+  @Input() set product(value: MarketplaceProduct) {
     this._product = value;
     this.isViewOnlyProduct = !value.PriceSchedule;
     this.hasSpecs = value.SpecCount > 0;
