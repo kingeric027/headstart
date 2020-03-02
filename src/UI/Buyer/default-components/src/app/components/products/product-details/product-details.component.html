@@ -8,8 +8,8 @@
       <div class="pb-3 border-bottom border-medium">
         <small><a href="javascript:;"
              (click)="setActiveSupplier(_product?.xp.Facets?.supplier[0])">{{_product?.xp.Facets?.supplier[0]}}</a></small>
-          <h1 class="h3 my-0">{{ _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
-            </h1>
+        <h1 class="h3 my-0">{{ _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
+        </h1>
         <ocm-toggle-favorite title="Favorite"
                              (click)="$event.stopPropagation()"
                              [favorite]="isFavorite()"
@@ -42,7 +42,13 @@
                                     (qtyChange)="qtyChange($event.detail)"
                                     [product]="_product">
                 </ocm-quantity-input>
-                <button class="btn btn-block btn-primary mb-3"
+                <button *ngIf="isQuoteProduct()"
+                        class="btn btn-block btn-primary mb-3"
+                        [disabled]="!specFormService.event?.valid || !qtyValid">
+                  Request Quote
+                </button>
+                <button *ngIf="!isQuoteProduct()"
+                        class="btn btn-block btn-primary mb-3"
                         type="submit"
                         [disabled]="!specFormService.event?.valid || !qtyValid"
                         (click)="addToCart()">
@@ -100,7 +106,13 @@
                               (qtyChange)="qtyChange($event.detail)"
                               [product]="_product">
           </ocm-quantity-input>
-          <button class="btn btn-block btn-primary"
+          <button *ngIf="isQuoteProduct()"
+                  class="btn btn-block btn-primary mb-3"
+                  [disabled]="!specFormService.event?.valid || !qtyValid">
+            Request Quote
+          </button>
+          <button *ngIf="!isQuoteProduct()"
+                  class="btn btn-block btn-primary"
                   type="submit"
                   [disabled]="!specFormService.event?.valid || !qtyValid"
                   (click)="addToCart($event)">

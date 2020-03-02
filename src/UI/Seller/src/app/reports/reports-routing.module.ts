@@ -1,9 +1,9 @@
 // core services
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ReportListComponent } from './components/report-list/report-list.component';
+import { OrchestrationLogsTableComponent } from './components/orchestration-logs-table/orchestration-logs-table.component';
 
-const routes: Routes = [{ path: '', component: ReportListComponent }];
+const routes: Routes = [{ path: 'logs', component: OrchestrationLogsTableComponent }];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

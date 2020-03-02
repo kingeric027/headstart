@@ -4,15 +4,15 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Models
 {
-	public class MarketplaceOrder : Order<OrderXp, UserXp, AddressXp>, IMarketplaceObject
+	public class MarketplaceOrder : Order<OrderXp, UserXp, BuyerAddressXP>
     {
-		public IEnumerable<ProposedShipmentSelection> ShippingSelections { get; set; }
-		public string AvalaraTaxTransactionCode { get; set; }
+        // will be on the ordercloud model when integration events are deployed to OC prod
+        public string CalculateEventsUpToDate { get; set; } 
+        public string ShippingRatesEventUpToDate { get; set; } 
 	}
 
     public class OrderXp
     {
-        public IEnumerable<ProposedShipmentSelection> ProposedShipmentSelections { get; set; }
         public string AvalaraTaxTransactionCode { get; set; }
     }
 }

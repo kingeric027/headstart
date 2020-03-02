@@ -13,15 +13,15 @@ namespace Marketplace.Common.Controllers
     {
         private readonly AppSettings _settings;
         private readonly ISendgridService _sendgridService;
-        private readonly IProposedShipmentCommand _proposedShipmentCommand;
+        private readonly IAddressValidationCommand _addressValidationCommand;
         private readonly IOrderCommand _orderCommand;
 
-        public WebhooksController(AppSettings settings, ISendgridService sendgridService, IProposedShipmentCommand proposedShipmentCommand, IOrderCommand orderCommand) : base(settings)
+        public WebhooksController(AppSettings settings, ISendgridService sendgridService, IAddressValidationCommand addressValidationCommand, IOrderCommand orderCommand) : base(settings)
         {
             _settings = settings;
             _sendgridService = sendgridService;
             _orderCommand = orderCommand;
-            _proposedShipmentCommand = proposedShipmentCommand;
+            _addressValidationCommand = addressValidationCommand;
         }
 
         // USING AN OC MESSAGE SENDER - NOT WEBHOOK
@@ -117,39 +117,39 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("validateaddresspostput")]
-        public async Task<PrewebhookResponseWithError> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Create payload)
+        public async Task<WebhookResponse> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Create payload)
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
             var address = payload.Request.Body;
-            return await _proposedShipmentCommand.IsValidAddressInFreightPopAsync(address);
+            return await _addressValidationCommand.IsValidAddressInFreightPopAsync(address);
         }
 
         [HttpPost, Route("validateselleraddresspatch")]
-        public async Task<PrewebhookResponseWithError> ValidateSellerAddressPatch([FromBody] WebhookPayloads.AdminAddresses.Patch payload)
+        public async Task<WebhookResponse> ValidateSellerAddressPatch([FromBody] WebhookPayloads.AdminAddresses.Patch payload)
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
-            return await _proposedShipmentCommand.GetExpectedNewSellerAddressAndValidateInFreightPop(payload);
+            return await _addressValidationCommand.GetExpectedNewSellerAddressAndValidateInFreightPop(payload);
         }
 
         [HttpPost, Route("validatesupplieraddresspatch")]
-        public async Task<PrewebhookResponseWithError> ValidateSupplierAddressPostPut([FromBody] WebhookPayloads.SupplierAddresses.Patch payload)
+        public async Task<WebhookResponse> ValidateSupplierAddressPostPut([FromBody] WebhookPayloads.SupplierAddresses.Patch payload)
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
-            return await _proposedShipmentCommand.GetExpectedNewSupplierAddressAndValidateInFreightPop(payload);
+            return await _addressValidationCommand.GetExpectedNewSupplierAddressAndValidateInFreightPop(payload);
         }
 
         [HttpPost, Route("validatemeaddresspatch")]
-        public async Task<PrewebhookResponseWithError> ValidateMeAddressPostPut([FromBody] WebhookPayloads.Me.PatchAddress payload)
+        public async Task<WebhookResponse> ValidateMeAddressPostPut([FromBody] WebhookPayloads.Me.PatchAddress payload)
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
-            return await _proposedShipmentCommand.GetExpectedNewMeAddressAndValidateInFreightPop(payload);
+            return await _addressValidationCommand.GetExpectedNewMeAddressAndValidateInFreightPop(payload);
         }
 
         [HttpPost, Route("validatebuyeraddresspatch")]
-        public async Task<PrewebhookResponseWithError> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Patch payload)
+        public async Task<WebhookResponse> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Patch payload)
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
-            return await _proposedShipmentCommand.GetExpectedNewBuyerAddressAndValidateInFreightPop(payload);
+            return await _addressValidationCommand.GetExpectedNewBuyerAddressAndValidateInFreightPop(payload);
         }
     }
 }

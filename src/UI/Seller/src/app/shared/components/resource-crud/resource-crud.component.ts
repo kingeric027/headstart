@@ -1,22 +1,20 @@
-import { OnInit, OnDestroy, ChangeDetectorRef, AfterContentInit, NgZone, createPlatform } from '@angular/core';
-import { Meta } from '@ordercloud/angular-sdk';
+import { OnInit, OnDestroy, ChangeDetectorRef, NgZone, Output } from '@angular/core';
 import { takeWhile } from 'rxjs/operators';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
-import { ListResource, Options, FilterDictionary } from '@app-seller/shared/services/resource-crud/resource-crud.types';
+import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
-  resourceList: ListResource<ResourceType> = { Meta: {}, Items: [] };
+  resourceList: ListPage<ResourceType> = { Meta: {}, Items: [] };
 
   // empty string if no resource is selected
   selectedResourceID = '';
-  updatedResource = {};
-  resourceInSelection = {};
-
+  updatedResource = {} as ResourceType;
+  resourceInSelection = {} as ResourceType;
   resourceForm: FormGroup;
   isMyResource = false;
 
@@ -57,21 +55,21 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.determineViewingContext();
     this.subscribeToResources();
     this.subscribeToResourceSelection();
     this.setForm(this.updatedResource);
   }
 
-  subscribeToResources() {
-    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe((resourceList) => {
+  subscribeToResources(): void {
+    this.ocService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
       this.resourceList = resourceList;
       this.changeDetectorRef.detectChanges();
     });
   }
 
-  async determineViewingContext() {
+  async determineViewingContext(): Promise<void> {
     this.isMyResource = this.router.url.startsWith('/my-');
     if (this.isMyResource) {
       const supplier = await this.ocService.getMyResource();
@@ -79,8 +77,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  subscribeToResourceSelection() {
-    this.activatedRoute.params.subscribe((params) => {
+  subscribeToResourceSelection(): void {
+    this.activatedRoute.params.subscribe(params => {
       if (this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
         const resourceIDSelected =
@@ -95,61 +93,55 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     });
   }
 
-  setForm(resource: any) {
+  setForm(resource: any): void {
     if (this.createForm) {
       this.resourceForm = this.createForm(resource);
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  resetForm(resource: any) {
+  resetForm(resource: any): void {
     if (this.createForm) {
       this.resourceForm.reset(this.createForm(resource));
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  private setIsCreatingNew() {
-    const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
-  }
-
-  handleScrollEnd() {
+  handleScrollEnd(): void {
     if (this.resourceList.Meta.TotalPages > this.resourceList.Meta.Page) {
       this.ocService.getNextPage();
     }
   }
 
-  searchResources(searchStr: string) {
+  searchResources(searchStr: string): void {
     this.ocService.searchBy(searchStr);
   }
 
-  async setResourceSelectionFromID(resourceID: string) {
+  async setResourceSelectionFromID(resourceID: string): Promise<void> {
     this.selectedResourceID = resourceID || '';
     const resource = await this.ocService.findOrGetResourceByID(resourceID);
     this.resourceInSelection = this.copyResource(resource);
     this.setUpdatedResourceAndResourceForm(resource);
   }
 
-  async setResourceSelectionFromResource(resource: any) {
+  setResourceSelectionFromResource(resource: any): void {
     this.selectedResourceID = (resource && resource.ID) || '';
 
     this.resourceInSelection = this.copyResource(resource);
     this.setUpdatedResourceAndResourceForm(resource);
   }
 
-  setResoureObjectsForCreatingNew() {
+  setResoureObjectsForCreatingNew(): void {
     this.resourceInSelection = this.ocService.emptyResource;
     this.setUpdatedResourceAndResourceForm(this.ocService.emptyResource);
   }
 
-  selectResource(resource: any) {
+  selectResource(resource: any): void {
     const [newURL, queryParams] = this.ocService.constructNewRouteInformation(resource.ID || '');
     this.navigate(newURL, { queryParams });
   }
 
-  updateResource(resourceUpdate: any) {
+  updateResource(resourceUpdate: any): void {
     // copying a resetting this.updated resource ensures that the copy and base object
     // reference is broken
     // not the prettiest function, feel free to improve
@@ -175,7 +167,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.changeDetectorRef.detectChanges();
   }
 
-  handleUpdateResource(event: any, field: string) {
+  handleUpdateResource(event: any, field: string): void {
     const resourceUpdate = {
       field,
       value: field === 'Active' ? event.target.checked : event.target.value,
@@ -183,28 +175,28 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.updateResource(resourceUpdate);
   }
 
-  copyResource(resource: any) {
+  copyResource(resource: ResourceType): ResourceType {
     return JSON.parse(JSON.stringify(resource));
   }
 
-  async saveUpdates() {
+  saveUpdates(): void {
     if (this.isCreatingNew) {
       this.createNewResource();
     } else {
-      this.updateExitingResource();
+      this.updateExistingResource();
     }
   }
 
-  async deleteResource() {
+  async deleteResource(): Promise<void> {
     await this.ocService.deleteResource(this.selectedResourceID);
     this.selectResource({});
   }
 
-  discardChanges() {
+  discardChanges(): void {
     this.setUpdatedResourceAndResourceForm(this.resourceInSelection);
   }
 
-  async updateExitingResource() {
+  async updateExistingResource(): Promise<void> {
     // dataIsSaving indicator is used in the resource table to conditionally tell the
     // submit button to disable
     try {
@@ -219,13 +211,13 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  setUpdatedResourceAndResourceForm(updatedResource: any) {
+  setUpdatedResourceAndResourceForm(updatedResource: any): void {
     this.updatedResource = this.copyResource(updatedResource);
     this.setForm(this.copyResource(updatedResource));
     this.changeDetectorRef.detectChanges();
   }
 
-  async createNewResource() {
+  async createNewResource(): Promise<void> {
     // dataIsSaving indicator is used in the resource table to conditionally tell the
     // submit button to disable
     try {
@@ -239,7 +231,13 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
+  }
+
+  private setIsCreatingNew(): void {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
+    this.isCreatingNew = endUrl === '/new';
   }
 }

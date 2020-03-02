@@ -15,7 +15,7 @@ import { MarketplaceModule, AppConfig } from 'marketplace';
 import { createCustomElement } from '@angular/elements';
 import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
-import { OrderCloudModule } from '@ordercloud/angular-sdk';
+import { OrderCloudModule, Configuration } from '@ordercloud/angular-sdk';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -54,7 +54,7 @@ import { OCMOrderShipments } from './components/orders/order-shipments/order-shi
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
 import { OCMOrderHistorical } from './components/orders/order-historical/order-historical.component';
 import { OCMOrderHistory } from './components/orders/order-history/order-history.component';
-
+import { OCMAddressSuggestion } from './components/layout/address-suggestions/address-suggestion.component'
 import { SpecFieldDirective } from './components/products/spec-form/spec-field.directive';
 import { SpecFormCheckboxComponent } from './components/products/spec-form/spec-form-checkbox/spec-form-checkbox.component';
 import { SpecFormInputComponent } from './components/products/spec-form/spec-form-input/spec-form-input.component';
@@ -174,6 +174,7 @@ const components = [
   OCMOrderShipments,
   OCMOrderHistorical,
   OCMOrderHistory,
+  OCMAddressSuggestion,
   OCMAppFooter,
   SpecFormCheckboxComponent,
   SpecFormInputComponent,
@@ -306,6 +307,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
     this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
+    this.buildWebComponent(OCMAddressSuggestion, 'address-suggestion');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
     this.buildWebComponent(ConfirmModal, 'confirm-modal');
   }

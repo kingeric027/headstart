@@ -104,7 +104,7 @@ namespace Orchestration.Tests
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.Address, new MarketplaceAddress()
+                yield return new TestCaseData(RecordType.Address, new MarketplaceAddressBuyer()
                 {
                     ID = "id"
                 });

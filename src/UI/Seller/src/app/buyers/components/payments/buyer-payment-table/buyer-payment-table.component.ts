@@ -2,9 +2,8 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { CreditCard } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
-import { BuyerService } from '@app-seller/shared/services/buyer/buyer.service';
-import { BuyerLocationService } from '@app-seller/shared/services/buyer/buyer-location.service';
-import { BuyerPaymentService } from '@app-seller/shared/services/buyer/buyer-payment.service';
+import { BuyerPaymentService } from '../buyer-payment.service';
+import { BuyerService } from '../../buyers/buyer.service';
 
 @Component({
   selector: 'app-buyer-payment-table',

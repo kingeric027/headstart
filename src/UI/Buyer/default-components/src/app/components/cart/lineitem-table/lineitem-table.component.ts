@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { Address, LineItem, Supplier } from '@ordercloud/angular-sdk';
+import { LineItem } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, LineItemGroupSupplier } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
@@ -18,20 +18,19 @@ export class OCMLineitemTable {
     this.setSupplierInfo(this.liGroupedByShipFrom);
   }
   @Input() readOnly: boolean;
-  supplierInfo: Supplier[] = [];
-  supplierAddresses: Address[] = [];
+  suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: LineItem[][];
   liGroups: any;
   _lineItems = [];
+
   constructor(private context: ShopperContextService) { }
 
-  async setSupplierInfo(liGroupedByShipFrom: LineItem[][]): Promise<void> {
-    this.supplierInfo = await this.context.orderHistory.getSupplierInfo(liGroupedByShipFrom);
-    this.supplierAddresses = await this.context.orderHistory.getSupplierAddresses(liGroupedByShipFrom);
+  async setSupplierInfo(liGroups: LineItem[][]): Promise<void> {
+    this.suppliers = await this.context.orderHistory.getLineItemSuppliers(liGroups);
   }
 
   removeLineItem(lineItemID: string): void {
-    this.context.currentOrder.removeFromCart(lineItemID);
+    this.context.order.cart.remove(lineItemID);
   }
 
   toProductDetails(productID: string): void {
@@ -41,7 +40,7 @@ export class OCMLineitemTable {
   changeQuantity(lineItemID: string, event: { qty: number; valid: boolean }): void {
     if (event.valid) {
       this.getLineItem(lineItemID).Quantity = event.qty;
-      this.context.currentOrder.setQuantityInCart(lineItemID, event.qty);
+      this.context.order.cart.setQuantity(lineItemID, event.qty);
     }
   }
 

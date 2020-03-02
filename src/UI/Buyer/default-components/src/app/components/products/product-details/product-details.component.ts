@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { minBy as _minBy } from 'lodash';
-import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
+import { ListSpec } from '@ordercloud/angular-sdk';
 import { SpecFormService } from '../spec-form/spec-form.service';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceProduct, ProductType } from 'marketplace';
 import { getImageUrls } from 'src/app/services/images.helpers';
 
 @Component({
@@ -12,7 +12,7 @@ import { getImageUrls } from 'src/app/services/images.helpers';
 })
 export class OCMProductDetails implements OnInit {
   _specs: ListSpec;
-  _product: BuyerProduct;
+  _product: MarketplaceProduct;
   specFormService: SpecFormService;
   isOrderable = false;
   quantity: number;
@@ -21,7 +21,7 @@ export class OCMProductDetails implements OnInit {
   priceBreaks: object;
   priceBreakRange: string[];
   selectedBreak: object;
-  relatedProducts$: Observable<BuyerProduct[]>;
+  relatedProducts$: Observable<MarketplaceProduct[]>;
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
@@ -38,7 +38,7 @@ export class OCMProductDetails implements OnInit {
     this.specLength = this._specs.Items.length;
   }
 
-  @Input() set product(value: BuyerProduct) {
+  @Input() set product(value: MarketplaceProduct) {
     this._product = value;
     this.isOrderable = !!this._product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
@@ -46,7 +46,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   ngOnInit(): void {
-    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
+    this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
 
   onSpecFormChange(event): void {
@@ -54,6 +54,10 @@ export class OCMProductDetails implements OnInit {
       this.specFormService.event = event.detail;
       this.price = this.getTotalPrice();
     }
+  }
+
+  isQuoteProduct(): boolean {
+    return this._product.xp.ProductType === ProductType.Quote;
   }
 
   qtyChange(event: { qty: number; valid: boolean }): void {
@@ -64,7 +68,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   addToCart(): void {
-    this.context.currentOrder.addToCart({
+    this.context.order.cart.add({
       ProductID: this._product.ID,
       Quantity: this.quantity,
       Specs: this.specFormService.getLineItemSpecs(this._specs),

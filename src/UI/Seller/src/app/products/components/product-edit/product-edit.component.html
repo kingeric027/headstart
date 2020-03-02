@@ -1,0 +1,330 @@
+<div *ngIf="productForm"
+     class="container-fluid resource-edit">
+  <form [formGroup]="productForm">
+    <!-- Product Details -->
+    <div class="row pt-3">
+      <div class="col-md-5">
+        <h5>Product Details</h5>
+        <p class="font-italic">This is a description of the basic information section.</p>
+      </div>
+      <div class="col-md-7 form-group">
+        <div class="form-group">
+          <label for="Name">Name</label>
+          <input type="text"
+                 class="form-control"
+                 id="Name"
+                 showErrors
+                 aria-describedby="Name"
+                 maxlength="100"
+                 [resourceForm]="productForm"
+                 formControlName="Name"
+                 (input)="handleUpdateProduct($event, 'Product.Name')"
+                 placeholder="Enter Name">
+        </div>
+        <div class="form-group"
+             *ngIf="isCreatingNew">
+          <label for="ID">Product ID</label>
+          <input type="text"
+                 class="form-control"
+                 id="ID"
+                 showErrors
+                 aria-describedby="ID"
+                 maxlength="100"
+                 [resourceForm]="productForm"
+                 formControlName="ID"
+                 (input)="handleUpdateProduct($event, 'Product.ID')"
+                 placeholder="Enter Product ID">
+        </div>
+        <div class="form-group"
+             *ngIf="!isCreatingNew && _superMarketplaceProductStatic">
+          <label for="ID">Product ID</label>
+          <input class="form-control"
+                 value="{{_superMarketplaceProductStatic.Product.ID}}"
+                 disabled>
+        </div>
+        <div class="form-group">
+          <label for="Description">Description</label>
+          <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
+                                           [formControlForText]="productForm?.controls.Description"
+                                           resourceField="Description"
+                                           pathOnResource="Description"
+                                           (resourceUpdated)="updateResourceFromFieldValue($event.field, $event.value)">
+          </reactive-quill-editor-component>
+        </div>
+        <div class="form-group">
+          <label for="Note">Product Message</label>
+          <input type="text"
+                 class="form-control"
+                 id="Note"
+                 showErrors
+                 aria-describedby="Note"
+                 maxlength="140"
+                 [resourceForm]="productForm"
+                 formControlName="Note"
+                 (input)="handleUpdateProduct($event, 'Product.xp.Note')"
+                 placeholder="(Optional) Enter a note about this product">
+        </div>
+        <div class="form-group">
+          <label for="QuantityMultiplier">Quantity Multiplier</label>
+          <input type="number"
+                 class="form-control"
+                 id="QuantityMultiplier"
+                 showErrors
+                 aria-describedby="Quantity Multiplier"
+                 min="1"
+                 [resourceForm]="productForm"
+                 formControlName="QuantityMultiplier"
+                 (input)="handleUpdateProduct($event, 'Product.QuantityMultiplier', 'number')"
+                 placeholder="Quantity Multiplier">
+        </div>
+        <div class="form-group">
+          <label for="Price">Price</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">$</span>
+            </div>
+            <input type="number"
+                   class="form-control currency"
+                   id="Price"
+                   showErrors
+                   aria-describedby="Price"
+                   min="1"
+                   step="0.01"
+                   [resourceForm]="productForm"
+                   formControlName="Price"
+                   (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
+                   placeholder="Price (USD)">
+          </div>
+        </div>
+        <product-tax-code-select-component [productForm]="productForm"
+                                           [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
+                                           [taxCodes]="taxCodes"
+                                           (handleTaxCodeCategorySelection)="handleTaxCodeCategorySelection($event)"
+                                           (handleTaxCodeSelection)="handleUpdateProduct($event, 'Product.xp.Tax')"
+                                           (handleTaxCodesSearched)="searchTaxCodes($event)"
+                                           (onScrollEnd)="handleScrollEnd($event)">
+        </product-tax-code-select-component>
+        <div class="form-group">
+          <label for="ProductType">Product Type</label>
+          <select type="dropdown"
+                  class="form-control"
+                  id="ProductType"
+                  aria-describedby="Product type"
+                  placeholder="Choose product type"
+                  (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
+            <option selected="selected"
+                    disabled>Choose a product type</option>
+            <option value="Standard">Standard</option>
+            <option value="Quote">Quote</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <!-- /Product Details -->
+
+    <!-- Product Variations TODO: NOT MVP -->
+    <!-- <div class="
+                  row
+                  pt-3
+                  mt-5
+                  border-top">
+            <div class="col-md-5">
+              <h5>Product Variations</h5>
+              <p class="font-italic">Does your product come in different varieties? Add them here.</p>
+            </div>
+            <div class="col-md-7">
+              <button *ngIf="!hasVariations"
+                      class="btn btn-outline-dark"
+                      (click)="hasVariations = true">Add Variations</button>
+              <div *ngIf="hasVariations"
+                   class="variation-form-container">
+                <div class="form-group">
+                  <label for="VariationType">Add a variation</label>
+                  <select type="dropdown"
+                          class="form-control"
+                          id="VariationType"
+                          aria-describedby="Variation type"
+                          placeholder="Choose variation type">
+                    <option default
+                            disabled>Choose a variation type</option>
+                    <option>Color</option>
+                    <option>Size</option>
+                    <option>Height</option>
+                  </select>
+                </div>
+                <button class="btn btn-link text-danger"
+                        (click)="hasVariations = false">Cancel variations</button>
+              </div>
+            </div>
+        </div> -->
+    <!-- /Product Variations -->
+
+    <!-- Shipping Information -->
+    <div class="row pt-3 mt-5 border-top">
+      <div class="col-md-5">
+        <h5>Shipping Information</h5>
+        <p class="font-italic">Provide accurate shipping weight and dimensions for the most accurate shipping estimates.</p>
+      </div>
+      <div class="col-md-7">
+        <div class="form-group">
+          <label for="ShipFromAddressID">Which location will this product ship from?</label>
+          <select type="dropdown"
+                  class="form-control"
+                  formControlName="ShipFromAddressID"
+                  id="ShipFromAddressID"
+                  aria-describedby="Ship From Address ID"
+                  (change)="handleUpdateProduct($event, 'Product.ShipFromAddressID')">
+            <option disabled
+                    [ngValue]="null">Choose an address</option>
+            <option *ngFor="let address of addresses?.Items"
+                    [value]="address.ID">{{address.AddressName}}</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="ShipHeight">Ship Height</label>
+            <input type="number"
+                   class="form-control"
+                   id="ShipHeight"
+                   showErrors
+                   aria-describedby="Ship Height"
+                   [resourceForm]="productForm"
+                   formControlName="ShipHeight"
+                   (input)="handleUpdateProduct($event, 'Product.ShipHeight', 'number')"
+                   placeholder="Enter Ship Height">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="ShipWidth">Ship Width</label>
+            <input type="number"
+                   class="form-control"
+                   id="ShipWidth"
+                   showErrors
+                   aria-describedby="Ship Width"
+                   [resourceForm]="productForm"
+                   formControlName="ShipWidth"
+                   (input)="handleUpdateProduct($event, 'Product.ShipWidth', 'number')"
+                   placeholder="Ship Width">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="ShipLength">Ship Length</label>
+            <input type="number"
+                   class="form-control"
+                   id="ShipLength"
+                   showErrors
+                   aria-describedby="Ship Length"
+                   [resourceForm]="productForm"
+                   formControlName="ShipLength"
+                   (input)="handleUpdateProduct($event, 'Product.ShipLength', 'number')"
+                   placeholder="Enter Ship Length">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="ShipWeight">Ship Weight</label>
+            <input type="number"
+                   class="form-control"
+                   id="ShipWeight"
+                   showErrors
+                   aria-describedby="Ship Weight"
+                   [resourceForm]="productForm"
+                   formControlName="ShipWeight"
+                   (input)="handleUpdateProduct($event, 'Product.ShipWeight', 'number')"
+                   placeholder="Ship Weight">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Shipping Information -->
+    <!-- Product Images -->
+    <div class="row pt-3 mt-5 border-top">
+      <div class="col-md-5">
+        <h5>Product Images</h5>
+        <p class="font-italic">Drag and Drop or upload your product images to display on the buyer site.</p>
+      </div>
+      <div class="col-md-7">
+        <!--droped image preview-->
+        <div class="d-flex justify-content-start align-items-center flex-wrap">
+          <div *ngFor="let image of images; let i = index"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
+                 [src]="image.URL"
+                 width="auto"
+                 height="100px">
+            <div class="product-img-delete text-center">
+              <button title="Delete photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="delete"
+                      type="button"
+                      (click)="open(content)">
+
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+              <ng-template #content
+                           let-modal
+                           class="confirm-modal">
+                <confirm-modal modalTitle="Delete Image?"
+                               description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
+                  <button type="button"
+                          class="btn btn-link text-dark"
+                          (click)="modal.dismiss()">Cancel</button>
+                  <button type="button"
+                          class="btn brand-button--danger"
+                          (click)="removeFile(image.URL)"
+                          (click)="modal.dismiss()">Yes, Delete</button>
+                </confirm-modal>
+              </ng-template>
+            </div>
+          </div>
+          <div *ngFor="let image of files; let i = index"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
+                 [src]="image.URL"
+                 width="auto"
+                 height="100px">
+            <div class="product-img-delete text-center">
+              <button title="Un-stage photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="unstage"
+                      (click)="unStage(i)">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            </div>
+          </div>
+          <label class="rmpm dropzone"
+                 for="upload"
+                 appDrag
+                 (files)="stageFiles($event)">
+          </label>
+          <input class="d-none"
+                 id="upload"
+                 type="file"
+                 (change)="manualFileUpload($event)"
+                 multiple>
+        </div>
+      </div>
+    </div>
+    <!-- /Product Images -->
+  </form>
+  <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
+  <div *ngIf="userContext?.UserType === 'SUPPLIER'"
+       class="d-flex justify-content-between align-items-center py-2">
+    <delete-confirm-modal-component *ngIf="!isCreatingNew"
+                                    buttonText="Delete Product"
+                                    (deleteConfirmed)="handleDelete($event)">
+    </delete-confirm-modal-component>
+    <div>
+      <button *ngIf="areChanges"
+              class="btn btn-primary"
+              type="submit"
+              [disabled]="productForm?.status === 'INVALID' || dataIsSaving"
+              (click)="handleSave()">{{getSaveBtnText()}}</button>
+      <button class="btn brand-button ml-3"
+              (click)="handleDiscardChanges()"
+              *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+    </div>
+  </div>
+</div>

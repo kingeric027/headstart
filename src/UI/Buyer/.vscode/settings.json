@@ -1,3 +1,7 @@
 {
-    "eslint.workingDirectories": [ "./default-components", "./marketplace" ]
+    "eslint.workingDirectories": [
+        "./default-components",
+        "./marketplace"
+    ],
+    "editor.formatOnSave": true
 }

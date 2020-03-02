@@ -14,12 +14,10 @@ namespace Marketplace.Common.Controllers.Avalara
     public class TaxCodesController : BaseController
     {
         private readonly IAvataxService _taxService;
-        private readonly ITaxCommand _taxCommand;
 
-        public TaxCodesController(AppSettings settings, IAvataxService taxService, ITaxCommand taxCommand) : base(settings)
+        public TaxCodesController(AppSettings settings, IAvataxService taxService) : base(settings)
         {
             _taxService = taxService;
-            _taxCommand = taxCommand;
         }
 
         [HttpGet, Route(""), MarketplaceUserAuth(ApiRole.ProductAdmin)]

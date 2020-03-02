@@ -7,7 +7,10 @@ export const ocAppConfig: AppConfig = {
   cmsUrl: environment.cmsUrl,
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
-  //sellerName is being hard-coded until this is available to store in OrderCloud
+  orderCloudApiUrl: environment.orderCloudApiUrl,
+  orderCloudAuthUrl: environment.orderCloudAuthUrl,
+  orderCloudApiVersion: environment.orderCloudApiVersion,
+  // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: 'SEB Seller',
   scope: [
     // 'AdminAddressReader' is just for reading admin addresses as a seller user on product create/edti
@@ -43,6 +46,7 @@ export const ocAppConfig: AppConfig = {
     'CreditCardAdmin',
     'SupplierAdmin',
     'SupplierUserAdmin',
+    'SupplierUserGroupAdmin',
     'SupplierAddressAdmin',
     'AdminUserAdmin',
 
@@ -61,10 +65,12 @@ export const ocAppConfig: AppConfig = {
     'MPBuyerAdmin',
     'MPBuyerReader',
     'MPSellerAdmin',
+    'MPReportReader',
     'MPSupplierAdmin',
     'MPMeSupplierAdmin',
     'MPMeSupplierAddressAdmin',
     'MPMeSupplierUserAdmin',
+    'MPSupplierUserGroupAdmin',
   ],
 };
 
@@ -95,7 +101,7 @@ export interface AppConfig {
 
   marketplaceID: string;
 
-  //sellerName is being hard-coded until this is available to store in OrderCloud
+  // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: string;
 
   /**
@@ -104,5 +110,10 @@ export interface AppConfig {
    * To learn more about these roles and the security profiles that comprise them
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
+
+  orderCloudApiUrl: string;
+  orderCloudAuthUrl: string;
+  orderCloudApiVersion: string;
+
   scope: string[];
 }

@@ -1,9 +1,10 @@
-import { PRODUCT_IMAGE_PATH_STRATEGY } from '../product/product-image.helper';
+import { PRODUCT_IMAGE_PATH_STRATEGY } from '@app-seller/products/product-image.helper';
 
 export interface SummaryResourceInfoPaths {
   toPrimaryHeader: string;
   toSecondaryHeader: string;
   toImage: string;
+  toExpandable: boolean;
 }
 
 export interface SummaryResourceInfoPathsDictionary {
@@ -15,46 +16,61 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
     toImage: 'xp.LogoUrl',
+    toExpandable: false
   },
   users: {
     toPrimaryHeader: 'Username',
     toSecondaryHeader: 'ID',
     toImage: '',
+    toExpandable: false
   },
   products: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
     toImage: PRODUCT_IMAGE_PATH_STRATEGY,
+    toExpandable: false
   },
   promotions: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'Code',
     toImage: '',
+    toExpandable: false
   },
   buyers: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
     toImage: '',
+    toExpandable: false
   },
   locations: {
     toPrimaryHeader: 'AddressName',
     toSecondaryHeader: 'ID',
     toImage: '',
+    toExpandable: false
   },
   payments: {
     toPrimaryHeader: 'CardholderName',
     toSecondaryHeader: 'CardType',
     toImage: '',
+    toExpandable: false
   },
   approvals: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ApprovalRuleID',
     toImage: '',
+    toExpandable: false
+  },
+  categories: {
+    toPrimaryHeader: 'Name',
+    toSecondaryHeader: 'ID',
+    toImage: '',
+    toExpandable: true
   },
   orders: {
     toPrimaryHeader: 'FromUser.Username',
     toSecondaryHeader: 'Status',
     toImage: '',
+    toExpandable: false
   },
 };
 
@@ -88,6 +104,7 @@ export const STRING_WITH_IMAGE = 'STRING_WITH_IMAGE';
 export const BASIC_STRING = 'BASIC_STRING';
 export const DATE_TIME = 'DATE_TIME';
 export const CURRENCY = 'CURRENCY';
+export const COPY_OBJECT = 'COPY_OBJECT';
 
 export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
   products: {
@@ -220,6 +237,26 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     ],
     imgPath: '',
   },
+  categories: {
+    fields: [
+      {
+        path: 'Name',
+        header: 'Name',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'Description',
+        header: 'Description',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'ID',
+        header: 'ID',
+        type: BASIC_STRING,
+      },
+    ],
+    imgPath: '',
+  },
   orders: {
     fields: [
       {
@@ -256,6 +293,41 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         path: 'Comments',
         header: 'Comments',
         type: BASIC_STRING,
+      },
+    ],
+    imgPath: '',
+  },
+  logs: {
+    fields: [
+      {
+        path: 'timeStamp',
+        header: 'Time Stamp',
+        type: DATE_TIME,
+      },
+      {
+        path: 'Action',
+        header: 'Action',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'RecordType',
+        header: 'Record Type',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'RecordId',
+        header: 'Record ID',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'Level',
+        header: 'Result',
+        type: BASIC_STRING,
+      },
+      {
+        path: 'Copy',
+        header: 'Copy',
+        type: COPY_OBJECT,
       },
     ],
     imgPath: '',

@@ -9,16 +9,28 @@ import {
   ShipmentItem,
   BuyerProduct,
   Meta,
+  Supplier,
+  Address,
+  BuyerCreditCard,
+  Product,
+  Buyer,
+  ListBuyerProduct,
 } from '@ordercloud/angular-sdk';
 
 export * from '@ordercloud/angular-sdk';
 export * from './services/shopper-context/shopper-context.service';
+export * from '../../src/lib/services/ordercloud-sandbox/ordercloud-sandbox.models';
 
 export interface CreditCardToken {
   AccountNumber: string;
   ExpirationDate: string; // MMYY or MMYYY
   CardholderName: string;
   CardType?: string;
+}
+
+export interface LineItemGroupSupplier {
+  supplier: Supplier;
+  shipFrom: Address;
 }
 
 export interface SupplierFilters {
@@ -41,39 +53,8 @@ export interface ShippingRate {
   TotalCost: number;
 }
 
-export interface ProposedShipmentSelection {
-  // tentative model pending platform implementation
-  ShipFromAddressID: string;
-  SupplierID: string;
-  ProposedShipmentOptionID: string;
-  Rate: number;
-}
-
-export interface ListProposedShipment {
-  Meta: Meta;
-  Items: ProposedShipment[];
-}
-
-export interface ProposedShipment {
-  ProposedShipmentItems: ProposedShipmentItem[];
-  ProposedShipmentOptions: ProposedShipmentOption[];
-}
-
-export interface ProposedShipmentItem {
-  LineItemID: string;
-  Quantity: number;
-}
-
-export interface ProposedShipmentOption {
-  ID: string;
-  Name: string;
-  DeliveryDays: number;
-  Cost: number;
-}
-
-export interface MarketplaceOrder extends Order<OrderXp, any, any> { }
+export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
 export interface OrderXp {
-  ProposedShipmentSelections: ProposedShipmentSelection[];
   AvalaraTaxTransactionCode: string;
 }
 
@@ -102,6 +83,11 @@ export interface OrderFilters {
   toDate?: string;
 }
 
+export enum OrderAddressType {
+  Billing = 'Billing',
+  Shipping = 'Shipping',
+}
+
 export enum OrderStatus {
   AllSubmitted = '!Unsubmitted',
   Unsubmitted = 'Unsubmitted',
@@ -109,7 +95,7 @@ export enum OrderStatus {
   Declined = 'Declined',
   Open = 'Open',
   Completed = 'Completed',
-  Canceled = 'Canceled'
+  Canceled = 'Canceled',
 }
 
 export interface CreditCard {
@@ -182,6 +168,10 @@ export class AppConfig {
   /**
    * base path to middleware
    */
+
+  orderCloudApiUrl: string;
+  orderCloudAuthUrl: string;
+  orderCloudApiVersion: string;
   middlewareUrl: string;
   /**
    * base path to CMS resources
@@ -198,6 +188,12 @@ export class AppConfig {
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
   scope: string[];
+}
+
+export interface CreditCardPayment {
+  SavedCard?: BuyerCreditCard;
+  NewCard?: CreditCardToken;
+  CVV: string;
 }
 
 export interface DecodedOCToken {
@@ -264,4 +260,59 @@ export interface SupplierCategoryConfig {
   timestamp: string;
   MarketplaceName: string;
   Filters: Array<SupplierCategoryConfigFilters>;
+}
+
+// Product Model
+// a corresponding model in the C# product
+export type ListMarketplaceProduct = ListBuyerProduct<MarketplaceProductXp>;
+
+export type MarketplaceProduct = BuyerProduct<MarketplaceProductXp>;
+
+export interface MarketplaceProductXp {
+  // DO NOT DELETE //
+  IntegrationData: any;
+  Facets: FacetDictionary;
+  Images: MarketPlaceProductImage[];
+  // DO NOT DELETE //
+  Status: ObjectStatus;
+  HasVariants: boolean;
+  Note: string;
+  Tax: TaxProperties;
+  UnitOfMeasure: UnitOfMeasure;
+  ProductType: ProductType;
+}
+
+export interface UnitOfMeasure {
+  Qty: number;
+  Unit: string;
+}
+
+export interface TaxProperties {
+  Category: string;
+  Code: string;
+  Description: string;
+}
+
+export enum ProductType {
+  Standard = 'Standard',
+  Quote = 'Quote',
+}
+
+interface FacetDictionary {
+  [key: string]: string[];
+}
+
+export enum ObjectStatus {
+  Draft = 'Draft',
+  Published = 'Published',
+}
+
+export interface MarketPlaceProductTaxCode {
+  Category: string;
+  Code: string;
+  Description: string;
+}
+export interface MarketPlaceProductImage {
+  URL: string;
+  Tag: string[];
 }

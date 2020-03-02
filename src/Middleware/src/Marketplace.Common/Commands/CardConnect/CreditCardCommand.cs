@@ -6,6 +6,7 @@ using Marketplace.Common.Services.CardConnect;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Models;
+using Marketplace.Models;
 using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 
@@ -32,8 +33,8 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
-                ApiUrl = "https://api.ordercloud.io",
-                AuthUrl = "https://auth.ordercloud.io"
+                ApiUrl = settings.OrderCloudSettings.ApiUrl,
+                AuthUrl = settings.OrderCloudSettings.AuthUrl
             });
 			_privilegedOC = oc;
 		}
@@ -56,8 +57,8 @@ namespace Marketplace.Common.Commands
 			var cc = await GetMeCardDetails(payment, user);
 
             Require.That(cc.Token != null, new ErrorCode("Invalid credit card token", 400, "Credit card must have valid authorization token"));
-
-			var order = await _privilegedOC.Orders.GetAsync(OrderDirection.Incoming, payment.OrderID);
+      
+			var order = await _privilegedOC.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, payment.OrderID);
 
 			var paymentlist = await _privilegedOC.Payments.ListAsync<Payment>(OrderDirection.Incoming, payment.OrderID, builder => builder.AddFilter(p => p.CreditCardID == payment.CreditCardID));
 			if (paymentlist.Meta.TotalCount == 0)
@@ -69,8 +70,8 @@ namespace Marketplace.Common.Commands
 
             if (order.BillingAddress == null)
             {
-                var address = await _oc.Me.GetAddressAsync(order.BillingAddressID, user.AccessToken);
-                order.BillingAddress = new Address()
+                var address = await _oc.Me.GetAddressAsync<MarketplaceAddressMeBuyer>(order.BillingAddressID, user.AccessToken);
+                order.BillingAddress = new MarketplaceAddressBuyer()
                 {
                     AddressName = address.AddressName,
                     City = address.City,

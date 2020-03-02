@@ -35,9 +35,9 @@ namespace Marketplace.Common.Services.FreightPop.Models
 
     public enum CarrierType
     {
-        LTL,
-        Air,
-        Parcel
+        LTL = 1,
+        Air = 2,
+        Parcel = 3
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

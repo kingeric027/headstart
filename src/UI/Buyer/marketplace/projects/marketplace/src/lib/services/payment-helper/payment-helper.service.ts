@@ -9,7 +9,7 @@ export class PaymentHelperService {
 
   async ListPaymentsOnOrder(orderID: string): Promise<ListPayment> {
     const payments = await this.ocPaymentService.List('outgoing', orderID).toPromise();
-    const withDetails = payments.Items.map((payment) => this.setPaymentDetails(payment));
+    const withDetails = payments.Items.map(payment => this.setPaymentDetails(payment));
     const Items = await Promise.all(withDetails);
     return { Items, Meta: payments.Meta };
   }

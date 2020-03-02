@@ -120,7 +120,7 @@
           <form class="d-flex flex-column filters"
                 [formGroup]="filterForm">
             <div *ngFor="let filter of filterConfig?.Filters"
-                 class="group">
+                 class="group mt-2">
               <label>{{filter.Display}}</label>
               <select class="form-control input-sm"
                       *ngIf="filter.Type === 'Dropdown'"
@@ -151,7 +151,7 @@
               </div>
             </div>
           </form>
-          <div class="d-flex justify-content-between align-items-center mt-2">
+          <div class="d-flex justify-content-between align-items-center mt-3">
             <button (click)="closePopover()"
                     class="btn btn-sm btn-link text-dark">Cancel</button>
             <button (click)="handleApplyFilters()"
@@ -216,7 +216,9 @@
                     [ngClass]="{'selected-resource': selectedResourceID === resource.ID}">
                   <td>
                     <summary-resource-display-component [resource]="resource"
-                                                        [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel">
+                                                        [resourceList]="resourceList.Items"
+                                                        [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel"
+                                                        [parentResourceID]="selectedParentResourceID">
                     </summary-resource-display-component>
                   </td>
                 </tr>
@@ -280,7 +282,7 @@
                       class="btn btn-primary"
                       type="submit"
                       [disabled]="resourceForm?.status === 'INVALID' || dataIsSaving"
-                      (click)="handleSave()">{{!isCreatingNew ? 'Save Changes': 'Create Resource'}}</button>
+                      (click)="handleSave()">{{getSaveBtnText()}}</button>
               <button class="btn brand-button ml-3"
                       (click)="handleDiscardChanges()"
                       *ngIf="areChanges && !isCreatingNew">Discard Changes</button>

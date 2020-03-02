@@ -50,7 +50,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("POST Address")]
         [HttpPost, Route("{buyerId}/address"), MarketplaceUserAuth()]
-        public async Task<MarketplaceAddress> PostAddress([FromBody] MarketplaceAddress obj, string buyerId, string clientId)
+        public async Task<MarketplaceAddressBuyer> PostAddress([FromBody] MarketplaceAddressBuyer obj, string buyerId, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId, clientId);
         }

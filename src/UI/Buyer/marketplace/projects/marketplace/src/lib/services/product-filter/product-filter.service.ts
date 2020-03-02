@@ -32,7 +32,9 @@ export class ProductFilterService implements IProductFilters {
   // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
   private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
 
-  public activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(this.getDefaultParms());
+  public activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(
+    this.getDefaultParms()
+  );
 
   constructor(
     private router: Router,
@@ -67,20 +69,26 @@ export class ProductFilterService implements IProductFilters {
     return { page, sortBy, search, ...activeFacets };
   }
 
-  async listProducts(): Promise < ListProduct > {
+  async listProducts(): Promise<ListProduct> {
     const { page, sortBy, search, categoryID, showOnlyFavorites, activeFacets = {} } = this.activeFiltersSubject.value;
-    const facets = _transform(activeFacets, (result, value, key: any) => (result[`xp.Facets.${key.toLocaleLowerCase()}`] = value), {});
-    const favorites = this.currentUser.favoriteProductIDs.join('|') || undefined;
-    return await this.ocMeService.ListProducts({
-      categoryID,
-      page,
-      search,
-      sortBy,
-      filters: {
-        ...facets,
-        ID: showOnlyFavorites ? favorites : undefined,
-      },
-    }).toPromise();
+    const facets = _transform(
+      activeFacets,
+      (result, value, key: any) => (result[`xp.Facets.${key.toLocaleLowerCase()}`] = value),
+      {}
+    );
+    const favorites = this.currentUser.get().FavoriteProductIDs.join('|') || undefined;
+    return await this.ocMeService
+      .ListProducts({
+        categoryID,
+        page,
+        search,
+        sortBy,
+        filters: {
+          ...facets,
+          ID: showOnlyFavorites ? favorites : undefined,
+        },
+      })
+      .toPromise();
   }
 
   private patchFilterState(patch: ProductFilters) {

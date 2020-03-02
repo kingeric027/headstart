@@ -1,37 +1,15 @@
 import { Product, PriceSchedule } from '@ordercloud/angular-sdk';
 
-export const DRAFT = 'DRAFT';
-export type DRAFT = typeof DRAFT;
-
-export const PUBLISHED = 'PUBLISHED';
-export type PUBLISHED = typeof PUBLISHED;
-
-export type ObjectStatus = DRAFT | PUBLISHED;
-
 // initial implementation of the MarketPlaceProduct model that has a corresponding
 // model in the C# product
 // making all non-product fields optional right now, could change later
 
-export interface MarketPlaceProduct extends Product<MarketplaceProductXp> {
-  Shipping?: ProductShipping;
-  PriceSchedule?: PriceSchedule;
-  HasVariants?: boolean;
-  Notes?: string;
-  UnitOfMeasure?: UnitOfMeasure;
-  Status?: ObjectStatus;
-}
-
 export interface SuperMarketplaceProduct {
-  Product: Product<MarketplaceProductXp>;
+  Product: MarketplaceProduct;
   PriceSchedule: PriceSchedule;
 }
 
-interface ProductShipping {
-  ShipWeight: number;
-  ShipHeight: number;
-  ShipWidth: number;
-  ShipLength: number;
-}
+export type MarketplaceProduct = Product<MarketplaceProductXp>;
 
 interface UnitOfMeasure {
   Qty: number;
@@ -42,6 +20,11 @@ interface TaxProperties {
   Category: string;
   Code: string;
   Description: string;
+}
+
+export enum ProductType {
+  Standard = 'Standard',
+  Quote = 'Quote',
 }
 
 interface FacetDictionary {
@@ -59,6 +42,12 @@ interface MarketplaceProductXp {
   Note: string;
   Tax: TaxProperties;
   UnitOfMeasure: UnitOfMeasure;
+  ProductType: ProductType;
+}
+
+export enum ObjectStatus {
+  Draft = 'Draft',
+  Published = 'Published',
 }
 
 export interface MarketPlaceProductTaxCode {

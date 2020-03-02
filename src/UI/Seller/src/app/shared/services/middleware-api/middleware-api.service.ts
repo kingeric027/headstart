@@ -1,14 +1,11 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { OcTokenService, Supplier } from '@ordercloud/angular-sdk';
+import { OcTokenService, Supplier, Buyer } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import {
-  MarketPlaceProduct,
-  MarketPlaceProductTaxCode,
-  SuperMarketplaceProduct,
-  DRAFT,
-} from '@app-seller/shared/models/MarketPlaceProduct.interface';
-import { ListResource } from '../resource-crud/resource-crud.types';
+import { SuperMarketplaceProduct, ObjectStatus } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { OrchestrationLog } from '@app-seller/reports/models/orchestration-log';
+import { ListPage } from './listPage.interface';
+import { ListArgs } from './listArgs.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +35,7 @@ export class MiddlewareAPIService {
   async createNewSuperMarketplaceProduct(
     superMarketplaceProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
-    superMarketplaceProduct.Product.xp.Status = DRAFT;
+    superMarketplaceProduct.Product.xp.Status = ObjectStatus.Draft;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
     const url = `${this.baseUrl}/products`;
     return await this.http.post<SuperMarketplaceProduct>(url, superMarketplaceProduct, this.headers).toPromise();
@@ -46,7 +43,7 @@ export class MiddlewareAPIService {
 
   async updateMarketplaceProduct(superMarketplaceProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
     // TODO: Temporary while Product set doesn't reflect the current strongly typed Xp
-    superMarketplaceProduct.Product.xp.Status = DRAFT;
+    superMarketplaceProduct.Product.xp.Status = ObjectStatus.Draft;
     const url = `${this.baseUrl}/products/${superMarketplaceProduct.Product.ID}`;
     return await this.http.put<SuperMarketplaceProduct>(url, superMarketplaceProduct, this.headers).toPromise();
   }
@@ -62,12 +59,6 @@ export class MiddlewareAPIService {
     return await this.http.delete<SuperMarketplaceProduct>(url, this.headers).toPromise();
   }
 
-  private formify(file: File): FormData {
-    const form = new FormData();
-    form.append('file', file);
-    return form;
-  }
-
   async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
     const url = `${
       this.baseUrl
@@ -78,5 +69,41 @@ export class MiddlewareAPIService {
   async createSupplier(supplier: Supplier): Promise<Supplier> {
     const url = `${this.baseUrl}/supplier`;
     return await this.http.post(url, supplier, this.headers).toPromise();
+  }
+
+  async createBuyer(buyer: Buyer): Promise<Supplier> {
+    const url = `${this.baseUrl}/buyer`;
+    return await this.http.post(url, buyer, this.headers).toPromise();
+  }
+
+  async listOrchestrationLogs(args: ListArgs = {}): Promise<ListPage<OrchestrationLog>> {
+    return await this.list(`${this.baseUrl}/orchestration/logs`, args);
+  }
+
+  private list<T>(url: string, args: ListArgs = {}): Promise<T> {
+    url = this.addUrlParams(url, args.filters);
+    delete args.filters;
+    url = this.addUrlParams(url, args);
+    return this.http.get<T>(url, this.headers).toPromise();
+  }
+
+  private addUrlParams(baseUrl: string, object: Record<string, any> = {}): string {
+    const symbol = baseUrl.includes('?') ? '&' : '?';
+    const fields = Object.entries(object);
+    const url = fields
+      .filter(([key, value]) => value)
+      .reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}${symbol}`);
+    return url.replace(/[?&]+$/g, ''); // remove trailling & or ?
+  }
+
+  private formify(file: File): FormData {
+    const form = new FormData();
+    form.append('file', file);
+    return form;
+  }
+
+  async getMySupplier(supplierID: string): Promise<Supplier> {
+    const url = `${this.baseUrl}/supplier/me/${supplierID}`;
+    return await this.http.get(url, this.headers).toPromise();
   }
 }

@@ -9,7 +9,11 @@ import { OrderHistoryService } from '../services/order-history/order-history.ser
   `,
 })
 export class OrderDetailWrapperComponent {
-  constructor(public context: ShopperContextService, private activatedRoute: ActivatedRoute, private orderHistory: OrderHistoryService) {
+  constructor(
+    public context: ShopperContextService,
+    private activatedRoute: ActivatedRoute,
+    private orderHistory: OrderHistoryService
+  ) {
     this.orderHistory.activeOrderID = this.activatedRoute.snapshot.params.orderID;
   }
 }
