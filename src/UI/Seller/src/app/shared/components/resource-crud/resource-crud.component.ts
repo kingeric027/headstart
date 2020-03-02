@@ -253,6 +253,5 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     /* Reduce possibility of errors: all IDs with the word new must equal it exactly,
     or begin with the word new and have a question mark following it for query params. */
     this.isCreatingNew = endUrl === 'new' || endUrl.startsWith('new?');
-    console.log('are we creating new?', this.isCreatingNew);
   }
 }
