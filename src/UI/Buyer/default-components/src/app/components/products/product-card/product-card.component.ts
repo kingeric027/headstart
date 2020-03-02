@@ -1,5 +1,5 @@
 import { Component, Input, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
-import { ShopperContextService, MarketplaceProduct } from 'marketplace';
+import { ShopperContextService, MarketplaceProduct, ProductType } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
@@ -47,7 +47,7 @@ export class OCMProductCard {
   }
 
   showAddToCart(): boolean {
-    return !this.isViewOnlyProduct && !this.hasSpecs && !this._product.xp.ProductType.Quote;
+    return !this.isViewOnlyProduct && !this.hasSpecs && this._product.xp.ProductType !== ProductType.Quote;
   }
 
   setQuantity(event: any): void {
