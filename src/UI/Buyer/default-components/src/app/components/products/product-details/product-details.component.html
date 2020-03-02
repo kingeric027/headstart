@@ -44,7 +44,8 @@
                 </ocm-quantity-input>
                 <button *ngIf="isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
-                        [disabled]="!specFormService.event?.valid || !qtyValid">
+                        [disabled]="!specFormService.event?.valid || !qtyValid"
+                        (click)="openQuoteForm()">
                   Request Quote
                 </button>
                 <button *ngIf="!isQuoteProduct()"
@@ -56,6 +57,14 @@
                   <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
                 </button>
               </div>
+            </div>
+            <div>
+              <ocm-modal [state]="quoteFormModal"
+                         [modalTitle]="'Request Quote'">
+                <ocm-quote-request-form (formSubmitted)="quoteFormSubmitted($event.detail)"
+                                        [CurrentUser]="currentUser"
+                                        (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
+              </ocm-modal>
             </div>
           </div>
           <div *ngIf="!isOrderable"

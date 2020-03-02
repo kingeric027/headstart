@@ -1,10 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { minBy as _minBy } from 'lodash';
-import { ListSpec } from '@ordercloud/angular-sdk';
+import { ListSpec, User } from '@ordercloud/angular-sdk';
 import { SpecFormService } from '../spec-form/spec-form.service';
 import { ShopperContextService, MarketplaceProduct, ProductType } from 'marketplace';
 import { getImageUrls } from 'src/app/services/images.helpers';
+import { ModalState } from 'src/app/models/modal-state.class';
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -27,7 +28,8 @@ export class OCMProductDetails implements OnInit {
   qtyValid = true;
   supplierNote: string;
   specLength: number;
-
+  quoteFormModal = ModalState.Closed;
+  currentUser: User;
   constructor(private formService: SpecFormService, private context: ShopperContextService) {
     this.specFormService = formService;
   }
@@ -46,6 +48,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   ngOnInit(): void {
+    this.currentUser = this.context.currentUser.get();
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
 
@@ -54,6 +57,10 @@ export class OCMProductDetails implements OnInit {
       this.specFormService.event = event.detail;
       this.price = this.getTotalPrice();
     }
+  }
+
+  openQuoteForm() {
+    this.quoteFormModal = ModalState.Open;
   }
 
   isQuoteProduct(): boolean {
@@ -122,5 +129,15 @@ export class OCMProductDetails implements OnInit {
 
   setActiveSupplier(supplierId: string): void {
     this.context.router.toProductList({ activeFacets: { Supplier: supplierId.toLowerCase() } });
+  }
+
+  dismissQuoteForm() {
+    console.log(this.currentUser)
+    this.quoteFormModal = ModalState.Closed;
+  }
+
+  quoteFormSubmitted(detail) {
+    this.quoteFormModal = ModalState.Closed;
+    console.log(detail);
   }
 }

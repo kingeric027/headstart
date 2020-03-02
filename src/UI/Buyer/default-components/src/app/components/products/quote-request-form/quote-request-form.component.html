@@ -1,0 +1,75 @@
+<form (ngSubmit)="onSubmit()"
+      novalidate
+      [formGroup]="quoteRequestForm"
+      name="QuoteRequestForm">
+  <div [formGroup]="quoteRequestForm">
+    <div class="form-group">
+      <label for="FirstName">First Name</label>
+      <input type="text"
+             formControlName="FirstName"
+             class="form-control"
+             id="FirstName"
+             placeholder="First Name"
+             autofocus="true"
+             autocomplete="off"
+             showErrors />
+    </div>
+    <div class="form-group">
+      <label for="LastName">Last Name</label>
+      <input type="text"
+             formControlName="LastName"
+             class="form-control"
+             id="LastName"
+             placeholder="Last Name"
+             autocomplete="off"
+             showErrors />
+    </div>
+    <!-- <div class="form-group">    
+        <label for="FranchiseLocation">Franchise Location</label>
+        <input type="text"
+               formControlName="FranchiseLocation"
+               class="form-control"
+               id="FranchiseLocation"
+               placeholder="Franchise Location"
+               autocomplete="off"
+               showErrors />
+      </div> -->
+    <div class="form-group">
+      <label for="Phone">Phone Number</label>
+      <input type="text"
+             formControlName="Phone"
+             class="form-control"
+             id="Phone"
+             placeholder="Phone Number"
+             autocomplete="off"
+             showErrors />
+    </div>
+    <div class="form-group">
+      <label for="Email">Email</label>
+      <input type="text"
+             formControlName="Email"
+             class="form-control"
+             id="Email"
+             placeholder="Email"
+             autocomplete="off"
+             showErrors />
+    </div>
+    <div class="form-group">
+      <label for="Comments">Comments</label>
+      <input type="text"
+             formControlName="Comments"
+             class="form-control"
+             id="Comments"
+             placeholder="Comments"
+             autocomplete="off"
+             showErrors />
+    </div>
+  </div>
+  <div class="d-flex justify-content-space-between align-items-center">
+    <button type="submit"
+            class="btn btn-primary btn-sm mr-2">Submit for Quote</button>
+    <button type="button"
+            class="btn btn-link text-danger"
+            (click)="dismissForm()">Cancel</button>
+  </div>
+</form>
