@@ -139,8 +139,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   selectResource(resource: any): void {
     const [newURL, queryParams] = this.ocService.constructNewRouteInformation(resource.ID || '');
-    const queryType = Object.keys(queryParams);
-    queryType.includes('ParentCategory') ? this.navigate(newURL, {}) : this.navigate(newURL, { queryParams });
+    this.navigate(newURL, { queryParams });
   }
 
   updateResource(resourceUpdate: any): void {
@@ -222,6 +221,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   async createNewResource(): Promise<void> {
     // dataIsSaving indicator is used in the resource table to conditionally tell the
     // submit button to disable
+    if (Object.keys(this.resourceToCreate).length === 0) {
+      //Only assign this value if a component inheriting this class hasn't already.
+      this.resourceToCreate = this.updatedResource;
+    }
     try {
       this.dataIsSaving = true;
       const newResource = await this.ocService.createNewResource(this.resourceToCreate);
@@ -236,6 +239,12 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   ngOnDestroy(): void {
     this.alive = false;
   }
+
+  // private setIsCreatingNew(): void {
+  //   const routeUrl = this.router.routerState.snapshot.url;
+  //   const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
+  //   this.isCreatingNew = endUrl === '/new';
+  // }
 
   private setIsCreatingNew(): void {
     const routeUrl = this.router.routerState.snapshot.url;
