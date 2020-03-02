@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { minBy as _minBy } from 'lodash';
 import { ListSpec } from '@ordercloud/angular-sdk';
 import { SpecFormService } from '../spec-form/spec-form.service';
-import { ShopperContextService, MarketplaceProduct } from 'marketplace';
+import { ShopperContextService, MarketplaceProduct, ProductType } from 'marketplace';
 import { getImageUrls } from 'src/app/services/images.helpers';
 
 @Component({
@@ -54,6 +54,10 @@ export class OCMProductDetails implements OnInit {
       this.specFormService.event = event.detail;
       this.price = this.getTotalPrice();
     }
+  }
+
+  isQuoteProduct(): boolean {
+    return this._product.xp.ProductType === ProductType.Quote;
   }
 
   qtyChange(event: { qty: number; valid: boolean }): void {
