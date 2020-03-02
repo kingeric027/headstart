@@ -55,24 +55,12 @@ namespace Marketplace.Common.Services.ShippingIntegration
         public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculation orderCalculation)
         {
             var totalTax = await _avatax.GetTaxEstimateAsync(orderCalculation);
-            var totalShippingCost = SumProposedShipmentCosts(orderCalculation);
 
             return new OrderCalculateResponse
             {
                 TaxTotal = totalTax,
-                ShippingTotal = totalShippingCost,
             };
 
-        }
-
-        private decimal SumProposedShipmentCosts(OrderCalculation orderCalculation)
-        {
-            var selectedProposedShipmentOptions = orderCalculation.ProposedShipmentRatesResponse.ProposedShipments.Select(proposedShipment =>
-            {
-                return proposedShipment.ProposedShipmentOptions
-                .First(proposedShipmentOption => proposedShipmentOption.ID == proposedShipment.SelectedProposedShipmentOptionID).Cost;
-            });
-            return selectedProposedShipmentOptions.Sum();
         }
 
         private List<string> GetProductsWithInvalidDimensions(IList<MarketplaceLineItem> lineItems)
