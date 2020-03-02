@@ -217,14 +217,6 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async updateResource(resource: any): Promise<any> {
-    if (resource.ParentID) {
-      const parentResourceID = this.getParentResourceID();
-      let numberOfChecks = 0;
-      const validDepth = await this.checkForDepth(parentResourceID, resource.ParentID, numberOfChecks);
-      if (!validDepth) {
-        throw {message: `The ${this.secondaryResourceLevel} cannot be saved this deep into a tree.  Please save this in a higher tier.`}
-      }
-    }
     const newResource = await this.ocService.Save(...this.createListArgs([resource.ID, resource])).toPromise();
     const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
     this.resourceSubject.value.Items[resourceIndex] = newResource;
@@ -240,27 +232,10 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async createNewResource(resource: any): Promise<any> {
-    if (resource.ParentID) {
-      const parentResourceID = this.getParentResourceID();
-      let numberOfChecks = 0;
-      const validDepth = await this.checkForDepth(parentResourceID, resource.ParentID, numberOfChecks);
-      if (!validDepth) {
-        throw {message: `The ${this.secondaryResourceLevel} cannot be created this deep into a tree.  Please create this in a higher tier.`}
-      }
-    }
     const newResource = await this.ocService.Create(...this.createListArgs([resource])).toPromise();
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;
-  }
-  
-  async checkForDepth (parentResourceID, resourceParentID, numberOfChecks) {
-    numberOfChecks++;
-    if (numberOfChecks === 3) {
-      return false;
-    }
-    const parentOfResource = await this.ocService.Get(parentResourceID, resourceParentID).toPromise();
-    return !parentOfResource.ParentID ? true : await this.checkForDepth(parentResourceID, parentOfResource.ParentID, numberOfChecks);
   }
 
   setNewResources(resourceResponse: ListPage<ResourceType>): void {

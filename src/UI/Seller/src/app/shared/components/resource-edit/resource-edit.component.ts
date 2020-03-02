@@ -1,5 +1,4 @@
 import { Component, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'resource-edit-component',
@@ -8,15 +7,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class ResourceEditComponent {
   _resource: any;
-  _resourceType: any;
   _resourceFields: any[];
-  _params: any;
 
-  constructor(
-    private changeDetectorRef: ChangeDetectorRef,
-    private router: Router,
-    private activatedRoute: ActivatedRoute  
-    ) {}
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   schemas = {
     AccessToken: {
@@ -698,10 +691,6 @@ export class ResourceEditComponent {
         xp: {},
       },
       properties: {
-        ParentID: {
-          type: 'string',
-          description: 'ID of the parent category.',
-        },
         ID: {
           type: 'string',
         },
@@ -722,6 +711,10 @@ export class ResourceEditComponent {
         Active: {
           type: 'boolean',
           description: 'If false, buyers cannot see this Category or any Categories or Products under it.',
+        },
+        ParentID: {
+          type: 'string',
+          description: 'ID of the parent category.',
         },
         ChildCount: {
           type: 'integer',
@@ -4456,7 +4449,6 @@ export class ResourceEditComponent {
   }
   @Input()
   set resourceType(value: string) {
-    this._resourceType = value;
     this._resourceFields = this.buildResourceFields(value);
   }
   @Output()
@@ -4479,15 +4471,5 @@ export class ResourceEditComponent {
         };
       })
       .filter(r => r.field !== 'xp');
-  }
-
-  checkForParent() {
-    const routeUrl = this.router.routerState.snapshot.url;
-    const splitUrl = routeUrl.split('/');
-    const endUrl = splitUrl[splitUrl.length - 1];
-    let params = endUrl.includes('new?') ? endUrl.split('=') : '';
-    params = params[1] ? params[1] : '';
-    this._params = params;
-    return endUrl.includes('new?');
   }
 }

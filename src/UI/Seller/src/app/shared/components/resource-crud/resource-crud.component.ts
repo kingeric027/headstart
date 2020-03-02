@@ -222,20 +222,11 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   async createNewResource(): Promise<void> {
     // dataIsSaving indicator is used in the resource table to conditionally tell the
     // submit button to disable
-    this.resourceToCreate = this.updatedResource;
-    const routeUrl = this.router.routerState.snapshot.url;
-    const redirectUrl = routeUrl.split('/');
-    if (!this.resourceToCreate?.ParentID && routeUrl.includes('?')) {
-      const splitUrl = routeUrl.split('=');
-      const endUrl = splitUrl[splitUrl.length - 1];
-      this.resourceToCreate.ParentID = endUrl;
-    }
     try {
       this.dataIsSaving = true;
       const newResource = await this.ocService.createNewResource(this.resourceToCreate);
       this.selectResource(newResource);
       this.dataIsSaving = false;
-      this.router.navigate([`${redirectUrl[1]}/${redirectUrl[2]}/${redirectUrl[3]}`]);
     } catch (ex) {
       this.dataIsSaving = false;
       throw ex;
@@ -250,6 +241,9 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     const routeUrl = this.router.routerState.snapshot.url;
     const splitUrl = routeUrl.split('/');
     const endUrl = splitUrl[splitUrl.length - 1];
-    this.isCreatingNew = endUrl.includes('new');
+    /* Reduce possibility of errors: all IDs with the word new must equal it exactly,
+    or begin with the word new and have a question mark following it for query params. */
+    this.isCreatingNew = endUrl === 'new' || endUrl.startsWith('new?');
+    console.log('are we creating new?', this.isCreatingNew);
   }
 }

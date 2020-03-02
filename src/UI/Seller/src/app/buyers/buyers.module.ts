@@ -8,12 +8,14 @@ import { BuyerPaymentTableComponent } from './components/payments/buyer-payment-
 import { BuyerApprovalTableComponent } from './components/approvals/buyer-approval-table/buyer-approval-table.component';
 import { BuyerCategoryTableComponent } from './components/categories/buyer-category-table/buyer-category-table.component';
 import { BuyerLocationEditComponent } from './components/locations/buyer-location-edit/buyer-location-edit.component';
+import { BuyerCategoryEditComponent } from './components/categories/buyer-category-edit/buyer-category-edit.component';
 
 @NgModule({
   imports: [SharedModule, BuyersRoutingModule],
   declarations: [
     BuyerTableComponent,
     BuyerCategoryTableComponent,
+    BuyerCategoryEditComponent,
     BuyerApprovalTableComponent,
     BuyerLocationTableComponent,
     BuyerLocationEditComponent,
