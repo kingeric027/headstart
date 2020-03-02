@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ListLineItem, OcMeService, Product } from '@ordercloud/angular-sdk';
+import { ListLineItem, OcMeService } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { ListLineItemWithProduct, MarketplaceOrder } from '../shopper-context';
+import { ListLineItemWithProduct, MarketplaceOrder, MarketplaceProduct } from '../shopper-context';
 import { CurrentOrderService } from '../services/order/order.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { CurrentOrderService } from '../services/order/order.service';
 export class CartWrapperComponent implements OnInit {
   order: MarketplaceOrder;
   lineItems: ListLineItemWithProduct;
-  productCache: Product[] = []; // TODO - move to cart service?
+  productCache: MarketplaceProduct[] = []; // TODO - move to cart service?
 
   constructor(
     private currentOrder: CurrentOrderService,
@@ -51,11 +51,11 @@ export class CartWrapperComponent implements OnInit {
     return { Items, Meta: lis.Meta };
   }
 
-  async requestProducts(ids: string[]): Promise<Product[]> {
+  async requestProducts(ids: string[]): Promise<MarketplaceProduct[]> {
     return await Promise.all(ids.map(id => this.ocMeService.GetProduct(id).toPromise()));
   }
 
-  getCachedProduct(id: string): Product {
+  getCachedProduct(id: string): MarketplaceProduct {
     return this.productCache.find(product => product.ID === id);
   }
 }

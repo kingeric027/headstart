@@ -104,41 +104,59 @@
                                            (handleTaxCodesSearched)="searchTaxCodes($event)"
                                            (onScrollEnd)="handleScrollEnd($event)">
         </product-tax-code-select-component>
+        <div class="form-group">
+          <label for="ProductType">Product Type</label>
+          <select type="dropdown"
+                  class="form-control"
+                  id="ProductType"
+                  aria-describedby="Product type"
+                  placeholder="Choose product type"
+                  (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
+            <option selected="selected"
+                    disabled>Choose a product type</option>
+            <option value="Standard">Standard</option>
+            <option value="Quote">Quote</option>
+          </select>
+        </div>
       </div>
     </div>
     <!-- /Product Details -->
 
     <!-- Product Variations TODO: NOT MVP -->
-    <!-- <div class="row pt-3 mt-5 border-top">
-      <div class="col-md-5">
-        <h5>Product Variations</h5>
-        <p class="font-italic">Does your product come in different varieties? Add them here.</p>
-      </div>
-      <div class="col-md-7">
-        <button *ngIf="!hasVariations"
-                class="btn btn-outline-dark"
-                (click)="hasVariations = true">Add Variations</button>
-        <div *ngIf="hasVariations"
-             class="variation-form-container">
-          <div class="form-group">
-            <label for="VariationType">Add a variation</label>
-            <select type="dropdown"
-                    class="form-control"
-                    id="VariationType"
-                    aria-describedby="Variation type"
-                    placeholder="Choose variation type">
-              <option default
-                      disabled>Choose a variation type</option>
-              <option>Color</option>
-              <option>Size</option>
-              <option>Height</option>
-            </select>
-          </div>
-          <button class="btn btn-link text-danger"
-                  (click)="hasVariations = false">Cancel variations</button>
-        </div>
-      </div>
-    </div> -->
+    <!-- <div class="
+                  row
+                  pt-3
+                  mt-5
+                  border-top">
+            <div class="col-md-5">
+              <h5>Product Variations</h5>
+              <p class="font-italic">Does your product come in different varieties? Add them here.</p>
+            </div>
+            <div class="col-md-7">
+              <button *ngIf="!hasVariations"
+                      class="btn btn-outline-dark"
+                      (click)="hasVariations = true">Add Variations</button>
+              <div *ngIf="hasVariations"
+                   class="variation-form-container">
+                <div class="form-group">
+                  <label for="VariationType">Add a variation</label>
+                  <select type="dropdown"
+                          class="form-control"
+                          id="VariationType"
+                          aria-describedby="Variation type"
+                          placeholder="Choose variation type">
+                    <option default
+                            disabled>Choose a variation type</option>
+                    <option>Color</option>
+                    <option>Size</option>
+                    <option>Height</option>
+                  </select>
+                </div>
+                <button class="btn btn-link text-danger"
+                        (click)="hasVariations = false">Cancel variations</button>
+              </div>
+            </div>
+        </div> -->
     <!-- /Product Variations -->
 
     <!-- Shipping Information -->

@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { minBy as _minBy } from 'lodash';
-import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
+import { ListSpec } from '@ordercloud/angular-sdk';
 import { SpecFormService } from '../spec-form/spec-form.service';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceProduct } from 'marketplace';
 import { getImageUrls } from 'src/app/services/images.helpers';
 
 @Component({
@@ -12,7 +12,7 @@ import { getImageUrls } from 'src/app/services/images.helpers';
 })
 export class OCMProductDetails implements OnInit {
   _specs: ListSpec;
-  _product: BuyerProduct;
+  _product: MarketplaceProduct;
   specFormService: SpecFormService;
   isOrderable = false;
   quantity: number;
@@ -21,7 +21,7 @@ export class OCMProductDetails implements OnInit {
   priceBreaks: object;
   priceBreakRange: string[];
   selectedBreak: object;
-  relatedProducts$: Observable<BuyerProduct[]>;
+  relatedProducts$: Observable<MarketplaceProduct[]>;
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
@@ -38,7 +38,7 @@ export class OCMProductDetails implements OnInit {
     this.specLength = this._specs.Items.length;
   }
 
-  @Input() set product(value: BuyerProduct) {
+  @Input() set product(value: MarketplaceProduct) {
     this._product = value;
     this.isOrderable = !!this._product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
