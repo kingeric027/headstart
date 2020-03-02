@@ -10,7 +10,7 @@ import { ValidateEmail, ValidateName, ValidatePhone } from 'src/app/validators/v
 export class OCMQuoteRequestForm implements OnInit {
     quoteRequestForm: FormGroup;
     private currentUser: User = {};
-    @Output() formSubmitted = new EventEmitter<{ user: User; formDirty: boolean; }>();
+    @Output() formSubmitted = new EventEmitter<{ user: User; }>();
     @Output() formDismissed = new EventEmitter();
     constructor() { }
 
@@ -38,8 +38,7 @@ export class OCMQuoteRequestForm implements OnInit {
     onSubmit(): void {
         if (this.quoteRequestForm.status === 'INVALID') return;
         this.formSubmitted.emit({
-            user: this.quoteRequestForm.value,
-            formDirty: this.quoteRequestForm.dirty
+            user: this.quoteRequestForm.value
         });
     }
 
