@@ -19,9 +19,9 @@ export class OCMProductCard {
   isViewOnlyProduct = true;
   hasSpecs = false;
 
-  constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) {}
+  constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) { }
 
-  @Input() set product(value: BuyerProduct)  {
+  @Input() set product(value: BuyerProduct) {
     this._product = value;
     this.isViewOnlyProduct = !value.PriceSchedule;
     this.hasSpecs = value.SpecCount > 0;
@@ -46,6 +46,10 @@ export class OCMProductCard {
 
   setIsFavorite(isFavorite: boolean): void {
     this.context.currentUser.setIsFavoriteProduct(isFavorite, this._product.ID);
+  }
+
+  showAddToCart(): boolean {
+    return !this.isViewOnlyProduct && !this.hasSpecs && this._product.xp.ProductType !== 'Quote';
   }
 
   setQuantity(event: any): void {

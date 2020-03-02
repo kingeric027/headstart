@@ -42,12 +42,12 @@
                                     (qtyChange)="qtyChange($event.detail)"
                                     [product]="_product">
                 </ocm-quantity-input>
-                <button *ngIf="_product?.xp?.ProductType === 'Quote'"
+                <button *ngIf="isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
                         [disabled]="!specFormService.event?.valid || !qtyValid">
                   Request Quote
                 </button>
-                <button *ngIf="_product?.xp?.ProductType !== 'Quote'"
+                <button *ngIf="!isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
                         type="submit"
                         [disabled]="!specFormService.event?.valid || !qtyValid"
@@ -106,12 +106,12 @@
                               (qtyChange)="qtyChange($event.detail)"
                               [product]="_product">
           </ocm-quantity-input>
-          <button *ngIf="_product?.xp?.ProductType === 'Quote'"
+          <button *ngIf="isQuoteProduct()"
                   class="btn btn-block btn-primary mb-3"
                   [disabled]="!specFormService.event?.valid || !qtyValid">
             Request Quote
           </button>
-          <button *ngIf="_product?.xp?.ProductType !== 'Quote'"
+          <button *ngIf="!isQuoteProduct()"
                   class="btn btn-block btn-primary"
                   type="submit"
                   [disabled]="!specFormService.event?.valid || !qtyValid"
