@@ -44,6 +44,11 @@ interface TaxProperties {
   Description: string;
 }
 
+export enum ProductType {
+  Standard = 'Standard',
+  Quote = 'Quote',
+}
+
 interface FacetDictionary {
   [key: string]: string[];
 }
@@ -59,7 +64,7 @@ interface MarketplaceProductXp {
   Note: string;
   Tax: TaxProperties;
   UnitOfMeasure: UnitOfMeasure;
-  ProductType: string;
+  ProductType: ProductType;
 }
 
 export interface MarketPlaceProductTaxCode {
