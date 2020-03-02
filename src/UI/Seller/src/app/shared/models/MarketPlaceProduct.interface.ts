@@ -59,6 +59,7 @@ interface MarketplaceProductXp {
   Note: string;
   Tax: TaxProperties;
   UnitOfMeasure: UnitOfMeasure;
+  ProductType: string;
 }
 
 export interface MarketPlaceProductTaxCode {
