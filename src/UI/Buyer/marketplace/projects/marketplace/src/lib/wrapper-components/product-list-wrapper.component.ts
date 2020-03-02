@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { ListBuyerProduct } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { takeWhile } from 'rxjs/operators';
+import { ListMarketplaceProduct } from '../shopper-context';
 
 @Component({
   template: `
@@ -10,7 +10,7 @@ import { takeWhile } from 'rxjs/operators';
   `,
 })
 export class ProductListWrapperComponent implements OnInit, OnDestroy {
-  products: ListBuyerProduct;
+  products: ListMarketplaceProduct;
   alive = true;
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}

@@ -6,7 +6,7 @@ import {
   ProductCatalogAssignment,
   OcCatalogService,
 } from '@ordercloud/angular-sdk';
-import { MarketPlaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { MarketplaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
 
@@ -17,7 +17,7 @@ import { ProductService } from '@app-seller/products/product.service';
 })
 export class ProductVisibilityAssignments implements OnInit, OnChanges {
   @Input()
-  product: MarketPlaceProduct;
+  product: MarketplaceProduct;
   buyers: Buyer[];
   add: ProductAssignment[];
   del: ProductAssignment[];
@@ -51,7 +51,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
     this.buyers = buyers.Items;
   }
 
-  async getProductCatalogAssignments(product: MarketPlaceProduct): Promise<void> {
+  async getProductCatalogAssignments(product: MarketplaceProduct): Promise<void> {
     const productCatalogAssignments = await this.ocCatalogService
       .ListProductAssignments({ productID: product && product.ID })
       .toPromise();

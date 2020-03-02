@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ListBuyerProduct } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
+import { ListMarketplaceProduct } from '../shopper-context';
 
 @Component({
   template: `
@@ -9,7 +9,7 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
   `,
 })
 export class HomeWrapperComponent implements OnInit {
-  featuredProducts: ListBuyerProduct;
+  featuredProducts: ListMarketplaceProduct;
 
   constructor(private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
 
