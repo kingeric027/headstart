@@ -49,7 +49,7 @@ export class OCMProductCard {
   }
 
   showAddToCart(): boolean {
-    return !this.isViewOnlyProduct && !this.hasSpecs && this._product.xp.ProductType !== 'Quote';
+    return !this.isViewOnlyProduct && !this.hasSpecs && !this._product.xp.ProductType.Quote;
   }
 
   setQuantity(event: any): void {

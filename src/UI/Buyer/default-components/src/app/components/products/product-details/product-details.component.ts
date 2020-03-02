@@ -57,7 +57,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   isQuoteProduct(): boolean {
-    return this._product.xp.ProductType === 'Quote';
+    return this._product.xp.ProductType.Quote;
   }
 
   qtyChange(event: { qty: number; valid: boolean }): void {
