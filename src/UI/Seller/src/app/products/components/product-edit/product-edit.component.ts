@@ -314,9 +314,7 @@ export class ProductEditComponent implements OnInit {
   async handleTaxCodeCategorySelection(event): Promise<void> {
     // TODO: This is a temporary fix to accomodate for data not having xp.TaxCode yet
     if (
-      this._superMarketplaceProductEditable &&
-      this._superMarketplaceProductEditable.Product &&
-      this._superMarketplaceProductEditable.Product.xp &&
+      this._superMarketplaceProductEditable?.Product?.xp &&
       !this._superMarketplaceProductEditable.Product.xp.Tax
     ) {
       this._superMarketplaceProductEditable.Product.xp.Tax = { Category: '', Code: '', Description: '' };
