@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-namespace Marketplace.Models.Models.Marketplace.Extended
+namespace Marketplace.Models.Extended
 {
-    class Class1
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum OrderType
     {
+        Standard,
+        Quote
     }
 }
