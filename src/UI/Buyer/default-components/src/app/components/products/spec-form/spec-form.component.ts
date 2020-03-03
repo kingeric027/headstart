@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl, FormBuilder, FormArray } from '@angular/forms';
+import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
 
 import { FieldConfig } from './field-config.interface';
-import { ListBuyerSpec, SpecOption } from '@ordercloud/angular-sdk';
+import { ListSpec, SpecOption } from '@ordercloud/angular-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
 
 @Component({
@@ -23,7 +23,7 @@ import { SpecFormEvent } from './spec-form-values.interface';
   styleUrls: ['./spec-form.component.scss'],
 })
 export class OCMSpecForm {
-  _specs: ListBuyerSpec;
+  _specs: ListSpec;
   @Output() specFormChange: EventEmitter<any> = new EventEmitter<any>();
 
   config: FieldConfig[] = [];
@@ -31,7 +31,7 @@ export class OCMSpecForm {
 
   constructor(private fb: FormBuilder) { }
 
-  @Input() set specs(value: ListBuyerSpec) {
+  @Input() set specs(value: ListSpec) {
     this._specs = value;
     this.init();
   }

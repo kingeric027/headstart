@@ -24,7 +24,7 @@
         <div>
           <div class="d-flex justify-content-between align-items-center">
             <h4 class="font-weight-bold">{{ price  | currency}}</h4>
-            <p class="text-muted ml-3">1 per set</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
+            <p class="text-muted ml-3">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
             <span class="badge badge-pill badge-warning"
                   *ngIf="percentSavings > 0">You save {{ percentSavings }}%!
             </span>

@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Order, LineItem, OcLineItemService, OcPaymentService, Payment } from '@ordercloud/angular-sdk';
-import { Address } from '@ordercloud/angular-sdk';
+import { Order, LineItem, OcLineItemService, OcPaymentService, Payment, Address } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
