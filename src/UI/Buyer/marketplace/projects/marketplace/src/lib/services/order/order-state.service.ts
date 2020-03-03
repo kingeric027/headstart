@@ -14,7 +14,10 @@ export class OrderStateService {
     Items: [],
   };
   private readonly DefaultOrder: MarketplaceOrder = {
-    xp: { AvalaraTaxTransactionCode: '' },
+    xp: {
+      AvalaraTaxTransactionCode: '',
+      OrderType: null
+    },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
   private lineItemSubject = new BehaviorSubject<ListLineItem>(this.DefaultLineItems);
