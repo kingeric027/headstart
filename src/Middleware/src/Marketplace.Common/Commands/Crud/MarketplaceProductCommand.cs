@@ -86,7 +86,7 @@ namespace Marketplace.Common.Commands.Crud
             }
             // Create Price Schedule
             var _priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
-            // Create Product - WORKING
+            // Create Product
             superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
             var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(superProduct.Product, user.AccessToken);
             // Make Spec Product Assignments
@@ -94,18 +94,15 @@ namespace Marketplace.Common.Commands.Crud
             await Task.WhenAll(specProductAssignmentRequests);
             // Generate Variants
             await _oc.Products.GenerateVariantsAsync(_product.ID, accessToken: user.AccessToken);
-            // Patch Variants with the User Specified ID(SKU)
-            if (superProduct.Variants.Any(v => v.xp.NewID != null))
+            // Patch Variants with the User Specified ID(SKU) AND necessary display xp values
+            var createVariantRequests = superProduct.Variants.Select(variant => 
             {
-                var createVariantRequests = superProduct.Variants.Select(variant => 
-                {
-                    var oldVariantID = variant.ID;
-                    variant.ID = variant.xp.NewID ?? variant.ID;
-                    variant.Name = variant.xp.NewID ?? variant.ID;
-                    return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = variant.ID, Name = variant.Name, xp = variant.xp }, accessToken: user.AccessToken);
-                });
-                await Task.WhenAll(createVariantRequests);
-            }
+                var oldVariantID = variant.ID;
+                variant.ID = variant.xp.NewID ?? variant.ID;
+                variant.Name = variant.xp.NewID ?? variant.ID;
+                return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = variant.ID, Name = variant.Name, xp = variant.xp }, accessToken: user.AccessToken);
+            });
+            await Task.WhenAll(createVariantRequests);
             // List Variants
             var _variants = await _oc.Products.ListVariantsAsync<Variant<MarketplaceVariantXp>>(_product.ID, accessToken: user.AccessToken);
             // List Product Specs
