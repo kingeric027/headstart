@@ -13,7 +13,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IOrderCommand
     {
-        Task HandleBuyerOrderSubmit(string orderId);
+        Task HandleBuyerOrderSubmit(Order order);
     }
 
     public class OrderCommand : IOrderCommand
@@ -37,17 +37,23 @@ namespace Marketplace.Common.Commands
             _ocSandboxService = orderCloudSandboxService;
         }
 
-        public async Task HandleBuyerOrderSubmit(string orderId)
+        public async Task HandleBuyerOrderSubmit(Order order)
         {
-            // should as much order submit logic to use the order calculation model as makes sense
-            // so that we do not need to go get the line items and shipping information multiple times
-            var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, orderId);
-            var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderCalculation);
-            await HandleTaxTransactionCreationAsync(buyerOrderCalculation);
-            var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderId);
-            var supplierOrders = orderSplitResult.OutgoingOrders;
-            await ImportSupplierOrdersIntoFreightPop(supplierOrders);
-            await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
+            if (order.xp.OrderType == "Quote")
+            {
+                await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
+            } else
+            {
+                // should as much order submit logic to use the order calculation model as makes sense
+                // so that we do not need to go get the line items and shipping information multiple times
+                var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, order.ID);
+                var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderCalculation);
+                await HandleTaxTransactionCreationAsync(buyerOrderCalculation);
+                var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
+                var supplierOrders = orderSplitResult.OutgoingOrders;
+                await ImportSupplierOrdersIntoFreightPop(supplierOrders);
+                await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
+            }
         }
 
         private async Task HandleTaxTransactionCreationAsync(OrderCalculation orderCalculation)
