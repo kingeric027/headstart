@@ -237,7 +237,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   private setIsCreatingNew(): void {
     const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
+    const splitUrl = routeUrl.split('/');
+    const endUrl = splitUrl[splitUrl.length - 1];
+    /* Reduce possibility of errors: all IDs with the word new must equal it exactly,
+    or begin with the word new and have a question mark following it for query params. */
+    this.isCreatingNew = endUrl === 'new' || endUrl.startsWith('new?');
   }
 }

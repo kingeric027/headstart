@@ -13,9 +13,8 @@
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
     <div class="resource-edit">
-        <resource-edit-component resourceType="Category"
-                                (updateResource)="updateResource($event)"
-                                [resource]="updatedResource">
-        </resource-edit-component>
+        <app-buyer-category-edit (updateCategory)="updateResource($event)"
+                                 [resource]="updatedResource">
+        </app-buyer-category-edit>
     </div>
 </resource-table-component>
