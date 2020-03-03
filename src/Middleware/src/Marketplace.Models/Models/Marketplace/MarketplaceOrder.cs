@@ -15,5 +15,6 @@ namespace Marketplace.Models
     {
         public string AvalaraTaxTransactionCode { get; set; }
         public OrderType OrderType { get; set; }
+        public QuoteOrderInfo QuoteOrderInfo { get; set; }
     }
 }
