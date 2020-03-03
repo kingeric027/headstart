@@ -57,11 +57,20 @@ export interface MarketplaceOrder extends Order<OrderXp, any, any> { }
 export interface OrderXp {
   AvalaraTaxTransactionCode: string;
   OrderType: OrderType;
+  QuoteOrderInfo: QuoteOrderInfo;
 }
 
 export enum OrderType {
   Standard = 'Standard',
   Quote = 'Quote',
+}
+
+export interface QuoteOrderInfo {
+  FirstName: string;
+  LastName: string;
+  Phone: string;
+  Email: string;
+  Comments?: string;
 }
 
 export interface ProductFilters {
