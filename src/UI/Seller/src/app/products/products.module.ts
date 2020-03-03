@@ -9,6 +9,7 @@ import { ProductViewComponent } from './components/product-view/product-view.com
 import { ProductVisibilityAssignments } from './components/product-visibility-assignments/product-visibility-assignments.component';
 import { ProductTaxCodeSelect } from './components/product-tax-code-select/product-tax-code-select.component';
 import { ProductTaxCodeSelectDropdown } from './components/product-tax-code-select-dropdown/product-tax-code-select-dropdown.component';
+import { ProductVariations } from './components/product-variations/product-variations.component';
 
 @NgModule({
   imports: [SharedModule, ProductsRoutingModule, PerfectScrollbarModule],
@@ -19,6 +20,7 @@ import { ProductTaxCodeSelectDropdown } from './components/product-tax-code-sele
     ProductVisibilityAssignments,
     ProductTaxCodeSelect,
     ProductTaxCodeSelectDropdown,
+    ProductVariations,
   ],
 })
 export class ProductsModule {}

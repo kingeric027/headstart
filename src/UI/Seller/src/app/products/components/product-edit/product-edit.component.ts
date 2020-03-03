@@ -8,17 +8,13 @@ import {
   OcSupplierAddressService,
   OcAdminAddressService,
   OcProductService,
-  Variant,
-  SpecOption,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import {
   MarketPlaceProductImage,
   MarketPlaceProductTaxCode,
   SuperMarketplaceProduct,
-  VariantXp,
-  VariantXpSpecValues,
-  Spec,
+  ObjectStatus,
 } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
@@ -60,29 +56,16 @@ export class ProductEditComponent implements OnInit {
   @Input()
   isCreatingNew: boolean;
   @Input()
-  dataIsSaving = false;
-
-  get specsWithVariations() {
-    return this._superMarketplaceProductEditable?.Specs?.filter(s => s.DefinesVariant);
-  }
-
-  get specsWithoutVariations() {
-    return this._superMarketplaceProductEditable?.Specs?.filter(s => !s.DefinesVariant);
-  }
-  
+  dataIsSaving = false;  
   userContext = {};
   hasVariations = false;
   images: ProductImage[] = [];
   images: MarketPlaceProductImage[] = [];
   files: FileHandle[] = [];
-  faTrash = faTrash;
   faTimes = faTimes;
-  faCog = faCog;
-  faExclamationCircle = faExclamationCircle;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
-  areSpecChanges = false;
   taxCodeCategorySelected = false;
   taxCodes: ListPage<TaxCodes>;
   productType: string;
@@ -197,12 +180,6 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(this._superMarketplaceProductStatic);
   }
 
-  handleDiscardSpecChanges(): void {
-    this.editSpecs = !this.editSpecs;
-    this._superMarketplaceProductEditable.Specs = this._superMarketplaceProductEditable?.Specs;
-    this.checkForSpecChanges();
-  }
-
   async createNewProduct() {
     try {
       this.dataIsSaving = true;
@@ -267,6 +244,7 @@ export class ProductEditComponent implements OnInit {
   }
   // TODO: Remove duplicate function, function exists in resource-crud.component.ts (minus the files check);
   checkForChanges(): void {
+    console.log('FILES', this.files)
     this.areChanges =
       JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic) ||
       this.imageFiles.length > 0 || this.staticContentFiles.length > 0;
@@ -438,141 +416,13 @@ export class ProductEditComponent implements OnInit {
     const updateProductResourceCopy = this.copyProductResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
     );
-    let input = (document.getElementById('AddVariation') as any)
-    let definesVariant = (document.getElementById(`DefinesVariant`) as any)
-    const newSpec = [{
-      ID: `${this._superMarketplaceProductEditable.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, "")}`,
-      Name: input.value,
-      AllowOpenText: false,
-      DefinesVariant: definesVariant.checked,
-      ListOrder: (this._superMarketplaceProductEditable.Specs?.length || 0) + 1,
-      Options: []
-    }]
-    input.value = '';
-    updateProductResourceCopy.Specs = newSpec.concat(updateProductResourceCopy.Specs);
-    this._superMarketplaceProductEditable = updateProductResourceCopy;
-    this.checkForSpecChanges();
-  }
-  addSpecOption(spec: Spec, specIndex: number): void {
-    const updateProductResourceCopy = this.copyProductResource(
-      this._superMarketplaceProductEditable || this.productService.emptyResource
-    );
-    let input = (document.getElementById(`${spec.ID}`) as any)
-    let markup = (document.getElementById(`${spec.ID}Markup`) as any).value;
-    const newOption = [{
-      ID: input.value.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, ""),
-      Value: input.value,
-      ListOrder: spec.Options.length + 1,
-      IsOpenText: false,
-      PriceMarkupType: markup ? 1 : "NoMarkup",
-      PriceMarkup: markup,
-      xp: null
-    }]
-    updateProductResourceCopy.Specs[specIndex].Options = newOption.concat(updateProductResourceCopy.Specs[specIndex].Options);
-    this._superMarketplaceProductEditable = updateProductResourceCopy;
-    this.mockVariants();
-    this.checkForSpecChanges();
-  };
-
-  removeSpecOption(specIndex: number, optionIndex: number): void {
-    const updateProductResourceCopy = this.copyProductResource(
-      this._superMarketplaceProductEditable || this.productService.emptyResource
-    );
-    updateProductResourceCopy.Specs[specIndex].Options.splice(optionIndex, 1);
-    this._superMarketplaceProductEditable = updateProductResourceCopy;
-    this.mockVariants();
-    this.checkForSpecChanges();
-  };
-
-  removeSpec(spec: Spec): void {
-    const updateProductResourceCopy = this.copyProductResource(
-      this._superMarketplaceProductEditable || this.productService.emptyResource
-    );
-    updateProductResourceCopy.Specs = updateProductResourceCopy.Specs.filter(s => s.ID !== spec.ID);
-    this._superMarketplaceProductEditable = updateProductResourceCopy;
-    this.mockVariants();
-    this.checkForSpecChanges();
-  }
-
-  mockVariants(): void {
-    const updateProductResourceCopy = this.copyProductResource(
-      this._superMarketplaceProductEditable || this.productService.emptyResource
-    );
-    updateProductResourceCopy.Variants = this.generateVariantsFromCurrentSpecs();
-    this._superMarketplaceProductEditable = updateProductResourceCopy;
-    console.log(this._superMarketplaceProductEditable.Variants);
-    this.validateVariants();
-    this.checkForChanges();
-  }
-
-  generateVariantsFromCurrentSpecs(): Variant[] {
-    const specsDefiningVariants = this.specsWithVariations;
-    const firstSpec = specsDefiningVariants[0];
-    let variants = this.createVariantsForFirstSpec(firstSpec);
-    for (var i = 1; i < specsDefiningVariants.length; i++) {
-      variants = this.combineSpecOptions(variants, specsDefiningVariants[i])
-    }
-    return variants;
-  };
-
-  createVariantsForFirstSpec(spec: Spec): Variant[] {
-    if (!spec) return;
-    return spec.Options.map(opt => {
-      return {
-        ID: `${this._superMarketplaceProductEditable.Product.ID}-${opt.ID}`,
-        Name: `${this._superMarketplaceProductEditable.Product.ID} ${opt.Value}`,
-        Active: true,
-        xp: {
-          SpecValues:[{
-            SpecName: spec.Name,
-            SpecOptionValue: opt.Value,
-            PriceMarkup: opt.PriceMarkup
-          }]
-        }
-      }
-    })
-  }
-
-  combineSpecOptions(workingVariantList: Variant[], spec: Spec): Variant[] {
-    let newVariantList = [];
-    workingVariantList.forEach(variant => {
-      spec.Options.forEach(opt => {
-        newVariantList.push({
-          ID: `${variant.ID}-${opt.ID}`,
-          Name: `${variant.Name} ${opt.Value}`,
-          Active: true,
-          xp: {
-            SpecValues:[...variant.xp.SpecValues, {
-              SpecName: spec.Name,
-              SpecOptionValue: opt.Value,
-              PriceMarkup: opt.PriceMarkup
-            }]
-          }
-        })
-      })
-    })
-    return newVariantList;
-  }
-
-  toggleEditSpecs(): void {
-    this.editSpecs = !this.editSpecs;
-  }
-
-  checkForSpecChanges(): void {
-    this.areSpecChanges = JSON.stringify(this._superMarketplaceProductEditable?.Specs) !== JSON.stringify(this._superMarketplaceProductStatic?.Specs);
-  } 
-
-  updateSku($event: any, i: number): void {
-    const updateProductResourceCopy = this.copyProductResource(
-      this._superMarketplaceProductEditable || this.productService.emptyResource
-    );
-    updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, "");
+    updateProductResourceCopy.Specs = e.Specs;
+    updateProductResourceCopy.Variants = e.Variants;
     this._superMarketplaceProductEditable = updateProductResourceCopy;
     this.checkForChanges();
   }
 
-  validateVariants(): void {
-    this.variantsValid = this._superMarketplaceProductEditable.Variants.length <= 100;
-    console.log('valid variants?', this.variantsValid)
+  validateVariants(e): void {
+    this.variantsValid = e;
   }
 }

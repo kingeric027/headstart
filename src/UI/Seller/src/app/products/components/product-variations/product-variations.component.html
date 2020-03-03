@@ -1,0 +1,180 @@
+    <!-- Product Variations -->
+    <!-- Spec Configuration -->
+    <div class="row pt-3 mt-5 border-top"
+         id="product-options">
+      <div class="col-md-5">
+        <h5>Product Variations</h5>
+        <p class="font-italic mb-0">Does your product come in different varieties? Add the options here.</p>
+        <p class="mb-0"
+           *ngIf="variants">This product has <span [ngClass]="{'text-danger': !variantsValid}"
+                class="font-weight-bold">{{variants?.length}}</span> variations. (Limit 100)</p>
+        <p *ngIf="!variantsValid"
+           class="text-danger">
+          <fa-icon [icon]="faExclamationCircle"></fa-icon> This product exceeds the limit of 100 variations.
+        </p>
+      </div>
+      <div class="col-md-7">
+        <button *ngIf="!editSpecs && !superProductEditable?.Specs"
+                [disabled]="!superProductEditable?.Product?.ID"
+                class="btn btn-outline-dark"
+                (click)="toggleEditSpecs()">
+          Configure Variations
+        </button>
+        <button *ngIf="!editSpecs && superProductEditable?.Specs"
+                class="btn btn-outline-dark"
+                (click)="toggleEditSpecs()">
+          <fa-icon [icon]="faCog"></fa-icon> Edit Variations
+        </button>
+        <div class="form-group"
+             *ngIf="editSpecs">
+          <label for="AddVariation">Add Variation</label>
+          <input type="text"
+                 class="form-control add-variation"
+                 id="AddVariation"
+                 placeholder="Name the variation">
+          <label class="check-container">SKUs vary based on this variation
+            <input type="checkbox"
+                   [checked]="shouldDefinesVariantBeChecked()"
+                   (change)="definesVariant = !definesVariant"
+                   [disabled]="!variantsValid || variants.length === 100"
+                   id="DefinesVariant">
+            <span class="checkmark"></span>
+          </label>
+          <button class="btn btn-outline-dark"
+                  (click)="addSpec()">Add</button>
+        </div>
+      </div>
+    </div>
+    <div class="row pt-3 position-relative product-variations"
+         [ngClass]="{'hidden': !editSpecs}">
+      <div class="col-md-12"
+           *ngIf="superProductEditable?.Specs">
+        <div class="card-deck">
+          <div class="product-spec card p-2"
+               *ngFor="let spec of superProductEditable?.Specs; let specIndex = index;">
+            <h5 class="ml-2">{{spec.Name}}</h5>
+            <table class="table table-sm table-hover">
+              <thead>
+                <tr>
+                  <th>Option</th>
+                  <th>Price Markup</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <input class="form-control"
+                           id="{{spec.ID}}"
+                           type="text"
+                           maxlength="20"
+                           placeholder="Option Name">
+                  </td>
+                  <td>
+                    <input class="form-control"
+                           id="{{spec.ID}}Markup"
+                           type="number"
+                           placeholder="Price Markup">
+                  </td>
+                  <td>
+                    <button class="btn btn-outline-dark"
+                            [disabled]="shouldDisableAddSpecOptBtn(spec)"
+                            (click)="addSpecOption(spec, specIndex)">Add</button>
+                  </td>
+                </tr>
+                <tr *ngFor="let opt of spec.Options; let optionIndex = index">
+                  <td>{{opt.Value}}</td>
+                  <td>{{!opt.PriceMarkup ? 0 : opt.PriceMarkup | currency }}</td>
+                  <td>
+                    <div class="icon-button ripple hover-btn"
+                         (click)="removeSpecOption(specIndex, optionIndex)">
+                      <div class="icon-wrapper">
+                        <fa-icon class="text-danger"
+                                 [icon]="faTrash">
+                        </fa-icon>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="btn btn-link text-danger"
+                    (click)="removeSpec(spec)">Delete Variation</button>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end align-items-center mt-3">
+          <button *ngIf="editSpecs"
+                  (click)="handleDiscardSpecChanges()"
+                  class="btn btn-link text-dark">Cancel</button>
+          <button *ngIf="editSpecs"
+                  class="btn btn-outline-dark"
+                  [disabled]="!areSpecChanges || !variantsValid"
+                  (click)="toggleEditSpecs()">{{areSpecChanges ? 'Save Changes' : 'No Changes'}}</button>
+        </div>
+      </div>
+    </div>
+    <!-- /Spec Configuration -->
+    <!-- Variant Matrix -->
+    <div *ngIf="variants?.length > 0"
+         class="row pt-3 position-relative product-variations">
+      <div class="variant-overlay"
+           *ngIf="editSpecs"><span>Pending Variation Changes...</span>
+      </div>
+      <div class="col-md-12">
+        <h6>The following product variations have unique SKU's associated with them. You can manage these product SKU's in the table inputs below.</h6>
+        <perfect-scrollbar class="product-table"
+                           style="width: 100%; max-height: 400px;">
+          <table class="table mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th *ngFor="let spec of specsWithVariations; let i = index"
+                    scope="col">{{variants[0]?.xp?.SpecValues[i]?.SpecName}}</th>
+                <th scope="col">SKU</th>
+                <th scope="col">Total Markup</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let variant of variants; let i = index">
+                <td *ngFor="let specValue of variant.xp?.SpecValues">
+                  {{specValue.SpecOptionValue}} <span class="font-weight-bold"
+                        *ngIf="specValue.PriceMarkup">(+{{specValue.PriceMarkup | currency}})</span>
+                </td>
+                <td>
+                  <div class="input-group-sm">
+                    <input class="form-control input-sm"
+                           type="text"
+                           (change)="updateSku($event, i)"
+                           [value]="variant?.xp?.NewID || variant?.ID">
+                  </div>
+                </td>
+                <td>{{getTotalMarkup(variant.xp?.SpecValues) | currency}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </perfect-scrollbar>
+        <div *ngIf="specsWithoutVariations?.length">
+          <h6>The following product variations do not have unique SKU's associated with them.</h6>
+          <perfect-scrollbar class="product-table"
+                             style="width: 100%; max-height: 400px;">
+            <table class="table mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th>Variation</th>
+                  <th>Option</th>
+                  <th>Price Markup</th>
+                </tr>
+              </thead>
+              <tbody *ngFor="let spec of specsWithoutVariations">
+                <tr *ngFor="let option of spec.Options">
+                  <td>{{spec.Name}}</td>
+                  <td>{{option.Value}}</td>
+                  <td>{{option.PriceMarkup || 0 | currency}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </perfect-scrollbar>
+        </div>
+      </div>
+    </div>
+    <!-- /Variant Matrix -->
+    <!-- /Product Variations -->
