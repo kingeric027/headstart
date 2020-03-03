@@ -244,7 +244,6 @@ export class ProductEditComponent implements OnInit {
   }
   // TODO: Remove duplicate function, function exists in resource-crud.component.ts (minus the files check);
   checkForChanges(): void {
-    console.log('FILES', this.files)
     this.areChanges =
       JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic) ||
       this.imageFiles.length > 0 || this.staticContentFiles.length > 0;
