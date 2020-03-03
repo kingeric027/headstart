@@ -12,30 +12,30 @@ export class BuyerCategoryService extends ResourceCrudService<Category> {
     super(router, activatedRoute, ocCategoryService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'categories');
   }
 
-  async updateResource(resource: any): Promise<any> {
+  async updateResource(resource: Category): Promise<Category> {
     await this.getResourceInformation(resource);
     return super.updateResource(resource);
   }
 
-  async createNewResource(resource: any): Promise<any> {
+  async createNewResource(resource: Category): Promise<Category> {
     await this.getResourceInformation(resource);
     return super.createNewResource(resource);
   }
 
- async getResourceInformation(resource: any) {
+ async getResourceInformation(resource: Category): Promise<boolean> {
     if (resource.ParentID) {
       const parentResourceID = this.getParentResourceID();
       let numberOfChecks = 0;
       const validDepth = await this.checkForDepth(parentResourceID, resource.ParentID, numberOfChecks);
       if (!validDepth) {
-        throw {message: `The ${this.secondaryResourceLevel} cannot be saved this deep into a tree.  Please create this in a higher tier.`};
+        throw {message: `Categories cannot be saved this deep into a tree.  Please create this in a higher tier.`};
       } else {
         return true;
       }
     }
   }
 
-  async checkForDepth (parentResourceID, resourceParentID, numberOfChecks) {
+  async checkForDepth (parentResourceID: string, resourceParentID: string, numberOfChecks: number): Promise<boolean> {
     numberOfChecks++;
     if (numberOfChecks === 3) {
       return false;

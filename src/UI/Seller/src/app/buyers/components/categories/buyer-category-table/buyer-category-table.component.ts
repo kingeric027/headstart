@@ -25,12 +25,11 @@ export class BuyerCategoryTableComponent extends ResourceCrudComponent<Category>
   async createNewResource(): Promise<void> {
     // dataIsSaving indicator is used in the resource table to conditionally tell the
     // submit button to disable
-    this.resourceToCreate = this.updatedResource;
     const routeUrl = this.router.routerState.snapshot.url;
-    if (!this.resourceToCreate?.ParentID && routeUrl.includes('?')) {
+    if (!this.updatedResource?.ParentID && routeUrl.includes('?')) {
       const splitUrl = routeUrl.split('=');
       const endUrl = splitUrl[splitUrl.length - 1];
-      this.resourceToCreate.ParentID = endUrl;
+      this.updatedResource.ParentID = endUrl;
     }
     super.createNewResource();
   }

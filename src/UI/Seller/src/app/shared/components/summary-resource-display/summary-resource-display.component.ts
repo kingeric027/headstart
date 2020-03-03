@@ -177,9 +177,6 @@ export class SummaryResourceDisplay implements OnChanges {
   isAtMaximumDepth() {
     const parentOfResource = this._resource?.ParentID;
     let parentOfParentOfResource;
-    // if (this._resource === undefined) {
-    //   return true;
-    // }
     if (parentOfResource) {
       parentOfParentOfResource = this._resourceList.find(resource => resource.ID === parentOfResource);
     }
