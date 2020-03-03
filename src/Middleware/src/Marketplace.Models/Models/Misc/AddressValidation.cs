@@ -9,6 +9,7 @@ namespace Marketplace.Common.Services.SmartyStreets.models
 	{
 		public Address RawAddress { get; set; }
 		public bool IsRawAddressValid { get; set; }
+		public bool AreSuggestionsValid { get; set; } // suggestions may be incomplete if they come from the autocomplete api
 		public List<Address> SuggestedAddresses { get; set; }
 	}
 }

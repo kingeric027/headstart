@@ -83,7 +83,7 @@ namespace Marketplace.Common.Commands
             return ratesResponse;
         }
 
-		// todo: move somewhere else
+		// todo: move somewhere else, see if we can use func in helper lib
 		private T PatchObject<T>(T patch, T existing)
 		{
 			// todo: add test for this function 

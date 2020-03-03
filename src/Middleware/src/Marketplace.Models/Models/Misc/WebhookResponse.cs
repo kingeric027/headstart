@@ -22,6 +22,7 @@ namespace Marketplace.Common.Models
 	public class AddressValidationWebhookResponse : WebhookResponse<AddressValidation> {
 		public AddressValidationWebhookResponse(AddressValidation validation) : base(validation)
 		{
+			proceed = validation.IsRawAddressValid;
 			Body = validation;
 			Message = "Address not found. Did you mean one of these addresses?";
 		}

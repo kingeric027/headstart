@@ -12,7 +12,7 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 {
 	public static class SmartyStreetMappers
 	{
-		public static USStreetLookup Map(Address address)
+		public static USStreetLookup MapToUSStreet(Address address)
 		{
 			var lookup = new USStreetLookup()
 			{
@@ -27,15 +27,19 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 			return lookup;
 		}
 
-		public static string ToPlainText(Address address)
+		public static AutoCompleteLookup MapToAutoComplete(Address address)
 		{
-			var lookup = $"{address.Street1} {address.Street2}"; 
+			var lookup = new AutoCompleteLookup()
+			{
+				Prefix = $"{address.Street1} {address.Street2}",
+				GeolocateType = null
+			};
 			return lookup;
 		}
 
-		public static List<Address> Map(Suggestion[] suggestions)
+		public static List<Address> Map(AutoCompleteResponse repsonse)
 		{
-			var addresses = suggestions.Select(suggestion => SmartyStreetMappers.Map(suggestion)).ToList();
+			var addresses = repsonse.suggestions.Select(suggestion => Map(suggestion)).ToList();
 			return addresses;
 		}
 
@@ -45,7 +49,8 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 			{
 				Street1 = suggestion.StreetLine,
 				City = suggestion.City,
-				State = suggestion.State
+				State = suggestion.State,
+				Country = "US"
 			};
 			return address;
 		}
@@ -58,7 +63,8 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 				Street2 = candidate.DeliveryLine2,
 				City = candidate.Components.CityName,
 				State = candidate.Components.State,
-				Zip = $"{candidate.Components.ZipCode}-{candidate.Components.Plus4Code}"
+				Zip = $"{candidate.Components.ZipCode}-{candidate.Components.Plus4Code}",
+				Country = "US"
 			};
 			return address;
 		}

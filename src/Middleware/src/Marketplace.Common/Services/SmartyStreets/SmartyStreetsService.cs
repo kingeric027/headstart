@@ -11,6 +11,8 @@ using AutoCompleteLookup = SmartyStreets.USAutocompleteApi.Lookup;
 using USStreetLookup = SmartyStreets.USStreetApi.Lookup;
 using Marketplace.Common.Services.SmartyStreets.Mappers;
 using System.Linq;
+using Flurl;
+using Flurl.Http;
 
 namespace Marketplace.Common.Services
 {
@@ -24,6 +26,7 @@ namespace Marketplace.Common.Services
 	{
 		private readonly AppSettings _settings;
 		private readonly ClientBuilder _builder;
+		private readonly string AutoCompleteBaseUrl = "https://us-autocomplete.api.smartystreets.com";
 
 		public SmartyStreetsService(AppSettings settings)
 		{
@@ -43,11 +46,13 @@ namespace Marketplace.Common.Services
 			{
 				RawAddress = address,
 				IsRawAddressValid = false,
+				AreSuggestionsValid = true
 			};
 			var candidate = await ValidateSingleUSAddress(address);
 			if (candidate.Count == 0)
 			{
 				var suggestions = await USAutoComplete(address);
+				response.AreSuggestionsValid = false;
 				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions);
 			}
 			else if (CandidateModified(candidate[0]))
@@ -63,22 +68,28 @@ namespace Marketplace.Common.Services
 		private async Task<List<Candidate>> ValidateSingleUSAddress(Address address)
 		{
 			var client = _builder.BuildUsStreetApiClient();
-			var lookup = SmartyStreetMappers.Map(address);
+			var lookup = SmartyStreetMappers.MapToUSStreet(address);
 			client.Send(lookup);
 			return await Task.FromResult(lookup.Result);
 		}
 
-		private async Task<Suggestion[]> USAutoComplete(Address address)
+		private async Task<AutoCompleteResponse> USAutoComplete(Address address)
 		{
-			var client = _builder.BuildUsAutocompleteApiClient();
-			var lookup = new AutoCompleteLookup(SmartyStreetMappers.ToPlainText(address));
-			client.Send(lookup);
-			return await Task.FromResult(lookup.Result);
+			var suggestions = await AutoCompleteBaseUrl
+				.AppendPathSegment("suggest")
+				.SetQueryParam("auth-id", _settings.SmartyStreetSettings.AuthID)
+				.SetQueryParam("auth-token", _settings.SmartyStreetSettings.AuthToken)
+				.SetQueryParam("prefix", $"{address.Street1} {address.Street2}")
+				.SetQueryParam("geolocate", "null")
+				.GetJsonAsync<AutoCompleteResponse>();
+
+			return suggestions;
 		}
 
 		private bool CandidateModified(Candidate candidate) 
 		{
-			return true;
+			// See https://smartystreets.com/docs/cloud/us-street-api#footnotes
+			return candidate.Analysis?.Footnotes != null;
 		}
 	}
 }
