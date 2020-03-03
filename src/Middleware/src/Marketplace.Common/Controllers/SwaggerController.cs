@@ -34,7 +34,7 @@ namespace Marketplace.Common.Controllers
                     Url = "https://ordercloud.io",
                     Version = "1.0"
                 }, ErrorCodes.All);
-            return await Task.FromResult(swagger);
+            return await Task.FromResult(swagger.Item1);
         }
     }
 }
