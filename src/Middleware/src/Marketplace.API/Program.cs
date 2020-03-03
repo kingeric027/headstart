@@ -91,7 +91,7 @@ namespace Marketplace.API
                     .Inject<ICreditCardCommand>()
 					.Inject<IMarketplaceSupplierCommand>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
-                    .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
+                    .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser")
 					.AddAuthentication()
 					.AddOrderCloudWebhooks(opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey);
             }
