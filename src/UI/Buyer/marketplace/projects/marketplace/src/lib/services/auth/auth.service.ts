@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable, of, BehaviorSubject, from } from 'rxjs';
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -16,20 +16,13 @@ import {
 // import { CookieService } from '@gorniv/ngx-universal';
 import { CookieService } from 'ngx-cookie';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { CurrentOrderService } from '../current-order/current-order.service';
 import { AppConfig } from '../../shopper-context';
+import { CurrentOrderService } from '../order/order.service';
 
 export interface IAuthentication {
-  profiledLogin(
-    username: string,
-    password: string,
-    rememberMe: boolean
-  ): Promise<AccessToken>;
+  profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
   logout(): Promise<void>;
-  validateCurrentPasswordAndChangePassword(
-    newPassword: string,
-    currentPassword: string
-  ): Promise<void>;
+  validateCurrentPasswordAndChangePassword(newPassword: string, currentPassword: string): Promise<void>;
   anonymousLogin(): Promise<AccessToken>;
   forgotPasssword(email: string): Promise<any>;
   register(me: MeUser): Promise<any>;
@@ -40,10 +33,10 @@ export interface IAuthentication {
   providedIn: 'root',
 })
 export class AuthService implements IAuthentication {
-  private rememberMeCookieName = `${this.appConfig.appname.replace(/ /g, '_').toLowerCase()}_rememberMe`;
   fetchingRefreshToken = false;
   failedRefreshAttempt = false;
   refreshToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  private rememberMeCookieName = `${this.appConfig.appname.replace(/ /g, '_').toLowerCase()}_rememberMe`;
   private loggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(
@@ -77,7 +70,7 @@ export class AuthService implements IAuthentication {
   refresh(): Observable<void> {
     this.fetchingRefreshToken = true;
     return from(this.refreshTokenLogin()).pipe(
-      tap((token) => {
+      tap(token => {
         this.refreshToken.next(token.access_token);
       }),
       catchError(() => {
@@ -96,22 +89,7 @@ export class AuthService implements IAuthentication {
     );
   }
 
-  private async refreshTokenLogin(): Promise<AccessToken> {
-    try {
-      const refreshToken = this.ocTokenService.GetRefresh();
-      const creds = await this.ocAuthService.RefreshToken(refreshToken, this.appConfig.clientID).toPromise();
-      this.setToken(creds.access_token);
-      return creds;
-    } catch (err) {
-      if (this.appConfig.anonymousShoppingEnabled) {
-        return this.anonymousLogin();
-      } else {
-        throw new Error(err);
-      }
-    }
-  }
-
-  setToken(token: string) {
+  setToken(token: string): void {
     if (!token) return;
     this.ocTokenService.SetAccess(token);
     this.isLoggedIn = true;
@@ -132,8 +110,10 @@ export class AuthService implements IAuthentication {
     return result;
   }
 
-  async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
-    const creds = await this.ocAuthService.Login(userName, password, this.appConfig.clientID, this.appConfig.scope).toPromise();
+  async profiledLogin(userName: string, password: string, rememberMe = false): Promise<AccessToken> {
+    const creds = await this.ocAuthService
+      .Login(userName, password, this.appConfig.clientID, this.appConfig.scope)
+      .toPromise();
     this.setToken(creds.access_token);
     if (rememberMe && creds.refresh_token) {
       /**
@@ -173,10 +153,11 @@ export class AuthService implements IAuthentication {
 
   async validateCurrentPasswordAndChangePassword(newPassword: string, currentPassword: string): Promise<void> {
     // reset password route does not require old password, so we are handling that here through a login
-    await this.ocAuthService.Login(this.currentUser.get().Username, currentPassword, this.appConfig.clientID, this.appConfig.scope).toPromise();
+    await this.ocAuthService
+      .Login(this.currentUser.get().Username, currentPassword, this.appConfig.clientID, this.appConfig.scope)
+      .toPromise();
     await this.ocMeService.ResetPasswordByToken({ NewPassword: newPassword }).toPromise();
   }
-
 
   async resetPassword(code: string, config: PasswordReset): Promise<any> {
     const reset = await this.ocPasswordResetService.ResetPasswordByVerificationCode(code, config).toPromise();
@@ -190,5 +171,20 @@ export class AuthService implements IAuthentication {
   getRememberStatus(): boolean {
     const rememberMe = this.cookieService.getObject(this.rememberMeCookieName) as { status: string };
     return !!(rememberMe && rememberMe.status);
+  }
+
+  private async refreshTokenLogin(): Promise<AccessToken> {
+    try {
+      const refreshToken = this.ocTokenService.GetRefresh();
+      const creds = await this.ocAuthService.RefreshToken(refreshToken, this.appConfig.clientID).toPromise();
+      this.setToken(creds.access_token);
+      return creds;
+    } catch (err) {
+      if (this.appConfig.anonymousShoppingEnabled) {
+        return this.anonymousLogin();
+      } else {
+        throw new Error(err);
+      }
+    }
   }
 }

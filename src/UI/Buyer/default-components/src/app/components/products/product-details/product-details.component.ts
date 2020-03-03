@@ -1,10 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { minBy as _minBy } from 'lodash';
-import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
+import { ListSpec, User } from '@ordercloud/angular-sdk';
 import { SpecFormService } from '../spec-form/spec-form.service';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceProduct, ProductType } from 'marketplace';
 import { getImageUrls } from 'src/app/services/images.helpers';
+import { ModalState } from 'src/app/models/modal-state.class';
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -12,7 +13,7 @@ import { getImageUrls } from 'src/app/services/images.helpers';
 })
 export class OCMProductDetails implements OnInit {
   _specs: ListSpec;
-  _product: BuyerProduct;
+  _product: MarketplaceProduct;
   specFormService: SpecFormService;
   isOrderable = false;
   quantity: number;
@@ -21,13 +22,14 @@ export class OCMProductDetails implements OnInit {
   priceBreaks: object;
   priceBreakRange: string[];
   selectedBreak: object;
-  relatedProducts$: Observable<BuyerProduct[]>;
+  relatedProducts$: Observable<MarketplaceProduct[]>;
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
   supplierNote: string;
   specLength: number;
-
+  quoteFormModal = ModalState.Closed;
+  currentUser: User;
   constructor(private formService: SpecFormService, private context: ShopperContextService) {
     this.specFormService = formService;
   }
@@ -38,7 +40,7 @@ export class OCMProductDetails implements OnInit {
     this.specLength = this._specs.Items.length;
   }
 
-  @Input() set product(value: BuyerProduct) {
+  @Input() set product(value: MarketplaceProduct) {
     this._product = value;
     this.isOrderable = !!this._product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
@@ -46,7 +48,8 @@ export class OCMProductDetails implements OnInit {
   }
 
   ngOnInit(): void {
-    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
+    this.currentUser = this.context.currentUser.get();
+    this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
 
   onSpecFormChange(event): void {
@@ -54,6 +57,14 @@ export class OCMProductDetails implements OnInit {
       this.specFormService.event = event.detail;
       this.price = this.getTotalPrice();
     }
+  }
+
+  openQuoteForm() {
+    this.quoteFormModal = ModalState.Open;
+  }
+
+  isQuoteProduct(): boolean {
+    return this._product.xp.ProductType === ProductType.Quote;
   }
 
   qtyChange(event: { qty: number; valid: boolean }): void {
@@ -64,7 +75,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   addToCart(): void {
-    this.context.currentOrder.addToCart({
+    this.context.order.cart.add({
       ProductID: this._product.ID,
       Quantity: this.quantity,
       Specs: this.specFormService.getLineItemSpecs(this._specs),
@@ -118,5 +129,15 @@ export class OCMProductDetails implements OnInit {
 
   setActiveSupplier(supplierId: string): void {
     this.context.router.toProductList({ activeFacets: { Supplier: supplierId.toLowerCase() } });
+  }
+
+  dismissQuoteForm() {
+    console.log(this.currentUser)
+    this.quoteFormModal = ModalState.Closed;
+  }
+
+  quoteFormSubmitted(detail) {
+    this.quoteFormModal = ModalState.Closed;
+    console.log(detail);
   }
 }

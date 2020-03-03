@@ -20,14 +20,14 @@ export interface ISupplierFilters {
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SupplierFilterService implements ISupplierFilters {
   private readonly nonFilterQueryParams = ['page', 'sortBy', 'search'];
 
-  public activeFiltersSubject: BehaviorSubject<
-    SupplierFilters
-  > = new BehaviorSubject<SupplierFilters>(this.getDefaultParms());
+  public activeFiltersSubject: BehaviorSubject<SupplierFilters> = new BehaviorSubject<SupplierFilters>(
+    this.getDefaultParms()
+  );
 
   constructor(
     private router: Router,
@@ -46,16 +46,13 @@ export class SupplierFilterService implements ISupplierFilters {
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
     const { page, sortBy, search, supplierID } = params;
-    const activeFilters = _pickBy(
-      params,
-      (_value, _key) => !this.nonFilterQueryParams.includes(_key)
-    );
+    const activeFilters = _pickBy(params, (_value, _key) => !this.nonFilterQueryParams.includes(_key));
     this.activeFiltersSubject.next({
       page,
       sortBy,
       search,
       supplierID,
-      activeFilters
+      activeFilters,
     });
   }
 
@@ -66,19 +63,13 @@ export class SupplierFilterService implements ISupplierFilters {
   }
 
   async listSuppliers(): Promise<ListSupplier> {
-    const {
-      page,
-      sortBy,
-      search,
-      supplierID,
-      activeFilters
-    } = this.activeFiltersSubject.value;
+    const { page, sortBy, search, supplierID, activeFilters } = this.activeFiltersSubject.value;
     return await this.ocSupplierService
       .List({
         page,
         search,
         sortBy,
-        filters: this.createFilters(activeFilters, supplierID)
+        filters: this.createFilters(activeFilters, supplierID),
       })
       .toPromise();
   }
@@ -96,7 +87,7 @@ export class SupplierFilterService implements ISupplierFilters {
       page: undefined,
       sortBy: undefined,
       search: undefined,
-      activeFilters: {}
+      activeFilters: {},
     };
   }
 
@@ -113,7 +104,7 @@ export class SupplierFilterService implements ISupplierFilters {
   toSupplier(supplierID: string) {
     this.patchFilterState({
       supplierID: supplierID || undefined,
-      page: undefined
+      page: undefined,
     });
   }
 

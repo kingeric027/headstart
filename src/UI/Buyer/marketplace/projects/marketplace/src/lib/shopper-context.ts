@@ -11,6 +11,10 @@ import {
   Meta,
   Supplier,
   Address,
+  BuyerCreditCard,
+  Product,
+  Buyer,
+  ListBuyerProduct,
 } from '@ordercloud/angular-sdk';
 
 export * from '@ordercloud/angular-sdk';
@@ -79,6 +83,11 @@ export interface OrderFilters {
   toDate?: string;
 }
 
+export enum OrderAddressType {
+  Billing = 'Billing',
+  Shipping = 'Shipping',
+}
+
 export enum OrderStatus {
   AllSubmitted = '!Unsubmitted',
   Unsubmitted = 'Unsubmitted',
@@ -86,7 +95,7 @@ export enum OrderStatus {
   Declined = 'Declined',
   Open = 'Open',
   Completed = 'Completed',
-  Canceled = 'Canceled'
+  Canceled = 'Canceled',
 }
 
 export interface CreditCard {
@@ -181,6 +190,12 @@ export class AppConfig {
   scope: string[];
 }
 
+export interface CreditCardPayment {
+  SavedCard?: BuyerCreditCard;
+  NewCard?: CreditCardToken;
+  CVV: string;
+}
+
 export interface DecodedOCToken {
   /**
    * the ordercloud username
@@ -245,4 +260,59 @@ export interface SupplierCategoryConfig {
   timestamp: string;
   MarketplaceName: string;
   Filters: Array<SupplierCategoryConfigFilters>;
+}
+
+// Product Model
+// a corresponding model in the C# product
+export type ListMarketplaceProduct = ListBuyerProduct<MarketplaceProductXp>;
+
+export type MarketplaceProduct = BuyerProduct<MarketplaceProductXp>;
+
+export interface MarketplaceProductXp {
+  // DO NOT DELETE //
+  IntegrationData: any;
+  Facets: FacetDictionary;
+  Images: MarketPlaceProductImage[];
+  // DO NOT DELETE //
+  Status: ObjectStatus;
+  HasVariants: boolean;
+  Note: string;
+  Tax: TaxProperties;
+  UnitOfMeasure: UnitOfMeasure;
+  ProductType: ProductType;
+}
+
+export interface UnitOfMeasure {
+  Qty: number;
+  Unit: string;
+}
+
+export interface TaxProperties {
+  Category: string;
+  Code: string;
+  Description: string;
+}
+
+export enum ProductType {
+  Standard = 'Standard',
+  Quote = 'Quote',
+}
+
+interface FacetDictionary {
+  [key: string]: string[];
+}
+
+export enum ObjectStatus {
+  Draft = 'Draft',
+  Published = 'Published',
+}
+
+export interface MarketPlaceProductTaxCode {
+  Category: string;
+  Code: string;
+  Description: string;
+}
+export interface MarketPlaceProductImage {
+  URL: string;
+  Tag: string[];
 }

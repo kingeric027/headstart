@@ -1,4 +1,4 @@
-import { OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { OnInit, OnDestroy, ChangeDetectorRef, NgZone, Output } from '@angular/core';
 import { takeWhile } from 'rxjs/operators';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { FormGroup } from '@angular/forms';
@@ -183,7 +183,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     if (this.isCreatingNew) {
       this.createNewResource();
     } else {
-      this.updateExitingResource();
+      this.updateExistingResource();
     }
   }
 
@@ -196,7 +196,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.setUpdatedResourceAndResourceForm(this.resourceInSelection);
   }
 
-  async updateExitingResource(): Promise<void> {
+  async updateExistingResource(): Promise<void> {
     // dataIsSaving indicator is used in the resource table to conditionally tell the
     // submit button to disable
     try {
@@ -237,7 +237,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   private setIsCreatingNew(): void {
     const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
+    const splitUrl = routeUrl.split('/');
+    const endUrl = splitUrl[splitUrl.length - 1];
+    /* Reduce possibility of errors: all IDs with the word new must equal it exactly,
+    or begin with the word new and have a question mark following it for query params. */
+    this.isCreatingNew = endUrl === 'new' || endUrl.startsWith('new?');
   }
 }

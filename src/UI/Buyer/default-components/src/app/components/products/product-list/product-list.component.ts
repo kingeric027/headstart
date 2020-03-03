@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { ListBuyerProduct, ListFacet, Category } from '@ordercloud/angular-sdk';
+import { ListFacet, Category } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { ProductFilters, ShopperContextService } from 'marketplace';
+import { ProductFilters, ShopperContextService, ListMarketplaceProduct } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { takeWhile } from 'rxjs/operators';
 
@@ -10,7 +10,7 @@ import { takeWhile } from 'rxjs/operators';
   styleUrls: ['./product-list.component.scss'],
 })
 export class OCMProductList implements OnInit, OnDestroy {
-  @Input() products: ListBuyerProduct;
+  @Input() products: ListMarketplaceProduct;
   alive = true;
   facets: ListFacet[];
   categoryCrumbs: Category[];
@@ -21,11 +21,13 @@ export class OCMProductList implements OnInit, OnDestroy {
   numberOfItemsInPagination = 10;
   searchTermForProducts = '';
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) {}
 
   ngOnInit(): void {
-    this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
-    this.context.currentUser.onFavoriteProductsChange(productIDs => (this.favoriteProducts = productIDs));
+    this.context.productFilters.activeFiltersSubject
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(this.handleFiltersChange);
+    this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
     if (getScreenSizeBreakPoint() === 'xs') {
       this.numberOfItemsInPagination = 3;
     } else if (getScreenSizeBreakPoint() === 'sm') {
@@ -62,5 +64,5 @@ export class OCMProductList implements OnInit, OnDestroy {
     this.hasFilters = this.context.productFilters.hasFilters();
     this.categoryCrumbs = this.context.categories.breadCrumbs;
     this.searchTermForProducts = filters.search;
-  }
+  };
 }

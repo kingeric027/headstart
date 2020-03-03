@@ -65,6 +65,7 @@ export class ProductEditComponent implements OnInit {
   areChanges = false;
   taxCodeCategorySelected = false;
   taxCodes: ListPage<MarketPlaceProductTaxCode>;
+  productType: string;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -79,7 +80,7 @@ export class ProductEditComponent implements OnInit {
     private modalService: NgbModal,
     private toasterService: ToastrService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  ) { }
 
   async ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
@@ -115,6 +116,7 @@ export class ProductEditComponent implements OnInit {
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
     }
+    this.productType = superProduct.Product?.xp?.ProductType;
     this.createProductForm(superProduct);
     this.images = ReplaceHostUrls(superProduct.Product);
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
@@ -129,24 +131,27 @@ export class ProductEditComponent implements OnInit {
   }
 
   createProductForm(superMarketplaceProduct: SuperMarketplaceProduct) {
-    this.productForm = new FormGroup({
-      Name: new FormControl(superMarketplaceProduct.Product.Name, [Validators.required, Validators.maxLength(100)]),
-      ID: new FormControl(superMarketplaceProduct.Product.ID),
-      Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(1000)),
-      Inventory: new FormControl(superMarketplaceProduct.Product.Inventory),
-      QuantityMultiplier: new FormControl(superMarketplaceProduct.Product.QuantityMultiplier),
-      ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID),
-      ShipHeight: new FormControl(superMarketplaceProduct.Product.ShipHeight, [Validators.required, Validators.min(0)]),
-      ShipWidth: new FormControl(superMarketplaceProduct.Product.ShipWidth, [Validators.required, Validators.min(0)]),
-      ShipLength: new FormControl(superMarketplaceProduct.Product.ShipLength, [Validators.required, Validators.min(0)]),
-      ShipWeight: new FormControl(superMarketplaceProduct.Product.ShipWeight, [Validators.required, Validators.min(0)]),
-      Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null)),
-      Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
-      // SpecCount: new FormControl(superMarketplaceProduct.SpecCount),
-      // VariantCount: new FormControl(superMarketplaceProduct.VariantCount),
-      TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
-      TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
-    });
+    if (superMarketplaceProduct.Product) {
+      this.productForm = new FormGroup({
+        Name: new FormControl(superMarketplaceProduct.Product.Name, [Validators.required, Validators.maxLength(100)]),
+        ID: new FormControl(superMarketplaceProduct.Product.ID),
+        Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(1000)),
+        Inventory: new FormControl(superMarketplaceProduct.Product.Inventory),
+        QuantityMultiplier: new FormControl(superMarketplaceProduct.Product.QuantityMultiplier),
+        ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID),
+        ShipHeight: new FormControl(superMarketplaceProduct.Product.ShipHeight, [Validators.required, Validators.min(0)]),
+        ShipWidth: new FormControl(superMarketplaceProduct.Product.ShipWidth, [Validators.required, Validators.min(0)]),
+        ShipLength: new FormControl(superMarketplaceProduct.Product.ShipLength, [Validators.required, Validators.min(0)]),
+        ShipWeight: new FormControl(superMarketplaceProduct.Product.ShipWeight, [Validators.required, Validators.min(0)]),
+        Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null)),
+        Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
+        ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType')),
+        // SpecCount: new FormControl(superMarketplaceProduct.SpecCount),
+        // VariantCount: new FormControl(superMarketplaceProduct.VariantCount),
+        TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
+        TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
+      });
+    }
   }
 
   async handleSave() {
@@ -170,12 +175,12 @@ export class ProductEditComponent implements OnInit {
 
   async createNewProduct() {
     try {
-    this.dataIsSaving = true;
-    const superProduct = await this.middleware.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
-    await this.addFiles(this.files, superProduct.Product.ID);
-    this.refreshProductData(superProduct);
-    this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
-    this.dataIsSaving = false;
+      this.dataIsSaving = true;
+      const superProduct = await this.middleware.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
+      await this.addFiles(this.files, superProduct.Product.ID);
+      this.refreshProductData(superProduct);
+      this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
+      this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
       throw ex;
@@ -309,8 +314,7 @@ export class ProductEditComponent implements OnInit {
   async handleTaxCodeCategorySelection(event): Promise<void> {
     // TODO: This is a temporary fix to accomodate for data not having xp.TaxCode yet
     if (
-      this._superMarketplaceProductEditable.Product &&
-      this._superMarketplaceProductEditable.Product.xp &&
+      this._superMarketplaceProductEditable?.Product?.xp &&
       !this._superMarketplaceProductEditable.Product.xp.Tax
     ) {
       this._superMarketplaceProductEditable.Product.xp.Tax = { Category: '', Code: '', Description: '' };

@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { ListBuyerAddress, Order, BuyerAddress, ListLineItem, Address } from '@ordercloud/angular-sdk';
-import { ShopperContextService, MarketplaceOrder } from 'marketplace';
-
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Address, BuyerAddress, ListBuyerAddress, ListLineItem, Order } from '@ordercloud/angular-sdk';
+import { MarketplaceOrder, ShopperContextService, OrderAddressType } from 'marketplace';
+import { ToastrService } from 'ngx-toastr';
+import { getSuggestedAddresses } from '../../../services/address-suggestion.helper';
 // TODO - Make this component "Dumb" by removing the dependence on context service 
 // and instead have it use inputs and outputs to interact with the CheckoutComponent.
 // Goal is to get all the checkout logic and state into one component. 
@@ -19,14 +20,15 @@ export class OCMCheckoutAddress implements OnInit {
   };
   usingShippingAsBilling = false;
   showAddAddressForm = false;
+  suggestedAddresses: ListBuyerAddress;
   
-  @Input() addressType: 'Shipping' | 'Billing';
+  @Input() addressType: OrderAddressType;
   @Input() isAnon: boolean;
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListLineItem;
   @Output() continue = new EventEmitter();
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService, private toasterService: ToastrService) { }
 
   ngOnInit(): void {
     if (!this.isAnon) {
@@ -34,7 +36,7 @@ export class OCMCheckoutAddress implements OnInit {
     }
     // shipping address is defined at the line item level
     this.selectedAddress =
-      this.addressType === 'Billing' ? this.order.BillingAddress : this.lineItems?.Items[0].ShippingAddress;
+      this.addressType === OrderAddressType.Billing ? this.order.BillingAddress : this.lineItems?.Items[0].ShippingAddress;
   }
 
   clearRequestOptions(): void {
@@ -57,7 +59,7 @@ export class OCMCheckoutAddress implements OnInit {
   }
 
   useShippingAsBilling(): void {
-    if (this.addressType === 'Shipping') return;
+    if (this.addressType === OrderAddressType.Shipping) return;
 
     this.usingShippingAsBilling = true;
     this.selectedAddress = this.lineItems?.Items[0].ShippingAddress;
@@ -66,22 +68,33 @@ export class OCMCheckoutAddress implements OnInit {
 
   async saveAddress(address: Address, formDirty: boolean, shouldSaveAddress: boolean): Promise<void> {
     // TODO: make bellow line better
-    const setOneTimeAddress =
-      this.isAnon ||
-      formDirty ||
-      (this.usingShippingAsBilling && !this.order.ShippingAddressID) ||
-      !address.ID ||
-      address.ID === '';
-    if (shouldSaveAddress) {
-      this.order = await this.saveAndSetAddress(address);
-    } else {
-      if (setOneTimeAddress) {
-        this.order = await this.setOneTimeAddress(address);
+    try {
+      const setOneTimeAddress =
+        this.isAnon ||
+        formDirty ||
+        (this.usingShippingAsBilling && !this.order.ShippingAddressID) ||
+        !address.ID ||
+        address.ID === '';
+      if (shouldSaveAddress) {
+        this.order = await this.saveAndSetAddress(address);
       } else {
-        this.order = await this.setSavedAddress(address.ID);
+        if (setOneTimeAddress) {
+          this.order = await this.setOneTimeAddress(address);
+        } else {
+          this.order = await this.setSavedAddress(address.ID);
+        }
       }
+      if (this.addressType === 'Shipping') {
+        this.lineItems.Items[0].ShippingAddress = address;
+        // TODO - handle this.
+        // this.context.currentOrder.lineItems = this.lineItems;
+      }
+      this.continue.emit();
+    } catch (ex) {
+      this.suggestedAddresses = getSuggestedAddresses(ex, address);
+      this.toasterService.error('Invalid Address');
     }
-    if (this.addressType === 'Shipping') {
+    if (this.addressType === OrderAddressType.Billing) {
       this.lineItems.Items[0].ShippingAddress = address;
       // TODO - handle this.
       // this.context.currentOrder.lineItems = this.lineItems;
@@ -114,18 +127,10 @@ export class OCMCheckoutAddress implements OnInit {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     address.ID = null;
-    if (this.addressType === 'Shipping') {
-      return await this.context.currentOrder.setShippingAddress(address);
-    } else if (this.addressType === 'Billing') {
-      return await this.context.currentOrder.setBillingAddress(address);
-    }
+    return await this.context.order.checkout.setAddress(this.addressType, address);
   }
 
   private async setSavedAddress(addressID: string): Promise<Order> {
-    if (this.addressType === 'Shipping') {
-      return await this.context.currentOrder.setShippingAddressByID(addressID);
-    } else if (this.addressType === 'Billing') {
-      return await this.context.currentOrder.setBillingAddressByID(addressID);
-    }
+    return await this.context.order.checkout.setAddressByID(this.addressType, addressID);
   }
 }

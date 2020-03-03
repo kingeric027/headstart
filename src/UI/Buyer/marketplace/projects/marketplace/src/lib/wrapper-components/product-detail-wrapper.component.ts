@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { BuyerProduct, ListSpec } from '@ordercloud/angular-sdk';
+import { ListSpec } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { CurrentUserService } from '../services/current-user/current-user.service';
+import { MarketplaceProduct } from '../shopper-context';
 
 @Component({
   template: `
@@ -11,7 +12,7 @@ import { CurrentUserService } from '../services/current-user/current-user.servic
 })
 export class ProductDetailWrapperComponent implements OnInit {
   specs: ListSpec;
-  product: BuyerProduct;
+  product: MarketplaceProduct;
 
   constructor(
     private activatedRoute: ActivatedRoute,

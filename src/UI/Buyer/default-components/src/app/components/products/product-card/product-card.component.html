@@ -23,14 +23,14 @@
            *ngIf="_product.PriceSchedule?.PriceBreaks">
           {{ (_product?.PriceSchedule?.PriceBreaks)[0]?.Price || 0 | currency }}
         </p>
-        <small class="card-text text-muted">1 per set</small> <!-- TODO: Plug in unit of measure when data is in OC. -->
+        <small class="card-text text-muted">{{ _product | UofM }}</small>
         <label for="quantity"
                class="sr-only">Quantity</label>
       </div>
     </div>
   </div>
   <div class="card-footer"
-       *ngIf="!isViewOnlyProduct && !hasSpecs">
+       *ngIf="showAddToCart()">
     <ocm-quantity-input class="w-50"
                         id="quantity"
                         [existingQty]="null"

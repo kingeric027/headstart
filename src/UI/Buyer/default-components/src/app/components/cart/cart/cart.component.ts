@@ -20,6 +20,6 @@ export class OCMCart {
   }
 
   emptyCart(): void {
-    this.context.currentOrder.emptyCart();
+    this.context.order.cart.empty();
   }
 }

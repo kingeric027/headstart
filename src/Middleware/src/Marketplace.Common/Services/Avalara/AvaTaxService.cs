@@ -73,8 +73,9 @@ namespace Marketplace.Common.Services.AvaTax
 				// This assumes the order has one ShipTo Address. Should change
 				trans.WithShippingRate(shippingRate, shipFromAddress, shipToAddress);
 
-				foreach (var lineItem in orderCalculation.LineItems) trans.WithLineItem(lineItem);
 			}
+			
+			foreach (var lineItem in orderCalculation.LineItems) trans.WithLineItem(lineItem);
 
 			return await trans.CreateAsync();
 		}

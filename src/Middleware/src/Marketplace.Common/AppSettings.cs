@@ -54,6 +54,7 @@ namespace Marketplace.Common
 		public string ApiUrl { get; set; }
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
+        public string WebhookHashKey { get; set; }
     }
 
 	public class AvalaraSettings

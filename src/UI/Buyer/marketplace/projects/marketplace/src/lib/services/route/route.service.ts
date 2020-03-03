@@ -47,8 +47,8 @@ export class RouteService implements IRouter {
   onUrlChange(callback: (path: string) => void): void {
     this.router.events
       .pipe(
-        filter((e) => e instanceof NavigationEnd),
-        map((e) => (e as any).url)
+        filter(e => e instanceof NavigationEnd),
+        map(e => (e as any).url)
       )
       .subscribe(callback);
   }
@@ -104,7 +104,7 @@ export class RouteService implements IRouter {
       options.status = OrderStatus.AllSubmitted;
     }
     const queryParams = this.orderFilterService.mapToUrlQueryParams(options);
-    this.router.navigate([`/profile/orders`], { queryParams });
+    this.router.navigate(['/profile/orders'], { queryParams });
   }
 
   toMyOrderDetails(orderID: string): void {
@@ -113,7 +113,7 @@ export class RouteService implements IRouter {
 
   toOrdersToApprove(options: OrderFilters = {}): void {
     const queryParams = this.orderFilterService.mapToUrlQueryParams(options);
-    this.router.navigate([`/profile/orders/approval`], { queryParams });
+    this.router.navigate(['/profile/orders/approval'], { queryParams });
   }
 
   toOrderToAppoveDetails(orderID: string): void {

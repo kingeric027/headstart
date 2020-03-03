@@ -54,7 +54,7 @@ import { OCMOrderShipments } from './components/orders/order-shipments/order-shi
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
 import { OCMOrderHistorical } from './components/orders/order-historical/order-historical.component';
 import { OCMOrderHistory } from './components/orders/order-history/order-history.component';
-
+import { OCMAddressSuggestion } from './components/layout/address-suggestions/address-suggestion.component';
 import { SpecFieldDirective } from './components/products/spec-form/spec-field.directive';
 import { SpecFormCheckboxComponent } from './components/products/spec-form/spec-form-checkbox/spec-form-checkbox.component';
 import { SpecFormInputComponent } from './components/products/spec-form/spec-form-input/spec-form-input.component';
@@ -118,9 +118,12 @@ import { OCMCheckoutShipping } from './components/checkout/checkout-shipping/che
 import { OCMShippingSelectionForm } from './components/checkout/shipping-selection-form/shipping-selection-form.component';
 import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.component.';
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
+import { OCMQuoteRequestForm } from './components/products/quote-request-form/quote-request-form.component';
+import { UnitOfMeasurePipe } from './pipes/unit-of-measure.pipe';
 
 const components = [
   OCMCategoryDropdown,
+  OCMQuoteRequestForm,
   OCMProductCard,
   OCMToggleFavorite,
   OCMQuantityInput,
@@ -174,6 +177,7 @@ const components = [
   OCMOrderShipments,
   OCMOrderHistorical,
   OCMOrderHistory,
+  OCMAddressSuggestion,
   OCMAppFooter,
   SpecFormCheckboxComponent,
   SpecFormInputComponent,
@@ -186,7 +190,7 @@ const components = [
   OCMCheckoutShipping,
   OCMShippingSelectionForm,
   ConfirmModal,
-  OCMPaymentCreditCard
+  OCMPaymentCreditCard,
 ];
 
 // @dynamic
@@ -205,6 +209,7 @@ const components = [
     PaymentMethodDisplayPipe,
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
+    UnitOfMeasurePipe,
     ...components,
   ],
   imports: [
@@ -267,6 +272,7 @@ export class AppModule {
     this.buildWebComponent(OCMMiniCart, 'ocm-mini-cart');
     this.buildWebComponent(OCMAppHeader, 'ocm-app-header');
     this.buildWebComponent(OCMCategoryDropdown, 'ocm-category-dropdown');
+    this.buildWebComponent(OCMQuoteRequestForm, 'ocm-quote-request-form');
 
     this.buildWebComponent(OCMPaymentList, 'ocm-payment-list');
     this.buildWebComponent(OCMAddressCard, 'ocm-address-card');
@@ -306,6 +312,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
     this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
+    this.buildWebComponent(OCMAddressSuggestion, 'address-suggestion');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
     this.buildWebComponent(ConfirmModal, 'confirm-modal');
   }

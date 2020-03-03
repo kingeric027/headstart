@@ -3,6 +3,7 @@ using System.Globalization;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Services.CardConnect.Models;
 using Marketplace.Helpers.Extensions;
+using Marketplace.Models;
 using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 
@@ -63,7 +64,7 @@ namespace Marketplace.Common.Mappers.CardConnect
         //    return cc;
         //}
 
-        public static AuthorizationRequest Map(BuyerCreditCard card, Order order, CreditCardPayment payment)
+        public static AuthorizationRequest Map(BuyerCreditCard card, MarketplaceOrder order, CreditCardPayment payment)
         {
             var req = new AuthorizationRequest()
             {

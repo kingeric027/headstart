@@ -11,7 +11,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 {
     public static class ZohoContactMapper
     {
-        public static ZohoContact Map(MarketplaceSupplier supplier, MarketplaceAddress address, User user, ZohoCurrency currency)
+        public static ZohoContact Map(MarketplaceSupplier supplier, MarketplaceAddressSupplier address, User user, ZohoCurrency currency)
         {
             return new ZohoContact()
             {
@@ -38,7 +38,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoContact Map(ZohoContact contact, MarketplaceSupplier supplier, MarketplaceAddress address, User user, ZohoCurrency currency)
+        public static ZohoContact Map(ZohoContact contact, MarketplaceSupplier supplier, MarketplaceAddressSupplier address, User user, ZohoCurrency currency)
         {
             return new ZohoContact()
             {
@@ -67,7 +67,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoContact Map(MarketplaceBuyer buyer, MarketplaceUser user, MarketplaceUserGroup group, ZohoCurrency currency, MarketplaceAddress address)
+        public static ZohoContact Map(MarketplaceBuyer buyer, MarketplaceUser user, MarketplaceUserGroup group, ZohoCurrency currency, MarketplaceAddressBuyer address)
         {
             return new ZohoContact()
             {
@@ -95,7 +95,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         }
 
         public static ZohoContact Map(ZohoContact contact, MarketplaceBuyer buyer, MarketplaceUser user, MarketplaceUserGroup group,
-            ZohoCurrency currency, MarketplaceAddress address)
+            ZohoCurrency currency, MarketplaceAddressBuyer address)
         {
             contact.company_name = buyer.ID;
             contact.contact_name = buyer.Name;
@@ -284,7 +284,22 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoAddressMapper
     {
-        public static ZohoAddress Map(MarketplaceAddress address)
+        public static ZohoAddress Map(MarketplaceAddressSupplier address)
+        {
+            return new ZohoAddress()
+            {
+                address = address.Street1,
+                street2 = address.Street2,
+                city = address.City,
+                state = address.State,
+                zip = address.Zip,
+                country = address.Country,
+                phone = address.Phone,
+                state_code = address.State
+            };
+        }
+        
+        public static ZohoAddress Map(MarketplaceAddressBuyer address)
         {
             return new ZohoAddress()
             {

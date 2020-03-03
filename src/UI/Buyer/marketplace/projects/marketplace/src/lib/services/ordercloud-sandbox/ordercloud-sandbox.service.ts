@@ -7,42 +7,45 @@ import { ShipmentPreference, OrderCalculation } from './ordercloud-sandbox.model
 // this is a temporary service to represent features that are not yet available in the ordercloud sdk
 // currently used for shipping integration routes
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OrderCloudSandboxService {
-  readonly baseUrl = `https://stagingapi.ordercloud.io/v1`
-  constructor(
-    private ocTokenService: OcTokenService,
-    private http: HttpClient,
-    public appSettings: AppConfig
-  ) {
-  }
+  readonly baseUrl = `https://stagingapi.ordercloud.io/v1`;
+  constructor(private ocTokenService: OcTokenService, private http: HttpClient, public appSettings: AppConfig) {}
 
   generateHeaders() {
     return {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.ocTokenService.GetAccess()}`
-      })
+        Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      }),
     };
   }
 
   calculateShippingOptions(orderID: string): Promise<OrderCalculation> {
-    return this.http.post<OrderCalculation>(
-      `${this.baseUrl}/orders/Outgoing/${orderID}/CalculateShippingOptions`, {}, this.generateHeaders())
-    .toPromise();
+    return this.http
+      .post<OrderCalculation>(
+        `${this.baseUrl}/orders/Outgoing/${orderID}/CalculateShippingOptions`,
+        {},
+        this.generateHeaders()
+      )
+      .toPromise();
   }
 
   selectShippingRate(orderID: string, selection: ShipmentPreference): Promise<OrderCalculation> {
-    const requestBody = {ShipmentPreferences: [selection]};
-    return this.http.post<OrderCalculation>(
-      `${this.baseUrl}/orders/Outgoing/${orderID}/SetShippingPreferences`, requestBody, this.generateHeaders())
-    .toPromise();
-  } 
+    const requestBody = { ShipmentPreferences: [selection] };
+    return this.http
+      .post<OrderCalculation>(
+        `${this.baseUrl}/orders/Outgoing/${orderID}/SetShippingPreferences`,
+        requestBody,
+        this.generateHeaders()
+      )
+      .toPromise();
+  }
 
   calculateOrder(orderID: string): Promise<OrderCalculation> {
-    return this.http.post<OrderCalculation>(
-      `${this.baseUrl}/orders/Outgoing/${orderID}/CalculateOrder`, {}, this.generateHeaders())
-    .toPromise();
-  } 
+    return this.http
+      .post<OrderCalculation>(`${this.baseUrl}/orders/Outgoing/${orderID}/CalculateOrder`, {}, this.generateHeaders())
+      .toPromise();
+  }
 }

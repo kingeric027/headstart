@@ -19,7 +19,7 @@ export class OCMProfile implements OnInit {
   constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
 
   ngOnInit(): void {
-    this.context.currentUser.onUserChange(this.handleUserChange);
+    this.context.currentUser.onChange(this.handleUserChange);
   }
 
   showEditProfile(): void {

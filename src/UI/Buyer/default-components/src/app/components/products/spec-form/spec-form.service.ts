@@ -1,6 +1,6 @@
 import { find as _find, sortBy as _sortBy } from 'lodash';
 import { SpecFormEvent } from './spec-form-values.interface';
-import { PriceBreak, SpecOption, BuyerSpec, ListBuyerSpec, LineItemSpec } from '@ordercloud/angular-sdk';
+import { PriceBreak, SpecOption, Spec, ListSpec, LineItemSpec } from '@ordercloud/angular-sdk';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -17,7 +17,7 @@ export class SpecFormService {
     };
   }
 
-  public getSpecMarkup(specs: ListBuyerSpec, selectedBreak: PriceBreak, qty: number): number {
+  public getSpecMarkup(specs: ListSpec, selectedBreak: PriceBreak, qty: number): number {
     const markups: Array<number> = new Array<number>();
     for (const value in this.event.form) {
       if (this.event.form.hasOwnProperty(value)) {
@@ -32,7 +32,7 @@ export class SpecFormService {
     return (selectedBreak.Price + markups.reduce((x, acc) => x + acc, 0)) * qty;
   }
 
-  public getLineItemSpecs(buyerSpecs: ListBuyerSpec): Array<LineItemSpec> {
+  public getLineItemSpecs(buyerSpecs: ListSpec): Array<LineItemSpec> {
     const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
     for (const value in this.event.form) {
       if (this.event.form.hasOwnProperty(value)) {
@@ -64,11 +64,11 @@ export class SpecFormService {
     }
   }
 
-  private getSpec(specs: ListBuyerSpec, value: any): BuyerSpec {
+  private getSpec(specs: ListSpec, value: any): Spec {
     return _find(specs.Items, item => item.Name.replace(/ /g, '') === value);
   }
 
-  private getOption(spec: BuyerSpec, value: any): SpecOption {
+  private getOption(spec: Spec, value: any): SpecOption {
     if (value === undefined || value === null) {
       return null;
     }

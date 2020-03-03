@@ -1,6 +1,5 @@
 import { Component, Input, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
-import { BuyerProduct } from '@ordercloud/angular-sdk';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, MarketplaceProduct, ProductType } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
@@ -10,18 +9,17 @@ import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 })
 export class OCMProductCard {
   _isFavorite = false;
-  _product: BuyerProduct = {
+  _product: MarketplaceProduct = {
     PriceSchedule: {},
-    xp: { Images: [] },
   };
   quantity: number;
   shouldDisplayAddToCart = false;
   isViewOnlyProduct = true;
   hasSpecs = false;
 
-  constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) {}
+  constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) { }
 
-  @Input() set product(value: BuyerProduct)  {
+  @Input() set product(value: MarketplaceProduct) {
     this._product = value;
     this.isViewOnlyProduct = !value.PriceSchedule;
     this.hasSpecs = value.SpecCount > 0;
@@ -33,7 +31,7 @@ export class OCMProductCard {
   }
 
   addToCart(): void {
-    this.context.currentOrder.addToCart({ ProductID: this._product.ID, Quantity: this.quantity });
+    this.context.order.cart.add({ ProductID: this._product.ID, Quantity: this.quantity });
   }
 
   getImageUrl(): string {
@@ -46,6 +44,10 @@ export class OCMProductCard {
 
   setIsFavorite(isFavorite: boolean): void {
     this.context.currentUser.setIsFavoriteProduct(isFavorite, this._product.ID);
+  }
+
+  showAddToCart(): boolean {
+    return !this.isViewOnlyProduct && !this.hasSpecs && this._product.xp.ProductType !== ProductType.Quote;
   }
 
   setQuantity(event: any): void {

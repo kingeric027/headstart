@@ -10,16 +10,14 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class OCMLogin implements OnInit {
   form: FormGroup;
-  isAnon: boolean;
   appName: string;
   ssoLink: string; // TODO - remove from marketplace generic. Should be SEB specific.
 
   constructor(private context: ShopperContextService, private toasterService: ToastrService) {}
 
-  ngOnInit(): void  {
+  ngOnInit(): void {
     this.ssoLink = this.context.appSettings.ssoLink;
     this.appName = this.context.appSettings.appname;
-    this.isAnon = this.context.currentUser.isAnonymous;
     this.form = new FormGroup({
       username: new FormControl(''),
       password: new FormControl(''),
@@ -39,6 +37,6 @@ export class OCMLogin implements OnInit {
   }
 
   showRegisterLink(): boolean {
-    return this.isAnon && this.context.appSettings.anonymousShoppingEnabled;
+    return this.context.appSettings.anonymousShoppingEnabled;
   }
 }

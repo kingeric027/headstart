@@ -2,8 +2,9 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { singular } from 'pluralize';
 import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/services/configuration/table-display';
 import { OcCategoryService } from '@ordercloud/angular-sdk';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { PLACEHOLDER_URL, PRODUCT_IMAGE_PATH_STRATEGY, getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'summary-resource-display-component',
@@ -19,11 +20,14 @@ export class SummaryResourceDisplay implements OnChanges {
   _isNewPlaceHolder = false;
   _isExpandable = false;
   faChevronDown = faChevronDown;
-  faChevronUp = faChevronUp;
+  faChevronRight = faChevronRight;
+  faPlus = faPlus;
   _isResourceExpanded: boolean;
   _resource: any;
   _resourceList: any;
   _parentResourceID: any = '';
+  _depthCount: number;
+  _isCreatingSubResource: boolean;
 
   @Input()
   set resourceList(value: any) {
@@ -46,6 +50,11 @@ export class SummaryResourceDisplay implements OnChanges {
     this._parentResourceID = value;
   }
 
+  @Input()
+  set isCreatingSubResource(value: any) {
+    this._isCreatingSubResource = value;
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.resourceType?.firstChange) {
       this.setDisplayValuesForPlaceholder();
@@ -55,7 +64,10 @@ export class SummaryResourceDisplay implements OnChanges {
     }
   }
 
-  constructor(private ocCategoryService: OcCategoryService) {}
+  constructor(
+    private ocCategoryService: OcCategoryService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute) {}
 
   setDisplayValuesForResource(resource: any) {
     this._primaryHeader = this.getValueOnExistingResource(resource, 'toPrimaryHeader');
@@ -92,7 +104,7 @@ export class SummaryResourceDisplay implements OnChanges {
   getValueOnPlaceHolderResource(valueType: string) {
     switch (valueType) {
       case 'toPrimaryHeader':
-        return `Your new ${singular(this.resourceType)}`;
+        return this._isCreatingSubResource ? `Your new sub-${singular(this.resourceType)}` : `Your new ${singular(this.resourceType)}`;
       default:
         return '';
     }
@@ -106,8 +118,9 @@ export class SummaryResourceDisplay implements OnChanges {
 
   getResourceDepth(resource, depthCount) {
     depthCount++;
+    this._depthCount = depthCount;
     const parentResource = this._resourceList.find(item => item.ID === resource?.ParentID);
-    return resource?.ParentID ? this.getResourceDepth(parentResource, depthCount) : depthCount * 10;
+    return resource?.ParentID ? this.getResourceDepth(parentResource, depthCount) : depthCount * 15;
   }
 
   async toggleNestedResources() {
@@ -153,4 +166,21 @@ export class SummaryResourceDisplay implements OnChanges {
     }
   }
 
+  addNestedResource(resource) {
+    event.stopPropagation();
+    const routeUrl = this.router.routerState.snapshot.url;
+    const splitUrl = routeUrl.split('/');
+    this.router.navigate([`${splitUrl[1]}/${splitUrl[2]}/${splitUrl[3]}/new`], { queryParams: { ParentCategory: resource } });
+  }
+
+  //Nested resources cannot be added beyond a third tier
+  isAtMaximumDepth() {
+    const parentOfResource = this._resource?.ParentID;
+    let parentOfParentOfResource;
+    if (parentOfResource) {
+      parentOfParentOfResource = this._resourceList.find(resource => resource.ID === parentOfResource);
+    }
+    parentOfParentOfResource = parentOfParentOfResource?.ParentID;
+    return (parentOfResource && parentOfParentOfResource);
+  }
 }

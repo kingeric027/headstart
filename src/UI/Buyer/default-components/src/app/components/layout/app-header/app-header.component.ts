@@ -1,4 +1,3 @@
-
 import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import {
   faSearch,
@@ -8,13 +7,14 @@ import {
   faUserCircle,
   faSignOutAlt,
   faHome,
-  faBars
+  faBars,
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { MeUser, LineItem, Category } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { ProductFilters, ShopperContextService, MarketplaceOrder } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
+import { CurrentUser } from 'marketplace/projects/marketplace/src/lib/services/current-user/current-user.service';
 
 @Component({
   templateUrl: './app-header.component.html',
@@ -22,8 +22,8 @@ import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 })
 export class OCMAppHeader implements OnInit {
   isCollapsed = true;
-  anonymous: boolean;
-  user: MeUser;
+  isAnonymous: boolean;
+  user: CurrentUser;
   order: MarketplaceOrder;
   alive = true;
   addToCartQuantity: number;
@@ -47,15 +47,15 @@ export class OCMAppHeader implements OnInit {
   faHome = faHome;
   faBars = faBars;
 
-  constructor(public context: ShopperContextService) { }
+  constructor(public context: ShopperContextService) {}
 
   ngOnInit(): void {
     this.screenSize = getScreenSizeBreakPoint();
     this.categories = this.context.categories.all;
     this.appName = this.context.appSettings.appname;
-    this.context.currentOrder.onOrderChange(order => (this.order = order));
-    this.context.currentUser.onIsAnonymousChange(isAnon => (this.anonymous = isAnon));
-    this.context.currentUser.onUserChange(user => (this.user = user));
+    this.isAnonymous = this.context.currentUser.isAnonymous();
+    this.context.order.onChange(order => (this.order = order));
+    this.context.currentUser.onChange(user => (this.user = user));
     this.context.productFilters.activeFiltersSubject
       .pipe(takeWhile(() => this.alive))
       .subscribe(this.handleFiltersChange);
@@ -69,17 +69,19 @@ export class OCMAppHeader implements OnInit {
 
   clickOutsideCategoryDropdown(event): void {
     const clickIsOutside = !event.target.closest('.categoryDropdown');
-    if (clickIsOutside) { this.showCategoryDropdown = false; }
+    if (clickIsOutside) {
+      this.showCategoryDropdown = false;
+    }
   }
 
   handleFiltersChange = (filters: ProductFilters): void => {
     this.searchTermForProducts = filters.search || '';
     this.activeCategoryID = this.context.categories.activeID;
-  }
+  };
 
   buildAddToCartListener(): void {
     let closePopoverTimeout;
-    this.context.currentOrder.addToCartSubject.subscribe((li: LineItem) => {
+    this.context.order.cart.onAdd.subscribe((li: LineItem) => {
       clearTimeout(closePopoverTimeout);
       if (li) {
         this.popover.ngbPopover = `Added ${li.Quantity} items to Cart`;
