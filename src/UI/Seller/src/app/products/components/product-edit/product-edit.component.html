@@ -112,10 +112,12 @@
                   aria-describedby="Product type"
                   placeholder="Choose product type"
                   (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
-            <option selected="selected"
+            <option [selected]="productType === undefined"
                     disabled>Choose a product type</option>
-            <option value="Standard">Standard</option>
-            <option value="Quote">Quote</option>
+            <option [selected]="productType === 'Standard'"
+                    value="Standard">Standard</option>
+            <option [selected]="productType === 'Quote'"
+                    value="Quote">Quote</option>
           </select>
         </div>
       </div>
