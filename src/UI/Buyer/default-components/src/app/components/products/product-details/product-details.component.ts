@@ -1,17 +1,19 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { ListSpec, OcLineItemService, OcOrderService, Order, User } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
-import { ListSpec, User } from '@ordercloud/angular-sdk';
-import { SpecFormService } from '../spec-form/spec-form.service';
-import { ShopperContextService, MarketplaceProduct, ProductType } from 'marketplace';
-import { getImageUrls } from 'src/app/services/images.helpers';
+import { LineItem, MarketplaceOrder, MarketplaceProduct, OrderType, ProductType, ShopperContextService } from 'marketplace';
+import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
+import { getImageUrls } from 'src/app/services/images.helpers';
+import { SpecFormService } from '../spec-form/spec-form.service';
 
 @Component({
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
 })
 export class OCMProductDetails implements OnInit {
+  faTimes = faTimes;
   _specs: ListSpec;
   _product: MarketplaceProduct;
   specFormService: SpecFormService;
@@ -30,7 +32,16 @@ export class OCMProductDetails implements OnInit {
   specLength: number;
   quoteFormModal = ModalState.Closed;
   currentUser: User;
-  constructor(private formService: SpecFormService, private context: ShopperContextService) {
+  showRequestSubmittedMessage = false;
+  submittedQuoteOrder: Order;
+  defaultQuoteOrder: MarketplaceOrder;
+  lineItem: LineItem = {};
+
+  constructor(
+    private formService: SpecFormService,
+    private context: ShopperContextService,
+    private ocOrderService: OcOrderService,
+    private ocLineItemService: OcLineItemService) {
     this.specFormService = formService;
   }
 
@@ -50,6 +61,19 @@ export class OCMProductDetails implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.context.currentUser.get();
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
+    this.defaultQuoteOrder = {
+      xp: {
+        AvalaraTaxTransactionCode: '',
+        OrderType: OrderType.Quote,
+        QuoteOrderInfo: {
+          FirstName: '',
+          LastName: '',
+          Phone: '',
+          Email: '',
+          Comments: ''
+        }
+      },
+    };
   }
 
   onSpecFormChange(event): void {
@@ -132,12 +156,24 @@ export class OCMProductDetails implements OnInit {
   }
 
   dismissQuoteForm() {
-    console.log(this.currentUser)
     this.quoteFormModal = ModalState.Closed;
   }
 
-  quoteFormSubmitted(detail) {
-    this.quoteFormModal = ModalState.Closed;
-    console.log(detail);
+  async submitQuoteOrder(user) {
+    try {
+      this.defaultQuoteOrder.xp.QuoteOrderInfo = user;
+      this.lineItem.ProductID = this._product.ID;
+      this.lineItem.Product = this._product;
+      this.submittedQuoteOrder = await this.ocOrderService.Create('Outgoing', this.defaultQuoteOrder).toPromise();
+      await this.ocLineItemService.Create('Outgoing', this.submittedQuoteOrder.ID, this.lineItem).toPromise();
+      this.quoteFormModal = ModalState.Closed
+      this.showRequestSubmittedMessage = true
+    } catch (ex) {
+      throw ex;
+    }
+  }
+
+  toOrderDetail() {
+    this.context.router.toMyOrderDetails(this.submittedQuoteOrder.ID);
   }
 }
