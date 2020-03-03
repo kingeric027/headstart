@@ -36,7 +36,7 @@
     "@nguniversal/express-engine": "^7.0.2",
     "@ngx-progressbar/core": "^5.2.1",
     "@ngx-progressbar/http": "^5.2.1",
-    "@ordercloud/angular-sdk": "0.0.1-28",
+    "@ordercloud/angular-sdk": "1.0.0-5",
     "@types/lodash": "^4.14.91",
     "@types/moment": "^2.13.0",
     "@typescript-eslint/eslint-plugin": "^2.19.2",

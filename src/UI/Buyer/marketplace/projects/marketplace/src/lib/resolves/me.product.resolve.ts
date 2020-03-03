@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
-import { OcMeService, ListBuyerSpec, BuyerSpec } from '@ordercloud/angular-sdk';
+import { OcMeService, ListSpec, Spec } from '@ordercloud/angular-sdk';
 import { each as _each } from 'lodash';
 import { Observable, of } from 'rxjs';
 import { MarketplaceProduct, ListMarketplaceProduct } from '../shopper-context';
@@ -34,23 +34,23 @@ export class MeProductResolver implements Resolve<MarketplaceProduct> {
 }
 
 @Injectable()
-export class MeListSpecsResolver implements Resolve<ListBuyerSpec> {
+export class MeListSpecsResolver implements Resolve<ListSpec> {
   constructor(private service: OcMeService) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<ListBuyerSpec> | Promise<ListBuyerSpec> | any {
+  resolve(route: ActivatedRouteSnapshot): Observable<ListSpec> | Promise<ListSpec> | any {
     return this.service.ListSpecs(route.params.productID);
   }
 }
 
 @Injectable()
-export class MeSpecsResolver implements Resolve<BuyerSpec> {
+export class MeSpecsResolver implements Resolve<Spec> {
   constructor(private service: OcMeService) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<BuyerSpec> | Promise<BuyerSpec> | any {
-    const list = route.parent.data.specList as ListBuyerSpec;
+  resolve(route: ActivatedRouteSnapshot): Observable<Spec> | Promise<Spec> | any {
+    const list = route.parent.data.specList as ListSpec;
     const productID = route.parent.params.productID;
-    const calls: Array<Promise<BuyerSpec>> = new Array<Promise<BuyerSpec>>();
-    list.Items.forEach((item: BuyerSpec) => {
+    const calls: Array<Promise<Spec>> = new Array<Promise<Spec>>();
+    list.Items.forEach((item: Spec) => {
       calls.push(this.service.GetSpec(productID, item.ID).toPromise());
     });
     return Promise.all(calls);
