@@ -10,8 +10,9 @@ import {
   getProductMainImageUrlOrPlaceholder,
   PLACEHOLDER_URL,
 } from '@app-seller/products/product-image.helper';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faSort } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -23,6 +24,9 @@ export class FullResourceTableComponent {
   rows = [];
   numberOfColumns = 1;
   faCopy = faCopy;
+  faSort = faSort;
+  sortAsc: boolean;
+  activeSort: string;
   objectPreviewText: string;
   _resourceList = { Meta: {}, Items: [] };
 
@@ -39,7 +43,8 @@ export class FullResourceTableComponent {
   resourceSelected = new EventEmitter();
 
   constructor(
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private router: Router
   ) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
@@ -48,8 +53,8 @@ export class FullResourceTableComponent {
     this.numberOfColumns = this.getNumberOfColumns(this.resourceType);
   }
 
-  getHeaders(resources: any[]): string[] {
-    return FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].fields.map(r => r.header);
+  getHeaders(resources: any[]): object[] {
+    return FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].fields.map(r => r);
   }
 
   getRows(resources: any[]): ResourceRow[] {
@@ -120,6 +125,27 @@ export class FullResourceTableComponent {
       return currentObject;
     } else {
       return '';
+    }
+  }
+
+  handleSort(header: string): void {
+    if (this.activeSort === header) {
+      this.sortAsc = !this.sortAsc;
+    } else {
+      this.sortAsc = true;
+    }
+    this.activeSort = header; //Track current sort to determine if next sort should be ASC or DESC.
+    let routeUrl = this.router.routerState.snapshot.url;
+    if (routeUrl.includes('?sortBy=')) {
+      let splitUrl = routeUrl.split('/');
+      let urlWithoutParams = splitUrl[splitUrl.length - 1].split('?');
+      splitUrl[splitUrl.length - 1] = urlWithoutParams[0];
+      routeUrl = splitUrl.join('/');
+    }
+    if (this.sortAsc) {
+      this.router.navigate([`${routeUrl}`], { queryParams: { sortBy: header } });
+    } else if (!this.sortAsc) {
+      this.router.navigate([`${routeUrl}`], { queryParams: { sortBy: '!' + header } });
     }
   }
 }

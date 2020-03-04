@@ -2,7 +2,14 @@
   <thead>
     <tr>
       <th *ngFor="let header of headers"
-          scope="col">{{header}}</th>
+          scope="col">
+          {{header.header}}
+          <button *ngIf="header.sortable"
+                  class="sortButton"
+                  (click)="handleSort(header.header)">
+            <fa-icon [icon]="faSort"></fa-icon>
+          </button>
+      </th>
     </tr>
   </thead>
   <tbody *ngIf="requestStatus === 'SUCCESSFUL_WITH_ITEMS' || requestStatus === 'REFRESHING_ITEMS' || requestStatus === 'FETCHING_SUBSEQUENT_PAGES'">
