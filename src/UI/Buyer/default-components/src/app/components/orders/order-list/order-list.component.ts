@@ -1,8 +1,8 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
-import { ListOrder } from '@ordercloud/angular-sdk';
+import { ListOrder, Order } from '@ordercloud/angular-sdk';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import { OrderListColumn } from '../../../models/order-list-column';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, OrderType } from 'marketplace';
 
 @Component({
   templateUrl: './order-list.component.html',
@@ -51,5 +51,9 @@ export class OCMOrderList {
 
   toOrderDetails(orderID: string): void {
     this.context.router.toMyOrderDetails(orderID);
+  }
+
+  isQuoteOrder(order: Order) {
+    return order.xp.OrderType === OrderType.Quote;
   }
 }
