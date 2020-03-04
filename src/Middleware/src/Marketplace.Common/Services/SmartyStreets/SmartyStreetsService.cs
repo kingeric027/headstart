@@ -46,14 +46,16 @@ namespace Marketplace.Common.Services
 				IsRawAddressValid = false,
 				AreSuggestionsValid = true
 			};
-			var candidate = await ValidateSingleUSAddress(address);
+			var candidate = await ValidateSingleUSAddress(address); // Always seems to return 1 or 0 candidates
 			if (candidate.Count == 0)
 			{
+				// Address not valid, no candiates found
 				var suggestions = await USAutoComplete(address);
-				response.AreSuggestionsValid = false;
+				response.AreSuggestionsValid = false; // Suggestions from this api do not include zip
 				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions);
 			}
-			else if (CandidateModified(candidate[0]))
+			// Valid candidate found, but may not match raw exactly. Want to show candidate to user to approve modifications
+			else if (CandidateModified(candidate[0])) 
 			{
 				response.SuggestedAddresses = new List<Address> { SmartyStreetMappers.Map(candidate[0]) };
 			} else
