@@ -160,17 +160,13 @@ export class OCMProductDetails implements OnInit {
   }
 
   async submitQuoteOrder(user) {
-    try {
-      this.defaultQuoteOrder.xp.QuoteOrderInfo = user;
-      this.lineItem.ProductID = this._product.ID;
-      this.lineItem.Product = this._product;
-      this.submittedQuoteOrder = await this.ocOrderService.Create('Outgoing', this.defaultQuoteOrder).toPromise();
-      await this.ocLineItemService.Create('Outgoing', this.submittedQuoteOrder.ID, this.lineItem).toPromise();
-      this.quoteFormModal = ModalState.Closed
-      this.showRequestSubmittedMessage = true
-    } catch (ex) {
-      throw ex;
-    }
+    this.defaultQuoteOrder.xp.QuoteOrderInfo = user;
+    this.lineItem.ProductID = this._product.ID;
+    this.lineItem.Product = this._product;
+    this.submittedQuoteOrder = await this.ocOrderService.Create('Outgoing', this.defaultQuoteOrder).toPromise();
+    await this.ocLineItemService.Create('Outgoing', this.submittedQuoteOrder.ID, this.lineItem).toPromise();
+    this.quoteFormModal = ModalState.Closed
+    this.showRequestSubmittedMessage = true
   }
 
   toOrderDetail() {
