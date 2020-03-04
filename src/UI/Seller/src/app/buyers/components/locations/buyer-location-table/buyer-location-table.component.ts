@@ -28,44 +28,4 @@ export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddr
   ) {
     super(changeDetectorRef, buyerLocationService, router, activatedroute, ngZone);
   }
-
-  // handleAddressSelect(address) {
-  //   this.updatedResource = address;
-  // }
-
-  // discardChanges(): void {
-  //   this.suggestedAddresses = null;
-  //   this.setUpdatedResourceAndResourceForm(this.resourceInSelection);
-  // }
-
-  // async updateExistingResource(): Promise<void> {
-  //   console.log('updating existing resource', this.updatedResource);
-  //   try {
-  //     this.dataIsSaving = true;
-  //     const updatedResource = await this.ocService.updateResource(this.updatedResource);
-  //     this.resourceInSelection = this.copyResource(updatedResource);
-  //     this.setUpdatedResourceAndResourceForm(updatedResource);
-  //     this.suggestedAddresses = null;
-  //     this.dataIsSaving = false;
-  //   } catch (ex) {
-  //     this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
-  //     this.dataIsSaving = false;
-  //     throw ex;
-  //   }
-  // }
-
-  // async createNewResource(): Promise<void> {
-  //   console.log('creating new with this updated resource', this.updatedResource);
-  //     try {
-  //       this.dataIsSaving = true;
-  //       const newResource = await this.ocService.createNewResource(this.updatedResource);
-  //       this.selectResource(newResource);
-  //       this.suggestedAddresses = null;
-  //       this.dataIsSaving = false;
-  //     } catch (ex) {
-  //       this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
-  //       this.dataIsSaving = false;
-  //       throw ex;
-  //     }
-  // }
 }
