@@ -63,7 +63,6 @@ export class BuyerLocationEditComponent implements OnInit {
     const routeUrl = this.router.routerState.snapshot.url;
     const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
     this.isCreatingNew = endUrl === '/new';
-    console.log(this.isCreatingNew);
   }
 
   checkForChanges(): void {
@@ -137,7 +136,6 @@ export class BuyerLocationEditComponent implements OnInit {
   async updateBuyerLocation(): Promise<void> {
     try {
       this.dataIsSaving = true;
-      console.log('edited buyer loc', this.buyerLocationEditable);
       const updatedBuyerLocation = await this.middleware.updateBuyerLocationByID(
         this.buyerID,
         this.buyerLocationEditable.Address.ID,
@@ -165,7 +163,6 @@ export class BuyerLocationEditComponent implements OnInit {
     * It is currently used in two places, but will likely soon become
     * obsolete when the product edit component gets refactored.
     */
-    console.log('buyer location update', buyerLocationUpdate);
     const piecesOfField = buyerLocationUpdate.field.split('.');
     const depthOfField = piecesOfField.length;
     const updateProductResourceCopy = this.copyProductResource(
