@@ -84,7 +84,7 @@ export class BuyerLocationEditComponent implements OnInit {
       Street2: new FormControl(buyerLocation.Address.Street2),
       City: new FormControl(buyerLocation.Address.City, Validators.required),
       State: new FormControl(buyerLocation.Address.State, Validators.required),
-      Zip: new FormControl(buyerLocation.Address.Zip, [Validators.required, ValidateUSZip]),
+      Zip: new FormControl(buyerLocation.Address.Zip, [Validators.required]),
       Country: new FormControl(buyerLocation.Address.Country, Validators.required),
       Phone: new FormControl(buyerLocation.Address.Phone, ValidatePhone),
       Email: new FormControl(buyerLocation.Address.xp.Email, ValidateEmail),
