@@ -61,7 +61,7 @@
             <div>
               <ocm-modal [state]="quoteFormModal"
                          [modalTitle]="'Request Quote'">
-                <ocm-quote-request-form (formSubmitted)="quoteFormSubmitted($event.detail)"
+                <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
                                         [CurrentUser]="currentUser"
                                         (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
               </ocm-modal>
@@ -84,6 +84,13 @@
             </span>
           </div>
         </div>
+      </div>
+      <div class="alert alert-success my-3"
+           *ngIf="showRequestSubmittedMessage">
+        <span>Your quote request was successfully submitted.
+          <button class="btn btn-link"
+                  (click)="toOrderDetail()">View quote request</button>
+        </span>
       </div>
       <strong>Description:</strong>
       <div class="p-2 border border-medium border-radius">
@@ -117,7 +124,8 @@
           </ocm-quantity-input>
           <button *ngIf="isQuoteProduct()"
                   class="btn btn-block btn-primary mb-3"
-                  [disabled]="!specFormService.event?.valid || !qtyValid">
+                  [disabled]="!specFormService.event?.valid || !qtyValid"
+                  (click)="handleRequestQuote()">
             Request Quote
           </button>
           <button *ngIf="!isQuoteProduct()"
