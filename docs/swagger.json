@@ -1,2976 +1,274 @@
 {
-  "Item1": {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "OrderCloud",
-      "description": "OrderCloud is an awesome C# platform API for making eCommerce applications. It is NOT a complete solution. It's designed to be used as the backend component with various other integrations and services.",
-      "version": "1.0",
-      "contact": {
-        "name": "OrderCloud",
-        "url": "http://ordercloud.io",
-        "email": "ordercloud@four51.com"
-      }
-    },
-    "servers": [
-      {
-        "url": "azure.net",
-        "description": "Main API Server (OrderCloud resources requiring an access token)"
-      }
-    ],
-    "tags": [
-      {
-        "name": "Authentication and Authorization",
-        "description": "The OrderCloud.io API implements OAuth2 combined with our own notion of Roles to control user authentication and authorization at fine-grain level. Be prepared to spend time learning about these concepts and designing the right model for your application. If you over-priviledge your users and attempt to control what they can do via front-end code, you run the risk of technically savvy users circumventing this by making direct API calls.",
-        "x-id": "AuthenticationAndAuthorization"
-      },
-      {
-        "name": "Orchestration",
-        "description": "Orchestration resources",
-        "x-id": "Orchestration"
-      },
-      {
-        "name": "Product Orchestrations",
-        "description": "\"Orchestration\" represents objects exposed for orchestration control",
-        "x-section-id": "Orchestration"
-      },
-      {
-        "name": "User Orchestrations",
-        "description": "\"Orchestration\" represents Organization objects exposed for orchestration control",
-        "x-section-id": "Orchestration"
-      },
-      {
-        "name": "Orchestration Logs",
-        "description": "\"Orchestration Logs\" represents logs of orchestration activities",
-        "x-section-id": "Orchestration"
-      },
-      {
-        "name": "Product Catalogs",
-        "description": "Products are priced (or unpriced) goods that can be offered to Buyers for placement on Orders. A Product can belong to any number of Catalogs, and a Catalog can be organized into hierarchical Categories to any arbitrary depth. Catalogs are assigned to Buyers, though visibility and pricing may vary by Buyer, User Group, Category, or individual Product. Pricing may include quantity breaks (collectively called a Price Schedule), and Price Schedules may be shared with multiple Products. User-selected Specs, which may include price markups, can be assigned to Products, enabling Buyer configurability at the time of ordering.",
-        "x-id": "ProductCatalogs"
-      },
-      {
-        "name": "Files",
-        "description": "\"Files\" represents files for content management control",
-        "x-section-id": "ProductCatalogs"
-      },
-      {
-        "name": "Products",
-        "description": "\"Products\" represents products for Marketplace",
-        "x-section-id": "ProductCatalogs"
-      },
-      {
-        "name": "Supplier Category Configs",
-        "description": "\"Supplier Category Config\" represents Supplier Category Configuration",
-        "x-section-id": "ProductCatalogs"
-      },
-      {
-        "name": "Orders and Fulfillment",
-        "description": "The central concept within OrderCloud.io is (not surprisingly) the Order. This is where Buyers, Sellers, Products, Addresses, and just about everything else come together to form business transactions. A feature that is somewhat unique to this area of the API is that you'll use the same set of endpoints regardless of whether you're a Buyer, Seller, or Supplier. What's important is the order *direction*, which is either incoming or outgoing. Order IDs are guaranteed unique within that context. As a seller, this means you can aggregate lists of incoming orders from many Buyers, or outgoing orders to many Suppliers. You may filter a list by Buyer or Supplier, but it's not required to uniquely identify an Order. (Buyers typically only deal with outgoing Orders; Suppliers with incoming.) Buyers add Line Items to Orders by specifying a Product, Quantity, and (optionally) Spec values. Shipping is applied at either the Order level or Line Item level. Shipments are independent of Orders; you can ship a partial Order, or aggregate items from multiple Orders onto a single Shipment.",
-        "x-id": "OrdersAndFulfillment"
-      },
-      {
-        "name": "Suppliers",
-        "description": "Suppliers are a third, optional type of organization used in indirect supply chain scenarios. Like the Seller, they contain Users and Groups. Once established, Products can be configured to auto-forward to Suppliers when ordered. This will automatically create a new PO, notify the Supplier, and track costs and profit margins if configured.",
-        "x-id": "Suppliers"
-      },
-      {
-        "name": "Suppliers",
-        "description": "\"Suppliers\" represents Supplier in Marketplace",
-        "x-section-id": "Suppliers"
-      },
-      {
-        "name": "Seller",
-        "description": "At the center of any OrderCloud.io solution is a single Seller organization. It consists directly of Users, Groups, and Addresses (used mainly for shipping calculations), which should be established ahead of Product Catalogs, Buyers, and Suppliers.",
-        "x-id": "Seller"
-      },
-      {
-        "name": "Buyers",
-        "description": "Buyers represent real-world legal entities to which the Seller offers Product Catalogs and from which the Seller receives Orders. Buyers contain many of the same things as Sellers (Users, Groups, Addresses) and much more, including Cost Centers, Spending Accounts, and Approval Rules.\nAssignments are prevalent concept. Most \"things\" can be assigned to a User, Group, or entire Buyer organization. Plan ahead, and use Groups to your advantage here. For example, if you assign 100 Addresses directly to 50 Users, you are going to need to create 100 additional assignments every time you add a new User. Or, 50 more assignments for every new Address. With careful planning, Groups can save you from \"assignment hell\".",
-        "x-id": "Buyers"
-      }
-    ],
-    "components": {
-      "securitySchemes": {
-        "OAuth2": {
-          "type": "oauth2",
-          "flows": {
-            "password": {
-              "tokenUrl": "/oauth/token",
-              "scopes": {
-                "AddressAdmin": "",
-                "AddressReader": "",
-                "AdminAddressAdmin": "",
-                "AdminAddressReader": "",
-                "AdminUserAdmin": "",
-                "AdminUserGroupAdmin": "",
-                "AdminUserGroupReader": "",
-                "AdminUserReader": "",
-                "ApiClientAdmin": "",
-                "ApiClientReader": "",
-                "ApprovalRuleAdmin": "",
-                "ApprovalRuleReader": "",
-                "BuyerAdmin": "",
-                "BuyerImpersonation": "",
-                "BuyerReader": "",
-                "BuyerUserAdmin": "",
-                "BuyerUserReader": "",
-                "CatalogAdmin": "",
-                "CatalogReader": "",
-                "CategoryAdmin": "",
-                "CategoryReader": "",
-                "CostCenterAdmin": "",
-                "CostCenterReader": "",
-                "CreditCardAdmin": "",
-                "CreditCardReader": "",
-                "FullAccess": "",
-                "IncrementorAdmin": "",
-                "IncrementorReader": "",
-                "InventoryAdmin": "",
-                "MeAddressAdmin": "",
-                "MeAdmin": "",
-                "MeCreditCardAdmin": "",
-                "MessageConfigAssignmentAdmin": "",
-                "MessageSenderAdmin": "",
-                "MessageSenderReader": "",
-                "MeXpAdmin": "",
-                "OrderAdmin": "",
-                "OrderReader": "",
-                "OverrideShipping": "",
-                "OverrideTax": "",
-                "OverrideUnitPrice": "",
-                "PasswordReset": "",
-                "PriceScheduleAdmin": "",
-                "PriceScheduleReader": "",
-                "ProductAdmin": "",
-                "ProductAssignmentAdmin": "",
-                "ProductFacetAdmin": "",
-                "ProductFacetReader": "",
-                "ProductReader": "",
-                "PromotionAdmin": "",
-                "PromotionReader": "",
-                "SecurityProfileAdmin": "",
-                "SecurityProfileReader": "",
-                "SetSecurityProfile": "",
-                "ShipmentAdmin": "",
-                "ShipmentReader": "",
-                "Shopper": "",
-                "SpendingAccountAdmin": "",
-                "SpendingAccountReader": "",
-                "SupplierAddressAdmin": "",
-                "SupplierAddressReader": "",
-                "SupplierAdmin": "",
-                "SupplierReader": "",
-                "SupplierUserAdmin": "",
-                "SupplierUserGroupAdmin": "",
-                "SupplierUserGroupReader": "",
-                "SupplierUserReader": "",
-                "UnsubmittedOrderReader": "",
-                "UserGroupAdmin": "",
-                "UserGroupReader": "",
-                "WebhookAdmin": "",
-                "WebhookReader": "",
-                "XpIndexAdmin": ""
-              }
-            },
-            "clientCredentials": {
-              "tokenUrl": "/oauth/token",
-              "scopes": {
-                "AddressAdmin": "",
-                "AddressReader": "",
-                "AdminAddressAdmin": "",
-                "AdminAddressReader": "",
-                "AdminUserAdmin": "",
-                "AdminUserGroupAdmin": "",
-                "AdminUserGroupReader": "",
-                "AdminUserReader": "",
-                "ApiClientAdmin": "",
-                "ApiClientReader": "",
-                "ApprovalRuleAdmin": "",
-                "ApprovalRuleReader": "",
-                "BuyerAdmin": "",
-                "BuyerImpersonation": "",
-                "BuyerReader": "",
-                "BuyerUserAdmin": "",
-                "BuyerUserReader": "",
-                "CatalogAdmin": "",
-                "CatalogReader": "",
-                "CategoryAdmin": "",
-                "CategoryReader": "",
-                "CostCenterAdmin": "",
-                "CostCenterReader": "",
-                "CreditCardAdmin": "",
-                "CreditCardReader": "",
-                "FullAccess": "",
-                "IncrementorAdmin": "",
-                "IncrementorReader": "",
-                "InventoryAdmin": "",
-                "MeAddressAdmin": "",
-                "MeAdmin": "",
-                "MeCreditCardAdmin": "",
-                "MessageConfigAssignmentAdmin": "",
-                "MessageSenderAdmin": "",
-                "MessageSenderReader": "",
-                "MeXpAdmin": "",
-                "OrderAdmin": "",
-                "OrderReader": "",
-                "OverrideShipping": "",
-                "OverrideTax": "",
-                "OverrideUnitPrice": "",
-                "PasswordReset": "",
-                "PriceScheduleAdmin": "",
-                "PriceScheduleReader": "",
-                "ProductAdmin": "",
-                "ProductAssignmentAdmin": "",
-                "ProductFacetAdmin": "",
-                "ProductFacetReader": "",
-                "ProductReader": "",
-                "PromotionAdmin": "",
-                "PromotionReader": "",
-                "SecurityProfileAdmin": "",
-                "SecurityProfileReader": "",
-                "SetSecurityProfile": "",
-                "ShipmentAdmin": "",
-                "ShipmentReader": "",
-                "Shopper": "",
-                "SpendingAccountAdmin": "",
-                "SpendingAccountReader": "",
-                "SupplierAddressAdmin": "",
-                "SupplierAddressReader": "",
-                "SupplierAdmin": "",
-                "SupplierReader": "",
-                "SupplierUserAdmin": "",
-                "SupplierUserGroupAdmin": "",
-                "SupplierUserGroupReader": "",
-                "SupplierUserReader": "",
-                "UnsubmittedOrderReader": "",
-                "UserGroupAdmin": "",
-                "UserGroupReader": "",
-                "WebhookAdmin": "",
-                "WebhookReader": "",
-                "XpIndexAdmin": ""
-              }
-            }
-          }
-        }
-      },
-      "schemas": {
-        "BuyerAddressXP": {
-          "type": "object",
-          "example": {"Accessorials":["DestinationInsideDelivery"]},
-          "properties": {
-            "Accessorials": {
-              "type": "array",
-              "enum": [
-                "DestinationInsideDelivery",
-                "DestinationLiftGate",
-                "LimitedAccessDelivery",
-                "ResidentialDelivery"
-              ],
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "BuyerXp": {
-          "type": "object",
-          "example": {},
-          "properties": {}
-        },
-        "CatalogXp": {
-          "type": "object",
-          "example": {},
-          "properties": {}
-        },
-        "Contact": {
-          "type": "object",
-          "example": {"Name":"","Email":"","Phone":""},
-          "properties": {
-            "Name": {
-              "type": "string"
-            },
-            "Email": {
-              "type": "string"
-            },
-            "Phone": {
-              "type": "string"
-            }
-          }
-        },
-        "CostCenterXp": {
-          "type": "object",
-          "example": {},
-          "properties": {}
-        },
-        "ListFacet": {
-          "type": "object",
-          "properties": {
-            "Name": {
-              "type": "string"
-            },
-            "XpPath": {
-              "type": "string"
-            },
-            "Values": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/ListFacetValue"
-              }
-            },
-            "xp": {
-              "type": "object"
-            }
-          }
-        },
-        "ListFacetValue": {
-          "type": "object",
-          "properties": {
-            "Value": {
-              "type": "string"
-            },
-            "Count": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        },
-        "ListOrchestrationLog": {
-          "type": "object",
-          "properties": {
-            "Items": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/OrchestrationLog"
-              }
-            },
-            "Meta": {
-              "$ref": "#/components/schemas/Meta"
-            }
-          }
-        },
-        "ListSuperMarketplaceProduct": {
-          "type": "object",
-          "properties": {
-            "Items": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/SuperMarketplaceProduct"
-              }
-            },
-            "Meta": {
-              "$ref": "#/components/schemas/Meta"
-            }
-          }
-        },
-        "MarketplaceAddressAssignment": {
-          "type": "object",
-          "example": {"ID":"","AddressID":"","UserID":"","UserGroupID":"","IsShipping":false,"IsBilling":false},
-          "properties": {
-            "ID": {
-              "type": "string"
-            },
-            "AddressID": {
-              "type": "string"
-            },
-            "UserID": {
-              "type": "string"
-            },
-            "UserGroupID": {
-              "type": "string"
-            },
-            "IsShipping": {
-              "type": "boolean"
-            },
-            "IsBilling": {
-              "type": "boolean"
-            }
-          }
-        },
-        "MarketplaceAddressBuyer": {
-          "type": "object",
-          "example": {"xp":{"Accessorials":["DestinationInsideDelivery"]},"ID":"","DateCreated":"2018-01-01T00:00:00-06:00","CompanyName":"","FirstName":"","LastName":"","Street1":"","Street2":"","City":"","State":"","Zip":"","Country":"","Phone":"","AddressName":""},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/BuyerAddressXP"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "DateCreated": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "CompanyName": {
-              "type": "string"
-            },
-            "FirstName": {
-              "type": "string"
-            },
-            "LastName": {
-              "type": "string"
-            },
-            "Street1": {
-              "type": "string"
-            },
-            "Street2": {
-              "type": "string"
-            },
-            "City": {
-              "type": "string"
-            },
-            "State": {
-              "type": "string"
-            },
-            "Zip": {
-              "type": "string"
-            },
-            "Country": {
-              "type": "string"
-            },
-            "Phone": {
-              "type": "string"
-            },
-            "AddressName": {
-              "type": "string"
-            }
-          }
-        },
-        "MarketplaceBuyer": {
-          "type": "object",
-          "example": {"xp":{},"ID":"","Name":"","DefaultCatalogID":"","Active":false},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/BuyerXp"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "Name": {
-              "type": "string"
-            },
-            "DefaultCatalogID": {
-              "type": "string"
-            },
-            "Active": {
-              "type": "boolean"
-            }
-          }
-        },
-        "MarketplaceCatalog": {
-          "type": "object",
-          "example": {"xp":{},"ID":"","OwnerID":"","Name":"","Description":"","Active":false,"CategoryCount":0},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/CatalogXp"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "OwnerID": {
-              "type": "string"
-            },
-            "Name": {
-              "type": "string"
-            },
-            "Description": {
-              "type": "string"
-            },
-            "Active": {
-              "type": "boolean"
-            },
-            "CategoryCount": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        },
-        "MarketplaceCatalogAssignment": {
-          "type": "object",
-          "example": {"ID":"","CatalogID":"","BuyerID":"","ViewAllCategories":false,"ViewAllProducts":false},
-          "properties": {
-            "ID": {
-              "type": "string"
-            },
-            "CatalogID": {
-              "type": "string"
-            },
-            "BuyerID": {
-              "type": "string"
-            },
-            "ViewAllCategories": {
-              "type": "boolean"
-            },
-            "ViewAllProducts": {
-              "type": "boolean"
-            }
-          }
-        },
-        "MarketplaceCostCenter": {
-          "type": "object",
-          "example": {"xp":{},"ID":"","Name":"","Description":""},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/CostCenterXp"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "Name": {
-              "type": "string"
-            },
-            "Description": {
-              "type": "string"
-            }
-          }
-        },
-        "MarketplacePriceSchedule": {
-          "type": "object",
-          "example": {"xp":{},"ID":"","Name":"","ApplyTax":false,"ApplyShipping":false,"MinQuantity":0,"MaxQuantity":0,"UseCumulativeQuantity":false,"RestrictedQuantity":false,"PriceBreaks":[{}]},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/PriceScheduleXp"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "Name": {
-              "type": "string"
-            },
-            "ApplyTax": {
-              "type": "boolean"
-            },
-            "ApplyShipping": {
-              "type": "boolean"
-            },
-            "MinQuantity": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "MaxQuantity": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "UseCumulativeQuantity": {
-              "type": "boolean"
-            },
-            "RestrictedQuantity": {
-              "type": "boolean"
-            },
-            "PriceBreaks": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/PriceBreak"
-              }
-            }
-          }
-        },
-        "MarketplaceProduct": {
-          "type": "object",
-          "example": {"xp":{"Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"Status":"Draft","HasVariants":false,"Note":"","Tax":{"Category":"","Code":"","Description":""},"UnitOfMeasure":{"Qty":0,"Unit":""},"ProductType":"Standard"},"OwnerID":"","DefaultPriceScheduleID":"","AutoForward":false,"ID":"","Name":"","Description":"","QuantityMultiplier":0,"ShipWeight":0,"ShipHeight":0,"ShipWidth":0,"ShipLength":0,"Active":false,"SpecCount":0,"VariantCount":0,"ShipFromAddressID":"","Inventory":{},"DefaultSupplierID":""},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/ProductXp"
-                }
-              ]
-            },
-            "OwnerID": {
-              "type": "string"
-            },
-            "DefaultPriceScheduleID": {
-              "type": "string"
-            },
-            "AutoForward": {
-              "type": "boolean"
-            },
-            "ID": {
-              "type": "string"
-            },
-            "Name": {
-              "type": "string"
-            },
-            "Description": {
-              "type": "string"
-            },
-            "QuantityMultiplier": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "ShipWeight": {
-              "type": "number",
-              "format": "float"
-            },
-            "ShipHeight": {
-              "type": "number",
-              "format": "float"
-            },
-            "ShipWidth": {
-              "type": "number",
-              "format": "float"
-            },
-            "ShipLength": {
-              "type": "number",
-              "format": "float"
-            },
-            "Active": {
-              "type": "boolean"
-            },
-            "SpecCount": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "VariantCount": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "ShipFromAddressID": {
-              "type": "string"
-            },
-            "Inventory": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Inventory"
-                }
-              ]
-            },
-            "DefaultSupplierID": {
-              "type": "string"
-            }
-          }
-        },
-        "MarketplaceProductAssignment": {
-          "type": "object",
-          "example": {"ID":"","ProductID":"","BuyerID":"","UserGroupID":"","PriceScheduleID":""},
-          "properties": {
-            "ID": {
-              "type": "string"
-            },
-            "ProductID": {
-              "type": "string"
-            },
-            "BuyerID": {
-              "type": "string"
-            },
-            "UserGroupID": {
-              "type": "string"
-            },
-            "PriceScheduleID": {
-              "type": "string"
-            }
-          }
-        },
-        "MarketplaceProductFacet": {
-          "type": "object",
-          "example": {"xp":{"Options":[""],"ParentID":""},"ID":"","Name":"","XpPath":"","ListOrder":0,"MinCount":0},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/ProductFacetXp"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "Name": {
-              "type": "string"
-            },
-            "XpPath": {
-              "type": "string"
-            },
-            "ListOrder": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "MinCount": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        },
-        "MarketplaceSpec": {
-          "type": "object",
-          "example": {"xp":{"UI":{"ControlType":"Text"}},"ID":"","ListOrder":0,"Name":"","DefaultValue":"","Required":false,"AllowOpenText":false,"DefaultOptionID":"","DefinesVariant":false,"OptionCount":0,"Options":[{}]},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/SpecXp"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "ListOrder": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "Name": {
-              "type": "string"
-            },
-            "DefaultValue": {
-              "type": "string"
-            },
-            "Required": {
-              "type": "boolean"
-            },
-            "AllowOpenText": {
-              "type": "boolean"
-            },
-            "DefaultOptionID": {
-              "type": "string"
-            },
-            "DefinesVariant": {
-              "type": "boolean"
-            },
-            "OptionCount": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "Options": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/SpecOption"
-              }
-            }
-          }
-        },
-        "MarketplaceSpecOption": {
-          "type": "object",
-          "example": {"xp":{"Description":"","SpecID":""},"ID":"","Value":"","ListOrder":0,"IsOpenText":false,"PriceMarkupType":"NoMarkup","PriceMarkup":0},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/SpecOptionXp"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "Value": {
-              "type": "string"
-            },
-            "ListOrder": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "IsOpenText": {
-              "type": "boolean"
-            },
-            "PriceMarkupType": {
-              "enum": [
-                "NoMarkup",
-                "AmountPerQuantity",
-                "AmountTotal",
-                "Percentage"
-              ],
-              "type": "string"
-            },
-            "PriceMarkup": {
-              "type": "number",
-              "format": "float"
-            }
-          }
-        },
-        "MarketplaceSpecProductAssignment": {
-          "type": "object",
-          "example": {"ID":"","SpecID":"","ProductID":"","DefaultValue":"","DefaultOptionID":""},
-          "properties": {
-            "ID": {
-              "type": "string"
-            },
-            "SpecID": {
-              "type": "string"
-            },
-            "ProductID": {
-              "type": "string"
-            },
-            "DefaultValue": {
-              "type": "string"
-            },
-            "DefaultOptionID": {
-              "type": "string"
-            }
-          }
-        },
-        "MarketplaceSupplier": {
-          "type": "object",
-          "example": {"xp":{"Description":"","Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"SupportContact":{"Name":"","Email":"","Phone":""}},"ID":"","Name":"","Active":false},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/SupplierXp"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "Name": {
-              "type": "string"
-            },
-            "Active": {
-              "type": "boolean"
-            }
-          }
-        },
-        "MarketplaceUser": {
-          "type": "object",
-          "example": {"xp":{},"ID":"","Username":"","Password":"","FirstName":"","LastName":"","Email":"","Phone":"","TermsAccepted":"2018-01-01T00:00:00-06:00","Active":false,"AvailableRoles":[""],"DateCreated":"2018-01-01T00:00:00-06:00","PasswordLastSetDate":"2018-01-01T00:00:00-06:00"},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/UserXp"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "Username": {
-              "type": "string"
-            },
-            "Password": {
-              "type": "string",
-              "format": "password"
-            },
-            "FirstName": {
-              "type": "string"
-            },
-            "LastName": {
-              "type": "string"
-            },
-            "Email": {
-              "type": "string"
-            },
-            "Phone": {
-              "type": "string"
-            },
-            "TermsAccepted": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "Active": {
-              "type": "boolean"
-            },
-            "AvailableRoles": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "DateCreated": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "PasswordLastSetDate": {
-              "type": "string",
-              "format": "password"
-            }
-          }
-        },
-        "MarketplaceUserGroup": {
-          "type": "object",
-          "example": {"xp":{},"ID":"","Name":"","Description":""},
-          "properties": {
-            "xp": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/UserGroupXp"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            },
-            "Name": {
-              "type": "string"
-            },
-            "Description": {
-              "type": "string"
-            }
-          }
-        },
-        "MarketplaceUserGroupAssignment": {
-          "type": "object",
-          "example": {"ID":"","UserGroupID":"","UserID":""},
-          "properties": {
-            "ID": {
-              "type": "string"
-            },
-            "UserGroupID": {
-              "type": "string"
-            },
-            "UserID": {
-              "type": "string"
-            }
-          }
-        },
-        "Meta": {
-          "type": "object",
-          "properties": {
-            "Page": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "PageSize": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "TotalCount": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "TotalPages": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "ItemRange": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "format": "int32"
-              }
-            }
-          }
-        },
-        "MetaWithFacets": {
-          "type": "object",
-          "properties": {
-            "Facets": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/ListFacet"
-              }
-            },
-            "Page": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "PageSize": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "TotalCount": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "TotalPages": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "ItemRange": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "format": "int32"
-              }
-            }
-          }
-        },
-        "OrchestrationLog": {
-          "type": "object",
-          "example": {"id":"","timeStamp":"2018-01-01T00:00:00-06:00","ErrorType":"WorkItemDefinition","Message":"","Level":"Progress","ResourceId":"","RecordId":"","RecordType":"Product","Action":"Ignore"},
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "timeStamp": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "ErrorType": {
-              "enum": [
-                "WorkItemDefinition",
-                "QueuedGetError",
-                "CachedGetError",
-                "DiffCalculationError",
-                "ActionEvaluationError",
-                "CacheUpdateError",
-                "QueueCleanupError",
-                "SyncCommandError",
-                "CreateExistsError",
-                "CreateGeneralError",
-                "UpdateGeneralError",
-                "PatchGeneralError",
-                "GetGeneralError"
-              ],
-              "type": "string"
-            },
-            "Message": {
-              "type": "string"
-            },
-            "Level": {
-              "enum": [
-                "Progress",
-                "Error",
-                "Warn",
-                "Success"
-              ],
-              "type": "string"
-            },
-            "ResourceId": {
-              "type": "string"
-            },
-            "RecordId": {
-              "type": "string"
-            },
-            "RecordType": {
-              "enum": [
-                "Product",
-                "PriceSchedule",
-                "Spec",
-                "SpecOption",
-                "SpecProductAssignment",
-                "ProductFacet",
-                "Buyer",
-                "User",
-                "UserGroup",
-                "Address",
-                "CostCenter",
-                "UserGroupAssignment",
-                "AddressAssignment",
-                "CatalogAssignment",
-                "Catalog"
-              ],
-              "type": "string"
-            },
-            "Action": {
-              "enum": [
-                "Ignore",
-                "Create",
-                "Update",
-                "Patch",
-                "Delete",
-                "Get"
-              ],
-              "type": "string"
-            }
-          }
-        },
-        "PriceScheduleXp": {
-          "type": "object",
-          "example": {},
-          "properties": {}
-        },
-        "ProductFacetXp": {
-          "type": "object",
-          "example": {"Options":[""],"ParentID":""},
-          "properties": {
-            "Options": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "ParentID": {
-              "type": "string"
-            }
-          }
-        },
-        "ProductImage": {
-          "type": "object",
-          "example": {"URL":"","Tag":{"VariantID":"","Options":[""]}},
-          "properties": {
-            "URL": {
-              "type": "string"
-            },
-            "Tag": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Tag"
-                }
-              ]
-            }
-          }
-        },
-        "ProductXp": {
-          "type": "object",
-          "example": {"Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"Status":"Draft","HasVariants":false,"Note":"","Tax":{"Category":"","Code":"","Description":""},"UnitOfMeasure":{"Qty":0,"Unit":""},"ProductType":"Standard"},
-          "properties": {
-            "Images": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/ProductImage"
-              }
-            },
-            "Status": {
-              "enum": [
-                "Draft",
-                "Published"
-              ],
-              "type": "string"
-            },
-            "HasVariants": {
-              "type": "boolean"
-            },
-            "Note": {
-              "type": "string",
-              "maxLength": 500
-            },
-            "Tax": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/TaxProperties"
-                }
-              ]
-            },
-            "UnitOfMeasure": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/UnitOfMeasure"
-                }
-              ]
-            },
-            "ProductType": {
-              "enum": [
-                "Standard",
-                "Quote"
-              ],
-              "type": "string"
-            }
-          }
-        },
-        "SpecOptionXp": {
-          "type": "object",
-          "example": {"Description":"","SpecID":""},
-          "properties": {
-            "Description": {
-              "type": "string"
-            },
-            "SpecID": {
-              "type": "string"
-            }
-          }
-        },
-        "SpecUI": {
-          "type": "object",
-          "example": {"ControlType":"Text"},
-          "properties": {
-            "ControlType": {
-              "enum": [
-                "Text",
-                "DropDown",
-                "Checkbox",
-                "Range"
-              ],
-              "type": "string"
-            }
-          }
-        },
-        "SpecXp": {
-          "type": "object",
-          "example": {"UI":{"ControlType":"Text"}},
-          "properties": {
-            "UI": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/SpecUI"
-                }
-              ]
-            }
-          }
-        },
-        "SuperMarketplaceProduct": {
-          "type": "object",
-          "example": {"Product":{"xp":{"Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"Status":"Draft","HasVariants":false,"Note":"","Tax":{"Category":"","Code":"","Description":""},"UnitOfMeasure":{"Qty":0,"Unit":""},"ProductType":"Standard"},"OwnerID":"","DefaultPriceScheduleID":"","AutoForward":false,"ID":"","Name":"","Description":"","QuantityMultiplier":0,"ShipWeight":0,"ShipHeight":0,"ShipWidth":0,"ShipLength":0,"Active":false,"SpecCount":0,"VariantCount":0,"ShipFromAddressID":"","Inventory":{},"DefaultSupplierID":""},"PriceSchedule":{},"ID":""},
-          "properties": {
-            "Product": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/MarketplaceProduct"
-                }
-              ]
-            },
-            "PriceSchedule": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/PriceSchedule"
-                }
-              ]
-            },
-            "ID": {
-              "type": "string"
-            }
-          }
-        },
-        "SupplierCategoriesFilter": {
-          "type": "object",
-          "example": {"Display":"","Path":"","Values":[""]},
-          "properties": {
-            "Display": {
-              "type": "string"
-            },
-            "Path": {
-              "type": "string"
-            },
-            "Values": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "SupplierCategoryConfig": {
-          "type": "object",
-          "example": {"id":"","timeStamp":"2018-01-01T00:00:00-06:00","MarketplaceName":"","Filters":[{"Display":"","Path":"","Values":[""]}]},
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "timeStamp": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "MarketplaceName": {
-              "type": "string"
-            },
-            "Filters": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/SupplierCategoriesFilter"
-              }
-            }
-          }
-        },
-        "SupplierXp": {
-          "type": "object",
-          "example": {"Description":"","Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"SupportContact":{"Name":"","Email":"","Phone":""}},
-          "properties": {
-            "Description": {
-              "type": "string"
-            },
-            "Images": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/ProductImage"
-              }
-            },
-            "SupportContact": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Contact"
-                }
-              ]
-            }
-          }
-        },
-        "Tag": {
-          "type": "object",
-          "example": {"VariantID":"","Options":[""]},
-          "properties": {
-            "VariantID": {
-              "type": "string"
-            },
-            "Options": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "TaxProperties": {
-          "type": "object",
-          "example": {"Category":"","Code":"","Description":""},
-          "properties": {
-            "Category": {
-              "type": "string"
-            },
-            "Code": {
-              "type": "string"
-            },
-            "Description": {
-              "type": "string",
-              "maxLength": 100
-            }
-          }
-        },
-        "UnitOfMeasure": {
-          "type": "object",
-          "example": {"Qty":0,"Unit":""},
-          "properties": {
-            "Qty": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "Unit": {
-              "type": "string"
-            }
-          }
-        },
-        "UserGroupXp": {
-          "type": "object",
-          "example": {},
-          "properties": {}
-        },
-        "UserXp": {
-          "type": "object",
-          "example": {},
-          "properties": {}
-        },
-        "Authentication": {
-          "type": "object",
-          "properties": {
-            "access_token": {
-              "type": "string"
-            }
-          }
-        }
-      }
-    },
-    "paths": {
-      "{marketplaceID}/images/product/{productID}": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/SuperMarketplaceProduct"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "Files.Post",
-          "tags": [
-            "Files"
-          ],
-          "parameters": [
-            {
-              "name": "marketplaceID",
-              "in": "path",
-              "description": "ID of the marketplace.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "productID",
-              "in": "path",
-              "description": "ID of the product.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "file",
-              "in": "query",
-              "description": "File of the super marketplace product.",
-              "required": true,
-              "schema": {
-                "type": "object"
-              }
-            }
-          ],
-          "summary": "POST Product Images",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "{marketplaceID}/images/product/{productID}/{fileName}": {
-        "delete": {
-          "responses": {
-            "200": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/SuperMarketplaceProduct"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "Files.Delete",
-          "tags": [
-            "Files"
-          ],
-          "parameters": [
-            {
-              "name": "marketplaceID",
-              "in": "path",
-              "description": "ID of the marketplace.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "productID",
-              "in": "path",
-              "description": "ID of the product.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "fileName",
-              "in": "path",
-              "description": "File name of the super marketplace product.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "DELETE Product Images",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "marketplace/{marketplaceID}/supplier/category/config": {
-        "get": {
-          "responses": {
-            "200": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/SupplierCategoryConfig"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "SupplierCategoryConfigs.Get",
-          "tags": [
-            "Supplier Category Configs"
-          ],
-          "parameters": [
-            {
-              "name": "marketplaceID",
-              "in": "path",
-              "description": "ID of the marketplace.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "GET SupplierCategoryConfig",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "SupplierReader",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/{buyerId}/address": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceAddressBuyer"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "UserOrchestrations.PostAddress",
-          "tags": [
-            "User Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceAddressBuyer"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "buyerId",
-              "in": "path",
-              "description": "Buyer id of the marketplace address buyer.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace address buyer.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Address",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/{buyerId}/addressassignment": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceAddressAssignment"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "UserOrchestrations.PostAddressAssignment",
-          "tags": [
-            "User Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceAddressAssignment"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "buyerId",
-              "in": "path",
-              "description": "Buyer id of the marketplace address assignment.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace address assignment.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST AddressAssignment",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/{buyerId}/costcenter": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceCostCenter"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "UserOrchestrations.PostCostCenter",
-          "tags": [
-            "User Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceCostCenter"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "buyerId",
-              "in": "path",
-              "description": "Buyer id of the marketplace cost center.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace cost center.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST CostCenter",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/{buyerId}/user": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceUser"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "UserOrchestrations.PostUser",
-          "tags": [
-            "User Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceUser"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "buyerId",
-              "in": "path",
-              "description": "Buyer id of the marketplace user.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace user.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST User",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/{buyerId}/usergroup": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceUserGroup"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "UserOrchestrations.PostUserGroup",
-          "tags": [
-            "User Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceUserGroup"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "buyerId",
-              "in": "path",
-              "description": "Buyer id of the marketplace user group.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace user group.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST UserGroup",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/{buyerId}/usergroupassignment": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceUserGroupAssignment"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "UserOrchestrations.PostUserGroupAssignment",
-          "tags": [
-            "User Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceUserGroupAssignment"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "buyerId",
-              "in": "path",
-              "description": "Buyer id of the marketplace user group assignment.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace user group assignment.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST UserGroupAssignment",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/buyer": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceBuyer"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "UserOrchestrations.PostBuyer",
-          "tags": [
-            "User Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceBuyer"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace buyer.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Buyer",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/catalog": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceCatalog"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "ProductOrchestrations.PostCatalog",
-          "tags": [
-            "Product Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceCatalog"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace catalog.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Catalog",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "CatalogAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/catalogproductassignment": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceCatalogAssignment"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "ProductOrchestrations.PostCatalogProductAssignment",
-          "tags": [
-            "Product Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceCatalogAssignment"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace catalog assignment.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Catalog Product Assignment",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "CatalogAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/priceschedule": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplacePriceSchedule"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "ProductOrchestrations.PostPriceSchedule",
-          "tags": [
-            "Product Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplacePriceSchedule"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace price schedule.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Price Schedule",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "PriceScheduleAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/product": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceProduct"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "ProductOrchestrations.PostProduct",
-          "tags": [
-            "Product Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceProduct"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace product.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Product",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/productassignment": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceProductAssignment"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "ProductOrchestrations.PostProductAssignment",
-          "tags": [
-            "Product Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceProductAssignment"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace product assignment.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Product Assignment",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/productfacet": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceProductFacet"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "ProductOrchestrations.PostProductFacet",
-          "tags": [
-            "Product Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceProductFacet"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace product facet.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Product Facet",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductFacetAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/spec": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceSpec"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "ProductOrchestrations.PostSpec",
-          "tags": [
-            "Product Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceSpec"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace spec.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Spec",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/specoption": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceSpecOption"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "ProductOrchestrations.PostSpecOption",
-          "tags": [
-            "Product Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceSpecOption"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace spec option.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Spec Option",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/{clientId}/specproductassignment": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceSpecProductAssignment"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "ProductOrchestrations.PostSpecProductAssignment",
-          "tags": [
-            "Product Orchestrations"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceSpecProductAssignment"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "clientId",
-              "in": "path",
-              "description": "Client id of the marketplace spec product assignment.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "POST Spec Product Assignment",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "orchestration/logs": {
-        "get": {
-          "responses": {
-            "200": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ListOrchestrationLog"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "OrchestrationLogs.List",
-          "tags": [
-            "Orchestration Logs"
-          ],
-          "parameters": [
-            {
-              "name": "search",
-              "in": "query",
-              "description": "Word or phrase to search for.",
-              "required": false,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "searchOn",
-              "in": "query",
-              "description": "Comma-delimited list of fields to search on.",
-              "required": false,
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "enum": []
-                }
-              }
-            },
-            {
-              "name": "sortBy",
-              "in": "query",
-              "description": "Comma-delimited list of fields to sort by.",
-              "required": false,
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "enum": []
-                }
-              }
-            },
-            {
-              "name": "page",
-              "in": "query",
-              "description": "Page of results to return. Default: 1",
-              "required": false,
-              "schema": {
-                "type": "integer"
-              }
-            },
-            {
-              "name": "pageSize",
-              "in": "query",
-              "description": "Number of results to return per page. Default: 20, max: 100.",
-              "required": false,
-              "schema": {
-                "type": "integer"
-              }
-            },
-            {
-              "name": "filters",
-              "in": "query",
-              "description": "Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'",
-              "required": false,
-              "schema": {
-                "type": "object"
-              }
-            }
-          ],
-          "summary": "GET Orchestration Logs",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": []
-            }
-          ]
-        }
-      },
-      "products": {
-        "get": {
-          "responses": {
-            "200": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ListSuperMarketplaceProduct"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "Products.List",
-          "tags": [
-            "Products"
-          ],
-          "parameters": [
-            {
-              "name": "search",
-              "in": "query",
-              "description": "Word or phrase to search for.",
-              "required": false,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "searchOn",
-              "in": "query",
-              "description": "Comma-delimited list of fields to search on.",
-              "required": false,
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "enum": []
-                }
-              }
-            },
-            {
-              "name": "sortBy",
-              "in": "query",
-              "description": "Comma-delimited list of fields to sort by.",
-              "required": false,
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "enum": []
-                }
-              }
-            },
-            {
-              "name": "page",
-              "in": "query",
-              "description": "Page of results to return. Default: 1",
-              "required": false,
-              "schema": {
-                "type": "integer"
-              }
-            },
-            {
-              "name": "pageSize",
-              "in": "query",
-              "description": "Number of results to return per page. Default: 20, max: 100.",
-              "required": false,
-              "schema": {
-                "type": "integer"
-              }
-            },
-            {
-              "name": "filters",
-              "in": "query",
-              "description": "Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'",
-              "required": false,
-              "schema": {
-                "type": "object"
-              }
-            }
-          ],
-          "summary": "LIST Product",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "ProductReader",
-                "FullAccess"
-              ]
-            }
-          ]
-        },
-        "post": {
-          "responses": {
-            "201": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/SuperMarketplaceProduct"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "Products.Post",
-          "tags": [
-            "Products"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/SuperMarketplaceProduct"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "summary": "POST Product",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "products/{id}": {
-        "get": {
-          "responses": {
-            "200": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/SuperMarketplaceProduct"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "Products.Get",
-          "tags": [
-            "Products"
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "description": "Id of the super marketplace product.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "GET Product",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "ProductReader",
-                "FullAccess"
-              ]
-            }
-          ]
-        },
-        "put": {
-          "responses": {
-            "200": {
-              "description": "",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/SuperMarketplaceProduct"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "Products.Put",
-          "tags": [
-            "Products"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/SuperMarketplaceProduct"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "description": "Id of the super marketplace product.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "PUT Product",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        },
-        "delete": {
-          "responses": {
-            "204": {
-              "description": ""
-            }
-          },
-          "operationId": "Products.Delete",
-          "tags": [
-            "Products"
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "description": "Id of the product.",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "summary": "DELETE Product",
-          "description": "",
-          "security": [
-            {
-              "OAuth2": [
-                "ProductAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      },
-      "supplier": {
-        "post": {
-          "responses": {
-            "201": {
-              "description": "If ID is provided and an object with that ID already exists, a 409 (conflict) error is returned.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MarketplaceSupplier"
-                  }
-                }
-              }
-            }
-          },
-          "operationId": "Suppliers.Create",
-          "tags": [
-            "Suppliers"
-          ],
-          "requestBody": {
-            "required": true,
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/MarketplaceSupplier"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "summary": "Create a new supplier.",
-          "description": "If ID is provided and an object with that ID already exists, a 409 (conflict) error is returned.",
-          "security": [
-            {
-              "OAuth2": [
-                "SupplierAdmin",
-                "FullAccess"
-              ]
-            }
-          ]
-        }
-      }
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Marketplace API",
+    "description": "Marketplace API",
+    "version": "1.0",
+    "contact": {
+      "name": "Marketplace",
+      "url": "https://ordercloud.io",
+      "email": "oheywood@four51.com"
     }
   },
-  "Item2": {
-    "swagger": "2.0",
-    "info": {
-      "title": "Marketplace API",
-      "description": "Marketplace API",
-      "version": "1.0",
-      "contact": {
-        "name": "Marketplace",
-        "url": "https://ordercloud.io",
-        "email": "oheywood@four51.com"
-      }
+  "servers": [
+    {
+      "url": "https://marketplace-api-qa.azurewebsites.net",
+      "description": "Marketplace API"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication and Authorization",
+      "description": "The OrderCloud.io API implements OAuth2 combined with our own notion of Roles to control user authentication and authorization at fine-grain level. Be prepared to spend time learning about these concepts and designing the right model for your application. If you over-priviledge your users and attempt to control what they can do via front-end code, you run the risk of technically savvy users circumventing this by making direct API calls.",
+      "x-id": "AuthenticationAndAuthorization"
     },
-    "host": "https://marketplace-api-qa.azurewebsites.net",
-    "basePath": "/",
-    "schemes": [
-      "https"
-    ],
-    "consumes": [
-      "application/json",
-      "text/plain; charset=utf-8"
-    ],
-    "produces": [
-      "application/json"
-    ],
-    "security": [
-      {
-        "oauth2": []
-      }
-    ],
-    "securityDefinitions": {
-      "oauth2": {
+    {
+      "name": "Orchestration",
+      "description": "Orchestration resources",
+      "x-id": "Orchestration"
+    },
+    {
+      "name": "Product Orchestrations",
+      "description": "\"Orchestration\" represents objects exposed for orchestration control",
+      "x-section-id": "Orchestration"
+    },
+    {
+      "name": "User Orchestrations",
+      "description": "\"Orchestration\" represents Organization objects exposed for orchestration control",
+      "x-section-id": "Orchestration"
+    },
+    {
+      "name": "Orchestration Logs",
+      "description": "\"Orchestration Logs\" represents logs of orchestration activities",
+      "x-section-id": "Orchestration"
+    },
+    {
+      "name": "Product Catalogs",
+      "description": "Products are priced (or unpriced) goods that can be offered to Buyers for placement on Orders. A Product can belong to any number of Catalogs, and a Catalog can be organized into hierarchical Categories to any arbitrary depth. Catalogs are assigned to Buyers, though visibility and pricing may vary by Buyer, User Group, Category, or individual Product. Pricing may include quantity breaks (collectively called a Price Schedule), and Price Schedules may be shared with multiple Products. User-selected Specs, which may include price markups, can be assigned to Products, enabling Buyer configurability at the time of ordering.",
+      "x-id": "ProductCatalogs"
+    },
+    {
+      "name": "Files",
+      "description": "\"Files\" represents files for content management control",
+      "x-section-id": "ProductCatalogs"
+    },
+    {
+      "name": "Products",
+      "description": "\"Products\" represents products for Marketplace",
+      "x-section-id": "ProductCatalogs"
+    },
+    {
+      "name": "Supplier Category Configs",
+      "description": "\"Supplier Category Config\" represents Supplier Category Configuration",
+      "x-section-id": "ProductCatalogs"
+    },
+    {
+      "name": "Orders and Fulfillment",
+      "description": "The central concept within OrderCloud.io is (not surprisingly) the Order. This is where Buyers, Sellers, Products, Addresses, and just about everything else come together to form business transactions. A feature that is somewhat unique to this area of the API is that you'll use the same set of endpoints regardless of whether you're a Buyer, Seller, or Supplier. What's important is the order *direction*, which is either incoming or outgoing. Order IDs are guaranteed unique within that context. As a seller, this means you can aggregate lists of incoming orders from many Buyers, or outgoing orders to many Suppliers. You may filter a list by Buyer or Supplier, but it's not required to uniquely identify an Order. (Buyers typically only deal with outgoing Orders; Suppliers with incoming.) Buyers add Line Items to Orders by specifying a Product, Quantity, and (optionally) Spec values. Shipping is applied at either the Order level or Line Item level. Shipments are independent of Orders; you can ship a partial Order, or aggregate items from multiple Orders onto a single Shipment.",
+      "x-id": "OrdersAndFulfillment"
+    },
+    {
+      "name": "Suppliers",
+      "description": "Suppliers are a third, optional type of organization used in indirect supply chain scenarios. Like the Seller, they contain Users and Groups. Once established, Products can be configured to auto-forward to Suppliers when ordered. This will automatically create a new PO, notify the Supplier, and track costs and profit margins if configured.",
+      "x-id": "Suppliers"
+    },
+    {
+      "name": "Suppliers",
+      "description": "\"Suppliers\" represents Supplier in Marketplace",
+      "x-section-id": "Suppliers"
+    },
+    {
+      "name": "Seller",
+      "description": "At the center of any OrderCloud.io solution is a single Seller organization. It consists directly of Users, Groups, and Addresses (used mainly for shipping calculations), which should be established ahead of Product Catalogs, Buyers, and Suppliers.",
+      "x-id": "Seller"
+    },
+    {
+      "name": "Buyers",
+      "description": "Buyers represent real-world legal entities to which the Seller offers Product Catalogs and from which the Seller receives Orders. Buyers contain many of the same things as Sellers (Users, Groups, Addresses) and much more, including Cost Centers, Spending Accounts, and Approval Rules.\nAssignments are prevalent concept. Most \"things\" can be assigned to a User, Group, or entire Buyer organization. Plan ahead, and use Groups to your advantage here. For example, if you assign 100 Addresses directly to 50 Users, you are going to need to create 100 additional assignments every time you add a new User. Or, 50 more assignments for every new Address. With careful planning, Groups can save you from \"assignment hell\".",
+      "x-id": "Buyers"
+    }
+  ],
+  "components": {
+    "securitySchemas": {
+      "OAuth2": {
         "type": "oauth2",
-        "tokenUrl": "https://auth.ordercloud.io/oauth/token",
-        "flow": "password",
-        "scopes": {
-          "AddressAdmin": "",
-          "AddressReader": "",
-          "AdminAddressAdmin": "",
-          "AdminAddressReader": "",
-          "AdminUserAdmin": "",
-          "AdminUserGroupAdmin": "",
-          "AdminUserGroupReader": "",
-          "AdminUserReader": "",
-          "ApiClientAdmin": "",
-          "ApiClientReader": "",
-          "ApprovalRuleAdmin": "",
-          "ApprovalRuleReader": "",
-          "BuyerAdmin": "",
-          "BuyerImpersonation": "",
-          "BuyerReader": "",
-          "BuyerUserAdmin": "",
-          "BuyerUserReader": "",
-          "CatalogAdmin": "",
-          "CatalogReader": "",
-          "CategoryAdmin": "",
-          "CategoryReader": "",
-          "CostCenterAdmin": "",
-          "CostCenterReader": "",
-          "CreditCardAdmin": "",
-          "CreditCardReader": "",
-          "FullAccess": "",
-          "IncrementorAdmin": "",
-          "IncrementorReader": "",
-          "InventoryAdmin": "",
-          "MeAddressAdmin": "",
-          "MeAdmin": "",
-          "MeCreditCardAdmin": "",
-          "MessageConfigAssignmentAdmin": "",
-          "MessageSenderAdmin": "",
-          "MessageSenderReader": "",
-          "MeXpAdmin": "",
-          "OrderAdmin": "",
-          "OrderReader": "",
-          "OverrideShipping": "",
-          "OverrideTax": "",
-          "OverrideUnitPrice": "",
-          "PasswordReset": "",
-          "PriceScheduleAdmin": "",
-          "PriceScheduleReader": "",
-          "ProductAdmin": "",
-          "ProductAssignmentAdmin": "",
-          "ProductFacetAdmin": "",
-          "ProductFacetReader": "",
-          "ProductReader": "",
-          "PromotionAdmin": "",
-          "PromotionReader": "",
-          "SecurityProfileAdmin": "",
-          "SecurityProfileReader": "",
-          "SetSecurityProfile": "",
-          "ShipmentAdmin": "",
-          "ShipmentReader": "",
-          "Shopper": "",
-          "SpendingAccountAdmin": "",
-          "SpendingAccountReader": "",
-          "SupplierAddressAdmin": "",
-          "SupplierAddressReader": "",
-          "SupplierAdmin": "",
-          "SupplierReader": "",
-          "SupplierUserAdmin": "",
-          "SupplierUserGroupAdmin": "",
-          "SupplierUserGroupReader": "",
-          "SupplierUserReader": "",
-          "UnsubmittedOrderReader": "",
-          "UserGroupAdmin": "",
-          "UserGroupReader": "",
-          "WebhookAdmin": "",
-          "WebhookReader": "",
-          "XpIndexAdmin": ""
+        "flows": {
+          "password": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {
+              "AddressAdmin": "",
+              "AddressReader": "",
+              "AdminAddressAdmin": "",
+              "AdminAddressReader": "",
+              "AdminUserAdmin": "",
+              "AdminUserGroupAdmin": "",
+              "AdminUserGroupReader": "",
+              "AdminUserReader": "",
+              "ApiClientAdmin": "",
+              "ApiClientReader": "",
+              "ApprovalRuleAdmin": "",
+              "ApprovalRuleReader": "",
+              "BuyerAdmin": "",
+              "BuyerImpersonation": "",
+              "BuyerReader": "",
+              "BuyerUserAdmin": "",
+              "BuyerUserReader": "",
+              "CatalogAdmin": "",
+              "CatalogReader": "",
+              "CategoryAdmin": "",
+              "CategoryReader": "",
+              "CostCenterAdmin": "",
+              "CostCenterReader": "",
+              "CreditCardAdmin": "",
+              "CreditCardReader": "",
+              "FullAccess": "",
+              "IncrementorAdmin": "",
+              "IncrementorReader": "",
+              "InventoryAdmin": "",
+              "MeAddressAdmin": "",
+              "MeAdmin": "",
+              "MeCreditCardAdmin": "",
+              "MessageConfigAssignmentAdmin": "",
+              "MessageSenderAdmin": "",
+              "MessageSenderReader": "",
+              "MeXpAdmin": "",
+              "OpenIDConnectAdmin": "",
+              "OpenIDConnectReader": "",
+              "OrderAdmin": "",
+              "OrderReader": "",
+              "OverrideShipping": "",
+              "OverrideTax": "",
+              "OverrideUnitPrice": "",
+              "PasswordReset": "",
+              "PriceScheduleAdmin": "",
+              "PriceScheduleReader": "",
+              "ProductAdmin": "",
+              "ProductAssignmentAdmin": "",
+              "ProductFacetAdmin": "",
+              "ProductFacetReader": "",
+              "ProductReader": "",
+              "PromotionAdmin": "",
+              "PromotionReader": "",
+              "SecurityProfileAdmin": "",
+              "SecurityProfileReader": "",
+              "SetSecurityProfile": "",
+              "ShipmentAdmin": "",
+              "ShipmentReader": "",
+              "Shopper": "",
+              "SpendingAccountAdmin": "",
+              "SpendingAccountReader": "",
+              "SupplierAddressAdmin": "",
+              "SupplierAddressReader": "",
+              "SupplierAdmin": "",
+              "SupplierReader": "",
+              "SupplierUserAdmin": "",
+              "SupplierUserGroupAdmin": "",
+              "SupplierUserGroupReader": "",
+              "SupplierUserReader": "",
+              "UnsubmittedOrderReader": "",
+              "UserGroupAdmin": "",
+              "UserGroupReader": "",
+              "WebhookAdmin": "",
+              "WebhookReader": "",
+              "XpIndexAdmin": ""
+            }
+          },
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token",
+            "scopes": {
+              "AddressAdmin": "",
+              "AddressReader": "",
+              "AdminAddressAdmin": "",
+              "AdminAddressReader": "",
+              "AdminUserAdmin": "",
+              "AdminUserGroupAdmin": "",
+              "AdminUserGroupReader": "",
+              "AdminUserReader": "",
+              "ApiClientAdmin": "",
+              "ApiClientReader": "",
+              "ApprovalRuleAdmin": "",
+              "ApprovalRuleReader": "",
+              "BuyerAdmin": "",
+              "BuyerImpersonation": "",
+              "BuyerReader": "",
+              "BuyerUserAdmin": "",
+              "BuyerUserReader": "",
+              "CatalogAdmin": "",
+              "CatalogReader": "",
+              "CategoryAdmin": "",
+              "CategoryReader": "",
+              "CostCenterAdmin": "",
+              "CostCenterReader": "",
+              "CreditCardAdmin": "",
+              "CreditCardReader": "",
+              "FullAccess": "",
+              "IncrementorAdmin": "",
+              "IncrementorReader": "",
+              "InventoryAdmin": "",
+              "MeAddressAdmin": "",
+              "MeAdmin": "",
+              "MeCreditCardAdmin": "",
+              "MessageConfigAssignmentAdmin": "",
+              "MessageSenderAdmin": "",
+              "MessageSenderReader": "",
+              "MeXpAdmin": "",
+              "OpenIDConnectAdmin": "",
+              "OpenIDConnectReader": "",
+              "OrderAdmin": "",
+              "OrderReader": "",
+              "OverrideShipping": "",
+              "OverrideTax": "",
+              "OverrideUnitPrice": "",
+              "PasswordReset": "",
+              "PriceScheduleAdmin": "",
+              "PriceScheduleReader": "",
+              "ProductAdmin": "",
+              "ProductAssignmentAdmin": "",
+              "ProductFacetAdmin": "",
+              "ProductFacetReader": "",
+              "ProductReader": "",
+              "PromotionAdmin": "",
+              "PromotionReader": "",
+              "SecurityProfileAdmin": "",
+              "SecurityProfileReader": "",
+              "SetSecurityProfile": "",
+              "ShipmentAdmin": "",
+              "ShipmentReader": "",
+              "Shopper": "",
+              "SpendingAccountAdmin": "",
+              "SpendingAccountReader": "",
+              "SupplierAddressAdmin": "",
+              "SupplierAddressReader": "",
+              "SupplierAdmin": "",
+              "SupplierReader": "",
+              "SupplierUserAdmin": "",
+              "SupplierUserGroupAdmin": "",
+              "SupplierUserGroupReader": "",
+              "SupplierUserReader": "",
+              "UnsubmittedOrderReader": "",
+              "UserGroupAdmin": "",
+              "UserGroupReader": "",
+              "WebhookAdmin": "",
+              "WebhookReader": "",
+              "XpIndexAdmin": ""
+            }
+          }
         }
       }
     },
-    "definitions": {
+    "schemas": {
       "BuyerAddressXP": {
         "type": "object",
+        "example": {"Accessorials":["DestinationInsideDelivery"]},
         "properties": {
           "Accessorials": {
             "type": "array",
+            "enum": [
+              "DestinationInsideDelivery",
+              "DestinationLiftGate",
+              "LimitedAccessDelivery",
+              "ResidentialDelivery"
+            ],
             "items": {
               "type": "string"
             }
@@ -2979,14 +277,17 @@
       },
       "BuyerXp": {
         "type": "object",
+        "example": {},
         "properties": {}
       },
       "CatalogXp": {
         "type": "object",
+        "example": {},
         "properties": {}
       },
       "Contact": {
         "type": "object",
+        "example": {"Name":"","Email":"","Phone":""},
         "properties": {
           "Name": {
             "type": "string"
@@ -3001,6 +302,7 @@
       },
       "CostCenterXp": {
         "type": "object",
+        "example": {},
         "properties": {}
       },
       "ListOrchestrationLog": {
@@ -3009,11 +311,11 @@
           "Items": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/OrchestrationLog"
+              "$ref": "#/components/schemas/OrchestrationLog"
             }
           },
           "Meta": {
-            "$ref": "#/definitions/Meta"
+            "$ref": "#/components/schemas/Meta"
           }
         }
       },
@@ -3023,16 +325,17 @@
           "Items": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/SuperMarketplaceProduct"
+              "$ref": "#/components/schemas/SuperMarketplaceProduct"
             }
           },
           "Meta": {
-            "$ref": "#/definitions/Meta"
+            "$ref": "#/components/schemas/Meta"
           }
         }
       },
       "MarketplaceAddressAssignment": {
         "type": "object",
+        "example": {"ID":"","AddressID":"","UserID":"","UserGroupID":"","IsShipping":false,"IsBilling":false},
         "properties": {
           "ID": {
             "type": "string"
@@ -3056,15 +359,21 @@
       },
       "MarketplaceAddressBuyer": {
         "type": "object",
+        "example": {"xp":{"Accessorials":["DestinationInsideDelivery"]},"ID":"","DateCreated":"2018-01-01T00:00:00-06:00","CompanyName":"","FirstName":"","LastName":"","Street1":"","Street2":"","City":"","State":"","Zip":"","Country":"","Phone":"","AddressName":""},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/BuyerAddressXP"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BuyerAddressXP"
+              }
+            ]
           },
           "ID": {
             "type": "string"
           },
           "DateCreated": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "CompanyName": {
             "type": "string"
@@ -3103,9 +412,14 @@
       },
       "MarketplaceBuyer": {
         "type": "object",
+        "example": {"xp":{},"ID":"","Name":"","DefaultCatalogID":"","Active":false},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/BuyerXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BuyerXp"
+              }
+            ]
           },
           "ID": {
             "type": "string"
@@ -3123,9 +437,14 @@
       },
       "MarketplaceCatalog": {
         "type": "object",
+        "example": {"xp":{},"ID":"","OwnerID":"","Name":"","Description":"","Active":false,"CategoryCount":0},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/CatalogXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CatalogXp"
+              }
+            ]
           },
           "ID": {
             "type": "string"
@@ -3143,12 +462,14 @@
             "type": "boolean"
           },
           "CategoryCount": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
       "MarketplaceCatalogAssignment": {
         "type": "object",
+        "example": {"ID":"","CatalogID":"","BuyerID":"","ViewAllCategories":false,"ViewAllProducts":false},
         "properties": {
           "ID": {
             "type": "string"
@@ -3169,9 +490,14 @@
       },
       "MarketplaceCostCenter": {
         "type": "object",
+        "example": {"xp":{},"ID":"","Name":"","Description":""},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/CostCenterXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CostCenterXp"
+              }
+            ]
           },
           "ID": {
             "type": "string"
@@ -3186,9 +512,14 @@
       },
       "MarketplacePriceSchedule": {
         "type": "object",
+        "example": {"xp":{},"ID":"","Name":"","ApplyTax":false,"ApplyShipping":false,"MinQuantity":0,"MaxQuantity":0,"UseCumulativeQuantity":false,"RestrictedQuantity":false,"PriceBreaks":[{}]},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/PriceScheduleXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PriceScheduleXp"
+              }
+            ]
           },
           "ID": {
             "type": "string"
@@ -3203,10 +534,12 @@
             "type": "boolean"
           },
           "MinQuantity": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "MaxQuantity": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "UseCumulativeQuantity": {
             "type": "boolean"
@@ -3217,16 +550,21 @@
           "PriceBreaks": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/PriceBreak"
+              "$ref": "#/components/schemas/PriceBreak"
             }
           }
         }
       },
       "MarketplaceProduct": {
         "type": "object",
+        "example": {"xp":{"Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"Status":"Draft","HasVariants":false,"Note":"","Tax":{"Category":"","Code":"","Description":""},"UnitOfMeasure":{"Qty":0,"Unit":""},"ProductType":"Standard"},"OwnerID":"","DefaultPriceScheduleID":"","AutoForward":false,"ID":"","Name":"","Description":"","QuantityMultiplier":0,"ShipWeight":0,"ShipHeight":0,"ShipWidth":0,"ShipLength":0,"Active":false,"SpecCount":0,"VariantCount":0,"ShipFromAddressID":"","Inventory":{},"DefaultSupplierID":""},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/ProductXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductXp"
+              }
+            ]
           },
           "OwnerID": {
             "type": "string"
@@ -3247,34 +585,45 @@
             "type": "string"
           },
           "QuantityMultiplier": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "ShipWeight": {
-            "type": "number"
+            "type": "number",
+            "format": "float"
           },
           "ShipHeight": {
-            "type": "number"
+            "type": "number",
+            "format": "float"
           },
           "ShipWidth": {
-            "type": "number"
+            "type": "number",
+            "format": "float"
           },
           "ShipLength": {
-            "type": "number"
+            "type": "number",
+            "format": "float"
           },
           "Active": {
             "type": "boolean"
           },
           "SpecCount": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "VariantCount": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "ShipFromAddressID": {
             "type": "string"
           },
           "Inventory": {
-            "$ref": "#/definitions/Inventory"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Inventory"
+              }
+            ]
           },
           "DefaultSupplierID": {
             "type": "string"
@@ -3283,6 +632,7 @@
       },
       "MarketplaceProductAssignment": {
         "type": "object",
+        "example": {"ID":"","ProductID":"","BuyerID":"","UserGroupID":"","PriceScheduleID":""},
         "properties": {
           "ID": {
             "type": "string"
@@ -3303,9 +653,14 @@
       },
       "MarketplaceProductFacet": {
         "type": "object",
+        "example": {"xp":{"Options":[""],"ParentID":""},"ID":"","Name":"","XpPath":"","ListOrder":0,"MinCount":0},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/ProductFacetXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductFacetXp"
+              }
+            ]
           },
           "ID": {
             "type": "string"
@@ -3317,24 +672,32 @@
             "type": "string"
           },
           "ListOrder": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "MinCount": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
       "MarketplaceSpec": {
         "type": "object",
+        "example": {"xp":{"UI":{"ControlType":"Text"}},"ID":"","ListOrder":0,"Name":"","DefaultValue":"","Required":false,"AllowOpenText":false,"DefaultOptionID":"","DefinesVariant":false,"OptionCount":0,"Options":[{}]},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/SpecXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SpecXp"
+              }
+            ]
           },
           "ID": {
             "type": "string"
           },
           "ListOrder": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "Name": {
             "type": "string"
@@ -3355,21 +718,27 @@
             "type": "boolean"
           },
           "OptionCount": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "Options": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/SpecOption"
+              "$ref": "#/components/schemas/SpecOption"
             }
           }
         }
       },
       "MarketplaceSpecOption": {
         "type": "object",
+        "example": {"xp":{"Description":"","SpecID":""},"ID":"","Value":"","ListOrder":0,"IsOpenText":false,"PriceMarkupType":"NoMarkup","PriceMarkup":0},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/SpecOptionXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SpecOptionXp"
+              }
+            ]
           },
           "ID": {
             "type": "string"
@@ -3378,21 +747,30 @@
             "type": "string"
           },
           "ListOrder": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "IsOpenText": {
             "type": "boolean"
           },
           "PriceMarkupType": {
+            "enum": [
+              "NoMarkup",
+              "AmountPerQuantity",
+              "AmountTotal",
+              "Percentage"
+            ],
             "type": "string"
           },
           "PriceMarkup": {
-            "type": "number"
+            "type": "number",
+            "format": "float"
           }
         }
       },
       "MarketplaceSpecProductAssignment": {
         "type": "object",
+        "example": {"ID":"","SpecID":"","ProductID":"","DefaultValue":"","DefaultOptionID":""},
         "properties": {
           "ID": {
             "type": "string"
@@ -3413,9 +791,14 @@
       },
       "MarketplaceSupplier": {
         "type": "object",
+        "example": {"xp":{"Description":"","Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"SupportContact":{"Name":"","Email":"","Phone":""}},"ID":"","Name":"","Active":false},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/SupplierXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SupplierXp"
+              }
+            ]
           },
           "ID": {
             "type": "string"
@@ -3430,9 +813,14 @@
       },
       "MarketplaceUser": {
         "type": "object",
+        "example": {"xp":{},"ID":"","Username":"","Password":"","FirstName":"","LastName":"","Email":"","Phone":"","TermsAccepted":"2018-01-01T00:00:00-06:00","Active":false,"AvailableRoles":[""],"DateCreated":"2018-01-01T00:00:00-06:00","PasswordLastSetDate":"2018-01-01T00:00:00-06:00"},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/UserXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserXp"
+              }
+            ]
           },
           "ID": {
             "type": "string"
@@ -3441,7 +829,8 @@
             "type": "string"
           },
           "Password": {
-            "type": "string"
+            "type": "string",
+            "format": "password"
           },
           "FirstName": {
             "type": "string"
@@ -3456,7 +845,8 @@
             "type": "string"
           },
           "TermsAccepted": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "Active": {
             "type": "boolean"
@@ -3468,18 +858,25 @@
             }
           },
           "DateCreated": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "PasswordLastSetDate": {
-            "type": "string"
+            "type": "string",
+            "format": "password"
           }
         }
       },
       "MarketplaceUserGroup": {
         "type": "object",
+        "example": {"xp":{},"ID":"","Name":"","Description":""},
         "properties": {
           "xp": {
-            "$ref": "#/definitions/UserGroupXp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserGroupXp"
+              }
+            ]
           },
           "ID": {
             "type": "string"
@@ -3494,6 +891,7 @@
       },
       "MarketplaceUserGroupAssignment": {
         "type": "object",
+        "example": {"ID":"","UserGroupID":"","UserID":""},
         "properties": {
           "ID": {
             "type": "string"
@@ -3510,21 +908,26 @@
         "type": "object",
         "properties": {
           "Page": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "PageSize": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "TotalCount": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "TotalPages": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "ItemRange": {
             "type": "array",
             "items": {
-              "type": "integer"
+              "type": "integer",
+              "format": "int32"
             }
           }
         }
@@ -3535,45 +938,73 @@
           "Facets": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/ListFacet"
+              "$ref": "#/components/schemas/ListFacet"
             }
           },
           "Page": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "PageSize": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "TotalCount": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "TotalPages": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "ItemRange": {
             "type": "array",
             "items": {
-              "type": "integer"
+              "type": "integer",
+              "format": "int32"
             }
           }
         }
       },
       "OrchestrationLog": {
         "type": "object",
+        "example": {"id":"","timeStamp":"2018-01-01T00:00:00-06:00","ErrorType":"WorkItemDefinition","Message":"","Level":"Progress","ResourceId":"","RecordId":"","RecordType":"Product","Action":"Ignore"},
         "properties": {
           "id": {
             "type": "string"
           },
           "timeStamp": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "ErrorType": {
+            "enum": [
+              "WorkItemDefinition",
+              "QueuedGetError",
+              "CachedGetError",
+              "DiffCalculationError",
+              "ActionEvaluationError",
+              "CacheUpdateError",
+              "QueueCleanupError",
+              "SyncCommandError",
+              "CreateExistsError",
+              "CreateGeneralError",
+              "UpdateGeneralError",
+              "PatchGeneralError",
+              "GetGeneralError"
+            ],
             "type": "string"
           },
           "Message": {
             "type": "string"
           },
           "Level": {
+            "enum": [
+              "Progress",
+              "Error",
+              "Warn",
+              "Success"
+            ],
             "type": "string"
           },
           "ResourceId": {
@@ -3583,19 +1014,46 @@
             "type": "string"
           },
           "RecordType": {
+            "enum": [
+              "Product",
+              "PriceSchedule",
+              "Spec",
+              "SpecOption",
+              "SpecProductAssignment",
+              "ProductFacet",
+              "Buyer",
+              "User",
+              "UserGroup",
+              "Address",
+              "CostCenter",
+              "UserGroupAssignment",
+              "AddressAssignment",
+              "CatalogAssignment",
+              "Catalog"
+            ],
             "type": "string"
           },
           "Action": {
+            "enum": [
+              "Ignore",
+              "Create",
+              "Update",
+              "Patch",
+              "Delete",
+              "Get"
+            ],
             "type": "string"
           }
         }
       },
       "PriceScheduleXp": {
         "type": "object",
+        "example": {},
         "properties": {}
       },
       "ProductFacetXp": {
         "type": "object",
+        "example": {"Options":[""],"ParentID":""},
         "properties": {
           "Options": {
             "type": "array",
@@ -3610,46 +1068,70 @@
       },
       "ProductImage": {
         "type": "object",
+        "example": {"URL":"","Tag":{"VariantID":"","Options":[""]}},
         "properties": {
           "URL": {
             "type": "string"
           },
           "Tag": {
-            "$ref": "#/definitions/Tag"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Tag"
+              }
+            ]
           }
         }
       },
       "ProductXp": {
         "type": "object",
+        "example": {"Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"Status":"Draft","HasVariants":false,"Note":"","Tax":{"Category":"","Code":"","Description":""},"UnitOfMeasure":{"Qty":0,"Unit":""},"ProductType":"Standard"},
         "properties": {
           "Images": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/ProductImage"
+              "$ref": "#/components/schemas/ProductImage"
             }
           },
           "Status": {
+            "enum": [
+              "Draft",
+              "Published"
+            ],
             "type": "string"
           },
           "HasVariants": {
             "type": "boolean"
           },
           "Note": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           },
           "Tax": {
-            "$ref": "#/definitions/TaxProperties"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TaxProperties"
+              }
+            ]
           },
           "UnitOfMeasure": {
-            "$ref": "#/definitions/UnitOfMeasure"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitOfMeasure"
+              }
+            ]
           },
           "ProductType": {
+            "enum": [
+              "Standard",
+              "Quote"
+            ],
             "type": "string"
           }
         }
       },
       "SpecOptionXp": {
         "type": "object",
+        "example": {"Description":"","SpecID":""},
         "properties": {
           "Description": {
             "type": "string"
@@ -3661,28 +1143,49 @@
       },
       "SpecUI": {
         "type": "object",
+        "example": {"ControlType":"Text"},
         "properties": {
           "ControlType": {
+            "enum": [
+              "Text",
+              "DropDown",
+              "Checkbox",
+              "Range"
+            ],
             "type": "string"
           }
         }
       },
       "SpecXp": {
         "type": "object",
+        "example": {"UI":{"ControlType":"Text"}},
         "properties": {
           "UI": {
-            "$ref": "#/definitions/SpecUI"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SpecUI"
+              }
+            ]
           }
         }
       },
       "SuperMarketplaceProduct": {
         "type": "object",
+        "example": {"Product":{"xp":{"Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"Status":"Draft","HasVariants":false,"Note":"","Tax":{"Category":"","Code":"","Description":""},"UnitOfMeasure":{"Qty":0,"Unit":""},"ProductType":"Standard"},"OwnerID":"","DefaultPriceScheduleID":"","AutoForward":false,"ID":"","Name":"","Description":"","QuantityMultiplier":0,"ShipWeight":0,"ShipHeight":0,"ShipWidth":0,"ShipLength":0,"Active":false,"SpecCount":0,"VariantCount":0,"ShipFromAddressID":"","Inventory":{},"DefaultSupplierID":""},"PriceSchedule":{},"ID":""},
         "properties": {
           "Product": {
-            "$ref": "#/definitions/MarketplaceProduct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MarketplaceProduct"
+              }
+            ]
           },
           "PriceSchedule": {
-            "$ref": "#/definitions/PriceSchedule"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PriceSchedule"
+              }
+            ]
           },
           "ID": {
             "type": "string"
@@ -3691,6 +1194,7 @@
       },
       "SupplierCategoriesFilter": {
         "type": "object",
+        "example": {"Display":"","Path":"","Values":[""]},
         "properties": {
           "Display": {
             "type": "string"
@@ -3708,12 +1212,14 @@
       },
       "SupplierCategoryConfig": {
         "type": "object",
+        "example": {"id":"","timeStamp":"2018-01-01T00:00:00-06:00","MarketplaceName":"","Filters":[{"Display":"","Path":"","Values":[""]}]},
         "properties": {
           "id": {
             "type": "string"
           },
           "timeStamp": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "MarketplaceName": {
             "type": "string"
@@ -3721,13 +1227,14 @@
           "Filters": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/SupplierCategoriesFilter"
+              "$ref": "#/components/schemas/SupplierCategoriesFilter"
             }
           }
         }
       },
       "SupplierXp": {
         "type": "object",
+        "example": {"Description":"","Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"SupportContact":{"Name":"","Email":"","Phone":""}},
         "properties": {
           "Description": {
             "type": "string"
@@ -3735,16 +1242,21 @@
           "Images": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/ProductImage"
+              "$ref": "#/components/schemas/ProductImage"
             }
           },
           "SupportContact": {
-            "$ref": "#/definitions/Contact"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Contact"
+              }
+            ]
           }
         }
       },
       "Tag": {
         "type": "object",
+        "example": {"VariantID":"","Options":[""]},
         "properties": {
           "VariantID": {
             "type": "string"
@@ -3759,6 +1271,7 @@
       },
       "TaxProperties": {
         "type": "object",
+        "example": {"Category":"","Code":"","Description":""},
         "properties": {
           "Category": {
             "type": "string"
@@ -3767,15 +1280,18 @@
             "type": "string"
           },
           "Description": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           }
         }
       },
       "UnitOfMeasure": {
         "type": "object",
+        "example": {"Qty":0,"Unit":""},
         "properties": {
           "Qty": {
-            "type": "integer"
+            "type": "integer",
+            "format": "int32"
           },
           "Unit": {
             "type": "string"
@@ -3784,53 +1300,49 @@
       },
       "UserGroupXp": {
         "type": "object",
+        "example": {},
         "properties": {}
       },
       "UserXp": {
         "type": "object",
+        "example": {},
         "properties": {}
+      },
+      "Authentication": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string"
+          }
+        }
       }
-    },
+    }
+  },
+  "paths": {
     "{marketplaceID}/images/product/{productID}": {
       "post": {
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/SuperMarketplaceProduct"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuperMarketplaceProduct"
+                }
+              }
             }
           }
         },
-        "operationId": "Post",
+        "operationId": "Files.Post",
         "tags": [
-          "File"
+          "Files"
         ],
-        "parameters": [
-          {
-            "name": "marketplaceID",
-            "in": "path",
-            "description": "ID of the marketplace.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "productID",
-            "in": "path",
-            "description": "ID of the product.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "file",
-            "in": "query",
-            "description": "File of the super marketplace product.",
-            "required": true,
-            "type": "object"
-          }
-        ],
+        "parameters": [{"name":"marketplaceID","in":"path","description":"ID of the marketplace.","required":true,"schema":{"type":"string"}},{"name":"productID","in":"path","description":"ID of the product.","required":true,"schema":{"type":"string"}},{"name":"file","in":"query","description":"File of the super marketplace product.","required":true,"schema":{"type":"object"}}],
+        "summary": "POST Product Images",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "FullAccess"
             ]
@@ -3843,41 +1355,25 @@
         "responses": {
           "200": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/SuperMarketplaceProduct"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuperMarketplaceProduct"
+                }
+              }
             }
           }
         },
-        "operationId": "Delete",
+        "operationId": "Files.Delete",
         "tags": [
-          "File"
+          "Files"
         ],
-        "parameters": [
-          {
-            "name": "marketplaceID",
-            "in": "path",
-            "description": "ID of the marketplace.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "productID",
-            "in": "path",
-            "description": "ID of the product.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "fileName",
-            "in": "path",
-            "description": "File name of the super marketplace product.",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "parameters": [{"name":"marketplaceID","in":"path","description":"ID of the marketplace.","required":true,"schema":{"type":"string"}},{"name":"productID","in":"path","description":"ID of the product.","required":true,"schema":{"type":"string"}},{"name":"fileName","in":"path","description":"File name of the super marketplace product.","required":true,"schema":{"type":"string"}}],
+        "summary": "DELETE Product Images",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "FullAccess"
             ]
@@ -3890,27 +1386,25 @@
         "responses": {
           "200": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/SupplierCategoryConfig"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplierCategoryConfig"
+                }
+              }
             }
           }
         },
-        "operationId": "Get",
+        "operationId": "SupplierCategoryConfigs.Get",
         "tags": [
-          "SupplierCategoryConfig"
+          "Supplier Category Configs"
         ],
-        "parameters": [
-          {
-            "name": "marketplaceID",
-            "in": "path",
-            "description": "ID of the marketplace.",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "parameters": [{"name":"marketplaceID","in":"path","description":"ID of the marketplace.","required":true,"schema":{"type":"string"}}],
+        "summary": "GET SupplierCategoryConfig",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "SupplierReader",
               "FullAccess"
             ]
@@ -3923,43 +1417,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceAddressBuyer"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceAddressBuyer"
+                }
+              }
             }
           }
         },
-        "operationId": "PostAddress",
+        "operationId": "UserOrchestrations.PostAddress",
         "tags": [
-          "UserOrchestration"
+          "User Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "buyerId",
-            "in": "path",
-            "description": "Buyer id of the marketplace address buyer.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace address buyer.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceAddressBuyer",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceAddressBuyer"
-            }
-          }
-        ],
+        "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace address buyer.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace address buyer.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Address",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "FullAccess"
             ]
           }
@@ -3971,43 +1447,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceAddressAssignment"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceAddressAssignment"
+                }
+              }
             }
           }
         },
-        "operationId": "PostAddressAssignment",
+        "operationId": "UserOrchestrations.PostAddressAssignment",
         "tags": [
-          "UserOrchestration"
+          "User Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "buyerId",
-            "in": "path",
-            "description": "Buyer id of the marketplace address assignment.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace address assignment.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceAddressAssignment",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceAddressAssignment"
-            }
-          }
-        ],
+        "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace address assignment.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace address assignment.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST AddressAssignment",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "FullAccess"
             ]
           }
@@ -4019,43 +1477,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceCostCenter"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceCostCenter"
+                }
+              }
             }
           }
         },
-        "operationId": "PostCostCenter",
+        "operationId": "UserOrchestrations.PostCostCenter",
         "tags": [
-          "UserOrchestration"
+          "User Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "buyerId",
-            "in": "path",
-            "description": "Buyer id of the marketplace cost center.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace cost center.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceCostCenter",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceCostCenter"
-            }
-          }
-        ],
+        "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace cost center.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace cost center.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST CostCenter",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "FullAccess"
             ]
           }
@@ -4067,43 +1507,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceUser"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceUser"
+                }
+              }
             }
           }
         },
-        "operationId": "PostUser",
+        "operationId": "UserOrchestrations.PostUser",
         "tags": [
-          "UserOrchestration"
+          "User Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "buyerId",
-            "in": "path",
-            "description": "Buyer id of the marketplace user.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace user.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceUser",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceUser"
-            }
-          }
-        ],
+        "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace user.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace user.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST User",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "FullAccess"
             ]
           }
@@ -4115,43 +1537,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceUserGroup"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceUserGroup"
+                }
+              }
             }
           }
         },
-        "operationId": "PostUserGroup",
+        "operationId": "UserOrchestrations.PostUserGroup",
         "tags": [
-          "UserOrchestration"
+          "User Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "buyerId",
-            "in": "path",
-            "description": "Buyer id of the marketplace user group.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace user group.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceUserGroup",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceUserGroup"
-            }
-          }
-        ],
+        "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace user group.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace user group.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST UserGroup",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "FullAccess"
             ]
           }
@@ -4163,43 +1567,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceUserGroupAssignment"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceUserGroupAssignment"
+                }
+              }
             }
           }
         },
-        "operationId": "PostUserGroupAssignment",
+        "operationId": "UserOrchestrations.PostUserGroupAssignment",
         "tags": [
-          "UserOrchestration"
+          "User Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "buyerId",
-            "in": "path",
-            "description": "Buyer id of the marketplace user group assignment.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace user group assignment.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceUserGroupAssignment",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceUserGroupAssignment"
-            }
-          }
-        ],
+        "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace user group assignment.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace user group assignment.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST UserGroupAssignment",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "FullAccess"
             ]
           }
@@ -4211,36 +1597,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceBuyer"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceBuyer"
+                }
+              }
             }
           }
         },
-        "operationId": "PostBuyer",
+        "operationId": "UserOrchestrations.PostBuyer",
         "tags": [
-          "UserOrchestration"
+          "User Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace buyer.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceBuyer",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceBuyer"
-            }
-          }
-        ],
+        "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace buyer.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Buyer",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "FullAccess"
             ]
           }
@@ -4252,36 +1627,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceCatalog"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceCatalog"
+                }
+              }
             }
           }
         },
-        "operationId": "PostCatalog",
+        "operationId": "ProductOrchestrations.PostCatalog",
         "tags": [
-          "ProductOrchestration"
+          "Product Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace catalog.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceCatalog",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceCatalog"
-            }
-          }
-        ],
+        "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace catalog.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Catalog",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "CatalogAdmin",
               "FullAccess"
             ]
@@ -4294,36 +1658,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceCatalogAssignment"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceCatalogAssignment"
+                }
+              }
             }
           }
         },
-        "operationId": "PostCatalogProductAssignment",
+        "operationId": "ProductOrchestrations.PostCatalogProductAssignment",
         "tags": [
-          "ProductOrchestration"
+          "Product Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace catalog assignment.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceCatalogAssignment",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceCatalogAssignment"
-            }
-          }
-        ],
+        "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace catalog assignment.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Catalog Product Assignment",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "CatalogAdmin",
               "FullAccess"
             ]
@@ -4336,36 +1689,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplacePriceSchedule"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplacePriceSchedule"
+                }
+              }
             }
           }
         },
-        "operationId": "PostPriceSchedule",
+        "operationId": "ProductOrchestrations.PostPriceSchedule",
         "tags": [
-          "ProductOrchestration"
+          "Product Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace price schedule.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplacePriceSchedule",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplacePriceSchedule"
-            }
-          }
-        ],
+        "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace price schedule.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Price Schedule",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "PriceScheduleAdmin",
               "FullAccess"
             ]
@@ -4378,36 +1720,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceProduct"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceProduct"
+                }
+              }
             }
           }
         },
-        "operationId": "PostProduct",
+        "operationId": "ProductOrchestrations.PostProduct",
         "tags": [
-          "ProductOrchestration"
+          "Product Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace product.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceProduct",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceProduct"
-            }
-          }
-        ],
+        "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace product.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Product",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "FullAccess"
             ]
@@ -4420,36 +1751,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceProductAssignment"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceProductAssignment"
+                }
+              }
             }
           }
         },
-        "operationId": "PostProductAssignment",
+        "operationId": "ProductOrchestrations.PostProductAssignment",
         "tags": [
-          "ProductOrchestration"
+          "Product Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace product assignment.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceProductAssignment",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceProductAssignment"
-            }
-          }
-        ],
+        "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace product assignment.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Product Assignment",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "FullAccess"
             ]
@@ -4462,36 +1782,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceProductFacet"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceProductFacet"
+                }
+              }
             }
           }
         },
-        "operationId": "PostProductFacet",
+        "operationId": "ProductOrchestrations.PostProductFacet",
         "tags": [
-          "ProductOrchestration"
+          "Product Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace product facet.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceProductFacet",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceProductFacet"
-            }
-          }
-        ],
+        "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace product facet.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Product Facet",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductFacetAdmin",
               "FullAccess"
             ]
@@ -4504,36 +1813,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceSpec"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceSpec"
+                }
+              }
             }
           }
         },
-        "operationId": "PostSpec",
+        "operationId": "ProductOrchestrations.PostSpec",
         "tags": [
-          "ProductOrchestration"
+          "Product Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace spec.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceSpec",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceSpec"
-            }
-          }
-        ],
+        "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace spec.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Spec",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "FullAccess"
             ]
@@ -4546,36 +1844,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceSpecOption"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceSpecOption"
+                }
+              }
             }
           }
         },
-        "operationId": "PostSpecOption",
+        "operationId": "ProductOrchestrations.PostSpecOption",
         "tags": [
-          "ProductOrchestration"
+          "Product Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace spec option.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceSpecOption",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceSpecOption"
-            }
-          }
-        ],
+        "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace spec option.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Spec Option",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "FullAccess"
             ]
@@ -4588,36 +1875,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceSpecProductAssignment"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceSpecProductAssignment"
+                }
+              }
             }
           }
         },
-        "operationId": "PostSpecProductAssignment",
+        "operationId": "ProductOrchestrations.PostSpecProductAssignment",
         "tags": [
-          "ProductOrchestration"
+          "Product Orchestrations"
         ],
-        "parameters": [
-          {
-            "name": "clientId",
-            "in": "path",
-            "description": "Client id of the marketplace spec product assignment.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "marketplaceSpecProductAssignment",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceSpecProductAssignment"
-            }
-          }
-        ],
+        "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace spec product assignment.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Spec Product Assignment",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "FullAccess"
             ]
@@ -4630,68 +1906,25 @@
         "responses": {
           "200": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/ListOrchestrationLog"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOrchestrationLog"
+                }
+              }
             }
           }
         },
-        "operationId": "List",
+        "operationId": "OrchestrationLogs.List",
         "tags": [
-          "OrchestrationLog"
+          "Orchestration Logs"
         ],
-        "parameters": [
-          {
-            "name": "search",
-            "in": "query",
-            "description": "Word or phrase to search for.",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "searchOn",
-            "in": "query",
-            "description": "Comma-delimited list of fields to search on.",
-            "required": false,
-            "type": "string",
-            "items": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "description": "Comma-delimited list of fields to sort by.",
-            "required": false,
-            "type": "string",
-            "items": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Page of results to return. Default: 1",
-            "required": false,
-            "type": "integer"
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "description": "Number of results to return per page. Default: 20, max: 100.",
-            "required": false,
-            "type": "integer"
-          },
-          {
-            "name": "filters",
-            "in": "query",
-            "description": "Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'",
-            "required": false,
-            "type": "object"
-          }
-        ],
+        "parameters": [{"name":"search","in":"query","description":"Word or phrase to search for.","required":false,"schema":{"type":"string"}},{"name":"searchOn","in":"query","description":"Comma-delimited list of fields to search on.","required":false,"schema":{"type":"array","items":{"type":"string","enum":[]}}},{"name":"sortBy","in":"query","description":"Comma-delimited list of fields to sort by.","required":false,"schema":{"type":"array","items":{"type":"string","enum":[]}}},{"name":"page","in":"query","description":"Page of results to return. Default: 1","required":false,"schema":{"type":"integer"}},{"name":"pageSize","in":"query","description":"Number of results to return per page. Default: 20, max: 100.","required":false,"schema":{"type":"integer"}},{"name":"filters","in":"query","description":"Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'","required":false,"schema":{"type":"object"}}],
+        "summary": "GET Orchestration Logs",
+        "description": "",
         "security": [
           {
-            "oauth2": []
+            "OAuth2": []
           }
         ]
       }
@@ -4701,68 +1934,25 @@
         "responses": {
           "200": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/ListSuperMarketplaceProduct"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListSuperMarketplaceProduct"
+                }
+              }
             }
           }
         },
-        "operationId": "List",
+        "operationId": "Products.List",
         "tags": [
-          "Product"
+          "Products"
         ],
-        "parameters": [
-          {
-            "name": "search",
-            "in": "query",
-            "description": "Word or phrase to search for.",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "searchOn",
-            "in": "query",
-            "description": "Comma-delimited list of fields to search on.",
-            "required": false,
-            "type": "string",
-            "items": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "description": "Comma-delimited list of fields to sort by.",
-            "required": false,
-            "type": "string",
-            "items": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Page of results to return. Default: 1",
-            "required": false,
-            "type": "integer"
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "description": "Number of results to return per page. Default: 20, max: 100.",
-            "required": false,
-            "type": "integer"
-          },
-          {
-            "name": "filters",
-            "in": "query",
-            "description": "Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'",
-            "required": false,
-            "type": "object"
-          }
-        ],
+        "parameters": [{"name":"search","in":"query","description":"Word or phrase to search for.","required":false,"schema":{"type":"string"}},{"name":"searchOn","in":"query","description":"Comma-delimited list of fields to search on.","required":false,"schema":{"type":"array","items":{"type":"string","enum":[]}}},{"name":"sortBy","in":"query","description":"Comma-delimited list of fields to sort by.","required":false,"schema":{"type":"array","items":{"type":"string","enum":[]}}},{"name":"page","in":"query","description":"Page of results to return. Default: 1","required":false,"schema":{"type":"integer"}},{"name":"pageSize","in":"query","description":"Number of results to return per page. Default: 20, max: 100.","required":false,"schema":{"type":"integer"}},{"name":"filters","in":"query","description":"Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'","required":false,"schema":{"type":"object"}}],
+        "summary": "LIST Product",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "ProductReader",
               "FullAccess"
@@ -4774,29 +1964,25 @@
         "responses": {
           "201": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/SuperMarketplaceProduct"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuperMarketplaceProduct"
+                }
+              }
             }
           }
         },
-        "operationId": "Post",
+        "operationId": "Products.Post",
         "tags": [
-          "Product"
+          "Products"
         ],
-        "parameters": [
-          {
-            "name": "superMarketplaceProduct",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/SuperMarketplaceProduct"
-            }
-          }
-        ],
+        "requestBody": {"required":true,"description":"","content":{"application/json":{"schema":{"allOf":[{"$ref":"#/components/schemas/SuperMarketplaceProduct"}]}}}},
+        "summary": "POST Product",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "FullAccess"
             ]
@@ -4809,27 +1995,25 @@
         "responses": {
           "200": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/SuperMarketplaceProduct"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuperMarketplaceProduct"
+                }
+              }
             }
           }
         },
-        "operationId": "Get",
+        "operationId": "Products.Get",
         "tags": [
-          "Product"
+          "Products"
         ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Id of the super marketplace product.",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "parameters": [{"name":"id","in":"path","description":"Id of the super marketplace product.","required":true,"schema":{"type":"string"}}],
+        "summary": "GET Product",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "ProductReader",
               "FullAccess"
@@ -4841,36 +2025,25 @@
         "responses": {
           "200": {
             "description": "",
-            "schema": {
-              "$ref": "#/definitions/SuperMarketplaceProduct"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuperMarketplaceProduct"
+                }
+              }
             }
           }
         },
-        "operationId": "Put",
+        "operationId": "Products.Put",
         "tags": [
-          "Product"
+          "Products"
         ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Id of the super marketplace product.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "superMarketplaceProduct",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/SuperMarketplaceProduct"
-            }
-          }
-        ],
+        "parameters": [{"name":"id","in":"path","description":"Id of the super marketplace product.","required":true,"schema":{"type":"string"}}],
+        "summary": "PUT Product",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "FullAccess"
             ]
@@ -4883,22 +2056,16 @@
             "description": ""
           }
         },
-        "operationId": "Delete",
+        "operationId": "Products.Delete",
         "tags": [
-          "Product"
+          "Products"
         ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Id of the product.",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "parameters": [{"name":"id","in":"path","description":"Id of the product.","required":true,"schema":{"type":"string"}}],
+        "summary": "DELETE Product",
+        "description": "",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "ProductAdmin",
               "FullAccess"
             ]
@@ -4911,29 +2078,25 @@
         "responses": {
           "201": {
             "description": "If ID is provided and an object with that ID already exists, a 409 (conflict) error is returned.",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceSupplier"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceSupplier"
+                }
+              }
             }
           }
         },
-        "operationId": "Create",
+        "operationId": "Suppliers.Create",
         "tags": [
-          "Supplier"
+          "Suppliers"
         ],
-        "parameters": [
-          {
-            "name": "marketplaceSupplier",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/MarketplaceSupplier"
-            }
-          }
-        ],
+        "requestBody": {"required":true,"description":"","content":{"application/json":{"schema":{"allOf":[{"$ref":"#/components/schemas/MarketplaceSupplier"}]}}}},
+        "summary": "Create a new supplier.",
+        "description": "If ID is provided and an object with that ID already exists, a 409 (conflict) error is returned.",
         "security": [
           {
-            "oauth2": [
+            "OAuth2": [
               "SupplierAdmin",
               "FullAccess"
             ]

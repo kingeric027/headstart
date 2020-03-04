@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Marketplace.Helpers.Models;
+using Marketplace.Helpers.OpenApiTools;
 using Marketplace.Helpers.SwaggerTools;
 using Marketplace.Models;
 using Microsoft.AspNetCore.Cors;
@@ -23,8 +24,9 @@ namespace Marketplace.Common.Controllers
         public async Task<JObject> Get()
         {
             var reference = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var swagger = SwaggerGenerator.GenerateSwaggerSpec<BaseController, MarketplaceUserAuthAttribute, IMarketplaceObject>(
-                Path.Combine(reference, "reference.md"), new SwaggerConfig()
+            var g = new OpenApiGeneratorX<BaseController, MarketplaceUserAuthAttribute, IMarketplaceObject>()
+                .CollectMetaData(Path.Combine(reference, "reference.md"), ErrorCodes.All)
+                .DefineSpec(new SwaggerConfig()
                 {
                     Name = "Marketplace",
                     ContactEmail = "oheywood@four51.com",
@@ -33,8 +35,8 @@ namespace Marketplace.Common.Controllers
                     Title = "Marketplace API",
                     Url = "https://ordercloud.io",
                     Version = "1.0"
-                }, ErrorCodes.All);
-            return await Task.FromResult(swagger.Item1);
+                });
+            return await Task.FromResult(g.Specification());
         }
     }
 }
