@@ -6,6 +6,7 @@ import { SuperMarketplaceProduct, ObjectStatus } from '@app-seller/shared/models
 import { OrchestrationLog } from '@app-seller/reports/models/orchestration-log';
 import { ListPage } from './listPage.interface';
 import { ListArgs } from './listArgs.interface';
+import { MarketplaceBuyerLocation } from '@app-seller/shared/models/MarketplaceBuyerLocation.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -105,5 +106,29 @@ export class MiddlewareAPIService {
   async getMySupplier(supplierID: string): Promise<Supplier> {
     const url = `${this.baseUrl}/supplier/me/${supplierID}`;
     return await this.http.get(url, this.headers).toPromise();
+  }
+
+  async getBuyerLocationByID(buyerID: string, buyerLocationID: string): Promise<any> {
+    const url = `${this.baseUrl}/buyerlocations/${buyerID}/${buyerLocationID}`;
+    return await this.http.get(url, this.headers).toPromise();
+  }
+
+  async createBuyerLocation(buyerID: string, buyerLocation: MarketplaceBuyerLocation): Promise<any> {
+    const url = `${this.baseUrl}/buyerlocations/${buyerID}`;
+    return await this.http.post(url, buyerLocation).toPromise();
+  }
+
+  async updateBuyerLocationByID(
+    buyerID: string,
+    buyerLocationID: string,
+    buyerLocation: MarketplaceBuyerLocation
+  ): Promise<any> {
+    const url = `${this.baseUrl}/buyerlocations/${buyerID}/${buyerLocationID}`;
+    return await this.http.put(url, buyerLocation).toPromise();
+  }
+
+  async deleteBuyerLocation(buyerID: string, buyerLocationID: string): Promise<void> {
+    const url = `${this.baseUrl}/buyerlocations/${buyerID}/${buyerLocationID}`;
+    await this.http.delete(url).toPromise();
   }
 }
