@@ -54,8 +54,4 @@ export class OCMLineitemTable {
     return this._lineItems.find(li => li.ID === lineItemID);
   }
 
-  isQuoteOrder(): boolean {
-    return this.orderType === OrderType.Quote;
-  }
-
 }

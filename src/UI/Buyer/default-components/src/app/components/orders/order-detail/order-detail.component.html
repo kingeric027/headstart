@@ -26,7 +26,7 @@
                                  [favorite]="isFavorite(order.ID)">
             </ocm-toggle-favorite>
           </button>
-          <button *ngIf="!approvalVersion && !isQuoteOrder()"
+          <button *ngIf="!approvalVersion && !isQuoteOrder(order)"
                   class="btn btn-secondary float-right mr-2"
                   (click)="open(reorderModal)">
             Reorder

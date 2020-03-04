@@ -28,7 +28,7 @@ export class OCMQuoteRequestForm implements OnInit {
         this.quoteRequestForm = new FormGroup({
             FirstName: new FormControl(this.currentUser.FirstName || '', [Validators.required, ValidateName]),
             LastName: new FormControl(this.currentUser.LastName || '', [Validators.required, ValidateName]),
-            //FranchiseLocation: new FormControl(this.currentUser.FranchiseLocation || '', [Validators.required, ValidateName]),
+            //BuyerLocation: new FormControl(this.currentUser.BuyerLocation || '', [Validators.required, ValidateName]),
             Phone: new FormControl(this.currentUser.Phone || '', [Validators.required, ValidatePhone]),
             Email: new FormControl(this.currentUser.Email || '', [Validators.required, ValidateEmail]),
             Comments: new FormControl('')

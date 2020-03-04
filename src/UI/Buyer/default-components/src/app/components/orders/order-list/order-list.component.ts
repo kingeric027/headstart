@@ -3,6 +3,7 @@ import { ListOrder, Order } from '@ordercloud/angular-sdk';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import { OrderListColumn } from '../../../models/order-list-column';
 import { ShopperContextService, OrderType } from 'marketplace';
+import { isQuoteOrder } from '../../../services/orderType.helper';
 
 @Component({
   templateUrl: './order-list.component.html',
@@ -13,13 +14,13 @@ export class OCMOrderList {
   @Input() columns: OrderListColumn[];
   faCaretDown = faCaretDown;
   faCaretUp = faCaretUp;
-
+  isQuoteOrder = isQuoteOrder;
   // todo - should this be in some kinda service?
   @Input() sortBy: string;
   @Output() updatedSort = new EventEmitter<string>();
   @Output() changedPage = new EventEmitter<number>();
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService) { }
 
   updateSort(selectedSortBy): void {
     let sortBy;
@@ -53,7 +54,4 @@ export class OCMOrderList {
     this.context.router.toMyOrderDetails(orderID);
   }
 
-  isQuoteOrder(order: Order) {
-    return order.xp.OrderType === OrderType.Quote;
-  }
 }

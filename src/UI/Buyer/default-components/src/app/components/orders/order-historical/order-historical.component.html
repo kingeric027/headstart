@@ -11,7 +11,7 @@
     </ocm-address-card>
   </div>
   <div class="col-6"
-       *ngIf="!isQuoteOrder()">
+       *ngIf="!isQuoteOrder(order)">
     <div *ngIf="order.Comments"
          class="alert alert-secondary small">
       <strong>Comments: </strong> {{order.Comments}}
@@ -36,14 +36,14 @@
     </ul>
   </div>
   <!-- QUOTE ORDER DETAILS -->
-  <div *ngIf="isQuoteOrder()"
+  <div *ngIf="isQuoteOrder(order)"
        class="col-6">
     <strong>Submitted By: </strong>
     <p>
       {{order.xp.QuoteOrderInfo.FirstName}}
       {{order.xp.QuoteOrderInfo.LastName}}
     </p>
-    <!-- <p>{{order.xp.QuoteOrderInfo.FranchiseLocation}}</p> -->
+    <!-- <p>{{order.xp.QuoteOrderInfo.BuyerLocation}}</p> -->
     <p>
       {{order.xp.QuoteOrderInfo.Phone | phoneFormat}}
     </p>
