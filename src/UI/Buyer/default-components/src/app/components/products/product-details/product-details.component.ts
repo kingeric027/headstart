@@ -166,6 +166,7 @@ export class OCMProductDetails implements OnInit {
       this.lineItem.Product = this._product;
       this.submittedQuoteOrder = await this.ocOrderService.Create('Outgoing', this.defaultQuoteOrder).toPromise();
       await this.ocLineItemService.Create('Outgoing', this.submittedQuoteOrder.ID, this.lineItem).toPromise();
+      await this.ocOrderService.Submit('Outgoing', this.submittedQuoteOrder.ID).toPromise();
       this.quoteFormModal = ModalState.Closed
       this.showRequestSubmittedMessage = true
     } catch (ex) {
