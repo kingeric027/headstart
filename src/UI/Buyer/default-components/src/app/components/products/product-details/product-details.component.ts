@@ -34,7 +34,6 @@ export class OCMProductDetails implements OnInit {
   currentUser: User;
   showRequestSubmittedMessage = false;
   submittedQuoteOrder: Order;
-  defaultQuoteOrder: MarketplaceOrder;
   lineItem: LineItem = {};
 
   constructor(
@@ -146,8 +145,8 @@ export class OCMProductDetails implements OnInit {
     this.quoteFormModal = ModalState.Closed;
   }
 
-  setDefaultQuoteOrder(user) {
-    this.defaultQuoteOrder = {
+  getDefaultQuoteOrder(user) {
+    const defaultQuoteOrder = {
       xp: {
         AvalaraTaxTransactionCode: '',
         OrderType: OrderType.Quote,
@@ -158,15 +157,15 @@ export class OCMProductDetails implements OnInit {
           Email: user.Email,
           Comments: user.Comments
         }
-      },
+      }
     };
+    return defaultQuoteOrder;
   }
 
   async submitQuoteOrder(user) {
-    this.setDefaultQuoteOrder(user);
     this.lineItem.ProductID = this._product.ID;
     this.lineItem.Product = this._product;
-    this.submittedQuoteOrder = await this.ocOrderService.Create('Outgoing', this.defaultQuoteOrder).toPromise();
+    this.submittedQuoteOrder = await this.ocOrderService.Create('Outgoing', this.getDefaultQuoteOrder(user)).toPromise();
     await this.ocLineItemService.Create('Outgoing', this.submittedQuoteOrder.ID, this.lineItem).toPromise();
     this.quoteFormModal = ModalState.Closed
     this.showRequestSubmittedMessage = true
