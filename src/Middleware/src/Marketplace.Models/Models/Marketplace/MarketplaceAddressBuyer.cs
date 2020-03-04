@@ -10,15 +10,23 @@ namespace Marketplace.Models
     {
     }
 
-    public class BuyerAddressXP { 
-        public List<DestinationAddressAccessorial> Accessorials { get; set; }
-    }
+    public class BuyerAddressXP
+	{
+		public Coordinates Coordinates;
+		public List<DestinationAddressAccessorial> Accessorials { get; set; }
+    }	
 
-    public enum DestinationAddressAccessorial
+public enum DestinationAddressAccessorial
     {
         DestinationInsideDelivery = 3,
         DestinationLiftGate = 4,
         LimitedAccessDelivery = 9,
         ResidentialDelivery = 15,
     }
+
+	public class Coordinates
+	{
+		public double Latitude { get; set; }
+		public double Longitude { get; set; }
+	}
 }

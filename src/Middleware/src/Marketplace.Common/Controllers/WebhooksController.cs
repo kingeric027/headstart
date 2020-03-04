@@ -2,6 +2,7 @@
 using Marketplace.Common.Models;
 using Marketplace.Common.Services;
 using Marketplace.Helpers;
+using Marketplace.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
@@ -137,7 +138,7 @@ namespace Marketplace.Common.Controllers
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
             var address = payload.Request.Body;
-            return await _addressValidationCommand.IsValidAddressInFreightPopAsync(address);
+            return await _addressValidationCommand.IsValidAddressAsync(address);
         }
 
         [HttpPost, Route("validateselleraddresspatch")]
@@ -145,7 +146,7 @@ namespace Marketplace.Common.Controllers
         public async Task<WebhookResponse> ValidateSellerAddressPatch([FromBody] WebhookPayloads.AdminAddresses.Patch payload)
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
-            return await _addressValidationCommand.GetExpectedNewSellerAddressAndValidateInFreightPop(payload);
+            return await _addressValidationCommand.GetExpectedNewSellerAddressAndValidate(payload);
         }
 
         [HttpPost, Route("validatesupplieraddresspatch")]
@@ -153,7 +154,7 @@ namespace Marketplace.Common.Controllers
         public async Task<WebhookResponse> ValidateSupplierAddressPostPut([FromBody] WebhookPayloads.SupplierAddresses.Patch payload)
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
-            return await _addressValidationCommand.GetExpectedNewSupplierAddressAndValidateInFreightPop(payload);
+            return await _addressValidationCommand.GetExpectedNewSupplierAddressAndValidate(payload);
         }
 
         [HttpPost, Route("validatemeaddresspatch")]
@@ -161,7 +162,7 @@ namespace Marketplace.Common.Controllers
         public async Task<WebhookResponse> ValidateMeAddressPostPut([FromBody] WebhookPayloads.Me.PatchAddress payload)
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
-            return await _addressValidationCommand.GetExpectedNewMeAddressAndValidateInFreightPop(payload);
+            return await _addressValidationCommand.GetExpectedNewMeAddressAndValidate(payload);
         }
 
         [HttpPost, Route("validatebuyeraddresspatch")]
@@ -169,7 +170,7 @@ namespace Marketplace.Common.Controllers
         public async Task<WebhookResponse> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Patch payload)
         // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
         {
-            return await _addressValidationCommand.GetExpectedNewBuyerAddressAndValidateInFreightPop(payload);
+            return await _addressValidationCommand.GetExpectedNewBuyerAddressAndValidate(payload);
         }
     }
 }

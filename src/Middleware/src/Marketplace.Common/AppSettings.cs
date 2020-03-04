@@ -26,7 +26,14 @@ namespace Marketplace.Common
         public FreightPopSettings FreightPopSettings { get; set; }
         public CardConnectSettings CardConnectSettings { get; set; } = new CardConnectSettings();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
+		public SmartyStreetSettings SmartyStreetSettings { get; set; } = new SmartyStreetSettings();
     }
+
+	public class SmartyStreetSettings
+	{
+		public string AuthID { get; set; }
+		public string AuthToken { get; set; }
+	}
 
     public class ZohoSettings
     {

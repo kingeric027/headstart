@@ -331,6 +331,16 @@ export abstract class ResourceCrudService<ResourceType> {
     return { sortBy, search, ...filters, OrderDirection };
   }
 
+  // TODO - move to some other file. Not related to resource crud
+  getSuggestedAddresses = (ex): ListBuyerAddress => {
+    for (const err of ex.error.Errors) {
+      if (err.ErrorCode === 'blocked by web hook') {
+        return err.Data?.Body?.SuggestedAddresses;
+      }
+    }
+    throw ex;
+  };
+
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
     const { sortBy, search, OrderDirection, ...filters } = params;
@@ -367,21 +377,5 @@ export abstract class ResourceCrudService<ResourceType> {
     } else {
       return false;
     }
-  }
-
-  getSuggestedAddresses(ex, address: Address): any {
-    let suggestedAddresses: ListAddress;
-    ex.error.Errors.forEach(err => {
-      if (err.ErrorCode === "blocked by web hook") {
-        err.Data.Body.SuggestedValidAddresses.forEach(suggestion => {
-          suggestion.ID = address.ID;
-          suggestion.DateCreated = address.DateCreated;
-          suggestion.CompanyName = address.CompanyName;
-          suggestion.AddressName = address.AddressName;
-        });
-      }
-      suggestedAddresses = err.Data.Body.SuggestedValidAddresses;
-    });
-    return suggestedAddresses;
   }
 }
