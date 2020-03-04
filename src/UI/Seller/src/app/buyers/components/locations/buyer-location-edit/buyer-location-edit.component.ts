@@ -145,6 +145,7 @@ export class BuyerLocationEditComponent implements OnInit {
       );
       this.buyerLocationEditable = updatedBuyerLocation;
       this.buyerLocationStatic = updatedBuyerLocation;
+      this.checkForChanges();
       this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
