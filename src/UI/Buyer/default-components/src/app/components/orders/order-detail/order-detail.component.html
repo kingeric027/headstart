@@ -13,6 +13,7 @@
       </div>
       <div class="row">
         <div class="col-md-6">
+          <div>Type: {{order.xp.OrderType}}</div>
           <div>Status:
             <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{order.Status}}
           </div>
@@ -26,7 +27,7 @@
                                  [favorite]="isFavorite(order.ID)">
             </ocm-toggle-favorite>
           </button>
-          <button *ngIf="!approvalVersion"
+          <button *ngIf="!approvalVersion && !isQuoteOrder()"
                   class="btn btn-secondary float-right mr-2"
                   (click)="open(reorderModal)">
             Reorder
@@ -81,8 +82,8 @@
         </button>
       </li>
     </ul>
-
-    <ocm-order-historical *ngIf="orderDetails && showDetails()"
+    <ocm-order-historical class="col-md-6"
+                          *ngIf="orderDetails && showDetails()"
                           [orderDetails]="orderDetails"></ocm-order-historical>
     <ocm-order-shipments *ngIf="showShipments()"></ocm-order-shipments>
   </ocm-profile-nav>

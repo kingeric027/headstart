@@ -10,7 +10,8 @@
                       *ngIf="order?.BillingAddress">
     </ocm-address-card>
   </div>
-  <div class="col-6">
+  <div class="col-6"
+       *ngIf="!isQuoteOrder()">
     <div *ngIf="order.Comments"
          class="alert alert-secondary small">
       <strong>Comments: </strong> {{order.Comments}}
@@ -34,7 +35,28 @@
       </li>
     </ul>
   </div>
+  <!-- QUOTE ORDER DETAILS -->
+  <div *ngIf="isQuoteOrder()"
+       class="col-6">
+    <strong class="border-bottom">Submitted By: </strong>
+    <p>
+      {{order.xp.QuoteOrderInfo.FirstName}}
+      {{order.xp.QuoteOrderInfo.LastName}}
+    </p>
+    <!-- <p>{{order.xp.QuoteOrderInfo.FranchiseLocation}}</p> -->
+    <p>
+      {{order.xp.QuoteOrderInfo.Phone | phoneFormat}}
+    </p>
+    <p>
+      {{order.xp.QuoteOrderInfo.Email}}
+    </p>
+    <div *ngIf="order?.xp?.QuoteOrderInfo?.Comments"
+         class="alert alert-secondary small">
+      <strong>Comments: </strong> {{order.xp.QuoteOrderInfo.Comments}}
+    </div>
+  </div>
 </div>
 <ocm-lineitem-table [lineItems]="lineItems?.Items"
+                    [orderType]="order?.xp?.OrderType"
                     [readOnly]="true">
 </ocm-lineitem-table>

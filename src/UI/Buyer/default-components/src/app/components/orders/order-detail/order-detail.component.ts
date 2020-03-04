@@ -83,6 +83,10 @@ export class OCMOrderDetails implements OnInit {
     this.message.classType = 'success';
   }
 
+  isQuoteOrder() {
+    return this.order.xp.OrderType === OrderType.Quote;
+  }
+
   async addToCart(): Promise<void> {
     const items = this.reorderResponse.ValidLi.map(li => {
       return { ProductID: li.Product.ID, Quantity: li.Quantity, Specs: li.Specs };

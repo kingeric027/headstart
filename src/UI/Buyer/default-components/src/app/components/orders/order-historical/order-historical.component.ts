@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { OrderDetails, MarketplaceOrder } from 'marketplace';
+import { OrderDetails, MarketplaceOrder, OrderType } from 'marketplace';
 import { OrderApproval, ListLineItem, Promotion, ListPayment } from '@ordercloud/angular-sdk';
 
 @Component({
@@ -12,13 +12,16 @@ export class OCMOrderHistorical {
   promotions: Promotion[] = [];
   payments: ListPayment;
   approvals: OrderApproval[] = [];
-
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.order;
     this.lineItems = value.lineItems;
     this.promotions = value.promotions.Items;
     this.payments = value.payments;
     this.approvals = value.approvals;
+  }
+
+  isQuoteOrder() {
+    return this.order.xp.OrderType === OrderType.Quote;
   }
 
 }
