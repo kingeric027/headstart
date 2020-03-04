@@ -9,6 +9,7 @@ namespace Marketplace.Common.Services.FreightPop
 	{
 		Task<Response<dynamic>> ImportOrderAsync(List<OrderRequest> orderRequestBody);
 		Task<Response<GetRatesData>> GetRatesAsync(RateRequestBody rateRequestBody);
+		Task<Response<List<ShipmentDetails>>> GetShipmentsForOrder(string orderID);
 	}
 
 	public class FreightPopService : IFreightPopService
@@ -39,7 +40,6 @@ namespace Marketplace.Common.Services.FreightPop
 		}
 		public async Task<Response<GetRatesData>> GetRatesAsync(RateRequestBody rateRequestBody)
 		{
-			// temporarily here to prevent auth issues with transient
 			await AuthenticateAync();
 			var rateRequestResponse = await MakeRequest("rate/getRates").PostJsonAsync(rateRequestBody).ReceiveJson<Response<GetRatesData>>();
 			return rateRequestResponse;
@@ -47,10 +47,15 @@ namespace Marketplace.Common.Services.FreightPop
 
 		public async Task<Response<dynamic>> ImportOrderAsync(List<OrderRequest> orderRequestBody)
 		{
-			// temporarily here to prevent auth issues with transient
 			await AuthenticateAync();
 			var orderRequestResponse = await MakeRequest("order/ImportOrder").PostJsonAsync(orderRequestBody).ReceiveJson<Response<dynamic>>();
 			return orderRequestResponse;
+		}
+		public async Task<Response<List<ShipmentDetails>>> GetShipmentsForOrder(string orderID)
+		{
+			await AuthenticateAync();
+			var getShipmentResponse = await MakeRequest($"shipment/getShipment?id={orderID}type={GetShipmentBy.OrderNo}").GetAsync().ReceiveJson<Response<List<ShipmentDetails>>>();
+			return getShipmentResponse;
 		}
 	}
 }
