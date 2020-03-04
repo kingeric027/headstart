@@ -61,19 +61,6 @@ export class OCMProductDetails implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.context.currentUser.get();
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
-    this.defaultQuoteOrder = {
-      xp: {
-        AvalaraTaxTransactionCode: '',
-        OrderType: OrderType.Quote,
-        QuoteOrderInfo: {
-          FirstName: '',
-          LastName: '',
-          Phone: '',
-          Email: '',
-          Comments: ''
-        }
-      },
-    };
   }
 
   onSpecFormChange(event): void {
@@ -159,8 +146,24 @@ export class OCMProductDetails implements OnInit {
     this.quoteFormModal = ModalState.Closed;
   }
 
+  setDefaultQuoteOrder(user) {
+    this.defaultQuoteOrder = {
+      xp: {
+        AvalaraTaxTransactionCode: '',
+        OrderType: OrderType.Quote,
+        QuoteOrderInfo: {
+          FirstName: user.FirstName,
+          LastName: user.LastName,
+          Phone: user.Phone,
+          Email: user.Email,
+          Comments: user.Comments
+        }
+      },
+    };
+  }
+
   async submitQuoteOrder(user) {
-    this.defaultQuoteOrder.xp.QuoteOrderInfo = user;
+    this.setDefaultQuoteOrder(user);
     this.lineItem.ProductID = this._product.ID;
     this.lineItem.Product = this._product;
     this.submittedQuoteOrder = await this.ocOrderService.Create('Outgoing', this.defaultQuoteOrder).toPromise();
