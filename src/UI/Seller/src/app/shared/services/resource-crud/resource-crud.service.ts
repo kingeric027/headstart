@@ -331,25 +331,15 @@ export abstract class ResourceCrudService<ResourceType> {
     return { sortBy, search, ...filters, OrderDirection };
   }
 
-  getSuggestedAddresses(ex, address: Address): any {
-    let suggestedAddresses: ListAddress;
-    let isErrorFromOC = true;
-    ex.error.Errors.forEach(err => {
+  // TODO - move to some other file. Not related to resource crud
+  getSuggestedAddresses = (ex): ListBuyerAddress => {
+    for (const err of ex.error.Errors) {
       if (err.ErrorCode === 'blocked by web hook') {
-        isErrorFromOC = false;
-        err.Data.Body.SuggestedAddresses.forEach(suggestion => {
-          suggestion.ID = address.ID;
-          suggestion.DateCreated = address.DateCreated;
-          suggestion.CompanyName = address.CompanyName;
-          suggestion.AddressName = address.AddressName;
-          suggestion.Country = address.Country;
-        });
+        return err.Data?.Body?.SuggestedAddresses;
       }
-      suggestedAddresses = err.Data.Body.SuggestedAddresses;
-    });
-    if (isErrorFromOC) throw ex;
-    return suggestedAddresses;
-  }
+    }
+    throw ex;
+  };
 
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {

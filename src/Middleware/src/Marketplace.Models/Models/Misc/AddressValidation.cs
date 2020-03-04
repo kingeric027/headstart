@@ -1,4 +1,5 @@
-﻿using OrderCloud.SDK;
+﻿using Marketplace.Models;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;

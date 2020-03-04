@@ -11,6 +11,7 @@ using Marketplace.Common.Services.SmartyStreets.Mappers;
 using System.Linq;
 using Flurl;
 using Flurl.Http;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Services
 {
@@ -52,12 +53,12 @@ namespace Marketplace.Common.Services
 				// Address not valid, no candiates found
 				var suggestions = await USAutoComplete(address);
 				response.AreSuggestionsValid = false; // Suggestions from this api do not include zip
-				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions);
+				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions, address);
 			}
 			// Valid candidate found, but may not match raw exactly. Want to show candidate to user to approve modifications
 			else if (CandidateModified(candidate[0])) 
 			{
-				response.SuggestedAddresses = new List<Address> { SmartyStreetMappers.Map(candidate[0]) };
+				response.SuggestedAddresses = new List<Address> { SmartyStreetMappers.Map(candidate[0], address) };
 			} else
 			{
 				response.IsRawAddressValid = true;

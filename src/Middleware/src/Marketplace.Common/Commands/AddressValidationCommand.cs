@@ -4,16 +4,17 @@ using OrderCloud.SDK;
 using System;
 using System.Threading.Tasks;
 using Marketplace.Common.Services;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Commands
 {
     public interface IAddressValidationCommand
     {
         Task<WebhookResponse> IsValidAddressAsync(Address address);
-        Task<WebhookResponse> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload);
-        Task<WebhookResponse> GetExpectedNewSupplierAddressAndValidateInFreightPop(WebhookPayloads.SupplierAddresses.Patch payload);
-        Task<WebhookResponse> GetExpectedNewMeAddressAndValidateInFreightPop(WebhookPayloads.Me.PatchAddress payload);
-        Task<WebhookResponse> GetExpectedNewBuyerAddressAndValidateInFreightPop(WebhookPayloads.Addresses.Patch payload);
+        Task<WebhookResponse> GetExpectedNewSellerAddressAndValidate(WebhookPayloads.AdminAddresses.Patch payload);
+        Task<WebhookResponse> GetExpectedNewSupplierAddressAndValidate(WebhookPayloads.SupplierAddresses.Patch payload);
+        Task<WebhookResponse> GetExpectedNewMeAddressAndValidate(WebhookPayloads.Me.PatchAddress payload);
+        Task<WebhookResponse> GetExpectedNewBuyerAddressAndValidate(WebhookPayloads.Addresses.Patch payload);
     }
     public class AddressValidationCommand : IAddressValidationCommand
     {
@@ -50,35 +51,35 @@ namespace Marketplace.Common.Commands
 			}
 		}
 
-        public async Task<WebhookResponse> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload)
+        public async Task<WebhookResponse> GetExpectedNewSellerAddressAndValidate(WebhookPayloads.AdminAddresses.Patch payload)
         {
-            var existingAddress = await _oc.AdminAddresses.GetAsync(payload.RouteParams.AddressID);
-            var expectedNewAddress = PatchObject(payload.Request.Body, existingAddress);
+            var existingAddress = await _oc.AdminAddresses.GetAsync<Address>(payload.RouteParams.AddressID);
+            var expectedNewAddress = PatchObject(payload.Request.Body as Address, existingAddress);
             var ratesResponse = await IsValidAddressAsync(expectedNewAddress);
             return ratesResponse;
         }
 
-        public async Task<WebhookResponse> GetExpectedNewSupplierAddressAndValidateInFreightPop(WebhookPayloads.SupplierAddresses.Patch payload)
+        public async Task<WebhookResponse> GetExpectedNewSupplierAddressAndValidate(WebhookPayloads.SupplierAddresses.Patch payload)
         {
-            var existingAddress = await _oc.SupplierAddresses.GetAsync(payload.RouteParams.SupplierID, payload.RouteParams.AddressID);
-            var expectedNewAddress = PatchObject(payload.Request.Body, existingAddress);
+            var existingAddress = await _oc.SupplierAddresses.GetAsync<Address>(payload.RouteParams.SupplierID, payload.RouteParams.AddressID);
+            var expectedNewAddress = PatchObject(payload.Request.Body as Address, existingAddress);
             var ratesResponse = await IsValidAddressAsync(expectedNewAddress);
             return ratesResponse;
         }
 
-        public async Task<WebhookResponse> GetExpectedNewMeAddressAndValidateInFreightPop(WebhookPayloads.Me.PatchAddress payload)
+        public async Task<WebhookResponse> GetExpectedNewMeAddressAndValidate(WebhookPayloads.Me.PatchAddress payload)
         {
             var userToken = payload.UserToken;
-            var existingAddress = await _oc.Me.GetAddressAsync(payload.RouteParams.AddressID, userToken);
-            var expectedNewAddress = PatchObject(payload.Request.Body, existingAddress);
+            var existingAddress = await _oc.Me.GetAddressAsync<BuyerAddress>(payload.RouteParams.AddressID, userToken);
+            var expectedNewAddress = PatchObject(payload.Request.Body as BuyerAddress, existingAddress);
             var ratesResponse = await IsValidAddressAsync(expectedNewAddress);
             return ratesResponse;
         }
 
-        public async Task<WebhookResponse> GetExpectedNewBuyerAddressAndValidateInFreightPop(WebhookPayloads.Addresses.Patch payload)
+        public async Task<WebhookResponse> GetExpectedNewBuyerAddressAndValidate(WebhookPayloads.Addresses.Patch payload)
         {
-            var existingAddress = await _oc.Addresses.GetAsync(payload.RouteParams.BuyerID, payload.RouteParams.AddressID);
-            var expectedNewAddress = PatchObject(payload.Request.Body, existingAddress);
+            var existingAddress = await _oc.Addresses.GetAsync<Address>(payload.RouteParams.BuyerID, payload.RouteParams.AddressID);
+            var expectedNewAddress = PatchObject(payload.Request.Body as Address, existingAddress);
             var ratesResponse = await IsValidAddressAsync(expectedNewAddress);
             return ratesResponse;
         }

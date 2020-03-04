@@ -27,7 +27,6 @@ function createBuyerLocationForm(supplierLocation: BuyerAddress) {
   styleUrls: ['./buyer-location-table.component.scss'],
 })
 export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddress> {
-
   suggestedAddresses: ListAddress;
   selectedAddress: Address;
 
@@ -60,7 +59,7 @@ export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddr
       this.suggestedAddresses = null;
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
+      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex);
       this.dataIsSaving = false;
       throw ex;
     }
@@ -74,7 +73,7 @@ export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddr
       this.suggestedAddresses = null;
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
+      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex);
       this.dataIsSaving = false;
       throw ex;
     }

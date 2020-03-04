@@ -1,4 +1,6 @@
-﻿using OrderCloud.SDK;
+﻿using Marketplace.Common.Extensions;
+using Marketplace.Models;
+using OrderCloud.SDK;
 using SmartyStreets.USAutocompleteApi;
 using SmartyStreets.USStreetApi;
 using System;
@@ -26,36 +28,28 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 			return lookup;
 		}
 
-		public static List<Address> Map(AutoCompleteResponse repsonse)
+		public static List<Address> Map(AutoCompleteResponse repsonse, Address raw)
 		{
-			var addresses = repsonse.suggestions.Select(suggestion => Map(suggestion)).ToList();
+			var addresses = repsonse.suggestions.Select(suggestion => Map(suggestion, raw)).ToList();
 			return addresses;
 		}
 
-		public static Address Map(Suggestion suggestion)
+		public static Address Map(Suggestion suggestion, Address raw)
 		{
-			var address = new Address()
-			{
-				Street1 = suggestion.StreetLine,
-				City = suggestion.City,
-				State = suggestion.State,
-				Country = "US"
-			};
-			return address;
+			raw.Street1 = suggestion.StreetLine;
+			raw.City = suggestion.City;
+			raw.State = suggestion.State;
+			return raw;
 		}
 
-		public static Address Map(Candidate candidate)
+		public static Address Map(Candidate candidate, Address raw)
 		{
-			var address = new Address()
-			{
-				Street1 = candidate.DeliveryLine1,
-				Street2 = candidate.DeliveryLine2,
-				City = candidate.Components.CityName,
-				State = candidate.Components.State,
-				Zip = $"{candidate.Components.ZipCode}-{candidate.Components.Plus4Code}",
-				Country = "US"
-			};
-			return address;
+			raw.Street1 = candidate.DeliveryLine1;
+			raw.Street2 = candidate.DeliveryLine2;
+			raw.City = candidate.Components.CityName;
+			raw.State = candidate.Components.State;
+			raw.Zip = $"{candidate.Components.ZipCode}-{candidate.Components.Plus4Code}";
+			return raw;
 		}
 
 		public static Address Map(BuyerAddress buyerAddress)
