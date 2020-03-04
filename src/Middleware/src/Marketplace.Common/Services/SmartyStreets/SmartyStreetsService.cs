@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using SmartyStreets;
 using SmartyStreets.USStreetApi;
 using SmartyStreets.USAutocompleteApi;
-using AutoCompleteLookup = SmartyStreets.USAutocompleteApi.Lookup;
-using USStreetLookup = SmartyStreets.USStreetApi.Lookup;
 using Marketplace.Common.Services.SmartyStreets.Mappers;
 using System.Linq;
 using Flurl;

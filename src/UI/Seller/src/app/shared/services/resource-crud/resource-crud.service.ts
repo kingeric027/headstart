@@ -331,6 +331,26 @@ export abstract class ResourceCrudService<ResourceType> {
     return { sortBy, search, ...filters, OrderDirection };
   }
 
+  getSuggestedAddresses(ex, address: Address): any {
+    let suggestedAddresses: ListAddress;
+    let isErrorFromOC = true;
+    ex.error.Errors.forEach(err => {
+      if (err.ErrorCode === 'blocked by web hook') {
+        isErrorFromOC = false;
+        err.Data.Body.SuggestedAddresses.forEach(suggestion => {
+          suggestion.ID = address.ID;
+          suggestion.DateCreated = address.DateCreated;
+          suggestion.CompanyName = address.CompanyName;
+          suggestion.AddressName = address.AddressName;
+          suggestion.Country = address.Country;
+        });
+      }
+      suggestedAddresses = err.Data.Body.SuggestedAddresses;
+    });
+    if (isErrorFromOC) throw ex;
+    return suggestedAddresses;
+  }
+
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
     const { sortBy, search, OrderDirection, ...filters } = params;
@@ -367,21 +387,5 @@ export abstract class ResourceCrudService<ResourceType> {
     } else {
       return false;
     }
-  }
-
-  getSuggestedAddresses(ex, address: Address): any {
-    let suggestedAddresses: ListAddress;
-    ex.error.Errors.forEach(err => {
-      if (err.ErrorCode === "blocked by web hook") {
-        err.Data.Body.SuggestedValidAddresses.forEach(suggestion => {
-          suggestion.ID = address.ID;
-          suggestion.DateCreated = address.DateCreated;
-          suggestion.CompanyName = address.CompanyName;
-          suggestion.AddressName = address.AddressName;
-        });
-      }
-      suggestedAddresses = err.Data.Body.SuggestedValidAddresses;
-    });
-    return suggestedAddresses;
   }
 }

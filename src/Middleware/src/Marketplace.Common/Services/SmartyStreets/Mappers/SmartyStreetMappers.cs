@@ -5,34 +5,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AutoCompleteLookup = SmartyStreets.USAutocompleteApi.Lookup;
-using USStreetLookup = SmartyStreets.USStreetApi.Lookup;
+using Lookup = SmartyStreets.USStreetApi.Lookup;
 
 namespace Marketplace.Common.Services.SmartyStreets.Mappers
 {
 	public static class SmartyStreetMappers
 	{
-		public static USStreetLookup MapToUSStreet(Address address)
+		public static Lookup MapToUSStreet(Address address)
 		{
-			var lookup = new USStreetLookup()
+			var lookup = new Lookup()
 			{
 				Street = address.Street1,
 				Street2 = address.Street2,
 				City = address.City,
 				State = address.State,
 				ZipCode = address.Zip,
-				MatchStrategy = USStreetLookup.STRICT,
+				MatchStrategy = Lookup.STRICT,
 				MaxCandidates = 5
-			};
-			return lookup;
-		}
-
-		public static AutoCompleteLookup MapToAutoComplete(Address address)
-		{
-			var lookup = new AutoCompleteLookup()
-			{
-				Prefix = $"{address.Street1} {address.Street2}",
-				GeolocateType = null
 			};
 			return lookup;
 		}
