@@ -65,6 +65,7 @@ namespace Marketplace.Common.Services
 			return response;
 		}
 
+		// returns 1 or 0 very complete addresses
 		private async Task<List<Candidate>> ValidateSingleUSAddress(Address address)
 		{
 			var client = _builder.BuildUsStreetApiClient();
@@ -73,6 +74,7 @@ namespace Marketplace.Common.Services
 			return await Task.FromResult(lookup.Result);
 		}
 
+		// returns many incomplete address suggestions
 		private async Task<AutoCompleteResponse> USAutoComplete(Address address)
 		{
 			var suggestions = await AutoCompleteBaseUrl
