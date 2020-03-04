@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import { OrderDetails, ShopperContextService, MarketplaceOrder, OrderReorderResponse } from 'marketplace';
+import { OrderDetails, ShopperContextService, MarketplaceOrder, OrderReorderResponse, OrderType } from 'marketplace';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
