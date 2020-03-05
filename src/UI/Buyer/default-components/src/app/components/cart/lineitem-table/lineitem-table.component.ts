@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { LineItem } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
-import { ShopperContextService, LineItemGroupSupplier } from 'marketplace';
+import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
@@ -17,6 +17,7 @@ export class OCMLineitemTable {
     this.liGroupedByShipFrom = Object.values(this.liGroups);
     this.setSupplierInfo(this.liGroupedByShipFrom);
   }
+  @Input() orderType: OrderType;
   @Input() readOnly: boolean;
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: LineItem[][];
@@ -52,4 +53,5 @@ export class OCMLineitemTable {
   getLineItem(lineItemID: string): LineItem {
     return this._lineItems.find(li => li.ID === lineItemID);
   }
+
 }

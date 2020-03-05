@@ -9,7 +9,7 @@
            aria-current="page">{{order.ID}}</a>
       </nav>
       <div class="pb-2 mt-4 mb-2">
-        <h2> <span class="text-muted">Order #:</span> {{order.ID}}</h2>
+        <h2> <span class="text-muted">Order #:</span> {{order.ID}} <span class="badge badge-pill badge-primary ml-2">{{order.xp.OrderType}}</span></h2>
       </div>
       <div class="row">
         <div class="col-md-6">
@@ -26,7 +26,7 @@
                                  [favorite]="isFavorite(order.ID)">
             </ocm-toggle-favorite>
           </button>
-          <button *ngIf="!approvalVersion"
+          <button *ngIf="!approvalVersion && !isQuoteOrder(order)"
                   class="btn btn-secondary float-right mr-2"
                   (click)="open(reorderModal)">
             Reorder
@@ -81,8 +81,8 @@
         </button>
       </li>
     </ul>
-
-    <ocm-order-historical *ngIf="orderDetails && showDetails()"
+    <ocm-order-historical class="col-md-6"
+                          *ngIf="orderDetails && showDetails()"
                           [orderDetails]="orderDetails"></ocm-order-historical>
     <ocm-order-shipments *ngIf="showShipments()"></ocm-order-shipments>
   </ocm-profile-nav>
