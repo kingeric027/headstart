@@ -47,8 +47,8 @@ namespace Marketplace.Common.Commands
             else
             {
                 // forwarding
-                var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, orderId);
-                var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderId);
+                var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, order.ID);
+                var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
                 var supplierOrders = orderSplitResult.OutgoingOrders;
 
                 // integrations
