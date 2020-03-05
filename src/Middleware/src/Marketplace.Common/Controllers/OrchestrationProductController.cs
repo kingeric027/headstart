@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
-using Marketplace.Helpers.SwaggerTools;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using OrderCloud.SDK;
@@ -11,11 +11,11 @@ namespace Marketplace.Common.Controllers
     [DocComments("\"Orchestration\" represents objects exposed for orchestration control")]
     [MarketplaceSection.Orchestration(ListOrder = 1)]
     [Route("orchestration/{clientId}")]
-    public class ProductOrchestrationController : BaseController
+    public class OrchestrationProductController : BaseController
     {
         private readonly IOrchestrationCommand _command;
 
-        public ProductOrchestrationController(AppSettings settings, IOrchestrationCommand command) : base(settings)
+        public OrchestrationProductController(AppSettings settings, IOrchestrationCommand command) : base(settings)
         {
             _command = command;
         }

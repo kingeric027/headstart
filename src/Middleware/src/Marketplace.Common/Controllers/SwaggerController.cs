@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Marketplace.Helpers.Models;
 using Marketplace.Helpers.OpenApiTools;
-using Marketplace.Helpers.SwaggerTools;
 using Marketplace.Models;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 

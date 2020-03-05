@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Marketplace.Helpers.SwaggerTools;
+using Marketplace.Helpers.Attributes;
 
 namespace Marketplace.Common
 {

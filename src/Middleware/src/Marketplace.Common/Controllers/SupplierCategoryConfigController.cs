@@ -1,10 +1,8 @@
-﻿using Cosmonaut;
-using Marketplace.Common.Queries;
-using Marketplace.Helpers;
+﻿using Marketplace.Common.Queries;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Helpers.SwaggerTools;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
@@ -12,7 +10,7 @@ using Marketplace.Models.Extended;
 namespace Marketplace.Common.Controllers
 {
     [DocComments("\"Supplier Category Config\" represents Supplier Category Configuration")]
-    [MarketplaceSection.ProductCatalogs(ListOrder = 2)]
+    [MarketplaceSection.Marketplace(ListOrder = 5)]
     public class SupplierCategoryConfigController : BaseController
     {
         private readonly ISupplierCategoryConfigQuery _query;

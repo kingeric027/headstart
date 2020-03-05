@@ -1,7 +1,6 @@
 ﻿using System;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
-using Marketplace.Helpers.SwaggerTools;
 using Marketplace.Models.Exceptions;
 using Marketplace.Models.Misc;
 using Microsoft.Azure.WebJobs;

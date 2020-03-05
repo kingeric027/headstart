@@ -18,22 +18,17 @@
   ],
   "tags": [
     {
-      "name": "Authentication and Authorization",
-      "description": "The OrderCloud.io API implements OAuth2 combined with our own notion of Roles to control user authentication and authorization at fine-grain level. Be prepared to spend time learning about these concepts and designing the right model for your application. If you over-priviledge your users and attempt to control what they can do via front-end code, you run the risk of technically savvy users circumventing this by making direct API calls.",
-      "x-id": "AuthenticationAndAuthorization"
-    },
-    {
       "name": "Orchestration",
       "description": "Orchestration resources",
       "x-id": "Orchestration"
     },
     {
-      "name": "Product Orchestrations",
+      "name": "Orchestration Products",
       "description": "\"Orchestration\" represents objects exposed for orchestration control",
       "x-section-id": "Orchestration"
     },
     {
-      "name": "User Orchestrations",
+      "name": "Orchestration Users",
       "description": "\"Orchestration\" represents Organization objects exposed for orchestration control",
       "x-section-id": "Orchestration"
     },
@@ -43,53 +38,68 @@
       "x-section-id": "Orchestration"
     },
     {
-      "name": "Product Catalogs",
-      "description": "Products are priced (or unpriced) goods that can be offered to Buyers for placement on Orders. A Product can belong to any number of Catalogs, and a Catalog can be organized into hierarchical Categories to any arbitrary depth. Catalogs are assigned to Buyers, though visibility and pricing may vary by Buyer, User Group, Category, or individual Product. Pricing may include quantity breaks (collectively called a Price Schedule), and Price Schedules may be shared with multiple Products. User-selected Specs, which may include price markups, can be assigned to Products, enabling Buyer configurability at the time of ordering.",
-      "x-id": "ProductCatalogs"
+      "name": "Marketplace",
+      "description": "Marketplace resources",
+      "x-id": "Marketplace"
     },
     {
-      "name": "Files",
-      "description": "\"Files\" represents files for content management control",
-      "x-section-id": "ProductCatalogs"
+      "name": "Buyers",
+      "description": "\"Buyers\" represents Buyers for Marketplace",
+      "x-section-id": "Marketplace"
+    },
+    {
+      "name": "Suppliers",
+      "description": "\"Marketplace Suppliers\" represents Supplier in Marketplace",
+      "x-section-id": "Marketplace"
     },
     {
       "name": "Products",
-      "description": "\"Products\" represents products for Marketplace",
-      "x-section-id": "ProductCatalogs"
+      "description": "\"Products\" represents Products for Marketplace",
+      "x-section-id": "Marketplace"
+    },
+    {
+      "name": "Files",
+      "description": "\"Files\" represents files for Marketplace content management control",
+      "x-section-id": "Marketplace"
     },
     {
       "name": "Supplier Category Configs",
       "description": "\"Supplier Category Config\" represents Supplier Category Configuration",
-      "x-section-id": "ProductCatalogs"
+      "x-section-id": "Marketplace"
     },
     {
-      "name": "Orders and Fulfillment",
-      "description": "The central concept within OrderCloud.io is (not surprisingly) the Order. This is where Buyers, Sellers, Products, Addresses, and just about everything else come together to form business transactions. A feature that is somewhat unique to this area of the API is that you'll use the same set of endpoints regardless of whether you're a Buyer, Seller, or Supplier. What's important is the order *direction*, which is either incoming or outgoing. Order IDs are guaranteed unique within that context. As a seller, this means you can aggregate lists of incoming orders from many Buyers, or outgoing orders to many Suppliers. You may filter a list by Buyer or Supplier, but it's not required to uniquely identify an Order. (Buyers typically only deal with outgoing Orders; Suppliers with incoming.) Buyers add Line Items to Orders by specifying a Product, Quantity, and (optionally) Spec values. Shipping is applied at either the Order level or Line Item level. Shipments are independent of Orders; you can ship a partial Order, or aggregate items from multiple Orders onto a single Shipment.",
-      "x-id": "OrdersAndFulfillment"
+      "name": "Integration",
+      "description": "Integration resources",
+      "x-id": "Integration"
     },
     {
-      "name": "Suppliers",
-      "description": "Suppliers are a third, optional type of organization used in indirect supply chain scenarios. Like the Seller, they contain Users and Groups. Once established, Products can be configured to auto-forward to Suppliers when ordered. This will automatically create a new PO, notify the Supplier, and track costs and profit margins if configured.",
-      "x-id": "Suppliers"
+      "name": "Integrations",
+      "description": "\"Integration\" represents Integrations Marketplace",
+      "x-section-id": "Integration"
     },
     {
-      "name": "Suppliers",
-      "description": "\"Suppliers\" represents Supplier in Marketplace",
-      "x-section-id": "Suppliers"
+      "name": "Tax Codes",
+      "description": "\"Integration\" represents Tax Codes for Marketplace",
+      "x-section-id": "Integration"
     },
     {
-      "name": "Seller",
-      "description": "At the center of any OrderCloud.io solution is a single Seller organization. It consists directly of Users, Groups, and Addresses (used mainly for shipping calculations), which should be established ahead of Product Catalogs, Buyers, and Suppliers.",
-      "x-id": "Seller"
+      "name": "Me Payments",
+      "description": "\"Integration\" represents ME Credit Card Payments for Marketplace",
+      "x-section-id": "Integration"
     },
     {
-      "name": "Buyers",
-      "description": "Buyers represent real-world legal entities to which the Seller offers Product Catalogs and from which the Seller receives Orders. Buyers contain many of the same things as Sellers (Users, Groups, Addresses) and much more, including Cost Centers, Spending Accounts, and Approval Rules.\nAssignments are prevalent concept. Most \"things\" can be assigned to a User, Group, or entire Buyer organization. Plan ahead, and use Groups to your advantage here. For example, if you assign 100 Addresses directly to 50 Users, you are going to need to create 100 additional assignments every time you add a new User. Or, 50 more assignments for every new Address. With careful planning, Groups can save you from \"assignment hell\".",
-      "x-id": "Buyers"
+      "name": "Me Credit Card Authorizations",
+      "description": "\"Integration\" represents ME Credit Card Tokenization for Marketplace",
+      "x-section-id": "Integration"
+    },
+    {
+      "name": "Credit Card Authorizations",
+      "description": "\"Integration\" represents Credit Card Tokenization for Marketplace",
+      "x-section-id": "Integration"
     }
   ],
   "components": {
-    "securitySchemas": {
+    "securitySchemes": {
       "OAuth2": {
         "type": "oauth2",
         "flows": {
@@ -262,7 +272,7 @@
         "example": {"Accessorials":["DestinationInsideDelivery"]},
         "properties": {
           "Accessorials": {
-            "type": "array",
+            "type": "string",
             "enum": [
               "DestinationInsideDelivery",
               "DestinationLiftGate",
@@ -272,6 +282,38 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "BuyerCreditCard": {
+        "type": "object",
+        "example": {"ID":"","Editable":false,"Token":"","DateCreated":"2018-01-01T00:00:00-06:00","CardType":"","PartialAccountNumber":"","CardholderName":"","ExpirationDate":"2018-01-01T00:00:00-06:00"},
+        "properties": {
+          "ID": {
+            "type": "string"
+          },
+          "Editable": {
+            "type": "boolean"
+          },
+          "Token": {
+            "type": "string"
+          },
+          "DateCreated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CardType": {
+            "type": "string"
+          },
+          "PartialAccountNumber": {
+            "type": "string"
+          },
+          "CardholderName": {
+            "type": "string"
+          },
+          "ExpirationDate": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -304,6 +346,160 @@
         "type": "object",
         "example": {},
         "properties": {}
+      },
+      "CreditCard": {
+        "type": "object",
+        "example": {"ID":"","Token":"","DateCreated":"2018-01-01T00:00:00-06:00","CardType":"","PartialAccountNumber":"","CardholderName":"","ExpirationDate":"2018-01-01T00:00:00-06:00"},
+        "properties": {
+          "ID": {
+            "type": "string"
+          },
+          "Token": {
+            "type": "string"
+          },
+          "DateCreated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CardType": {
+            "type": "string"
+          },
+          "PartialAccountNumber": {
+            "type": "string"
+          },
+          "CardholderName": {
+            "type": "string"
+          },
+          "ExpirationDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreditCardPayment": {
+        "type": "object",
+        "example": {"OrderID":"","CreditCardID":"","CreditCardDetails":{"AccountNumber":"","ExpirationDate":"","CardholderName":"","CardType":""},"Currency":"","CVV":"","MerchantID":""},
+        "properties": {
+          "OrderID": {
+            "type": "string"
+          },
+          "CreditCardID": {
+            "type": "string"
+          },
+          "CreditCardDetails": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreditCardToken"
+              }
+            ]
+          },
+          "Currency": {
+            "type": "string",
+            "maxLength": 3,
+            "minLength": 3
+          },
+          "CVV": {
+            "type": "string",
+            "maxLength": 4,
+            "minLength": 3
+          },
+          "MerchantID": {
+            "type": "string"
+          }
+        }
+      },
+      "CreditCardToken": {
+        "type": "object",
+        "example": {"AccountNumber":"","ExpirationDate":"","CardholderName":"","CardType":""},
+        "properties": {
+          "AccountNumber": {
+            "type": "string"
+          },
+          "ExpirationDate": {
+            "type": "string",
+            "maxLength": 6,
+            "minLength": 4
+          },
+          "CardholderName": {
+            "type": "string"
+          },
+          "CardType": {
+            "type": "string"
+          }
+        }
+      },
+      "Inventory": {
+        "type": "object",
+        "example": {"Enabled":false,"NotificationPoint":0,"VariantLevelTracking":false,"OrderCanExceed":false,"QuantityAvailable":0,"LastUpdated":"2018-01-01T00:00:00-06:00"},
+        "properties": {
+          "Enabled": {
+            "type": "boolean"
+          },
+          "NotificationPoint": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "VariantLevelTracking": {
+            "type": "boolean"
+          },
+          "OrderCanExceed": {
+            "type": "boolean"
+          },
+          "QuantityAvailable": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "LastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ListFacet": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string"
+          },
+          "XpPath": {
+            "type": "string"
+          },
+          "Values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListFacetValue"
+            }
+          },
+          "xp": {
+            "type": "object"
+          }
+        }
+      },
+      "ListFacetValue": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "string"
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ListMarketplaceTaxCode": {
+        "type": "object",
+        "properties": {
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MarketplaceTaxCode"
+            }
+          },
+          "Meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        }
       },
       "ListOrchestrationLog": {
         "type": "object",
@@ -512,7 +708,7 @@
       },
       "MarketplacePriceSchedule": {
         "type": "object",
-        "example": {"xp":{},"ID":"","Name":"","ApplyTax":false,"ApplyShipping":false,"MinQuantity":0,"MaxQuantity":0,"UseCumulativeQuantity":false,"RestrictedQuantity":false,"PriceBreaks":[{}]},
+        "example": {"xp":{},"ID":"","Name":"","ApplyTax":false,"ApplyShipping":false,"MinQuantity":0,"MaxQuantity":0,"UseCumulativeQuantity":false,"RestrictedQuantity":false,"PriceBreaks":[{"Quantity":0,"Price":0}]},
         "properties": {
           "xp": {
             "allOf": [
@@ -557,7 +753,7 @@
       },
       "MarketplaceProduct": {
         "type": "object",
-        "example": {"xp":{"Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"Status":"Draft","HasVariants":false,"Note":"","Tax":{"Category":"","Code":"","Description":""},"UnitOfMeasure":{"Qty":0,"Unit":""},"ProductType":"Standard"},"OwnerID":"","DefaultPriceScheduleID":"","AutoForward":false,"ID":"","Name":"","Description":"","QuantityMultiplier":0,"ShipWeight":0,"ShipHeight":0,"ShipWidth":0,"ShipLength":0,"Active":false,"SpecCount":0,"VariantCount":0,"ShipFromAddressID":"","Inventory":{},"DefaultSupplierID":""},
+        "example": {"xp":{"Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"Status":"Draft","HasVariants":false,"Note":"","Tax":{"Category":"","Code":"","Description":""},"UnitOfMeasure":{"Qty":0,"Unit":""},"ProductType":"Standard"},"OwnerID":"","DefaultPriceScheduleID":"","AutoForward":false,"ID":"","Name":"","Description":"","QuantityMultiplier":0,"ShipWeight":0,"ShipHeight":0,"ShipWidth":0,"ShipLength":0,"Active":false,"SpecCount":0,"VariantCount":0,"ShipFromAddressID":"","Inventory":{"Enabled":false,"NotificationPoint":0,"VariantLevelTracking":false,"OrderCanExceed":false,"QuantityAvailable":0,"LastUpdated":"2018-01-01T00:00:00-06:00"},"DefaultSupplierID":""},
         "properties": {
           "xp": {
             "allOf": [
@@ -683,7 +879,7 @@
       },
       "MarketplaceSpec": {
         "type": "object",
-        "example": {"xp":{"UI":{"ControlType":"Text"}},"ID":"","ListOrder":0,"Name":"","DefaultValue":"","Required":false,"AllowOpenText":false,"DefaultOptionID":"","DefinesVariant":false,"OptionCount":0,"Options":[{}]},
+        "example": {"xp":{"UI":{"ControlType":"Text"}},"ID":"","ListOrder":0,"Name":"","DefaultValue":"","Required":false,"AllowOpenText":false,"DefaultOptionID":"","DefinesVariant":false,"OptionCount":0,"Options":[{"ID":"","Value":"","ListOrder":0,"IsOpenText":false,"PriceMarkupType":"NoMarkup","PriceMarkup":0}]},
         "properties": {
           "xp": {
             "allOf": [
@@ -1046,6 +1242,130 @@
           }
         }
       },
+      "Payment": {
+        "type": "object",
+        "example": {"ID":"","Type":"PurchaseOrder","DateCreated":"2018-01-01T00:00:00-06:00","CreditCardID":"","SpendingAccountID":"","Description":"","Amount":0,"Accepted":false,"Transactions":[{"ID":"","Type":"","DateExecuted":"2018-01-01T00:00:00-06:00","Amount":0,"Succeeded":false,"ResultCode":"","ResultMessage":""}]},
+        "properties": {
+          "ID": {
+            "type": "string"
+          },
+          "Type": {
+            "enum": [
+              "PurchaseOrder",
+              "CreditCard",
+              "SpendingAccount"
+            ],
+            "type": "string"
+          },
+          "DateCreated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CreditCardID": {
+            "type": "string"
+          },
+          "SpendingAccountID": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Amount": {
+            "type": "number",
+            "format": "float"
+          },
+          "Accepted": {
+            "type": "boolean"
+          },
+          "Transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentTransaction"
+            }
+          }
+        }
+      },
+      "PaymentTransaction": {
+        "type": "object",
+        "example": {"ID":"","Type":"","DateExecuted":"2018-01-01T00:00:00-06:00","Amount":0,"Succeeded":false,"ResultCode":"","ResultMessage":""},
+        "properties": {
+          "ID": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
+          },
+          "DateExecuted": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Amount": {
+            "type": "number",
+            "format": "float"
+          },
+          "Succeeded": {
+            "type": "boolean"
+          },
+          "ResultCode": {
+            "type": "string"
+          },
+          "ResultMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "PriceBreak": {
+        "type": "object",
+        "example": {"Quantity":0,"Price":0},
+        "properties": {
+          "Quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Price": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "PriceSchedule": {
+        "type": "object",
+        "example": {"ID":"","Name":"","ApplyTax":false,"ApplyShipping":false,"MinQuantity":0,"MaxQuantity":0,"UseCumulativeQuantity":false,"RestrictedQuantity":false,"PriceBreaks":[{"Quantity":0,"Price":0}]},
+        "properties": {
+          "ID": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "ApplyTax": {
+            "type": "boolean"
+          },
+          "ApplyShipping": {
+            "type": "boolean"
+          },
+          "MinQuantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MaxQuantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UseCumulativeQuantity": {
+            "type": "boolean"
+          },
+          "RestrictedQuantity": {
+            "type": "boolean"
+          },
+          "PriceBreaks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PriceBreak"
+            }
+          }
+        }
+      },
       "PriceScheduleXp": {
         "type": "object",
         "example": {},
@@ -1129,6 +1449,38 @@
           }
         }
       },
+      "SpecOption": {
+        "type": "object",
+        "example": {"ID":"","Value":"","ListOrder":0,"IsOpenText":false,"PriceMarkupType":"NoMarkup","PriceMarkup":0},
+        "properties": {
+          "ID": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          },
+          "ListOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IsOpenText": {
+            "type": "boolean"
+          },
+          "PriceMarkupType": {
+            "enum": [
+              "NoMarkup",
+              "AmountPerQuantity",
+              "AmountTotal",
+              "Percentage"
+            ],
+            "type": "string"
+          },
+          "PriceMarkup": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
       "SpecOptionXp": {
         "type": "object",
         "example": {"Description":"","SpecID":""},
@@ -1171,7 +1523,7 @@
       },
       "SuperMarketplaceProduct": {
         "type": "object",
-        "example": {"Product":{"xp":{"Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"Status":"Draft","HasVariants":false,"Note":"","Tax":{"Category":"","Code":"","Description":""},"UnitOfMeasure":{"Qty":0,"Unit":""},"ProductType":"Standard"},"OwnerID":"","DefaultPriceScheduleID":"","AutoForward":false,"ID":"","Name":"","Description":"","QuantityMultiplier":0,"ShipWeight":0,"ShipHeight":0,"ShipWidth":0,"ShipLength":0,"Active":false,"SpecCount":0,"VariantCount":0,"ShipFromAddressID":"","Inventory":{},"DefaultSupplierID":""},"PriceSchedule":{},"ID":""},
+        "example": {"Product":{"xp":{"Images":[{"URL":"","Tag":{"VariantID":"","Options":[""]}}],"Status":"Draft","HasVariants":false,"Note":"","Tax":{"Category":"","Code":"","Description":""},"UnitOfMeasure":{"Qty":0,"Unit":""},"ProductType":"Standard"},"OwnerID":"","DefaultPriceScheduleID":"","AutoForward":false,"ID":"","Name":"","Description":"","QuantityMultiplier":0,"ShipWeight":0,"ShipHeight":0,"ShipWidth":0,"ShipLength":0,"Active":false,"SpecCount":0,"VariantCount":0,"ShipFromAddressID":"","Inventory":{"Enabled":false,"NotificationPoint":0,"VariantLevelTracking":false,"OrderCanExceed":false,"QuantityAvailable":0,"LastUpdated":"2018-01-01T00:00:00-06:00"},"DefaultSupplierID":""},"PriceSchedule":{"ID":"","Name":"","ApplyTax":false,"ApplyShipping":false,"MinQuantity":0,"MaxQuantity":0,"UseCumulativeQuantity":false,"RestrictedQuantity":false,"PriceBreaks":[{"Quantity":0,"Price":0}]},"ID":""},
         "properties": {
           "Product": {
             "allOf": [
@@ -1319,7 +1671,7 @@
     }
   },
   "paths": {
-    "{marketplaceID}/images/product/{productID}": {
+    "/{marketplaceID}/images/product/{productID}": {
       "post": {
         "responses": {
           "201": {
@@ -1350,7 +1702,7 @@
         ]
       }
     },
-    "{marketplaceID}/images/product/{productID}/{fileName}": {
+    "/{marketplaceID}/images/product/{productID}/{fileName}": {
       "delete": {
         "responses": {
           "200": {
@@ -1381,7 +1733,69 @@
         ]
       }
     },
-    "marketplace/{marketplaceID}/supplier/category/config": {
+    "/buyer": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "If ID is provided and an object with that ID already exists, a 409 (conflict) error is returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceBuyer"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "Buyers.Create",
+        "tags": [
+          "Buyers"
+        ],
+        "requestBody": {"required":true,"description":"","content":{"application/json":{"schema":{"allOf":[{"$ref":"#/components/schemas/MarketplaceBuyer"}]}}}},
+        "summary": "POST Marketplace Buyer",
+        "description": "If ID is provided and an object with that ID already exists, a 409 (conflict) error is returned.",
+        "security": [
+          {
+            "OAuth2": [
+              "BuyerAdmin",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "/buyers/{buyerID}/creditcards": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditCard"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "CreditCardAuthorizations.Post",
+        "tags": [
+          "Credit Card Authorizations"
+        ],
+        "parameters": [{"name":"buyerID","in":"path","description":"ID of the buyer.","required":true,"schema":{"type":"string"}}],
+        "summary": "POST Credit Cards",
+        "description": "",
+        "security": [
+          {
+            "OAuth2": [
+              "CreditCardAdmin",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "/marketplace/{marketplaceID}/supplier/category/config": {
       "get": {
         "responses": {
           "200": {
@@ -1412,7 +1826,70 @@
         ]
       }
     },
-    "orchestration/{clientId}/{buyerId}/address": {
+    "/me/creditcards": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuyerCreditCard"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "MeCreditCardAuthorizations.MePost",
+        "tags": [
+          "Me Credit Card Authorizations"
+        ],
+        "requestBody": {"required":true,"description":"","content":{"application/json":{"schema":{"allOf":[{"$ref":"#/components/schemas/CreditCardToken"}],"required":["ExpirationDate"]}}}},
+        "summary": "POST Credit Card",
+        "description": "",
+        "security": [
+          {
+            "OAuth2": [
+              "MeCreditCardAdmin",
+              "CreditCardAdmin",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "/me/payments": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payment"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "MePayments.Post",
+        "tags": [
+          "Me Payments"
+        ],
+        "requestBody": {"required":true,"description":"","content":{"application/json":{"schema":{"allOf":[{"$ref":"#/components/schemas/CreditCardPayment"}],"required":["OrderID","Currency","MerchantID"]}}}},
+        "summary": "POST Payment",
+        "description": "",
+        "security": [
+          {
+            "OAuth2": [
+              "Shopper",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "/orchestration/{clientId}/{buyerId}/address": {
       "post": {
         "responses": {
           "201": {
@@ -1426,9 +1903,9 @@
             }
           }
         },
-        "operationId": "UserOrchestrations.PostAddress",
+        "operationId": "OrchestrationUsers.PostAddress",
         "tags": [
-          "User Orchestrations"
+          "Orchestration Users"
         ],
         "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace address buyer.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace address buyer.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Address",
@@ -1442,7 +1919,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/{buyerId}/addressassignment": {
+    "/orchestration/{clientId}/{buyerId}/addressassignment": {
       "post": {
         "responses": {
           "201": {
@@ -1456,9 +1933,9 @@
             }
           }
         },
-        "operationId": "UserOrchestrations.PostAddressAssignment",
+        "operationId": "OrchestrationUsers.PostAddressAssignment",
         "tags": [
-          "User Orchestrations"
+          "Orchestration Users"
         ],
         "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace address assignment.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace address assignment.","required":true,"schema":{"type":"string"}}],
         "summary": "POST AddressAssignment",
@@ -1472,7 +1949,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/{buyerId}/costcenter": {
+    "/orchestration/{clientId}/{buyerId}/costcenter": {
       "post": {
         "responses": {
           "201": {
@@ -1486,9 +1963,9 @@
             }
           }
         },
-        "operationId": "UserOrchestrations.PostCostCenter",
+        "operationId": "OrchestrationUsers.PostCostCenter",
         "tags": [
-          "User Orchestrations"
+          "Orchestration Users"
         ],
         "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace cost center.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace cost center.","required":true,"schema":{"type":"string"}}],
         "summary": "POST CostCenter",
@@ -1502,7 +1979,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/{buyerId}/user": {
+    "/orchestration/{clientId}/{buyerId}/user": {
       "post": {
         "responses": {
           "201": {
@@ -1516,9 +1993,9 @@
             }
           }
         },
-        "operationId": "UserOrchestrations.PostUser",
+        "operationId": "OrchestrationUsers.PostUser",
         "tags": [
-          "User Orchestrations"
+          "Orchestration Users"
         ],
         "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace user.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace user.","required":true,"schema":{"type":"string"}}],
         "summary": "POST User",
@@ -1532,7 +2009,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/{buyerId}/usergroup": {
+    "/orchestration/{clientId}/{buyerId}/usergroup": {
       "post": {
         "responses": {
           "201": {
@@ -1546,9 +2023,9 @@
             }
           }
         },
-        "operationId": "UserOrchestrations.PostUserGroup",
+        "operationId": "OrchestrationUsers.PostUserGroup",
         "tags": [
-          "User Orchestrations"
+          "Orchestration Users"
         ],
         "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace user group.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace user group.","required":true,"schema":{"type":"string"}}],
         "summary": "POST UserGroup",
@@ -1562,7 +2039,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/{buyerId}/usergroupassignment": {
+    "/orchestration/{clientId}/{buyerId}/usergroupassignment": {
       "post": {
         "responses": {
           "201": {
@@ -1576,9 +2053,9 @@
             }
           }
         },
-        "operationId": "UserOrchestrations.PostUserGroupAssignment",
+        "operationId": "OrchestrationUsers.PostUserGroupAssignment",
         "tags": [
-          "User Orchestrations"
+          "Orchestration Users"
         ],
         "parameters": [{"name":"buyerId","in":"path","description":"Buyer id of the marketplace user group assignment.","required":true,"schema":{"type":"string"}},{"name":"clientId","in":"path","description":"Client id of the marketplace user group assignment.","required":true,"schema":{"type":"string"}}],
         "summary": "POST UserGroupAssignment",
@@ -1592,7 +2069,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/buyer": {
+    "/orchestration/{clientId}/buyer": {
       "post": {
         "responses": {
           "201": {
@@ -1606,9 +2083,9 @@
             }
           }
         },
-        "operationId": "UserOrchestrations.PostBuyer",
+        "operationId": "OrchestrationUsers.PostBuyer",
         "tags": [
-          "User Orchestrations"
+          "Orchestration Users"
         ],
         "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace buyer.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Buyer",
@@ -1622,7 +2099,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/catalog": {
+    "/orchestration/{clientId}/catalog": {
       "post": {
         "responses": {
           "201": {
@@ -1636,9 +2113,9 @@
             }
           }
         },
-        "operationId": "ProductOrchestrations.PostCatalog",
+        "operationId": "OrchestrationProducts.PostCatalog",
         "tags": [
-          "Product Orchestrations"
+          "Orchestration Products"
         ],
         "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace catalog.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Catalog",
@@ -1653,7 +2130,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/catalogproductassignment": {
+    "/orchestration/{clientId}/catalogproductassignment": {
       "post": {
         "responses": {
           "201": {
@@ -1667,9 +2144,9 @@
             }
           }
         },
-        "operationId": "ProductOrchestrations.PostCatalogProductAssignment",
+        "operationId": "OrchestrationProducts.PostCatalogProductAssignment",
         "tags": [
-          "Product Orchestrations"
+          "Orchestration Products"
         ],
         "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace catalog assignment.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Catalog Product Assignment",
@@ -1684,7 +2161,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/priceschedule": {
+    "/orchestration/{clientId}/priceschedule": {
       "post": {
         "responses": {
           "201": {
@@ -1698,9 +2175,9 @@
             }
           }
         },
-        "operationId": "ProductOrchestrations.PostPriceSchedule",
+        "operationId": "OrchestrationProducts.PostPriceSchedule",
         "tags": [
-          "Product Orchestrations"
+          "Orchestration Products"
         ],
         "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace price schedule.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Price Schedule",
@@ -1715,7 +2192,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/product": {
+    "/orchestration/{clientId}/product": {
       "post": {
         "responses": {
           "201": {
@@ -1729,9 +2206,9 @@
             }
           }
         },
-        "operationId": "ProductOrchestrations.PostProduct",
+        "operationId": "OrchestrationProducts.PostProduct",
         "tags": [
-          "Product Orchestrations"
+          "Orchestration Products"
         ],
         "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace product.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Product",
@@ -1746,7 +2223,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/productassignment": {
+    "/orchestration/{clientId}/productassignment": {
       "post": {
         "responses": {
           "201": {
@@ -1760,9 +2237,9 @@
             }
           }
         },
-        "operationId": "ProductOrchestrations.PostProductAssignment",
+        "operationId": "OrchestrationProducts.PostProductAssignment",
         "tags": [
-          "Product Orchestrations"
+          "Orchestration Products"
         ],
         "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace product assignment.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Product Assignment",
@@ -1777,7 +2254,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/productfacet": {
+    "/orchestration/{clientId}/productfacet": {
       "post": {
         "responses": {
           "201": {
@@ -1791,9 +2268,9 @@
             }
           }
         },
-        "operationId": "ProductOrchestrations.PostProductFacet",
+        "operationId": "OrchestrationProducts.PostProductFacet",
         "tags": [
-          "Product Orchestrations"
+          "Orchestration Products"
         ],
         "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace product facet.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Product Facet",
@@ -1808,7 +2285,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/spec": {
+    "/orchestration/{clientId}/spec": {
       "post": {
         "responses": {
           "201": {
@@ -1822,9 +2299,9 @@
             }
           }
         },
-        "operationId": "ProductOrchestrations.PostSpec",
+        "operationId": "OrchestrationProducts.PostSpec",
         "tags": [
-          "Product Orchestrations"
+          "Orchestration Products"
         ],
         "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace spec.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Spec",
@@ -1839,7 +2316,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/specoption": {
+    "/orchestration/{clientId}/specoption": {
       "post": {
         "responses": {
           "201": {
@@ -1853,9 +2330,9 @@
             }
           }
         },
-        "operationId": "ProductOrchestrations.PostSpecOption",
+        "operationId": "OrchestrationProducts.PostSpecOption",
         "tags": [
-          "Product Orchestrations"
+          "Orchestration Products"
         ],
         "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace spec option.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Spec Option",
@@ -1870,7 +2347,7 @@
         ]
       }
     },
-    "orchestration/{clientId}/specproductassignment": {
+    "/orchestration/{clientId}/specproductassignment": {
       "post": {
         "responses": {
           "201": {
@@ -1884,9 +2361,9 @@
             }
           }
         },
-        "operationId": "ProductOrchestrations.PostSpecProductAssignment",
+        "operationId": "OrchestrationProducts.PostSpecProductAssignment",
         "tags": [
-          "Product Orchestrations"
+          "Orchestration Products"
         ],
         "parameters": [{"name":"clientId","in":"path","description":"Client id of the marketplace spec product assignment.","required":true,"schema":{"type":"string"}}],
         "summary": "POST Spec Product Assignment",
@@ -1901,7 +2378,7 @@
         ]
       }
     },
-    "orchestration/logs": {
+    "/orchestration/logs": {
       "get": {
         "responses": {
           "200": {
@@ -1919,7 +2396,7 @@
         "tags": [
           "Orchestration Logs"
         ],
-        "parameters": [{"name":"search","in":"query","description":"Word or phrase to search for.","required":false,"schema":{"type":"string"}},{"name":"searchOn","in":"query","description":"Comma-delimited list of fields to search on.","required":false,"schema":{"type":"array","items":{"type":"string","enum":[]}}},{"name":"sortBy","in":"query","description":"Comma-delimited list of fields to sort by.","required":false,"schema":{"type":"array","items":{"type":"string","enum":[]}}},{"name":"page","in":"query","description":"Page of results to return. Default: 1","required":false,"schema":{"type":"integer"}},{"name":"pageSize","in":"query","description":"Number of results to return per page. Default: 20, max: 100.","required":false,"schema":{"type":"integer"}},{"name":"filters","in":"query","description":"Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'","required":false,"schema":{"type":"object"}}],
+        "parameters": [{"name":"search","in":"query","description":"Word or phrase to search for.","required":false,"schema":{"type":"string"}},{"name":"searchOn","in":"query","description":"Comma-delimited list of fields to search on.","required":false,"schema":{"type":"array","items":{"type":"string","enum":["ID"]}}},{"name":"sortBy","in":"query","description":"Comma-delimited list of fields to sort by.","required":false,"schema":{"type":"array","items":{"type":"string","enum":["timeStamp","ErrorType","Level","ResourceId","RecordId","RecordType","Action"]}}},{"name":"page","in":"query","description":"Page of results to return. Default: 1","required":false,"schema":{"type":"integer"}},{"name":"pageSize","in":"query","description":"Number of results to return per page. Default: 20, max: 100.","required":false,"schema":{"type":"integer"}},{"name":"filters","in":"query","description":"Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'","required":false,"schema":{"type":"object"}}],
         "summary": "GET Orchestration Logs",
         "description": "",
         "security": [
@@ -1929,7 +2406,38 @@
         ]
       }
     },
-    "products": {
+    "/ordercalculate": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderCalculateResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "Integrations.CalculateOrder",
+        "tags": [
+          "Integrations"
+        ],
+        "parameters": [{"name":"orderCalculationRequest","in":"query","description":"Order calculation request of the order calculate response.","required":true,"schema":{"type":"object"}}],
+        "summary": "POST Order Calculate",
+        "description": "",
+        "security": [
+          {
+            "OAuth2": [
+              "Shopper",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "/products": {
       "get": {
         "responses": {
           "200": {
@@ -1947,8 +2455,8 @@
         "tags": [
           "Products"
         ],
-        "parameters": [{"name":"search","in":"query","description":"Word or phrase to search for.","required":false,"schema":{"type":"string"}},{"name":"searchOn","in":"query","description":"Comma-delimited list of fields to search on.","required":false,"schema":{"type":"array","items":{"type":"string","enum":[]}}},{"name":"sortBy","in":"query","description":"Comma-delimited list of fields to sort by.","required":false,"schema":{"type":"array","items":{"type":"string","enum":[]}}},{"name":"page","in":"query","description":"Page of results to return. Default: 1","required":false,"schema":{"type":"integer"}},{"name":"pageSize","in":"query","description":"Number of results to return per page. Default: 20, max: 100.","required":false,"schema":{"type":"integer"}},{"name":"filters","in":"query","description":"Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'","required":false,"schema":{"type":"object"}}],
-        "summary": "LIST Product",
+        "parameters": [{"name":"search","in":"query","description":"Word or phrase to search for.","required":false,"schema":{"type":"string"}},{"name":"searchOn","in":"query","description":"Comma-delimited list of fields to search on.","required":false,"schema":{"type":"array","items":{"type":"string","enum":["ID"]}}},{"name":"sortBy","in":"query","description":"Comma-delimited list of fields to sort by.","required":false,"schema":{"type":"array","items":{"type":"string","enum":["ID"]}}},{"name":"page","in":"query","description":"Page of results to return. Default: 1","required":false,"schema":{"type":"integer"}},{"name":"pageSize","in":"query","description":"Number of results to return per page. Default: 20, max: 100.","required":false,"schema":{"type":"integer"}},{"name":"filters","in":"query","description":"Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'","required":false,"schema":{"type":"object"}}],
+        "summary": "LIST Super Product",
         "description": "",
         "security": [
           {
@@ -1978,7 +2486,7 @@
           "Products"
         ],
         "requestBody": {"required":true,"description":"","content":{"application/json":{"schema":{"allOf":[{"$ref":"#/components/schemas/SuperMarketplaceProduct"}]}}}},
-        "summary": "POST Product",
+        "summary": "POST Super Product",
         "description": "",
         "security": [
           {
@@ -1990,7 +2498,7 @@
         ]
       }
     },
-    "products/{id}": {
+    "/products/{id}": {
       "get": {
         "responses": {
           "200": {
@@ -2009,7 +2517,7 @@
           "Products"
         ],
         "parameters": [{"name":"id","in":"path","description":"Id of the super marketplace product.","required":true,"schema":{"type":"string"}}],
-        "summary": "GET Product",
+        "summary": "GET Super Product",
         "description": "",
         "security": [
           {
@@ -2039,7 +2547,7 @@
           "Products"
         ],
         "parameters": [{"name":"id","in":"path","description":"Id of the super marketplace product.","required":true,"schema":{"type":"string"}}],
-        "summary": "PUT Product",
+        "summary": "PUT Super Product",
         "description": "",
         "security": [
           {
@@ -2073,7 +2581,68 @@
         ]
       }
     },
-    "supplier": {
+    "/shippingrates": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposedShipmentResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "Integrations.GetShippingRates",
+        "tags": [
+          "Integrations"
+        ],
+        "parameters": [{"name":"orderCalculationRequest","in":"query","description":"Order calculation request of the proposed shipment response.","required":true,"schema":{"type":"object"}}],
+        "summary": "POST Shipping Rates request",
+        "description": "",
+        "security": [
+          {
+            "OAuth2": [
+              "Shopper",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "/supplier": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceSupplier"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "Suppliers.GetMySupplier",
+        "tags": [
+          "Suppliers"
+        ],
+        "parameters": [{"name":"supplierID","in":"query","description":"ID of the supplier.","required":true,"schema":{"type":"string"}}],
+        "summary": "GET MarketplaceSupplier",
+        "description": "",
+        "security": [
+          {
+            "OAuth2": [
+              "SupplierAdmin",
+              "SupplierReader",
+              "FullAccess"
+            ]
+          }
+        ]
+      },
       "post": {
         "responses": {
           "201": {
@@ -2092,12 +2661,43 @@
           "Suppliers"
         ],
         "requestBody": {"required":true,"description":"","content":{"application/json":{"schema":{"allOf":[{"$ref":"#/components/schemas/MarketplaceSupplier"}]}}}},
-        "summary": "Create a new supplier.",
+        "summary": "POST Marketplace Supplier",
         "description": "If ID is provided and an object with that ID already exists, a 409 (conflict) error is returned.",
         "security": [
           {
             "OAuth2": [
               "SupplierAdmin",
+              "FullAccess"
+            ]
+          }
+        ]
+      }
+    },
+    "/taxcodes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListMarketplaceTaxCode"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "TaxCodes.GetTaxCodes",
+        "tags": [
+          "Tax Codes"
+        ],
+        "parameters": [{"name":"search","in":"query","description":"Word or phrase to search for.","required":false,"schema":{"type":"string"}},{"name":"searchOn","in":"query","description":"Comma-delimited list of fields to search on.","required":false,"schema":{"type":"array","items":{"type":"string","enum":["ID"]}}},{"name":"sortBy","in":"query","description":"Comma-delimited list of fields to sort by.","required":false,"schema":{"type":"array","items":{"type":"string","enum":["ID"]}}},{"name":"page","in":"query","description":"Page of results to return. Default: 1","required":false,"schema":{"type":"integer"}},{"name":"pageSize","in":"query","description":"Number of results to return per page. Default: 20, max: 100.","required":false,"schema":{"type":"integer"}},{"name":"filters","in":"query","description":"Any additional key/value pairs passed in the query string are interpreted as filters. Valid keys are top-level properties of the returned model or 'xp.???'","required":false,"schema":{"type":"object"}}],
+        "summary": "LIST Tax Codes",
+        "description": "",
+        "security": [
+          {
+            "OAuth2": [
+              "ProductAdmin",
               "FullAccess"
             ]
           }

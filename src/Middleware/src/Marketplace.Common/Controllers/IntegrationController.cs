@@ -2,10 +2,16 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using Marketplace.Helpers.Attributes;
+using Marketplace.Models;
+using Marketplace.Models.Attributes;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers
 {
-	public class IntegrationController: BaseController
+    [DocComments("\"Integration\" represents Integrations Marketplace")]
+    [MarketplaceSection.Integration(ListOrder = 1)]
+    public class IntegrationController: BaseController
 	{
 		private readonly IOCShippingIntegration _OCShippingIntegration;
 		public IntegrationController(AppSettings settings, IOCShippingIntegration OCShippingIntegration) : base(settings) 
@@ -14,8 +20,9 @@ namespace Marketplace.Common.Controllers
 		}
 
 		// todo auth on this endpoint
+        [DocName("POST Shipping Rates request")]
 		[Route("shippingrates")]
-		[HttpPost]
+		[HttpPost, MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<ProposedShipmentResponse> GetShippingRates([FromBody] OrderCalculationRequest orderCalculationRequest)
 		{
 			var proposedShipmentOptions = await _OCShippingIntegration.GetRatesAsync(orderCalculationRequest.OrderCalculation);
@@ -23,8 +30,9 @@ namespace Marketplace.Common.Controllers
 		}
 
 		// todo auth on this endpoint
+        [DocName("POST Order Calculate")]
 		[Route("ordercalculate")]
-		[HttpPost]
+		[HttpPost, MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] OrderCalculationRequest orderCalculationRequest)
 		{
 			var orderCalculationResponse = await _OCShippingIntegration.CalculateOrder(orderCalculationRequest.OrderCalculation);

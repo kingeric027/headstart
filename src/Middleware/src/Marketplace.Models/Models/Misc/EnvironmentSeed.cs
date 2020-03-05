@@ -1,6 +1,6 @@
 ﻿using Marketplace.Models.Models.Marketplace;
 using System.Collections.Generic;
-using Marketplace.Helpers.SwaggerTools;
+using Marketplace.Helpers.Attributes;
 
 namespace Marketplace.Models.Misc
 {

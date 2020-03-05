@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Helpers.SwaggerTools;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
 
 namespace Marketplace.Common.Controllers
 {
-    [DocComments("\"Files\" represents files for content management control")]
-    [MarketplaceSection.ProductCatalogs(ListOrder = 1)]
+    [DocComments("\"Files\" represents files for Marketplace content management control")]
+    [MarketplaceSection.Marketplace(ListOrder = 4)]
     [Route("{marketplaceID}")]
 	public class FileController: BaseController
 	{

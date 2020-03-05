@@ -1,5 +1,5 @@
 ﻿using System;
-using Marketplace.Helpers.SwaggerTools;
+using Marketplace.Helpers.Attributes;
 
 namespace Marketplace.Models.Attributes
 {
@@ -10,35 +10,15 @@ namespace Marketplace.Models.Attributes
         {
             
         }
-        
+        // <summary>
+        /// Use on controllers to indicate that they belong in the Orchestration section of the API reference docs.
+        /// </summary>
         public class OrchestrationAttribute : DocSection { }
         /// <summary>
-        /// Use on controllers to indicate that they belong in the Authentication section of the API reference docs.
+        /// Use on controllers to indicate that they belong in the Marketplace section of the API reference docs.
         /// </summary>
-        public class AuthenticationAndAuthorizationAttribute : DocSection { }
-        /// <summary>
-        /// Use on controllers to indicate that they belong in the Seller section of the API reference docs.
-        /// </summary>
-        public class SellerAttribute : DocSection { }
-        /// <summary>
-        /// Use on controllers to indicate that they belong in the Buyers section of the API reference docs.
-        /// </summary>
-        public class BuyersAttribute : DocSection { }
-        /// <summary>
-        /// Use on controllers to indicate that they belong in the Suppliers section of the API reference docs.
-        /// </summary>
-        public class SuppliersAttribute : DocSection { }
-        /// <summary>
-        /// Use on controllers to indicate that they belong in the Product Catalogs section of the API reference docs.
-        /// </summary>
-        public class ProductCatalogsAttribute : DocSection { }
-        /// <summary>
-        /// Use on controllers to indicate that they belong in the Orders section of the API reference docs.
-        /// </summary>
-        public class OrdersAndFulfillmentAttribute : DocSection { }
-        /// <summary>
-        /// Use on controllers to indicate that they belong in "me" section of the API reference docs.
-        /// </summary>
-        public class MeAndMyStuffAttribute : DocSection { }
+        public class MarketplaceAttribute : DocSection { }
+
+        public class IntegrationAttribute : DocSection { }
     }
 }
