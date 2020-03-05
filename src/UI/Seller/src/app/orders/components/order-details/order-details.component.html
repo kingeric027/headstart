@@ -87,7 +87,7 @@
            *ngIf="isQuoteOrder(_order)">
         <strong>Submitted By</strong>
         <span class="float-right">{{_order.xp?.QuoteOrderInfo.FirstName}} {{_order.xp?.QuoteOrderInfo.LastName}}</span><br>
-        <span class="float-right">{{_order.xp?.QuoteOrderInfo.Phone | phoneFormat}}</span><br>
+        <span class="float-right">{{_order.xp?.QuoteOrderInfo.Phone | tel}}</span><br>
         <span class="float-right">{{_order.xp?.QuoteOrderInfo.Email}}</span><br>
         <div *ngIf="order?.xp?.QuoteOrderInfo?.Comments"
              class="alert alert-secondary small">
