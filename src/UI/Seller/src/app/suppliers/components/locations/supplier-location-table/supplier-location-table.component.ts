@@ -54,7 +54,7 @@ export class SupplierLocationTableComponent extends ResourceCrudComponent<Addres
     try {
       this.dataIsSaving = true;
       const updatedResource = await this.ocService.updateResource(this.updatedResource);
-      this.resourceInSelection = this.copyResource(updatedResource);
+      this.resourceInSelection = this.ocService.copyResource(updatedResource);
       this.setUpdatedResourceAndResourceForm(updatedResource);
       this.suggestedAddresses = null;
       this.dataIsSaving = false;

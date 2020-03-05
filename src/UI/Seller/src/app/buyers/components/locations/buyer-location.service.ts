@@ -10,18 +10,32 @@ import { BUYER_SUB_RESOURCE_LIST } from '../buyers/buyer.service';
 })
 export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
   emptyResource = {
-    CompanyName: '',
-    FirstName: '',
-    LastName: '',
-    Street1: '',
-    Street2: '',
-    City: '',
-    State: '',
-    Zip: '',
-    Country: '',
-    Phone: '',
-    AddressName: 'Your new supplier location',
-    xp: null,
+    UserGroup: {
+      xp: {
+        Type: '',
+      },
+      ID: '',
+      Name: '',
+      Description: '',
+    },
+    Address: {
+      xp: {
+        Email: '',
+      },
+      ID: '',
+      DateCreated: '',
+      CompanyName: '',
+      FirstName: '',
+      LastName: '',
+      Street1: '',
+      Street2: '',
+      City: '',
+      State: '',
+      Zip: '',
+      Country: '',
+      Phone: '',
+      AddressName: '',
+    },
   };
 
   constructor(router: Router, activatedRoute: ActivatedRoute, ocAddressService: OcAddressService) {
