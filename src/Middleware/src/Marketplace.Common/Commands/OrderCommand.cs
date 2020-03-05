@@ -46,16 +46,16 @@ namespace Marketplace.Common.Commands
             }
             else
             {
-                // should as much order submit logic to use the order calculation model as makes sense
-                // so that we do not need to go get the line items and shipping information multiple times
-                var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, order.ID);
-                var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderCalculation);
-                await HandleTaxTransactionCreationAsync(buyerOrderCalculation);
-                var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
-                var supplierOrders = orderSplitResult.OutgoingOrders;
-                await ImportSupplierOrdersIntoFreightPop(supplierOrders);
-                await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
-            }
+            // forwarding
+            var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, orderId);
+            var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderId);
+            var supplierOrders = orderSplitResult.OutgoingOrders;
+            
+            // integrations
+            var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderCalculation);
+            await HandleTaxTransactionCreationAsync(buyerOrderCalculation);
+            await ImportSupplierOrdersIntoFreightPop(supplierOrders);
+            await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
         }
 
         private async Task HandleTaxTransactionCreationAsync(OrderCalculation orderCalculation)
