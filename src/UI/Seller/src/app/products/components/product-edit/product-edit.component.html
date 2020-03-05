@@ -111,6 +111,32 @@
                    placeholder="Price (USD)">
           </div>
         </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="MinQuantity">Minimum Order Quantity</label>
+            <input type="number"
+                   class="form-control"
+                   id="MinQuantity"
+                   showErrors
+                   aria-describedby="Minimum Order Quantity"
+                   [resourceForm]="productForm"
+                   formControlName="MinQuantity"
+                   (input)="handleUpdateProduct($event, 'PriceSchedule.MinQuantity', 'number')"
+                   placeholder="Enter Minimum Order Quantity">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="MaxQuantity">Maximum Order Quantity</label>
+            <input type="number"
+                   class="form-control"
+                   id="MaxQuantity"
+                   showErrors
+                   aria-describedby="Maximum Order Quantity"
+                   [resourceForm]="productForm"
+                   formControlName="MaxQuantity"
+                   (input)="handleUpdateProduct($event, 'PriceSchedule.MaxQuantity', 'number')"
+                   placeholder="Enter Maximum Order Quantity">
+          </div>
+        </div>
         <product-tax-code-select-component [productForm]="productForm"
                                            [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
                                            [taxCodes]="taxCodes"
