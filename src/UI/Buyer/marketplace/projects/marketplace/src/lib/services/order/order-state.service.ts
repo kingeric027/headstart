@@ -14,7 +14,17 @@ export class OrderStateService {
     Items: [],
   };
   private readonly DefaultOrder: MarketplaceOrder = {
-    xp: { AvalaraTaxTransactionCode: '' },
+    xp: {
+      AvalaraTaxTransactionCode: '',
+      OrderType: null,
+      QuoteOrderInfo: {
+        FirstName: null,
+        LastName: null,
+        Phone: null,
+        Email: null,
+        Comments: null,
+      }
+    },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
   private lineItemSubject = new BehaviorSubject<ListLineItem>(this.DefaultLineItems);
@@ -25,7 +35,7 @@ export class OrderStateService {
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
     private appConfig: AppConfig
-  ) {}
+  ) { }
 
   get order(): MarketplaceOrder {
     return this.orderSubject.value;

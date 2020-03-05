@@ -38,7 +38,7 @@ namespace Marketplace.Common.Controllers
         [OrderCloudWebhookAuth]
         public async void HandleOrderSubmit([FromBody] WebhookPayloads.Orders.Submit payload)
         {
-            await _orderCommand.HandleBuyerOrderSubmit(payload.Response.Body.ID);
+            await _orderCommand.HandleBuyerOrderSubmit(payload.Response.Body);
             await _sendgridService.SendSupplierEmails(payload.Response.Body.ID);
             await _sendgridService.SendSingleEmail("noreply@four51.com", payload.Response.Body.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
         }

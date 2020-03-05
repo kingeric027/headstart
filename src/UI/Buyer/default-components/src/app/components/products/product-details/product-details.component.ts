@@ -1,17 +1,19 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { minBy as _minBy } from 'lodash';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ListSpec, User } from '@ordercloud/angular-sdk';
-import { SpecFormService } from '../spec-form/spec-form.service';
-import { ShopperContextService, MarketplaceProduct, ProductType } from 'marketplace';
-import { getImageUrls } from 'src/app/services/images.helpers';
+import { minBy as _minBy } from 'lodash';
+import { LineItem, MarketplaceProduct, OrderType, ProductType, ShopperContextService } from 'marketplace';
+import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
+import { getImageUrls } from 'src/app/services/images.helpers';
+import { SpecFormService } from '../spec-form/spec-form.service';
 
 @Component({
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss'],
 })
 export class OCMProductDetails implements OnInit {
+  faTimes = faTimes;
   _specs: ListSpec;
   _product: MarketplaceProduct;
   specFormService: SpecFormService;
@@ -30,7 +32,11 @@ export class OCMProductDetails implements OnInit {
   specLength: number;
   quoteFormModal = ModalState.Closed;
   currentUser: User;
-  constructor(private formService: SpecFormService, private context: ShopperContextService) {
+  showRequestSubmittedMessage = false;
+  submittedQuoteOrder: any;
+  constructor(
+    private formService: SpecFormService,
+    private context: ShopperContextService) {
     this.specFormService = formService;
   }
 
@@ -132,12 +138,37 @@ export class OCMProductDetails implements OnInit {
   }
 
   dismissQuoteForm() {
-    console.log(this.currentUser)
     this.quoteFormModal = ModalState.Closed;
   }
 
-  quoteFormSubmitted(detail) {
+  getDefaultQuoteOrder(user) {
+    const defaultQuoteOrder = {
+      xp: {
+        AvalaraTaxTransactionCode: '',
+        OrderType: OrderType.Quote,
+        QuoteOrderInfo: {
+          FirstName: user.FirstName,
+          LastName: user.LastName,
+          Phone: user.Phone,
+          Email: user.Email,
+          Comments: user.Comments
+        }
+      }
+    };
+    return defaultQuoteOrder;
+  }
+
+  async submitQuoteOrder(user) {
+    const defaultOrder = this.getDefaultQuoteOrder(user);
+    const lineItem: LineItem = {};
+    lineItem.ProductID = this._product.ID;
+    lineItem.Product = this._product;
+    this.context.order.submitQuoteOrder(defaultOrder, lineItem).then(order => this.submittedQuoteOrder = order);
     this.quoteFormModal = ModalState.Closed;
-    console.log(detail);
+    this.showRequestSubmittedMessage = true;
+  }
+
+  toOrderDetail() {
+    this.context.router.toMyOrderDetails(this.submittedQuoteOrder.ID);
   }
 }

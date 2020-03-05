@@ -23,7 +23,8 @@
       </div>
       <ng-content></ng-content>
     </div>
-    <div class="px-3 pt-2 d-none d-sm-block border-bottom">
+    <div class="px-3 pt-2 d-none d-sm-block border-bottom"
+         *ngIf="orderType !== 'Quote'">
       <div class="row">
         <div class="col-sm-7">
         </div>
@@ -65,8 +66,11 @@
             </div>
           </div>
           <div class="col-sm-5">
-            <div class="row align-items-center pt-3 pt-sm-0">
-              <div class="col-4 text-center">
+            <div class="row align-items-center pt-3 pt-sm-0"
+                 *ngIf="orderType !== 'Quote'">
+              <div class="
+                 col-4
+                 text-center">
                 <span class="d-block d-sm-none">Unit Price</span>
                 <span class="text-nowrap">{{li.UnitPrice | currency}}</span>
               </div>
