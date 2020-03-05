@@ -12,9 +12,16 @@
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
-
+  <app-buyer-user-edit class="resource-edit"
+                       *ngIf="resourceForm"
+                       [resourceForm]="resourceForm"
+                       [resourceInSelection]="resourceInSelection"
+                       [filterConfig]="filterConfig"
+                       (updateResource)="updateResource($event)"
+                       (userGroupAssignments)="captureUserGroupAssignments($event)">
+  </app-buyer-user-edit>
   <!-- edit user -->
-  <div class="resource-edit">
+  <!-- <div class="resource-edit">
     <form *ngIf="resourceForm"
           [formGroup]="resourceForm">
       <div class="form-group">
@@ -60,5 +67,5 @@
         </div>
       </div>
     </form>
-  </div>
+  </div> -->
 </resource-table-component>

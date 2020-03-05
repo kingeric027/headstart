@@ -9,6 +9,8 @@ import { BuyerApprovalTableComponent } from './components/approvals/buyer-approv
 import { BuyerCategoryTableComponent } from './components/categories/buyer-category-table/buyer-category-table.component';
 import { BuyerLocationEditComponent } from './components/locations/buyer-location-edit/buyer-location-edit.component';
 import { BuyerCategoryEditComponent } from './components/categories/buyer-category-edit/buyer-category-edit.component';
+import { BuyerUserEditComponent } from './components/users/buyer-user-edit/buyer-user-edit.component';
+import { BuyerUserPermissionsAssignments } from './components/users/buyer-user-permissions-assignments/buyer-user-permissions-assignments.component';
 
 @NgModule({
   imports: [SharedModule, BuyersRoutingModule],
@@ -21,6 +23,8 @@ import { BuyerCategoryEditComponent } from './components/categories/buyer-catego
     BuyerLocationEditComponent,
     BuyerPaymentTableComponent,
     BuyerUserTableComponent,
+    BuyerUserEditComponent,
+    BuyerUserPermissionsAssignments,
   ],
 })
-export class BuyersModule { }
+export class BuyersModule {}
