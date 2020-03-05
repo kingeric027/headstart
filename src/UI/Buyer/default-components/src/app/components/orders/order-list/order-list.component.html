@@ -54,13 +54,16 @@
         </td>
         <td *ngIf="columns.indexOf('ID')> -1"
             (click)="toOrderDetails(order.ID)"
-            class="link text-primary">{{order.ID}}</td>
+            class="link text-primary">
+          {{order.ID}}
+          <span class="badge badge-pill badge-secondary ml-2">{{order.xp.OrderType}}</span>
+        </td>
         <td *ngIf="columns.indexOf('Status') > -1">
           <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{order.Status}}
         </td>
         <td *ngIf="columns.indexOf('DateSubmitted') > -1">{{order.DateSubmitted | date: 'short' || 'N/A'}}</td>
         <td *ngIf="columns.indexOf('SubmittedBy') > -1">{{order.FromUser.FirstName}} {{order.FromUser.LastName}}</td>
-        <td *ngIf="columns.indexOf('Total') > -1">{{order.Total | currency}}</td>
+        <td *ngIf="columns.indexOf('Total') > -1">{{isQuoteOrder(order) ? 'N/A' : order.Total | currency}}</td>
       </tr>
     </tbody>
   </table>

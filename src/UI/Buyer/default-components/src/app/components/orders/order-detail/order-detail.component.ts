@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import { OrderDetails, ShopperContextService, MarketplaceOrder, OrderReorderResponse } from 'marketplace';
+import { OrderDetails, ShopperContextService, MarketplaceOrder, OrderReorderResponse, OrderType } from 'marketplace';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { isQuoteOrder } from '../../../services/orderType.helper';
 
 @Component({
   templateUrl: './order-detail.component.html',
@@ -16,8 +17,8 @@ export class OCMOrderDetails implements OnInit {
   subView: 'details' | 'shipments' = 'details';
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
-
-  constructor(private context: ShopperContextService, private modalService: NgbModal) {}
+  isQuoteOrder = isQuoteOrder;
+  constructor(private context: ShopperContextService, private modalService: NgbModal) { }
 
   async ngOnInit(): Promise<void> {
     this.orderDetails = await this.context.orderHistory.getOrderDetails();
