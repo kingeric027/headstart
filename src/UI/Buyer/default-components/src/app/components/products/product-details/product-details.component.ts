@@ -34,7 +34,6 @@ export class OCMProductDetails implements OnInit {
   currentUser: User;
   showRequestSubmittedMessage = false;
   submittedQuoteOrder: Order;
-  defaultQuoteOrder: MarketplaceOrder;
   lineItem: LineItem = {};
 
   constructor(
@@ -61,19 +60,6 @@ export class OCMProductDetails implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.context.currentUser.get();
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
-    this.defaultQuoteOrder = {
-      xp: {
-        AvalaraTaxTransactionCode: '',
-        OrderType: OrderType.Quote,
-        QuoteOrderInfo: {
-          FirstName: '',
-          LastName: '',
-          Phone: '',
-          Email: '',
-          Comments: ''
-        }
-      },
-    };
   }
 
   onSpecFormChange(event): void {
@@ -159,19 +145,30 @@ export class OCMProductDetails implements OnInit {
     this.quoteFormModal = ModalState.Closed;
   }
 
+  getDefaultQuoteOrder(user) {
+    const defaultQuoteOrder = {
+      xp: {
+        AvalaraTaxTransactionCode: '',
+        OrderType: OrderType.Quote,
+        QuoteOrderInfo: {
+          FirstName: user.FirstName,
+          LastName: user.LastName,
+          Phone: user.Phone,
+          Email: user.Email,
+          Comments: user.Comments
+        }
+      }
+    };
+    return defaultQuoteOrder;
+  }
+
   async submitQuoteOrder(user) {
-    try {
-      this.defaultQuoteOrder.xp.QuoteOrderInfo = user;
-      this.lineItem.ProductID = this._product.ID;
-      this.lineItem.Product = this._product;
-      this.submittedQuoteOrder = await this.ocOrderService.Create('Outgoing', this.defaultQuoteOrder).toPromise();
-      await this.ocLineItemService.Create('Outgoing', this.submittedQuoteOrder.ID, this.lineItem).toPromise();
-      await this.ocOrderService.Submit('Outgoing', this.submittedQuoteOrder.ID).toPromise();
-      this.quoteFormModal = ModalState.Closed
-      this.showRequestSubmittedMessage = true
-    } catch (ex) {
-      throw ex;
-    }
+    this.lineItem.ProductID = this._product.ID;
+    this.lineItem.Product = this._product;
+    this.submittedQuoteOrder = await this.ocOrderService.Create('Outgoing', this.getDefaultQuoteOrder(user)).toPromise();
+    await this.ocLineItemService.Create('Outgoing', this.submittedQuoteOrder.ID, this.lineItem).toPromise();
+    this.quoteFormModal = ModalState.Closed
+    this.showRequestSubmittedMessage = true
   }
 
   toOrderDetail() {
