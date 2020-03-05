@@ -76,7 +76,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
     ngZone: NgZone
-  ) { }
+  ) {}
 
   @Input()
   resourceList: ListPage<any> = { Meta: {}, Items: [] };
@@ -103,12 +103,14 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   set updatedResource(value: any) {
     this._updatedResource = value;
-    this.checkForChanges();
+    if (this._resourceInSelection && this._updatedResource && this._ocService)
+      this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
   }
   @Input()
   set resourceInSelection(value: any) {
     this._resourceInSelection = value;
-    this.checkForChanges();
+    if (this._resourceInSelection && this._updatedResource && this._ocService)
+      this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
   }
   @Input()
   selectedResourceID: string;
@@ -247,7 +249,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       this.changeDetectorRef.detectChanges();
     });
   }
-
+  // TODO: Refactor to remove duplicate function (function exists in resrouce-crud.service.ts)
   private checkIfCreatingNew() {
     const routeUrl = this.router.routerState.snapshot.url;
     const splitUrl = routeUrl.split('/');
@@ -315,7 +317,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   handleSelectResource(resource: any) {
-    this.resourceSelected.emit(resource); 
+    this.resourceSelected.emit(resource);
   }
 
   openPopover() {
@@ -337,14 +339,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.fromDate = '';
   }
 
-  checkForChanges() {
-    this.areChanges = JSON.stringify(this._updatedResource) !== JSON.stringify(this._resourceInSelection);
-  }
-
   getSaveBtnText(): string {
-    if (this.dataIsSaving) return 'Saving...';
-    if (this.isCreatingNew) return 'Create';
-    if (!this.isCreatingNew) return 'Save Changes';
+    return this._ocService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew);
   }
 
   ngOnDestroy() {

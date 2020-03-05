@@ -56,22 +56,12 @@ export class BuyerLocationEditComponent implements OnInit {
     this.buyerLocationEditable = buyerLocation;
     this.buyerLocationStatic = buyerLocation;
     this.createBuyerLocationForm(buyerLocation);
-    this.checkIfCreatingNew();
-    this.checkForChanges();
-  }
-
-  private checkIfCreatingNew() {
-    const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
-  }
-
-  checkForChanges(): void {
-    this.areChanges = JSON.stringify(this.buyerLocationEditable) !== JSON.stringify(this.buyerLocationStatic);
+    this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
+    this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
   ngOnInit(): void {
-    this.checkIfCreatingNew();
+    this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
   }
 
   createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation) {
@@ -93,18 +83,16 @@ export class BuyerLocationEditComponent implements OnInit {
 
   updateResourceFromEvent(event: any, field: string): void {
     this.updateResource.emit({ value: event.target.value, field });
-    this.checkForChanges();
+    this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
   handleAddressSelect(address) {
     this.selectAddress.emit(address);
-    this.checkForChanges();
+    this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
   getSaveBtnText(): string {
-    if (this.dataIsSaving) return 'Saving...';
-    if (this.isCreatingNew) return 'Create';
-    if (!this.isCreatingNew) return 'Save Changes';
+    return this.buyerLocationService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew);
   }
 
   async handleSave(): Promise<void> {
@@ -144,7 +132,7 @@ export class BuyerLocationEditComponent implements OnInit {
       );
       this.buyerLocationEditable = updatedBuyerLocation;
       this.buyerLocationStatic = updatedBuyerLocation;
-      this.checkForChanges();
+      this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
       this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
@@ -158,34 +146,12 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   updateBuyerLocationResource(buyerLocationUpdate: any) {
-    /* 
-    * TODO:
-    * This function is used to dynamically update deeply nested objects
-    * It is currently used in two places, but will likely soon become
-    * obsolete when the product edit component gets refactored.
-    */
-    const piecesOfField = buyerLocationUpdate.field.split('.');
-    const depthOfField = piecesOfField.length;
-    const updateProductResourceCopy = this.copyProductResource(
-      this.buyerLocationEditable || this.buyerLocationService.emptyResource
+    const resourceToEdit = this.buyerLocationEditable || this.buyerLocationService.emptyResource;
+    this.buyerLocationEditable = this.buyerLocationService.getUpdatedEditableResource(
+      buyerLocationUpdate,
+      resourceToEdit
     );
-    switch (depthOfField) {
-      case 4:
-        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
-          buyerLocationUpdate.value;
-        break;
-      case 3:
-        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]] = buyerLocationUpdate.value;
-        break;
-      case 2:
-        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]] = buyerLocationUpdate.value;
-        break;
-      default:
-        updateProductResourceCopy[piecesOfField[0]] = buyerLocationUpdate.value;
-        break;
-    }
-    this.buyerLocationEditable = updateProductResourceCopy;
-    this.checkForChanges();
+    this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
   handleUpdateBuyerLocation(event: any, field: string) {
@@ -194,10 +160,6 @@ export class BuyerLocationEditComponent implements OnInit {
       value: field === 'Active' ? event.target.checked : event.target.value,
     };
     this.updateBuyerLocationResource(buyerLocationUpdate);
-  }
-
-  copyProductResource(product: any) {
-    return JSON.parse(JSON.stringify(product));
   }
 
   handleDiscardChanges(): void {

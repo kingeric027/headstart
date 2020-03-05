@@ -121,14 +121,14 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   async setResourceSelectionFromID(resourceID: string): Promise<void> {
     this.selectedResourceID = resourceID || '';
     const resource = await this.ocService.findOrGetResourceByID(resourceID);
-    this.resourceInSelection = this.copyResource(resource);
+    this.resourceInSelection = this.ocService.copyResource(resource);
     this.setUpdatedResourceAndResourceForm(resource);
   }
 
   setResourceSelectionFromResource(resource: any): void {
     this.selectedResourceID = (resource && resource.ID) || '';
 
-    this.resourceInSelection = this.copyResource(resource);
+    this.resourceInSelection = this.ocService.copyResource(resource);
     this.setUpdatedResourceAndResourceForm(resource);
   }
 
@@ -143,28 +143,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   updateResource(resourceUpdate: ResourceUpdate): void {
-    // copying a resetting this.updated resource ensures that the copy and base object
-    // reference is broken
-    // not the prettiest function, feel free to improve
-    const piecesOfField = resourceUpdate.field.split('.');
-    const depthOfField = piecesOfField.length;
-    const updatedResourceCopy = this.copyResource(this.updatedResource);
-    switch (depthOfField) {
-      case 4:
-        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
-          resourceUpdate.value;
-        break;
-      case 3:
-        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]] = resourceUpdate.value;
-        break;
-      case 2:
-        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]] = resourceUpdate.value;
-        break;
-      default:
-        updatedResourceCopy[piecesOfField[0]] = resourceUpdate.value;
-        break;
-    }
-    this.updatedResource = updatedResourceCopy;
+    this.updatedResource = this.ocService.getUpdatedEditableResource(resourceUpdate, this.updatedResource);
     this.changeDetectorRef.detectChanges();
   }
 
@@ -174,10 +153,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
       value: field === 'Active' ? event.target.checked : event.target.value,
     };
     this.updateResource(resourceUpdate);
-  }
-
-  copyResource(resource: ResourceType): ResourceType {
-    return JSON.parse(JSON.stringify(resource));
   }
 
   saveUpdates(): void {
@@ -203,7 +178,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     try {
       this.dataIsSaving = true;
       const updatedResource = await this.ocService.updateResource(this.updatedResource);
-      this.resourceInSelection = this.copyResource(updatedResource);
+      this.resourceInSelection = this.ocService.copyResource(updatedResource);
       this.setUpdatedResourceAndResourceForm(updatedResource);
       this.dataIsSaving = false;
     } catch (ex) {
@@ -213,8 +188,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   setUpdatedResourceAndResourceForm(updatedResource: any): void {
-    this.updatedResource = this.copyResource(updatedResource);
-    this.setForm(this.copyResource(updatedResource));
+    this.updatedResource = this.ocService.copyResource(updatedResource);
+    this.setForm(this.ocService.copyResource(updatedResource));
     this.changeDetectorRef.detectChanges();
   }
 

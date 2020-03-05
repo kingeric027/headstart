@@ -84,7 +84,7 @@ export class ProductEditComponent implements OnInit {
 
   async ngOnInit() {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
-    this.checkIfCreatingNew();
+    this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
   }
@@ -120,14 +120,8 @@ export class ProductEditComponent implements OnInit {
     this.createProductForm(superProduct);
     this.images = ReplaceHostUrls(superProduct.Product);
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
-    this.checkIfCreatingNew();
+    this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
-  }
-
-  private checkIfCreatingNew() {
-    const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
   }
 
   createProductForm(superMarketplaceProduct: SuperMarketplaceProduct) {
@@ -203,33 +197,8 @@ export class ProductEditComponent implements OnInit {
   }
 
   updateProductResource(productUpdate: any) {
-    /* 
-    * TODO:
-    * This function is used to dynamically update deeply nested objects
-    * It is currently used in two places, but will likely soon become
-    * obsolete when the product edit component gets refactored.
-    */
-    const piecesOfField = productUpdate.field.split('.');
-    const depthOfField = piecesOfField.length;
-    const updateProductResourceCopy = this.copyProductResource(
-      this._superMarketplaceProductEditable || this.productService.emptyResource
-    );
-    switch (depthOfField) {
-      case 4:
-        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
-          productUpdate.value;
-        break;
-      case 3:
-        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]] = productUpdate.value;
-        break;
-      case 2:
-        updateProductResourceCopy[piecesOfField[0]][piecesOfField[1]] = productUpdate.value;
-        break;
-      default:
-        updateProductResourceCopy[piecesOfField[0]] = productUpdate.value;
-        break;
-    }
-    this._superMarketplaceProductEditable = updateProductResourceCopy;
+    const resourceToUpdate = this._superMarketplaceProductEditable || this.productService.emptyResource;
+    this._superMarketplaceProductEditable = this.productService.getUpdatedEditableResource(productUpdate, resourceToUpdate);
     this.checkForChanges();
   }
 
@@ -246,13 +215,9 @@ export class ProductEditComponent implements OnInit {
     this.updateProductResource(productUpdate);
   }
 
-  copyProductResource(product: any) {
-    return JSON.parse(JSON.stringify(product));
-  }
-
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
   updateResourceFromFieldValue(field: string, value: any) {
-    const updateProductResourceCopy = this.copyProductResource(
+    const updateProductResourceCopy = this.productService.copyResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
     );
     updateProductResourceCopy.Product = {
@@ -262,7 +227,7 @@ export class ProductEditComponent implements OnInit {
     this._superMarketplaceProductEditable = updateProductResourceCopy;
     this.checkForChanges();
   }
-
+  // TODO: Remove duplicate function, function exists in resource-crud.component.ts (minus the files check);
   checkForChanges(): void {
     this.areChanges =
       JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic) ||
@@ -355,8 +320,6 @@ export class ProductEditComponent implements OnInit {
   }
 
   getSaveBtnText(): string {
-    if (this.dataIsSaving) return 'Saving...';
-    if (this.isCreatingNew) return 'Create';
-    if (!this.isCreatingNew) return 'Save Changes';
+    return this.productService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew)
   }
 }

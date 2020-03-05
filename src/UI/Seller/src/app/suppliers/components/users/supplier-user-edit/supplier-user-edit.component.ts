@@ -3,6 +3,7 @@ import { get as _get } from 'lodash';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserGroupAssignment } from '@ordercloud/angular-sdk';
+import { SupplierUserService } from '../supplier-user.service';
 @Component({
   selector: 'app-supplier-user-edit',
   templateUrl: './supplier-user-edit.component.html',
@@ -20,14 +21,8 @@ export class SupplierUserEditComponent {
   @Output()
   userGroupAssignments = new EventEmitter<UserGroupAssignment[]>();
   isCreatingNew: boolean;
-  constructor(private router: Router) {
-    this.checkIfCreatingNew();
-  }
-
-  private checkIfCreatingNew() {
-    const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
+  constructor(private supplierUserService: SupplierUserService) {
+    this.isCreatingNew = this.supplierUserService.checkIfCreatingNew();
   }
   updateResourceFromEvent(event: any, field: string): void {
     field === 'Active'
