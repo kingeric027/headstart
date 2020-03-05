@@ -21,7 +21,7 @@ export class SupplierUserEditComponent {
   @Output()
   userGroupAssignments = new EventEmitter<UserGroupAssignment[]>();
   isCreatingNew: boolean;
-  constructor(private supplierUserService: SupplierUserService) {
+  constructor(public supplierUserService: SupplierUserService) {
     this.isCreatingNew = this.supplierUserService.checkIfCreatingNew();
   }
   updateResourceFromEvent(event: any, field: string): void {

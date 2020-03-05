@@ -6,9 +6,12 @@ import {
   OcMeService,
   UserGroupAssignment,
   OcSupplierUserGroupService,
+  ListUserGroup,
+  ListUserGroupAssignment,
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
+import { ListArgs } from '@app-seller/shared/services/middleware-api/listArgs.interface';
 
 export const SUPPLIER_SUB_RESOURCE_LIST = ['users', 'locations'];
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
@@ -50,29 +53,5 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     const me = await this.ocMeService.Get().toPromise();
     const supplier = await this.ocSupplierService.Get(me.Supplier.ID).toPromise();
     return supplier;
-  }
-
-  async updateSupplierUserUserGroupAssignments(
-    supplierID: string,
-    add: UserGroupAssignment[],
-    del: UserGroupAssignment[]
-  ): Promise<void> {
-    const addRequests = add.map(newAssignment => this.addSupplierUserUserGroupAssignment(supplierID, newAssignment));
-    const deleteRequests = del.map(assignmentToRemove =>
-      this.removeSupplierUserUserGroupAssignment(supplierID, assignmentToRemove)
-    );
-    await Promise.all([...addRequests, ...deleteRequests]);
-  }
-
-  addSupplierUserUserGroupAssignment(supplierID: string, assignment: UserGroupAssignment): Promise<void> {
-    return this.ocSupplierUserGroupService
-      .SaveUserAssignment(supplierID, { UserID: assignment.UserID, UserGroupID: assignment.UserGroupID })
-      .toPromise();
-  }
-
-  removeSupplierUserUserGroupAssignment(supplierID: string, assignment: UserGroupAssignment): Promise<void> {
-    return this.ocSupplierUserGroupService
-      .DeleteUserAssignment(supplierID, assignment.UserGroupID, assignment.UserID)
-      .toPromise();
   }
 }
