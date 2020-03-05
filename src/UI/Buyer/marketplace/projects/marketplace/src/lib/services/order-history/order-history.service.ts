@@ -88,9 +88,11 @@ export class OrderHistoryService implements IOrderHistory {
     const suppliers: LineItemGroupSupplier[] = [];
     for (const group of liGroups) {
       const line = group[0];
-      const supplier = await this.ocSupplierService.Get(line.SupplierID).toPromise();
-      const shipFrom = await this.ocSupplierAddressService.Get(line.SupplierID, line.ShipFromAddressID).toPromise();
-      suppliers.push({ supplier, shipFrom });
+      if (line?.SupplierID) {
+        const supplier = await this.ocSupplierService.Get(line.SupplierID).toPromise();
+        const shipFrom = await this.ocSupplierAddressService.Get(line.SupplierID, line.ShipFromAddressID).toPromise();
+        suppliers.push({ supplier, shipFrom });
+      }
     }
     return suppliers;
   }
