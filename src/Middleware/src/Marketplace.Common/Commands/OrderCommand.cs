@@ -1,10 +1,11 @@
-﻿using Marketplace.Common.Services.ShippingIntegration;
+using Marketplace.Common.Services.ShippingIntegration;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
+using Marketplace.Models.Extended;
 using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.ShippingIntegration.Models;
@@ -39,10 +40,11 @@ namespace Marketplace.Common.Commands
 
         public async Task HandleBuyerOrderSubmit(Order order)
         {
-            if (order.xp.OrderType == "Quote")
+            if (order.xp.OrderType == OrderType.Quote)
             {
                 await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
-            } else
+            }
+            else
             {
                 // should as much order submit logic to use the order calculation model as makes sense
                 // so that we do not need to go get the line items and shipping information multiple times
