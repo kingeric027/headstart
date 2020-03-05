@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
+import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -141,7 +142,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.navigate(newURL, { queryParams });
   }
 
-  updateResource(resourceUpdate: any): void {
+  updateResource(resourceUpdate: ResourceUpdate): void {
     // copying a resetting this.updated resource ensures that the copy and base object
     // reference is broken
     // not the prettiest function, feel free to improve

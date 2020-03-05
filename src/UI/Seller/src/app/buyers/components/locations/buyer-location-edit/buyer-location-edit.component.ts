@@ -7,6 +7,7 @@ import { ValidatePhone, ValidateUSZip, ValidateEmail } from '@app-seller/validat
 import { Router } from '@angular/router';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',
@@ -30,7 +31,7 @@ export class BuyerLocationEditComponent implements OnInit {
   @Input()
   suggestedAddresses: ListAddress;
   @Output()
-  updateResource = new EventEmitter<any>();
+  updateResource = new EventEmitter<ResourceUpdate>();
   @Output()
   isCreatingNew: boolean;
   buyerID: string;
