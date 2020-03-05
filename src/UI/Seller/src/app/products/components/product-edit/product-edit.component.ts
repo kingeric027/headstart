@@ -133,6 +133,7 @@ export class ProductEditComponent implements OnInit {
   createProductForm(superMarketplaceProduct: SuperMarketplaceProduct) {
     if (superMarketplaceProduct.Product) {
       this.productForm = new FormGroup({
+        Active: new FormControl(superMarketplaceProduct.Product.Active),
         Name: new FormControl(superMarketplaceProduct.Product.Name, [Validators.required, Validators.maxLength(100)]),
         ID: new FormControl(superMarketplaceProduct.Product.ID),
         Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(1000)),
@@ -236,7 +237,7 @@ export class ProductEditComponent implements OnInit {
     const productUpdate = {
       field,
       value:
-        field === 'Active'
+        field === 'Product.Active'
           ? event.target.checked
           : typeOfValue === 'number'
             ? Number(event.target.value)
