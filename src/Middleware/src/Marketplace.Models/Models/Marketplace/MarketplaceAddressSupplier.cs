@@ -8,8 +8,9 @@ namespace Marketplace.Models
     }
 
     public class SupplierAddressXP
-    {
-        public List<OriginAddressAccessorial> Accessorials { get; set; }
+	{
+		public Coordinates Coordinates;
+		public List<OriginAddressAccessorial> Accessorials { get; set; }
     }
 
     public enum OriginAddressAccessorial

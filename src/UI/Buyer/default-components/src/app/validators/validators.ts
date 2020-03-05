@@ -2,14 +2,14 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { removeSpacesFrom, isValidLength, isValidPerLuhnAlgorithm } from '../services/card-validation.helper';
 
 export const ErrorDictionary = {
-  name: 'Name can only contain characters Aa-Zz 0-9 - \' .',
+  name: "Name can only contain characters Aa-Zz 0-9 - ' .",
   phone: 'Phone can only contain 20 numbers or "-" chars (no spaces)',
   zip: 'Zip Code is invalid',
   DateError: 'Enter date of the form mm-dd-yyyy',
   date: 'Enter date of the form mm-dd-yyyy',
   required: 'This field is required',
   email: 'Please enter a valid email',
-  ocMatchFields: 'Passwords don\'t match',
+  ocMatchFields: "Passwords don't match",
   strongPassword: `Password must be at least eight characters long and include at least 
     one letter and one number. Password can also include special characters.`,
   creditCardNumber: 'Card number is invalid',
@@ -17,9 +17,7 @@ export const ErrorDictionary = {
 };
 
 // only alphanumic and space . '
-export function ValidateName(
-  control: AbstractControl
-): ValidationErrors | null {
+export function ValidateName(control: AbstractControl): ValidationErrors | null {
   const isValid = /^[a-zA-Z0-9-.'\\s]*$/.test(control.value);
   if (!control.value || isValid) {
     return null;
@@ -28,9 +26,7 @@ export function ValidateName(
 }
 
 // max 20 chars, numbers and -
-export function ValidatePhone(
-  control: AbstractControl
-): ValidationErrors | null {
+export function ValidatePhone(control: AbstractControl): ValidationErrors | null {
   const isValid = /^[0-9-]{0,20}$/.test(control.value);
   if (!control.value || isValid) {
     return null;
@@ -39,9 +35,7 @@ export function ValidatePhone(
 }
 
 // contains @ and . with text surrounding
-export function ValidateEmail(
-  control: AbstractControl
-): ValidationErrors | null {
+export function ValidateEmail(control: AbstractControl): ValidationErrors | null {
   const isValid = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(control.value);
   if (!control.value || isValid) {
     return null;
@@ -50,9 +44,7 @@ export function ValidateEmail(
 }
 
 // mm-dd-yyyy, all numbers
-export function ValidateDate(
-  control: AbstractControl
-): ValidationErrors | null {
+export function ValidateDate(control: AbstractControl): ValidationErrors | null {
   const isValid = /^[0-9]{2}-[0-9]{2}-[0-9]{4}$/.test(control.value);
   if (!control.value || isValid) {
     return null;
@@ -60,22 +52,16 @@ export function ValidateDate(
   return { date: true };
 }
 
-export function ValidateCAZip(
-  control: AbstractControl
-): ValidationErrors | null {
-  const isValid = /^[A-Za-z]\\d[A-Za-z][ -]?\\d[A-Za-z]\\d$/.test(
-    control.value
-  );
+export function ValidateCAZip(control: AbstractControl): ValidationErrors | null {
+  const isValid = /^[A-Za-z]\\d[A-Za-z][ -]?\\d[A-Za-z]\\d$/.test(control.value);
   if (!control.value || isValid) {
     return null;
   }
   return { zip: true };
 }
 
-export function ValidateUSZip(
-  control: AbstractControl
-): ValidationErrors | null {
-  const isValid = /^[0-9]{5}$/.test(control.value);
+export function ValidateUSZip(control: AbstractControl): ValidationErrors | null {
+  const isValid = /^[0-9]{5}(?:-[0-9]{4})?$/.test(control.value);
   if (!control.value || isValid) {
     return null;
   }
@@ -83,9 +69,7 @@ export function ValidateUSZip(
 }
 
 // password must include one number, one letter and have min length of 8
-export function ValidateStrongPassword(
-  control: AbstractControl
-): ValidationErrors | null {
+export function ValidateStrongPassword(control: AbstractControl): ValidationErrors | null {
   const hasNumber = /[0-9]/.test(control.value); // TODO - boil these 3 checks into one regex
   const hasLetter = /[a-zA-Z]/.test(control.value);
   const hasMinLength = control.value && control.value.length >= 8;
@@ -118,9 +102,7 @@ export function ValidateFieldMatches(fieldToMatch: string): ValidatorFn {
  * We need to validate the free form entry strings which are converted to date objects
  */
 
-export function DateValidator(
-  control: AbstractControl
-): ValidationErrors | null {
+export function DateValidator(control: AbstractControl): ValidationErrors | null {
   // only validate if both fields have been touched
   if (control.value == null || control.value === '') {
     return null;
@@ -140,9 +122,7 @@ export function DateValidator(
 
 // Credit Card Validation
 
-export function ValidateCreditCard(
-  control: AbstractControl
-): ValidationErrors | null {
+export function ValidateCreditCard(control: AbstractControl): ValidationErrors | null {
   const cardNumber = removeSpacesFrom(control.value);
   if (!control.value) {
     return null;
@@ -152,6 +132,3 @@ export function ValidateCreditCard(
   if (!isValidPerLuhnAlgorithm(cardNumber)) return { creditCardNumber: true };
   return null;
 }
-
-
-

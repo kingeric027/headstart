@@ -59,6 +59,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   selectedParentResourceID = '';
   breadCrumbs: BreadCrumb[] = [];
   isCreatingNew = false;
+  isCreatingSubResource = false;
   isMyResource = false;
   alive = true;
   screenSize;
@@ -249,8 +250,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   private checkIfCreatingNew() {
     const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
+    const splitUrl = routeUrl.split('/');
+    const endUrl = splitUrl[splitUrl.length - 1];
+    this.isCreatingNew = endUrl.includes('new');
+    this.isCreatingSubResource = endUrl.includes('new?');
   }
 
   private setBreadCrumbs() {
@@ -312,9 +315,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   handleSelectResource(resource: any) {
-    const [newURL, queryParams] = this._ocService.constructNewRouteInformation(resource.ID || '');
-    this.router.navigate([newURL], { queryParams });
-    this.resourceSelected.emit(resource);
+    this.resourceSelected.emit(resource); 
   }
 
   openPopover() {

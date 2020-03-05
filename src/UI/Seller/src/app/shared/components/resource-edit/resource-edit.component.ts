@@ -4443,7 +4443,7 @@ export class ResourceEditComponent {
     },
   };
   @Input()
-  set resource(value: any) {
+  set resource(value: any) { 
     this._resource = value;
     this.changeDetectorRef.detectChanges();
   }
