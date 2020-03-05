@@ -10,9 +10,9 @@ import {
   getProductMainImageUrlOrPlaceholder,
   PLACEHOLDER_URL,
 } from '@app-seller/products/product-image.helper';
-import { faCopy, faSort } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -25,8 +25,11 @@ export class FullResourceTableComponent {
   numberOfColumns = 1;
   faCopy = faCopy;
   faSort = faSort;
-  sortAsc: boolean;
+  faSortUp = faSortUp;
+  faSortDown = faSortDown;
+  sortDirection: string;
   activeSort: string;
+  _ocService: ResourceCrudService<any>;
   objectPreviewText: string;
   _resourceList = { Meta: {}, Items: [] };
 
@@ -39,12 +42,15 @@ export class FullResourceTableComponent {
     this._resourceList = value;
     this.setDisplayValuesForResource(value.Items);
   }
+  @Input()
+  set ocService(service: ResourceCrudService<any>) {
+    this._ocService = service;
+  }
   @Output()
   resourceSelected = new EventEmitter();
 
   constructor(
     private toastrService: ToastrService,
-    private router: Router
   ) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
@@ -128,24 +134,26 @@ export class FullResourceTableComponent {
     }
   }
 
-  handleSort(header: string): void {
-    if (this.activeSort === header) {
-      this.sortAsc = !this.sortAsc;
+  handleSort(header: string) {
+    this.activeSort = header;
+    if (!this.sortDirection) {
+      this.sortDirection = 'asc';
+    } else if (this.sortDirection === 'asc') {
+      this.sortDirection = 'desc';
+    } else if (this.sortDirection === 'desc') {
+      this.sortDirection = this.activeSort = '';
+    }
+    let sortInverse = this.sortDirection === 'desc' ? '!' : '';
+    this._ocService.sortBy(sortInverse + this.activeSort);
+  }
+
+  getSortArrowDirection(header: string) {
+    if (this.activeSort === header && this.sortDirection === 'asc') {
+      return faSortUp;
+    } else if (this.activeSort === header && this.sortDirection === 'desc') {
+      return faSortDown;
     } else {
-      this.sortAsc = true;
-    }
-    this.activeSort = header; //Track current sort to determine if next sort should be ASC or DESC.
-    let routeUrl = this.router.routerState.snapshot.url;
-    if (routeUrl.includes('?sortBy=')) {
-      let splitUrl = routeUrl.split('/');
-      let urlWithoutParams = splitUrl[splitUrl.length - 1].split('?');
-      splitUrl[splitUrl.length - 1] = urlWithoutParams[0];
-      routeUrl = splitUrl.join('/');
-    }
-    if (this.sortAsc) {
-      this.router.navigate([`${routeUrl}`], { queryParams: { sortBy: header } });
-    } else if (!this.sortAsc) {
-      this.router.navigate([`${routeUrl}`], { queryParams: { sortBy: '!' + header } });
+      return faSort;
     }
   }
 }

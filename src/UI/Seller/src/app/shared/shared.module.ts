@@ -10,6 +10,7 @@ import {
   NgbDropdownModule,
   NgbModalModule,
   NgbDatepickerModule,
+  NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
@@ -58,6 +59,7 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     NgbTabsetModule,
     NgbModalModule,
     NgbDatepickerModule,
+    NgbTooltipModule,
     QuillModule.forRoot(),
   ],
   exports: [
