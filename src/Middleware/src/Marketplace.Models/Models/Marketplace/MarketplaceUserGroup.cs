@@ -8,5 +8,6 @@ namespace Marketplace.Models
 
     public class UserGroupXp
     {
+        public string Type { get; set; }
     }
 }

@@ -10,11 +10,11 @@ namespace Marketplace.Models
     {
     }
 
-    public class BuyerAddressXP
-	{
+    public class BuyerAddressXP { 
+        public List<DestinationAddressAccessorial> Accessorials { get; set; }
+        public string Email { get; set; }
 		public Coordinates Coordinates;
-		public List<DestinationAddressAccessorial> Accessorials { get; set; }
-    }	
+    }
 
 public enum DestinationAddressAccessorial
     {
