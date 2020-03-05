@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { ListSpec, OcLineItemService, OcOrderService, Order, User } from '@ordercloud/angular-sdk';
+import { ListSpec, User } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
-import { LineItem, MarketplaceOrder, MarketplaceProduct, OrderType, ProductType, ShopperContextService } from 'marketplace';
+import { LineItem, MarketplaceProduct, OrderType, ProductType, ShopperContextService } from 'marketplace';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { getImageUrls } from 'src/app/services/images.helpers';
@@ -33,14 +33,10 @@ export class OCMProductDetails implements OnInit {
   quoteFormModal = ModalState.Closed;
   currentUser: User;
   showRequestSubmittedMessage = false;
-  submittedQuoteOrder: Order;
-  lineItem: LineItem = {};
-
+  submittedQuoteOrder: any;
   constructor(
     private formService: SpecFormService,
-    private context: ShopperContextService,
-    private ocOrderService: OcOrderService,
-    private ocLineItemService: OcLineItemService) {
+    private context: ShopperContextService) {
     this.specFormService = formService;
   }
 
@@ -163,12 +159,13 @@ export class OCMProductDetails implements OnInit {
   }
 
   async submitQuoteOrder(user) {
-    this.lineItem.ProductID = this._product.ID;
-    this.lineItem.Product = this._product;
-    this.submittedQuoteOrder = await this.ocOrderService.Create('Outgoing', this.getDefaultQuoteOrder(user)).toPromise();
-    await this.ocLineItemService.Create('Outgoing', this.submittedQuoteOrder.ID, this.lineItem).toPromise();
-    this.quoteFormModal = ModalState.Closed
-    this.showRequestSubmittedMessage = true
+    const defaultOrder = this.getDefaultQuoteOrder(user);
+    const lineItem: LineItem = {};
+    lineItem.ProductID = this._product.ID;
+    lineItem.Product = this._product;
+    this.context.order.submitQuoteOrder(defaultOrder, lineItem).then(order => this.submittedQuoteOrder = order);
+    this.quoteFormModal = ModalState.Closed;
+    this.showRequestSubmittedMessage = true;
   }
 
   toOrderDetail() {
