@@ -2,8 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Helpers;
+using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Helpers.Attributes;
 using Marketplace.Helpers.Models;
 using Marketplace.Models;
+using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.Crud
@@ -43,9 +46,10 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
         {
-            var _productsList =  await _oc.Products.ListAsync<MarketplaceProduct>(filters: args, accessToken: user.AccessToken);
+            var _productsList = await _oc.Products.ListAsync<MarketplaceProduct>(filters: args.ToFilterString(),
+                accessToken: user.AccessToken);
             var _superProductsList = new List<SuperMarketplaceProduct> { };
-            foreach (MarketplaceProduct product in _productsList.Items)
+            foreach (var product in _productsList.Items)
             {
                 var priceSchedule = await _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
                 _superProductsList.Add(new SuperMarketplaceProduct
