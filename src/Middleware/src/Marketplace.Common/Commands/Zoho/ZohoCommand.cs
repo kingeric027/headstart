@@ -18,7 +18,7 @@ namespace Marketplace.Common.Commands.Zoho
 {
     public interface IZohoCommand
     {
-        Task<ZohoSalesOrder> CreateSalesOrder(OrderCalculation orderCalculation);
+        Task<ZohoSalesOrder> CreateSalesOrder(OrderWorksheet orderWorksheet);
         Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, OrderSplitResult orders);
     }
 
@@ -79,23 +79,23 @@ namespace Marketplace.Common.Commands.Zoho
             }
         }
 
-        public async Task<ZohoSalesOrder> CreateSalesOrder(OrderCalculation orderCalculation)
+        public async Task<ZohoSalesOrder> CreateSalesOrder(OrderWorksheet orderWorksheet)
         {
             try
             {
                 // Step 1: Create contact (customer) in Zoho
-                var contact = await CreateOrUpdateContact(orderCalculation.Order);
+                var contact = await CreateOrUpdateContact(orderWorksheet.Order);
 
                 // Step 2: Create or update Items from LineItems/Products on Order
-                var items = await CreateOrUpdateLineItems(orderCalculation.LineItems);
+                var items = await CreateOrUpdateLineItems(orderWorksheet.LineItems);
 
                 // Step 3: Create item for shipments
-                items.AddRange(await ApplyShipping(orderCalculation));
+                items.AddRange(await ApplyShipping(orderWorksheet));
 
                 // Step 4: create sales order with all objects from above
                 var salesOrder =
-                    await _zoho.SalesOrders.CreateAsync(ZohoSalesOrderMapper.Map(orderCalculation.Order, items.ToList(), contact,
-                        orderCalculation.LineItems));
+                    await _zoho.SalesOrders.CreateAsync(ZohoSalesOrderMapper.Map(orderWorksheet.Order, items.ToList(), contact,
+                        orderWorksheet.LineItems));
 
                 return salesOrder;
             }
@@ -132,10 +132,10 @@ namespace Marketplace.Common.Commands.Zoho
             return items.ToList();
         }
 
-        private async Task<List<ZohoLineItem>> ApplyShipping(OrderCalculation orderCalculation) {
+        private async Task<List<ZohoLineItem>> ApplyShipping(OrderWorksheet orderWorksheet) {
             //// Step 4: shipping must be added as lineitems on the order
             var z_shipping = await _zoho.Items.ListAsync(new ZohoFilter() { Key = "sku", Value = "shipping"});
-            if (z_shipping.Items.Count != 0) return ZohoLineItemMapper.Map(orderCalculation, z_shipping.Items.FirstOrDefault());
+            if (z_shipping.Items.Count != 0) return ZohoLineItemMapper.Map(orderWorksheet, z_shipping.Items.FirstOrDefault());
             // doesn't exist so we need to create it. shouldn't happen very often
             var new_shipping = await _zoho.Items.CreateAsync(new ZohoLineItem()
             {
@@ -145,7 +145,7 @@ namespace Marketplace.Common.Commands.Zoho
                 sku = "shipping",
                 quantity = 1
             });
-            return ZohoLineItemMapper.Map(orderCalculation, new_shipping);
+            return ZohoLineItemMapper.Map(orderWorksheet, new_shipping);
         }
 
         private async Task<ZohoContact> CreateOrUpdateVendor(Order order)

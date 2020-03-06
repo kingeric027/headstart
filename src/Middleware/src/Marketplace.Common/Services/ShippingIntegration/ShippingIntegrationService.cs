@@ -6,7 +6,6 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
-using Marketplace.Models;
 using Marketplace.Models.Exceptions;
 using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
@@ -16,8 +15,8 @@ namespace Marketplace.Common.Services.ShippingIntegration
 {
     public interface IOCShippingIntegration
     {
-        Task<ProposedShipmentResponse> GetRatesAsync(OrderCalculation orderCalculation);
-        Task<OrderCalculateResponse> CalculateOrder(OrderCalculation orderCalculation);
+        Task<ShipmentEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload);
+        Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload orderCalculatePayload);
     }
 
     public class OCShippingIntegration : IOCShippingIntegration
@@ -30,12 +29,13 @@ namespace Marketplace.Common.Services.ShippingIntegration
             _avatax = avatax;
         }
 
-        public async Task<ProposedShipmentResponse> GetRatesAsync(OrderCalculation orderCalculation)
+        public async Task<ShipmentEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload)
         {
-            var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(orderCalculation.LineItems);
+            var orderWorksheet = orderCalculatePayload.OrderCalculation;
+            var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(orderWorksheet.LineItems);
             Require.That(productIDsWithInvalidDimensions.Count == 0, Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
 
-            var proposedShipmentRequests = ProposedShipmentRequestsMapper.Map(orderCalculation);
+            var proposedShipmentRequests = ShipmentEstimateRequestsMapper.Map(orderWorksheet);
             proposedShipmentRequests = proposedShipmentRequests.Select(proposedShipmentRequest =>
             {
                 proposedShipmentRequest.RateResponseTask = _freightPopService.GetRatesAsync(proposedShipmentRequest.RateRequestBody);
@@ -45,16 +45,16 @@ namespace Marketplace.Common.Services.ShippingIntegration
             var tasks = proposedShipmentRequests.Select(p => p.RateResponseTask);
             await Task.WhenAll(tasks);
 
-            var proposedShipments = proposedShipmentRequests.Select(proposedShipmentRequest => ProposedShipmentMapper.Map(proposedShipmentRequest)).ToList();
-            return new ProposedShipmentResponse()
+            var shipmentEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest)).ToList();
+            return new ShipmentEstimateResponse()
             {
-                ProposedShipments = proposedShipments
+                ShipmentEstimates = shipmentEstimates
             };
         }
 
-        public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculation orderCalculation)
+        public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload orderCalculatePayload)
         {
-            var totalTax = await _avatax.GetTaxEstimateAsync(orderCalculation);
+            var totalTax = await _avatax.GetTaxEstimateAsync(orderCalculatePayload.OrderCalculation);
 
             return new OrderCalculateResponse
             {

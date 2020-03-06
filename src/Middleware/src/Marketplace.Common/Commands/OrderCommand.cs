@@ -47,22 +47,22 @@ namespace Marketplace.Common.Commands
             else
             {
                 // forwarding
-                var buyerOrderCalculation = await _ocSandboxService.GetOrderCalculation(OrderDirection.Incoming, order.ID);
+                var buyerOrderWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, order.ID);
                 var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
                 var supplierOrders = orderSplitResult.OutgoingOrders;
 
                 // integrations
-                var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderCalculation);
-                await HandleTaxTransactionCreationAsync(buyerOrderCalculation);
+                var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderWorksheet);
+                await HandleTaxTransactionCreationAsync(buyerOrderWorksheet);
                 await ImportSupplierOrdersIntoFreightPop(supplierOrders);
                 await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
             }
         }
 
-        private async Task HandleTaxTransactionCreationAsync(OrderCalculation orderCalculation)
+        private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
         {
-            var transaction = await _avatax.CreateTransactionAsync(orderCalculation);
-            await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderCalculation.Order.ID, new PartialOrder()
+            var transaction = await _avatax.CreateTransactionAsync(orderWorksheet);
+            await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
             {
                 TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
                 xp = { AvalaraTaxTransactionCode = transaction.code }

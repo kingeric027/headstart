@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {
-    public static class ProposedShipmentOptionsMapper
+    public static class ShipmentEstimateMethodsMapper
     {
         private static List<ShippingRate> GetCheapestRatesForEachDeliveryDays(List<ShippingRate> shippingRates)
         {
@@ -18,25 +18,25 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
             return cheapestRatesForEachDeliveryDays.ToList();
         }
         
-        public static List<ProposedShipmentOption> Map(IList<ShippingRate> shippingRates)
+        public static List<ShipmentMethod> Map(IList<ShippingRate> shippingRates)
         {
             var cheapestRates = GetCheapestRatesForEachDeliveryDays(shippingRates.ToList());
             return cheapestRates.Select(cheapestRate =>
             {
-                return ProposedShipmentOptionMapper.Map(cheapestRate);
+                return ShipmentMethodMapper.Map(cheapestRate);
             }).ToList();
         }
     }
 
-    public static class ProposedShipmentOptionMapper
+    public static class ShipmentMethodMapper
     {
-        public static ProposedShipmentOption Map(ShippingRate obj)
+        public static ShipmentMethod Map(ShippingRate obj)
         {
-            return new ProposedShipmentOption
+            return new ShipmentMethod
             {
                 ID = obj.Id,
                 Name = obj.Service,
-                EstimatedDeliveryDays = obj.DeliveryDays,
+                EstimatedTransitDays = obj.DeliveryDays,
                 Cost = (decimal)obj.TotalCost
             };
         }

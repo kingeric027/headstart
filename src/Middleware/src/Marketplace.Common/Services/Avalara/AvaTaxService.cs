@@ -16,9 +16,9 @@ namespace Marketplace.Common.Services.AvaTax
 	public interface IAvataxService
 	{
 		// Use this before checkout. No records will be saved in avalara.
-		Task<decimal> GetTaxEstimateAsync(OrderCalculation orderCalculation);
+		Task<decimal> GetTaxEstimateAsync(OrderWorksheet orderWorksheet);
 		// Use this during submit.
-		Task<TransactionModel> CreateTransactionAsync(OrderCalculation taxableOrder);
+		Task<TransactionModel> CreateTransactionAsync(OrderWorksheet orderWorksheet);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
 		// When should we do this? 
 		Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode);
@@ -47,26 +47,26 @@ namespace Marketplace.Common.Services.AvaTax
 			return codeList;
 		}
 
-		public async Task<decimal> GetTaxEstimateAsync(OrderCalculation orderCalculation)
+		public async Task<decimal> GetTaxEstimateAsync(OrderWorksheet orderWorksheet)
 		{
-			var transaction = await CreateTransactionAsync(DocumentType.SalesOrder, orderCalculation);
+			var transaction = await CreateTransactionAsync(DocumentType.SalesOrder, orderWorksheet);
 			return transaction.totalTax ?? 0;
 		}
 
-		public async Task<TransactionModel> CreateTransactionAsync(OrderCalculation orderCalculation)
+		public async Task<TransactionModel> CreateTransactionAsync(OrderWorksheet orderWorksheet)
 		{
-			return await CreateTransactionAsync(DocumentType.SalesInvoice, orderCalculation);
+			return await CreateTransactionAsync(DocumentType.SalesInvoice, orderWorksheet);
 		}
 
-		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderCalculation orderCalculation)
+		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)
 		{
-			var trans = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderCalculation.Order));
-			foreach (var proposedShipment in orderCalculation.ProposedShipmentRatesResponse.ProposedShipments)
+			var trans = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderWorksheet.Order));
+			foreach (var shipmentEstimate in orderWorksheet.ShipmentEstimateResponse.ShipmentEstimates)
 			{
-				var selectedProposedShipment = proposedShipment.ProposedShipmentOptions.First(proposedShipmentOption => proposedShipmentOption.ID == proposedShipment.SelectedProposedShipmentOptionID);
-				var shippingRate = selectedProposedShipment.Cost;
-				var firstLineItemID = proposedShipment.ProposedShipmentItems.FirstOrDefault().LineItemID;
-				var firstLineItem = orderCalculation.LineItems.First(lineItem => lineItem.ID == firstLineItemID);
+				var selectedShipMethod = shipmentEstimate.ShipmentMethods.First(shipmentMethod => shipmentMethod.ID == shipmentEstimate.SelectedShipMethodID);
+				var shippingRate = selectedShipMethod.Cost;
+				var firstLineItemID = shipmentEstimate.ShipmentEstimateItems.FirstOrDefault().LineItemID;
+				var firstLineItem = orderWorksheet.LineItems.First(lineItem => lineItem.ID == firstLineItemID);
 				var shipFromAddress = firstLineItem.ShipFromAddress;
 				var shipToAddress = firstLineItem.ShippingAddress;
 
@@ -75,7 +75,7 @@ namespace Marketplace.Common.Services.AvaTax
 
 			}
 			
-			foreach (var lineItem in orderCalculation.LineItems) trans.WithLineItem(lineItem);
+			foreach (var lineItem in orderWorksheet.LineItems) trans.WithLineItem(lineItem);
 
 			return await trans.CreateAsync();
 		}

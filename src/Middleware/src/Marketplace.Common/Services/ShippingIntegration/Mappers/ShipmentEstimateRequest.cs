@@ -2,20 +2,19 @@
 using System.Linq;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Models.Marketplace;
-using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {
-    public static class ProposedShipmentRequestMapper
+    public static class ShipmentEstimateRequestMapper
     {
-        public static ProposedShipmentRequest Map(List<MarketplaceLineItem> obj)
+        public static ShipmentEstimateRequest Map(List<MarketplaceLineItem> obj)
         {
     
-                var proposedShipmentItems = obj.Select(lineItem => ProposedShipmentItemMapper.Map(lineItem)).ToList();
-                return new ProposedShipmentRequest
+                var shipmentEstimateItems = obj.Select(lineItem => ShipmentEstimateItemMapper.Map(lineItem)).ToList();
+                return new ShipmentEstimateRequest
                 {
                     ID = obj[0].ShipFromAddressID,
-                    ProposedShipmentItems = proposedShipmentItems,
+                    ShipmentEstimateItems = shipmentEstimateItems,
                     RateRequestBody = RateRequestBodyMapper.Map(obj),
                 };
         }

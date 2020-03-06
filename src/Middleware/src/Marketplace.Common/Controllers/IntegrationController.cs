@@ -1,16 +1,8 @@
-﻿using Marketplace.Common.Commands;
-using Marketplace.Common.Models;
-using Marketplace.Common.Services;
-using Marketplace.Common.Services.ShippingIntegration;
+﻿using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Helpers;
-using Marketplace.Helpers.Models;
 using Microsoft.AspNetCore.Mvc;
-using OrderCloud.SDK;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models;
-using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Controllers
 {
@@ -26,19 +18,19 @@ namespace Marketplace.Common.Controllers
 		[Route("shippingrates")]
 		[HttpPost]
 		[OrderCloudWebhookAuth]
-		public async Task<ProposedShipmentResponse> GetShippingRates([FromBody] OrderCalculationRequest orderCalculationRequest)
+		public async Task<ShipmentEstimateResponse> GetShippingRates([FromBody] OrderCalculatePayload orderCalculatePayload)
 		{
-			var proposedShipmentOptions = await _OCShippingIntegration.GetRatesAsync(orderCalculationRequest.OrderCalculation);
-			return proposedShipmentOptions;
+			var shipmentEstimates = await _OCShippingIntegration.GetRatesAsync(orderCalculatePayload);
+			return shipmentEstimates;
 		}
 
 		// todo auth on this endpoint
 		[Route("ordercalculate")]
 		[HttpPost]
 		[OrderCloudWebhookAuth]
-		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] OrderCalculationRequest orderCalculationRequest)
+		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] OrderCalculatePayload orderCalculatePayload)
 		{
-			var orderCalculationResponse = await _OCShippingIntegration.CalculateOrder(orderCalculationRequest.OrderCalculation);
+			var orderCalculationResponse = await _OCShippingIntegration.CalculateOrder(orderCalculatePayload);
 			return orderCalculationResponse;
 		}
 	}
