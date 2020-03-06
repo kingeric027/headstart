@@ -86,7 +86,7 @@
         </div>
       </div>
       <div class="alert alert-success my-3"
-           *ngIf="showRequestSubmittedMessage">
+           *ngIf="showRequestSubmittedMessage && specFormService.event?.valid && qtyValid">
         <span>Your quote request was successfully submitted.
           <button class="btn btn-link"
                   (click)="toOrderDetail()">View quote request</button>
@@ -125,7 +125,7 @@
           <button *ngIf="isQuoteProduct()"
                   class="btn btn-block btn-primary mb-3"
                   [disabled]="!specFormService.event?.valid || !qtyValid"
-                  (click)="handleRequestQuote()">
+                  (click)="openQuoteForm()">
             Request Quote
           </button>
           <button *ngIf="!isQuoteProduct()"
@@ -138,6 +138,12 @@
           </button>
         </div>
       </div>
+      <ocm-modal [state]="quoteFormModal"
+                 [modalTitle]="'Request Quote'">
+        <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
+                                [CurrentUser]="currentUser"
+                                (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
+      </ocm-modal>
     </div>
   </div>
   <div *ngIf="relatedProducts$ | async; let relatedProducts">

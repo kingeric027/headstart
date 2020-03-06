@@ -65,14 +65,6 @@ export class OCMProductDetails implements OnInit {
     }
   }
 
-  openQuoteForm() {
-    this.quoteFormModal = ModalState.Open;
-  }
-
-  isQuoteProduct(): boolean {
-    return this._product.xp.ProductType === ProductType.Quote;
-  }
-
   qtyChange(event: { qty: number; valid: boolean }): void {
     if (event.valid) {
       this.quantity = event.qty;
@@ -137,6 +129,14 @@ export class OCMProductDetails implements OnInit {
     this.context.router.toProductList({ activeFacets: { Supplier: supplierId.toLowerCase() } });
   }
 
+  openQuoteForm() {
+    this.quoteFormModal = ModalState.Open;
+  }
+
+  isQuoteProduct(): boolean {
+    return this._product.xp.ProductType === ProductType.Quote;
+  }
+
   dismissQuoteForm() {
     this.quoteFormModal = ModalState.Closed;
   }
@@ -159,13 +159,20 @@ export class OCMProductDetails implements OnInit {
   }
 
   async submitQuoteOrder(user) {
-    const defaultOrder = this.getDefaultQuoteOrder(user);
-    const lineItem: LineItem = {};
-    lineItem.ProductID = this._product.ID;
-    lineItem.Product = this._product;
-    this.context.order.submitQuoteOrder(defaultOrder, lineItem).then(order => this.submittedQuoteOrder = order);
-    this.quoteFormModal = ModalState.Closed;
-    this.showRequestSubmittedMessage = true;
+    try {
+      const defaultOrder = this.getDefaultQuoteOrder(user);
+      const lineItem: LineItem = {};
+      lineItem.ProductID = this._product.ID;
+      lineItem.Product = this._product;
+      lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);
+      this.context.order.submitQuoteOrder(defaultOrder, lineItem).then(order => this.submittedQuoteOrder = order);
+      this.quoteFormModal = ModalState.Closed;
+      this.showRequestSubmittedMessage = true;
+    } catch (ex) {
+      this.showRequestSubmittedMessage = false;
+      this.quoteFormModal = ModalState.Closed;
+      throw ex;
+    }
   }
 
   toOrderDetail() {
