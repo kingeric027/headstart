@@ -3,13 +3,13 @@ import { get as _get } from 'lodash';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserGroupAssignment } from '@ordercloud/angular-sdk';
-import { SupplierUserService } from '../supplier-user.service';
+import { BuyerUserService } from '../buyer-user.service';
 @Component({
-  selector: 'app-supplier-user-edit',
-  templateUrl: './supplier-user-edit.component.html',
-  styleUrls: ['./supplier-user-edit.component.scss'],
+  selector: 'app-buyer-user-edit',
+  templateUrl: './buyer-user-edit.component.html',
+  styleUrls: ['./buyer-user-edit.component.scss'],
 })
-export class SupplierUserEditComponent {
+export class BuyerUserEditComponent {
   @Input()
   resourceForm: FormGroup;
   @Input()
@@ -21,8 +21,8 @@ export class SupplierUserEditComponent {
   @Output()
   userGroupAssignments = new EventEmitter<UserGroupAssignment[]>();
   isCreatingNew: boolean;
-  constructor(public supplierUserService: SupplierUserService) {
-    this.isCreatingNew = this.supplierUserService.checkIfCreatingNew();
+  constructor(public buyerUserService: BuyerUserService) {
+    this.isCreatingNew = this.buyerUserService.checkIfCreatingNew();
   }
   updateResourceFromEvent(event: any, field: string): void {
     field === 'Active'

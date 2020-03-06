@@ -25,10 +25,10 @@ export class SupplierUserTableComponent extends ResourceCrudComponent<User> {
   userGroupAssignments: UserGroupAssignment[] = [];
   constructor(
     private supplierUserService: SupplierUserService,
+    public supplierService: SupplierService,
     changeDetectorRef: ChangeDetectorRef,
     router: Router,
     activatedroute: ActivatedRoute,
-    private supplierService: SupplierService,
     ngZone: NgZone
   ) {
     super(changeDetectorRef, supplierUserService, router, activatedroute, ngZone, createSupplierUserForm);
@@ -53,7 +53,7 @@ export class SupplierUserTableComponent extends ResourceCrudComponent<User> {
   }
 
   async executeSupplierUserSecurityProfileAssignmentRequests(): Promise<void> {
-    const supplierID = this.supplierService.getParentResourceID();
-    await this.supplierService.updateSupplierUserUserGroupAssignments(supplierID, this.userGroupAssignments, []);
+    const supplierID = this.supplierUserService.getParentResourceID();
+    await this.supplierUserService.updateUserUserGroupAssignments(supplierID, this.userGroupAssignments, []);
   }
 }

@@ -3,7 +3,7 @@
                                           [isCreatingNew]="isCreatingNew"
                                           [user]="resourceInSelection"
                                           (assignmentsToAdd)="addUserGroupAssignments($event)"
-                                          [userPermissionsService]="supplierUserService">
+                                          [userPermissionsService]="buyerUserService">
   </user-permissions-assignments-component>
   <form *ngIf="resourceForm"
         [formGroup]="resourceForm">
@@ -93,6 +93,6 @@
                                           [isCreatingNew]="isCreatingNew"
                                           [user]="resourceInSelection"
                                           (assignmentsToAdd)="addUserGroupAssignments($event)"
-                                          [userPermissionsService]="supplierUserService">
+                                          [userPermissionsService]="buyerUserService">
   </user-permissions-assignments-component>
 </div>

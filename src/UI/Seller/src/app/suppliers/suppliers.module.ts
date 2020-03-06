@@ -9,7 +9,6 @@ import { SupplierCategorySelectComponent } from './components/category-select/su
 import { SupplierEditComponent } from './components/suppliers/supplier-edit/supplier-edit.component';
 import { SupplierUserTableComponent } from './components/users/supplier-user-table/supplier-user-table.component';
 import { SupplierUserEditComponent } from './components/users/supplier-user-edit/supplier-user-edit.component';
-import { SupplierUserPermissionsAssignments } from './components/supplier-user-permissions-assignments/supplier-user-permissions-assignments.component';
 
 @NgModule({
   imports: [SharedModule, SuppliersRoutingModule, PerfectScrollbarModule],
@@ -21,7 +20,6 @@ import { SupplierUserPermissionsAssignments } from './components/supplier-user-p
     SupplierCategorySelectComponent,
     SupplierEditComponent,
     SupplierUserEditComponent,
-    SupplierUserPermissionsAssignments,
   ],
 })
-export class SuppliersModule { }
+export class SuppliersModule {}

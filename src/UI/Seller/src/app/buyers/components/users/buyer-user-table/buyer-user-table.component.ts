@@ -9,6 +9,7 @@ import { BuyerService } from '../../buyers/buyer.service';
 
 function createBuyerUserForm(user: User) {
   return new FormGroup({
+    Active: new FormControl(user.Active),
     Username: new FormControl(user.Username, Validators.required),
     FirstName: new FormControl(user.FirstName, Validators.required),
     LastName: new FormControl(user.LastName, Validators.required),
