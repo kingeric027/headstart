@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import { MarketplaceOrder, AppConfig } from '../../shopper-context';
-import { ShipmentPreference, OrderCalculation } from './ordercloud-sandbox.models';
+import { AppConfig } from '../../shopper-context';
+import { ShipmentPreference, OrderWorksheet } from './ordercloud-sandbox.models';
 
 // this is a temporary service to represent features that are not yet available in the ordercloud sdk
 // currently used for shipping integration routes
@@ -22,30 +22,26 @@ export class OrderCloudSandboxService {
     };
   }
 
-  calculateShippingOptions(orderID: string): Promise<OrderCalculation> {
+  estimateShipping(orderID: string): Promise<OrderWorksheet> {
     return this.http
-      .post<OrderCalculation>(
-        `${this.baseUrl}/orders/Outgoing/${orderID}/CalculateShippingOptions`,
-        {},
-        this.generateHeaders()
-      )
+      .post<OrderWorksheet>(`${this.baseUrl}/orders/Outgoing/${orderID}/estimateshipping`, {}, this.generateHeaders())
       .toPromise();
   }
 
-  selectShippingRate(orderID: string, selection: ShipmentPreference): Promise<OrderCalculation> {
-    const requestBody = { ShipmentPreferences: [selection] };
+  selectShipMethod(orderID: string, selection: ShipmentPreference): Promise<OrderWorksheet> {
+    const requestBody = { ShipmethodSelections: [selection] };
     return this.http
-      .post<OrderCalculation>(
-        `${this.baseUrl}/orders/Outgoing/${orderID}/SetShippingPreferences`,
+      .post<OrderWorksheet>(
+        `${this.baseUrl}/orders/Outgoing/${orderID}/shipmethods`,
         requestBody,
         this.generateHeaders()
       )
       .toPromise();
   }
 
-  calculateOrder(orderID: string): Promise<OrderCalculation> {
+  calculateOrder(orderID: string): Promise<OrderWorksheet> {
     return this.http
-      .post<OrderCalculation>(`${this.baseUrl}/orders/Outgoing/${orderID}/CalculateOrder`, {}, this.generateHeaders())
+      .post<OrderWorksheet>(`${this.baseUrl}/orders/Outgoing/${orderID}/calculate`, {}, this.generateHeaders())
       .toPromise();
   }
 }

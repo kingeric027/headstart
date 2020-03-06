@@ -1,9 +1,20 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Marketplace.Common.Services.FreightPop.Models;
+using Marketplace.Models;
+using Marketplace.Models.Models.Marketplace;
 using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Models
 {
+	public class ShipmentEstimateRequest
+	{
+		public string ID { get; set; }
+		public List<ShipmentEstimateItem> ShipmentEstimateItems { get; set; }
+		public RateRequestBody RateRequestBody { get; set; }
+		public Task<Response<GetRatesData>> RateResponseTask { get; set; }
+	}
 	public class LineItemOverride
 	{
 		public string LineItemID { get; set; }
@@ -11,11 +22,12 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 	}
 	public class OrderWorksheet
 	{
-		public Order Order { get; set; }
-		public List<LineItem> LineItems { get; set; }
+		public MarketplaceOrder Order { get; set; }
+		public List<MarketplaceLineItem> LineItems { get; set; }
 		public ShipmentEstimateResponse ShipmentEstimateResponse { get; set; }
 		public OrderCalculateResponse OrderCalculateResponse { get; set; }
 	}
+	
 	public class OrderCalculateResponse
 	{
 		public List<LineItemOverride> LineItemOverrides { get; set; }

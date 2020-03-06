@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Flurl.Http;
 using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services
@@ -14,7 +11,7 @@ namespace Marketplace.Common.Services
     /// </summary>
     public interface IOrderCloudSandboxService
     {
-        Task<OrderCalculation> GetOrderCalculation(OrderDirection orderDirection, string orderID);
+        Task<OrderWorksheet> GetOrderWorksheetAsync(OrderDirection orderDirection, string orderID);
     }
     public class OrderCloudSandboxService : IOrderCloudSandboxService
     {
@@ -46,11 +43,11 @@ namespace Marketplace.Common.Services
         }
 
 
-		public async Task<OrderCalculation> GetOrderCalculation(OrderDirection orderDirection, string orderID)
+		public async Task<OrderWorksheet> GetOrderWorksheetAsync(OrderDirection orderDirection, string orderID)
 		{
 			await AuthenticateAync();
-            return await _flurl.Request($"{_settings.OrderCloudSettings.ApiUrl}/v1/orders/{orderDirection}/{orderID}/CalculateOrder")
-                .WithHeader("Authorization", $"Bearer {accessToken}").GetAsync().ReceiveJson<OrderCalculation>();
+            return await _flurl.Request($"{_settings.OrderCloudSettings.ApiUrl}/v1/orders/{orderDirection}/{orderID}/worksheet")
+                .WithHeader("Authorization", $"Bearer {accessToken}").GetAsync().ReceiveJson<OrderWorksheet>();
 		}
 	}
 }

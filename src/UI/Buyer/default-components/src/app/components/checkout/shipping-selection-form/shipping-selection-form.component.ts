@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ProposedShipment, ShipmentPreference } from 'marketplace';
+import { ShipmentEstimate, ShipmentPreference } from 'marketplace';
 import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
@@ -7,11 +7,11 @@ import { FormGroup, FormControl } from '@angular/forms';
   styleUrls: ['./shipping-selection-form.component.scss'],
 })
 export class OCMShippingSelectionForm implements OnInit {
-  _proposedShipment: ProposedShipment;
-  @Input() set proposedShipment(value: ProposedShipment) {
-    this._proposedShipment = value;
-    this.setSelectedRate(value.SelectedProposedShipmentOptionID);
-  };
+  _shipmentEstimate: ShipmentEstimate;
+  @Input() set shipmentEstimate(value: ShipmentEstimate) {
+    this._shipmentEstimate = value;
+    this.setSelectedRate(value.SelectedShipMethodID);
+  }
   @Input() shipFromAddressID: string;
   @Input() supplierID: string;
   @Output() selectionChanged = new EventEmitter<ShipmentPreference>();
@@ -22,18 +22,18 @@ export class OCMShippingSelectionForm implements OnInit {
 
   ngOnInit(): void {
     this.form = new FormGroup({ rateID: new FormControl(null) });
-    this.form = new FormGroup({ proposedShipmentOptionID: new FormControl(null) });
+    this.form = new FormGroup({ ShipmentMethodID: new FormControl(null) });
   }
 
-  setSelectedRate(selectedProposedShipmentOptionID: string): void {
-    this.form.setValue({ proposedShipmentOptionID: selectedProposedShipmentOptionID });
+  setSelectedRate(selectedShipmentMethodID: string): void {
+    this.form.setValue({ ShipmentMethodID: selectedShipmentMethodID });
   }
 
   onFormChanges(): void {
-    const selectedProposedShipmentOptionID = this.form.value.proposedShipmentOptionID;
+    const selectedShipMethodID = this.form.value.ShipmentMethodID;
     this.selectionChanged.emit({
-      ProposedShipmentOptionID: selectedProposedShipmentOptionID,
-      ProposedShipmentID: this._proposedShipment.ID
+      ShipmentMethodID: selectedShipMethodID,
+      ShipmentEstimateID: this._shipmentEstimate.ID,
     });
   }
 }

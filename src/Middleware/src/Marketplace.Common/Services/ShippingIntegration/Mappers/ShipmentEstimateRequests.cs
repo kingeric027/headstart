@@ -4,16 +4,16 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {
-    public static class ProposedShipmentRequestsMapper
+    public static class ShipmentEstimateRequestsMapper
     {
-        // takes a super order, groups up the line items and returns a list of rate requests
-        public static List<ProposedShipmentRequest> Map(OrderCalculation obj)
+        // takes an order worksheet, groups up the line items and returns a list of rate requests
+        public static List<ShipmentEstimateRequest> Map(OrderWorksheet obj)
         {
             var proposedShipmentGroupings = obj.LineItems.GroupBy(li => li.ShipFromAddressID);
             return proposedShipmentGroupings.Select(proposedShipmentGrouping =>
             {
                 var lineItems = proposedShipmentGrouping.ToList();
-                return ProposedShipmentRequestMapper.Map(lineItems);
+                return ShipmentEstimateRequestMapper.Map(lineItems);
             }).ToList();
         }
     }

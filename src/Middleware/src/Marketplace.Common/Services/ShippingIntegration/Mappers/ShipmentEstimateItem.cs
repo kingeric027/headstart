@@ -3,11 +3,11 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {
-    public static class ProposedShipmentItemMapper
+    public static class ShipmentEstimateItemMapper
     {
-        public static ProposedShipmentItem Map(LineItem obj)
+        public static ShipmentEstimateItem Map(LineItem obj)
         {
-            return new ProposedShipmentItem
+            return new ShipmentEstimateItem
             {
                 LineItemID = obj.ID,
                 Quantity = obj.Quantity

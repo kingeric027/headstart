@@ -5,14 +5,13 @@ import {
   BuyerCreditCard,
   OcOrderService,
   OcPaymentService,
-  Address,
   BuyerAddress,
 } from '@ordercloud/angular-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
 import { OrderStateService } from './order-state.service';
-import { OrderCalculation, ShipmentPreference } from '../ordercloud-sandbox/ordercloud-sandbox.models';
+import { OrderWorksheet, ShipmentPreference } from '../ordercloud-sandbox/ordercloud-sandbox.models';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
 
 export interface ICheckout {
@@ -23,8 +22,8 @@ export interface ICheckout {
   createOneTimeCCPayment(card: CreditCardToken): Promise<Payment>;
   setAddress(type: OrderAddressType, address: BuyerAddress): Promise<MarketplaceOrder>;
   setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder>;
-  getProposedShipments(): Promise<OrderCalculation>;
-  selectShippingRate(selection: ShipmentPreference): Promise<MarketplaceOrder>;
+  estimateShipping(): Promise<OrderWorksheet>;
+  selectShipMethod(selection: ShipmentPreference): Promise<MarketplaceOrder>;
   calculateOrder(): Promise<MarketplaceOrder>;
 }
 
@@ -88,19 +87,19 @@ export class CheckoutService implements ICheckout {
 
   // Integration Methods
   // order cloud sandbox service methods, to be replaced by updated sdk in the future
-  async getProposedShipments(): Promise<OrderCalculation> {
-    return await this.orderCloudSandBoxService.calculateShippingOptions(this.order.ID);
+  async estimateShipping(): Promise<OrderWorksheet> {
+    return await this.orderCloudSandBoxService.estimateShipping(this.order.ID);
   }
 
-  async selectShippingRate(selection: ShipmentPreference): Promise<MarketplaceOrder> {
-    const orderCalculation = await this.orderCloudSandBoxService.selectShippingRate(this.order.ID, selection);
+  async selectShipMethod(selection: ShipmentPreference): Promise<MarketplaceOrder> {
+    const orderCalculation = await this.orderCloudSandBoxService.selectShipMethod(this.order.ID, selection);
     this.order = orderCalculation.Order;
     return this.order;
   }
 
   async calculateOrder(): Promise<MarketplaceOrder> {
     const orderCalculation = await this.orderCloudSandBoxService.calculateOrder(this.order.ID);
-    this.order = await orderCalculation.Order;
+    this.order = orderCalculation.Order;
     return this.order;
   }
 
