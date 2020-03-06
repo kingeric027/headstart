@@ -24,7 +24,7 @@ export class ProductService extends ResourceCrudService<Product> {
       ID: null,
       Name: null,
       Description: null,
-      QuantityMultiplier: null,
+      QuantityMultiplier: 1,
       ShipWeight: null,
       ShipHeight: null,
       ShipWidth: null,
