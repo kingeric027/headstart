@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
+import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',
@@ -86,8 +87,10 @@ export class BuyerLocationEditComponent implements OnInit {
     this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
-  handleAddressSelect(address) {
-    this.selectAddress.emit(address);
+  handleSelectedAddress(event: Address): void {
+    const copiedResource = this.buyerLocationService.copyResource(this.buyerLocationEditable);
+    copiedResource.Address = event;
+    this.buyerLocationEditable = copiedResource;
     this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
@@ -117,8 +120,8 @@ export class BuyerLocationEditComponent implements OnInit {
       this.router.navigateByUrl(`/buyers/${this.buyerID}/locations/${newBuyerLocation.Address.ID}`);
       this.dataIsSaving = false;
     } catch (ex) {
+      this.suggestedAddresses = getSuggestedAddresses(ex);
       this.dataIsSaving = false;
-      throw ex;
     }
   }
 
@@ -135,8 +138,8 @@ export class BuyerLocationEditComponent implements OnInit {
       this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
       this.dataIsSaving = false;
     } catch (ex) {
+      this.suggestedAddresses = getSuggestedAddresses(ex);
       this.dataIsSaving = false;
-      throw ex;
     }
   }
 
@@ -164,5 +167,7 @@ export class BuyerLocationEditComponent implements OnInit {
 
   handleDiscardChanges(): void {
     this.buyerLocationEditable = this.buyerLocationStatic;
+    this.suggestedAddresses = null;
+    this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 }
