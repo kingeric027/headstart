@@ -67,8 +67,8 @@
             <ng-template ngbPanelContent>
               <ocm-checkout-shipping [order]="order"
                                      [lineItems]="lineItems"
-                                     [proposedShipments]="proposedShipments"
-                                     (selectShipRate)="onSelectShipRate($event.detail)"       
+                                     [shipmentEstimates]="shipmentEstimates"
+                                     (selectShipRate)="selectShipmentMethod($event.detail)"       
                                      (continue)="doneWithShippingRates()">
               </ocm-checkout-shipping>
             </ng-template>

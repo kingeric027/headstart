@@ -2,7 +2,18 @@
   <thead>
     <tr>
       <th *ngFor="let header of headers"
-          scope="col">{{header}}</th>
+          nowrap
+          scope="col">
+          {{header.header}}
+          <button *ngIf="header.sortable"
+                  type="button"
+                  class="sortButton"
+                  (click)="handleSort(header.path)"
+                  ngbTooltip="Sort"
+                  placement="bottom">
+            <fa-icon [icon]="getSortArrowDirection(header.path)"></fa-icon>
+          </button>
+      </th>
     </tr>
   </thead>
   <tbody *ngIf="requestStatus === 'SUCCESSFUL_WITH_ITEMS' || requestStatus === 'REFRESHING_ITEMS' || requestStatus === 'FETCHING_SUBSEQUENT_PAGES'">
@@ -33,7 +44,8 @@
         </div>
         <span *ngIf="cell.type === 'COPY_OBJECT'">
          <button class="btn btn-light"
-                title="{{objectPreviewText}}"
+                ngbTooltip="{{objectPreviewText}}"
+                placement="left-top left left-bottom auto"
                 (mouseover)="previewObject(row.resource)"
                 (click)="copyObject(row.resource)">
                 <fa-icon [icon]="faCopy"></fa-icon>

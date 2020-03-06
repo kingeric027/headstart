@@ -181,11 +181,12 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static List<ZohoLineItem> Map(OrderCalculation orderCalculation, ZohoLineItem shipping)
+        public static List<ZohoLineItem> Map(OrderWorksheet orderWorksheet, ZohoLineItem shipping)
         {
-            return orderCalculation.ProposedShipmentRatesResponse.ProposedShipments.Select(proposedShipment => {
-                var choosenProposedShipmentSelection = proposedShipment.ProposedShipmentOptions.First(proposedShipmentOption => proposedShipmentOption.ID == proposedShipment.SelectedProposedShipmentOptionID);
-                var supplierIDOfShipment = orderCalculation.LineItems.First(lineItem => lineItem.ID == proposedShipment.ProposedShipmentItems.First().LineItemID);
+            return orderWorksheet.ShipmentEstimateResponse.ShipmentEstimates.Select(shipmentEstimate => {
+                //var choosenProposedShipmentSelection = shipmentEstimate.ShipmentMethods.First(shipmentMethod => shipmentMethod.ID == proposedShipment.SelectedProposedShipmentOptionID);
+                var choosenShipMethod = shipmentEstimate.ShipmentMethods.First(shipmentMethod => shipmentMethod.ID == shipmentEstimate.SelectedShipMethodID);
+                var supplierIDOfShipment = orderWorksheet.LineItems.First(lineItem => lineItem.ID == shipmentEstimate.ShipmentEstimateItems.First().LineItemID);
                 return new ZohoLineItem()
                 {
                     item_id = shipping.item_id,
@@ -193,7 +194,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
                     // need to figure out how to set supplier ID here
                     name = $"{shipping.name} for {supplierIDOfShipment}",
-                    rate = decimal.ToDouble(choosenProposedShipmentSelection.Cost),
+                    rate = decimal.ToDouble(choosenShipMethod.Cost),
                     description = $"{shipping.description} for {supplierIDOfShipment}",
                     sku = shipping.sku,
                     quantity = 1

@@ -1,18 +1,18 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { LineItem, MarketplaceOrder, ProposedShipment, ShipmentPreference, ListLineItem } from 'marketplace';
+import { LineItem, MarketplaceOrder, ShipmentEstimate, ShipmentPreference, ListLineItem } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-shipping.component.html',
-  styleUrls: ['./checkout-shipping.component.scss']
+  styleUrls: ['./checkout-shipping.component.scss'],
 })
 export class OCMCheckoutShipping implements OnInit {
-  _proposedShipments = null;
-  _lineItemsByProposedShipment = null;
+  _shipmentEstimates = null;
+  _lineItemsByShipmentEstimate = null;
 
-  @Input() set proposedShipments(value: ProposedShipment[]) {
-    this._proposedShipments = value;
-    this._lineItemsByProposedShipment = value.map(proposedShipment => {
-      return this.getLineItemsForProposedShipment(proposedShipment);
+  @Input() set shipmentEstimates(value: ShipmentEstimate[]) {
+    this._shipmentEstimates = value;
+    this._lineItemsByShipmentEstimate = value.map(shipmentEstimate => {
+      return this.getLineItemsForShipmentEstimate(shipmentEstimate);
     });
   }
   @Input() order: MarketplaceOrder;
@@ -24,26 +24,26 @@ export class OCMCheckoutShipping implements OnInit {
 
   ngOnInit(): void {}
 
-  getLineItemsForProposedShipment(proposedShipment: ProposedShipment): LineItem[] {
-    return proposedShipment.ProposedShipmentItems.map(proposedShipmentItem => {
-      return this.lineItems.Items.find(li => li.ID === proposedShipmentItem.LineItemID);
+  getLineItemsForShipmentEstimate(shipmentEstimate: ShipmentEstimate): LineItem[] {
+    return shipmentEstimate.ShipmentEstimateItems.map(shipmentEstimateItem => {
+      return this.lineItems.Items.find(li => li.ID === shipmentEstimateItem.LineItemID);
     });
   }
 
-  getSupplierID(proposedShipment: ProposedShipment): string {
+  getSupplierID(shipmentEstimate: ShipmentEstimate): string {
     if (!this.order.xp) return null;
-    const line = this.getFirstLineItem(proposedShipment)
+    const line = this.getFirstLineItem(shipmentEstimate);
     return line.SupplierID;
   }
 
-  getShipFromAddressID(proposedShipment: ProposedShipment): string {
+  getShipFromAddressID(shipmentEstimate: ShipmentEstimate): string {
     if (!this.order.xp) return null;
-    const line = this.getFirstLineItem(proposedShipment)
+    const line = this.getFirstLineItem(shipmentEstimate);
     return line.ShipFromAddressID;
   }
 
-  getFirstLineItem(proposedShipment: ProposedShipment): LineItem {
-    const firstLineItemID = proposedShipment.ProposedShipmentItems[0].LineItemID;
+  getFirstLineItem(shipmentEstimate: ShipmentEstimate): LineItem {
+    const firstLineItemID = shipmentEstimate.ShipmentEstimateItems[0].LineItemID;
     return this.lineItems.Items.find(lineItem => lineItem.ID === firstLineItemID);
   }
 
