@@ -43,17 +43,11 @@ const Promotions: MPRoute = {
   route: '/promotions',
 };
 
-const Categories: MPRoute = {
-  rolesWithAccess: ['MPCategoryAdmin', 'MPCategoryReader'],
-  title: 'Categories',
-  route: '/categories',
-};
-
 const ProductNavGrouping: MPRoute = {
   rolesWithAccess: ['MPPRoductAdmin', 'MPProductReader', 'MPMeProductAdmin'],
   title: 'Products',
   route: '/products',
-  subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, Categories],
+  subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions],
 };
 
 // Orders
