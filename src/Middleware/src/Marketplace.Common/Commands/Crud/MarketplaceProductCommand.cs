@@ -46,22 +46,20 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
         {
-            var _productsList = await _oc.Products.ListAsync<MarketplaceProduct>(filters: args.ToFilterString(),
+            var productsList = await _oc.Products.ListAsync<MarketplaceProduct>(
+                filters: args.ToFilterString(), 
+                pageSize: args.PageSize, 
+                page: args.Page,
                 accessToken: user.AccessToken);
-            var _superProductsList = new List<SuperMarketplaceProduct> { };
-            foreach (var product in _productsList.Items)
-            {
-                var priceSchedule = await _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
-                _superProductsList.Add(new SuperMarketplaceProduct
-                {
-                    Product = product,
-                    PriceSchedule = priceSchedule
-                });
-            }
+            var priceSchedules = await Throttler.RunAsync(productsList.Items, 100, 10, product => _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken));
             return new ListPage<SuperMarketplaceProduct>
             {
-                Meta = _productsList.Meta,
-                Items = _superProductsList
+                Meta = productsList.Meta,
+                Items = productsList.Items.Select(product => new SuperMarketplaceProduct()
+                {
+                    Product = product,
+                    PriceSchedule = priceSchedules.FirstOrDefault(ps => ps.ID == product.DefaultPriceScheduleID)
+                }).ToList()
             };
         }
 
