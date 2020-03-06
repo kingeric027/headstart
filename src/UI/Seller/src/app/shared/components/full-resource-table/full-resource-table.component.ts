@@ -10,8 +10,10 @@ import {
   getProductMainImageUrlOrPlaceholder,
   PLACEHOLDER_URL,
 } from '@app-seller/products/product-image.helper';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { SortDirection } from './sort-direction.enum';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -23,6 +25,11 @@ export class FullResourceTableComponent {
   rows = [];
   numberOfColumns = 1;
   faCopy = faCopy;
+  faSort = faSort;
+  faSortUp = faSortUp;
+  faSortDown = faSortDown;
+  sortDirection: SortDirection = SortDirection.None;
+  activeSort: string;
   objectPreviewText: string;
   _resourceList = { Meta: {}, Items: [] };
 
@@ -35,11 +42,13 @@ export class FullResourceTableComponent {
     this._resourceList = value;
     this.setDisplayValuesForResource(value.Items);
   }
+  @Input()
+  ocService: ResourceCrudService<any>;
   @Output()
   resourceSelected = new EventEmitter();
 
   constructor(
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
   ) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
@@ -48,8 +57,8 @@ export class FullResourceTableComponent {
     this.numberOfColumns = this.getNumberOfColumns(this.resourceType);
   }
 
-  getHeaders(resources: any[]): string[] {
-    return FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].fields.map(r => r.header);
+  getHeaders(resources: any[]): object[] {
+    return FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].fields.map(r => r);
   }
 
   getRows(resources: any[]): ResourceRow[] {
@@ -120,6 +129,26 @@ export class FullResourceTableComponent {
       return currentObject;
     } else {
       return '';
+    }
+  }
+
+  handleSort(header: string) {
+    this.activeSort = header;
+    this.sortDirection = (this.sortDirection + 1) % 3;
+    if (this.sortDirection === SortDirection.None) {
+      this.activeSort = '';
+    }
+    let sortInverse = this.sortDirection === SortDirection.Desc ? '!' : '';
+    this.ocService.sortBy(sortInverse + this.activeSort);
+  }
+
+  getSortArrowDirection(header: string) {
+    if (this.activeSort === header && this.sortDirection === SortDirection.Asc) {
+      return faSortUp;
+    } else if (this.activeSort === header && this.sortDirection === SortDirection.Desc) {
+      return faSortDown;
+    } else {
+      return faSort;
     }
   }
 }

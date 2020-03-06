@@ -175,7 +175,9 @@
           <full-resource-table-component [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel"
                                          [requestStatus]="requestStatus"
                                          (resourceSelected)="handleSelectResource($event)"
-                                         [resourceList]="resourceList"></full-resource-table-component>
+                                         [resourceList]="resourceList"
+                                         [ocService]="_ocService">
+          </full-resource-table-component>
           <request-status [requestStatus]="requestStatus"
                           [subResourceName]="_ocService.secondaryResourceLevel || ''"
                           [selectedParentResouceName]="selectedParentResourceName">

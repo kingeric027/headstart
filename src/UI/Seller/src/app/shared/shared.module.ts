@@ -10,6 +10,7 @@ import {
   NgbDropdownModule,
   NgbModalModule,
   NgbDatepickerModule,
+  NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
@@ -59,6 +60,7 @@ import { PhoneFormatPipe } from './pipes/phone-format.pipe';
     NgbTabsetModule,
     NgbModalModule,
     NgbDatepickerModule,
+    NgbTooltipModule,
     QuillModule.forRoot(),
   ],
   exports: [
