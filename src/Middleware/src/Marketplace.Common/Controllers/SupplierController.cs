@@ -24,7 +24,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("GET MarketplaceSupplier")]
-        [HttpGet, MarketplaceUserAuth(ApiRole.SupplierAdmin, ApiRole.SupplierReader)]
+        [HttpGet, Route("me/{supplierID}"), MarketplaceUserAuth(ApiRole.SupplierAdmin, ApiRole.SupplierReader)]
         public async Task<MarketplaceSupplier> GetMySupplier(string supplierID)
         {
             // ocAuth is the token for the organization that is specified in the AppSettings
