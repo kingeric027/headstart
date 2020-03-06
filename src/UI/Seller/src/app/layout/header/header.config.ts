@@ -126,7 +126,7 @@ const BuyerUsers: MPRoute = {
 
 const BuyerPurchasingLocations: MPRoute = {
   rolesWithAccess: ['MPBuyerAdmin', 'MPBuyerReader'],
-  title: 'Purchasing Locations',
+  title: 'Locations',
   route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/locations`,
 };
 
@@ -152,7 +152,14 @@ const BuyerNavGrouping = {
   rolesWithAccess: ['MPBuyerAdmin', 'MPBuyerReader'],
   title: 'Buyers',
   route: '/buyers',
-  subRoutes: [AllBuyers, BuyerUsers, BuyerPurchasingLocations, BuyerPaymentMethods, BuyerApprovalRules, BuyerCategories],
+  subRoutes: [
+    AllBuyers,
+    BuyerUsers,
+    BuyerPurchasingLocations,
+    BuyerPaymentMethods,
+    BuyerApprovalRules,
+    BuyerCategories,
+  ],
 };
 
 // Suppliers

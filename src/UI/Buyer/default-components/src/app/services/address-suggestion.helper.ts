@@ -1,18 +1,10 @@
-import { BuyerAddress, ListBuyerAddress } from 'marketplace';
+import { ListBuyerAddress } from 'marketplace';
 
-export const getSuggestedAddresses = (ex, address: BuyerAddress): ListBuyerAddress => {
-    let suggestedAddresses: ListBuyerAddress;
-    ex.error.Errors.forEach(err => {
-        if (err.ErrorCode === "blocked by web hook") {
-            err.Data.Body.SuggestedValidAddresses.forEach(suggestion => {
-                suggestion.Shipping = true;
-                suggestion.Billing = true;
-                suggestion.FirstName = address.FirstName;
-                suggestion.LastName = address.LastName;
-                suggestion.Phone = address.Phone;
-            });
-        }
-        suggestedAddresses = err.Data.Body.SuggestedValidAddresses;
-    });
-    return suggestedAddresses;
-}
+export const getSuggestedAddresses = (ex): ListBuyerAddress => {
+  for (const err of ex.error.Errors) {
+    if (err.ErrorCode === 'blocked by web hook') {
+      return err.Data?.Body?.SuggestedAddresses;
+    }
+  }
+  throw ex;
+};

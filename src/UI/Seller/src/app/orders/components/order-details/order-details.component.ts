@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { Order, LineItem, OcLineItemService, OcPaymentService, Payment } from '@ordercloud/angular-sdk';
-import { Address } from '@ordercloud/angular-sdk';
+import { Order, LineItem, OcLineItemService, OcPaymentService, Payment, Address } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { OrderService } from '@app-seller/orders/order.service';
 
 @Component({
   selector: 'app-order-details',
@@ -26,7 +26,7 @@ export class OrderDetailsComponent {
       this.handleSelectedOrderChange(order);
     }
   }
-  constructor(private ocLineItemService: OcLineItemService, private ocPaymentService: OcPaymentService) {}
+  constructor(private ocLineItemService: OcLineItemService, private ocPaymentService: OcPaymentService, private orderService: OrderService) { }
 
   setCardType(payment) {
     if (!payment.xp.cardType || payment.xp.cardType === null) {
@@ -49,6 +49,10 @@ export class OrderDetailsComponent {
   getIncomingOrOutgoing() {
     const url = window.location.href;
     url.includes('Outgoing') ? (this.orderDirection = 'Outgoing') : (this.orderDirection = 'Incoming');
+  }
+
+  isQuoteOrder(order: Order) {
+    return this.orderService.isQuoteOrder(order);
   }
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {

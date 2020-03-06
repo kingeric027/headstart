@@ -27,7 +27,7 @@ export class OCMAddressList implements OnInit {
   showCreateAddressForm = false;
   isLoading = false;
   suggestedAddresses: ListBuyerAddress;
-  constructor(private context: ShopperContextService, private toasterService: ToastrService) { }
+  constructor(private context: ShopperContextService, private toasterService: ToastrService) {}
 
   ngOnInit(): void {
     this.reloadAddresses();
@@ -98,8 +98,8 @@ export class OCMAddressList implements OnInit {
       this.suggestedAddresses = null;
       this.refresh();
     } catch (ex) {
-      this.suggestedAddresses = getSuggestedAddresses(ex, address)
-      this.toasterService.error('Invalid Address')
+      this.suggestedAddresses = getSuggestedAddresses(ex);
+      this.toasterService.error('Invalid Address');
     }
   }
 
@@ -113,8 +113,8 @@ export class OCMAddressList implements OnInit {
       this.suggestedAddresses = null;
       this.refresh();
     } catch (ex) {
-      this.suggestedAddresses = getSuggestedAddresses(ex, address)
-      this.toasterService.error('Invalid Address')
+      this.suggestedAddresses = getSuggestedAddresses(ex);
+      this.toasterService.error('Invalid Address');
     }
   }
 

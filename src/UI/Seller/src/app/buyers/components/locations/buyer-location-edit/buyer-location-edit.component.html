@@ -3,36 +3,70 @@
     <div *ngIf="!suggestedAddresses || suggestedAddresses?.length === 0"
          class="row pt-3">
       <div class="col-md-5">
-        <h5>Address Details</h5>
+        <h5>Location Details</h5>
         <p>These are the details of this Buyer Purchasing Location</p>
       </div>
       <div class="col-md-7 form-group">
-        <div class="form-group">
-          <label for="AddressName">Address Name</label>
+        <div *ngIf="isCreatingNew"
+             class="form-group">
+          <label for="ID">Location ID (Optional)</label>
           <input type="text"
                  class="form-control"
-                 id="AddressName"
+                 id="ID"
                  showErrors
-                 aria-describedby="Address Name"
+                 aria-describedby="ID"
                  maxlength="100"
                  [resourceForm]="resourceForm"
-                 formControlName="AddressName"
-                 (input)="updateResourceFromEvent($event, 'AddressName')"
-                 placeholder="Enter Address Name">
+                 formControlName="ID"
+                 (input)="handleUpdateBuyerLocation($event, 'UserGroup.ID')"
+                 (input)="handleUpdateBuyerLocation($event, 'Address.ID')"
+                 placeholder="Enter ID (optional)">
         </div>
-        <div class="form-group">
-          <label for="Company Name">Company Name</label>
-          <input type="text"
-                 class="form-control"
-                 id="Company Name"
-                 showErrors
-                 aria-describedby="Company Name"
-                 maxlength="100"
-                 [resourceForm]="resourceForm"
-                 formControlName="CompanyName"
-                 (input)="updateResourceFromEvent($event, 'CompanyName')"
-                 placeholder="Enter Company Name">
+        <div class="form-group"
+             *ngIf="!isCreatingNew && buyerLocationEditable">
+          <label for="ID">Location ID</label>
+          <input class="form-control"
+                 value="{{buyerLocationEditable.Address.ID}}"
+                 disabled>
         </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="LocationName">Location Name</label>
+            <input type="text"
+                   class="form-control"
+                   id="LocationName"
+                   showErrors
+                   aria-describedby="LocationName"
+                   maxlength="100"
+                   [resourceForm]="resourceForm"
+                   formControlName="LocationName"
+                   (input)="handleUpdateBuyerLocation($event, 'UserGroup.Name')"
+                   (input)="handleUpdateBuyerLocation($event, 'Address.AddressName')"
+                   placeholder="Enter Location Name">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="Company Name">Company Name</label>
+            <input type="text"
+                   class="form-control"
+                   id="Company Name"
+                   showErrors
+                   aria-describedby="Company Name"
+                   maxlength="100"
+                   [resourceForm]="resourceForm"
+                   formControlName="CompanyName"
+                   (input)="handleUpdateBuyerLocation($event, 'Address.CompanyName')"
+                   placeholder="Enter Company Name">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!suggestedAddresses || suggestedAddresses?.length === 0"
+         class="row pt-3">
+      <div class="col-md-5">
+        <h5>Location Address</h5>
+        <p>This is the address of the Buyer Purchasing Location</p>
+      </div>
+      <div class="col-md-7 form-group">
         <div class="form-group">
           <label for="Street 1">Street 1</label>
           <input type="text"
@@ -43,7 +77,7 @@
                  maxlength="100"
                  [resourceForm]="resourceForm"
                  formControlName="Street1"
-                 (input)="updateResourceFromEvent($event, 'Street1')"
+                 (input)="handleUpdateBuyerLocation($event, 'Address.Street1')"
                  placeholder="Enter Street 1">
         </div>
         <div class="form-group">
@@ -59,44 +93,46 @@
                  (input)="updateResourceFromEvent($event, 'Street 2')"
                  placeholder="Enter Street 2">
         </div>
-        <div class="form-group">
-          <label for="City">City</label>
-          <input type="text"
-                 class="form-control"
-                 id="City"
-                 showErrors
-                 aria-describedby="City"
-                 maxlength="100"
-                 [resourceForm]="resourceForm"
-                 formControlName="City"
-                 (input)="updateResourceFromEvent($event, 'City')"
-                 placeholder="Enter City">
-        </div>
-        <div class="form-group">
-          <label for="State">State</label>
-          <input type="text"
-                 class="form-control"
-                 id="State"
-                 showErrors
-                 maxlength="100"
-                 aria-describedby="State"
-                 [resourceForm]="resourceForm"
-                 formControlName="State"
-                 (input)="updateResourceFromEvent($event, 'State')"
-                 placeholder="Enter State">
-        </div>
-        <div class="form-group">
-          <label for="Zip">Zip</label>
-          <input type="text"
-                 class="form-control"
-                 id="Zip"
-                 showErrors
-                 maxlength="100"
-                 aria-describedby="Zip"
-                 [resourceForm]="resourceForm"
-                 formControlName="Zip"
-                 (input)="updateResourceFromEvent($event, 'Zip')"
-                 placeholder="Enter Zip">
+        <div class="form-row">
+          <div class="form-group col-md-5">
+            <label for="City">City</label>
+            <input type="text"
+                   class="form-control"
+                   id="City"
+                   showErrors
+                   aria-describedby="City"
+                   maxlength="100"
+                   [resourceForm]="resourceForm"
+                   formControlName="City"
+                   (input)="handleUpdateBuyerLocation($event, 'Address.City')"
+                   placeholder="Enter City">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="State">State</label>
+            <input type="text"
+                   class="form-control"
+                   id="State"
+                   showErrors
+                   maxlength="100"
+                   aria-describedby="State"
+                   [resourceForm]="resourceForm"
+                   formControlName="State"
+                   (input)="handleUpdateBuyerLocation($event, 'Address.State')"
+                   placeholder="Enter State">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="Zip">Zip</label>
+            <input type="text"
+                   class="form-control"
+                   id="Zip"
+                   showErrors
+                   maxlength="100"
+                   aria-describedby="Zip"
+                   [resourceForm]="resourceForm"
+                   formControlName="Zip"
+                   (input)="handleUpdateBuyerLocation($event, 'Address.Zip')"
+                   placeholder="Enter Zip">
+          </div>
         </div>
         <div class="form-group">
           <label for="Country">Country Code</label>
@@ -104,12 +140,38 @@
                  class="form-control"
                  id="CountryCode"
                  showErrors
-                 aria-describedby="Country Code"
+                 aria-describedby="Country"
                  maxlength="2"
                  [resourceForm]="resourceForm"
                  formControlName="Country"
-                 (input)="updateResourceFromEvent($event, 'Country')"
+                 (input)="handleUpdateBuyerLocation($event, 'Address.Country')"
                  placeholder="Enter Country Code">
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="Phone">Phone</label>
+            <input type="tel"
+                   class="form-control"
+                   id="Phone"
+                   showErrors
+                   aria-describedby="Phone Number"
+                   [resourceForm]="resourceForm"
+                   formControlName="Phone"
+                   (input)="updateResourceFromEvent($event, 'Address.Phone')"
+                   placeholder="Contact Phone Number">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="Email">Email</label>
+            <input type="email"
+                   class="form-control"
+                   id="Email"
+                   showErrors
+                   aria-describedby="Email"
+                   [resourceForm]="resourceForm"
+                   formControlName="Email"
+                   (input)="handleUpdateBuyerLocation($event, 'Address.xp.Email')"
+                   placeholder="Contact Email">
+          </div>
         </div>
       </div>
     </div>
@@ -123,7 +185,23 @@
         <address-suggestion (selectedAddress)="handleAddressSelect($event)"
                             [suggestedAddresses]="suggestedAddresses"></address-suggestion>
       </div>
-
+    </div>
+    <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
+    <div class="d-flex justify-content-between align-items-center py-2">
+      <delete-confirm-modal-component *ngIf="!isCreatingNew"
+                                      buttonText="Delete Buyer Location"
+                                      (deleteConfirmed)="handleDelete($event)">
+      </delete-confirm-modal-component>
+      <div>
+        <button *ngIf="areChanges"
+                class="btn btn-primary"
+                type="submit"
+                [disabled]="productForm?.status === 'INVALID' || dataIsSaving"
+                (click)="handleSave()">{{getSaveBtnText()}}</button>
+        <button class="btn brand-button ml-3"
+                (click)="handleDiscardChanges()"
+                *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+      </div>
     </div>
   </form>
 </div>

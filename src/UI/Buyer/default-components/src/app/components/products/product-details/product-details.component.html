@@ -24,7 +24,7 @@
         <div>
           <div class="d-flex justify-content-between align-items-center">
             <h4 class="font-weight-bold">{{ price  | currency}}</h4>
-            <p class="text-muted ml-3">1 per set</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
+            <p class="text-muted ml-3">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
             <span class="badge badge-pill badge-warning"
                   *ngIf="percentSavings > 0">You save {{ percentSavings }}%!
             </span>
@@ -44,7 +44,8 @@
                 </ocm-quantity-input>
                 <button *ngIf="isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
-                        [disabled]="!specFormService.event?.valid || !qtyValid">
+                        [disabled]="!specFormService.event?.valid || !qtyValid"
+                        (click)="openQuoteForm()">
                   Request Quote
                 </button>
                 <button *ngIf="!isQuoteProduct()"
@@ -56,6 +57,14 @@
                   <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
                 </button>
               </div>
+            </div>
+            <div>
+              <ocm-modal [state]="quoteFormModal"
+                         [modalTitle]="'Request Quote'">
+                <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
+                                        [CurrentUser]="currentUser"
+                                        (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
+              </ocm-modal>
             </div>
           </div>
           <div *ngIf="!isOrderable"
@@ -75,6 +84,13 @@
             </span>
           </div>
         </div>
+      </div>
+      <div class="alert alert-success my-3"
+           *ngIf="showRequestSubmittedMessage">
+        <span>Your quote request was successfully submitted.
+          <button class="btn btn-link"
+                  (click)="toOrderDetail()">View quote request</button>
+        </span>
       </div>
       <strong>Description:</strong>
       <div class="p-2 border border-medium border-radius">
@@ -108,7 +124,8 @@
           </ocm-quantity-input>
           <button *ngIf="isQuoteProduct()"
                   class="btn btn-block btn-primary mb-3"
-                  [disabled]="!specFormService.event?.valid || !qtyValid">
+                  [disabled]="!specFormService.event?.valid || !qtyValid"
+                  (click)="handleRequestQuote()">
             Request Quote
           </button>
           <button *ngIf="!isQuoteProduct()"

@@ -91,7 +91,7 @@ export class OCMCheckoutAddress implements OnInit {
       }
       this.continue.emit();
     } catch (ex) {
-      this.suggestedAddresses = getSuggestedAddresses(ex, address);
+      this.suggestedAddresses = getSuggestedAddresses(ex);
       this.toasterService.error('Invalid Address');
     }
     if (this.addressType === OrderAddressType.Billing) {

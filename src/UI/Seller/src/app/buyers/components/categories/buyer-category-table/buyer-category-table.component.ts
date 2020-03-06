@@ -8,7 +8,7 @@ import { BuyerService } from '../../buyers/buyer.service';
 @Component({
   selector: 'app-buyer-category-table',
   templateUrl: './buyer-category-table.component.html',
-  //   styleUrls: ['./buyer-category-table.component.scss'],
+  styleUrls: ['./buyer-category-table.component.scss'],
 })
 export class BuyerCategoryTableComponent extends ResourceCrudComponent<Category> {
   constructor(
@@ -20,5 +20,17 @@ export class BuyerCategoryTableComponent extends ResourceCrudComponent<Category>
     ngZone: NgZone
   ) {
     super(changeDetectorRef, buyerCategoryService, router, activatedroute, ngZone);
+  }
+
+  async createNewResource(): Promise<void> {
+    // dataIsSaving indicator is used in the resource table to conditionally tell the
+    // submit button to disable
+    const routeUrl = this.router.routerState.snapshot.url;
+    if (!this.updatedResource?.ParentID && routeUrl.includes('?')) {
+      const splitUrl = routeUrl.split('=');
+      const endUrl = splitUrl[splitUrl.length - 1];
+      this.updatedResource.ParentID = endUrl;
+    }
+    super.createNewResource();
   }
 }

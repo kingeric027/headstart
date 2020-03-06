@@ -9,6 +9,21 @@
       </div>
       <div class="col-md-7 form-group">
         <div class="form-group">
+          <p class="mb-1">Active</p>
+          <label class="switch mb-0"
+                 for="Active">
+            <input type="checkbox"
+                   class="form-check-input"
+                   id="Active"
+                   showErrors
+                   [resourceForm]="resourceForm"
+                   aria-describedby="Active"
+                   formControlName="Active"
+                   (input)="handleUpdateProduct($event, 'Product.Active')">
+            <span class="slider round cursor-pointer"></span>
+          </label>
+        </div>
+        <div class="form-group">
           <label for="Name">Name</label>
           <input type="text"
                  class="form-control"
@@ -112,10 +127,12 @@
                   aria-describedby="Product type"
                   placeholder="Choose product type"
                   (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
-            <option selected="selected"
+            <option [selected]="productType === undefined"
                     disabled>Choose a product type</option>
-            <option value="Standard">Standard</option>
-            <option value="Quote">Quote</option>
+            <option [selected]="productType === 'Standard'"
+                    value="Standard">Standard</option>
+            <option [selected]="productType === 'Quote'"
+                    value="Quote">Quote</option>
           </select>
         </div>
       </div>

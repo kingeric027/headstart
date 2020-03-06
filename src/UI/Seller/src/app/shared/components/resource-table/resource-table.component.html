@@ -206,7 +206,8 @@
                     class="selectable-row selected-resource">
                   <td>
                     <summary-resource-display-component [isNewPlaceHolder]="true"
-                                                        [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel">
+                                                        [resourceType]="_ocService.secondaryResourceLevel || _ocService.primaryResourceLevel"
+                                                        [isCreatingSubResource]="isCreatingSubResource">
                     </summary-resource-display-component>
                   </td>
                 </tr>

@@ -59,6 +59,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   selectedParentResourceID = '';
   breadCrumbs: BreadCrumb[] = [];
   isCreatingNew = false;
+  isCreatingSubResource = false;
   isMyResource = false;
   alive = true;
   screenSize;
@@ -75,7 +76,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
     ngZone: NgZone
-  ) { }
+  ) {}
 
   @Input()
   resourceList: ListPage<any> = { Meta: {}, Items: [] };
@@ -102,12 +103,14 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   set updatedResource(value: any) {
     this._updatedResource = value;
-    this.checkForChanges();
+    if (this._resourceInSelection && this._updatedResource && this._ocService)
+      this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
   }
   @Input()
   set resourceInSelection(value: any) {
     this._resourceInSelection = value;
-    this.checkForChanges();
+    if (this._resourceInSelection && this._updatedResource && this._ocService)
+      this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
   }
   @Input()
   selectedResourceID: string;
@@ -246,11 +249,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       this.changeDetectorRef.detectChanges();
     });
   }
-
+  // TODO: Refactor to remove duplicate function (function exists in resrouce-crud.service.ts)
   private checkIfCreatingNew() {
     const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
+    const splitUrl = routeUrl.split('/');
+    const endUrl = splitUrl[splitUrl.length - 1];
+    this.isCreatingNew = endUrl.includes('new');
+    this.isCreatingSubResource = endUrl.includes('new?');
   }
 
   private setBreadCrumbs() {
@@ -312,8 +317,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   handleSelectResource(resource: any) {
-    const [newURL, queryParams] = this._ocService.constructNewRouteInformation(resource.ID || '');
-    this.router.navigate([newURL], { queryParams });
     this.resourceSelected.emit(resource);
   }
 
@@ -336,14 +339,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.fromDate = '';
   }
 
-  checkForChanges() {
-    this.areChanges = JSON.stringify(this._updatedResource) !== JSON.stringify(this._resourceInSelection);
-  }
-
   getSaveBtnText(): string {
-    if (this.dataIsSaving) return 'Saving...';
-    if (this.isCreatingNew) return 'Create';
-    if (!this.isCreatingNew) return 'Save Changes';
+    return this._ocService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew);
   }
 
   ngOnDestroy() {

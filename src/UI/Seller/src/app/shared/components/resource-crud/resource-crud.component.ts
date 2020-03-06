@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
+import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -120,14 +121,14 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   async setResourceSelectionFromID(resourceID: string): Promise<void> {
     this.selectedResourceID = resourceID || '';
     const resource = await this.ocService.findOrGetResourceByID(resourceID);
-    this.resourceInSelection = this.copyResource(resource);
+    this.resourceInSelection = this.ocService.copyResource(resource);
     this.setUpdatedResourceAndResourceForm(resource);
   }
 
   setResourceSelectionFromResource(resource: any): void {
     this.selectedResourceID = (resource && resource.ID) || '';
 
-    this.resourceInSelection = this.copyResource(resource);
+    this.resourceInSelection = this.ocService.copyResource(resource);
     this.setUpdatedResourceAndResourceForm(resource);
   }
 
@@ -141,29 +142,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.navigate(newURL, { queryParams });
   }
 
-  updateResource(resourceUpdate: any): void {
-    // copying a resetting this.updated resource ensures that the copy and base object
-    // reference is broken
-    // not the prettiest function, feel free to improve
-    const piecesOfField = resourceUpdate.field.split('.');
-    const depthOfField = piecesOfField.length;
-    const updatedResourceCopy = this.copyResource(this.updatedResource);
-    switch (depthOfField) {
-      case 4:
-        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
-          resourceUpdate.value;
-        break;
-      case 3:
-        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]] = resourceUpdate.value;
-        break;
-      case 2:
-        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]] = resourceUpdate.value;
-        break;
-      default:
-        updatedResourceCopy[piecesOfField[0]] = resourceUpdate.value;
-        break;
-    }
-    this.updatedResource = updatedResourceCopy;
+  updateResource(resourceUpdate: ResourceUpdate): void {
+    this.updatedResource = this.ocService.getUpdatedEditableResource(resourceUpdate, this.updatedResource);
     this.changeDetectorRef.detectChanges();
   }
 
@@ -173,10 +153,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
       value: field === 'Active' ? event.target.checked : event.target.value,
     };
     this.updateResource(resourceUpdate);
-  }
-
-  copyResource(resource: ResourceType): ResourceType {
-    return JSON.parse(JSON.stringify(resource));
   }
 
   saveUpdates(): void {
@@ -202,7 +178,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     try {
       this.dataIsSaving = true;
       const updatedResource = await this.ocService.updateResource(this.updatedResource);
-      this.resourceInSelection = this.copyResource(updatedResource);
+      this.resourceInSelection = this.ocService.copyResource(updatedResource);
       this.setUpdatedResourceAndResourceForm(updatedResource);
       this.dataIsSaving = false;
     } catch (ex) {
@@ -212,8 +188,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   setUpdatedResourceAndResourceForm(updatedResource: any): void {
-    this.updatedResource = this.copyResource(updatedResource);
-    this.setForm(this.copyResource(updatedResource));
+    this.updatedResource = this.ocService.copyResource(updatedResource);
+    this.setForm(this.ocService.copyResource(updatedResource));
     this.changeDetectorRef.detectChanges();
   }
 
@@ -237,7 +213,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   private setIsCreatingNew(): void {
     const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    this.isCreatingNew = endUrl === '/new';
+    const splitUrl = routeUrl.split('/');
+    const endUrl = splitUrl[splitUrl.length - 1];
+    /* Reduce possibility of errors: all IDs with the word new must equal it exactly,
+    or begin with the word new and have a question mark following it for query params. */
+    this.isCreatingNew = endUrl === 'new' || endUrl.startsWith('new?');
   }
 }

@@ -15,6 +15,7 @@ import {
 import { ListPage } from '../middleware-api/listPage.interface';
 import { ListFilters } from '../middleware-api/listArgs.interface';
 import { BuyerAddress, ListBuyerAddress, ListAddress, Address } from '@ordercloud/angular-sdk';
+import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
@@ -331,6 +332,16 @@ export abstract class ResourceCrudService<ResourceType> {
     return { sortBy, search, ...filters, OrderDirection };
   }
 
+  // TODO - move to some other file. Not related to resource crud
+  getSuggestedAddresses = (ex): ListBuyerAddress => {
+    for (const err of ex.error.Errors) {
+      if (err.ErrorCode === 'blocked by web hook') {
+        return err.Data?.Body?.SuggestedAddresses;
+      }
+    }
+    throw ex;
+  };
+
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
     const { sortBy, search, OrderDirection, ...filters } = params;
@@ -369,19 +380,46 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
-  getSuggestedAddresses(ex, address: Address): any {
-    let suggestedAddresses: ListAddress;
-    ex.error.Errors.forEach(err => {
-      if (err.ErrorCode === "blocked by web hook") {
-        err.Data.Body.SuggestedValidAddresses.forEach(suggestion => {
-          suggestion.ID = address.ID;
-          suggestion.DateCreated = address.DateCreated;
-          suggestion.CompanyName = address.CompanyName;
-          suggestion.AddressName = address.AddressName;
-        });
-      }
-      suggestedAddresses = err.Data.Body.SuggestedValidAddresses;
-    });
-    return suggestedAddresses;
+  getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resoruceToUpdate: T): T {
+    const piecesOfField = resourceUpdate.field.split('.');
+    const depthOfField = piecesOfField.length;
+    const updatedResourceCopy = this.copyResource(resoruceToUpdate);
+    switch (depthOfField) {
+      case 4:
+        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
+          resourceUpdate.value;
+        break;
+      case 3:
+        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]] = resourceUpdate.value;
+        break;
+      case 2:
+        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]] = resourceUpdate.value;
+        break;
+      default:
+        updatedResourceCopy[piecesOfField[0]] = resourceUpdate.value;
+        break;
+    }
+    console.log(updatedResourceCopy)
+    return updatedResourceCopy;
+  }
+
+  copyResource<T>(resource: T): T {
+    return JSON.parse(JSON.stringify(resource));
+  }
+
+  checkIfCreatingNew(): boolean {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
+    return endUrl === '/new';
+  }
+
+  checkForChanges<T>(resourceEditable: T, resourceStatic: T): boolean {
+    return JSON.stringify(resourceEditable) !== JSON.stringify(resourceStatic);
+  }
+
+  getSaveBtnText(dataIsSaving: boolean, isCreatingNew: boolean): string {
+    if (dataIsSaving) return 'Saving...';
+    if (isCreatingNew) return 'Create';
+    if (!isCreatingNew) return 'Save Changes';
   }
 }

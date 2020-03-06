@@ -98,7 +98,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 		/// <summary>Line item overrides of the order calculate response.</summary> 
 		public IList<LineItemOverride> LineItemOverrides { get => GetProp<IList<LineItemOverride>>("LineItemOverrides", new List<LineItemOverride>()); set => SetProp<IList<LineItemOverride>>("LineItemOverrides", value); }
 		/// <summary>Shipping total of the order calculate response.</summary> 
-		public decimal ShippingTotal { get => GetProp<decimal>("ShippingTotal"); set => SetProp<decimal>("ShippingTotal", value); }
+		public decimal? ShippingTotal { get; set; }
 		/// <summary>Tax total of the order calculate response.</summary> 
 		public decimal TaxTotal { get => GetProp<decimal>("TaxTotal"); set => SetProp<decimal>("TaxTotal", value); }
 		/// <summary>Container for extended (custom) properties of the order calculate response.</summary> 

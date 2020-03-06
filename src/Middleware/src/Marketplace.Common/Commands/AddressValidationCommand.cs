@@ -3,138 +3,102 @@ using Marketplace.Common.Services.ShippingIntegration;
 using OrderCloud.SDK;
 using System;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.FreightPop;
-using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services;
-using Marketplace.Models.Misc;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Commands
 {
     public interface IAddressValidationCommand
     {
-        Task<WebhookResponse> IsValidAddressInFreightPopAsync(Address address);
-        Task<WebhookResponse> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload);
-        Task<WebhookResponse> GetExpectedNewSupplierAddressAndValidateInFreightPop(WebhookPayloads.SupplierAddresses.Patch payload);
-        Task<WebhookResponse> GetExpectedNewMeAddressAndValidateInFreightPop(WebhookPayloads.Me.PatchAddress payload);
-        Task<WebhookResponse> GetExpectedNewBuyerAddressAndValidateInFreightPop(WebhookPayloads.Addresses.Patch payload);
+        Task<WebhookResponse> IsValidAddressAsync(Address address);
+        Task<WebhookResponse> GetExpectedNewSellerAddressAndValidate(WebhookPayloads.AdminAddresses.Patch payload);
+        Task<WebhookResponse> GetExpectedNewSupplierAddressAndValidate(WebhookPayloads.SupplierAddresses.Patch payload);
+        Task<WebhookResponse> GetExpectedNewMeAddressAndValidate(WebhookPayloads.Me.PatchAddress payload);
+        Task<WebhookResponse> GetExpectedNewBuyerAddressAndValidate(WebhookPayloads.Addresses.Patch payload);
     }
     public class AddressValidationCommand : IAddressValidationCommand
     {
-        private readonly IFreightPopService _freightPopService;
         private readonly IOrderCloudClient _oc;
-        private readonly IOCShippingIntegration _ocShippingIntegration;
 		private readonly ISmartyStreetsService _smartyStreets;
-		private readonly WebhookResponse validResponse = new WebhookResponse { proceed = true };
-		private readonly AddressValidationPreWebhookError inValidResponse; 
-        public AddressValidationCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, IOrderCloudClient ocClient, ISmartyStreetsService smartyStreets)
+		public AddressValidationCommand(IOrderCloudClient ocClient, ISmartyStreetsService smartyStreets)
         {
-            _freightPopService = freightPopService;
             _oc = ocClient;
-            _ocShippingIntegration = ocShippingIntegration;
 			_smartyStreets = smartyStreets;
-			inValidResponse = new AddressValidationPreWebhookError(_smartyStreets.GetSuggestedAddresses(null));
 		}
 
-        public async Task<WebhookResponse> IsValidAddressInFreightPopAsync(Address address)
+        public async Task<WebhookResponse> IsValidAddressAsync(Address address)
         {
-            var rateRequestBody = AddressValidationRateRequestMapper.Map(address);
             try
             {
-                var ratesResponse = await _freightPopService.GetRatesAsync(rateRequestBody);
-                if(ratesResponse.Data.ErrorMessages.Count > 0)
-                {
-                    return inValidResponse;
-                } else
-                {
-                    return validResponse;
-                }
-            } catch (Exception ex)
+				var validation = await _smartyStreets.ValidateAddress(address);
+				return new AddressValidationWebhookResponse(validation);
+			} catch (Exception ex)
             {
-                return inValidResponse;
-            }
+				return new WebhookResponse<Exception>(ex);
+			}
         }
 
-        public async Task<WebhookResponse> IsValidAddressInFreightPopAsync(BuyerAddress address)
+		public async Task<WebhookResponse> IsValidAddressAsync(BuyerAddress address)
         {
-            var rateRequestBody = AddressValidationRateRequestMapper.Map(address);
             try
             {
-                var ratesResponse = await _freightPopService.GetRatesAsync(rateRequestBody);
-                return ratesResponse.Data.ErrorMessages.Count > 0 ? inValidResponse : validResponse;
-            }
+				var validation = await _smartyStreets.ValidateAddress(address);
+				return new AddressValidationWebhookResponse(validation);
+			}
             catch (Exception ex)
             {
-                return inValidResponse;
-            }
-        }
+				return new WebhookResponse<Exception>(ex);
+			}
+		}
 
-        public async Task<WebhookResponse> GetExpectedNewSellerAddressAndValidateInFreightPop(WebhookPayloads.AdminAddresses.Patch payload)
+        public async Task<WebhookResponse> GetExpectedNewSellerAddressAndValidate(WebhookPayloads.AdminAddresses.Patch payload)
         {
-            var existingAddress = await _oc.AdminAddresses.GetAsync(payload.RouteParams.AddressID);
-            var expectedNewAddress = GetExpectedNewAddress(payload.Request.Body, existingAddress);
-            var ratesResponse = await IsValidAddressInFreightPopAsync(expectedNewAddress);
+            var existingAddress = await _oc.AdminAddresses.GetAsync<Address>(payload.RouteParams.AddressID);
+            var expectedNewAddress = PatchObject(payload.Request.Body as Address, existingAddress);
+            var ratesResponse = await IsValidAddressAsync(expectedNewAddress);
             return ratesResponse;
         }
 
-        public async Task<WebhookResponse> GetExpectedNewSupplierAddressAndValidateInFreightPop(WebhookPayloads.SupplierAddresses.Patch payload)
+        public async Task<WebhookResponse> GetExpectedNewSupplierAddressAndValidate(WebhookPayloads.SupplierAddresses.Patch payload)
         {
-            var existingAddress = await _oc.SupplierAddresses.GetAsync(payload.RouteParams.SupplierID, payload.RouteParams.AddressID);
-            var expectedNewAddress = GetExpectedNewAddress(payload.Request.Body, existingAddress);
-            var ratesResponse = await IsValidAddressInFreightPopAsync(expectedNewAddress);
+            var existingAddress = await _oc.SupplierAddresses.GetAsync<Address>(payload.RouteParams.SupplierID, payload.RouteParams.AddressID);
+            var expectedNewAddress = PatchObject(payload.Request.Body as Address, existingAddress);
+            var ratesResponse = await IsValidAddressAsync(expectedNewAddress);
             return ratesResponse;
         }
 
-        public async Task<WebhookResponse> GetExpectedNewMeAddressAndValidateInFreightPop(WebhookPayloads.Me.PatchAddress payload)
+        public async Task<WebhookResponse> GetExpectedNewMeAddressAndValidate(WebhookPayloads.Me.PatchAddress payload)
         {
             var userToken = payload.UserToken;
-            var existingAddress = await _oc.Me.GetAddressAsync(payload.RouteParams.AddressID, userToken);
-            var expectedNewAddress = GetExpectedNewAddress(payload.Request.Body, existingAddress);
-            var ratesResponse = await IsValidAddressInFreightPopAsync(expectedNewAddress);
+            var existingAddress = await _oc.Me.GetAddressAsync<BuyerAddress>(payload.RouteParams.AddressID, userToken);
+            var expectedNewAddress = PatchObject(payload.Request.Body as BuyerAddress, existingAddress);
+            var ratesResponse = await IsValidAddressAsync(expectedNewAddress);
             return ratesResponse;
         }
 
-        public async Task<WebhookResponse> GetExpectedNewBuyerAddressAndValidateInFreightPop(WebhookPayloads.Addresses.Patch payload)
+        public async Task<WebhookResponse> GetExpectedNewBuyerAddressAndValidate(WebhookPayloads.Addresses.Patch payload)
         {
-            var existingAddress = await _oc.Addresses.GetAsync(payload.RouteParams.BuyerID, payload.RouteParams.AddressID);
-            var expectedNewAddress = GetExpectedNewAddress(payload.Request.Body, existingAddress);
-            var ratesResponse = await IsValidAddressInFreightPopAsync(expectedNewAddress);
+            var existingAddress = await _oc.Addresses.GetAsync<Address>(payload.RouteParams.BuyerID, payload.RouteParams.AddressID);
+            var expectedNewAddress = PatchObject(payload.Request.Body as Address, existingAddress);
+            var ratesResponse = await IsValidAddressAsync(expectedNewAddress);
             return ratesResponse;
         }
 
-        private BuyerAddress GetExpectedNewAddress(BuyerAddress patch, BuyerAddress existingAddress)
-        {
-
-            // todo: add test for this function 
-
-            var patchType = patch.GetType();
-            var propertiesInPatch = patchType.GetProperties();
-            foreach (var property in propertiesInPatch)
-            {
-                var patchValue = property.GetValue(patch);
-                if (patchValue != null)
-                {
-                    property.SetValue(existingAddress, patchValue, null);
-                }
-            }
-            return existingAddress;
-        }
-
-        private Address GetExpectedNewAddress(Address patch, Address existingAddress)
-        {
-
-            // todo: add test for this function 
-
-            var patchType = patch.GetType();
-            var propertiesInPatch = patchType.GetProperties();
-            foreach (var property in propertiesInPatch)
-            {
-                var patchValue = property.GetValue(patch);
-                if (patchValue != null)
-                {
-                    property.SetValue(existingAddress, patchValue, null);
-                }
-            }
-            return existingAddress;
-        }
-    }
+		// todo: move somewhere else, see if we can use func in helper lib
+		private T PatchObject<T>(T patch, T existing)
+		{
+			// todo: add test for this function 
+			var patchType = patch.GetType();
+			var propertiesInPatch = patchType.GetProperties();
+			foreach (var property in propertiesInPatch)
+			{
+				var patchValue = property.GetValue(patch);
+				if (patchValue != null)
+				{
+					property.SetValue(existing, patchValue, null);
+				}
+			}
+			return existing;
+		}
+	}
 }

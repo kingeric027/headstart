@@ -27,7 +27,6 @@ function createSupplierLocationForm(supplierLocation: Address) {
   styleUrls: ['./supplier-location-table.component.scss'],
 })
 export class SupplierLocationTableComponent extends ResourceCrudComponent<Address> {
-
   suggestedAddresses: ListAddress;
   selectedAddress: Address;
 
@@ -55,12 +54,12 @@ export class SupplierLocationTableComponent extends ResourceCrudComponent<Addres
     try {
       this.dataIsSaving = true;
       const updatedResource = await this.ocService.updateResource(this.updatedResource);
-      this.resourceInSelection = this.copyResource(updatedResource);
+      this.resourceInSelection = this.ocService.copyResource(updatedResource);
       this.setUpdatedResourceAndResourceForm(updatedResource);
       this.suggestedAddresses = null;
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
+      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex);
       this.dataIsSaving = false;
       throw ex;
     }
@@ -74,7 +73,7 @@ export class SupplierLocationTableComponent extends ResourceCrudComponent<Addres
       this.suggestedAddresses = null;
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex, this.updatedResource);
+      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex);
       this.dataIsSaving = false;
       throw ex;
     }

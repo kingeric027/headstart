@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Flurl.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -92,7 +92,9 @@ namespace Marketplace.API
                     .Inject<ICreditCardCommand>()
 					.Inject<IMarketplaceSupplierCommand>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
-                    .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
+                    .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser")
+					.AddAuthentication()
+					.AddOrderCloudWebhooks(opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey);
             }
 
 			// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
