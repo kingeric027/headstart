@@ -39,6 +39,7 @@ import { FormControlErrorDirective } from './directives/form-control-errors.dire
 import { RequestStatus } from './components/request-status/request-status.component';
 import { DragDirective } from './directives/dragDrop.directive';
 import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
+import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 
 @NgModule({
   imports: [
@@ -93,6 +94,7 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     FormControlErrorDirective,
     DragDirective,
     DeleteConfirmModal,
+    PhoneFormatPipe,
     ConfirmModal,
   ],
   declarations: [
@@ -117,6 +119,7 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
     FormControlErrorDirective,
     DragDirective,
     ConfirmModal,
+    PhoneFormatPipe,
   ],
 })
 export class SharedModule {

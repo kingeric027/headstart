@@ -1,160 +1,179 @@
 <!-- TODO: Componentize into smaller chunks (Order Details, Address, Payment, Line Item) -->
 <div class="container float-left">
-   <div *ngIf="_order">
-      <div class="pb-2 mt-4 mb-2">
-        <h2> <span class="text-muted">Order #:</span> {{_order.ID}}</h2>
+  <div *ngIf="_order">
+    <div class="pb-2 mt-4 mb-2">
+      <h2> <span class="text-muted">Order #:</span> {{_order.ID}}<span class="badge badge-pill badge-primary ml-2">{{_order?.xp?.OrderType}}</span></h2>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div>Status: {{_order.Status}}
+        </div>
+        <small class="float-left">Submitted on {{_order.DateSubmitted | date: 'short'}}</small>
       </div>
-      <div class="row">
-        <div class="col-md-6">
-          <div>Status: {{_order.Status}}
+    </div>
+    <hr>
+    <div class="row mb-5"
+         *ngIf="_order">
+      <div class="col-6">
+        <div *ngIf="_lineItems[0] && !isQuoteOrder(_order)">
+          <div *ngIf="_lineItems[0].ShippingAddress"
+               class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <span class="text-muted">Shipping Address</span>
+              <p class="mb-0 text-capitalize font-weight-bold">{{_lineItems[0].ShippingAddress.Street1}}<span *ngIf="_lineItems[0].ShippingAddress?.Street2">, {{_lineItems[0].ShippingAddress.Street2}}</span></p>
+              <p class="mb-0 text-capitalize font-weight-bold">{{_lineItems[0].ShippingAddress.City}}, {{_lineItems[0].ShippingAddress.State}} {{_lineItems[0].ShippingAddress.Zip}}</p>
+              <small class="mb-0">{{getFullName(_lineItems[0].ShippingAddress)}}
+                <span *ngIf="_lineItems[0].ShippingAddress?.Phone"> | {{_lineItems[0].ShippingAddress.Phone}}</span>
+              </small>
+            </div>
           </div>
-          <small class="float-left">Submitted on {{_order.DateSubmitted | date: 'short'}}</small>
-         </div>
-       </div>
-       <hr>
-       <div class="row mb-5"
-       *ngIf="_order">
-    <div class="col-6">
-        <div *ngIf="_lineItems[0]">
-            <div *ngIf="_lineItems[0].ShippingAddress" class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <span class="text-muted">Shipping Address</span>
-                    <p class="mb-0 text-capitalize font-weight-bold">{{_lineItems[0].ShippingAddress.Street1}}<span *ngIf="_lineItems[0].ShippingAddress.Street2">, {{_lineItems[0].ShippingAddress.Street2}}</span></p>
-                    <p class="mb-0 text-capitalize font-weight-bold">{{_lineItems[0].ShippingAddress.City}}, {{_lineItems[0].ShippingAddress.State}} {{_lineItems[0].ShippingAddress.Zip}}</p>
-                    <small class="mb-0">{{getFullName(_lineItems[0].ShippingAddress)}}
-                        <span *ngIf="_lineItems[0].ShippingAddress.Phone"> | {{_lineItems[0].ShippingAddress.Phone}}</span>
-                    </small>
-                </div>
+          <!-- Since Outgoing Orders do not have a Billing Address, using an *ngIf -->
+          <div *ngIf="_order.BillingAddress"
+               class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <span class="text-muted">Billing Address</span>
+              <p class="mb-0 text-capitalize font-weight-bold">{{_order.BillingAddress.Street1}}<span *ngIf="_order.BillingAddress.Street2">, {{_order.BillingAddress.Street2}}</span></p>
+              <p class="mb-0 text-capitalize font-weight-bold">{{_order.BillingAddress.City}}, {{_order.BillingAddress.State}} {{_order.BillingAddress.Zip}}</p>
+              <small class="mb-0">{{getFullName(_order.BillingAddress)}}
+                <span *ngIf="_lineItems[0].ShippingAddress?.Phone"> | {{_order.BillingAddress.Phone}}</span>
+              </small>
             </div>
-            <!-- Since Outgoing Orders do not have a Billing Address, using an *ngIf -->
-            <div *ngIf="_order.BillingAddress" class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <span class="text-muted">Billing Address</span>
-                    <p class="mb-0 text-capitalize font-weight-bold">{{_order.BillingAddress.Street1}}<span *ngIf="_order.BillingAddress.Street2">, {{_order.BillingAddress.Street2}}</span></p>
-                    <p class="mb-0 text-capitalize font-weight-bold">{{_order.BillingAddress.City}}, {{_order.BillingAddress.State}} {{_order.BillingAddress.Zip}}</p>
-                    <small class="mb-0">{{getFullName(_order.BillingAddress)}}
-                        <span *ngIf="_lineItems[0].ShippingAddress.Phone"> | {{_order.BillingAddress.Phone}}</span>
-                    </small>
-                </div>
-            </div>
+          </div>
         </div>
-    </div>
-    <div class="col-6">
-      <div *ngIf="_order.Comments"
-           class="alert alert-secondary small">
-        <strong>Comments: </strong> {{_order.Comments}}
       </div>
-      <!-- Since Outgoing Orders do not have a Shipping/Tax, using an *ngIf -->
-      <div *ngIf="orderDirection === 'Incoming'">
-        <strong>Subtotal</strong> <span class="float-right">{{_order.Subtotal | currency}}</span><br>
-        <strong>Shipping</strong> <span class="float-right">{{_order.ShippingCost | currency}}</span><br>
-        <strong>Tax</strong> <span class="float-right">{{_order.TaxCost | currency}}</span><br>
-        <div *ngIf="_order.PromotionDiscount">
-         <strong class="text-danger">Promo Discount</strong> <span class="float-right text-danger">-{{_order.PromotionDiscount | currency}}</span>
+      <!-- DISPLAY FOR STANDARD (NON-QUOTE) ORDERS-->
+      <div class="col-6"
+           *ngIf="!isQuoteOrder(_order)">
+        <div *ngIf="_order.Comments"
+             class="alert alert-secondary small">
+          <strong>Comments: </strong> {{_order.Comments}}
         </div>
+        <!-- Since Outgoing Orders do not have a Shipping/Tax, using an *ngIf -->
+        <div *ngIf="orderDirection === 'Incoming'">
+          <strong>Subtotal</strong> <span class="float-right">{{_order.Subtotal | currency}}</span><br>
+          <strong>Shipping</strong> <span class="float-right">{{_order.ShippingCost | currency}}</span><br>
+          <strong>Tax</strong> <span class="float-right">{{_order.TaxCost | currency}}</span><br>
+          <div *ngIf="_order.PromotionDiscount">
+            <strong class="text-danger">Promo Discount</strong> <span class="float-right text-danger">-{{_order.PromotionDiscount | currency}}</span>
+          </div>
+          <hr>
+        </div>
+        <div class="text-right lead"><b class="float-left">Total:</b><span class="_order-total">{{_order.Total | currency}}</span></div>
         <hr>
-    </div>
-      <div class="text-right lead"><b class="float-left">Total:</b><span class="_order-total">{{_order.Total | currency}}</span></div>
-      <hr>
-    <!-- Since Outgoing Orders do not have Payment information, using an *ngIf -->
-      <div class="lead" *ngIf="orderDirection === 'Incoming'">
+        <!-- Since Outgoing Orders do not have Payment information, using an *ngIf -->
+        <div class="lead"
+             *ngIf="orderDirection === 'Incoming'">
           <b>Payments</b>
-      </div>
-      <div class="mb-4" *ngFor="let payment of _payments">
-        <span *ngIf="payment.Type === 'CreditCard'">
+        </div>
+        <div class="mb-4"
+             *ngFor="let payment of _payments">
+          <span *ngIf="payment.Type === 'CreditCard'">
             <strong>
-                {{ setCardType(payment) }} ending in {{ payment.xp.partialAccountNumber }}
+              {{ setCardType(payment) }} ending in {{ payment.xp.partialAccountNumber }}
             </strong>
-        </span>
-        <span *ngIf="payment.Type === 'PurchaseOrder'">
+          </span>
+          <span *ngIf="payment.Type === 'PurchaseOrder'">
             Purchase Order <small *ngIf="payment.xp.PONumber">{{payment.xp.PONumber}}</small>
-        </span>
-        <span *ngIf="payment.Type === 'SpendingAccount'">
+          </span>
+          <span *ngIf="payment.Type === 'SpendingAccount'">
             Spending Account: {{ payment.Details.Name }}
-        </span>
-        <span class="float-right">-{{payment.Amount | currency}}</span>
-        <hr>
+          </span>
+          <span class="float-right">-{{payment.Amount | currency}}</span>
+          <hr>
+        </div>
+      </div>
+      <!--DISPLAY FOR QUOTE ORDERS-->
+      <div class="col-6"
+           *ngIf="isQuoteOrder(_order)">
+        <strong>Submitted By</strong>
+        <span class="float-right">{{_order.xp?.QuoteOrderInfo.FirstName}} {{_order.xp?.QuoteOrderInfo.LastName}}</span><br>
+        <span class="float-right">{{_order.xp?.QuoteOrderInfo.Phone | tel}}</span><br>
+        <span class="float-right">{{_order.xp?.QuoteOrderInfo.Email}}</span><br>
+        <div *ngIf="order?.xp?.QuoteOrderInfo?.Comments"
+             class="alert alert-secondary small">
+          <strong>Comments: </strong> {{_order.xp.QuoteOrderInfo.Comments}}
+        </div>
+      </div>
+    </div>
+    <div *ngIf="_liGroupedByShipFrom?.length > 0">
+      <div class="card border shadow-sm mb-4"
+           *ngFor="let liGroup of _liGroupedByShipFrom">
+        <div class="card-header p-3">
+          <div class="row">
+            <div class="col">
+              <h5 class="card-title mb-0">
+                Ship From: {{ liGroup[0].ShipFromAddress.CompanyName }}
+                <small class="text-muted d-block">
+                  <span>{{ liGroup[0].ShipFromAddress.Street1 }}<span *ngIf="_lineItems[0].ShippingAddress?.Street2">, {{_lineItems[0].ShippingAddress.Street2}}</span>,
+                    {{ liGroup[0].ShipFromAddress.City }}, {{ liGroup[0].ShipFromAddress.State }} {{ liGroup[0].ShipFromAddress.Zip }}</span>
+                </small>
+              </h5>
+            </div>
+          </div>
+          <ng-content></ng-content>
+        </div>
+        <div *ngIf="!isQuoteOrder"
+             class="px-3 pt-2 d-none d-sm-block border-bottom">
+          <div class="row">
+            <div class="col-sm-7">
+            </div>
+            <div class="col-sm-5">
+              <div class="row">
+                <div class="col-4 text-center">
+                  <h6>Price</h6>
+                </div>
+                <div class="col-4 text-center">
+                  <h6>Qty</h6>
+                </div>
+                <div class="col-4 text-center">
+                  <h6>Total</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex-none">
+          <div *ngFor="let li of liGroup; let i = index">
+            <div class="m-2 row align-items-center">
+              <div class="col-sm-7">
+                <div class="row align-items-sm-center">
+                  <div class="col-3 p-0">
+                    <img [id]="i"
+                         [src]="getImageUrl(li)"
+                         width="auto"
+                         height="100px">
+                  </div>
+                  <div class="col-9">
+                    <h6>
+                      <span>{{ li.Product.Name }}</span>
+                      <small class="text-muted d-block">{{ li.Product.ID }}</small>
+                    </h6>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-5"
+                   *ngIf="!isQuoteOrder">
+                <div class="row align-items-center pt-3 pt-sm-0">
+                  <div class="col-4 text-center">
+                    <span class="d-block d-sm-none">Unit Price</span>
+                    <span class="text-nowrap">{{ li.UnitPrice | currency }}</span>
+                  </div>
+                  <div class="col-4 text-center">
+                    <span class="d-block d-sm-none">Qty</span>
+                    <span class="text-nowrap">&times;{{ li.Quantity | number }}</span>
+                  </div>
+                  <div class="col-4 text-center">
+                    <span class="d-block d-sm-none">Total</span>
+                    <span class="text-nowrap">{{ li.LineTotal | currency }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- hr only visible on mobile to more clearly distinguish between line items -->
+            <hr class="pb-4 d-block d-sm-none">
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div *ngIf="_liGroupedByShipFrom?.length > 0">
-      <div class="card border shadow-sm mb-4"
-            *ngFor="let liGroup of _liGroupedByShipFrom">
-        <div class="card-header p-3">
-            <div class="row">
-                <div class="col">
-                    <h5 class="card-title mb-0">
-                        Ship From: {{ liGroup[0].ShipFromAddress.CompanyName }}
-                        <small class="text-muted d-block">
-                            <span>{{ liGroup[0].ShipFromAddress.Street1 }}<span *ngIf="_lineItems[0].ShippingAddress.Street2">, {{_lineItems[0].ShippingAddress.Street2}}</span>,
-                            {{ liGroup[0].ShipFromAddress.City }}, {{ liGroup[0].ShipFromAddress.State }} {{ liGroup[0].ShipFromAddress.Zip }}</span>
-                        </small>
-                    </h5>
-                </div>
-            </div>
-            <ng-content></ng-content>
-        </div>
-        <div class="px-3 pt-2 d-none d-sm-block border-bottom">
-            <div class="row">
-                <div class="col-sm-7">
-                </div>
-                <div class="col-sm-5">
-                    <div class="row">
-                        <div class="col-4 text-center">
-                            <h6>Price</h6>
-                        </div>
-                        <div class="col-4 text-center">
-                            <h6>Qty</h6>
-                        </div>
-                        <div class="col-4 text-center">
-                            <h6>Total</h6>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="flex-none">
-            <div *ngFor="let li of liGroup; let i = index">
-                <div class="m-2 row align-items-center">
-                    <div class="col-sm-7">
-                        <div class="row align-items-sm-center">
-                            <div class="col-3 p-0">
-                                <img 
-                                    [id]="i"
-                                    [src]="getImageUrl(li)"
-                                    width="auto"
-                                    height="100px">
-                            </div>
-                            <div class="col-9">
-                                <h6>
-                                    <span>{{ li.Product.Name }}</span>
-                                    <small class="text-muted d-block">{{ li.Product.ID }}</small>
-                                </h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-5">
-                        <div class="row align-items-center pt-3 pt-sm-0">
-                            <div class="col-4 text-center">
-                                <span class="d-block d-sm-none">Unit Price</span>
-                                <span class="text-nowrap">{{ li.UnitPrice | currency }}</span>
-                            </div>
-                            <div class="col-4 text-center">
-                                <span class="d-block d-sm-none">Qty</span>
-                                <span class="text-nowrap">&times;{{ li.Quantity | number }}</span>
-                            </div>
-                             <div class="col-4 text-center">
-                                <span class="d-block d-sm-none">Total</span>
-                                <span class="text-nowrap">{{ li.LineTotal | currency }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <!-- hr only visible on mobile to more clearly distinguish between line items -->
-                <hr class="pb-4 d-block d-sm-none">
-            </div>
-        </div>
-    </div>
-   </div>
- </div>
 </div>

@@ -4,37 +4,13 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'tel',
 })
 export class PhoneFormatPipe implements PipeTransform {
-  transform(tel: string) {
-    if (!tel) {
-      return '';
+  transform(phoneNumber: string): string {
+    const cleaned = ('' + phoneNumber).replace(/\D/g, '')
+    const match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/)
+    if (match) {
+      const intlCode = (match[1] ? '+1 ' : '')
+      return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('')
     }
-
-    const value = tel
-      .toString()
-      .trim()
-      .replace(/[^0-9]/g, '');
-
-    let city, number;
-
-    switch (value.length) {
-      case 1:
-      case 2:
-      case 3:
-        city = value;
-        break;
-
-      default:
-        city = value.slice(0, 3);
-        number = value.slice(3);
-    }
-    if (number) {
-      if (number.length > 3) {
-        number = `${number.slice(0, 3)}-${number.slice(3, 7)}`;
-      }
-
-      return `(${city}) ${number}`.trim();
-    } else {
-      return `(${city}`;
-    }
+    return null
   }
 }
