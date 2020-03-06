@@ -113,28 +113,32 @@
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="MinQuantity">Minimum Order Quantity</label>
+            <label for="MinQuantity">Min Quantity</label>
             <input type="number"
                    class="form-control"
                    id="MinQuantity"
                    showErrors
-                   aria-describedby="Minimum Order Quantity"
+                   aria-describedby="Min Quantity"
+                   min="1"
+                   step="1"
                    [resourceForm]="productForm"
                    formControlName="MinQuantity"
                    (input)="handleUpdateProduct($event, 'PriceSchedule.MinQuantity', 'number')"
-                   placeholder="Enter Minimum Order Quantity">
+                   placeholder="Enter Min Quantity">
           </div>
           <div class="form-group col-md-6">
-            <label for="MaxQuantity">Maximum Order Quantity</label>
+            <label for="MaxQuantity">Max Quantity</label>
             <input type="number"
                    class="form-control"
                    id="MaxQuantity"
                    showErrors
-                   aria-describedby="Maximum Order Quantity"
+                   aria-describedby="Max Quantity"
+                   min="1"
+                   step="1"
                    [resourceForm]="productForm"
                    formControlName="MaxQuantity"
                    (input)="handleUpdateProduct($event, 'PriceSchedule.MaxQuantity', 'number')"
-                   placeholder="Enter Maximum Order Quantity">
+                   placeholder="Enter Max Quantity">
           </div>
         </div>
         <product-tax-code-select-component [productForm]="productForm"
