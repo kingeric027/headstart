@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Marketplace.Common;
 using Marketplace.Common.Services;
-using Marketplace.Common.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using NUnit.Framework;

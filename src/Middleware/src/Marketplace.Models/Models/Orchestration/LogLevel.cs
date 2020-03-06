@@ -1,11 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Marketplace.Common.Models
+namespace Marketplace.Models.Orchestration
 {
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum LogLevel { Progress, Error, Warn, Success }

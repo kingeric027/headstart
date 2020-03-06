@@ -4,9 +4,13 @@ using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
+using Marketplace.Helpers.Attributes;
+using Marketplace.Models.Attributes;
 
 namespace Marketplace.Common.Controllers
 {
+    [DocComments("\"Marketplace Suppliers\" represents Supplier in Marketplace")]
+    [MarketplaceSection.Marketplace(ListOrder = 2)]
     [Route("supplier")]
     public class SupplierController : BaseController
     {
@@ -19,7 +23,8 @@ namespace Marketplace.Common.Controllers
             _oc = oc;
         }
 
-        [HttpGet, Route("me/{supplierID}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        [DocName("GET MarketplaceSupplier")]
+        [HttpGet, MarketplaceUserAuth(ApiRole.SupplierAdmin, ApiRole.SupplierReader)]
         public async Task<MarketplaceSupplier> GetMySupplier(string supplierID)
         {
             // ocAuth is the token for the organization that is specified in the AppSettings
@@ -27,6 +32,7 @@ namespace Marketplace.Common.Controllers
             return await _command.GetMySupplier(supplierID, VerifiedUserContext, ocAuth.AccessToken);
         }
 
+        [DocName("POST Marketplace Supplier")]
         [HttpPost, MarketplaceUserAuth(ApiRole.SupplierAdmin)]
         public async Task<MarketplaceSupplier> Create([FromBody] MarketplaceSupplier supplier)
         {

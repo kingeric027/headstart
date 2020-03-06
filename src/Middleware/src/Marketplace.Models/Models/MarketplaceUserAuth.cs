@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Marketplace.Helpers.Attributes;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
@@ -12,15 +13,16 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Models
 {
-	public class MarketplaceUserAuthAttribute : AuthorizeAttribute
+	public class MarketplaceUserAuthAttribute : AuthorizeAttribute, IApiAuthAttribute
 	{
+        public ApiRole[]  ApiRoles { get; }
 		/// <param name="roles">Optional list of roles. If provided, user must have just one of them, otherwise authorization fails.</param>
 		public MarketplaceUserAuthAttribute(params ApiRole[] roles)
 		{
 			AuthenticationSchemes = "MarketplaceUser";
-			roles = roles.Append(ApiRole.FullAccess).ToArray(); // Full Access is always included in the list of roles that give access to a resource.  
-			Roles = string.Join(",", roles);
-		}
+			ApiRoles = roles.Append(ApiRole.FullAccess).ToArray(); // Full Access is always included in the list of roles that give access to a resource.  
+			Roles = string.Join(",", ApiRoles);
+        }
 	}
 
 	public class MarketplaceUserAuthHandler : AuthenticationHandler<MarketplaceUserAuthOptions>

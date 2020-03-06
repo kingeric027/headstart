@@ -1,12 +1,8 @@
 ﻿using Cosmonaut;
-using Marketplace.Common.Models;
-using Marketplace.Helpers.Models;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Queries
 {

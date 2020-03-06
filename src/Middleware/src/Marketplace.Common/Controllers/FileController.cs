@@ -1,15 +1,17 @@
 ﻿using Marketplace.Common.Services;
-using Marketplace.Helpers;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
+using Marketplace.Models.Attributes;
 
 namespace Marketplace.Common.Controllers
 {
-	[Route("{marketplaceID}")]
+    [DocComments("\"Files\" represents files for Marketplace content management control")]
+    [MarketplaceSection.Marketplace(ListOrder = 4)]
+    [Route("{marketplaceID}")]
 	public class FileController: BaseController
 	{
 		private readonly IContentManagementService _content;
@@ -18,14 +20,16 @@ namespace Marketplace.Common.Controllers
 			_content = content;
 		}
 
+        [DocName("POST Product Images")]
 		[HttpPost, Route("images/product/{productID}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> UploadProductImages(IFormFile file, string marketplaceID, string productID)
+		public async Task<SuperMarketplaceProduct> Post(IFormFile file, string marketplaceID, string productID)
 		{
 			return await _content.UploadProductImage(file, marketplaceID, productID, VerifiedUserContext.AccessToken);
 		}
 
+        [DocName("DELETE Product Images")]
 		[HttpDelete, Route("images/product/{productID}/{fileName}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> DeleteProductImages(string marketplaceID, string productID, string fileName)
+		public async Task<SuperMarketplaceProduct> Delete(string marketplaceID, string productID, string fileName)
 		{
 			return await _content.DeleteProductImage(marketplaceID, productID, fileName, VerifiedUserContext.AccessToken);
 		}

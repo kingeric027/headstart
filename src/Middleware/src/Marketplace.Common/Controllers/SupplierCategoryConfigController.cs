@@ -1,14 +1,16 @@
-﻿using Cosmonaut;
-using Marketplace.Common.Models;
-using Marketplace.Common.Queries;
-using Marketplace.Helpers;
+﻿using Marketplace.Common.Queries;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
+using Marketplace.Models.Attributes;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Controllers
 {
+    [DocComments("\"Supplier Category Config\" represents Supplier Category Configuration")]
+    [MarketplaceSection.Marketplace(ListOrder = 5)]
     public class SupplierCategoryConfigController : BaseController
     {
         private readonly ISupplierCategoryConfigQuery _query;
@@ -18,6 +20,7 @@ namespace Marketplace.Common.Controllers
             _query = query;
         }
 
+        [DocName("GET SupplierCategoryConfig")]
         [HttpGet, Route("marketplace/{marketplaceID}/supplier/category/config"), MarketplaceUserAuth(ApiRole.SupplierReader)]
         public async Task<SupplierCategoryConfig> Get(string marketplaceID)
         {

@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
 using Marketplace.Models.Exceptions;
+using ErrorCode = Marketplace.Helpers.Models.ErrorCode;
 
 namespace Marketplace.Models
 {
     public static class ErrorCodes
     {
-        public static IDictionary<string, ErrorCode> All { get; } = new Dictionary<string, ErrorCode>
+        public static IDictionary<string, IErrorCode> All { get; } = new Dictionary<string, IErrorCode>
         {
             { "Checkout.MissingShippingSelection", new  ErrorCode<MissingShippingSelectionError>("MissingShippingSelection", 404, "Cannot proceed until all shipping selections have been made.") },
             { "Checkout.InvalidShipFromAddress", new ErrorCode<InvalidShipFromAddressIDError>("InvalidShipFromAddress", 400, "This ShipFromAddressID does not match any products in the order") },

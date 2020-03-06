@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Marketplace.Helpers.Attributes;
 
 namespace Marketplace.Common
 {
@@ -15,6 +16,7 @@ namespace Marketplace.Common
         string SendgridApiKey { get; }
     }
 
+    [DocIgnore]
     public class AppSettings : IAppSettings
     {
 		public AvalaraSettings AvalaraSettings { get; set; }
