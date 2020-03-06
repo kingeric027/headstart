@@ -13,6 +13,7 @@ import {
 import { faCopy, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
+import { SortDirection } from './sort-direction.enum';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -27,9 +28,8 @@ export class FullResourceTableComponent {
   faSort = faSort;
   faSortUp = faSortUp;
   faSortDown = faSortDown;
-  sortDirection: string;
+  sortDirection: SortDirection = SortDirection.None;
   activeSort: string;
-  _ocService: ResourceCrudService<any>;
   objectPreviewText: string;
   _resourceList = { Meta: {}, Items: [] };
 
@@ -43,9 +43,7 @@ export class FullResourceTableComponent {
     this.setDisplayValuesForResource(value.Items);
   }
   @Input()
-  set ocService(service: ResourceCrudService<any>) {
-    this._ocService = service;
-  }
+  ocService: ResourceCrudService<any>;
   @Output()
   resourceSelected = new EventEmitter();
 
@@ -136,21 +134,18 @@ export class FullResourceTableComponent {
 
   handleSort(header: string) {
     this.activeSort = header;
-    if (!this.sortDirection) {
-      this.sortDirection = 'asc';
-    } else if (this.sortDirection === 'asc') {
-      this.sortDirection = 'desc';
-    } else if (this.sortDirection === 'desc') {
-      this.sortDirection = this.activeSort = '';
+    this.sortDirection = (this.sortDirection + 1) % 3;
+    if (this.sortDirection === SortDirection.None) {
+      this.activeSort = '';
     }
-    let sortInverse = this.sortDirection === 'desc' ? '!' : '';
-    this._ocService.sortBy(sortInverse + this.activeSort);
+    let sortInverse = this.sortDirection === SortDirection.Desc ? '!' : '';
+    this.ocService.sortBy(sortInverse + this.activeSort);
   }
 
   getSortArrowDirection(header: string) {
-    if (this.activeSort === header && this.sortDirection === 'asc') {
+    if (this.activeSort === header && this.sortDirection === SortDirection.Asc) {
       return faSortUp;
-    } else if (this.activeSort === header && this.sortDirection === 'desc') {
+    } else if (this.activeSort === header && this.sortDirection === SortDirection.Desc) {
       return faSortDown;
     } else {
       return faSort;
