@@ -18,7 +18,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
             return cheapestRatesForEachDeliveryDays.ToList();
         }
         
-        public static List<ShipmentMethod> Map(IList<ShippingRate> shippingRates)
+        public static List<ShipMethod> Map(IList<ShippingRate> shippingRates)
         {
             var cheapestRates = GetCheapestRatesForEachDeliveryDays(shippingRates.ToList());
             return cheapestRates.Select(cheapestRate =>
@@ -30,9 +30,9 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 
     public static class ShipmentMethodMapper
     {
-        public static ShipmentMethod Map(ShippingRate obj)
+        public static ShipMethod Map(ShippingRate obj)
         {
-            return new ShipmentMethod
+            return new ShipMethod
             {
                 ID = obj.Id,
                 Name = obj.Service,

@@ -2,25 +2,25 @@ import { LineItem } from '@ordercloud/angular-sdk';
 import { MarketplaceOrder } from '../../shopper-context';
 
 // tentative models to be overriden by ordercloud sdk
-export interface ShipmentPreference {
-  ShipmentEstimateID: string;
-  ShipmentMethodID: string;
+export interface ShipMethodSelection {
+  ShipEstimateID: string;
+  ShipMethodID: string;
 }
 
-export interface ShipmentEstimate {
+export interface ShipEstimate {
   ID: string;
-  ShipmentEstimateItems: ShipmentEstimateItem[];
-  ShipmentMethods: ShipmentMethod[];
+  ShipEstimateItems: ShipEstimateItem[];
+  ShipMethods: ShipMethod[];
   SelectedShipMethodID: string;
   xp: any;
 }
 
-export interface ShipmentEstimateItem {
+export interface ShipEstimateItem {
   LineItemID: string;
   Quantity: number;
 }
 
-export interface ShipmentMethod {
+export interface ShipMethod {
   ID: string;
   Name: string;
   EstimatedTransitDays: number;
@@ -31,12 +31,12 @@ export interface ShipmentMethod {
 export interface OrderWorksheet {
   Order: MarketplaceOrder;
   LineItems: LineItem[];
-  ShipmentEstimateResponse: ShipmentEstimateResponse;
+  ShipEstimateResponse: ShipEstimateResponse;
   OrderCalculateResponse: OrderCalculateResponse;
 }
 
-export interface ShipmentEstimateResponse {
-  ShipmentEstimates: ShipmentEstimate[];
+export interface ShipEstimateResponse {
+  ShipEstimates: ShipEstimate[];
 }
 
 export interface OrderCalculateResponse {

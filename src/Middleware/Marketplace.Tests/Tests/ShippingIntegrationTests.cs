@@ -125,29 +125,29 @@ namespace Marketplace.Tests
             };
         }
 
-        private List<ShipmentMethod> GetProposedShipmentCheapestList()
+        private List<ShipMethod> GetProposedShipmentCheapestList()
         {
-            return new List<ShipmentMethod>()
+            return new List<ShipMethod>()
             {
-                new ShipmentMethod() {
+                new ShipMethod() {
                     Cost = (decimal)235.05,
                     EstimatedTransitDays = 4,
                     ID = "FedexParcel-fab38772-74c0-4956-8856-28f2f2489ee7",
                     Name = "FEDEX_GROUND",
                 },
-                new ShipmentMethod() {
+                new ShipMethod() {
                     ID = "FedexParcel-63607797-48e1-41ec-b435-0c762fd63724",
                     EstimatedTransitDays = 3,
                     Name= "FEDEX_EXPRESS_SAVER",
                     Cost = (decimal)750.6,
                 },
-                new ShipmentMethod() {
+                new ShipMethod() {
                     ID = "FedexParcel-79d89afe-0644-47f9-8759-a2e667606fa2",
                     EstimatedTransitDays = 2,
                     Name = "FEDEX_2_DAY",
                     Cost = (decimal)855.15,
                 },        
-                new ShipmentMethod() {
+                new ShipMethod() {
                     ID = "FedexParcel-4c22e232-0da8-4a29-a826-9a47e3a8eaa0",
                     EstimatedTransitDays = 1,
                     Name = "STANDARD_OVERNIGHT",

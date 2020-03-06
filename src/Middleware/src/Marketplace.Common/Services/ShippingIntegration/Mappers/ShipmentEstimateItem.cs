@@ -5,9 +5,9 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {
     public static class ShipmentEstimateItemMapper
     {
-        public static ShipmentEstimateItem Map(LineItem obj)
+        public static ShipEstimateItem Map(LineItem obj)
         {
-            return new ShipmentEstimateItem
+            return new ShipEstimateItem
             {
                 LineItemID = obj.ID,
                 Quantity = obj.Quantity

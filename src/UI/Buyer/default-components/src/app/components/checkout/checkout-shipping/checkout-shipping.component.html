@@ -1,10 +1,10 @@
-<div *ngIf="_shipmentEstimates">
-  <div *ngFor="let shipmentEstimate of _shipmentEstimates; let i = index">
-    <ocm-lineitem-table [lineItems]="_lineItemsByShipmentEstimate[i]" [readOnly]="true">
+<div *ngIf="_shipEstimates">
+  <div *ngFor="let shipEstimate of _shipEstimates; let i = index">
+    <ocm-lineitem-table [lineItems]="_lineItemsByShipEstimate[i]" [readOnly]="true">
       <ocm-shipping-selection-form
-        [shipmentEstimate]="shipmentEstimate"
-        [supplierID]="getSupplierID(shipmentEstimate)"
-        [shipFromAddressID]="getShipFromAddressID(shipmentEstimate)"
+        [shipEstimate]="shipEstimate"
+        [supplierID]="getSupplierID(shipEstimate)"
+        [shipFromAddressID]="getShipFromAddressID(shipEstimate)"
         (selectionChanged)="selectRate($event.detail)"
       >
       </ocm-shipping-selection-form>
