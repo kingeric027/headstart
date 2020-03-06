@@ -15,11 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Marketplace.Helpers" Version="0.0.23" />
     <PackageReference Include="OrderCloud.SDK" Version="0.7.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\oc-marketplace-helpers.steve.davis\src\Marketplace.Helpers\Marketplace.Helpers.csproj" />
   </ItemGroup>
 
 </Project>

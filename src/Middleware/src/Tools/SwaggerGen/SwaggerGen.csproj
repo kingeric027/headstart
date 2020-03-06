@@ -6,7 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\oc-marketplace-helpers.steve.davis\src\Marketplace.Helpers\Marketplace.Helpers.csproj" />
+    <PackageReference Include="Marketplace.Helpers" Version="0.0.23" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Marketplace.Common\Marketplace.Common.csproj" />
     <ProjectReference Include="..\..\Marketplace.Models\Marketplace.Models.csproj" />
   </ItemGroup>

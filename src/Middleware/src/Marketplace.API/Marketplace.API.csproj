@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Marketplace.Helpers" Version="0.0.23" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="SendGrid" Version="9.12.5" />
   </ItemGroup>
