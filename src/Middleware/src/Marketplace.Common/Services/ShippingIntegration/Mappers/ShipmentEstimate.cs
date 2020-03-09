@@ -9,7 +9,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
             return new ShipEstimate
             {
                 ID = obj.ID,
-                ShipEstimateItems = obj.ShipmentEstimateItems,
+                ShipEstimateItems = obj.ShipEstimateItems,
                 ShipMethods = ShipmentEstimateMethodsMapper.Map(obj.RateResponseTask.Result.Data.Rates)
             };
         }

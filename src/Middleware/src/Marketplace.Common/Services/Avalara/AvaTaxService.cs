@@ -61,7 +61,7 @@ namespace Marketplace.Common.Services.AvaTax
 		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)
 		{
 			var trans = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderWorksheet.Order));
-			foreach (var shipmentEstimate in orderWorksheet.ShipmentEstimateResponse.ShipEstimates)
+			foreach (var shipmentEstimate in orderWorksheet.ShipEstimateResponse.ShipEstimates)
 			{
 				var selectedShipMethod = shipmentEstimate.ShipMethods.First(shipmentMethod => shipmentMethod.ID == shipmentEstimate.SelectedShipMethodID);
 				var shippingRate = selectedShipMethod.Cost;

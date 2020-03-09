@@ -183,10 +183,10 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
         public static List<ZohoLineItem> Map(OrderWorksheet orderWorksheet, ZohoLineItem shipping)
         {
-            return orderWorksheet.ShipmentEstimateResponse.ShipEstimates.Select(shipmentEstimate => {
+            return orderWorksheet.ShipEstimateResponse.ShipEstimates.Select(shipEstimate => {
                 //var choosenProposedShipmentSelection = shipmentEstimate.ShipmentMethods.First(shipmentMethod => shipmentMethod.ID == proposedShipment.SelectedProposedShipmentOptionID);
-                var choosenShipMethod = shipmentEstimate.ShipMethods.First(shipmentMethod => shipmentMethod.ID == shipmentEstimate.SelectedShipMethodID);
-                var supplierIDOfShipment = orderWorksheet.LineItems.First(lineItem => lineItem.ID == shipmentEstimate.ShipEstimateItems.First().LineItemID);
+                var choosenShipMethod = shipEstimate.ShipMethods.First(shipmentMethod => shipmentMethod.ID == shipEstimate.SelectedShipMethodID);
+                var supplierIDOfShipment = orderWorksheet.LineItems.First(lineItem => lineItem.ID == shipEstimate.ShipEstimateItems.First().LineItemID);
                 return new ZohoLineItem()
                 {
                     item_id = shipping.item_id,
