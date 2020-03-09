@@ -11,7 +11,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 	public class ShipmentEstimateRequest
 	{
 		public string ID { get; set; }
-		public List<ShipmentEstimateItem> ShipmentEstimateItems { get; set; }
+		public List<ShipEstimateItem> ShipEstimateItems { get; set; }
 		public RateRequestBody RateRequestBody { get; set; }
 		public Task<Response<GetRatesData>> RateResponseTask { get; set; }
 	}
@@ -24,57 +24,56 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 	{
 		public MarketplaceOrder Order { get; set; }
 		public List<MarketplaceLineItem> LineItems { get; set; }
-		public ShipmentEstimateResponse ShipmentEstimateResponse { get; set; }
+		public ShipEstimateResponse ShipEstimateResponse { get; set; }
 		public OrderCalculateResponse OrderCalculateResponse { get; set; }
 	}
-	
 	public class OrderCalculateResponse
 	{
 		public List<LineItemOverride> LineItemOverrides { get; set; }
 		public decimal? ShippingTotal { get; set; }
 		public decimal? TaxTotal { get; set; }
-		public JObject xp { get; set; }
+		public JRaw xp { get; set; }
 	}
-	public class ShipmentEstimateResponse
+	public class ShipEstimateResponse
 	{
-		public List<ShipmentEstimate> ShipmentEstimates { get; set; }
+		public List<ShipEstimate> ShipEstimates { get; set; }
 	}
-	public class ShipmentEstimateItem
+	public class ShipEstimateItem
 	{
 		//unique to this proposedshipment
 		public string LineItemID { get; set; }
 		public int Quantity { get; set; }
 	}
-	public class ShipmentMethod
+	public class ShipMethod
 	{
 		//unique to this proposedshipment
 		public string ID { get; set; }
 		public string Name { get; set; }
 		public decimal Cost { get; set; }
 		public int EstimatedTransitDays { get; set; }
-		public JObject xp { get; set; }
+		public JRaw xp { get; set; }
 	}
-	public class ShipmentEstimate
+	public class ShipEstimate
 	{
 		public string ID { get; set; }
-		public JObject xp { get; set; }
+		public JRaw xp { get; set; }
 		public string SelectedShipMethodID { get; set; }
-		public List<ShipmentEstimateItem> ShipmentEstimateItems { get; set; }
-		public List<ShipmentMethod> ShipmentMethods { get; set; }
+		public List<ShipEstimateItem> ShipEstimateItems { get; set; }
+		public List<ShipMethod> ShipMethods { get; set; }
 	}
 	//model that's passed from the front end to set selections
-	public class OrderShipmethodSelection
+	public class OrderShipMethodSelection
 	{
-		public ShipmethodSelection[] ShipmethodSelections { get; set; }
+		public ShipMethodSelection[] ShipMethodSelections { get; set; }
 	}
-	public class ShipmethodSelection
+	public class ShipMethodSelection
 	{
-		public string ShipmentEstimateID { get; set; }
-		public string ShipmentMethodID { get; set; }
+		public string ShipEstimateID { get; set; }
+		public string ShipMethodID { get; set; }
 	}
 	public class OrderCalculatePayload
 	{
-		public OrderWorksheet OrderCalculation { get; set; }
+		public OrderWorksheet OrderWorksheet { get; set; }
 		public JRaw ConfigData { get; set; }
 	}
 }

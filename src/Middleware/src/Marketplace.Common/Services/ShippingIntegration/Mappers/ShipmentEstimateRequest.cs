@@ -14,7 +14,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
                 return new ShipmentEstimateRequest
                 {
                     ID = obj[0].ShipFromAddressID,
-                    ShipmentEstimateItems = shipmentEstimateItems,
+                    ShipEstimateItems = shipmentEstimateItems,
                     RateRequestBody = RateRequestBodyMapper.Map(obj),
                 };
         }

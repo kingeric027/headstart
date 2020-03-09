@@ -4,13 +4,13 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {
     public static class ShipmentEstimateMapper
     {
-        public static ShipmentEstimate Map(ShipmentEstimateRequest obj)
+        public static ShipEstimate Map(ShipmentEstimateRequest obj)
         {
-            return new ShipmentEstimate
+            return new ShipEstimate
             {
                 ID = obj.ID,
-                ShipmentEstimateItems = obj.ShipmentEstimateItems,
-                ShipmentMethods = ShipmentEstimateMethodsMapper.Map(obj.RateResponseTask.Result.Data.Rates)
+                ShipEstimateItems = obj.ShipEstimateItems,
+                ShipMethods = ShipmentEstimateMethodsMapper.Map(obj.RateResponseTask.Result.Data.Rates)
             };
         }
     }

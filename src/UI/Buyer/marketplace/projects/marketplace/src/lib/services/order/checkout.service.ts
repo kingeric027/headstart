@@ -11,7 +11,7 @@ import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
 import { OrderStateService } from './order-state.service';
-import { OrderWorksheet, ShipmentPreference } from '../ordercloud-sandbox/ordercloud-sandbox.models';
+import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/ordercloud-sandbox.models';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
 
 export interface ICheckout {
@@ -23,7 +23,7 @@ export interface ICheckout {
   setAddress(type: OrderAddressType, address: BuyerAddress): Promise<MarketplaceOrder>;
   setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder>;
   estimateShipping(): Promise<OrderWorksheet>;
-  selectShipMethod(selection: ShipmentPreference): Promise<MarketplaceOrder>;
+  selectShipMethod(selection: ShipMethodSelection): Promise<MarketplaceOrder>;
   calculateOrder(): Promise<MarketplaceOrder>;
 }
 
@@ -91,7 +91,7 @@ export class CheckoutService implements ICheckout {
     return await this.orderCloudSandBoxService.estimateShipping(this.order.ID);
   }
 
-  async selectShipMethod(selection: ShipmentPreference): Promise<MarketplaceOrder> {
+  async selectShipMethod(selection: ShipMethodSelection): Promise<MarketplaceOrder> {
     const orderCalculation = await this.orderCloudSandBoxService.selectShipMethod(this.order.ID, selection);
     this.order = orderCalculation.Order;
     return this.order;

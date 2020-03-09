@@ -7,8 +7,8 @@ import {
   ListPayment,
   ListLineItem,
   ListBuyerCreditCard,
-  ShipmentPreference,
-  ShipmentEstimate,
+  ShipMethodSelection,
+  ShipEstimate,
   CreditCardPayment,
 } from 'marketplace';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
@@ -25,7 +25,7 @@ export class OCMCheckout implements OnInit {
   payments: ListPayment;
   cards: ListBuyerCreditCard;
   selectedCard: CreditCardPayment;
-  shipmentEstimates: ShipmentEstimate[] = null;
+  shipEstimates: ShipEstimate[] = null;
   currentPanel: string;
   faCheck = faCheck;
   checkout: CheckoutService = this.context.order.checkout;
@@ -69,11 +69,11 @@ export class OCMCheckout implements OnInit {
 
   async doneWithShipToAddress(): Promise<void> {
     const orderWorksheet = await this.checkout.estimateShipping();
-    this.shipmentEstimates = orderWorksheet.ShipmentEstimateResponse.ShipmentEstimates;
+    this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
     this.toSection('shippingSelection');
   }
 
-  async selectShipmentMethod(selection: ShipmentPreference): Promise<void> {
+  async selectShipMethod(selection: ShipMethodSelection): Promise<void> {
     await this.checkout.selectShipMethod(selection);
   }
 

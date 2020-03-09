@@ -61,11 +61,11 @@ namespace Marketplace.Common.Services.AvaTax
 		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)
 		{
 			var trans = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderWorksheet.Order));
-			foreach (var shipmentEstimate in orderWorksheet.ShipmentEstimateResponse.ShipmentEstimates)
+			foreach (var shipmentEstimate in orderWorksheet.ShipEstimateResponse.ShipEstimates)
 			{
-				var selectedShipMethod = shipmentEstimate.ShipmentMethods.First(shipmentMethod => shipmentMethod.ID == shipmentEstimate.SelectedShipMethodID);
+				var selectedShipMethod = shipmentEstimate.ShipMethods.First(shipmentMethod => shipmentMethod.ID == shipmentEstimate.SelectedShipMethodID);
 				var shippingRate = selectedShipMethod.Cost;
-				var firstLineItemID = shipmentEstimate.ShipmentEstimateItems.FirstOrDefault().LineItemID;
+				var firstLineItemID = shipmentEstimate.ShipEstimateItems.FirstOrDefault().LineItemID;
 				var firstLineItem = orderWorksheet.LineItems.First(lineItem => lineItem.ID == firstLineItemID);
 				var shipFromAddress = firstLineItem.ShipFromAddress;
 				var shipToAddress = firstLineItem.ShippingAddress;

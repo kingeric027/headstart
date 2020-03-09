@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ShipmentEstimate, ShipmentPreference } from 'marketplace';
+import { ShipEstimate, ShipMethodSelection } from 'marketplace';
 import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
@@ -7,14 +7,14 @@ import { FormGroup, FormControl } from '@angular/forms';
   styleUrls: ['./shipping-selection-form.component.scss'],
 })
 export class OCMShippingSelectionForm implements OnInit {
-  _shipmentEstimate: ShipmentEstimate;
-  @Input() set shipmentEstimate(value: ShipmentEstimate) {
-    this._shipmentEstimate = value;
+  _shipEstimate: ShipEstimate;
+  @Input() set shipEstimate(value: ShipEstimate) {
+    this._shipEstimate = value;
     this.setSelectedRate(value.SelectedShipMethodID);
   }
   @Input() shipFromAddressID: string;
   @Input() supplierID: string;
-  @Output() selectionChanged = new EventEmitter<ShipmentPreference>();
+  @Output() selectionChanged = new EventEmitter<ShipMethodSelection>();
 
   form: FormGroup;
 
@@ -22,18 +22,18 @@ export class OCMShippingSelectionForm implements OnInit {
 
   ngOnInit(): void {
     this.form = new FormGroup({ rateID: new FormControl(null) });
-    this.form = new FormGroup({ ShipmentMethodID: new FormControl(null) });
+    this.form = new FormGroup({ ShipMethodID: new FormControl(null) });
   }
 
-  setSelectedRate(selectedShipmentMethodID: string): void {
-    this.form.setValue({ ShipmentMethodID: selectedShipmentMethodID });
+  setSelectedRate(selectedShipMethodID: string): void {
+    this.form.setValue({ ShipMethodID: selectedShipMethodID });
   }
 
   onFormChanges(): void {
-    const selectedShipMethodID = this.form.value.ShipmentMethodID;
+    const selectedShipMethodID = this.form.value.ShipMethodID;
     this.selectionChanged.emit({
-      ShipmentMethodID: selectedShipMethodID,
-      ShipmentEstimateID: this._shipmentEstimate.ID,
+      ShipMethodID: selectedShipMethodID,
+      ShipEstimateID: this._shipEstimate.ID,
     });
   }
 }
