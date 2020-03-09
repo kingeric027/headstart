@@ -30,6 +30,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 AuthUrl = appSettings.OrderCloudSettings.AuthUrl,
 
                 // currently just syncing shipments for fast from the four51 freightpop account where they are currently imported
+                // this oc client is required due to a bug that doesn't allow seller users to access shipments on a supplier order
                 ClientId = "DA08971F-DD3C-449A-98D2-E39D784761E7",
                 ClientSecret = appSettings.OrderCloudSettings.ClientSecret,
                 Roles = new[]
@@ -44,7 +45,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 ClientId = appSettings.OrderCloudSettings.ClientID,
                 ClientSecret = appSettings.OrderCloudSettings.ClientSecret,
                 Roles = new[]
-    {
+                {
                     ApiRole.FullAccess
                 }
             });
@@ -86,22 +87,29 @@ namespace Marketplace.Common.Services.ShippingIntegration
         private async Task CreateShipmentInOrderCloudIfNeeded(ShipmentDetails freightPopShipment, MarketplaceOrder relatedOrder)
         {
             // ordercloud bug prevents listing of shipments for a supplier order when authenticated as a seller user
-            var orderCloudShipments = await _ocFastSupplier.Shipments.ListAsync(orderID: relatedOrder.ID);
+            var orderCloudShipments = await _oc.Shipments.ListAsync(orderID: relatedOrder.ID);
+            var buyerIDForOrder = await GetBuyerIDForSupplierOrder(relatedOrder);
             if(orderCloudShipments.Meta.TotalCount == 0)
             {
-                await AddShipmentToOrderCloud(freightPopShipment, relatedOrder);
+                await AddShipmentToOrderCloud(freightPopShipment, relatedOrder, buyerIDForOrder);
             }
         }
 
-        private async Task AddShipmentToOrderCloud(ShipmentDetails freightPopShipment, MarketplaceOrder relatedOrder)
+        private async Task AddShipmentToOrderCloud(ShipmentDetails freightPopShipment, MarketplaceOrder relatedOrder, string buyerID)
         {
-            var ocShipment = await _oc.Shipments.CreateAsync(OCShipmentMapper.Map(freightPopShipment, relatedOrder.FromCompanyID));
+            var ocShipment = await _ocFastSupplier.Shipments.CreateAsync(OCShipmentMapper.Map(freightPopShipment, buyerID));
             foreach(var freightPopShipmentItem in freightPopShipment.Items)
             {
                 await _oc.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, relatedOrder.ID));
             }
         }
 
+        private async Task<string> GetBuyerIDForSupplierOrder(MarketplaceOrder relatedOrder)
+        {
+            var buyerOrderID = relatedOrder.xp.RelatedBuyerOrder;
+            var relatedBuyerOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, buyerOrderID);
+            return relatedBuyerOrder.FromCompanyID;
+        }
 
         public async Task<List<MarketplaceOrder>> GetOrdersNeedingShipmentAsync(int NumberOfDaysBack)
         {
@@ -112,7 +120,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
             //var firstPage = await GetOrdersNeedingShipmentAsync(currentPage++, twoWeeksAgo);
             //allOrders.AddRange(firstPage.Items);
-            var theOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, "aKuuWI04J0yy9UJ5LauauQ");
+            var theOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, "YP54VXOv30eJ6ZWRkIqTtA");
             allOrders.Add(theOrder);
 
             //var subsequentPages = await Throttler.RunAsync(new string[firstPage.Meta.TotalPages - 1], 100, 5,

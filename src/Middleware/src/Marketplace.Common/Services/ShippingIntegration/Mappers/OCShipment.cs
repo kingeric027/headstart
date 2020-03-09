@@ -14,7 +14,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
             {
                 Shipper = "Fedex",
                 DateShipped = freightPopShipment.ShipDate,
-
+                BuyerID = buyerID,
                 // when would there be more than one tracking number for a single freightpop shipment?
                 TrackingNumber = freightPopShipment.TrackingNumbers.First(),
                 Cost = freightPopShipment.Rate.DiscountedCost,
