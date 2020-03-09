@@ -9,6 +9,7 @@ using Marketplace.Models.Extended;
 using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using System.Linq;
 
 namespace Marketplace.Common.Commands
 {
@@ -40,21 +41,21 @@ namespace Marketplace.Common.Commands
 
         public async Task HandleBuyerOrderSubmit(Order order)
         {
-            if (order.xp.OrderType == OrderType.Quote)
-            {
-                await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
-            }
-            else
-            {
-                // forwarding
-                var buyerOrderWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, order.ID);
-                var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
-                var supplierOrders = orderSplitResult.OutgoingOrders;
+            // forwarding
+            var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
+            var supplierOrders = orderSplitResult.OutgoingOrders;
 
-                // integrations
-                await ImportSupplierOrdersIntoFreightPop(supplierOrders);
+            // creating relationship between the buyer order and the supplier order
+            // no relationship exists currently in the platform
+            var updatedSupplierOrders = await AddBuyerOrderIDToSupplierOrders(order.ID, supplierOrders.Select(o => o.ID).ToList());
+            
+            // quote orders do not need to flow into our integrations
+            if (order.xp == null || order.xp.OrderType != OrderType.Quote)
+            {
+                var buyerOrderWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, order.ID);
+                await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders);
                 
-                // temporarily do not do these integrations until platform bug is fixed
+                // temporarily do not do these integrations until platform bug that results in nulled fields on order worksheet is fixed
                 if(buyerOrderWorksheet.ShipEstimateResponse != null) {
                     await HandleTaxTransactionCreationAsync(buyerOrderWorksheet);
                     var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderWorksheet);
@@ -63,13 +64,30 @@ namespace Marketplace.Common.Commands
             }
         }
 
+        private async Task<List<Order>> AddBuyerOrderIDToSupplierOrders(string buyerOrderID, IList<string> supplierOrderIDs)
+        {
+            var partialOrder = new PartialOrder()
+            {
+                xp = new { RelatedBuyerOrder = buyerOrderID }
+            };
+
+            var updatedSupplierOrders = new List<Order>();
+            foreach(var supplierOrderID in supplierOrderIDs)
+            {
+                var updatedSupplierOrder = await _oc.Orders.PatchAsync(OrderDirection.Outgoing, supplierOrderID, partialOrder);
+                updatedSupplierOrders.Add(updatedSupplierOrder);
+            }
+
+            return updatedSupplierOrders;
+        }
+
         private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
         {
             var transaction = await _avatax.CreateTransactionAsync(orderWorksheet);
             await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
             {
                 TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
-                xp = { AvalaraTaxTransactionCode = transaction.code }
+                xp = new { AvalaraTaxTransactionCode = transaction.code }
             });
         }
 
