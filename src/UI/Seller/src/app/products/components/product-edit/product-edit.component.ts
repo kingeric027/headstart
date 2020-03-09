@@ -10,6 +10,7 @@ import {
   OcProductService,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ValidateMinMax } from '@app-seller/validators/validators';
 import {
   MarketPlaceProductImage,
   MarketPlaceProductTaxCode,
@@ -147,7 +148,8 @@ export class ProductEditComponent implements OnInit {
         // VariantCount: new FormControl(superMarketplaceProduct.VariantCount),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
-      });
+      }, { validators: ValidateMinMax }
+      );
     }
   }
 

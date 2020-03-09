@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors, ValidatorFn, ControlContainer } from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn, ControlContainer, FormGroup } from '@angular/forms';
 import {
   areAllCategoriesComplete,
   areDuplicateCategories,
@@ -14,6 +14,8 @@ export const ErrorDictionary = {
   min: 'Please enter a higher value',
   email: 'Please enter a valid email',
   ocMatchFields: `Passwords don't match`,
+  minGreaterThanMax: `Minimum value cannot be greater than maximum`,
+  maxLessThanMin: `Maximum value cannot be less than minimum`,
   strongPassword: `Password must be at least eight characters long and include at least 
     one letter and one number. Password can also include special characters.`,
   richTextFormatError:
@@ -102,6 +104,27 @@ export function ValidateFieldMatches(fieldToMatch: string): ValidatorFn {
     return { ocMatchFields: true };
   };
 }
+
+export const ValidateMinMax: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
+  const min = control.get('MinQuantity');
+  const max = control.get('MaxQuantity');
+  if (min.value <= max.value) {
+    if (min.errors) {
+      min.setErrors(null);
+      min.setValue(min.value);
+    }
+    if (max.errors) {
+      max.setErrors(null);
+      max.setValue(max.value);
+    }
+    return null;
+  } else if (min.value > max.value && max.value !== null) {
+    min.setErrors({ minGreaterThanMax: true });
+    max.setErrors({ maxLessThanMin: true });
+    return null;
+  } 
+  return null;
+};
 
 /**
  * Our date inputs use ngbDatepicker but also allow freeform entry.

@@ -133,7 +133,7 @@
                    id="MaxQuantity"
                    showErrors
                    aria-describedby="Max Quantity"
-                   min="1"
+                   min="{{productForm.controls.MinQuantity.value}}"
                    step="1"
                    [resourceForm]="productForm"
                    formControlName="MaxQuantity"
