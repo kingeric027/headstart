@@ -7,6 +7,7 @@ import { OrchestrationLog } from '@app-seller/reports/models/orchestration-log';
 import { ListPage } from './listPage.interface';
 import { ListArgs } from './listArgs.interface';
 import { MarketplaceBuyerLocation } from '@app-seller/shared/models/MarketplaceBuyerLocation.interface';
+import { Configuration, TaxCodes } from 'marketplace-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +27,9 @@ export class MiddlewareAPIService {
   ) {
     this.baseUrl = this.appConfig.middlewareUrl;
     this.marketplaceID = this.appConfig.marketplaceID;
+    Configuration.Set({
+      baseApiUrl: this.appConfig.middlewareUrl,
+    });
   }
 
   async getSuperMarketplaceProductByID(productID: string): Promise<any> {
@@ -61,10 +65,7 @@ export class MiddlewareAPIService {
   }
 
   async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
-    const url = `${
-      this.baseUrl
-    }/taxcodes?taxCategory=${taxCategory}&search=${search}&pageSize=${pageSize}&page=${page}`;
-    return await this.http.get(url, this.headers).toPromise();
+    return await TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize }, this.token());
   }
 
   async createSupplier(supplier: Supplier): Promise<Supplier> {
@@ -80,29 +81,6 @@ export class MiddlewareAPIService {
   async listOrchestrationLogs(args: ListArgs = {}): Promise<ListPage<OrchestrationLog>> {
     return await this.list(`${this.baseUrl}/orchestration/logs`, args);
   }
-
-  private list<T>(url: string, args: ListArgs = {}): Promise<T> {
-    url = this.addUrlParams(url, args.filters);
-    delete args.filters;
-    url = this.addUrlParams(url, args);
-    return this.http.get<T>(url, this.headers).toPromise();
-  }
-
-  private addUrlParams(baseUrl: string, object: Record<string, any> = {}): string {
-    const symbol = baseUrl.includes('?') ? '&' : '?';
-    const fields = Object.entries(object);
-    const url = fields
-      .filter(([key, value]) => value)
-      .reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}${symbol}`);
-    return url.replace(/[?&]+$/g, ''); // remove trailling & or ?
-  }
-
-  private formify(file: File): FormData {
-    const form = new FormData();
-    form.append('file', file);
-    return form;
-  }
-
   async getMySupplier(supplierID: string): Promise<Supplier> {
     const url = `${this.baseUrl}/supplier/me/${supplierID}`;
     return await this.http.get(url, this.headers).toPromise();
@@ -130,5 +108,31 @@ export class MiddlewareAPIService {
   async deleteBuyerLocation(buyerID: string, buyerLocationID: string): Promise<void> {
     const url = `${this.baseUrl}/buyerlocations/${buyerID}/${buyerLocationID}`;
     await this.http.delete(url).toPromise();
+  }
+
+  private token(): string {
+    return this.ocTokenService.GetAccess();
+  }
+
+  private list<T>(url: string, args: ListArgs = {}): Promise<T> {
+    url = this.addUrlParams(url, args.filters);
+    delete args.filters;
+    url = this.addUrlParams(url, args);
+    return this.http.get<T>(url, this.headers).toPromise();
+  }
+
+  private addUrlParams(baseUrl: string, object: Record<string, any> = {}): string {
+    const symbol = baseUrl.includes('?') ? '&' : '?';
+    const fields = Object.entries(object);
+    const url = fields
+      .filter(([key, value]) => value)
+      .reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}${symbol}`);
+    return url.replace(/[?&]+$/g, ''); // remove trailling & or ?
+  }
+
+  private formify(file: File): FormData {
+    const form = new FormData();
+    form.append('file', file);
+    return form;
   }
 }
