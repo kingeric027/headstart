@@ -73,11 +73,6 @@
       "x-id": "Integration"
     },
     {
-      "name": "Integrations",
-      "description": "\"Integration\" represents Integrations Marketplace",
-      "x-section-id": "Integration"
-    },
-    {
       "name": "Tax Codes",
       "description": "\"Integration\" represents Tax Codes for Marketplace",
       "x-section-id": "Integration"
@@ -269,7 +264,7 @@
     "schemas": {
       "BuyerAddressXP": {
         "type": "object",
-        "example": {"Accessorials":["DestinationInsideDelivery"]},
+        "example": {"Accessorials":["DestinationInsideDelivery"],"Email":""},
         "properties": {
           "Accessorials": {
             "type": "string",
@@ -282,6 +277,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "Email": {
+            "type": "string"
           }
         }
       },
@@ -555,7 +553,7 @@
       },
       "MarketplaceAddressBuyer": {
         "type": "object",
-        "example": {"xp":{"Accessorials":["DestinationInsideDelivery"]},"ID":"","DateCreated":"2018-01-01T00:00:00-06:00","CompanyName":"","FirstName":"","LastName":"","Street1":"","Street2":"","City":"","State":"","Zip":"","Country":"","Phone":"","AddressName":""},
+        "example": {"xp":{"Accessorials":["DestinationInsideDelivery"],"Email":""},"ID":"","DateCreated":"2018-01-01T00:00:00-06:00","CompanyName":"","FirstName":"","LastName":"","Street1":"","Street2":"","City":"","State":"","Zip":"","Country":"","Phone":"","AddressName":""},
         "properties": {
           "xp": {
             "allOf": [
@@ -1007,6 +1005,21 @@
           }
         }
       },
+      "MarketplaceTaxCode": {
+        "type": "object",
+        "example": {"Category":"","Code":"","Description":""},
+        "properties": {
+          "Category": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          }
+        }
+      },
       "MarketplaceUser": {
         "type": "object",
         "example": {"xp":{},"ID":"","Username":"","Password":"","FirstName":"","LastName":"","Email":"","Phone":"","TermsAccepted":"2018-01-01T00:00:00-06:00","Active":false,"AvailableRoles":[""],"DateCreated":"2018-01-01T00:00:00-06:00","PasswordLastSetDate":"2018-01-01T00:00:00-06:00"},
@@ -1065,7 +1078,7 @@
       },
       "MarketplaceUserGroup": {
         "type": "object",
-        "example": {"xp":{},"ID":"","Name":"","Description":""},
+        "example": {"xp":{"Type":""},"ID":"","Name":"","Description":""},
         "properties": {
           "xp": {
             "allOf": [
@@ -1652,8 +1665,12 @@
       },
       "UserGroupXp": {
         "type": "object",
-        "example": {},
-        "properties": {}
+        "example": {"Type":""},
+        "properties": {
+          "Type": {
+            "type": "string"
+          }
+        }
       },
       "UserXp": {
         "type": "object",
@@ -2406,37 +2423,6 @@
         ]
       }
     },
-    "/ordercalculate": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrderCalculateResponse"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "Integrations.CalculateOrder",
-        "tags": [
-          "Integrations"
-        ],
-        "parameters": [{"name":"orderCalculationRequest","in":"query","description":"Order calculation request of the order calculate response.","required":true,"schema":{"type":"object"}}],
-        "summary": "POST Order Calculate",
-        "description": "",
-        "security": [
-          {
-            "OAuth2": [
-              "Shopper",
-              "FullAccess"
-            ]
-          }
-        ]
-      }
-    },
     "/products": {
       "get": {
         "responses": {
@@ -2575,37 +2561,6 @@
           {
             "OAuth2": [
               "ProductAdmin",
-              "FullAccess"
-            ]
-          }
-        ]
-      }
-    },
-    "/shippingrates": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProposedShipmentResponse"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "Integrations.GetShippingRates",
-        "tags": [
-          "Integrations"
-        ],
-        "parameters": [{"name":"orderCalculationRequest","in":"query","description":"Order calculation request of the proposed shipment response.","required":true,"schema":{"type":"object"}}],
-        "summary": "POST Shipping Rates request",
-        "description": "",
-        "security": [
-          {
-            "OAuth2": [
-              "Shopper",
               "FullAccess"
             ]
           }
