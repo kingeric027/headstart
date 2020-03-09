@@ -1005,6 +1005,21 @@
           }
         }
       },
+      "MarketplaceTaxCode": {
+        "type": "object",
+        "example": {"Category":"","Code":"","Description":""},
+        "properties": {
+          "Category": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          }
+        }
+      },
       "MarketplaceUser": {
         "type": "object",
         "example": {"xp":{},"ID":"","Username":"","Password":"","FirstName":"","LastName":"","Email":"","Phone":"","TermsAccepted":"2018-01-01T00:00:00-06:00","Active":false,"AvailableRoles":[""],"DateCreated":"2018-01-01T00:00:00-06:00","PasswordLastSetDate":"2018-01-01T00:00:00-06:00"},
