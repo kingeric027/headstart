@@ -16,10 +16,12 @@ namespace Marketplace.ShippingQuery
         }
 
         [FunctionName("ShipmentQuery")]
-        public void Run([TimerTrigger("0 0 15-23 * * *")]TimerInfo myTimer, ILogger log)
+        public void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, ILogger log)
         {
+            // "0 */5 * * * *"
+            // "0 0 15-23 * * *"
             // running test once every hour from 9am to 5pm CST
-            _shipmentQuery.GetShipments();
+            _shipmentQuery.SyncShipments();
         }
     }
 }
