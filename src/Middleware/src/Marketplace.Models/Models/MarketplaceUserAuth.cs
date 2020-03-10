@@ -62,7 +62,7 @@ namespace Marketplace.Models
                     return AuthenticateResult.Fail("Authentication failure");
                 cid.AddClaim(new Claim("username", user.Username));
                 cid.AddClaim(new Claim("userid", user.ID));
-                cid.AddClaim(new Claim("email", user.Email));
+                cid.AddClaim(new Claim("email", user.Email ?? ""));
                 cid.AddClaim(new Claim("buyer", user.Buyer?.ID ?? ""));
                 cid.AddClaim(new Claim("supplier", user.Supplier?.ID ?? ""));
                 cid.AddClaims(user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)));
