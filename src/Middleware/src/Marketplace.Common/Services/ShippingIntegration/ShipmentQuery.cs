@@ -16,6 +16,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
     {
         Task SyncShipments(ILogger logger);
         Task SyncLatestOrder(ILogger logger);
+        Task SyncOneOrder(ILogger logger);
     }
 
     public class ShipmentQuery : IShipmentQuery
@@ -73,6 +74,16 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
             await SyncShipmentsForOrders(order);
       
+        }
+
+        public async Task SyncOneOrder(ILogger logger)
+        {
+            _logger = logger;
+            _logger.LogInformation("Beginning shipment sync for orders submitted in the last last 1 days");
+            var orders = await GetOneOrder("aKuuWI04J0yy9UJ5LauauQ");
+            _logger.LogInformation($"Retrieved {orders.Count()} orders");
+
+            await SyncShipmentsForOrders(orders);
         }
 
         private async Task SyncShipmentsForOrders(List<MarketplaceOrder> orders)
@@ -188,9 +199,18 @@ namespace Marketplace.Common.Services.ShippingIntegration
             };
         }
 
+        private async Task<List<MarketplaceOrder>> GetOneOrder(string orderID)
+        {
+            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID);
+            return new List<MarketplaceOrder>()
+            {
+                order
+            };
+        }
+
         private Task<ListPage<MarketplaceOrder>> GetOrdersNeedingShipmentAsync(int page, DateTime fromDate)
         {
-            return _oc.Orders.ListAsync<MarketplaceOrder>(OrderDirection.Outgoing, page: page, pageSize: 100, filters: $"IsSubmitted=true&Status=Open&DateSubmitted>{fromDate}");
+            return _oc.Orders.ListAsync<MarketplaceOrder>(OrderDirection.Outgoing, page: page, pageSize: 100, filters: $"IsSubmitted=true&Status=Open&DateSubmitted=>{fromDate.ToLongDateString()}");
         }
     }
 }
