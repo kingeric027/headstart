@@ -11,8 +11,8 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Marketplace.Common\Marketplace.Common.csproj" />
-    <ProjectReference Include="..\src\Marketplace.Models\Marketplace.Models.csproj" />
+    <ProjectReference Include="..\Marketplace.Common\Marketplace.Common.csproj" />
+    <ProjectReference Include="..\Marketplace.Models\Marketplace.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

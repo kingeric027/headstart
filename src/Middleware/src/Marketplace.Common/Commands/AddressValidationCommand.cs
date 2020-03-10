@@ -4,6 +4,7 @@ using OrderCloud.SDK;
 using System;
 using System.Threading.Tasks;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.SmartyStreets;
 using Marketplace.Models;
 
 namespace Marketplace.Common.Commands

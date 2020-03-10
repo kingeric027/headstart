@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Avalara.AvaTax.RestClient;
+using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.AvaTax;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models;

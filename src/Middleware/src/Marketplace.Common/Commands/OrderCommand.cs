@@ -8,6 +8,7 @@ using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using System.Linq;
 

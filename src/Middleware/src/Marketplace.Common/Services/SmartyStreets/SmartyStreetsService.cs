@@ -1,19 +1,14 @@
-﻿using Marketplace.Common.Services.SmartyStreets.models;
-using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using SmartyStreets;
-using SmartyStreets.USStreetApi;
-using SmartyStreets.USAutocompleteApi;
-using Marketplace.Common.Services.SmartyStreets.Mappers;
-using System.Linq;
 using Flurl;
 using Flurl.Http;
-using Marketplace.Models;
+using Marketplace.Common.Services.SmartyStreets.Mappers;
+using Marketplace.Common.Services.SmartyStreets.models;
+using OrderCloud.SDK;
+using SmartyStreets;
+using SmartyStreets.USStreetApi;
 
-namespace Marketplace.Common.Services
+namespace Marketplace.Common.Services.SmartyStreets
 {
 	public interface ISmartyStreetsService
 	{
