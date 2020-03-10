@@ -18,6 +18,7 @@ using Marketplace.Common.Services.CardConnect;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.Zoho;
+using Marketplace.Helpers;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Models.Orchestration;
@@ -54,47 +55,48 @@ namespace Marketplace.API
 			{
 				var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
 					_settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
-                var sdk = new OrderCloudClient(new OrderCloudClientConfig
-                {
-                    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
-                    ClientId = _settings.OrderCloudSettings.ClientID,
-                    ClientSecret = _settings.OrderCloudSettings.ClientSecret,
-                    Roles = new[]
-                    {
-                        ApiRole.FullAccess
-                    }
-                });
-				services
-					.ConfigureWebApiServices(_settings, "v1", "Marketplace API")
+                services
+                    .ConfigureWebApiServices(_settings, "v1", "Marketplace API")
                     .Inject<IAppSettings>()
                     .Inject<IDevCenterService>()
                     .Inject<IFlurlClient>()
                     .Inject<IZohoClient>()
                     .Inject<IZohoCommand>()
                     .Inject<ISyncCommand>()
-					.Inject<IAvataxService>()
-					.Inject<IFreightPopService>()
-					.Inject<ISmartyStreetsService>()
-					.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-					.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
-					.Inject<IOrchestrationCommand>()
+                    .Inject<IAvataxService>()
+                    .Inject<IFreightPopService>()
+                    .Inject<ISmartyStreetsService>()
+                    .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
+                    .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
+                    .Inject<IOrchestrationCommand>()
                     .Inject<IOrchestrationLogCommand>()
-					.Inject<IOCShippingIntegration>()
-					.Inject<IAddressValidationCommand>()
-					.Inject<IEnvironmentSeedCommand>()
-					.Inject<IOrderCloudSandboxService>()
+                    .Inject<IOCShippingIntegration>()
+                    .Inject<IAddressValidationCommand>()
+                    .Inject<IEnvironmentSeedCommand>()
+                    .Inject<IOrderCloudSandboxService>()
                     .Inject<IMarketplaceProductCommand>()
-					.Inject<ISupplierCategoryConfigQuery>()
-					.Inject<ISendgridService>()
-                    .AddTransient<IOrderCloudClient>(s => sdk)
+                    .Inject<ISupplierCategoryConfigQuery>()
+                    .Inject<ISendgridService>()
+                    .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
+                    {
+                        ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+                        AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                        ClientId = _settings.OrderCloudSettings.ClientID,
+                        ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                        Roles = new[]
+                        {
+                            ApiRole.FullAccess
+                        }
+                    })
                     .Inject<ICardConnectService>()
                     .Inject<ICreditCardCommand>()
-					.Inject<IMarketplaceSupplierCommand>()
+                    .Inject<IMarketplaceSupplierCommand>()
                     .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                     .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser")
-					.AddAuthentication()
-					.AddOrderCloudWebhooks(opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey);
+                    .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>(
+                        "OrderCloudWebhook",
+                        opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
+                    .AddAuthentication();
             }
 
 			// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
