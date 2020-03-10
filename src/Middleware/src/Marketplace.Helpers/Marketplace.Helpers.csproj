@@ -16,6 +16,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Helpers\SwaggerTools\**" />
+    <EmbeddedResource Remove="Helpers\SwaggerTools\**" />
+    <None Remove="Helpers\SwaggerTools\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Cosmonaut" Version="2.11.3" />
     <PackageReference Include="Cosmonaut.Extensions.Microsoft.DependencyInjection" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
@@ -50,7 +56,6 @@
 
   <ItemGroup>
     <Folder Include="Helpers\PipeWrench\" />
-    <Folder Include="Helpers\SwaggerTools\" />
   </ItemGroup>
 
 </Project>

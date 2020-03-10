@@ -81,10 +81,10 @@ namespace Marketplace.Helpers.OpenApiTools
                     schemas.Add(modelDefinitionKey, schemaDef);
                 }
             }
-            schemas.Add("Meta", new Definition(typeof(ListPageMeta)).ToJObject());
-            schemas.Add("MetaWithFacets", new Definition(typeof(ListPageMetaWithFacets)).ToJObject());
-            schemas.Add("ListFacet", new Definition(typeof(ListFacet)).ToJObject());
-            schemas.Add("ListFacetValue", new Definition(typeof(ListFacetValue)).ToJObject());
+            schemas.Add("Meta", new DefinitionObject(typeof(ListPageMeta)).ToJObject());
+            schemas.Add("MetaWithFacets", new DefinitionObject(typeof(ListPageMetaWithFacets)).ToJObject());
+            schemas.Add("ListFacet", new DefinitionObject(typeof(ListFacet)).ToJObject());
+            schemas.Add("ListFacetValue", new DefinitionObject(typeof(ListFacetValue)).ToJObject());
 
             //Find all methods that return ListPage and create all the different types of List objects 
             foreach (var endpoint in data.Resources.SelectMany(r => r.Endpoints).Where(e => e.IsList))

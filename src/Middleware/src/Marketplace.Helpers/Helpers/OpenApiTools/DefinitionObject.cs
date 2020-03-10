@@ -3,10 +3,10 @@ using Newtonsoft.Json.Linq;
 
 namespace Marketplace.Helpers.OpenApiTools
 {
-    public class Definition
+    public class DefinitionObject
     {
         private readonly JObject _definition = new JObject { { "type", "object" } };
-        public Definition(Type type)
+        public DefinitionObject(Type type)
         {
             var obj = new JObject();
             foreach (var prop in type.GetProperties())

@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Marketplace.Helpers
 {
-    public class TypedExtensionDataConverter<TObject> : JsonConverter
+    public class TypedExtensionJsonConverter<TObject> : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
