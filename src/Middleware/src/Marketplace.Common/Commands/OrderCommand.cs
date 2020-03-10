@@ -52,10 +52,14 @@ namespace Marketplace.Common.Commands
                 var supplierOrders = orderSplitResult.OutgoingOrders;
 
                 // integrations
-                var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderWorksheet);
-                await HandleTaxTransactionCreationAsync(buyerOrderWorksheet);
                 await ImportSupplierOrdersIntoFreightPop(supplierOrders);
-                await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
+                
+                // temporarily do not do these integrations until platform bug is fixed
+                if(buyerOrderWorksheet.ShipEstimateResponse != null) {
+                    await HandleTaxTransactionCreationAsync(buyerOrderWorksheet);
+                    var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderWorksheet);
+                    await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
+                }
             }
         }
 

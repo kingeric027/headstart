@@ -7,37 +7,34 @@
 </div>
 <div class="container">
   <div *ngIf="order">
-    <div class="row flex-lg-row-reverse"
-         *ngIf="order.LineItemCount">
+    <div class="row flex-lg-row-reverse" *ngIf="order.LineItemCount">
       <div class="col-lg-3">
         <ocm-order-summary [order]="order" [checkoutPanel]="currentPanel"></ocm-order-summary>
       </div>
       <div class="col-lg-9">
-        <ngb-accordion [closeOthers]="true"
-                       (panelChange)="beforeChange($event)"
-                       #acc="ngbAccordion"
-                       [activeIds]="currentPanel">
-          <ngb-panel *ngIf="isAnon"
-                     id="login">
+        <ngb-accordion
+          [closeOthers]="true"
+          (panelChange)="beforeChange($event)"
+          #acc="ngbAccordion"
+          [activeIds]="currentPanel"
+        >
+          <ngb-panel *ngIf="isAnon" id="login">
             <ng-template ngbPanelTitle>
               <a class="link-text"> Login </a>
-              <fa-icon class="float-right text-success"
-                       *ngIf="getValidation('login')"
-                       [icon]="faCheck"></fa-icon>
+              <fa-icon class="float-right text-success" *ngIf="getValidation('login')" [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
               <div class="row">
                 <div class="col-4">
-                  <button class="btn btn-block btn-primary"
-                          routerLink="/login">Login</button>
+                  <button class="btn btn-block btn-primary" routerLink="/login">Login</button>
                 </div>
                 <div class="col-4">
-                  <button class="btn btn-block btn-primary"
-                          routerLink="/register">Create Account</button>
+                  <button class="btn btn-block btn-primary" routerLink="/register">Create Account</button>
                 </div>
                 <div class="col-4">
-                  <button class="btn btn-block btn-primary"
-                          (click)="toSection('shippingAddress')">Checkout as Guest</button>
+                  <button class="btn btn-block btn-primary" (click)="toSection('shippingAddress')">
+                    Checkout as Guest
+                  </button>
                 </div>
               </div>
             </ng-template>
@@ -45,62 +42,74 @@
           <ngb-panel id="shippingAddress">
             <ng-template ngbPanelTitle>
               <a class="link-text"> Shipping Address </a>
-              <fa-icon class="float-right text-success"
-                       *ngIf="getValidation('shippingAddress')"
-                       [icon]="faCheck"></fa-icon>
+              <fa-icon
+                class="float-right text-success"
+                *ngIf="getValidation('shippingAddress')"
+                [icon]="faCheck"
+              ></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-address [addressType]="'Shipping'"
-                                    [isAnon]="isAnon"
-                                    [order]="order"
-                                    [lineItems]="lineItems"
-                                    (continue)="doneWithShipToAddress()"></ocm-checkout-address>
+              <ocm-checkout-address
+                [addressType]="'Shipping'"
+                [isAnon]="isAnon"
+                [order]="order"
+                [lineItems]="lineItems"
+                (continue)="doneWithShipToAddress()"
+              ></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="shippingSelection">
             <ng-template ngbPanelTitle>
               <a class="link-text"> Shipping Selection </a>
-              <fa-icon class="float-right text-success"
-                       *ngIf="getValidation('shippingSelection')"
-                       [icon]="faCheck"></fa-icon>
+              <fa-icon
+                class="float-right text-success"
+                *ngIf="getValidation('shippingSelection')"
+                [icon]="faCheck"
+              ></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-shipping [order]="order"
-                                     [lineItems]="lineItems"
-                                     [shipmentEstimates]="shipmentEstimates"
-                                     (selectShipRate)="selectShipmentMethod($event.detail)"       
-                                     (continue)="doneWithShippingRates()">
+              <ocm-checkout-shipping
+                [order]="order"
+                [lineItems]="lineItems"
+                [shipEstimates]="shipEstimates"
+                (selectShipRate)="selectShipMethod($event.detail)"
+                (continue)="doneWithShippingRates()"
+              >
               </ocm-checkout-shipping>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="payment">
             <ng-template ngbPanelTitle>
               <a class="link-text"> Payment </a>
-              <fa-icon class="float-right text-success"
-                       *ngIf="getValidation('payment')"
-                       [icon]="faCheck"></fa-icon>
+              <fa-icon class="float-right text-success" *ngIf="getValidation('payment')" [icon]="faCheck"></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-payment [isAnon]="isAnon"
-                                    [order]="order"
-                                    [cards]="cards"
-                                    (cardSelected)="onCardSelected($event.detail)">
+              <ocm-checkout-payment
+                [isAnon]="isAnon"
+                [order]="order"
+                [cards]="cards"
+                (cardSelected)="onCardSelected($event.detail)"
+              >
               </ocm-checkout-payment>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="billingAddress">
             <ng-template ngbPanelTitle>
               <a class="link-text">Credit Card Billing Address </a>
-              <fa-icon class="float-right text-success"
-                       *ngIf="getValidation('billingAddress')"
-                       [icon]="faCheck"></fa-icon>
+              <fa-icon
+                class="float-right text-success"
+                *ngIf="getValidation('billingAddress')"
+                [icon]="faCheck"
+              ></fa-icon>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-address [addressType]="'Billing'"
-                                    [isAnon]="isAnon"
-                                    [order]="order"
-                                    [lineItems]="lineItems"
-                                    (continue)="toSection('confirm')"></ocm-checkout-address>
+              <ocm-checkout-address
+                [addressType]="'Billing'"
+                [isAnon]="isAnon"
+                [order]="order"
+                [lineItems]="lineItems"
+                (continue)="toSection('confirm')"
+              ></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="confirm">
@@ -108,11 +117,13 @@
               <a class="link-text"> Confirm </a>
             </ng-template>
             <ng-template ngbPanelContent>
-              <ocm-checkout-confirm [isAnon]="isAnon"
-                                    [order]="order"
-                                    [lineItems]="lineItems"
-                                    [payments]="payments"
-                                    (submitOrderWithComment)="submitOrderWithComment($event.detail)">
+              <ocm-checkout-confirm
+                [isAnon]="isAnon"
+                [order]="order"
+                [lineItems]="lineItems"
+                [payments]="payments"
+                (submitOrderWithComment)="submitOrderWithComment($event.detail)"
+              >
               </ocm-checkout-confirm>
             </ng-template>
           </ngb-panel>

@@ -15,7 +15,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 {
     public interface IOCShippingIntegration
     {
-        Task<ShipmentEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload);
+        Task<ShipEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload);
         Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload orderCalculatePayload);
     }
 
@@ -29,9 +29,9 @@ namespace Marketplace.Common.Services.ShippingIntegration
             _avatax = avatax;
         }
 
-        public async Task<ShipmentEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload)
+        public async Task<ShipEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload)
         {
-            var orderWorksheet = orderCalculatePayload.OrderCalculation;
+            var orderWorksheet = orderCalculatePayload.OrderWorksheet;
             var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(orderWorksheet.LineItems);
             Require.That(productIDsWithInvalidDimensions.Count == 0, Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
 
@@ -45,16 +45,16 @@ namespace Marketplace.Common.Services.ShippingIntegration
             var tasks = proposedShipmentRequests.Select(p => p.RateResponseTask);
             await Task.WhenAll(tasks);
 
-            var shipmentEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest)).ToList();
-            return new ShipmentEstimateResponse()
+            var shipEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest)).ToList();
+            return new ShipEstimateResponse()
             {
-                ShipmentEstimates = shipmentEstimates
+                ShipEstimates = shipEstimates
             };
         }
 
         public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload orderCalculatePayload)
         {
-            var totalTax = await _avatax.GetTaxEstimateAsync(orderCalculatePayload.OrderCalculation);
+            var totalTax = await _avatax.GetTaxEstimateAsync(orderCalculatePayload.OrderWorksheet);
 
             return new OrderCalculateResponse
             {

@@ -69,7 +69,6 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async getMyResource(): Promise<any> {
-    console.log('get my resource for this resource not defined');
     return await Promise.resolve('');
   }
 
@@ -399,7 +398,6 @@ export abstract class ResourceCrudService<ResourceType> {
         updatedResourceCopy[piecesOfField[0]] = resourceUpdate.value;
         break;
     }
-    console.log(updatedResourceCopy)
     return updatedResourceCopy;
   }
 

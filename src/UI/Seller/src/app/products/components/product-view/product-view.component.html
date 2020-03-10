@@ -15,6 +15,8 @@
       <p>{{supplier?.Name}}</p>
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Description</label>
       <p [innerHtml]="_superMarketplaceProduct?.Product?.Description"></p>
+      <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Product Type</label>
+      <p>{{_superMarketplaceProduct?.Product?.xp?.ProductType}}</p>
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Quantity Multiplier</label>
       <p>{{_superMarketplaceProduct?.Product?.QuantityMultiplier}}</p>
       <label class="small text-uppercase font-weight-bold text-primary-light mb-0">Default Price</label>

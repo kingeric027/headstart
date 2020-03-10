@@ -17,7 +17,7 @@ namespace Marketplace.Tests
             var testRates = GetShippingRatesFullList();
 
             // Act
-            var result = ProposedShipmentOptionsMapper.Map(testRates);
+            var result = ShipmentEstimateMethodsMapper.Map(testRates);
 
             // Assert
             var expectedProposedShipments = GetProposedShipmentCheapestList();
@@ -125,31 +125,31 @@ namespace Marketplace.Tests
             };
         }
 
-        private List<ProposedShipmentOption> GetProposedShipmentCheapestList()
+        private List<ShipMethod> GetProposedShipmentCheapestList()
         {
-            return new List<ProposedShipmentOption>()
+            return new List<ShipMethod>()
             {
-                new ProposedShipmentOption() {
+                new ShipMethod() {
                     Cost = (decimal)235.05,
-                    EstimatedDeliveryDays = 4,
+                    EstimatedTransitDays = 4,
                     ID = "FedexParcel-fab38772-74c0-4956-8856-28f2f2489ee7",
                     Name = "FEDEX_GROUND",
                 },
-                new ProposedShipmentOption() {
+                new ShipMethod() {
                     ID = "FedexParcel-63607797-48e1-41ec-b435-0c762fd63724",
-                    EstimatedDeliveryDays = 3,
+                    EstimatedTransitDays = 3,
                     Name= "FEDEX_EXPRESS_SAVER",
                     Cost = (decimal)750.6,
                 },
-                new ProposedShipmentOption() {
+                new ShipMethod() {
                     ID = "FedexParcel-79d89afe-0644-47f9-8759-a2e667606fa2",
-                    EstimatedDeliveryDays = 2,
+                    EstimatedTransitDays = 2,
                     Name = "FEDEX_2_DAY",
                     Cost = (decimal)855.15,
                 },        
-                new ProposedShipmentOption() {
+                new ShipMethod() {
                     ID = "FedexParcel-4c22e232-0da8-4a29-a826-9a47e3a8eaa0",
-                    EstimatedDeliveryDays = 1,
+                    EstimatedTransitDays = 1,
                     Name = "STANDARD_OVERNIGHT",
                     Cost = (decimal)1106.41,
                 },

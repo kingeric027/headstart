@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { AppConfig } from '../../shopper-context';
-import { ShipmentPreference, OrderWorksheet } from './ordercloud-sandbox.models';
+import { ShipMethodSelection, OrderWorksheet } from './ordercloud-sandbox.models';
 
 // this is a temporary service to represent features that are not yet available in the ordercloud sdk
 // currently used for shipping integration routes
@@ -28,7 +28,7 @@ export class OrderCloudSandboxService {
       .toPromise();
   }
 
-  selectShipMethod(orderID: string, selection: ShipmentPreference): Promise<OrderWorksheet> {
+  selectShipMethod(orderID: string, selection: ShipMethodSelection): Promise<OrderWorksheet> {
     const requestBody = { ShipmethodSelections: [selection] };
     return this.http
       .post<OrderWorksheet>(

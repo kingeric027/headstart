@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>OrderCloud</Authors>
     <Company>Four51, Inc.</Company>
@@ -15,8 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Marketplace.Helpers" Version="0.0.23" />
-    <PackageReference Include="OrderCloud.SDK" Version="0.7.0" />
+    <PackageReference Include="Marketplace.Helpers" Version="0.0.24" />
+    <PackageReference Include="OrderCloud.SDK" Version="0.7.1" />
   </ItemGroup>
 
 </Project>

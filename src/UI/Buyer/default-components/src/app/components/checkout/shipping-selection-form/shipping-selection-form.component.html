@@ -1,8 +1,8 @@
 <form [formGroup]="form" class="p-3">
-  <select class="custom-select" formControlName="ShipmentMethodID" (change)="onFormChanges()">
+  <select class="custom-select" formControlName="ShipMethodID" (change)="onFormChanges()">
     <option [ngValue]="null" disabled>Choose a shipping option...</option>
-    <option *ngFor="let shipmentMethod of _shipmentEstimate?.ShipmentMethods" [ngValue]="shipmentMethod.ID">
-      {{ shipmentMethod.Name }} {{ shipmentMethod.Cost | currency }}
+    <option *ngFor="let shipMethod of _shipEstimate?.ShipMethods" [ngValue]="shipMethod.ID">
+      {{ shipMethod.Name }} {{ shipMethod.Cost | currency }}
     </option>
   </select>
 </form>

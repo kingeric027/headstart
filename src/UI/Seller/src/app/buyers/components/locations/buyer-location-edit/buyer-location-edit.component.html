@@ -1,7 +1,6 @@
 <div class="container-fluid resource-edit">
   <form [formGroup]="resourceForm">
-    <div *ngIf="!suggestedAddresses || suggestedAddresses?.length === 0"
-         class="row pt-3">
+    <div class="row pt-3">
       <div class="col-md-5">
         <h5>Location Details</h5>
         <p>These are the details of this Buyer Purchasing Location</p>
@@ -60,13 +59,18 @@
         </div>
       </div>
     </div>
-    <div *ngIf="!suggestedAddresses || suggestedAddresses?.length === 0"
-         class="row pt-3">
+    <div class="row pt-3">
       <div class="col-md-5">
         <h5>Location Address</h5>
         <p>This is the address of the Buyer Purchasing Location</p>
       </div>
-      <div class="col-md-7 form-group">
+      <div class="col-md-7 form-group"
+           *ngIf="suggestedAddresses && suggestedAddresses.length > 0">
+        <address-suggestion (selectedAddress)="handleSelectedAddress($event)"
+                            [suggestedAddresses]="suggestedAddresses"></address-suggestion>
+      </div>
+      <div class="col-md-7 form-group"
+           *ngIf="!suggestedAddresses || suggestedAddresses.length === 0">
         <div class="form-group">
           <label for="Street 1">Street 1</label>
           <input type="text"
@@ -173,17 +177,6 @@
                    placeholder="Contact Email">
           </div>
         </div>
-      </div>
-    </div>
-    <div class="row pt-3">
-      <div *ngIf="suggestedAddresses?.length > 0"
-           class="col-md-5">
-        <h5>Address Suggestions</h5>
-        <p>The address you've entered was invalid. Please choose from these suggested addresses or enter a valid address.</p>
-      </div>
-      <div class="col-md-7 form-group">
-        <address-suggestion (selectedAddress)="handleAddressSelect($event)"
-                            [suggestedAddresses]="suggestedAddresses"></address-suggestion>
       </div>
     </div>
     <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
