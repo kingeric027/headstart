@@ -26,7 +26,7 @@ namespace Marketplace.ShippingQuery
         [FunctionName("ShipmentQueryLatestOrder")]
         public void RunIndividualOrder([TimerTrigger("0 0 0 1 1 *")]TimerInfo myTimer, ILogger logger)
         {
-            // only runs once a year on jan 1, for manually triggering from azure ui
+            // only runs once a year on jan 1, used because we can manually trigger from azure ui
             _shipmentQuery.SyncLatestOrder(logger);
         }
     }
