@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BuyerCreditCard, ListBuyerCreditCard, OcMeService } from '@ordercloud/angular-sdk';
-import { CreditCardToken } from '../../shopper-context';
-import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
+import { MarketplaceSDK, CreditCardToken } from 'marketplace-javascript-sdk';
 
 export interface ICreditCards {
   Save(card: CreditCardToken): Promise<BuyerCreditCard>;
@@ -20,15 +19,15 @@ export class CreditCardService implements ICreditCards {
     Amex: RegExp('^3[47][0-9]{13}$'),
     BCGlobal: RegExp('^(6541|6556)[0-9]{12}$'),
     DinersClub: RegExp('^3(?:0[0-5]|[68][0-9])[0-9]{11}$'),
-    JCB: RegExp('^(?:2131|1800|35\d{3})\d{11}$'),
+    JCB: RegExp('^(?:2131|1800|35d{3})d{11}$'),
     UnionPay: RegExp('^(62[0-9]{14,17})$'),
   };
 
-  constructor(private ocMeService: OcMeService, private middleware: MiddlewareApiService) {}
+  constructor(private ocMeService: OcMeService) {}
 
   async Save(card: CreditCardToken): Promise<BuyerCreditCard> {
     card.CardType = this.getCardType(card.AccountNumber);
-    return await this.middleware.saveMeCreditCard(card);
+    return await MarketplaceSDK.MeCreditCardAuthorizations.MePost(card);
   }
 
   async Delete(cardID: string): Promise<void> {

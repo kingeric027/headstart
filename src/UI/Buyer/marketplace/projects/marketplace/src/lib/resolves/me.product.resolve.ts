@@ -3,15 +3,15 @@ import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
 import { OcMeService, ListSpec, Spec } from '@ordercloud/angular-sdk';
 import { each as _each } from 'lodash';
 import { Observable, of } from 'rxjs';
-import { MarketplaceProduct, ListMarketplaceProduct } from '../shopper-context';
+import { ListMarketplaceMeProduct, MarketplaceMeProduct } from '../shopper-context';
 
 @Injectable()
-export class MeListRelatedProductsResolver implements Resolve<ListMarketplaceProduct> {
+export class MeListRelatedProductsResolver implements Resolve<ListMarketplaceMeProduct> {
   constructor(private service: OcMeService) {}
 
   resolve(
     route: ActivatedRouteSnapshot
-  ): Observable<Array<MarketplaceProduct>> | Promise<Array<MarketplaceProduct>> | any {
+  ): Observable<Array<MarketplaceMeProduct>> | Promise<Array<MarketplaceMeProduct>> | any {
     // const product = route.parent.data.product as MarketplaceProduct;
     // if (!product.xp || !product.xp.RelatedProducts) {
     //   return of([]);
@@ -25,10 +25,10 @@ export class MeListRelatedProductsResolver implements Resolve<ListMarketplacePro
 }
 
 @Injectable()
-export class MeProductResolver implements Resolve<MarketplaceProduct> {
+export class MeProductResolver implements Resolve<MarketplaceMeProduct> {
   constructor(private service: OcMeService) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<MarketplaceProduct> | Promise<MarketplaceProduct> | any {
+  resolve(route: ActivatedRouteSnapshot): Observable<MarketplaceMeProduct> | Promise<MarketplaceMeProduct> | any {
     return this.service.GetProduct(route.params.productID);
   }
 }

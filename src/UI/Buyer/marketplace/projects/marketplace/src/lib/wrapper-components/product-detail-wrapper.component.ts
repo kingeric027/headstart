@@ -3,7 +3,7 @@ import { ListSpec } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { CurrentUserService } from '../services/current-user/current-user.service';
-import { MarketplaceProduct } from '../shopper-context';
+import { MarketplaceMeProduct } from '../shopper-context';
 
 @Component({
   template: `
@@ -12,7 +12,7 @@ import { MarketplaceProduct } from '../shopper-context';
 })
 export class ProductDetailWrapperComponent implements OnInit {
   specs: ListSpec;
-  product: MarketplaceProduct;
+  product: MarketplaceMeProduct;
 
   constructor(
     private activatedRoute: ActivatedRoute,

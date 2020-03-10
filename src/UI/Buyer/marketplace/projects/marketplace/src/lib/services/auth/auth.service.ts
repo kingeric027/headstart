@@ -18,6 +18,7 @@ import { CookieService } from 'ngx-cookie';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { AppConfig } from '../../shopper-context';
 import { CurrentOrderService } from '../order/order.service';
+import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 
 export interface IAuthentication {
   profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
@@ -114,6 +115,7 @@ export class AuthService implements IAuthentication {
     const creds = await this.ocAuthService
       .Login(userName, password, this.appConfig.clientID, this.appConfig.scope)
       .toPromise();
+    MarketplaceSDK.Tokens.SetAccessToken(creds.access_token);
     this.setToken(creds.access_token);
     if (rememberMe && creds.refresh_token) {
       /**
@@ -131,6 +133,7 @@ export class AuthService implements IAuthentication {
   async anonymousLogin(): Promise<AccessToken> {
     try {
       const creds = await this.ocAuthService.Anonymous(this.appConfig.clientID, this.appConfig.scope).toPromise();
+      MarketplaceSDK.Tokens.SetAccessToken(creds.access_token);
       this.setToken(creds.access_token);
       return creds;
     } catch (err) {
@@ -141,6 +144,7 @@ export class AuthService implements IAuthentication {
 
   async logout(): Promise<void> {
     this.ocTokenService.RemoveAccess();
+    MarketplaceSDK.Tokens.RemoveAccessToken();
     this.isLoggedIn = false;
     if (this.appConfig.anonymousShoppingEnabled) {
       this.router.navigate(['/home']);

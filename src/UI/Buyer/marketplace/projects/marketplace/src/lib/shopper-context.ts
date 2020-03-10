@@ -13,17 +13,11 @@ import {
   BuyerCreditCard,
   ListBuyerProduct,
 } from '@ordercloud/angular-sdk';
+import { ProductXp, CreditCardToken } from 'marketplace-javascript-sdk';
 
 export * from '@ordercloud/angular-sdk';
 export * from './services/shopper-context/shopper-context.service';
 export * from '../../src/lib/services/ordercloud-sandbox/ordercloud-sandbox.models';
-
-export interface CreditCardToken {
-  AccountNumber: string;
-  ExpirationDate: string; // MMYY or MMYYY
-  CardholderName: string;
-  CardType?: string;
-}
 
 export interface LineItemGroupSupplier {
   supplier: Supplier;
@@ -262,69 +256,8 @@ export interface DecodedOCToken {
   orderid?: string;
 }
 
-export interface SupplierCategoryConfigFilters {
-  Display: string;
-  Path: string;
-  Values: string[];
-}
-export interface SupplierCategoryConfig {
-  id: string;
-  timestamp: string;
-  MarketplaceName: string;
-  Filters: Array<SupplierCategoryConfigFilters>;
-}
-
 // Product Model
 // a corresponding model in the C# product
-export type ListMarketplaceProduct = ListBuyerProduct<MarketplaceProductXp>;
+export type ListMarketplaceMeProduct = ListBuyerProduct<ProductXp>;
 
-export type MarketplaceProduct = BuyerProduct<MarketplaceProductXp>;
-
-export interface MarketplaceProductXp {
-  // DO NOT DELETE //
-  IntegrationData: any;
-  Facets: FacetDictionary;
-  Images: MarketPlaceProductImage[];
-  // DO NOT DELETE //
-  Status: ObjectStatus;
-  HasVariants: boolean;
-  Note: string;
-  Tax: TaxProperties;
-  UnitOfMeasure: UnitOfMeasure;
-  ProductType: ProductType;
-}
-
-export interface UnitOfMeasure {
-  Qty: number;
-  Unit: string;
-}
-
-export interface TaxProperties {
-  Category: string;
-  Code: string;
-  Description: string;
-}
-
-export enum ProductType {
-  Standard = 'Standard',
-  Quote = 'Quote',
-}
-
-interface FacetDictionary {
-  [key: string]: string[];
-}
-
-export enum ObjectStatus {
-  Draft = 'Draft',
-  Published = 'Published',
-}
-
-export interface MarketPlaceProductTaxCode {
-  Category: string;
-  Code: string;
-  Description: string;
-}
-export interface MarketPlaceProductImage {
-  URL: string;
-  Tag: string[];
-}
+export type MarketplaceMeProduct = BuyerProduct<ProductXp>;
