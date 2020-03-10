@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;

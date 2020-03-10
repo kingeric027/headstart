@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Mappers.Avalara;
@@ -8,10 +7,8 @@ using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
 using OrderCloud.SDK;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Marketplace.Common.Services.AvaTax
+namespace Marketplace.Common.Services.Avalara
 {
 	public interface IAvataxService
 	{
