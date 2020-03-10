@@ -10,8 +10,8 @@ import {
   ListUserGroupAssignment,
 } from '@ordercloud/angular-sdk';
 import { BUYER_SUB_RESOURCE_LIST } from '../buyers/buyer.service';
-import { ListArgs } from '@app-seller/shared/services/middleware-api/listArgs.interface';
 import { IUserPermissionsService } from '@app-seller/shared/models/user-permissions.interface';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 // TODO - this service is only relevent if you're already on the buyer details page. How can we enforce/inidcate that?
 @Injectable({

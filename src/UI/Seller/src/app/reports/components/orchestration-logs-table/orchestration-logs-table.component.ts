@@ -1,8 +1,8 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Router, ActivatedRoute } from '@angular/router';
-import { OrchestrationLog } from '@app-seller/reports/models/orchestration-log';
 import { OrchestrationLogsService } from '@app-seller/reports/orchestration-logs.service';
+import { OrchestrationLog } from 'marketplace-javascript-sdk';
 
 @Component({
   selector: 'app-orchestration-logs-table',
@@ -33,7 +33,16 @@ export class OrchestrationLogsTableComponent extends ResourceCrudComponent<Orche
       {
         Display: 'Record Type',
         Path: 'RecordType',
-        Values: ['Catalog', 'PriceSchedule', 'Product', 'ProductFacet', 'Spec', 'SpecOption', 'SpecProductAssignment', 'User'],
+        Values: [
+          'Catalog',
+          'PriceSchedule',
+          'Product',
+          'ProductFacet',
+          'Spec',
+          'SpecOption',
+          'SpecProductAssignment',
+          'User',
+        ],
         Type: 'Dropdown',
       },
       {

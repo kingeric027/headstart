@@ -1,12 +1,9 @@
 import { Component, Input } from '@angular/core';
-import {
-  MarketPlaceProductImage,
-  SuperMarketplaceProduct,
-} from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { OcSupplierService, Product, Supplier } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
+import { SuperMarketplaceProduct, ProductImage } from 'marketplace-javascript-sdk';
 
 @Component({
   selector: 'app-product-view',
@@ -14,7 +11,7 @@ import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
   styleUrls: ['./product-view.component.scss'],
 })
 export class ProductViewComponent {
-  images: MarketPlaceProductImage[] = [];
+  images: ProductImage[] = [];
   _superMarketplaceProduct: SuperMarketplaceProduct;
   supplier: Supplier;
 

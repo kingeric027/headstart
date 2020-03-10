@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OcBuyerService } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { OrchestrationLog } from './models/orchestration-log';
-import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
-import { ListArgs } from '@app-seller/shared/services/middleware-api/listArgs.interface';
+import { OrchestrationLog, ListPage } from 'marketplace-javascript-sdk';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({

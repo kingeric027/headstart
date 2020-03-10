@@ -11,7 +11,6 @@ import {
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
-import { ListArgs } from '@app-seller/shared/services/middleware-api/listArgs.interface';
 
 export const SUPPLIER_SUB_RESOURCE_LIST = ['users', 'locations'];
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?

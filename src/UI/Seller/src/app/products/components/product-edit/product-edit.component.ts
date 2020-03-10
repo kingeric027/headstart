@@ -10,11 +10,6 @@ import {
   OcProductService,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import {
-  MarketPlaceProductImage,
-  MarketPlaceProductTaxCode,
-  SuperMarketplaceProduct,
-} from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
@@ -23,9 +18,10 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
+import { ProductImage, SuperMarketplaceProduct, ListPage } from 'marketplace-javascript-sdk';
+import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 
 @Component({
   selector: 'app-product-edit',
@@ -56,7 +52,7 @@ export class ProductEditComponent implements OnInit {
 
   userContext = {};
   hasVariations = false;
-  images: MarketPlaceProductImage[] = [];
+  images: ProductImage[] = [];
   files: FileHandle[] = [];
   faTrash = faTrash;
   faTimes = faTimes;
@@ -64,7 +60,7 @@ export class ProductEditComponent implements OnInit {
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
   taxCodeCategorySelected = false;
-  taxCodes: ListPage<MarketPlaceProductTaxCode>;
+  taxCodes: ListPage<TaxCodes>;
   productType: string;
 
   constructor(
@@ -94,11 +90,6 @@ export class ProductEditComponent implements OnInit {
     context.Me.Supplier
       ? (this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise())
       : (this.addresses = await this.ocAdminAddressService.List().toPromise());
-  }
-
-  private async handleSelectedProductChange(product: Product): Promise<void> {
-    const marketPlaceProduct = await this.middleware.getSuperMarketplaceProductByID(product.ID);
-    this.refreshProductData(marketPlaceProduct);
   }
 
   async refreshProductData(superProduct: SuperMarketplaceProduct) {
@@ -321,5 +312,10 @@ export class ProductEditComponent implements OnInit {
 
   getSaveBtnText(): string {
     return this.productService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew)
+  }
+
+  private async handleSelectedProductChange(product: Product): Promise<void> {
+    const marketPlaceProduct = await this.middleware.getSuperMarketplaceProductByID(product.ID);
+    this.refreshProductData(marketPlaceProduct);
   }
 }

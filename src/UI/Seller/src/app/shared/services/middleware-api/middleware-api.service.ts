@@ -1,31 +1,23 @@
 import { Injectable, Inject } from '@angular/core';
-import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { OcTokenService, Supplier, Buyer } from '@ordercloud/angular-sdk';
+import { HttpClient } from '@angular/common/http';
+import { Supplier, Buyer } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { SuperMarketplaceProduct, ObjectStatus } from '@app-seller/shared/models/MarketPlaceProduct.interface';
-import { OrchestrationLog } from '@app-seller/reports/models/orchestration-log';
-import { ListPage } from './listPage.interface';
-import { ListArgs } from './listArgs.interface';
 import { MarketplaceBuyerLocation } from '@app-seller/shared/models/MarketplaceBuyerLocation.interface';
-import { Configuration, TaxCodes } from 'marketplace-javascript-sdk';
+import {
+  Configuration,
+  MarketplaceSDK,
+  SuperMarketplaceProduct,
+  OrchestrationLog,
+  ListPage,
+} from 'marketplace-javascript-sdk';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MiddlewareAPIService {
-  readonly headers = {
-    headers: new HttpHeaders({
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-    }),
-  };
-  readonly baseUrl: string;
   readonly marketplaceID: string;
-  constructor(
-    private ocTokenService: OcTokenService,
-    private http: HttpClient,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {
-    this.baseUrl = this.appConfig.middlewareUrl;
+  constructor(private http: HttpClient, @Inject(applicationConfiguration) private appConfig: AppConfig) {
     this.marketplaceID = this.appConfig.marketplaceID;
     Configuration.Set({
       baseApiUrl: this.appConfig.middlewareUrl,
@@ -33,22 +25,20 @@ export class MiddlewareAPIService {
   }
 
   async getSuperMarketplaceProductByID(productID: string): Promise<any> {
-    const url = `${this.baseUrl}/products/${productID}`;
-    return await this.http.get(url, this.headers).toPromise();
+    return await MarketplaceSDK.Products.Get(productID);
   }
 
   async createNewSuperMarketplaceProduct(
     superMarketplaceProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
-    superMarketplaceProduct.Product.xp.Status = ObjectStatus.Draft;
+    superMarketplaceProduct.Product.xp.Status = 'Draft';
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
-    const url = `${this.baseUrl}/products`;
-    return await this.http.post<SuperMarketplaceProduct>(url, superMarketplaceProduct, this.headers).toPromise();
+    return await MarketplaceSDK.Products.Post(superMarketplaceProduct);
   }
 
   async updateMarketplaceProduct(superMarketplaceProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
     // TODO: Temporary while Product set doesn't reflect the current strongly typed Xp
-    superMarketplaceProduct.Product.xp.Status = ObjectStatus.Draft;
+    superMarketplaceProduct.Product.xp.Status = 'Draft';
     const url = `${this.baseUrl}/products/${superMarketplaceProduct.Product.ID}`;
     return await this.http.put<SuperMarketplaceProduct>(url, superMarketplaceProduct, this.headers).toPromise();
   }
@@ -60,30 +50,27 @@ export class MiddlewareAPIService {
 
   async deleteProductImage(productID: string, imageUrl: string): Promise<SuperMarketplaceProduct> {
     const imageName = imageUrl.split('/').slice(-1)[0];
-    const url = `${this.baseUrl}/${this.marketplaceID}/images/product/${productID}/${imageName}`;
-    return await this.http.delete<SuperMarketplaceProduct>(url, this.headers).toPromise();
+    return await MarketplaceSDK.Files.Delete(this.marketplaceID, productID, imageName);
   }
 
   async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
-    return await TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize }, this.token());
+    return await MarketplaceSDK.TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
   }
 
   async createSupplier(supplier: Supplier): Promise<Supplier> {
-    const url = `${this.baseUrl}/supplier`;
-    return await this.http.post(url, supplier, this.headers).toPromise();
+    return await MarketplaceSDK.Suppliers.Create(supplier);
   }
 
   async createBuyer(buyer: Buyer): Promise<Supplier> {
-    const url = `${this.baseUrl}/buyer`;
-    return await this.http.post(url, buyer, this.headers).toPromise();
+    return await MarketplaceSDK.Buyers.Create(buyer);
   }
 
   async listOrchestrationLogs(args: ListArgs = {}): Promise<ListPage<OrchestrationLog>> {
-    return await this.list(`${this.baseUrl}/orchestration/logs`, args);
+    return await MarketplaceSDK.OrchestrationLogs.List(args);
   }
+
   async getMySupplier(supplierID: string): Promise<Supplier> {
-    const url = `${this.baseUrl}/supplier/me/${supplierID}`;
-    return await this.http.get(url, this.headers).toPromise();
+    return await MarketplaceSDK.Suppliers.GetMySupplier(supplierID);
   }
 
   async getBuyerLocationByID(buyerID: string, buyerLocationID: string): Promise<any> {
@@ -108,26 +95,6 @@ export class MiddlewareAPIService {
   async deleteBuyerLocation(buyerID: string, buyerLocationID: string): Promise<void> {
     const url = `${this.baseUrl}/buyerlocations/${buyerID}/${buyerLocationID}`;
     await this.http.delete(url).toPromise();
-  }
-
-  private token(): string {
-    return this.ocTokenService.GetAccess();
-  }
-
-  private list<T>(url: string, args: ListArgs = {}): Promise<T> {
-    url = this.addUrlParams(url, args.filters);
-    delete args.filters;
-    url = this.addUrlParams(url, args);
-    return this.http.get<T>(url, this.headers).toPromise();
-  }
-
-  private addUrlParams(baseUrl: string, object: Record<string, any> = {}): string {
-    const symbol = baseUrl.includes('?') ? '&' : '?';
-    const fields = Object.entries(object);
-    const url = fields
-      .filter(([key, value]) => value)
-      .reduce((urlSoFar, [key, value]) => `${urlSoFar}${key}=${value}&`, `${baseUrl}${symbol}`);
-    return url.replace(/[?&]+$/g, ''); // remove trailling & or ?
   }
 
   private formify(file: File): FormData {

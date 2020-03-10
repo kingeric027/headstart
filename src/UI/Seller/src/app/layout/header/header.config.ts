@@ -1,5 +1,4 @@
 import { SELLER, SUPPLIER } from '@app-seller/shared/models/ordercloud-user.types';
-import { ListFilters } from '@app-seller/shared/services/middleware-api/listArgs.interface';
 
 // ! included to ensure no overlap with ordercloud ids as this in invalid in ids
 export const REDIRECT_TO_FIRST_PARENT = '!';
@@ -10,7 +9,7 @@ export interface MPRoute {
   orderCloudUserTypesWithAccess?: string[];
   title: string;
   route: string;
-  queryParams?: ListFilters;
+  queryParams?: Record<string, any>;
 
   // if subroutes are included, itesms will display in a dropdown
   subRoutes?: MPRoute[];
