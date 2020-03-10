@@ -49,7 +49,7 @@ export class CurrentUserService {
     this.ocTokenService.SetAccess(accessToken.access_token);
     this.appStateService.isLoggedIn.next(true);
     this.me = await this.ocMeService.Get().toPromise();
-    this.mySupplier = await this.middleware.getMySupplier(this.me.Supplier.ID);
+    if (this.me?.Supplier) this.mySupplier = await this.middleware.getMySupplier(this.me?.Supplier?.ID);
   }
 
   async getUser(): Promise<MeUser> {
