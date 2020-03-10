@@ -16,12 +16,18 @@ namespace Marketplace.ShippingQuery
         }
 
         [FunctionName("ShipmentQuery")]
-        public void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, ILogger log)
+        public void RunFullQuery([TimerTrigger("0 */10 14-23 * * *")]TimerInfo myTimer, ILogger logger)
         {
-            // "0 */5 * * * *"
-            // "0 0 15-23 * * *"
-            // running test once every hour from 9am to 5pm CST
-            _shipmentQuery.SyncShipments();
+            // run every 10 minutes between 9am and 6pm CDT
+            // only currently running on orders made in the last day
+            _shipmentQuery.SyncShipments(logger);
+        }
+
+        [FunctionName("ShipmentQueryLatestOrder")]
+        public void RunIndividualOrder([TimerTrigger("0 0 0 1 1 *")]TimerInfo myTimer, ILogger logger)
+        {
+            // only runs once a year on jan 1, for manually triggering from azure ui
+            _shipmentQuery.SyncLatestOrder(logger);
         }
     }
 }
