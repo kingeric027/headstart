@@ -9,7 +9,7 @@ namespace Marketplace.Common.Services.FreightPop.Models
         public string ShipmentId { get; set; }
         public string QuoteId { get; set; }
         public Carrier Carrier { get; set; }
-        public Rate Rate { get; set; }
+        public ShipmentRate Rate { get; set; }
         public PaymentTerm PaymentTerm { get; set; }
         public AccountDetails ThirdPartyAccountInfo { get; set; }
         public DateTime ShipDate { get; set; }
@@ -31,7 +31,7 @@ namespace Marketplace.Common.Services.FreightPop.Models
         public string[] TrackingURLs { get; set; }
     }
 
-    public class Rate
+    public class ShipmentRate
     {
         public string Id { get; set; }
         public string Currency { get; set; }

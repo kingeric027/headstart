@@ -12,6 +12,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
             {
                 // why does the rate address only have one street and how can we ensure that 
                 // all of the necessary information gets included here (concatenate 1 and 2?)
+                Company = obj.CompanyName,
                 Street1 = obj.Street1,
                 Street2 = obj.Street2,
                 Phone = obj.Phone,

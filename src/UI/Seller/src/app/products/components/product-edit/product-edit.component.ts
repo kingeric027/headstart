@@ -22,6 +22,7 @@ import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
 import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
+import { ValidateMinMax } from '@app-seller/validators/validators';
 
 @Component({
   selector: 'app-product-edit',
@@ -130,13 +131,16 @@ export class ProductEditComponent implements OnInit {
         ShipLength: new FormControl(superMarketplaceProduct.Product.ShipLength, [Validators.required, Validators.min(0)]),
         ShipWeight: new FormControl(superMarketplaceProduct.Product.ShipWeight, [Validators.required, Validators.min(0)]),
         Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null)),
+        MinQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MinQuantity, Validators.min(1)),
+        MaxQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MaxQuantity, Validators.min(1)),
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
         ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType')),
         // SpecCount: new FormControl(superMarketplaceProduct.SpecCount),
         // VariantCount: new FormControl(superMarketplaceProduct.VariantCount),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
-      });
+      }, { validators: ValidateMinMax }
+      );
     }
   }
 

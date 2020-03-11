@@ -6,6 +6,7 @@ using Flurl.Http;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Services;
+using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
