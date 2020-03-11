@@ -50,7 +50,7 @@ export interface ShippingRate {
   TotalCost: number;
 }
 
-export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
+export interface MarketplaceOrder extends Order<OrderXp, any, any> { }
 export interface OrderXp {
   AvalaraTaxTransactionCode: string;
   OrderType: OrderType;
@@ -292,6 +292,12 @@ export interface MarketplaceProductXp {
   Tax: TaxProperties;
   UnitOfMeasure: UnitOfMeasure;
   ProductType: ProductType;
+  StaticContent: MarketPlaceProductStaticContent[];
+}
+
+export interface MarketPlaceProductStaticContent {
+  URL: string;
+  Title: string;
 }
 
 export interface UnitOfMeasure {

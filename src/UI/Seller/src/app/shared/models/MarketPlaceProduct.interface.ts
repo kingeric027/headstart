@@ -43,6 +43,12 @@ interface MarketplaceProductXp {
   Tax: TaxProperties;
   UnitOfMeasure: UnitOfMeasure;
   ProductType: ProductType;
+  StaticContent: MarketPlaceProductStaticContent[];
+}
+
+export interface MarketPlaceProductStaticContent {
+  URL: string;
+  Title: string;
 }
 
 export enum ObjectStatus {
