@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Supplier, Buyer } from '@ordercloud/angular-sdk';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Supplier, Buyer, OcTokenService } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { MarketplaceBuyerLocation } from '@app-seller/shared/models/MarketplaceBuyerLocation.interface';
 import {
@@ -17,7 +17,18 @@ import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 })
 export class MiddlewareAPIService {
   readonly marketplaceID: string;
-  constructor(private http: HttpClient, @Inject(applicationConfiguration) private appConfig: AppConfig) {
+  readonly headers = {
+    headers: new HttpHeaders({
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    }),
+  };
+  readonly baseUrl: string;
+  constructor(
+    private ocTokenService: OcTokenService,
+    private http: HttpClient,
+    @Inject(applicationConfiguration) private appConfig: AppConfig
+  ) {
+    this.baseUrl = this.appConfig.middlewareUrl;
     this.marketplaceID = this.appConfig.marketplaceID;
     Configuration.Set({
       baseApiUrl: this.appConfig.middlewareUrl,
