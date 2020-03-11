@@ -150,6 +150,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
             var ocShipment = await _oc.Shipments.CreateAsync(OCShipmentMapper.Map(freightPopShipment, buyerID));
             foreach(var freightPopShipmentItem in freightPopShipment.Items)
             {
+                // currently this creates two items in ordercloud inadvertantely, platform bug is being resolved
                 await _oc.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, relatedOrder.ID));
             }
         }

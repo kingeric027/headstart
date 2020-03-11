@@ -20,6 +20,7 @@ namespace Marketplace.ShippingQuery
         {
             // run every 10 minutes between 9am and 6pm CDT
             // only currently running on orders made in the last day
+            // determine different schedule and order range for production
             _shipmentQuery.SyncShipments(logger);
         }
 
