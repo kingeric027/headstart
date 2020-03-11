@@ -8,7 +8,7 @@ export const environment = {
   clientID: '3A5DD92D-0B04-4E62-B8AC-197ADF10FBC4',
   marketplaceID: 'SEB',
   baseUrl: 'http://marketplace-buyer-ui-qa.azurewebsites.net/',
-  middlewareUrl: 'https://marketplace-api-qa.azurewebsites.net',
+  middlewareUrl: 'https://marketplace-api-staging.azurewebsites.net',
   cmsUrl: 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
