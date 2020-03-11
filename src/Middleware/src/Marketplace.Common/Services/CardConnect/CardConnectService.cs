@@ -57,7 +57,7 @@ namespace Marketplace.Common.Services.CardConnect
                     ErrorCode = attempt.respcode
                 });
             }
-            else if (!this.PassedCvvCheck(attempt))
+            else if (!this.PassedCvvCheck(attempt, request))
             {
                 throw new ApiErrorException(new ApiError()
                 {
@@ -86,8 +86,10 @@ namespace Marketplace.Common.Services.CardConnect
             return attempt.respstat == "A" && (attempt.respcode == "0" || attempt.respcode == "00" || attempt.respcode == "000");
         }
 
-        private bool PassedCvvCheck(AuthorizationResponse attempt)
+        private bool PassedCvvCheck(AuthorizationResponse attempt, AuthorizationRequest request)
         {
+            if (request.cvv2 == null && (attempt.cvvresp == "P" || attempt.cvvresp == null)) 
+                return true;
             return (attempt.cvvresp != null &&
                     attempt.cvvresp != "N" && attempt.cvvresp != "P" && attempt.cvvresp != "U");
         }
