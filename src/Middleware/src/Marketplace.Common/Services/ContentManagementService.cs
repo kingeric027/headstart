@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
@@ -139,7 +139,7 @@ namespace Marketplace.Common.Services
 		private string GetProductImageName(string mkplID, string imgName) => $"{mkplID}/products/{imgName}";
 		private string GetProductImageName(string mkplID, string prodId, int? i) => $"{mkplID}/products/{prodId}-{i}";
 		private string GetProductImageURL(string blobName) => $"{_settings.BlobSettings.HostUrl}/images/{blobName}";
-		private string GetProductStaticContentName(string mkplID, string productID, string fileName) => $"{mkplID}/products/{productID}/{fileName}";
-		private string GetStaticContentURL(string productID, string blobName) => $"{_settings.BlobSettings.HostUrl}/products/{productID}/{blobName}";
+		private string GetProductStaticContentName(string mkplID, string productID, string fileName) => $"{mkplID}/static-content/{productID}/{fileName}";
+		private string GetStaticContentURL(string productID, string blobName) => $"{_settings.BlobSettings.HostUrl}/static-content/{productID}/{blobName}";
 	}
 }

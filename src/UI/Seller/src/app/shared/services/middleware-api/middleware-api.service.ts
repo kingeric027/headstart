@@ -60,10 +60,20 @@ export class MiddlewareAPIService {
     return await this.http.delete<SuperMarketplaceProduct>(url, this.headers).toPromise();
   }
 
+  async uploadStaticContent(file: File, productID: string, fileName: string): Promise<SuperMarketplaceProduct> {
+    const url = `${this.baseUrl}/${this.marketplaceID}/static-content/${productID}/${fileName}`;
+    return await this.http.post<SuperMarketplaceProduct>(url, this.formify(file), this.headers).toPromise();
+  }
+
+  async deleteStaticContent(productID: string, fileName: string): Promise<SuperMarketplaceProduct> {
+    const url = `${this.baseUrl}/${this.marketplaceID}/static-content/${productID}/${fileName}`;
+    return await this.http.delete<SuperMarketplaceProduct>(url, this.headers).toPromise();
+  }
+
   async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
     const url = `${
       this.baseUrl
-    }/taxcodes?taxCategory=${taxCategory}&search=${search}&pageSize=${pageSize}&page=${page}`;
+      }/taxcodes?taxCategory=${taxCategory}&search=${search}&pageSize=${pageSize}&page=${page}`;
     return await this.http.get(url, this.headers).toPromise();
   }
 

@@ -15,6 +15,7 @@ import {
   MarketPlaceProductImage,
   MarketPlaceProductTaxCode,
   SuperMarketplaceProduct,
+  MarketPlaceProductStaticContent,
 } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
@@ -58,7 +59,6 @@ export class ProductEditComponent implements OnInit {
   userContext = {};
   hasVariations = false;
   images: MarketPlaceProductImage[] = [];
-  files: FileHandle[] = [];
   faTrash = faTrash;
   faTimes = faTimes;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
@@ -67,6 +67,11 @@ export class ProductEditComponent implements OnInit {
   taxCodeCategorySelected = false;
   taxCodes: ListPage<MarketPlaceProductTaxCode>;
   productType: string;
+  fileType: string;
+  imageFiles: FileHandle[] = [];
+  staticContentFiles: FileHandle[] = [];
+  staticContent: MarketPlaceProductStaticContent[];
+  documentName: string;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -117,12 +122,14 @@ export class ProductEditComponent implements OnInit {
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
     }
+    this.staticContent = superProduct.Product?.xp?.StaticContent;
     this.productType = superProduct.Product?.xp?.ProductType;
     this.createProductForm(superProduct);
     this.images = ReplaceHostUrls(superProduct.Product);
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
+    console.log(superProduct)
   }
 
   createProductForm(superMarketplaceProduct: SuperMarketplaceProduct) {
@@ -167,7 +174,8 @@ export class ProductEditComponent implements OnInit {
   }
 
   handleDiscardChanges(): void {
-    this.files = [];
+    this.imageFiles = [];
+    this.staticContentFiles = [];
     this._superMarketplaceProductEditable = this._superMarketplaceProductStatic;
     this.refreshProductData(this._superMarketplaceProductStatic);
   }
@@ -176,7 +184,8 @@ export class ProductEditComponent implements OnInit {
     try {
       this.dataIsSaving = true;
       const superProduct = await this.middleware.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
-      await this.addFiles(this.files, superProduct.Product.ID);
+      await this.addFiles(this.imageFiles, superProduct.Product.ID, "image");
+      await this.addFiles(this.staticContentFiles, superProduct.Product.ID, "staticContent");
       this.refreshProductData(superProduct);
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
       this.dataIsSaving = false;
@@ -192,7 +201,8 @@ export class ProductEditComponent implements OnInit {
       const superProduct = await this.middleware.updateMarketplaceProduct(this._superMarketplaceProductEditable);
       this._superMarketplaceProductStatic = superProduct;
       this._superMarketplaceProductEditable = superProduct;
-      if (this.files) this.addFiles(this.files, superProduct.Product.ID);
+      if (this.imageFiles) this.addFiles(this.imageFiles, superProduct.Product.ID, "image");
+      if (this.staticContentFiles) this.addFiles(this.staticContentFiles, superProduct.Product.ID, "staticContent");
       this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
@@ -235,45 +245,81 @@ export class ProductEditComponent implements OnInit {
   checkForChanges(): void {
     this.areChanges =
       JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic) ||
-      this.files.length > 0;
+      this.imageFiles.length > 0 || this.staticContentFiles.length > 0;
   }
 
   /** ****************************************
    *  **** PRODUCT IMAGE UPLOAD FUNCTIONS ****
    * ******************************************/
 
-  manualFileUpload(event): void {
-    const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
-      const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
-      return { File: file, URL };
-    });
-    this.stageFiles(files);
+  manualFileUpload(event, fileType: string): void {
+    if (fileType === "image") {
+      const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
+        const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
+        return { File: file, URL };
+      });
+      this.stageImages(files);
+    } else if (fileType === "staticContent") {
+      const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
+        const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
+        return { File: file, URL, fileName: this.documentName };
+      });
+      this.stageDocuments(files);
+    }
   }
 
-  stageFiles(files: FileHandle[]) {
-    this.files = this.files.concat(files);
+  stageImages(files: FileHandle[]) {
+    this.imageFiles = this.imageFiles.concat(files);
     this.checkForChanges();
+    console.log('staging img', this.imageFiles)
   }
 
-  async addFiles(files: FileHandle[], productID: string) {
+  async addFiles(files: FileHandle[], productID: string, fileType?: string) {
+    console.log(files)
     let superProduct;
     for (const file of files) {
-      superProduct = await this.middleware.uploadProductImage(file.File, productID);
+      if (fileType === "image") {
+        superProduct = await this.middleware.uploadProductImage(file.File, productID)
+      } else {
+        superProduct = await this.middleware.uploadStaticContent(file.File, productID, this.documentName);
+      }
     }
-    this.files = [];
+    fileType === "image" ?
+      this.imageFiles = [] :
+      this.staticContentFiles = [];
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
     superProduct = Object.assign(this._superMarketplaceProductStatic || {}, superProduct);
+    console.log(superProduct)
     this.refreshProductData(superProduct);
   }
 
-  async removeFile(imgUrl: string) {
-    let superProduct = await this.middleware.deleteProductImage(this._superMarketplaceProductStatic.Product.ID, imgUrl);
+  async removeFile(URL: string) {
+    let superProduct = await this.middleware.deleteProductImage(this._superMarketplaceProductStatic.Product.ID, URL);
     superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
     this.refreshProductData(superProduct);
   }
 
-  unStage(index: number) {
-    this.files.splice(index, 1);
+  unstageImage(index: number) {
+    this.imageFiles.splice(index, 1)
+    this.checkForChanges();
+  }
+
+  /** ****************************************
+   *  **** PRODUCT DOCUMENT UPLOAD FUNCTIONS ****
+   * ******************************************/
+
+  getDocumentInfo(event: KeyboardEvent) {
+    this.documentName = (event.target as HTMLInputElement).value;
+  }
+
+  stageDocuments(files: FileHandle[]) {
+    this.staticContentFiles = this.staticContentFiles.concat(files);
+    this.checkForChanges();
+    console.log('staging doc', this.staticContentFiles)
+  }
+
+  unstageDocument(index) {
+    this.staticContentFiles.splice(index, 1);
     this.checkForChanges();
   }
 

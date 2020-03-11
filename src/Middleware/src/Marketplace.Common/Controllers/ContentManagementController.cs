@@ -35,14 +35,14 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[DocName("POST Static Content")]
-		[HttpPost, Route("static-content/product/{productID}/{fileName}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+		[HttpPost, Route("static-content/{productID}/{fileName}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
 		public async Task<SuperMarketplaceProduct> PostStaticContent(IFormFile file, string productID, string fileName)
 		{
 			return await _content.UploadStaticContent(file, productID, fileName, VerifiedUserContext.AccessToken);
 		}
 
 		[DocName("DELETE Static Content")]
-		[HttpDelete, Route("static-content/product/{productID}/{fileName}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+		[HttpDelete, Route("static-content/{productID}/{fileName}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
 		public async Task<SuperMarketplaceProduct> DeleteStaticContent(string marketplaceID, string productID, string fileName)
 		{
 			return await _content.DeleteStaticContent(marketplaceID, productID, fileName, VerifiedUserContext.AccessToken);
