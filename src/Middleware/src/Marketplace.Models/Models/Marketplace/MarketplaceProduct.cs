@@ -37,6 +37,7 @@ namespace Marketplace.Models
         public TaxProperties Tax { get; set; } = new TaxProperties();
         public UnitOfMeasure UnitOfMeasure { get; set; } = new UnitOfMeasure();
         public ProductType ProductType { get; set; }
+        public List<StaticContent> StaticContent { get; set; } = new List<StaticContent>();
 
     }
 }
