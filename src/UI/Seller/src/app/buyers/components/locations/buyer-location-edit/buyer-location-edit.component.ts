@@ -2,13 +2,13 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { ListAddress, Address } from '@ordercloud/angular-sdk';
 import { BuyerLocationService } from '../buyer-location.service';
-import { MarketplaceBuyerLocation } from '@app-seller/shared/models/MarketplaceBuyerLocation.interface';
 import { ValidatePhone, ValidateUSZip, ValidateEmail } from '@app-seller/validators/validators';
 import { Router } from '@angular/router';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
+import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',
