@@ -1,15 +1,8 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Supplier, Buyer, OcTokenService } from '@ordercloud/angular-sdk';
+import { OcTokenService } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import {
-  Configuration,
-  MarketplaceSDK,
-  SuperMarketplaceProduct,
-  OrchestrationLog,
-  ListPage,
-} from 'marketplace-javascript-sdk';
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { Configuration, MarketplaceSDK, SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
 
 @Injectable({

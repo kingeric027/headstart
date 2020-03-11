@@ -39,6 +39,8 @@ import { CurrentOrderService } from './services/order/order.service';
 import { CartService } from './services/order/cart.service';
 import { CheckoutService } from './services/order/checkout.service';
 import { OrderStateService } from './services/order/order-state.service';
+import { Configuration } from 'marketplace-javascript-sdk';
+import { AppConfig } from './shopper-context';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -86,4 +88,10 @@ import { OrderStateService } from './services/order/order-state.service';
     SupplierListWrapperComponent,
   ],
 })
-export class MarketplaceModule {}
+export class MarketplaceModule {
+  constructor(private appConfig: AppConfig) {
+    Configuration.Set({
+      baseApiUrl: this.appConfig.middlewareUrl,
+    });
+  }
+}
