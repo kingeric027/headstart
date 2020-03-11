@@ -20,7 +20,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage } from 'marketplace-javascript-sdk';
+import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 
 @Component({
@@ -71,9 +71,9 @@ export class ProductEditComponent implements OnInit {
     private ocProductService: OcProductService,
     private ocAdminAddressService: OcAdminAddressService,
     private productService: ProductService,
-    private middleware: MiddlewareAPIService,
     private sanitizer: DomSanitizer,
     private modalService: NgbModal,
+    private middleware: MiddlewareAPIService,
     private toasterService: ToastrService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) { }
@@ -102,7 +102,7 @@ export class ProductEditComponent implements OnInit {
         this._superMarketplaceProductEditable.Product.xp.Tax.Category === 'FR000000'
           ? this._superMarketplaceProductEditable.Product.xp.Tax.Category.substr(0, 2)
           : this._superMarketplaceProductEditable.Product.xp.Tax.Category.substr(0, 1);
-      const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCategory, '', 1, 100);
+      const avalaraTaxCodes = await this.listTaxCodes(taxCategory, '', 1, 100);
       this.taxCodes = avalaraTaxCodes;
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
@@ -254,7 +254,9 @@ export class ProductEditComponent implements OnInit {
   }
 
   async removeFile(imgUrl: string) {
-    let superProduct = await this.middleware.deleteProductImage(this._superMarketplaceProductStatic.Product.ID, imgUrl);
+    const prodID = this._superMarketplaceProductStatic.Product.ID;
+    const imageName = imgUrl.split('/').slice(-1)[0];
+    let superProduct = await MarketplaceSDK.Files.Delete(this.appConfig.marketplaceID, prodID, imageName);
     superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
     this.refreshProductData(superProduct);
   }
@@ -279,7 +281,7 @@ export class ProductEditComponent implements OnInit {
     this.resetTaxCodeAndDescription();
     this.handleUpdateProduct(event, 'Product.xp.Tax.Category');
     this._superMarketplaceProductEditable.Product.xp.Tax.Code = '';
-    const avalaraTaxCodes = await this.middleware.listTaxCodes(event.target.value, '', 1, 100);
+    const avalaraTaxCodes = await this.listTaxCodes(event.target.value, '', 1, 100);
     this.taxCodes = avalaraTaxCodes;
   }
   // Reset TaxCode Code and Description if a new TaxCode Category is selected
@@ -291,7 +293,7 @@ export class ProductEditComponent implements OnInit {
   async searchTaxCodes(searchTerm: string) {
     if (searchTerm === undefined) searchTerm = '';
     const taxCodeCategory = this._superMarketplaceProductEditable.Product.xp.Tax.Category;
-    const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCodeCategory, searchTerm, 1, 100);
+    const avalaraTaxCodes = await this.listTaxCodes(taxCodeCategory, searchTerm, 1, 100);
     this.taxCodes = avalaraTaxCodes;
   }
 
@@ -301,7 +303,7 @@ export class ProductEditComponent implements OnInit {
     const nextPageNumber = this.taxCodes.Meta.Page + 1;
     if (totalPages > nextPageNumber) {
       const taxCodeCategory = this._superMarketplaceProductEditable.Product.xp.Tax.Category;
-      const avalaraTaxCodes = await this.middleware.listTaxCodes(taxCodeCategory, searchTerm, nextPageNumber, 100);
+      const avalaraTaxCodes = await this.listTaxCodes(taxCodeCategory, searchTerm, nextPageNumber, 100);
       this.taxCodes = {
         Meta: avalaraTaxCodes.Meta,
         Items: [...this.taxCodes.Items, ...avalaraTaxCodes.Items],
@@ -315,7 +317,11 @@ export class ProductEditComponent implements OnInit {
   }
 
   private async handleSelectedProductChange(product: Product): Promise<void> {
-    const marketPlaceProduct = await this.middleware.getSuperMarketplaceProductByID(product.ID);
+    const marketPlaceProduct = await MarketplaceSDK.Products.Get(product.ID);
     this.refreshProductData(marketPlaceProduct);
+  }
+
+  private async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
+    return await MarketplaceSDK.TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
   }
 }

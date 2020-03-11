@@ -35,43 +35,6 @@ export class MiddlewareAPIService {
     });
   }
 
-  async getSuperMarketplaceProductByID(productID: string): Promise<any> {
-    return await MarketplaceSDK.Products.Get(productID);
-  }
-
-  async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
-    return await MarketplaceSDK.TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
-  }
-
-  async createSupplier(supplier: Supplier): Promise<Supplier> {
-    return await MarketplaceSDK.Suppliers.Create(supplier);
-  }
-
-  async createBuyer(buyer: Buyer): Promise<Supplier> {
-    return await MarketplaceSDK.Buyers.Create(buyer);
-  }
-
-  async listOrchestrationLogs(args: ListArgs = {}): Promise<ListPage<OrchestrationLog>> {
-    return await MarketplaceSDK.OrchestrationLogs.List(args);
-  }
-
-  async getMySupplier(supplierID: string): Promise<Supplier> {
-    return await MarketplaceSDK.Suppliers.GetMySupplier(supplierID);
-  }
-
-  async getBuyerLocationByID(buyerID: string, buyerLocationID: string): Promise<any> {
-    return await MarketplaceSDK.BuyerLocations.Get(buyerID, buyerLocationID);
-  }
-
-  async deleteBuyerLocation(buyerID: string, buyerLocationID: string): Promise<void> {
-    return await MarketplaceSDK.BuyerLocations.Delete(buyerLocationID, buyerID);
-  }
-
-  async deleteProductImage(productID: string, imageUrl: string): Promise<SuperMarketplaceProduct> {
-    const imageName = imageUrl.split('/').slice(-1)[0];
-    return await MarketplaceSDK.Files.Delete(this.marketplaceID, productID, imageName);
-  }
-
   async createNewSuperMarketplaceProduct(
     superMarketplaceProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {

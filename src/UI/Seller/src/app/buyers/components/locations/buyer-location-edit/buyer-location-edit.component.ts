@@ -9,6 +9,7 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
+import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',
@@ -49,7 +50,7 @@ export class BuyerLocationEditComponent implements OnInit {
     private currentUserService: CurrentUserService
   ) {}
   private async handleSelectedAddressChange(address: Address): Promise<void> {
-    const marketplaceBuyerLocation = await this.middleware.getBuyerLocationByID(this.buyerID, address.ID);
+    const marketplaceBuyerLocation = await MarketplaceSDK.BuyerLocations.Get(this.buyerID, address.ID);
     this.refreshBuyerLocationData(marketplaceBuyerLocation);
   }
 
@@ -144,7 +145,7 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   async handleDelete($event): Promise<void> {
-    await this.middleware.deleteBuyerLocation(this.buyerID, this.buyerLocationEditable.Address.ID);
+    await MarketplaceSDK.BuyerLocations.Delete(this.buyerID, this.buyerLocationEditable.Address.ID);
     this.router.navigateByUrl(`/buyers/${this.buyerID}/locations`);
   }
 
