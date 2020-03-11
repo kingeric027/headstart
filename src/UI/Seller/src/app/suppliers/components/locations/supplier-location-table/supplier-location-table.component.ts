@@ -53,7 +53,7 @@ export class SupplierLocationTableComponent extends ResourceCrudComponent<Addres
   async updateExistingResource(): Promise<void> {
     try {
       this.dataIsSaving = true;
-      const updatedResource = await this.ocService.updateResource(this.updatedResource);
+      const updatedResource = await this.ocService.updateResource(this.updatedResource.ID, this.updatedResource);
       this.resourceInSelection = this.ocService.copyResource(updatedResource);
       this.setUpdatedResourceAndResourceForm(updatedResource);
       this.suggestedAddresses = null;
