@@ -26,7 +26,7 @@ namespace Marketplace.Models.Misc
 		[MinLength(3, ErrorMessage = "Invalid CVV: Must be 3 or 4 digit code.")]
 		[MaxLength(4, ErrorMessage = "Invalid CVV: Must be 3 or 4 digit code.")]
 		public string CVV { get; set; }
-		[Required]
+		[System.ComponentModel.DataAnnotations.Required]
 		public string MerchantID { get; set; }
 	}
 }

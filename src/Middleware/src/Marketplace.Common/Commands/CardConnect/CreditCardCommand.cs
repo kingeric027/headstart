@@ -62,7 +62,6 @@ namespace Marketplace.Common.Commands
 			var paymentlist = await _privilegedOC.Payments.ListAsync<Payment>(OrderDirection.Incoming, payment.OrderID, builder => builder.AddFilter(p => p.CreditCardID == payment.CreditCardID));
 			if (paymentlist.Meta.TotalCount == 0)
 				throw new ApiErrorException(new ErrorCode("Required", 404, $"Unable to find Payment on Order {payment.OrderID} with CreditCardID {payment.CreditCardID}"), payment.OrderID);
-            //TODO: add flexibility to id the actual payment in OC
 			var ocPayment = paymentlist.Items.First();
 
 			Require.That(!order.IsSubmitted, new ErrorCode("Invalid Order Status", 400, "Order has already been submitted"));
