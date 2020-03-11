@@ -22,7 +22,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("POST Product Images")]
 		[HttpPost, Route("images/product/{productID}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> Post(IFormFile file, string marketplaceID, string productID)
+		public async Task<SuperMarketplaceProduct> Post([FromForm] IFormFile file, string marketplaceID, string productID)
 		{
 			return await _content.UploadProductImage(file, marketplaceID, productID, VerifiedUserContext.AccessToken);
 		}
