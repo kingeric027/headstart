@@ -35,15 +35,16 @@ namespace Marketplace.Common.Commands
 		public async Task<ImpersonationToken> Seed(EnvironmentSeed seed, VerifiedUserContext user)
 		{
 			_seed = seed;
-			var org = await this.CreateOrganization(user.AccessToken);
+			var org = await CreateOrganization(user.AccessToken);
 			var company = await _dev.GetOrganizations(org.OwnerDevID, user.AccessToken);
 
 			// at this point everything we do is as impersonation of the admin user on a new token
 			var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
-			await this.PatchDefaultApiClients(impersonation.access_token);
-			await this.CreateWebhooks(impersonation.access_token, "https://marketplace-api-qa.azurewebsites.net");
-			await this.CreateMarketPlaceRoles(impersonation.access_token);
-			await this.CreateSuppliers(user, impersonation.access_token);
+			await PatchDefaultApiClients(impersonation.access_token);
+			await CreateWebhooks(impersonation.access_token, "https://marketplace-api-staging.azurewebsites.net");
+			await CreateMarketPlaceRoles(impersonation.access_token);
+			await CreateSuppliers(user, impersonation.access_token);
+			await CreateXPIndices(impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
 			return impersonation;
 		}
@@ -65,13 +66,25 @@ namespace Marketplace.Common.Commands
 			{
 				await _command.Create(supplier, user, token);
 			}
+		}
 
-			//Add xp index for SupplierUserGroup.xp.Type
-			await _oc.XpIndices.PutAsync(new XpIndex
+		static readonly List<XpIndex> DefaultIndices = new List<XpIndex>() {
+			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Type" },       
+			new XpIndex { ThingType = XpThingType.Product, Key = "Images.URL" },       
+			new XpIndex { ThingType = XpThingType.Product, Key = "Status" },       
+			new XpIndex { ThingType = XpThingType.Company, Key = "Data.ServiceCategory" },       
+			new XpIndex { ThingType = XpThingType.Company, Key = "Data.VendorLevel" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
+			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },       
+		};
+
+		public async Task CreateXPIndices(string token)
+		{
+			foreach (var index in DefaultIndices)
 			{
-				ThingType = XpThingType.UserGroup,
-				Key = "Type"
-			}, token);
+				await _oc.XpIndices.PutAsync(index, token);
+			}
 		}
 
 		private async Task PatchDefaultApiClients(string token)
