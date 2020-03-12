@@ -4,12 +4,12 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Commands;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Extensions;
+using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
-using Marketplace.Models.Exceptions;
-using Marketplace.Models.Misc;
-using Marketplace.Models.Orchestration;
-using Action = Marketplace.Models.Misc.Action;
-using LogLevel = Marketplace.Models.Orchestration.LogLevel;
+using Action = Marketplace.Common.Models.Action;
+using LogLevel = Marketplace.Common.Models.LogLevel;
 
 namespace Marketplace.Orchestration
 {

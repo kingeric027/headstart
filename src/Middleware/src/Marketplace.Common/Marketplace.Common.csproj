@@ -39,10 +39,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Exceptions\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Marketplace.Models\Marketplace.Models.csproj" />
   </ItemGroup>
 

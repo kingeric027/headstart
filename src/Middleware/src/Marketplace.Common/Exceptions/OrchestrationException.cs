@@ -1,11 +1,10 @@
 ﻿using System;
-using Marketplace.Models.Misc;
+using Marketplace.Common.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using Action = Marketplace.Models.Misc.Action;
 
-namespace Marketplace.Models.Exceptions
+namespace Marketplace.Common.Exceptions
 {
     public class OrchestrationException : Exception
     {
@@ -50,7 +49,7 @@ namespace Marketplace.Models.Exceptions
         [JsonConverter(typeof(StringEnumConverter))]
         public RecordType RecordType { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public Action Action { get; set; }
+        public Models.Action Action { get; set; }
         public JObject Current { get; set; }
         public JObject Cache { get; set; }
         public JObject Diff { get; set; }

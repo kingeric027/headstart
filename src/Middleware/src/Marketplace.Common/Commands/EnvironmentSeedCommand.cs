@@ -7,7 +7,6 @@ using Marketplace.Common.Services.DevCenter.Models;
 using Marketplace.Helpers.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
-using Marketplace.Models.Models.Misc;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands

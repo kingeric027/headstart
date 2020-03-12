@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Marketplace.Common.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Extensions;
+using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Helpers.Models;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Helpers.Services;
 using Marketplace.Models;
-using Marketplace.Models.Exceptions;
-using Marketplace.Models.Misc;
-using Marketplace.Models.Orchestration;
-using Action = Marketplace.Models.Misc.Action;
+using Action = Marketplace.Common.Models.Action;
 using ErrorCodes = Marketplace.Helpers.Exceptions.ErrorCodes;
 
 namespace Marketplace.Common.Commands
@@ -21,7 +20,7 @@ namespace Marketplace.Common.Commands
     {
         Task CleanupQueue(string path);
         Task SaveToCache(WorkItem wi);
-        Task<Action> DetermineAction(WorkItem wi);
+        //Task<Action> DetermineAction(WorkItem wi);
         Task<JObject> CalculateDiff(WorkItem wi);
         Task<JObject> GetQueuedItem(string path);
         Task<JObject> GetCachedItem(string path);
@@ -51,14 +50,6 @@ namespace Marketplace.Common.Commands
             });
             _log = log;
         }
-
-        //public OrchestrationCommand(AppSettings settings, LogQuery log, IBlobService queueBlob, IBlobService cacheBlob)
-        //{
-        //    _settings = settings;
-        //    _blobQueue = queueBlob;
-        //    _blobCache = cacheBlob;
-        //    _log = log;
-        //}
 
         public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId, string clientId) where T : IMarketplaceObject
         {
@@ -125,7 +116,6 @@ namespace Marketplace.Common.Commands
             try
             {
                 var blob = await _blobQueue.Get<JObject>(path);
-                //return blob.SelectToken("Model") as JObject;
                 return blob;
             }
             catch (Exception ex)
@@ -139,7 +129,6 @@ namespace Marketplace.Common.Commands
             try
             {
                 var blob = await _blobCache.Get<JObject>($"{path}");
-                //return blob.SelectToken("Model") as JObject;
                 return blob;
             }
             catch (Exception)
@@ -162,41 +151,15 @@ namespace Marketplace.Common.Commands
 
         public async Task<Action> DetermineAction(WorkItem wi)
         {
-            // we want to ensure a condition is met before determining an action
-            // so that if there is a case not compensated for it flows to an exception
             try
             {
-                // first check if there is a cache object, if not it's a CREATE event
-                if (wi.Cache == null)
-                    return await Task.FromResult(Action.Create);
-
-                // if cache does exists, and there is no difference ignore the action
-                if (wi.Cache != null && wi.Diff == null)
-                    return await Task.FromResult((wi.RecordType == RecordType.SpecProductAssignment || wi.RecordType == RecordType.UserGroupAssignment || wi.RecordType == RecordType.CatalogAssignment) ? Action.Ignore : Action.Get);
-
-                // special case for SpecAssignment because there is no ID for the OC object
-                // but we want one in orchestration to handle caching
-                // in further retrospect I don't think we need to handle updating objects when only the ID is being changed
-                // maybe in the future a true business case will be necessary to do this
-                if ((wi.RecordType == RecordType.SpecProductAssignment || wi.RecordType == RecordType.UserGroupAssignment || wi.RecordType == RecordType.CatalogAssignment) && wi.Diff.Count == 1 && wi.Diff.SelectToken("ID").Path == "ID")
-                    return await Task.FromResult(Action.Ignore);
-
-                if (wi.Cache != null && wi.Diff != null)
-                {
-                    // cache exists, we want to force a PUT when xp has deleted properties because 
-                    // it's the only way to delete the properties
-                    if (wi.Cache.HasDeletedXp(wi.Current))
-                        return await Task.FromResult(Action.Update);
-                    // otherwise we want to PATCH the existing object
-                    return await Task.FromResult(Action.Patch);
-                }
+                var action = WorkItemMethods.DetermineAction(wi);
+                return await Task.FromResult(action);
             }
             catch (Exception ex)
             {
                 throw new OrchestrationException(OrchestrationErrorType.ActionEvaluationError, wi, ex.Message);
             }
-            
-            throw new OrchestrationException(OrchestrationErrorType.ActionEvaluationError, wi, "Unable to determine action");
         }
     }
 }

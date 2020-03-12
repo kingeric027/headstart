@@ -5,7 +5,6 @@ using Marketplace.Common.TemporaryAppConstants;
 using Marketplace.Helpers.Models;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
-using Marketplace.Models.Models.Misc;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;

@@ -1,8 +1,11 @@
 using System.Collections;
+using System.Threading.Tasks;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Extensions;
+using Marketplace.Common.Models;
+using Marketplace.Helpers.Extensions;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using Marketplace.Models.Exceptions;
-using Marketplace.Models.Misc;
 
 namespace Orchestration.Tests
 {
@@ -31,22 +34,20 @@ namespace Orchestration.Tests
             });
         }
 
-        //[Test, TestCaseSource(typeof(ActionFactory), nameof(ActionFactory.TestCases))]
-        //public async Task<Action> determine_action_results(WorkItem wi)
-        //{
-        //    var command = new OrchestrationCommand(Substitute.For<AppSettings>(), new LogQuery(Substitute.For<ICosmosStore<OrchestrationLog>>()), Substitute.For<IBlobService>(), Substitute.For<IBlobService>());
-        //    wi.Diff = await command.CalculateDiff(wi);
-        //    var action = await command.DetermineAction(wi);
-        //    return action;
-        //}
+        [Test, TestCaseSource(typeof(ActionFactory), nameof(ActionFactory.TestCases))]
+        public Action determine_action_results(WorkItem wi)
+        {
+            wi.Diff = wi.Current.Diff(wi.Cache);
+            var action = WorkItemMethods.DetermineAction(wi);
+            return action;
+        }
 
-        //[Test, TestCaseSource(typeof(DiffFactory), nameof(DiffFactory.TestCases))]
-        //public async Task<JObject> diff_results(WorkItem wi)
-        //{
-        //    var command = new OrchestrationCommand(Substitute.For<AppSettings>(), new LogQuery(Substitute.For<ICosmosStore<OrchestrationLog>>()), Substitute.For<IBlobService>(), Substitute.For<IBlobService>());
-        //    var diff = await command.CalculateDiff(wi);
-        //    return diff;
-        //}
+        [Test, TestCaseSource(typeof(DiffFactory), nameof(DiffFactory.TestCases))]
+        public JObject diff_results(WorkItem wi)
+        {
+            var diff = wi.Current.Diff(wi.Cache);
+            return diff;
+        }
     }
 
     public class DiffFactory

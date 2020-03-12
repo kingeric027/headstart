@@ -1,13 +1,14 @@
 ﻿using System;
+using Marketplace.Common.Commands;
+using Marketplace.Common.Exceptions;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
 using Marketplace.Models.Exceptions;
-using Marketplace.Models.Misc;
 using Microsoft.Azure.WebJobs;
 using Newtonsoft.Json.Linq;
-using Action = Marketplace.Models.Misc.Action;
+using Action = Marketplace.Common.Models.Action;
 
-namespace Marketplace.Models.Orchestration
+namespace Marketplace.Common.Models
 {
     public class OrchestrationLog : ICosmosObject
     {
