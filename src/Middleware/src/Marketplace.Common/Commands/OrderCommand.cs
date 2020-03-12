@@ -103,13 +103,21 @@ namespace Marketplace.Common.Commands
         }
 
         private async Task ImportSupplierOrderIntoFreightPop(Order supplierOrder)
-        { 
+        {
+
             var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, supplierOrder.ID);
-            var firstLineItem = lineItems.Items[0];
-            var supplier = await _oc.Suppliers.GetAsync(firstLineItem.SupplierID);
-            var supplierAddress = await _oc.SupplierAddresses.GetAsync(supplier.ID, firstLineItem.ShipFromAddressID);
-            var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItems.Items, supplier, supplierAddress);
-            await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
+            
+            // we further split the supplier order into multiple orders for each shipfromaddressID before it goes into freightpop
+            var freightPopOrders = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
+
+            foreach(var lineItemGrouping in freightPopOrders)
+            {
+                var firstLineItem = lineItemGrouping.First();
+                var supplier = await _oc.Suppliers.GetAsync(firstLineItem.SupplierID);
+                var supplierAddress = await _oc.SupplierAddresses.GetAsync(supplier.ID, firstLineItem.ShipFromAddressID);
+                var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItemGrouping.ToList(), supplier, supplierAddress);
+                await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
+            }
         }
     }
 }

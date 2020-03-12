@@ -14,7 +14,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
             var orderRequest = new OrderRequest
             {
-                OrderNumber = order.ID,
+                OrderNumber = $"{order.ID}-{supplierAddress.ID}",
 
                 // todo get carrier on order
                 //Carrier = 
