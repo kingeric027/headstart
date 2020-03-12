@@ -110,14 +110,21 @@ namespace Marketplace.Common.Commands
             // we further split the supplier order into multiple orders for each shipfromaddressID before it goes into freightpop
             var freightPopOrders = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
 
+            var freightPopOrderIDs = new List<string>();
             foreach(var lineItemGrouping in freightPopOrders)
             {
                 var firstLineItem = lineItemGrouping.First();
+
+                var freightPopOrderID = $"{supplierOrder.ID}-{firstLineItem.ShipFromAddressID}";
+                freightPopOrderIDs.Add(freightPopOrderID);
+
                 var supplier = await _oc.Suppliers.GetAsync(firstLineItem.SupplierID);
                 var supplierAddress = await _oc.SupplierAddresses.GetAsync(supplier.ID, firstLineItem.ShipFromAddressID);
-                var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItemGrouping.ToList(), supplier, supplierAddress);
+                var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItemGrouping.ToList(), supplier, supplierAddress, freightPopOrderID);
                 await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
             }
+
+            await _oc.Orders.PatchAsync(OrderDirection.Outgoing, supplierOrder.ID, new PartialOrder() { xp = new { FreightPopOrderIDs = freightPopOrderIDs } });
         }
     }
 }

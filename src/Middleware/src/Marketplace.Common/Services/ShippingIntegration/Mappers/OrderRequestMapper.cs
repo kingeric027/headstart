@@ -8,13 +8,13 @@ namespace Marketplace.Common.Services.ShippingIntegration
 {
     public static class OrderRequestMapper
     {
-        public static List<OrderRequest> Map(Order order, IList<LineItem> lineItems, Supplier supplier, Address supplierAddress)
+        public static List<OrderRequest> Map(Order order, IList<LineItem> lineItems, Supplier supplier, Address supplierAddress, string freightPopOrderID)
         {
             var firstLineItem = lineItems[0];
 
             var orderRequest = new OrderRequest
             {
-                OrderNumber = $"{order.ID}-{supplierAddress.ID}",
+                OrderNumber = freightPopOrderID,
 
                 // todo get carrier on order
                 //Carrier = 
