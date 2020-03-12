@@ -9,6 +9,7 @@ using OrderCloud.SDK;
 using Marketplace.Common.Services.FreightPop.Models;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Microsoft.Extensions.Logging;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
@@ -90,20 +91,21 @@ namespace Marketplace.Common.Services.ShippingIntegration
         {
             try
             {
+                var shipmentSyncOrders = await GetShipmentSyncOrders(orders);
                 // abiding by 30 req per minute freightpop limit for now
-                var freightPopShipmentsResponses = await Throttler.RunAsync(orders, 2000, 1,
-                (order) =>
+                var shipmentSyncOrdersWithResponses = await Throttler.RunAsync(shipmentSyncOrders, 2000, 1,
+                (shipmentSyncOrder) =>
                 {
-                    return _freightPopService.GetShipmentsForOrder(order.ID);
+                    return GetShipmentDetailsForShipmentSyncOrder(shipmentSyncOrder);
                 });
 
-                var freightPopShipments = freightPopShipmentsResponses.Where(s => s != null && s.Data != null);
+                var shipmentSyncOrdersToUpdate = shipmentSyncOrdersWithResponses.Where(s => s.FreightPopShipmentResponses!= null && s.FreightPopShipmentResponses.Data != null);
 
-                _logger.LogInformation($"Retrieved {freightPopShipments.Count()} freightpop shipments");
+                _logger.LogInformation($"Retrieved {shipmentSyncOrdersToUpdate.Count()} freightpop shipments");
 
-                await Throttler.RunAsync(freightPopShipments, 100, 5, (freightPopShipmentResponse) =>
+                await Throttler.RunAsync(shipmentSyncOrdersToUpdate, 100, 5, (shipmentSyncOrder) =>
                 {
-                    return CreateShipmentsInOrderCloudIfNeeded(freightPopShipmentResponse, orders);
+                    return CreateShipmentsInOrderCloudIfNeeded(shipmentSyncOrder);
                 });
             }
             catch (Exception ex)
@@ -112,13 +114,45 @@ namespace Marketplace.Common.Services.ShippingIntegration
             }
         }
 
-        private async Task CreateShipmentsInOrderCloudIfNeeded(Response<List<ShipmentDetails>> freightPopShipmentResponse, List<MarketplaceOrder> orders)
+        private async Task<ShipmentSyncOrder> GetShipmentDetailsForShipmentSyncOrder(ShipmentSyncOrder shipmentSyncOrder)
         {
-            foreach (var freightPopShipment in freightPopShipmentResponse.Data)
+            shipmentSyncOrder.FreightPopShipmentResponses = await _freightPopService.GetShipmentsForOrder(shipmentSyncOrder.FreightPopOrderID);
+            return shipmentSyncOrder;
+
+        }
+
+        private async Task<List<ShipmentSyncOrder>> GetShipmentSyncOrders(List<MarketplaceOrder> orders)
+        {
+            var shipmentSyncOrders = new List<ShipmentSyncOrder>();
+            foreach(var order in orders)
             {
-                var relatedOrderID = freightPopShipment.Reference1;
-                var relatedOrder = orders.Find(order => order.ID == relatedOrderID);
-                await CreateShipmentInOrderCloudIfNeeded(freightPopShipment, relatedOrder);
+                if(order.xp.FreightPopOrderIDs != null)
+                {
+                    foreach(var freightPopOrder in order.xp.FreightPopOrderIDs)
+                    {
+                        shipmentSyncOrders.Add(new ShipmentSyncOrder()
+                        {
+                            OrderCloudOrderID = order.ID,
+                            FreightPopOrderID = freightPopOrder,
+                            Order = order,
+                            FreightPopShipmentResponses = new Response<List<ShipmentDetails>>()
+                        });
+                    }
+                } else
+                {
+                    // if there are no freightpop order IDs on supplier order, mark it as needing attention
+                    _logger.LogWarning($"No FreightPOP orders marked on order {order.ID}. Marked as needing attention");
+                    await _oc.Orders.PatchAsync(OrderDirection.Outgoing, order.ID, new PartialOrder() { xp = new { NeedsAttention = true, StopShipSync = true } });
+                }
+            }
+            return shipmentSyncOrders;
+        }
+
+        private async Task CreateShipmentsInOrderCloudIfNeeded(ShipmentSyncOrder shipmentSyncOrder)
+        {
+            foreach (var freightPopShipment in shipmentSyncOrder.FreightPopShipmentResponses.Data)
+            {
+                await CreateShipmentInOrderCloudIfNeeded(freightPopShipment, shipmentSyncOrder.Order);
             }
         }
 
@@ -136,6 +170,11 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 if(orderCloudShipments.Meta.TotalCount == 0)
                 {
                     await AddShipmentToOrderCloud(freightPopShipment, relatedOrder, buyerIDForOrder);
+                } else
+                {
+                    // if there are already shipments in ordercloud, why was the order not marked as complete
+                    _logger.LogWarning($"Preexisting shipment in ordercloud for {relatedOrder.ID}. Marked as needing attention");
+                    await _oc.Orders.PatchAsync(OrderDirection.Outgoing, relatedOrder.ID, new PartialOrder() { xp = new { NeedsAttention = true, StopShipSync = true } });
                 }
                 _logger.LogInformation($"Sync complete for order number {relatedOrder.ID}");
             } catch (Exception ex)       
@@ -207,7 +246,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         private Task<ListPage<MarketplaceOrder>> GetOrdersNeedingShipmentAsync(int page, DateTime fromDate)
         {
-            return _oc.Orders.ListAsync<MarketplaceOrder>(OrderDirection.Outgoing, page: page, pageSize: 100, filters: $"IsSubmitted=true&Status=Open&DateSubmitted=>{fromDate.ToLongDateString()}");
+            return _oc.Orders.ListAsync<MarketplaceOrder>(OrderDirection.Outgoing, page: page, pageSize: 100, filters: $"IsSubmitted=true&Status=Open&DateSubmitted=>{fromDate.ToLongDateString()}&xp.StopShipSync=false");
         }
     }
 }
