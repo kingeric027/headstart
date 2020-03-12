@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
     {
         Task CleanupQueue(string path);
         Task SaveToCache(WorkItem wi);
-        //Task<Action> DetermineAction(WorkItem wi);
+        Task<Action> DetermineAction(WorkItem wi);
         Task<JObject> CalculateDiff(WorkItem wi);
         Task<JObject> GetQueuedItem(string path);
         Task<JObject> GetCachedItem(string path);

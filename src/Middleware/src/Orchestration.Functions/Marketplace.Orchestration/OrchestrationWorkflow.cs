@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Exceptions;
-using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Action = Marketplace.Common.Models.Action;
