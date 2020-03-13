@@ -166,7 +166,7 @@ export class ProductEditComponent implements OnInit {
   async createNewProduct() {
     try {
       this.dataIsSaving = true;
-      const superProduct = await this.middleware.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
+      const superProduct = await this.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
       await this.addFiles(this.files, superProduct.Product.ID);
       this.refreshProductData(superProduct);
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
@@ -180,7 +180,7 @@ export class ProductEditComponent implements OnInit {
   async updateProduct() {
     try {
       this.dataIsSaving = true;
-      const superProduct = await this.middleware.updateMarketplaceProduct(this._superMarketplaceProductEditable);
+      const superProduct = await this.updateMarketplaceProduct(this._superMarketplaceProductEditable);
       this._superMarketplaceProductStatic = superProduct;
       this._superMarketplaceProductEditable = superProduct;
       if (this.files) this.addFiles(this.files, superProduct.Product.ID);
@@ -319,6 +319,20 @@ export class ProductEditComponent implements OnInit {
   getSaveBtnText(): string {
     return this.productService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew)
   }
+
+  private async createNewSuperMarketplaceProduct(
+    superMarketplaceProduct: SuperMarketplaceProduct
+  ): Promise<SuperMarketplaceProduct> {
+    superMarketplaceProduct.Product.xp.Status = 'Draft';
+    superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
+    return await MarketplaceSDK.Products.Post(superMarketplaceProduct);
+  }
+
+  private async updateMarketplaceProduct(superMarketplaceProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
+    // TODO: Temporary while Product set doesn't reflect the current strongly typed Xp
+    superMarketplaceProduct.Product.xp.Status = 'Draft';
+    return await MarketplaceSDK.Products.Put(superMarketplaceProduct.Product.ID, superMarketplaceProduct);
+  };
 
   private async handleSelectedProductChange(product: Product): Promise<void> {
     const marketPlaceProduct = await MarketplaceSDK.Products.Get(product.ID);

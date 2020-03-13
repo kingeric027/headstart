@@ -49,10 +49,6 @@ export class BuyerLocationEditComponent implements OnInit {
     private middleware: MiddlewareAPIService,
     private currentUserService: CurrentUserService
   ) {}
-  private async handleSelectedAddressChange(address: Address): Promise<void> {
-    const marketplaceBuyerLocation = await MarketplaceSDK.BuyerLocations.Get(this.buyerID, address.ID);
-    this.refreshBuyerLocationData(marketplaceBuyerLocation);
-  }
 
   async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {
     this.buyerLocationEditable = buyerLocation;
@@ -116,7 +112,7 @@ export class BuyerLocationEditComponent implements OnInit {
           .join('-')
           .replace(/[^a-zA-Z0-9 ]/g, '');
       this.buyerLocationEditable.UserGroup.ID = this.buyerLocationEditable.Address.ID;
-      const newBuyerLocation = await this.middleware.createBuyerLocation(this.buyerID, this.buyerLocationEditable);
+      const newBuyerLocation = await MarketplaceSDK.BuyerLocations.Create(this.buyerID, this.buyerLocationEditable);
       this.refreshBuyerLocationData(newBuyerLocation);
       this.router.navigateByUrl(`/buyers/${this.buyerID}/locations/${newBuyerLocation.Address.ID}`);
       this.dataIsSaving = false;
@@ -129,7 +125,7 @@ export class BuyerLocationEditComponent implements OnInit {
   async updateBuyerLocation(): Promise<void> {
     try {
       this.dataIsSaving = true;
-      const updatedBuyerLocation = await this.middleware.updateBuyerLocationByID(
+      const updatedBuyerLocation = await MarketplaceSDK.BuyerLocations.Update(
         this.buyerID,
         this.buyerLocationEditable.Address.ID,
         this.buyerLocationEditable
@@ -170,5 +166,10 @@ export class BuyerLocationEditComponent implements OnInit {
     this.buyerLocationEditable = this.buyerLocationStatic;
     this.suggestedAddresses = null;
     this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
+  }
+
+  private async handleSelectedAddressChange(address: Address): Promise<void> {
+    const marketplaceBuyerLocation = await MarketplaceSDK.BuyerLocations.Get(this.buyerID, address.ID);
+    this.refreshBuyerLocationData(marketplaceBuyerLocation);
   }
 }
