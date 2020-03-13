@@ -1,14 +1,4 @@
-<<<<<<< HEAD
 import { MarketplaceOrder, OrderAddressType, CreditCardPayment, AppConfig } from '../../shopper-context';
-=======
-import {
-  MarketplaceOrder,
-  CreditCardToken,
-  OrderAddressType,
-  CreditCardPayment,
-  AppConfig,
-} from '../../shopper-context';
->>>>>>> upstream/dev
 import {
   ListPayment,
   Payment,
