@@ -19,7 +19,7 @@ export class CreditCardService implements ICreditCards {
     Amex: RegExp('^3[47][0-9]{13}$'),
     BCGlobal: RegExp('^(6541|6556)[0-9]{12}$'),
     DinersClub: RegExp('^3(?:0[0-5]|[68][0-9])[0-9]{11}$'),
-    JCB: RegExp('^(?:2131|1800|35d{3})d{11}$'),
+    JCB: RegExp(`^(?:2131|1800|35\d{3})\d{11}$`),
     UnionPay: RegExp('^(62[0-9]{14,17})$'),
   };
 
