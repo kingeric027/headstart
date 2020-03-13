@@ -144,7 +144,20 @@ namespace Marketplace.Helpers.OpenApiTools
 
         private static IEnumerable<ApiEndpoint> GetEndpoints<TController, TAttribute, TModel>(Type c, string resource) where TAttribute : Attribute, IApiAuthAttribute
         {
-            var result = from m in c.GetMethods()
+            var temp = from m in c.GetMethods()
+                let verb =
+                    m.HasAttribute<HttpGetAttribute>() ? System.Net.Http.HttpMethod.Get :
+                    m.HasAttribute<HttpPostAttribute>() ? System.Net.Http.HttpMethod.Post :
+                    m.HasAttribute<HttpPutAttribute>() ? System.Net.Http.HttpMethod.Put :
+                    m.HasAttribute<HttpPatchAttribute>() ? new System.Net.Http.HttpMethod("PATCH") :
+                    m.HasAttribute<HttpDeleteAttribute>() ? System.Net.Http.HttpMethod.Delete : null
+                where verb != null
+                let routex = GetRoute(m)
+                let requestTypex = m.GetParameters().Select(p => p.ParameterType)
+                    .FirstOrDefault(p => p.IsModelType<TModel>())
+                select new { routex, requestTypex};
+
+               var result = from m in c.GetMethods()
                 let verb =
                     m.HasAttribute<HttpGetAttribute>() ? System.Net.Http.HttpMethod.Get :
                     m.HasAttribute<HttpPostAttribute>() ? System.Net.Http.HttpMethod.Post :

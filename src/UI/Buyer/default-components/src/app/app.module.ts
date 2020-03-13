@@ -77,6 +77,7 @@ import { OCMCheckoutAddress } from './components/checkout/checkout-address/check
 import { OCMAddressForm } from './components/profile/address-form/address-form.component';
 import { OCMGenericList } from './components/layout/generic-list/generic-list.component';
 import { OCMAddressList } from './components/profile/address-list/address-list.component';
+import { OCMLocationList } from './components/profile/location-list/location-list.component';
 import { OCMChangePasswordForm } from './components/profile/change-password-form/change-password-form.component';
 import { OCMResetPassword } from './components/authentication/reset-password/reset-password.component';
 import { OCMRegister } from './components/authentication/register/register.component';
@@ -161,6 +162,7 @@ const components = [
   OCMResetPassword,
   OCMChangePasswordForm,
   OCMAddressList,
+  OCMLocationList,
   OCMGenericList,
   OCMAddressForm,
   OCMProfileForm,
@@ -291,6 +293,7 @@ export class AppModule {
     this.buildWebComponent(OCMResetPassword, 'ocm-reset-password');
     this.buildWebComponent(OCMChangePasswordForm, 'ocm-change-password');
     this.buildWebComponent(OCMAddressList, 'ocm-address-list');
+    this.buildWebComponent(OCMLocationList, 'ocm-location-list');
     this.buildWebComponent(OCMGenericList, 'ocm-generic-list');
     this.buildWebComponent(OCMAddressForm, 'ocm-address-form');
     this.buildWebComponent(OCMProfileForm, 'ocm-profile-form');

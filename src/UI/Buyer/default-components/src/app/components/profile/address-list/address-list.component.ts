@@ -18,9 +18,16 @@ export class OCMAddressList implements OnInit {
   faTrashAlt = faTrashAlt;
   faEdit = faEdit;
   currentAddress: BuyerAddress;
-  requestOptions: { page?: number; search?: string } = {
+  requestOptions: {
+    page?: number;
+    search?: string;
+    filters?: {
+      [key: string]: string | string[];
+    };
+  } = {
     page: undefined,
     search: undefined,
+    filters: { ['Editable']: 'true' },
   };
   resultsPerPage = 8;
   areYouSureModal = ModalState.Closed;

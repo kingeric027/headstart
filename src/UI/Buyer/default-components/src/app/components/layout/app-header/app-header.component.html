@@ -81,7 +81,10 @@
                (click)="context.router.toMyProfile()">My Profile</a>
             <a class="nav-item dropdown-item cursor-pointer"
                [ngClass]="{'active': activePath === '/profile/addresses'}"
-               (click)="context.router.toMyAddresses()">Address Book</a>
+               (click)="context.router.toMyAddresses()">My Address Book</a>
+            <a class="nav-item dropdown-item cursor-pointer"
+               [ngClass]="{'active': activePath === '/profile/locations'}"
+               (click)="context.router.toMyLocations()">My Locations</a>
             <a class="nav-item dropdown-item cursor-pointer"
                [ngClass]="{'active': activePath === '/profile/payment-methods'}"
                (click)="context.router.toMyPaymentMethods()">Payment Methods</a>

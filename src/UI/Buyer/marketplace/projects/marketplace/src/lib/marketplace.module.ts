@@ -8,6 +8,7 @@ import {
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
+import { LocationListWrapperComponent } from './wrapper-components/location-list-wrapper.component';
 import { ForgotPasswordWrapperComponent } from './wrapper-components/forgot-password-wrapper.component';
 import { HomeWrapperComponent } from './wrapper-components/home-wrapper.component';
 import { LoginWrapperComponent } from './wrapper-components/login-wrapper.component';
@@ -71,6 +72,7 @@ import { AppConfig } from './shopper-context';
     CartWrapperComponent,
     CheckoutWrapperComponent,
     AddressListWrapperComponent,
+    LocationListWrapperComponent,
     ForgotPasswordWrapperComponent,
     HomeWrapperComponent,
     LoginWrapperComponent,

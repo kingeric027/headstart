@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { OcTokenService } from '@ordercloud/angular-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { Configuration, SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
