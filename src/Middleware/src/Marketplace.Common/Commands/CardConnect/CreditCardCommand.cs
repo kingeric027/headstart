@@ -48,13 +48,21 @@ namespace Marketplace.Common.Commands
 			return await _oc.Me.CreateCreditCardAsync(await MeTokenize(card), user.AccessToken);
         }
 
+        public bool IsValidCvv(CreditCardPayment payment, BuyerCreditCard cc)
+        {
+            // if credit card is direct without using a saved card then it's a ME card and should enforce CVV
+            // saved credit cards for ME just require CVV
+            return (payment.CreditCardDetails == null || payment.CVV != null) && (!cc.Editable || payment.CVV != null);
+        }
+
 		public async Task<Payment> AuthorizePayment(CreditCardPayment payment, VerifiedUserContext user)
         {
 			Require.That(payment.CreditCardID != null || payment.CreditCardDetails != null, 
 				new ErrorCode("Missing credit card info", 400, "Must include CreditCardDetails or CreditCardID."));
 
 			var cc = await GetMeCardDetails(payment, user);
-
+            
+            Require.That(payment.IsValidCvv(cc), new ErrorCode("Invalid CVV", 400, "CVV is required for Credit Card Payment"));
             Require.That(cc.Token != null, new ErrorCode("Invalid credit card token", 400, "Credit card must have valid authorization token"));
       
 			var order = await _privilegedOC.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, payment.OrderID);
@@ -62,6 +70,7 @@ namespace Marketplace.Common.Commands
 			var paymentlist = await _privilegedOC.Payments.ListAsync<Payment>(OrderDirection.Incoming, payment.OrderID, builder => builder.AddFilter(p => p.CreditCardID == payment.CreditCardID));
 			if (paymentlist.Meta.TotalCount == 0)
 				throw new ApiErrorException(new ErrorCode("Required", 404, $"Unable to find Payment on Order {payment.OrderID} with CreditCardID {payment.CreditCardID}"), payment.OrderID);
+            //TODO: add flexibility to id the actual payment in OC
 			var ocPayment = paymentlist.Items.First();
 
 			Require.That(!order.IsSubmitted, new ErrorCode("Invalid Order Status", 400, "Order has already been submitted"));

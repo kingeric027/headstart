@@ -14,8 +14,8 @@ namespace Marketplace.Helpers.OpenApiTools
             _obj.Add("operationId", res.Name + '.' + method.Name);
             _obj.Add("tags", new JArray(res.Description));
             //Add parameters obj
-            var param = new ParamObject(res, method, data).ToTuple();
-            _obj.Add(param.Item1, param.Item2);
+            var param = new ParamObject(res, method, data).ToTuples();
+            param.ForEach(p => _obj.Add(p.Item1, p.Item2));
 
             _obj.Add("summary", method.Description);
             _obj.Add("description", string.Join("<br/></br>", method.Comments));

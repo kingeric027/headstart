@@ -1,17 +1,15 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Flurl.Http.Testing;
 using Marketplace.Common;
-using Marketplace.Common.Commands.Zoho;
+using Marketplace.Common.Commands;
 using Marketplace.Common.Mappers.CardConnect;
 using Marketplace.Common.Services.CardConnect;
 using Marketplace.Common.Services.CardConnect.Models;
 using Marketplace.Helpers.Exceptions;
-using Marketplace.Models;
 using Marketplace.Models.Misc;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Bson;
 using NSubstitute;
 using NUnit.Framework;
 using OrderCloud.SDK;
@@ -413,9 +411,36 @@ namespace Orchestration.Tests
             var ex = Assert.ThrowsAsync<ApiErrorException>(() => _service.AuthWithoutCapture(new AuthorizationRequest()));
             Assert.That(ex.ApiError.StatusCode == HttpStatusCode.BadRequest);
         }
+
+        [Test, TestCaseSource(typeof(CvvFactory), nameof(CvvFactory.CvvCases))]
+        public void require_cvv_for_me_creditcards(CreditCardPayment payment, BuyerCreditCard cc, bool isValid)
+        {
+            Assert.That(payment.IsValidCvv(cc) == isValid);
+        }
     }
 
-    public class ResponseCodeFactory
+    public static class CvvFactory
+    {
+        public static IEnumerable CvvCases
+        {
+            get
+            {
+                yield return new TestCaseData(new CreditCardPayment() {CVV = "112"}, new BuyerCreditCard() {Editable = true}, true);
+                yield return new TestCaseData(new CreditCardPayment() {CVV = null}, new BuyerCreditCard() {Editable = true}, false);
+                yield return new TestCaseData(new CreditCardPayment()
+                {
+                    CreditCardDetails = new CreditCardToken() { AccountNumber = "00"}, CVV = null
+                }, new BuyerCreditCard() {Editable = true}, false);
+                yield return new TestCaseData(new CreditCardPayment()
+                {
+                    CreditCardDetails = new CreditCardToken() { AccountNumber = "00" },
+                    CVV = "112"
+                }, new BuyerCreditCard() { Editable = true }, true);
+            }
+        }
+    }
+
+    public static class ResponseCodeFactory
     {
         public static IEnumerable FailCases
         {
@@ -423,7 +448,6 @@ namespace Orchestration.Tests
                 yield return new TestCaseData(@"{'respstat': 'B', 'respcode': 'NU', 'cvvresp': 'M', 'avsresp': 'Y'}");
                 yield return new TestCaseData(@"{'respstat': 'C', 'respcode': '05', 'cvvresp': 'M', 'avsresp': 'Y'}");
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'N', 'avsresp': 'Y'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'P', 'avsresp': 'Y'}");
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'U', 'avsresp': 'Y'}");
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'N'}");
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'A'}");
