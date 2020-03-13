@@ -47,7 +47,7 @@ export class CheckoutService implements ICheckout {
     private appConfig: AppConfig
   ) {}
 
-  async submit(card: CreditCardPayment, marketplaceID: string): Promise<string> {
+  async submit(card: CreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.
     await this.middlewareApi.authorizeCreditCard(this.order.ID, card);
     const orderWithCleanID = await this.ocOrderService
