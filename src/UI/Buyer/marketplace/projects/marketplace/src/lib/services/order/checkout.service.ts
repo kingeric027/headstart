@@ -1,4 +1,14 @@
+<<<<<<< HEAD
 import { MarketplaceOrder, OrderAddressType, CreditCardPayment, AppConfig } from '../../shopper-context';
+=======
+import {
+  MarketplaceOrder,
+  CreditCardToken,
+  OrderAddressType,
+  CreditCardPayment,
+  AppConfig,
+} from '../../shopper-context';
+>>>>>>> upstream/dev
 import {
   ListPayment,
   Payment,
@@ -15,7 +25,7 @@ import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandb
 import { MarketplaceSDK, CreditCardToken } from 'marketplace-javascript-sdk';
 
 export interface ICheckout {
-  submit(card: CreditCardPayment): Promise<void>;
+  submit(card: CreditCardPayment, marketplaceID: string): Promise<string>;
   addComment(comment: string): Promise<MarketplaceOrder>;
   listPayments(): Promise<ListPayment>;
   createSavedCCPayment(card: BuyerCreditCard): Promise<Payment>;
@@ -37,10 +47,11 @@ export class CheckoutService implements ICheckout {
     private paymentHelper: PaymentHelperService,
     private appSettings: AppConfig,
     private state: OrderStateService,
-    private orderCloudSandBoxService: OrderCloudSandboxService
+    private orderCloudSandBoxService: OrderCloudSandboxService,
+    private appConfig: AppConfig
   ) {}
 
-  async submit(payment: CreditCardPayment): Promise<void> {
+  async submit(payment: CreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.
     const ccPayment = {
       OrderId: this.order.ID,
@@ -51,8 +62,15 @@ export class CheckoutService implements ICheckout {
       MerchantID: this.appSettings.cardConnectMerchantID,
     };
     await MarketplaceSDK.MePayments.Post(ccPayment); // authorize card
-    await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
+    const orderWithCleanID = await this.ocOrderService
+      .Patch('outgoing', this.order.ID, {
+        ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
+      })
+      .toPromise();
+    this.order = orderWithCleanID;
+    await this.ocOrderService.Submit('outgoing', orderWithCleanID.ID).toPromise();
     await this.state.reset();
+    return orderWithCleanID.ID;
   }
 
   async addComment(comment: string): Promise<MarketplaceOrder> {

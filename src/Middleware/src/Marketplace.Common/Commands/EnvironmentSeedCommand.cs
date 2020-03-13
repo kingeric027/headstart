@@ -45,6 +45,7 @@ namespace Marketplace.Common.Commands
 			await CreateMarketPlaceRoles(impersonation.access_token);
 			await CreateSuppliers(user, impersonation.access_token);
 			await CreateXPIndices(impersonation.access_token);
+			await CreateIncrementors(impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
 			return impersonation;
 		}
@@ -84,6 +85,19 @@ namespace Marketplace.Common.Commands
 			foreach (var index in DefaultIndices)
 			{
 				await _oc.XpIndices.PutAsync(index, token);
+			}
+		}
+
+		static readonly List<Incrementor> DefaultIncrementors = new List<Incrementor>() {
+			new Incrementor { ID = "orderIncrementor", Name = "Order Incrementor", LastNumber = 1, LeftPaddingCount = 6 },
+			new Incrementor { ID = "supplierIncrementor", Name = "Supplier Incrementor", LastNumber = 1, LeftPaddingCount = 3 }
+		};
+
+		public async Task CreateIncrementors(string token)
+		{
+			foreach (var incrementor in DefaultIncrementors)
+			{
+				await _oc.Incrementors.CreateAsync(incrementor, token);
 			}
 		}
 

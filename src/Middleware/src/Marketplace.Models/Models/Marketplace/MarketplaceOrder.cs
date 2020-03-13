@@ -14,7 +14,7 @@ namespace Marketplace.Models
     public class OrderXp
     {
         public string AvalaraTaxTransactionCode { get; set; }
-        public string RelatedBuyerOrder { get; set; }
+        public int NumberOfSupplierOrders { get; set; }
         public bool NeedsAttention { get; set; }
         public bool StopShipSync { get; set; }
 
