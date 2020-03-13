@@ -1,4 +1,10 @@
-import { MarketplaceOrder, CreditCardToken, OrderAddressType, CreditCardPayment } from '../../shopper-context';
+import {
+  MarketplaceOrder,
+  CreditCardToken,
+  OrderAddressType,
+  CreditCardPayment,
+  AppConfig,
+} from '../../shopper-context';
 import {
   ListPayment,
   Payment,
@@ -15,7 +21,7 @@ import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/order
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
 
 export interface ICheckout {
-  submit(card: CreditCardPayment): Promise<void>;
+  submit(card: CreditCardPayment, marketplaceID: string): Promise<string>;
   addComment(comment: string): Promise<MarketplaceOrder>;
   listPayments(): Promise<ListPayment>;
   createSavedCCPayment(card: BuyerCreditCard): Promise<Payment>;
@@ -37,14 +43,22 @@ export class CheckoutService implements ICheckout {
     private paymentHelper: PaymentHelperService,
     private middlewareApi: MiddlewareApiService,
     private state: OrderStateService,
-    private orderCloudSandBoxService: OrderCloudSandboxService
+    private orderCloudSandBoxService: OrderCloudSandboxService,
+    private appConfig: AppConfig
   ) {}
 
-  async submit(card: CreditCardPayment): Promise<void> {
+  async submit(card: CreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.
     await this.middlewareApi.authorizeCreditCard(this.order.ID, card);
-    await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
+    const orderWithCleanID = await this.ocOrderService
+      .Patch('outgoing', this.order.ID, {
+        ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
+      })
+      .toPromise();
+    this.order = orderWithCleanID;
+    await this.ocOrderService.Submit('outgoing', orderWithCleanID.ID).toPromise();
     await this.state.reset();
+    return orderWithCleanID.ID;
   }
 
   async addComment(comment: string): Promise<MarketplaceOrder> {

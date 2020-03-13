@@ -48,7 +48,7 @@ namespace Marketplace.Common.Commands
 
             // creating relationship between the buyer order and the supplier order
             // no relationship exists currently in the platform
-            var updatedSupplierOrders = await AddBuyerOrderIDToSupplierOrders(order.ID, supplierOrders.Select(o => o.ID).ToList());
+            var updatedSupplierOrders = await UpdateSupplierOrderIDs(order.ID, supplierOrders.Select(o => o.ID).ToList());
             
             // quote orders do not need to flow into our integrations
             if (order.xp == null || order.xp.OrderType != OrderType.Quote)
@@ -65,20 +65,22 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        private async Task<List<Order>> AddBuyerOrderIDToSupplierOrders(string buyerOrderID, IList<string> supplierOrderIDs)
+        private async Task<List<Order>> UpdateSupplierOrderIDs(string buyerOrderID, IList<string> supplierOrderIDs)
         {
-            var partialOrder = new PartialOrder()
-            {
-                xp = new { RelatedBuyerOrder = buyerOrderID }
-            };
-
+            var i = 0;
             var updatedSupplierOrders = new List<Order>();
             foreach(var supplierOrderID in supplierOrderIDs)
             {
+                i++;
+                var appendString = i.ToString().PadLeft(2, '0');
+                var partialOrder = new PartialOrder()
+                {
+                    ID = $"{buyerOrderID}-{appendString}"
+                };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync(OrderDirection.Outgoing, supplierOrderID, partialOrder);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
-
+            await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrderID, new PartialOrder() { xp = new { NumberOfSupplierOrders = i } });
             return updatedSupplierOrders;
         }
 
