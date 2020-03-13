@@ -14,10 +14,10 @@ namespace Marketplace.Models
     public class OrderXp
     {
         public string AvalaraTaxTransactionCode { get; set; }
-        public int NumberOfSupplierOrders { get; set; }
+        public List<string> ShipFromAddressIDs { get; set; }
+        public List<string> SupplierIDs { get; set;}
         public bool NeedsAttention { get; set; }
         public bool StopShipSync { get; set; }
-        public List<string> FreightPopOrderIDs { get; set;}
 
         // these need to be reworked, quote order info is required currently on every order
         //public OrderType? OrderType { get; set; }
