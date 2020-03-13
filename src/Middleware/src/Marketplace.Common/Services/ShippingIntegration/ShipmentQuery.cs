@@ -157,11 +157,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         private async Task<string> GetBuyerIDForSupplierOrder(MarketplaceOrder relatedOrder)
         {
-            if(relatedOrder.xp == null || relatedOrder.xp.RelatedBuyerOrder == null)
-            {
-                throw new Exception("RelatedBuyerOrder is not marked on this order");
-            }
-            var buyerOrderID = relatedOrder.xp.RelatedBuyerOrder;
+            var buyerOrderID = relatedOrder.ID.Split("-").First();
             var relatedBuyerOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, buyerOrderID);
             return relatedBuyerOrder.FromCompanyID;
         }
