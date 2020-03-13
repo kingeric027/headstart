@@ -13,6 +13,7 @@ import { AppStateService } from '@app-seller/shared/services/app-state/app-state
 import * as jwtDecode from 'jwt-decode';
 import { DecodedOrderCloudToken } from '@app-seller/shared';
 import { SELLER, SUPPLIER, OrderCloudUserType } from '@app-seller/shared/models/ordercloud-user.types';
+import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 
 export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possible';
 @Injectable({
@@ -78,7 +79,7 @@ export class AppAuthService {
   }
 
   getOrdercloudUserType(): OrderCloudUserType {
-    let usrtype = this.getUsrTypeFromToken();
+    const usrtype = this.getUsrTypeFromToken();
     const OrdercloudUserType = usrtype === 'admin' ? SELLER : SUPPLIER;
     return OrdercloudUserType;
   }
@@ -117,9 +118,10 @@ export class AppAuthService {
 
   logout(): Observable<any> {
     const cookiePrefix = this.appConfig.appname.replace(/ /g, '_').toLowerCase();
+    MarketplaceSDK.Tokens.RemoveAccessToken();
     const appCookieNames = _keys(this.cookieService.getAll());
     appCookieNames.forEach(cookieName => {
-      if (cookieName.indexOf(cookiePrefix) > -1) {
+      if (cookieName.includes(cookiePrefix)) {
         this.cookieService.remove(cookieName);
       }
     });
@@ -128,7 +130,7 @@ export class AppAuthService {
   }
 
   setRememberStatus(status: boolean): void {
-    this.cookieService.putObject(this.rememberMeCookieName, { status: status });
+    this.cookieService.putObject(this.rememberMeCookieName, { status });
   }
 
   getRememberStatus(): boolean {

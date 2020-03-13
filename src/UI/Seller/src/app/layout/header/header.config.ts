@@ -1,5 +1,4 @@
 import { SELLER, SUPPLIER } from '@app-seller/shared/models/ordercloud-user.types';
-import { ListFilters } from '@app-seller/shared/services/middleware-api/listArgs.interface';
 import { MPRoles } from '@app-seller/config/mp-security-profiles';
 
 // ! included to ensure no overlap with ordercloud ids as this in invalid in ids
@@ -11,8 +10,7 @@ export interface MPRoute {
   orderCloudUserTypesWithAccess?: string[];
   title: string;
   route: string;
-  queryParams?: ListFilters;
-
+  queryParams?: Record<string, any>;
   // if subroutes are included, itesms will display in a dropdown
   subRoutes?: MPRoute[];
 }

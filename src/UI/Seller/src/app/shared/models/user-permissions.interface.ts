@@ -1,5 +1,5 @@
-import { ListArgs } from '../services/middleware-api/listArgs.interface';
 import { ListUserGroup, ListUserGroupAssignment, UserGroupAssignment } from '@ordercloud/angular-sdk';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 export interface IUserPermissionsService {
   getUserGroups(orgID: string, options: ListArgs): Promise<ListUserGroup>;

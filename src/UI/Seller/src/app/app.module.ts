@@ -1,6 +1,6 @@
 // angular core
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, ErrorHandler } from '@angular/core';
+import { NgModule, ErrorHandler, Inject } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // 3rd party
@@ -28,6 +28,8 @@ import { CacheInterceptor } from '@app-seller/auth/interceptors/cache/cache-inte
 
 // error handler config
 import { AppErrorHandler } from './config/error-handling.config';
+import { Configuration } from 'marketplace-javascript-sdk';
+import { applicationConfiguration, AppConfig } from './config/app.config';
 
 @NgModule({
   declarations: [AppComponent],
@@ -74,4 +76,10 @@ import { AppErrorHandler } from './config/error-handling.config';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(@Inject(applicationConfiguration) private appConfig: AppConfig) {
+    Configuration.Set({
+      baseApiUrl: this.appConfig.middlewareUrl,
+    });
+  }
+}

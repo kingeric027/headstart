@@ -6,9 +6,9 @@ import {
   ProductCatalogAssignment,
   OcCatalogService,
 } from '@ordercloud/angular-sdk';
-import { MarketplaceProduct } from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
+import { MarketplaceProduct } from 'marketplace-javascript-sdk';
 
 @Component({
   selector: 'product-visibility-assignments-component',

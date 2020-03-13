@@ -2,13 +2,14 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { ListAddress, Address } from '@ordercloud/angular-sdk';
 import { BuyerLocationService } from '../buyer-location.service';
-import { MarketplaceBuyerLocation } from '@app-seller/shared/models/MarketplaceBuyerLocation.interface';
 import { ValidatePhone, ValidateUSZip, ValidateEmail } from '@app-seller/validators/validators';
 import { Router } from '@angular/router';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
+import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
+import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',
@@ -48,10 +49,6 @@ export class BuyerLocationEditComponent implements OnInit {
     private middleware: MiddlewareAPIService,
     private currentUserService: CurrentUserService
   ) {}
-  private async handleSelectedAddressChange(address: Address): Promise<void> {
-    const marketplaceBuyerLocation = await this.middleware.getBuyerLocationByID(this.buyerID, address.ID);
-    this.refreshBuyerLocationData(marketplaceBuyerLocation);
-  }
 
   async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {
     this.buyerLocationEditable = buyerLocation;
@@ -115,7 +112,7 @@ export class BuyerLocationEditComponent implements OnInit {
           .join('-')
           .replace(/[^a-zA-Z0-9 ]/g, '');
       this.buyerLocationEditable.UserGroup.ID = this.buyerLocationEditable.Address.ID;
-      const newBuyerLocation = await this.middleware.createBuyerLocation(this.buyerID, this.buyerLocationEditable);
+      const newBuyerLocation = await MarketplaceSDK.BuyerLocations.Create(this.buyerID, this.buyerLocationEditable);
       this.refreshBuyerLocationData(newBuyerLocation);
       this.router.navigateByUrl(`/buyers/${this.buyerID}/locations/${newBuyerLocation.Address.ID}`);
       this.dataIsSaving = false;
@@ -128,7 +125,7 @@ export class BuyerLocationEditComponent implements OnInit {
   async updateBuyerLocation(): Promise<void> {
     try {
       this.dataIsSaving = true;
-      const updatedBuyerLocation = await this.middleware.updateBuyerLocationByID(
+      const updatedBuyerLocation = await MarketplaceSDK.BuyerLocations.Update(
         this.buyerID,
         this.buyerLocationEditable.Address.ID,
         this.buyerLocationEditable
@@ -144,7 +141,7 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   async handleDelete($event): Promise<void> {
-    await this.middleware.deleteBuyerLocation(this.buyerID, this.buyerLocationEditable.Address.ID);
+    await MarketplaceSDK.BuyerLocations.Delete(this.buyerID, this.buyerLocationEditable.Address.ID);
     this.router.navigateByUrl(`/buyers/${this.buyerID}/locations`);
   }
 
@@ -169,5 +166,10 @@ export class BuyerLocationEditComponent implements OnInit {
     this.buyerLocationEditable = this.buyerLocationStatic;
     this.suggestedAddresses = null;
     this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
+  }
+
+  private async handleSelectedAddressChange(address: Address): Promise<void> {
+    const marketplaceBuyerLocation = await MarketplaceSDK.BuyerLocations.Get(this.buyerID, address.ID);
+    this.refreshBuyerLocationData(marketplaceBuyerLocation);
   }
 }

@@ -3,8 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ListSupplier } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { SupplierCategoryConfig } from '../shopper-context';
-import { MiddlewareApiService } from '../services/middleware-api/middleware-api.service';
+import { MarketplaceSDK, SupplierCategoryConfig } from 'marketplace-javascript-sdk';
 
 @Component({
   template: `
@@ -16,11 +15,7 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
   supplierCategoryConfig: SupplierCategoryConfig;
   alive = true;
 
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private middleware: MiddlewareApiService,
-    public context: ShopperContextService
-  ) {}
+  constructor(private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
 
   ngOnInit(): void {
     this.suppliers = this.activatedRoute.snapshot.data.products;
@@ -39,8 +34,7 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
   };
 
   private getSupplierCategories = async (): Promise<void> => {
-    this.supplierCategoryConfig = await this.middleware.getMarketplaceSupplierCategories(
-      this.context.appSettings.marketplaceID
-    );
+    const marketplaceID = this.context.appSettings.marketplaceID;
+    this.supplierCategoryConfig = await MarketplaceSDK.SupplierCategoryConfigs.Get(marketplaceID);
   };
 }

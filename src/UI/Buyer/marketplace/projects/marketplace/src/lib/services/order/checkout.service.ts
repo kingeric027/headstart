@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+import { MarketplaceOrder, OrderAddressType, CreditCardPayment, AppConfig } from '../../shopper-context';
+=======
 import {
   MarketplaceOrder,
   CreditCardToken,
@@ -5,6 +8,7 @@ import {
   CreditCardPayment,
   AppConfig,
 } from '../../shopper-context';
+>>>>>>> upstream/dev
 import {
   ListPayment,
   Payment,
@@ -15,10 +19,10 @@ import {
 } from '@ordercloud/angular-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
-import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
 import { OrderStateService } from './order-state.service';
 import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/ordercloud-sandbox.models';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
+import { MarketplaceSDK, CreditCardToken } from 'marketplace-javascript-sdk';
 
 export interface ICheckout {
   submit(card: CreditCardPayment, marketplaceID: string): Promise<string>;
@@ -41,15 +45,23 @@ export class CheckoutService implements ICheckout {
     private ocOrderService: OcOrderService,
     private ocPaymentService: OcPaymentService,
     private paymentHelper: PaymentHelperService,
-    private middlewareApi: MiddlewareApiService,
+    private appSettings: AppConfig,
     private state: OrderStateService,
     private orderCloudSandBoxService: OrderCloudSandboxService,
     private appConfig: AppConfig
   ) {}
 
-  async submit(card: CreditCardPayment): Promise<string> {
+  async submit(payment: CreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.
-    await this.middlewareApi.authorizeCreditCard(this.order.ID, card);
+    const ccPayment = {
+      OrderId: this.order.ID,
+      CreditCardID: payment?.SavedCard.ID,
+      CreditCardDetails: payment.NewCard,
+      Currency: 'USD',
+      CVV: payment.CVV,
+      MerchantID: this.appSettings.cardConnectMerchantID,
+    };
+    await MarketplaceSDK.MePayments.Post(ccPayment); // authorize card
     const orderWithCleanID = await this.ocOrderService
       .Patch('outgoing', this.order.ID, {
         ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,

@@ -7,7 +7,7 @@ import { takeWhile } from 'rxjs/operators';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { getPsHeight } from '@app-seller/shared/services/dom.helper';
-import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
+import { ListPage } from 'marketplace-javascript-sdk';
 
 @Component({
   selector: 'resource-select-dropdown-component',

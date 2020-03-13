@@ -1,5 +1,5 @@
 import { Component, Input, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
-import { ShopperContextService, MarketplaceProduct, ProductType } from 'marketplace';
+import { ShopperContextService, MarketplaceMeProduct } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
@@ -9,7 +9,7 @@ import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 })
 export class OCMProductCard {
   _isFavorite = false;
-  _product: MarketplaceProduct = {
+  _product: MarketplaceMeProduct = {
     PriceSchedule: {},
   };
   quantity: number;
@@ -17,9 +17,9 @@ export class OCMProductCard {
   isViewOnlyProduct = true;
   hasSpecs = false;
 
-  constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) { }
+  constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) {}
 
-  @Input() set product(value: MarketplaceProduct) {
+  @Input() set product(value: MarketplaceMeProduct) {
     this._product = value;
     this.isViewOnlyProduct = !value.PriceSchedule;
     this.hasSpecs = value.SpecCount > 0;
@@ -47,7 +47,7 @@ export class OCMProductCard {
   }
 
   showAddToCart(): boolean {
-    return !this.isViewOnlyProduct && !this.hasSpecs && this._product.xp.ProductType !== ProductType.Quote;
+    return !this.isViewOnlyProduct && !this.hasSpecs && this._product.xp.ProductType !== 'Quote';
   }
 
   setQuantity(event: any): void {

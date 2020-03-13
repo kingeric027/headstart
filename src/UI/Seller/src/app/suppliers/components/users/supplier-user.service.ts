@@ -10,7 +10,7 @@ import {
   ListUserGroupAssignment,
 } from '@ordercloud/angular-sdk';
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
-import { ListArgs } from '@app-seller/shared/services/middleware-api/listArgs.interface';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
 @Injectable({
@@ -66,7 +66,7 @@ export class SupplierUserService extends ResourceCrudService<User> {
   }
 
   async getUserGroups(supplierID: string, options: ListArgs): Promise<ListUserGroup> {
-    return await this.ocSupplierUserGroupService.List(supplierID, options).toPromise();
+    return await this.ocSupplierUserGroupService.List(supplierID, options as any).toPromise();
   }
 
   async listUserAssignments(userID: string, supplierID: string): Promise<ListUserGroupAssignment> {
