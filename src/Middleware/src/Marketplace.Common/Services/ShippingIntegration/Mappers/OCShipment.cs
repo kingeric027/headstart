@@ -12,6 +12,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
         {
             return new Shipment
             {
+                ID = freightPopShipment.ShipmentId,
                 Shipper = "Fedex",
                 DateShipped = freightPopShipment.ShipDate,
                 BuyerID = buyerID,

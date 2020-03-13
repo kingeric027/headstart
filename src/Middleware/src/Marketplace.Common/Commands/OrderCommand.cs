@@ -83,7 +83,8 @@ namespace Marketplace.Common.Commands
                     xp = new
                     {
                         ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
-                        SupplierIDs = new List<string>() { supplierID }
+                        SupplierIDs = new List<string>() { supplierID },
+                        StopShipSync = false
                     }
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
@@ -145,7 +146,7 @@ namespace Marketplace.Common.Commands
             {
                 var firstLineItem = lineItemGrouping.First();
 
-                var freightPopOrderID = $"{supplierOrder.ID}-{firstLineItem.ShipFromAddressID}";
+                var freightPopOrderID = $"{supplierOrder.ID.Split('-').First()}-{firstLineItem.ShipFromAddressID}";
                 freightPopOrderIDs.Add(freightPopOrderID);
 
                 var supplier = await _oc.Suppliers.GetAsync(firstLineItem.SupplierID);
@@ -153,8 +154,6 @@ namespace Marketplace.Common.Commands
                 var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItemGrouping.ToList(), supplier, supplierAddress, freightPopOrderID);
                 await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
             }
-
-            await _oc.Orders.PatchAsync(OrderDirection.Outgoing, supplierOrder.ID, new PartialOrder() { xp = new { FreightPopOrderIDs = freightPopOrderIDs } });
         }
     }
 }
