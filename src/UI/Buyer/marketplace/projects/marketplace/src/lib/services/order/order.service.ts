@@ -38,12 +38,7 @@ export class CurrentOrderService implements ICurrentOrder {
     orderDetails.ID = `${this.appConfig.marketplaceID}{orderIncrementor}`;
     const quoteOrder = await this.ocOrderService.Create('Outgoing', orderDetails).toPromise();
     await this.ocLineItemService.Create('Outgoing', quoteOrder.ID, lineItem).toPromise();
-    const submittedQuoteOrder = await this.ocOrderService
-      .Submit('Outgoing', quoteOrder.ID)
-      .toPromise()
-      .then(order => {
-        return order;
-      });
+    const submittedQuoteOrder = await this.ocOrderService.Submit('Outgoing', quoteOrder.ID).toPromise();
     return submittedQuoteOrder;
   }
 }

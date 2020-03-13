@@ -101,9 +101,8 @@ export class OCMCheckout implements OnInit {
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
-    const orderID = this.order.ID; // submit() will reset this.order
     await this.checkout.addComment(comment);
-    const cleanOrderID = await this.checkout.submit(this.selectedCard, this.context.appSettings.marketplaceID);
+    const cleanOrderID = await this.checkout.submit(this.selectedCard);
 
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(cleanOrderID);
