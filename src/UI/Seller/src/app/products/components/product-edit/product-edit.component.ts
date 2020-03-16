@@ -323,9 +323,9 @@ export class ProductEditComponent implements OnInit {
     this.checkForChanges();
   }
 
-  async removeDocument(url: string) {
-    //let superProduct = await this.middleware.deleteStaticContent(this._superMarketplaceProductStatic.Product.ID, fileName);
-    let superProduct = await this.middleware.deleteStaticContent(this.getDocumentUrl(url));
+  async removeDocument(fileName: string) {
+    const prodID = this._superMarketplaceProductStatic.Product.ID;
+    let superProduct = await MarketplaceSDK.Files.Delete(this.appConfig.marketplaceID, prodID, fileName);
     superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
     this.refreshProductData(superProduct);
   }

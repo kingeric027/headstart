@@ -34,7 +34,7 @@ namespace Marketplace.Common.Controllers
 			return await _content.DeleteProductImage(marketplaceID, productID, fileName, VerifiedUserContext.AccessToken);
 		}
 
-		[DocName("POST Static Content")]
+/*		[DocName("POST Static Content")]
 		[HttpPost, Route("static-content/{productID}/{fileName}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
 		public async Task<SuperMarketplaceProduct> PostStaticContent(IFormFile file, string productID, string fileName)
 		{
@@ -46,6 +46,6 @@ namespace Marketplace.Common.Controllers
 		public async Task<SuperMarketplaceProduct> DeleteStaticContent(string marketplaceID, string productID, string fileName)
 		{
 			return await _content.DeleteStaticContent(marketplaceID, productID, fileName, VerifiedUserContext.AccessToken);
-		}
+		}*/
 	}
 }
