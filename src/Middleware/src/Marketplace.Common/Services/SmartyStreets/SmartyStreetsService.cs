@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
@@ -46,7 +47,7 @@ namespace Marketplace.Common.Services.SmartyStreets
 			if (candidate.Count == 0)
 			{
 				// Address not valid, no candiates found
-				var suggestions = await USAutoCompletePro(address);
+				var suggestions = await USAutoCompletePro($"{address.Street1} {address.Street2}");
 				response.AreSuggestionsValid = false; // Suggestions from this api do not include zip
 				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions, address);
 			}
@@ -71,12 +72,12 @@ namespace Marketplace.Common.Services.SmartyStreets
 		}
 
 		// returns many incomplete address suggestions
-		private async Task<AutoCompleteResponse> USAutoCompletePro(Address address)
+		private async Task<AutoCompleteResponse> USAutoCompletePro(string search)
 		{
 			var suggestions = await AutoCompleteBaseUrl
-				.AppendPathSegment("suggest")
+				.AppendPathSegment("lookup")
 				.SetQueryParam("key", _smartySettings.WebsiteKey)
-				.SetQueryParam("search", $"{address.Street1} {address.Street2}")
+				.SetQueryParam("search", search)
 				.WithHeader("Referer", _smartySettings.RefererHost)
 				.GetJsonAsync<AutoCompleteResponse>();
 
