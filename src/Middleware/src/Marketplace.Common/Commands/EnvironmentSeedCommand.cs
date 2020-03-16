@@ -22,14 +22,16 @@ namespace Marketplace.Common.Commands
 		private readonly AppSettings _settings;
 		private readonly IDevCenterService _dev;
 		private EnvironmentSeed _seed;
-		private readonly IMarketplaceSupplierCommand _command;
+		private readonly IMarketplaceSupplierCommand _supplierCommand;
+		private readonly IMarketplaceBuyerCommand _buyerCommand;
 
-		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand command)
+		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand)
 		{
 			_settings = settings;
 			_oc = oc;
 			_dev = dev;
-			_command = command;
+			_supplierCommand = supplierCommand;
+			_buyerCommand = buyerCommand;
 		}
 
 		public async Task<ImpersonationToken> Seed(EnvironmentSeed seed, VerifiedUserContext user)
@@ -43,6 +45,7 @@ namespace Marketplace.Common.Commands
 			await PatchDefaultApiClients(impersonation.access_token);
 			await CreateWebhooks(impersonation.access_token, "https://marketplace-api-staging.azurewebsites.net");
 			await CreateMarketPlaceRoles(impersonation.access_token);
+			await CreateBuyers(user, impersonation.access_token);
 			await CreateSuppliers(user, impersonation.access_token);
 			await CreateXPIndices(impersonation.access_token);
 			await CreateIncrementors(impersonation.access_token);
@@ -50,7 +53,12 @@ namespace Marketplace.Common.Commands
 			return impersonation;
 		}
 
-		//private async Task ConfigureBuyers(string token) {}
+		private async Task CreateBuyers(VerifiedUserContext user, string token) {
+			foreach (var buyer in _seed.Buyers)
+			{
+				await _buyerCommand.Create(buyer, user, token);
+			}
+		}
 
 		private async Task CreateSuppliers(VerifiedUserContext user, string token)
 		{
@@ -65,7 +73,7 @@ namespace Marketplace.Common.Commands
 			// Create Suppliers and necessary user groups and security profile assignments
 			foreach (MarketplaceSupplier supplier in _seed.Suppliers)
 			{
-				await _command.Create(supplier, user, token);
+				await _supplierCommand.Create(supplier, user, token);
 			}
 		}
 
