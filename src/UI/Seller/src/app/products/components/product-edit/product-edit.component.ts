@@ -27,9 +27,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { ProductImage, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
-import { ValidateMinMax } from '@app-seller/validators/validators';
 
 @Component({
   selector: 'app-product-edit',
@@ -121,9 +120,9 @@ export class ProductEditComponent implements OnInit {
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
     }
-    this.staticContent = superProduct.Product?.xp?.StaticContent;
     this.productType = superProduct.Product?.xp?.ProductType;
     this.createProductForm(superProduct);
+    this.staticContent = superProduct.Product?.xp?.StaticContent;
     this.images = ReplaceHostUrls(superProduct.Product);
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.isCreatingNew = this.productService.checkIfCreatingNew();
@@ -182,9 +181,8 @@ export class ProductEditComponent implements OnInit {
   async createNewProduct() {
     try {
       this.dataIsSaving = true;
-      const superProduct = await this.middleware.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
-      await this.addFiles(this.imageFiles, superProduct.Product.ID, "image");
-      await this.addFiles(this.staticContentFiles, superProduct.Product.ID, "staticContent");
+      const superProduct = await this.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
+      await this.addFiles(this.files, superProduct.Product.ID);
       this.refreshProductData(superProduct);
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
       this.dataIsSaving = false;
@@ -293,8 +291,10 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(superProduct);
   }
 
-  async removeFile(URL: string) {
-    let superProduct = await this.middleware.deleteProductImage(this._superMarketplaceProductStatic.Product.ID, URL);
+  async removeFile(imgUrl: string) {
+    const prodID = this._superMarketplaceProductStatic.Product.ID;
+    const imageName = imgUrl.split('/').slice(-1)[0];
+    let superProduct = await MarketplaceSDK.Files.Delete(this.appConfig.marketplaceID, prodID, imageName);
     superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
     this.refreshProductData(superProduct);
   }
