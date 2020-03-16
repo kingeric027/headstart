@@ -52,7 +52,7 @@ namespace Marketplace.Common.Exceptions
         public Models.Action Action { get; set; }
         public JObject Current { get; set; }
         public JObject Cache { get; set; }
-        public JObject Diff { get; set; }
+        public JToken Diff { get; set; }
         public object Data { get; set; }
     }
 

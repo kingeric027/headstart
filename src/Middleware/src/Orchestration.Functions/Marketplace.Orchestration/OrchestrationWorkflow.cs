@@ -41,7 +41,7 @@ namespace Marketplace.Orchestration
                 wi.Current = queue["Model"] as JObject;
                 wi.Token = queue["Token"].ToString();
                 wi.ClientId = queue["ClientId"].ToString();
-                wi.Diff = await context.CallActivityAsync<JObject>("CalculateDiff", wi);
+                //wi.Diff = await context.CallActivityAsync<JObject>("CalculateDiff", wi);
                 wi.Action = await context.CallActivityAsync<Action>("DetermineAction", wi);
 
                 switch (wi.Action)
@@ -102,8 +102,8 @@ namespace Marketplace.Orchestration
         [FunctionName("DetermineAction")]
         public async Task<Action> DetermineAction([ActivityTrigger] WorkItem wi) => await _orch.DetermineAction(wi);
 
-        [FunctionName("CalculateDiff")]
-        public async Task<JObject> CalculateDiff([ActivityTrigger] WorkItem wi) => await _orch.CalculateDiff(wi);
+        //[FunctionName("CalculateDiff")]
+        //public async Task<JObject> CalculateDiff([ActivityTrigger] WorkItem wi) => await _orch.CalculateDiff(wi);
 
         [FunctionName("GetQueuedItem")]
         public async Task<JObject> GetQueuedItem([ActivityTrigger] string path) => await _orch.GetQueuedItem(path);

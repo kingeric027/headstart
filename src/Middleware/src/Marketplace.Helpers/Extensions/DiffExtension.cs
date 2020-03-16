@@ -7,33 +7,33 @@ namespace Marketplace.Helpers.Extensions
     
     public static class DiffExtension
     {
-        public static JObject Diff(this JObject current, JObject cache)
-        {
-            if (cache == null) return null;
-            if (JToken.DeepEquals(current, cache)) return null;
+        //public static JObject Diff(this JObject current, JObject cache)
+        //{
+        //    if (cache == null) return null;
+        //    if (JToken.DeepEquals(current, cache)) return null;
 
-            var diff = new JObject();
+        //    var diff = new JObject();
 
-            foreach (var (key, value) in current)
-            {
-                if (key == "Token" || key == "ClientId" || key == "TermsAccepted" || key == "OwnerID") continue;
-                var previousValue = cache.SelectToken(key);
+        //    foreach (var (key, value) in current)
+        //    {
+        //        if (key == "Token" || key == "ClientId" || key == "TermsAccepted" || key == "OwnerID") continue;
+        //        var previousValue = cache.SelectToken(key);
 
-                if (JToken.DeepEquals(value, previousValue)) continue;
+        //        if (JToken.DeepEquals(value, previousValue)) continue;
 
-                if (value.Type == JTokenType.Object)
-                {
-                    var obj = ((JObject)value).Diff(cache); // recursion
-                    if (obj != null) diff.Add(key, obj);
-                }
-                else
-                {
-                    diff.Add(key, value);
-                }
-            }
+        //        if (value.Type == JTokenType.Object)
+        //        {
+        //            var obj = ((JObject)value).Diff(cache); // recursion
+        //            if (obj != null) diff.Add(key, obj);
+        //        }
+        //        else
+        //        {
+        //            diff.Add(key, value);
+        //        }
+        //    }
 
-            return diff.HasValues ? diff : null;
-        }
+        //    return diff.HasValues ? diff : null;
+        //}
 
         public static bool HasDeletedXp(this JObject cache, JObject current)
         {

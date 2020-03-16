@@ -1,11 +1,16 @@
 using System.Collections;
 using System.Threading.Tasks;
+using JsonDiffPatchDotNet;
+using Marketplace.Common.Commands;
 using Marketplace.Common.Exceptions;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Helpers.Extensions;
+using Marketplace.Models;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using OrderCloud.SDK;
 
 namespace Orchestration.Tests
 {
@@ -37,16 +42,57 @@ namespace Orchestration.Tests
         [Test, TestCaseSource(typeof(ActionFactory), nameof(ActionFactory.TestCases))]
         public Action determine_action_results(WorkItem wi)
         {
-            wi.Diff = wi.Current.Diff(wi.Cache);
+            //wi.Diff = wi.Current.Diff(wi.Cache);
             var action = WorkItemMethods.DetermineAction(wi);
             return action;
         }
 
         [Test, TestCaseSource(typeof(DiffFactory), nameof(DiffFactory.TestCases))]
-        public JObject diff_results(WorkItem wi)
+        public JToken diff_results(WorkItem wi)
         {
-            var diff = wi.Current.Diff(wi.Cache);
-            return diff;
+            //if(JToken.DeepEquals(wi.Current, wi.Cache)) return null;
+            //var diff = wi.Diff;
+            //var other = wi.OtherDiff;
+            //var un = wi.Unpatch();
+            //var p = wi.Patch();
+            //var patchSame = JToken.DeepEquals(p, wi.Current);
+            var attempt = wi.Current.ToObject<PartialMarketplaceProduct>(new JsonSerializer()
+            {
+                ContractResolver = OrchestrationSerializer<PartialMarketplaceProduct>.Instance,
+                Converters = { new PartialConverter() }
+            });
+            //var obj = JObject.FromObject(wi.Current).ToObject<PartialProduct<ProductXp>>(JsonSerializer.Create(
+            //    new JsonSerializerSettings()
+            //    {
+            //        ContractResolver = OrchestrationSerializer<PartialMarketplaceProduct>.Instance,
+            //        Converters =
+            //        {
+            //            new PartialConverter()
+            //        }
+            //    }));
+            return JToken.Parse("{}");
+        }
+
+        [Test, TestCaseSource(typeof(DeletedXpFactory), nameof(DeletedXpFactory.TestCases))]
+        public bool has_deleted_xp(WorkItem item)
+        {
+            var has = item.Cache.HasDeletedXp(item.Current);
+            return has;
+        }
+    }
+
+    public class DeletedXpFactory
+    {
+        public static IEnumerable TestCases
+        {
+            get
+            {
+                yield return new TestCaseData(new WorkItem()
+                {
+                    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }}}"),
+                    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'description' }}}"),
+                }).Returns(true);
+            }
         }
     }
 
@@ -58,57 +104,75 @@ namespace Orchestration.Tests
             {
                 yield return new TestCaseData(new WorkItem()
                 {
-                    Cache = JObject.Parse(@"{ 'ID': 'id', 'AutoForward': false}"),
-                    Current = JObject.Parse(@"{ 'ID': 'id', 'AutoForward': true }")
-                }).Returns(JObject.Parse(@"{ 'AutoForward': true }"));
-
-                yield return new TestCaseData(new WorkItem()
-                {
-                    Cache = JObject.Parse(@"{ 'Token': 'old_token', 'ClientId': 'old_id', 'ID': 'id'}"),
-                    Current = JObject.Parse(@"{ 'Token': 'new_token',  'ClientId': 'new_id','ID': 'id' }")
+                    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'description' }}}"),
+                    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }}}"),
                 }).Returns(null);
 
                 yield return new TestCaseData(new WorkItem()
                 {
-                    Cache = JObject.Parse(@"{ 'ID': 'id'}"),
-                    Current = JObject.Parse(@"{ 'ID': 'id' }")
+                    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }}}"),
+                    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'description' }}}"),
                 }).Returns(null);
 
                 yield return new TestCaseData(new WorkItem()
                 {
-                    Cache = JObject.Parse(@"{ 'ID': 'id', 'OptionCount': 5 }"),
-                    Current = JObject.Parse(@"{ 'ID': 'id' }")
-                }).Returns(null);
+                    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'changed'  }}}"),
+                    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'description' }}}"),
+                }).Returns(JToken.Parse("{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'changed'  }}}"));
 
-                yield return new TestCaseData(new WorkItem()
-                {
-                    Cache = JObject.Parse(@"{ 'ID': 'id', 'OptionCount': 5 }"),
-                    Current = JObject.Parse(@"{ 'ID': 'id', 'Required': true }")
-                }).Returns(JObject.Parse(@"{ 'Required': true }"));
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Cache = JObject.Parse(@"{ 'ID': 'id', 'AutoForward': false}"),
+                //    Current = JObject.Parse(@"{ 'ID': 'id', 'AutoForward': true }")
+                //}).Returns(JObject.Parse(@"{ 'AutoForward': true }"));
 
-                yield return new TestCaseData(new WorkItem()
-                {
-                    Cache = JObject.Parse(@"{ 'ID': 'id', 'OptionCount': 5, 'xp': { 'key': 'value' }}"),
-                    Current = JObject.Parse(@"{ 'ID': 'id', 'Required': true, 'xp': { 'key': 'change' } }")
-                }).Returns(JObject.Parse(@"{ 'Required': true, 'xp': { 'key': 'change' }}"));
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Cache = JObject.Parse(@"{ 'Token': 'old_token', 'ClientId': 'old_id', 'ID': 'id'}"),
+                //    Current = JObject.Parse(@"{ 'Token': 'new_token',  'ClientId': 'new_id','ID': 'id' }")
+                //}).Returns(null);
 
-                yield return new TestCaseData(new WorkItem()
-                {
-                    Cache = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value' }}"),
-                    Current = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value', 'nested': { 'key': 'value' }}}")
-                }).Returns(JObject.Parse(@"{ 'xp': { 'key': 'value', 'nested': { 'key': 'value' }}}"));
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Cache = JObject.Parse(@"{ 'ID': 'id'}"),
+                //    Current = JObject.Parse(@"{ 'ID': 'id' }")
+                //}).Returns(null);
 
-                yield return new TestCaseData(new WorkItem()
-                {
-                    Cache = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value' }}"),
-                    Current = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value', 'nested': { 'key': 'value', 'array': ['1','2'] }}}")
-                }).Returns(JObject.Parse(@"{ 'xp': { 'key': 'value', 'nested': { 'key': 'value', 'array': ['1','2'] }}}"));
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Cache = JObject.Parse(@"{ 'ID': 'id', 'OptionCount': 5 }"),
+                //    Current = JObject.Parse(@"{ 'ID': 'id' }")
+                //}).Returns(null);
 
-                yield return new TestCaseData(new WorkItem()
-                {
-                    Cache = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value', 'nested': { 'key': 'value', 'array': ['1','2'] }}}"),
-                    Current = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value', 'nested': { 'key': 'value', 'array': ['1','2','3'] }}}")
-                }).Returns(JObject.Parse(@"{ 'xp': { 'key': 'value', 'nested': { 'key': 'value', 'array': ['1','2','3'] }}}"));
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Cache = JObject.Parse(@"{ 'ID': 'id', 'OptionCount': 5 }"),
+                //    Current = JObject.Parse(@"{ 'ID': 'id', 'Required': true }")
+                //}).Returns(JObject.Parse(@"{ 'Required': true }"));
+
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Cache = JObject.Parse(@"{ 'ID': 'id', 'OptionCount': 5, 'xp': { 'key': 'value' }}"),
+                //    Current = JObject.Parse(@"{ 'ID': 'id', 'Required': true, 'xp': { 'key': 'change' } }")
+                //}).Returns(JObject.Parse(@"{ 'Required': true, 'xp': { 'key': 'change' }}"));
+
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Cache = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value' }}"),
+                //    Current = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value', 'nested': { 'key': 'value' }}}")
+                //}).Returns(JObject.Parse(@"{ 'xp': { 'key': 'value', 'nested': { 'key': 'value' }}}"));
+
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Cache = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value' }}"),
+                //    Current = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value', 'nested': { 'key': 'value', 'array': ['1','2'] }}}")
+                //}).Returns(JObject.Parse(@"{ 'xp': { 'key': 'value', 'nested': { 'key': 'value', 'array': ['1','2'] }}}"));
+
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Cache = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value', 'nested': { 'key': 'value', 'array': ['1','2'] }}}"),
+                //    Current = JObject.Parse(@"{ 'ID': 'id', 'xp': { 'key': 'value', 'nested': { 'key': 'value', 'array': ['1','2','3'] }}}")
+                //}).Returns(JObject.Parse(@"{ 'xp': { 'key': 'value', 'nested': { 'key': 'value', 'array': ['1','2','3'] }}}"));
             }
         }
     }

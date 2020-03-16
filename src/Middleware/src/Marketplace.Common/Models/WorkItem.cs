@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using JsonDiffPatchDotNet;
 using Marketplace.Common.Exceptions;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Extensions;
@@ -11,6 +13,10 @@ namespace Marketplace.Common.Models
     [DocIgnore]
     public class WorkItem
     {
+        private readonly JsonDiffPatch _diff = new JsonDiffPatch(new Options()
+        {
+            ArrayDiff = ArrayDiffMode.Simple
+        });
         public WorkItem()
         {
         }
@@ -79,11 +85,22 @@ namespace Marketplace.Common.Models
         public Action Action { get; set; }
         public JObject Current { get; set; } // not used for delete
         public JObject Cache { get; set; } // not used for create
-        public JObject Diff { get; set; } // only for update
+
+        public JToken Diff => _diff.Diff(this.Current, this.Cache);
+        public JToken OtherDiff => _diff.Diff(this.Cache, this.Current);
+
         public string Token { get; set; }
         public string ClientId { get; set; }
 
-        
+        public JToken Patch()
+        {
+            return _diff.Patch(this.Current, this.Diff);
+        }
+
+        public JToken Unpatch()
+        {
+            return _diff.Unpatch(this.Current, this.Diff);
+        }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -119,7 +136,8 @@ namespace Marketplace.Common.Models
                 // but we want one in orchestration to handle caching
                 // in further retrospect I don't think we need to handle updating objects when only the ID is being changed
                 // maybe in the future a true business case will be necessary to do this
-                if ((wi.RecordType == RecordType.SpecProductAssignment || wi.RecordType == RecordType.UserGroupAssignment || wi.RecordType == RecordType.CatalogAssignment) && wi.Diff.Count == 1 && wi.Diff.SelectToken("ID").Path == "ID")
+                if ((wi.RecordType == RecordType.SpecProductAssignment || wi.RecordType == RecordType.UserGroupAssignment || wi.RecordType == RecordType.CatalogAssignment) 
+                    && wi.Diff.Children().Count() == 1 && wi.Diff.SelectToken("ID").Path == "ID")
                     return Action.Ignore;
 
                 if (wi.Cache != null && wi.Diff != null)

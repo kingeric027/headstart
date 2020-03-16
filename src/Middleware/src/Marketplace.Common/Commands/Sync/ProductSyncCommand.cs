@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
@@ -6,9 +9,45 @@ using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
 using Marketplace.Models;
+using Marketplace.Helpers;
+using Marketplace.Helpers.Extensions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Marketplace.Common.Commands
 {
+    
+    public class PartialConverter : JsonConverter
+    {
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            JObject.FromObject(((OrchestrationModel)value).Props, serializer).WriteTo(writer);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) =>
+            throw new NotImplementedException();
+
+        public override bool CanConvert(Type type)
+        {
+            var t = typeof(OrchestrationModel).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()) &&
+                typeof(IPartial).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+            return t;
+        }
+    }
+
+    public class OrchestrationSerializer<T> : DefaultContractResolver
+    {
+        public static readonly OrchestrationSerializer<T> Instance = new OrchestrationSerializer<T>();
+
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        {
+            var property = base.CreateProperty(member, memberSerialization);
+            if (member.GetCustomAttribute(typeof(ApiNoUpdateAttribute)) != null)
+                property.ShouldSerialize = o => false;
+            
+            return property;
+        }
+    }
     public class ProductSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
@@ -82,7 +121,11 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialMarketplaceProduct>();
+            var obj = JObject.FromObject(wi.Diff).ToObject<PartialMarketplaceProduct>(JsonSerializer.Create(
+                new JsonSerializerSettings()
+                {
+                    ContractResolver = OrchestrationSerializer<PartialMarketplaceProduct>.Instance
+                }));
             try
             {
                 var response = await _oc.Products.PatchAsync(wi.RecordId, obj, wi.Token);

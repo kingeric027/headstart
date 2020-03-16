@@ -21,7 +21,7 @@ namespace Marketplace.Common.Commands
         Task CleanupQueue(string path);
         Task SaveToCache(WorkItem wi);
         Task<Action> DetermineAction(WorkItem wi);
-        Task<JObject> CalculateDiff(WorkItem wi);
+        //Task<JObject> CalculateDiff(WorkItem wi);
         Task<JObject> GetQueuedItem(string path);
         Task<JObject> GetCachedItem(string path);
         Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId, string clientId) where T : IMarketplaceObject;
@@ -137,17 +137,17 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        public async Task<JObject> CalculateDiff(WorkItem wi)
-        {
-            try
-            {
-                return await Task.FromResult(wi.Current.Diff(wi.Cache));
-            }
-            catch (Exception ex)
-            {
-                throw new OrchestrationException(OrchestrationErrorType.DiffCalculationError, wi, ex.Message);
-            }
-        }
+        //public async Task<JObject> CalculateDiff(WorkItem wi)
+        //{
+        //    try
+        //    {
+        //        return await Task.FromResult(wi.Diff);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new OrchestrationException(OrchestrationErrorType.DiffCalculationError, wi, ex.Message);
+        //    }
+        //}
 
         public async Task<Action> DetermineAction(WorkItem wi)
         {

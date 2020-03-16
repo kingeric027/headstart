@@ -21,7 +21,6 @@ namespace Marketplace.Common.Models
             this.Action = wi.Action;
             this.Current = wi.Current;
             this.Cache = wi.Cache;
-            this.Diff = wi.Diff;
             this.RecordId = wi.RecordId;
             this.ResourceId = wi.ResourceId;
             this.RecordType = wi.RecordType;
@@ -63,7 +62,5 @@ namespace Marketplace.Common.Models
         public JObject Current { get; set; }
         [DocIgnore]
         public JObject Cache { get; set; }
-        [DocIgnore]
-        public JObject Diff { get; set; }
     }
 }
