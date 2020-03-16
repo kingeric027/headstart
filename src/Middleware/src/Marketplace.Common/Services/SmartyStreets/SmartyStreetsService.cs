@@ -18,14 +18,14 @@ namespace Marketplace.Common.Services.SmartyStreets
 
 	public class SmartyStreetsService : ISmartyStreetsService
 	{
-		private readonly AppSettings _settings;
+		private readonly SmartyStreetSettings _smartySettings;
 		private readonly ClientBuilder _builder;
-		private readonly string AutoCompleteBaseUrl = "https://us-autocomplete.api.smartystreets.com";
+		private readonly string AutoCompleteBaseUrl = "https://us-autocomplete-pro.api.smartystreets.com";
 
 		public SmartyStreetsService(AppSettings settings)
 		{
-			_settings = settings;
-			_builder = new ClientBuilder(_settings.SmartyStreetSettings.AuthID, _settings.SmartyStreetSettings.AuthToken);
+			_smartySettings = settings.SmartyStreetSettings;
+			_builder = new ClientBuilder(_smartySettings.AuthID, _smartySettings.AuthToken);
 		}
 
 		public async Task<AddressValidation> ValidateAddress(BuyerAddress buyerAddress)
@@ -46,7 +46,7 @@ namespace Marketplace.Common.Services.SmartyStreets
 			if (candidate.Count == 0)
 			{
 				// Address not valid, no candiates found
-				var suggestions = await USAutoComplete(address);
+				var suggestions = await USAutoCompletePro(address);
 				response.AreSuggestionsValid = false; // Suggestions from this api do not include zip
 				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions, address);
 			}
@@ -71,14 +71,13 @@ namespace Marketplace.Common.Services.SmartyStreets
 		}
 
 		// returns many incomplete address suggestions
-		private async Task<AutoCompleteResponse> USAutoComplete(Address address)
+		private async Task<AutoCompleteResponse> USAutoCompletePro(Address address)
 		{
 			var suggestions = await AutoCompleteBaseUrl
 				.AppendPathSegment("suggest")
-				.SetQueryParam("auth-id", _settings.SmartyStreetSettings.AuthID)
-				.SetQueryParam("auth-token", _settings.SmartyStreetSettings.AuthToken)
-				.SetQueryParam("prefix", $"{address.Street1} {address.Street2}")
-				.SetQueryParam("geolocate", "null")
+				.SetQueryParam("key", _smartySettings.WebsiteKey)
+				.SetQueryParam("search", $"{address.Street1} {address.Street2}")
+				.WithHeader("Referer", _smartySettings.RefererHost)
 				.GetJsonAsync<AutoCompleteResponse>();
 
 			return suggestions;
