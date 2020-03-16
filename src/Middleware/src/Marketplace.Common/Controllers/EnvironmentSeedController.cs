@@ -17,9 +17,9 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("seed"), DevCenterUserAuth()]
-        public async Task<ImpersonationToken> Seed([FromBody] EnvironmentSeed suppliers)
+        public async Task<ImpersonationToken> Seed([FromBody] EnvironmentSeed seed)
         {
-            return await _command.Seed(suppliers, this.VerifiedUserContext);
+            return await _command.Seed(seed, this.VerifiedUserContext);
         }
     }
 }

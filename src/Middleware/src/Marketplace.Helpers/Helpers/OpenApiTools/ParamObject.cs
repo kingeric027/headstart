@@ -11,9 +11,10 @@ namespace Marketplace.Helpers.OpenApiTools
 {
     public class ParamObject
     {
-        private readonly Tuple<string, JRaw> _param;
+        private readonly List<Tuple<string, JRaw>> _param;
         public ParamObject(ApiResource resource, ApiEndpoint endpoint, ApiMetaData data)
         {
+            _param = new List<Tuple<string, JRaw>>();
             if (endpoint.SubResource != null)
                 // Used to get correct enumerables on query params such as sortBy and searchOn for the Me resource
                 resource = data.Resources.FirstOrDefault(r => r.Name == endpoint.SubResource);
@@ -112,16 +113,16 @@ namespace Marketplace.Helpers.OpenApiTools
                         new JProperty("schema", schema)
                     ))));
 
-                _param = new Tuple<string, JRaw>("requestBody", requestObj.ToJRaw());
+                _param.Add(new Tuple<string, JRaw>("requestBody", requestObj.ToJRaw()));
             }
 
             if (paramArray.Count > 0)
             {
-                _param = new Tuple<string, JRaw>("parameters", paramArray.ToJRaw());
+                _param.Add(new Tuple<string, JRaw>("parameters", paramArray.ToJRaw()));
             }
         }
 
-        public Tuple<string, JRaw> ToTuple()
+        public List<Tuple<string, JRaw>> ToTuples()
         {
             return _param;
         }

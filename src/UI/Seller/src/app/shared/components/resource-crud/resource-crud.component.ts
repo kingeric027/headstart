@@ -5,8 +5,8 @@ import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
-import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
+import { ListPage } from 'marketplace-javascript-sdk';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -177,7 +177,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     // submit button to disable
     try {
       this.dataIsSaving = true;
-      const updatedResource = await this.ocService.updateResource(this.updatedResource);
+      const updatedResource = await this.ocService.updateResource((this.resourceInSelection as any).ID, this.updatedResource);
       this.resourceInSelection = this.ocService.copyResource(updatedResource);
       this.setUpdatedResourceAndResourceForm(updatedResource);
       this.dataIsSaving = false;

@@ -7,134 +7,230 @@ interface MPRole {
   RoleName: string;
   OrderCloudRoles: string[];
 }
+
+export const MPRoles = {
+  MPMeProductAdmin: 'MPMeProductAdmin',
+  MPMeProductReader: 'MPMeProductReader',
+  MPProductAdmin: 'MPProductAdmin',
+  MPProductReader: 'MPProductReader',
+  MPPromotionAdmin: 'MPPromotionAdmin',
+  MPPromotionReader: 'MPPromotionReader',
+  MPCategoryAdmin: 'MPCategoryAdmin',
+  MPCategoryReader: 'MPCategoryReader',
+  MPOrderAdmin: 'MPOrderAdmin',
+  MPOrderReader: 'MPOrderReader',
+  MPShipmentAdmin: 'MPShipmentAdmin',
+  MPBuyerAdmin: 'MPBuyerAdmin',
+  MPBuyerReader: 'MPBuyerReader',
+  MPSellerAdmin: 'MPSellerAdmin',
+  MPSupplierAdmin: 'MPSupplierAdmin',
+  MPMeSupplierAdmin: 'MPMeSupplierAdmin',
+  MPMeSupplierAddressAdmin: 'MPMeSupplierAddressAdmin',
+  MPMeSupplierUserAdmin: 'MPMeSupplierUserAdmin',
+  MPReportReader: 'MPReportReader',
+  MPStoreFrontAdmin: 'MPStoreFrontAdmin',
+};
+
+const OrderCloudRoles = {
+  AddressAdmin: 'AddressAdmin',
+  AddressReader: 'AddressReader',
+  AdminAddressAdmin: 'AdminAddressAdmin',
+  AdminAddressReader: 'AdminAddressReader',
+  AdminUserAdmin: 'AdminUserAdmin',
+  AdminUserGroupAdmin: 'AdminUserGroupAdmin',
+  AdminUserGroupReader: 'AdminUserGroupReader',
+  AdminUserReader: 'AdminUserReader',
+  ApiClientAdmin: 'ApiClientAdmin',
+  ApiClientReader: 'ApiClientReader',
+  ApprovalRuleAdmin: 'ApprovalRuleAdmin',
+  ApprovalRuleReader: 'ApprovalRuleReader',
+  BuyerAdmin: 'BuyerAdmin',
+  BuyerImpersonation: 'BuyerImpersonation',
+  BuyerReader: 'BuyerReader',
+  BuyerUserAdmin: 'BuyerUserAdmin',
+  BuyerUserReader: 'BuyerUserReader',
+  CatalogAdmin: 'CatalogAdmin',
+  CatalogReader: 'CatalogReader',
+  CategoryAdmin: 'CategoryAdmin',
+  CategoryReader: 'CategoryReader',
+  CostCenterAdmin: 'CostCenterAdmin',
+  CostCenterReader: 'CostCenterReader',
+  CreditCardAdmin: 'CreditCardAdmin',
+  CreditCardReader: 'CreditCardReader',
+  FullAccess: 'FullAccess',
+  GrantForAnyRole: 'GrantForAnyRole',
+  IncrementorAdmin: 'IncrementorAdmin',
+  IncrementorReader: 'IncrementorReader',
+  IntegrationEventAdmin: 'IntegrationEventAdmin',
+  IntegrationEventReader: 'IntegrationEventReader',
+  InventoryAdmin: 'InventoryAdmin',
+  MeAddressAdmin: 'MeAddressAdmin',
+  MeAdmin: 'MeAdmin',
+  MeCreditCardAdmin: 'MeCreditCardAdmin',
+  MessageConfigAssignmentAdmin: 'MessageConfigAssignmentAdmin',
+  MessageSenderAdmin: 'MessageSenderAdmin',
+  MessageSenderReader: 'MessageSenderReader',
+  MeXpAdmin: 'MeXpAdmin',
+  OrderAdmin: 'OrderAdmin',
+  OrderReader: 'OrderReader',
+  OverrideShipping: 'OverrideShipping',
+  OverrideTax: 'OverrideTax',
+  OverrideUnitPrice: 'OverrideUnitPrice',
+  PasswordReset: 'PasswordReset',
+  PriceScheduleAdmin: 'PriceScheduleAdmin',
+  PriceScheduleReader: 'PriceScheduleReader',
+  ProductAdmin: 'ProductAdmin',
+  ProductAssignmentAdmin: 'ProductAssignmentAdmin',
+  ProductFacetAdmin: 'ProductFacetAdmin',
+  ProductFacetReader: 'ProductFacetReader',
+  ProductReader: 'ProductReader',
+  PromotionAdmin: 'PromotionAdmin',
+  PromotionReader: 'PromotionReader',
+  SecurityProfileAdmin: 'SecurityProfileAdmin',
+  SecurityProfileReader: 'SecurityProfileReader',
+  SetSecurityProfile: 'SetSecurityProfile',
+  ShipmentAdmin: 'ShipmentAdmin',
+  ShipmentReader: 'ShipmentReader',
+  Shopper: 'Shopper',
+  SpendingAccountAdmin: 'SpendingAccountAdmin',
+  SpendingAccountReader: 'SpendingAccountReader',
+  SupplierAddressAdmin: 'SupplierAddressAdmin',
+  SupplierAddressReader: 'SupplierAddressReader',
+  SupplierAdmin: 'SupplierAdmin',
+  SupplierReader: 'SupplierReader',
+  SupplierUserAdmin: 'SupplierUserAdmin',
+  SupplierUserGroupAdmin: 'SupplierUserGroupAdmin',
+  SupplierUserGroupReader: 'SupplierUserGroupReader',
+  SupplierUserReader: 'SupplierUserReader',
+  UnsubmittedOrderReader: 'UnsubmittedOrderReader',
+  UserGroupAdmin: 'UserGroupAdmin',
+  UserGroupReader: 'UserGroupReader',
+  WebhookAdmin: 'WebhookAdmin',
+  WebhookReader: 'WebhookReader',
+  XpIndexAdmin: 'XpIndexAdmin',
+};
+
 const MPMeProductAdmin: MPRole = {
   // Assigned to user types who want to manage own products in OC
-  RoleName: 'MPMeProductAdmin',
-  OrderCloudRoles: ['ProductAdmin', 'PriceScheduleAdmin', 'InventoryAdmin'],
+  RoleName: MPRoles.MPMeProductAdmin,
+  OrderCloudRoles: [OrderCloudRoles.ProductAdmin, OrderCloudRoles.PriceScheduleAdmin, OrderCloudRoles.InventoryAdmin],
 };
 const MPMeProductReader: MPRole = {
   // Assigned to user types who want to view own products in OC
-  RoleName: 'MPMeProductReader',
-  OrderCloudRoles: ['ProductReader', 'PriceScheduleReader', 'InventoryReader'],
+  RoleName: MPRoles.MPMeProductReader,
+  OrderCloudRoles: [OrderCloudRoles.ProductReader, OrderCloudRoles.PriceScheduleReader],
 };
 const MPProductAdmin: MPRole = {
   // Assigned to user types who want to manager the display to buyers of others products in OC
-  RoleName: 'MPProductAdmin',
-  OrderCloudRoles: ['ProductReader', 'CatalogAdmin', 'ProductAssignmentAdmin', 'ProductFacetAdmin'],
+  RoleName: MPRoles.MPProductAdmin,
+  OrderCloudRoles: [
+    OrderCloudRoles.ProductReader,
+    OrderCloudRoles.CatalogAdmin,
+    OrderCloudRoles.ProductAssignmentAdmin,
+    OrderCloudRoles.ProductFacetAdmin,
+  ],
 };
 const MPProductReader: MPRole = {
   // Assigned to user types who want to view the display to buyers of others products in OC but cannot manager (might not be needed for SEB)
-  RoleName: 'MPProductReader',
-  OrderCloudRoles: ['ProductReader', 'CatalogReader', 'ProductFacetReader'],
+  RoleName: MPRoles.MPProductReader,
+  OrderCloudRoles: [OrderCloudRoles.ProductReader, OrderCloudRoles.CatalogReader, OrderCloudRoles.ProductFacetReader],
 };
 const MPPromotionAdmin: MPRole = {
   // Assigned to user types who want to administer promotions
-  RoleName: 'MPPromotionAdmin',
-  OrderCloudRoles: ['PromotionAdmin'],
+  RoleName: MPRoles.MPPromotionAdmin,
+  OrderCloudRoles: [OrderCloudRoles.PromotionAdmin],
 };
 const MPPromotionReader: MPRole = {
   // Assigned to user types who want to view promotions
-  RoleName: 'MPPromotionReader',
-  OrderCloudRoles: ['PromotionReader'],
+  RoleName: MPRoles.MPPromotionReader,
+  OrderCloudRoles: [OrderCloudRoles.PromotionReader],
 };
 const MPCategoryAdmin: MPRole = {
   // Assigned to user types who want to administer categorys and assignments
-  RoleName: 'MPCategoryAdmin',
-  OrderCloudRoles: ['CategoryAdmin'],
+  RoleName: MPRoles.MPCategoryAdmin,
+  OrderCloudRoles: [OrderCloudRoles.CategoryAdmin],
 };
 const MPCategoryReader: MPRole = {
   // Assigned to user types who want to view categorys
-  RoleName: 'MPCategoryReader',
-  OrderCloudRoles: ['CategoryReader'],
+  RoleName: MPRoles.MPCategoryReader,
+  OrderCloudRoles: [OrderCloudRoles.CategoryReader],
 };
 const MPOrderAdmin: MPRole = {
   // Assigned to user types who want to edit orders, line items, and shipments. Would likely by a supplier who needs to make manual updates to an order
-  RoleName: 'MPOrderAdmin',
-  OrderCloudRoles: ['OrderAdmin', 'ShipmentReader'],
+  RoleName: MPRoles.MPOrderAdmin,
+  OrderCloudRoles: [OrderCloudRoles.OrderAdmin, OrderCloudRoles.ShipmentReader],
 };
 const MPOrderReader: MPRole = {
   // Assigned to a user type who wants to view orders. Would likely be a seller user who shouldn't edit orders but wants to view
-  RoleName: 'MPOrderReader',
-  OrderCloudRoles: ['OrderReader', 'ShipmentReader'],
+  RoleName: MPRoles.MPOrderReader,
+  OrderCloudRoles: [OrderCloudRoles.OrderReader, OrderCloudRoles.ShipmentReader],
 };
 const MPShipmentAdmin: MPRole = {
   // Assigned to a user type who wants to administer shipping for a supplier
-  RoleName: 'MPShipmentAdmin',
-  OrderCloudRoles: ['OrderReader', 'ShipmentAdmin'],
+  RoleName: MPRoles.MPShipmentAdmin,
+  OrderCloudRoles: [OrderCloudRoles.OrderReader, OrderCloudRoles.ShipmentAdmin],
 };
 // unclear if we need a MeBuyerAdmin
 // will need to be some disucssion about the breakout of these for SEB
 const MPBuyerAdmin: MPRole = {
   // Assigned to a user type who wants to administer buyers and related subresources
-  RoleName: 'MPBuyerAdmin',
+  RoleName: MPRoles.MPBuyerAdmin,
   OrderCloudRoles: [
-    'BuyerAdmin',
-    'BuyerUserAdmin',
-    'UserGroupAdmin',
-    'AddressAdmin',
-    'CreditCardAdmin',
-    'ApprovalRuleAdmin',
+    OrderCloudRoles.BuyerAdmin,
+    OrderCloudRoles.BuyerUserAdmin,
+    OrderCloudRoles.UserGroupAdmin,
+    OrderCloudRoles.AddressAdmin,
+    OrderCloudRoles.CreditCardAdmin,
+    OrderCloudRoles.ApprovalRuleAdmin,
   ],
 };
 const MPBuyerReader: MPRole = {
   // Assigned to a user type who wants to view buyers and related subresources
-  RoleName: 'MPBuyerReader',
+  RoleName: MPRoles.MPBuyerReader,
   OrderCloudRoles: [
-    'BuyerReader',
-    'BuyerUserReader',
-    'UserGroupReader',
-    'AddressReader',
-    'CreditCardReader',
-    'ApprovalRuleReader',
+    OrderCloudRoles.BuyerReader,
+    OrderCloudRoles.BuyerUserReader,
+    OrderCloudRoles.UserGroupReader,
+    OrderCloudRoles.AddressReader,
+    OrderCloudRoles.CreditCardReader,
+    OrderCloudRoles.ApprovalRuleReader,
   ],
 };
 const MPSellerAdmin: MPRole = {
   // Assigned to a user type who wants to view buyers and related subresources
-  RoleName: 'MPSellerAdmin',
-  OrderCloudRoles: ['AdminUserAdmin'],
+  RoleName: MPRoles.MPSellerAdmin,
+  OrderCloudRoles: [OrderCloudRoles.AdminUserAdmin],
 };
 const MPSupplierAdmin: MPRole = {
   // Assigned to a user type who wants to view buyers and related subresources
-  RoleName: 'MPSupplierAdmin',
-  OrderCloudRoles: ['SupplierAdmin', 'SupplierUserAdmin', 'SupplierAddressAdmin'],
+  RoleName: MPRoles.MPSupplierAdmin,
+  OrderCloudRoles: [
+    OrderCloudRoles.SupplierAdmin,
+    OrderCloudRoles.SupplierUserAdmin,
+    OrderCloudRoles.SupplierAddressAdmin,
+  ],
 };
 const MPMeSupplierAdmin: MPRole = {
-  RoleName: 'MPMeSupplierAdmin',
-  OrderCloudRoles: ['SupplierAdmin', 'SupplierAddressReader', 'SupplierUserReader'],
+  RoleName: MPRoles.MPMeSupplierAdmin,
+  OrderCloudRoles: [
+    OrderCloudRoles.SupplierAdmin,
+    OrderCloudRoles.SupplierAddressReader,
+    OrderCloudRoles.SupplierUserReader,
+  ],
 };
 const MPMeSupplierAddressAdmin: MPRole = {
-  RoleName: 'MPMeSupplierAddressAdmin',
-  OrderCloudRoles: ['SupplierReader', 'SupplierAddressAdmin'],
+  RoleName: MPRoles.MPMeSupplierAddressAdmin,
+  OrderCloudRoles: [OrderCloudRoles.SupplierReader, OrderCloudRoles.SupplierAddressAdmin],
 };
 const MPMeSupplierUserAdmin: MPRole = {
-  RoleName: 'MPMeSupplierUserAdmin',
-  OrderCloudRoles: ['SupplierReader', 'SupplierUserAdmin'],
+  RoleName: MPRoles.MPMeSupplierUserAdmin,
+  OrderCloudRoles: [OrderCloudRoles.SupplierReader, OrderCloudRoles.SupplierUserAdmin],
 };
 const MPReportReader: MPRole = {
-  RoleName: 'MPReportReader',
+  RoleName: MPRoles.MPReportReader,
   OrderCloudRoles: [],
 };
-const AllMPRoles = [
-  MPMeProductAdmin,
-  MPMeProductReader,
-  MPProductAdmin,
-  MPProductReader,
-  MPPromotionAdmin,
-  MPPromotionReader,
-  MPCategoryAdmin,
-  MPCategoryReader,
-  MPOrderAdmin,
-  MPOrderReader,
-  MPShipmentAdmin,
-  MPBuyerAdmin,
-  MPBuyerReader,
-  MPSellerAdmin,
-  MPSupplierAdmin,
-  MPMeSupplierAdmin,
-  MPMeSupplierAddressAdmin,
-  MPMeSupplierUserAdmin,
-  MPReportReader,
-];
+
 interface UserType {
   Name: string;
   MPRoles: MPRole[];

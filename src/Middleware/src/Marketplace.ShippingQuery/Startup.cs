@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Marketplace.Common.Services.ShippingIntegration;
 using OrderCloud.SDK;
 using System;
+using Marketplace.Common.Services.FreightPop;
+using Flurl.Http;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration
@@ -26,6 +28,8 @@ namespace Marketplace.Orchestration
             // end needs improvement
 
             builder.Services
+                .Inject<IFlurlClient>()
+                .Inject<IFreightPopService>()
                 .Inject<IOrderCloudClient>()
                 .Inject<IShipmentQuery>();
         }

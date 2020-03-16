@@ -4,7 +4,8 @@ import { faTimes, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { takeWhile } from 'rxjs/operators';
-import { SupplierFilters, SupplierCategoryConfig, ShopperContextService } from 'marketplace';
+import { SupplierFilters, ShopperContextService } from 'marketplace';
+import { SupplierCategoryConfig } from 'marketplace-javascript-sdk';
 
 @Component({
   templateUrl: './supplier-list.component.html',
@@ -14,7 +15,7 @@ export class OCMSupplierList implements OnChanges, OnDestroy {
   @Input() suppliers: ListSupplier;
   _supplierCategoryConfig: SupplierCategoryConfig;
   @ViewChild('popover', { static: false }) public popover: NgbPopover;
-  alive = true; 
+  alive = true;
   searchTermForSuppliers: string = null;
   filterForm: FormGroup;
   faTimes = faTimes;
@@ -87,5 +88,5 @@ export class OCMSupplierList implements OnChanges, OnDestroy {
         this.filterForm.controls[filter.Path].setValue(filters.activeFilters[filter.Path]);
       });
     }
-  }
+  };
 }

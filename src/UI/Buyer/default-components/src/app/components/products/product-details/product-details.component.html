@@ -97,6 +97,11 @@
         <p [innerHTML]="_product.Description || 'This product has no description.'">
         </p>
       </div>
+      <strong>Documents:</strong>
+      <div class="p-2 border border-medium border-radius"
+           *ngFor="let document of _product?.xp?.StaticContent">
+        <a href="{{document.URL}}">{{document.Title}}</a>
+      </div>
     </div>
     <!-- DISPLAY LONG SPEC FORM TO RIGHT -->
     <div class="col-xl-2 col-lg-3"

@@ -87,6 +87,7 @@ export class OCMCheckout implements OnInit {
     this.selectedCard = output;
     if (output.SavedCard) {
       await this.checkout.createSavedCCPayment(output.SavedCard);
+      delete this.selectedCard.NewCard;
     } else {
       // need to figure out how to use the platform. ran into creditCardID cannot be null.
       // so for now I always save any credit card in OC.
@@ -100,12 +101,11 @@ export class OCMCheckout implements OnInit {
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
-    const orderID = this.order.ID; // submit() will reset this.order
     await this.checkout.addComment(comment);
-    await this.checkout.submit(this.selectedCard);
+    const cleanOrderID = await this.checkout.submit(this.selectedCard);
 
     // todo: "Order Submitted Successfully" message
-    this.context.router.toMyOrderDetails(orderID);
+    this.context.router.toMyOrderDetails(cleanOrderID);
   }
 
   getValidation(id: string): any {

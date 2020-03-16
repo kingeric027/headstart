@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
-import { MarketplaceProduct } from 'marketplace';
+import { MarketplaceMeProduct } from 'marketplace';
 
 @Component({
   templateUrl: './quantity-input.component.html',
@@ -21,7 +21,7 @@ export class OCMQuantityInput implements OnInit {
   max: number;
   disabled = false;
 
-  @Input() set product(value: MarketplaceProduct) {
+  @Input() set product(value: MarketplaceMeProduct) {
     this.init(value);
   }
 
@@ -31,7 +31,7 @@ export class OCMQuantityInput implements OnInit {
     });
   }
 
-  init(product: MarketplaceProduct): void {
+  init(product: MarketplaceMeProduct): void {
     this.isQtyRestricted = product.PriceSchedule.RestrictedQuantity;
     this.inventory = this.getInventory(product);
     this.min = this.minQty(product);
@@ -76,21 +76,21 @@ export class OCMQuantityInput implements OnInit {
     return true;
   }
 
-  getDefaultQty(product: MarketplaceProduct): number {
+  getDefaultQty(product: MarketplaceMeProduct): number {
     if (this.existingQty) return this.existingQty;
     if (product.PriceSchedule.RestrictedQuantity) return product.PriceSchedule.PriceBreaks[0].Quantity;
     return product.PriceSchedule.MinQuantity;
   }
 
-  minQty(product: MarketplaceProduct): number {
+  minQty(product: MarketplaceMeProduct): number {
     return product.PriceSchedule?.MinQuantity || 1
   }
 
-  maxQty(product: MarketplaceProduct): number {
+  maxQty(product: MarketplaceMeProduct): number {
     return product.PriceSchedule?.MaxQuantity || Infinity
   }
 
-  getInventory(product: MarketplaceProduct): number {
+  getInventory(product: MarketplaceMeProduct): number {
     if (
       product.Inventory &&
       product.Inventory.Enabled &&

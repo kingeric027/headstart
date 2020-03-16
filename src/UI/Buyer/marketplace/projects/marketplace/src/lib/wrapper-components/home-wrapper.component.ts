@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { ListMarketplaceProduct } from '../shopper-context';
+import { ListMarketplaceMeProduct } from '../shopper-context';
 
 @Component({
   template: `
@@ -9,7 +9,7 @@ import { ListMarketplaceProduct } from '../shopper-context';
   `,
 })
 export class HomeWrapperComponent implements OnInit {
-  featuredProducts: ListMarketplaceProduct;
+  featuredProducts: ListMarketplaceMeProduct;
 
   constructor(private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
 

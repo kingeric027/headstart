@@ -20,6 +20,7 @@ export interface IRouter {
   toForgotPassword(): void;
   toMyProfile(): void;
   toMyAddresses(): void;
+  toMyLocations(): void;
   toMyPaymentMethods(): void;
   toMyOrders(): void;
   toMyOrderDetails(orderID: string): void;
@@ -92,6 +93,10 @@ export class RouteService implements IRouter {
 
   toMyAddresses(): void {
     this.toRoute('/profile/addresses');
+  }
+
+  toMyLocations(): void {
+    this.toRoute('/profile/locations');
   }
 
   toMyPaymentMethods(): void {

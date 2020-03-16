@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ListSpec, User } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
-import { LineItem, MarketplaceProduct, OrderType, ProductType, ShopperContextService } from 'marketplace';
+import { LineItem, MarketplaceMeProduct, OrderType, ShopperContextService } from 'marketplace';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { getImageUrls } from 'src/app/services/images.helpers';
@@ -15,7 +15,7 @@ import { SpecFormService } from '../spec-form/spec-form.service';
 export class OCMProductDetails implements OnInit {
   faTimes = faTimes;
   _specs: ListSpec;
-  _product: MarketplaceProduct;
+  _product: MarketplaceMeProduct;
   specFormService: SpecFormService;
   isOrderable = false;
   quantity: number;
@@ -24,7 +24,7 @@ export class OCMProductDetails implements OnInit {
   priceBreaks: object;
   priceBreakRange: string[];
   selectedBreak: object;
-  relatedProducts$: Observable<MarketplaceProduct[]>;
+  relatedProducts$: Observable<MarketplaceMeProduct[]>;
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
@@ -46,7 +46,7 @@ export class OCMProductDetails implements OnInit {
     this.specLength = this._specs.Items.length;
   }
 
-  @Input() set product(value: MarketplaceProduct) {
+  @Input() set product(value: MarketplaceMeProduct) {
     this._product = value;
     this.isOrderable = !!this._product.PriceSchedule;
     this.imageUrls = this.getImageUrls();
@@ -134,7 +134,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   isQuoteProduct(): boolean {
-    return this._product.xp.ProductType === ProductType.Quote;
+    return this._product.xp.ProductType === 'Quote';
   }
 
   dismissQuoteForm() {

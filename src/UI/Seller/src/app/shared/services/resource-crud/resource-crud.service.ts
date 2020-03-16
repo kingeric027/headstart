@@ -12,10 +12,10 @@ import {
   SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
 } from './resource-crud.types';
-import { ListPage } from '../middleware-api/listPage.interface';
-import { ListFilters } from '../middleware-api/listArgs.interface';
 import { BuyerAddress, ListBuyerAddress, ListAddress, Address } from '@ordercloud/angular-sdk';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
+import { ListPage } from 'marketplace-javascript-sdk';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
@@ -216,8 +216,8 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
-  async updateResource(resource: any): Promise<any> {
-    const newResource = await this.ocService.Save(...this.createListArgs([resource.ID, resource])).toPromise();
+  async updateResource(originalID: string, resource: any): Promise<any> {
+    const newResource = await this.ocService.Save(...this.createListArgs([originalID, resource])).toPromise();
     const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
     this.resourceSubject.value.Items[resourceIndex] = newResource;
     this.resourceSubject.next(this.resourceSubject.value);
@@ -273,7 +273,7 @@ export abstract class ResourceCrudService<ResourceType> {
     this.patchFilterState({ search: searchTerm || undefined });
   }
 
-  addFilters(newFilters: ListFilters): void {
+  addFilters(newFilters: ListArgs): void {
     const newFilterDictionary = { ...this.optionsSubject.value.filters, ...newFilters };
     this.patchFilterState({ filters: newFilterDictionary });
   }

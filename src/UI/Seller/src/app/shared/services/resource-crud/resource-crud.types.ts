@@ -1,4 +1,4 @@
-import { ListArgs } from '../middleware-api/listArgs.interface';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 export interface Options extends ListArgs {
   OrderDirection?: string;

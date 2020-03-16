@@ -33,7 +33,7 @@ export class OCMCheckoutShipping implements OnInit {
   getSupplierID(shipEstimate: ShipEstimate): string {
     if (!this.order.xp) return null;
     const line = this.getFirstLineItem(shipEstimate);
-    return line.SupplierID;
+    return line?.SupplierID;
   }
 
   getShipFromAddressID(shipEstimate: ShipEstimate): string {

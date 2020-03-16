@@ -22,33 +22,43 @@ namespace Marketplace.Common.Commands
 		private readonly AppSettings _settings;
 		private readonly IDevCenterService _dev;
 		private EnvironmentSeed _seed;
-		private readonly IMarketplaceSupplierCommand _command;
+		private readonly IMarketplaceSupplierCommand _supplierCommand;
+		private readonly IMarketplaceBuyerCommand _buyerCommand;
 
-		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand command)
+		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand)
 		{
 			_settings = settings;
 			_oc = oc;
 			_dev = dev;
-			_command = command;
+			_supplierCommand = supplierCommand;
+			_buyerCommand = buyerCommand;
 		}
 
 		public async Task<ImpersonationToken> Seed(EnvironmentSeed seed, VerifiedUserContext user)
 		{
 			_seed = seed;
-			var org = await this.CreateOrganization(user.AccessToken);
+			var org = await CreateOrganization(user.AccessToken);
 			var company = await _dev.GetOrganizations(org.OwnerDevID, user.AccessToken);
 
 			// at this point everything we do is as impersonation of the admin user on a new token
 			var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
-			await this.PatchDefaultApiClients(impersonation.access_token);
-			await this.CreateWebhooks(impersonation.access_token, "https://marketplace-api-qa.azurewebsites.net");
-			await this.CreateMarketPlaceRoles(impersonation.access_token);
-			await this.CreateSuppliers(user, impersonation.access_token);
+			await PatchDefaultApiClients(impersonation.access_token);
+			await CreateWebhooks(impersonation.access_token, "https://marketplace-api-staging.azurewebsites.net");
+			await CreateMarketPlaceRoles(impersonation.access_token);
+			await CreateBuyers(user, impersonation.access_token);
+			await CreateSuppliers(user, impersonation.access_token);
+			await CreateXPIndices(impersonation.access_token);
+			await CreateIncrementors(impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
 			return impersonation;
 		}
 
-		//private async Task ConfigureBuyers(string token) {}
+		private async Task CreateBuyers(VerifiedUserContext user, string token) {
+			foreach (var buyer in _seed.Buyers)
+			{
+				await _buyerCommand.Create(buyer, user, token);
+			}
+		}
 
 		private async Task CreateSuppliers(VerifiedUserContext user, string token)
 		{
@@ -63,15 +73,40 @@ namespace Marketplace.Common.Commands
 			// Create Suppliers and necessary user groups and security profile assignments
 			foreach (MarketplaceSupplier supplier in _seed.Suppliers)
 			{
-				await _command.Create(supplier, user, token);
+				await _supplierCommand.Create(supplier, user, token);
 			}
+		}
 
-			//Add xp index for SupplierUserGroup.xp.Type
-			await _oc.XpIndices.PutAsync(new XpIndex
+		static readonly List<XpIndex> DefaultIndices = new List<XpIndex>() {
+			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Type" },       
+			new XpIndex { ThingType = XpThingType.Product, Key = "Images.URL" },       
+			new XpIndex { ThingType = XpThingType.Product, Key = "Status" },       
+			new XpIndex { ThingType = XpThingType.Company, Key = "Data.ServiceCategory" },       
+			new XpIndex { ThingType = XpThingType.Company, Key = "Data.VendorLevel" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
+			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },       
+		};
+
+		public async Task CreateXPIndices(string token)
+		{
+			foreach (var index in DefaultIndices)
 			{
-				ThingType = XpThingType.UserGroup,
-				Key = "Type"
-			}, token);
+				await _oc.XpIndices.PutAsync(index, token);
+			}
+		}
+
+		static readonly List<Incrementor> DefaultIncrementors = new List<Incrementor>() {
+			new Incrementor { ID = "orderIncrementor", Name = "Order Incrementor", LastNumber = 1, LeftPaddingCount = 6 },
+			new Incrementor { ID = "supplierIncrementor", Name = "Supplier Incrementor", LastNumber = 1, LeftPaddingCount = 3 }
+		};
+
+		public async Task CreateIncrementors(string token)
+		{
+			foreach (var incrementor in DefaultIncrementors)
+			{
+				await _oc.Incrementors.CreateAsync(incrementor, token);
+			}
 		}
 
 		private async Task PatchDefaultApiClients(string token)

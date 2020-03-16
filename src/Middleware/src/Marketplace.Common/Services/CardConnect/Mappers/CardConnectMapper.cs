@@ -35,7 +35,8 @@ namespace Marketplace.Common.Mappers.CardConnect
                 CardholderName = card.CardholderName,
                 ExpirationDate = card.ExpirationDate.ToDateTime(),
                 PartialAccountNumber = card.AccountNumber.ToCreditCardDisplay(),
-                Token = response.token
+                Token = response.token,
+                Editable = true
             };
             return cc;
         }

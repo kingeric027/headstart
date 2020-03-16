@@ -1,9 +1,9 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { CreditCardToken } from 'marketplace';
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe';
 import { ValidateCreditCard } from 'src/app/validators/validators';
 import { removeSpacesFrom } from 'src/app/services/card-validation.helper';
+import { CreditCardToken } from 'marketplace-javascript-sdk';
 
 export interface CreditCardFormOutput {
   card: CreditCardToken;

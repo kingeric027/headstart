@@ -14,6 +14,7 @@ import { ProfileWrapperComponent } from './wrapper-components/profile-wrapper.co
 import { IsProfiledUserGuard } from './interceptors/is-profiled-user/is-profiled-user.guard';
 import { MeChangePasswordWrapperComponent } from './wrapper-components/me-change-password-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
+import { LocationListWrapperComponent } from './wrapper-components/location-list-wrapper.component';
 import { MeListBuyerAddressResolver } from './resolves/me.resolve';
 import { PaymentListWrapperComponent } from './wrapper-components/payment-list-wrapper.component';
 import { ProductListWrapperComponent } from './wrapper-components/product-list-wrapper.component';
@@ -120,6 +121,11 @@ export const MarketplaceRoutes: Routes = [
         { path: '', component: ProfileWrapperComponent,  },
         { path: 'change-password', component: MeChangePasswordWrapperComponent },
         { path: 'addresses', component: AddressListWrapperComponent,
+          resolve: {
+            addresses: MeListBuyerAddressResolver,
+          },
+        },
+        { path: 'locations', component: LocationListWrapperComponent,
           resolve: {
             addresses: MeListBuyerAddressResolver,
           },

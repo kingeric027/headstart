@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { ListFacet, Category } from '@ordercloud/angular-sdk';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { ProductFilters, ShopperContextService, ListMarketplaceProduct } from 'marketplace';
+import { ProductFilters, ShopperContextService, ListMarketplaceMeProduct } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { takeWhile } from 'rxjs/operators';
 
@@ -10,7 +10,7 @@ import { takeWhile } from 'rxjs/operators';
   styleUrls: ['./product-list.component.scss'],
 })
 export class OCMProductList implements OnInit, OnDestroy {
-  @Input() products: ListMarketplaceProduct;
+  @Input() products: ListMarketplaceMeProduct;
   alive = true;
   facets: ListFacet[];
   categoryCrumbs: Category[];

@@ -1,4 +1,4 @@
-import { MarketplaceOrder, CreditCardToken, OrderAddressType, CreditCardPayment } from '../../shopper-context';
+import { MarketplaceOrder, OrderAddressType, CreditCardPayment, AppConfig } from '../../shopper-context';
 import {
   ListPayment,
   Payment,
@@ -9,13 +9,13 @@ import {
 } from '@ordercloud/angular-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
-import { MiddlewareApiService } from '../middleware-api/middleware-api.service';
 import { OrderStateService } from './order-state.service';
 import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/ordercloud-sandbox.models';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
+import { MarketplaceSDK, CreditCardToken } from 'marketplace-javascript-sdk';
 
 export interface ICheckout {
-  submit(card: CreditCardPayment): Promise<void>;
+  submit(card: CreditCardPayment, marketplaceID: string): Promise<string>;
   addComment(comment: string): Promise<MarketplaceOrder>;
   listPayments(): Promise<ListPayment>;
   createSavedCCPayment(card: BuyerCreditCard): Promise<Payment>;
@@ -35,16 +35,32 @@ export class CheckoutService implements ICheckout {
     private ocOrderService: OcOrderService,
     private ocPaymentService: OcPaymentService,
     private paymentHelper: PaymentHelperService,
-    private middlewareApi: MiddlewareApiService,
+    private appSettings: AppConfig,
     private state: OrderStateService,
-    private orderCloudSandBoxService: OrderCloudSandboxService
+    private orderCloudSandBoxService: OrderCloudSandboxService,
+    private appConfig: AppConfig
   ) {}
 
-  async submit(card: CreditCardPayment): Promise<void> {
+  async submit(payment: CreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.
-    await this.middlewareApi.authorizeCreditCard(this.order.ID, card);
-    await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
+    const ccPayment = {
+      OrderId: this.order.ID,
+      CreditCardID: payment?.SavedCard.ID,
+      CreditCardDetails: payment.NewCard,
+      Currency: 'USD',
+      CVV: payment.CVV,
+      MerchantID: this.appSettings.cardConnectMerchantID,
+    };
+    await MarketplaceSDK.MePayments.Post(ccPayment); // authorize card
+    const orderWithCleanID = await this.ocOrderService
+      .Patch('outgoing', this.order.ID, {
+        ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
+      })
+      .toPromise();
+    this.order = orderWithCleanID;
+    await this.ocOrderService.Submit('outgoing', orderWithCleanID.ID).toPromise();
     await this.state.reset();
+    return orderWithCleanID.ID;
   }
 
   async addComment(comment: string): Promise<MarketplaceOrder> {

@@ -14,7 +14,9 @@
             <button class="dropdown-item"
                     (click)="context.router.toChangePassword()">Change Password</button>
             <button class="dropdown-item"
-                    (click)="context.router.toMyAddresses()">Addresses</button>
+                    (click)="context.router.toMyAddresses()">My Address Book</button>
+            <button class="dropdown-item"
+                    (click)="context.router.toMyLocations()">My Locations</button>
             <button class="dropdown-item"
                     (click)="context.router.toMyPaymentMethods()">Payment Methods</button>
             <button class="dropdown-item"
@@ -37,7 +39,11 @@
         </li>
         <li class="nav-item side-nav-button mb-3 cursor-pointer">
           <a class="link text-primary"
-             (click)="context.router.toMyAddresses()">Addresses</a>
+             (click)="context.router.toMyAddresses()">My Address Book</a>
+        </li>
+        <li class="nav-item side-nav-button mb-3 cursor-pointer">
+          <a class="link text-primary"
+             (click)="context.router.toMyLocations()">My Locations</a>
         </li>
         <li class="nav-item side-nav-button mb-3 cursor-pointer">
           <a class="link text-primary"

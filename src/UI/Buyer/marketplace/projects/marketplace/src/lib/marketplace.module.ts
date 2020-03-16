@@ -8,6 +8,7 @@ import {
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
+import { LocationListWrapperComponent } from './wrapper-components/location-list-wrapper.component';
 import { ForgotPasswordWrapperComponent } from './wrapper-components/forgot-password-wrapper.component';
 import { HomeWrapperComponent } from './wrapper-components/home-wrapper.component';
 import { LoginWrapperComponent } from './wrapper-components/login-wrapper.component';
@@ -39,6 +40,8 @@ import { CurrentOrderService } from './services/order/order.service';
 import { CartService } from './services/order/cart.service';
 import { CheckoutService } from './services/order/checkout.service';
 import { OrderStateService } from './services/order/order-state.service';
+import { Configuration } from 'marketplace-javascript-sdk';
+import { AppConfig } from './shopper-context';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -69,6 +72,7 @@ import { OrderStateService } from './services/order/order-state.service';
     CartWrapperComponent,
     CheckoutWrapperComponent,
     AddressListWrapperComponent,
+    LocationListWrapperComponent,
     ForgotPasswordWrapperComponent,
     HomeWrapperComponent,
     LoginWrapperComponent,
@@ -86,4 +90,10 @@ import { OrderStateService } from './services/order/order-state.service';
     SupplierListWrapperComponent,
   ],
 })
-export class MarketplaceModule {}
+export class MarketplaceModule {
+  constructor(private appConfig: AppConfig) {
+    Configuration.Set({
+      baseApiUrl: this.appConfig.middlewareUrl,
+    });
+  }
+}

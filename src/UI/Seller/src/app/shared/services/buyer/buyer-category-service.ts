@@ -12,9 +12,9 @@ export class BuyerCategoryService extends ResourceCrudService<Category> {
     super(router, activatedRoute, ocCategoryService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'categories');
   }
 
-  async updateResource(resource: Category): Promise<Category> {
+  async updateResource(originalID: string, resource: Category): Promise<Category> {
     await this.getResourceInformation(resource);
-    return super.updateResource(resource);
+    return super.updateResource(originalID, resource);
   }
 
   async createNewResource(resource: Category): Promise<Category> {

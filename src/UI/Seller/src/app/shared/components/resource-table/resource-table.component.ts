@@ -20,8 +20,8 @@ import { faCalendar, faChevronLeft, faFilter, faHome, faTimes } from '@fortaweso
 import { NgbDateStruct, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { singular } from 'pluralize';
 import { filter, takeWhile } from 'rxjs/operators';
-import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
-import { ListFilters } from '@app-seller/shared/services/middleware-api/listArgs.interface';
+import { ListPage } from 'marketplace-javascript-sdk';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 interface BreadCrumb {
   displayText: string;
@@ -161,7 +161,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     }
     if (typeof this.filterForm.value.timeStamp === 'object') {
       const timeStamp = this.transformDateForUser(this.filterForm.value.timeStamp);
-      this.toDate = timeStamp + 'T23:59:59.999Z'; //Since user selects a date, include all times in that day
+      this.toDate = timeStamp + 'T23:59:59.999Z'; // Since user selects a date, include all times in that day
       this.filterForm.value.timeStamp = '<=' + this.toDate;
     }
     this._ocService.addFilters(this.removeFieldsWithNoValue(this.filterForm.value));
@@ -177,7 +177,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     return date.month + '-' + date.day + '-' + date.year;
   }
 
-  removeFieldsWithNoValue(formValues: ListFilters) {
+  removeFieldsWithNoValue(formValues: ListArgs) {
     const values = { ...formValues };
     Object.entries(values).forEach(([key, value]) => {
       if (!value) {
@@ -254,7 +254,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     const routeUrl = this.router.routerState.snapshot.url;
     const splitUrl = routeUrl.split('/');
     const endUrl = splitUrl[splitUrl.length - 1];
-    this.isCreatingNew = endUrl.includes('new');
+    this.isCreatingNew = endUrl === 'new' || endUrl.startsWith('new?');
     this.isCreatingSubResource = endUrl.includes('new?');
   }
 

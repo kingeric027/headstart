@@ -1,6 +1,5 @@
 import { Directive, HostBinding, HostListener, Output, EventEmitter } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { MarketPlaceProductImage } from '../models/MarketPlaceProduct.interface';
 
 export interface FileHandle {
   File: File;
@@ -21,7 +20,7 @@ export class DragDirective {
 
   constructor(private sanitizer: DomSanitizer) {}
 
-  //Dragover listener
+  // Dragover listener
   @HostListener('dragover', ['$event'])
   onDragOver(evt) {
     evt.preventDefault();
@@ -30,7 +29,7 @@ export class DragDirective {
     this.opacity = '0.8';
   }
 
-  //Dragleave listener
+  // Dragleave listener
   @HostListener('dragleave', ['$event'])
   public onDragLeave(evt) {
     evt.preventDefault();
@@ -39,7 +38,7 @@ export class DragDirective {
     this.opacity = '1';
   }
 
-  //Drop listener
+  // Drop listener
   @HostListener('drop', ['$event'])
   public onDrop(evt: DragEvent) {
     evt.preventDefault();

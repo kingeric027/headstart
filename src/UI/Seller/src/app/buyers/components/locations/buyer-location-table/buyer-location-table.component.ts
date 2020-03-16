@@ -6,7 +6,6 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ValidateUSZip, ValidatePhone, ValidateEmail } from '@app-seller/validators/validators';
 import { BuyerLocationService } from '../buyer-location.service';
 import { BuyerService } from '../../buyers/buyer.service';
-import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 @Component({
   selector: 'app-buyer-location-table',
@@ -23,7 +22,6 @@ export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddr
     router: Router,
     activatedroute: ActivatedRoute,
     private buyerService: BuyerService,
-    private middleware: MiddlewareAPIService,
     ngZone: NgZone
   ) {
     super(changeDetectorRef, buyerLocationService, router, activatedroute, ngZone);

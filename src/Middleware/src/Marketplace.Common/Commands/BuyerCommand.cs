@@ -25,7 +25,7 @@ namespace Marketplace.Common.Commands
         {
             // Create Buyer with active set to false, checks will need to be performed to ensure that
             // the buyer has everything it needs to be active first
-            buyer.Active = false;
+			buyer.Active = false;
             var ocBuyer = await _oc.Buyers.CreateAsync(buyer, token);
             var ocBuyerID = ocBuyer.ID;
 
@@ -34,7 +34,7 @@ namespace Marketplace.Common.Commands
             {
                 BuyerID = ocBuyerID,
                 SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
-            });
+            }, token);
 
             await CreateUserTypeUserGroupsAndSecurityProfileAssignments(token, ocBuyerID);
 

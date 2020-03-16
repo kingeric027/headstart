@@ -1,10 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import {
-  MarketPlaceProductTaxCode,
-  SuperMarketplaceProduct,
-} from '@app-seller/shared/models/MarketPlaceProduct.interface';
-import { ListPage } from '@app-seller/shared/services/middleware-api/listPage.interface';
+
+import { SuperMarketplaceProduct, ListPage } from 'marketplace-javascript-sdk';
+import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 
 @Component({
   selector: 'product-tax-code-select-component',
@@ -17,7 +15,7 @@ export class ProductTaxCodeSelect {
   @Input()
   superMarketplaceProductEditable: SuperMarketplaceProduct;
   @Input()
-  taxCodes: ListPage<MarketPlaceProductTaxCode>;
+  taxCodes: ListPage<TaxCodes>;
   @Output()
   handleTaxCodeCategorySelection = new EventEmitter<any>();
   @Output()
@@ -31,7 +29,7 @@ export class ProductTaxCodeSelect {
     this.handleTaxCodeCategorySelection.emit(event);
   }
 
-  handleSelectTaxCode(taxCodeSelection: MarketPlaceProductTaxCode): void {
+  handleSelectTaxCode(taxCodeSelection: TaxCodes): void {
     const event = {
       target: {
         value: taxCodeSelection,

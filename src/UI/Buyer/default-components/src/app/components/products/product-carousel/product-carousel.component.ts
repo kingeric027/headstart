@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
-import { MarketplaceProduct } from 'marketplace';
+import { MarketplaceMeProduct } from 'marketplace';
 
 @Component({
   templateUrl: './product-carousel.component.html',
   styleUrls: ['./product-carousel.component.scss'],
 })
 export class OCMProductCarousel {
-  @Input() products: MarketplaceProduct[] = [];
+  @Input() products: MarketplaceMeProduct[] = [];
   @Input() displayTitle: string;
 
   index = 0;
@@ -23,7 +23,7 @@ export class OCMProductCarousel {
     this.index += this.rowLength;
   }
 
-  getProducts(): MarketplaceProduct[] {
+  getProducts(): MarketplaceMeProduct[] {
     return this.products.slice(this.index, this.index + this.rowLength);
   }
 }

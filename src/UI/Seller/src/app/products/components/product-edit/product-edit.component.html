@@ -345,7 +345,7 @@
     <div class="row pt-3 mt-5 border-top">
       <div class="col-md-5">
         <h5>Product Documents</h5>
-        <p class="font-italic">Drag and Drop or upload your product documents to display and dowload on the buyer site.</p>
+        <p class="font-italic">Name and upload your product documents to display and dowload on the buyer site.</p>
       </div>
       <div class="col-md-7">
         <!--droped doc preview-->
@@ -356,7 +356,7 @@
                    class="form-control"
                    placeholder="Document Name"
                    aria-label="Document Name"
-                   (keyup)="getDocumentInfo($event)"
+                   (keyup)="getDocumentName($event)"
                    aria-describedby="document name">
             <div class="input-group-append">
               <label class="btn btn-outline-primary"
@@ -383,44 +383,45 @@
               </button>
             </div>
           </div>
-          <div *ngFor="let document of staticContent; let i = index"
-               class="product-img-wrapper mr-2 mt-5">
-            <a>{{document.Title}}</a>
-            <div class="product-img-delete float-right">
-              <button title="Delete document"
-                      class="btn btn-light btn-group-item"
-                      data-ui="action-btn"
-                      data-action="delete"
-                      type="button"
-                      (click)="open(content)">
-                <fa-icon [icon]="faTrash"></fa-icon>
-              </button>
-              <ng-template #content
-                           let-modal
-                           class="confirm-modal">
-                <confirm-modal modalTitle="Delete Document?"
-                               description="Deleting this document cannot be reversed.">
-                  <button type="button"
-                          class="btn btn-link text-dark"
-                          (click)="modal.dismiss()">Cancel</button>
-                  <button type="button"
-                          class="btn brand-button--danger"
-                          (click)="removeFile(file.URL)"
-                          (click)="modal.dismiss()">Yes, Delete</button>
-                </confirm-modal>
-              </ng-template>
-            </div>
-          </div>
-          <!-- <label class="rmpm dropzone"
-                 for="documentUpload"
-                 appDrag
-                 (files)="stageDocuments($event)">
-          </label>
-          <input class="d-none"
-                 id="documentUpload"
-                 type="file"
-                 (change)="manualFileUpload($event, 'staticContent')"
-                 multiple> -->
+          <table class="table table-sm bg-light"
+                 *ngIf="staticContent">
+            <thead>
+              <tr>
+                <th>Document</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let file of staticContent">
+                <td>{{file.Title}}</td>
+                <td><a href="{{getDocumentUrl(file.URL)}}"
+                     target="_blank"
+                     download="{{file.Title}}.pdf">download</a></td>
+                <td>
+                  <button title="Delete file"
+                          class="btn btn-light btn-group-item"
+                          data-ui="action-btn"
+                          data-action="delete"
+                          type="button"
+                          (click)="open(content)">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                  </button></td>
+                <ng-template #content
+                             let-modal
+                             class="confirm-modal">
+                  <confirm-modal modalTitle="Delete Image?"
+                                 description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
+                    <button type="button"
+                            class="btn btn-link text-dark"
+                            (click)="modal.dismiss()">Cancel</button>
+                    <button type="button"
+                            class="btn brand-button--danger"
+                            (click)="removeDocument(file.URL)"
+                            (click)="modal.dismiss()">Yes, Delete</button>
+                  </confirm-modal>
+                </ng-template>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
