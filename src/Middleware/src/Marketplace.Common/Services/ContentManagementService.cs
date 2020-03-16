@@ -25,9 +25,10 @@ namespace Marketplace.Common.Services
 		private readonly IBlobService _imageContainer;
 		private readonly IBlobService _staticContentContainer;
 
-		public ContentManagementService(AppSettings settings, IOrderCloudClient oc) {
+		public ContentManagementService(AppSettings settings, IOrderCloudClient oc)
+		{
 			_settings = settings;
-            _oc = oc;
+			_oc = oc;
 			// TODO: move this down to where we're injecting this service
 			_imageContainer = new BlobService(new BlobServiceConfig()
 			{
@@ -80,7 +81,7 @@ namespace Marketplace.Common.Services
 
 			var Images = product.xp.Images.Where(img => !img.URL.EndsWith(fileName));
 
-			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { xp = new { Images }}, token);
+			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { xp = new { Images } }, token);
 			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
 			return new SuperMarketplaceProduct
 			{
@@ -130,7 +131,7 @@ namespace Marketplace.Common.Services
 			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { xp = new { Images } }, token);
 			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
 			return new SuperMarketplaceProduct
-			{ 
+			{
 				Product = _patchedProduct,
 				PriceSchedule = _priceSchedule
 			};

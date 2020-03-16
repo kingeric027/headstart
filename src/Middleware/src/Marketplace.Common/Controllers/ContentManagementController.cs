@@ -22,30 +22,29 @@ namespace Marketplace.Common.Controllers
 
         [DocName("POST Product Images")]
 		[HttpPost, Route("images/product/{productID}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> PostImage(IFormFile file, string marketplaceID, string productID)
+		public async Task<SuperMarketplaceProduct> Post([FromForm] IFormFile file, string marketplaceID, string productID)
 		{
 			return await _content.UploadProductImage(file, marketplaceID, productID, VerifiedUserContext.AccessToken);
 		}
 
         [DocName("DELETE Product Images")]
 		[HttpDelete, Route("images/product/{productID}/{fileName}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> DeleteImage(string marketplaceID, string productID, string fileName)
+		public async Task<SuperMarketplaceProduct> Delete(string marketplaceID, string productID, string fileName)
 		{
 			return await _content.DeleteProductImage(marketplaceID, productID, fileName, VerifiedUserContext.AccessToken);
 		}
 
-/*		[DocName("POST Static Content")]
+		[DocName("POST Static Content")]
 		[HttpPost, Route("static-content/{productID}/{fileName}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
 		public async Task<SuperMarketplaceProduct> PostStaticContent(IFormFile file, string productID, string fileName)
 		{
 			return await _content.UploadStaticContent(file, productID, fileName, VerifiedUserContext.AccessToken);
 		}
-
 		[DocName("DELETE Static Content")]
 		[HttpDelete, Route("static-content/{productID}/{fileName}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
 		public async Task<SuperMarketplaceProduct> DeleteStaticContent(string marketplaceID, string productID, string fileName)
 		{
 			return await _content.DeleteStaticContent(marketplaceID, productID, fileName, VerifiedUserContext.AccessToken);
-		}*/
+		}
 	}
 }
