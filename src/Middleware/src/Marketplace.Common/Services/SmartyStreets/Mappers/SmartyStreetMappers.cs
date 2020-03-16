@@ -1,7 +1,6 @@
 ﻿using Marketplace.Common.Extensions;
 using Marketplace.Models;
 using OrderCloud.SDK;
-using SmartyStreets.USAutocompleteApi;
 using SmartyStreets.USStreetApi;
 using System;
 using System.Collections.Generic;
@@ -34,11 +33,13 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 			return addresses;
 		}
 
-		public static Address Map(Suggestion suggestion, Address raw)
+		public static Address Map(AutoCompleteSuggestion suggestion, Address raw)
 		{
-			raw.Street1 = suggestion.StreetLine;
-			raw.City = suggestion.City;
-			raw.State = suggestion.State;
+			raw.Street1 = suggestion.street_line;
+			raw.Street2 = suggestion.secondary;
+			raw.City = suggestion.city;
+			raw.State = suggestion.state;
+			raw.Zip = suggestion.zipcode;
 			return raw;
 		}
 
