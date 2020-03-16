@@ -10,13 +10,6 @@ import {
   OcProductService,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ValidateMinMax } from '@app-seller/validators/validators';
-import {
-  MarketPlaceProductImage,
-  MarketPlaceProductTaxCode,
-  SuperMarketplaceProduct,
-  MarketPlaceProductStaticContent,
-} from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
@@ -27,8 +20,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, MarketPlaceProductStaticContent } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
+import { ValidateMinMax } from '@app-seller/validators/validators';
 
 @Component({
   selector: 'app-product-edit',
