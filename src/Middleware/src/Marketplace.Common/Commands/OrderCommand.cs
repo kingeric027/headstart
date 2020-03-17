@@ -48,7 +48,7 @@ namespace Marketplace.Common.Commands
 
             // creating relationship between the buyer order and the supplier order
             // no relationship exists currently in the platform
-            var updatedSupplierOrders = await UpdateSupplierOrderIDs(order.ID, supplierOrders.Select(o => o.ID).ToList());
+            var updatedSupplierOrders = await CreateOrderRelationships(order.ID, supplierOrders.ToList());
             
             // quote orders do not need to flow into our integrations
             if (order.xp == null || order.xp.OrderType != OrderType.Quote)
@@ -65,23 +65,54 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        private async Task<List<Order>> UpdateSupplierOrderIDs(string buyerOrderID, IList<string> supplierOrderIDs)
+        private async Task<List<Order>> CreateOrderRelationships(string buyerOrderID, List<Order> supplierOrders)
         {
-            var i = 0;
             var updatedSupplierOrders = new List<Order>();
-            foreach(var supplierOrderID in supplierOrderIDs)
+            var supplierIDs = new List<string>();
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrderID);
+            var shipFromAddressIDs = GetShipFromAddressIDs(lineItems.Items.ToList());
+
+            foreach (var supplierOrder in supplierOrders)
             {
-                i++;
-                var appendString = i.ToString().PadLeft(2, '0');
-                var partialOrder = new PartialOrder()
+                var supplierID = supplierOrder.ToCompanyID;
+                supplierIDs.Add(supplierID);
+                var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierID));
+                var supplierOrderPatch = new PartialOrder()
                 {
-                    ID = $"{buyerOrderID}-{appendString}"
+                    ID = $"{buyerOrderID}-{supplierID}",
+                    xp = new
+                    {
+                        ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
+                        SupplierIDs = new List<string>() { supplierID },
+                        StopShipSync = false
+                    }
                 };
-                var updatedSupplierOrder = await _oc.Orders.PatchAsync(OrderDirection.Outgoing, supplierOrderID, partialOrder);
+                var updatedSupplierOrder = await _oc.Orders.PatchAsync(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
-            await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrderID, new PartialOrder() { xp = new { NumberOfSupplierOrders = i } });
+
+            var buyerOrderPatch = new PartialOrder()
+            {
+                xp = new
+                {
+                    ShipFromAddressIDs = shipFromAddressIDs,
+                    SupplierIDs = supplierIDs
+                }
+            };
+            await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrderID, buyerOrderPatch);
             return updatedSupplierOrders;
+        }
+
+        private List<string> GetShipFromAddressIDs(List<LineItem> lineItems)
+        {
+            var shipFromAddressIDs = new List<string>();
+            lineItems.ForEach(li => {
+                if (!shipFromAddressIDs.Contains(li.ShipFromAddressID))
+                {
+                    shipFromAddressIDs.Add(li.ShipFromAddressID);   
+                }
+            });
+            return shipFromAddressIDs;
         }
 
         private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
@@ -103,13 +134,26 @@ namespace Marketplace.Common.Commands
         }
 
         private async Task ImportSupplierOrderIntoFreightPop(Order supplierOrder)
-        { 
+        {
+
             var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, supplierOrder.ID);
-            var firstLineItem = lineItems.Items[0];
-            var supplier = await _oc.Suppliers.GetAsync(firstLineItem.SupplierID);
-            var supplierAddress = await _oc.SupplierAddresses.GetAsync(supplier.ID, firstLineItem.ShipFromAddressID);
-            var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItems.Items, supplier, supplierAddress);
-            await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
+            
+            // we further split the supplier order into multiple orders for each shipfromaddressID before it goes into freightpop
+            var freightPopOrders = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
+
+            var freightPopOrderIDs = new List<string>();
+            foreach(var lineItemGrouping in freightPopOrders)
+            {
+                var firstLineItem = lineItemGrouping.First();
+
+                var freightPopOrderID = $"{supplierOrder.ID.Split('-').First()}-{firstLineItem.ShipFromAddressID}";
+                freightPopOrderIDs.Add(freightPopOrderID);
+
+                var supplier = await _oc.Suppliers.GetAsync(firstLineItem.SupplierID);
+                var supplierAddress = await _oc.SupplierAddresses.GetAsync(supplier.ID, firstLineItem.ShipFromAddressID);
+                var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItemGrouping.ToList(), supplier, supplierAddress, freightPopOrderID);
+                await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
+            }
         }
     }
 }
