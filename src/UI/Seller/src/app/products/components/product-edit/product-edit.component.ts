@@ -10,12 +10,6 @@ import {
   OcProductService,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import {
-  MarketPlaceProductImage,
-  MarketPlaceProductTaxCode,
-  SuperMarketplaceProduct,
-  ObjectStatus,
-} from '@app-seller/shared/models/MarketPlaceProduct.interface';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
@@ -26,7 +20,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecXp, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { ProductStaticContent } from 'marketplace-javascript-sdk/dist/models/ProductStaticContent';
@@ -60,7 +54,6 @@ export class ProductEditComponent implements OnInit {
   userContext = {};
   hasVariations = false;
   images: ProductImage[] = [];
-  images: MarketPlaceProductImage[] = [];
   files: FileHandle[] = [];
   faTimes = faTimes;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
@@ -404,23 +397,14 @@ export class ProductEditComponent implements OnInit {
     return await MarketplaceSDK.TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
   }
 
-  getTotalMarkup = (specOptions: VariantXpSpecValues[]): number => {
+  getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
       specOptions.forEach(opt => opt.PriceMarkup ? totalMarkup = +totalMarkup + +opt.PriceMarkup : 0);
     }
     return totalMarkup;
   }
-  addSpec(): void {
-    const updateProductResourceCopy = this.copyProductResource(
-      this._superMarketplaceProductEditable || this.productService.emptyResource
-    );
-    updateProductResourceCopy.Specs = e.Specs;
-    updateProductResourceCopy.Variants = e.Variants;
-    this._superMarketplaceProductEditable = updateProductResourceCopy;
-    this.checkForChanges();
-  }
-
+  
   validateVariants(e): void {
     this.variantsValid = e;
   }

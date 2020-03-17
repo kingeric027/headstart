@@ -1,9 +1,9 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Variant, SpecOption } from '@ordercloud/angular-sdk';
-import { SuperMarketplaceProduct, VariantXpSpecValues, Spec } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { Variant, SpecOption, Spec } from '@ordercloud/angular-sdk';
 import { faExclamationCircle, faCog, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
+import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
 
 @Component({
   selector: 'product-variations-component',
@@ -46,7 +46,7 @@ export class ProductVariations {
   faExclamationCircle = faExclamationCircle;
 
   constructor(private productService: ProductService) {}
-  getTotalMarkup = (specOptions: VariantXpSpecValues[]): number => {
+  getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
       specOptions.forEach(opt => opt.PriceMarkup ? totalMarkup = +totalMarkup + +opt.PriceMarkup : 0);
