@@ -37,7 +37,7 @@ export abstract class ResourceCrudService<ResourceType> {
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private ocService: any,
+    public ocService: any,
     route: string,
     primaryResourceLevel: string,
     subResourceList: string[] = [],

@@ -9,6 +9,7 @@ using OrderCloud.SDK;
 using Marketplace.Common.Services.FreightPop.Models;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Microsoft.Extensions.Logging;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
@@ -28,20 +29,22 @@ namespace Marketplace.Common.Services.ShippingIntegration
         public ShipmentQuery(IFreightPopService freightPopService, AppSettings appSettings)
         {
             _freightPopService = freightPopService;
-           //_ocFastSupplier = new OrderCloudClient(new OrderCloudClientConfig
-           //{
-           //    ApiUrl = appSettings.OrderCloudSettings.ApiUrl,
-           //    AuthUrl = appSettings.OrderCloudSettings.AuthUrl,
 
-           //     // currently just syncing shipments for fast from the four51 freightpop account where they are currently imported
-           //     // this oc client is required due to a bug that doesn't allow seller users to access shipments on a supplier order
-           //     ClientId = "DA08971F-DD3C-449A-98D2-E39D784761E7",
-           //    ClientSecret = appSettings.OrderCloudSettings.ClientSecret,
-           //    Roles = new[]
-           //    {
-           //         ApiRole.FullAccess
-           //    }
-           //});
+            // seller users currently cannot list shipments for supplier orders in the platform, this is a bug that is being resolved
+            _ocFastSupplier = new OrderCloudClient(new OrderCloudClientConfig
+            {
+                ApiUrl = appSettings.OrderCloudSettings.ApiUrl,
+                AuthUrl = appSettings.OrderCloudSettings.AuthUrl,
+
+                // currently just syncing shipments for fast from the four51 freightpop account where they are currently imported
+                // this oc client is required due to a bug that doesn't allow seller users to access shipments on a supplier order
+                ClientId = "DA08971F-DD3C-449A-98D2-E39D784761E7",
+                ClientSecret = appSettings.OrderCloudSettings.ClientSecret,
+                Roles = new[]
+                {
+                    ApiRole.FullAccess
+               }
+            });
             _oc = new OrderCloudClient(new OrderCloudClientConfig
             {
                 ApiUrl = appSettings.OrderCloudSettings.ApiUrl,
@@ -57,12 +60,18 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         public async Task SyncShipments(ILogger logger)
         {
-            _logger = logger;
-            _logger.LogInformation("Beginning shipment sync for orders submitted in the last last 1 days");
-             var orders = await GetOrdersNeedingShipmentAsync(1);
-            _logger.LogInformation($"Retrieved {orders.Count()} orders");
+            try
+            {
+                _logger = logger;
+                _logger.LogInformation("Beginning shipment sync for orders submitted in the last last 1 days");
+                 var orders = await GetOrdersNeedingShipmentAsync(1);
+                _logger.LogInformation($"Retrieved {orders.Count()} orders");
 
-            await SyncShipmentsForOrders(orders);
+                await SyncShipmentsForOrders(orders);
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
         }
 
         public async Task SyncLatestOrder(ILogger logger)
@@ -90,20 +99,21 @@ namespace Marketplace.Common.Services.ShippingIntegration
         {
             try
             {
+                var shipmentSyncOrders = await GetShipmentSyncOrders(orders);
                 // abiding by 30 req per minute freightpop limit for now
-                var freightPopShipmentsResponses = await Throttler.RunAsync(orders, 2000, 1,
-                (order) =>
+                var shipmentSyncOrdersWithResponses = await Throttler.RunAsync(shipmentSyncOrders, 2000, 1,
+                (shipmentSyncOrder) =>
                 {
-                    return _freightPopService.GetShipmentsForOrder(order.ID);
+                    return GetShipmentDetailsForShipmentSyncOrder(shipmentSyncOrder);
                 });
 
-                var freightPopShipments = freightPopShipmentsResponses.Where(s => s != null && s.Data != null);
+                var shipmentSyncOrdersToUpdate = shipmentSyncOrdersWithResponses.Where(s => s.FreightPopShipmentResponses!= null && s.FreightPopShipmentResponses.Data != null);
 
-                _logger.LogInformation($"Retrieved {freightPopShipments.Count()} freightpop shipments");
+                _logger.LogInformation($"Retrieved {shipmentSyncOrdersToUpdate.Count()} freightpop shipments");
 
-                await Throttler.RunAsync(freightPopShipments, 100, 5, (freightPopShipmentResponse) =>
+                await Throttler.RunAsync(shipmentSyncOrdersToUpdate, 100, 5, (shipmentSyncOrder) =>
                 {
-                    return CreateShipmentsInOrderCloudIfNeeded(freightPopShipmentResponse, orders);
+                    return CreateShipmentsInOrderCloudIfNeeded(shipmentSyncOrder);
                 });
             }
             catch (Exception ex)
@@ -112,13 +122,45 @@ namespace Marketplace.Common.Services.ShippingIntegration
             }
         }
 
-        private async Task CreateShipmentsInOrderCloudIfNeeded(Response<List<ShipmentDetails>> freightPopShipmentResponse, List<MarketplaceOrder> orders)
+        private async Task<ShipmentSyncOrder> GetShipmentDetailsForShipmentSyncOrder(ShipmentSyncOrder shipmentSyncOrder)
         {
-            foreach (var freightPopShipment in freightPopShipmentResponse.Data)
+            shipmentSyncOrder.FreightPopShipmentResponses = await _freightPopService.GetShipmentsForOrder(shipmentSyncOrder.FreightPopOrderID);
+            return shipmentSyncOrder;
+
+        }
+
+        private async Task<List<ShipmentSyncOrder>> GetShipmentSyncOrders(List<MarketplaceOrder> orders)
+        {
+            var shipmentSyncOrders = new List<ShipmentSyncOrder>();
+            foreach(var order in orders)
             {
-                var relatedOrderID = freightPopShipment.Reference1;
-                var relatedOrder = orders.Find(order => order.ID == relatedOrderID);
-                await CreateShipmentInOrderCloudIfNeeded(freightPopShipment, relatedOrder);
+                if(order.xp.ShipFromAddressIDs != null)
+                {
+                    foreach(var shipFromAddressID in order.xp.ShipFromAddressIDs)
+                    {
+                        shipmentSyncOrders.Add(new ShipmentSyncOrder()
+                        {
+                            OrderCloudOrderID = order.ID,
+                            FreightPopOrderID = $"{order.ID.Split('-').First()}-{shipFromAddressID}",
+                            Order = order,
+                            FreightPopShipmentResponses = new Response<List<ShipmentDetails>>()
+                        });
+                    }
+                } else
+                {
+                    // if there are no freightpop order IDs on supplier order, mark it as needing attention
+                    _logger.LogWarning($"No FreightPOP orders marked on order {order.ID}. Marked as needing attention");
+                    await _oc.Orders.PatchAsync(OrderDirection.Outgoing, order.ID, new PartialOrder() { xp = new { NeedsAttention = true, StopShipSync = true } });
+                }
+            }
+            return shipmentSyncOrders;
+        }
+
+        private async Task CreateShipmentsInOrderCloudIfNeeded(ShipmentSyncOrder shipmentSyncOrder)
+        {
+            foreach (var freightPopShipment in shipmentSyncOrder.FreightPopShipmentResponses.Data)
+            {
+                await CreateShipmentInOrderCloudIfNeeded(freightPopShipment, shipmentSyncOrder.Order);
             }
         }
 
@@ -129,14 +171,14 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 // ordercloud bug prevents listing of shipments for a supplier order when authenticated as a seller user
                 // oddly another bug is currently changing the tocompanyid of the order to the seller and thus the seller user auth can be used here 
                 _logger.LogInformation($"Syncing order number {relatedOrder.ID}");
-                var orderCloudShipments = await _oc.Shipments.ListAsync(orderID: relatedOrder.ID);
+                var orderCloudShipments = await _ocFastSupplier.Shipments.ListAsync(orderID: relatedOrder.ID);
                 var buyerIDForOrder = await GetBuyerIDForSupplierOrder(relatedOrder);
 
                 // needs to be more complex in the future, logic pending discussion around split of orders by supplierid
-                if(orderCloudShipments.Meta.TotalCount == 0)
+                if(!orderCloudShipments.Items.Any(o => o.ID == freightPopShipment.ShipmentId))
                 {
                     await AddShipmentToOrderCloud(freightPopShipment, relatedOrder, buyerIDForOrder);
-                }
+                } 
                 _logger.LogInformation($"Sync complete for order number {relatedOrder.ID}");
             } catch (Exception ex)       
             {
@@ -147,11 +189,11 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         private async Task AddShipmentToOrderCloud(ShipmentDetails freightPopShipment, MarketplaceOrder relatedOrder, string buyerID)
         {
-            var ocShipment = await _oc.Shipments.CreateAsync(OCShipmentMapper.Map(freightPopShipment, buyerID));
+            var ocShipment = await _ocFastSupplier.Shipments.CreateAsync(OCShipmentMapper.Map(freightPopShipment, buyerID));
             foreach(var freightPopShipmentItem in freightPopShipment.Items)
             {
                 // currently this creates two items in ordercloud inadvertantely, platform bug is being resolved
-                await _oc.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, relatedOrder.ID));
+                await _ocFastSupplier.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, relatedOrder.ID));
             }
         }
 
@@ -171,16 +213,19 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
             var firstPage = await GetOrdersNeedingShipmentAsync(currentPage++, twoWeeksAgo);
             allOrders.AddRange(firstPage.Items);
-
-            var subsequentPages = await Throttler.RunAsync(new string[firstPage.Meta.TotalPages - 1], 100, 5,
-                (s) =>
-                {
-                    return GetOrdersNeedingShipmentAsync(currentPage++, twoWeeksAgo);
-                });
-
-            foreach (var orderListPage in subsequentPages)
+            
+            if(firstPage.Meta.TotalPages > 0)
             {
-                allOrders.AddRange(orderListPage.Items);
+                var subsequentPages = await Throttler.RunAsync(new string[firstPage.Meta.TotalPages - 1], 100, 5,
+                    (s) =>
+                    {
+                        return GetOrdersNeedingShipmentAsync(currentPage++, twoWeeksAgo);
+                    });
+
+                foreach (var orderListPage in subsequentPages)
+                {
+                    allOrders.AddRange(orderListPage.Items);
+                }
             }
 
             return allOrders;
@@ -207,7 +252,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         private Task<ListPage<MarketplaceOrder>> GetOrdersNeedingShipmentAsync(int page, DateTime fromDate)
         {
-            return _oc.Orders.ListAsync<MarketplaceOrder>(OrderDirection.Outgoing, page: page, pageSize: 100, filters: $"IsSubmitted=true&Status=Open&DateSubmitted=>{fromDate.ToLongDateString()}");
+            return _oc.Orders.ListAsync<MarketplaceOrder>(OrderDirection.Outgoing, page: page, pageSize: 100, filters: $"IsSubmitted=true&Status=Open&xp.StopShipSync=false");
         }
     }
 }
