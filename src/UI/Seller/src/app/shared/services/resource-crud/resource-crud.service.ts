@@ -415,7 +415,8 @@ export abstract class ResourceCrudService<ResourceType> {
     return JSON.stringify(resourceEditable) !== JSON.stringify(resourceStatic);
   }
 
-  getSaveBtnText(dataIsSaving: boolean, isCreatingNew: boolean): string {
+  getSaveBtnText(dataIsSaving: boolean, isCreatingNew: boolean, isError?: boolean): string {
+    if (isError) return 'Re-submit'
     if (dataIsSaving) return 'Saving...';
     if (isCreatingNew) return 'Create';
     if (!isCreatingNew) return 'Save Changes';

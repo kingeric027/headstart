@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { ListAddress, Address } from '@ordercloud/angular-sdk';
+import { ListAddress, Address, BuyerAddress } from '@ordercloud/angular-sdk';
 import { BuyerLocationService } from '../buyer-location.service';
 import { ValidatePhone, ValidateUSZip, ValidateEmail } from '@app-seller/validators/validators';
 import { Router } from '@angular/router';
@@ -31,7 +31,7 @@ export class BuyerLocationEditComponent implements OnInit {
   @Input()
   filterConfig;
   @Input()
-  suggestedAddresses: ListAddress;
+  suggestedAddresses: Array<BuyerAddress>;
   @Output()
   updateResource = new EventEmitter<ResourceUpdate>();
   @Output()
@@ -92,7 +92,11 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   getSaveBtnText(): string {
-    return this.buyerLocationService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew);
+    return this.buyerLocationService.getSaveBtnText(
+      this.dataIsSaving,
+      this.isCreatingNew,
+      this.suggestedAddresses?.length > 0
+    );
   }
 
   async handleSave(): Promise<void> {
@@ -117,7 +121,7 @@ export class BuyerLocationEditComponent implements OnInit {
       this.router.navigateByUrl(`/buyers/${this.buyerID}/locations/${newBuyerLocation.Address.ID}`);
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = getSuggestedAddresses(ex);
+      this.suggestedAddresses = getSuggestedAddresses(ex.response.data);
       this.dataIsSaving = false;
     }
   }
@@ -126,22 +130,23 @@ export class BuyerLocationEditComponent implements OnInit {
     try {
       this.dataIsSaving = true;
       const updatedBuyerLocation = await MarketplaceSDK.BuyerLocations.Update(
-        this.buyerID,
         this.buyerLocationEditable.Address.ID,
+        this.buyerID,
         this.buyerLocationEditable
       );
+      this.suggestedAddresses = null;
       this.buyerLocationEditable = updatedBuyerLocation;
       this.buyerLocationStatic = updatedBuyerLocation;
       this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = getSuggestedAddresses(ex);
+      this.suggestedAddresses = getSuggestedAddresses(ex.response.data);
       this.dataIsSaving = false;
     }
   }
 
   async handleDelete($event): Promise<void> {
-    await MarketplaceSDK.BuyerLocations.Delete(this.buyerID, this.buyerLocationEditable.Address.ID);
+    await MarketplaceSDK.BuyerLocations.Delete(this.buyerLocationEditable.Address.ID, this.buyerID);
     this.router.navigateByUrl(`/buyers/${this.buyerID}/locations`);
   }
 
