@@ -20,9 +20,10 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, MarketPlaceProductStaticContent } from 'marketplace-javascript-sdk';
+import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
+import { ProductStaticContent } from 'marketplace-javascript-sdk/dist/models/ProductStaticContent';
 
 @Component({
   selector: 'app-product-edit',
@@ -66,7 +67,7 @@ export class ProductEditComponent implements OnInit {
   fileType: string;
   imageFiles: FileHandle[] = [];
   staticContentFiles: FileHandle[] = [];
-  staticContent: MarketPlaceProductStaticContent[];
+  staticContent: ProductStaticContent[] = [];
   documentName: string;
   url: string;
 
@@ -115,8 +116,10 @@ export class ProductEditComponent implements OnInit {
       this.taxCodes = { Meta: {}, Items: [] };
     }
     this.productType = superProduct.Product?.xp?.ProductType;
-    this.createProductForm(superProduct);
     this.staticContent = superProduct.Product?.xp?.StaticContent;
+    this.createProductForm(superProduct);
+    console.log(superProduct)
+
     this.images = ReplaceHostUrls(superProduct.Product);
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.isCreatingNew = this.productService.checkIfCreatingNew();
@@ -193,7 +196,7 @@ export class ProductEditComponent implements OnInit {
       this._superMarketplaceProductStatic = superProduct;
       this._superMarketplaceProductEditable = superProduct;
       if (this.imageFiles) this.addFiles(this.imageFiles, superProduct.Product.ID, "image");
-      if (this.staticContentFiles && this.staticContent.length <= 10) {
+      if (this.staticContentFiles) {
         this.addFiles(this.staticContentFiles, superProduct.Product.ID, "staticContent");
       }
       this.dataIsSaving = false;
@@ -269,19 +272,20 @@ export class ProductEditComponent implements OnInit {
 
   async addFiles(files: FileHandle[], productID: string, fileType?: string) {
     let superProduct;
-    for (const file of files) {
-      if (fileType === "image") {
-        superProduct = await this.middleware.uploadProductImage(file.File, productID)
-      } else {
-        superProduct = await this.middleware.uploadStaticContent(file.File, productID, this.documentName);
+    if (fileType === "image") {
+      for (const file of files) {
+        superProduct = await this.middleware.uploadProductImage(file.File, productID);
       }
+    } else {
+      this.staticContentFiles.forEach(async file => {
+        superProduct = await this.middleware.uploadStaticContent(file.File, productID, file.fileName);
+      });
     }
     fileType === "image" ?
       this.imageFiles = [] :
       this.staticContentFiles = [];
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
     superProduct = Object.assign(this._superMarketplaceProductStatic || {}, superProduct);
-    console.log(superProduct)
     this.refreshProductData(superProduct);
   }
 
@@ -323,9 +327,9 @@ export class ProductEditComponent implements OnInit {
     this.checkForChanges();
   }
 
-  async removeDocument(fileName: string) {
-    const prodID = this._superMarketplaceProductStatic.Product.ID;
-    let superProduct = await MarketplaceSDK.Files.Delete(this.appConfig.marketplaceID, prodID, fileName);
+  async removeDocument(file: ProductStaticContent) {
+    //const prodID = this._superMarketplaceProductStatic.Product.ID;
+    let superProduct = await this.middleware.deleteStaticContent(file.URL);
     superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
     this.refreshProductData(superProduct);
   }

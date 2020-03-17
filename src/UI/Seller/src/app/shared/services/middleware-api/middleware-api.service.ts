@@ -27,10 +27,17 @@ export class MiddlewareAPIService {
   }
 
   async uploadStaticContent(file: File, productID: string, fileName: string): Promise<SuperMarketplaceProduct> {
-    const form = new FormData();
-    form.append('file', file);
-    const url = `${this.appConfig.middlewareUrl}/${this.appConfig.marketplaceID}/static-content/${productID}/${fileName}`;
-    return await this.http.post<SuperMarketplaceProduct>(url, form, this.headers).toPromise();
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const url = `${this.appConfig.middlewareUrl}/${this.appConfig.marketplaceID}/static-content/${productID}/${fileName}`;
+      return await this.http.post<SuperMarketplaceProduct>(url, form, this.headers).toPromise();
+    } catch (ex) {
+      throw ex;
+    }
   }
 
+  async deleteStaticContent(url: string): Promise<SuperMarketplaceProduct> {
+    return await this.http.delete<SuperMarketplaceProduct>(url, this.headers).toPromise();
+  }
 }

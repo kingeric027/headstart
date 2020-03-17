@@ -394,7 +394,6 @@
               <tr *ngFor="let file of staticContent">
                 <td>{{file.Title}}</td>
                 <td><a href="{{getDocumentUrl(file.URL)}}"
-                     target="_blank"
                      download="{{file.Title}}.pdf">download</a></td>
                 <td>
                   <button title="Delete file"
@@ -415,7 +414,7 @@
                             (click)="modal.dismiss()">Cancel</button>
                     <button type="button"
                             class="btn brand-button--danger"
-                            (click)="removeDocument(file.Title)"
+                            (click)="removeDocument(file)"
                             (click)="modal.dismiss()">Yes, Delete</button>
                   </confirm-modal>
                 </ng-template>

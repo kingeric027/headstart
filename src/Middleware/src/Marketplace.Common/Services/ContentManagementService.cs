@@ -7,6 +7,8 @@ using Marketplace.Common.Helpers;
 using System.Linq;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
+using Marketplace.Helpers.Models;
+using Marketplace.Helpers;
 
 namespace Marketplace.Common.Services
 {
@@ -92,10 +94,11 @@ namespace Marketplace.Common.Services
 
 		public async Task<SuperMarketplaceProduct> UploadStaticContent(IFormFile file, string productID, string fileName, string token)
 		{
+
 			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
 			if (product.xp?.StaticContent == null)
 				product.xp = new ProductXp { StaticContent = new List<StaticContent>() };
-
+			Require.That(product.xp.StaticContent.Count < 10, new ErrorCode("Only ten files per product", 400, "Must remove any extra documents associated with this product."));
 			await _staticContentContainer.Save(fileName, file);
 
 			product.xp?.StaticContent?.Add(new StaticContent()
