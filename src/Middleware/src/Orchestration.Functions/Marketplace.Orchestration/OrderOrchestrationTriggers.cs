@@ -9,7 +9,7 @@ using Marketplace.Common;
 using OrderCloud.SDK;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 
-namespace Marketplace.ShippingQuery
+namespace Marketplace.Orchestration
 {
     public class OrderOrchestrationTrigger
     {
