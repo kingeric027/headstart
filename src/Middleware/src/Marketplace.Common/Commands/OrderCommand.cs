@@ -11,6 +11,7 @@ using Marketplace.Common.Services;
 using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using System.Linq;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Commands
 {
@@ -137,7 +138,7 @@ namespace Marketplace.Common.Commands
         private async Task ImportSupplierOrderIntoFreightPop(MarketplaceOrder supplierOrder)
         {
 
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, supplierOrder.ID);
+            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, supplierOrder.ID);
             
             // we further split the supplier order into multiple orders for each shipfromaddressID before it goes into freightpop
             var freightPopOrders = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
