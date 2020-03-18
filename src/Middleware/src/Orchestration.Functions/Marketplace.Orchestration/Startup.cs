@@ -16,6 +16,7 @@ using Marketplace.Orchestration;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.DependencyInjection;
 using OrderCloud.SDK;
+using Marketplace.Common.Services.FreightPop;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration
@@ -36,8 +37,10 @@ namespace Marketplace.Orchestration
 
             builder.Services
                 .Inject<IFlurlClient>()
+                .Inject<IFreightPopService>()
                 .Inject<IOrderCloudClient>()
                 .Inject<IOrchestrationCommand>()
+                .Inject<IOrderOrchestrationCommand>()
                 .Inject<ISyncCommand>()
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(c);
         }

@@ -13,6 +13,7 @@ namespace Marketplace.Common
         BlobSettings BlobSettings { get; }
         CosmosSettings CosmosSettings { get;}
         OrderCloudSettings OrderCloudSettings { get; }
+        FreightPopSettings FreightPopSettings { get; set; }
         string SendgridApiKey { get; }
     }
 
