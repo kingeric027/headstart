@@ -1,10 +1,17 @@
 <div class="row mb-5"
      *ngIf="order">
   <div class="col-6">
+    <div *ngIf="buyerLocation?.CompanyName">
+      <span class="mb-3">Buyer Location</span>
+      <p><strong>{{buyerLocation?.CompanyName}}</strong></p>
+    </div>
+    <span>Shipping Address</span>
     <ocm-address-card *ngIf="lineItems?.Items[0].ShippingAddress"
                       [address]="lineItems?.Items[0].ShippingAddress"
                       addressTitle="Shipping Address">
     </ocm-address-card>
+    <br/>
+    <span>Billing Address</span>
     <ocm-address-card [address]="order.BillingAddress"
                       addressTitle="Billing Address"
                       *ngIf="order?.BillingAddress">

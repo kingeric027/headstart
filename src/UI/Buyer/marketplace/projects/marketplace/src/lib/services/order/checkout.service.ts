@@ -22,6 +22,7 @@ export interface ICheckout {
   createOneTimeCCPayment(card: CreditCardToken): Promise<Payment>;
   setAddress(type: OrderAddressType, address: BuyerAddress): Promise<MarketplaceOrder>;
   setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder>;
+  setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder>;
   estimateShipping(): Promise<OrderWorksheet>;
   selectShipMethod(selection: ShipMethodSelection): Promise<MarketplaceOrder>;
   calculateOrder(): Promise<MarketplaceOrder>;
@@ -86,6 +87,18 @@ export class CheckoutService implements ICheckout {
       }
     }
   }
+
+  async setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder> {
+    const patch = { xp: { ['BuyerLocationID']: buyerLocationID } };
+    try {
+      return await this.patch(patch as MarketplaceOrder);
+    } catch (ex) {
+      if (ex.error.Errors[0].ErrorCode === 'NotFound') {
+        throw Error('You no longer have access to this buyer location. Please enter or select a different one.');
+      }
+    }
+  }
+
 
   async listPayments(): Promise<ListPayment> {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);

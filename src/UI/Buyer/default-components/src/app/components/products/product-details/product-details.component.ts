@@ -144,6 +144,7 @@ export class OCMProductDetails implements OnInit {
   getDefaultQuoteOrder(user) {
     const defaultQuoteOrder = {
       xp: {
+        BuyerLocationID: '',
         AvalaraTaxTransactionCode: '',
         OrderType: OrderType.Quote,
         QuoteOrderInfo: {

@@ -12,6 +12,8 @@ import { getSuggestedAddresses } from '../../../services/address-suggestion.help
   styleUrls: ['./checkout-address.component.scss'],
 })
 export class OCMCheckoutAddress implements OnInit {
+  existingBuyerLocations: ListBuyerAddress;
+  selectedBuyerLocation: BuyerAddress = {};
   existingAddresses: ListBuyerAddress;
   selectedAddress: BuyerAddress;
   requestOptions: { page?: number; search?: string } = {
@@ -33,6 +35,7 @@ export class OCMCheckoutAddress implements OnInit {
   ngOnInit(): void {
     if (!this.isAnon) {
       this.getSavedAddresses();
+      this.getSavedBuyerLocations();
     }
     // shipping address is defined at the line item level
     this.selectedAddress =
@@ -41,6 +44,16 @@ export class OCMCheckoutAddress implements OnInit {
 
   clearRequestOptions(): void {
     this.updateRequestOptions({ page: undefined, search: undefined });
+  }
+
+  toggleShowBuyerLocationForm(event): void {
+    this.showAddAddressForm = event.target.value === 'new';
+    const selectedBuyerLocation = this.existingBuyerLocations.Items.find(location => event.target.value === location.ID);
+    const addressMatch = this.existingAddresses.Items.find(location => location.ID === selectedBuyerLocation.ID);
+    if (addressMatch) {
+      this.selectedAddress = addressMatch;
+    }
+    this.existingBuyerLocationSelected(selectedBuyerLocation);
   }
 
   toggleShowAddressForm(event): void {
@@ -52,6 +65,11 @@ export class OCMCheckoutAddress implements OnInit {
   updateRequestOptions(options: { page?: number; search?: string }): void {
     this.requestOptions = options;
     this.getSavedAddresses();
+    this.getSavedBuyerLocations();
+  }
+
+  existingBuyerLocationSelected(location: BuyerAddress): void {
+    this.selectedBuyerLocation = location;
   }
 
   existingAddressSelected(address: BuyerAddress): void {
@@ -63,12 +81,15 @@ export class OCMCheckoutAddress implements OnInit {
 
     this.usingShippingAsBilling = true;
     this.selectedAddress = this.lineItems?.Items[0].ShippingAddress;
-    this.saveAddress(this.selectedAddress, false, false);
+    this.saveAddress(this.selectedBuyerLocation, this.selectedAddress, false, false);
   }
 
-  async saveAddress(address: Address, formDirty: boolean, shouldSaveAddress: boolean): Promise<void> {
+  async saveAddress(buyerLocation: Address, address: Address, formDirty: boolean, shouldSaveAddress: boolean): Promise<void> {
     // TODO: make bellow line better
     try {
+      if (buyerLocation.ID) {
+        this.order = await this.setBuyerLocation(buyerLocation.ID);
+      }
       const setOneTimeAddress =
         this.isAnon ||
         formDirty ||
@@ -95,11 +116,21 @@ export class OCMCheckoutAddress implements OnInit {
       this.toasterService.error('Invalid Address');
     }
     if (this.addressType === OrderAddressType.Billing) {
-      this.lineItems.Items[0].ShippingAddress = address;
+      this.order.BillingAddress = address;
       // TODO - handle this.
       // this.context.currentOrder.lineItems = this.lineItems;
     }
     this.continue.emit();
+  }
+
+  private async getSavedBuyerLocations(): Promise<void> {
+    const filters = {};
+    filters[this.addressType] = true;
+    const options = { filters, ...this.requestOptions };
+    this.existingBuyerLocations = await this.context.currentUser.addresses.listBuyerLocations(options);
+    if (this.existingBuyerLocations?.Items.length === 1) {
+      this.selectedBuyerLocation = this.selectedAddress = this.existingBuyerLocations.Items[0];
+    }
   }
 
   private async getSavedAddresses(): Promise<void> {
@@ -132,5 +163,9 @@ export class OCMCheckoutAddress implements OnInit {
 
   private async setSavedAddress(addressID: string): Promise<Order> {
     return await this.context.order.checkout.setAddressByID(this.addressType, addressID);
+  }
+
+  private async setBuyerLocation(buyerLocationID: string): Promise<Order> {
+    return await this.context.order.checkout.setBuyerLocationByID(buyerLocationID);
   }
 }

@@ -46,6 +46,7 @@ export interface ShippingRate {
 
 export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
 export interface OrderXp {
+  BuyerLocationID: string;
   AvalaraTaxTransactionCode: string;
   OrderType: OrderType;
   QuoteOrderInfo: QuoteOrderInfo;

@@ -21,6 +21,11 @@ export class CurrentUserAddressService implements ICurrentUserAddress  {
         return this.ocMeService.ListAddresses(args).toPromise();
     }
 
+    async listBuyerLocations(args: ListArgs): Promise<ListBuyerAddress> {
+        args.filters = { ...args.filters, Editable: 'false' };
+        return this.list(args);
+    }
+
     async listShipping(args: ListArgs): Promise<ListBuyerAddress> {
         args.filters = { ...args.filters, Shipping: 'true' };
         return this.list(args);
