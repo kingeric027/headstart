@@ -37,7 +37,8 @@ export class MiddlewareAPIService {
     }
   }
 
-  async deleteStaticContent(url: string): Promise<SuperMarketplaceProduct> {
+  async deleteStaticContent(fileName: string, productID: string): Promise<SuperMarketplaceProduct> {
+    const url = `${this.appConfig.middlewareUrl}/${this.appConfig.marketplaceID}/static-content/${productID}/${fileName}`;
     return await this.http.delete<SuperMarketplaceProduct>(url, this.headers).toPromise();
   }
 }

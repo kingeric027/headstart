@@ -118,8 +118,6 @@ export class ProductEditComponent implements OnInit {
     this.productType = superProduct.Product?.xp?.ProductType;
     this.staticContent = superProduct.Product?.xp?.StaticContent;
     this.createProductForm(superProduct);
-    console.log(superProduct)
-
     this.images = ReplaceHostUrls(superProduct.Product);
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.isCreatingNew = this.productService.checkIfCreatingNew();
@@ -267,7 +265,6 @@ export class ProductEditComponent implements OnInit {
   stageImages(files: FileHandle[]) {
     this.imageFiles = this.imageFiles.concat(files);
     this.checkForChanges();
-    console.log('staging img', this.imageFiles)
   }
 
   async addFiles(files: FileHandle[], productID: string, fileType?: string) {
@@ -327,9 +324,10 @@ export class ProductEditComponent implements OnInit {
     this.checkForChanges();
   }
 
-  async removeDocument(file: ProductStaticContent) {
-    //const prodID = this._superMarketplaceProductStatic.Product.ID;
-    let superProduct = await this.middleware.deleteStaticContent(file.URL);
+  async removeDocument(fileName: string) {
+    console.log(this._superMarketplaceProductStatic)
+    const prodID = this._superMarketplaceProductStatic.Product.ID;
+    let superProduct = await this.middleware.deleteStaticContent(fileName, prodID);
     superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
     this.refreshProductData(superProduct);
   }

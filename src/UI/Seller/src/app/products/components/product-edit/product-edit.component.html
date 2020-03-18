@@ -384,17 +384,17 @@
             </div>
           </div>
           <table class="table table-sm bg-light"
-                 *ngIf="staticContent">
+                 *ngIf="staticContent.length > 0">
             <thead>
               <tr>
-                <th>Document</th>
+                <th>Documents</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let file of staticContent">
                 <td>{{file.Title}}</td>
                 <td><a href="{{getDocumentUrl(file.URL)}}"
-                     download="{{file.Title}}.pdf">download</a></td>
+                     download>download</a></td>
                 <td>
                   <button title="Delete file"
                           class="btn btn-light btn-group-item"
@@ -407,14 +407,14 @@
                 <ng-template #content
                              let-modal
                              class="confirm-modal">
-                  <confirm-modal modalTitle="Delete Image?"
-                                 description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
+                  <confirm-modal modalTitle="Delete Document?"
+                                 description="Deleting this document cannot be reversed.">
                     <button type="button"
                             class="btn btn-link text-dark"
                             (click)="modal.dismiss()">Cancel</button>
                     <button type="button"
                             class="btn brand-button--danger"
-                            (click)="removeDocument(file)"
+                            (click)="removeDocument(file.Title)"
                             (click)="modal.dismiss()">Yes, Delete</button>
                   </confirm-modal>
                 </ng-template>

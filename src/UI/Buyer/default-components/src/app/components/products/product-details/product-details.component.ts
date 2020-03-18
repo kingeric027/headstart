@@ -82,7 +82,6 @@ export class OCMProductDetails implements OnInit {
 
   getPriceBreakRange(index: number): string {
     if (!this._product.PriceSchedule?.PriceBreaks.length) return '';
-
     const priceBreaks = this._product.PriceSchedule.PriceBreaks;
     const indexOfNextPriceBreak = index + 1;
     if (indexOfNextPriceBreak < priceBreaks.length) {
@@ -111,6 +110,13 @@ export class OCMProductDetails implements OnInit {
     return this.specFormService.event.valid
       ? this.specFormService.getSpecMarkup(this._specs, selectedBreak, this.quantity || startingBreak.Quantity)
       : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
+  }
+
+  getDocumentUrl(url: string) {
+    let spliturl = url.split('/')
+    spliturl.splice(4, 1);
+    let str = spliturl.join('/')
+    return str;
   }
 
   getImageUrls(): string[] {

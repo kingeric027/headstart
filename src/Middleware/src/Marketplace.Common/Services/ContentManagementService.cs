@@ -98,7 +98,7 @@ namespace Marketplace.Common.Services
 			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
 			if (product.xp?.StaticContent == null)
 				product.xp = new ProductXp { StaticContent = new List<StaticContent>() };
-			Require.That(product.xp.StaticContent.Count < 10, new ErrorCode("Only ten files per product", 400, "Must remove any extra documents associated with this product."));
+			Require.That(product.xp.StaticContent.Count < 10, new ErrorCode("Exceeds document limit on product", 400, "A product can have up to 10 associated documents."));
 			await _staticContentContainer.Save(fileName, file);
 
 			product.xp?.StaticContent?.Add(new StaticContent()
@@ -129,9 +129,9 @@ namespace Marketplace.Common.Services
 			var blobName = GetProductStaticContentName(marketplaceID, productID, fileName);
 			await _staticContentContainer.Delete(blobName);
 
-			var Images = product.xp.Images.Where(img => !img.URL.EndsWith(fileName));
+			var StaticContent = product.xp.StaticContent.Where(file => !file.URL.EndsWith(fileName));
 
-			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { xp = new { Images } }, token);
+			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { xp = new { StaticContent } }, token);
 			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
 			return new SuperMarketplaceProduct
 			{
@@ -144,6 +144,6 @@ namespace Marketplace.Common.Services
 		private string GetProductImageName(string mkplID, string prodId, int? i) => $"{mkplID}/products/{prodId}-{i}";
 		private string GetProductImageURL(string blobName) => $"{_settings.BlobSettings.HostUrl}/images/{blobName}";
 		private string GetProductStaticContentName(string mkplID, string productID, string fileName) => $"{mkplID}/static-content/{productID}/{fileName}";
-		private string GetStaticContentURL(string productID, string blobName) => $"{_settings.BlobSettings.HostUrl}/static-content/{productID}/{blobName}";
+		private string GetStaticContentURL(string productID, string fileName) => $"{_settings.BlobSettings.HostUrl}/static-content/{productID}/{fileName}";
 	}
 }
