@@ -69,7 +69,6 @@ export class ProductEditComponent implements OnInit {
   staticContentFiles: FileHandle[] = [];
   staticContent: ProductStaticContent[] = [];
   documentName: string;
-  url: string;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -252,18 +251,20 @@ export class ProductEditComponent implements OnInit {
         const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
         return { File: file, URL };
       });
-      this.stageImages(files);
+      this.stageFiles(files, fileType);
     } else if (fileType === "staticContent") {
       const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
         const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
         return { File: file, URL, fileName: this.documentName };
       });
-      this.stageDocuments(files);
+      this.stageFiles(files, fileType);
     }
   }
 
-  stageImages(files: FileHandle[]) {
-    this.imageFiles = this.imageFiles.concat(files);
+  stageFiles(files: FileHandle[], fileType: string) {
+    fileType === " image" ?
+      this.imageFiles = this.imageFiles.concat(files) :
+      this.staticContentFiles = this.staticContentFiles.concat(files);
     this.checkForChanges();
   }
 
@@ -286,16 +287,23 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(superProduct);
   }
 
-  async removeFile(imgUrl: string) {
+  async removeFile(fileDetail: string, fileType: string) {
+    //fileDetail for an image is the image URL. For static content, it is the file
     const prodID = this._superMarketplaceProductStatic.Product.ID;
-    const imageName = imgUrl.split('/').slice(-1)[0];
-    let superProduct = await MarketplaceSDK.Files.Delete(this.appConfig.marketplaceID, prodID, imageName);
+    let superProduct;
+    if (fileType === "image") {
+      const imageName = fileDetail.split('/').slice(-1)[0];
+      superProduct = await MarketplaceSDK.Files.Delete(this.appConfig.marketplaceID, prodID, imageName);
+    } else {
+      superProduct = await this.middleware.deleteStaticContent(fileDetail, prodID);
+    }
     superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
     this.refreshProductData(superProduct);
   }
 
-  unstageImage(index: number) {
-    this.imageFiles.splice(index, 1)
+  unstageFile(index: number, fileType: string) {
+    fileType === "image" ?
+      this.imageFiles.splice(index, 1) : this.staticContentFiles.splice(index, 1);
     this.checkForChanges();
   }
 
@@ -303,6 +311,7 @@ export class ProductEditComponent implements OnInit {
    *  *** PRODUCT DOCUMENT UPLOAD FUNCTIONS ***
    * ******************************************/
 
+  /* This url points to the document in blob storage in order for it to be downloadable. */
   getDocumentUrl(url: string) {
     let spliturl = url.split('/')
     spliturl.splice(4, 1);
@@ -312,24 +321,6 @@ export class ProductEditComponent implements OnInit {
 
   getDocumentName(event: KeyboardEvent) {
     this.documentName = (event.target as HTMLInputElement).value;
-  }
-
-  stageDocuments(files: FileHandle[]) {
-    this.staticContentFiles = this.staticContentFiles.concat(files);
-    this.checkForChanges();
-  }
-
-  unstageDocument(index) {
-    this.staticContentFiles.splice(index, 1);
-    this.checkForChanges();
-  }
-
-  async removeDocument(fileName: string) {
-    console.log(this._superMarketplaceProductStatic)
-    const prodID = this._superMarketplaceProductStatic.Product.ID;
-    let superProduct = await this.middleware.deleteStaticContent(fileName, prodID);
-    superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
-    this.refreshProductData(superProduct);
   }
 
   async open(content) {

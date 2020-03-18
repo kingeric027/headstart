@@ -322,8 +322,8 @@
               <button title="Un-stage photo"
                       class="btn btn-light btn-group-item"
                       data-ui="action-btn"
-                      data-action="unstageImage"
-                      (click)="unstageImage(i)">
+                      data-action="unstageFile"
+                      (click)="unstageFile(i, 'image')">
                 <fa-icon [icon]="faTimes"></fa-icon>
               </button>
             </div>
@@ -377,8 +377,8 @@
               <button title="Un-stage file"
                       class="btn btn-light btn-group-item"
                       data-ui="action-btn"
-                      data-action="unstageDocument"
-                      (click)="unstageDocument(i)">
+                      data-action="unstageFile"
+                      (click)="unstageFile(i, 'staticContent')">
                 <fa-icon [icon]="faTimes"></fa-icon>
               </button>
             </div>
