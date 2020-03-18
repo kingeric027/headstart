@@ -13,27 +13,28 @@ using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
     
-    public class PartialConverter : JsonConverter
-    {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            JObject.FromObject(((OrchestrationModel)value).Props, serializer).WriteTo(writer);
-        }
+    //public class PartialConverter : JsonConverter
+    //{
+    //    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    //    {
+    //        JObject.FromObject(((OrchestrationModel)value).Props, serializer).WriteTo(writer);
+    //    }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) =>
-            throw new NotImplementedException();
+    //    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) =>
+    //        throw new NotImplementedException();
 
-        public override bool CanConvert(Type type)
-        {
-            var t = typeof(OrchestrationModel).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()) &&
-                typeof(IPartial).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
-            return t;
-        }
-    }
+    //    public override bool CanConvert(Type type)
+    //    {
+    //        var t = typeof(OrchestrationModel).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()) &&
+    //            typeof(IPartial).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+    //        return t;
+    //    }
+    //}
 
     public class OrchestrationSerializer<T> : DefaultContractResolver
     {
@@ -42,7 +43,7 @@ namespace Marketplace.Common.Commands
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
-            if (member.GetCustomAttribute(typeof(ApiNoUpdateAttribute)) != null)
+            if (member.GetCustomAttribute(typeof(OrchestrationIgnoreAttribute)) != null)
                 property.ShouldSerialize = o => false;
             
             return property;

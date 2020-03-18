@@ -6,6 +6,7 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Models;
 using Marketplace.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -50,26 +51,11 @@ namespace Orchestration.Tests
         [Test, TestCaseSource(typeof(DiffFactory), nameof(DiffFactory.TestCases))]
         public JToken diff_results(WorkItem wi)
         {
-            //if(JToken.DeepEquals(wi.Current, wi.Cache)) return null;
-            //var diff = wi.Diff;
-            //var other = wi.OtherDiff;
-            //var un = wi.Unpatch();
-            //var p = wi.Patch();
-            //var patchSame = JToken.DeepEquals(p, wi.Current);
-            var attempt = wi.Current.ToObject<PartialMarketplaceProduct>(new JsonSerializer()
+            var diff = wi.Current.Diff(wi.Cache);
+            var attempt = diff.ToObject<PartialMarketplaceProduct>(new JsonSerializer()
             {
-                ContractResolver = OrchestrationSerializer<PartialMarketplaceProduct>.Instance,
-                Converters = { new PartialConverter() }
+                ContractResolver = OrchestrationSerializer<PartialMarketplaceProduct>.Instance
             });
-            //var obj = JObject.FromObject(wi.Current).ToObject<PartialProduct<ProductXp>>(JsonSerializer.Create(
-            //    new JsonSerializerSettings()
-            //    {
-            //        ContractResolver = OrchestrationSerializer<PartialMarketplaceProduct>.Instance,
-            //        Converters =
-            //        {
-            //            new PartialConverter()
-            //        }
-            //    }));
             return JToken.Parse("{}");
         }
 
@@ -104,21 +90,21 @@ namespace Orchestration.Tests
             {
                 yield return new TestCaseData(new WorkItem()
                 {
-                    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'description' }}}"),
-                    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }}}"),
+                    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'UnitOfMeasure': {'Qty': 10 }, 'Tax': { 'Category': 'category', 'Code': 'code', 'Note': 'description' }}}"),
+                    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'UnitOfMeasure': {'Qty': 100 }, 'Tax': { 'Category': 'category', 'Code': 'code' }}}"),
                 }).Returns(null);
 
-                yield return new TestCaseData(new WorkItem()
-                {
-                    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }}}"),
-                    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'description' }}}"),
-                }).Returns(null);
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }}}"),
+                //    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Note': 'description' }}}"),
+                //}).Returns(null);
 
-                yield return new TestCaseData(new WorkItem()
-                {
-                    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'changed'  }}}"),
-                    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'description' }}}"),
-                }).Returns(JToken.Parse("{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'changed'  }}}"));
+                //yield return new TestCaseData(new WorkItem()
+                //{
+                //    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Note': 'changed'  }}}"),
+                //    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Note': 'description' }}}"),
+                //}).Returns(JToken.Parse("{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Note': 'changed'  }}}"));
 
                 //yield return new TestCaseData(new WorkItem()
                 //{

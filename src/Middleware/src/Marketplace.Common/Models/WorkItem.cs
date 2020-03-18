@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using JsonDiffPatchDotNet;
 using Marketplace.Common.Exceptions;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Extensions;
@@ -13,14 +12,7 @@ namespace Marketplace.Common.Models
     [DocIgnore]
     public class WorkItem
     {
-        private readonly JsonDiffPatch _diff = new JsonDiffPatch(new Options()
-        {
-            ArrayDiff = ArrayDiffMode.Simple
-        });
-        public WorkItem()
-        {
-        }
-
+        public WorkItem() { }
         public WorkItem(string path)
         {
             var split = path.Split("/");
@@ -85,22 +77,9 @@ namespace Marketplace.Common.Models
         public Action Action { get; set; }
         public JObject Current { get; set; } // not used for delete
         public JObject Cache { get; set; } // not used for create
-
-        public JToken Diff => _diff.Diff(this.Current, this.Cache);
-        public JToken OtherDiff => _diff.Diff(this.Cache, this.Current);
-
+        public JToken Diff { get; set; }
         public string Token { get; set; }
         public string ClientId { get; set; }
-
-        public JToken Patch()
-        {
-            return _diff.Patch(this.Current, this.Diff);
-        }
-
-        public JToken Unpatch()
-        {
-            return _diff.Unpatch(this.Current, this.Diff);
-        }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
