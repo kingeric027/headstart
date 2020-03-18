@@ -80,7 +80,7 @@ export class ProductVariations {
   }
 
   updateSku($event: any, i: number): void {
-    const updateProductResourceCopy = this.copyProductResource(
+    const updateProductResourceCopy = this.productService.copyResource(
         this.superProductEditable || this.productService.emptyResource
     );
     updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, "");
@@ -89,11 +89,11 @@ export class ProductVariations {
   }
 
   addSpec(): void {
-    const updateProductResourceCopy = this.copyProductResource(
+    const updateProductResourceCopy = this.productService.copyResource(
         this.superProductEditable || this.productService.emptyResource
     );
     let input = (document.getElementById('AddVariation') as any)
-    const newSpec = [{
+    const newSpec: Spec[] = [{
       ID: `${updateProductResourceCopy.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, "")}`,
       Name: input.value,
       AllowOpenText: false,
@@ -109,7 +109,7 @@ export class ProductVariations {
     this.productVariationsChanged.emit(this.superProductEditable);
   }
   addSpecOption(spec: Spec, specIndex: number): void {
-    const updateProductResourceCopy = this.copyProductResource(
+    const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
     let input = (document.getElementById(`${spec.ID}`) as any)
@@ -131,7 +131,7 @@ export class ProductVariations {
   };
 
   removeSpecOption(specIndex: number, optionIndex: number): void {
-    const updateProductResourceCopy = this.copyProductResource(
+    const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
     updateProductResourceCopy.Specs[specIndex].Options.splice(optionIndex, 1);
@@ -142,7 +142,7 @@ export class ProductVariations {
   };
 
   removeSpec(spec: Spec): void {
-    const updateProductResourceCopy = this.copyProductResource(
+    const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
     updateProductResourceCopy.Specs = updateProductResourceCopy.Specs.filter(s => s.ID !== spec.ID);
@@ -153,7 +153,7 @@ export class ProductVariations {
   }
 
   mockVariants(): void {
-    const updateProductResourceCopy = this.copyProductResource(
+    const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
     updateProductResourceCopy.Variants = this.generateVariantsFromCurrentSpecs();

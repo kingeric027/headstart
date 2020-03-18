@@ -389,8 +389,8 @@ export class ProductEditComponent implements OnInit {
   };
 
   private async handleSelectedProductChange(product: Product): Promise<void> {
-    const marketPlaceProduct = await MarketplaceSDK.Products.Get(product.ID);
-    this.refreshProductData(marketPlaceProduct);
+    const marketplaceProduct = await MarketplaceSDK.Products.Get(product.ID);
+    this.refreshProductData(marketplaceProduct);
   }
 
   private async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
@@ -405,6 +405,17 @@ export class ProductEditComponent implements OnInit {
     return totalMarkup;
   }
   
+  updateEditableProductWithVariationChanges(e): void {
+    const updateProductResourceCopy = this.productService.copyResource(
+      this._superMarketplaceProductEditable || this.productService.emptyResource
+    );
+    updateProductResourceCopy.Specs = e.Specs;
+    updateProductResourceCopy.Variants = e.Variants;
+    this._superMarketplaceProductEditable = updateProductResourceCopy;
+    console.log(this._superMarketplaceProductEditable)
+    this.checkForChanges();
+  }
+
   validateVariants(e): void {
     this.variantsValid = e;
   }
