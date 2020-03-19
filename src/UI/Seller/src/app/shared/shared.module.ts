@@ -42,7 +42,6 @@ import { DragDirective } from './directives/dragDrop.directive';
 import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
 import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { UserPermissionsAssignments } from './components/user-permissions-assignments/user-permissions-assignments.component';
-import { PluralPipe } from './pipes/plural.pipe';
 
 @NgModule({
   imports: [
@@ -101,7 +100,6 @@ import { PluralPipe } from './pipes/plural.pipe';
     PhoneFormatPipe,
     ConfirmModal,
     // Pipes
-    PluralPipe,
     UserPermissionsAssignments,
   ],
   declarations: [
@@ -127,7 +125,6 @@ import { PluralPipe } from './pipes/plural.pipe';
     DragDirective,
     ConfirmModal,
     // Pipes
-    PluralPipe,
     PhoneFormatPipe,
     UserPermissionsAssignments,
   ],
