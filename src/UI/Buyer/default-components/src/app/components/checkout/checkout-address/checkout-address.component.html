@@ -3,6 +3,21 @@
           class="btn btn-secondary mb-3 ml-2"
           (click)="useShippingAsBilling()">Use Shipping Address</button>
   <div class="form-group">
+    <div *ngIf="addressType === 'Shipping'">
+      <label for="selectBuyerLocation">Buyer Location</label>
+      <select (change)="toggleShowBuyerLocationForm($event)"
+            class="form-control"
+            id="selectBuyerLocation">
+        <option default
+                disabled>Select your buyer location to determine tax</option>
+        <option *ngFor="let location of existingBuyerLocations?.Items"
+                [value]="location.ID"
+                [selected]="existingBuyerLocations?.Items.length === 1">
+           <span class="font-weight-bold">{{location.Street1}}<span *ngIf="location.Street2"> {{location.Street2}}</span>,
+                {{location.City}} {{location.State}} {{location.Zip}}</span>
+      </select>
+      <br/>
+    </div>
     <label for="selectAddress">{{addressType}} Address</label>
     <select (change)="toggleShowAddressForm($event)"
             class="form-control"
@@ -10,6 +25,8 @@
       <option default
               disabled>Choose from your saved addresses, or choose to enter a new address</option>
       <option *ngFor="let address of existingAddresses?.Items"
+              [selected]="(existingBuyerLocations?.Items.length === 1 && existingBuyerLocations?.Items[0].ID === address.ID) 
+                         || address.ID === selectedBuyerLocation.ID"
               [value]="address.ID">
         <span class="font-weight-bold">{{address.Street1}}<span *ngIf="address.Street2"> {{address.Street2}}</span>,
           {{address.City}} {{address.State}} {{address.Zip}}</span>
@@ -17,7 +34,7 @@
       <option value="new">Add a New Address</option>
     </select>
     <button type="submit"
-            (click)="saveAddress(selectedAddress)"
+            (click)="saveAddress(selectedBuyerLocation, selectedAddress)"
             class="btn btn-primary btn-sm mr-2 mt-3">Save and Continue</button>
   </div>
   <ocm-address-form *ngIf="showAddAddressForm"

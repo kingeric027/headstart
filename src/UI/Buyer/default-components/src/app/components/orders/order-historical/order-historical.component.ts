@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { OrderDetails, MarketplaceOrder, OrderType } from 'marketplace';
-import { OrderApproval, ListLineItem, Promotion, ListPayment } from '@ordercloud/angular-sdk';
+import { OrderDetails, MarketplaceOrder, ShopperContextService, OrderType } from 'marketplace';
+import { OrderApproval, ListLineItem, Promotion, ListPayment, BuyerAddress } from '@ordercloud/angular-sdk';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 
 @Component({
@@ -14,12 +14,20 @@ export class OCMOrderHistorical {
   payments: ListPayment;
   approvals: OrderApproval[] = [];
   isQuoteOrder = isQuoteOrder;
+  buyerLocation: BuyerAddress;
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.order;
     this.lineItems = value.lineItems;
     this.promotions = value.promotions.Items;
     this.payments = value.payments;
     this.approvals = value.approvals;
+    this.getBuyerLocation();
   }
 
+  constructor(private context: ShopperContextService) { }
+
+  async getBuyerLocation(): Promise<void> {
+    const buyerLocation = await this.context.currentUser.addresses.listBuyerLocations({filters: {ID: this.order.xp.BuyerLocationID} });
+    this.buyerLocation = buyerLocation.Items[0];
+  }
 }
