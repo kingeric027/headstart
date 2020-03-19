@@ -9,7 +9,8 @@
            aria-current="page">{{order.ID}}</a>
       </nav>
       <div class="pb-2 mt-4 mb-2">
-        <h2> <span class="text-muted">Order #:</span> {{order.ID}} <span class="badge badge-pill badge-primary ml-2">{{order.xp.OrderType}}</span></h2>
+        <h2> <span class="text-muted">Order #:</span> {{order.ID}} <span *ngIf="order.xp.OrderType === 'Quote'"
+                class="badge badge-pill badge-primary ml-2">{{order.xp.OrderType}}</span></h2>
       </div>
       <div class="row">
         <div class="col-md-6">

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MarketplaceOrder, AppConfig } from '../../shopper-context';
+import { MarketplaceOrder, AppConfig, OrderType } from '../../shopper-context';
 import { BehaviorSubject } from 'rxjs';
 import { ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
@@ -17,14 +17,14 @@ export class OrderStateService {
     xp: {
       BuyerLocationID: '',
       AvalaraTaxTransactionCode: '',
-      OrderType: null,
+      OrderType: OrderType.Standard,
       QuoteOrderInfo: {
-        FirstName: null,
-        LastName: null,
-        Phone: null,
-        Email: null,
-        Comments: null,
-      }
+        FirstName: '',
+        LastName: '',
+        Phone: '',
+        Email: '',
+        Comments: '',
+      },
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
@@ -36,7 +36,7 @@ export class OrderStateService {
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
     private appConfig: AppConfig
-  ) { }
+  ) {}
 
   get order(): MarketplaceOrder {
     return this.orderSubject.value;
