@@ -169,7 +169,8 @@ export class ProductVariations {
   }
 
   generateVariantsFromCurrentSpecs(): Variant[] {
-    const specsDefiningVariants = this.specsWithVariations;
+    let specsDefiningVariants = this.specsWithVariations;
+    specsDefiningVariants = specsDefiningVariants.sort((a, b) => a.ListOrder - b.ListOrder);
     const firstSpec = specsDefiningVariants[0];
     let variants = this.createVariantsForFirstSpec(firstSpec);
     for (var i = 1; i < specsDefiningVariants.length; i++) {
