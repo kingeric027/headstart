@@ -44,7 +44,7 @@ export interface ShippingRate {
   TotalCost: number;
 }
 
-export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
+export interface MarketplaceOrder extends Order<OrderXp, any, any> { }
 export interface OrderXp {
   BuyerLocationID: string;
   AvalaraTaxTransactionCode: string;

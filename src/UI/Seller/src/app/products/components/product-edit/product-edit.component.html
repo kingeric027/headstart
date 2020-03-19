@@ -311,7 +311,7 @@
               </ng-template>
             </div>
           </div>
-          <div *ngFor="let image of files; let i = index"
+          <div *ngFor="let image of imageFiles; let i = index"
                class="product-img-wrapper mr-2">
             <img class="product-img"
                  [id]="i"
@@ -322,26 +322,109 @@
               <button title="Un-stage photo"
                       class="btn btn-light btn-group-item"
                       data-ui="action-btn"
-                      data-action="unstage"
-                      (click)="unStage(i)">
+                      data-action="unstageFile"
+                      (click)="unstageFile(i, 'image')">
                 <fa-icon [icon]="faTimes"></fa-icon>
               </button>
             </div>
           </div>
           <label class="rmpm dropzone"
-                 for="upload"
+                 for="imageUpload"
                  appDrag
-                 (files)="stageFiles($event)">
+                 (files)="stageImages($event)">
           </label>
           <input class="d-none"
-                 id="upload"
+                 id="imageUpload"
                  type="file"
-                 (change)="manualFileUpload($event)"
+                 (change)="manualFileUpload($event, 'image')"
                  multiple>
         </div>
       </div>
     </div>
-    <!-- /Product Images -->
+    <!-- Product Documents -->
+    <div class="row pt-3 mt-5 border-top">
+      <div class="col-md-5">
+        <h5>Product Documents</h5>
+        <p class="font-italic">Name and upload your product documents to display and dowload on the buyer site.</p>
+      </div>
+      <div class="col-md-7">
+        <!--droped doc preview-->
+        <div class="d-flex justify-content-start align-items-center flex-wrap">
+          <div class="input-group mb-3">
+            <input type="text"
+                   required
+                   class="form-control"
+                   placeholder="Document Name"
+                   aria-label="Document Name"
+                   (keyup)="getDocumentName($event)"
+                   aria-describedby="document name">
+            <div class="input-group-append">
+              <label class="btn btn-outline-primary"
+                     for="documentUpload"
+                     (files)="stageDocuments($events)">
+                choose file
+                <input id="documentUpload"
+                       class="d-none"
+                       type="file"
+                       (change)="manualFileUpload($event, 'staticContent')">
+              </label>
+            </div>
+          </div>
+          <div *ngFor="let file of staticContentFiles; let i = index"
+               class="product-img-wrapper mr-2">
+            <a class="text-link">{{file.fileName}}</a>
+            <div class="float-right float-middle">
+              <button title="Un-stage file"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="unstageFile"
+                      (click)="unstageFile(i, 'staticContent')">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            </div>
+          </div>
+          <table class="table table-sm bg-light"
+                 *ngIf="staticContent.length > 0">
+            <thead>
+              <tr>
+                <th>Documents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let file of staticContent">
+                <td>{{file.Title}}</td>
+                <td><a href="{{getDocumentUrl(file.URL)}}"
+                     download>download</a></td>
+                <td>
+                  <button title="Delete file"
+                          class="btn btn-light btn-group-item"
+                          data-ui="action-btn"
+                          data-action="delete"
+                          type="button"
+                          (click)="open(content)">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                  </button></td>
+                <ng-template #content
+                             let-modal
+                             class="confirm-modal">
+                  <confirm-modal modalTitle="Delete Document?"
+                                 description="Deleting this document cannot be reversed.">
+                    <button type="button"
+                            class="btn btn-link text-dark"
+                            (click)="modal.dismiss()">Cancel</button>
+                    <button type="button"
+                            class="btn brand-button--danger"
+                            (click)="removeDocument(file.Title)"
+                            (click)="modal.dismiss()">Yes, Delete</button>
+                  </confirm-modal>
+                </ng-template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- /Product Documents -->
   </form>
   <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
   <div *ngIf="userContext?.UserType === 'SUPPLIER'"

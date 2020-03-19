@@ -4,6 +4,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 export interface FileHandle {
   File: File;
   URL: SafeUrl;
+  fileName?: string;
 }
 
 @Directive({
@@ -18,7 +19,7 @@ export class DragDirective {
   @HostBinding('style.opacity')
   private opacity = '1';
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private sanitizer: DomSanitizer) { }
 
   // Dragover listener
   @HostListener('dragover', ['$event'])
