@@ -84,12 +84,13 @@ export class OCMCheckoutAddress implements OnInit {
     this.saveAddress(this.selectedBuyerLocation, this.selectedAddress, false, false);
   }
 
+  //TODO - Refactor this function
   async saveAddress(buyerLocation: Address, address: Address, formDirty: boolean, shouldSaveAddress: boolean): Promise<void> {
-    // TODO: make bellow line better
     try {
       if (buyerLocation.ID) {
         this.order = await this.setBuyerLocation(buyerLocation.ID);
       }
+      // TODO: make below line better
       const setOneTimeAddress =
         this.isAnon ||
         formDirty ||
