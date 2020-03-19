@@ -99,6 +99,7 @@ import { UserPermissionsAssignments } from './components/user-permissions-assign
     DeleteConfirmModal,
     PhoneFormatPipe,
     ConfirmModal,
+    // Pipes
     UserPermissionsAssignments,
   ],
   declarations: [
@@ -123,6 +124,7 @@ import { UserPermissionsAssignments } from './components/user-permissions-assign
     FormControlErrorDirective,
     DragDirective,
     ConfirmModal,
+    // Pipes
     PhoneFormatPipe,
     UserPermissionsAssignments,
   ],

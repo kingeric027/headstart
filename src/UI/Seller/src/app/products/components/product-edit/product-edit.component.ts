@@ -15,12 +15,12 @@ import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCog, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecXp, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { ProductStaticContent } from 'marketplace-javascript-sdk/dist/models/ProductStaticContent';
@@ -50,13 +50,11 @@ export class ProductEditComponent implements OnInit {
   @Input()
   isCreatingNew: boolean;
   @Input()
-  dataIsSaving = false;
-
+  dataIsSaving = false;  
   userContext = {};
   hasVariations = false;
   images: ProductImage[] = [];
   files: FileHandle[] = [];
-  faTrash = faTrash;
   faTimes = faTimes;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
@@ -64,6 +62,9 @@ export class ProductEditComponent implements OnInit {
   taxCodeCategorySelected = false;
   taxCodes: ListPage<TaxCodes>;
   productType: string;
+  productVariations: any;
+  variantsValid = true;
+  editSpecs: boolean = false;
   fileType: string;
   imageFiles: FileHandle[] = [];
   staticContentFiles: FileHandle[] = [];
@@ -388,11 +389,34 @@ export class ProductEditComponent implements OnInit {
   };
 
   private async handleSelectedProductChange(product: Product): Promise<void> {
-    const marketPlaceProduct = await MarketplaceSDK.Products.Get(product.ID);
-    this.refreshProductData(marketPlaceProduct);
+    const marketplaceProduct = await MarketplaceSDK.Products.Get(product.ID);
+    this.refreshProductData(marketplaceProduct);
   }
 
   private async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
     return await MarketplaceSDK.TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
+  }
+
+  getTotalMarkup = (specOptions: SpecOption[]): number => {
+    let totalMarkup = 0;
+    if (specOptions) {
+      specOptions.forEach(opt => opt.PriceMarkup ? totalMarkup = +totalMarkup + +opt.PriceMarkup : 0);
+    }
+    return totalMarkup;
+  }
+  
+  updateEditableProductWithVariationChanges(e): void {
+    const updateProductResourceCopy = this.productService.copyResource(
+      this._superMarketplaceProductEditable || this.productService.emptyResource
+    );
+    updateProductResourceCopy.Specs = e.Specs;
+    updateProductResourceCopy.Variants = e.Variants;
+    this._superMarketplaceProductEditable = updateProductResourceCopy;
+    console.log(this._superMarketplaceProductEditable)
+    this.checkForChanges();
+  }
+
+  validateVariants(e): void {
+    this.variantsValid = e;
   }
 }

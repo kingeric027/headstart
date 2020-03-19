@@ -60,7 +60,7 @@
         <div class="form-group">
           <label for="Description">Description</label>
           <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
-                                           [formControlForText]="productForm?.controls.Description"
+                                           [formControlForText]="productForm?.controls?.Description"
                                            resourceField="Description"
                                            pathOnResource="Description"
                                            (resourceUpdated)="updateResourceFromFieldValue($event.field, $event.value)">
@@ -73,7 +73,7 @@
                  id="Note"
                  showErrors
                  aria-describedby="Note"
-                 maxlength="140"
+                 maxlength="240"
                  [resourceForm]="productForm"
                  formControlName="Note"
                  (input)="handleUpdateProduct($event, 'Product.xp.Note')"
@@ -155,44 +155,16 @@
       </div>
     </div>
     <!-- /Product Details -->
-
-    <!-- Product Variations TODO: NOT MVP -->
-    <!-- <div class="
-                  row
-                  pt-3
-                  mt-5
-                  border-top">
-            <div class="col-md-5">
-              <h5>Product Variations</h5>
-              <p class="font-italic">Does your product come in different varieties? Add them here.</p>
-            </div>
-            <div class="col-md-7">
-              <button *ngIf="!hasVariations"
-                      class="btn btn-outline-dark"
-                      (click)="hasVariations = true">Add Variations</button>
-              <div *ngIf="hasVariations"
-                   class="variation-form-container">
-                <div class="form-group">
-                  <label for="VariationType">Add a variation</label>
-                  <select type="dropdown"
-                          class="form-control"
-                          id="VariationType"
-                          aria-describedby="Variation type"
-                          placeholder="Choose variation type">
-                    <option default
-                            disabled>Choose a variation type</option>
-                    <option>Color</option>
-                    <option>Size</option>
-                    <option>Height</option>
-                  </select>
-                </div>
-                <button class="btn btn-link text-danger"
-                        (click)="hasVariations = false">Cancel variations</button>
-              </div>
-            </div>
-        </div> -->
+    <!-- Product Variations -->
+    <product-variations-component [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
+                                  [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
+                                  [areChanges]="areChanges"
+                                  [checkForChanges]="checkForChanges"
+                                  [copyProductResource]="copyProductResource"
+                                  (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
+                                  (variantsValidated)="validateVariants($event)">
+    </product-variations-component>
     <!-- /Product Variations -->
-
     <!-- Shipping Information -->
     <div class="row pt-3 mt-5 border-top">
       <div class="col-md-5">
@@ -426,6 +398,7 @@
     </div>
     <!-- /Product Documents -->
   </form>
+
   <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
   <div *ngIf="userContext?.UserType === 'SUPPLIER'"
        class="d-flex justify-content-between align-items-center py-2">
@@ -433,15 +406,19 @@
                                     buttonText="Delete Product"
                                     (deleteConfirmed)="handleDelete($event)">
     </delete-confirm-modal-component>
-    <div>
-      <button *ngIf="areChanges"
-              class="btn btn-primary"
-              type="submit"
-              [disabled]="productForm?.status === 'INVALID' || dataIsSaving"
-              (click)="handleSave()">{{getSaveBtnText()}}</button>
-      <button class="btn brand-button ml-3"
-              (click)="handleDiscardChanges()"
-              *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+    <div class="d-flex flex-column justify-content-end">
+      <p *ngIf="!variantsValid"
+         class="text-danger">There are problems with the product variations.</p>
+      <div>
+        <button *ngIf="areChanges"
+                class="btn btn-primary"
+                type="submit"
+                [disabled]="productForm?.status === 'INVALID' || !variantsValid || dataIsSaving"
+                (click)="handleSave()">{{getSaveBtnText()}}</button>
+        <button class="btn brand-button ml-3"
+                (click)="handleDiscardChanges()"
+                *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+      </div>
     </div>
   </div>
 </div>
