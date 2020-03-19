@@ -23,7 +23,7 @@ import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
 import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecXp, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
-import { ProductStaticContent } from 'marketplace-javascript-sdk/dist/models/ProductStaticContent';
+import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
 
 @Component({
   selector: 'app-product-edit',
@@ -64,11 +64,11 @@ export class ProductEditComponent implements OnInit {
   productType: string;
   productVariations: any;
   variantsValid = true;
-  editSpecs: boolean = false;
+  editSpecs = false;
   fileType: string;
   imageFiles: FileHandle[] = [];
   staticContentFiles: FileHandle[] = [];
-  staticContent: ProductStaticContent[] = [];
+  staticContent: StaticContent[] = [];
   documentName: string;
 
   constructor(
@@ -193,9 +193,9 @@ export class ProductEditComponent implements OnInit {
       const superProduct = await this.updateMarketplaceProduct(this._superMarketplaceProductEditable);
       this._superMarketplaceProductStatic = superProduct;
       this._superMarketplaceProductEditable = superProduct;
-      if (this.imageFiles) this.addFiles(this.imageFiles, superProduct.Product.ID, "image");
+      if (this.imageFiles) this.addFiles(this.imageFiles, superProduct.Product.ID, 'image');
       if (this.staticContentFiles) {
-        this.addFiles(this.staticContentFiles, superProduct.Product.ID, "staticContent");
+        this.addFiles(this.staticContentFiles, superProduct.Product.ID, 'staticContent');
       }
       this.dataIsSaving = false;
     } catch (ex) {
@@ -247,13 +247,13 @@ export class ProductEditComponent implements OnInit {
    * ******************************************/
 
   manualFileUpload(event, fileType: string): void {
-    if (fileType === "image") {
+    if (fileType === 'image') {
       const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
         const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
         return { File: file, URL };
       });
       this.stageFiles(files, fileType);
-    } else if (fileType === "staticContent") {
+    } else if (fileType === 'staticContent') {
       const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
         const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
         return { File: file, URL, fileName: this.documentName };
@@ -263,7 +263,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   stageFiles(files: FileHandle[], fileType: string) {
-    fileType === " image" ?
+    fileType === ' image' ?
       this.imageFiles = this.imageFiles.concat(files) :
       this.staticContentFiles = this.staticContentFiles.concat(files);
     this.checkForChanges();
@@ -271,7 +271,7 @@ export class ProductEditComponent implements OnInit {
 
   async addFiles(files: FileHandle[], productID: string, fileType?: string) {
     let superProduct;
-    if (fileType === "image") {
+    if (fileType === 'image') {
       for (const file of files) {
         superProduct = await this.middleware.uploadProductImage(file.File, productID);
       }
@@ -280,7 +280,7 @@ export class ProductEditComponent implements OnInit {
         superProduct = await this.middleware.uploadStaticContent(file.File, productID, file.fileName);
       });
     }
-    fileType === "image" ?
+    fileType === 'image' ?
       this.imageFiles = [] :
       this.staticContentFiles = [];
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -289,12 +289,12 @@ export class ProductEditComponent implements OnInit {
   }
 
   async removeFile(fileDetail: string, fileType: string) {
-    //fileDetail for an image is the image URL. For static content, it is the file
+    // fileDetail for an image is the image URL. For static content, it is the file
     const prodID = this._superMarketplaceProductStatic.Product.ID;
     let superProduct;
-    if (fileType === "image") {
+    if (fileType === 'image') {
       const imageName = fileDetail.split('/').slice(-1)[0];
-      superProduct = await MarketplaceSDK.Files.Delete(this.appConfig.marketplaceID, prodID, imageName);
+      superProduct = await MarketplaceSDK.ContentManagements.DeleteImage(this.appConfig.marketplaceID, prodID, imageName);
     } else {
       superProduct = await this.middleware.deleteStaticContent(fileDetail, prodID);
     }
@@ -303,7 +303,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   unstageFile(index: number, fileType: string) {
-    fileType === "image" ?
+    fileType === 'image' ?
       this.imageFiles.splice(index, 1) : this.staticContentFiles.splice(index, 1);
     this.checkForChanges();
   }
@@ -314,9 +314,9 @@ export class ProductEditComponent implements OnInit {
 
   /* This url points to the document in blob storage in order for it to be downloadable. */
   getDocumentUrl(url: string) {
-    let spliturl = url.split('/')
+    const spliturl = url.split('/')
     spliturl.splice(4, 1);
-    let str = spliturl.join('/')
+    const str = spliturl.join('/')
     return str;
   }
 
