@@ -54,7 +54,7 @@ export class ProductService extends ResourceCrudService<Product> {
       Name: '',
       ApplyTax: false,
       ApplyShipping: false,
-      MinQuantity: null,
+      MinQuantity: 1,
       MaxQuantity: null,
       UseCumulativeQuantity: false,
       RestrictedQuantity: false,
