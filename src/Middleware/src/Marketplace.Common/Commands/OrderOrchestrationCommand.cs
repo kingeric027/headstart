@@ -141,23 +141,23 @@ namespace Marketplace.Common.Commands
 
         private async Task CreateShipmentInOrderCloudIfNeeded(ShipmentDetails freightPopShipment, MarketplaceOrder relatedOrder, string supplierToken)
         {
-            var orderCloudShipments = await _oc.Shipments.ListAsync(orderID: relatedOrder.ID, supplierToken);
+            var orderCloudShipments = await _oc.Shipments.ListAsync(orderID: relatedOrder.ID, accessToken: supplierToken);
             var buyerIDForOrder = await GetBuyerIDForSupplierOrder(relatedOrder);
 
             // needs to be more complex in the future, logic pending discussion around split of orders by supplierid
             if (!orderCloudShipments.Items.Any(o => o.ID == freightPopShipment.ShipmentId))
             {
-                await AddShipmentToOrderCloud(freightPopShipment, relatedOrder, buyerIDForOrder);
+                await AddShipmentToOrderCloud(freightPopShipment, relatedOrder, buyerIDForOrder, supplierToken);
             }
         }
         
-        private async Task AddShipmentToOrderCloud(ShipmentDetails freightPopShipment, MarketplaceOrder relatedOrder, string buyerID)
+        private async Task AddShipmentToOrderCloud(ShipmentDetails freightPopShipment, MarketplaceOrder relatedOrder, string buyerID, string supplierToken)
         {
-            var ocShipment = await _oc.Shipments.CreateAsync(OCShipmentMapper.Map(freightPopShipment, buyerID));
+            var ocShipment = await _oc.Shipments.CreateAsync(OCShipmentMapper.Map(freightPopShipment, buyerID), accessToken: supplierToken);
             foreach (var freightPopShipmentItem in freightPopShipment.Items)
             {
                 // currently this creates two items in ordercloud inadvertantely, platform bug is being resolved
-                await _oc.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, relatedOrder.ID));
+                await _oc.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, relatedOrder.ID), accessToken: supplierToken);
             }
         }
         private async Task<string> GetBuyerIDForSupplierOrder(MarketplaceOrder relatedOrder)
