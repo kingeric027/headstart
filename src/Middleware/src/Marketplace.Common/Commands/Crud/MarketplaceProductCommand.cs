@@ -37,7 +37,7 @@ namespace Marketplace.Common.Commands.Crud
             var _product =  await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
             var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.DefaultPriceScheduleID, user.AccessToken);
             var _specs = await _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
-            var _variants = await _oc.Products.ListVariantsAsync<Variant<MarketplaceVariantXp>>(id, null, null, null, 1, 100, null, user.AccessToken);
+            var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
         
             return new SuperMarketplaceProduct
             {
@@ -56,7 +56,7 @@ namespace Marketplace.Common.Commands.Crud
             {
                 var priceSchedule = await _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
                 var _specs = await _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, user.AccessToken);
-                var _variants = await _oc.Products.ListVariantsAsync<Variant<MarketplaceVariantXp>>(product.ID, null, null, null, 1, 100, null, user.AccessToken);
+                var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, user.AccessToken);
                 _superProductsList.Add(new SuperMarketplaceProduct
                 {
                     Product = product,
@@ -99,7 +99,7 @@ namespace Marketplace.Common.Commands.Crud
                 return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
             });
             // List Variants
-            var _variants = await _oc.Products.ListVariantsAsync<Variant<MarketplaceVariantXp>>(_product.ID, accessToken: user.AccessToken);
+            var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(_product.ID, accessToken: user.AccessToken);
             // List Product Specs
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(_product.ID, accessToken: user.AccessToken);
             // Return the SuperProduct
@@ -118,7 +118,7 @@ namespace Marketplace.Common.Commands.Crud
             IList<Spec> requestSpecs = superProduct.Specs.ToList();
             IList<Spec> existingSpecs = (await _oc.Products.ListSpecsAsync(id, accessToken: user.AccessToken)).Items.ToList();
             // Two variant lists to compare (requestVariants and existingVariants)
-            IList<Variant<MarketplaceVariantXp>> requestVariants = superProduct.Variants;
+            IList<MarketplaceVariant> requestVariants = superProduct.Variants;
             IList<Variant> existingVariants = (await _oc.Products.ListVariantsAsync(id, pageSize: 100, accessToken: user.AccessToken)).Items.ToList();
             // Calculate differences in specs - specs to add, and specs to delete
             var specsToAdd = requestSpecs.Where(s => !existingSpecs.Any(s2 => s2.ID == s.ID)).ToList();
@@ -167,7 +167,7 @@ namespace Marketplace.Common.Commands.Crud
             // Update the Product itself
             var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
             // List Variants
-            var _variants = await _oc.Products.ListVariantsAsync<Variant<MarketplaceVariantXp>>(id, pageSize: 100, accessToken: user.AccessToken);
+            var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: user.AccessToken);
             // List Product Specs
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
             return new SuperMarketplaceProduct

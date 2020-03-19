@@ -12,7 +12,7 @@ namespace Marketplace.Models
         public PriceSchedule PriceSchedule { get; set; }
         public string ID { get; set; }
         public IList<Spec> Specs { get; set; }
-        public IList<Variant<MarketplaceVariantXp>> Variants { get; set; }
+        public IList<MarketplaceVariant> Variants { get; set; }
     }
 
     public class PartialMarketplaceProduct : PartialProduct<ProductXp>
@@ -23,7 +23,9 @@ namespace Marketplace.Models
     {
     }
 
-    public class ProductXp
+	public class MarketplaceVariant : Variant<MarketplaceVariantXp { }
+
+	public class ProductXp
     {
         #region DO NOT DELETE
         public dynamic IntegrationData { get; set; }
