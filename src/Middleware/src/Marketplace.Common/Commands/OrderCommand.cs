@@ -16,7 +16,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IOrderCommand
     {
-        Task HandleBuyerOrderSubmit(Order order);
+        Task HandleBuyerOrderSubmit(MarketplaceOrder order);
     }
 
     public class OrderCommand : IOrderCommand
@@ -40,15 +40,15 @@ namespace Marketplace.Common.Commands
             _ocSandboxService = orderCloudSandboxService;
         }
 
-        public async Task HandleBuyerOrderSubmit(Order order)
+        public async Task HandleBuyerOrderSubmit(MarketplaceOrder order)
         {
             // forwarding
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
-            var supplierOrders = orderSplitResult.OutgoingOrders;
+            var supplierOrders = orderSplitResult.OutgoingOrders.ToList();
 
             // creating relationship between the buyer order and the supplier order
             // no relationship exists currently in the platform
-            var updatedSupplierOrders = await CreateOrderRelationships(order.ID, supplierOrders.ToList());
+            var updatedSupplierOrders = await CreateOrderRelationshipsAndTransferXP(order, supplierOrders);
             
             // quote orders do not need to flow into our integrations
             if (order.xp == null || order.xp.OrderType != OrderType.Quote)
@@ -65,11 +65,11 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        private async Task<List<Order>> CreateOrderRelationships(string buyerOrderID, List<Order> supplierOrders)
+        private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrder buyerOrder, List<Order> supplierOrders)
         {
-            var updatedSupplierOrders = new List<Order>();
+            var updatedSupplierOrders = new List<MarketplaceOrder>();
             var supplierIDs = new List<string>();
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrderID);
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrder.ID);
             var shipFromAddressIDs = GetShipFromAddressIDs(lineItems.Items.ToList());
 
             foreach (var supplierOrder in supplierOrders)
@@ -79,15 +79,16 @@ namespace Marketplace.Common.Commands
                 var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierID));
                 var supplierOrderPatch = new PartialOrder()
                 {
-                    ID = $"{buyerOrderID}-{supplierID}",
+                    ID = $"{buyerOrder.ID}-{supplierID}",
                     xp = new
                     {
                         ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
                         SupplierIDs = new List<string>() { supplierID },
-                        StopShipSync = false
+                        StopShipSync = false,
+                        buyerOrder.xp.OrderType
                     }
                 };
-                var updatedSupplierOrder = await _oc.Orders.PatchAsync(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
+                var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
 
@@ -99,7 +100,7 @@ namespace Marketplace.Common.Commands
                     SupplierIDs = supplierIDs
                 }
             };
-            await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrderID, buyerOrderPatch);
+            await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, buyerOrderPatch);
             return updatedSupplierOrders;
         }
 
@@ -125,7 +126,7 @@ namespace Marketplace.Common.Commands
             });
         }
 
-        private async Task ImportSupplierOrdersIntoFreightPop(IList<Order> supplierOrders)
+        private async Task ImportSupplierOrdersIntoFreightPop(IList<MarketplaceOrder> supplierOrders)
         {
             foreach(var supplierOrder in supplierOrders)
             {
@@ -133,7 +134,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        private async Task ImportSupplierOrderIntoFreightPop(Order supplierOrder)
+        private async Task ImportSupplierOrderIntoFreightPop(MarketplaceOrder supplierOrder)
         {
 
             var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, supplierOrder.ID);
