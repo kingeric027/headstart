@@ -116,6 +116,11 @@ export class OCMCheckout implements OnInit {
     this.sections.find(x => x.id === id).valid = value;
   }
 
+  async calculateAndToConfirm() {
+    await this.checkout.calculateOrder();
+    this.toSection('confirm');
+  }
+
   toSection(id: string): void {
     const prevIdx = Math.max(this.sections.findIndex(x => x.id === id) - 1, 0);
     const prev = this.sections[prevIdx].id;

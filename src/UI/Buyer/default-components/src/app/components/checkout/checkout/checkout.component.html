@@ -108,7 +108,7 @@
                 [isAnon]="isAnon"
                 [order]="order"
                 [lineItems]="lineItems"
-                (continue)="toSection('confirm')"
+                (continue)="calculateAndToConfirm()"
               ></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
