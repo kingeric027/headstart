@@ -21,13 +21,13 @@ export class OCMOrderHistorical {
     this.promotions = value.promotions.Items;
     this.payments = value.payments;
     this.approvals = value.approvals;
-    this.getBuyerLocation();
+    this.getBuyerLocation(this.order.xp.BuyerLocationID);
   }
 
   constructor(private context: ShopperContextService) { }
 
-  async getBuyerLocation(): Promise<void> {
-    const buyerLocation = await this.context.currentUser.addresses.listBuyerLocations({filters: {ID: this.order.xp.BuyerLocationID} });
-    this.buyerLocation = buyerLocation.Items[0];
+  async getBuyerLocation(addressID): Promise<void> {
+    const buyerLocation = await this.context.currentUser.addresses.get(addressID);
+    this.buyerLocation = buyerLocation;
   }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { OcMeService, BuyerAddress, ListBuyerAddress } from '@ordercloud/angular-sdk';
 
 export interface ICurrentUserAddress {
+    get(addressID: string): Promise<BuyerAddress>;
     list(args: ListArgs): Promise<ListBuyerAddress>;
     listShipping(args: ListArgs): Promise<ListBuyerAddress>;
     listBilling(args: ListArgs): Promise<ListBuyerAddress>;
@@ -16,6 +17,10 @@ export interface ICurrentUserAddress {
 export class CurrentUserAddressService implements ICurrentUserAddress  {
 
     constructor(private ocMeService: OcMeService) {}
+
+    async get(addressID: string): Promise<BuyerAddress> {
+        return this.ocMeService.GetAddress(addressID).toPromise();
+    }
 
     async list(args: ListArgs): Promise<ListBuyerAddress> {
         return this.ocMeService.ListAddresses(args).toPromise();

@@ -11,6 +11,7 @@ export interface MarketplaceOrderXp {
   AvalaraTaxTransactionCode: string;
   NeedsAttention: boolean;
   StopShipSync: boolean;
+  BuyerLocationID: string;
   OrderType: OrderType;
   QuoteOrderInfo: QuoteOrderInfo;
 }
