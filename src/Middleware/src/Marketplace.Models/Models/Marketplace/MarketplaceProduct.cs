@@ -23,7 +23,7 @@ namespace Marketplace.Models
     {
     }
 
-	public class MarketplaceVariant : Variant<MarketplaceVariantXp { }
+	public class MarketplaceVariant : Variant<MarketplaceVariantXp> { }
 
 	public class ProductXp
     {
