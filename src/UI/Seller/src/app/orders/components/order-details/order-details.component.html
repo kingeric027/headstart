@@ -2,7 +2,8 @@
 <div class="container float-left">
   <div *ngIf="_order">
     <div class="pb-2 mt-4 mb-2">
-      <h2> <span class="text-muted">Order #:</span> {{_order.ID}}<span class="badge badge-pill badge-primary ml-2">{{_order?.xp?.OrderType}}</span></h2>
+      <h2> <span class="text-muted">Order #:</span> {{_order.ID}}<span *ngIf="_order?.xp?.OrderType === 'Quote'"
+              class="badge badge-pill badge-primary ml-2">{{_order?.xp?.OrderType}}</span></h2>
     </div>
     <div class="row">
       <div class="col-md-6">

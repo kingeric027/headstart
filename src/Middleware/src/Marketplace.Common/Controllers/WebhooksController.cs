@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Models.Misc;
+using Marketplace.Common.Helpers;
 
 namespace Marketplace.Common.Controllers
 {
@@ -35,7 +36,7 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("ordersubmit")]
         [OrderCloudWebhookAuth]
-        public async void HandleOrderSubmit([FromBody] WebhookPayloads.Orders.Submit payload)
+        public async void HandleOrderSubmit([FromBody] MarketplaceOrderSubmitPayload payload)
         {
             await _orderCommand.HandleBuyerOrderSubmit(payload.Response.Body);
             await _sendgridService.SendSupplierEmails(payload.Response.Body.ID);

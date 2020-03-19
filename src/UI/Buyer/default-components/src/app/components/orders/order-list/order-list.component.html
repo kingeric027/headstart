@@ -56,7 +56,8 @@
             (click)="toOrderDetails(order.ID)"
             class="link text-primary">
           {{order.ID}}
-          <span class="badge badge-pill badge-secondary ml-2">{{order.xp.OrderType}}</span>
+          <span *ngIf="order.xp.OrderType === 'Quote'"
+                class="badge badge-pill badge-secondary ml-2">{{order.xp.OrderType}}</span>
         </td>
         <td *ngIf="columns.indexOf('Status') > -1">
           <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{order.Status}}
