@@ -15,8 +15,11 @@ export class BuyerService extends ResourceCrudService<Buyer> {
     super(router, activatedRoute, ocBuyerService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST);
   }
 
-  async createNewResource(resource: any): Promise<any> {
-    const newBuyer = await MarketplaceSDK.Buyers.Create(resource);
+  async createNewResource(buyer: Buyer): Promise<any> {
+    // Create Buyer with active set to false, checks will need to be performed to ensure that
+    // the buyer has everything it needs to be active first
+    buyer.Active = false;
+    const newBuyer = await MarketplaceSDK.Buyers.Create(buyer);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newBuyer];
     this.resourceSubject.next(this.resourceSubject.value);
     return newBuyer;
