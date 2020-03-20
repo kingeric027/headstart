@@ -55,12 +55,19 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload orderCalculatePayload)
         {
-            var totalTax = await _avatax.GetTaxEstimateAsync(orderCalculatePayload.OrderWorksheet);
-
-            return new OrderCalculateResponse
+            if(orderCalculatePayload.OrderWorksheet.Order.xp != null && orderCalculatePayload.OrderWorksheet.Order.xp.OrderType == Marketplace.Models.Extended.OrderType.Quote)
             {
-                TaxTotal = totalTax,
-            };
+                // quote orders do not have tax cost associated with them
+                return new OrderCalculateResponse();
+            } else
+            {
+                var totalTax = await _avatax.GetTaxEstimateAsync(orderCalculatePayload.OrderWorksheet);
+
+                return new OrderCalculateResponse
+                {
+                    TaxTotal = totalTax,
+                };
+            }
 
         }
 
