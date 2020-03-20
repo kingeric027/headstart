@@ -5,6 +5,7 @@ import { OrderStateService } from './order-state.service';
 import { CartService, ICart } from './cart.service';
 import { CheckoutService, ICheckout } from './checkout.service';
 import { OcLineItemService, OcOrderService, Order, LineItem } from '@ordercloud/angular-sdk';
+import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
 
 export interface ICurrentOrder {
   cart: ICart;
@@ -28,6 +29,7 @@ export class CurrentOrderService implements ICurrentOrder {
     private state: OrderStateService,
     private ocLineItemService: OcLineItemService,
     private ocOrderService: OcOrderService,
+    private ocSandboxService: OrderCloudSandboxService,
     private appConfig: AppConfig
   ) {}
 
@@ -38,6 +40,7 @@ export class CurrentOrderService implements ICurrentOrder {
     orderDetails.ID = `${this.appConfig.marketplaceID}{orderIncrementor}`;
     const quoteOrder = await this.ocOrderService.Create('Outgoing', orderDetails).toPromise();
     await this.ocLineItemService.Create('Outgoing', quoteOrder.ID, lineItem).toPromise();
+    await this.ocSandboxService.calculateOrder(quoteOrder.ID);
     const submittedQuoteOrder = await this.ocOrderService.Submit('Outgoing', quoteOrder.ID).toPromise();
     return submittedQuoteOrder;
   }
