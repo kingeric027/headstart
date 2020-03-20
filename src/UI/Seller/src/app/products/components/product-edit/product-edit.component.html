@@ -289,7 +289,7 @@
                           (click)="modal.dismiss()">Cancel</button>
                   <button type="button"
                           class="btn brand-button--danger"
-                          (click)="removeFile(image.URL)"
+                          (click)="removeFile(image.URL, 'image')"
                           (click)="modal.dismiss()">Yes, Delete</button>
                 </confirm-modal>
               </ng-template>
@@ -315,7 +315,7 @@
           <label class="rmpm dropzone"
                  for="imageUpload"
                  appDrag
-                 (files)="stageImages($event)">
+                 (files)="stageFiles($event)">
           </label>
           <input class="d-none"
                  id="imageUpload"
@@ -338,14 +338,16 @@
             <input type="text"
                    required
                    class="form-control"
+                   value="{{documentName}}"
                    placeholder="Document Name"
                    aria-label="Document Name"
                    (keyup)="getDocumentName($event)"
                    aria-describedby="document name">
             <div class="input-group-append">
-              <label class="btn btn-outline-primary"
+              <label *ngIf="documentName?.length"
+                     class="btn btn-outline-primary"
                      for="documentUpload"
-                     (files)="stageDocuments($events)">
+                     (files)="stageFiles($event)">
                 choose file
                 <input id="documentUpload"
                        class="d-none"
@@ -378,7 +380,7 @@
               <tr *ngFor="let file of staticContent">
                 <td>{{file.Title}}</td>
                 <td><a href="{{getDocumentUrl(file.URL)}}"
-                     download>download</a></td>
+                     download="file.Title">download</a></td>
                 <td>
                   <button title="Delete file"
                           class="btn btn-light btn-group-item"
@@ -398,7 +400,7 @@
                             (click)="modal.dismiss()">Cancel</button>
                     <button type="button"
                             class="btn brand-button--danger"
-                            (click)="removeDocument(file.Title)"
+                            (click)="removeFile(file.Title, 'staticContent')"
                             (click)="modal.dismiss()">Yes, Delete</button>
                   </confirm-modal>
                 </ng-template>

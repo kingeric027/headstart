@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using OrderCloud.SDK;
 using System.Threading.Tasks;

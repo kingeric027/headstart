@@ -50,7 +50,7 @@ export class ProductEditComponent implements OnInit {
   @Input()
   isCreatingNew: boolean;
   @Input()
-  dataIsSaving = false;  
+  dataIsSaving = false;
   userContext = {};
   hasVariations = false;
   images: ProductImage[] = [];
@@ -249,20 +249,19 @@ export class ProductEditComponent implements OnInit {
         const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
         return { File: file, URL };
       });
-      this.stageFiles(files, fileType);
+      this.stageImages(files);
     } else if (fileType === 'staticContent') {
       const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
         const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
         return { File: file, URL, fileName: this.documentName };
       });
-      this.stageFiles(files, fileType);
+      this.documentName = null;
+      this.stageDocuments(files);
     }
   }
 
-  stageFiles(files: FileHandle[], fileType: string) {
-    fileType === ' image' ?
-      this.imageFiles = this.imageFiles.concat(files) :
-      this.staticContentFiles = this.staticContentFiles.concat(files);
+  stageImages(files: FileHandle[]) {
+    this.imageFiles = this.imageFiles.concat(files);
     this.checkForChanges();
   }
 
@@ -274,7 +273,10 @@ export class ProductEditComponent implements OnInit {
       }
     } else {
       this.staticContentFiles.forEach(async file => {
-        superProduct = await this.middleware.uploadStaticContent(file.File, productID, file.fileName);
+        const test = file.File.name.split('.');
+        const ext = test[1];
+        const filenameWithExt = file.fileName + ext;
+        superProduct = await this.middleware.uploadStaticContent(file.File, productID, filenameWithExt);
       });
     }
     fileType === 'image' ?
@@ -319,6 +321,18 @@ export class ProductEditComponent implements OnInit {
 
   getDocumentName(event: KeyboardEvent) {
     this.documentName = (event.target as HTMLInputElement).value;
+  }
+
+  stageDocuments(files: FileHandle[]) {
+    files.forEach(file => {
+      const test = file.File.name.split('.');
+      const ext = test[1];
+      const filenameWithExt = file.fileName + '.' + ext;
+      file.fileName = filenameWithExt;
+    });
+    this.staticContentFiles = this.staticContentFiles.concat(files);
+    console.log(this.staticContentFiles)
+    this.checkForChanges();
   }
 
   async open(content) {
@@ -401,7 +415,7 @@ export class ProductEditComponent implements OnInit {
     }
     return totalMarkup;
   }
-  
+
   updateEditableProductWithVariationChanges(e): void {
     const updateProductResourceCopy = this.productService.copyResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
