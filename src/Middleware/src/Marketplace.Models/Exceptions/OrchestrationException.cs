@@ -19,7 +19,16 @@ namespace Marketplace.Models.Exceptions
                 Data = data
             };
         }
-       
+
+        public OrchestrationException(OrchestrationErrorType type, string message)
+        {
+            Error = new OrchestrationError
+            {
+                Type = type,
+                Data = message
+            };
+        }
+
         public OrchestrationException(OrchestrationErrorType type, WorkItem wi, object data = null)
         {
             Error = new OrchestrationError()
@@ -72,6 +81,11 @@ namespace Marketplace.Models.Exceptions
         CreateGeneralError,
         UpdateGeneralError,
         PatchGeneralError,
-        GetGeneralError
+        GetGeneralError,
+        AuthenticateSupplierError,
+        GetOrdersNeedingShipmentError,
+        GetShipmentSyncOrders,
+        GetShipmentDetailsForShipmentSyncOrders,
+        CreateShipmentsInOrderCloudIfNeeded
     }
 }

@@ -87,9 +87,9 @@ namespace Marketplace.Models.Misc
     {
         Product, PriceSchedule, Spec, SpecOption, SpecProductAssignment, ProductFacet,
         Buyer, User, UserGroup, Address, CostCenter, UserGroupAssignment, AddressAssignment, 
-        CatalogAssignment, Catalog
+        CatalogAssignment, Catalog, Supplier, Order
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum Action { Ignore, Create, Update, Patch, Delete, Get }
+    public enum Action { Ignore, Create, Update, Patch, Delete, Get, SyncShipments }
 }

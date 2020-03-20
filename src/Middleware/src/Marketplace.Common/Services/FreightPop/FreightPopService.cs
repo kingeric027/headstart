@@ -15,19 +15,23 @@ namespace Marketplace.Common.Services.FreightPop
 
 	public class FreightPopService : IFreightPopService
 	{
-		private readonly AppSettings _appSettings;
+		private readonly string _username;
+		private readonly string _password;
+		private readonly string _freightPopBaseUrl;
 		private readonly IFlurlClient _flurl;
 		private string accessToken;
 		private DateTime tokenExpireDate;
-		public FreightPopService(AppSettings appSettings, IFlurlClient flurl)
+		public FreightPopService(AppSettings appSettings)
 		{
-			_flurl = flurl;
-			_appSettings = appSettings;
+			_flurl = new FlurlClient();
+			_username = appSettings.FreightPopSettings.Username;
+			_password = appSettings.FreightPopSettings.Password;
+			_freightPopBaseUrl = appSettings.FreightPopSettings.BaseUrl;
 		}
 
 		private IFlurlRequest MakeRequest(string resource)
 		{
-			return _flurl.Request($"{_appSettings.FreightPopSettings.BaseUrl}/{resource}")
+			return _flurl.Request($"{_freightPopBaseUrl}/{resource}")
 				.WithHeader("Authorization", $"Bearer {accessToken}");
 		}
 		private async Task AuthenticateAync()
@@ -37,10 +41,10 @@ namespace Marketplace.Common.Services.FreightPop
 			{
 				var passwordGrantRequest = new PasswordGrantRequestData
 				{
-					Username = _appSettings.FreightPopSettings.Username,
-					Password = _appSettings.FreightPopSettings.Password
+					Username = _username,
+					Password = _password
 				};
-				var passwordGrantResponse = await _flurl.Request($"{_appSettings.FreightPopSettings.BaseUrl}/token/getToken").PostJsonAsync(passwordGrantRequest).ReceiveJson<Response<PasswordGrantResponseData>>();
+				var passwordGrantResponse = await _flurl.Request($"{_freightPopBaseUrl}/token/getToken").PostJsonAsync(passwordGrantRequest).ReceiveJson<Response<PasswordGrantResponseData>>();
 			
 				// freightpop tokens expire in 14 days but I don't know how to decode (not JWTs) so I am maintaining the expire date when the toke is grabbed
 				tokenExpireDate = DateTime.Now.AddDays(13);
