@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+<<<<<<< HEAD
 import { OrderService } from '@app-seller/orders/order.service';
 import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
@@ -7,6 +8,13 @@ import { groupBy as _groupBy } from 'lodash';
 import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { OrderService } from '@app-seller/orders/order.service';
 import { ProductImage } from 'marketplace-javascript-sdk';
+=======
+import { OrderService } from '@app-seller/orders/order.service';
+import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
+import { Address, LineItem, OcLineItemService, OcOrderService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
+import { groupBy as _groupBy } from 'lodash';
+>>>>>>> SEB-507
 
 @Component({
   selector: 'app-order-details',
@@ -29,11 +37,15 @@ export class OrderDetailsComponent {
       this.handleSelectedOrderChange(order);
     }
   }
+<<<<<<< HEAD
   constructor(
     private ocLineItemService: OcLineItemService,
     private ocPaymentService: OcPaymentService,
     private orderService: OrderService
   ) {}
+=======
+  constructor(private ocLineItemService: OcLineItemService, private ocPaymentService: OcPaymentService, private orderService: OrderService, private ocOrderService: OcOrderService) { }
+>>>>>>> SEB-507
 
   setCardType(payment) {
     if (!payment.xp.cardType || payment.xp.cardType === null) {
