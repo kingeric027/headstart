@@ -9,6 +9,7 @@ using Marketplace.Common;
 using OrderCloud.SDK;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Marketplace.Orchestration
 {
@@ -31,12 +32,17 @@ namespace Marketplace.Orchestration
         {
             // run every 10 minutes between 9am and 6pm CDT
             // determine if different schedule or order range is needed for production
+            logger.LogInformation("Starting function");
             try
             {
+                logger.LogInformation("Going to get suppliers");
                 var suppliersToSync = await _orderOrchestrationCommand.GetSuppliersNeedingSync();
+                logger.LogInformation($"Retrieved suppliers {suppliersToSync.Count()}");
                 foreach (var supplier in suppliersToSync)
                 {
+                    logger.LogInformation($"Starting supplier {supplier.ID}");
                     await client.StartNewAsync("ShipmentSyncOrchestration", input: supplier);
+                    logger.LogInformation($"Finished supplier {supplier.ID}");
                 }
             } catch (Exception ex)
             {
