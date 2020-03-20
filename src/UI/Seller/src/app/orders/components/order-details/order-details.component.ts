@@ -26,7 +26,11 @@ export class OrderDetailsComponent {
       this.handleSelectedOrderChange(order);
     }
   }
-  constructor(private ocLineItemService: OcLineItemService, private ocPaymentService: OcPaymentService, private orderService: OrderService, private ocOrderService: OcOrderService) { }
+  constructor(
+    private ocLineItemService: OcLineItemService,
+    private ocPaymentService: OcPaymentService,
+    private orderService: OrderService,
+  ) { }
 
 
   setCardType(payment) {
@@ -54,10 +58,6 @@ export class OrderDetailsComponent {
 
   isQuoteOrder(order: Order) {
     return this.orderService.isQuoteOrder(order);
-  }
-
-  async setOrderStatus() {
-    await this.ocOrderService.Complete(this.orderDirection, this._order.ID).toPromise().then(patchedOrder => this.handleSelectedOrderChange(patchedOrder))
   }
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {
