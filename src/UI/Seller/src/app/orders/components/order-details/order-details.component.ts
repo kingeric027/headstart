@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
-import { Order, LineItem, OcLineItemService, OcPaymentService, Payment, Address, OcOrderService } from '@ordercloud/angular-sdk';
-import { groupBy as _groupBy } from 'lodash';
-import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { OrderService } from '@app-seller/orders/order.service';
+import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { Address, LineItem, OcLineItemService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
+import { groupBy as _groupBy } from 'lodash';
 import { ProductImage } from 'marketplace-javascript-sdk';
 
 @Component({
@@ -19,7 +19,6 @@ export class OrderDetailsComponent {
   images: ProductImage[] = [];
   orderDirection: string;
   cardType: string;
-  relatedBuyerOrder: Order = {};
 
   @Input()
   set order(order: Order) {
