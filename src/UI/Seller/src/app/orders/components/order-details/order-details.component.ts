@@ -1,20 +1,9 @@
 import { Component, Input } from '@angular/core';
-<<<<<<< HEAD
-import { OrderService } from '@app-seller/orders/order.service';
-import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
-import { MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
-import { Address, LineItem, OcLineItemService, OcOrderService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
+import { Order, LineItem, OcLineItemService, OcPaymentService, Payment, Address, OcOrderService } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { OrderService } from '@app-seller/orders/order.service';
 import { ProductImage } from 'marketplace-javascript-sdk';
-=======
-import { OrderService } from '@app-seller/orders/order.service';
-import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
-import { MarketPlaceProductImage } from '@app-seller/shared/models/MarketPlaceProduct.interface';
-import { Address, LineItem, OcLineItemService, OcOrderService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
-import { groupBy as _groupBy } from 'lodash';
->>>>>>> SEB-507
 
 @Component({
   selector: 'app-order-details',
@@ -30,6 +19,7 @@ export class OrderDetailsComponent {
   images: ProductImage[] = [];
   orderDirection: string;
   cardType: string;
+  relatedBuyerOrder: Order = {};
 
   @Input()
   set order(order: Order) {
@@ -37,15 +27,11 @@ export class OrderDetailsComponent {
       this.handleSelectedOrderChange(order);
     }
   }
-<<<<<<< HEAD
   constructor(
     private ocLineItemService: OcLineItemService,
     private ocPaymentService: OcPaymentService,
-    private orderService: OrderService
-  ) {}
-=======
-  constructor(private ocLineItemService: OcLineItemService, private ocPaymentService: OcPaymentService, private orderService: OrderService, private ocOrderService: OcOrderService) { }
->>>>>>> SEB-507
+    private orderService: OrderService,
+  ) { }
 
   setCardType(payment) {
     if (!payment.xp.cardType || payment.xp.cardType === null) {
@@ -72,10 +58,6 @@ export class OrderDetailsComponent {
 
   isQuoteOrder(order: Order) {
     return this.orderService.isQuoteOrder(order);
-  }
-
-  async setOrderStatus() {
-    await this.ocOrderService.Complete(this.orderDirection, this._order.ID).toPromise().then(patchedOrder => this.handleSelectedOrderChange(patchedOrder))
   }
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {
