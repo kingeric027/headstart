@@ -20,7 +20,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecXp, SpecOption } from 'marketplace-javascript-sdk';
+import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
@@ -56,6 +56,7 @@ export class ProductEditComponent implements OnInit {
   images: ProductImage[] = [];
   files: FileHandle[] = [];
   faTimes = faTimes;
+  faTrash = faTrash;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
@@ -144,8 +145,7 @@ export class ProductEditComponent implements OnInit {
         MaxQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MaxQuantity, Validators.min(1)),
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
         ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType')),
-        // SpecCount: new FormControl(superMarketplaceProduct.SpecCount),
-        // VariantCount: new FormControl(superMarketplaceProduct.VariantCount),
+        IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
       }, { validators: ValidateMinMax }
@@ -213,12 +213,9 @@ export class ProductEditComponent implements OnInit {
   handleUpdateProduct(event: any, field: string, typeOfValue?: string) {
     const productUpdate = {
       field,
-      value:
-        field === 'Product.Active'
-          ? event.target.checked
-          : typeOfValue === 'number'
-            ? Number(event.target.value)
-            : event.target.value,
+      value: 
+      (field === 'Product.Active' || field === 'Product.xp.IsResale')
+       ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
   }
@@ -239,7 +236,7 @@ export class ProductEditComponent implements OnInit {
   checkForChanges(): void {
     this.areChanges =
       JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic) ||
-      this.imageFiles.length > 0 || this.staticContentFiles.length > 0;
+      this.imageFiles?.length > 0 || this.staticContentFiles?.length > 0;
   }
 
   /** ****************************************
@@ -412,11 +409,14 @@ export class ProductEditComponent implements OnInit {
     updateProductResourceCopy.Specs = e.Specs;
     updateProductResourceCopy.Variants = e.Variants;
     this._superMarketplaceProductEditable = updateProductResourceCopy;
-    console.log(this._superMarketplaceProductEditable)
     this.checkForChanges();
   }
 
   validateVariants(e): void {
     this.variantsValid = e;
+  }
+
+  shouldIsResaleBeChecked(): boolean {
+    return this._superMarketplaceProductEditable?.Product?.xp?.IsResale;
   }
 }
