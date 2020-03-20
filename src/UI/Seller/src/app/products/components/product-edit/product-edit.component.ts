@@ -20,7 +20,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecXp, SpecOption } from 'marketplace-javascript-sdk';
+import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
@@ -414,5 +414,9 @@ export class ProductEditComponent implements OnInit {
 
   validateVariants(e): void {
     this.variantsValid = e;
+  }
+
+  shouldIsResaleBeChecked(): boolean {
+    return this._superMarketplaceProductEditable?.Product?.xp?.IsResale;
   }
 }

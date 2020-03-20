@@ -141,6 +141,7 @@
             <label for="IsResale">Resale</label>
             <label class="check-container">This is a resale product
               <input type="checkbox"
+                     [checked]="shouldIsResaleBeChecked()"
                      (change)="handleUpdateProduct($event, 'Product.xp.IsResale')"
                      id="IsResale">
               <span class="checkmark"></span>
