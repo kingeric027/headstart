@@ -94,12 +94,13 @@ namespace Marketplace.Common.Services
 
 		public async Task<SuperMarketplaceProduct> UploadStaticContent(IFormFile file, string productID, string fileName, string token)
 		{
+			string filename_withExtension = fileName + file.ContentType;
 
 			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
 			if (product.xp?.StaticContent == null)
 				product.xp = new ProductXp { StaticContent = new List<StaticContent>() };
 			Require.That(product.xp.StaticContent.Count < 10, new ErrorCode("Exceeds document limit on product", 400, "A product can have up to 10 associated documents."));
-			await _staticContentContainer.Save(fileName, file);
+			await _staticContentContainer.Save(filename_withExtension, file);
 
 			product.xp?.StaticContent?.Add(new StaticContent()
 			{
