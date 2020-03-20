@@ -136,21 +136,32 @@
                                            (handleTaxCodesSearched)="searchTaxCodes($event)"
                                            (onScrollEnd)="handleScrollEnd($event)">
         </product-tax-code-select-component>
-        <div class="form-group">
-          <label for="ProductType">Product Type</label>
-          <select type="dropdown"
-                  class="form-control"
-                  id="ProductType"
-                  aria-describedby="Product type"
-                  placeholder="Choose product type"
-                  (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
-            <option [selected]="productType === undefined"
-                    disabled>Choose a product type</option>
-            <option [selected]="productType === 'Standard'"
-                    value="Standard">Standard</option>
-            <option [selected]="productType === 'Quote'"
-                    value="Quote">Quote</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="IsResale">Resale</label>
+            <label class="check-container">This is a resale product
+              <input type="checkbox"
+                     (change)="handleUpdateProduct($event, 'Product.xp.IsResale')"
+                     id="IsResale">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="ProductType">Product Type</label>
+            <select type="dropdown"
+                    class="form-control"
+                    id="ProductType"
+                    aria-describedby="Product type"
+                    placeholder="Choose product type"
+                    (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
+              <option [selected]="productType === undefined"
+                      disabled>Choose a product type</option>
+              <option [selected]="productType === 'Standard'"
+                      value="Standard">Standard</option>
+              <option [selected]="productType === 'Quote'"
+                      value="Quote">Quote</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -356,7 +367,7 @@
             </div>
           </div>
           <table class="table table-sm bg-light"
-                 *ngIf="staticContent.length > 0">
+                 *ngIf="staticContent?.length > 0">
             <thead>
               <tr>
                 <th>Documents</th>
