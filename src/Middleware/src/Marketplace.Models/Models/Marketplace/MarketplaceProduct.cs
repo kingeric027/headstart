@@ -42,6 +42,7 @@ namespace Marketplace.Models
         public UnitOfMeasure UnitOfMeasure { get; set; } = new UnitOfMeasure();
         public ProductType ProductType { get; set; }
         public List<StaticContent> StaticContent { get; set; } = new List<StaticContent>();
+        public bool IsResale { get; set; } = false;
     }
 
     public class MarketplaceVariantXp
