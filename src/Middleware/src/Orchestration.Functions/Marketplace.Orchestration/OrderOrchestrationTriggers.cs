@@ -8,6 +8,7 @@ using Marketplace.Common.Queries;
 using Marketplace.Common;
 using OrderCloud.SDK;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using System.Threading.Tasks;
 
 namespace Marketplace.Orchestration
 {
@@ -26,29 +27,16 @@ namespace Marketplace.Orchestration
         }
 
         [FunctionName("OrderShipmentTimeTrigger")]
-        public async void SyncOrders([TimerTrigger("0 */10 14-23 * * *")]TimerInfo myTimer, [OrchestrationClient]DurableOrchestrationClient client, ILogger logger)
+        public async Task SyncOrders([TimerTrigger("0 */1 14-23 * * *")]TimerInfo myTimer, [OrchestrationClient]DurableOrchestrationClient client, ILogger logger)
         {
-            // run every 30 minutes between 9am and 6pm CDT
+            // run every 10 minutes between 9am and 6pm CDT
             // determine if different schedule or order range is needed for production
             try
             {
                 var suppliersToSync = await _orderOrchestrationCommand.GetSuppliersNeedingSync();
                 foreach (var supplier in suppliersToSync)
                 {
-                    var supplierOrderCloudClient = new OrderCloudClient(new OrderCloudClientConfig
-                    {
-                        ApiUrl = _appSettings.OrderCloudSettings.ApiUrl,
-                        AuthUrl = _appSettings.OrderCloudSettings.AuthUrl,
-                        ClientId = supplier.xp.ApiClientID,
-                        ClientSecret = _appSettings.OrderCloudSettings.ClientSecret,
-                        Roles = new[]
-                            {
-                                 ApiRole.FullAccess
-                            }
-                    });
-                    await supplierOrderCloudClient.AuthenticateAsync();
-                    var supplierToken = supplierOrderCloudClient.TokenResponse.AccessToken;
-                    await client.StartNewAsync("ShipmentSyncOrchestration", supplierToken);
+                    await client.StartNewAsync("ShipmentSyncOrchestration", input: supplier);
                 }
             } catch (Exception ex)
             {
