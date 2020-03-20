@@ -255,6 +255,7 @@ export class ProductEditComponent implements OnInit {
         const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
         return { File: file, URL, fileName: this.documentName };
       });
+      this.documentName = null;
       this.stageDocuments(files);
     }
   }
