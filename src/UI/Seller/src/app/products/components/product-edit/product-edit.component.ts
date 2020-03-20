@@ -104,6 +104,7 @@ export class ProductEditComponent implements OnInit {
   async refreshProductData(superProduct: SuperMarketplaceProduct) {
     this._superMarketplaceProductStatic = superProduct;
     this._superMarketplaceProductEditable = superProduct;
+    if (!this._superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure) this._superMarketplaceProductEditable.Product.xp.UnitOfMeasure = { Unit: null, Qty: null };
     if (
       this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
     ) {
@@ -148,6 +149,8 @@ export class ProductEditComponent implements OnInit {
         IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
+        UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit')),
+        UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty')),
       }, { validators: ValidateMinMax }
       );
     }
