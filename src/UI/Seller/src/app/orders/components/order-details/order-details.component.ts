@@ -30,6 +30,7 @@ export class OrderDetailsComponent {
     private ocLineItemService: OcLineItemService,
     private ocPaymentService: OcPaymentService,
     private orderService: OrderService,
+    private ocOrderService: OcOrderService
   ) { }
 
 
@@ -54,6 +55,10 @@ export class OrderDetailsComponent {
   getIncomingOrOutgoing() {
     const url = window.location.href;
     url.includes('Outgoing') ? (this.orderDirection = 'Outgoing') : (this.orderDirection = 'Incoming');
+  }
+
+  async setOrderStatus() {
+    await this.ocOrderService.Complete(this.orderDirection, this._order.ID).toPromise().then(patchedOrder => this.handleSelectedOrderChange(patchedOrder))
   }
 
   isQuoteOrder(order: Order) {
