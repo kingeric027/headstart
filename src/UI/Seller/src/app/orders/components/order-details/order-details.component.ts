@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
-import { Order, LineItem, OcLineItemService, OcPaymentService, Payment, Address } from '@ordercloud/angular-sdk';
-import { groupBy as _groupBy } from 'lodash';
-import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { OrderService } from '@app-seller/orders/order.service';
+import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { Address, LineItem, OcLineItemService, OcOrderService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
+import { groupBy as _groupBy } from 'lodash';
 import { ProductImage } from 'marketplace-javascript-sdk';
 
 @Component({
@@ -29,8 +29,10 @@ export class OrderDetailsComponent {
   constructor(
     private ocLineItemService: OcLineItemService,
     private ocPaymentService: OcPaymentService,
-    private orderService: OrderService
-  ) {}
+    private orderService: OrderService,
+    private ocOrderService: OcOrderService
+  ) { }
+
 
   setCardType(payment) {
     if (!payment.xp.cardType || payment.xp.cardType === null) {
@@ -53,6 +55,10 @@ export class OrderDetailsComponent {
   getIncomingOrOutgoing() {
     const url = window.location.href;
     url.includes('Outgoing') ? (this.orderDirection = 'Outgoing') : (this.orderDirection = 'Incoming');
+  }
+
+  async setOrderStatus() {
+    await this.ocOrderService.Complete(this.orderDirection, this._order.ID).toPromise().then(patchedOrder => this.handleSelectedOrderChange(patchedOrder))
   }
 
   isQuoteOrder(order: Order) {
