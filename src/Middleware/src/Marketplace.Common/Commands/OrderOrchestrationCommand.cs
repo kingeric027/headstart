@@ -251,6 +251,7 @@ namespace Marketplace.Common.Commands
                 return _oc.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, relatedOrder.ID), accessToken: supplierToken);
             });
         }
+
         private async Task<string> GetBuyerIDForSupplierOrder(MarketplaceOrder relatedOrder)
         {
             var buyerOrderID = relatedOrder.ID.Split("-").First();
