@@ -45,9 +45,12 @@ export class ProductService extends ResourceCrudService<Product> {
           Code: null,
           Description: null,
         },
-        UnitOfMeasure: null,
+        UnitOfMeasure: {
+          Unit: null,
+          Qty: null,
+        },
         ProductType: null,
-        StaticContent: null
+        StaticContent: null,
       },
     },
     PriceSchedule: {

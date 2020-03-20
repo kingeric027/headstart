@@ -100,6 +100,31 @@
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
+            <label for="UnitOfMeasureQty">Quantity per Unit</label>
+            <input type="number"
+                   class="form-control"
+                   id="UnitOfMeasureQty"
+                   min="1"
+                   aria-describedby="Max Quantity"
+                   [resourceForm]="productForm"
+                   formControlName="UnitOfMeasureQty"
+                   (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Qty')"
+                   placeholder="How many of this item per unit?">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="UnitOfMeasureUnit">Unit of Measure</label>
+            <input type="text"
+                   class="form-control"
+                   id="UnitOfMeasureUnit"
+                   aria-describedby="Min Quantity"
+                   [resourceForm]="productForm"
+                   formControlName="UnitOfMeasureUnit"
+                   (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Unit')"
+                   placeholder="Measuring unit. (Ex: Per, Crate, etc..)">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
             <label for="MinQuantity">Min Quantity</label>
             <input type="number"
                    class="form-control"
