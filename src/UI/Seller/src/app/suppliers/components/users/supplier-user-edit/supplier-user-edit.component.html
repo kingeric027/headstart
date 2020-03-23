@@ -1,10 +1,11 @@
 <div class="container-fluid">
-  <user-permissions-assignments-component *ngIf="resourceInSelection && !isCreatingNew"
-                                          [isCreatingNew]="isCreatingNew"
-                                          [user]="resourceInSelection"
-                                          (assignmentsToAdd)="addUserGroupAssignments($event)"
-                                          [userPermissionsService]="supplierUserService">
-  </user-permissions-assignments-component>
+  <user-group-assignments *ngIf="resourceInSelection && !isCreatingNew"
+                          [isCreatingNew]="isCreatingNew"
+                          userGroupType="UserPermissions"
+                          [user]="resourceInSelection"
+                          (assignmentsToAdd)="addUserGroupAssignments($event)"
+                          [userPermissionsService]="supplierUserService">
+  </user-group-assignments>
   <form *ngIf="resourceForm"
         [formGroup]="resourceForm">
     <div class="row pt-3">
@@ -89,10 +90,11 @@
       </div>
     </div>
   </form>
-  <user-permissions-assignments-component *ngIf="resourceInSelection && isCreatingNew"
-                                          [isCreatingNew]="isCreatingNew"
-                                          [user]="resourceInSelection"
-                                          (assignmentsToAdd)="addUserGroupAssignments($event)"
-                                          [userPermissionsService]="supplierUserService">
-  </user-permissions-assignments-component>
+  <user-group-assignments *ngIf="resourceInSelection && isCreatingNew"
+                          [isCreatingNew]="isCreatingNew"
+                          userGroupType="UserPermissions"
+                          [user]="resourceInSelection"
+                          (assignmentsToAdd)="addUserGroupAssignments($event)"
+                          [userPermissionsService]="supplierUserService">
+  </user-group-assignments>
 </div>
