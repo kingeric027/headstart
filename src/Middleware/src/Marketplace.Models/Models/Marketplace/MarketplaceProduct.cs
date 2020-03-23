@@ -43,6 +43,7 @@ namespace Marketplace.Models
         public ProductType ProductType { get; set; }
         public List<StaticContent> StaticContent { get; set; } = new List<StaticContent>();
         public bool IsResale { get; set; } = false;
+        public List<ProductAccessorial> Accessorials { get; set; }
     }
 
     public class MarketplaceVariantXp
@@ -56,5 +57,12 @@ namespace Marketplace.Models
         public string SpecName { get; set; }
         public string SpecOptionValue { get; set; }
         public string PriceMarkup { get; set; }
+    }
+
+    public enum ProductAccessorial
+    {
+        Freezable = 6,
+        Hazmat = 7,
+        KeepFromFreezing = 8,
     }
 }

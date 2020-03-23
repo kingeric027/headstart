@@ -19,9 +19,9 @@ namespace Marketplace.Models
         public bool NeedsAttention { get; set; }
         public bool StopShipSync { get; set; }
         public string BuyerLocationID { get; set; }
-        public OrderType OrderType { get; set; }
-        // need to figure out how these required fields work on non quote orders
-        //public QuoteOrderInfo QuoteOrderInfo { get; set; }
+        public OrderType? OrderType { get; set; }
+        // these need to be reworked, quote order info is required currently on every order
+        // public QuoteOrderInfo QuoteOrderInfo { get; set; }
     }
 
     public class MarketplaceOrderSubmitPayload
