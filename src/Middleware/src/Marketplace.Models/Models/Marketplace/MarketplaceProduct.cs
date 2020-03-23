@@ -16,7 +16,7 @@ namespace Marketplace.Models
 
     public class PartialMarketplaceProduct : PartialProduct<ProductXp>
     {
-        public new ProductXp xp { get; set; } = new ProductXp();
+       public new ProductXp xp { get; set; } = new ProductXp();
     }
 
     public class MarketplaceProduct : Product<ProductXp>, IMarketplaceObject
@@ -45,4 +45,26 @@ namespace Marketplace.Models
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
     public class OrchestrationIgnoreAttribute : Attribute { }
+
+    public class TestObject : PartialProduct<TestObjectXp>
+    {
+        [MaxLength(500), OrchestrationIgnore]
+        public new string Name { get; set; }
+        public new TestObjectXp xp { get; set; } = new TestObjectXp();
+    }
+
+    public class TestObjectXp
+    {
+        [OrchestrationIgnore]
+        public string Ignored { get; set; }
+        public SubObject Sub { get; set; } = new SubObject();
+    }
+
+    public class SubObject
+    {
+        public string Key { get; set; }
+        [OrchestrationIgnore]
+        public string Value { get; set; }
+    }
+
 }

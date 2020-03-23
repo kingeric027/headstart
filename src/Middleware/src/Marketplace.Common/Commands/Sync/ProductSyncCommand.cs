@@ -17,38 +17,17 @@ using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
-    
-    //public class PartialConverter : JsonConverter
-    //{
-    //    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-    //    {
-    //        JObject.FromObject(((OrchestrationModel)value).Props, serializer).WriteTo(writer);
-    //    }
-
-    //    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) =>
-    //        throw new NotImplementedException();
-
-    //    public override bool CanConvert(Type type)
-    //    {
-    //        var t = typeof(OrchestrationModel).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()) &&
-    //            typeof(IPartial).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
-    //        return t;
-    //    }
-    //}
-
-    public class OrchestrationSerializer<T> : DefaultContractResolver
+    public class OrchestrationSerializer : DefaultContractResolver
     {
-        public static readonly OrchestrationSerializer<T> Instance = new OrchestrationSerializer<T>();
-
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
             if (member.GetCustomAttribute(typeof(OrchestrationIgnoreAttribute)) != null)
                 property.ShouldSerialize = o => false;
-            
             return property;
         }
     }
+
     public class ProductSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
@@ -122,10 +101,10 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialMarketplaceProduct>(JsonSerializer.Create(
+            var obj = wi.Diff.ToObject<PartialMarketplaceProduct>(JsonSerializer.Create(
                 new JsonSerializerSettings()
                 {
-                    ContractResolver = OrchestrationSerializer<PartialMarketplaceProduct>.Instance
+                    ContractResolver = new OrchestrationSerializer()
                 }));
             try
             {
