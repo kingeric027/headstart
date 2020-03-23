@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Extensions;
@@ -46,7 +47,17 @@ namespace Marketplace.Common.Services.Avalara
 
 		public async Task<decimal> GetTaxEstimateAsync(OrderWorksheet orderWorksheet)
 		{
-			var transaction = await CreateTransactionAsync(DocumentType.SalesOrder, orderWorksheet);
+			var transaction = new TransactionModel();
+			// temporary hide avalara bug to make checkout work
+			try
+			{
+				transaction = await CreateTransactionAsync(DocumentType.SalesOrder, orderWorksheet);
+			}
+			catch (Exception ex)
+			{
+
+				Console.WriteLine(ex.Message);
+			}
 			return transaction.totalTax ?? 0;
 		}
 
