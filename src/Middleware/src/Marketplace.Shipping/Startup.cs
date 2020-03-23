@@ -32,8 +32,9 @@ namespace Marketplace.Shipping
         }
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .ConfigureWebApiServices(_settings, "v1", "Marketplace API")
+			services
+				.ConfigureWebApiServices(_settings)
+				.ConfigureOpenApiSpec("v1", "Marketplace API")
                 .Inject<IFlurlClient>()
                 .Inject<IOCShippingIntegration>()
                 .Inject<IAvataxService>()
