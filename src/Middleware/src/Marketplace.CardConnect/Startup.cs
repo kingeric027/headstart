@@ -30,7 +30,8 @@ namespace Marketplace.CardConnect
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .ConfigureWebApiServices(_settings, "v1", "Marketplace API")
+                .ConfigureWebApiServices(_settings)
+				.ConfigureOpenApiSpec("v1", "Marketplace API")
                 .Inject<IFlurlClient>()
                 .Inject<ICardConnectService>()
                 .Inject<ICreditCardCommand>()

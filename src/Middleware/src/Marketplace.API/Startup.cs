@@ -42,7 +42,8 @@ namespace Marketplace.API
             var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
                 _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
             services
-                .ConfigureWebApiServices(_settings, "v1", "Marketplace API")
+                .ConfigureWebApiServices(_settings)
+				.ConfigureOpenApiSpec("v1", "Marketplace API")
                 .Inject<IAppSettings>()
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()

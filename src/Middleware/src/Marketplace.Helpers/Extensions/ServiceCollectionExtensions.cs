@@ -46,7 +46,7 @@ namespace Marketplace.Helpers.Extensions
             return services.AddCosmosStore<TModel>(settings);
         }
 
-        public static IServiceCollection ConfigureWebApiServices<T>(this IServiceCollection services, T settings, string version, string docsTitle) 
+        public static IServiceCollection ConfigureWebApiServices<T>(this IServiceCollection services, T settings) 
             where T : class
         {
             services.AddTransient<GlobalExceptionHandler>();
@@ -59,18 +59,22 @@ namespace Marketplace.Helpers.Extensions
                     o.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 });
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc(version, new Info { Title = docsTitle, Version = version });
-                c.CustomSchemaIds(x => x.FullName);
-            });
-
             services.AddCors(o => o.AddPolicy("marketplacecors",
                 builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); }));
             return services;
         }
 
-        public static IApplicationBuilder ConfigureWebApp(this IApplicationBuilder app, IHostingEnvironment env, string version)
+		public static IServiceCollection ConfigureOpenApiSpec(this IServiceCollection services, string version, string docsTitle)
+		{
+			services.AddSwaggerGen(c =>
+			{
+				c.SwaggerDoc(version, new Info { Title = docsTitle, Version = version });
+				c.CustomSchemaIds(x => x.FullName);
+			});
+			return services;
+		}
+
+		public static IApplicationBuilder ConfigureWebApp(this IApplicationBuilder app, IHostingEnvironment env, string version)
         {
             if (env.IsDevelopment())
             {
