@@ -1,16 +1,17 @@
 <!-- User Permissions -->
 <div class="row pt-3 mt-3 bg-white shadow-sm user-permissions-alert">
   <div class="col-md-5">
-    <h5>User Permissions</h5>
-    <p class="font-italic">Select which permissions to grant this user. </p>
+    <h5>{{displayText.Title}}</h5>
+    <p class="font-italic">{{displayText.InfoText}}</p>
   </div>
   <div class="col-md-7">
     <table class="table table-hover">
       <thead>
         <tr>
           <th scope="col">Assigned</th>
-          <th scope="col">Permission</th>
-          <th scope="col">Description</th>
+          <th scope="col">{{displayText.Column2}}</th>
+          <th scope="col"
+              *ngIf="userGroupType === 'UserPermissions'">Description</th>
         </tr>
       </thead>
       <tbody>
@@ -27,7 +28,7 @@
             </label>
           </td>
           <td>{{group.Name}}</td>
-          <td>{{group.Description}}</td>
+          <td *ngIf="userGroupType === 'UserPermissions'">{{group.Description}}</td>
         </tr>
       </tbody>
     </table>
@@ -50,8 +51,8 @@
             <fa-icon [icon]="faExclamationCircle"
                      class="alert-icon mr-3"></fa-icon>
             <p class="mb-0 d-flex flex-column">
-              <small class="font-weight-bold">This is a potentially destructive action that affects user permissions.</small>
-              Please confirm that you wish to alter this user's permissions.
+              <small class="font-weight-bold">This is a potentially destructive action that affects {{displayText.Title}}.</small>
+              {{displayText.ConfirmText}}
             </p>
           </div>
         </div>

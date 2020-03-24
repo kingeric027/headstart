@@ -41,7 +41,7 @@ import { RequestStatus } from './components/request-status/request-status.compon
 import { DragDirective } from './directives/dragDrop.directive';
 import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
 import { PhoneFormatPipe } from './pipes/phone-format.pipe';
-import { UserPermissionsAssignments } from './components/user-permissions-assignments/user-permissions-assignments.component';
+import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component';
 
 @NgModule({
   imports: [
@@ -99,8 +99,7 @@ import { UserPermissionsAssignments } from './components/user-permissions-assign
     DeleteConfirmModal,
     PhoneFormatPipe,
     ConfirmModal,
-    // Pipes
-    UserPermissionsAssignments,
+    UserGroupAssignments,
   ],
   declarations: [
     SearchComponent,
@@ -124,9 +123,9 @@ import { UserPermissionsAssignments } from './components/user-permissions-assign
     FormControlErrorDirective,
     DragDirective,
     ConfirmModal,
+    UserGroupAssignments,
     // Pipes
     PhoneFormatPipe,
-    UserPermissionsAssignments,
   ],
 })
 export class SharedModule {
