@@ -21,9 +21,9 @@ namespace Marketplace.Common.Services.Avalara.Mappers
 		{
 			return new CertificateModel()
 			{
-				//signedDate = source.SignedDate.UtcDateTime,
-				//expirationDate = source.ExpirationDate.UtcDateTime,
-				//pdf = source.Base64UrlEncodedPDF,
+				signedDate = source.SignedDate.UtcDateTime,
+				expirationDate = source.ExpirationDate.UtcDateTime,
+				pdf = source.Base64UrlEncodedPDF,
 				exemptPercentage = 100,
 				exemptionNumber = "id",
 				exposureZone = new ExposureZoneModel()
