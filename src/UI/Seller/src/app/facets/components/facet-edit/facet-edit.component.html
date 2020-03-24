@@ -1,0 +1,79 @@
+<div class="container-fluid">
+  <form *ngIf="resourceForm"
+        [formGroup]="resourceForm">
+    <div class="row pt-3">
+      <div class="col-md-5">
+        <h5>Product Facet Information</h5>
+        <p class="font-italic">Information about product facet.</p>
+      </div>
+      <div class="col-md-7 form-group">
+        <div class="form-group"
+             *ngIf="isCreatingNew">
+          <label for="ID">Facet ID</label>
+          <input type="text"
+                 class="form-control"
+                 id="ID"
+                 showErrors
+                 aria-describedby="ID"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="ID"
+                 (input)="updateResourceFromEvent($event, 'ID')"
+                 placeholder="Enter Facet ID">
+        </div>
+        <div class="form-group"
+             *ngIf="!isCreatingNew">
+          <label for="ID">Facet ID</label>
+          <input class="form-control"
+                 formControlName="ID"
+                 disabled>
+        </div>
+        <div class="form-group">
+          <label for="Name">Name</label>
+          <input type="text"
+                 class="form-control"
+                 id="Name"
+                 maxlength="100"
+                 aria-describedby="Name"
+                 formControlName="Name"
+                 (input)="updateResourceFromEvent($event, 'Name')"
+                 placeholder="Enter Facet Name">
+        </div>
+      </div>
+    </div>
+    <div class="row pt-3">
+      <div class="col-md-5">
+        <h5>Facet Options</h5>
+        <p class="font-italic">What options are available for this facet? Limit 25.</p>
+      </div>
+      <div class="col-md-7 form-group">
+        <div class="form-group">
+          <label [ngClass]="{'font-weight-bold': facetOptionLimitReached()}"
+                 for="addFacetOption">{{updatedResource?.xp?.Options?.length || 0}} / 25 Options</label>
+          <div class="input-group w-50">
+            <input class="form-control"
+                   type="text"
+                   placeholder="Add a facet option"
+                   id="newFacetOption" />
+            <div class="input-group-append">
+              <button class="btn btn-dark"
+                      type="submit"
+                      [disabled]="facetOptionLimitReached()"
+                      (click)="addFacetOption()"
+                      [attr.title]="facetOptionLimitReached() ? 'Limit of 25 options reached.' : null"
+                      data-toggle="tooltip"
+                      data-placement="bottom">
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="chip"
+             *ngFor="let option of updatedResource?.xp?.Options">{{option}}
+          <fa-icon (click)="removeFacetOption(option)"
+                   [icon]="faTimesCircle"></fa-icon>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
