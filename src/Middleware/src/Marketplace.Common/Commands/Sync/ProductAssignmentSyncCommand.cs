@@ -4,6 +4,7 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers;
 using Marketplace.Models;
 using OrderCloud.SDK;
 
@@ -60,7 +61,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<MarketplaceProductAssignment>();
+            var obj = wi.Current.ToObject<MarketplaceProductAssignment>(OrchestrationSerializer.Serializer);
             try
             {
                 await _oc.Products.SaveAssignmentAsync(obj, wi.Token);
@@ -80,7 +81,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<ProductAssignment>();
+            var obj = wi.Current.ToObject<ProductAssignment>(OrchestrationSerializer.Serializer);
             try
             {
                 await _oc.Products.SaveAssignmentAsync(obj, wi.Token);

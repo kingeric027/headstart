@@ -4,6 +4,7 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers;
 using OrderCloud.SDK;
 using Marketplace.Models;
 
@@ -61,7 +62,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<MarketplaceAddressBuyer>();
+            var obj = wi.Current.ToObject<MarketplaceAddressBuyer>(OrchestrationSerializer.Serializer);
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
@@ -82,7 +83,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialAddress>();
+            var obj = wi.Diff.ToObject<PartialAddress>(OrchestrationSerializer.Serializer);
             try
             {
                 var response = await _oc.Addresses.PatchAsync(wi.ResourceId, wi.RecordId, obj, wi.Token);

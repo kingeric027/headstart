@@ -4,6 +4,7 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers;
 using OrderCloud.SDK;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Models;
@@ -62,7 +63,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<MarketplaceSpecOption>();
+            var obj = wi.Current.ToObject<MarketplaceSpecOption>(OrchestrationSerializer.Serializer);
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
@@ -83,7 +84,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialSpecOption>();
+            var obj = wi.Diff.ToObject<PartialSpecOption>(OrchestrationSerializer.Serializer);
             try
             {
                 // must get ID from current or cache in case it's not part of the Diff (and it's not expected to be)

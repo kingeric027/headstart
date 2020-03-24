@@ -81,12 +81,7 @@ namespace Orchestration.Tests
         public void serializer_ignore_results(WorkItem wi)
         {
             var diff = wi.Current.Diff(wi.Cache);
-            var customSerializer = diff.ToObject<MockObject>(new JsonSerializer()
-            {
-                ContractResolver = new OrchestrationSerializer(),
-                Converters = { new DynamicConverter() }
-            });
-            var builtinSerializer = diff.ToObject<MockObject>();
+            var customSerializer = diff.ToObject<MockObject>(OrchestrationSerializer.Serializer);
             Assert.IsNotNull(customSerializer.Description);
             Assert.IsNull(customSerializer.Name);
             Assert.IsNotNull(customSerializer.xp.ShouldBeChanged);

@@ -4,6 +4,7 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers;
 using OrderCloud.SDK;
 using Marketplace.Models;
 using Marketplace.Models.Exceptions;
@@ -92,7 +93,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialUser>();
+            var obj = wi.Diff.ToObject<PartialUser>(OrchestrationSerializer.Serializer);
             try
             {
                 // odd case where the TermsAccepted property is initialized and the value is invalid. we'll default it to current date/time

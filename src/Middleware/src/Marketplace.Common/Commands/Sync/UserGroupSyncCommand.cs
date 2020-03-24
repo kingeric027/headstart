@@ -4,6 +4,7 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
+using Marketplace.Helpers;
 using OrderCloud.SDK;
 using Marketplace.Models;
 using Marketplace.Models.Exceptions;
@@ -84,7 +85,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialUserGroup>();
+            var obj = wi.Diff.ToObject<PartialUserGroup>(OrchestrationSerializer.Serializer);
             try
             {
                 var response = await _oc.UserGroups.PatchAsync(wi.ResourceId, wi.RecordId, obj, wi.Token);
