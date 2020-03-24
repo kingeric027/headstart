@@ -94,7 +94,7 @@ namespace Marketplace.Common.Services
 
 		public async Task<SuperMarketplaceProduct> UploadStaticContent(IFormFile file, string productID, string fileName, string token)
 		{
-
+			/* TODO: Fix Problem with parallel requests */
 			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
 			if (product.xp?.StaticContent == null)
 				product.xp = new ProductXp { StaticContent = new List<StaticContent>() };
