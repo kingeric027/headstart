@@ -50,10 +50,14 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
         {
-            var _productsList =  await _oc.Products.ListAsync<MarketplaceProduct>(filters: args, accessToken: user.AccessToken);
+            var _productsList = await _oc.Products.ListAsync<MarketplaceProduct>(
+                filters: args.ToFilterString(),
+                search: args.Search,
+                pageSize: args.PageSize,
+                page: args.Page,
+                accessToken: user.AccessToken);
             var _superProductsList = new List<SuperMarketplaceProduct> { };
-            foreach (MarketplaceProduct product in _productsList.Items)
-            {
+            await Throttler.RunAsync(_productsList.Items, 100, 10, async product => {
                 var priceSchedule = await _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
                 var _specs = await _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, user.AccessToken);
                 var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, user.AccessToken);
@@ -64,7 +68,7 @@ namespace Marketplace.Common.Commands.Crud
                     Specs = _specs.Items,
                     Variants = _variants.Items
                 });
-            }
+            });
             return new ListPage<SuperMarketplaceProduct>
             {
                 Meta = _productsList.Meta,
