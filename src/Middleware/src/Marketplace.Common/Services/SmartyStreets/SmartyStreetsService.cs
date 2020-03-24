@@ -5,6 +5,7 @@ using Flurl;
 using Flurl.Http;
 using Marketplace.Common.Services.SmartyStreets.Mappers;
 using Marketplace.Models.Misc;
+using Newtonsoft.Json;
 using OrderCloud.SDK;
 using SmartyStreets;
 using SmartyStreets.USStreetApi;
@@ -52,12 +53,17 @@ namespace Marketplace.Common.Services.SmartyStreets
 				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions, address);
 			}
 			// Valid candidate found, but may not match raw exactly. Want to show candidate to user to approve modifications
-			else if (CandidateModified(candidate[0])) 
+			else 
 			{
-				response.SuggestedAddresses = new List<Address> { SmartyStreetMappers.Map(candidate[0], address) };
-			} else
-			{
-				response.IsRawAddressValid = true;
+				var mappedCandidate = SmartyStreetMappers.Map(candidate[0], address);
+				if (DoesSubmittedAddressMatchSuggested(mappedCandidate, address))
+				{
+					response.IsRawAddressValid = true;
+				} else
+				{
+					response.SuggestedAddresses = new List<Address> { mappedCandidate };
+
+				}
 			}
 			return response;
 		}
@@ -84,10 +90,11 @@ namespace Marketplace.Common.Services.SmartyStreets
 			return suggestions;
 		}
 
-		private bool CandidateModified(Candidate candidate) 
+		private bool DoesSubmittedAddressMatchSuggested(Address mappedCandidate, Address address) 
 		{
-			// See https://smartystreets.com/docs/cloud/us-street-api#footnotes
-			return candidate.Analysis?.Footnotes != null;
+			var serializedMapped = JsonConvert.SerializeObject(mappedCandidate);
+			var serializedAddress = JsonConvert.SerializeObject(address);
+			return serializedMapped == serializedAddress;
 		}
 	}
 }
