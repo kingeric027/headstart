@@ -77,7 +77,7 @@ namespace Marketplace.Common.Models
         public Action Action { get; set; }
         public JObject Current { get; set; } // not used for delete
         public JObject Cache { get; set; } // not used for create
-        public JToken Diff { get; set; }
+        public JObject Diff { get; set; }
         public string Token { get; set; }
         public string ClientId { get; set; }
     }
