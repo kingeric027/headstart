@@ -11,11 +11,10 @@ using Marketplace.Models.Models.Marketplace;
 using System.Collections.Generic;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using System.Linq;
-using Marketplace.Models.Exceptions;
-using Marketplace.Models.Orchestration;
-using Marketplace.Models.Misc;
-using Action = Marketplace.Models.Misc.Action;
-using LogLevel = Marketplace.Models.Orchestration.LogLevel;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Models;
+using Action = Marketplace.Common.Models.Action;
+using LogLevel = Marketplace.Common.Models.LogLevel;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Models.Misc;
 

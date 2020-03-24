@@ -8,16 +8,12 @@ using Marketplace.Models.Models.Marketplace;
 using Marketplace.Helpers;
 using Marketplace.Common.Services.FreightPop.Models;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
-using Marketplace.Common.Services.ShippingIntegration.Models;
 using System;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
-using Marketplace.Models.Orchestration;
-using DurableTask.Core.Exceptions;
-using Marketplace.Models.Misc;
-using Action = Marketplace.Models.Misc.Action;
-using Marketplace.Models.Exceptions;
-using OrchestrationException = Marketplace.Models.Exceptions.OrchestrationException;
 using Marketplace.Models.Models.Misc;
+using Action = System.Action;
 
 namespace Marketplace.Common.Commands
 {
@@ -80,7 +76,7 @@ namespace Marketplace.Common.Commands
                 await _log.Save(new OrchestrationLog(ex)
                 {
                     RecordType = RecordType.Supplier,
-                    Action = Action.SyncShipments,
+                    Action = Marketplace.Common.Models.Action.SyncShipments,
                     ErrorType = OrchestrationErrorType.AuthenticateSupplierError,
                     Message = $"Failed to authenticate supplier with ApiClientID {apiClientID}. Error: {ex.Message}",
                 });
@@ -125,7 +121,7 @@ namespace Marketplace.Common.Commands
                 await _log.Save(new OrchestrationLog()
                 {
                     RecordType = RecordType.Supplier,
-                    Action = Action.SyncShipments,
+                    Action = Marketplace.Common.Models.Action.SyncShipments,
                     ErrorType = OrchestrationErrorType.GetOrdersNeedingShipmentError,
                     Message = $"Failed to retrieve orders for supplier: {workItem.Supplier.ID}. Error: {ex.Message}",
                 });
@@ -167,7 +163,7 @@ namespace Marketplace.Common.Commands
                 await _log.Save(new OrchestrationLog()
                 {
                     RecordType = RecordType.Supplier,
-                    Action = Action.SyncShipments,
+                    Action = Marketplace.Common.Models.Action.SyncShipments,
                     ErrorType = OrchestrationErrorType.GetShipmentSyncOrders,
                     Message = $"Error getting shipment sync orders for: {workItem.Supplier.ID}. Error: {ex.Message}",
                 });
@@ -191,7 +187,7 @@ namespace Marketplace.Common.Commands
                 await _log.Save(new OrchestrationLog()
                 {
                     RecordType = RecordType.Supplier,
-                    Action = Action.SyncShipments,
+                    Action = Marketplace.Common.Models.Action.SyncShipments,
                     ErrorType = OrchestrationErrorType.GetShipmentDetailsForShipmentSyncOrders,
                     Message = $"Error getting shipment sync orders for: {workItem.Supplier.ID}. Error: {ex.Message}",
                 });
@@ -220,7 +216,7 @@ namespace Marketplace.Common.Commands
                 await _log.Save(new OrchestrationLog()
                 {
                     RecordType = RecordType.Order,
-                    Action = Action.SyncShipments,
+                    Action = Marketplace.Common.Models.Action.SyncShipments,
                     ErrorType = OrchestrationErrorType.CreateShipmentsInOrderCloudIfNeeded,
                     Message = $"Error creating ordercloud shipment for freightpop order id: {workItem.ShipmentSyncOrder.FreightPopOrderID}. Error: {ex.Message}",
                 });

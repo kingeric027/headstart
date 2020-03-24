@@ -1,8 +1,8 @@
 ﻿using Marketplace.Common.Models;
-using Marketplace.Models.Models.Misc;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.TemporaryAppConstants
 {

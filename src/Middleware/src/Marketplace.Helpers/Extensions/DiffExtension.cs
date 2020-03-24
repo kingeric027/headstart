@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Marketplace.Helpers.Extensions
 {
+    
     public static class DiffExtension
     {
         public static JObject Diff(this JObject current, JObject cache)

@@ -1,13 +1,9 @@
 using System;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
-using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Queries;
 using Marketplace.Common;
-using OrderCloud.SDK;
-using Marketplace.Common.Services.ShippingIntegration.Models;
 using System.Threading.Tasks;
 using System.Linq;
 
