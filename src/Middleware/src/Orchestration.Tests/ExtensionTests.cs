@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Marketplace.Common.Commands;
 using NUnit.Framework;
 using Marketplace.Common.Extensions;
+using Marketplace.Common.Models;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
-using Marketplace.Models.Orchestration;
 
 namespace Orchestration.Tests
 {

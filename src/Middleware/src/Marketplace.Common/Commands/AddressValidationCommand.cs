@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.SmartyStreets;
 using Marketplace.Models;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.Commands
 {

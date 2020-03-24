@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Marketplace.Models.Models.Misc;
-namespace Marketplace.Common.Models
+
+namespace Marketplace.Models.Misc
 {
 	public class MarketplaceUserType
 	{

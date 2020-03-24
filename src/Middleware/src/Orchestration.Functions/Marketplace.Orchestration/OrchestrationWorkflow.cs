@@ -4,12 +4,11 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Commands;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
-using Marketplace.Models.Exceptions;
-using Marketplace.Models.Misc;
-using Marketplace.Models.Orchestration;
-using Action = Marketplace.Models.Misc.Action;
-using LogLevel = Marketplace.Models.Orchestration.LogLevel;
+using Action = Marketplace.Common.Models.Action;
+using LogLevel = Marketplace.Common.Models.LogLevel;
 
 namespace Marketplace.Orchestration
 {
@@ -42,7 +41,7 @@ namespace Marketplace.Orchestration
                 wi.Current = queue["Model"] as JObject;
                 wi.Token = queue["Token"].ToString();
                 wi.ClientId = queue["ClientId"].ToString();
-                wi.Diff = await context.CallActivityAsync<JObject>("CalculateDiff", wi);
+                //wi.Diff = await context.CallActivityAsync<JObject>("CalculateDiff", wi);
                 wi.Action = await context.CallActivityAsync<Action>("DetermineAction", wi);
 
                 switch (wi.Action)
@@ -103,8 +102,8 @@ namespace Marketplace.Orchestration
         [FunctionName("DetermineAction")]
         public async Task<Action> DetermineAction([ActivityTrigger] WorkItem wi) => await _orch.DetermineAction(wi);
 
-        [FunctionName("CalculateDiff")]
-        public async Task<JObject> CalculateDiff([ActivityTrigger] WorkItem wi) => await _orch.CalculateDiff(wi);
+        //[FunctionName("CalculateDiff")]
+        //public async Task<JObject> CalculateDiff([ActivityTrigger] WorkItem wi) => await _orch.CalculateDiff(wi);
 
         [FunctionName("GetQueuedItem")]
         public async Task<JObject> GetQueuedItem([ActivityTrigger] string path) => await _orch.GetQueuedItem(path);

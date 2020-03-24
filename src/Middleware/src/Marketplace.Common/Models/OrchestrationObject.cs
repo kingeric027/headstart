@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Marketplace.Models;
 
-namespace Marketplace.Models.Orchestration
+namespace Marketplace.Common.Models
 {
     public interface IOrchestrationObject<T>
     {

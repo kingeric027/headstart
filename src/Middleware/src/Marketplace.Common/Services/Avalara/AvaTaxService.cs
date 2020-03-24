@@ -7,6 +7,7 @@ using Marketplace.Common.Mappers.Avalara;
 using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
+using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.Avalara

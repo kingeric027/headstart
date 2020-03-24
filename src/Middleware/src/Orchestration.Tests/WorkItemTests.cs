@@ -1,11 +1,42 @@
 using System.Collections;
+using System.ComponentModel.DataAnnotations;
+using Marketplace.Common.Commands;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Models;
+using Marketplace.Helpers;
+using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Helpers;
+using Marketplace.Helpers.Helpers.Attributes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using Marketplace.Models.Exceptions;
-using Marketplace.Models.Misc;
 
 namespace Orchestration.Tests
 {
+    public class MockObject
+    {
+        public string ID { get; set; }
+        public string Description { get; set; }
+        [MaxLength(500), OrchestrationIgnore]
+        public string Name { get; set; }
+        public MockObjectXp xp { get; set; } = new MockObjectXp();
+    }
+
+    public class MockObjectXp
+    {
+        [OrchestrationIgnore]
+        public string ShouldBeIgnored { get; set; }
+        public string ShouldBeChanged { get; set; }
+        public MockSubObject MockSub { get; set; } = new MockSubObject();
+    }
+
+    public class MockSubObject
+    {
+        public string ShouldBeChanged { get; set; }
+        [OrchestrationIgnore]
+        public string ShouldBeIgnored { get; set; }
+    }
+
     public class Tests
     {
         [SetUp]
@@ -31,22 +62,73 @@ namespace Orchestration.Tests
             });
         }
 
-        //[Test, TestCaseSource(typeof(ActionFactory), nameof(ActionFactory.TestCases))]
-        //public async Task<Action> determine_action_results(WorkItem wi)
-        //{
-        //    var command = new OrchestrationCommand(Substitute.For<AppSettings>(), new LogQuery(Substitute.For<ICosmosStore<OrchestrationLog>>()), Substitute.For<IBlobService>(), Substitute.For<IBlobService>());
-        //    wi.Diff = await command.CalculateDiff(wi);
-        //    var action = await command.DetermineAction(wi);
-        //    return action;
-        //}
+        [Test, TestCaseSource(typeof(ActionFactory), nameof(ActionFactory.TestCases))]
+        public Action determine_action_results(WorkItem wi)
+        {
+            //wi.Diff = wi.Current.Diff(wi.Cache);
+            var action = WorkItemMethods.DetermineAction(wi);
+            return action;
+        }
 
-        //[Test, TestCaseSource(typeof(DiffFactory), nameof(DiffFactory.TestCases))]
-        //public async Task<JObject> diff_results(WorkItem wi)
-        //{
-        //    var command = new OrchestrationCommand(Substitute.For<AppSettings>(), new LogQuery(Substitute.For<ICosmosStore<OrchestrationLog>>()), Substitute.For<IBlobService>(), Substitute.For<IBlobService>());
-        //    var diff = await command.CalculateDiff(wi);
-        //    return diff;
-        //}
+        [Test, TestCaseSource(typeof(DiffFactory), nameof(DiffFactory.TestCases))]
+        public JToken diff_results(WorkItem wi)
+        {
+            var diff = wi.Current.Diff(wi.Cache);
+            return diff;
+        }
+
+        [Test, TestCaseSource(typeof(SerializerFactory), nameof(SerializerFactory.TestCases))]
+        public void serializer_ignore_results(WorkItem wi)
+        {
+            var diff = wi.Current.Diff(wi.Cache);
+            var customSerializer = diff.ToObject<MockObject>(OrchestrationSerializer.Serializer);
+            Assert.IsNotNull(customSerializer.Description);
+            Assert.IsNull(customSerializer.Name);
+            Assert.IsNotNull(customSerializer.xp.ShouldBeChanged);
+            Assert.IsNull(customSerializer.xp.ShouldBeIgnored);
+            Assert.IsNull(customSerializer.xp.MockSub.ShouldBeIgnored);
+            Assert.IsNotNull(customSerializer.xp.MockSub.ShouldBeChanged);
+        }
+
+        [Test, TestCaseSource(typeof(DeletedXpFactory), nameof(DeletedXpFactory.TestCases))]
+        public bool has_deleted_xp(WorkItem item)
+        {
+            var has = item.Cache.HasDeletedXp(item.Current);
+            return has;
+        }
+    }
+
+    
+    public class DeletedXpFactory
+    {
+        public static IEnumerable TestCases
+        {
+            get
+            {
+                yield return new TestCaseData(new WorkItem()
+                {
+                    Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }}}"),
+                    Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Description': 'description' }}}"),
+                }).Returns(true);
+            }
+        }
+    }
+
+    public class SerializerFactory
+    {
+        public static IEnumerable TestCases
+        {
+            get
+            {
+                yield return new TestCaseData(new WorkItem()
+                {
+                    Current = JObject.Parse(
+                        @"{ 'ID': 'id', 'Name': 'name is changed', 'Description': 'new value', 'xp': { 'ShouldBeChanged': 'new value', 'ShouldBeIgnored': 'new value', 'MockSub': { 'ShouldBeChanged': 'new category', 'ShouldBeIgnored': 'new value' }}}"),
+                    Cache = JObject.Parse(
+                        @"{ 'ID': 'id', 'Name': 'name', 'Description': 'old value', 'xp': { 'ShouldBeChanged': 'old value', 'ShouldBeIgnored': 'old value', 'MockSub': { 'ShouldBeChanged': 'old category', 'ShouldBeIgnored': 'old value' }}}"),
+                });
+            }
+        }
     }
 
     public class DiffFactory

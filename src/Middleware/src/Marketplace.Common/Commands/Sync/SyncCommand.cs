@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
 using Marketplace.Models.Misc;
 using OrderCloud.SDK;
-using Action = Marketplace.Models.Misc.Action;
+using Action = Marketplace.Common.Models.Action;
 
 namespace Marketplace.Common.Commands
 {

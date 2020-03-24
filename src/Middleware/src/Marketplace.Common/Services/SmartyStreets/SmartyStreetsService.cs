@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
 using Marketplace.Common.Services.SmartyStreets.Mappers;
-using Marketplace.Common.Services.SmartyStreets.models;
+using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 using SmartyStreets;
 using SmartyStreets.USStreetApi;
