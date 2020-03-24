@@ -1,25 +1,22 @@
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using JsonDiffPatchDotNet;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Exceptions;
-using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
+using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
-using Marketplace.Helpers.Models;
-using Marketplace.Models;
+using Marketplace.Helpers.Helpers;
+using Marketplace.Helpers.Helpers.Attributes;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using OrderCloud.SDK;
-using IPartial = Marketplace.Helpers.Models.IPartial;
 
 namespace Orchestration.Tests
 {
     public class MockObject
     {
+        public string ID { get; set; }
+        public string Description { get; set; }
         [MaxLength(500), OrchestrationIgnore]
         public string Name { get; set; }
         public MockObjectXp xp { get; set; } = new MockObjectXp();
@@ -28,15 +25,16 @@ namespace Orchestration.Tests
     public class MockObjectXp
     {
         [OrchestrationIgnore]
-        public string Ignored { get; set; }
+        public string ShouldBeIgnored { get; set; }
+        public string ShouldBeChanged { get; set; }
         public MockSubObject MockSub { get; set; } = new MockSubObject();
     }
 
     public class MockSubObject
     {
-        public string Key { get; set; }
+        public string ShouldBeChanged { get; set; }
         [OrchestrationIgnore]
-        public string Value { get; set; }
+        public string ShouldBeIgnored { get; set; }
     }
 
     public class Tests
@@ -83,14 +81,18 @@ namespace Orchestration.Tests
         public void serializer_ignore_results(WorkItem wi)
         {
             var diff = wi.Current.Diff(wi.Cache);
-            var attempt = diff.ToObject<MockObject>(new JsonSerializer()
+            var customSerializer = diff.ToObject<MockObject>(new JsonSerializer()
             {
-                ContractResolver = new OrchestrationSerializer()
+                ContractResolver = new OrchestrationSerializer(),
+                Converters = { new DynamicConverter() }
             });
-            Assert.IsNull(attempt.xp.Ignored);
-            Assert.IsNull(attempt.xp.MockSub.Value);
-            Assert.IsNull(attempt.Name);
-            //Assert.IsNull(attempt.xp.Note);
+            var builtinSerializer = diff.ToObject<MockObject>();
+            Assert.IsNotNull(customSerializer.Description);
+            Assert.IsNull(customSerializer.Name);
+            Assert.IsNotNull(customSerializer.xp.ShouldBeChanged);
+            Assert.IsNull(customSerializer.xp.ShouldBeIgnored);
+            Assert.IsNull(customSerializer.xp.MockSub.ShouldBeIgnored);
+            Assert.IsNotNull(customSerializer.xp.MockSub.ShouldBeChanged);
         }
 
         [Test, TestCaseSource(typeof(DeletedXpFactory), nameof(DeletedXpFactory.TestCases))]
@@ -126,18 +128,10 @@ namespace Orchestration.Tests
                 yield return new TestCaseData(new WorkItem()
                 {
                     Current = JObject.Parse(
-                        @"{ 'ID': 'id', 'Name': 'name is changed', 'xp': { 'Ignored': 'attempting', 'Sub': { 'Key': 'category', 'Value': 'code is changed' }}}"),
+                        @"{ 'ID': 'id', 'Name': 'name is changed', 'Description': 'new value', 'xp': { 'ShouldBeChanged': 'new value', 'ShouldBeIgnored': 'new value', 'MockSub': { 'ShouldBeChanged': 'new category', 'ShouldBeIgnored': 'new value' }}}"),
                     Cache = JObject.Parse(
-                        @"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Sub': { 'Ignored': 'cached', 'Key': 'category', 'Value': 'code' }}}"),
+                        @"{ 'ID': 'id', 'Name': 'name', 'Description': 'old value', 'xp': { 'ShouldBeChanged': 'old value', 'ShouldBeIgnored': 'old value', 'MockSub': { 'ShouldBeChanged': 'old category', 'ShouldBeIgnored': 'old value' }}}"),
                 });
-
-                //yield return new TestCaseData(new WorkItem()
-                //{
-                //    Current = JObject.Parse(
-                //        @"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }, 'Note': 'changed note'  }}"),
-                //    Cache = JObject.Parse(
-                //        @"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }, 'Note': 'cached note'  }}")
-                //});
             }
         }
     }

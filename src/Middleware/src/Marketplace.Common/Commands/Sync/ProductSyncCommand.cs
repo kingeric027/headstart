@@ -11,6 +11,8 @@ using OrderCloud.SDK;
 using Marketplace.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Helpers;
+using Marketplace.Helpers.Helpers.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Marketplace.Helpers.Models;
@@ -18,34 +20,6 @@ using Newtonsoft.Json.Converters;
 
 namespace Marketplace.Common.Commands
 {
-    /// <summary>
-    /// Convert objects and JObjects to ExpandoObjects (main use case is xp)
-    /// </summary>
-    public class DynamicConverter : ExpandoObjectConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return
-                objectType == typeof(object) ||
-                objectType == typeof(JObject) ||
-                base.CanConvert(objectType);
-        }
-    }
-    public class OrchestrationSerializer : DefaultContractResolver
-    {
-        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-        {
-            var property = base.CreateProperty(member, memberSerialization);
-            if (member.GetCustomAttribute(typeof(OrchestrationIgnoreAttribute)) != null)
-            {
-                property.ShouldSerialize = o => false;
-                property.ShouldDeserialize = o => false;
-                property.Readable = false;
-            }
-            return property;
-        }
-    }
-
     public class ProductSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;

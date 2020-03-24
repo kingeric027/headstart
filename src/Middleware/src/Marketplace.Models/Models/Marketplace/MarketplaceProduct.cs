@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Marketplace.Helpers.Helpers.Attributes;
 using Marketplace.Models.Extended;
 using OrderCloud.SDK;
 using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
@@ -16,7 +17,6 @@ namespace Marketplace.Models
 
     public class PartialMarketplaceProduct : PartialProduct<ProductXp>
     {
-       public new ProductXp xp { get; set; } = new ProductXp();
     }
 
     public class MarketplaceProduct : Product<ProductXp>, IMarketplaceObject
@@ -42,7 +42,4 @@ namespace Marketplace.Models
         public ProductType ProductType { get; set; }
 
     }
-
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
-    public class OrchestrationIgnoreAttribute : Attribute { }
 }
