@@ -1,11 +1,10 @@
 ﻿using System;
-using Marketplace.Models.Misc;
+using Marketplace.Common.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using Action = Marketplace.Models.Misc.Action;
 
-namespace Marketplace.Models.Exceptions
+namespace Marketplace.Common.Exceptions
 {
     public class OrchestrationException : Exception
     {
@@ -19,7 +18,16 @@ namespace Marketplace.Models.Exceptions
                 Data = data
             };
         }
-       
+
+        public OrchestrationException(OrchestrationErrorType type, string message)
+        {
+            Error = new OrchestrationError
+            {
+                Type = type,
+                Data = message
+            };
+        }
+
         public OrchestrationException(OrchestrationErrorType type, WorkItem wi, object data = null)
         {
             Error = new OrchestrationError()
@@ -50,10 +58,10 @@ namespace Marketplace.Models.Exceptions
         [JsonConverter(typeof(StringEnumConverter))]
         public RecordType RecordType { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public Action Action { get; set; }
+        public Models.Action Action { get; set; }
         public JObject Current { get; set; }
         public JObject Cache { get; set; }
-        public JObject Diff { get; set; }
+        public JToken Diff { get; set; }
         public object Data { get; set; }
     }
 
@@ -72,6 +80,11 @@ namespace Marketplace.Models.Exceptions
         CreateGeneralError,
         UpdateGeneralError,
         PatchGeneralError,
-        GetGeneralError
+        GetGeneralError,
+        AuthenticateSupplierError,
+        GetOrdersNeedingShipmentError,
+        GetShipmentSyncOrders,
+        GetShipmentDetailsForShipmentSyncOrders,
+        CreateShipmentsInOrderCloudIfNeeded
     }
 }

@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.DevCenter.Models;
 using Marketplace.Helpers.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
-using Marketplace.Models.Models.Misc;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -24,6 +24,8 @@ namespace Marketplace.Common.Commands
 		private EnvironmentSeed _seed;
 		private readonly IMarketplaceSupplierCommand _supplierCommand;
 		private readonly IMarketplaceBuyerCommand _buyerCommand;
+		private readonly string _allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
 
 		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand)
 		{
@@ -43,6 +45,7 @@ namespace Marketplace.Common.Commands
 			// at this point everything we do is as impersonation of the admin user on a new token
 			var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
 			await PatchDefaultApiClients(impersonation.access_token);
+			await CreateApiClients(impersonation.access_token);
 			await CreateWebhooks(impersonation.access_token, "https://marketplace-api-staging.azurewebsites.net");
 			await CreateMarketPlaceRoles(impersonation.access_token);
 			await CreateBuyers(user, impersonation.access_token);
@@ -125,8 +128,25 @@ namespace Marketplace.Common.Commands
 			await Task.WhenAll(tasks);
 		}
 
+		private async Task CreateApiClients(string token)
+		{
+			var clientSecret = RandomGen.GetString(_allowedChars, 60);
+			var integrationsClient = new PartialApiClient()
+			{
+				AppName = "Middleware Integrations",
+				Active = true,
+				AllowAnyBuyer = false,
+				AllowAnySupplier = false,
+				AllowSeller = true,
+				AccessTokenDuration = 600,
+				RefreshTokenDuration = 43200,
+				DefaultContextUserName = "Default_Admin",
+				ClientSecret = clientSecret
+			};
+			await _oc.ApiClients.CreateAsync(integrationsClient, token);
+		}
 
-		public async Task CreateWebhooks(string accessToken, string baseURL)
+		private async Task CreateWebhooks(string accessToken, string baseURL)
 		{
 
 			var apiClientResponse = await _oc.ApiClients.ListAsync(accessToken: accessToken);

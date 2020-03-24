@@ -1,18 +1,18 @@
-﻿using Marketplace.Helpers.Attributes;
-using Marketplace.Models.Exceptions;
+﻿using System;
+using System.Linq;
+using Marketplace.Common.Exceptions;
+using Marketplace.Helpers.Attributes;
+using Marketplace.Helpers.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
-namespace Marketplace.Models.Misc
+namespace Marketplace.Common.Models
 {
     [DocIgnore]
     public class WorkItem
     {
-        public WorkItem()
-        {
-        }
-
+        public WorkItem() { }
         public WorkItem(string path)
         {
             var split = path.Split("/");
@@ -77,7 +77,7 @@ namespace Marketplace.Models.Misc
         public Action Action { get; set; }
         public JObject Current { get; set; } // not used for delete
         public JObject Cache { get; set; } // not used for create
-        public JObject Diff { get; set; } // only for update
+        public JObject Diff { get; set; }
         public string Token { get; set; }
         public string ClientId { get; set; }
     }
@@ -87,9 +87,52 @@ namespace Marketplace.Models.Misc
     {
         Product, PriceSchedule, Spec, SpecOption, SpecProductAssignment, ProductFacet,
         Buyer, User, UserGroup, Address, CostCenter, UserGroupAssignment, AddressAssignment, 
-        CatalogAssignment, Catalog
+        CatalogAssignment, Catalog, Supplier, Order
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum Action { Ignore, Create, Update, Patch, Delete, Get }
+    public enum Action { Ignore, Create, Update, Patch, Delete, Get, SyncShipments }
+
+    public static class WorkItemMethods
+    {
+        public static Action DetermineAction(WorkItem wi)
+        {
+            // we want to ensure a condition is met before determining an action
+            // so that if there is a case not compensated for it flows to an exception
+            try
+            {
+                // first check if there is a cache object, if not it's a CREATE event
+                if (wi.Cache == null)
+                    return Action.Create;
+
+                // if cache does exists, and there is no difference ignore the action
+                if (wi.Cache != null && wi.Diff == null)
+                    return (wi.RecordType == RecordType.SpecProductAssignment || wi.RecordType == RecordType.UserGroupAssignment || wi.RecordType == RecordType.CatalogAssignment)
+                        ? Action.Ignore
+                        : Action.Get;
+
+                // special case for SpecAssignment because there is no ID for the OC object
+                // but we want one in orchestration to handle caching
+                // in further retrospect I don't think we need to handle updating objects when only the ID is being changed
+                // maybe in the future a true business case will be necessary to do this
+                if ((wi.RecordType == RecordType.SpecProductAssignment || wi.RecordType == RecordType.UserGroupAssignment || wi.RecordType == RecordType.CatalogAssignment) 
+                    && wi.Diff.Children().Count() == 1 && wi.Diff.SelectToken("ID").Path == "ID")
+                    return Action.Ignore;
+
+                if (wi.Cache != null && wi.Diff != null)
+                {
+                    // cache exists, we want to force a PUT when xp has deleted properties because 
+                    // it's the only way to delete the properties
+                    // otherwise we want to PATCH the existing object
+                    return wi.Cache.HasDeletedXp(wi.Current) ? Action.Update : Action.Patch;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new OrchestrationException(OrchestrationErrorType.ActionEvaluationError, wi, ex.Message);
+            }
+
+            throw new OrchestrationException(OrchestrationErrorType.ActionEvaluationError, wi, "Unable to determine action");
+        }
+    }
 }

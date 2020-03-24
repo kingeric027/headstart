@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Marketplace.Common.Services.AvaTax.Models
+﻿namespace Marketplace.Models.Misc
 {
     public class TaxCode
     {

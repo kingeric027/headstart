@@ -1,13 +1,12 @@
 ﻿using System;
+using Marketplace.Common.Exceptions;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
-using Marketplace.Models.Exceptions;
-using Marketplace.Models.Misc;
 using Microsoft.Azure.WebJobs;
 using Newtonsoft.Json.Linq;
-using Action = Marketplace.Models.Misc.Action;
+using OrderCloud.SDK;
 
-namespace Marketplace.Models.Orchestration
+namespace Marketplace.Common.Models
 {
     public class OrchestrationLog : ICosmosObject
     {
@@ -20,11 +19,16 @@ namespace Marketplace.Models.Orchestration
             this.Action = wi.Action;
             this.Current = wi.Current;
             this.Cache = wi.Cache;
-            this.Diff = wi.Diff;
             this.RecordId = wi.RecordId;
             this.ResourceId = wi.ResourceId;
             this.RecordType = wi.RecordType;
             this.Level = LogLevel.Warn;
+        }
+
+        public OrchestrationLog(OrderCloudException ex)
+        {
+            this.Level = LogLevel.Error;
+            this.OrderCloudErrors = ex.Errors;
         }
 
         public OrchestrationLog(OrchestrationException ex)
@@ -64,5 +68,6 @@ namespace Marketplace.Models.Orchestration
         public JObject Cache { get; set; }
         [DocIgnore]
         public JObject Diff { get; set; }
+        public OrderCloud.SDK.ApiError[] OrderCloudErrors { get; set; }
     }
 }

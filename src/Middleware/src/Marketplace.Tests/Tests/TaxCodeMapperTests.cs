@@ -3,6 +3,7 @@ using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Services.Avalara.Mappers;
 using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Helpers;
+using Marketplace.Models.Misc;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Orchestration.Tests.Mocks;

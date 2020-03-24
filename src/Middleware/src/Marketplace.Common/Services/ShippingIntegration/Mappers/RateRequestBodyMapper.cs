@@ -13,7 +13,6 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
             var firstLineItem = obj[0];
             var shipToAddress = firstLineItem.ShippingAddress;
             var shipFromAddress = firstLineItem.ShipFromAddress;
-
             return new RateRequestBody
             {
                 ConsigneeAddress = RateAddressMapper.Map(shipToAddress),
@@ -21,7 +20,8 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
                 Items = obj.Select(lineItem =>
                 {
                     return RateItemMapper.Map(lineItem);
-                }).ToList()
+                }).ToList(),
+                Accessorials = AccessorialMapper.Map(obj, shipToAddress, shipFromAddress)
             };
         }
 

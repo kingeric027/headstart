@@ -1,10 +1,7 @@
-﻿using Marketplace.Models;
+﻿using System.Collections.Generic;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Marketplace.Common.Services.SmartyStreets.models
+namespace Marketplace.Models.Misc
 {
 	public class AddressValidation
 	{

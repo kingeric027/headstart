@@ -100,6 +100,31 @@
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
+            <label for="UnitOfMeasureQty">Quantity per Unit</label>
+            <input type="number"
+                   class="form-control"
+                   id="UnitOfMeasureQty"
+                   min="1"
+                   aria-describedby="Max Quantity"
+                   [resourceForm]="productForm"
+                   formControlName="UnitOfMeasureQty"
+                   (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Qty')"
+                   placeholder="How many of this item per unit?">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="UnitOfMeasureUnit">Unit of Measure</label>
+            <input type="text"
+                   class="form-control"
+                   id="UnitOfMeasureUnit"
+                   aria-describedby="Min Quantity"
+                   [resourceForm]="productForm"
+                   formControlName="UnitOfMeasureUnit"
+                   (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Unit')"
+                   placeholder="Measuring unit. (Ex: Per, Crate, etc..)">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
             <label for="MinQuantity">Min Quantity</label>
             <input type="number"
                    class="form-control"
@@ -136,21 +161,33 @@
                                            (handleTaxCodesSearched)="searchTaxCodes($event)"
                                            (onScrollEnd)="handleScrollEnd($event)">
         </product-tax-code-select-component>
-        <div class="form-group">
-          <label for="ProductType">Product Type</label>
-          <select type="dropdown"
-                  class="form-control"
-                  id="ProductType"
-                  aria-describedby="Product type"
-                  placeholder="Choose product type"
-                  (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
-            <option [selected]="productType === undefined"
-                    disabled>Choose a product type</option>
-            <option [selected]="productType === 'Standard'"
-                    value="Standard">Standard</option>
-            <option [selected]="productType === 'Quote'"
-                    value="Quote">Quote</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="IsResale">Resale</label>
+            <label class="check-container">This is a resale product
+              <input type="checkbox"
+                     [checked]="shouldIsResaleBeChecked()"
+                     (change)="handleUpdateProduct($event, 'Product.xp.IsResale')"
+                     id="IsResale">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="ProductType">Product Type</label>
+            <select type="dropdown"
+                    class="form-control"
+                    id="ProductType"
+                    aria-describedby="Product type"
+                    placeholder="Choose product type"
+                    (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
+              <option [selected]="productType === undefined"
+                      disabled>Choose a product type</option>
+              <option [selected]="productType === 'Standard'"
+                      value="Standard">Standard</option>
+              <option [selected]="productType === 'Quote'"
+                      value="Quote">Quote</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -277,7 +314,7 @@
                           (click)="modal.dismiss()">Cancel</button>
                   <button type="button"
                           class="btn brand-button--danger"
-                          (click)="removeFile(image.URL)"
+                          (click)="removeFile(image.URL, 'image')"
                           (click)="modal.dismiss()">Yes, Delete</button>
                 </confirm-modal>
               </ng-template>
@@ -303,7 +340,7 @@
           <label class="rmpm dropzone"
                  for="imageUpload"
                  appDrag
-                 (files)="stageImages($event)">
+                 (files)="stageFiles($event)">
           </label>
           <input class="d-none"
                  id="imageUpload"
@@ -326,14 +363,16 @@
             <input type="text"
                    required
                    class="form-control"
+                   value="{{documentName}}"
                    placeholder="Document Name"
                    aria-label="Document Name"
                    (keyup)="getDocumentName($event)"
                    aria-describedby="document name">
             <div class="input-group-append">
-              <label class="btn btn-outline-primary"
+              <label *ngIf="documentName?.length"
+                     class="btn btn-outline-primary"
                      for="documentUpload"
-                     (files)="stageDocuments($events)">
+                     (files)="stageFiles($event)">
                 choose file
                 <input id="documentUpload"
                        class="d-none"
@@ -356,7 +395,7 @@
             </div>
           </div>
           <table class="table table-sm bg-light"
-                 *ngIf="staticContent.length > 0">
+                 *ngIf="staticContent?.length > 0">
             <thead>
               <tr>
                 <th>Documents</th>
@@ -366,7 +405,7 @@
               <tr *ngFor="let file of staticContent">
                 <td>{{file.Title}}</td>
                 <td><a href="{{getDocumentUrl(file.URL)}}"
-                     download>download</a></td>
+                     download="file.Title">download</a></td>
                 <td>
                   <button title="Delete file"
                           class="btn btn-light btn-group-item"
@@ -386,7 +425,7 @@
                             (click)="modal.dismiss()">Cancel</button>
                     <button type="button"
                             class="btn brand-button--danger"
-                            (click)="removeDocument(file.Title)"
+                            (click)="removeFile(file.Title, 'staticContent')"
                             (click)="modal.dismiss()">Yes, Delete</button>
                   </confirm-modal>
                 </ng-template>

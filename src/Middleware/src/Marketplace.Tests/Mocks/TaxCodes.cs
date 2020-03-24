@@ -4,6 +4,7 @@ using Marketplace.Helpers.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Marketplace.Models.Misc;
 
 namespace Orchestration.Tests.Mocks
 {

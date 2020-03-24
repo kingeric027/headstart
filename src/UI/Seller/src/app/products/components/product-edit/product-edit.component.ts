@@ -20,7 +20,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecXp, SpecOption } from 'marketplace-javascript-sdk';
+import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
@@ -50,12 +50,13 @@ export class ProductEditComponent implements OnInit {
   @Input()
   isCreatingNew: boolean;
   @Input()
-  dataIsSaving = false;  
+  dataIsSaving = false;
   userContext = {};
   hasVariations = false;
   images: ProductImage[] = [];
   files: FileHandle[] = [];
   faTimes = faTimes;
+  faTrash = faTrash;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
@@ -103,6 +104,7 @@ export class ProductEditComponent implements OnInit {
   async refreshProductData(superProduct: SuperMarketplaceProduct) {
     this._superMarketplaceProductStatic = superProduct;
     this._superMarketplaceProductEditable = superProduct;
+    if (!this._superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure) this._superMarketplaceProductEditable.Product.xp.UnitOfMeasure = { Unit: null, Qty: null };
     if (
       this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
     ) {
@@ -144,10 +146,11 @@ export class ProductEditComponent implements OnInit {
         MaxQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MaxQuantity, Validators.min(1)),
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
         ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType')),
-        // SpecCount: new FormControl(superMarketplaceProduct.SpecCount),
-        // VariantCount: new FormControl(superMarketplaceProduct.VariantCount),
+        IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
+        UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit')),
+        UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty')),
       }, { validators: ValidateMinMax }
       );
     }
@@ -213,12 +216,9 @@ export class ProductEditComponent implements OnInit {
   handleUpdateProduct(event: any, field: string, typeOfValue?: string) {
     const productUpdate = {
       field,
-      value:
-        field === 'Product.Active'
-          ? event.target.checked
-          : typeOfValue === 'number'
-            ? Number(event.target.value)
-            : event.target.value,
+      value: 
+      (field === 'Product.Active' || field === 'Product.xp.IsResale')
+       ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
   }
@@ -239,7 +239,7 @@ export class ProductEditComponent implements OnInit {
   checkForChanges(): void {
     this.areChanges =
       JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic) ||
-      this.imageFiles.length > 0 || this.staticContentFiles.length > 0;
+      this.imageFiles?.length > 0 || this.staticContentFiles?.length > 0;
   }
 
   /** ****************************************
@@ -252,20 +252,19 @@ export class ProductEditComponent implements OnInit {
         const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
         return { File: file, URL };
       });
-      this.stageFiles(files, fileType);
+      this.stageImages(files);
     } else if (fileType === 'staticContent') {
       const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
         const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
         return { File: file, URL, fileName: this.documentName };
       });
-      this.stageFiles(files, fileType);
+      this.documentName = null;
+      this.stageDocuments(files);
     }
   }
 
-  stageFiles(files: FileHandle[], fileType: string) {
-    fileType === ' image' ?
-      this.imageFiles = this.imageFiles.concat(files) :
-      this.staticContentFiles = this.staticContentFiles.concat(files);
+  stageImages(files: FileHandle[]) {
+    this.imageFiles = this.imageFiles.concat(files);
     this.checkForChanges();
   }
 
@@ -277,7 +276,10 @@ export class ProductEditComponent implements OnInit {
       }
     } else {
       this.staticContentFiles.forEach(async file => {
-        superProduct = await this.middleware.uploadStaticContent(file.File, productID, file.fileName);
+        const test = file.File.name.split('.');
+        const ext = test[1];
+        const filenameWithExt = file.fileName + ext;
+        superProduct = await this.middleware.uploadStaticContent(file.File, productID, filenameWithExt);
       });
     }
     fileType === 'image' ?
@@ -322,6 +324,18 @@ export class ProductEditComponent implements OnInit {
 
   getDocumentName(event: KeyboardEvent) {
     this.documentName = (event.target as HTMLInputElement).value;
+  }
+
+  stageDocuments(files: FileHandle[]) {
+    files.forEach(file => {
+      const test = file.File.name.split('.');
+      const ext = test[1];
+      const filenameWithExt = file.fileName + '.' + ext;
+      file.fileName = filenameWithExt;
+    });
+    this.staticContentFiles = this.staticContentFiles.concat(files);
+    console.log(this.staticContentFiles)
+    this.checkForChanges();
   }
 
   async open(content) {
@@ -404,7 +418,7 @@ export class ProductEditComponent implements OnInit {
     }
     return totalMarkup;
   }
-  
+
   updateEditableProductWithVariationChanges(e): void {
     const updateProductResourceCopy = this.productService.copyResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
@@ -412,11 +426,14 @@ export class ProductEditComponent implements OnInit {
     updateProductResourceCopy.Specs = e.Specs;
     updateProductResourceCopy.Variants = e.Variants;
     this._superMarketplaceProductEditable = updateProductResourceCopy;
-    console.log(this._superMarketplaceProductEditable)
     this.checkForChanges();
   }
 
   validateVariants(e): void {
     this.variantsValid = e;
+  }
+
+  shouldIsResaleBeChecked(): boolean {
+    return this._superMarketplaceProductEditable?.Product?.xp?.IsResale;
   }
 }

@@ -3,19 +3,20 @@ using OrderCloud.SDK;
 using System.Collections.Generic;
 using System.Linq;
 using Marketplace.Common.Services.FreightPop.Models;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
     public static class OrderRequestMapper
     {
-        public static List<OrderRequest> Map(Order order, IList<LineItem> lineItems, Supplier supplier, Address supplierAddress, string freightPopOrderID)
+        public static List<OrderRequest> Map(Order order, IList<MarketplaceLineItem> lineItems, Supplier supplier, Address supplierAddress, string freightPopOrderID)
         {
             var firstLineItem = lineItems[0];
 
             var orderRequest = new OrderRequest
             {
                 OrderNumber = freightPopOrderID,
-
+                AdditionalDetails = AdditionalDetailsMapper.Map(lineItems.ToList(), firstLineItem.ShippingAddress, firstLineItem.ShipFromAddress),
                 // todo get carrier on order
                 //Carrier = 
                 Items = lineItems.Select(lineItem => ShipmentItemMapper.Map(lineItem)).ToList(),

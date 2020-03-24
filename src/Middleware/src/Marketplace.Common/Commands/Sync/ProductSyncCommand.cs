@@ -1,12 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
 using Marketplace.Models;
-using Marketplace.Models.Exceptions;
-using Marketplace.Models.Misc;
-using Marketplace.Models.Orchestration;
+using Marketplace.Helpers;
+using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Helpers;
+using Marketplace.Helpers.Helpers.Attributes;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Marketplace.Helpers.Models;
+using Newtonsoft.Json.Converters;
 
 namespace Marketplace.Common.Commands
 {
@@ -62,7 +72,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<MarketplaceProduct>();
+            var obj = wi.Current.ToObject<MarketplaceProduct>(OrchestrationSerializer.Serializer); ;
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
@@ -83,7 +93,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Diff).ToObject<PartialMarketplaceProduct>();
+            var obj = wi.Diff.ToObject<PartialMarketplaceProduct>(OrchestrationSerializer.Serializer);
             try
             {
                 var response = await _oc.Products.PatchAsync(wi.RecordId, obj, wi.Token);

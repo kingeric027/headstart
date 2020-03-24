@@ -1,9 +1,9 @@
 ﻿using Marketplace.Common.TemporaryAppConstants;
 using Marketplace.Helpers.Models;
 using Marketplace.Models;
-using Marketplace.Models.Models.Misc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.Commands
 {
@@ -23,9 +23,6 @@ namespace Marketplace.Common.Commands
         }
         public async Task<MarketplaceBuyer> Create(MarketplaceBuyer buyer, VerifiedUserContext user, string token)
         {
-            // Create Buyer with active set to false, checks will need to be performed to ensure that
-            // the buyer has everything it needs to be active first
-			buyer.Active = false;
             var ocBuyer = await _oc.Buyers.CreateAsync(buyer, token);
             var ocBuyerID = ocBuyer.ID;
 

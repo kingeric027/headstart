@@ -1,5 +1,6 @@
 ﻿using Marketplace.Common.Extensions;
 using Marketplace.Models;
+using Newtonsoft.Json;
 using OrderCloud.SDK;
 using SmartyStreets.USStreetApi;
 using System;
@@ -35,22 +36,26 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 
 		public static Address Map(AutoCompleteSuggestion suggestion, Address raw)
 		{
-			raw.Street1 = suggestion.street_line;
-			raw.Street2 = suggestion.secondary;
-			raw.City = suggestion.city;
-			raw.State = suggestion.state;
-			raw.Zip = suggestion.zipcode;
-			return raw;
+			// break reference which was causing pass by reference error
+			var rawCopy = JsonConvert.DeserializeObject<Address>(JsonConvert.SerializeObject(raw));
+			rawCopy.Street1 = suggestion.street_line;
+			rawCopy.Street2 = suggestion.secondary;
+			rawCopy.City = suggestion.city;
+			rawCopy.State = suggestion.state;
+			rawCopy.Zip = suggestion.zipcode;
+			return rawCopy;
 		}
 
 		public static Address Map(Candidate candidate, Address raw)
 		{
-			raw.Street1 = candidate.DeliveryLine1;
-			raw.Street2 = candidate.DeliveryLine2;
-			raw.City = candidate.Components.CityName;
-			raw.State = candidate.Components.State;
-			raw.Zip = $"{candidate.Components.ZipCode}-{candidate.Components.Plus4Code}";
-			return raw;
+			// break reference which was causing pass by reference error
+			var rawCopy = JsonConvert.DeserializeObject<Address>(JsonConvert.SerializeObject(raw));
+			rawCopy.Street1 = candidate.DeliveryLine1;
+			rawCopy.Street2 = candidate.DeliveryLine2;
+			rawCopy.City = candidate.Components.CityName;
+			rawCopy.State = candidate.Components.State;
+			rawCopy.Zip = $"{candidate.Components.ZipCode}-{candidate.Components.Plus4Code}";
+			return rawCopy;
 		}
 
 		public static Address Map(BuyerAddress buyerAddress)

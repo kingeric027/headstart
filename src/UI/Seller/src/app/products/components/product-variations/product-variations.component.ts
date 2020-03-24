@@ -15,6 +15,7 @@ export class ProductVariations {
   set superMarketplaceProductEditable(superProductEditable: SuperMarketplaceProduct) {
     this.superProductEditable = superProductEditable;
     this.variants = superProductEditable?.Variants;
+    superProductEditable?.Product?.ID ? this.canConfigureVariations = true : this.canConfigureVariations = false;
   };
   @Input()
   set superMarketplaceProductStatic(superProductStatic: SuperMarketplaceProduct) {
@@ -37,6 +38,7 @@ export class ProductVariations {
   superProductStatic: SuperMarketplaceProduct;
   variants: Variant[];
   specOptAdded = new EventEmitter<SpecOption>();
+  canConfigureVariations = false;
   areSpecChanges = false;
   definesVariant = false;
   variantsValid = true;

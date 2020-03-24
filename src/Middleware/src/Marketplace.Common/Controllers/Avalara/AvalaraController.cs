@@ -12,6 +12,7 @@ using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Models.Misc;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.Controllers.Avalara
 {

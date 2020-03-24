@@ -1,11 +1,12 @@
 ﻿using OrderCloud.SDK;
 using Marketplace.Common.Services.FreightPop.Models;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
     public static class ShipmentItemMapper
     {
-        public static FreightPop.Models.ShipmentItem Map(LineItem obj)
+        public static FreightPop.Models.ShipmentItem Map(MarketplaceLineItem obj)
         {
             var rateItem = new FreightPop.Models.ShipmentItem
             {

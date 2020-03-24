@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
+using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Helpers;
-using Marketplace.Models.Orchestration;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands

@@ -1,6 +1,7 @@
 ﻿using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Helpers;
+using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Misc;
 using OrderCloud.SDK;
 using System;
