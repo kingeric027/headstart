@@ -107,12 +107,12 @@ namespace Orchestration.Tests.Mocks
                 }
             };
         }
-        public static List<MarketplaceTaxCode> marketplaceTaxCodeListPageFirstRecord()
+        public static List<TaxCode> marketplaceTaxCodeListPageFirstRecord()
         {
-            return new List<MarketplaceTaxCode>
+            return new List<TaxCode>
 
             {
-                new MarketplaceTaxCode()
+                new TaxCode()
                 {
                     Category = "Test-Category",
                     Code = "Test-Tax-Code",
@@ -120,12 +120,12 @@ namespace Orchestration.Tests.Mocks
                 }
             };
         }
-        public static List<MarketplaceTaxCode> marketplaceTaxCodeListPageSecondRecord()
+        public static List<TaxCode> marketplaceTaxCodeListPageSecondRecord()
         {
-            return new List<MarketplaceTaxCode>
+            return new List<TaxCode>
 
             {
-                new MarketplaceTaxCode()
+                new TaxCode()
                 {
                     Category = "Second-Test-Category",
                     Code = "Second-Test-Tax-Code",
@@ -133,18 +133,18 @@ namespace Orchestration.Tests.Mocks
                 }
             };
         }
-        public static List<MarketplaceTaxCode> marketplaceTaxCodeListPageAllRecords()
+        public static List<TaxCode> marketplaceTaxCodeListPageAllRecords()
         {
-            return new List<MarketplaceTaxCode>
+            return new List<TaxCode>
 
             {
-                new MarketplaceTaxCode()
+                new TaxCode()
                 {
                     Category = "Test-Category",
                     Code = "Test-Tax-Code",
                     Description = "Test Tax Code Description"
                 },
-                new MarketplaceTaxCode()
+                new TaxCode()
                 {
                     Category = "Second-Test-Category",
                     Code = "Second-Test-Tax-Code",

@@ -1,25 +1,31 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Extensions;
-using Marketplace.Common.Mappers.Avalara;
+using Marketplace.Common.Services.Avalara.Mappers;
 using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
+using Marketplace.Models.Models.Misc;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.Avalara
 {
 	public interface IAvataxService
 	{
+		Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> marketplaceListArgs);
+		Task<TaxCertificate> GetCertificate(int companyID, int certifitcateID);
+		Task<TaxCertificate> CreateCertificate(int companyID, TaxCertificate cert);
+		Task<TaxCertificate> UpdateCertificate(int companyID, int certificateID, TaxCertificate cert);
+
 		// Use this before checkout. No records will be saved in avalara.
-		Task<decimal> GetTaxEstimateAsync(OrderWorksheet orderWorksheet);
+		Task<decimal> GetEstimateAsync(OrderWorksheet orderWorksheet);
 		// Use this during submit.
 		Task<TransactionModel> CreateTransactionAsync(OrderWorksheet orderWorksheet);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
 		// When should we do this? 
 		Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode);
-		Task<ListPage<MarketplaceTaxCode>> ListTaxCodesAsync(ListArgs<TaxCodeModel> marketplaceListArgs);
 	}
 
 	public class AvataxService : IAvataxService
@@ -36,28 +42,57 @@ namespace Marketplace.Common.Services.Avalara
 					.WithSecurity(settings.AvalaraSettings.AccountID, settings.AvalaraSettings.LicenseKey);
 		}
 
-		public async Task<ListPage<MarketplaceTaxCode>> ListTaxCodesAsync(ListArgs<TaxCodeModel> marketplaceListArgs)
+		public async Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> marketplaceListArgs)
 		{
-			var args = TaxCodeMapper.Map(marketplaceListArgs);
+			var args = AvalaraMapper.Map(marketplaceListArgs);
 			var avataxCodes = await _avaTax.ListTaxCodesAsync(args.Filter, args.Top, args.Skip, args.OrderBy);
-			var codeList = TaxCodeMapper.Map(avataxCodes, args);
+			var codeList = AvalaraMapper.Map(avataxCodes, args);
 			return codeList;
 		}
 
-		public async Task<decimal> GetTaxEstimateAsync(OrderWorksheet orderWorksheet)
+		public async Task<TaxCertificate> GetCertificate(int companyID, int certifitcateID)
 		{
-			var transaction = await CreateTransactionAsync(DocumentType.SalesOrder, orderWorksheet);
-			return transaction.totalTax ?? 0;
+			var certificate = await _avaTax.GetCertificateAsync(companyID, certifitcateID, "");
+			return AvalaraMapper.Map(certificate);
+		}
+
+		public async Task<TaxCertificate> CreateCertificate(int companyID, TaxCertificate cert)
+		{
+			var certificates = await _avaTax.CreateCertificatesAsync(companyID, false, new List<CertificateModel> { AvalaraMapper.Map(cert) });
+			return AvalaraMapper.Map(certificates[0]);
+		}
+
+		public async Task<TaxCertificate> UpdateCertificate(int companyID, int certifitcateID, TaxCertificate cert)
+		{
+			var certificate = await _avaTax.UpdateCertificateAsync(companyID, certifitcateID, AvalaraMapper.Map(cert));
+			return AvalaraMapper.Map(certificate);
+		}
+
+		public async Task<decimal> GetEstimateAsync(OrderWorksheet orderWorksheet)
+		{
+			var taxEstimate = (await CreateTransactionAsync(DocumentType.SalesOrder, orderWorksheet)).totalTax ?? 0;
+			return taxEstimate;
 		}
 
 		public async Task<TransactionModel> CreateTransactionAsync(OrderWorksheet orderWorksheet)
 		{
-			return await CreateTransactionAsync(DocumentType.SalesInvoice, orderWorksheet);
+			var transaction = await CreateTransactionAsync(DocumentType.SalesInvoice, orderWorksheet);
+			return transaction;
 		}
+
+		public async Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode)
+		{
+			var model = new CommitTransactionModel() { commit = true };
+			var transaction = await _avaTax.CommitTransactionAsync(_companyCode, transactionCode, DocumentType.SalesInvoice, "", model);
+			return transaction;
+		}
+
+		private string GetCustomerCode(Order order) => order.FromCompanyID;
 
 		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)
 		{
 			var trans = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderWorksheet.Order));
+			trans.WithTransactionCode(orderWorksheet.Order.ID);
 			foreach (var shipmentEstimate in orderWorksheet.ShipEstimateResponse.ShipEstimates)
 			{
 				var selectedShipMethod = shipmentEstimate.ShipMethods.First(shipmentMethod => shipmentMethod.ID == shipmentEstimate.SelectedShipMethodID);
@@ -67,25 +102,13 @@ namespace Marketplace.Common.Services.Avalara
 				var shipFromAddress = firstLineItem.ShipFromAddress;
 				var shipToAddress = firstLineItem.ShippingAddress;
 
-				// This assumes the order has one ShipTo Address. Should change
+				// This assumes the order has one ShipTo Address. This is ok for marketplace, but not a general OC integration.
 				trans.WithShippingRate(shippingRate, shipFromAddress, shipToAddress);
-
 			}
-			
+
 			foreach (var lineItem in orderWorksheet.LineItems) trans.WithLineItem(lineItem);
 
 			return await trans.CreateAsync();
-		}
-
-		public async Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode)
-		{
-			var model = new CommitTransactionModel() { commit = true };
-			return await _avaTax.CommitTransactionAsync(_companyCode, transactionCode, DocumentType.SalesInvoice, "", model);
-		}
-
-		private string GetCustomerCode(Order order)
-		{
-			return order.FromCompanyID;
 		}
 	}
 }

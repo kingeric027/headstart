@@ -55,7 +55,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload orderCalculatePayload)
         {
-            var totalTax = await _avatax.GetTaxEstimateAsync(orderCalculatePayload.OrderWorksheet);
+            var totalTax = await _avatax.GetEstimateAsync(orderCalculatePayload.OrderWorksheet);
 
             return new OrderCalculateResponse
             {

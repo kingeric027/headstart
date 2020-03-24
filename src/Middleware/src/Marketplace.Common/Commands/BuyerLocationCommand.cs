@@ -1,12 +1,14 @@
 ﻿using Marketplace.Common.Helpers;
 using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
+using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.TemporaryAppConstants;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using Marketplace.Models.Models.Misc;
+using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -21,11 +23,12 @@ namespace Marketplace.Common.Commands
         Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID, VerifiedUserContext user);
         Task<MarketplaceBuyerLocation> Update(string buyerID, string buyerLocationID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user);
         Task Delete(string buyerID, string buyerLocationID, VerifiedUserContext user);
-    }
+	}
+
     public class MarketplaceBuyerLocationCommand : IMarketplaceBuyerLocationCommand
     {
         private readonly IOrderCloudClient _oc;
-        private readonly AppSettings _settings;
+		private readonly AppSettings _settings;
 
         public MarketplaceBuyerLocationCommand(AppSettings settings, IOrderCloudClient oc)
         {
@@ -83,5 +86,6 @@ namespace Marketplace.Common.Commands
             var deleteUserGroupReq = _oc.UserGroups.DeleteAsync(buyerID, buyerLocationID, accessToken: user.AccessToken);
             await Task.WhenAll(deleteAddressReq, deleteUserGroupReq);
         }
-    }
+
+	}
 }

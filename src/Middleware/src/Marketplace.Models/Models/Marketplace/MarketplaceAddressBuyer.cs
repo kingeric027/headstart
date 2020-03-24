@@ -1,4 +1,5 @@
 ﻿using OrderCloud.SDK;
+using System;
 using System.Collections.Generic;
 
 namespace Marketplace.Models
@@ -14,6 +15,8 @@ namespace Marketplace.Models
         public List<DestinationAddressAccessorial> Accessorials { get; set; }
         public string Email { get; set; }
 		public Coordinates Coordinates;
+		public string AvalaraCertificateID { get; set; }
+		public DateTimeOffset CertificateExpirationDate { get; set; }
     }
 
 public enum DestinationAddressAccessorial
