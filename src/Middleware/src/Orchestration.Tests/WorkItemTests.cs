@@ -65,7 +65,7 @@ namespace Orchestration.Tests
         [Test, TestCaseSource(typeof(ActionFactory), nameof(ActionFactory.TestCases))]
         public Action determine_action_results(WorkItem wi)
         {
-            //wi.Diff = wi.Current.Diff(wi.Cache);
+            wi.Diff = wi.Current.Diff(wi.Cache);
             var action = WorkItemMethods.DetermineAction(wi);
             return action;
         }
