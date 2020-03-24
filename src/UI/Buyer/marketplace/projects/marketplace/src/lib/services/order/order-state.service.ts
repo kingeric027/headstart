@@ -18,13 +18,7 @@ export class OrderStateService {
       BuyerLocationID: '',
       AvalaraTaxTransactionCode: '',
       OrderType: OrderType.Standard,
-      QuoteOrderInfo: {
-        FirstName: '',
-        LastName: '',
-        Phone: '',
-        Email: '',
-        Comments: '',
-      },
+      QuoteOrderInfo: null,
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
