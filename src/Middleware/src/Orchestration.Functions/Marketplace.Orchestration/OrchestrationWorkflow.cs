@@ -41,7 +41,7 @@ namespace Marketplace.Orchestration
                 wi.Current = queue["Model"] as JObject;
                 wi.Token = queue["Token"].ToString();
                 wi.ClientId = queue["ClientId"].ToString();
-                //wi.Diff = await context.CallActivityAsync<JObject>("CalculateDiff", wi);
+                wi.Diff = await context.CallActivityAsync<JObject>("CalculateDiff", wi);
                 wi.Action = await context.CallActivityAsync<Action>("DetermineAction", wi);
 
                 switch (wi.Action)
