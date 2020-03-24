@@ -252,20 +252,6 @@ namespace Marketplace.Common.Commands
 			  }
 			},
 			new Webhook() {
-			  Name = "Order Submit",
-			  Description = "Takes Buyer Order, forwards order to suppliers, imports supplier orders into freight pop, imports information into zoho, avalara, and card connect",
-			  Url = "/ordersubmit",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/submit", Verb = "POST" }
-			  }
-			},
-			new Webhook() {
 			  Name = "Post and Put Address Validation Pre-webhook",
 			  Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
 			  Url = "/validateaddresspostput",
