@@ -1,14 +1,14 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { MarketplaceMeProduct } from 'marketplace';
+import { Product } from '../../../../marketplace/node_modules/@ordercloud/angular-sdk/dist/ordercloud-angular-sdk';
 @Pipe({
   name: 'UofM',
 })
 export class UnitOfMeasurePipe implements PipeTransform {
-  transform(product: MarketplaceMeProduct): string {
+  transform(product: Product): string {
     const uofm = product?.xp?.UnitOfMeasure;  
     if (uofm?.Qty == null || uofm?.Unit == null) {
         return '';
     }
-    return `${uofm.Qty} per ${uofm.Unit}`
+    return `${uofm.Qty} / ${uofm.Unit}`
   }
 }
