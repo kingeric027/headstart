@@ -10,6 +10,7 @@ using Marketplace.Helpers.Extensions;
 using Marketplace.Helpers.Models;
 using Marketplace.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using OrderCloud.SDK;
@@ -17,6 +18,27 @@ using IPartial = Marketplace.Helpers.Models.IPartial;
 
 namespace Orchestration.Tests
 {
+    public class MockObject
+    {
+        [MaxLength(500), OrchestrationIgnore]
+        public string Name { get; set; }
+        public MockObjectXp xp { get; set; } = new MockObjectXp();
+    }
+
+    public class MockObjectXp
+    {
+        [OrchestrationIgnore]
+        public string Ignored { get; set; }
+        public MockSubObject MockSub { get; set; } = new MockSubObject();
+    }
+
+    public class MockSubObject
+    {
+        public string Key { get; set; }
+        [OrchestrationIgnore]
+        public string Value { get; set; }
+    }
+
     public class Tests
     {
         [SetUp]
@@ -61,12 +83,12 @@ namespace Orchestration.Tests
         public void serializer_ignore_results(WorkItem wi)
         {
             var diff = wi.Current.Diff(wi.Cache);
-            var attempt = diff.ToObject<TestObject>(new JsonSerializer()
+            var attempt = diff.ToObject<MockObject>(new JsonSerializer()
             {
                 ContractResolver = new OrchestrationSerializer()
             });
             Assert.IsNull(attempt.xp.Ignored);
-            Assert.IsNull(attempt.xp.Sub.Value);
+            Assert.IsNull(attempt.xp.MockSub.Value);
             Assert.IsNull(attempt.Name);
             //Assert.IsNull(attempt.xp.Note);
         }
@@ -112,9 +134,9 @@ namespace Orchestration.Tests
                 //yield return new TestCaseData(new WorkItem()
                 //{
                 //    Current = JObject.Parse(
-                //        @"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Note': 'changed'  }}}"),
+                //        @"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }, 'Note': 'changed note'  }}"),
                 //    Cache = JObject.Parse(
-                //        @"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code', 'Note': 'description' }}}"),
+                //        @"{ 'ID': 'id', 'Name': 'name', 'xp': { 'Tax': { 'Category': 'category', 'Code': 'code' }, 'Note': 'cached note'  }}")
                 //});
             }
         }
