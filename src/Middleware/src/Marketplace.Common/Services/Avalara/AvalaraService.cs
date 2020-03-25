@@ -13,7 +13,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.Avalara
 {
-	public interface IAvataxService
+	public interface IAvalaraService
 	{
 		Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> marketplaceListArgs);
 		Task<TaxCertificate> GetCertificate(int companyID, int certifitcateID);
@@ -29,12 +29,12 @@ namespace Marketplace.Common.Services.Avalara
 		Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode);
 	}
 
-	public class AvataxService : IAvataxService
+	public class AvalaraService : IAvalaraService
 	{
 		private readonly AvaTaxClient _avaTax;
 		private readonly string _companyCode;
 
-		public AvataxService(AppSettings settings)
+		public AvalaraService(AppSettings settings)
 		{
 			_companyCode = settings.AvalaraSettings.CompanyCode;
 			var env = settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;

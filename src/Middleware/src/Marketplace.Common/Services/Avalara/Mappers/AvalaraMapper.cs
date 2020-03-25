@@ -25,10 +25,10 @@ namespace Marketplace.Common.Services.Avalara.Mappers
 				expirationDate = source.ExpirationDate.UtcDateTime,
 				pdf = source.Base64UrlEncodedPDF,
 				exemptPercentage = 100,
-				exemptionNumber = "id",
+				exemptionNumber = source.ExemptionNumber,
 				exposureZone = new ExposureZoneModel()
 				{
-					name = "Michigan"
+					name = source.ExposureZoneName
 				},
 				exemptionReason = new ExemptionReasonModel()
 				{

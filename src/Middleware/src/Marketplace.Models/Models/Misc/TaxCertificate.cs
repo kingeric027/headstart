@@ -15,8 +15,10 @@ namespace Marketplace.Models.Models.Misc
 		public DateTimeOffset ExpirationDate { get; set; }
 		[ApiReadOnly]
 		public bool Expired => ExpirationDate > DateTimeOffset.Now;
+		// Typically state, e.g. 'Michigan'
+		// https://developer.avalara.com/api-reference/avatax/rest/v2/models/ExposureZoneModel/
 		[Required]
-		public string State { get; set; }
+		public string ExposureZoneName { get; set; } 
 		[Required]
 		public string Base64UrlEncodedPDF { get; set; }
 		public string ExemptionNumber { get; set; }

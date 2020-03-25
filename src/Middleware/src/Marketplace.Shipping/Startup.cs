@@ -37,7 +37,7 @@ namespace Marketplace.Shipping
 				.ConfigureOpenApiSpec("v1", "Marketplace API")
                 .Inject<IFlurlClient>()
                 .Inject<IOCShippingIntegration>()
-                .Inject<IAvataxService>()
+                .Inject<IAvalaraService>()
                 .Inject<IFreightPopService>()
                 .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser");
         }
