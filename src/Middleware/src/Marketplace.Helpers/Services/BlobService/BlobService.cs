@@ -86,6 +86,15 @@ namespace Marketplace.Helpers.Services
                 new BlobRequestOptions() { SingleBlobUploadThresholdInBytes = 4 * 1024 * 1024 }, new OperationContext());
         }
 
+        public async Task Upload(string reference, byte[] bytes, string fileType = null)
+        {
+            await this.Init();
+            var block = _container.GetBlockBlobReference(reference);
+            if (fileType != null)
+                block.Properties.ContentType = fileType;
+            await block.UploadFromByteArrayAsync(bytes, 0, bytes.Length);
+        }
+
         public async Task Save(string reference, string blob, string fileType = null)
         {
             await this.Init();
