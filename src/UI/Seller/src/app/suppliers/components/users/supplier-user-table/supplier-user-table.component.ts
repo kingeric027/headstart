@@ -2,20 +2,8 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { User, UserGroupAssignment } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ValidateEmail } from '@app-seller/validators/validators';
 import { SupplierUserService } from '../supplier-user.service';
 import { SupplierService } from '../../suppliers/supplier.service';
-
-function createSupplierUserForm(user: User) {
-  return new FormGroup({
-    Username: new FormControl(user.Username, Validators.required),
-    FirstName: new FormControl(user.FirstName, Validators.required),
-    LastName: new FormControl(user.LastName, Validators.required),
-    Email: new FormControl(user.Email, [Validators.required, ValidateEmail]),
-    Active: new FormControl(user.Active),
-  });
-}
 @Component({
   selector: 'app-supplier-user-table',
   templateUrl: './supplier-user-table.component.html',
@@ -31,7 +19,7 @@ export class SupplierUserTableComponent extends ResourceCrudComponent<User> {
     activatedroute: ActivatedRoute,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, supplierUserService, router, activatedroute, ngZone, createSupplierUserForm);
+    super(changeDetectorRef, supplierUserService, router, activatedroute, ngZone);
   }
 
   captureUserGroupAssignments(event): void {

@@ -1,7 +1,7 @@
 // core services
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PromotionTableComponent } from './components/promotions/promotion-table/promotion-table.component';
+import { PromotionTableComponent } from './components/promotion-table/promotion-table.component';
 
 const routes: Routes = [
   { path: '', component: PromotionTableComponent },

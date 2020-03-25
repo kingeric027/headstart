@@ -4,18 +4,18 @@
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
                           [dataIsSaving]="dataIsSaving"
-                          [parentResourceService]="buyerService"
                           [resourceForm]="resourceForm"
+                          [filterConfig]="filterConfig"
                           (searched)="searchResources($event)"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
-  <app-buyer-user-edit class="resource-edit"
-                       [resourceInSelection]="resourceInSelection"
-                       [filterConfig]="filterConfig"
-                       (updateResource)="updateResource($event)"
-                       (userGroupAssignments)="captureUserGroupAssignments($event)">
-  </app-buyer-user-edit>
+  <app-facet-edit class="resource-edit"
+                  [resourceInSelection]="resourceInSelection"
+                  [filterConfig]="filterConfig"
+                  [updatedResource]="updatedResource"
+                  (updateResource)="updateResource($event)">
+  </app-facet-edit>
 </resource-table-component>
