@@ -54,7 +54,7 @@ namespace Marketplace.Common.Controllers.Avalara
 			return await _taxService.UpdateCertificateAsync(companyID, certificateID, cert);
 		}
 
-		[DocName("Get tax exeption certificate pdf")]
+		[DocIgnore]
 		[HttpGet, Route("{companyID}/certificate/{certificateID}/pdf")]
 		public async Task<FileResult> DownloadCertificate(int companyID, int certificateID)
 		{
