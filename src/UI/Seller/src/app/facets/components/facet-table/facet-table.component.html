@@ -13,8 +13,6 @@
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
   <app-facet-edit class="resource-edit"
-                  *ngIf="resourceForm"
-                  [resourceForm]="resourceForm"
                   [resourceInSelection]="resourceInSelection"
                   [filterConfig]="filterConfig"
                   [updatedResource]="updatedResource"

@@ -1,33 +1,31 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { get as _get } from 'lodash';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { UserGroupAssignment, User } from '@ordercloud/angular-sdk';
-import { BuyerUserService } from '../buyer-user.service';
 import { ValidateEmail } from '@app-seller/validators/validators';
+import { SellerUserService } from '@app-seller/seller-users/seller-user.service';
 @Component({
-  selector: 'app-buyer-user-edit',
-  templateUrl: './buyer-user-edit.component.html',
-  styleUrls: ['./buyer-user-edit.component.scss'],
+  selector: 'app-seller-user-edit',
+  templateUrl: './seller-user-edit.component.html',
+  styleUrls: ['./seller-user-edit.component.scss'],
 })
-export class BuyerUserEditComponent {
+export class SellerUserEditComponent {
   @Input()
   filterConfig;
   @Input()
-  set resourceInSelection(buyerUser: User) {
-    this.createBuyerUserForm(buyerUser);
+  set resourceInSelection(sellerUser: User) {
+    this.createSellerUserForm(sellerUser);
   }
   @Output()
   updateResource = new EventEmitter<any>();
   @Output()
-  userGroupAssignments = new EventEmitter<UserGroupAssignment[]>();
   isCreatingNew: boolean;
   resourceForm: FormGroup;
-  constructor(public buyerUserService: BuyerUserService) {
-    this.isCreatingNew = this.buyerUserService.checkIfCreatingNew();
+  constructor(public sellerUserService: SellerUserService) {
+    this.isCreatingNew = this.sellerUserService.checkIfCreatingNew();
   }
 
-  createBuyerUserForm(user: User) {
+  createSellerUserForm(user: User) {
     this.resourceForm = new FormGroup({
       Active: new FormControl(user.Active),
       Username: new FormControl(user.Username, Validators.required),
@@ -40,8 +38,5 @@ export class BuyerUserEditComponent {
     field === 'Active'
       ? this.updateResource.emit({ value: event.target.checked, field })
       : this.updateResource.emit({ value: event.target.value, field });
-  }
-  addUserGroupAssignments(event): void {
-    this.userGroupAssignments.emit(event);
   }
 }
