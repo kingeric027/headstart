@@ -13,7 +13,6 @@ namespace Marketplace.Models.Models.Misc
 		public DateTimeOffset SignedDate { get; set; }
 		[Required]
 		public DateTimeOffset ExpirationDate { get; set; }
-
 		// Typically state, e.g. 'Michigan'
 		// https://developer.avalara.com/api-reference/avatax/rest/v2/models/ExposureZoneModel/
 		[Required]

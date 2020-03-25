@@ -1,7 +1,6 @@
 ﻿using Marketplace.Common.Helpers;
 using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
-using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.TemporaryAppConstants;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
@@ -84,6 +83,5 @@ namespace Marketplace.Common.Commands
             var deleteUserGroupReq = _oc.UserGroups.DeleteAsync(buyerID, buyerLocationID, accessToken: user.AccessToken);
             await Task.WhenAll(deleteAddressReq, deleteUserGroupReq);
         }
-
 	}
 }

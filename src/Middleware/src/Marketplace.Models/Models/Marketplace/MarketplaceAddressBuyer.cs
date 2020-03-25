@@ -15,8 +15,7 @@ namespace Marketplace.Models
         public List<DestinationAddressAccessorial> Accessorials { get; set; }
         public string Email { get; set; }
 		public Coordinates Coordinates;
-		public string AvalaraCertificateID { get; set; }
-		public DateTimeOffset CertificateExpirationDate { get; set; }
+		public string AvalaraCertificateID { get; set; } // null if no certificate
     }
 
 public enum DestinationAddressAccessorial
