@@ -23,6 +23,7 @@ namespace Marketplace.Helpers.Services
         Task Save(string reference, string blob, string fileType = null);
         Task Save(string reference, JObject blob, string fileType = null);
 		Task Save(string reference, IFormFile blob, string fileType = null);
+        Task Save(string reference, byte[] bytes, string fileType = null)
         Task Save(BlobBase64Image base64Image);
         Task Delete(string id);
     }
@@ -86,7 +87,7 @@ namespace Marketplace.Helpers.Services
                 new BlobRequestOptions() { SingleBlobUploadThresholdInBytes = 4 * 1024 * 1024 }, new OperationContext());
         }
 
-        public async Task Upload(string reference, byte[] bytes, string fileType = null)
+        public async Task Save(string reference, byte[] bytes, string fileType = null)
         {
             await this.Init();
             var block = _container.GetBlockBlobReference(reference);
