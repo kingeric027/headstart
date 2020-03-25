@@ -35,7 +35,7 @@ export class SupplierUserTableComponent extends ResourceCrudComponent<User> {
   }
 
   captureUserGroupAssignments(event): void {
-    this.userGroupAssignments = event;
+    this.userGroupAssignments = event.Assignments;
   }
 
   async createNewResource() {

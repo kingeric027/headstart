@@ -12,12 +12,13 @@ using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using System.Linq;
 using Marketplace.Models.Models.Marketplace;
+using System;
 
 namespace Marketplace.Common.Commands
 {
     public interface IOrderCommand
     {
-        Task HandleBuyerOrderSubmit(MarketplaceOrder order);
+        Task HandleBuyerOrderSubmit(OrderWorksheet order);
     }
 
     public class OrderCommand : IOrderCommand
@@ -41,28 +42,32 @@ namespace Marketplace.Common.Commands
             _ocSandboxService = orderCloudSandboxService;
         }
 
-        public async Task HandleBuyerOrderSubmit(MarketplaceOrder order)
+        public async Task HandleBuyerOrderSubmit(OrderWorksheet orderWorksheet)
         {
-            // forwarding
-            var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, order.ID);
-            var supplierOrders = orderSplitResult.OutgoingOrders.ToList();
-
-            // creating relationship between the buyer order and the supplier order
-            // no relationship exists currently in the platform
-            var updatedSupplierOrders = await CreateOrderRelationshipsAndTransferXP(order, supplierOrders);
-            
-            // quote orders do not need to flow into our integrations
-            if (order.xp == null || order.xp.OrderType != OrderType.Quote)
+            try
             {
-                var buyerOrderWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, order.ID);
-                await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders);
-                
-                // temporarily do not do these integrations until platform bug that results in nulled fields on order worksheet is fixed
-                if(buyerOrderWorksheet.ShipEstimateResponse != null) {
-                    await HandleTaxTransactionCreationAsync(buyerOrderWorksheet);
-                    var zoho_salesorder = await _zoho.CreateSalesOrder(buyerOrderWorksheet);
+                // forwarding
+                var buyerOrder = orderWorksheet.Order;
+                var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, buyerOrder.ID);
+                var supplierOrders = orderSplitResult.OutgoingOrders.ToList();
+
+                // creating relationship between the buyer order and the supplier order
+                // no relationship exists currently in the platform
+                var updatedSupplierOrders = await CreateOrderRelationshipsAndTransferXP(buyerOrder, supplierOrders);
+            
+                // quote orders do not need to flow into our integrations
+                if (buyerOrder.xp == null || buyerOrder.xp.OrderType != OrderType.Quote)
+                {
+                    var updatedWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, buyerOrder.ID);
+                    await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders);
+                    await HandleTaxTransactionCreationAsync(orderWorksheet);
+                    var zoho_salesorder = await _zoho.CreateSalesOrder(orderWorksheet);
                     await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
                 }
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                // todo add error response in proper format for checkout integration after receiving models 
             }
         }
 
@@ -77,17 +82,11 @@ namespace Marketplace.Common.Commands
             {
                 var supplierID = supplierOrder.ToCompanyID;
                 supplierIDs.Add(supplierID);
-                var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierID));
+                var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierID)).ToList();
                 var supplierOrderPatch = new PartialOrder()
                 {
                     ID = $"{buyerOrder.ID}-{supplierID}",
-                    xp = new
-                    {
-                        ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
-                        SupplierIDs = new List<string>() { supplierID },
-                        StopShipSync = false,
-                        buyerOrder.xp.OrderType
-                    }
+                    xp = GetNewOrderXP(buyerOrder, supplierID, shipFromAddressIDsForSupplierOrder)
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
@@ -103,6 +102,19 @@ namespace Marketplace.Common.Commands
             };
             await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, buyerOrderPatch);
             return updatedSupplierOrders;
+        }
+
+        private OrderXp GetNewOrderXP(MarketplaceOrder buyerOrder, string supplierID, List<string> shipFromAddressIDsForSupplierOrder)
+        {
+            var supplierOrderXp = new OrderXp()
+            {
+                ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
+                SupplierIDs = new List<string>() { supplierID },
+                StopShipSync = false,
+                OrderType = buyerOrder.xp.OrderType,
+                QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo
+            };
+            return supplierOrderXp;
         }
 
         private List<string> GetShipFromAddressIDs(List<LineItem> lineItems)

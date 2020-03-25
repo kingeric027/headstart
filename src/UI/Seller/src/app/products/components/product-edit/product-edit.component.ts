@@ -123,7 +123,6 @@ export class ProductEditComponent implements OnInit {
     this.images = ReplaceHostUrls(superProduct.Product);
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.isCreatingNew = this.productService.checkIfCreatingNew();
-    this.staticContent.forEach(file => this.sanitizer.bypassSecurityTrustResourceUrl(file.URL))
     this.checkForChanges();
   }
 
@@ -180,7 +179,10 @@ export class ProductEditComponent implements OnInit {
     try {
       this.dataIsSaving = true;
       const superProduct = await this.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
-      await this.addFiles(this.files, superProduct.Product.ID);
+      if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
+      if (this.staticContentFiles.length > 0) {
+        await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
+      }
       this.refreshProductData(superProduct);
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
       this.dataIsSaving = false;
@@ -196,9 +198,9 @@ export class ProductEditComponent implements OnInit {
       const superProduct = await this.updateMarketplaceProduct(this._superMarketplaceProductEditable);
       this._superMarketplaceProductStatic = superProduct;
       this._superMarketplaceProductEditable = superProduct;
-      if (this.imageFiles) this.addFiles(this.imageFiles, superProduct.Product.ID, 'image');
-      if (this.staticContentFiles) {
-        this.addFiles(this.staticContentFiles, superProduct.Product.ID, 'staticContent');
+      if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
+      if (this.staticContentFiles.length > 0) {
+        await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
       }
       this.dataIsSaving = false;
     } catch (ex) {
@@ -216,9 +218,9 @@ export class ProductEditComponent implements OnInit {
   handleUpdateProduct(event: any, field: string, typeOfValue?: string) {
     const productUpdate = {
       field,
-      value: 
-      (field === 'Product.Active' || field === 'Product.xp.IsResale')
-       ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
+      value:
+        (field === 'Product.Active' || field === 'Product.xp.IsResale')
+          ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
   }
@@ -254,9 +256,10 @@ export class ProductEditComponent implements OnInit {
       });
       this.stageImages(files);
     } else if (fileType === 'staticContent') {
+
       const files: FileHandle[] = Array.from(event.target.files).map((file: File) => {
         const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
-        return { File: file, URL, fileName: this.documentName };
+        return { File: file, URL, Filename: this.documentName };
       });
       this.documentName = null;
       this.stageDocuments(files);
@@ -268,23 +271,23 @@ export class ProductEditComponent implements OnInit {
     this.checkForChanges();
   }
 
-  async addFiles(files: FileHandle[], productID: string, fileType?: string) {
+  async addDocuments(files: FileHandle[], productID: string) {
     let superProduct;
-    if (fileType === 'image') {
-      for (const file of files) {
-        superProduct = await this.middleware.uploadProductImage(file.File, productID);
-      }
-    } else {
-      this.staticContentFiles.forEach(async file => {
-        const test = file.File.name.split('.');
-        const ext = test[1];
-        const filenameWithExt = file.fileName + ext;
-        superProduct = await this.middleware.uploadStaticContent(file.File, productID, filenameWithExt);
-      });
+    for (const file of files) {
+      superProduct = await this.middleware.uploadStaticContent(file.File, productID, file.Filename);
     }
-    fileType === 'image' ?
-      this.imageFiles = [] :
-      this.staticContentFiles = [];
+    this.staticContentFiles = [];
+    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
+    superProduct = Object.assign(this._superMarketplaceProductStatic || {}, superProduct);
+    this.refreshProductData(superProduct);
+  }
+
+  async addImages(files: FileHandle[], productID: string) {
+    let superProduct;
+    for (const file of files) {
+      superProduct = await this.middleware.uploadProductImage(file.File, productID);
+    }
+    this.imageFiles = []
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
     superProduct = Object.assign(this._superMarketplaceProductStatic || {}, superProduct);
     this.refreshProductData(superProduct);
@@ -328,13 +331,12 @@ export class ProductEditComponent implements OnInit {
 
   stageDocuments(files: FileHandle[]) {
     files.forEach(file => {
-      const test = file.File.name.split('.');
-      const ext = test[1];
-      const filenameWithExt = file.fileName + '.' + ext;
-      file.fileName = filenameWithExt;
+      const fileName = file.File.name.split('.');
+      const ext = fileName[1];
+      const fileNameWithExt = file.Filename + '.' + ext;
+      file.Filename = fileNameWithExt;
     });
     this.staticContentFiles = this.staticContentFiles.concat(files);
-    console.log(this.staticContentFiles)
     this.checkForChanges();
   }
 

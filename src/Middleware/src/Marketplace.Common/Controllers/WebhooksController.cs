@@ -8,6 +8,7 @@ using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using Marketplace.Common.Helpers;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Controllers
 {
@@ -36,11 +37,11 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("ordersubmit")]
         [OrderCloudWebhookAuth]
-        public async void HandleOrderSubmit([FromBody] MarketplaceOrderSubmitPayload payload)
+        public async void HandleOrderSubmit([FromBody] OrderCalculatePayload payload)
         {
-            await _orderCommand.HandleBuyerOrderSubmit(payload.Response.Body);
-            await _sendgridService.SendSupplierEmails(payload.Response.Body.ID);
-            await _sendgridService.SendSingleEmail("noreply@four51.com", payload.Response.Body.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
+            await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
+            await _sendgridService.SendSupplierEmails(payload.OrderWorksheet.Order.ID);
+            await _sendgridService.SendSingleEmail("noreply@four51.com", payload.OrderWorksheet.Order.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
         }
 
         [HttpPost, Route("orderrequiresapproval")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS		

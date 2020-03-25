@@ -4,7 +4,7 @@
     <div class="pb-2 mt-4 mb-2">
       <h2> <span class="text-muted">Order #:</span> {{_order.ID}}<span *ngIf="_order?.xp?.OrderType === 'Quote'"
               class="badge badge-pill badge-primary ml-2">{{_order?.xp?.OrderType}}</span></h2>
-      <button *ngIf="_order?.xp?.OrderType === 'Quote'"
+      <button *ngIf="_order?.xp?.OrderType === 'Quote' && _order?.Status !== 'Completed'"
               class="btn btn-outline-primary float-right"
               (click)="setOrderStatus()">Acknowledge Quote</button>
     </div>
@@ -90,12 +90,12 @@
       <div class="col-6"
            *ngIf="isQuoteOrder(_order)">
         <strong>Submitted By</strong>
-        <span class="float-right">{{_order.xp?.QuoteOrderInfo.FirstName}} {{_order.xp?.QuoteOrderInfo.LastName}}</span><br>
-        <span class="float-right">{{_order.xp?.QuoteOrderInfo.Phone | tel}}</span><br>
-        <span class="float-right">{{_order.xp?.QuoteOrderInfo.Email}}</span><br>
+        <span class="float-right">{{_order.xp?.QuoteOrderInfo?.FirstName}} {{_order.xp?.QuoteOrderInfo?.LastName}}</span><br>
+        <span class="float-right">{{_order.xp?.QuoteOrderInfo?.Phone | tel}}</span><br>
+        <span class="float-right">{{_order.xp?.QuoteOrderInfo?.Email}}</span><br>
         <div *ngIf="order?.xp?.QuoteOrderInfo?.Comments"
              class="alert alert-secondary small">
-          <strong>Comments: </strong> {{_order.xp.QuoteOrderInfo.Comments}}
+          <strong>Comments: </strong> {{_order.xp.QuoteOrderInfo?.Comments}}
         </div>
       </div>
     </div>

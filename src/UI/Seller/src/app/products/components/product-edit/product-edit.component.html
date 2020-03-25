@@ -340,7 +340,7 @@
           <label class="rmpm dropzone"
                  for="imageUpload"
                  appDrag
-                 (files)="stageFiles($event)">
+                 (files)="stageImages($event)">
           </label>
           <input class="d-none"
                  id="imageUpload"
@@ -372,7 +372,7 @@
               <label *ngIf="documentName?.length"
                      class="btn btn-outline-primary"
                      for="documentUpload"
-                     (files)="stageFiles($event)">
+                     (files)="stageImages($event)">
                 choose file
                 <input id="documentUpload"
                        class="d-none"
@@ -383,7 +383,7 @@
           </div>
           <div *ngFor="let file of staticContentFiles; let i = index"
                class="product-img-wrapper mr-2">
-            <a class="text-link">{{file.fileName}}</a>
+            <a class="text-link">{{file.Filename}}</a>
             <div class="float-right float-middle">
               <button title="Un-stage file"
                       class="btn btn-light btn-group-item"
