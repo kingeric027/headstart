@@ -114,14 +114,12 @@ export class OCMCheckoutAddress implements OnInit {
       this.continue.emit();
     } catch (ex) {
       this.suggestedAddresses = getSuggestedAddresses(ex);
-      this.toasterService.error('Invalid Address');
     }
     if (this.addressType === OrderAddressType.Billing) {
       this.order.BillingAddress = address;
       // TODO - handle this.
       // this.context.currentOrder.lineItems = this.lineItems;
     }
-    this.continue.emit();
   }
 
   private async getSavedBuyerLocations(): Promise<void> {

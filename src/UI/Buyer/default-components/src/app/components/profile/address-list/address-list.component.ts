@@ -106,7 +106,6 @@ export class OCMAddressList implements OnInit {
       this.refresh();
     } catch (ex) {
       this.suggestedAddresses = getSuggestedAddresses(ex);
-      this.toasterService.error('Invalid Address');
     }
   }
 
@@ -121,7 +120,6 @@ export class OCMAddressList implements OnInit {
       this.refresh();
     } catch (ex) {
       this.suggestedAddresses = getSuggestedAddresses(ex);
-      this.toasterService.error('Invalid Address');
     }
   }
 
