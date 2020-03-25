@@ -15,6 +15,7 @@ namespace Marketplace.Common.Services
     {
         Task SendSingleEmail(string from, string to, string subject, string htmlContent);
         Task SendSupplierEmails(string orderID);
+        Task SendSingleTemplateEmail(string from, string to, string subject, string templateID, object templateData);
     }
     public class SendgridService : ISendgridService
     {
@@ -29,11 +30,24 @@ namespace Marketplace.Common.Services
         public async Task SendSingleEmail(string from, string to, string subject, string htmlContent)
         {
             var client = new SendGridClient(_settings.SendgridApiKey);
-            var fromEmail = new EmailAddress(from);
-            var toEmail = new EmailAddress(to);
-            var msg = MailHelper.CreateSingleEmail(fromEmail, toEmail, subject, null, htmlContent);
-            await client.SendEmailAsync(msg);
+                var fromEmail = new EmailAddress(from);
+                var toEmail = new EmailAddress(to);
+                var msg = MailHelper.CreateSingleEmail(fromEmail, toEmail, subject, null, htmlContent);
+                await client.SendEmailAsync(msg);
         }
+
+        public async Task SendSingleTemplateEmail(string from, string to, string subject, string templateID, object templateData)
+        {
+            var client = new SendGridClient(_settings.SendgridApiKey);
+            var sendGridMessage = new SendGridMessage();
+            sendGridMessage.SetFrom(from);
+            sendGridMessage.AddTo(to);
+            sendGridMessage.SetSubject(subject);
+            sendGridMessage.SetTemplateId(templateID);
+            sendGridMessage.SetTemplateData(templateData);
+            await client.SendEmailAsync(sendGridMessage);
+        }
+
         public async Task SendSupplierEmails(string orderID)
         {
             var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);

@@ -30,7 +30,7 @@ export class OrderStateService {
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
     private appConfig: AppConfig
-  ) {}
+  ) { }
 
   get order(): MarketplaceOrder {
     return this.orderSubject.value;
@@ -58,7 +58,7 @@ export class OrderStateService {
 
   async reset(): Promise<void> {
     const orders = await this.ocMeService
-      .ListOrders({ sortBy: '!DateCreated', filters: { status: 'Unsubmitted' } })
+      .ListOrders({ sortBy: '!DateCreated', filters: { status: 'Unsubmitted', 'xp.OrderType': 'Standard' } })
       .toPromise();
     if (orders.Items.length) {
       this.order = orders.Items[0];

@@ -39,10 +39,43 @@ namespace Marketplace.Common.Controllers
         [OrderCloudWebhookAuth]
         public async void HandleOrderSubmit([FromBody] OrderCalculatePayload payload)
         {
-            await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
-            await _sendgridService.SendSupplierEmails(payload.OrderWorksheet.Order.ID);
-            await _sendgridService.SendSingleEmail("noreply@four51.com", payload.OrderWorksheet.Order.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
-        }
+            JObject testTemplateData = new JObject(
+                new JProperty("FirstName", "John"),
+                new JProperty("LastName", "Smith"),
+                new JProperty("OrderID", 12345),
+                new JProperty("DateSubmitted", "01/02/2020"),
+                new JProperty("ShippingAddressID", 1),
+                new JProperty("BillingAddressID", 2),
+                new JProperty("BillingAddress",
+                    new JObject(
+                        new JProperty("Street1", "1234 test street"),
+                        new JProperty("Street2", "Apt. 201"),
+                        new JProperty("City", "Minneapolis"),
+                        new JProperty("State", "MN"),
+                        new JProperty("Zip", 55408)
+                    )),
+                    new JProperty("products", 
+                        new JObject(
+                            new JProperty("1", 
+                                new JObject(
+                                    new JProperty("ProductID", "1000"),
+                                    new JProperty("ProductName", "test"),
+                                    new JProperty("Quantity", 12),
+                                    new JProperty("LineTotal", 12)
+                                    ))
+                            )
+                        ),
+                new JProperty("Subtotal", 12),
+                new JProperty("TaxCost", 1),
+                new JProperty("ShippingCost", 3),
+                new JProperty("PromotionDiscount", 0),
+                new JProperty("Total", 16)
+                );
+        await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
+        await _sendgridService.SendSupplierEmails(payload.OrderWorksheet.Order.ID);
+        //await _sendgridService.SendSingleEmail("noreply@four51.com", payload.OrderWorksheet.Order.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
+        await _sendgridService.SendSingleTemplateEmail("noreply@four51.com", "scasey@four51.com", "test order submit", "defb11ada55d48d8a38dc1074eaaca67 ", testTemplateData);
+}
 
         [HttpPost, Route("orderrequiresapproval")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS		
         [OrderCloudWebhookAuth]
