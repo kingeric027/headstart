@@ -8,6 +8,7 @@ namespace Marketplace.Models.Models.Misc
 {
 	public class TaxCertificate
 	{
+		[ApiReadOnly]
 		public int ID { get; set; }
 		[Required]
 		public DateTimeOffset SignedDate { get; set; }
