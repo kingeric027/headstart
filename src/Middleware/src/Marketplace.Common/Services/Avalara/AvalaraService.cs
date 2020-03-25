@@ -10,37 +10,46 @@ using Marketplace.Helpers;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Misc;
 using OrderCloud.SDK;
+using Flurl.Http;
+using Flurl;
+using System.IO;
 
 namespace Marketplace.Common.Services.Avalara
 {
 	public interface IAvalaraService
 	{
 		Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> marketplaceListArgs);
-		Task<TaxCertificate> GetCertificate(int companyID, int certifitcateID);
-		Task<TaxCertificate> CreateCertificate(int companyID, TaxCertificate cert);
-		Task<TaxCertificate> UpdateCertificate(int companyID, int certificateID, TaxCertificate cert);
-
+		Task<TaxCertificate> GetCertificateAsync(int companyID, int certifitcateID);
+		Task<TaxCertificate> CreateCertificateAsync(int companyID, TaxCertificate cert);
+		Task<TaxCertificate> UpdateCertificateAsync(int companyID, int certificateID, TaxCertificate cert);
+		Task<byte[]> DownloadCertificatePdfAsync(int companyID, int certificateID);
 		// Use this before checkout. No records will be saved in avalara.
 		Task<decimal> GetEstimateAsync(OrderWorksheet orderWorksheet);
 		// Use this during submit.
 		Task<TransactionModel> CreateTransactionAsync(OrderWorksheet orderWorksheet);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
 		// When should we do this? 
-		Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode);
+		Task<TransactionModel> CommitTransactionAsync(string transactionCode);
 	}
 
 	public class AvalaraService : IAvalaraService
 	{
+		const string PROD_URL = "https://rest.avatax.com/api/v2";
+		const string SANDBOX_URL = "https://sandbox-rest.avatax.com/api/v2";
+		private readonly AppSettings _settings;
 		private readonly AvaTaxClient _avaTax;
 		private readonly string _companyCode;
+		private readonly string _baseUrl;
 
 		public AvalaraService(AppSettings settings)
 		{
-			_companyCode = settings.AvalaraSettings.CompanyCode;
-			var env = settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;
+			_settings = settings;
+			_companyCode = _settings.AvalaraSettings.CompanyCode;
+			_baseUrl = _settings.Env == AppEnvironment.Prod ? PROD_URL : SANDBOX_URL;
+			var env = _settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;
 
-			_avaTax = new AvaTaxClient("four51 marketplace", "v1", settings.Env.ToString(), env)
-					.WithSecurity(settings.AvalaraSettings.AccountID, settings.AvalaraSettings.LicenseKey);
+			_avaTax = new AvaTaxClient("four51 marketplace", "v1", _settings.Env.ToString(), env)
+					.WithSecurity(_settings.AvalaraSettings.AccountID, _settings.AvalaraSettings.LicenseKey);
 		}
 
 		public async Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> marketplaceListArgs)
@@ -51,22 +60,34 @@ namespace Marketplace.Common.Services.Avalara
 			return codeList;
 		}
 
-		public async Task<TaxCertificate> GetCertificate(int companyID, int certifitcateID)
+		public async Task<TaxCertificate> GetCertificateAsync(int companyID, int certifitcateID)
 		{
 			var certificate = await _avaTax.GetCertificateAsync(companyID, certifitcateID, "");
-			return AvalaraMapper.Map(certificate);
+			var mappedCertificate = AvalaraMapper.Map(certificate, companyID, _settings.EnvironmentSettings.BaseUrl);
+			return mappedCertificate;
 		}
 
-		public async Task<TaxCertificate> CreateCertificate(int companyID, TaxCertificate cert)
+		public async Task<TaxCertificate> CreateCertificateAsync(int companyID, TaxCertificate cert)
 		{
 			var certificates = await _avaTax.CreateCertificatesAsync(companyID, false, new List<CertificateModel> { AvalaraMapper.Map(cert) });
-			return AvalaraMapper.Map(certificates[0]);
+			var mappedCertificate = AvalaraMapper.Map(certificates[0], companyID, _settings.EnvironmentSettings.BaseUrl);
+			return mappedCertificate;
 		}
 
-		public async Task<TaxCertificate> UpdateCertificate(int companyID, int certifitcateID, TaxCertificate cert)
+		public async Task<TaxCertificate> UpdateCertificateAsync(int companyID, int certifitcateID, TaxCertificate cert)
 		{
 			var certificate = await _avaTax.UpdateCertificateAsync(companyID, certifitcateID, AvalaraMapper.Map(cert));
-			return AvalaraMapper.Map(certificate);
+			var mappedCertificate = AvalaraMapper.Map(certificate, companyID, _settings.EnvironmentSettings.BaseUrl);
+			return mappedCertificate;
+		}
+
+		// The avalara SDK method for this was throwing an internal JSON parse exception.
+		public async Task<byte[]> DownloadCertificatePdfAsync(int companyID, int certificateID)
+		{
+			var pdfBtyes = await new Url($"{_baseUrl}/companies/{companyID}/certificates/{certificateID}/attachment")
+				.WithBasicAuth(_settings.AvalaraSettings.AccountID.ToString(), _settings.AvalaraSettings.LicenseKey)
+				.GetBytesAsync();
+			return pdfBtyes;
 		}
 
 		public async Task<decimal> GetEstimateAsync(OrderWorksheet orderWorksheet)
@@ -81,7 +102,7 @@ namespace Marketplace.Common.Services.Avalara
 			return transaction;
 		}
 
-		public async Task<TransactionModel> CommitTaxTransactionAsync(string transactionCode)
+		public async Task<TransactionModel> CommitTransactionAsync(string transactionCode)
 		{
 			var model = new CommitTransactionModel() { commit = true };
 			var transaction = await _avaTax.CommitTransactionAsync(_companyCode, transactionCode, DocumentType.SalesInvoice, "", model);

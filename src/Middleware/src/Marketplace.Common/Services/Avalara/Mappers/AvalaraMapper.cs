@@ -21,12 +21,13 @@ namespace Marketplace.Common.Services.Avalara.Mappers
 		{
 			return new CertificateModel()
 			{
-				id = int.Parse(source.ID),
+				id = source.ID,
 				signedDate = source.SignedDate.UtcDateTime,
 				expirationDate = source.ExpirationDate.UtcDateTime,
 				pdf = source.Base64UrlEncodedPDF,
 				exemptPercentage = 100,
 				exemptionNumber = source.ExemptionNumber,
+				filename = source.FileName,
 				exposureZone = new ExposureZoneModel()
 				{
 					name = source.ExposureZoneName
@@ -38,16 +39,17 @@ namespace Marketplace.Common.Services.Avalara.Mappers
 			};
 		}
 
-		public static TaxCertificate Map(CertificateModel source)
+		public static TaxCertificate Map(CertificateModel source, int companyID, string baseUrl)
 		{
 			return new TaxCertificate()
 			{
-				ID = source.id.ToString(),
+				ID = source.id ?? 0,
 				SignedDate = source.signedDate,
 				ExpirationDate = source.expirationDate,
 				ExemptionNumber = source.exemptionNumber,
-				ExposureZoneName = source.exposureZone.name
-				// Skip pdf intentionally. It has its own download route.
+				ExposureZoneName = source.exposureZone.name,
+				FileName = source.filename,
+				PDFUrl = $"{baseUrl}/avalara/{companyID}/certificate/{source.id}/pdf"
 			};
 		}
 

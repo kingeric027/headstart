@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Services.AvaTax.Models;
-using Marketplace.Helpers;
+﻿using Marketplace.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
@@ -13,6 +8,9 @@ using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Models.Misc;
 using Marketplace.Models.Misc;
+using System.Net.Http;
+using System.Net;
+using System.Text;
 
 namespace Marketplace.Common.Controllers.Avalara
 {
@@ -36,31 +34,32 @@ namespace Marketplace.Common.Controllers.Avalara
 		}
 
 		[DocName("Get tax exeption certificate details")]
-		[HttpGet, Route("{companyID}/certificate/{certificateID}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+		[HttpGet, Route("{companyID}/certificate/{certificateID}")]
 		public async Task<TaxCertificate> GetCertificate(int companyID, int certificateID)
 		{
-			return await _taxService.GetCertificate(companyID, certificateID);
+			return await _taxService.GetCertificateAsync(companyID, certificateID);
 		}
 
 		[DocName("Create tax exeption certificate")]
-		[HttpPost, Route("{companyID}/certificate"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+		[HttpPost, Route("{companyID}/certificate")]
 		public async Task<TaxCertificate> CreateCertificate(int companyID, [FromBody] TaxCertificate cert)
 		{
-			return await _taxService.CreateCertificate(companyID, cert);
+			return await _taxService.CreateCertificateAsync(companyID, cert);
 		}
 
 		[DocName("Update tax exeption certificate")]
-		[HttpPut, Route("{companyID}/certificate/{certificateID}"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+		[HttpPut, Route("{companyID}/certificate/{certificateID}")]
 		public async Task<TaxCertificate> UpdateCertificate(int companyID, int certificateID, [FromBody] TaxCertificate cert)
 		{
-			return await _taxService.UpdateCertificate(companyID, certificateID, cert);
+			return await _taxService.UpdateCertificateAsync(companyID, certificateID, cert);
 		}
 
-		[DocName("Download tax exeption certificate pdf")]
-		[HttpGet, Route("{companyID}/certificate/{certificateID}/pdf"), MarketplaceUserAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
-		public async Task DownloadCertificate(int companyID, int certificateID)
+		[DocName("Get tax exeption certificate pdf")]
+		[HttpGet, Route("{companyID}/certificate/{certificateID}/pdf")]
+		public async Task<FileResult> DownloadCertificate(int companyID, int certificateID)
 		{
-
+			var pdf = await _taxService.DownloadCertificatePdfAsync(companyID, certificateID);
+			return File(pdf, "application/pdf");
 		}
 	}
 }
