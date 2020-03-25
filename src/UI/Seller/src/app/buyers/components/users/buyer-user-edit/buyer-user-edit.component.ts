@@ -15,6 +15,7 @@ export class BuyerUserEditComponent {
   filterConfig;
   @Input()
   set resourceInSelection(buyerUser: User) {
+    this.selectedResource = buyerUser;
     this.createBuyerUserForm(buyerUser);
   }
   @Output()
@@ -23,10 +24,10 @@ export class BuyerUserEditComponent {
   userGroupAssignments = new EventEmitter<UserGroupAssignment[]>();
   isCreatingNew: boolean;
   resourceForm: FormGroup;
+  selectedResource: User;
   constructor(public buyerUserService: BuyerUserService) {
     this.isCreatingNew = this.buyerUserService.checkIfCreatingNew();
   }
-
   createBuyerUserForm(user: User) {
     this.resourceForm = new FormGroup({
       Active: new FormControl(user.Active),
