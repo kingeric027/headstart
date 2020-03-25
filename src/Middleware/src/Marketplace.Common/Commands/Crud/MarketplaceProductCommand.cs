@@ -185,6 +185,8 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task Delete(string id, VerifiedUserContext user)
         {
+            var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
+            await Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
             await _oc.Products.DeleteAsync(id, user.AccessToken);
         }
     }
