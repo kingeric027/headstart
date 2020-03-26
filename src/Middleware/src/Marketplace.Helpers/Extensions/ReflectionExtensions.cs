@@ -28,7 +28,13 @@ namespace Marketplace.Helpers.Extensions
 
             return pi;
         }
-        
+
+        public static bool HasAttribute<T>(this Type type, bool includeInherited = true) where T : Attribute
+        {
+            var result = type.GetAttributes<T>(includeInherited);
+            return result.Any();
+        }
+
         public static bool HasAttribute<T>(this MemberInfo member, bool includeInherited = true) where T : Attribute
         {
             var result = member.GetAttributes<T>(includeInherited);
