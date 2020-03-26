@@ -54,9 +54,8 @@ namespace Marketplace.Common.Controllers.Avalara
 			return await _taxService.UpdateCertificateAsync(companyID, certificateID, cert);
 		}
 
-		[DocIgnore]
 		[HttpGet, Route("{companyID}/certificate/{certificateID}/pdf")]
-		public async Task<FileResult> DownloadCertificate(int companyID, int certificateID)
+		public async Task<object> DownloadCertificate(int companyID, int certificateID)
 		{
 			var pdf = await _taxService.DownloadCertificatePdfAsync(companyID, certificateID);
 			return File(pdf, "application/pdf");
