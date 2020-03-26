@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Extended;
 using OrderCloud.SDK;
 
 namespace Marketplace.Models
 {
+    [SwaggerModel]
 	public class MarketplaceOrder : Order<OrderXp, UserXp, BuyerAddressXP>
     {
         // will be on the ordercloud model when integration events are deployed to OC prod
@@ -11,6 +13,7 @@ namespace Marketplace.Models
         public string ShippingRatesEventUpToDate { get; set; } 
 	}
 
+    [SwaggerModel]
     public class OrderXp
     {
         public string AvalaraTaxTransactionCode { get; set; }

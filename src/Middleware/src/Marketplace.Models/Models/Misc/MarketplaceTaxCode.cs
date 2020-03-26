@@ -1,5 +1,8 @@
-﻿namespace Marketplace.Models.Misc
+﻿using Marketplace.Helpers.Attributes;
+
+namespace Marketplace.Models.Misc
 {
+    [SwaggerModel]
     public class MarketplaceTaxCode
     {
         public string Category { get; set; }

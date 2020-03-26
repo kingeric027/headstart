@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Marketplace.Helpers.Attributes;
 
 namespace Marketplace.Models.Extended
 {
+    [SwaggerModel]
     public class TaxProperties
     {
         [Required]

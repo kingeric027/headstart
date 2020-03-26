@@ -14,7 +14,7 @@ namespace Marketplace.Helpers.OpenApiTools
     // as described here https://swagger.io/specification/ Mainly for sdk-code-gen purposes
     //Useful resource: http://editor.swagger.io/
 
-    public class OpenApiGenerator<TController, TAttribute, TModel> where TController : Controller
+    public class OpenApiGenerator<TController, TAttribute> where TController : Controller
         where TAttribute : Attribute, IApiAuthAttribute
     {
         private ApiMetaData _data;
@@ -28,13 +28,13 @@ namespace Marketplace.Helpers.OpenApiTools
             return this._spec;
         }
 
-        public OpenApiGenerator<TController, TAttribute, TModel> CollectMetaData(string refPath, IDictionary<string, IErrorCode> errors)
+        public OpenApiGenerator<TController, TAttribute> CollectMetaData(string refPath, IDictionary<string, IErrorCode> errors)
         {
-            this._data = ApiReflector.GetMetaData<TController, TAttribute, TModel>(refPath, errors);
+            this._data = ApiReflector.GetMetaData<TController, TAttribute>(refPath, errors);
             return this;
         }
 
-        public OpenApiGenerator<TController, TAttribute, TModel> DefineSpec(SwaggerConfig config)
+        public OpenApiGenerator<TController, TAttribute> DefineSpec(SwaggerConfig config)
         {
             this._spec = new JObject()
                 .AddMetaData(config)

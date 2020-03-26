@@ -1,11 +1,14 @@
-﻿using OrderCloud.SDK;
+﻿using Marketplace.Helpers.Attributes;
+using OrderCloud.SDK;
 
 namespace Marketplace.Models
 {
+    [SwaggerModel]
     public class MarketplaceUserGroup : UserGroup<UserGroupXp>, IMarketplaceObject
     {
     }
 
+    [SwaggerModel]
     public class UserGroupXp
     {
         public string Type { get; set; }

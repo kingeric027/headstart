@@ -1,7 +1,9 @@
-﻿using OrderCloud.SDK;
+﻿using Marketplace.Helpers.Attributes;
+using OrderCloud.SDK;
 
 namespace Marketplace.Models.Misc
 {
+    [SwaggerModel]
 	public class MessageNotification
 	{
 		public string BuyerID { get; set; }

@@ -1,12 +1,15 @@
 ﻿using OrderCloud.SDK;
 using System.Collections.Generic;
+using Marketplace.Helpers.Attributes;
 
 namespace Marketplace.Models
 {
+    [SwaggerModel]
     public class MarketplaceAddressSupplier : Address<SupplierAddressXP>, IMarketplaceObject
     {
     }
 
+    [SwaggerModel]
     public class SupplierAddressXP
 	{
 		public Coordinates Coordinates;

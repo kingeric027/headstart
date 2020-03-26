@@ -1,6 +1,9 @@
 ﻿
+using Marketplace.Helpers.Attributes;
+
 namespace Marketplace.Models.Marketplace.Extended
 {
+    [SwaggerModel]
     public class Contact
     {
         public string Name { get; set; }
