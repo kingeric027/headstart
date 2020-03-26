@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Version>0.0.28</Version>
+    <Version>0.0.29</Version>
     <Description>Helpers for OrderCloud middleware projects</Description>
     <PackageIconUrl>https://ordercloud.io/wp-content/uploads/2018/01/oc-circle-logo-2018.png</PackageIconUrl>
     <PackageProjectUrl>https://ordercloud.io/</PackageProjectUrl>
