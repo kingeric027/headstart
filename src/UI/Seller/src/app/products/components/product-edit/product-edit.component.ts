@@ -410,7 +410,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   private async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
-    return await MarketplaceSDK.TaxCodes.GetTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
+    return await MarketplaceSDK.Avalaras.ListTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
   }
 
   getTotalMarkup = (specOptions: SpecOption[]): number => {

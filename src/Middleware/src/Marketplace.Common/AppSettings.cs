@@ -9,8 +9,9 @@ namespace Marketplace.Common
 
     public interface IAppSettings
     {
-        AppEnvironment Env { get; }
-        BlobSettings BlobSettings { get; }
+		AppEnvironment Env { get; }
+		EnvironmentSettings EnvironmentSettings { get; }
+		BlobSettings BlobSettings { get; }
         CosmosSettings CosmosSettings { get;}
         OrderCloudSettings OrderCloudSettings { get; }
         FreightPopSettings FreightPopSettings { get; set; }
@@ -20,17 +21,23 @@ namespace Marketplace.Common
     [DocIgnore]
     public class AppSettings : IAppSettings
     {
+		public AppEnvironment Env { get; set; }
+		public EnvironmentSettings EnvironmentSettings { get; set; } = new EnvironmentSettings();
 		public AvalaraSettings AvalaraSettings { get; set; }
-        public AppEnvironment Env { get; set; }
         public BlobSettings BlobSettings { get; set; }
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
-        public string SendgridApiKey { get; set; }
         public FreightPopSettings FreightPopSettings { get; set; }
         public CardConnectSettings CardConnectSettings { get; set; } = new CardConnectSettings();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
 		public SmartyStreetSettings SmartyStreetSettings { get; set; } = new SmartyStreetSettings();
+        public string SendgridApiKey { get; set; }
     }
+
+	public class EnvironmentSettings
+	{
+		public string BaseUrl { get; set; }
+	}
 
 	public class SmartyStreetSettings
 	{

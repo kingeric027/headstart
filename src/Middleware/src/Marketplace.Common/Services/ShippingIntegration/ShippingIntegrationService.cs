@@ -23,8 +23,8 @@ namespace Marketplace.Common.Services.ShippingIntegration
     public class OCShippingIntegration : IOCShippingIntegration
     {
         readonly IFreightPopService _freightPopService;
-        private readonly IAvataxService _avatax;
-        public OCShippingIntegration(IFreightPopService freightPopService, IAvataxService avatax)
+        private readonly IAvalaraService _avatax;
+        public OCShippingIntegration(IFreightPopService freightPopService, IAvalaraService avatax)
         {
             _freightPopService = freightPopService;
             _avatax = avatax;
@@ -61,7 +61,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 return new OrderCalculateResponse();
             } else
             {
-                var totalTax = await _avatax.GetTaxEstimateAsync(orderCalculatePayload.OrderWorksheet);
+                var totalTax = await _avatax.GetEstimateAsync(orderCalculatePayload.OrderWorksheet);
 
                 return new OrderCalculateResponse
                 {

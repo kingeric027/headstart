@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { ListAddress, Address, BuyerAddress } from '@ordercloud/angular-sdk';
+import { Address, BuyerAddress } from '@ordercloud/angular-sdk';
 import { BuyerLocationService } from '../buyer-location.service';
-import { ValidatePhone, ValidateUSZip, ValidateEmail } from '@app-seller/validators/validators';
+import { ValidatePhone, ValidateEmail } from '@app-seller/validators/validators';
 import { Router } from '@angular/router';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
@@ -130,8 +130,8 @@ export class BuyerLocationEditComponent implements OnInit {
     try {
       this.dataIsSaving = true;
       const updatedBuyerLocation = await MarketplaceSDK.BuyerLocations.Update(
-        this.buyerLocationEditable.Address.ID,
         this.buyerID,
+        this.buyerLocationEditable.Address.ID,
         this.buyerLocationEditable
       );
       this.suggestedAddresses = null;
@@ -146,7 +146,7 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   async handleDelete($event): Promise<void> {
-    await MarketplaceSDK.BuyerLocations.Delete(this.buyerLocationEditable.Address.ID, this.buyerID);
+    await MarketplaceSDK.BuyerLocations.Delete(this.buyerID, this.buyerLocationEditable.Address.ID);
     this.router.navigateByUrl(`/buyers/${this.buyerID}/locations`);
   }
 

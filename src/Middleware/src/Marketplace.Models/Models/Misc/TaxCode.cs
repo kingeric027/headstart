@@ -1,6 +1,6 @@
 ﻿namespace Marketplace.Models.Misc
 {
-    public class MarketplaceTaxCode
+    public class TaxCode
     {
         public string Category { get; set; }
         public string Code { get; set; }
