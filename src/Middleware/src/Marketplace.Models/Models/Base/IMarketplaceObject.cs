@@ -10,4 +10,6 @@ namespace Marketplace.Models
         [MinLength(8, ErrorMessage = "Must be a minimum of 8 and maximum of 100 characters")]
         string ID { get; set; }
     }
+   
+    
 }

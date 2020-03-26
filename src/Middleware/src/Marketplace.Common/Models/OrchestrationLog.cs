@@ -2,12 +2,16 @@
 using Marketplace.Common.Exceptions;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
+using Marketplace.Models;
 using Microsoft.Azure.WebJobs;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Models
 {
+    [SwaggerModel]
     public class OrchestrationLog : ICosmosObject
     {
         public OrchestrationLog()
@@ -47,6 +51,7 @@ namespace Marketplace.Common.Models
         }
 
         public string id { get; set; }
+        public string ID { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         [Sortable]
         public DateTimeOffset timeStamp { get; set; }
         [Sortable]
