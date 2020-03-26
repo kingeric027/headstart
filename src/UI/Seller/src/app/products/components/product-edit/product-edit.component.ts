@@ -164,7 +164,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   async handleDelete($event): Promise<void> {
-    await this.ocProductService.Delete(this._superMarketplaceProductStatic.Product.ID).toPromise();
+    await MarketplaceSDK.Products.Delete(this._superMarketplaceProductStatic.Product.ID);
     this.router.navigateByUrl('/products');
   }
 
