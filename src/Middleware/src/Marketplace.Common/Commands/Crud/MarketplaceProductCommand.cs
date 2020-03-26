@@ -89,6 +89,7 @@ namespace Marketplace.Common.Commands.Crud
             var _priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
             // Create Product
             superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
+            superProduct.Product.xp.Facets.Add("supplier", new List<string>() { user.SupplierID });
             var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(superProduct.Product, user.AccessToken);
             // Make Spec Product Assignments
             await Throttler.RunAsync(superProduct.Specs, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = _product.ID, SpecID = s.ID }, accessToken: user.AccessToken));
@@ -185,6 +186,8 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task Delete(string id, VerifiedUserContext user)
         {
+            var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
+            await Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
             await _oc.Products.DeleteAsync(id, user.AccessToken);
         }
     }

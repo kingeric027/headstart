@@ -251,9 +251,10 @@ namespace Marketplace.Helpers.Extensions
 
         public static bool IsModelType<T>(this Type type)
         {
-            var response = type.IsClass &&
+            var response = type.IsClass && 
                            (type.Assembly == Assembly.GetAssembly(typeof(T))
-                           || type.Assembly == Assembly.GetAssembly(typeof(OrderCloudModel)))
+                           || type.Assembly == Assembly.GetAssembly(typeof(OrderCloudModel))
+                           || type.HasAttribute<SwaggerModel>(true))
                            && type.WithoutGenericArgs() != typeof(ListArgs<>);
             return response;
         }

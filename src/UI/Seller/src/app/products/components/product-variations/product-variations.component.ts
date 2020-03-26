@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Variant, SpecOption, Spec } from '@ordercloud/angular-sdk';
-import { faExclamationCircle, faCog, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faCog, faTrash, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
@@ -36,7 +36,7 @@ export class ProductVariations {
   @Output() variantsValidated = new EventEmitter<boolean>();
   superProductEditable: SuperMarketplaceProduct;
   superProductStatic: SuperMarketplaceProduct;
-  variants: Variant[];
+  variants: Variant[] = [];
   specOptAdded = new EventEmitter<SpecOption>();
   canConfigureVariations = false;
   areSpecChanges = false;
@@ -45,6 +45,7 @@ export class ProductVariations {
   editSpecs = false;
   faTrash = faTrash;
   faCog = faCog;
+  faTimesCircle = faTimesCircle;
   faExclamationCircle = faExclamationCircle;
 
   constructor(private productService: ProductService) {}
@@ -168,6 +169,7 @@ export class ProductVariations {
 
   validateVariants(): void {
     this.variantsValid = this.superProductEditable.Variants.length <= 100;
+    this.variantsValid = this.superProductEditable?.Variants?.length <= 100;
   }
 
   generateVariantsFromCurrentSpecs(): Variant[] {
@@ -182,7 +184,7 @@ export class ProductVariations {
   };
 
   createVariantsForFirstSpec(spec: Spec): Variant[] {
-    if (!spec) return;
+    if (!spec) return [];
     return spec.Options.map(opt => {
       return {
         ID: `${this.superProductEditable.Product.ID}-${opt.ID}`,
@@ -219,4 +221,6 @@ export class ProductVariations {
     })
     return newVariantList;
   }
+
+  getPriceMarkup = (specOption: SpecOption): number => !specOption.PriceMarkup ? 0 : specOption.PriceMarkup
 }

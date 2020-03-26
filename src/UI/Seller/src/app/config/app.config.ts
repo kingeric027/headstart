@@ -49,6 +49,7 @@ export const ocAppConfig: AppConfig = {
     'SupplierUserGroupAdmin',
     'SupplierAddressAdmin',
     'AdminUserAdmin',
+    'ProductFacetAdmin',
 
     // custom roles used to conditionally display ui
     'MPMeProductAdmin',
@@ -71,6 +72,7 @@ export const ocAppConfig: AppConfig = {
     'MPMeSupplierAddressAdmin',
     'MPMeSupplierUserAdmin',
     'MPSupplierUserGroupAdmin',
+    'MPStoreFrontAdmin',
   ],
 };
 

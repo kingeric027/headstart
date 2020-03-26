@@ -1,15 +1,15 @@
 <div class="container-fluid">
-  <user-group-assignments *ngIf="resourceInSelection && !isCreatingNew"
+  <user-group-assignments *ngIf="selectedResource && !isCreatingNew"
                           [isCreatingNew]="isCreatingNew"
                           userGroupType="UserPermissions"
-                          [user]="resourceInSelection"
+                          [user]="selectedResource"
                           (assignmentsToAdd)="addUserGroupAssignments($event)"
                           [userPermissionsService]="buyerUserService">
   </user-group-assignments>
-  <user-group-assignments *ngIf="resourceInSelection && !isCreatingNew"
+  <user-group-assignments *ngIf="selectedResource && !isCreatingNew"
                           [isCreatingNew]="isCreatingNew"
                           userGroupType="BuyerLocation"
-                          [user]="resourceInSelection"
+                          [user]="selectedResource"
                           (assignmentsToAdd)="addUserGroupAssignments($event)"
                           [userPermissionsService]="buyerUserService">
   </user-group-assignments>
@@ -97,17 +97,17 @@
       </div>
     </div>
   </form>
-  <user-group-assignments *ngIf="resourceInSelection && isCreatingNew"
+  <user-group-assignments *ngIf="selectedResource && isCreatingNew"
                           [isCreatingNew]="isCreatingNew"
                           userGroupType="UserPermissions"
-                          [user]="resourceInSelection"
+                          [user]="selectedResource"
                           (assignmentsToAdd)="addUserGroupAssignments($event)"
                           [userPermissionsService]="buyerUserService">
   </user-group-assignments>
-  <user-group-assignments *ngIf="resourceInSelection && isCreatingNew"
+  <user-group-assignments *ngIf="selectedResource && isCreatingNew"
                           [isCreatingNew]="isCreatingNew"
                           userGroupType="BuyerLocation"
-                          [user]="resourceInSelection"
+                          [user]="selectedResource"
                           (assignmentsToAdd)="addUserGroupAssignments($event)"
                           [userPermissionsService]="buyerUserService">
   </user-group-assignments>

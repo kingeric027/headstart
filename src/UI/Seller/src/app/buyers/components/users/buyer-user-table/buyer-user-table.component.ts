@@ -2,22 +2,9 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { User, UserGroupAssignment } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ValidateEmail } from '@app-seller/validators/validators';
 import { BuyerUserService } from '../buyer-user.service';
 import { BuyerService } from '../../buyers/buyer.service';
 import { UserGroupTypes } from '@app-seller/shared/components/user-group-assignments/user-group-assignments.constants';
-
-function createBuyerUserForm(user: User) {
-  return new FormGroup({
-    Active: new FormControl(user.Active),
-    Username: new FormControl(user.Username, Validators.required),
-    FirstName: new FormControl(user.FirstName, Validators.required),
-    LastName: new FormControl(user.LastName, Validators.required),
-    Email: new FormControl(user.Email, [Validators.required, ValidateEmail]),
-  });
-}
-
 @Component({
   selector: 'app-buyer-user-table',
   templateUrl: './buyer-user-table.component.html',
@@ -35,7 +22,7 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
     private buyerService: BuyerService,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, buyerUserService, router, activatedroute, ngZone, createBuyerUserForm);
+    super(changeDetectorRef, buyerUserService, router, activatedroute, ngZone);
   }
 
   captureUserGroupAssignments(event): void {

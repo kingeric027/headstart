@@ -1,9 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { get as _get } from 'lodash';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserGroupAssignment } from '@ordercloud/angular-sdk';
+import { UserGroupAssignment, User } from '@ordercloud/angular-sdk';
 import { BuyerUserService } from '../buyer-user.service';
+import { ValidateEmail } from '@app-seller/validators/validators';
 @Component({
   selector: 'app-buyer-user-edit',
   templateUrl: './buyer-user-edit.component.html',
@@ -11,18 +12,30 @@ import { BuyerUserService } from '../buyer-user.service';
 })
 export class BuyerUserEditComponent {
   @Input()
-  resourceForm: FormGroup;
-  @Input()
   filterConfig;
   @Input()
-  resourceInSelection;
+  set resourceInSelection(buyerUser: User) {
+    this.selectedResource = buyerUser;
+    this.createBuyerUserForm(buyerUser);
+  }
   @Output()
   updateResource = new EventEmitter<any>();
   @Output()
   userGroupAssignments = new EventEmitter<UserGroupAssignment[]>();
   isCreatingNew: boolean;
+  resourceForm: FormGroup;
+  selectedResource: User;
   constructor(public buyerUserService: BuyerUserService) {
     this.isCreatingNew = this.buyerUserService.checkIfCreatingNew();
+  }
+  createBuyerUserForm(user: User) {
+    this.resourceForm = new FormGroup({
+      Active: new FormControl(user.Active),
+      Username: new FormControl(user.Username, Validators.required),
+      FirstName: new FormControl(user.FirstName, Validators.required),
+      LastName: new FormControl(user.LastName, Validators.required),
+      Email: new FormControl(user.Email, [Validators.required, ValidateEmail]),
+    });
   }
   updateResourceFromEvent(event: any, field: string): void {
     field === 'Active'
