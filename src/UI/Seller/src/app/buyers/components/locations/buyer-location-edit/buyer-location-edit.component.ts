@@ -130,8 +130,8 @@ export class BuyerLocationEditComponent implements OnInit {
     try {
       this.dataIsSaving = true;
       const updatedBuyerLocation = await MarketplaceSDK.BuyerLocations.Update(
-        this.buyerLocationEditable.Address.ID,
         this.buyerID,
+        this.buyerLocationEditable.Address.ID,
         this.buyerLocationEditable
       );
       this.suggestedAddresses = null;
@@ -146,7 +146,7 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   async handleDelete($event): Promise<void> {
-    await MarketplaceSDK.BuyerLocations.Delete(this.buyerLocationEditable.Address.ID, this.buyerID);
+    await MarketplaceSDK.BuyerLocations.Delete(this.buyerID, this.buyerLocationEditable.Address.ID);
     this.router.navigateByUrl(`/buyers/${this.buyerID}/locations`);
   }
 
