@@ -1,31 +1,32 @@
 <ocm-profile-nav>
-    <div *ngIf="!isLoading">
-      <div class="d-flex justify-content-between align-items-center">
-        <h1 class="page-heading">Locations</h1>
-      </div>
-      <div class="row">
-        <div class="col-lg-12">
-          <ocm-generic-list [meta]="addresses?.Meta"
-                            [searchPlaceholder]="'locations'"
-                            (requestOptionsUpdated)="updateRequestOptions($event.detail)">
-            <div class="address-card pb-3 mb-3"
-                 *ngFor="let address of addresses?.Items">
-              <ocm-address-card [address]="address"
-                                [highlight]="currentAddress === address">
-              </ocm-address-card>
-            </div>
-          </ocm-generic-list>
-        </div>
+  <div *ngIf="!isLoading">
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="page-heading">Locations</h1>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <ocm-generic-list
+          [meta]="addresses?.Meta"
+          [searchPlaceholder]="'locations'"
+          (requestOptionsUpdated)="updateRequestOptions($event.detail)"
+        >
+          <div class="address-card pb-3 mb-3" *ngFor="let location of locations">
+            <ocm-address-card [address]="location.location" [highlight]="currentLocation === location">
+            </ocm-address-card>
+          </div>
+        </ocm-generic-list>
       </div>
     </div>
-    <div *ngIf="isLoading">
-      <ocm-loading-layout height="335px"
-                          width="100%"
-                          mb="1.5rem"
-                          [resource]="addresses"
-                          [rows]="3"
-                          [columns]="3"
-                          [isLoading]="isLoading"></ocm-loading-layout>
-  
-    </div>
-  </ocm-profile-nav>
+  </div>
+  <div *ngIf="isLoading">
+    <ocm-loading-layout
+      height="335px"
+      width="100%"
+      mb="1.5rem"
+      [resource]="addresses"
+      [rows]="3"
+      [columns]="3"
+      [isLoading]="isLoading"
+    ></ocm-loading-layout>
+  </div>
+</ocm-profile-nav>

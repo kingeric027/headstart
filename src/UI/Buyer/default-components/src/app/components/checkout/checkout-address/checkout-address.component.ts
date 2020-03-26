@@ -84,7 +84,7 @@ export class OCMCheckoutAddress implements OnInit {
     this.saveAddress(this.selectedBuyerLocation, this.selectedAddress, false, false);
   }
 
-  //TODO - Refactor this function
+  // TODO - Refactor this function
   async saveAddress(buyerLocation: Address, address: Address, formDirty: boolean, shouldSaveAddress: boolean): Promise<void> {
     try {
       if (buyerLocation.ID) {

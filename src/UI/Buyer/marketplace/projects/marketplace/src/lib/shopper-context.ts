@@ -266,8 +266,8 @@ export interface DecodedOCToken {
 }
 
 export interface BuyerLocationWithCert {
-  location: MarketplaceAddressBuyer;
-  certificate: TaxCertificate;
+  location?: MarketplaceAddressBuyer;
+  certificate?: TaxCertificate;
 }
 
 // Product Model

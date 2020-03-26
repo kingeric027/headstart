@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MeUser, OcMeService, User } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
-import { CurrentUserAddressService, ICurrentUserAddress } from './address.service';
+import { CurrentUserAddressService } from './address.service';
 import { ICreditCards, CreditCardService } from './credit-card.service';
 
 export interface CurrentUser extends MeUser {
@@ -11,7 +11,7 @@ export interface CurrentUser extends MeUser {
 }
 
 export interface ICurrentUser {
-  addresses: ICurrentUserAddress;
+  addresses: CurrentUserAddressService;
   cards: ICreditCards;
   get(): CurrentUser;
   patch(user: MeUser): Promise<CurrentUser>;
