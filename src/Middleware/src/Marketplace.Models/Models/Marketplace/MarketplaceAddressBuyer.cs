@@ -15,7 +15,7 @@ namespace Marketplace.Models
         public List<DestinationAddressAccessorial> Accessorials { get; set; }
         public string Email { get; set; }
 		public Coordinates Coordinates;
-		public string AvalaraCertificateID { get; set; } // null if no certificate
+		public int AvalaraCertificateID { get; set; } // null if no certificate
     }
 
 public enum DestinationAddressAccessorial
