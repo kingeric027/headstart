@@ -14,7 +14,7 @@ namespace Marketplace.Helpers.OpenApiTools
     // as described here https://swagger.io/specification/ Mainly for sdk-code-gen purposes
     //Useful resource: http://editor.swagger.io/
 
-    public class OpenApiGenerator<TController, TAttribute> where TController : Controller
+    public class OpenApiGenerator<TController, TAttribute, TModel> where TController : Controller
         where TAttribute : Attribute, IApiAuthAttribute
     {
         private ApiMetaData _data;
