@@ -13,8 +13,6 @@
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
   <app-buyer-user-edit class="resource-edit"
-                       *ngIf="resourceForm"
-                       [resourceForm]="resourceForm"
                        [resourceInSelection]="resourceInSelection"
                        [filterConfig]="filterConfig"
                        (updateResource)="updateResource($event)"

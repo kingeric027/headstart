@@ -16,61 +16,67 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
     toImage: 'xp.LogoUrl',
-    toExpandable: false
+    toExpandable: false,
   },
   users: {
     toPrimaryHeader: 'Username',
     toSecondaryHeader: 'ID',
     toImage: '',
-    toExpandable: false
+    toExpandable: false,
   },
   products: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
     toImage: PRODUCT_IMAGE_PATH_STRATEGY,
-    toExpandable: false
+    toExpandable: false,
   },
   promotions: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'Code',
     toImage: '',
-    toExpandable: false
+    toExpandable: false,
+  },
+  facets: {
+    toPrimaryHeader: 'Name',
+    toSecondaryHeader: 'ID',
+    toImage: '',
+    toExpandable: false,
   },
   buyers: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
     toImage: '',
-    toExpandable: false
+    toExpandable: false,
   },
   locations: {
     toPrimaryHeader: 'AddressName',
     toSecondaryHeader: 'ID',
     toImage: '',
-    toExpandable: false
+    toExpandable: false,
   },
   payments: {
     toPrimaryHeader: 'CardholderName',
     toSecondaryHeader: 'CardType',
     toImage: '',
-    toExpandable: false
+    toExpandable: false,
   },
   approvals: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ApprovalRuleID',
     toImage: '',
-    toExpandable: false
+    toExpandable: false,
   },
   categories: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
     toImage: '',
-    toExpandable: true
+    toExpandable: true,
   },
   orders: {
     toPrimaryHeader: 'FromUser.Username',
     toSecondaryHeader: 'Status',
     toImage: '',
-    toExpandable: false
+    toExpandable: false,
   },
 };
 
@@ -172,6 +178,23 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     imgPath: '',
   },
   promotions: {
+    fields: [
+      {
+        path: 'Name',
+        header: 'Name',
+        type: BASIC_STRING,
+        sortable: true,
+      },
+      {
+        path: 'ID',
+        header: 'ID',
+        type: BASIC_STRING,
+        sortable: true,
+      },
+    ],
+    imgPath: '',
+  },
+  facets: {
     fields: [
       {
         path: 'Name',

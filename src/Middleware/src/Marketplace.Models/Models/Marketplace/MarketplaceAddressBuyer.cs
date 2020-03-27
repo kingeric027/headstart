@@ -1,4 +1,5 @@
 ﻿using OrderCloud.SDK;
+using System;
 using System.Collections.Generic;
 using Marketplace.Helpers.Attributes;
 
@@ -19,6 +20,7 @@ namespace Marketplace.Models
         public List<DestinationAddressAccessorial> Accessorials { get; set; }
         public string Email { get; set; }
 		public Coordinates Coordinates;
+		public int AvalaraCertificateID { get; set; } // null if no certificate
     }
 
     public enum DestinationAddressAccessorial

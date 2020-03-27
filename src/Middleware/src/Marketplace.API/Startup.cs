@@ -50,7 +50,7 @@ namespace Marketplace.API
                 .Inject<IZohoClient>()
                 .Inject<IZohoCommand>()
                 .Inject<ISyncCommand>()
-                .Inject<IAvataxService>()
+                .Inject<IAvalaraService>()
                 .Inject<IFreightPopService>()
                 .Inject<ISmartyStreetsService>()
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)

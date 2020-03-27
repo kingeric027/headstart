@@ -23,8 +23,7 @@ namespace Marketplace.Models
         public bool StopShipSync { get; set; }
         public string BuyerLocationID { get; set; }
         public OrderType? OrderType { get; set; }
-        // these need to be reworked, quote order info is required currently on every order
-        // public QuoteOrderInfo QuoteOrderInfo { get; set; }
+        public QuoteOrderInfo QuoteOrderInfo { get; set; }
     }
 
     public class MarketplaceOrderSubmitPayload

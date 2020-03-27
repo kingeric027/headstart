@@ -2,6 +2,7 @@
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
+using Marketplace.Models.Models.Misc;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System;
@@ -34,7 +35,7 @@ namespace Marketplace.Common.Controllers
 
 		[DocName("POST a Buyer Location")]
 		[HttpPost, Route("{buyerID}"), MarketplaceUserAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
-        public async Task<MarketplaceBuyerLocation> Create([FromBody] MarketplaceBuyerLocation buyerLocation, string buyerID)
+        public async Task<MarketplaceBuyerLocation> Create(string buyerID, [FromBody] MarketplaceBuyerLocation buyerLocation)
         {
             // ocAuth is the token for the organization that is specified in the AppSettings
             var ocAuth = await _oc.AuthenticateAsync();
@@ -43,16 +44,16 @@ namespace Marketplace.Common.Controllers
 
 		[DocName("PUT a Buyer Location")]
 		[HttpPut, Route("{buyerID}/{buyerLocationID}"), MarketplaceUserAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
-        public async Task<MarketplaceBuyerLocation> Update([FromBody] MarketplaceBuyerLocation buyerLocation, string buyerLocationID, string buyerID)
+        public async Task<MarketplaceBuyerLocation> Update(string buyerID, string buyerLocationID, [FromBody] MarketplaceBuyerLocation buyerLocation)
         {
             return await _command.Update(buyerID, buyerLocationID, buyerLocation, VerifiedUserContext);
         }
 
 		[DocName("Delete a Buyer Location")]
 		[HttpDelete, Route("{buyerID}/{buyerLocationID}"), MarketplaceUserAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
-        public async Task Delete(string buyerLocationID, string buyerID)
+        public async Task Delete(string buyerID, string buyerLocationID)
         {
             await _command.Delete(buyerID, buyerLocationID, VerifiedUserContext);
         }
-    }
+	}
 }

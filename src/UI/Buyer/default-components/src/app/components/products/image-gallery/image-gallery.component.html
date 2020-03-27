@@ -1,6 +1,6 @@
 <div>
   <div>
-    <ngx-image-zoom class="img-fluid mx-auto d-block pt-2 px-2"
+    <lib-ngx-image-zoom class="img-fluid mx-auto d-block pt-2 px-2"
                     [thumbImage]="imgUrls && imgUrls[selectedIndex] ? imgUrls[selectedIndex] : 'http://placehold.it/500x500'"
                     [fullImage]="imgUrls && imgUrls[selectedIndex] ? imgUrls[selectedIndex] : []"
                     [zoomMode]="'hover'"
@@ -9,7 +9,7 @@
                     [lensWidth]="200"
                     [lensHeight]="200"
                     [circularLens]="false"
-                    [magnification]="2"></ngx-image-zoom>
+                    [magnification]="2"></lib-ngx-image-zoom>
   </div>
   <div>
     <div class="gallery-container row"

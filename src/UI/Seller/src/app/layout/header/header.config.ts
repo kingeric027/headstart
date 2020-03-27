@@ -42,11 +42,17 @@ const Promotions: MPRoute = {
   route: '/promotions',
 };
 
+const ProductFacets: MPRoute = {
+  rolesWithAccess: [MPRoles.MPStoreFrontAdmin],
+  title: 'Facets',
+  route: '/facets',
+};
+
 const ProductNavGrouping: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
   title: 'Products',
   route: '/products',
-  subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions],
+  subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, ProductFacets],
 };
 
 // Orders

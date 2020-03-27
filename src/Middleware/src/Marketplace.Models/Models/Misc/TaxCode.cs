@@ -3,7 +3,7 @@
 namespace Marketplace.Models.Misc
 {
     [SwaggerModel]
-    public class MarketplaceTaxCode
+    public class TaxCode
     {
         public string Category { get; set; }
         public string Code { get; set; }
