@@ -19,7 +19,7 @@ namespace Marketplace.Common.Controllers
         public async Task<JObject> Get()
         {
             var reference = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var g = new OpenApiGenerator<BaseController, MarketplaceUserAuthAttribute, IMarketplaceObject>()
+            var g = new OpenApiGenerator<BaseController, MarketplaceUserAuthAttribute>()
                 .CollectMetaData(Path.Combine(reference, "reference.md"), ErrorCodes.All)
                 .DefineSpec(new SwaggerConfig()
                 {

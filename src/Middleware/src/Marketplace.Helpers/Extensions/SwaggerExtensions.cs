@@ -249,11 +249,10 @@ namespace Marketplace.Helpers.Extensions
             return t == typeof(ListPage<>) || t == typeof(ListPageWithFacets<>);
         }
 
-        public static bool IsModelType<T>(this Type type)
+        public static bool IsModelType(this Type type)
         {
-            var response = type.IsClass && 
-                           (type.Assembly == Assembly.GetAssembly(typeof(T))
-                           || type.Assembly == Assembly.GetAssembly(typeof(OrderCloudModel))
+            var response = type.IsClass 
+                           && (type.Assembly == Assembly.GetAssembly(typeof(OrderCloudModel))
                            || type.HasAttribute<SwaggerModel>(true))
                            && type.WithoutGenericArgs() != typeof(ListArgs<>);
             return response;

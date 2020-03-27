@@ -1,11 +1,14 @@
-﻿using OrderCloud.SDK;
+﻿using Marketplace.Helpers.Attributes;
+using OrderCloud.SDK;
 
 namespace Marketplace.Models
 {
+    [SwaggerModel]
     public class MarketplaceSpecOption : SpecOption<SpecOptionXp>, IMarketplaceObject
     {
     }
 
+    [SwaggerModel]
     public class SpecOptionXp
     {
         public string Description { get; set; }

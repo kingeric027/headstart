@@ -1,5 +1,8 @@
-﻿namespace Marketplace.Models.Extended
+﻿using Marketplace.Helpers.Attributes;
+
+namespace Marketplace.Models.Extended
 {
+    [SwaggerModel]
     public class UnitOfMeasure
     {
         public int Qty { get; set; }

@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Marketplace.Helpers.Attributes;
 using OrderCloud.SDK;
 
 namespace Marketplace.Models.Misc
 {
+    [SwaggerModel]
     public class CreditCardToken
     {
         public string AccountNumber { get; set; }
@@ -14,6 +16,7 @@ namespace Marketplace.Models.Misc
         public string CardType { get; set; }
     }
 
+    [SwaggerModel]
 	public class CreditCardPayment
 	{
 		[System.ComponentModel.DataAnnotations.Required]
