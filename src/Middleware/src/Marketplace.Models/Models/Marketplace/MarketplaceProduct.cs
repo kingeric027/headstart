@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Helpers.Attributes;
 using Marketplace.Models.Extended;
 using OrderCloud.SDK;
@@ -8,6 +9,7 @@ using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribut
 
 namespace Marketplace.Models
 {
+    [SwaggerModel]
     public class SuperMarketplaceProduct : IMarketplaceObject
     {
         public MarketplaceProduct Product { get; set; }
@@ -17,16 +19,20 @@ namespace Marketplace.Models
         public IList<MarketplaceVariant> Variants { get; set; }
     }
 
+    [SwaggerModel]
     public class PartialMarketplaceProduct : PartialProduct<ProductXp>
     {
     }
 
+    [SwaggerModel]
     public class MarketplaceProduct : Product<ProductXp>, IMarketplaceObject
     {
     }
 
+    [SwaggerModel]
 	public class MarketplaceVariant : Variant<MarketplaceVariantXp> { }
 
+    [SwaggerModel]
 	public class ProductXp
     {
         #region DO NOT DELETE
@@ -49,12 +55,14 @@ namespace Marketplace.Models
         public List<ProductAccessorial> Accessorials { get; set; }
     }
 
+    [SwaggerModel]
     public class MarketplaceVariantXp
     {
         public List<SpecValue> SpecValues { get; set; }
         public string NewID { get; set; }
     }
 
+    [SwaggerModel]
     public class SpecValue
     {
         public string SpecName { get; set; }

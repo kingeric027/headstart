@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
 
 namespace Marketplace.Models.Extended
 {
+    [SwaggerModel]
     public class SupplierCategoryConfig : ICosmosObject
     {
         public SupplierCategoryConfig()
@@ -16,6 +18,7 @@ namespace Marketplace.Models.Extended
         public IEnumerable<SupplierCategoriesFilter> Filters { get; set; }
     }
 
+    [SwaggerModel]
     public class SupplierCategoriesFilter
     {
         public string Display { get; set; }

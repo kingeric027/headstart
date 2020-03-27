@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Marketplace.Helpers.Attributes;
 
 namespace Marketplace.Models.Extended
 {
+    [SwaggerModel]
     public class ProductImage
     {
         [Required] // example if we need to reduce char count , JsonProperty(PropertyName = "u")]
@@ -10,6 +12,7 @@ namespace Marketplace.Models.Extended
         public Tag Tag { get; set; }
     }
 
+    [SwaggerModel]
     public class Tag
     {
         public string VariantID { get; set; }

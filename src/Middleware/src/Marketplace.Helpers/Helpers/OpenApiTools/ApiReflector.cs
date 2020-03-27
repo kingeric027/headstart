@@ -42,17 +42,17 @@ namespace Marketplace.Helpers.OpenApiTools
             { }
         }
 
-        public static ApiMetaData GetMetaData<TController, TAttribute, TModel>(string refPath, IDictionary<string, IErrorCode> errors)
+        public static ApiMetaData GetMetaData<TController, TAttribute>(string refPath, IDictionary<string, IErrorCode> errors)
             where TController : Controller
             where TAttribute : Attribute, IApiAuthAttribute
         {
             return new ApiMetaData
             {
-                Sections = GetSections<TController, TAttribute, TModel>(refPath).ToList(),
+                Sections = GetSections<TController, TAttribute>(refPath).ToList(),
                 Models = (
                     from t in _customTypes
                     where !t.IsEnum
-                    let m = GetModelFromType<TModel>(t, true, true)
+                    let m = GetModelFromType(t, true, true)
                     orderby m.IsPartial, m.Name
                     select m).ToList(),
                 Enums = (
@@ -70,7 +70,7 @@ namespace Marketplace.Helpers.OpenApiTools
 
         private static readonly HashSet<Type> _customTypes = new HashSet<Type>();
 
-        private static IEnumerable<ApiSection> GetSections<TController, TAttribute, TModel>(string refPath)
+        private static IEnumerable<ApiSection> GetSections<TController, TAttribute>(string refPath)
             where TController : Controller
             where TAttribute : Attribute, IApiAuthAttribute
         {
@@ -99,7 +99,7 @@ namespace Marketplace.Helpers.OpenApiTools
                         if (section != null)
                             yield return section;
 
-                        var res = GetResources<TController, TAttribute, TModel>(id).ToList();
+                        var res = GetResources<TController, TAttribute>(id).ToList();
                         section = new ApiSection
                         {
                             ID = id,
@@ -119,7 +119,7 @@ namespace Marketplace.Helpers.OpenApiTools
                 yield return section;
         }
 
-        private static IEnumerable<ApiResource> GetResources<TController, TAttribute, TModel>(string sectionID) where TAttribute : Attribute, IApiAuthAttribute
+        private static IEnumerable<ApiResource> GetResources<TController, TAttribute>(string sectionID) where TAttribute : Attribute, IApiAuthAttribute
         {
                var resource = from c in Assembly.GetAssembly(typeof(TController)).GetExportedTypes()
                 where c.IsSubclassOf(typeof(TController))
@@ -128,7 +128,7 @@ namespace Marketplace.Helpers.OpenApiTools
                 let section = c.GetAttribute<DocSection>()
                 where section != null && section.ID == sectionID
                 let name = c.ControllerFriendlyName()
-                let endpoints = GetEndpoints<TController, TAttribute, TModel>(c, name).ToList()
+                let endpoints = GetEndpoints<TController, TAttribute>(c, name).ToList()
                 where endpoints.Any()
                 orderby section.ListOrder, name
                 select new ApiResource
@@ -142,7 +142,7 @@ namespace Marketplace.Helpers.OpenApiTools
             return resource;
         }
 
-        private static IEnumerable<ApiEndpoint> GetEndpoints<TController, TAttribute, TModel>(Type c, string resource) where TAttribute : Attribute, IApiAuthAttribute
+        private static IEnumerable<ApiEndpoint> GetEndpoints<TController, TAttribute>(Type c, string resource) where TAttribute : Attribute, IApiAuthAttribute
         {
             var result = from m in c.GetMethods()
                 let verb =
@@ -153,7 +153,7 @@ namespace Marketplace.Helpers.OpenApiTools
                     m.HasAttribute<HttpDeleteAttribute>() ? System.Net.Http.HttpMethod.Delete : null
                 where verb != null
                 let route = GetRoute(m)
-                let requestType = m.GetParameters().Select(p => p.ParameterType).FirstOrDefault(p => p.IsModelType<TModel>())
+                let requestType = m.GetParameters().Select(p => p.ParameterType).FirstOrDefault(p => p.IsModelType())
                 let responseType = m.ResponseType()
                 orderby m.Name.SortOrder()
                 select new ApiEndpoint
@@ -165,10 +165,10 @@ namespace Marketplace.Helpers.OpenApiTools
                     MethodInfo = m,
                     Route = route,
                     HttpVerb = verb,
-                    PathArgs = GetArgs<TController, TModel>(requestType ?? responseType, m, route, true).ToList(),
-                    QueryArgs = GetArgs<TController, TModel>(requestType ?? responseType, m, route, false).ToList(),
-                    RequestModel = GetModelFromType<TModel>(requestType, false, true),
-                    ResponseModel = GetModelFromType<TModel>(responseType, true, false),
+                    PathArgs = GetArgs<TController>(requestType ?? responseType, m, route, true).ToList(),
+                    QueryArgs = GetArgs<TController>(requestType ?? responseType, m, route, false).ToList(),
+                    RequestModel = GetModelFromType(requestType, false, true),
+                    ResponseModel = GetModelFromType(responseType, true, false),
                     HttpStatus = responseType.HttpStatusCode(verb),
                     RequiredRoles = GetRequiredRoles<TAttribute>(m),
                     IsList = responseType.UnwrapGeneric(typeof(Task<>)).IsListPage(),
@@ -186,21 +186,21 @@ namespace Marketplace.Helpers.OpenApiTools
             return roles.Select(r => r.ToString()).ToList();
         }
 
-        private static IEnumerable<ApiParameter> GetArgs<TController, TModel>(Type modelType, MethodInfo methodInfo, string path, bool inPath)
+        private static IEnumerable<ApiParameter> GetArgs<TController>(Type modelType, MethodInfo methodInfo, string path, bool inPath)
         {
             foreach (var param in methodInfo.GetParameters())
             {
-                if ((param.ParameterType.IsModelType<TModel>()))
+                if ((param.ParameterType.IsModelType()))
                     continue;
 
                 if (path.Contains($"{param.Name}") != inPath)
                     continue;
 
-                CacheCustomTypes<TModel>(param.ParameterType);
+                CacheCustomTypes(param.ParameterType);
 
                 if (param.ParameterType.WithoutGenericArgs() == typeof(ListArgs<>))
                 {
-                    foreach (var arg in GetArgs<TController, TModel>(modelType, ListArgsReflector.Method, path, inPath))
+                    foreach (var arg in GetArgs<TController>(modelType, ListArgsReflector.Method, path, inPath))
                     {
                         arg.IsListArg = true;
                         yield return arg;
@@ -318,12 +318,12 @@ namespace Marketplace.Helpers.OpenApiTools
             return e;
         }
 
-        private static ApiModel GetModelFromType<TModel>(Type type, bool includeReadOnly, bool includeWriteOnly)
+        private static ApiModel GetModelFromType(Type type, bool includeReadOnly, bool includeWriteOnly)
         {
             if (type == null || type == typeof(void))
                 return null;
 
-            CacheCustomTypes<TModel>(type);
+            CacheCustomTypes(type);
 
             var name = type.Name;
             var isPartial = false;
@@ -335,7 +335,7 @@ namespace Marketplace.Helpers.OpenApiTools
                 isPartial = true;
             }
 
-            var innerModel = GetModelFromType<TModel>(type.GetGenericArguments().FirstOrDefault(), includeReadOnly, includeWriteOnly);
+            var innerModel = GetModelFromType(type.GetGenericArguments().FirstOrDefault(), includeReadOnly, includeWriteOnly);
             
             var props = (
                 from p in type.GetProperties()
@@ -351,7 +351,7 @@ namespace Marketplace.Helpers.OpenApiTools
                     Description = GetDescription(p, includeWriteOnly),
                     ReadOnly = p.HasAttribute<ApiReadOnlyAttribute>(),
                     WriteOnly = p.HasAttribute<ApiWriteOnlyAttribute>(),
-                    SampleData = GetSampleData<TModel>(p, includeReadOnly, includeWriteOnly)
+                    SampleData = GetSampleData(p, includeReadOnly, includeWriteOnly)
                 }
                 where includeReadOnly || !prop.ReadOnly
                 where includeWriteOnly || !prop.WriteOnly
@@ -370,13 +370,13 @@ namespace Marketplace.Helpers.OpenApiTools
             };
         }
 
-        private static object GetSampleData<TController>(PropertyInfo prop, bool includeReadOnly, bool includeWriteOnly)
+        private static object GetSampleData(PropertyInfo prop, bool includeReadOnly, bool includeWriteOnly)
         {
             var attr = prop.GetAttribute<DocSampleDataAttribute>();
-            return attr?.Value ?? GetSampleData<TController>(prop.PropertyType, includeReadOnly, includeWriteOnly);
+            return attr?.Value ?? GetSampleData(prop.PropertyType, includeReadOnly, includeWriteOnly);
         }
 
-        private static object GetSampleData<TModel>(Type type, bool includeReadOnly, bool includeWriteOnly)
+        private static object GetSampleData(Type type, bool includeReadOnly, bool includeWriteOnly)
         {
             type = type.WithoutNullable();
 
@@ -422,10 +422,10 @@ namespace Marketplace.Helpers.OpenApiTools
 
 
             if (type.IsCollection())
-                return new[] { GetSampleData<TModel>(type.GetCollectionItemType(), includeReadOnly, includeWriteOnly) };
+                return new[] { GetSampleData(type.GetCollectionItemType(), includeReadOnly, includeWriteOnly) };
 
-            if (type.IsModelType<TModel>())
-                return GetModelFromType<TModel>(type, includeReadOnly, includeWriteOnly)?.Sample;
+            if (type.IsModelType())
+                return GetModelFromType(type, includeReadOnly, includeWriteOnly)?.Sample;
 
             return new object();
         }
@@ -500,14 +500,14 @@ namespace Marketplace.Helpers.OpenApiTools
             return s;
         }
 
-        private static void CacheCustomTypes<TModel>(Type type, bool nestedInPartial = false)
+        private static void CacheCustomTypes(Type type, bool nestedInPartial = false)
         {
             if (type == null)
                 return;
 
             if (type.IsCollection())
             {
-                CacheCustomTypes<TModel>(type.GetCollectionItemType(), nestedInPartial);
+                CacheCustomTypes(type.GetCollectionItemType(), nestedInPartial);
                 return;
             }
 
@@ -519,12 +519,12 @@ namespace Marketplace.Helpers.OpenApiTools
                     _customTypes.Add(type);
 
                 foreach (var innerType in type.GetGenericArguments())
-                    CacheCustomTypes<TModel>(innerType, false);
+                    CacheCustomTypes(innerType, false);
 
                 return;
             }
 
-            if (!type.IsModelType<TModel>()) //
+            if (!type.IsModelType()) //
                 return;
 
             if (!type.IsGenericType)
@@ -538,7 +538,7 @@ namespace Marketplace.Helpers.OpenApiTools
             }
 
             foreach (var prop in type.GetProperties())
-                CacheCustomTypes<TModel>(prop.PropertyType, nestedInPartial);
+                CacheCustomTypes(prop.PropertyType, nestedInPartial);
         }
     }
 }

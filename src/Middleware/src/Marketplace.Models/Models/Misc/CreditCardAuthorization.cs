@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Marketplace.Helpers.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using OrderCloud.SDK;
 
 namespace Marketplace.Models.Misc
 {
+    [SwaggerModel]
     public class CreditCardAuthorization
     {
-        [ApiReadOnly]
+        [OrderCloud.SDK.ApiReadOnly]
         public ResponseStatus Status { get; set; } // respstat
         public string ReferenceNumber { get; set; } // retref
         public string Account { get; set; } // account
@@ -18,24 +19,24 @@ namespace Marketplace.Models.Misc
         public decimal? Amount { get; set; } // amount
         [System.ComponentModel.DataAnnotations.Required]
         public string MerchantID { get; set; } // merchid
-        [ApiReadOnly]
+        [OrderCloud.SDK.ApiReadOnly]
         public string ResponseCode { get; set; } // respcode
-        [ApiReadOnly]
+        [OrderCloud.SDK.ApiReadOnly]
         public string ResponseText { get; set; } // resptext
-        [ApiReadOnly]
+        [OrderCloud.SDK.ApiReadOnly]
         public string ResponseProcessor { get; set; } // respproc
-        [ApiReadOnly]
+        [OrderCloud.SDK.ApiReadOnly]
         public string AVSResponseCode { get; set; } // avsresp
-        [ApiReadOnly]
+        [OrderCloud.SDK.ApiReadOnly]
         public CVVResponse CVVResponseCode { get; set; } // cvvresp
-        [ApiReadOnly]
+        [OrderCloud.SDK.ApiReadOnly]
         public BinType BinType { get; set; }
-        [ApiReadOnly]
+        [OrderCloud.SDK.ApiReadOnly]
         public string AuthorizationCode { get; set; } // authcode
         //public string Signature { get; set; } // signature
-        [ApiReadOnly]
+        [OrderCloud.SDK.ApiReadOnly]
         public bool CommercialCard { get; set; } // commcard
-        [ApiReadOnly]
+        [OrderCloud.SDK.ApiReadOnly]
         public dynamic Receipt { get; set; } // receipt
 
         // request properties
