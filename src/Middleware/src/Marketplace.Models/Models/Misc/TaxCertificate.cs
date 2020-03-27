@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Marketplace.Models.Models.Misc
 {
+	[SwaggerModel]
 	public class TaxCertificate
 	{
 		[ApiReadOnly]

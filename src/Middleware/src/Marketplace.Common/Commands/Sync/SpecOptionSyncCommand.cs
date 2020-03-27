@@ -113,7 +113,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Specs.GetOptionAsync(wi.Current.To<SpecOption>().xp.SpecID, wi.RecordId, wi.Token);
+                var response = await _oc.Specs.GetOptionAsync(wi.Current.ToObject<MarketplaceSpecOption>().xp.SpecID, wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)

@@ -52,7 +52,7 @@ namespace Marketplace.Common.Services.CardConnect
                 throw new ApiErrorException(new ApiError()
                 {
                     Data = attempt,
-                    Message = $"AVS Validation Failure",
+                    Message = $"Credit Card Address Validation Failure",
                     StatusCode = HttpStatusCode.BadRequest,
                     ErrorCode = attempt.respcode
                 });
