@@ -51,7 +51,6 @@ namespace Marketplace.Common.Models
         }
 
         public string id { get; set; }
-        public string ID { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         [Sortable]
         public DateTimeOffset timeStamp { get; set; }
         [Sortable]
