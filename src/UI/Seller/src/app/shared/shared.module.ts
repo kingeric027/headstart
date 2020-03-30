@@ -42,6 +42,7 @@ import { DragDirective } from './directives/dragDrop.directive';
 import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
 import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component';
+import { LocationIDInputDirective } from './directives/location-id-input.directive';
 
 @NgModule({
   imports: [
@@ -95,6 +96,7 @@ import { UserGroupAssignments } from './components/user-group-assignments/user-g
     QuillModule,
     ReactiveQuillComponent,
     FormControlErrorDirective,
+    LocationIDInputDirective,
     DragDirective,
     DeleteConfirmModal,
     PhoneFormatPipe,
@@ -121,6 +123,7 @@ import { UserGroupAssignments } from './components/user-group-assignments/user-g
     ResourceEditComponent,
     ReactiveQuillComponent,
     FormControlErrorDirective,
+    LocationIDInputDirective,
     DragDirective,
     ConfirmModal,
     UserGroupAssignments,

@@ -29,7 +29,7 @@ export class BuyerUserService extends ResourceCrudService<User> implements IUser
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    ocUserService: OcUserService,
+    private ocUserService: OcUserService,
     private ocBuyerUserGroupService: OcUserGroupService
   ) {
     super(router, activatedRoute, ocUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'users');
@@ -65,5 +65,14 @@ export class BuyerUserService extends ResourceCrudService<User> implements IUser
 
   async listUserAssignments(userID: string, buyerID: string): Promise<ListUserGroupAssignment> {
     return await this.ocBuyerUserGroupService.ListUserAssignments(buyerID, { userID }).toPromise();
+  }
+
+  async createNewResource(resource: any): Promise<any> {
+    const buyerID = this.getParentResourceID();
+    resource.ID = buyerID + '-{' + buyerID + '-UserIncrementor' + '}';
+    const newResource = await this.ocService.Create(...this.createListArgs([resource])).toPromise();
+    this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
+    this.resourceSubject.next(this.resourceSubject.value);
+    return newResource;
   }
 }

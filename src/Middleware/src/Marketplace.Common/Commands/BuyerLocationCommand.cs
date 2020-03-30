@@ -9,6 +9,7 @@ using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,7 +45,11 @@ namespace Marketplace.Common.Commands
         }
         public async Task<MarketplaceBuyerLocation> Create(string buyerID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user, string token)
         {
+            var buyerLocationID = CreateBuyerLocationID(buyerID, buyerLocation);
+            buyerLocation.Address.ID = buyerLocationID;
             var buyerAddress = await _oc.Addresses.CreateAsync<MarketplaceAddressBuyer>(buyerID, buyerLocation.Address, accessToken: user.AccessToken);
+
+            buyerLocation.UserGroup.ID = buyerAddress.ID;
             var buyerUserGroup = await _oc.UserGroups.CreateAsync<MarketplaceUserGroup>(buyerID, buyerLocation.UserGroup, accessToken: user.AccessToken);
             await CreateUserGroupAndAssignments(token, buyerID, buyerUserGroup.ID, buyerAddress.ID);
             return new MarketplaceBuyerLocation
@@ -52,6 +57,23 @@ namespace Marketplace.Common.Commands
                 Address = buyerAddress,
                 UserGroup = buyerUserGroup,
             };
+        }
+
+        private string CreateBuyerLocationID(string buyerID, MarketplaceBuyerLocation buyerLocation)
+        {
+            var addressIDInRequest = buyerLocation.Address.ID;
+            if(addressIDInRequest.Contains("LocationIncrementor"))
+            {
+                // prevents prefix duplication with address validation prewebhooks
+                return addressIDInRequest;
+            }
+            if (addressIDInRequest == null || addressIDInRequest.Length == 0)
+            {
+                return buyerID + "-{" + buyerID + "-LocationIncrementor}";
+            } else
+            {
+                return buyerID + "-" + addressIDInRequest;
+            }
         }
 
         public async Task CreateUserGroupAndAssignments(string token, string buyerID, string buyerUserGroupID, string buyerAddressID)

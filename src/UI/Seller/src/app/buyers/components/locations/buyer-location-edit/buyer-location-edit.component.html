@@ -8,18 +8,26 @@
       <div class="col-md-7 form-group">
         <div *ngIf="isCreatingNew"
              class="form-group">
-          <label for="ID">Location ID (Optional)</label>
-          <input type="text"
-                 class="form-control"
-                 id="ID"
-                 showErrors
-                 aria-describedby="ID"
-                 maxlength="100"
-                 [resourceForm]="resourceForm"
-                 formControlName="ID"
-                 (input)="handleUpdateBuyerLocation($event, 'UserGroup.ID')"
-                 (input)="handleUpdateBuyerLocation($event, 'Address.ID')"
-                 placeholder="Enter ID (optional)">
+          <div class="form-group">
+            <label for="ID">Location ID (Optional)</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">{{buyerID}}-</span>
+              </div>
+              <input type="text"
+                     class="form-control"
+                     id="ID"
+                     showErrors
+                     appLocationIDInput
+                     aria-describedby="ID"
+                     maxlength="5"
+                     [resourceForm]="resourceForm"
+                     formControlName="ID"
+                     (input)="handleUpdateBuyerLocation($event, 'UserGroup.ID')"
+                     (input)="handleUpdateBuyerLocation($event, 'Address.ID')"
+                     placeholder="Enter ID (optional)">
+            </div>
+          </div>
         </div>
         <div class="form-group"
              *ngIf="!isCreatingNew && buyerLocationEditable">
