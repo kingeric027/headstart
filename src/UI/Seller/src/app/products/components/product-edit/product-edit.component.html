@@ -192,6 +192,31 @@
       </div>
     </div>
     <!-- /Product Details -->
+    <div class="row pt-3 border-top">
+      <div class="col-md-5">
+        <h5>Product Filters</h5>
+        <p class="font-italic">Configure the store front filters that your product should show up under, when buyers filter down the product list.</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row"
+             *ngFor="let facet of facetOptions">
+          <div class="border col-md-4 d-flex justify-content-start align-items-center">
+            <p class="mb-0">{{facet.Name}}</p>
+          </div>
+          <div class="border col-md-8">
+            <div class="chip supplier-facet-chip"
+                 (click)="toggleFacetOption(facet, option)"
+                 [ngClass]="{'active': isFacetOptionApplied(facet, option)}"
+                 *ngFor="let option of facet?.xp?.Options">{{option}}
+              <fa-icon *ngIf="isFacetOptionApplied(facet, option)"
+                       [icon]="faCheckCircle"></fa-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Product Variations -->
     <product-variations-component [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
                                   [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
@@ -350,6 +375,7 @@
         </div>
       </div>
     </div>
+    <!-- /Product Images -->
     <!-- Product Documents -->
     <div class="row pt-3 mt-5 border-top">
       <div class="col-md-5">
