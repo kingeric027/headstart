@@ -26,4 +26,25 @@ export class FacetTableComponent extends ResourceCrudComponent<ProductFacet> imp
   filterConfig = {
     Filters: [],
   };
+
+  // Overwrite create resource function to add XpPath
+  async createNewResource(): Promise<void> {
+    // dataIsSaving indicator is used in the resource table to conditionally tell the
+    // submit button to disable
+    // Add XpPath from Facet.Name
+    this.updatedResource.XpPath = this.updatedResource.Name.toLowerCase()
+      .split(' ')
+      .join('-')
+      .trim();
+    console.log(this.updatedResource);
+    try {
+      this.dataIsSaving = true;
+      const newResource = await this.ocService.createNewResource(this.updatedResource);
+      this.selectResource(newResource);
+      this.dataIsSaving = false;
+    } catch (ex) {
+      this.dataIsSaving = false;
+      throw ex;
+    }
+  }
 }
