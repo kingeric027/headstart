@@ -5,28 +5,26 @@
     </div>
     <div class="row">
       <div class="col-lg-12">
-        <ocm-generic-list
-          [meta]="addresses?.Meta"
-          [searchPlaceholder]="'locations'"
-          (requestOptionsUpdated)="updateRequestOptions($event.detail)"
-        >
-          <div class="address-card pb-3 mb-3" *ngFor="let location of locations">
-            <ocm-address-card [address]="location.location" [highlight]="currentLocation === location">
-            </ocm-address-card>
+        <ocm-generic-list [meta]="addresses?.Meta"
+                          [searchPlaceholder]="'locations'"
+                          (requestOptionsUpdated)="updateRequestOptions($event.detail)">
+          <div class="address-card pb-3 mb-3"
+               *ngFor="let location of locations">
+            <ocm-location-details [location]="location"
+                                  [highlight]="currentLocation === location">
+            </ocm-location-details>
           </div>
         </ocm-generic-list>
       </div>
     </div>
   </div>
   <div *ngIf="isLoading">
-    <ocm-loading-layout
-      height="335px"
-      width="100%"
-      mb="1.5rem"
-      [resource]="addresses"
-      [rows]="3"
-      [columns]="3"
-      [isLoading]="isLoading"
-    ></ocm-loading-layout>
+    <ocm-loading-layout height="335px"
+                        width="100%"
+                        mb="1.5rem"
+                        [resource]="addresses"
+                        [rows]="3"
+                        [columns]="3"
+                        [isLoading]="isLoading"></ocm-loading-layout>
   </div>
 </ocm-profile-nav>

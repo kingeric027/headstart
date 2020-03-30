@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
 import { OcMeService, ListBuyerAddress } from '@ordercloud/angular-sdk';
 import { Observable } from 'rxjs';
-import { CurrentUserAddressService } from '../services/current-user/address.service';
+import { AddressService } from '../services/addresses/address.service';
 
 @Injectable()
 export class MeListAddressResolver implements Resolve<ListBuyerAddress> {
@@ -15,7 +15,7 @@ export class MeListAddressResolver implements Resolve<ListBuyerAddress> {
 
 @Injectable()
 export class MeListBuyerLocationResolver implements Resolve<ListBuyerAddress> {
-  constructor(private service: CurrentUserAddressService) {}
+  constructor(private service: AddressService) {}
 
   resolve(): Observable<ListBuyerAddress> | Promise<ListBuyerAddress> | any {
     return this.service.listBuyerLocationsWithCerts();

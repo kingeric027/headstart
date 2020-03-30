@@ -24,10 +24,10 @@ export class OCMOrderHistorical {
     this.getBuyerLocation(this.order.xp.BuyerLocationID);
   }
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) {}
 
   async getBuyerLocation(addressID): Promise<void> {
-    const buyerLocation = await this.context.currentUser.addresses.get(addressID);
+    const buyerLocation = await this.context.addresses.get(addressID);
     this.buyerLocation = buyerLocation;
   }
 }

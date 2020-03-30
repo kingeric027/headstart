@@ -24,15 +24,17 @@ export class OCMOrderDateFilter implements OnInit, OnDestroy {
       toDate: new FormControl(null as Date, DateValidator),
     });
     this.onFormChanges();
-    this.context.orderHistory.filters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handlefiltersChange);
+    this.context.orderHistory.filters.activeFiltersSubject
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(this.handlefiltersChange);
   }
 
   handlefiltersChange = (filters: OrderFilters): void => {
     const fromDate = this.inverseFormatDate(filters.fromDate);
     const toDate = this.inverseFormatDate(filters.toDate);
     this.form.setValue({ fromDate, toDate });
-  }
-  
+  };
+
   clearToDate(): void {
     this.form.get('toDate').setValue(null);
     this.doFilter();

@@ -34,21 +34,21 @@ namespace Marketplace.Common.Controllers.Avalara
 		}
 
 		[DocName("Get tax exeption certificate details")]
-		[HttpGet, Route("{companyID}/certificate/{certificateID}")]
+		[HttpGet, Route("{companyID}/certificate/{certificateID}"), MarketplaceUserAuth(ApiRole.Shopper)]
 		public async Task<TaxCertificate> GetCertificate(int companyID, int certificateID)
 		{
 			return await _taxService.GetCertificateAsync(companyID, certificateID);
 		}
 
 		[DocName("Create tax exeption certificate")]
-		[HttpPost, Route("{companyID}/certificate")]
+		[HttpPost, Route("{companyID}/certificate"), MarketplaceUserAuth(ApiRole.AddressAdmin)]
 		public async Task<TaxCertificate> CreateCertificate(int companyID, [FromBody] TaxCertificate cert)
 		{
 			return await _taxService.CreateCertificateAsync(companyID, cert);
 		}
 
 		[DocName("Update tax exeption certificate")]
-		[HttpPut, Route("{companyID}/certificate/{certificateID}")]
+		[HttpPut, Route("{companyID}/certificate/{certificateID}"), MarketplaceUserAuth(ApiRole.AddressAdmin)]
 		public async Task<TaxCertificate> UpdateCertificate(int companyID, int certificateID, [FromBody] TaxCertificate cert)
 		{
 			return await _taxService.UpdateCertificateAsync(companyID, certificateID, cert);

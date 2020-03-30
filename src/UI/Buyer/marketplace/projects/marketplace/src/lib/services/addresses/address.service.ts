@@ -1,17 +1,22 @@
 import { Injectable } from '@angular/core';
-import { OcMeService, BuyerAddress, ListBuyerAddress } from '@ordercloud/angular-sdk';
+import { OcMeService, OcAddressService } from '@ordercloud/angular-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
-import BuyerLocations from 'marketplace-javascript-sdk/dist/api/BuyerLocations';
-import { TaxCertificate, MarketplaceAddressBuyer, BuyerAddressXP, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { TaxCertificate, MarketplaceAddressBuyer, MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { ListMarketplaceAddressBuyer, AppConfig, BuyerLocationWithCert } from '../../shopper-context';
+import { CurrentUserService } from '../current-user/current-user.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CurrentUserAddressService {
-  companyId: number;
-  constructor(private ocMeService: OcMeService, private appConfig: AppConfig) {
-    this.companyId = this.appConfig.avalaraCompanyId;
+export class AddressService {
+  avalaraCompanyId: number;
+  constructor(
+    private ocMeService: OcMeService,
+    private appConfig: AppConfig,
+    private ocAddressService: OcAddressService,
+    private user: CurrentUserService
+  ) {
+    this.avalaraCompanyId = this.appConfig.avalaraCompanyId;
   }
 
   async get(addressID: string): Promise<MarketplaceAddressBuyer> {
@@ -56,19 +61,24 @@ export class CurrentUserAddressService {
   }
 
   async createCertificate(locationID: string, certificate: TaxCertificate): Promise<TaxCertificate> {
-    const created = await MarketplaceSDK.Avalaras.CreateCertificate(this.companyId, certificate);
-    await this.ocMeService.PatchAddress(locationID, { xp: { AvalaraCertificateID: created.ID } }).toPromise();
+    const buyerID = this.user.get().Buyer.ID;
+    const created = await MarketplaceSDK.Avalaras.CreateCertificate(this.avalaraCompanyId, certificate);
+    await this.ocAddressService
+      .Patch(buyerID, locationID, {
+        xp: { AvalaraCertificateID: created.ID, AvalaraCertificateExpiration: created.ExpirationDate },
+      })
+      .toPromise();
     return created;
   }
 
   async updateCertificate(certificateID: number, certificate: TaxCertificate): Promise<TaxCertificate> {
-    const created = await MarketplaceSDK.Avalaras.UpdateCertificate(this.companyId, certificateID, certificate);
+    const created = await MarketplaceSDK.Avalaras.UpdateCertificate(this.avalaraCompanyId, certificateID, certificate);
     return created;
   }
 
   private getCertificate = (address: MarketplaceAddressBuyer): Promise<TaxCertificate> => {
     const certificateID = address?.xp?.AvalaraCertificateID;
     if (certificateID === null || certificateID === undefined) return Promise.resolve(null);
-    return MarketplaceSDK.Avalaras.GetCertificate(this.companyId, certificateID);
+    return MarketplaceSDK.Avalaras.GetCertificate(this.avalaraCompanyId, certificateID);
   };
 }

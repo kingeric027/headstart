@@ -17,6 +17,7 @@ export const ocAppConfig: AppConfig = {
   avalaraCompanyId: 280411,
   scope: [
     'MeAddressAdmin',
+    'AddressAdmin', // Only for location owners
     'MeAdmin',
     'MeCreditCardAdmin',
     'MeXpAdmin',

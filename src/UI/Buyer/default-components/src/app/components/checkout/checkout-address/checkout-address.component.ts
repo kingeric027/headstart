@@ -126,7 +126,7 @@ export class OCMCheckoutAddress implements OnInit {
     const filters = {};
     filters[this.addressType] = true;
     const options = { filters, ...this.requestOptions };
-    this.existingBuyerLocations = await this.context.currentUser.addresses.listBuyerLocations(options);
+    this.existingBuyerLocations = await this.context.addresses.listBuyerLocations(options);
     if (this.existingBuyerLocations?.Items.length === 1) {
       this.selectedBuyerLocation = this.selectedAddress = this.existingBuyerLocations.Items[0];
     }
@@ -136,12 +136,12 @@ export class OCMCheckoutAddress implements OnInit {
     const filters = {};
     filters[this.addressType] = true;
     const options = { filters, ...this.requestOptions };
-    this.existingAddresses = await this.context.currentUser.addresses.list(options);
+    this.existingAddresses = await this.context.addresses.list(options);
   }
 
   private async saveAndSetAddress(address: BuyerAddress): Promise<Order> {
     const addressToSave = this.addShippingAndBillingOptionsOnAddress(address);
-    const savedAddress = await this.context.currentUser.addresses.create(addressToSave);
+    const savedAddress = await this.context.addresses.create(addressToSave);
     return await this.setSavedAddress(savedAddress.ID);
   }
 

@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { BuyerAddress } from '@ordercloud/angular-sdk';
 import { ShopperContextService, BuyerLocationWithCert } from 'marketplace';
 
 @Component({
@@ -34,7 +33,7 @@ export class OCMLocationList implements OnInit {
 
   private async reloadAddresses(): Promise<void> {
     this.isLoading = true;
-    this.locations = await this.context.currentUser.addresses.listBuyerLocationsWithCerts(this.requestOptions);
+    this.locations = await this.context.addresses.listBuyerLocationsWithCerts(this.requestOptions);
     this.isLoading = false;
   }
 }

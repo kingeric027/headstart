@@ -1,30 +1,19 @@
-import { CurrentUserService, ICurrentUser } from '../current-user/current-user.service';
+import { CurrentUserService } from '../current-user/current-user.service';
 import { Injectable } from '@angular/core';
-import { RouteService, IRouter } from '../route/route.service';
-import { ProductFilterService, IProductFilters } from '../product-filter/product-filter.service';
-import { AuthService, IAuthentication } from '../auth/auth.service';
-import { OrderHistoryService, IOrderHistory } from '../order-history/order-history.service';
+import { RouteService } from '../route/route.service';
+import { ProductFilterService } from '../product-filter/product-filter.service';
+import { AuthService } from '../auth/auth.service';
+import { OrderHistoryService } from '../order-history/order-history.service';
 import { AppConfig } from '../../shopper-context';
-import { SupplierFilterService, ISupplierFilters } from '../supplier-filter/supplier-filter.service';
-import { ProductCategoriesService, ICategories } from '../product-categories/product-categories.service';
-import { CurrentOrderService, ICurrentOrder } from '../order/order.service';
-
-export interface IShopperContext {
-  router: IRouter;
-  currentUser: ICurrentUser;
-  order: ICurrentOrder;
-  productFilters: IProductFilters;
-  categories: ICategories;
-  supplierFilters: ISupplierFilters;
-  authentication: IAuthentication;
-  orderHistory: IOrderHistory;
-  appSettings: AppConfig; // TODO - should this come from custom-components repo somehow? Or be configured in admin and persisted in db?
-}
+import { SupplierFilterService } from '../supplier-filter/supplier-filter.service';
+import { ProductCategoriesService } from '../product-categories/product-categories.service';
+import { CurrentOrderService } from '../order/order.service';
+import { AddressService } from '../addresses/address.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ShopperContextService implements IShopperContext {
+export class ShopperContextService {
   constructor(
     public order: CurrentOrderService,
     public currentUser: CurrentUserService,
@@ -34,6 +23,7 @@ export class ShopperContextService implements IShopperContext {
     public authentication: AuthService,
     public orderHistory: OrderHistoryService,
     public appSettings: AppConfig,
-    public categories: ProductCategoriesService
+    public categories: ProductCategoriesService,
+    public addresses: AddressService
   ) {}
 }

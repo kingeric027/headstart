@@ -121,6 +121,8 @@ import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.co
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
 import { OCMQuoteRequestForm } from './components/products/quote-request-form/quote-request-form.component';
 import { UnitOfMeasurePipe } from './pipes/unit-of-measure.pipe';
+import { OCMLocationDetails } from './components/profile/location-details/location-details.component';
+import { OCMCertificateForm } from './components/profile/certificate-form/certificate-form.component';
 
 const components = [
   OCMCategoryDropdown,
@@ -193,6 +195,8 @@ const components = [
   OCMShippingSelectionForm,
   ConfirmModal,
   OCMPaymentCreditCard,
+  OCMLocationDetails,
+  OCMCertificateForm,
 ];
 
 // @dynamic
@@ -318,6 +322,8 @@ export class AppModule {
     this.buildWebComponent(OCMAddressSuggestion, 'address-suggestion');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
     this.buildWebComponent(ConfirmModal, 'confirm-modal');
+    this.buildWebComponent(OCMLocationDetails, 'ocm-location-details');
+    this.buildWebComponent(OCMCertificateForm, 'ocm-certificate-form');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string): void {
