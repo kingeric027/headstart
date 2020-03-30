@@ -15,11 +15,10 @@ import { IsProfiledUserGuard } from './interceptors/is-profiled-user/is-profiled
 import { MeChangePasswordWrapperComponent } from './wrapper-components/me-change-password-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
 import { LocationListWrapperComponent } from './wrapper-components/location-list-wrapper.component';
-import { MeListBuyerAddressResolver } from './resolves/me.resolve';
+import { MeListAddressResolver, MeListBuyerLocationResolver } from './resolves/me.resolve';
 import { PaymentListWrapperComponent } from './wrapper-components/payment-list-wrapper.component';
 import { ProductListWrapperComponent } from './wrapper-components/product-list-wrapper.component';
-import {
-  MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
+import { MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
 import { ProductDetailWrapperComponent } from './wrapper-components/product-detail-wrapper.component';
 import { LoginWrapperComponent } from './wrapper-components/login-wrapper.component';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
@@ -46,7 +45,7 @@ export class MyOrdersWrapperComponent implements OnInit, OnDestroy {
 
   setOrders = async () => {
     this.orders = await this.orderFilters.listOrders();
-  }
+  };
 
   ngOnDestroy() {
     this.alive = false;
@@ -68,7 +67,7 @@ export class OrdersToApproveWrapperComponent implements OnInit, OnDestroy {
 
   setOrders = async () => {
     this.orders = await this.orderFilters.listApprovableOrders();
-  }
+  };
 
   ngOnDestroy() {
     this.alive = false;
@@ -80,12 +79,13 @@ export const MarketplaceRoutes: Routes = [
   { path: 'register', component: RegisterWrapperComponent },
   { path: 'forgot-password', component: ForgotPasswordWrapperComponent },
   { path: 'reset-password', component: ResetPasswordWrapperComponent },
-  { path: '',
+  {
+    path: '',
     canActivate: [HasTokenGuard],
     resolve: {
       baseResolve: BaseResolve,
     },
-    children : [
+    children: [
       { path: '', redirectTo: '/home', pathMatch: 'full' },
       { path: 'home', resolve: { featuredProducts: FeaturedProductsResolver }, component: HomeWrapperComponent },
       // { path: 'support', component: SupportComponent },
@@ -117,27 +117,35 @@ export const MarketplaceRoutes: Routes = [
           },
         ],
       },
-      { path: 'profile' , canActivate: [IsProfiledUserGuard], children: [
-        { path: '', component: ProfileWrapperComponent,  },
-        { path: 'change-password', component: MeChangePasswordWrapperComponent },
-        { path: 'addresses', component: AddressListWrapperComponent,
-          resolve: {
-            addresses: MeListBuyerAddressResolver,
+      {
+        path: 'profile',
+        canActivate: [IsProfiledUserGuard],
+        children: [
+          { path: '', component: ProfileWrapperComponent },
+          { path: 'change-password', component: MeChangePasswordWrapperComponent },
+          {
+            path: 'addresses',
+            component: AddressListWrapperComponent,
+            resolve: {
+              addresses: MeListAddressResolver,
+            },
           },
-        },
-        { path: 'locations', component: LocationListWrapperComponent,
-          resolve: {
-            addresses: MeListBuyerAddressResolver,
+          {
+            path: 'locations',
+            component: LocationListWrapperComponent,
+            resolve: {
+              locations: MeListBuyerLocationResolver,
+            },
           },
-        },
-        { path: 'payment-methods', component: PaymentListWrapperComponent },
-        { path: 'orders', component: MyOrdersWrapperComponent },
-        { path: 'orders/approval', component: OrdersToApproveWrapperComponent },
-        { path: 'orders/:orderID', component: OrderDetailWrapperComponent },
-        { path: 'orders/approval/:orderID', component: OrderDetailWrapperComponent },
-      ], }
-    ]
-  }
+          { path: 'payment-methods', component: PaymentListWrapperComponent },
+          { path: 'orders', component: MyOrdersWrapperComponent },
+          { path: 'orders/approval', component: OrdersToApproveWrapperComponent },
+          { path: 'orders/:orderID', component: OrderDetailWrapperComponent },
+          { path: 'orders/approval/:orderID', component: OrderDetailWrapperComponent },
+        ],
+      },
+    ],
+  },
 ];
 
 @NgModule({

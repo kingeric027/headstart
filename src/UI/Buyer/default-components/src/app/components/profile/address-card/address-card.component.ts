@@ -12,7 +12,7 @@ export class OCMAddressCard {
 
   // make into pipe?
   getFullName(address: Address): string {
-    const fullName = `${address.FirstName || ''} ${address.LastName || ''}`;
+    const fullName = `${address?.FirstName || ''} ${address?.LastName || ''}`;
     return fullName.trim();
   }
 }

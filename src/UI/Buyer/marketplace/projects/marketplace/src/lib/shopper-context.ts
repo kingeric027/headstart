@@ -12,8 +12,15 @@ import {
   Address,
   BuyerCreditCard,
   ListBuyerProduct,
+  ListAddress,
 } from '@ordercloud/angular-sdk';
-import { ProductXp, CreditCardToken } from 'marketplace-javascript-sdk';
+import {
+  ProductXp,
+  CreditCardToken,
+  BuyerAddressXP,
+  MarketplaceAddressBuyer,
+  TaxCertificate,
+} from 'marketplace-javascript-sdk';
 
 export * from '@ordercloud/angular-sdk';
 export * from './services/shopper-context/shopper-context.service';
@@ -44,7 +51,7 @@ export interface ShippingRate {
   TotalCost: number;
 }
 
-export interface MarketplaceOrder extends Order<OrderXp, any, any> { }
+export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
 export interface OrderXp {
   BuyerLocationID: string;
   AvalaraTaxTransactionCode: string;
@@ -179,6 +186,7 @@ export class AppConfig {
   orderCloudApiUrl: string;
   orderCloudAuthUrl: string;
   orderCloudApiVersion: string;
+  avalaraCompanyId: number;
   middlewareUrl: string;
   /**
    * base path to CMS resources
@@ -257,8 +265,15 @@ export interface DecodedOCToken {
   orderid?: string;
 }
 
+export interface BuyerLocationWithCert {
+  location?: MarketplaceAddressBuyer;
+  certificate?: TaxCertificate;
+}
+
 // Product Model
 // a corresponding model in the C# product
 export type ListMarketplaceMeProduct = ListBuyerProduct<ProductXp>;
 
 export type MarketplaceMeProduct = BuyerProduct<ProductXp>;
+
+export type ListMarketplaceAddressBuyer = ListAddress<BuyerAddressXP>;
