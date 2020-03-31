@@ -41,7 +41,7 @@ namespace Marketplace.Common.Controllers
         {
             await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
             await _sendgridService.SendSupplierEmails(payload.OrderWorksheet.Order.ID);
-            await _sendgridService.SendSingleEmail("noreply@four51.com", payload.OrderWorksheet.Order.FromUser.Email, "Order Confirmation", "<h1>this is a test email for order submit</h1>"); // to buyer placing order
+            await _sendgridService.SendOrderSubmitTemplateEmail(payload.OrderWorksheet);
         }
 
         [HttpPost, Route("orderrequiresapproval")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS		
@@ -94,7 +94,7 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Refunded", "<h1>this is a test email for order refunded</h1>");
         }
 
-        [HttpPost, Route("orderupdated")] // TO DO: TEST 
+        [HttpPost, Route("orderupdated")]
         [OrderCloudWebhookAuth]
         public async void HandleOrderUpdated([FromBody] WebhookPayloads.Orders.Patch payload)
         {
