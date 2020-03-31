@@ -22,22 +22,16 @@ namespace Marketplace.Common.Commands
 
     public class CreditCardCommand : ICreditCardCommand
     {
-        private readonly ICardConnectService _card;
+        private readonly ICardConnectService _cardConnect;
         private readonly AppSettings _settings;
         private readonly IOrderCloudClient _oc;
-		private readonly IOrderCloudClient _privilegedOC;
 
 		public CreditCardCommand(AppSettings settings, ICardConnectService card, IOrderCloudClient oc)
         {
-            _card = card;
+			_cardConnect = card;
             _settings = settings;
-            _oc = new OrderCloudClient(new OrderCloudClientConfig()
-            {
-                ApiUrl = settings.OrderCloudSettings.ApiUrl,
-                AuthUrl = settings.OrderCloudSettings.AuthUrl
-            });
-			_privilegedOC = oc;
-		}
+			_oc = oc;
+        }
 
         public async Task<CreditCard> TokenizeAndSave(string buyerID, CreditCardToken card, VerifiedUserContext user)
         {
@@ -70,15 +64,15 @@ namespace Marketplace.Common.Commands
             Require.That(cc.Token != null, new ErrorCode("Invalid credit card token", 400, "Credit card must have valid authorization token"));
 			Require.That(cc.xp.CCBillingAddress != null, new ErrorCode("Invalid Bill Address", 400, "Credit card must have a billing address"));
 
-			var order = await _privilegedOC.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, payment.OrderID);
+			var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, payment.OrderID);
 
 			Require.That(!order.IsSubmitted, new ErrorCode("Invalid Order Status", 400, "Order has already been submitted"));
 
-			var ocPayment = await _privilegedOC.Payments.GetAsync<Payment>(OrderDirection.Incoming, payment.OrderID, paymentID);
+			var ocPayment = await _oc.Payments.GetAsync<Payment>(OrderDirection.Incoming, payment.OrderID, paymentID);
 
-            var call = await _card.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment));
-			ocPayment = await _privilegedOC.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true });
-            var transaction = await _privilegedOC.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID,
+            var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment));
+			ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true });
+            var transaction = await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID,
                 CardConnectMapper.Map(order, ocPayment, call));
             return transaction;
         }
@@ -94,13 +88,13 @@ namespace Marketplace.Common.Commands
 
 		private async Task<MarketplaceBuyerCreditCard> MeTokenize(CreditCardToken card)
 		{
-			var auth = await _card.Tokenize(CardConnectMapper.Map(card));
+			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card));
 			return BuyerCreditCardMapper.Map(card, auth);
 		}
 
 		private async Task<MarketplaceCreditCard> Tokenize(CreditCardToken card)
 		{
-			var auth = await _card.Tokenize(CardConnectMapper.Map(card));
+			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card));
 			return CreditCardMapper.Map(card, auth);
 		}
 	}
