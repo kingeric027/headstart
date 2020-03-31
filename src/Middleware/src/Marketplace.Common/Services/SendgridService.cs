@@ -12,6 +12,7 @@ namespace Marketplace.Common.Services
 {
     public interface ISendgridService
     {
+        Task SendSingleEmail(string from, string to, string subject, string htmlContent)
         Task SendSingleTemplateEmail(EmailAddress from, EmailAddress to, string templateID, object templateData);
         Task SendSupplierEmails(string orderID);
         Task SendOrderSubmitTemplateEmail(OrderWorksheet orderData);
@@ -31,6 +32,15 @@ namespace Marketplace.Common.Services
         {
             var client = new SendGridClient(_settings.SendgridApiKey);
             var msg = MailHelper.CreateSingleTemplateEmail(from, to, templateID, templateData);
+            await client.SendEmailAsync(msg);
+        }
+
+        public async Task SendSingleEmail(string from, string to, string subject, string htmlContent)
+        {
+            var client = new SendGridClient(_settings.SendgridApiKey);
+            var fromEmail = new EmailAddress(from);
+            var toEmail = new EmailAddress(to);
+            var msg = MailHelper.CreateSingleEmail(fromEmail, toEmail, subject, null, htmlContent);
             await client.SendEmailAsync(msg);
         }
 
