@@ -5,6 +5,9 @@ import { filter, map } from 'rxjs/operators';
 import { ProductFilters, OrderFilters, SupplierFilters, OrderStatus } from '../../shopper-context';
 import { OrderFilterService } from '../order-history/order-filter.service';
 import { SupplierFilterService } from '../supplier-filter/supplier-filter.service';
+import { AuthService } from '../auth/auth.service';
+import { ProfileSection, ProfileSections } from './profile-routing.config';
+import { TokenHelperService } from '../token-helper/token-helper.service';
 
 export interface IRouter {
   getActiveUrl(): string;
@@ -27,6 +30,7 @@ export interface IRouter {
   toOrdersToApprove(): void;
   toOrderToAppoveDetails(orderID: string): void;
   toChangePassword(): void;
+  getProfileSections(): ProfileSection[];
   toRoute(path: string): void;
 }
 
@@ -38,11 +42,20 @@ export class RouteService implements IRouter {
     private router: Router,
     private supplierFilterService: SupplierFilterService,
     private productFilterService: ProductFilterService,
-    private orderFilterService: OrderFilterService
+    private orderFilterService: OrderFilterService,
+    private tokenHelperService: TokenHelperService
   ) {}
 
   getActiveUrl(): string {
     return this.router.url;
+  }
+
+  getProfileSections(): ProfileSection[] {
+    var allSections = ProfileSections;
+    var roles = this.tokenHelperService.getDecodedOCToken().role;
+    return allSections.filter(
+      s => !s.rolesWithAccess || !s.rolesWithAccess.length || roles.some(r => s.rolesWithAccess.includes(r))
+    );
   }
 
   onUrlChange(callback: (path: string) => void): void {

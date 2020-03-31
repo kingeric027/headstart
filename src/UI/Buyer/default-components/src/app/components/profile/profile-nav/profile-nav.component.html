@@ -9,53 +9,19 @@
           <div ngbDropdownMenu
                aria-labelledby="dropdownBasic1"
                class="w-100 text-center">
-            <button class="dropdown-item"
-                    (click)="context.router.toMyProfile()">Profile</button>
-            <button class="dropdown-item"
-                    (click)="context.router.toChangePassword()">Change Password</button>
-            <button class="dropdown-item"
-                    (click)="context.router.toMyAddresses()">My Address Book</button>
-            <button class="dropdown-item"
-                    (click)="context.router.toMyLocations()">My Locations</button>
-            <button class="dropdown-item"
-                    (click)="context.router.toMyPaymentMethods()">Payment Methods</button>
-            <button class="dropdown-item"
-                    (click)="context.router.toMyOrders()">My Orders</button>
-            <button class="dropdown-item"
-                    (click)="context.router.toOrdersToApprove()">Orders To Approve</button>
+            <button *ngFor="let profileSection of profileSections"
+                    class="dropdown-item"
+                    (click)="context.router[profileSection.routerCall]()">{{profileSection.displayText}}</button>
           </div>
         </div>
       </div>
     </div>
     <div class="col-md-3  d-none d-md-flex">
       <ul class="nav flex-column">
-        <li class="nav-item side-nav-button mb-3 cursor-pointer">
+        <li *ngFor="let profileSection of profileSections"
+            class="nav-item side-nav-button mb-3 cursor-pointer">
           <a class="link text-primary"
-             (click)="context.router.toMyProfile()">Profile</a>
-        </li>
-        <li class="nav-item side-nav-button mb-3 cursor-pointer">
-          <a class="link text-primary"
-             (click)="context.router.toChangePassword()">Change Password</a>
-        </li>
-        <li class="nav-item side-nav-button mb-3 cursor-pointer">
-          <a class="link text-primary"
-             (click)="context.router.toMyAddresses()">My Address Book</a>
-        </li>
-        <li class="nav-item side-nav-button mb-3 cursor-pointer">
-          <a class="link text-primary"
-             (click)="context.router.toMyLocations()">My Locations</a>
-        </li>
-        <li class="nav-item side-nav-button mb-3 cursor-pointer">
-          <a class="link text-primary"
-             (click)="context.router.toMyPaymentMethods()">Payment Methods</a>
-        </li>
-        <li class="nav-item side-nav-button mb-3 cursor-pointer">
-          <a class="link text-primary"
-             (click)="context.router.toMyOrders()">My Orders</a>
-        </li>
-        <li class="nav-item side-nav-button mb-3 cursor-pointer">
-          <a class="link text-primary"
-             (click)="context.router.toOrdersToApprove()">Orders To Approve</a>
+             (click)="context.router[profileSection.routerCall]()">{{profileSection.displayText}}</a>
         </li>
       </ul>
     </div>
