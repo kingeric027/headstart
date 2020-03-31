@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Marketplace.Helpers.Attributes;
 using OrderCloud.SDK;
+using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
 namespace Marketplace.Models.Misc
 {
