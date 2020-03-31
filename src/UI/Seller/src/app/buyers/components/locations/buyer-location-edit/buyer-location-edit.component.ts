@@ -111,10 +111,6 @@ export class BuyerLocationEditComponent implements OnInit {
     try {
       this.dataIsSaving = true;
       this.buyerLocationEditable.UserGroup.xp.Type = 'BuyerLocation';
-      if (!this.buyerLocationEditable.Address.ID)
-        this.buyerLocationEditable.Address.ID = this.buyerLocationEditable.Address.AddressName.split(' ')
-          .join('-')
-          .replace(/[^a-zA-Z0-9 ]/g, '');
       this.buyerLocationEditable.UserGroup.ID = this.buyerLocationEditable.Address.ID;
       const newBuyerLocation = await MarketplaceSDK.BuyerLocations.Create(this.buyerID, this.buyerLocationEditable);
       this.refreshBuyerLocationData(newBuyerLocation);
