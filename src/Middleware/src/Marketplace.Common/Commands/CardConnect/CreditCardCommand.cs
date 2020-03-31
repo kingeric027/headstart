@@ -7,6 +7,7 @@ using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Models;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -16,7 +17,7 @@ namespace Marketplace.Common.Commands
         //Task<CreditCardAuthorization> Authorize(CreditCardAuthorization auth);
         Task<BuyerCreditCard> MeTokenizeAndSave(CreditCardToken card, VerifiedUserContext user);
         Task<CreditCard> TokenizeAndSave(string buyerID, CreditCardToken card, VerifiedUserContext user);
-        Task<Payment> AuthorizePayment(CreditCardPayment payment, VerifiedUserContext user);
+        Task<Payment> AuthorizePayment(string paymentID, CreditCardPayment payment, VerifiedUserContext user);
     }
 
     public class CreditCardCommand : ICreditCardCommand
@@ -40,87 +41,64 @@ namespace Marketplace.Common.Commands
 
         public async Task<CreditCard> TokenizeAndSave(string buyerID, CreditCardToken card, VerifiedUserContext user)
         {
-            return await _oc.CreditCards.CreateAsync(buyerID, await Tokenize(card), user.AccessToken);
-        }
+			var creditCard = await _oc.CreditCards.CreateAsync(buyerID, await Tokenize(card), user.AccessToken);
+			return creditCard;
+
+		}
 
         public async Task<BuyerCreditCard> MeTokenizeAndSave(CreditCardToken card, VerifiedUserContext user)
         {
-			return await _oc.Me.CreateCreditCardAsync(await MeTokenize(card), user.AccessToken);
-        }
+			var buyerCreditCard = await _oc.Me.CreateCreditCardAsync(await MeTokenize(card), user.AccessToken);
+			return buyerCreditCard;
+		}
 
         public bool IsValidCvv(CreditCardPayment payment, BuyerCreditCard cc)
         {
-            // if credit card is direct without using a saved card then it's a ME card and should enforce CVV
-            // saved credit cards for ME just require CVV
-            return (payment.CreditCardDetails == null || payment.CVV != null) && (!cc.Editable || payment.CVV != null);
-        }
+			// if credit card is direct without using a saved card then it's a ME card and should enforce CVV
+			// saved credit cards for ME just require CVV
+			return (payment.CreditCardDetails == null || payment.CVV != null) && (!cc.Editable || payment.CVV != null);
+		}
 
-		public async Task<Payment> AuthorizePayment(CreditCardPayment payment, VerifiedUserContext user)
+		public async Task<Payment> AuthorizePayment(string paymentID, CreditCardPayment payment, VerifiedUserContext user)
         {
-			Require.That(payment.CreditCardID != null || payment.CreditCardDetails != null, 
-				new ErrorCode("Missing credit card info", 400, "Must include CreditCardDetails or CreditCardID."));
+			Require.That((payment.CreditCardID != null) ^ (payment.CreditCardDetails != null), 
+				new ErrorCode("Missing credit card info", 400, "Request must include either CreditCardDetails or CreditCardID, but not both."));
 
 			var cc = await GetMeCardDetails(payment, user);
             
-            Require.That(payment.IsValidCvv(cc), new ErrorCode("Invalid CVV", 400, "CVV is required for Credit Card Payment"));
+            Require.That(IsValidCvv(payment, cc), new ErrorCode("Invalid CVV", 400, "CVV is required for Credit Card Payment"));
             Require.That(cc.Token != null, new ErrorCode("Invalid credit card token", 400, "Credit card must have valid authorization token"));
-      
+			Require.That(cc.xp.CCBillingAddress != null, new ErrorCode("Invalid Bill Address", 400, "Credit card must have a billing address"));
+
 			var order = await _privilegedOC.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, payment.OrderID);
 
-			var paymentlist = await _privilegedOC.Payments.ListAsync<Payment>(OrderDirection.Incoming, payment.OrderID, builder => builder.AddFilter(p => p.CreditCardID == payment.CreditCardID));
-			if (paymentlist.Meta.TotalCount == 0)
-				throw new ApiErrorException(new ErrorCode("Required", 404, $"Unable to find Payment on Order {payment.OrderID} with CreditCardID {payment.CreditCardID}"), payment.OrderID);
-            //TODO: add flexibility to id the actual payment in OC
-			var ocPayment = paymentlist.Items.First();
-
 			Require.That(!order.IsSubmitted, new ErrorCode("Invalid Order Status", 400, "Order has already been submitted"));
-            Require.That(order.BillingAddress != null || order.BillingAddressID != null, new ErrorCode("Invalid Bill Address", 400, "Order must supply valid billing address for credit card verification"));
 
-            if (order.BillingAddress == null)
-            {
-                var address = await _oc.Me.GetAddressAsync<MarketplaceAddressMeBuyer>(order.BillingAddressID, user.AccessToken);
-                order.BillingAddress = new MarketplaceAddressBuyer()
-                {
-                    AddressName = address.AddressName,
-                    City = address.City,
-                    Country = address.Country,
-                    ID = address.ID,
-                    DateCreated = address.DateCreated,
-                    Phone = address.Phone,
-                    FirstName = address.FirstName,
-                    LastName = address.LastName,
-                    Street1 = address.Street1,
-                    CompanyName = address.CompanyName,
-                    Street2 = address.Street2,
-                    State = address.State,
-                    Zip = address.Zip,
-                    xp = address.xp
-                };
-            }
+			var ocPayment = await _privilegedOC.Payments.GetAsync<Payment>(OrderDirection.Incoming, payment.OrderID, paymentID);
 
             var call = await _card.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment));
 			ocPayment = await _privilegedOC.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true });
-            var trans = await _privilegedOC.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID,
+            var transaction = await _privilegedOC.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID,
                 CardConnectMapper.Map(order, ocPayment, call));
-            return trans;
+            return transaction;
         }
 
-		private async Task<BuyerCreditCard> GetMeCardDetails(CreditCardPayment payment, VerifiedUserContext user)
+		private async Task<MarketplaceBuyerCreditCard> GetMeCardDetails(CreditCardPayment payment, VerifiedUserContext user)
 		{
 			if (payment.CreditCardID != null)
 			{
-				return await _oc.Me.GetCreditCardAsync<BuyerCreditCard>(payment.CreditCardID, user.AccessToken);
+				return await _oc.Me.GetCreditCardAsync<MarketplaceBuyerCreditCard>(payment.CreditCardID, user.AccessToken);
 			}
 			return await MeTokenize(payment.CreditCardDetails);
 		}
 
-		private async Task<BuyerCreditCard> MeTokenize(CreditCardToken card)
+		private async Task<MarketplaceBuyerCreditCard> MeTokenize(CreditCardToken card)
 		{
 			var auth = await _card.Tokenize(CardConnectMapper.Map(card));
 			return BuyerCreditCardMapper.Map(card, auth);
 		}
 
-		private async Task<CreditCard> Tokenize(CreditCardToken card)
+		private async Task<MarketplaceCreditCard> Tokenize(CreditCardToken card)
 		{
 			var auth = await _card.Tokenize(CardConnectMapper.Map(card));
 			return CreditCardMapper.Map(card, auth);
