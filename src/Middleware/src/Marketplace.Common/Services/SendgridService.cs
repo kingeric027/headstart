@@ -12,7 +12,7 @@ namespace Marketplace.Common.Services
 {
     public interface ISendgridService
     {
-        Task SendSingleEmail(string from, string to, string subject, string htmlContent);
+        Task SendSingleTemplateEmail(EmailAddress from, EmailAddress to, string templateID, object templateData);
         Task SendSupplierEmails(string orderID);
         Task SendOrderSubmitTemplateEmail(OrderWorksheet orderData);
     }
@@ -20,18 +20,17 @@ namespace Marketplace.Common.Services
     {
         private readonly AppSettings _settings;
         private readonly IOrderCloudClient _oc;
-
+        private const string ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
+        private const string QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
             _oc = ocClient;
             _settings = settings;
         }
-        public async Task SendSingleEmail(string from, string to, string subject, string htmlContent)
+        public async Task SendSingleTemplateEmail(EmailAddress from, EmailAddress to, string templateID, object templateData)
         {
             var client = new SendGridClient(_settings.SendgridApiKey);
-            var fromEmail = new EmailAddress(from);
-            var toEmail = new EmailAddress(to);
-            var msg = MailHelper.CreateSingleEmail(fromEmail, toEmail, subject, null, htmlContent);
+            var msg = MailHelper.CreateSingleTemplateEmail(from, to, templateID, templateData);
             await client.SendEmailAsync(msg);
         }
 
@@ -39,18 +38,13 @@ namespace Marketplace.Common.Services
         {
             if (orderWorksheet.Order.xp.OrderType == OrderType.Standard)
             {
-                List<object> productsList = new List<object>();
-
-                foreach (var item in orderWorksheet.LineItems)
-                {
-                    productsList.Add(new
-                    {
+                var productsList = orderWorksheet.LineItems.Select((LineItem item) =>
+                 new {
                         item.ProductID,
-                        ProductName = item.Product.Name,
+                        item.Product.Name,
                         item.Quantity,
                         item.LineTotal
-                    });
-                };
+                });
 
                 var dynamicTemplateData = new
                 {
@@ -75,12 +69,9 @@ namespace Marketplace.Common.Services
                     PromotionalDiscount = orderWorksheet.Order.PromotionDiscount,
                     orderWorksheet.Order.Total
                 };
-                var client = new SendGridClient(_settings.SendgridApiKey);
                 var fromEmail = new EmailAddress("noreply@four51.com");
                 var toEmail = new EmailAddress(orderWorksheet.Order.FromUser.Email);
-                var templateID = "d-defb11ada55d48d8a38dc1074eaaca67";
-                var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, dynamicTemplateData);
-                await client.SendEmailAsync(msg);
+                await SendSingleTemplateEmail(fromEmail, toEmail, ORDER_SUBMIT_TEMPLATE_ID, dynamicTemplateData);
             } else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
                 var dynamicTemplateData = new
@@ -88,12 +79,9 @@ namespace Marketplace.Common.Services
                     orderWorksheet.Order.FromUser.FirstName,
                     orderWorksheet.Order.FromUser.LastName
                 };
-                var client = new SendGridClient(_settings.SendgridApiKey);
                 var fromEmail = new EmailAddress("noreply@four51.com");
                 var toEmail = new EmailAddress(orderWorksheet.Order.FromUser.Email);
-                var templateID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
-                var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, dynamicTemplateData);
-                await client.SendEmailAsync(msg);
+                await SendSingleTemplateEmail(fromEmail, toEmail, QUOTE_ORDER_SUBMIT_TEMPLATE_ID, dynamicTemplateData);
             }
         }
 
@@ -112,7 +100,9 @@ namespace Marketplace.Common.Services
                         var emailRecipient = supplierInfo.xp.SupportContact.Email;
                         if (emailRecipient.Length > 0)
                         {
-                            await SendSingleEmail("noreply@four51.com", emailRecipient, "Order Confirmation", "<h1>this is a test email for order submit</h1>");
+                            var fromEmail = new EmailAddress("noreply@four51.com");
+                            var toEmail = new EmailAddress("scasey@four51.com");
+                            await SendSingleTemplateEmail(fromEmail, toEmail, null, null);
                         }
                     });
         }
