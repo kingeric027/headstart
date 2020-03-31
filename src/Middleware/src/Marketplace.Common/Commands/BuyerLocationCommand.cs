@@ -62,6 +62,15 @@ namespace Marketplace.Common.Commands
             await Task.WhenAll(deleteAddressReq, deleteUserGroupReq);
         }
         public async Task CreateApprovalUserGroupsAndApprovalRule(string token, string buyerLocationID)
-        {            var buyerID = buyerLocationID.Split('-').First();            var approvingGroupID = $"{buyerLocationID}-OrderApprover";            foreach (var userType in SEBUserTypes.BuyerLocation())            {                var userGroupID = $"{buyerLocationID}-{userType.UserGroupIDSuffix}";                await _oc.UserGroups.CreateAsync(buyerID, new UserGroup()                {                    ID = userGroupID,                    Name = userType.UserGroupName,                    xp =                        {                            Type = "Approval",                            Location = buyerLocationID                        }                }, token);            }            await _oc.ApprovalRules.CreateAsync(buyerID, new ApprovalRule()            {                ID = buyerLocationID,                ApprovingGroupID = approvingGroupID,                Description = "General Approval Rule for Location. Every Order Over a Certain Limit will Require Approval for the designated group of users.",                Name = "General Location Approval Rule",                RuleExpression = $"order.xp.ApprovalNeeded = {buyerLocationID} && order.Total > 0"            });        }
+        {            var buyerID = buyerLocationID.Split('-').First();            var approvingGroupID = $"{buyerLocationID}-OrderApprover";            foreach (var userType in SEBUserTypes.BuyerLocation())            {                var userGroupID = $"{buyerLocationID}-{userType.UserGroupIDSuffix}";                await _oc.UserGroups.CreateAsync(buyerID, new UserGroup()                {                    ID = userGroupID,                    Name = userType.UserGroupName,                    xp =                        {                            Type = "Approval",                            Location = buyerLocationID                        }                }, token);                foreach (var customRole in userType.CustomRoles)
+                {
+                    await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+                    {
+                        BuyerID = buyerID,
+                        UserGroupID = userGroupID,
+                        SecurityProfileID = customRole.ToString()
+                    }, token);
+                }            }
+            await _oc.ApprovalRules.CreateAsync(buyerID, new ApprovalRule()            {                ID = buyerLocationID,                ApprovingGroupID = approvingGroupID,                Description = "General Approval Rule for Location. Every Order Over a Certain Limit will Require Approval for the designated group of users.",                Name = "General Location Approval Rule",                RuleExpression = $"order.xp.ApprovalNeeded = {buyerLocationID} && order.Total > 0"            });        }
     }
 }
