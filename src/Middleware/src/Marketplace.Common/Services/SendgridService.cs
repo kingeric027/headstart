@@ -12,7 +12,7 @@ namespace Marketplace.Common.Services
 {
     public interface ISendgridService
     {
-        Task SendSingleEmail(string from, string to, string subject, string htmlContent)
+        Task SendSingleEmail(string from, string to, string subject, string htmlContent);
         Task SendSingleTemplateEmail(EmailAddress from, EmailAddress to, string templateID, object templateData);
         Task SendSupplierEmails(string orderID);
         Task SendOrderSubmitTemplateEmail(OrderWorksheet orderData);
