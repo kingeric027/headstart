@@ -139,6 +139,7 @@ export const MarketplaceRoutes: Routes = [
             },
           },
           { path: 'payment-methods', component: PaymentListWrapperComponent },
+          { path: 'users', component: UserManagementWrapperComponent },
           { path: 'orders', component: MyOrdersWrapperComponent },
           { path: 'orders/approval', component: OrdersToApproveWrapperComponent },
           { path: 'orders/:orderID', component: OrderDetailWrapperComponent },
