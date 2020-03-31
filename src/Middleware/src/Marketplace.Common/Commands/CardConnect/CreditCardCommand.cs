@@ -37,20 +37,12 @@ namespace Marketplace.Common.Commands
         {
 			var creditCard = await _oc.CreditCards.CreateAsync(buyerID, await Tokenize(card), user.AccessToken);
 			return creditCard;
-
 		}
 
         public async Task<BuyerCreditCard> MeTokenizeAndSave(CreditCardToken card, VerifiedUserContext user)
         {
 			var buyerCreditCard = await _oc.Me.CreateCreditCardAsync(await MeTokenize(card), user.AccessToken);
 			return buyerCreditCard;
-		}
-
-        public bool IsValidCvv(CreditCardPayment payment, BuyerCreditCard cc)
-        {
-			// if credit card is direct without using a saved card then it's a ME card and should enforce CVV
-			// saved credit cards for ME just require CVV
-			return (payment.CreditCardDetails == null || payment.CVV != null) && (!cc.Editable || payment.CVV != null);
 		}
 
 		public async Task<Payment> AuthorizePayment(string paymentID, CreditCardPayment payment, VerifiedUserContext user)
@@ -60,7 +52,7 @@ namespace Marketplace.Common.Commands
 
 			var cc = await GetMeCardDetails(payment, user);
             
-            Require.That(IsValidCvv(payment, cc), new ErrorCode("Invalid CVV", 400, "CVV is required for Credit Card Payment"));
+            Require.That(payment.IsValidCvv(cc), new ErrorCode("Invalid CVV", 400, "CVV is required for Credit Card Payment"));
             Require.That(cc.Token != null, new ErrorCode("Invalid credit card token", 400, "Credit card must have valid authorization token"));
 			Require.That(cc.xp.CCBillingAddress != null, new ErrorCode("Invalid Bill Address", 400, "Credit card must have a billing address"));
 

@@ -34,4 +34,14 @@ namespace Marketplace.Models.Misc
 		[System.ComponentModel.DataAnnotations.Required]
 		public string MerchantID { get; set; }
 	}
+
+	public static class CreditCardPaymentExtensions
+	{
+		public static bool IsValidCvv(this CreditCardPayment payment, BuyerCreditCard cc)
+		{
+			// if credit card is direct without using a saved card then consider it a ME card and should enforce CVV
+			// saved credit cards for ME just require CVV
+			return (payment.CreditCardDetails == null || payment.CVV != null) && (!cc.Editable || payment.CVV != null);
+		}
+	}
 }
