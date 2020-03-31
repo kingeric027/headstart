@@ -42,6 +42,7 @@ import { CheckoutService } from './services/order/checkout.service';
 import { OrderStateService } from './services/order/order-state.service';
 import { Configuration } from 'marketplace-javascript-sdk';
 import { AppConfig } from './shopper-context';
+import { UserManagementWrapperComponent } from './wrapper-components/user-management-wrapper.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -83,6 +84,7 @@ import { AppConfig } from './shopper-context';
     ProductListWrapperComponent,
     ProfileWrapperComponent,
     RegisterWrapperComponent,
+    UserManagementWrapperComponent,
     ResetPasswordWrapperComponent,
     OrderDetailWrapperComponent,
     OrderShipmentsWrapperComponent,

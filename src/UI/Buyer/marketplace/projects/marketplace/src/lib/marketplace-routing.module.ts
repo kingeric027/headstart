@@ -27,6 +27,7 @@ import { OrderFilterService } from './services/order-history/order-filter.servic
 import { ListOrder } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
+import { UserManagementWrapperComponent } from './wrapper-components/user-management-wrapper.component';
 
 // auth components
 

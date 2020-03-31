@@ -24,6 +24,7 @@ export interface IRouter {
   toMyProfile(): void;
   toMyAddresses(): void;
   toMyLocations(): void;
+  toUsers(): void;
   toMyPaymentMethods(): void;
   toMyOrders(): void;
   toMyOrderDetails(orderID: string): void;
@@ -78,6 +79,10 @@ export class RouteService implements IRouter {
 
   toHome() {
     this.toRoute('/home');
+  }
+
+  toUsers() {
+    this.toRoute('/profile/users');
   }
 
   toCheckout(): void {

@@ -28,9 +28,10 @@ export const ProfileSections: ProfileSection[] = [
     showInDropdown: true,
   },
   {
-    routerCall: 'toUserManagement',
-    displayText: 'User Permissions',
+    routerCall: 'toUsers',
+    displayText: 'User Management',
     url: '/profile/users',
+    rolesWithAccess: ['MPApprovalRuleAdmin'],
     showInDropdown: true,
   },
   {
@@ -43,13 +44,6 @@ export const ProfileSections: ProfileSection[] = [
     routerCall: 'toMyOrders',
     displayText: 'Orders Submitted',
     url: '/profile/orders',
-    showInDropdown: true,
-  },
-  {
-    routerCall: 'toOrdersToApprove',
-    displayText: 'User Permission',
-    url: '/profile/orders/approval',
-    rolesWithAccess: ['MPApprovalRuleAdmin'],
     showInDropdown: true,
   },
   {
