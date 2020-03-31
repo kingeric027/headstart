@@ -21,6 +21,7 @@ namespace Marketplace.Models.Models.Marketplace
 	[SwaggerModel]
 	public class CreditCardXP
 	{
+		[Required]
 		public Address CCBillingAddress { get; set; }
 	}
 }
