@@ -79,33 +79,19 @@ namespace Marketplace.Common.TemporaryAppConstants
                 new MarketplaceUserType {
                     UserGroupName = "Order Approver",
                     UserGroupIDSuffix = "OrderApprover",
-                },
-                new MarketplaceUserType {
-                    UserGroupName = "Needs Approval",
-                    UserGroupIDSuffix = "NeedsApproval",
-                },
-            };
-
-        public static List<MarketplaceUserType> BuyerLocation()
-        {
-            return new List<MarketplaceUserType>()
-            {
-                new MarketplaceUserType {
-                    UserGroupName = "Order Approvers",
-                    UserGroupIDSuffix = "OrderApprover",
                     CustomRoles = new List<CustomRole>
                     {
                         CustomRole.MPOrderApprover,
                     }
                 },
                 new MarketplaceUserType {
-                    UserGroupName = "Orders Need Approval",
+                    UserGroupName = "Needs Approval",
                     UserGroupIDSuffix = "NeedsApproval",
                     CustomRoles = new List<CustomRole>
                     {
                         CustomRole.MPNeedsApproval,
                     }
-                }
+                },
             };
         }
     }
