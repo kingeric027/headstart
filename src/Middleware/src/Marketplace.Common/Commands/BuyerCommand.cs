@@ -24,6 +24,7 @@ namespace Marketplace.Common.Commands
         public async Task<MarketplaceBuyer> Create(MarketplaceBuyer buyer, VerifiedUserContext user, string token)
         {
             buyer.ID = "{buyerIncrementor}";
+            buyer.Active = true;
             var ocBuyer = await _oc.Buyers.CreateAsync(buyer, token);
             var ocBuyerID = ocBuyer.ID;
 

@@ -9,8 +9,6 @@ export class LocationIDInputDirective {
   @HostListener('keydown', ['$event'])
   keyDown(event: KeyboardEvent): void {
     const key = event.keyCode;
-    console.log(key);
-    debugger;
     if (!this.isAllowedKey(key)) {
       event.preventDefault();
     }
