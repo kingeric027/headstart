@@ -1,4 +1,5 @@
 import {
+<<<<<<< HEAD
   MarketplaceOrder,
   OrderAddressType,
   CreditCardPayment,
@@ -6,6 +7,16 @@ import {
   MarketplaceBuyerCreditCard,
 } from '../../shopper-context';
 import { ListPayment, Payment, OcOrderService, OcPaymentService, BuyerAddress } from '@ordercloud/angular-sdk';
+=======
+  ListPayment,
+  Payment,
+  BuyerCreditCard,
+  OcOrderService,
+  OcPaymentService,
+  BuyerAddress,
+  OcMeService,
+} from '@ordercloud/angular-sdk';
+>>>>>>> upstream/dev
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
@@ -34,6 +45,7 @@ export class CheckoutService implements ICheckout {
   constructor(
     private ocOrderService: OcOrderService,
     private ocPaymentService: OcPaymentService,
+    private ocMeService: OcMeService,
     private paymentHelper: PaymentHelperService,
     private appSettings: AppConfig,
     private state: OrderStateService,
@@ -88,9 +100,14 @@ export class CheckoutService implements ICheckout {
   }
 
   async setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder> {
-    const patch = { xp: { ['BuyerLocationID']: buyerLocationID } };
+    const patch = { xp: { ['BuyerLocationID']: buyerLocationID, ApprovalNeeded: '' } };
+    const isApprovalNeeded = await this.isApprovalNeeded(buyerLocationID);
+    if (isApprovalNeeded) patch.xp.ApprovalNeeded = buyerLocationID;
     try {
-      return await this.patch(patch as MarketplaceOrder);
+      this.order = await this.ocOrderService.Patch('outgoing', this.order.ID, patch).toPromise();
+      return this.order;
+      // replace with line below when sdk is regenerated
+      // return await this.patch(patch as MarketplaceOrder);
     } catch (ex) {
       if (ex.error.Errors[0].ErrorCode === 'NotFound') {
         throw Error('You no longer have access to this buyer location. Please enter or select a different one.');
@@ -98,6 +115,14 @@ export class CheckoutService implements ICheckout {
     }
   }
 
+<<<<<<< HEAD
+=======
+  async isApprovalNeeded(locationID: string): Promise<boolean> {
+    const userGroups = await this.ocMeService.ListUserGroups({ searchOn: 'ID', search: locationID }).toPromise();
+    return userGroups.Items.some(u => u.ID === `${locationID}-NeedsApproval`);
+  }
+
+>>>>>>> upstream/dev
   async listPayments(): Promise<ListPayment> {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);
   }
