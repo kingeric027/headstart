@@ -58,6 +58,7 @@ namespace Marketplace.API
                 .Inject<IOrchestrationCommand>()
                 .Inject<IOrchestrationLogCommand>()
                 .Inject<IOCShippingIntegration>()
+                .Inject<IShipmentCommand>()
                 .Inject<IAddressValidationCommand>()
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IOrderCloudSandboxService>()
