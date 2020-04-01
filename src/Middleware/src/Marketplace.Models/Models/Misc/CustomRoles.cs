@@ -28,6 +28,8 @@
 		MPBaseBuyer,
 		MPApprovalRuleAdmin,
 		MPCreditCardAdmin,
-		MPAddressAdmin
+		MPAddressAdmin,
+		MPOrderApprover,
+		MPNeedsApproval
 	}
 }

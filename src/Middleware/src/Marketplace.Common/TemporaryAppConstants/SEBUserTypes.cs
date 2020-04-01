@@ -79,13 +79,20 @@ namespace Marketplace.Common.TemporaryAppConstants
                 new MarketplaceUserType {
                     UserGroupName = "Order Approver",
                     UserGroupIDSuffix = "OrderApprover",
+                    CustomRoles = new List<CustomRole>
+                    {
+                        CustomRole.MPOrderApprover,
+                    }
                 },
                 new MarketplaceUserType {
                     UserGroupName = "Needs Approval",
                     UserGroupIDSuffix = "NeedsApproval",
+                    CustomRoles = new List<CustomRole>
+                    {
+                        CustomRole.MPNeedsApproval,
+                    }
                 },
             };
-
         }
     }
 }

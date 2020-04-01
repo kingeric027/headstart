@@ -27,6 +27,7 @@ import { OrderFilterService } from './services/order-history/order-filter.servic
 import { ListOrder } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
+import { UserManagementWrapperComponent } from './wrapper-components/user-management-wrapper.component';
 
 // auth components
 
@@ -138,6 +139,7 @@ export const MarketplaceRoutes: Routes = [
             },
           },
           { path: 'payment-methods', component: PaymentListWrapperComponent },
+          { path: 'users', component: UserManagementWrapperComponent },
           { path: 'orders', component: MyOrdersWrapperComponent },
           { path: 'orders/approval', component: OrdersToApproveWrapperComponent },
           { path: 'orders/:orderID', component: OrderDetailWrapperComponent },
