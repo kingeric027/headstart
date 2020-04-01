@@ -1,4 +1,3 @@
-import { CurrentUserService } from '../current-user/current-user.service';
 import { Injectable } from '@angular/core';
 import { RouteService } from '../route/route.service';
 import { ProductFilterService } from '../product-filter/product-filter.service';
@@ -9,6 +8,8 @@ import { SupplierFilterService } from '../supplier-filter/supplier-filter.servic
 import { ProductCategoriesService } from '../product-categories/product-categories.service';
 import { CurrentOrderService } from '../order/order.service';
 import { AddressService } from '../addresses/address.service';
+import { CurrentUserService } from '../current-user/current-user.service';
+import { UserManagementService } from '../user-management/user-management.service';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +25,7 @@ export class ShopperContextService {
     public orderHistory: OrderHistoryService,
     public appSettings: AppConfig,
     public categories: ProductCategoriesService,
+    public userManagementService: UserManagementService,
     public addresses: AddressService
   ) {}
 }
