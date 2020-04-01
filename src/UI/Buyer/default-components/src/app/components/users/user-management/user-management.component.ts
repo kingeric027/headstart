@@ -96,6 +96,8 @@ export class OCMUserManagement implements OnInit {
       this.del.map(d => this.ocOcUserGroupService.DeleteUserAssignment(buyerID, d.UserGroupID, d.UserID).toPromise()),
     ];
     await Promise.all(assignmentRequests);
-    await this.updateAssignments();
+    this.approvalAssignmentsStatic = this.approvalAssignmentsEditable;
+    this.requestedUserConfirmation = false;
+    this.checkForChanges();
   }
 }
