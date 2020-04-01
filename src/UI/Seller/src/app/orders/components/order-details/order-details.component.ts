@@ -19,6 +19,7 @@ export class OrderDetailsComponent {
   images: ProductImage[] = [];
   orderDirection: string;
   cardType: string;
+  createShipment: boolean;
 
   @Input()
   set order(order: Order) {
@@ -68,5 +69,9 @@ export class OrderDetailsComponent {
     this._payments = paymentsResponse.Items;
     this._liGroups = _groupBy(this._lineItems, li => li.ShipFromAddressID);
     this._liGroupedByShipFrom = Object.values(this._liGroups);
+  }
+
+  toggleCreateShipment(createShipment: boolean) {
+    this.createShipment = createShipment;
   }
 }

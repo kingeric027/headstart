@@ -96,7 +96,11 @@
         </div>
       </div>
     </div>
-    <div *ngIf="_liGroupedByShipFrom?.length > 0">
+    <app-order-shipments (createOrViewShipmentEvent)="toggleCreateShipment($event)"
+                         [order]="_order">
+
+    </app-order-shipments>
+    <div *ngIf="_liGroupedByShipFrom?.length > 0 && !createShipment">
       <div class="card border shadow-sm mb-4"
            *ngFor="let liGroup of _liGroupedByShipFrom">
         <div class="card-header p-3">
