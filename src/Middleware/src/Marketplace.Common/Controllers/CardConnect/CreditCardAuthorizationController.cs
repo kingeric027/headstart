@@ -20,10 +20,10 @@ namespace Marketplace.Common.Controllers.CardConnect
         }
 
         [DocName("POST Payment")]
-        [HttpPost, Route("me/payments/{paymentID}"), MarketplaceUserAuth(ApiRole.Shopper)]
-        public async Task<Payment> Post(string paymentID, [FromBody] CreditCardPayment payment)
+        [HttpPost, Route("me/payments"), MarketplaceUserAuth(ApiRole.Shopper)]
+        public async Task<Payment> Post([FromBody] CreditCardPayment payment)
         {
-            return await _card.AuthorizePayment(paymentID, payment, VerifiedUserContext);
+            return await _card.AuthorizePayment(payment, VerifiedUserContext);
         }
     }
 

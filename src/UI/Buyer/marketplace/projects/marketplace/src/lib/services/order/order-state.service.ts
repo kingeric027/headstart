@@ -15,7 +15,6 @@ export class OrderStateService {
   };
   private readonly DefaultOrder: MarketplaceOrder = {
     xp: {
-      BuyerLocationID: '',
       AvalaraTaxTransactionCode: '',
       OrderType: OrderType.Standard,
       QuoteOrderInfo: null,
@@ -30,7 +29,7 @@ export class OrderStateService {
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
     private appConfig: AppConfig
-  ) { }
+  ) {}
 
   get order(): MarketplaceOrder {
     return this.orderSubject.value;

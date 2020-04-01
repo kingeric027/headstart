@@ -1,22 +1,18 @@
 import {
-<<<<<<< HEAD
   MarketplaceOrder,
   OrderAddressType,
   CreditCardPayment,
   AppConfig,
   MarketplaceBuyerCreditCard,
 } from '../../shopper-context';
-import { ListPayment, Payment, OcOrderService, OcPaymentService, BuyerAddress } from '@ordercloud/angular-sdk';
-=======
+import {
   ListPayment,
   Payment,
-  BuyerCreditCard,
   OcOrderService,
   OcPaymentService,
   BuyerAddress,
   OcMeService,
 } from '@ordercloud/angular-sdk';
->>>>>>> upstream/dev
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
@@ -30,8 +26,8 @@ export interface ICheckout {
   listPayments(): Promise<ListPayment>;
   createSavedCCPayment(card: MarketplaceBuyerCreditCard): Promise<Payment>;
   createOneTimeCCPayment(card: CreditCardToken): Promise<Payment>;
-  setAddress(type: OrderAddressType, address: BuyerAddress): Promise<MarketplaceOrder>;
-  setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder>;
+  setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder>;
+  setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
   setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder>;
   estimateShipping(): Promise<OrderWorksheet>;
   selectShipMethod(selection: ShipMethodSelection): Promise<MarketplaceOrder>;
@@ -79,19 +75,17 @@ export class CheckoutService implements ICheckout {
     return await this.patch({ Comments: comment });
   }
 
-  async setAddress(type: OrderAddressType, address: BuyerAddress): Promise<MarketplaceOrder> {
-    if (type === OrderAddressType.Billing) {
-      this.order = await this.ocOrderService.SetBillingAddress('outgoing', this.order.ID, address).toPromise();
-    } else if (type === OrderAddressType.Shipping) {
-      this.order = await this.ocOrderService.SetShippingAddress('outgoing', this.order.ID, address).toPromise();
-    }
+  async setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder> {
+    // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
+    // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
+    address.ID = null;
+    this.order = await this.ocOrderService.SetShippingAddress('outgoing', this.order.ID, address).toPromise();
     return this.order;
   }
 
-  async setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder> {
-    const patch = { [`${type.toString()}AddressID`]: addressID };
+  async setShippingAddressByID(addressID: string): Promise<MarketplaceOrder> {
     try {
-      return await this.patch(patch);
+      return await this.patch({ ShippingAddressID: addressID });
     } catch (ex) {
       if (ex.error.Errors[0].ErrorCode === 'NotFound') {
         throw Error('You no longer have access to this saved address. Please enter or select a different one.');
@@ -100,14 +94,12 @@ export class CheckoutService implements ICheckout {
   }
 
   async setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder> {
-    const patch = { xp: { ['BuyerLocationID']: buyerLocationID, ApprovalNeeded: '' } };
+    const patch = { BillingAddressID: buyerLocationID, xp: { ApprovalNeeded: '' } };
     const isApprovalNeeded = await this.isApprovalNeeded(buyerLocationID);
     if (isApprovalNeeded) patch.xp.ApprovalNeeded = buyerLocationID;
     try {
-      this.order = await this.ocOrderService.Patch('outgoing', this.order.ID, patch).toPromise();
+      this.order = await this.patch(patch as MarketplaceOrder);
       return this.order;
-      // replace with line below when sdk is regenerated
-      // return await this.patch(patch as MarketplaceOrder);
     } catch (ex) {
       if (ex.error.Errors[0].ErrorCode === 'NotFound') {
         throw Error('You no longer have access to this buyer location. Please enter or select a different one.');
@@ -115,14 +107,11 @@ export class CheckoutService implements ICheckout {
     }
   }
 
-<<<<<<< HEAD
-=======
   async isApprovalNeeded(locationID: string): Promise<boolean> {
     const userGroups = await this.ocMeService.ListUserGroups({ searchOn: 'ID', search: locationID }).toPromise();
     return userGroups.Items.some(u => u.ID === `${locationID}-NeedsApproval`);
   }
 
->>>>>>> upstream/dev
   async listPayments(): Promise<ListPayment> {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);
   }
