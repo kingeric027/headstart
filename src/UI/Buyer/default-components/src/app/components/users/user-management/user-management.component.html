@@ -1,3 +1,72 @@
 <ocm-profile-nav>
-  <h1 class="page-heading border-bottom pb-3">User Management to Go Here</h1>
+  <h1 class="page-heading border-bottom pb-3">Order Approval Management</h1>
+  <div *ngFor="let location of locations">{{ location.Name }}</div>
+  <!-- User Permissions -->
+  <div class="row pt-3 mt-3 bg-white shadow-sm user-permissions-alert">
+    <div class="col-md-5">
+      <p class="font-italic">As a approval rule administrator for this location you can set which users will require approval to submit orders and which users have the authority to approve those orders.</p>
+    </div>
+    <div class="col-md-7">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">User</th>
+            <th scope="col">Can Approve Orders</th>
+            <th scope="col">Orders Need Approval</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{user.Username}}</td>
+            <td class="justify-content-start cursor-pointer align-items-center">
+              <label class="switch mb-0">
+                <input class="form-check-input"
+                       type="checkbox"
+                       (click)="toggleAssignment(user.ID, 'OrderApprover')"
+                       [checked]="isAssigned(user.ID, 'OrderApprover')">
+                <span class="slider round"></span>
+              </label>
+            </td>
+            <td class="justify-content-start cursor-pointer align-items-center">
+              <label class="switch mb-0">
+                <input class="form-check-input"
+                       type="checkbox"
+                       (click)="toggleAssignment(user.ID, 'NeedsApproval')"
+                       [checked]="
+                       isAssigned(user.ID, 'NeedsApproval'
+                       )">
+                <span class="slider round"></span>
+              </label>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!isCreatingNew"
+           class="pb-3">
+        <button [disabled]="!areChanges"
+                class="btn btn-link"
+                (click)="discardUserUserGroupAssignmentChanges()">{{areChanges ? 'Cancel' : 'No Changes'}}</button>
+        <button *ngIf="areChanges && !requestedUserConfirmation"
+                [disabled]="!areChanges || requestedUserConfirmation"
+                class="btn brand-button"
+                (click)="requestUserConfirmation()">{{requestedUserConfirmation ? 'Pending Confirmation' : 'Save Changes'}}</button>
+        <button *ngIf="requestedUserConfirmation && areChanges"
+                class="btn btn-primary"
+                (click)="executeUserUserGroupAssignmentRequests()">Confirm</button>
+        <div *ngIf="areChanges && requestedUserConfirmation"
+             class="mt-3 pb-3 border-top">
+          <div class="p-4 border-radius border-primary bg-light">
+            <div class="d-flex justify-content-start align-items-center">
+              <fa-icon [icon]="faExclamationCircle"
+                       class="alert-icon mr-3"></fa-icon>
+              <p class="mb-0 d-flex flex-column">
+                <small class="font-weight-bold">This is a potentially destructive action that affects order approvals.</small>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /Supplier User Permissions  -->
 </ocm-profile-nav>

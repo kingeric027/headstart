@@ -29,7 +29,7 @@ export const ProfileSections: ProfileSection[] = [
   },
   {
     routerCall: 'toUsers',
-    displayText: 'User Management',
+    displayText: 'User Approval Management',
     url: '/profile/users',
     rolesWithAccess: ['MPApprovalRuleAdmin'],
     showInDropdown: true,
