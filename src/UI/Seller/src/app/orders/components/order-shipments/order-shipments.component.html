@@ -52,7 +52,7 @@
         </div>
     </div>
 </div>
-<div *ngIf="createShipment" class="p-3 mt-3 mb-2 border bg-light text-dark">
+<div *ngIf="createShipment && canCreateShipment()" class="p-3 mt-3 mb-2 border bg-light text-dark">
  <h5 class="mb-3 font-weight-bold">1) Enter Shipment Data</h5>
  <form (ngSubmit)="onSubmit()"
         novalidate
@@ -63,6 +63,8 @@
     <label for="TrackingNumber"
            class="control-label font-weight-bold mt-1">Tracking Number</label>
       <input type="text"
+             required
+             showErrors
              formControlName="TrackingNumber"
              class="form-control"
              id="trackingNumber"
@@ -74,6 +76,8 @@
         <label for="Ship Date"
                class="control-label font-weight-bold mt-1">Ship Date</label>
         <input type="date"
+               required
+               showErrors
                formControlName="ShipDate"
                class="form-control"
                id="shipDate"
@@ -99,6 +103,8 @@
         <label for="Shipper"
                 class="control-label font-weight-bold mt-1">Carrier</label>
             <input type="text"
+                   required
+                   showErrors
                    formControlName="Shipper"
                    class="form-control"
                    id="Shipper"
@@ -226,7 +232,11 @@
    </div>
   <button type="submit"
           id="submitBtn"
+          [disabled]="shouldDisableSave(shipmentForm)"
           class="btn btn-primary mt-4 w-100">Create Shipment</button>
 </form>
+</div>
+<div *ngIf="createShipment && !canCreateShipment()" class="p-3 mt-3 mb-2 border bg-light text-dark d-flex justify-content-center">
+    <span class="text-align-center">All items have been shipped for this order.</span>
 </div>
 </div>

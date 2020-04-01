@@ -25,7 +25,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("POST Marketplace Shipment")]
         // todo update auth
-        [HttpPost, MarketplaceUserAuth(ApiRole.SupplierAdmin)]
+        [HttpPost, MarketplaceUserAuth(ApiRole.ShipmentAdmin)]
         public async Task<ShipmentCreateResponse> Create([FromBody] SuperShipment superShipment)
         {
             // ocAuth is the token for the organization that is specified in the AppSettings
