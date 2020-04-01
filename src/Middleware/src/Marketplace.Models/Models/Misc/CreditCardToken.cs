@@ -24,6 +24,8 @@ namespace Marketplace.Models.Misc
 	{
 		[System.ComponentModel.DataAnnotations.Required]
 		public string OrderID { get; set; }
+		[System.ComponentModel.DataAnnotations.Required]
+		public string PaymentID { get; set; }
 		public string CreditCardID { get; set; } // Use for saved Credit Cards
 		public CreditCardToken CreditCardDetails { get; set; }  // Use for one-time Credit Cards
 		[System.ComponentModel.DataAnnotations.Required]

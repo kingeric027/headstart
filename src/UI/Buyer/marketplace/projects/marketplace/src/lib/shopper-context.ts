@@ -10,9 +10,10 @@ import {
   BuyerProduct,
   Supplier,
   Address,
-  BuyerCreditCard,
   ListBuyerProduct,
   ListAddress,
+  ListBuyerCreditCard,
+  BuyerCreditCard,
 } from '@ordercloud/angular-sdk';
 import {
   ProductXp,
@@ -206,7 +207,7 @@ export class AppConfig {
 }
 
 export interface CreditCardPayment {
-  SavedCard?: BuyerCreditCard;
+  SavedCard?: MarketplaceBuyerCreditCard;
   NewCard?: CreditCardToken;
   CVV: string;
 }
@@ -277,3 +278,11 @@ export type ListMarketplaceMeProduct = ListBuyerProduct<ProductXp>;
 export type MarketplaceMeProduct = BuyerProduct<ProductXp>;
 
 export type ListMarketplaceAddressBuyer = ListAddress<BuyerAddressXP>;
+
+export type ListMarketplaceBuyerCreditCard = ListBuyerCreditCard<CreditCardXP>;
+
+export type MarketplaceBuyerCreditCard = BuyerCreditCard<CreditCardXP>;
+
+export interface CreditCardXP {
+  CCBilingAddress: Address;
+}

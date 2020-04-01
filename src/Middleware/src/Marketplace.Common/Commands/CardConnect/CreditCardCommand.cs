@@ -17,7 +17,7 @@ namespace Marketplace.Common.Commands
         //Task<CreditCardAuthorization> Authorize(CreditCardAuthorization auth);
         Task<BuyerCreditCard> MeTokenizeAndSave(CreditCardToken card, VerifiedUserContext user);
         Task<CreditCard> TokenizeAndSave(string buyerID, CreditCardToken card, VerifiedUserContext user);
-        Task<Payment> AuthorizePayment(string paymentID, CreditCardPayment payment, VerifiedUserContext user);
+        Task<Payment> AuthorizePayment(CreditCardPayment payment, VerifiedUserContext user);
     }
 
     public class CreditCardCommand : ICreditCardCommand
@@ -45,7 +45,7 @@ namespace Marketplace.Common.Commands
 			return buyerCreditCard;
 		}
 
-		public async Task<Payment> AuthorizePayment(string paymentID, CreditCardPayment payment, VerifiedUserContext user)
+		public async Task<Payment> AuthorizePayment(CreditCardPayment payment, VerifiedUserContext user)
         {
 			Require.That((payment.CreditCardID != null) ^ (payment.CreditCardDetails != null), 
 				new ErrorCode("Missing credit card info", 400, "Request must include either CreditCardDetails or CreditCardID, but not both."));
@@ -60,7 +60,7 @@ namespace Marketplace.Common.Commands
 
 			Require.That(!order.IsSubmitted, new ErrorCode("Invalid Order Status", 400, "Order has already been submitted"));
 
-			var ocPayment = await _oc.Payments.GetAsync<Payment>(OrderDirection.Incoming, payment.OrderID, paymentID);
+			var ocPayment = await _oc.Payments.GetAsync<Payment>(OrderDirection.Incoming, payment.OrderID, payment.PaymentID);
 
             var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment));
 			ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true });

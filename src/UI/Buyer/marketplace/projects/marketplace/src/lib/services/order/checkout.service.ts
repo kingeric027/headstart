@@ -1,12 +1,11 @@
-import { MarketplaceOrder, OrderAddressType, CreditCardPayment, AppConfig } from '../../shopper-context';
 import {
-  ListPayment,
-  Payment,
-  BuyerCreditCard,
-  OcOrderService,
-  OcPaymentService,
-  BuyerAddress,
-} from '@ordercloud/angular-sdk';
+  MarketplaceOrder,
+  OrderAddressType,
+  CreditCardPayment,
+  AppConfig,
+  MarketplaceBuyerCreditCard,
+} from '../../shopper-context';
+import { ListPayment, Payment, OcOrderService, OcPaymentService, BuyerAddress } from '@ordercloud/angular-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
@@ -18,7 +17,7 @@ export interface ICheckout {
   submit(card: CreditCardPayment, marketplaceID: string): Promise<string>;
   addComment(comment: string): Promise<MarketplaceOrder>;
   listPayments(): Promise<ListPayment>;
-  createSavedCCPayment(card: BuyerCreditCard): Promise<Payment>;
+  createSavedCCPayment(card: MarketplaceBuyerCreditCard): Promise<Payment>;
   createOneTimeCCPayment(card: CreditCardToken): Promise<Payment>;
   setAddress(type: OrderAddressType, address: BuyerAddress): Promise<MarketplaceOrder>;
   setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder>;
@@ -99,19 +98,19 @@ export class CheckoutService implements ICheckout {
     }
   }
 
-
   async listPayments(): Promise<ListPayment> {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);
   }
 
-  async createSavedCCPayment(card: BuyerCreditCard): Promise<Payment> {
+  async createSavedCCPayment(card: MarketplaceBuyerCreditCard): Promise<Payment> {
     return await this.createCCPayment(card.PartialAccountNumber, card.CardType, card.ID);
   }
 
   async createOneTimeCCPayment(card: CreditCardToken): Promise<Payment> {
     // This slice() is sooo crucial. Otherwise we would be storing creditcard numbers in xp.
     // Which would be really really bad.
-    return await this.createCCPayment(card.AccountNumber.slice(-4), card.CardType, null);
+    const partialAccountNum = card.AccountNumber.slice(-4);
+    return await this.createCCPayment(partialAccountNum, card.CardType, null);
   }
 
   // Integration Methods
