@@ -15,7 +15,7 @@ namespace Marketplace.Models.Misc
         public string ExpirationDate { get; set; }
         public string CardholderName { get; set; }
         public string CardType { get; set; }
-		[Required]
+		[System.ComponentModel.DataAnnotations.Required]
 		public Address CCBillingAddress { get; set; }
     }
 
