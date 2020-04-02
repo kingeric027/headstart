@@ -27,6 +27,7 @@ export class OCMUserManagement implements OnInit {
   currentApprovalRule: ApprovalRule = null;
   currentLocationApprovalThresholdStatic = 0;
   currentLocationApprovalThresholdEditable = 0;
+  areAllUsersAssignedToNeedsApproval = false;
 
   constructor(
     private context: ShopperContextService,
@@ -36,6 +37,38 @@ export class OCMUserManagement implements OnInit {
 
   ngOnInit() {
     this.fetchUserManagementInformation();
+  }
+
+  toggleAllNeedingApproval(): void {
+    if (this.areAllUsersAssignedToNeedsApproval) {
+      this.setNeedApprovalForNoUsers();
+    } else {
+      this.setNeedApprovalForAllUsers();
+    }
+  }
+
+  checkIfAllUsersAreAssignedToNeedsApproval(): void {
+    this.areAllUsersAssignedToNeedsApproval = this.users.every(u =>
+      this.approvalAssignmentsEditable.some(a => a.UserID === u.ID && a.UserGroupID.includes('NeedsApproval'))
+    );
+  }
+
+  setNeedApprovalForAllUsers(): void {
+    this.setNeedApprovalForNoUsers();
+    this.approvalAssignmentsEditable = [
+      ...this.approvalAssignmentsEditable,
+      ...this.users.map(u => {
+        return { UserID: u.ID, UserGroupID: `${this.currentLocation.ID}-NeedsApproval` };
+      }),
+    ];
+    this.checkForChanges();
+  }
+
+  setNeedApprovalForNoUsers(): void {
+    this.approvalAssignmentsEditable = this.approvalAssignmentsEditable.filter(
+      c => !c.UserGroupID.includes('NeedsApproval')
+    );
+    this.checkForChanges();
   }
 
   async fetchUserManagementInformation(): Promise<void> {
@@ -55,6 +88,7 @@ export class OCMUserManagement implements OnInit {
     this.currentApprovalRule = approvalRule;
     this.currentLocationApprovalThresholdStatic = Number(this.currentApprovalRule.RuleExpression.split('>')[1]);
     this.currentLocationApprovalThresholdEditable = this.currentLocationApprovalThresholdStatic;
+    this.checkIfAllUsersAreAssignedToNeedsApproval();
   }
 
   async updateAssignments(): Promise<void> {
@@ -124,6 +158,7 @@ export class OCMUserManagement implements OnInit {
         )
     );
     this.areChanges = this.add.length > 0 || this.del.length > 0;
+    this.checkIfAllUsersAreAssignedToNeedsApproval();
   }
 
   discardUserUserGroupAssignmentChanges(): void {
