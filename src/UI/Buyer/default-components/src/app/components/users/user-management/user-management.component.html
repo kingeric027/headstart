@@ -110,7 +110,9 @@
             <div class="input-group-prepend">
               <span class="input-group-text">$</span>
             </div>
-            <input type="text"
+            <input type="number"
+                   min=0
+                   max=100000
                    value="{{currentLocationApprovalThresholdEditable}}"
                    class="form-control"
                    (change)="setThresholdFromEvent($event)"
