@@ -7,6 +7,6 @@ import { OrderShipmentsComponent } from './components/order-shipments/order-ship
 
 @NgModule({
   imports: [SharedModule, OrdersRoutingModule],
-  declarations: [OrderTableComponent, OrderDetailsComponent],
+  declarations: [OrderTableComponent, OrderDetailsComponent, OrderShipmentsComponent],
 })
 export class OrdersModule {}
