@@ -1,5 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { ShopperContextService, UserGroup, User, UserGroupAssignment, OcUserGroupService } from 'marketplace';
+import {
+  ShopperContextService,
+  UserGroup,
+  User,
+  UserGroupAssignment,
+  OcUserGroupService,
+  ApprovalRule,
+  OcApprovalRuleService,
+} from 'marketplace';
 import { ngModuleJitUrl } from '@angular/compiler';
 
 @Component({
@@ -16,8 +24,15 @@ export class OCMUserManagement implements OnInit {
   areChanges = false;
   requestedUserConfirmation = false;
   currentLocation: UserGroup = null;
+  currentApprovalRule: ApprovalRule = null;
+  currentLocationApprovalThresholdStatic = 0;
+  currentLocationApprovalThresholdEditable = 0;
 
-  constructor(private context: ShopperContextService, private ocOcUserGroupService: OcUserGroupService) {}
+  constructor(
+    private context: ShopperContextService,
+    private ocOcUserGroupService: OcUserGroupService,
+    private ocApprovalRuleService: OcApprovalRuleService
+  ) {}
 
   ngOnInit() {
     this.fetchUserManagementInformation();
@@ -25,9 +40,21 @@ export class OCMUserManagement implements OnInit {
 
   async fetchUserManagementInformation(): Promise<void> {
     this.locations = await this.context.userManagementService.getLocations();
-    this.currentLocation = this.locations[0];
-    this.users = await this.context.userManagementService.getLocationUsers(this.currentLocation.ID);
-    await this.updateAssignments();
+    if (this.locations.length) {
+      this.currentLocation = this.locations[0];
+      this.users = await this.context.userManagementService.getLocationUsers(this.currentLocation.ID);
+      await this.updateAssignments();
+      const currentApprovalRule = await this.context.userManagementService.getLocationApprovalRule(
+        this.currentLocation.ID
+      );
+      this.setApprovalRuleValues(currentApprovalRule);
+    }
+  }
+
+  setApprovalRuleValues(approvalRule: ApprovalRule): void {
+    this.currentApprovalRule = approvalRule;
+    this.currentLocationApprovalThresholdStatic = Number(this.currentApprovalRule.RuleExpression.split('>')[1]);
+    this.currentLocationApprovalThresholdEditable = this.currentLocationApprovalThresholdStatic;
   }
 
   async updateAssignments(): Promise<void> {
@@ -40,6 +67,25 @@ export class OCMUserManagement implements OnInit {
     this.approvalAssignmentsStatic = [...approverAssignments, ...needsApprovalAssignments];
     this.approvalAssignmentsEditable = [...this.approvalAssignmentsStatic];
     this.checkForChanges();
+  }
+
+  setThreshold(value: number): void {
+    this.currentLocationApprovalThresholdEditable = value;
+  }
+
+  setThresholdFromEvent(event: any): void {
+    this.currentLocationApprovalThresholdEditable = Number(event.target.value);
+  }
+
+  async saveNewThreshold(): Promise<void> {
+    const buyerID = this.currentLocation.ID.split('-')[0];
+    const newRuleExpression = `${this.currentApprovalRule.RuleExpression.split('>')[0]}>${
+      this.currentLocationApprovalThresholdEditable
+    }`;
+    const newApprovalRule = await this.ocApprovalRuleService
+      .Patch(buyerID, this.currentApprovalRule.ID, { RuleExpression: newRuleExpression })
+      .toPromise();
+    this.setApprovalRuleValues(newApprovalRule);
   }
 
   isAssigned(userID: string, assignmentType: string): boolean {
@@ -80,12 +126,12 @@ export class OCMUserManagement implements OnInit {
     this.areChanges = this.add.length > 0 || this.del.length > 0;
   }
 
-  discardUserUserGroupAssignmentChanges() {
+  discardUserUserGroupAssignmentChanges(): void {
     this.approvalAssignmentsEditable = this.approvalAssignmentsStatic;
     this.checkForChanges();
   }
 
-  requestUserConfirmation() {
+  requestUserConfirmation(): void {
     this.requestedUserConfirmation = true;
   }
 

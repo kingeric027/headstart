@@ -6,6 +6,8 @@ import {
   OcUserGroupService,
   UserGroupAssignment,
   OcMeService,
+  ApprovalRule,
+  OcApprovalRuleService,
 } from '@ordercloud/angular-sdk';
 import { CurrentUserService } from '../current-user/current-user.service';
 
@@ -14,6 +16,7 @@ export interface IUserManagement {
   getLocationUsers(locationID: string): Promise<User[]>;
   getLocationApproverAssignments(locationID: string): Promise<UserGroupAssignment[]>;
   getLocationNeedsApprovalAssignments(locationID: string): Promise<UserGroupAssignment[]>;
+  getLocationApprovalRule(locationID: string): Promise<ApprovalRule>;
 }
 
 @Injectable({
@@ -24,6 +27,7 @@ export class UserManagementService implements IUserManagement {
     private ocUserGroupService: OcUserGroupService,
     private ocMeService: OcMeService,
     public currentUserService: CurrentUserService,
+    public ocApprovalRuleService: OcApprovalRuleService,
     private ocUserService: OcUserService
   ) {}
 
@@ -67,5 +71,11 @@ export class UserManagementService implements IUserManagement {
       .ListUserAssignments(buyerID, { pageSize: 100, userGroupID: userGroupID })
       .toPromise();
     return locationUsers.Items;
+  }
+
+  async getLocationApprovalRule(locationID: string): Promise<ApprovalRule> {
+    const buyerID = this.currentUserService.get().Buyer.ID;
+    const approvalRule = await this.ocApprovalRuleService.Get(buyerID, locationID).toPromise();
+    return approvalRule;
   }
 }
