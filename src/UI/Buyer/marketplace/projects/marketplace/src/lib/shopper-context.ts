@@ -26,6 +26,7 @@ import {
 export * from '@ordercloud/angular-sdk';
 export * from './services/shopper-context/shopper-context.service';
 export * from '../../src/lib/services/ordercloud-sandbox/ordercloud-sandbox.models';
+export { CreditCardPayment } from 'marketplace-javascript-sdk';
 
 export interface LineItemGroupSupplier {
   supplier: Supplier;
@@ -203,12 +204,6 @@ export class AppConfig {
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
   scope: string[];
-}
-
-export interface CreditCardPayment {
-  SavedCard?: MarketplaceBuyerCreditCard;
-  NewCard?: CreditCardToken;
-  CVV: string;
 }
 
 export interface DecodedOCToken {

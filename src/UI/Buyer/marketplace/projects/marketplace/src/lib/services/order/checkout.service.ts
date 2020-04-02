@@ -1,10 +1,4 @@
-import {
-  MarketplaceOrder,
-  OrderAddressType,
-  CreditCardPayment,
-  AppConfig,
-  MarketplaceBuyerCreditCard,
-} from '../../shopper-context';
+import { MarketplaceOrder, AppConfig, MarketplaceBuyerCreditCard } from '../../shopper-context';
 import {
   ListPayment,
   Payment,
@@ -18,7 +12,7 @@ import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
 import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/ordercloud-sandbox.models';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
-import { MarketplaceSDK, CreditCardToken } from 'marketplace-javascript-sdk';
+import { MarketplaceSDK, CreditCardToken, CreditCardPayment } from 'marketplace-javascript-sdk';
 
 export interface ICheckout {
   submit(card: CreditCardPayment, marketplaceID: string): Promise<string>;
@@ -50,16 +44,8 @@ export class CheckoutService implements ICheckout {
   ) {}
 
   async submit(payment: CreditCardPayment): Promise<string> {
-    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.
-    const ccPayment = {
-      OrderId: this.order.ID,
-      CreditCardID: payment?.SavedCard.ID,
-      CreditCardDetails: payment.NewCard,
-      Currency: 'USD',
-      CVV: payment.CVV,
-      MerchantID: this.appSettings.cardConnectMerchantID,
-    };
-    await MarketplaceSDK.MePayments.Post(ccPayment); // authorize card
+    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
+    await MarketplaceSDK.MePayments.Post(payment); // authorize card
     const orderWithCleanID = await this.ocOrderService
       .Patch('outgoing', this.order.ID, {
         ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
