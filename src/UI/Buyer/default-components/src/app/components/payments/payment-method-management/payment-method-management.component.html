@@ -26,27 +26,27 @@
            *ngIf="showCardForm">
         <ocm-credit-card-form [submitText]="'Add Card'"
                               (formSubmitted)="addCard($event.detail)"
-                              (formDismissed)="dismissEditAddressForm()">
+                              (formDismissed)="dismissAddCardForm()">
         </ocm-credit-card-form>
       </div>
       <div [ngClass]="{'col-lg-12': !showCardForm, 'col-lg-6': showCardForm}">
-          <div class="payment-card pb-3 mb-3"
-               *ngFor="let card of cards?.Items">
+        <div class="payment-card pb-3 mb-3"
+             *ngFor="let card of cards?.Items">
 
-            <ocm-credit-card-display [card]="card"
-                                     [highlight]="currentCard === card"
-                                     class="col-12 my-2">
-              <!-- Delete Button -->
-              <div class="icon-button ripple hover-btn"
-                   (click)="showAreYouSure(card)">
-                <div class="icon-wrapper">
-                  <fa-icon class="text-danger"
-                           [icon]="faTrashAlt">
-                  </fa-icon>
-                </div>
+          <ocm-credit-card-display [card]="card"
+                                   [highlight]="currentCard === card"
+                                   class="col-12 my-2">
+            <!-- Delete Button -->
+            <div class="icon-button ripple hover-btn"
+                 (click)="showAreYouSure(card)">
+              <div class="icon-wrapper">
+                <fa-icon class="text-danger"
+                         [icon]="faTrashAlt">
+                </fa-icon>
               </div>
-            </ocm-credit-card-display>
-          </div>
+            </div>
+          </ocm-credit-card-display>
+        </div>
       </div>
       <!-- Display the Card Form on Desktop View (lg+) -->
       <div class="col-lg-6 d-none d-lg-block border-left"

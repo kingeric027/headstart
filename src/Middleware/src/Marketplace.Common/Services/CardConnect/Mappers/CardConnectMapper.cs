@@ -23,7 +23,7 @@ namespace Marketplace.Common.Mappers.CardConnect
 				Token = response.token,
 				xp = new CreditCardXP
 				{
-					CCBillingAddress = card.CCBilingAddress
+					CCBillingAddress = card.CCBillingAddress
 				}
             };
             return cc;
@@ -44,7 +44,7 @@ namespace Marketplace.Common.Mappers.CardConnect
                 Editable = true,
 				xp = new CreditCardXP
 				{
-					CCBillingAddress = card.CCBilingAddress
+					CCBillingAddress = card.CCBillingAddress
 				}
 			};
             return cc;

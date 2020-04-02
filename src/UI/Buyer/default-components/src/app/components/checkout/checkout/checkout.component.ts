@@ -47,10 +47,6 @@ export class OCMCheckout implements OnInit {
       valid: false,
     },
     {
-      id: 'billingAddress',
-      valid: false,
-    },
-    {
       id: 'confirm',
       valid: false,
     },
@@ -97,7 +93,7 @@ export class OCMCheckout implements OnInit {
     }
 
     this.payments = await this.checkout.listPayments();
-    this.toSection('billingAddress');
+    this.toSection('confirm');
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
@@ -114,11 +110,6 @@ export class OCMCheckout implements OnInit {
 
   setValidation(id: string, value: boolean): void {
     this.sections.find(x => x.id === id).valid = value;
-  }
-
-  async calculateAndToConfirm() {
-    await this.checkout.calculateOrder();
-    this.toSection('confirm');
   }
 
   toSection(id: string): void {

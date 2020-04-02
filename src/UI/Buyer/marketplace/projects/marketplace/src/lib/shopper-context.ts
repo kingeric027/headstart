@@ -283,5 +283,5 @@ export type ListMarketplaceBuyerCreditCard = ListBuyerCreditCard<CreditCardXP>;
 export type MarketplaceBuyerCreditCard = BuyerCreditCard<CreditCardXP>;
 
 export interface CreditCardXP {
-  CCBilingAddress: Address;
+  CCBillingAddress: Address;
 }

@@ -16,7 +16,7 @@ namespace Marketplace.Models.Misc
         public string CardholderName { get; set; }
         public string CardType { get; set; }
 		[Required]
-		public Address CCBilingAddress { get; set; }
+		public Address CCBillingAddress { get; set; }
     }
 
     [SwaggerModel]
