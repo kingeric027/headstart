@@ -4,6 +4,7 @@ import { faExclamationCircle, faCog, faTrash, faTimesCircle } from '@fortawesome
 import { ProductService } from '@app-seller/products/product.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'product-variations-component',
@@ -48,7 +49,7 @@ export class ProductVariations {
   faTimesCircle = faTimesCircle;
   faExclamationCircle = faExclamationCircle;
 
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService, private toasterService: ToastrService) {}
   getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
@@ -96,6 +97,10 @@ export class ProductVariations {
         this.superProductEditable || this.productService.emptyResource
     );
     let input = (document.getElementById('AddVariation') as any)
+    if (input.value === '') {
+      this.toasterService.warning('Please name your variation');
+      return;
+    }
     const newSpec: Spec[] = [{
       ID: `${updateProductResourceCopy.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, "")}`,
       Name: input.value,
