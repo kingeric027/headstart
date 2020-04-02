@@ -77,7 +77,7 @@ export class OCMUserManagement implements OnInit {
     this.currentLocationApprovalThresholdEditable = Number(event.target.value);
   }
 
-  async saveNewThreshold(): void {
+  async saveNewThreshold(): Promise<void> {
     const buyerID = this.currentLocation.ID.split('-')[0];
     const newRuleExpression = `${this.currentApprovalRule.RuleExpression.split('>')[0]}>${
       this.currentLocationApprovalThresholdEditable
