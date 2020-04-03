@@ -10,7 +10,7 @@ namespace Marketplace.Models.Extended
         public string Category { get; set; }
         [Required]
         public string Code { get; set; }
-        [MaxLength(100, ErrorMessage = "Tax Description cannot exceed 100 characters")]
+        [MaxLength(200, ErrorMessage = "Tax Description cannot exceed 200 characters")]
         public string Description { get; set; }
     }
 }

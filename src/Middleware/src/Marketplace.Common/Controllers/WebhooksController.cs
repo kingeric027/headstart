@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Commands;
+using Marketplace.Common.Commands;
 using Marketplace.Common.Services;
 using Marketplace.Helpers;
 using Marketplace.Models;
@@ -40,8 +40,7 @@ namespace Marketplace.Common.Controllers
         public async void HandleOrderSubmit([FromBody] OrderCalculatePayload payload)
         {
             await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
-            await _sendgridService.SendSupplierEmails(payload.OrderWorksheet.Order.ID);
-            await _sendgridService.SendOrderSubmitTemplateEmail(payload.OrderWorksheet);
+            await _sendgridService.SendOrderSubmitEmail(payload.OrderWorksheet);
         }
 
         [HttpPost, Route("orderrequiresapproval")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS		
