@@ -31,8 +31,9 @@
     </div>
     <hr>
     <div class="text-right lead"><b class="float-left">Total:</b><span class="order-total">{{order.Total | currency}}</span></div>
-    <hr>
-    <ocm-payment-list *ngIf="payments"
+    <hr *ngIf="isOrderToApprove"
+    >
+    <ocm-payment-list *ngIf="payments && !isOrderToApprove"
                       [payments]="payments"></ocm-payment-list>
     <hr>
     <ul>

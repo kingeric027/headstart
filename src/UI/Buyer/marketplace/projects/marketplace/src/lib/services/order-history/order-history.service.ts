@@ -31,7 +31,7 @@ export interface IOrderHistory {
   approveOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<MarketplaceOrder>;
   declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<MarketplaceOrder>;
   validateReorder(orderID?: string): Promise<OrderReorderResponse>;
-  getOrderDetails(orderID?: string): Promise<OrderDetails>;
+  getOrderDetails(isOrderToApprove: boolean, orderID?: string): Promise<OrderDetails>;
   getLineItemSuppliers(liGroups: LineItem[][]): Promise<LineItemGroupSupplier[]>;
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
 }
@@ -64,7 +64,7 @@ export class OrderHistoryService implements IOrderHistory {
   async declineOrder(
     orderID: string = this.activeOrderID,
     Comments = '',
-    AllowResubmit = false
+    AllowResubmit = true
   ): Promise<MarketplaceOrder> {
     return await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
@@ -73,12 +73,12 @@ export class OrderHistoryService implements IOrderHistory {
     return this.reorderHelper.validateReorder(orderID);
   }
 
-  async getOrderDetails(orderID: string = this.activeOrderID): Promise<OrderDetails> {
+  async getOrderDetails(isOrderToApprove: boolean, orderID: string = this.activeOrderID): Promise<OrderDetails> {
     const res = await Promise.all([
       this.ocOrderService.Get('outgoing', orderID).toPromise(),
       this.ocLineItemService.List('outgoing', orderID).toPromise(),
       this.getPromotions(orderID),
-      this.getPayments(orderID),
+      this.getPayments(isOrderToApprove, orderID),
       this.getApprovals(orderID),
     ]);
     return { order: res[0], lineItems: res[1], promotions: res[2], payments: res[3], approvals: res[4] };
@@ -121,8 +121,13 @@ export class OrderHistoryService implements IOrderHistory {
     return this.ocOrderService.ListPromotions('outgoing', orderID).toPromise();
   }
 
-  private async getPayments(orderID: string): Promise<ListPayment> {
-    return this.paymentHelper.ListPaymentsOnOrder(orderID);
+  private async getPayments(isOrderToApprove: boolean, orderID: string): Promise<ListPayment> {
+    if (isOrderToApprove) {
+      // approver likely does not have the access required to get this information
+      return null;
+    } else {
+      return this.paymentHelper.ListPaymentsOnOrder(orderID);
+    }
   }
 
   private async getApprovals(orderID: string): Promise<OrderApproval[]> {

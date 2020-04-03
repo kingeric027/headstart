@@ -6,26 +6,33 @@
         <a class="breadcrumb-item link text-primary"
            (click)="toAllOrders()">All Orders</a>
         <a class="breadcrumb-item link text-primary"
-           aria-current="page">{{order.ID}}</a>
+           aria-current="page">{{ order.ID }}</a>
       </nav>
       <div class="pb-2 mt-4 mb-2">
-        <h2> <span class="text-muted">Order #:</span> {{order.ID}} <span *ngIf="order.xp.OrderType === 'Quote'"
-                class="badge badge-pill badge-primary ml-2">{{order.xp.OrderType}}</span></h2>
+        <h2>
+          <span class="text-muted">Order #:</span> {{ order.ID }}
+          <span *ngIf="order.xp.OrderType === 'Quote'"
+                class="badge badge-pill badge-primary ml-2">{{
+            order.xp.OrderType
+          }}</span>
+        </h2>
       </div>
       <div class="row">
         <div class="col-md-6">
-          <div>Status:
-            <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{order.Status}}
-          </div>
-          <small class="float-left">Submitted on {{order.DateSubmitted | date: 'short'}}</small>
+          <div>Status: <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{ order.Status }}</div>
+          <small class="float-left">Submitted on {{ order.DateSubmitted | date: 'short' }}</small>
         </div>
         <div class="col-md-6">
+          <ocm-order-approval *ngIf="approvalVersion"
+                              class="float-right"
+                              [orderID]="order.ID"></ocm-order-approval>
+
           <button *ngIf="!approvalVersion"
                   class="btn btn-outline-secondary float-right"
-                  (click)="toggleFavorite(order)">Favorite
+                  (click)="toggleFavorite(order)">
+            Favorite
             <ocm-toggle-favorite title="Favorite"
-                                 [favorite]="isFavorite(order.ID)">
-            </ocm-toggle-favorite>
+                                 [favorite]="isFavorite(order.ID)"> </ocm-toggle-favorite>
           </button>
           <button *ngIf="!approvalVersion && !isQuoteOrder(order)"
                   class="btn btn-secondary float-right mr-2"
@@ -39,10 +46,12 @@
             <confirm-modal [modalTitle]="'Reorder'"
                            aria-labelledby="confirm-modal">
               <div class="alert"
-                   [ngClass]="{'alert-danger': message.classType == 'danger',
-                                              'alert-warning': message.classType == 'warning',
-                                              'alert-success': message.classType == 'success'}">
-                <p [innerHTML]='message.string'> </p>
+                   [ngClass]="{
+                  'alert-danger': message.classType == 'danger',
+                  'alert-warning': message.classType == 'warning',
+                  'alert-success': message.classType == 'success'
+                }">
+                <p [innerHTML]="message.string"></p>
               </div>
               <ocm-lineitem-table *ngIf="reorderResponse.InvalidLi.length"
                                   [lineItems]="reorderResponse.InvalidLi"
@@ -56,17 +65,17 @@
                         class="btn btn-primary btn-md"
                         [disabled]="!reorderResponse?.ValidLi?.length"
                         (click)="addToCart()"
-                        (click)="modal.dismiss()">Add Valid Items to Cart</button>
+                        (click)="modal.dismiss()">
+                  Add Valid Items to Cart
+                </button>
               </div>
             </confirm-modal>
           </ng-template>
         </div>
-        <ocm-order-approval *ngIf="approvalVersion"
-                            class="float-right"
-                            [orderID]='order.ID'></ocm-order-approval>
       </div>
     </div>
-    <ul class="nav nav-tabs mb-3">
+    <ul *ngIf="!approvalVersion"
+        class="nav nav-tabs mb-3">
       <li class="nav-item">
         <button class="btn btn-link nav-link"
                 (click)="toDetails()">
@@ -84,6 +93,7 @@
     </ul>
     <ocm-order-historical class="col-md-6"
                           *ngIf="orderDetails && showDetails()"
+                          [isOrderToApprove]="isOrderToApprove"
                           [orderDetails]="orderDetails"></ocm-order-historical>
     <ocm-order-shipments *ngIf="showShipments()"></ocm-order-shipments>
   </ocm-profile-nav>

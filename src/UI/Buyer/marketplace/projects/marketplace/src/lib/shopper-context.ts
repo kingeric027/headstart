@@ -112,6 +112,19 @@ export enum OrderStatus {
   Canceled = 'Canceled',
 }
 
+export enum OrderFlowStatus {
+  Submitted = 'Submitted',
+  Shipped = 'Shipped',
+  AwaitingApproval = 'Awaiting Approval',
+  AwaitingChanges = 'Awaiting Changes',
+}
+
+export enum OrderContext {
+  Submitted = 'Submitted',
+  Approve = 'Approve',
+  GetApproval = 'GetApproval',
+}
+
 export interface CreditCard {
   CardholderName: string;
   CardNumber: string;

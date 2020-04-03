@@ -49,14 +49,14 @@ export const ProfileSections: ProfileSection[] = [
   {
     routerCall: 'toOrdersToApprove',
     displayText: 'Orders To Approve',
-    url: '/profile/orders/approval',
+    url: '/profile/orders/approve',
     rolesWithAccess: ['MPOrderApprover'],
     showInDropdown: true,
   },
   {
-    routerCall: 'toOrdersToApprove',
-    displayText: 'Orders Awaiting Approval',
-    url: '/profile/orders/approval',
+    routerCall: 'toOrderApprovalFlow',
+    displayText: 'Order Approval Flow',
+    url: '/profile/orders/getapproval',
     rolesWithAccess: ['MPNeedsApproval'],
     showInDropdown: true,
   },

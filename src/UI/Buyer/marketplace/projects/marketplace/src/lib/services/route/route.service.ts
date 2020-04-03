@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { ProductFilterService } from '../product-filter/product-filter.service';
 import { filter, map } from 'rxjs/operators';
-import { ProductFilters, OrderFilters, SupplierFilters, OrderStatus } from '../../shopper-context';
+import { ProductFilters, OrderFilters, SupplierFilters, OrderStatus, OrderContext } from '../../shopper-context';
 import { OrderFilterService } from '../order-history/order-filter.service';
 import { SupplierFilterService } from '../supplier-filter/supplier-filter.service';
 import { AuthService } from '../auth/auth.service';
 import { ProfileSection, ProfileSections } from './profile-routing.config';
 import { TokenHelperService } from '../token-helper/token-helper.service';
-
 export interface IRouter {
   getActiveUrl(): string;
+  getOrderContext(): OrderContext;
   onUrlChange(callback: (path: string) => void): void;
   toProductDetails(productID: string): void;
   toProductList(options?: ProductFilters): void;
@@ -130,17 +130,35 @@ export class RouteService implements IRouter {
     this.router.navigate(['/profile/orders'], { queryParams });
   }
 
+  getOrderContext(): OrderContext {
+    if (this.router.url.includes('/approve')) {
+      return OrderContext.Approve;
+    }
+    if (this.router.url.includes('/getapproval')) {
+      return OrderContext.GetApproval;
+    }
+    return OrderContext.Submitted;
+  }
+
   toMyOrderDetails(orderID: string): void {
     this.toRoute(`/profile/orders/${orderID}`);
   }
 
   toOrdersToApprove(options: OrderFilters = {}): void {
     const queryParams = this.orderFilterService.mapToUrlQueryParams(options);
-    this.router.navigate(['/profile/orders/approval'], { queryParams });
+    this.router.navigate(['/profile/orders/approve'], { queryParams });
   }
 
   toOrderToAppoveDetails(orderID: string): void {
-    this.toRoute(`/profile/orders/approval/${orderID}`);
+    this.toRoute(`/profile/orders/approve/${orderID}`);
+  }
+
+  toOrdersToGetApproval(options: OrderFilters = {}): void {
+    this.toRoute(`/profile/orders/getapproval`);
+  }
+
+  toOrderGetApprovalDetails(orderID: string): void {
+    this.toRoute(`/profile/orders/getapproval/${orderID}`);
   }
 
   toSupplierList(options: SupplierFilters = {}): void {
