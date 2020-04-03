@@ -35,6 +35,13 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendSingleEmail("noreply@four51.com", payload.Recipient.Email, "Password Reset", "<h1>this is a test email for password reset</h1>");
         }
 
+        [HttpPost, Route("ordersubmittedforapproval")]
+        [OrderCloudWebhookAuth]
+        public async void HandleOrderSubmittedForApproval([FromBody] MessageNotification payload)
+        {
+            await _sendgridService.SendOrderApprovalEmails(payload);
+        }
+
         [HttpPost, Route("ordersubmit")]
         [OrderCloudWebhookAuth]
         public async void HandleOrderSubmit([FromBody] OrderCalculatePayload payload)
@@ -104,8 +111,7 @@ namespace Marketplace.Common.Controllers
         [OrderCloudWebhookAuth]
         public async void HandleNewUser([FromBody] WebhookPayloads.Users.Create payload)
         {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", payload.Response.Body.Email, "New Buyer User", "<h1>this is a test email for buyer user creation</h1>"); // to buyer - welcome email
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "New Buyer User", "<h1>this is a test email for buyer user creation</h1>"); // to admin - new user registered on buyer site
+            await _sendgridService.SendNewUserEmail(payload);
         }
 
         [HttpPost, Route("productcreated")]
