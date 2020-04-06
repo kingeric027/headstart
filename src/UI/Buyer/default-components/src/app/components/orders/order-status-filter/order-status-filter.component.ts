@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { OrderStatus, OrderFilters, ShopperContextService, OrderContext, OrderFlowStatus } from 'marketplace';
+import { OrderStatus, OrderFilters, ShopperContextService, OrderContext } from 'marketplace';
 import { takeWhile } from 'rxjs/operators';
 
 @Component({
@@ -10,17 +10,12 @@ import { takeWhile } from 'rxjs/operators';
 export class OCMOrderStatusFilter implements OnInit, OnDestroy {
   alive = true;
   form: FormGroup;
-  statuses = [OrderFlowStatus.Submitted, OrderFlowStatus.Shipped];
+  statuses = [];
 
   constructor(private context: ShopperContextService) {}
 
   ngOnInit(): void {
-    const needsApproval = this.context.currentUser.hasRoles('MPNeedsApproval');
-    if (needsApproval) {
-      this.statuses = [...this.statuses, OrderFlowStatus.AwaitingApproval, OrderFlowStatus.AwaitingChanges];
-    }
-    const orderContext = this.context.router.getOrderContext();
-    // const defaultFilter = orderContext === OrderContext.
+    this.statuses = Object.values(OrderStatus);
     this.form = new FormGroup({
       status: new FormControl(OrderStatus.AllSubmitted),
     });

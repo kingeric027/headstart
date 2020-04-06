@@ -54,13 +54,6 @@ export const ProfileSections: ProfileSection[] = [
     showInDropdown: true,
   },
   {
-    routerCall: 'toOrderApprovalFlow',
-    displayText: 'Order Approval Flow',
-    url: '/profile/orders/getapproval',
-    rolesWithAccess: ['MPNeedsApproval'],
-    showInDropdown: true,
-  },
-  {
     routerCall: 'toChangePassword',
     displayText: 'Change Password',
     url: '/profile/details',

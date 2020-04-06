@@ -134,9 +134,6 @@ export class RouteService implements IRouter {
     if (this.router.url.includes('/approve')) {
       return OrderContext.Approve;
     }
-    if (this.router.url.includes('/getapproval')) {
-      return OrderContext.GetApproval;
-    }
     return OrderContext.Submitted;
   }
 
@@ -151,14 +148,6 @@ export class RouteService implements IRouter {
 
   toOrderToAppoveDetails(orderID: string): void {
     this.toRoute(`/profile/orders/approve/${orderID}`);
-  }
-
-  toOrdersToGetApproval(options: OrderFilters = {}): void {
-    this.toRoute(`/profile/orders/getapproval`);
-  }
-
-  toOrderGetApprovalDetails(orderID: string): void {
-    this.toRoute(`/profile/orders/getapproval/${orderID}`);
   }
 
   toSupplierList(options: SupplierFilters = {}): void {

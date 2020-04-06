@@ -104,19 +104,11 @@ export enum OrderAddressType {
 
 export enum OrderStatus {
   AllSubmitted = '!Unsubmitted',
-  Unsubmitted = 'Unsubmitted',
   AwaitingApproval = 'AwaitingApproval',
-  Declined = 'Declined',
+  ChangesRequested = 'ChangesRequested',
   Open = 'Open',
   Completed = 'Completed',
   Canceled = 'Canceled',
-}
-
-export enum OrderFlowStatus {
-  Submitted = 'Submitted',
-  Shipped = 'Shipped',
-  AwaitingApproval = 'Awaiting Approval',
-  AwaitingChanges = 'Awaiting Changes',
 }
 
 export enum OrderContext {
