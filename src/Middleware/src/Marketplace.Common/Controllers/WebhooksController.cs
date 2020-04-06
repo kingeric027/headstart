@@ -104,7 +104,7 @@ namespace Marketplace.Common.Controllers
         [OrderCloudWebhookAuth]
         public async void HandleOrderUpdated([FromBody] WebhookPayloads.Orders.Patch payload)
         {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Updated", "<h1>this is a test email for order update</h1>");
+            await _sendgridService.SendOrderUpdatedEmail(payload);
         }
 
         [HttpPost, Route("newuser")]
