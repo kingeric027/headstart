@@ -38,32 +38,18 @@ namespace Marketplace.Common.Services.SmartyStreets
 
 		public async Task<AddressValidation> ValidateAddress(Address address)
 		{
-			var response = new AddressValidation()
-			{
-				RawAddress = address,
-				IsRawAddressValid = false,
-				AreSuggestionsValid = true
-			};
+			var response = new AddressValidation(address);
 			var candidate = await ValidateSingleUSAddress(address); // Always seems to return 1 or 0 candidates
-			if (candidate.Count == 0)
+			if (candidate.Count > 0)
 			{
-				// Address not valid, no candiates found
-				var suggestions = await USAutoCompletePro($"{address.Street1} {address.Street2}");
-				response.AreSuggestionsValid = false; // Suggestions from this api do not include zip
-				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions, address);
+				response.ValidAddress = SmartyStreetMappers.Map(candidate[0], address);
+				response.RawAndValidDiffCodes = candidate[0].Analysis.DpvFootnotes;
 			}
-			// Valid candidate found, but may not match raw exactly. Want to show candidate to user to approve modifications
 			else 
 			{
-				var mappedCandidate = SmartyStreetMappers.Map(candidate[0], address);
-				if (DoesSubmittedAddressMatchSuggested(mappedCandidate, address))
-				{
-					response.IsRawAddressValid = true;
-				} else
-				{
-					response.SuggestedAddresses = new List<Address> { mappedCandidate };
-
-				}
+				// no valid address found
+				var suggestions = await USAutoCompletePro($"{address.Street1} {address.Street2}");
+				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions, address);
 			}
 			return response;
 		}
@@ -88,13 +74,6 @@ namespace Marketplace.Common.Services.SmartyStreets
 				.GetJsonAsync<AutoCompleteResponse>();
 
 			return suggestions;
-		}
-
-		private bool DoesSubmittedAddressMatchSuggested(Address mappedCandidate, Address address) 
-		{
-			var serializedMapped = JsonConvert.SerializeObject(mappedCandidate);
-			var serializedAddress = JsonConvert.SerializeObject(address);
-			return serializedMapped == serializedAddress;
 		}
 	}
 }
