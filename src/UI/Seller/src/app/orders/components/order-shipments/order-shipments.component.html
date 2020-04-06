@@ -1,4 +1,5 @@
 <div class="mb-3 col-sm-10">
+ <div class="d-print-none">
   <button class="btn btn-outline-dark"
           (click)="toggleCreateShipment()">
     <fa-icon [icon]="getCreateButtonIcon()"></fa-icon> {{getCreateButtonAction()}} Shipment
@@ -8,6 +9,7 @@
           (click)="toggleViewShipments()">
     <fa-icon [icon]="getViewButtonIcon()"></fa-icon> {{getViewButtonAction()}} Shipments ({{shipments.Items.length}})
   </button>
+</div>
   <div *ngIf="viewShipments" class="d-inline-flex mt-3 col-sm-12">
     <div class="col-sm-2 mt-3">
         <button *ngFor="let shipment of shipments?.Items; let i = index"
@@ -42,7 +44,8 @@
                                     <img [id]="i"
                                          [src]="getImageUrl(li)"
                                          width="auto"
-                                         height="100px">
+                                         height="100px"
+                                         class="d-print-none">
                                 </span>
                          </div>
                          <hr *ngIf="i !== shipmentItems.Items.length - 1"/>
@@ -210,7 +213,8 @@
             <img [id]="i"
                  [src]="getImageUrl(li)"
                  width="auto"
-                 height="100px">
+                 height="100px"
+                 class="d-print-none">
             </div>
          </div>
           <div class="col-sm-3">
