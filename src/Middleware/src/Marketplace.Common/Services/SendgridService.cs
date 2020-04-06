@@ -36,7 +36,7 @@ namespace Marketplace.Common.Services
             _oc = ocClient;
             _settings = settings;
         }
-                public async Task SendSingleEmail(string from, string to, string subject, string htmlContent)
+        public async Task SendSingleEmail(string from, string to, string subject, string htmlContent)
         {
             var client = new SendGridClient(_settings.SendgridApiKey);
             var fromEmail = new EmailAddress(from);
@@ -56,71 +56,58 @@ namespace Marketplace.Common.Services
         {
             var templateData = new
             {
-                payload.Request.Body.FirstName,
-                payload.Request.Body.LastName,
-                payload.Request.Body.Username
+                payload.Response.Body.FirstName,
+                payload.Response.Body.LastName,
+                payload.Response.Body.Username
             };
             var fromEmail = new EmailAddress("noreply@four51.com");
-            var toEmail = new EmailAddress(payload.Request.Body.Email);
+            var toEmail = new EmailAddress(payload.Response.Body.Email);
             await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_NEW_USER_TEMPLATE_ID, templateData);
         }
-        
+
         public async Task SendOrderUpdatedEmail(WebhookPayloads.Orders.Patch payload)
         {
             var order = await _oc.Orders.GetAsync(OrderDirection.Incoming, payload.Response.Body.ID);
-            Console.WriteLine(order);
-           var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, payload.Response.Body.ID);
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID);
             List<object> productsList = new List<object>();
 
             foreach (var item in lineItems.Items)
             {
                 productsList.Add(new
                 {
-                    ProductName = item.Product.Name,
+                    item.Product.Name,
                     item.ProductID,
                     item.Quantity,
                     item.LineTotal
                 });
             };
-                var dynamicTemplateData = new
-                {
-                    payload.Response.Body.FromUser.FirstName,
-                    payload.Response.Body.FromUser.LastName,
-                    payload.Response.Body.ID,
-                    DateSubmitted = payload.Response.Body.DateCreated.ToString(),
-                    payload.Response.Body.ShippingAddressID,
-                    BillingAddressID = 1283497,
-                    BillingAddress = new
-                    {
-                        Street1 = "123 test street",
-                        Street2 = "",
-                        City = "minneapolis",
-                        State = "MN",
-                        Zip = 55408
-                    },
-                    products = productsList,
-                    payload.Response.Body.Subtotal,
-                    payload.Response.Body.TaxCost,
-                    payload.Response.Body.ShippingCost,
-                    PromotionalDiscount = payload.Response.Body.PromotionDiscount,
-                    payload.Response.Body.Total
-                };
-                var fromEmail = new EmailAddress("noreply@four51.com");
-                //var toEmail = new EmailAddress("scasey@four51.com");
-                var toEmail = new EmailAddress(payload.Response.Body.FromUser.Email);
-                await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_ORDER_UPDATED_TEMPLATE_ID, dynamicTemplateData);
-/*            }
-            else if (payload.Response.Body.xp.OrderType == "Quote")
+
+            var dynamicTemplateData = new
             {
-                var dynamicTemplateData = new
+                order.FromUser.FirstName,
+                order.FromUser.LastName,
+                order.ID,
+                DateSubmitted = order.DateSubmitted.ToString(),
+                order.ShippingAddressID,
+                order.BillingAddressID,
+                BillingAddress = new
                 {
-                    payload.Response.Body.FromUser.FirstName,
-                    payload.Response.Body.FromUser.LastName
-                };
-                var fromEmail = new EmailAddress("noreply@four51.com");
-                var toEmail = new EmailAddress(payload.Response.Body.FromUser.Email);
-                await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID, dynamicTemplateData);
-            }*/
+                    order.BillingAddress.Street1,
+                    order.BillingAddress.Street2,
+                    order.BillingAddress.City,
+                    order.BillingAddress.State,
+                    order.BillingAddress.Zip
+                },
+                products = productsList,
+                payload.Response.Body.Subtotal,
+                payload.Response.Body.TaxCost,
+                payload.Response.Body.ShippingCost,
+                PromotionalDiscount = payload.Response.Body.PromotionDiscount,
+                payload.Response.Body.Total
+            };
+            var fromEmail = new EmailAddress("noreply@four51.com");
+            var toEmail = new EmailAddress(payload.Response.Body.FromUser.Email);
+            await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_ORDER_UPDATED_TEMPLATE_ID, dynamicTemplateData);
         }
 
         /*                 --------- ORDER SUBMIT EMAILS ----------                 */
@@ -129,12 +116,13 @@ namespace Marketplace.Common.Services
             if (orderWorksheet.Order.xp.OrderType == OrderType.Standard)
             {
                 var productsList = orderWorksheet.LineItems.Select((MarketplaceLineItem item) =>
-                 new {
-                        item.ProductID,
-                        item.Product.Name,
-                        item.Quantity,
-                        item.LineTotal
-                });
+                 new
+                 {
+                     item.ProductID,
+                     item.Product.Name,
+                     item.Quantity,
+                     item.LineTotal
+                 });
 
                 var dynamicTemplateData = new
                 {
@@ -163,7 +151,8 @@ namespace Marketplace.Common.Services
                 var toEmail = new EmailAddress(orderWorksheet.Order.FromUser.Email);
                 await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_ORDER_SUBMIT_TEMPLATE_ID, dynamicTemplateData);
                 await SendSupplierOrderSubmitEmail(orderWorksheet);
-            } else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
+            }
+            else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
                 var dynamicTemplateData = new
                 {
@@ -189,10 +178,12 @@ namespace Marketplace.Common.Services
                     var quoteOrderData = new { supplierInfo.xp.SupportContact.Name };
                     await SendOrderSupplierEmails(orderWorksheet, SUPPLIER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID, quoteOrderData);
                 }
-            } else
+            }
+            else
             {
                 var productsList = orderWorksheet.LineItems.Select((MarketplaceLineItem item) =>
-                    new {
+                    new
+                    {
                         item.ProductID,
                         item.Product.Name,
                         item.Quantity,

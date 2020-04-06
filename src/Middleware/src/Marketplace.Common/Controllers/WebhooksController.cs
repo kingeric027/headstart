@@ -39,7 +39,7 @@ namespace Marketplace.Common.Controllers
         [OrderCloudWebhookAuth]
         public async void HandleOrderSubmittedForApproval([FromBody] MessageNotification payload)
         {
-            await _sendgridService.SendOrderApprovalEmails(payload);
+            //await _sendgridService.SendOrderApprovalEmails(payload);
         }
 
         [HttpPost, Route("ordersubmit")]
