@@ -16,13 +16,13 @@ export class OCMAddressForm implements OnInit {
   @Input() showOptionToSave = false;
   @Output() formDismissed = new EventEmitter();
   @Output()
-  formSubmitted = new EventEmitter<{ address: Address; formDirty: boolean; shouldSaveAddress: boolean }>();
+  formSubmitted = new EventEmitter<{ address: Address; shouldSaveAddress: boolean }>();
   stateOptions: string[] = [];
   countryOptions: { label: string; abbreviation: string }[];
   addressForm: FormGroup;
   shouldSaveAddressForm: FormGroup;
-  private ExistingAddress: BuyerAddress = {};
   selectedAddress: BuyerAddress;
+  private ExistingAddress: BuyerAddress = {};
 
   constructor() {
     this.countryOptions = GeographyConfig.getCountries();
@@ -52,7 +52,7 @@ export class OCMAddressForm implements OnInit {
       ID: new FormControl(this.ExistingAddress.ID || ''),
     });
     this.shouldSaveAddressForm = new FormGroup({
-      shouldSaveAddress: new FormControl(false)
+      shouldSaveAddress: new FormControl(false),
     });
     this.onCountryChange();
   }
@@ -74,8 +74,7 @@ export class OCMAddressForm implements OnInit {
     if (this.addressForm.status === 'INVALID') return;
     this.formSubmitted.emit({
       address: this.selectedAddress ? this.selectedAddress : this.addressForm.value,
-      formDirty: this.addressForm.dirty,
-      shouldSaveAddress: this.shouldSaveAddressForm.controls.shouldSaveAddress.value
+      shouldSaveAddress: this.shouldSaveAddressForm.controls.shouldSaveAddress.value,
     });
   }
 

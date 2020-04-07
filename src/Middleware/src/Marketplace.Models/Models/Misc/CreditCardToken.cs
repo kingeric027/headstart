@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Marketplace.Helpers.Attributes;
 using OrderCloud.SDK;
+using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
 namespace Marketplace.Models.Misc
 {
@@ -14,6 +15,8 @@ namespace Marketplace.Models.Misc
         public string ExpirationDate { get; set; }
         public string CardholderName { get; set; }
         public string CardType { get; set; }
+		[System.ComponentModel.DataAnnotations.Required]
+		public Address CCBillingAddress { get; set; }
     }
 
     [SwaggerModel]
@@ -21,6 +24,8 @@ namespace Marketplace.Models.Misc
 	{
 		[System.ComponentModel.DataAnnotations.Required]
 		public string OrderID { get; set; }
+		[System.ComponentModel.DataAnnotations.Required]
+		public string PaymentID { get; set; }
 		public string CreditCardID { get; set; } // Use for saved Credit Cards
 		public CreditCardToken CreditCardDetails { get; set; }  // Use for one-time Credit Cards
 		[System.ComponentModel.DataAnnotations.Required]
@@ -34,13 +39,13 @@ namespace Marketplace.Models.Misc
 		public string MerchantID { get; set; }
 	}
 
-    public static class CreditCardPaymentExtensions
-    {
-        public static bool IsValidCvv(this CreditCardPayment payment, BuyerCreditCard cc)
-        {
-            // if credit card is direct without using a saved card then consider it a ME card and should enforce CVV
-            // saved credit cards for ME just require CVV
-            return (payment.CreditCardDetails == null || payment.CVV != null) && (!cc.Editable || payment.CVV != null);
-        }
-    }
+	public static class CreditCardPaymentExtensions
+	{
+		public static bool IsValidCvv(this CreditCardPayment payment, BuyerCreditCard cc)
+		{
+			// if credit card is direct without using a saved card then consider it a ME card and should enforce CVV
+			// saved credit cards for ME just require CVV
+			return (payment.CreditCardDetails == null || payment.CVV != null) && (!cc.Editable || payment.CVV != null);
+		}
+	}
 }

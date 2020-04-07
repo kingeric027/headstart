@@ -50,7 +50,6 @@
             </ng-template>
             <ng-template ngbPanelContent>
               <ocm-checkout-address
-                [addressType]="'Shipping'"
                 [isAnon]="isAnon"
                 [order]="order"
                 [lineItems]="lineItems"
@@ -91,25 +90,6 @@
                 (cardSelected)="onCardSelected($event.detail)"
               >
               </ocm-checkout-payment>
-            </ng-template>
-          </ngb-panel>
-          <ngb-panel id="billingAddress">
-            <ng-template ngbPanelTitle>
-              <a class="link-text">Credit Card Billing Address </a>
-              <fa-icon
-                class="float-right text-success"
-                *ngIf="getValidation('billingAddress')"
-                [icon]="faCheck"
-              ></fa-icon>
-            </ng-template>
-            <ng-template ngbPanelContent>
-              <ocm-checkout-address
-                [addressType]="'Billing'"
-                [isAnon]="isAnon"
-                [order]="order"
-                [lineItems]="lineItems"
-                (continue)="calculateAndToConfirm()"
-              ></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="confirm">

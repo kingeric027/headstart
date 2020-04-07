@@ -42,6 +42,7 @@ export class SupplierService extends ResourceCrudService<Supplier> {
 
   async createNewResource(resource: any): Promise<any> {
     resource.ID = '{supplierIncrementor}';
+    if (!resource.xp?.Images[0]?.URL) resource.xp.Images = [];
     const newSupplier = await MarketplaceSDK.Suppliers.Create(resource);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newSupplier];
     this.resourceSubject.next(this.resourceSubject.value);

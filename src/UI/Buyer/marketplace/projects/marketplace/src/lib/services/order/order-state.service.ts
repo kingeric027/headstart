@@ -15,7 +15,6 @@ export class OrderStateService {
   };
   private readonly DefaultOrder: MarketplaceOrder = {
     xp: {
-      BuyerLocationID: '',
       AvalaraTaxTransactionCode: '',
       OrderType: OrderType.Standard,
       QuoteOrderInfo: null,

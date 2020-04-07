@@ -28,7 +28,7 @@ function createSupplierForm(supplier: Supplier) {
   return new FormGroup({
     ID: new FormControl({ value: supplier.ID, disabled: !this.isCreatingNew }),
     Name: new FormControl(supplier.Name, Validators.required),
-    LogoUrl: new FormControl(_get(supplier, 'xp.Images') && _get(supplier, 'xp.Images')[0].URL),
+    LogoUrl: new FormControl(_get(supplier, 'xp.Images') && _get(supplier, 'xp.Images')[0]?.URL),
     Description: new FormControl(_get(supplier, 'xp.Description'), ValidateRichTextDescription),
     // need to figure out strucure of free string array
     // StaticContentLinks: new FormControl(_get(supplier, 'xp.StaticContentLinks'), Validators.required),

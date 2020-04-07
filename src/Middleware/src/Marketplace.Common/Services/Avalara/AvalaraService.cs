@@ -113,8 +113,8 @@ namespace Marketplace.Common.Services.Avalara
 
 		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)
 		{
-			var trans = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderWorksheet.Order));
-			trans.WithTransactionCode(orderWorksheet.Order.ID);
+			var builder = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderWorksheet.Order));
+			builder.WithTransactionCode(orderWorksheet.Order.ID);
 			foreach (var shipmentEstimate in orderWorksheet.ShipEstimateResponse.ShipEstimates)
 			{
 				var selectedShipMethod = shipmentEstimate.ShipMethods.First(shipmentMethod => shipmentMethod.ID == shipmentEstimate.SelectedShipMethodID);
@@ -125,12 +125,13 @@ namespace Marketplace.Common.Services.Avalara
 				var shipToAddress = firstLineItem.ShippingAddress;
 
 				// This assumes the order has one ShipTo Address. This is ok for marketplace, but not a general OC integration.
-				trans.WithShippingRate(shippingRate, shipFromAddress, shipToAddress);
+				builder.WithShippingRate(shippingRate, shipFromAddress, shipToAddress);
 			}
 
-			foreach (var lineItem in orderWorksheet.LineItems) trans.WithLineItem(lineItem);
+			foreach (var lineItem in orderWorksheet.LineItems) builder.WithLineItem(lineItem);
 
-			return await trans.CreateAsync();
+			var transaction = await builder.CreateAsync();
+			return transaction;
 		}
 	}
 }

@@ -21,7 +21,6 @@ namespace Marketplace.Models
         public List<string> SupplierIDs { get; set;}
         public bool NeedsAttention { get; set; }
         public bool StopShipSync { get; set; }
-        public string BuyerLocationID { get; set; }
         public OrderType? OrderType { get; set; }
         public QuoteOrderInfo QuoteOrderInfo { get; set; }
     }

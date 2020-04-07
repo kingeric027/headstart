@@ -1,9 +1,10 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe';
-import { ValidateCreditCard } from 'src/app/validators/validators';
+import { ValidateCreditCard, ValidateUSZip } from 'src/app/validators/validators';
 import { removeSpacesFrom } from 'src/app/services/card-validation.helper';
 import { CreditCardToken } from 'marketplace-javascript-sdk';
+import { GeographyConfig } from 'src/app/config/geography.class';
 
 export interface CreditCardFormOutput {
   card: CreditCardToken;
@@ -30,7 +31,7 @@ export class OCMCreditCardForm implements OnInit {
   }
   @Input() set showCardDetails(value) {
     if (value && !this._showCardDetails) {
-      this.buildCardDetailsForm();
+      this.buildCardDetailsForm(this.card);
     }
     if (!value && this._showCardDetails) {
       this.removeCardDetailsForm();
@@ -42,72 +43,107 @@ export class OCMCreditCardForm implements OnInit {
   _showCardDetails = true;
   cardForm = new FormGroup({});
   monthOptions = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-  yearOptions = this.getYearOptions();
+  yearOptions = this.buildYearOptions();
+  stateOptions: string[] = [];
+  countryOptions: { label: string; abbreviation: string }[];
+  private readonly defaultCountry = 'US';
 
-  constructor(private creditCardFormatPipe: CreditCardFormatPipe) {}
+  constructor(private creditCardFormatPipe: CreditCardFormatPipe) {
+    this.countryOptions = GeographyConfig.getCountries();
+    this.stateOptions = this.getStateOptions(this.defaultCountry);
+  }
 
   ngOnInit(): void {
-    this.buildCardDetailsForm();
-    this.setCardDetailsForm(this.card);
+    this.buildCardDetailsForm(this.card);
   }
 
   onSubmit(): void {
     this.formSubmitted.emit({
       card: {
-        AccountNumber: removeSpacesFrom(this.cardForm.value.cardNumber || ''),
-        CardholderName: this.cardForm.value.cardholderName,
-        ExpirationDate: `${this.cardForm.value.expMonth}${this.cardForm.value.expYear}`,
+        AccountNumber: removeSpacesFrom(this.cardForm.value.number || ''),
+        CardholderName: this.cardForm.value.name,
+        ExpirationDate: `${this.cardForm.value.month}${this.cardForm.value.year}`,
+        CCBillingAddress: {
+          Street1: this.cardForm.value.street,
+          City: this.cardForm.value.city,
+          State: this.cardForm.value.state,
+          Zip: this.cardForm.value.zip,
+          Country: this.cardForm.value.country,
+        },
       },
       cvv: this.cardForm.value.cvv,
     });
-  }
-
-  buildCVVForm(): void {
-    this.cardForm.addControl('cvv', new FormControl('', Validators.required));
-  }
-
-  removeCVVForm(): void {
-    this.cardForm.removeControl('cvv');
-  }
-
-  buildCardDetailsForm(): void {
-    this.cardForm.addControl('cardNumber', new FormControl('', [Validators.required, ValidateCreditCard]));
-    this.cardForm.addControl('cardholderName', new FormControl('', Validators.required));
-    this.cardForm.addControl('expMonth', new FormControl('', Validators.required));
-    this.cardForm.addControl('expYear', new FormControl('', Validators.required));
-  }
-
-  removeCardDetailsForm(): void {
-    this.cardForm.removeControl('cardNumber');
-    this.cardForm.removeControl('cardholderName');
-    this.cardForm.removeControl('expMonth');
-    this.cardForm.removeControl('expYear');
   }
 
   dismissForm(): void {
     this.formDismissed.emit();
   }
 
-  private getYearOptions(): string[] {
+  onCountryChange(event?): void {
+    this.stateOptions = this.getStateOptions(this.cardForm.value.country);
+    this.cardForm.get('zip').setValidators([Validators.required, ValidateUSZip]);
+    if (event) {
+      this.cardForm.patchValue({ State: null, Zip: '' });
+    }
+  }
+
+  private buildCVVForm(): void {
+    this.cardForm.addControl('cvv', new FormControl('', Validators.required));
+  }
+
+  private removeCVVForm(): void {
+    this.cardForm.removeControl('cvv');
+  }
+
+  private buildCardDetailsForm(card: CreditCardToken): void {
+    const form = {
+      name: card?.CardholderName || '',
+      number: card?.AccountNumber ?  this.creditCardFormatPipe.transform(card.AccountNumber) : '',
+      month: card?.ExpirationDate?.substring(0, 2) || this.monthOptions[0],
+      year: card?.ExpirationDate?.substring(2, 4) || this.yearOptions[1].slice(-2),
+      street: card?.CCBillingAddress?.Street1 || '',
+      city: card?.CCBillingAddress?.City || '',
+      state: card?.CCBillingAddress?.State || null,
+      zip: card?.CCBillingAddress?.Zip || '',
+      country: card?.CCBillingAddress?.Country || this.defaultCountry
+    }
+
+    this.cardForm.addControl('number', new FormControl(form.number, [Validators.required, ValidateCreditCard]));
+    this.cardForm.addControl('name', new FormControl(name, Validators.required));
+    this.cardForm.addControl('month', new FormControl(form.month, Validators.required));
+    this.cardForm.addControl('year', new FormControl(form.year, Validators.required));
+    this.cardForm.addControl('street', new FormControl(form.street, Validators.required));
+    this.cardForm.addControl('city', new FormControl(form.city, Validators.required));
+    this.cardForm.addControl('state', new FormControl(form.state, Validators.required));
+    this.cardForm.addControl('zip', new FormControl(form.zip, [Validators.required, ValidateUSZip]));
+    this.cardForm.addControl('country', new FormControl(form.country, Validators.required));
+  }
+
+  private removeCardDetailsForm(): void {
+    const nonCVVCtrls = [
+      'name',
+      'number',
+      'month',
+      'year',
+      'street',
+      'city',
+      'state',
+      'zip',
+      'country',
+    ];
+    for (const ctrl of nonCVVCtrls) {
+      this.cardForm.removeControl(ctrl);
+    }
+  }
+
+  private getStateOptions(country: string): string[] {
+    return GeographyConfig.getStates(country).map(s => s.abbreviation);
+  }
+
+  private buildYearOptions(): string[] {
     const currentYear = new Date().getFullYear();
     return Array(20)
       .fill(0)
       .map((x, i) => `${i + currentYear}`);
-  }
-
-  private setCardDetailsForm(card: CreditCardToken): void {
-    let expMonth, expYear, cardNumber, cardholderName;
-    if (card && card.AccountNumber) {
-      expMonth = card.ExpirationDate.substring(0, 2);
-      expYear = card.ExpirationDate.substring(2, 4);
-      cardNumber = this.creditCardFormatPipe.transform(card.AccountNumber);
-      cardholderName = card.CardholderName;
-    } else {
-      expMonth = this.monthOptions[0];
-      expYear = this.yearOptions[1].slice(-2);
-      cardNumber = '';
-      cardholderName = '';
-    }
-    this.cardForm.setValue({ expMonth, expYear, cardNumber, cardholderName });
   }
 }
