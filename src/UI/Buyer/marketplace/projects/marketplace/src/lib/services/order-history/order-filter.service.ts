@@ -115,16 +115,26 @@ export class OrderFilterService implements IOrderFilters {
     const from = fromDate ? `>${fromDate}` : undefined;
     const to = toDate ? `<${toDate}` : undefined;
     const favorites = this.currentUser.get().FavoriteOrderIDs.join('|') || undefined;
-    return {
+    let listOptions = {
       page,
       search,
       sortBy,
       filters: {
         ID: showOnlyFavorites ? favorites : undefined,
-        Status: status,
         DateSubmitted: [from, to].filter(x => x),
       },
     };
+    listOptions = this.addStatusFilters(status, listOptions);
+    return listOptions;
+  }
+
+  private addStatusFilters(status: string, listOptions: any): any {
+    if (status === OrderStatus.ChangesRequested) {
+      listOptions.filters.DateDeclined = '*';
+    } else {
+      listOptions.filters.Status = status;
+    }
+    return listOptions;
   }
 
   private patchFilterState(patch: OrderFilters) {

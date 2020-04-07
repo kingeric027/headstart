@@ -30,7 +30,7 @@ export class OrderStateService {
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
     private appConfig: AppConfig
-  ) { }
+  ) {}
 
   get order(): MarketplaceOrder {
     return this.orderSubject.value;
@@ -57,8 +57,12 @@ export class OrderStateService {
   }
 
   async reset(): Promise<void> {
+    // get the most recent unsubmitted order that is not an order that was previously declined
     const orders = await this.ocMeService
-      .ListOrders({ sortBy: '!DateCreated', filters: { status: 'Unsubmitted', 'xp.OrderType': 'Standard' } })
+      .ListOrders({
+        sortBy: '!DateCreated',
+        filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
+      })
       .toPromise();
     if (orders.Items.length) {
       this.order = orders.Items[0];

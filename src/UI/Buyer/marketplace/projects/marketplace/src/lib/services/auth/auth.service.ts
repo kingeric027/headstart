@@ -97,7 +97,6 @@ export class AuthService implements IAuthentication {
   }
 
   async forgotPasssword(email: string): Promise<any> {
-    console.log('forgot', email);
     const reset = await this.ocPasswordResetService
       .SendVerificationCode({ Email: email, ClientID: this.appConfig.clientID, URL: this.appConfig.baseUrl })
       .toPromise();

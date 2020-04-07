@@ -104,12 +104,17 @@ export enum OrderAddressType {
 
 export enum OrderStatus {
   AllSubmitted = '!Unsubmitted',
-  Unsubmitted = 'Unsubmitted',
   AwaitingApproval = 'AwaitingApproval',
-  Declined = 'Declined',
+  ChangesRequested = 'ChangesRequested',
   Open = 'Open',
   Completed = 'Completed',
   Canceled = 'Canceled',
+}
+
+export enum OrderContext {
+  Submitted = 'Submitted',
+  Approve = 'Approve',
+  GetApproval = 'GetApproval',
 }
 
 export interface CreditCard {

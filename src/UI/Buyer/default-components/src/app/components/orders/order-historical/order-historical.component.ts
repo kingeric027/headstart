@@ -15,6 +15,7 @@ export class OCMOrderHistorical {
   approvals: OrderApproval[] = [];
   isQuoteOrder = isQuoteOrder;
   buyerLocation: BuyerAddress;
+  @Input() isOrderToApprove = false;
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.order;
     this.lineItems = value.lineItems;

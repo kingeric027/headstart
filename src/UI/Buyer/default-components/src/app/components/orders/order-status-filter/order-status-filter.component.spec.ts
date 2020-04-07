@@ -40,7 +40,7 @@ describe('StatusFilterComponent', () => {
         OrderStatus.Open,
         OrderStatus.AwaitingApproval,
         OrderStatus.Completed,
-        OrderStatus.Declined,
+        // OrderStatus.Declined,
       ]);
     });
   });
