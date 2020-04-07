@@ -4,18 +4,17 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Models.Misc
 {
-    [SwaggerModel]
-	public class AddressValidation
+	public class AddressValidation<TAddress>
 	{
-		public AddressValidation(Address raw)
+		public AddressValidation(TAddress raw)
 		{
 			RawAddress = raw;
 		}
 
-		public Address RawAddress { get; set; }
+		public TAddress RawAddress { get; set; }
+		public TAddress ValidAddress { get; set; }
 		public bool ValidAddressFound => ValidAddress != null;
-		public Address ValidAddress { get; set; } = null;
-		public List<Address> SuggestedAddresses { get; set; } = new List<Address>() { };
+		public List<TAddress> SuggestedAddresses { get; set; } = new List<TAddress>() { };
 		// https://smartystreets.com/docs/cloud/us-street-api#footnotes
 		public string GapBeteenRawAndValid { get; set; }
 	}

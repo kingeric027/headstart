@@ -35,10 +35,11 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[HttpPatch, Route("me/addresses/{addressID}"), MarketplaceUserAuth(ApiRole.MeAddressAdmin)]
-		public async Task PatchMeAddress(string addressID, [FromBody] PartialBuyerAddress address)
+		public async Task PatchMeAddress(string addressID, [FromBody] PartialBuyerAddress patch)
 		{
-			var validation = await _addressCommand.ValidateAddress(address);
-			await _oc.Me.PatchAddressAsync(addressID, validation.ValidAddress, VerifiedUserContext.AccessToken);
+			var address = await _addressCommand.GetPatchedMeAddress(addressID, patch, VerifiedUserContext.AccessToken);
+			await _addressCommand.ValidateAddress(address);
+			await _oc.Me.PatchAddressAsync(addressID, patch, VerifiedUserContext.AccessToken);
 		}
 
 		// BUYER endpoints
@@ -58,10 +59,11 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[HttpPatch, Route("buyers/{buyerID}/addresses/{addressID}"), MarketplaceUserAuth(ApiRole.AddressAdmin)]
-		public async Task<Address> PatchBuyerAddress(string buyerID, string addressID, [FromBody] PartialAddress address)
+		public async Task<Address> PatchBuyerAddress(string buyerID, string addressID, [FromBody] PartialAddress patch)
 		{
-			var validation = await _addressCommand.ValidateAddress(address);
-			return await _oc.Addresses.PatchAsync(buyerID, addressID, validation.ValidAddress, VerifiedUserContext.AccessToken);
+			var address = await _addressCommand.GetPatchedBuyerAddress(buyerID, addressID, patch, VerifiedUserContext.AccessToken);
+			await _addressCommand.ValidateAddress(address);
+			return await _oc.Addresses.PatchAsync(buyerID, addressID, patch, VerifiedUserContext.AccessToken);
 		}
 
 		// SUPPLIER endpoints
@@ -81,10 +83,11 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[HttpPatch, Route("suppliers/{supplierID}/addresses/{addressID}"), MarketplaceUserAuth(ApiRole.SupplierAddressAdmin)]
-		public async Task<Address> PatchSupplierAddress(string supplierID, string addressID, [FromBody] PartialAddress address)
+		public async Task<Address> PatchSupplierAddress(string supplierID, string addressID, [FromBody] PartialAddress patch)
 		{
-			var validation = await _addressCommand.ValidateAddress(address);
-			return await _oc.SupplierAddresses.PatchAsync(supplierID, addressID, validation.ValidAddress, VerifiedUserContext.AccessToken);
+			var address = await _addressCommand.GetPatchedSupplierAddress(supplierID, addressID, patch, VerifiedUserContext.AccessToken);
+			await _addressCommand.ValidateAddress(address);
+			return await _oc.SupplierAddresses.PatchAsync(supplierID, addressID, patch, VerifiedUserContext.AccessToken);
 		}
 
 		// ADMIN endpoints
@@ -104,10 +107,11 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[HttpPatch, Route("addresses/{addressID}"), MarketplaceUserAuth(ApiRole.AdminAddressAdmin)]
-		public async Task<Address> PatchAdminAddress(string addressID, [FromBody] PartialAddress address)
+		public async Task<Address> PatchAdminAddress(string addressID, [FromBody] PartialAddress patch)
 		{
-			var validation = await _addressCommand.ValidateAddress(address);
-			return await _oc.AdminAddresses.PatchAsync(addressID, validation.ValidAddress, VerifiedUserContext.AccessToken);
+			var address = _addressCommand.GetPatchedAdminAddress(addressID, patch, VerifiedUserContext.AccessToken);
+			await _addressCommand.ValidateAddress(patch);
+			return await _oc.AdminAddresses.PatchAsync(addressID, patch, VerifiedUserContext.AccessToken);
 		}
 
 		// ORDER endpoints
@@ -119,25 +123,11 @@ namespace Marketplace.Common.Controllers
 			return await _oc.Orders.SetBillingAddressAsync(direction, orderID, validation.ValidAddress, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpPatch, Route("order/{direction}/{orderID}/billto"), MarketplaceUserAuth(ApiRole.Shopper, ApiRole.OrderAdmin)]
-		public async Task<Order> PatchBillingAddress(OrderDirection direction, string orderID, [FromBody] PartialAddress address)
-		{
-			var validation = await _addressCommand.ValidateAddress(address);
-			return await _oc.Orders.PatchBillingAddressAsync(direction, orderID, validation.ValidAddress, VerifiedUserContext.AccessToken);
-		}
-
 		[HttpPut, Route("order/{direction}/{orderID}/shipto"), MarketplaceUserAuth(ApiRole.Shopper, ApiRole.OrderAdmin)]
 		public async Task<Order> SetShippingAddress(OrderDirection direction, string orderID, [FromBody] PartialAddress address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);
 			return await _oc.Orders.SetShippingAddressAsync(direction, orderID, validation.ValidAddress, VerifiedUserContext.AccessToken);
-		}
-
-		[HttpPatch, Route("order/{direction}/{orderID}/shipto"), MarketplaceUserAuth(ApiRole.Shopper, ApiRole.OrderAdmin)]
-		public async Task<Order> PatchShippingAddress(OrderDirection direction, string orderID, [FromBody] PartialAddress address)
-		{
-			var validation = await _addressCommand.ValidateAddress(address);
-			return await _oc.Orders.PatchShippingAddressAsync(direction, orderID, validation.ValidAddress, VerifiedUserContext.AccessToken);
 		}
 	}
 }

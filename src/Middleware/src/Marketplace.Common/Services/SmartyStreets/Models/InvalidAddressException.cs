@@ -10,4 +10,9 @@ namespace Marketplace.Common.Services.SmartyStreets.Models
 	{
 		public InvalidAddressException(AddressValidation validation) : base("InvalidAddress", 400, "Address not valid", validation) { }
 	}
+
+	public class InvalidBuyerAddressException : ApiErrorException
+	{
+		public InvalidBuyerAddressException(BuyerAddressValidation validation) : base("InvalidAddress", 400, "Address not valid", validation) { }
+	}
 }

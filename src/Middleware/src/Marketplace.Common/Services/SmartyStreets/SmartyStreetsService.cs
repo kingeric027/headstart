@@ -14,8 +14,8 @@ namespace Marketplace.Common.Services.SmartyStreets
 {
 	public interface ISmartyStreetsService
 	{
-		Task<AddressValidation> ValidateAddress(Address address);
-		Task<AddressValidation> ValidateAddress(BuyerAddress address);
+		Task<AddressValidation<Address>> ValidateAddress(Address address);
+		Task<AddressValidation<BuyerAddress>> ValidateAddress(BuyerAddress address);
 	}
 
 	public class SmartyStreetsService : ISmartyStreetsService
@@ -30,35 +30,48 @@ namespace Marketplace.Common.Services.SmartyStreets
 			_builder = new ClientBuilder(_smartySettings.AuthID, _smartySettings.AuthToken);
 		}
 
-		public async Task<AddressValidation> ValidateAddress(BuyerAddress buyerAddress)
+		public async Task<AddressValidation<TAddress>> ValidateAddress<TAddress>(TAddress address)
 		{
-			var address = SmartyStreetMappers.Map(buyerAddress);
-			return await ValidateAddress(address);
+			var response = new AddressValidation<TAddress>(address);
+			var lookup = SmartyStreetBuyerAddressMapper.MapToUSStreetLookup(address);
+			var candidate = await ValidateSingleUSAddress(lookup); // Always seems to return 1 or 0 candidates
+			if (candidate.Count > 0)
+			{
+				response.ValidAddress = SmartyStreetBuyerAddressMapper.Map(candidate[0], address);
+				response.GapBeteenRawAndValid = candidate[0].Analysis.DpvFootnotes;
+			}
+			else
+			{
+				// no valid address found
+				var suggestions = await USAutoCompletePro($"{address.Street1} {address.Street2}");
+				response.SuggestedAddresses = SmartyStreetBuyerAddressMapper.Map(suggestions, address);
+			}
+			return response;
 		}
 
 		public async Task<AddressValidation> ValidateAddress(Address address)
 		{
 			var response = new AddressValidation(address);
-			var candidate = await ValidateSingleUSAddress(address); // Always seems to return 1 or 0 candidates
+			var lookup = SmartyStreetAddressMapper.MapToUSStreetLookup(address);
+			var candidate = await ValidateSingleUSAddress(lookup); // Always seems to return 1 or 0 candidates
 			if (candidate.Count > 0)
 			{
-				response.ValidAddress = SmartyStreetMappers.Map(candidate[0], address);
-				response.RawAndValidDiffCodes = candidate[0].Analysis.DpvFootnotes;
+				response.ValidAddress = SmartyStreetAddressMapper.Map(candidate[0], address);
+				response.GapBeteenRawAndValid = candidate[0].Analysis.DpvFootnotes;
 			}
 			else 
 			{
 				// no valid address found
 				var suggestions = await USAutoCompletePro($"{address.Street1} {address.Street2}");
-				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions, address);
+				response.SuggestedAddresses = SmartyStreetAddressMapper.Map(suggestions, address);
 			}
 			return response;
 		}
 
 		// returns 1 or 0 very complete addresses
-		private async Task<List<Candidate>> ValidateSingleUSAddress(Address address)
+		private async Task<List<Candidate>> ValidateSingleUSAddress(Lookup lookup)
 		{
 			var client = _builder.BuildUsStreetApiClient();
-			var lookup = SmartyStreetMappers.MapToUSStreet(address);
 			client.Send(lookup);
 			return await Task.FromResult(lookup.Result);
 		}
