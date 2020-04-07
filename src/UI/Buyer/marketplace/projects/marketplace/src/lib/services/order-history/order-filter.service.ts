@@ -67,7 +67,6 @@ export class OrderFilterService implements IOrderFilters {
     this.patchFilterState({
       fromDate: fromDate || undefined,
       toDate: toDate || undefined,
-      page: undefined,
     });
   }
 
@@ -129,8 +128,17 @@ export class OrderFilterService implements IOrderFilters {
   }
 
   private patchFilterState(patch: OrderFilters) {
+    if (this.isNewDateFilter(patch, this.activeFiltersSubject.value)) patch.page = undefined;
     const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
     const queryParams = this.mapToUrlQueryParams(activeFilters);
     this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
+  }
+
+  private isNewDateFilter(patch: OrderFilters, activeFilters: OrderFilters): boolean {
+    let isNewDateFilter = false;
+    if (Object.keys(patch).includes('toDate') || Object.keys(patch).includes('fromDate')) {
+      isNewDateFilter = patch.toDate !== activeFilters.toDate || patch.fromDate !== activeFilters.fromDate;
+    }
+    return isNewDateFilter;
   }
 }
