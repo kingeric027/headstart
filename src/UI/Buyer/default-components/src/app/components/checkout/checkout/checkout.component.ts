@@ -74,7 +74,8 @@ export class OCMCheckout implements OnInit {
   }
 
   async selectShipMethod(selection: ShipMethodSelection): Promise<void> {
-    await this.checkout.selectShipMethod(selection);
+    const orderWorksheet = await this.checkout.selectShipMethod(selection);
+    this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
   }
 
   async doneWithShippingRates(): Promise<void> {

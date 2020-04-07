@@ -7,10 +7,12 @@ import { LineItem, MarketplaceOrder, ShipEstimate, ShipMethodSelection, ListLine
 })
 export class OCMCheckoutShipping implements OnInit {
   _shipEstimates = null;
+  _areAllShippingSelectionsMade = false;
   _lineItemsByShipEstimate = null;
 
   @Input() set shipEstimates(value: ShipEstimate[]) {
     this._shipEstimates = value;
+    this._areAllShippingSelectionsMade = this.areAllShippingSelectionsMade(value);
     this._lineItemsByShipEstimate = value.map(shipEstimate => {
       return this.getLineItemsForShipEstimate(shipEstimate);
     });
@@ -28,6 +30,10 @@ export class OCMCheckoutShipping implements OnInit {
     return shipEstimate.ShipEstimateItems.map(shipEstimateItem => {
       return this.lineItems.Items.find(li => li.ID === shipEstimateItem.LineItemID);
     });
+  }
+
+  areAllShippingSelectionsMade(shipEstimates: ShipEstimate[]): boolean {
+    return shipEstimates.every(shipEstimate => shipEstimate.SelectedShipMethodID)
   }
 
   getSupplierID(shipEstimate: ShipEstimate): string {
