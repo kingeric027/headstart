@@ -4,6 +4,8 @@ import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/produc
 import { Address, LineItem, OcLineItemService, OcOrderService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { ProductImage } from 'marketplace-javascript-sdk';
+import { PDFService } from '@app-seller/orders/pdf-render.service';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-order-details',
@@ -11,6 +13,7 @@ import { ProductImage } from 'marketplace-javascript-sdk';
   styleUrls: ['./order-details.component.scss'],
 })
 export class OrderDetailsComponent {
+  faDownload = faDownload;
   _order: Order = {};
   _lineItems: LineItem[] = [];
   _payments: Payment[] = [];
@@ -31,6 +34,7 @@ export class OrderDetailsComponent {
     private ocLineItemService: OcLineItemService,
     private ocPaymentService: OcPaymentService,
     private orderService: OrderService,
+    private pdfService: PDFService,
     private ocOrderService: OcOrderService
   ) { }
 
@@ -79,5 +83,9 @@ export class OrderDetailsComponent {
 
   toggleCreateShipment(createShipment: boolean) {
     this.createShipment = createShipment;
+  }
+
+  protected createAndSavePDF(): void {
+    this.pdfService.createAndSavePDF(this._order.ID);
   }
 }
