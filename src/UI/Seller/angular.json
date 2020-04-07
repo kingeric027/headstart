@@ -43,7 +43,7 @@
                 }
               ]
             },
-            "demo": {
+            "staging": {
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
