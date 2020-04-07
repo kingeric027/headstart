@@ -10,10 +10,10 @@
     "lint": "eslint src/**/*.ts",
     "e2e": "ng e2e",
     "precommit": "lint-staged --config ./lint-staged.config.js",
-    "serve-qa": "ng serve --configuration=qa",
-    "build-qa": "ng build --configuration=qa",
-    "serve-demo": "ng serve --configuration=demo",
-    "build-demo": "ng build --configuration=demo"
+    "serve-test": "ng serve --configuration=test",
+    "build-test": "ng build --configuration=test",
+    "serve-staging": "ng serve --configuration=staging",
+    "build-staging": "ng build --configuration=staging"
   },
   "private": true,
   "dependencies": {
