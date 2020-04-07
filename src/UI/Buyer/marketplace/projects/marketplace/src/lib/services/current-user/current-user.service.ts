@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MeUser, OcMeService, User } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
-import { ICreditCards, CreditCardService } from './credit-card.service';
+import { CreditCardService } from './credit-card.service';
 
 export interface CurrentUser extends MeUser {
   FavoriteProductIDs: string[];
@@ -10,7 +10,7 @@ export interface CurrentUser extends MeUser {
 }
 
 export interface ICurrentUser {
-  cards: ICreditCards;
+  cards: CreditCardService;
   get(): CurrentUser;
   patch(user: MeUser): Promise<CurrentUser>;
   onChange(callback: (user: CurrentUser) => void): void; // TODO - replace all these onChange functions with real Observables. More powerful

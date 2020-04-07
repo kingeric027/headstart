@@ -10,9 +10,10 @@ import {
   BuyerProduct,
   Supplier,
   Address,
-  BuyerCreditCard,
   ListBuyerProduct,
   ListAddress,
+  ListBuyerCreditCard,
+  BuyerCreditCard,
 } from '@ordercloud/angular-sdk';
 import {
   ProductXp,
@@ -25,6 +26,7 @@ import {
 export * from '@ordercloud/angular-sdk';
 export * from './services/shopper-context/shopper-context.service';
 export * from '../../src/lib/services/ordercloud-sandbox/ordercloud-sandbox.models';
+export { CreditCardPayment } from 'marketplace-javascript-sdk';
 
 export interface LineItemGroupSupplier {
   supplier: Supplier;
@@ -53,10 +55,9 @@ export interface ShippingRate {
 
 export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
 export interface OrderXp {
-  BuyerLocationID: string;
-  AvalaraTaxTransactionCode: string;
-  OrderType: OrderType;
-  QuoteOrderInfo: QuoteOrderInfo;
+  AvalaraTaxTransactionCode?: string;
+  OrderType?: OrderType;
+  QuoteOrderInfo?: QuoteOrderInfo;
 }
 
 export enum OrderType {
@@ -210,12 +211,6 @@ export class AppConfig {
   scope: string[];
 }
 
-export interface CreditCardPayment {
-  SavedCard?: BuyerCreditCard;
-  NewCard?: CreditCardToken;
-  CVV: string;
-}
-
 export interface DecodedOCToken {
   /**
    * the ordercloud username
@@ -282,3 +277,11 @@ export type ListMarketplaceMeProduct = ListBuyerProduct<ProductXp>;
 export type MarketplaceMeProduct = BuyerProduct<ProductXp>;
 
 export type ListMarketplaceAddressBuyer = ListAddress<BuyerAddressXP>;
+
+export type ListMarketplaceBuyerCreditCard = ListBuyerCreditCard<CreditCardXP>;
+
+export type MarketplaceBuyerCreditCard = BuyerCreditCard<CreditCardXP>;
+
+export interface CreditCardXP {
+  CCBillingAddress: Address;
+}

@@ -113,9 +113,9 @@ export class OCMProductDetails implements OnInit {
   }
 
   getDocumentUrl(url: string) {
-    let spliturl = url.split('/')
+    const spliturl = url.split('/')
     spliturl.splice(4, 1);
-    let str = spliturl.join('/')
+    const str = spliturl.join('/')
     return str;
   }
 
@@ -150,7 +150,6 @@ export class OCMProductDetails implements OnInit {
   getDefaultQuoteOrder(user) {
     const defaultQuoteOrder = {
       xp: {
-        BuyerLocationID: '',
         AvalaraTaxTransactionCode: '',
         OrderType: OrderType.Quote,
         QuoteOrderInfo: {
