@@ -5,10 +5,10 @@
 export const environment = {
   hostedApp: true,
   clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
-  middlewareUrl: 'https://marketplace-api-demo.azurewebsites.net',
-  appname: 'Marketplace Admin Demo',
+  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  appname: 'Marketplace Admin Staging',
   marketplaceID: 'seb',
-  cmsUrl: 'https://marketplaceqa.blob.core.windows.net',
+  cmsUrl: 'https://marktplacestaging.blob.core.windows.net',
   orderCloudApiUrl: 'https://api.ordercloud.io',
   orderCloudAuthUrl: 'https://auth.ordercloud.io/oauth/token',
   orderCloudApiVersion: 'v1',
