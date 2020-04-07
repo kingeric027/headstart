@@ -105,7 +105,9 @@ export class ProductVariations {
     const newSpec: Spec[] | any = [{
       ID: `${updateProductResourceCopy.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, "")}`,
       Name: input.value,
+      // If this.definesVariant - AllowOptenText _MUST_ be false (platform requirement)
       AllowOpenText: false,
+      Required: this.definesVariant ? true : false,
       DefinesVariant: this.definesVariant,
       ListOrder: (updateProductResourceCopy.Specs?.length || 0) + 1,
       Options: []
