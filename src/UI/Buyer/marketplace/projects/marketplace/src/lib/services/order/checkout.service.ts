@@ -25,7 +25,7 @@ export interface ICheckout {
   setAddressByID(type: OrderAddressType, addressID: string): Promise<MarketplaceOrder>;
   setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder>;
   estimateShipping(): Promise<OrderWorksheet>;
-  selectShipMethod(selection: ShipMethodSelection): Promise<MarketplaceOrder>;
+  selectShipMethod(selection: ShipMethodSelection): Promise<OrderWorksheet>;
   calculateOrder(): Promise<MarketplaceOrder>;
 }
 
@@ -131,10 +131,10 @@ export class CheckoutService implements ICheckout {
     return await this.orderCloudSandBoxService.estimateShipping(this.order.ID);
   }
 
-  async selectShipMethod(selection: ShipMethodSelection): Promise<MarketplaceOrder> {
-    const orderCalculation = await this.orderCloudSandBoxService.selectShipMethod(this.order.ID, selection);
-    this.order = orderCalculation.Order;
-    return this.order;
+  async selectShipMethod(selection: ShipMethodSelection): Promise<OrderWorksheet> {
+    const orderWorksheet = await this.orderCloudSandBoxService.selectShipMethod(this.order.ID, selection);
+    this.order = orderWorksheet.Order;
+    return orderWorksheet;
   }
 
   async calculateOrder(): Promise<MarketplaceOrder> {
