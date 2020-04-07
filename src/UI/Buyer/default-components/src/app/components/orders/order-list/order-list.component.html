@@ -45,7 +45,9 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let order of orders?.Items">
+      <tr class="cursor-pointer"
+          *ngFor="let order of orders?.Items"
+          (click)="toOrderDetails(order.ID)">
         <td *ngIf="columns.indexOf('Favorite') > -1"
             (click)="$event.stopPropagation()">
           <ocm-toggle-favorite [favorite]="isFavorite(order.ID)"
@@ -53,8 +55,7 @@
           </ocm-toggle-favorite>
         </td>
         <td *ngIf="columns.indexOf('ID')> -1"
-            (click)="toOrderDetails(order.ID)"
-            class="link text-primary">
+            class="text-primary">
           {{order.ID}}
           <span *ngIf="order.xp.OrderType === 'Quote'"
                 class="badge badge-pill badge-secondary ml-2">{{order.xp.OrderType}}</span>

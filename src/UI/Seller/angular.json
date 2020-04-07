@@ -26,7 +26,7 @@
             "scripts": []
           },
           "configurations": {
-            "qa": {
+            "test": {
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -39,7 +39,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.qa.ts"
+                  "with": "src/environments/environment.test.ts"
                 }
               ]
             },
@@ -56,7 +56,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.demo.ts"
+                  "with": "src/environments/environment.staging.ts"
                 }
               ]
             }
@@ -68,11 +68,11 @@
             "browserTarget": "base-seller:build"
           },
           "configurations": {
-            "qa": {
-              "browserTarget": "base-seller:build:qa"
+            "test": {
+              "browserTarget": "base-seller:build:test"
             },
-            "demo": {
-              "browserTarget": "base-seller:build:demo"
+            "staging": {
+              "browserTarget": "base-seller:build:staging"
             }
           }
         },

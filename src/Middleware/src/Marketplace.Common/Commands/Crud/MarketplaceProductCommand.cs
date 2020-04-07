@@ -19,7 +19,11 @@ namespace Marketplace.Common.Commands.Crud
         Task Delete(string id, VerifiedUserContext user);
 
     }
-
+    public class DefaultOptionSpecAssignment
+    {
+        public string SpecID { get; set; }
+        public string OptionID { get; set; }
+    }
     public class MarketplaceProductCommand : IMarketplaceProductCommand
     {
         private readonly IOrderCloudClient _oc;
@@ -78,13 +82,21 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct superProduct, VerifiedUserContext user)
         {
+            var defaultSpecOptions = new List<DefaultOptionSpecAssignment>();
             // Create Specs
-            var specRequests = await Throttler.RunAsync(superProduct.Specs, 100, 5, s => _oc.Specs.SaveAsync<Spec>(s.ID, s, accessToken: user.AccessToken));
+            var specRequests = await Throttler.RunAsync(superProduct.Specs, 100, 5, s =>
+            {
+                defaultSpecOptions.Add(new DefaultOptionSpecAssignment { SpecID = s.ID, OptionID = s.DefaultOptionID });
+                s.DefaultOptionID = null;
+                return _oc.Specs.SaveAsync<Spec>(s.ID, s, accessToken: user.AccessToken);
+            });
             // Create Spec Options
             foreach (Spec spec in superProduct.Specs)
             {
                 await Throttler.RunAsync(spec.Options, 100, 5, o => _oc.Specs.SaveOptionAsync(spec.ID, o.ID, o, accessToken: user.AccessToken));
             }
+            // Patch Specs with requested DefaultOptionID
+            await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
             // Create Price Schedule
             var _priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
             // Create Product

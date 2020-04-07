@@ -5,21 +5,26 @@ using Marketplace.Common.Services.CardConnect.Models;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Mappers.CardConnect
 {
     public static class CreditCardMapper
     {
-        public static CreditCard Map(CreditCardToken card, AccountResponse response)
+        public static MarketplaceCreditCard Map(CreditCardToken card, AccountResponse response)
         {
-            var cc = new CreditCard()
-            {
-                CardType = card.CardType,
-                CardholderName = card.CardholderName,
-                ExpirationDate = card.ExpirationDate.ToDateTime(),
-                PartialAccountNumber = card.AccountNumber.ToCreditCardDisplay(),
-                Token = response.token
+			var cc = new MarketplaceCreditCard()
+			{
+				CardType = card.CardType,
+				CardholderName = card.CardholderName,
+				ExpirationDate = card.ExpirationDate.ToDateTime(),
+				PartialAccountNumber = card.AccountNumber.ToCreditCardDisplay(),
+				Token = response.token,
+				xp = new CreditCardXP
+				{
+					CCBillingAddress = card.CCBillingAddress
+				}
             };
             return cc;
         }
@@ -27,17 +32,21 @@ namespace Marketplace.Common.Mappers.CardConnect
 
     public static class BuyerCreditCardMapper
     {
-        public static BuyerCreditCard Map(CreditCardToken card, AccountResponse response)
+        public static MarketplaceBuyerCreditCard Map(CreditCardToken card, AccountResponse response)
         {
-            var cc = new BuyerCreditCard()
+            var cc = new MarketplaceBuyerCreditCard()
             {
                 CardType = card.CardType,
                 CardholderName = card.CardholderName,
                 ExpirationDate = card.ExpirationDate.ToDateTime(),
                 PartialAccountNumber = card.AccountNumber.ToCreditCardDisplay(),
                 Token = response.token,
-                Editable = true
-            };
+                Editable = true,
+				xp = new CreditCardXP
+				{
+					CCBillingAddress = card.CCBillingAddress
+				}
+			};
             return cc;
         }
     }
@@ -65,25 +74,26 @@ namespace Marketplace.Common.Mappers.CardConnect
         //    return cc;
         //}
 
-        public static AuthorizationRequest Map(BuyerCreditCard card, MarketplaceOrder order, CreditCardPayment payment)
+        public static AuthorizationRequest Map(MarketplaceBuyerCreditCard card, MarketplaceOrder order, CreditCardPayment payment)
         {
-            var req = new AuthorizationRequest()
+			var address = card.xp.CCBillingAddress;
+			var req = new AuthorizationRequest()
             {
-                name = $"{order.BillingAddress.FirstName} {order.BillingAddress.LastName}",
+                name = $"{card.CardholderName}",
                 account = card.Token,
-                address = order.BillingAddress.Street1,
+                address = address.Street1,
                 amount = order.Total.ToString(CultureInfo.InvariantCulture),
                 //capture = auth.capture,
                 //bin = auth.bin,
-                city = order.BillingAddress.City,
-                country = order.BillingAddress.Country,
+                city = address.City,
+                country = address.Country,
                 currency = payment.Currency,
                 cvv2 = payment.CVV,
                 expiry = $"{card.ExpirationDate.Value:MMyyyy}",
                 merchid = payment.MerchantID,
                 orderid = order.ID,
-                postal = order.BillingAddress.Zip,
-                region = order.BillingAddress.State
+                postal = address.Zip,
+                region = address.State
             };
             return req;
         }

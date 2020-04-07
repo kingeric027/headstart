@@ -6,10 +6,9 @@ import { OrderStatus } from 'marketplace';
 })
 export class OrderStatusDisplayPipe implements PipeTransform {
   OrderStatusMap = {
-    [OrderStatus.AllSubmitted]: 'All',
-    [OrderStatus.Unsubmitted]: 'Unsubmitted',
+    [OrderStatus.AllSubmitted]: 'All Submitted',
     [OrderStatus.AwaitingApproval]: 'Awaiting Approval',
-    [OrderStatus.Declined]: 'Declined',
+    [OrderStatus.ChangesRequested]: 'Changes Requested',
     [OrderStatus.Open]: 'Open',
     [OrderStatus.Completed]: 'Completed',
     [OrderStatus.Canceled]: 'Canceled',
@@ -19,6 +18,7 @@ export class OrderStatusDisplayPipe implements PipeTransform {
     if (!status) {
       return null;
     }
-    return this.OrderStatusMap[status];
+    const displayValue = this.OrderStatusMap[status];
+    return displayValue;
   }
 }

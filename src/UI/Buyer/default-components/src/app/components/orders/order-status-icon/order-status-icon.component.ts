@@ -15,7 +15,7 @@ export class OCMOrderStatusIcon {
     [OrderStatus.Completed]: this.faCircle,
     [OrderStatus.AwaitingApproval]: this.faClock,
     [OrderStatus.Open]: this.faCircle,
-    [OrderStatus.Declined]: this.faCircle,
+    // [OrderStatus.Declined]: this.faCircle,
     [OrderStatus.Canceled]: this.faBan,
   };
 }

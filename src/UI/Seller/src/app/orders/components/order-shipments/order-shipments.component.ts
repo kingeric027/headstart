@@ -127,7 +127,6 @@ export class OrderShipmentsComponent implements OnChanges {
 
   getImageUrl(lineItem: LineItem): string {
     const product = lineItem.Product;
-    console.log('WHAT IS THE PRODUCT', product);
     return getProductMainImageUrlOrPlaceholder(product);
   }
 

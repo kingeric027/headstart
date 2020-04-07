@@ -1,17 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BuyerCreditCard, ListBuyerCreditCard, OcMeService } from '@ordercloud/angular-sdk';
+import { OcMeService } from '@ordercloud/angular-sdk';
 import { MarketplaceSDK, CreditCardToken } from 'marketplace-javascript-sdk';
-
-export interface ICreditCards {
-  Save(card: CreditCardToken): Promise<BuyerCreditCard>;
-  Delete(cardID: string): Promise<void>;
-  List(): Promise<ListBuyerCreditCard>;
-}
+import { MarketplaceBuyerCreditCard, ListMarketplaceBuyerCreditCard } from '../../shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CreditCardService implements ICreditCards {
+export class CreditCardService {
   private readonly cardTypes = {
     Visa: RegExp('^4[0-9]{12}(?:[0-9]{3})?$'), // e.g. 4000000000000000
     MasterCard: RegExp('^5[1-5][0-9]{14}$'), // e.g. 5100000000000000
@@ -25,7 +20,7 @@ export class CreditCardService implements ICreditCards {
 
   constructor(private ocMeService: OcMeService) {}
 
-  async Save(card: CreditCardToken): Promise<BuyerCreditCard> {
+  async Save(card: CreditCardToken): Promise<MarketplaceBuyerCreditCard> {
     card.CardType = this.getCardType(card.AccountNumber);
     return await MarketplaceSDK.MeCreditCardAuthorizations.MePost(card);
   }
@@ -34,7 +29,7 @@ export class CreditCardService implements ICreditCards {
     return await this.ocMeService.DeleteCreditCard(cardID).toPromise();
   }
 
-  async List(): Promise<ListBuyerCreditCard> {
+  async List(): Promise<ListMarketplaceBuyerCreditCard> {
     return await this.ocMeService.ListCreditCards({ pageSize: 100 }).toPromise();
   }
 

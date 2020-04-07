@@ -1,89 +1,163 @@
-<div *ngIf="_showCardDetails"
-    class="row align-items-center">
-  <div class="col-12">
-    <label class="small text-muted"
-           for="accepted-cards">Accepting All Major Credit Cards</label>
-  </div>
-</div>
-<div class="row">
-  <div class="col-12">
-    <form (ngSubmit)="onSubmit()"
-          novalidate
-          [formGroup]="cardForm"
-          name="CardForm"
-          class="add-card-form">
-      <div *ngIf="_showCardDetails">
-        <div class="form-group d-flex justify-content-between mb-0">
-          <div class="form-group card-number mr-2 flex-fill">
-            <label class="sr-only"
-                  for="cardNumber">Card Number</label>
-            <input type="text"
-                  formControlName="cardNumber"
-                  class="form-control"
-                  id="cardNumber"
-                  placeholder="Card Number"
-                  autofocus="true"
-                  showErrors
-                  appCreditCardInput
-                  autocomplete="off" />
-          </div>
-          <div class="form-group mr-2 flex-fill">
-            <label class="sr-only"
-                  for="month">Expiration Month</label>
-            <select formControlName="expMonth"
-                    class="custom-select"
-                    id="state">
-              <option *ngFor="let month of monthOptions"
-                      [value]="month">{{ month }}</option>
-            </select>
-          </div>
-          <div class="form-group flex-fill">
-            <label class="sr-only"
-                  for="year">Expiration Year</label>
-            <select formControlName="expYear"
-                    class="custom-select"
-                    id="state">
-              <option *ngFor="let year of yearOptions"
-                      [value]="year.slice(-2)">{{ year }}</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group d-flex justify-content-between mb-0">
-          <div class="form-group card-name flex-fill">
-            <label class="sr-only"
-                  for="name">Name on Card</label>
-            <input type="text"
-                  formControlName="cardholderName"
-                  class="form-control"
-                  id="name"
-                  showErrors
-                  placeholder="Name on Card"
-                  autocomplete="off" />
-          </div>
-        </div>
+<form (ngSubmit)="onSubmit()"
+      novalidate
+      [formGroup]="cardForm"
+      name="CardForm"
+      class="add-card-form">
+  <div *ngIf="_showCardDetails">
+    <div class="row align-items-center">
+      <label class="small text-muted col-12"
+             for="accepted-cards">Card Details</label>
+    </div>
+    <div class="form-group d-flex justify-content-between mb-0">
+      <div class="form-group flex-fill">
+        <label class="sr-only"
+               for="name">Name on Card</label>
+        <input type="text"
+               formControlName="name"
+               class="form-control"
+               id="name"
+               showErrors
+               placeholder="Name on Card"
+               autocomplete="off" />
       </div>
-      <div *ngIf="_showCVV"
-          class="form-group d-flex justify-content-between mb-0">
-        <div class="form-group card-name flex-fill">
-          <label class="sr-only"
-                for="CVV">CVV</label>
-              <input type="text"
-                  formControlName="cvv"
-                  class="form-control w-25"
-                  id="CVV"
-                  type="password"
-                  placeholder="CVV"
-                  autocomplete="off"
-                  showErrors />
-            </div>
-          </div>
-      <button type="submit"
-              class="btn btn-primary btn-block-xs"
-              [disabled]="!cardForm.valid">{{ submitText }}</button>
-      <button (click)="dismissForm()"
-              *ngIf="!_showCVV"
-              class="btn btn-link text-danger"
-              type="button">Cancel</button>
-    </form>
+    </div>
+    <div class="form-group d-flex justify-content-between mb-0">
+      <div class="form-group card-number mr-2 flex-fill">
+        <label class="sr-only"
+               for="cardNumber">Card Number</label>
+        <input type="text"
+               formControlName="number"
+               class="form-control"
+               id="cardNumber"
+               placeholder="Card Number"
+               autofocus="true"
+               showErrors
+               appCreditCardInput
+               autocomplete="off" />
+      </div>
+      <div class="form-group mr-2 flex-fill">
+        <label class="sr-only"
+               for="month">Expiration Month</label>
+        <select formControlName="month"
+                class="custom-select"
+                id="state">
+          <option *ngFor="let month of monthOptions"
+                  [value]="month">{{ month }}</option>
+        </select>
+      </div>
+      <div class="form-group flex-fill">
+        <label class="sr-only"
+               for="year">Expiration Year</label>
+        <select formControlName="year"
+                class="custom-select"
+                id="state">
+          <option *ngFor="let year of yearOptions"
+                  [value]="year.slice(-2)">{{ year }}</option>
+        </select>
+      </div>
+    </div>
   </div>
-</div>
+  <div *ngIf="_showCVV"
+       class="form-group d-flex justify-content-between mb-0">
+    <div class="form-group card-name flex-fill">
+      <label class="sr-only"
+             for="CVV">CVV</label>
+      <input type="text"
+             formControlName="cvv"
+             class="form-control w-25"
+             id="CVV"
+             type="password"
+             placeholder="CVV"
+             autocomplete="off"
+             showErrors />
+    </div>
+  </div>
+  <div *ngIf="_showCardDetails">
+    <div class="row align-items-center">
+      <label class="small text-muted col-12"
+             for="accepted-cards">Billing Address</label>
+    </div>
+    <div class="form-group d-flex justify-content-between mb-0">
+      <div class="form-group w-100">
+        <label class="sr-only"
+               for="Street1">Street</label>
+        <input type="text"
+               formControlName="street"
+               class="form-control"
+               id="Street1"
+               placeholder="Street"
+               autocomplete="off"
+               showErrors />
+      </div>
+    </div>
+    <div class="form-group d-flex justify-content-between mb-0">
+      <div class="form-group mr-2 flex-fill">
+        <label class="sr-only"
+               for="City">City</label>
+        <input type="text"
+               formControlName="city"
+               class="form-control"
+               id="City"
+               placeholder="City"
+               autocomplete="off"
+               showErrors />
+      </div>
+      <div class="form-group w-25 mr-2 flex-fill">
+        <label class="sr-only"
+               for="State">State</label>
+        <select *ngIf="stateOptions.length !== 0"
+                formControlName="state"
+                class="form-control"
+                id="State"
+                showErrors>
+          <option [ngValue]="null"
+                  disabled>State</option>
+          <option *ngFor="let State of stateOptions"
+                  [value]="State">{{ State }}</option>
+        </select>
+        <input *ngIf="stateOptions.length === 0"
+               type="text"
+               formControlName="state"
+               class="form-control"
+               id="State"
+               autocomplete="off"
+               showErrors />
+      </div>
+      <div class="form-group flex-fill"
+           style="width: 30%;">
+        <label class="sr-only"
+               for="zipCode">Zip</label>
+        <input type="text"
+               formControlName="zip"
+               class="form-control"
+               id="zipCode"
+               placeholder="Zip"
+               autocomplete="off"
+               showErrors />
+      </div>
+    </div>
+    <div class="form-group d-flex justify-content-between mb-0">
+      <label class="sr-only"
+             for="country">Country</label>
+      <select formControlName="country"
+              class="form-control"
+              id="Country"
+              showErrors
+              (change)="onCountryChange($event)">
+        <option [ngValue]="null"
+                disabled>Country</option>
+        <option *ngFor="let country of countryOptions"
+                [value]="country.abbreviation">{{ country.label }}</option>
+      </select>
+    </div>
+  </div>
+  <button type="submit"
+          class="btn btn-primary btn-block-xs mt-4 mr-2"
+          [disabled]="!cardForm.valid">
+    {{ submitText }}
+  </button>
+  <button (click)="dismissForm()"
+          *ngIf="!_showCVV"
+          class="btn btn-link text-danger mt-4"
+          type="button">Cancel</button>
+</form>
