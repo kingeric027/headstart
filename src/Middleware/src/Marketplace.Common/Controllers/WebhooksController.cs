@@ -30,16 +30,16 @@ namespace Marketplace.Common.Controllers
         // USING AN OC MESSAGE SENDER - NOT WEBHOOK
         [HttpPost, Route("passwordreset")]
         [OrderCloudWebhookAuth]
-        public async void HandleBuyerPasswordReset([FromBody] MessageNotification payload)
+        public async void HandleBuyerPasswordReset([FromBody] MessageNotification<PasswordResetEventBody> payload)
         {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", payload.Recipient.Email, "Password Reset", "<h1>this is a test email for password reset</h1>");
+            await _sendgridService.SendPasswordResetEmail(payload);
         }
 
         [HttpPost, Route("ordersubmittedforapproval")]
         [OrderCloudWebhookAuth]
-        public async void HandleOrderSubmittedForApproval([FromBody] MessageNotification payload)
+        public async void HandleOrderSubmittedForApproval([FromBody] MessageNotification<OrderSubmitEventBody> payload)
         {
-            //await _sendgridService.SendOrderApprovalEmails(payload);
+            await _sendgridService.SendOrderSubmittedForApprovalEmail(payload);
         }
 
         [HttpPost, Route("ordersubmit")]
@@ -50,26 +50,25 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendOrderSubmitEmail(payload.OrderWorksheet);
         }
 
-        [HttpPost, Route("orderrequiresapproval")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS		
+        [HttpPost, Route("orderrequiresapproval")]
         [OrderCloudWebhookAuth]
-        public async void HandleOrderRequiresApproval(JObject payload)
+        public async void HandleOrderRequiresApproval([FromBody] MessageNotification<OrderSubmitEventBody> payload)
         {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "order sent for approval test", "<h1>this is a test email for order sent for approval</h1>"); // to buyer whose order needs approval
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "order requires approval test", "<h1>this is a test email for order requires approval</h1>"); // to approver who needs to approve order
+            await _sendgridService.SendOrderRequiresApprovalEmail(payload);
         }
 
-        [HttpPost, Route("orderapproved")] // TO DO: TEST
+        [HttpPost, Route("orderapproved")]
         [OrderCloudWebhookAuth]
         public async void HandleOrderApproved([FromBody] WebhookPayloads.Orders.Approve payload)
         {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Approved", "<h1>this is a test email for order approved</h1>");
+            await _sendgridService.SendOrderApprovedEmail(payload);
         }
 
-        [HttpPost, Route("orderdeclined")] // TO DO: TEST
+        [HttpPost, Route("orderdeclined")]
         [OrderCloudWebhookAuth]
         public async void HandleOrderDeclined([FromBody] WebhookPayloads.Orders.Decline payload)
         {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Declined", "<h1>this is a test email for order declined</h1>");
+            await _sendgridService.SendOrderDeclinedEmail(payload);
         }
 
         [HttpPost, Route("ordershipped")] // TO DO: TEST
@@ -107,7 +106,7 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendOrderUpdatedEmail(payload);
         }
 
-        [HttpPost, Route("newuser")]
+        [HttpPost, Route("newuser")] // TO DO: send email to mp manager
         [OrderCloudWebhookAuth]
         public async void HandleNewUser([FromBody] WebhookPayloads.Users.Create payload)
         {

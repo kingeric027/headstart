@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
@@ -20,6 +21,11 @@ namespace Marketplace.Common.Services
         Task SendOrderSubmitEmail(OrderWorksheet orderData);
         Task SendNewUserEmail(WebhookPayloads.Users.Create payload);
         Task SendOrderUpdatedEmail(WebhookPayloads.Orders.Patch payload);
+        Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
+        Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
+        Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
+        Task SendOrderApprovedEmail(WebhookPayloads.Orders.Approve payload);
+        Task SendOrderDeclinedEmail(WebhookPayloads.Orders.Decline payload);
     }
     public class SendgridService : ISendgridService
     {
@@ -31,11 +37,17 @@ namespace Marketplace.Common.Services
         private const string SUPPLIER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-5776a6c57b344aeda605444c96ff39e8";
         private const string BUYER_NEW_USER_TEMPLATE_ID = "d-f3831baa2beb4c19aeace19e48132768";
         private const string BUYER_ORDER_UPDATED_TEMPLATE_ID = "d-ff15cd80bb934f90ae4fe90678d88d54";
+        private const string BUYER_PASSWORD_RESET_TEMPLATE_ID = "d-ca6a6ff8c9ac4264bf86b5d6cdd3a038";
+        private const string BUYER_ORDER_SUBMITTED_FOR_APPROVAL_TEMPLATE_ID = "d-4c674afcd6ef44e9b7793eb6c5b917ea";
+        private const string BUYER_ORDER_APPROVED_TEMPLATE_ID = "d-2f3b92b95b7b45ea8f8fb94c8ac928e0";
+        private const string BUYER_ORDER_DECLINED_TEMPLATE_ID = "d-3b6167f40d6b407b95759d1cb01fff30";
+        private const string ORDER_REQUIRES_APPROVAL_TEMPLATE_ID = "d-fbe9f4e9fabd4a37ba2364201d238316";
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
             _oc = ocClient;
             _settings = settings;
         }
+
         public async Task SendSingleEmail(string from, string to, string subject, string htmlContent)
         {
             var client = new SendGridClient(_settings.SendgridApiKey);
@@ -44,45 +56,32 @@ namespace Marketplace.Common.Services
             var msg = MailHelper.CreateSingleEmail(fromEmail, toEmail, subject, null, htmlContent);
             await client.SendEmailAsync(msg);
         }
+
         public async Task SendSingleTemplateEmail(EmailAddress from, EmailAddress to, string templateID, object templateData)
         {
             var client = new SendGridClient(_settings.SendgridApiKey);
             var msg = MailHelper.CreateSingleTemplateEmail(from, to, templateID, templateData);
-            var res = await client.SendEmailAsync(msg);
-            Console.WriteLine(res);
+            await client.SendEmailAsync(msg);
         }
 
-        public async Task SendNewUserEmail(WebhookPayloads.Users.Create payload)
+        public async Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification)
         {
             var templateData = new
             {
-                payload.Response.Body.FirstName,
-                payload.Response.Body.LastName,
-                payload.Response.Body.Username
+                messageNotification.Recipient.FirstName,
+                messageNotification.Recipient.LastName
             };
             var fromEmail = new EmailAddress("noreply@four51.com");
-            var toEmail = new EmailAddress(payload.Response.Body.Email);
-            await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_NEW_USER_TEMPLATE_ID, templateData);
+            var toEmail = new EmailAddress(messageNotification.Recipient.Email);
+            await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendOrderUpdatedEmail(WebhookPayloads.Orders.Patch payload)
+        public async Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
-            var order = await _oc.Orders.GetAsync(OrderDirection.Incoming, payload.Response.Body.ID);
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID);
-            List<object> productsList = new List<object>();
+            var productsList = GetMarketplaceProductList(messageNotification.EventBody.LineItems);
 
-            foreach (var item in lineItems.Items)
-            {
-                productsList.Add(new
-                {
-                    item.Product.Name,
-                    item.ProductID,
-                    item.Quantity,
-                    item.LineTotal
-                });
-            };
-
-            var dynamicTemplateData = new
+            var order = messageNotification.EventBody.Order;
+            var templateData = new
             {
                 order.FromUser.FirstName,
                 order.FromUser.LastName,
@@ -98,7 +97,67 @@ namespace Marketplace.Common.Services
                     order.BillingAddress.State,
                     order.BillingAddress.Zip
                 },
-                products = productsList,
+                Products = productsList,
+                order.Subtotal,
+                order.TaxCost,
+                order.ShippingCost,
+                PromotionalDiscount = order.PromotionDiscount,
+                order.Total
+            };
+            var fromEmail = new EmailAddress("noreply@four51.com");
+            var toEmail = new EmailAddress(messageNotification.Recipient.Email);
+            await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_ORDER_SUBMITTED_FOR_APPROVAL_TEMPLATE_ID, templateData);
+        }
+
+        public async Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
+        {
+            var templateData = new
+            {
+                messageNotification.Recipient.FirstName,
+                messageNotification.Recipient.LastName,
+                OrderID = messageNotification.EventBody.Order.ID
+            };
+            var fromEmail = new EmailAddress("noreply@four51.com");
+            var toEmail = new EmailAddress(messageNotification.Recipient.Email);
+            await SendSingleTemplateEmail(fromEmail, toEmail, ORDER_REQUIRES_APPROVAL_TEMPLATE_ID, templateData);
+        }
+
+        public async Task SendNewUserEmail(WebhookPayloads.Users.Create payload)
+        {
+            var templateData = new
+            {
+                payload.Response.Body.FirstName,
+                payload.Response.Body.LastName,
+                payload.Response.Body.Username
+            };
+            var fromEmail = new EmailAddress("noreply@four51.com");
+            var toEmail = new EmailAddress(payload.Response.Body.Email);
+            await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_NEW_USER_TEMPLATE_ID, templateData);
+        }
+
+        public async Task SendOrderApprovedEmail(WebhookPayloads.Orders.Approve payload)
+        {
+            var order = await _oc.Orders.GetAsync(OrderDirection.Incoming, payload.Response.Body.ID);
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID);
+            List<object> productsList = GetProductList(lineItems);
+
+            var templateData = new
+            {
+                order.FromUser.FirstName,
+                order.FromUser.LastName,
+                order.ID,
+                DateSubmitted = order.DateSubmitted.ToString(),
+                order.ShippingAddressID,
+                order.BillingAddressID,
+                BillingAddress = new
+                {
+                    order.BillingAddress.Street1,
+                    order.BillingAddress.Street2,
+                    order.BillingAddress.City,
+                    order.BillingAddress.State,
+                    order.BillingAddress.Zip
+                },
+                Products = productsList,
                 payload.Response.Body.Subtotal,
                 payload.Response.Body.TaxCost,
                 payload.Response.Body.ShippingCost,
@@ -107,24 +166,50 @@ namespace Marketplace.Common.Services
             };
             var fromEmail = new EmailAddress("noreply@four51.com");
             var toEmail = new EmailAddress(payload.Response.Body.FromUser.Email);
-            await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_ORDER_UPDATED_TEMPLATE_ID, dynamicTemplateData);
+            await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_ORDER_APPROVED_TEMPLATE_ID, templateData);
         }
 
-        /*                 --------- ORDER SUBMIT EMAILS ----------                 */
+        public async Task SendOrderDeclinedEmail(WebhookPayloads.Orders.Decline payload)
+        {
+            var order = await _oc.Orders.GetAsync(OrderDirection.Incoming, payload.Response.Body.ID);
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID);
+            List<object> productsList = GetProductList(lineItems);
+
+            var templateData = new
+            {
+                order.FromUser.FirstName,
+                order.FromUser.LastName,
+                order.ID,
+                DateSubmitted = order.DateSubmitted.ToString(),
+                order.ShippingAddressID,
+                order.BillingAddressID,
+                BillingAddress = new
+                {
+                    order.BillingAddress.Street1,
+                    order.BillingAddress.Street2,
+                    order.BillingAddress.City,
+                    order.BillingAddress.State,
+                    order.BillingAddress.Zip
+                },
+                Products = productsList,
+                payload.Response.Body.Subtotal,
+                payload.Response.Body.TaxCost,
+                payload.Response.Body.ShippingCost,
+                PromotionalDiscount = payload.Response.Body.PromotionDiscount,
+                payload.Response.Body.Total
+            };
+            var fromEmail = new EmailAddress("noreply@four51.com");
+            var toEmail = new EmailAddress(payload.Response.Body.FromUser.Email);
+            await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_ORDER_DECLINED_TEMPLATE_ID, templateData);
+        }
+
         public async Task SendOrderSubmitEmail(OrderWorksheet orderWorksheet)
         {
             if (orderWorksheet.Order.xp.OrderType == OrderType.Standard)
             {
-                var productsList = orderWorksheet.LineItems.Select((MarketplaceLineItem item) =>
-                 new
-                 {
-                     item.ProductID,
-                     item.Product.Name,
-                     item.Quantity,
-                     item.LineTotal
-                 });
+                var productsList = GetMarketplaceProductList(orderWorksheet.LineItems);
 
-                var dynamicTemplateData = new
+                var templateData = new
                 {
                     orderWorksheet.Order.FromUser.FirstName,
                     orderWorksheet.Order.FromUser.LastName,
@@ -149,7 +234,7 @@ namespace Marketplace.Common.Services
                 };
                 var fromEmail = new EmailAddress("noreply@four51.com");
                 var toEmail = new EmailAddress(orderWorksheet.Order.FromUser.Email);
-                await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_ORDER_SUBMIT_TEMPLATE_ID, dynamicTemplateData);
+                await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_ORDER_SUBMIT_TEMPLATE_ID, templateData);
                 await SendSupplierOrderSubmitEmail(orderWorksheet);
             }
             else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
@@ -181,15 +266,8 @@ namespace Marketplace.Common.Services
             }
             else
             {
-                var productsList = orderWorksheet.LineItems.Select((MarketplaceLineItem item) =>
-                    new
-                    {
-                        item.ProductID,
-                        item.Product.Name,
-                        item.Quantity,
-                        item.LineTotal
-                    });
-                var dynamicTemplateData = new
+                var productsList = GetMarketplaceProductList(orderWorksheet.LineItems);
+                var templateData = new
                 {
                     orderWorksheet.Order.ToCompanyID,
                     orderWorksheet.Order.FromUser.FirstName,
@@ -213,9 +291,44 @@ namespace Marketplace.Common.Services
                     PromotionalDiscount = orderWorksheet.Order.PromotionDiscount,
                     orderWorksheet.Order.Total
                 };
-                await SendOrderSupplierEmails(orderWorksheet, SUPPLIER_ORDER_SUBMIT_TEMPLATE_ID, dynamicTemplateData);
+                await SendOrderSupplierEmails(orderWorksheet, SUPPLIER_ORDER_SUBMIT_TEMPLATE_ID, templateData);
             }
         }
+
+        public async Task SendOrderUpdatedEmail(WebhookPayloads.Orders.Patch payload)
+        {
+            var order = await _oc.Orders.GetAsync(OrderDirection.Incoming, payload.Response.Body.ID);
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, order.ID);
+            List<object> productsList = GetProductList(lineItems);
+
+            var templateData = new
+            {
+                order.FromUser.FirstName,
+                order.FromUser.LastName,
+                order.ID,
+                DateSubmitted = order.DateSubmitted.ToString(),
+                order.ShippingAddressID,
+                order.BillingAddressID,
+                BillingAddress = new
+                {
+                    order.BillingAddress.Street1,
+                    order.BillingAddress.Street2,
+                    order.BillingAddress.City,
+                    order.BillingAddress.State,
+                    order.BillingAddress.Zip
+                },
+                Products = productsList,
+                payload.Response.Body.Subtotal,
+                payload.Response.Body.TaxCost,
+                payload.Response.Body.ShippingCost,
+                PromotionalDiscount = payload.Response.Body.PromotionDiscount,
+                payload.Response.Body.Total
+            };
+            var fromEmail = new EmailAddress("noreply@four51.com");
+            var toEmail = new EmailAddress(payload.Response.Body.FromUser.Email);
+            await SendSingleTemplateEmail(fromEmail, toEmail, BUYER_ORDER_UPDATED_TEMPLATE_ID, templateData);
+        }
+
         public async Task SendOrderSupplierEmails(OrderWorksheet orderWorksheet, string templateID, object templateData)
         {
             var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderWorksheet.Order.ID);
@@ -241,13 +354,47 @@ namespace Marketplace.Common.Services
             };
         }
 
-        // helper function
+        // helper functions 
         private List<string> GetSupplierInfo(ListPage<LineItem> lineItems)
         {
             var supplierList = lineItems.Items.Select(item => item.SupplierID)
                 .Distinct()
                 .ToList();
             return supplierList;
+        }
+
+        private List<object> GetMarketplaceProductList(List<MarketplaceLineItem> lineItems)
+        {
+            List<object> productsList = new List<object>();
+
+            foreach (var item in lineItems)
+            {
+                productsList.Add(new
+                {
+                    ProductName = item.Product.Name,
+                    item.ProductID,
+                    item.Quantity,
+                    item.LineTotal
+                });
+            };
+            return productsList;
+        }
+
+        private List<object> GetProductList(ListPage<LineItem> lineItems)
+        {
+            List<object> productsList = new List<object>();
+
+            foreach (var item in lineItems.Items)
+            {
+                productsList.Add(new
+                {
+                    ProductName = item.Product.Name,
+                    item.ProductID,
+                    item.Quantity,
+                    item.LineTotal
+                });
+            };
+            return productsList;
         }
     }
 }
