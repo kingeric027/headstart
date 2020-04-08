@@ -24,8 +24,11 @@
       <p *ngIf="!_superMarketplaceProduct?.Product?.xp?.Tax">No Tax Code</p>
     </div>
   </div>
-  <!-- /Product Details -->
+
+  <product-filters-component [readonly]="'true'"
+                             [facetsOnProduct]="_superMarketplaceProduct?.Product?.xp?.Facets || []"></product-filters-component> <!-- /Product Details -->
   <!-- Shipping Information -->
+
   <div class="row pt-3 mt-5 border-top">
     <div class="col-md-5">
       <h5>Shipping Information</h5>

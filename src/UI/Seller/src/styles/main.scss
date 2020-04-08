@@ -273,20 +273,28 @@ html {
   -o-transition: all 150ms ease-in-out;
   transition: all 100ms ease-in-out;
   cursor: default;
-  &:hover {
-    background: $primary-dark;
-    color: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.19);
+  &.readonly {
+    &.active {
+      background: $primary-dark;
+      color: white;
+    }
   }
-  &.active {
-    background: $primary-dark;
-    color: white;
+  &.editable {
     &:hover {
-      background: $primary-light;
-      color: $primary-dark;
+      background: $primary-dark;
+      color: white;
       box-shadow: 0 2px 4px rgba(0,0,0,0.19);
-      .supplier-facet-chip {
-        display: none;
+    }
+    &.active {
+      background: $primary-dark;
+      color: white;
+      &:hover {
+        background: $primary-light;
+        color: $primary-dark;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.19);
+        .supplier-facet-chip {
+          display: none;
+        }
       }
     }
   }
