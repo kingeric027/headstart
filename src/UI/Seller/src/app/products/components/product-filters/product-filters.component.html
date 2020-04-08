@@ -17,32 +17,29 @@
             </thead>
             <tbody>
               <ng-container *ngFor="let facet of facetOptions">
-                <!-- filtering out facet options that aren't formatted to work with this ui -->
-                <ng-container *ngIf="facet.XpPath.startsWith('Facets.')">
-                  <tr *ngIf="!readonly || (readonly && areFacetOptionsSelected(facet))">
-                    <td>
-                      {{facet.Name}}
-                    </td>
-                    <td>
-                      <ng-container *ngFor="let option of facet?.xp?.Options">
-                        <div *ngIf="readonly && isFacetOptionApplied(facet, option)"
-                             class="chip supplier-facet-chip readonly active">{{option}}
-                          <fa-icon [icon]="faCheckCircle"></fa-icon>
-                        </div>
-                        <div *ngIf="!readonly"
-                             class="
+                <tr *ngIf="!readonly || (readonly && areFacetOptionsSelected(facet))">
+                  <td>
+                    {{facet.Name}}
+                  </td>
+                  <td>
+                    <ng-container *ngFor="let option of facet?.xp?.Options">
+                      <div *ngIf="readonly && isFacetOptionApplied(facet, option)"
+                           class="chip supplier-facet-chip readonly active">{{option}}
+                        <fa-icon [icon]="faCheckCircle"></fa-icon>
+                      </div>
+                      <div *ngIf="!readonly"
+                           class="
                               chip
                               editable
                               supplier-facet-chip"
-                             (click)="toggleFacetOption(facet, option)"
-                             [ngClass]="{'active': isFacetOptionApplied(facet, option)}">{{option}}
-                          <fa-icon *ngIf="isFacetOptionApplied(facet, option)"
-                                   [icon]="faCheckCircle"></fa-icon>
-                        </div>
-                      </ng-container>
-                    </td>
-                  </tr>
-                </ng-container>
+                           (click)="toggleFacetOption(facet, option)"
+                           [ngClass]="{'active': isFacetOptionApplied(facet, option)}">{{option}}
+                        <fa-icon *ngIf="isFacetOptionApplied(facet, option)"
+                                 [icon]="faCheckCircle"></fa-icon>
+                      </div>
+                    </ng-container>
+                  </td>
+                </tr>
               </ng-container>
             </tbody>
           </table>
