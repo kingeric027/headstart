@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
-import { get as _get, omit as _omit } from 'lodash';
+import { get as _get } from 'lodash';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { UserContext } from '@app-seller/config/user-context';
@@ -8,8 +8,6 @@ import {
   OcSupplierAddressService,
   OcAdminAddressService,
   OcProductService,
-  ProductFacet,
-  OcProductFacetService,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -17,16 +15,15 @@ import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCircle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption, ProductXp } from 'marketplace-javascript-sdk';
+import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
-import { FacetService } from '@app-seller/facets/facet.service';
 
 @Component({
   selector: 'app-product-edit',
@@ -61,7 +58,6 @@ export class ProductEditComponent implements OnInit {
   faTimes = faTimes;
   faTrash = faTrash;
   faCircle = faCircle;
-  faCheckCircle = faCheckCircle;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
@@ -76,7 +72,6 @@ export class ProductEditComponent implements OnInit {
   staticContentFiles: FileHandle[] = [];
   staticContent: StaticContent[] = [];
   documentName: string;
-  facetOptions: ProductFacet[];
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -90,7 +85,6 @@ export class ProductEditComponent implements OnInit {
     private modalService: NgbModal,
     private middleware: MiddlewareAPIService,
     private toasterService: ToastrService,
-    private ocFacetService: OcProductFacetService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) { }
 
@@ -98,15 +92,10 @@ export class ProductEditComponent implements OnInit {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
-    this.getFacets();
-    console.log(this.facetOptions);
     this.userContext = await this.currentUserService.getUserContext();
   }
 
-  async getFacets(): Promise<void> {
-    const facets = await this.ocFacetService.List().toPromise();
-    this.facetOptions = facets.Items.filter(f => f?.xp?.Options?.length);
-  }
+  
 
   async getAddresses(): Promise<void> {
     const context: UserContext = await this.currentUserService.getUserContext();
@@ -116,8 +105,9 @@ export class ProductEditComponent implements OnInit {
   }
 
   async refreshProductData(superProduct: SuperMarketplaceProduct) {
-    this._superMarketplaceProductStatic = superProduct;
-    this._superMarketplaceProductEditable = superProduct;
+    // copying to break reference bugs
+    this._superMarketplaceProductStatic = JSON.parse(JSON.stringify(superProduct));
+    this._superMarketplaceProductEditable = JSON.parse(JSON.stringify(superProduct));
     if (!this._superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure) this._superMarketplaceProductEditable.Product.xp.UnitOfMeasure = { Unit: null, Qty: null };
     if (
       this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
@@ -131,10 +121,10 @@ export class ProductEditComponent implements OnInit {
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
     }
-    this.productType = superProduct.Product?.xp?.ProductType;
-    this.staticContent = superProduct.Product?.xp?.StaticContent;
-    this.createProductForm(superProduct);
-    this.images = ReplaceHostUrls(superProduct.Product);
+    this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
+    this.staticContent = this._superMarketplaceProductEditable.Product?.xp?.StaticContent;
+    this.createProductForm(this._superMarketplaceProductEditable);
+    this.images = ReplaceHostUrls(this._superMarketplaceProductEditable.Product);
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
@@ -452,29 +442,5 @@ export class ProductEditComponent implements OnInit {
     return this._superMarketplaceProductEditable?.Product?.xp?.IsResale;
   }
 
-  isFacetOptionApplied(facet: ProductFacet, option: string): boolean {
-    const productXpFacetKey = facet?.XpPath.split('.')[1];
-    if ((this._superMarketplaceProductEditable?.Product?.xp as any)?.Facets[productXpFacetKey]) {
-      const facetOptionsToTest = (this._superMarketplaceProductEditable?.Product?.xp as any)?.Facets[productXpFacetKey]
-      const active = facetOptionsToTest?.includes(option)
-      return active;
-    } else return false;
-  }
 
-  toggleFacetOption(facet: ProductFacet, option: string): void {
-    const productXpFacetKey = facet?.XpPath.split('.')[1];
-    const copiedResource = this.productService.copyResource(this._superMarketplaceProductEditable || this.productService.emptyResource);
-    // If the key doesn't exist on Product.xp.Facets, initialize it as an empty array
-    if (!(this._superMarketplaceProductEditable?.Product?.xp as any)?.Facets[productXpFacetKey]) {
-      (copiedResource?.Product?.xp as any).Facets[productXpFacetKey] = [] 
-    }
-    const facetInSelection = (copiedResource?.Product?.xp as any)?.Facets[productXpFacetKey];
-    // If the facet in quetsion includes the option requested, remove it from the array, else add it.
-    facetInSelection.includes(option) ? (copiedResource?.Product?.xp as any).Facets[productXpFacetKey] = facetInSelection.filter(o => o !== option) : (copiedResource?.Product?.xp as any).Facets[productXpFacetKey] = facetInSelection.concat([option]);
-    if ((copiedResource?.Product?.xp as any).Facets[productXpFacetKey].length === 0) {
-      (copiedResource?.Product?.xp as any).Facets = _omit((copiedResource?.Product?.xp as any)?.Facets, productXpFacetKey)
-    };
-    this._superMarketplaceProductEditable = copiedResource;
-    this.checkForChanges();
-  }
 }
