@@ -47,8 +47,8 @@ namespace Marketplace.Common.Commands
 
 		public async Task<Payment> AuthorizePayment(CreditCardPayment payment, VerifiedUserContext user)
         {
-			Require.That((payment.CreditCardID != null) ^ (payment.CreditCardDetails != null), 
-				new ErrorCode("Missing credit card info", 400, "Request must include either CreditCardDetails or CreditCardID, but not both."));
+			Require.That((payment.CreditCardID != null) || (payment.CreditCardDetails != null), 
+				new ErrorCode("Missing credit card info", 400, "Request must include either CreditCardDetails or CreditCardID"));
 
 			var cc = await GetMeCardDetails(payment, user);
             
