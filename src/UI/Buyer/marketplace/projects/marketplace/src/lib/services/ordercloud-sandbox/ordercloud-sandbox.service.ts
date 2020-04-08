@@ -10,8 +10,11 @@ import { ShipMethodSelection, OrderWorksheet } from './ordercloud-sandbox.models
   providedIn: 'root',
 })
 export class OrderCloudSandboxService {
-  readonly baseUrl = `https://stagingapi.ordercloud.io/v1`;
-  constructor(private ocTokenService: OcTokenService, private http: HttpClient, public appSettings: AppConfig) {}
+  baseUrl = ``;
+  constructor(private ocTokenService: OcTokenService, private http: HttpClient, public appSettings: AppConfig) {
+    // awaiting fully current sdk
+    this.baseUrl = `${appSettings.orderCloudApiUrl}/v1`;
+  }
 
   generateHeaders() {
     return {
