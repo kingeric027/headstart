@@ -55,6 +55,7 @@ namespace Marketplace.API
                 .Inject<ISmartyStreetsService>()
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
+                .InjectCosmosStore<ImageQuery, Image>(cosmosConfig)
                 .Inject<IOrchestrationCommand>()
                 .Inject<IOrchestrationLogCommand>()
                 .Inject<IOCShippingIntegration>()
