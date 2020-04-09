@@ -137,7 +137,7 @@ namespace Marketplace.Common.Services
             }
         }
 
-        public async Task SendSupplierOrderSubmitEmail(OrderWorksheet orderWorksheet)
+        public async Task SendSupplierOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
         {
             if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {

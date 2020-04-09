@@ -18,7 +18,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IOrderCommand
     {
-        Task HandleBuyerOrderSubmit(OrderWorksheet order);
+        Task HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
     }
 
     public class OrderCommand : IOrderCommand
@@ -42,7 +42,7 @@ namespace Marketplace.Common.Commands
             _ocSandboxService = orderCloudSandboxService;
         }
 
-        public async Task HandleBuyerOrderSubmit(OrderWorksheet orderWorksheet)
+        public async Task HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
         {
             try
             {
@@ -58,6 +58,7 @@ namespace Marketplace.Common.Commands
                 // quote orders do not need to flow into our integrations
                 if (buyerOrder.xp == null || buyerOrder.xp.OrderType != OrderType.Quote)
                 {
+                    // leaving this in until the sdk supports type parameters on order worksheet
                     var updatedWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, buyerOrder.ID);
                     await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders);
                     await HandleTaxTransactionCreationAsync(orderWorksheet);
@@ -129,7 +130,7 @@ namespace Marketplace.Common.Commands
             return shipFromAddressIDs;
         }
 
-        private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
+        private async Task HandleTaxTransactionCreationAsync(MarketplaceOrderWorksheet orderWorksheet)
         {
             var transaction = await _avatax.CreateTransactionAsync(orderWorksheet);
             await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Helpers;
+using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.DevCenter.Models;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
@@ -19,6 +21,7 @@ namespace Marketplace.Common.Commands
 	public class EnvironmentSeedCommand : IEnvironmentSeedCommand
 	{
 		private readonly IOrderCloudClient _oc;
+		private readonly IOrderCloudSandboxService _ocSandbox;
 		private readonly AppSettings _settings;
 		private readonly IDevCenterService _dev;
 		private EnvironmentSeed _seed;
@@ -27,7 +30,7 @@ namespace Marketplace.Common.Commands
 		private readonly string _allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 
-		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand)
+		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand, IOrderCloudSandboxService orderCloudSandboxService)
 		{
 			_settings = settings;
 			_oc = oc;
@@ -46,12 +49,13 @@ namespace Marketplace.Common.Commands
 			var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
 			await PatchDefaultApiClients(impersonation.access_token);
 			await CreateApiClients(impersonation.access_token);
-			await CreateWebhooks(impersonation.access_token, "https://marketplace-api-staging.azurewebsites.net");
+			await CreateWebhooks(impersonation.access_token, seed.ApiUrl);
 			await CreateMarketPlaceRoles(impersonation.access_token);
 			await CreateBuyers(user, impersonation.access_token);
 			await CreateSuppliers(user, impersonation.access_token);
 			await CreateXPIndices(impersonation.access_token);
 			await CreateIncrementors(impersonation.access_token);
+			await CreateAndAssignIntegrationEvent(seed.ApiUrl, impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
 			return impersonation;
 		}
@@ -88,6 +92,7 @@ namespace Marketplace.Common.Commands
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.VendorLevel" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "OrderType" },       
 			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },       
 		};
 
@@ -157,6 +162,22 @@ namespace Marketplace.Common.Commands
 				webhook.HashKey = _settings.OrderCloudSettings.WebhookHashKey;
 				await _oc.Webhooks.CreateAsync(webhook, accessToken);
 			}
+		}
+
+		private async Task CreateAndAssignIntegrationEvent(string apiUrl, string token)
+		{
+			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
+			{
+				ElevatedRoles = new List<ApiRole>( ) { ApiRole.FullAccess },
+				ID = "freightpopshipping",
+				EventType = IntegrationEventType.OrderCheckout,
+				CustomImplementationUrl = apiUrl,
+				Name = "FreightPOP Shipping",
+				HashKey = _settings.OrderCloudSettings.WebhookHashKey
+			}, token);
+			var apiClients = await _oc.ApiClients.ListAsync(accessToken: token);
+			var buyerAppApiClientID = apiClients.Items.First(a => a.AppName.Contains("Buyer")).ID;
+			await _oc.ApiClients.PatchAsync(buyerAppApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" });
 		}
 
 		private async Task<AdminCompany> CreateOrganization(string token)

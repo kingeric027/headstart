@@ -12,6 +12,7 @@ namespace Marketplace.Common.Services
     public interface IOrderCloudSandboxService
     {
         Task<OrderWorksheet> GetOrderWorksheetAsync(OrderDirection orderDirection, string orderID);
+        Task CreateIntegrationEvent(IntegrationEvent integrationEvent, string token = "");
     }
     public class OrderCloudSandboxService : IOrderCloudSandboxService
     {
@@ -43,11 +44,11 @@ namespace Marketplace.Common.Services
         }
 
 
-		public async Task<OrderWorksheet> GetOrderWorksheetAsync(OrderDirection orderDirection, string orderID)
+		public async Task<MarketplaceOrderWorksheet> GetOrderWorksheetAsync(OrderDirection orderDirection, string orderID)
 		{
 			await AuthenticateAync();
             return await _flurl.Request($"{_settings.OrderCloudSettings.ApiUrl}/v1/orders/{orderDirection}/{orderID}/worksheet")
-                .WithHeader("Authorization", $"Bearer {accessToken}").GetAsync().ReceiveJson<OrderWorksheet>();
+                .WithHeader("Authorization", $"Bearer {accessToken}").GetAsync().ReceiveJson<MarketplaceOrderWorksheet>();
 		}
-	}
+    }
 }
