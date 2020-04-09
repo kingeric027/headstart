@@ -30,9 +30,15 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 	}
 
 	// should be able to remove with sdk update
-	public class OrderCalculatePayload<TOrderWorksheet>
+	public class OrderCalculatePayload<TOrderWorksheet> : OrderCalculatePayload
 	{
-		public TOrderWorksheet OrderWorksheet { get; set; }
+		public new TOrderWorksheet OrderWorksheet { get; set; }
+	}
+
+	// should be able to remove with sdk update
+	public class OrderCalculatePayload
+	{
+		public OrderWorksheet OrderWorksheet { get; set; }
 		public JRaw ConfigData { get; set; }
 	}
 }
