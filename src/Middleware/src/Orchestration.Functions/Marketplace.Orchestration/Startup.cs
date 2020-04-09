@@ -1,20 +1,14 @@
 ﻿using System;
-using Cosmonaut;
-using Cosmonaut.Extensions.Microsoft.DependencyInjection;
 using Flurl.Http;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
-using Marketplace.Common.Services.DevCenter;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Helpers.Models;
 using Marketplace.Orchestration;
-using Microsoft.Azure.Documents.Client;
-using Microsoft.Extensions.DependencyInjection;
 using OrderCloud.SDK;
 using Marketplace.Common.Services.FreightPop;
 
@@ -27,14 +21,11 @@ namespace Marketplace.Orchestration
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.InjectAzureFunctionSettings<AppSettings>();
-
-            // needs improvement through helper library
-            var settings = new AppSettings();
-            builder.GetCurrentConfiguration().GetSection("AppSettings").Bind(settings);
-            var c = new CosmosConfig(settings.CosmosSettings.DatabaseName, settings.CosmosSettings.EndpointUri, settings.CosmosSettings.PrimaryKey);
-            // end needs improvement
-
+            var connectionString = Environment.GetEnvironmentVariable("APP_CONFIG_CONNECTION");
+            var settings = builder
+                .InjectAzureFunctionSettings<AppSettings>(connectionString)
+                .BindSettings<AppSettings>();
+            
             builder.Services
                 .Inject<IFlurlClient>()
                 .Inject<IFreightPopService>()
@@ -42,7 +33,10 @@ namespace Marketplace.Orchestration
                 .Inject<IOrchestrationCommand>()
                 .Inject<IOrderOrchestrationCommand>()
                 .Inject<ISyncCommand>()
-                .InjectCosmosStore<LogQuery, OrchestrationLog>(c);
+                .InjectCosmosStore<LogQuery, OrchestrationLog>(new CosmosConfig(
+                        settings.CosmosSettings.DatabaseName, 
+                        settings.CosmosSettings.EndpointUri, 
+                        settings.CosmosSettings.PrimaryKey));
         }
     }
 }
