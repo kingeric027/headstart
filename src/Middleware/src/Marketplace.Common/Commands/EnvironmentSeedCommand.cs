@@ -21,7 +21,6 @@ namespace Marketplace.Common.Commands
 	public class EnvironmentSeedCommand : IEnvironmentSeedCommand
 	{
 		private readonly IOrderCloudClient _oc;
-		private readonly IOrderCloudSandboxService _ocSandbox;
 		private readonly AppSettings _settings;
 		private readonly IDevCenterService _dev;
 		private EnvironmentSeed _seed;

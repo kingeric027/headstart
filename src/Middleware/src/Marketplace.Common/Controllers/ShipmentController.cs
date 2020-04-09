@@ -17,8 +17,7 @@ namespace Marketplace.Common.Controllers
     {
         
         private readonly IShipmentCommand _command;
-        private readonly IOrderCloudClient _oc;
-        public ShipmentController(IShipmentCommand command, IOrderCloudClient oc, AppSettings settings) : base(settings)
+        public ShipmentController(IShipmentCommand command, AppSettings settings) : base(settings)
         {
             _command = command;
         }
