@@ -11,9 +11,10 @@ using Lookup = SmartyStreets.USStreetApi.Lookup;
 
 namespace Marketplace.Common.Services.SmartyStreets.Mappers
 {
-	public static class SmartyStreetMapper
+	// TODO - exact same logic as BuyerAddressMapper - any way to merge?
+	public static class AddressMapper
 	{
-		public static Lookup MapToUSStreetLookup(BridgeAddress address)
+		public static Lookup MapToUSStreetLookup(Address address)
 		{
 			var lookup = new Lookup()
 			{
@@ -28,10 +29,10 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 			return lookup;
 		}
 
-		public static List<BridgeAddress> Map(AutoCompleteResponse repsonse, BridgeAddress raw)
+		public static List<Address> Map(AutoCompleteResponse repsonse, Address raw)
 		{
 			var addresses = repsonse.suggestions.Select(suggestion => {
-				var rawCopy = JsonConvert.DeserializeObject<BridgeAddress>(JsonConvert.SerializeObject(raw));
+				var rawCopy = JsonConvert.DeserializeObject<Address>(JsonConvert.SerializeObject(raw));
 				rawCopy.Street1 = suggestion.street_line;
 				rawCopy.Street2 = suggestion.secondary;
 				rawCopy.City = suggestion.city;
@@ -42,10 +43,10 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 			return addresses;
 		}
 
-		public static BridgeAddress Map(Candidate candidate, BridgeAddress raw)
+		public static Address Map(Candidate candidate, Address raw)
 		{
 			// break reference which was causing pass by reference error
-			var rawCopy = JsonConvert.DeserializeObject<BridgeAddress>(JsonConvert.SerializeObject(raw));
+			var rawCopy = JsonConvert.DeserializeObject<Address>(JsonConvert.SerializeObject(raw));
 			rawCopy.Street1 = candidate.DeliveryLine1;
 			rawCopy.Street2 = candidate.DeliveryLine2;
 			rawCopy.City = candidate.Components.CityName;
@@ -53,21 +54,5 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 			rawCopy.Zip = $"{candidate.Components.ZipCode}-{candidate.Components.Plus4Code}";
 			return rawCopy;
 		}
-	}
-
-	public class BridgeAddress
-	{
-		public string Phone { get; set; }
-		public string Country { get; set; }
-		public string Zip { get; set; }
-		public string State { get; set; }
-		public string City { get; set; }
-		public string Street2 { get; set; }
-		public string Street1 { get; set; }
-		public string LastName { get; set; }
-		public string FirstName { get; set; }
-		public string CompanyName { get; set; }
-		public string AddressName { get; set; }
-		public dynamic xp { get; set; }
 	}
 }

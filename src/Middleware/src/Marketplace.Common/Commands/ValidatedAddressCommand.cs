@@ -13,8 +13,8 @@ namespace Marketplace.Common.Commands
 {
     public interface IValidatedAddressCommand
     {
-		Task<AddressValidation> ValidateAddress(Address address);
-		Task<BuyerAddressValidation> ValidateAddress(BuyerAddress address);
+		Task<AddressValidation<Address>> ValidateAddress(Address address);
+		Task<AddressValidation<BuyerAddress>> ValidateAddress(BuyerAddress address);
 		Task<Address> GetPatchedAdminAddress(string addressID, Address patch, string token);
 		Task<Address> GetPatchedSupplierAddress(string supplierID, string addressID, Address patch, string token);
 		Task<Address> GetPatchedBuyerAddress(string buyerID, string addressID, Address patch, string token);
@@ -31,17 +31,17 @@ namespace Marketplace.Common.Commands
 			_smartyStreets = smartyStreets;
 		}
 
-		public async Task<AddressValidation> ValidateAddress(Address address)
+		public async Task<AddressValidation<Address>> ValidateAddress(Address address)
 		{
 			var validation = await _smartyStreets.ValidateAddress(address);
 			if (!validation.ValidAddressFound) throw new InvalidAddressException(validation);
 			return validation;
 		}
 
-		public async Task<BuyerAddressValidation> ValidateAddress(BuyerAddress address)
+		public async Task<AddressValidation<BuyerAddress>> ValidateAddress(BuyerAddress address)
 		{
 			var validation = await _smartyStreets.ValidateAddress(address);
-			if (!validation.ValidAddressFound) throw new InvalidAddressException(validation);
+			if (!validation.ValidAddressFound) throw new InvalidBuyerAddressException(validation);
 			return validation;
 		}
 

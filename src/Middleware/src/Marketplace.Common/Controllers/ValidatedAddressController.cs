@@ -115,7 +115,6 @@ namespace Marketplace.Common.Controllers
 		}
 
 		// ORDER endpoints
-
 		[HttpPut, Route("order/{direction}/{orderID}/billto"), MarketplaceUserAuth(ApiRole.Shopper, ApiRole.OrderAdmin)]
 		public async Task<Order> SetBillingAddress(OrderDirection direction, string orderID, [FromBody] PartialAddress address)
 		{

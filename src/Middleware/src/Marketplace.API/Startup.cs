@@ -59,7 +59,7 @@ namespace Marketplace.API
                 .Inject<IOrchestrationLogCommand>()
                 .Inject<IOCShippingIntegration>()
                 .Inject<IShipmentCommand>()
-                .Inject<IAddressValidationCommand>()
+                .Inject<IValidatedAddressCommand>()
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IOrderCloudSandboxService>()
                 .Inject<IMarketplaceProductCommand>()
