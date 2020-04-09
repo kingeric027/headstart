@@ -23,7 +23,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 	public class OrderWorksheet
 	{
 		public MarketplaceOrder Order { get; set; }
-		public List<MarketplaceLineItem> LineItems { get; set; }
+		public IList<MarketplaceLineItem> LineItems { get; set; }
 		public ShipEstimateResponse ShipEstimateResponse { get; set; }
 		public OrderCalculateResponse OrderCalculateResponse { get; set; }
 	}

@@ -59,14 +59,14 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("orderapproved")]
         [OrderCloudWebhookAuth]
-        public async void HandleOrderApproved([FromBody] WebhookPayloads.Orders.Approve payload)
+        public async void HandleOrderApproved([FromBody] MarketplaceOrderApprovePayload payload)
         {
             await _sendgridService.SendOrderApprovedEmail(payload);
         }
 
         [HttpPost, Route("orderdeclined")]
         [OrderCloudWebhookAuth]
-        public async void HandleOrderDeclined([FromBody] WebhookPayloads.Orders.Decline payload)
+        public async void HandleOrderDeclined([FromBody] MarketplaceOrderDeclinePayload payload)
         {
             await _sendgridService.SendOrderDeclinedEmail(payload);
         }
@@ -101,7 +101,7 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("orderupdated")]
         [OrderCloudWebhookAuth]
-        public async void HandleOrderUpdated([FromBody] WebhookPayloads.Orders.Patch payload)
+        public async void HandleOrderUpdated([FromBody] MarketplaceOrderPatchPayload payload)
         {
             await _sendgridService.SendOrderUpdatedEmail(payload);
         }
