@@ -1,10 +1,12 @@
 ﻿using Marketplace.Helpers.Attributes;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
+using System.Collections.Generic;
 
 namespace Marketplace.Models.Misc
 {
     [SwaggerModel]
-	public class MessageNotification
+	public class MessageNotification<EventBodyType>
 	{
 		public string BuyerID { get; set; }
 		public string UserToken { get; set; }
@@ -12,7 +14,7 @@ namespace Marketplace.Models.Misc
 		public MessageType MessageType { get; set; }
 		public string[] CCRecipient { get; set; }
 		public MessageConfigData ConfigData { get; set; }
-		public MessageEventBody EventBody { get; set; }
+		public EventBodyType EventBody { get; set; }
 	}
 
 	public enum MessageType
@@ -29,7 +31,14 @@ namespace Marketplace.Models.Misc
         NewUserInvitation
     }
 
-    public class MessageEventBody
+    public class OrderSubmitEventBody
+    {
+        public MarketplaceOrder Order { get; set; }
+        public List<OrderApproval> Approvals { get; set; }
+        public List<MarketplaceLineItem> LineItems { get; set; }
+        public List<MarketplaceProduct> Products { get; set; }
+    }
+    public class PasswordResetEventBody
     {
         public string Username { get; set; }
         public string PasswordRenewalAccessToken { get; set; }
