@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { OcSupplierAddressService, Address, ListAddress } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
+import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -31,8 +32,23 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
     const newID = this.getIncrementedID(parentResourceID, existingAddresses);
     resource.ID = newID;
 
-    const newResource = await this.ocService.Create(...this.createListArgs([resource])).toPromise();
+    const newResource = await MarketplaceSDK.ValidatedAddresses.CreateSupplierAddress(
+      this.getParentResourceID(),
+      resource
+    );
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
+    this.resourceSubject.next(this.resourceSubject.value);
+    return newResource;
+  }
+
+  async updateResource(originalID: string, resource: any): Promise<any> {
+    const newResource = await MarketplaceSDK.ValidatedAddresses.SaveSupplierAddress(
+      this.getParentResourceID(),
+      originalID,
+      resource
+    );
+    const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
+    this.resourceSubject.value.Items[resourceIndex] = newResource;
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;
   }
