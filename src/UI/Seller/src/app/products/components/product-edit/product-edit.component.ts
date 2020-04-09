@@ -88,7 +88,7 @@ export class ProductEditComponent implements OnInit {
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
@@ -99,12 +99,14 @@ export class ProductEditComponent implements OnInit {
 
   async getAddresses(): Promise<void> {
     const context: UserContext = await this.currentUserService.getUserContext();
-    context.Me.Supplier
-      ? (this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise())
-      : (this.addresses = await this.ocAdminAddressService.List().toPromise());
+    if(context.Me.Supplier) {
+      this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise();
+    } else {
+      this.addresses = await this.ocAdminAddressService.List().toPromise();
+    }
   }
 
-  async refreshProductData(superProduct: SuperMarketplaceProduct) {
+  async refreshProductData(superProduct: SuperMarketplaceProduct): Promise<void> {
     // copying to break reference bugs
     this._superMarketplaceProductStatic = JSON.parse(JSON.stringify(superProduct));
     this._superMarketplaceProductEditable = JSON.parse(JSON.stringify(superProduct));
@@ -130,7 +132,7 @@ export class ProductEditComponent implements OnInit {
     this.checkForChanges();
   }
 
-  createProductForm(superMarketplaceProduct: SuperMarketplaceProduct) {
+  createProductForm(superMarketplaceProduct: SuperMarketplaceProduct): void {
     if (superMarketplaceProduct.Product) {
       this.productForm = new FormGroup({
         Active: new FormControl(superMarketplaceProduct.Product.Active),
@@ -159,7 +161,7 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
-  async handleSave() {
+  async handleSave(): Promise<void> {
     if (this.isCreatingNew) {
       await this.createNewProduct();
     } else {
@@ -167,7 +169,7 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
-  async handleDelete($event): Promise<void> {
+  async handleDelete(): Promise<void> {
     await MarketplaceSDK.Products.Delete(this._superMarketplaceProductStatic.Product.ID);
     this.router.navigateByUrl('/products');
   }
@@ -179,7 +181,7 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(this._superMarketplaceProductStatic);
   }
 
-  async createNewProduct() {
+  async createNewProduct(): Promise<void> {
     try {
       this.dataIsSaving = true;
       const superProduct = await this.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
@@ -196,7 +198,7 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
-  async updateProduct() {
+  async updateProduct(): Promise<void> {
     try {
       this.dataIsSaving = true;
       const superProduct = await this.updateMarketplaceProduct(this._superMarketplaceProductEditable);
@@ -212,13 +214,13 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
-  updateProductResource(productUpdate: any) {
+  updateProductResource(productUpdate: any): void {
     const resourceToUpdate = this._superMarketplaceProductEditable || this.productService.emptyResource;
     this._superMarketplaceProductEditable = this.productService.getUpdatedEditableResource(productUpdate, resourceToUpdate);
     this.checkForChanges();
   }
 
-  handleUpdateProduct(event: any, field: string, typeOfValue?: string) {
+  handleUpdateProduct(event: any, field: string, typeOfValue?: string): void {
     const productUpdate = {
       field,
       value:
@@ -229,7 +231,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
-  updateResourceFromFieldValue(field: string, value: any) {
+  updateResourceFromFieldValue(field: string, value: any): void{
     const updateProductResourceCopy = this.productService.copyResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
     );
@@ -269,12 +271,12 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
-  stageImages(files: FileHandle[]) {
+  stageImages(files: FileHandle[]): void {
     this.imageFiles = this.imageFiles.concat(files);
     this.checkForChanges();
   }
 
-  async addDocuments(files: FileHandle[], productID: string) {
+  async addDocuments(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
       superProduct = await this.middleware.uploadStaticContent(file.File, productID, file.Filename);
@@ -285,7 +287,7 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(superProduct);
   }
 
-  async addImages(files: FileHandle[], productID: string) {
+  async addImages(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
       superProduct = await this.middleware.uploadProductImage(file.File, productID);
@@ -296,7 +298,7 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(superProduct);
   }
 
-  async removeFile(fileDetail: string, fileType: string) {
+  async removeFile(fileDetail: string, fileType: string): Promise<void> {
     // fileDetail for an image is the image URL. For static content, it is the file
     const prodID = this._superMarketplaceProductStatic.Product.ID;
     let superProduct;
@@ -310,9 +312,12 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(superProduct);
   }
 
-  unstageFile(index: number, fileType: string) {
-    fileType === 'image' ?
-      this.imageFiles.splice(index, 1) : this.staticContentFiles.splice(index, 1);
+  unstageFile(index: number, fileType: string): void {
+    if(fileType === 'image') {
+      this.imageFiles.splice(index, 1)
+    } else {
+      this.staticContentFiles.splice(index, 1);
+    }
     this.checkForChanges();
   }
 
@@ -321,18 +326,18 @@ export class ProductEditComponent implements OnInit {
    * ******************************************/
 
   /* This url points to the document in blob storage in order for it to be downloadable. */
-  getDocumentUrl(url: string) {
+  getDocumentUrl(url: string): string {
     const spliturl = url.split('/')
     spliturl.splice(4, 1);
     const str = spliturl.join('/')
     return str;
   }
 
-  getDocumentName(event: KeyboardEvent) {
+  getDocumentName(event: KeyboardEvent): void {
     this.documentName = (event.target as HTMLInputElement).value;
   }
 
-  stageDocuments(files: FileHandle[]) {
+  stageDocuments(files: FileHandle[]): void {
     files.forEach(file => {
       const fileName = file.File.name.split('.');
       const ext = fileName[1];
@@ -343,8 +348,8 @@ export class ProductEditComponent implements OnInit {
     this.checkForChanges();
   }
 
-  async open(content) {
-    await this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
+  open(content): void {
+    this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
   }
 
   async handleTaxCodeCategorySelection(event): Promise<void> {
@@ -367,14 +372,14 @@ export class ProductEditComponent implements OnInit {
     this.handleUpdateProduct({ target: { value: null } }, 'Product.xp.Tax.Description');
   }
 
-  async searchTaxCodes(searchTerm: string) {
+  async searchTaxCodes(searchTerm: string): Promise<void> {
     if (searchTerm === undefined) searchTerm = '';
     const taxCodeCategory = this._superMarketplaceProductEditable.Product.xp.Tax.Category;
     const avalaraTaxCodes = await this.listTaxCodes(taxCodeCategory, searchTerm, 1, 100);
     this.taxCodes = avalaraTaxCodes;
   }
 
-  async handleScrollEnd(searchTerm: string) {
+  async handleScrollEnd(searchTerm: string): Promise<void> {
     if (searchTerm === undefined) searchTerm = '';
     const totalPages = this.taxCodes.Meta.TotalPages;
     const nextPageNumber = this.taxCodes.Meta.Page + 1;
@@ -393,7 +398,7 @@ export class ProductEditComponent implements OnInit {
     return this.productService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew)
   }
 
-  private async createNewSuperMarketplaceProduct(
+  async createNewSuperMarketplaceProduct(
     superMarketplaceProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
     superMarketplaceProduct.Product.xp.Status = 'Draft';
@@ -401,18 +406,18 @@ export class ProductEditComponent implements OnInit {
     return await MarketplaceSDK.Products.Post(superMarketplaceProduct);
   }
 
-  private async updateMarketplaceProduct(superMarketplaceProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
+  async updateMarketplaceProduct(superMarketplaceProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
     // TODO: Temporary while Product set doesn't reflect the current strongly typed Xp
     superMarketplaceProduct.Product.xp.Status = 'Draft';
     return await MarketplaceSDK.Products.Put(superMarketplaceProduct.Product.ID, superMarketplaceProduct);
   };
 
-  private async handleSelectedProductChange(product: Product): Promise<void> {
+  async handleSelectedProductChange(product: Product): Promise<void> {
     const marketplaceProduct = await MarketplaceSDK.Products.Get(product.ID);
     this.refreshProductData(marketplaceProduct);
   }
 
-  private async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
+  async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
     return await MarketplaceSDK.Avalaras.ListTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
   }
 
