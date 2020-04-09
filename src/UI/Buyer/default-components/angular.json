@@ -35,11 +35,11 @@
             "scripts": []
           },
           "configurations": {
-            "qa": {
+            "test": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.qa.ts"
+                  "with": "src/environments/environment.test.ts"
                 }
               ],
               "optimization": true,
@@ -62,11 +62,11 @@
                 }
               ]
             },
-            "demo": {
+            "staging": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.demo.ts"
+                  "with": "src/environments/environment.staging.ts"
                 }
               ],
               "optimization": true,
@@ -101,11 +101,11 @@
             }
           },
           "configurations": {
-            "qa": {
-              "browserTarget": "default-components:build:qa"
+            "test": {
+              "browserTarget": "default-components:build:test"
             },
-            "demo": {
-              "browserTarget": "default-components:build:demo"
+            "staging": {
+              "browserTarget": "default-components:build:staging"
             }
           }
         },
@@ -153,15 +153,16 @@
             "devServerTarget": "default-components:serve"
           },
           "configurations": {
-            "qa": {
-              "devServerTarget": "default-components:serve:qa"
+            "test": {
+              "devServerTarget": "default-components:serve:test"
             },
-            "demo": {
-              "devServerTarget": "default-components:serve:demo"
+            "staging": {
+              "devServerTarget": "default-components:serve:staging"
             }
           }
         }
       }
-    }},
+    }
+  },
   "defaultProject": "default-components"
 }

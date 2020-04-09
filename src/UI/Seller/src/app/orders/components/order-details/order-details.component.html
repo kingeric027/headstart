@@ -1,5 +1,5 @@
 <!-- TODO: Componentize into smaller chunks (Order Details, Address, Payment, Line Item) -->
-<div class="container float-left">
+<div class="container float-left order-detail-pdf-range">
   <div *ngIf="_order">
     <div class="pb-2 mt-4 mb-2">
       <h2> <span class="text-muted">Order #:</span> {{_order.ID}}<span *ngIf="_order?.xp?.OrderType === 'Quote'"
@@ -7,6 +7,9 @@
       <button *ngIf="_order?.xp?.OrderType === 'Quote' && _order?.Status !== 'Completed'"
               class="btn btn-outline-primary float-right"
               (click)="setOrderStatus()">Acknowledge Quote</button>
+              <button *ngIf="_order?.xp?.OrderType !== 'Quote' && orderDirection === 'Incoming'"
+                      class="btn btn-outline-primary float-right d-print-none"
+                      (click)="createAndSavePDF()"><fa-icon [icon]="faDownload"></fa-icon> Download Order Invoice PDF</button>
     </div>
     <div class="row">
       <div class="col-md-6">
@@ -99,7 +102,11 @@
         </div>
       </div>
     </div>
-    <div *ngIf="_liGroupedByShipFrom?.length > 0">
+    <app-order-shipments (createOrViewShipmentEvent)="toggleCreateShipment($event)"
+                         [order]="_order">
+
+    </app-order-shipments>
+    <div *ngIf="_liGroupedByShipFrom?.length > 0 && !createShipment">
       <div class="card border shadow-sm mb-4"
            *ngFor="let liGroup of _liGroupedByShipFrom">
         <div class="card-header p-3">
@@ -145,7 +152,8 @@
                     <img [id]="i"
                          [src]="getImageUrl(li)"
                          width="auto"
-                         height="100px">
+                         height="100px"
+                         class="d-print-none">
                   </div>
                   <div class="col-9">
                     <h6>

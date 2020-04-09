@@ -14,15 +14,23 @@ export const ocAppConfig: AppConfig = {
   orderCloudApiVersion: environment.orderCloudApiVersion,
   anonymousShoppingEnabled: false,
   cardConnectMerchantID: '840000000052', // TODO - look for somewhere else to put this.
+  avalaraCompanyId: 280411,
   scope: [
     'MeAddressAdmin',
+    'AddressAdmin', // Only for location owners
     'MeAdmin',
     'MeCreditCardAdmin',
     'MeXpAdmin',
+    'MPApprovalRuleAdmin',
+    'UserGroupAdmin',
+    'MPNeedsApproval',
+    'MPOrderApprover',
+    'ApprovalRuleAdmin',
     'Shopper',
+    'BuyerUserAdmin',
     'BuyerReader',
     'PasswordReset',
     'SupplierReader',
     'SupplierAddressReader',
-  ]
+  ],
 };

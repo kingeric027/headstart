@@ -75,25 +75,12 @@
                aria-labelledby="account-dropdown"
                ngbDropdownMenu>
             <h6 class="dropdown-header">Hi, {{ user?.FirstName }}!</h6>
-
-            <a class="nav-item dropdown-item cursor-pointer"
-               [ngClass]="{'active': activePath === '/profile/details'}"
-               (click)="context.router.toMyProfile()">My Profile</a>
-            <a class="nav-item dropdown-item cursor-pointer"
-               [ngClass]="{'active': activePath === '/profile/addresses'}"
-               (click)="context.router.toMyAddresses()">My Address Book</a>
-            <a class="nav-item dropdown-item cursor-pointer"
-               [ngClass]="{'active': activePath === '/profile/locations'}"
-               (click)="context.router.toMyLocations()">My Locations</a>
-            <a class="nav-item dropdown-item cursor-pointer"
-               [ngClass]="{'active': activePath === '/profile/payment-methods'}"
-               (click)="context.router.toMyPaymentMethods()">Payment Methods</a>
-            <a class="nav-item dropdown-item cursor-pointer"
-               [ngClass]="{'active': activePath === '/profile/orders'}"
-               (click)="context.router.toMyOrders()">My Orders</a>
-            <a class="nav-item dropdown-item cursor-pointer"
-               [ngClass]="{'active': activePath === '/profile/orders/approval'}"
-               (click)="context.router.toOrdersToApprove()">Orders To Approve</a>
+            <span *ngFor="let profileSection of profileSections">
+              <a *ngIf="profileSection.showInDropdown"
+                 class="nav-item dropdown-item cursor-pointer"
+                 [ngClass]="{'active': activePath === profileSection.url}"
+                 (click)="context.router[profileSection.routerCall]()">{{profileSection.displayText}}</a>
+            </span>
             <div class="dropdown-divider"></div>
             <a class="nav-item dropdown-item cursor-pointer"
                (click)="logout()"

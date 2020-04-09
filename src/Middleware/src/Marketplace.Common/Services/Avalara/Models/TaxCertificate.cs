@@ -3,6 +3,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Models.Misc
 {
+	[SwaggerModel]
 	public class TaxCertificate
 	{
 		[ApiReadOnly]

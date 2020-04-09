@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ListBuyerCreditCard, CreditCardPayment } from 'marketplace';
+import { ListBuyerCreditCard } from 'marketplace';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { CreditCardFormOutput } from '../credit-card-form/credit-card-form.component';
+import { SelectedCreditCard } from '../../checkout/checkout-payment/checkout-payment.component';
 
 @Component({
   templateUrl: './payment-credit-card.component.html',
@@ -11,7 +12,7 @@ export class OCMPaymentCreditCard implements OnInit {
   showNewCCForm = false;
 
   @Input() cards: ListBuyerCreditCard;
-  @Output() cardSelected = new EventEmitter<CreditCardPayment>();
+  @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
   form = new FormGroup({
     cardID: new FormControl(null, Validators.required),
     cvv: new FormControl('', Validators.required),

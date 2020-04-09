@@ -10,14 +10,23 @@ import {
   BuyerProduct,
   Supplier,
   Address,
-  BuyerCreditCard,
   ListBuyerProduct,
+  ListAddress,
+  ListBuyerCreditCard,
+  BuyerCreditCard,
 } from '@ordercloud/angular-sdk';
-import { ProductXp, CreditCardToken } from 'marketplace-javascript-sdk';
+import {
+  ProductXp,
+  CreditCardToken,
+  BuyerAddressXP,
+  MarketplaceAddressBuyer,
+  TaxCertificate,
+} from 'marketplace-javascript-sdk';
 
 export * from '@ordercloud/angular-sdk';
 export * from './services/shopper-context/shopper-context.service';
 export * from '../../src/lib/services/ordercloud-sandbox/ordercloud-sandbox.models';
+export { CreditCardPayment } from 'marketplace-javascript-sdk';
 
 export interface LineItemGroupSupplier {
   supplier: Supplier;
@@ -44,12 +53,11 @@ export interface ShippingRate {
   TotalCost: number;
 }
 
-export interface MarketplaceOrder extends Order<OrderXp, any, any> { }
+export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
 export interface OrderXp {
-  BuyerLocationID: string;
-  AvalaraTaxTransactionCode: string;
-  OrderType: OrderType;
-  QuoteOrderInfo: QuoteOrderInfo;
+  AvalaraTaxTransactionCode?: string;
+  OrderType?: OrderType;
+  QuoteOrderInfo?: QuoteOrderInfo;
 }
 
 export enum OrderType {
@@ -97,12 +105,17 @@ export enum OrderAddressType {
 
 export enum OrderStatus {
   AllSubmitted = '!Unsubmitted',
-  Unsubmitted = 'Unsubmitted',
   AwaitingApproval = 'AwaitingApproval',
-  Declined = 'Declined',
+  ChangesRequested = 'ChangesRequested',
   Open = 'Open',
   Completed = 'Completed',
   Canceled = 'Canceled',
+}
+
+export enum OrderContext {
+  Submitted = 'Submitted',
+  Approve = 'Approve',
+  GetApproval = 'GetApproval',
 }
 
 export interface CreditCard {
@@ -179,6 +192,7 @@ export class AppConfig {
   orderCloudApiUrl: string;
   orderCloudAuthUrl: string;
   orderCloudApiVersion: string;
+  avalaraCompanyId: number;
   middlewareUrl: string;
   /**
    * base path to CMS resources
@@ -195,12 +209,6 @@ export class AppConfig {
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
   scope: string[];
-}
-
-export interface CreditCardPayment {
-  SavedCard?: BuyerCreditCard;
-  NewCard?: CreditCardToken;
-  CVV: string;
 }
 
 export interface DecodedOCToken {
@@ -257,8 +265,23 @@ export interface DecodedOCToken {
   orderid?: string;
 }
 
+export interface BuyerLocationWithCert {
+  location?: MarketplaceAddressBuyer;
+  certificate?: TaxCertificate;
+}
+
 // Product Model
 // a corresponding model in the C# product
 export type ListMarketplaceMeProduct = ListBuyerProduct<ProductXp>;
 
 export type MarketplaceMeProduct = BuyerProduct<ProductXp>;
+
+export type ListMarketplaceAddressBuyer = ListAddress<BuyerAddressXP>;
+
+export type ListMarketplaceBuyerCreditCard = ListBuyerCreditCard<CreditCardXP>;
+
+export type MarketplaceBuyerCreditCard = BuyerCreditCard<CreditCardXP>;
+
+export interface CreditCardXP {
+  CCBillingAddress: Address;
+}

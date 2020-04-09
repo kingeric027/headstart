@@ -14,14 +14,15 @@ namespace Marketplace.Models
     {
     }
 
-    [SwaggerModel]
-    public class BuyerAddressXP
-    { 
-        public List<DestinationAddressAccessorial> Accessorials { get; set; }
-        public string Email { get; set; }
+	[SwaggerModel]
+	public class BuyerAddressXP
+	{
+		public List<DestinationAddressAccessorial> Accessorials { get; set; }
+		public string Email { get; set; }
 		public Coordinates Coordinates;
-		public int AvalaraCertificateID { get; set; } // null if no certificate
-    }
+		public int? AvalaraCertificateID { get; set; } // default value is null if no certificate
+		public DateTimeOffset? AvalaraCertificateExpiration { get; set; } // default value is null if no certificate 
+	}
 
     public enum DestinationAddressAccessorial
     {

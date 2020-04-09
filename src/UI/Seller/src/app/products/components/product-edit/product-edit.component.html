@@ -191,11 +191,15 @@
         </div>
       </div>
     </div>
-    <!-- /Product Details -->
+
+    <product-filters-component (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
+                               [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []"></product-filters-component>
+
     <!-- Product Variations -->
     <product-variations-component [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
                                   [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
                                   [areChanges]="areChanges"
+                                  [isCreatingNew]="isCreatingNew"
                                   [checkForChanges]="checkForChanges"
                                   [copyProductResource]="copyProductResource"
                                   (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
@@ -350,6 +354,7 @@
         </div>
       </div>
     </div>
+    <!-- /Product Images -->
     <!-- Product Documents -->
     <div class="row pt-3 mt-5 border-top">
       <div class="col-md-5">

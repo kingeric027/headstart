@@ -20,7 +20,7 @@ import { ProfileWrapperComponent } from './wrapper-components/profile-wrapper.co
 import { RegisterWrapperComponent } from './wrapper-components/register-wrapper.component';
 import { ResetPasswordWrapperComponent } from './wrapper-components/reset-password-wrapper.component';
 import { FeaturedProductsResolver } from './resolves/features-products.resolve';
-import { MeListBuyerAddressResolver } from './resolves/me.resolve';
+import { MeListAddressResolver, MeListBuyerLocationResolver } from './resolves/me.resolve';
 import { MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
 import { AuthService } from './services/auth/auth.service';
 import { CurrentUserService } from './services/current-user/current-user.service';
@@ -42,13 +42,15 @@ import { CheckoutService } from './services/order/checkout.service';
 import { OrderStateService } from './services/order/order-state.service';
 import { Configuration } from 'marketplace-javascript-sdk';
 import { AppConfig } from './shopper-context';
+import { UserManagementWrapperComponent } from './wrapper-components/user-management-wrapper.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [MarketplaceRoutingModule, CommonModule],
   providers: [
     FeaturedProductsResolver,
-    MeListBuyerAddressResolver,
+    MeListAddressResolver,
+    MeListBuyerLocationResolver,
     MeProductResolver,
     MeListSpecsResolver,
     MeListRelatedProductsResolver,
@@ -82,6 +84,7 @@ import { AppConfig } from './shopper-context';
     ProductListWrapperComponent,
     ProfileWrapperComponent,
     RegisterWrapperComponent,
+    UserManagementWrapperComponent,
     ResetPasswordWrapperComponent,
     OrderDetailWrapperComponent,
     OrderShipmentsWrapperComponent,

@@ -15,7 +15,7 @@ import { MarketplaceModule, AppConfig } from 'marketplace';
 import { createCustomElement } from '@angular/elements';
 import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
-import { OrderCloudModule, Configuration } from '@ordercloud/angular-sdk';
+import { OrderCloudModule } from '@ordercloud/angular-sdk';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -71,6 +71,7 @@ import { OCMProfile } from './components/profile/profile/profile.component';
 import { OCMProfileNav } from './components/profile/profile-nav/profile-nav.component';
 import { OCMAppFooter } from './components/layout/app-footer/app-footer.component';
 import { OCMOrderDetails } from './components/orders/order-detail/order-detail.component';
+import { OCMUserManagement } from './components/users/user-management/user-management.component';
 import { OCMPaymentMethodManagement } from './components/payments/payment-method-management/payment-method-management.component';
 import { OCMCheckoutPayment } from './components/checkout/checkout-payment/checkout-payment.component';
 import { OCMCheckoutAddress } from './components/checkout/checkout-address/checkout-address.component';
@@ -121,6 +122,8 @@ import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.co
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
 import { OCMQuoteRequestForm } from './components/products/quote-request-form/quote-request-form.component';
 import { UnitOfMeasurePipe } from './pipes/unit-of-measure.pipe';
+import { OCMLocationDetails } from './components/profile/location-details/location-details.component';
+import { OCMCertificateForm } from './components/profile/certificate-form/certificate-form.component';
 
 const components = [
   OCMCategoryDropdown,
@@ -179,6 +182,7 @@ const components = [
   OCMOrderShipments,
   OCMOrderHistorical,
   OCMOrderHistory,
+  OCMUserManagement,
   OCMAddressSuggestion,
   OCMAppFooter,
   SpecFormCheckboxComponent,
@@ -193,6 +197,8 @@ const components = [
   OCMShippingSelectionForm,
   ConfirmModal,
   OCMPaymentCreditCard,
+  OCMLocationDetails,
+  OCMCertificateForm,
 ];
 
 // @dynamic
@@ -315,9 +321,12 @@ export class AppModule {
     this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
     this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
+    this.buildWebComponent(OCMUserManagement, 'ocm-user-management');
     this.buildWebComponent(OCMAddressSuggestion, 'address-suggestion');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
     this.buildWebComponent(ConfirmModal, 'confirm-modal');
+    this.buildWebComponent(OCMLocationDetails, 'ocm-location-details');
+    this.buildWebComponent(OCMCertificateForm, 'ocm-certificate-form');
   }
 
   buildWebComponent(angularComponent, htmlTagName: string): void {

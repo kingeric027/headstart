@@ -15,6 +15,8 @@ import { takeWhile } from 'rxjs/operators';
 import { ProductFilters, ShopperContextService, MarketplaceOrder } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { CurrentUser } from 'marketplace/projects/marketplace/src/lib/services/current-user/current-user.service';
+import { ProfileSections } from '../../../../../../marketplace/projects/marketplace/src/lib/services/route/profile-routing.config';
+import { ProfileSection } from 'marketplace/projects/marketplace/src/lib/services/route/profile-routing.config';
 
 @Component({
   templateUrl: './app-header.component.html',
@@ -34,6 +36,7 @@ export class OCMAppHeader implements OnInit {
   categories: Category[] = [];
   screenSize = getScreenSizeBreakPoint();
   showCategoryDropdown = false;
+  profileSections: ProfileSection[] = [];
 
   @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
@@ -47,7 +50,9 @@ export class OCMAppHeader implements OnInit {
   faHome = faHome;
   faBars = faBars;
 
-  constructor(public context: ShopperContextService) {}
+  constructor(public context: ShopperContextService) {
+    this.profileSections = context.router.getProfileSections();
+  }
 
   ngOnInit(): void {
     this.screenSize = getScreenSizeBreakPoint();

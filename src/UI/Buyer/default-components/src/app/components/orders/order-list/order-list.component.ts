@@ -2,7 +2,7 @@ import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { ListOrder, Order } from '@ordercloud/angular-sdk';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import { OrderListColumn } from '../../../models/order-list-column';
-import { ShopperContextService, OrderType } from 'marketplace';
+import { ShopperContextService, OrderType, OrderContext } from 'marketplace';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 
 @Component({
@@ -20,7 +20,7 @@ export class OCMOrderList {
   @Output() updatedSort = new EventEmitter<string>();
   @Output() changedPage = new EventEmitter<number>();
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) {}
 
   updateSort(selectedSortBy): void {
     let sortBy;
@@ -51,7 +51,12 @@ export class OCMOrderList {
   }
 
   toOrderDetails(orderID: string): void {
-    this.context.router.toMyOrderDetails(orderID);
+    const url = this.context.router.getActiveUrl();
+    const isOrderToApprove = this.context.router.getOrderContext() === OrderContext.Approve;
+    if (isOrderToApprove) {
+      this.context.router.toOrderToAppoveDetails(orderID);
+    } else {
+      this.context.router.toMyOrderDetails(orderID);
+    }
   }
-
 }

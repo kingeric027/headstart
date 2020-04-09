@@ -23,6 +23,8 @@ namespace Marketplace.Common.Commands
         }
         public async Task<MarketplaceBuyer> Create(MarketplaceBuyer buyer, VerifiedUserContext user, string token)
         {
+            buyer.ID = "{buyerIncrementor}";
+            buyer.Active = true;
             var ocBuyer = await _oc.Buyers.CreateAsync(buyer, token);
             var ocBuyerID = ocBuyer.ID;
 
@@ -35,6 +37,9 @@ namespace Marketplace.Common.Commands
 
             await CreateUserTypeUserGroupsAndSecurityProfileAssignments(token, ocBuyerID);
 
+            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor"});
+            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" });
+
             return buyer;
 
         }
@@ -43,7 +48,7 @@ namespace Marketplace.Common.Commands
         {
             foreach (var userType in SEBUserTypes.Buyer())
             {
-                var userGroupID = $"{buyerID}{userType.UserGroupIDSuffix}";
+                var userGroupID = $"{buyerID}-{userType.UserGroupIDSuffix}";
 
                 await _oc.UserGroups.CreateAsync(buyerID, new UserGroup()
                 {

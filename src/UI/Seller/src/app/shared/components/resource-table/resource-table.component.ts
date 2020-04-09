@@ -337,6 +337,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this._ocService.clearAllFilters();
     this.toDate = '';
     this.fromDate = '';
+    this.filterForm.reset();
   }
 
   getSaveBtnText(): string {

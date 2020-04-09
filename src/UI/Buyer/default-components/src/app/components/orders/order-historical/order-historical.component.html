@@ -10,7 +10,7 @@
                       [address]="lineItems?.Items[0].ShippingAddress"
                       addressTitle="Shipping Address">
     </ocm-address-card>
-    <br/>
+    <br />
     <span>Billing Address</span>
     <ocm-address-card [address]="order.BillingAddress"
                       addressTitle="Billing Address"
@@ -31,8 +31,9 @@
     </div>
     <hr>
     <div class="text-right lead"><b class="float-left">Total:</b><span class="order-total">{{order.Total | currency}}</span></div>
-    <hr>
-    <ocm-payment-list *ngIf="payments"
+    <hr *ngIf="isOrderToApprove"
+    >
+    <ocm-payment-list *ngIf="payments && !isOrderToApprove"
                       [payments]="payments"></ocm-payment-list>
     <hr>
     <ul>
@@ -47,19 +48,19 @@
        class="col-6">
     <strong>Submitted By: </strong>
     <p>
-      {{order.xp.QuoteOrderInfo.FirstName}}
-      {{order.xp.QuoteOrderInfo.LastName}}
+      {{order.xp?.QuoteOrderInfo?.FirstName}}
+      {{order.xp?.QuoteOrderInfo?.LastName}}
     </p>
-    <!-- <p>{{order.xp.QuoteOrderInfo.BuyerLocation}}</p> -->
+    <!-- <p>{{order.xp?.BuyerLocation}}</p> -->
     <p>
-      {{order.xp.QuoteOrderInfo.Phone | phoneFormat}}
+      {{order.xp?.QuoteOrderInfo?.Phone | phoneFormat}}
     </p>
     <p>
-      {{order.xp.QuoteOrderInfo.Email}}
+      {{order.xp?.QuoteOrderInfo?.Email}}
     </p>
     <div *ngIf="order?.xp?.QuoteOrderInfo?.Comments"
          class="alert alert-secondary small">
-      <strong>Comments: </strong> {{order.xp.QuoteOrderInfo.Comments}}
+      <strong>Comments: </strong> {{order.xp?.QuoteOrderInfo?.Comments}}
     </div>
   </div>
 </div>

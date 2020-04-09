@@ -1,6 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import { OrderDetails, ShopperContextService, MarketplaceOrder, OrderReorderResponse, OrderType } from 'marketplace';
+import {
+  OrderDetails,
+  ShopperContextService,
+  MarketplaceOrder,
+  OrderReorderResponse,
+  OrderType,
+  OrderContext,
+} from 'marketplace';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 
@@ -11,20 +18,19 @@ import { isQuoteOrder } from '../../../services/orderType.helper';
 export class OCMOrderDetails implements OnInit {
   order: MarketplaceOrder;
   orderDetails: OrderDetails;
-  approvalVersion: boolean;
+  approvalVersion = false;
   faCube = faCube;
   faTruck = faTruck;
   subView: 'details' | 'shipments' = 'details';
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
   isQuoteOrder = isQuoteOrder;
-  constructor(private context: ShopperContextService, private modalService: NgbModal) { }
+  constructor(private context: ShopperContextService, private modalService: NgbModal) {}
 
   async ngOnInit(): Promise<void> {
-    this.orderDetails = await this.context.orderHistory.getOrderDetails();
+    this.approvalVersion = this.context.router.getOrderContext() === OrderContext.Approve;
+    this.orderDetails = await this.context.orderHistory.getOrderDetails(this.approvalVersion);
     this.order = this.orderDetails.order;
-    const url = this.context.router.getActiveUrl();
-    this.approvalVersion = url.includes('/approval');
     this.validateReorder(this.order.ID);
   }
 

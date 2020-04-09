@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MeUser, OcMeService, User } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
-import { CurrentUserAddressService, ICurrentUserAddress } from './address.service';
-import { ICreditCards, CreditCardService } from './credit-card.service';
+import { CreditCardService } from './credit-card.service';
 
 export interface CurrentUser extends MeUser {
   FavoriteProductIDs: string[];
@@ -11,8 +10,7 @@ export interface CurrentUser extends MeUser {
 }
 
 export interface ICurrentUser {
-  addresses: ICurrentUserAddress;
-  cards: ICreditCards;
+  cards: CreditCardService;
   get(): CurrentUser;
   patch(user: MeUser): Promise<CurrentUser>;
   onChange(callback: (user: CurrentUser) => void): void; // TODO - replace all these onChange functions with real Observables. More powerful
@@ -35,7 +33,6 @@ export class CurrentUserService implements ICurrentUser {
   constructor(
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
-    public addresses: CurrentUserAddressService,
     public cards: CreditCardService
   ) {}
 
@@ -69,6 +66,10 @@ export class CurrentUserService implements ICurrentUser {
 
   setIsFavoriteOrder(isFav: boolean, orderID: string) {
     this.setFavoriteValue(this.favOrdersXP, isFav, orderID);
+  }
+
+  hasRoles(...roles: string[]): boolean {
+    return roles.every(role => this.user.AvailableRoles.includes(role));
   }
 
   private MapToCurrentUser(user: MeUser): CurrentUser {

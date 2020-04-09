@@ -15,7 +15,7 @@ import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCog, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
@@ -57,6 +57,7 @@ export class ProductEditComponent implements OnInit {
   files: FileHandle[] = [];
   faTimes = faTimes;
   faTrash = faTrash;
+  faCircle = faCircle;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
@@ -94,6 +95,8 @@ export class ProductEditComponent implements OnInit {
     this.userContext = await this.currentUserService.getUserContext();
   }
 
+  
+
   async getAddresses(): Promise<void> {
     const context: UserContext = await this.currentUserService.getUserContext();
     context.Me.Supplier
@@ -102,8 +105,9 @@ export class ProductEditComponent implements OnInit {
   }
 
   async refreshProductData(superProduct: SuperMarketplaceProduct) {
-    this._superMarketplaceProductStatic = superProduct;
-    this._superMarketplaceProductEditable = superProduct;
+    // copying to break reference bugs
+    this._superMarketplaceProductStatic = JSON.parse(JSON.stringify(superProduct));
+    this._superMarketplaceProductEditable = JSON.parse(JSON.stringify(superProduct));
     if (!this._superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure) this._superMarketplaceProductEditable.Product.xp.UnitOfMeasure = { Unit: null, Qty: null };
     if (
       this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
@@ -117,10 +121,10 @@ export class ProductEditComponent implements OnInit {
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
     }
-    this.productType = superProduct.Product?.xp?.ProductType;
-    this.staticContent = superProduct.Product?.xp?.StaticContent;
-    this.createProductForm(superProduct);
-    this.images = ReplaceHostUrls(superProduct.Product);
+    this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
+    this.staticContent = this._superMarketplaceProductEditable.Product?.xp?.StaticContent;
+    this.createProductForm(this._superMarketplaceProductEditable);
+    this.images = ReplaceHostUrls(this._superMarketplaceProductEditable.Product);
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
@@ -196,8 +200,7 @@ export class ProductEditComponent implements OnInit {
     try {
       this.dataIsSaving = true;
       const superProduct = await this.updateMarketplaceProduct(this._superMarketplaceProductEditable);
-      this._superMarketplaceProductStatic = superProduct;
-      this._superMarketplaceProductEditable = superProduct;
+      this.refreshProductData(superProduct);
       if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
       if (this.staticContentFiles.length > 0) {
         await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
@@ -438,4 +441,6 @@ export class ProductEditComponent implements OnInit {
   shouldIsResaleBeChecked(): boolean {
     return this._superMarketplaceProductEditable?.Product?.xp?.IsResale;
   }
+
+
 }

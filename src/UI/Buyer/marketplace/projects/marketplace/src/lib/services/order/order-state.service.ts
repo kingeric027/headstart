@@ -15,7 +15,6 @@ export class OrderStateService {
   };
   private readonly DefaultOrder: MarketplaceOrder = {
     xp: {
-      BuyerLocationID: '',
       AvalaraTaxTransactionCode: '',
       OrderType: OrderType.Standard,
       QuoteOrderInfo: null,
@@ -57,8 +56,12 @@ export class OrderStateService {
   }
 
   async reset(): Promise<void> {
+    // get the most recent unsubmitted order that is not an order that was previously declined
     const orders = await this.ocMeService
-      .ListOrders({ sortBy: '!DateCreated', filters: { status: 'Unsubmitted' } })
+      .ListOrders({
+        sortBy: '!DateCreated',
+        filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
+      })
       .toPromise();
     if (orders.Items.length) {
       this.order = orders.Items[0];
