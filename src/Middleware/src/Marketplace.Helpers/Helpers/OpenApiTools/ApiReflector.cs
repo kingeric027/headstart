@@ -13,10 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
-using ApiReadOnlyAttribute = Marketplace.Helpers.Attributes.ApiReadOnlyAttribute;
-using ApiWriteOnlyAttribute = Marketplace.Helpers.Attributes.ApiWriteOnlyAttribute;
-using ErrorCode = Marketplace.Helpers.OpenApiTools.ErrorCode;
-using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
 namespace Marketplace.Helpers.OpenApiTools
 {
@@ -347,7 +343,7 @@ namespace Marketplace.Helpers.OpenApiTools
                     Name = p.Name,
                     PropInfo = p,
                     SimpleType = p.SimpleType(),
-                    Required = p.HasAttribute<RequiredAttribute>(),
+                    Required = p.HasAttribute<OrderCloud.SDK.RequiredAttribute>(),
                     Description = GetDescription(p, includeWriteOnly),
                     ReadOnly = p.HasAttribute<ApiReadOnlyAttribute>(),
                     WriteOnly = p.HasAttribute<ApiWriteOnlyAttribute>(),
@@ -363,7 +359,7 @@ namespace Marketplace.Helpers.OpenApiTools
                 Type = type,
                 InnerModel = innerModel,
                 Properties = props,
-                IsReadOnly = type.HasAttribute<ApiReadOnlyAttribute>(),
+                IsReadOnly = type.HasAttribute<OrderCloud.SDK.ApiReadOnlyAttribute>(),
                 IsWriteOnly = type.HasAttribute<ApiWriteOnlyAttribute>(),
                 IsPartial = isPartial,
                 Sample = props.ToDictionary(p => p.Name, p => p.SampleData)
@@ -480,7 +476,7 @@ namespace Marketplace.Helpers.OpenApiTools
 
             if (isWrite)
             {
-                if (attributes.OfType<RequiredAttribute>().Any())
+                if (attributes.OfType<OrderCloud.SDK.RequiredAttribute>().Any())
                     s += " Required.";
 
                 var mla = attributes.OfType<MaxLengthAttribute>().FirstOrDefault();
