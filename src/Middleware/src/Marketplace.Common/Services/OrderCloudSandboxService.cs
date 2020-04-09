@@ -7,12 +7,11 @@ namespace Marketplace.Common.Services
 {
 
     /// <summary>
-    /// this is a temporary service that should be removed when shipping integration is in production order cloud and this is available in the sdk more easily
+    /// this is a temporary service that should be removed when the sdk supports overriding the type of the return value on the get worksheet call
     /// </summary>
     public interface IOrderCloudSandboxService
     {
-        Task<OrderWorksheet> GetOrderWorksheetAsync(OrderDirection orderDirection, string orderID);
-        Task CreateIntegrationEvent(IntegrationEvent integrationEvent, string token = "");
+        Task<MarketplaceOrderWorksheet> GetOrderWorksheetAsync(OrderDirection orderDirection, string orderID);
     }
     public class OrderCloudSandboxService : IOrderCloudSandboxService
     {
