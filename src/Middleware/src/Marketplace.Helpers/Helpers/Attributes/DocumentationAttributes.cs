@@ -99,6 +99,11 @@ namespace Marketplace.Helpers.Attributes
     //[AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
     //public class ApiWriteOnlyAttribute : Attribute { }
 
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
+    public class ApiIgnore : Attribute
+    {
+    }
+
 
     /// <summary>
     /// Use on model properties and action params to document sample data
