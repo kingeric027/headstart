@@ -38,11 +38,11 @@ export class AddressService {
   }
 
   async create(address: MarketplaceAddressBuyer): Promise<MarketplaceAddressBuyer> {
-    return this.ocMeService.CreateAddress(address).toPromise();
+    return MarketplaceSDK.ValidatedAddresses.CreateMeAddress(address);
   }
 
   async edit(addressID: string, address: MarketplaceAddressBuyer): Promise<MarketplaceAddressBuyer> {
-    return this.ocMeService.SaveAddress(addressID, address).toPromise();
+    return MarketplaceSDK.ValidatedAddresses.SaveMeAddress(addressID, address);
   }
 
   async delete(addressID: string): Promise<void> {

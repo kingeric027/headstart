@@ -12,7 +12,7 @@ import { GeographyConfig } from '../../../config/geography.class';
 })
 export class OCMAddressForm implements OnInit {
   @Input() btnText: string;
-  @Input() suggestedAddresses: ListBuyerAddress;
+  @Input() suggestedAddresses: BuyerAddress[];
   @Input() showOptionToSave = false;
   @Output() formDismissed = new EventEmitter();
   @Output()
@@ -52,7 +52,7 @@ export class OCMAddressForm implements OnInit {
       ID: new FormControl(this.ExistingAddress.ID || ''),
     });
     this.shouldSaveAddressForm = new FormGroup({
-      shouldSaveAddress: new FormControl(false)
+      shouldSaveAddress: new FormControl(false),
     });
     this.onCountryChange();
   }
@@ -75,7 +75,7 @@ export class OCMAddressForm implements OnInit {
     this.formSubmitted.emit({
       address: this.selectedAddress ? this.selectedAddress : this.addressForm.value,
       formDirty: this.addressForm.dirty,
-      shouldSaveAddress: this.shouldSaveAddressForm.controls.shouldSaveAddress.value
+      shouldSaveAddress: this.shouldSaveAddressForm.controls.shouldSaveAddress.value,
     });
   }
 

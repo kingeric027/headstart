@@ -1,10 +1,9 @@
-import { ListBuyerAddress } from 'marketplace';
-
-export const getSuggestedAddresses = (ex): ListBuyerAddress => {
-  for (const err of ex.error.Errors) {
-    if (err.ErrorCode === 'blocked by web hook') {
-      return err.Data?.Body?.SuggestedAddresses;
-    }
+import { BuyerAddress } from 'marketplace';
+export const getSuggestedAddresses = (ex): BuyerAddress[] => {
+  const suggestions = ex?.response?.data?.Data?.SuggestedAddresses;
+  if (suggestions && Array.isArray(suggestions) && suggestions !== []) {
+    return suggestions;
   }
+  // TODO - if suggestions === []
   throw ex;
 };

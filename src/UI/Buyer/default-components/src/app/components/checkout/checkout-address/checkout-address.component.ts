@@ -22,7 +22,7 @@ export class OCMCheckoutAddress implements OnInit {
   };
   usingShippingAsBilling = false;
   showAddAddressForm = false;
-  suggestedAddresses: ListBuyerAddress;
+  suggestedAddresses: BuyerAddress[];
   
   @Input() addressType: OrderAddressType;
   @Input() isAnon: boolean;

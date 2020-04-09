@@ -72,9 +72,17 @@ export class CheckoutService implements ICheckout {
 
   async setAddress(type: OrderAddressType, address: BuyerAddress): Promise<MarketplaceOrder> {
     if (type === OrderAddressType.Billing) {
-      this.order = await this.ocOrderService.SetBillingAddress('outgoing', this.order.ID, address).toPromise();
+      this.order = MarketplaceSDK.ValidatedAddresses.SetBillingAddress(
+        'Outgoing',
+        this.order.ID,
+        address
+      ) as MarketplaceOrder;
     } else if (type === OrderAddressType.Shipping) {
-      this.order = await this.ocOrderService.SetShippingAddress('outgoing', this.order.ID, address).toPromise();
+      this.order = MarketplaceSDK.ValidatedAddresses.SetShippingAddress(
+        'Outgoing',
+        this.order.ID,
+        address
+      ) as MarketplaceOrder;
     }
     return this.order;
   }
