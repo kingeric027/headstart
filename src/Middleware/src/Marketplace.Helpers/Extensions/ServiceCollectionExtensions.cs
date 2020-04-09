@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Linq;
 using Cosmonaut;
 using Cosmonaut.Extensions.Microsoft.DependencyInjection;
 using Marketplace.Helpers.Attributes;
@@ -108,28 +106,23 @@ namespace Marketplace.Helpers.Extensions
             return services;
         }
 
-        public static IServiceCollection InjectAzureFunctionSettings<T>(this IFunctionsHostBuilder host, string section = "AppSettings") where T : class, new()
+        public static IFunctionsHostBuilder InjectAzureFunctionSettings<T>(this IFunctionsHostBuilder host, string appSettingsConnectionString, string section = "AppSettings") where T : class, new()
         {
             var settings = new T();
             var builder = new ConfigurationBuilder();
 
-            if (host.Services.FirstOrDefault(d => d.ServiceType == typeof(IConfiguration))?.ImplementationInstance is IConfiguration configRoot)
-                builder.AddConfiguration(configRoot).SetBasePath(string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID"))
-                    ? Directory.GetCurrentDirectory()
-                    : "/home/site/wwwroot");
-
             var config = builder
-                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables()
+                .AddAzureAppConfiguration(appSettingsConnectionString)
                 .Build();
-            
+            config.GetSection(section).Bind(settings);
+
             host.Services
                 .Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config))
                 .BuildServiceProvider()
-                .GetService<IConfiguration>()
-                .GetSection(section)
-                .Bind(settings);
-            return host.Services.AddSingleton(settings);
+                .GetService<IConfiguration>();
+
+            host.Services.AddSingleton(settings);
+            return host;
         }
 
         public static IServiceCollection InjectConsoleAppSettings<T>(this IServiceCollection services, string folder, string file) where T : class
@@ -145,4 +138,5 @@ namespace Marketplace.Helpers.Extensions
 
         
     }
+
 }
