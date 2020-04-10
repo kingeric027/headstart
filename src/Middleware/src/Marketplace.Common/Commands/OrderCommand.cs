@@ -75,8 +75,10 @@ namespace Marketplace.Common.Commands
 
         public async Task AcknowledgeQuoteOrder(string orderID)
         {
-            await _oc.Orders.ListAsync(OrderDirection.Incoming);
-            Console.WriteLine("here");
+            int index = orderID.IndexOf("-");
+            string buyerOrderID = orderID.Substring(0, index);
+            await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+            await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
         }
 
         private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrder buyerOrder, List<Order> supplierOrders)
