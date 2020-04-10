@@ -31,6 +31,7 @@ namespace Marketplace.Common.Commands
         public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token)
         {
             // Create Supplier
+            supplier.ID = "{supplierIncrementor}";
             var ocSupplier = await _oc.Suppliers.CreateAsync(supplier, token);
             var ocSupplierID = ocSupplier.ID;
             // Create Integration User Group
