@@ -280,8 +280,8 @@ namespace Orchestration.Tests
     //        };
     //        settings.OrderCloudSettings = new OrderCloudSettings()
     //        {
-    //            ClientSecret = "d576450ca8f89967eea0d3477544ea4bee60af051a5c173be09db08c562b",
-    //            ClientID = "97349A89-E279-45BE-A072-83DF8F7043F4",
+    //            ClientSecret = 
+    //            ClientID =
     //            AuthUrl = "https://auth.ordercloud.io",
     //            ApiUrl = "https://api.ordercloud.io"
     //        };
