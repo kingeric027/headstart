@@ -11,7 +11,7 @@ namespace Marketplace.Common.Controllers
 {
     [DocComments("\"Orchestration Logs\" represents logs of orchestration activities")]
     [MarketplaceSection.Orchestration(ListOrder = 3)]
-    [Route("content/image")]
+    [Route("content/images")]
     public class ImageController : BaseController
     {
         private readonly IImageCommand _command;
@@ -20,15 +20,21 @@ namespace Marketplace.Common.Controllers
             _command = command;
         }
 
-        [DocName("GET Images")]
+        [DocName("LIST Images")]
         [HttpGet]
         public async Task<ListPage<Image>> List(ListArgs<Image> marketplaceListArgs)
         {
             return await _command.List(marketplaceListArgs);
         }
+        [DocName("GET Image")]
+        [HttpGet, Route("{id}")]
+        public async Task<Image> Get(string id)
+        {
+            return await _command.Get(id);
+        }
         [DocName("POST Image")]
         [HttpPost]
-        public async Task<Image> Save(Image img)
+        public async Task<Image> Post([FromBody] Image img)
         {
             return await _command.Create(img);
         }

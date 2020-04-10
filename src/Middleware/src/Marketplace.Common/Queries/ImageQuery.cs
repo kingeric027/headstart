@@ -4,6 +4,7 @@ using Marketplace.Common.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Helpers.Models;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using OrderCloud.SDK;
 using System;
@@ -34,7 +35,8 @@ namespace Marketplace.Common.Queries
 
         public async Task<Image> Get(string id)
         {
-            var item = await _store.FindAsync(id);
+            var options = new RequestOptions { PartitionKey = new PartitionKey(id) };
+            var item = await _store.FindAsync(id, options);
             return item;
         }
 
@@ -53,7 +55,8 @@ namespace Marketplace.Common.Queries
 
         public async Task Delete(string id)
         {
-            await _store.RemoveByIdAsync(id);
+            var options = new RequestOptions { PartitionKey = new PartitionKey(id) };
+            await _store.RemoveByIdAsync(id, options);
         }
     }
 }
