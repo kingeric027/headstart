@@ -12,6 +12,7 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using OrderCloud.SDK;
 using Swashbuckle.AspNetCore.Swagger;
@@ -54,7 +55,8 @@ namespace Marketplace.Helpers.Extensions
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(o =>
                 {
-                    o.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                    o.SerializerSettings.ContractResolver = new MarketplaceSerializer();
+                    o.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
 
             services.AddCors(o => o.AddPolicy("marketplacecors",
