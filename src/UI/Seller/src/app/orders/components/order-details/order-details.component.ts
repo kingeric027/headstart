@@ -65,7 +65,7 @@ export class OrderDetailsComponent {
   }
 
   async setOrderStatus() {
-    this.middleware.acknowledgeQuoteOrder(this._order.ID);
+    await this.middleware.acknowledgeQuoteOrder(this._order.ID).then(completedOrder => this.handleSelectedOrderChange(completedOrder));
   }
 
   isQuoteOrder(order: Order) {
