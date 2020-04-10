@@ -19,6 +19,7 @@ namespace Marketplace.Common.Commands
     public interface IOrderCommand
     {
         Task HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
+        Task AcknowledgeQuoteOrder(string orderID);
     }
 
     public class OrderCommand : IOrderCommand
@@ -70,6 +71,14 @@ namespace Marketplace.Common.Commands
                 Console.WriteLine(ex.Message);
                 // todo add error response in proper format for checkout integration after receiving models 
             }
+        }
+
+        public async Task AcknowledgeQuoteOrder(string orderID)
+        {
+            int index = orderID.IndexOf("-");
+            string buyerOrderID = orderID.Substring(0, index);
+            await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+            await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
         }
 
         private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrder buyerOrder, List<Order> supplierOrders)
