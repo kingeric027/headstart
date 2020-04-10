@@ -51,10 +51,10 @@ namespace Marketplace.Common.Commands
 			await CreateWebhooks(impersonation.access_token, seed.ApiUrl);
 			await CreateMarketPlaceRoles(impersonation.access_token);
 			await CreateBuyers(user, impersonation.access_token);
-			await CreateSuppliers(user, impersonation.access_token);
 			await CreateXPIndices(impersonation.access_token);
 			await CreateIncrementors(impersonation.access_token);
 			await CreateAndAssignIntegrationEvent(seed.ApiUrl, impersonation.access_token);
+			await CreateSuppliers(user, impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
 			return impersonation;
 		}
