@@ -58,7 +58,7 @@ namespace Marketplace.Common.Commands
                 AppName = $"Integration Client {ocSupplier.Name}",
                 Active = true,
                 DefaultContextUserName = supplierUser.Username,
-                ClientSecret = "d576450ca8f89967eea0d3477544ea4bee60af051a5c173be09db08c562b", // _settings.OrderCloudSettings.ClientSecret,
+                ClientSecret = _settings.OrderCloudSettings.ClientSecret,
                 AccessTokenDuration = 600,
                 RefreshTokenDuration = 43200,
                 AllowAnyBuyer = false,
