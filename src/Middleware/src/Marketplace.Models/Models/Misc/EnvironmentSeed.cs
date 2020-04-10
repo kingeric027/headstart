@@ -12,5 +12,6 @@ namespace Marketplace.Models.Misc
 		public List<MarketplaceSupplier> Suppliers { get; set; }
 		[Required]
 		public List<MarketplaceBuyer> Buyers { get; set; }
+		public string ApiUrl { get; set; }
 	}
 }

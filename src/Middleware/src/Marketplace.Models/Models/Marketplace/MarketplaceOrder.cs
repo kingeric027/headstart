@@ -8,9 +8,6 @@ namespace Marketplace.Models
     [SwaggerModel]
 	public class MarketplaceOrder : Order<OrderXp, UserXp, BuyerAddressXP>
     {
-        // will be on the ordercloud model when integration events are deployed to OC prod
-        public string CalculateEventsUpToDate { get; set; } 
-        public string ShippingRatesEventUpToDate { get; set; } 
 	}
 
     [SwaggerModel]

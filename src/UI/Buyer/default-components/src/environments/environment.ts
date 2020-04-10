@@ -16,8 +16,8 @@ export const environment = {
   orderCloudAuthUrl: 'https://stagingauth.ordercloud.io/oauth/token',
   orderCloudApiVersion: 'v1',
 };
-
 /*
+
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
  *

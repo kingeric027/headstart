@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OrderCloud.SDK" Version="0.7.1" />
+    <PackageReference Include="OrderCloud.SDK" Version="0.8.0" />
   </ItemGroup>
 
   <ItemGroup>

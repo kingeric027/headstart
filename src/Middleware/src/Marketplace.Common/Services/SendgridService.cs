@@ -17,8 +17,8 @@ namespace Marketplace.Common.Services
     {
         Task SendSingleEmail(string from, string to, string subject, string htmlContent);
         Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData);
-        Task SendOrderSupplierEmails(OrderWorksheet orderWorksheet, string templateID, object templateData);
-        Task SendOrderSubmitEmail(OrderWorksheet orderData);
+        Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData);
+        Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
         Task SendNewUserEmail(WebhookPayloads.Users.Create payload);
         Task SendOrderUpdatedEmail(MarketplaceOrderPatchPayload payload);
         Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
@@ -118,7 +118,7 @@ namespace Marketplace.Common.Services
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_DECLINED_TEMPLATE_ID, GetOrderTemplateData(payload.Response.Body, lineItems.Items));
         }
 
-        public async Task SendOrderSubmitEmail(OrderWorksheet orderWorksheet)
+        public async Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
         {
             if (orderWorksheet.Order.xp.OrderType == OrderType.Standard)
             {
@@ -137,11 +137,11 @@ namespace Marketplace.Common.Services
             }
         }
 
-        public async Task SendSupplierOrderSubmitEmail(OrderWorksheet orderWorksheet)
+        public async Task SendSupplierOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
         {
             if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
-                var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderWorksheet.Order.ID);
+                var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderWorksheet.Order.ID);
                 var supplierList = GetSupplierInfo(lineItems);
                 foreach (string supplier in supplierList)
                 {
@@ -162,9 +162,9 @@ namespace Marketplace.Common.Services
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_UPDATED_TEMPLATE_ID, GetOrderTemplateData(payload.Response.Body, lineItems.Items)); ;
         }
 
-        public async Task SendOrderSupplierEmails(OrderWorksheet orderWorksheet, string templateID, object templateData)
+        public async Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData)
         {
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderWorksheet.Order.ID);
+            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderWorksheet.Order.ID);
             var supplierList = GetSupplierInfo(lineItems);
             foreach (string supplier in supplierList)
             {
@@ -184,7 +184,7 @@ namespace Marketplace.Common.Services
         }
 
         // helper functions 
-        private List<string> GetSupplierInfo(ListPage<LineItem> lineItems)
+        private List<string> GetSupplierInfo(ListPage<MarketplaceLineItem> lineItems)
         {
             var supplierList = lineItems.Items.Select(item => item.SupplierID)
                 .Distinct()
