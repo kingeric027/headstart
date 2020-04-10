@@ -1,4 +1,5 @@
 ﻿using Marketplace.Common.Services.ShippingIntegration.Models;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 {

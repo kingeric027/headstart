@@ -17,7 +17,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
     public interface IOCShippingIntegration
     {
         Task<ShipEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload);
-        Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload orderCalculatePayload);
+        Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload);
     }
 
     public class OCShippingIntegration : IOCShippingIntegration
@@ -49,11 +49,11 @@ namespace Marketplace.Common.Services.ShippingIntegration
             var shipEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest)).ToList();
             return new ShipEstimateResponse()
             {
-                ShipEstimates = shipEstimates
+                ShipEstimates = shipEstimates as IList<ShipEstimate>
             };
         }
 
-        public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload orderCalculatePayload)
+        public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload)
         {
             if(orderCalculatePayload.OrderWorksheet.Order.xp != null && orderCalculatePayload.OrderWorksheet.Order.xp.OrderType == Marketplace.Models.Extended.OrderType.Quote)
             {
@@ -71,7 +71,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         }
 
-        private List<string> GetProductsWithInvalidDimensions(IList<MarketplaceLineItem> lineItems)
+        private List<string> GetProductsWithInvalidDimensions(IList<LineItem> lineItems)
         {
             return lineItems.Where(lineItem =>
             {

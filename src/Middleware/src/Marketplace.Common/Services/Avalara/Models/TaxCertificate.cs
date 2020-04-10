@@ -1,10 +1,8 @@
-﻿using Marketplace.Helpers.Attributes;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System;
+using Marketplace.Helpers.Attributes;
+using OrderCloud.SDK;
 
-namespace Marketplace.Models.Models.Misc
+namespace Marketplace.Models.Misc
 {
 	[SwaggerModel]
 	public class TaxCertificate

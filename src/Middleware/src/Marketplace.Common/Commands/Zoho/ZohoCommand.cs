@@ -18,7 +18,7 @@ namespace Marketplace.Common.Commands.Zoho
 {
     public interface IZohoCommand
     {
-        Task<ZohoSalesOrder> CreateSalesOrder(OrderWorksheet orderWorksheet);
+        Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrderWorksheet orderWorksheet);
         Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, OrderSplitResult orders);
     }
 
@@ -79,7 +79,7 @@ namespace Marketplace.Common.Commands.Zoho
             }
         }
 
-        public async Task<ZohoSalesOrder> CreateSalesOrder(OrderWorksheet orderWorksheet)
+        public async Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrderWorksheet orderWorksheet)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace Marketplace.Common.Commands.Zoho
             return items.ToList();
         }
 
-        private async Task<List<ZohoLineItem>> ApplyShipping(OrderWorksheet orderWorksheet) {
+        private async Task<List<ZohoLineItem>> ApplyShipping(MarketplaceOrderWorksheet orderWorksheet) {
             //// Step 4: shipping must be added as lineitems on the order
             var z_shipping = await _zoho.Items.ListAsync(new ZohoFilter() { Key = "sku", Value = "shipping"});
             if (z_shipping.Items.Count != 0) return ZohoLineItemMapper.Map(orderWorksheet, z_shipping.Items.FirstOrDefault());

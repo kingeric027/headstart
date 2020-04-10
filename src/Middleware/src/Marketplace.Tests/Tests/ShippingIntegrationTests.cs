@@ -4,6 +4,7 @@ using Marketplace.Common.Services.FreightPop.Models;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Newtonsoft.Json;
+using OrderCloud.SDK;
 
 namespace Marketplace.Tests
 {

@@ -181,7 +181,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static List<ZohoLineItem> Map(OrderWorksheet orderWorksheet, ZohoLineItem shipping)
+        public static List<ZohoLineItem> Map(MarketplaceOrderWorksheet orderWorksheet, ZohoLineItem shipping)
         {
             return orderWorksheet.ShipEstimateResponse.ShipEstimates.Select(shipEstimate => {
                 //var choosenProposedShipmentSelection = shipmentEstimate.ShipmentMethods.First(shipmentMethod => shipmentMethod.ID == proposedShipment.SelectedProposedShipmentOptionID);
