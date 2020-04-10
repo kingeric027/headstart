@@ -1,4 +1,5 @@
 ﻿using System;
+using Marketplace.Helpers.Attributes;
 using OrderCloud.SDK;
 
 namespace Marketplace.Models.Misc
