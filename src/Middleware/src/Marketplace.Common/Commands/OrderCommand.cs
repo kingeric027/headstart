@@ -13,12 +13,13 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using System.Linq;
 using Marketplace.Models.Models.Marketplace;
 using System;
+using Newtonsoft.Json;
 
 namespace Marketplace.Common.Commands
 {
     public interface IOrderCommand
     {
-        Task HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
+        Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
         Task<Order> AcknowledgeQuoteOrder(string orderID);
     }
 
@@ -32,18 +33,20 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudSandboxService _ocSandboxService;
         private readonly IZohoCommand _zoho;
         private readonly IAvalaraService _avatax;
-
-        public OrderCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, IAvalaraService avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        private readonly ISendgridService _sendgridService;
+        
+        public OrderCommand(IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraService avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
             _ocShippingIntegration = ocShippingIntegration;
             _avatax = avatax;
             _zoho = zoho;
+            _sendgridService = sendgridService;
             _ocSandboxService = orderCloudSandboxService;
         }
 
-        public async Task HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
+        public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
         {
             try
             {
@@ -66,10 +69,22 @@ namespace Marketplace.Common.Commands
                     var zoho_salesorder = await _zoho.CreateSalesOrder(orderWorksheet);
                     await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
                 }
-            } catch (Exception ex)
+                await _sendgridService.SendOrderSubmitEmail(orderWorksheet);
+
+                var response = new OrderSubmitResponse()
+                {
+                    HttpStatusCode = 200,
+                };
+                return response;
+            }
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                // todo add error response in proper format for checkout integration after receiving models 
+                var response = new OrderSubmitResponse()
+                {
+                    HttpStatusCode = 500,
+                    UnhandledErrorBody = JsonConvert.SerializeObject(ex),
+                };
+                return response;
             }
         }
 

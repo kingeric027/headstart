@@ -44,10 +44,10 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("ordersubmit")]
         [OrderCloudWebhookAuth]
-        public async void HandleOrderSubmit([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> payload)
+        public async Task<OrderSubmitResponse> HandleOrderSubmit([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> payload)
         {
-            await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
-            await _sendgridService.SendOrderSubmitEmail(payload.OrderWorksheet);
+            var response = await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
+            return response;
         }
 
         [HttpPost, Route("orderrequiresapproval")]
