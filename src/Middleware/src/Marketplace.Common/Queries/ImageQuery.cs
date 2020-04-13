@@ -17,14 +17,16 @@ namespace Marketplace.Common.Queries
 {
     public class ImageQuery
     {
-        private readonly ICosmosStore<Image> _store;
-        public ImageQuery(ICosmosStore<Image> store)
+        private readonly ICosmosStore<Image> _imageStore;
+        private readonly ICosmosStore<ImageProductAssignment> _imageProductAssignmentStore;
+        public ImageQuery(ICosmosStore<Image> store, ICosmosStore<ImageProductAssignment> imageProductAssignmentStore)
         {
-            _store = store;
+            _imageStore = store;
+            _imageProductAssignmentStore = imageProductAssignmentStore;
         }
         public async Task<ListPage<Image>> List(ListArgs<Image> args)
         {
-            var query = _store.Query(new FeedOptions() { EnableCrossPartitionQuery = true })
+            var query = _imageStore.Query(new FeedOptions() { EnableCrossPartitionQuery = true })
                 .Search(args)
                 .Filter(args)
                 .Sort(args);
@@ -36,27 +38,44 @@ namespace Marketplace.Common.Queries
         public async Task<Image> Get(string id)
         {
             var options = new RequestOptions { PartitionKey = new PartitionKey(id) };
-            var item = await _store.FindAsync(id, options);
+            var item = await _imageStore.FindAsync(id, options);
             return item;
         }
 
         public async Task<Image> Save(Image img)
         {
             img.timeStamp = DateTime.Now;
-            var result = await _store.UpsertAsync(img);
+            var result = await _imageStore.UpsertAsync(img);
             return result.Entity;
         }
 
         public async Task<List<Image>> SaveMany(List<Image> imgs)
         {
-            var result = await _store.UpsertRangeAsync(imgs);
+            var result = await _imageStore.UpsertRangeAsync(imgs);
             return result.SuccessfulEntities.Select(e => e.Entity).ToList();
         }
 
         public async Task Delete(string id)
         {
+            // Check if any assignments exist, if so - delete them.
+            var assignments = await _imageProductAssignmentStore.Query(new FeedOptions() { EnableCrossPartitionQuery = true }).Where(x => x.ImageID == id).ToListAsync();
+            await Throttler.RunAsync(assignments, 100, 5, a => _imageProductAssignmentStore.RemoveByIdAsync(a.id, new RequestOptions() { PartitionKey = new PartitionKey(a.ProductID) }));
+            // Then remove the image
             var options = new RequestOptions { PartitionKey = new PartitionKey(id) };
-            await _store.RemoveByIdAsync(id, options);
+            await _imageStore.RemoveByIdAsync(id, options);
+        }
+
+        public async Task <List<Image>> GetProductImages(string productID)
+        {
+            var productImages = new List<Image>();
+            var assignments = await _imageProductAssignmentStore.Query(new FeedOptions() { EnableCrossPartitionQuery = true }).Where(x => x.ProductID == productID).ToListAsync();
+            await Throttler.RunAsync(assignments, 100, 5, async a =>
+            {
+                var options = new RequestOptions { PartitionKey = new PartitionKey(a.ImageID) };
+                var image = await _imageStore.FindAsync(a.ImageID, options);
+                productImages.Add(image);
+            });
+            return productImages;
         }
     }
 }

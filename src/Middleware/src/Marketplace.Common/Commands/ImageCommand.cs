@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
@@ -18,19 +19,18 @@ namespace Marketplace.Common.Commands
         Task<Image> Get(string id);
         Task<Image> Create(Image img);
         Task Delete(string ID);
+        Task<List<Image>> GetProductImages(string productID);
     }
 
     public class ImageCommand : IImageCommand
     {
         private readonly AppSettings _settings;
         private readonly ImageQuery _img;
-        private readonly ICosmosStore<ImageProductAssignment> _store;
 
-        public ImageCommand(AppSettings settings, ImageQuery img, ICosmosStore<ImageProductAssignment> store)
+        public ImageCommand(AppSettings settings, ImageQuery img)
         {
             _settings = settings;
             _img = img;
-            _store = store;
         }
 
         public async Task<ListPage<Image>> List(ListArgs<Image> marketplaceListArgs)
@@ -47,11 +47,11 @@ namespace Marketplace.Common.Commands
         }
         public async Task Delete(string id)
         {
-            // Check if any assignments exist, if so - delete them.
-            var assignments = await _store.Query(new FeedOptions() { EnableCrossPartitionQuery = true }).Where(x => x.ImageID == id).ToListAsync();
-            await Throttler.RunAsync(assignments, 100, 5, a => _store.RemoveByIdAsync(a.id, new RequestOptions() { PartitionKey = new PartitionKey(a.ProductID) }));
-            // Delete the image
             await _img.Delete(id);
+        }
+        public async Task<List<Image>> GetProductImages(string productID)
+        {
+            return await _img.GetProductImages(productID);
         }
     }
 }

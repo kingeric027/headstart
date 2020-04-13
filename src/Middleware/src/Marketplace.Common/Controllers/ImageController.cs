@@ -6,6 +6,7 @@ using Marketplace.Helpers;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Attributes;
 using OrderCloud.SDK;
+using System.Collections.Generic;
 
 namespace Marketplace.Common.Controllers
 {
@@ -43,6 +44,12 @@ namespace Marketplace.Common.Controllers
         public async Task Delete(string id)
         {
             await _command.Delete(id);
+        }
+        [DocName("GET a product's images")]
+        [HttpGet, Route("product/{productID}")]
+        public async Task<List<Image>> GetProductImages(string productID)
+        {
+            return await _command.GetProductImages(productID);
         }
     }
 }

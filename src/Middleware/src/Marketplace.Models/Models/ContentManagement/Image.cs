@@ -8,14 +8,15 @@ using System.Text;
 namespace Marketplace.Common.Models
 {
     [SwaggerModel]
-    public class ImageProductAssignment : ICosmosObject
+    public class Image : ICosmosObject
     {
-        [ApiIgnore]
+        [JsonProperty(PropertyName = "ID")]
         public string id { get; set; }
-        [ApiIgnore]
+        [Sortable]
+        [JsonProperty(PropertyName = "DateCreated")]
         public DateTimeOffset timeStamp { get; set; }
-        public string ProductID { get; set; }
-        public string ImageID { get; set; }
-        public List<string> VariantIDs { get; set; }
+        public string URL { get; set; }
+        public int ListOrder { get; set; }
+        public List<string> Tags { get; set; }
     }
 }
