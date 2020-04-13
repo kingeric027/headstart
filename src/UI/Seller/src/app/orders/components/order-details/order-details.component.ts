@@ -28,6 +28,7 @@ export class OrderDetailsComponent {
   @Input()
   set order(order: Order) {
     if (Object.keys(order).length) {
+      this.createShipment = false;
       this.handleSelectedOrderChange(order);
     }
   }

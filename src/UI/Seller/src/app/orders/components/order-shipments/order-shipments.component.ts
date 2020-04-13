@@ -44,6 +44,7 @@ export class OrderShipmentsComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.order.ID) {
+      this.createShipment = false;
       this.getShipments();
       this.getLineItems();
     }
