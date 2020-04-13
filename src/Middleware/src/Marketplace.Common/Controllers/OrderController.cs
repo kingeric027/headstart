@@ -26,9 +26,9 @@ namespace Marketplace.Common.Controllers
         // todo update auth
         [HttpPost]
         [Route("acknowledgequote/{orderID}")]
-        public async Task AcknowledgeQuoteOrder(string orderID)
+        public async Task<Order> AcknowledgeQuoteOrder(string orderID)
         {
-            await _command.AcknowledgeQuoteOrder(orderID);
+            return await _command.AcknowledgeQuoteOrder(orderID);
         } 
     }
 }
