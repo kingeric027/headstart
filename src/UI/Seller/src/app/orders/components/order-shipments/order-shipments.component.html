@@ -1,6 +1,7 @@
 <div class="mb-3 col-sm-10">
  <div class="d-print-none">
-  <button class="btn btn-outline-dark"
+  <button *ngIf="!isQuoteOrder(order) && !isSellerUser"
+          class="btn btn-outline-dark"
           (click)="toggleCreateShipment()">
     <fa-icon [icon]="getCreateButtonIcon()"></fa-icon> {{getCreateButtonAction()}} Shipment
   </button>
