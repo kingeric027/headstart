@@ -15,14 +15,14 @@ using System.Threading.Tasks;
 
 namespace Marketplace.Common.Queries
 {
-    public class ImageQuery : ICosmosQuery<Image>
+    public class ImageQuery
     {
         private readonly ICosmosStore<Image> _store;
         public ImageQuery(ICosmosStore<Image> store)
         {
             _store = store;
         }
-        public async Task<ListPage<Image>> List(IListArgs args)
+        public async Task<ListPage<Image>> List(ListArgs<Image> args)
         {
             var query = _store.Query(new FeedOptions() { EnableCrossPartitionQuery = true })
                 .Search(args)

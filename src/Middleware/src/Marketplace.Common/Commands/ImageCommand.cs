@@ -45,16 +45,13 @@ namespace Marketplace.Common.Commands
         {
             return await _img.Save(img);
         }
-        public async Task Delete(string ID)
+        public async Task Delete(string id)
         {
-            // NOT WORKING - Check if any assignments exist, if so - delete them.
-            //var assignments = await _store.Query(new FeedOptions() { EnableCrossPartitionQuery = true }).ToListAsync();
-            //if (assignments[0] != null)
-            //{
-            //    await Throttler.RunAsync(assignments, 100, 5, a => _store.RemoveAsync(x => x.ProductID == a.ProductID, new FeedOptions() { EnableCrossPartitionQuery = true, PartitionKey = new PartitionKey(ID) }));
-            //}
-            //Delete the image
-           await _img.Delete(ID);
+            // Check if any assignments exist, if so - delete them.
+            var assignments = await _store.Query(new FeedOptions() { EnableCrossPartitionQuery = true }).Where(x => x.ImageID == id).ToListAsync();
+            await Throttler.RunAsync(assignments, 100, 5, a => _store.RemoveByIdAsync(a.id, new RequestOptions() { PartitionKey = new PartitionKey(a.ProductID) }));
+            // Delete the image
+            await _img.Delete(id);
         }
     }
 }

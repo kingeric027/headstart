@@ -36,9 +36,7 @@ namespace Marketplace.Common.Queries
 
         public async Task<ImageProductAssignment> Save(ImageProductAssignment pia)
         {
-            // Ensure that an assignment does not already exist, if it does - return it.
-            var item = await _store.Query().Where(x => x.ImageID == pia.ImageID && x.ProductID == pia.ProductID).ToListAsync();
-            if (item[0] != null) return item[0];
+            pia.id = $"{pia.ImageID}-{pia.ProductID}";
             pia.timeStamp = DateTime.Now;
             var result = await _store.UpsertAsync(pia);
             return result.Entity;
@@ -47,8 +45,7 @@ namespace Marketplace.Common.Queries
         public async Task Delete(string ImageID, string ProductID)
         {
             var options = new RequestOptions { PartitionKey = new PartitionKey(ProductID) };
-            var item = await _store.Query().Where(x => x.ImageID == ImageID && x.ProductID == ProductID).ToListAsync();
-            await _store.RemoveByIdAsync(item[0].id, options);
+            await _store.RemoveByIdAsync($"{ImageID}-{ProductID}", options);
         }
     }
 }
