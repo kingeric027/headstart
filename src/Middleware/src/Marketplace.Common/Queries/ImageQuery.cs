@@ -15,7 +15,17 @@ using System.Threading.Tasks;
 
 namespace Marketplace.Common.Queries
 {
-    public class ImageQuery
+    public interface IImageQuery
+    {
+        Task Delete(string id);
+        Task<Image> Get(string id);
+        Task<List<Image>> GetProductImages(string productID);
+        Task<ListPage<Image>> List(ListArgs<Image> args);
+        Task<Image> Save(Image img);
+        Task<List<Image>> SaveMany(List<Image> imgs);
+    }
+
+    public class ImageQuery : IImageQuery
     {
         private readonly ICosmosStore<Image> _imageStore;
         private readonly ICosmosStore<ImageProductAssignment> _imageProductAssignmentStore;
@@ -65,7 +75,7 @@ namespace Marketplace.Common.Queries
             await _imageStore.RemoveByIdAsync(id, options);
         }
 
-        public async Task <List<Image>> GetProductImages(string productID)
+        public async Task<List<Image>> GetProductImages(string productID)
         {
             var productImages = new List<Image>();
             var assignments = await _imageProductAssignmentStore.Query(new FeedOptions() { EnableCrossPartitionQuery = true }).Where(x => x.ProductID == productID).ToListAsync();

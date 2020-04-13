@@ -28,10 +28,10 @@ namespace Marketplace.Common.Services
 		private readonly IOrderCloudClient _oc;
 		private readonly IBlobService _imageContainer;
 		private readonly IBlobService _staticContentContainer;
-		private readonly ImageQuery _img;
-		private readonly ImageProductAssignmentQuery _ipa;
+		private readonly IImageQuery _img;
+		private readonly IImageProductAssignmentQuery _ipa;
 
-		public ContentManagementService(AppSettings settings, IOrderCloudClient oc, ImageQuery img, ImageProductAssignmentQuery ipa)
+		public ContentManagementService(AppSettings settings, IOrderCloudClient oc, IImageQuery img, IImageProductAssignmentQuery ipa)
 		{
 			_settings = settings;
 			_oc = oc;

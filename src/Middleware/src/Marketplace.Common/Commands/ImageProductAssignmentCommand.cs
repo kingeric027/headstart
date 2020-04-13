@@ -20,11 +20,11 @@ namespace Marketplace.Common.Commands
     public class ImageProductAssignmentCommand : IImageProductAssignmentCommand
     {
         private readonly AppSettings _settings;
-        private readonly ImageProductAssignmentQuery _ipa;
-        private readonly ImageQuery _img;
+        private readonly IImageProductAssignmentQuery _ipa;
+        private readonly IImageQuery _img;
         private readonly IOrderCloudClient _oc;
 
-        public ImageProductAssignmentCommand(AppSettings settings, ImageProductAssignmentQuery ipa, ImageQuery img, IOrderCloudClient oc)
+        public ImageProductAssignmentCommand(AppSettings settings, IImageProductAssignmentQuery ipa, IImageQuery img, IOrderCloudClient oc)
         {
             _settings = settings;
             _ipa = ipa;

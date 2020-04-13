@@ -16,7 +16,14 @@ using static Marketplace.Helpers.Exceptions.ApiErrorException;
 
 namespace Marketplace.Common.Queries
 {
-    public class ImageProductAssignmentQuery
+    public interface IImageProductAssignmentQuery
+    {
+        Task Delete(string ImageID, string ProductID);
+        Task<ListPage<ImageProductAssignment>> List(ListArgs<ImageProductAssignment> args);
+        Task<ImageProductAssignment> Save(ImageProductAssignment pia);
+    }
+
+    public class ImageProductAssignmentQuery : IImageProductAssignmentQuery
     {
         private readonly ICosmosStore<ImageProductAssignment> _store;
         public ImageProductAssignmentQuery(ICosmosStore<ImageProductAssignment> store)

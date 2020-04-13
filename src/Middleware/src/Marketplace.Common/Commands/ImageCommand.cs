@@ -25,9 +25,9 @@ namespace Marketplace.Common.Commands
     public class ImageCommand : IImageCommand
     {
         private readonly AppSettings _settings;
-        private readonly ImageQuery _img;
+        private readonly IImageQuery _img;
 
-        public ImageCommand(AppSettings settings, ImageQuery img)
+        public ImageCommand(AppSettings settings, IImageQuery img)
         {
             _settings = settings;
             _img = img;
