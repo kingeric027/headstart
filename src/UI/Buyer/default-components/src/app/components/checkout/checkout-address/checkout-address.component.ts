@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Address, BuyerAddress, ListBuyerAddress, ListLineItem } from '@ordercloud/angular-sdk';
-import { MarketplaceOrder, ShopperContextService } from 'marketplace';
+import { MarketplaceOrder, ShopperContextService, OrderAddressType } from 'marketplace';
 import { getSuggestedAddresses } from '../../../services/address-suggestion.helper';
 // TODO - Make this component "Dumb" by removing the dependence on context service 
 // and instead have it use inputs and outputs to interact with the CheckoutComponent.
@@ -17,7 +17,7 @@ export class OCMCheckoutAddress implements OnInit {
   existingShippingAddresses: ListBuyerAddress;
   selectedShippingAddress: BuyerAddress;
   showNewAddressForm = false;
-  suggestedAddresses: ListBuyerAddress;
+  suggestedAddresses: BuyerAddress[];
   
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListLineItem;
@@ -48,7 +48,7 @@ export class OCMCheckoutAddress implements OnInit {
     if (newShippingAddress != null) {
       this.selectedShippingAddress = await this.saveNewShippingAddress(newShippingAddress);
     }
-    this.context.order.checkout.setShippingAddressByID(this.selectedShippingAddress.ID);
+    this.context.order.checkout.setAddressByID(OrderAddressType.Shipping, this.selectedShippingAddress.ID);
     this.continue.emit();
   }
 

@@ -65,7 +65,7 @@ export class CheckoutService implements ICheckout {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     address.ID = null;
-    this.order = await this.ocOrderService.SetShippingAddress('outgoing', this.order.ID, address).toPromise();
+    this.order = await  MarketplaceSDK.ValidatedAddresses.SetShippingAddress('Outgoing', this.order.ID, address);
     return this.order;
   }
 
