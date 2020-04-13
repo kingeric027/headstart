@@ -233,7 +233,7 @@ namespace Marketplace.Common.Commands
 			
 			// buyer
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPApprovalRuleAdmin , Roles = new[] { ApiRole.ApprovalRuleAdmin } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPApprovalRuleAdmin , Roles = new[] { ApiRole.ApprovalRuleAdmin, ApiRole.BuyerUserAdmin, ApiRole.UserGroupAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPOrderApprover },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPNeedsApproval },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCreditCardAdmin  , Roles = new[] { ApiRole.MeCreditCardAdmin } },
