@@ -1,8 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Variant, SpecOption, Spec } from '@ordercloud/angular-sdk';
-import { faExclamationCircle, faCog, faTrash, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Variant, SpecOption, Spec, OcSpecService } from '@ordercloud/angular-sdk';
+import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
 import { ToastrService } from 'ngx-toastr';
 
@@ -25,6 +24,7 @@ export class ProductVariations {
   @Input() areChanges: boolean;
   @Input() checkForChanges;
   @Input() copyProductResource;
+  @Input() isCreatingNew: boolean;
   get specsWithVariations() {
     return this.superProductEditable?.Specs?.filter(s => s.DefinesVariant);
   };
@@ -47,9 +47,10 @@ export class ProductVariations {
   faTrash = faTrash;
   faCog = faCog;
   faTimesCircle = faTimesCircle;
+  faCheckDouble = faCheckDouble;
   faExclamationCircle = faExclamationCircle;
 
-  constructor(private productService: ProductService, private toasterService: ToastrService) {}
+  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef) {}
   getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
@@ -101,16 +102,18 @@ export class ProductVariations {
       this.toasterService.warning('Please name your variation');
       return;
     }
-    const newSpec: Spec[] = [{
+    const newSpec: Spec[] | any = [{
       ID: `${updateProductResourceCopy.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, "")}`,
       Name: input.value,
+      // If this.definesVariant - AllowOptenText _MUST_ be false (platform requirement)
       AllowOpenText: false,
+      Required: this.definesVariant ? true : false,
       DefinesVariant: this.definesVariant,
       ListOrder: (updateProductResourceCopy.Specs?.length || 0) + 1,
       Options: []
     }]
     input.value = '';
-    updateProductResourceCopy.Specs = newSpec.concat(updateProductResourceCopy.Specs);
+    updateProductResourceCopy.Specs = updateProductResourceCopy.Specs.concat(newSpec);
     this.superProductEditable = updateProductResourceCopy;
     this.definesVariant = false;
     this.checkForSpecChanges();
@@ -131,7 +134,8 @@ export class ProductVariations {
       PriceMarkup: markup,
       xp: null
     }]
-    updateProductResourceCopy.Specs[specIndex].Options = newOption.concat(updateProductResourceCopy.Specs[specIndex].Options);
+    if (!updateProductResourceCopy.Specs[specIndex].Options.length) updateProductResourceCopy.Specs[specIndex].DefaultOptionID = newOption[0].ID;
+    updateProductResourceCopy.Specs[specIndex].Options = updateProductResourceCopy.Specs[specIndex].Options.concat(newOption);
     this.superProductEditable = updateProductResourceCopy;
     this.productVariationsChanged.emit(this.superProductEditable);
     this.mockVariants();
@@ -228,4 +232,24 @@ export class ProductVariations {
   }
 
   getPriceMarkup = (specOption: SpecOption): number => !specOption.PriceMarkup ? 0 : specOption.PriceMarkup
+
+  isDefaultSpecOption = (specID: string, optionID: string, specIndex: number): boolean => this.superProductEditable?.Specs[specIndex]?.DefaultOptionID === optionID;
+  disableSpecOption = (specIndex: string, option: SpecOption): boolean => this.isCreatingNew ? false : !JSON.stringify(this.superProductStatic?.Specs[specIndex]?.Options)?.includes(JSON.stringify(option));
+
+  stageDefaultSpecOption(specID: string, optionID: string, specIndex: number): void {
+    const updateProductResourceCopy = this.productService.copyResource(
+      this.superProductEditable || this.productService.emptyResource
+    );
+    updateProductResourceCopy.Specs[specIndex].DefaultOptionID = optionID;
+    this.superProductEditable = updateProductResourceCopy;
+  }
+
+  async setDefaultSpecOption(specID: string, optionID: string, specIndex: number): Promise<void> {
+    const updateProductResourceCopy = this.productService.copyResource(
+      this.superProductEditable || this.productService.emptyResource
+    );
+    updateProductResourceCopy.Specs[specIndex].DefaultOptionID = optionID;
+    this.superProductEditable.Specs = updateProductResourceCopy.Specs;
+    await this.ocSpecService.Patch(specID, { DefaultOptionID: optionID }).toPromise();
+  }
 }

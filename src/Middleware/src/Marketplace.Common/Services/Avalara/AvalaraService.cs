@@ -24,9 +24,9 @@ namespace Marketplace.Common.Services.Avalara
 		Task<TaxCertificate> UpdateCertificateAsync(int companyID, int certificateID, TaxCertificate cert);
 		Task<byte[]> DownloadCertificatePdfAsync(int companyID, int certificateID);
 		// Use this before checkout. No records will be saved in avalara.
-		Task<decimal> GetEstimateAsync(OrderWorksheet orderWorksheet);
+		Task<decimal> GetEstimateAsync(MarketplaceOrderWorksheet orderWorksheet);
 		// Use this during submit.
-		Task<TransactionModel> CreateTransactionAsync(OrderWorksheet orderWorksheet);
+		Task<TransactionModel> CreateTransactionAsync(MarketplaceOrderWorksheet orderWorksheet);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
 		// When should we do this? 
 		Task<TransactionModel> CommitTransactionAsync(string transactionCode);
@@ -90,13 +90,13 @@ namespace Marketplace.Common.Services.Avalara
 			return pdfBtyes;
 		}
 
-		public async Task<decimal> GetEstimateAsync(OrderWorksheet orderWorksheet)
+		public async Task<decimal> GetEstimateAsync(MarketplaceOrderWorksheet orderWorksheet)
 		{
 			var taxEstimate = (await CreateTransactionAsync(DocumentType.SalesOrder, orderWorksheet)).totalTax ?? 0;
 			return taxEstimate;
 		}
 
-		public async Task<TransactionModel> CreateTransactionAsync(OrderWorksheet orderWorksheet)
+		public async Task<TransactionModel> CreateTransactionAsync(MarketplaceOrderWorksheet orderWorksheet)
 		{
 			var transaction = await CreateTransactionAsync(DocumentType.SalesInvoice, orderWorksheet);
 			return transaction;
@@ -111,10 +111,10 @@ namespace Marketplace.Common.Services.Avalara
 
 		private string GetCustomerCode(Order order) => order.FromCompanyID;
 
-		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)
+		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, MarketplaceOrderWorksheet orderWorksheet)
 		{
-			var trans = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderWorksheet.Order));
-			trans.WithTransactionCode(orderWorksheet.Order.ID);
+			var builder = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderWorksheet.Order));
+			builder.WithTransactionCode(orderWorksheet.Order.ID);
 			foreach (var shipmentEstimate in orderWorksheet.ShipEstimateResponse.ShipEstimates)
 			{
 				var selectedShipMethod = shipmentEstimate.ShipMethods.First(shipmentMethod => shipmentMethod.ID == shipmentEstimate.SelectedShipMethodID);
@@ -125,12 +125,13 @@ namespace Marketplace.Common.Services.Avalara
 				var shipToAddress = firstLineItem.ShippingAddress;
 
 				// This assumes the order has one ShipTo Address. This is ok for marketplace, but not a general OC integration.
-				trans.WithShippingRate(shippingRate, shipFromAddress, shipToAddress);
+				builder.WithShippingRate(shippingRate, shipFromAddress, shipToAddress);
 			}
 
-			foreach (var lineItem in orderWorksheet.LineItems) trans.WithLineItem(lineItem);
+			foreach (var lineItem in orderWorksheet.LineItems) builder.WithLineItem(lineItem);
 
-			return await trans.CreateAsync();
+			var transaction = await builder.CreateAsync();
+			return transaction;
 		}
 	}
 }

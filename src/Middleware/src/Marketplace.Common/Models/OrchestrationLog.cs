@@ -12,7 +12,7 @@ using OrderCloud.SDK;
 namespace Marketplace.Common.Models
 {
     [SwaggerModel]
-    public class OrchestrationLog : ICosmosObject
+    public class OrchestrationLog : CosmosObject
     {
         public OrchestrationLog()
         {
@@ -50,9 +50,6 @@ namespace Marketplace.Common.Models
 
         }
 
-        public string id { get; set; }
-        [Sortable]
-        public DateTimeOffset timeStamp { get; set; }
         [Sortable]
         public OrchestrationErrorType? ErrorType { get; set; }
         public string Message { get; set; }

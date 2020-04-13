@@ -3,6 +3,7 @@ using Marketplace.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers
 {
@@ -28,7 +29,7 @@ namespace Marketplace.Common.Controllers
 		[Route("ordercalculate")]
 		[HttpPost]
 		[OrderCloudWebhookAuth]
-		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] OrderCalculatePayload orderCalculatePayload)
+		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload)
 		{
 			var orderCalculationResponse = await _OCShippingIntegration.CalculateOrder(orderCalculatePayload);
 			return orderCalculationResponse;

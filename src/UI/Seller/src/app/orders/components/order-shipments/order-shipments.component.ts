@@ -44,6 +44,7 @@ export class OrderShipmentsComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.order.ID) {
+      this.createShipment = false;
       this.getShipments();
       this.getLineItems();
     }
@@ -127,7 +128,6 @@ export class OrderShipmentsComponent implements OnChanges {
 
   getImageUrl(lineItem: LineItem): string {
     const product = lineItem.Product;
-    console.log('WHAT IS THE PRODUCT', product);
     return getProductMainImageUrlOrPlaceholder(product);
   }
 

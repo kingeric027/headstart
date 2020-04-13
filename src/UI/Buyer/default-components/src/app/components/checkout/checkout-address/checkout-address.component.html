@@ -1,47 +1,44 @@
 <div *ngIf="!isLoading">
-  <button *ngIf="addressType && addressType === 'Billing'"
-          class="btn btn-secondary mb-3 ml-2"
-          (click)="useShippingAsBilling()">Use Shipping Address</button>
   <div class="form-group">
-    <div *ngIf="addressType === 'Shipping'">
+    <div>
       <label for="selectBuyerLocation">Buyer Location</label>
-      <select (change)="toggleShowBuyerLocationForm($event)"
-            class="form-control"
-            id="selectBuyerLocation">
+      <select (change)="onBuyerLocationChange($event.target.value)"
+              class="form-control"
+              id="selectBuyerLocation">
         <option default
                 disabled>Select your buyer location to determine tax</option>
         <option *ngFor="let location of existingBuyerLocations?.Items"
                 [value]="location.ID"
                 [selected]="existingBuyerLocations?.Items.length === 1">
-           <span class="font-weight-bold">{{location.Street1}}<span *ngIf="location.Street2"> {{location.Street2}}</span>,
-                {{location.City}} {{location.State}} {{location.Zip}}</span>
+          <span class="font-weight-bold">{{location.Street1}}<span *ngIf="location.Street2"> {{location.Street2}}</span>,
+            {{location.City}} {{location.State}} {{location.Zip}}</span>
       </select>
-      <br/>
+      <br />
     </div>
-    <label for="selectAddress">{{addressType}} Address</label>
-    <select (change)="toggleShowAddressForm($event)"
+    <label for="selectAddress">Shipping Address</label>
+    <select (change)="onShippingAddressChange($event.target.value)"
             class="form-control"
             id="selectAddress">
       <option default
               disabled>Choose from your saved addresses, or choose to enter a new address</option>
-      <option *ngFor="let address of existingAddresses?.Items"
+      <option *ngFor="let address of existingShippingAddresses?.Items"
               [selected]="(existingBuyerLocations?.Items.length === 1 && existingBuyerLocations?.Items[0].ID === address.ID) 
                          || address.ID === selectedBuyerLocation.ID"
               [value]="address.ID">
         <span class="font-weight-bold">{{address.Street1}}<span *ngIf="address.Street2"> {{address.Street2}}</span>,
           {{address.City}} {{address.State}} {{address.Zip}}</span>
       </option>
-      <option value="new">Add a New Address</option>
+      <option [value]="NEW_ADDRESS_CODE">Add a New Address</option>
     </select>
     <button type="submit"
-            (click)="saveAddress(selectedBuyerLocation, selectedAddress)"
+            *ngIf="!showNewAddressForm"
+            (click)="saveAddressesAndContinue()"
             class="btn btn-primary btn-sm mr-2 mt-3">Save and Continue</button>
   </div>
-  <ocm-address-form *ngIf="showAddAddressForm"
-                    [existingAddress]="selectedAddress"
+  <ocm-address-form *ngIf="showNewAddressForm"
                     [suggestedAddresses]="suggestedAddresses"
                     [showOptionToSave]="true"
-                    (formSubmitted)="saveAddress(selectedBuyerLocation, $event.detail.address, $event.detail.formDirty, $event.detail.shouldSaveAddress)"
+                    (formSubmitted)="saveAddressesAndContinue($event.detail.address)"
                     [btnText]="'Save and Continue'">
   </ocm-address-form>
 </div>

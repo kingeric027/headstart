@@ -4,6 +4,9 @@ import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/produc
 import { Address, LineItem, OcLineItemService, OcOrderService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { ProductImage } from 'marketplace-javascript-sdk';
+import { PDFService } from '@app-seller/orders/pdf-render.service';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 @Component({
   selector: 'app-order-details',
@@ -11,6 +14,7 @@ import { ProductImage } from 'marketplace-javascript-sdk';
   styleUrls: ['./order-details.component.scss'],
 })
 export class OrderDetailsComponent {
+  faDownload = faDownload;
   _order: Order = {};
   _lineItems: LineItem[] = [];
   _payments: Payment[] = [];
@@ -24,6 +28,7 @@ export class OrderDetailsComponent {
   @Input()
   set order(order: Order) {
     if (Object.keys(order).length) {
+      this.createShipment = false;
       this.handleSelectedOrderChange(order);
     }
   }
@@ -31,7 +36,9 @@ export class OrderDetailsComponent {
     private ocLineItemService: OcLineItemService,
     private ocPaymentService: OcPaymentService,
     private orderService: OrderService,
-    private ocOrderService: OcOrderService
+    private pdfService: PDFService,
+    private ocOrderService: OcOrderService,
+    private middleware: MiddlewareAPIService
   ) { }
 
 
@@ -59,7 +66,7 @@ export class OrderDetailsComponent {
   }
 
   async setOrderStatus() {
-    await this.ocOrderService.Complete(this.orderDirection, this._order.ID).toPromise().then(patchedOrder => this.handleSelectedOrderChange(patchedOrder))
+    await this.middleware.acknowledgeQuoteOrder(this._order.ID).then(completedOrder => this.handleSelectedOrderChange(completedOrder));
   }
 
   isQuoteOrder(order: Order) {
@@ -79,5 +86,9 @@ export class OrderDetailsComponent {
 
   toggleCreateShipment(createShipment: boolean) {
     this.createShipment = createShipment;
+  }
+
+  protected createAndSavePDF(): void {
+    this.pdfService.createAndSavePDF(this._order.ID);
   }
 }

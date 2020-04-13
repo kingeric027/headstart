@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Marketplace.Helpers.Attributes;
 using OrderCloud.SDK;
 
 namespace Marketplace.Helpers.Models
@@ -13,7 +14,9 @@ namespace Marketplace.Helpers.Models
 
     public class CosmosObject : ICosmosObject
     {
+        [ApiIgnore]
         public string id { get; set; } = Guid.NewGuid().ToString();
+        [ApiIgnore]
         public DateTimeOffset timeStamp { get; set; } = DateTimeOffset.Now;
     }
 

@@ -1,7 +1,8 @@
 import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
 import { ListBuyerCreditCard } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
-import { MarketplaceOrder, CreditCardPayment } from 'marketplace';
+import { MarketplaceOrder, MarketplaceBuyerCreditCard } from 'marketplace';
+import { CreditCardToken } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
 
 @Component({
   templateUrl: './checkout-payment.component.html',
@@ -17,13 +18,19 @@ export class OCMCheckoutPayment implements OnInit {
   @Input() cards: ListBuyerCreditCard;
   @Input() isAnon: boolean;
   @Input() order: MarketplaceOrder;
-  @Output() cardSelected = new EventEmitter<CreditCardPayment>();
+  @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
 
   constructor() {}
 
   ngOnInit(): void {}
 
-  onCardSelected(card: CreditCardPayment): void {
+  onCardSelected(card: SelectedCreditCard): void {
     this.cardSelected.emit(card);
   }
+}
+
+export interface SelectedCreditCard {
+  SavedCard?: MarketplaceBuyerCreditCard;
+  NewCard?: CreditCardToken;
+  CVV: string;
 }

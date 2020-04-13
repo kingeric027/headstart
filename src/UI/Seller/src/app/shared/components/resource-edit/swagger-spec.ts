@@ -260,19 +260,15 @@ export const schemas = {
         },
       },
     },
-    Buyer: {
-      type: 'object',
-      example: {
-        ID: '',
-        Name: '',
-        DefaultCatalogID: '',
-        Active: false,
-        xp: {},
-      },
-      properties: {
-        ID: {
-          type: 'string',
-        },
+  Buyer: {
+    type: 'object',
+    example: {
+      Name: '',
+      DefaultCatalogID: '',
+      Active: false,
+      xp: {},
+    },
+    properties: {
         Name: {
           type: 'string',
           maxLength: 100,

@@ -13,12 +13,14 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using System.Linq;
 using Marketplace.Models.Models.Marketplace;
 using System;
+using Newtonsoft.Json;
 
 namespace Marketplace.Common.Commands
 {
     public interface IOrderCommand
     {
-        Task HandleBuyerOrderSubmit(OrderWorksheet order);
+        Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
+        Task<Order> AcknowledgeQuoteOrder(string orderID);
     }
 
     public class OrderCommand : IOrderCommand
@@ -31,18 +33,20 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudSandboxService _ocSandboxService;
         private readonly IZohoCommand _zoho;
         private readonly IAvalaraService _avatax;
-
-        public OrderCommand(IFreightPopService freightPopService, IOCShippingIntegration ocShippingIntegration, IAvalaraService avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        private readonly ISendgridService _sendgridService;
+        
+        public OrderCommand(IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraService avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
             _ocShippingIntegration = ocShippingIntegration;
             _avatax = avatax;
             _zoho = zoho;
+            _sendgridService = sendgridService;
             _ocSandboxService = orderCloudSandboxService;
         }
 
-        public async Task HandleBuyerOrderSubmit(OrderWorksheet orderWorksheet)
+        public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
         {
             try
             {
@@ -58,17 +62,38 @@ namespace Marketplace.Common.Commands
                 // quote orders do not need to flow into our integrations
                 if (buyerOrder.xp == null || buyerOrder.xp.OrderType != OrderType.Quote)
                 {
+                    // leaving this in until the sdk supports type parameters on order worksheet
                     var updatedWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, buyerOrder.ID);
                     await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders);
                     await HandleTaxTransactionCreationAsync(orderWorksheet);
                     var zoho_salesorder = await _zoho.CreateSalesOrder(orderWorksheet);
                     await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
                 }
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                // todo add error response in proper format for checkout integration after receiving models 
+                await _sendgridService.SendOrderSubmitEmail(orderWorksheet);
+
+                var response = new OrderSubmitResponse()
+                {
+                    HttpStatusCode = 200,
+                };
+                return response;
             }
+            catch (Exception ex)
+            {
+                var response = new OrderSubmitResponse()
+                {
+                    HttpStatusCode = 500,
+                    UnhandledErrorBody = JsonConvert.SerializeObject(ex),
+                };
+                return response;
+            }
+        }
+
+        public async Task<Order> AcknowledgeQuoteOrder(string orderID)
+        {
+            int index = orderID.IndexOf("-");
+            string buyerOrderID = orderID.Substring(0, index);
+            await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
+            return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
         }
 
         private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrder buyerOrder, List<Order> supplierOrders)
@@ -129,7 +154,7 @@ namespace Marketplace.Common.Commands
             return shipFromAddressIDs;
         }
 
-        private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
+        private async Task HandleTaxTransactionCreationAsync(MarketplaceOrderWorksheet orderWorksheet)
         {
             var transaction = await _avatax.CreateTransactionAsync(orderWorksheet);
             await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()

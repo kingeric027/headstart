@@ -52,7 +52,11 @@
         <div class="card-deck">
           <div class="product-spec card p-2"
                *ngFor="let spec of superProductEditable?.Specs; let specIndex = index;">
-            <h5 class="ml-2">{{spec.Name}}</h5>
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="ml-2 mb-0">{{spec.Name}}</h5>
+              <button class="btn btn-link text-danger"
+                      (click)="removeSpec(spec)">Delete Variation</button>
+            </div>
             <table class="table table-sm table-hover">
               <thead>
                 <tr>
@@ -67,14 +71,14 @@
                     <input class="form-control"
                            id="{{spec.ID}}"
                            type="text"
-                           maxlength="20"
-                           placeholder="Option Name">
+                           maxlength="30"
+                           placeholder="Name">
                   </td>
                   <td>
                     <input class="form-control"
                            id="{{spec.ID}}Markup"
                            type="number"
-                           placeholder="Price Markup">
+                           placeholder="Markup">
                   </td>
                   <td>
                     <button class="btn btn-outline-dark"
@@ -84,27 +88,41 @@
                 </tr>
               </tbody>
             </table>
-            <div class="row">
-              <div class="col-md-12">
-                <div class="chip"
-                     *ngFor="let opt of spec.Options; let optionIndex = index">{{opt.Value}} <span *ngIf="opt.PriceMarkup">(+{{getPriceMarkup(opt) | currency }})</span>
-                  <fa-icon (click)="removeSpecOption(specIndex, optionIndex)"
-                           [icon]="faTimesCircle"></fa-icon>
-                </div>
-              </div>
-            </div>
-            <button class="btn btn-link text-danger"
-                    (click)="removeSpec(spec)">Delete Variation</button>
+            <table class="table table-sm table-hover">
+              <thead>
+                <tr>
+                  <th>Option</th>
+                  <th>Price Markup</th>
+                  <th>Default</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let opt of spec.Options; let optionIndex = index">
+                  <td>{{opt.Value}}</td>
+                  <td>{{getPriceMarkup(opt) | currency}}</td>
+                  <td>
+                    <label class="check-container mt-0">
+                      <input type="checkbox"
+                             [checked]="isDefaultSpecOption(spec.ID, opt.ID, specIndex)"
+                             (change)="isCreatingNew ? stageDefaultSpecOption(spec.ID, opt.ID, specIndex) : setDefaultSpecOption(spec.ID, opt.ID, specIndex)"
+                             [disabled]="disableSpecOption(specIndex, opt)"
+                             id="DefaultSpecOption">
+                      <span class="checkmark"></span>
+                    </label>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
         <div class="d-flex justify-content-end align-items-center mt-3">
-          <button *ngIf="editSpecs"
+          <button *ngIf="editSpecs && areSpecChanges"
                   (click)="handleDiscardSpecChanges()"
                   class="btn btn-link text-dark">Cancel</button>
           <button *ngIf="editSpecs"
                   class="btn btn-outline-dark"
-                  [disabled]="!areSpecChanges || !variantsValid"
-                  (click)="toggleEditSpecs()">{{areSpecChanges ? 'Save Changes' : 'No Changes'}}</button>
+                  [disabled]="!variantsValid"
+                  (click)="toggleEditSpecs()">{{areSpecChanges ? 'Save Changes' : 'Done'}}</button>
         </div>
       </div>
     </div>

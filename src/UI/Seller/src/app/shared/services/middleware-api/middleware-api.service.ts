@@ -1,7 +1,7 @@
-import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { OcTokenService } from '@ordercloud/angular-sdk';
+import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { OcTokenService, Order } from '@ordercloud/angular-sdk';
 import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
 
 @Injectable({
@@ -29,13 +29,22 @@ export class MiddlewareAPIService {
   async uploadStaticContent(file: File, productID: string, fileName: string): Promise<SuperMarketplaceProduct> {
     const form = new FormData();
     form.append('file', file);
-    const url = `${this.appConfig.middlewareUrl}/${this.appConfig.marketplaceID}/static-content/${productID}/${fileName}`;
+    const url = `${this.appConfig.middlewareUrl}/${
+      this.appConfig.marketplaceID
+      }/static-content/${productID}/${fileName}`;
     return await this.http.post<SuperMarketplaceProduct>(url, form, this.headers).toPromise();
-
   }
 
   async deleteStaticContent(fileName: string, productID: string): Promise<SuperMarketplaceProduct> {
-    const url = `${this.appConfig.middlewareUrl}/${this.appConfig.marketplaceID}/static-content/${productID}/${fileName}`;
+    const url = `${this.appConfig.middlewareUrl}/${
+      this.appConfig.marketplaceID
+      }/static-content/${productID}/${fileName}`;
     return await this.http.delete<SuperMarketplaceProduct>(url, this.headers).toPromise();
+  }
+
+  async acknowledgeQuoteOrder(orderID: string): Promise<Order> {
+    const url = `${this.appConfig.middlewareUrl}/order/acknowledgequote/${orderID}`;
+    return await this.http.post<Order>(url, this.headers).toPromise();
+
   }
 }

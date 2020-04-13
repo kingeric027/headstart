@@ -27,16 +27,6 @@ export class AddressService {
     return this.ocMeService.ListAddresses(args).toPromise();
   }
 
-  async listShipping(args: ListArgs = {}): Promise<ListMarketplaceAddressBuyer> {
-    args.filters = { ...args.filters, Shipping: 'true' };
-    return this.list(args);
-  }
-
-  async listBilling(args: ListArgs = {}): Promise<ListMarketplaceAddressBuyer> {
-    args.filters = { ...args.filters, Billing: 'true' };
-    return this.list(args);
-  }
-
   async create(address: MarketplaceAddressBuyer): Promise<MarketplaceAddressBuyer> {
     return MarketplaceSDK.ValidatedAddresses.CreateMeAddress(address);
   }

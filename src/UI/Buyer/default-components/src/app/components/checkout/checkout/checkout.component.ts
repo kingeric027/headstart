@@ -9,9 +9,9 @@ import {
   ListBuyerCreditCard,
   ShipMethodSelection,
   ShipEstimate,
-  CreditCardPayment,
 } from 'marketplace';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
+import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -24,7 +24,7 @@ export class OCMCheckout implements OnInit {
   lineItems: ListLineItem;
   payments: ListPayment;
   cards: ListBuyerCreditCard;
-  selectedCard: CreditCardPayment;
+  selectedCard: SelectedCreditCard;
   shipEstimates: ShipEstimate[] = null;
   currentPanel: string;
   faCheck = faCheck;
@@ -44,10 +44,6 @@ export class OCMCheckout implements OnInit {
     },
     {
       id: 'payment',
-      valid: false,
-    },
-    {
-      id: 'billingAddress',
       valid: false,
     },
     {
@@ -74,7 +70,8 @@ export class OCMCheckout implements OnInit {
   }
 
   async selectShipMethod(selection: ShipMethodSelection): Promise<void> {
-    await this.checkout.selectShipMethod(selection);
+    const orderWorksheet = await this.checkout.selectShipMethod(selection);
+    this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
   }
 
   async doneWithShippingRates(): Promise<void> {
@@ -83,7 +80,7 @@ export class OCMCheckout implements OnInit {
     this.toSection('payment');
   }
 
-  async onCardSelected(output: CreditCardPayment): Promise<void> {
+  async onCardSelected(output: SelectedCreditCard): Promise<void> {
     this.selectedCard = output;
     if (output.SavedCard) {
       await this.checkout.createSavedCCPayment(output.SavedCard);
@@ -97,12 +94,21 @@ export class OCMCheckout implements OnInit {
     }
 
     this.payments = await this.checkout.listPayments();
-    this.toSection('billingAddress');
+    this.toSection('confirm');
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
     await this.checkout.addComment(comment);
-    const cleanOrderID = await this.checkout.submit(this.selectedCard);
+    const ccPayment = {
+      OrderId: this.order.ID,
+      PaymentID: this.payments.Items[0].ID, // There's always only one at this point
+      CreditCardID: this.selectedCard?.SavedCard?.ID,
+      CreditCardDetails: this.selectedCard.NewCard,
+      Currency: 'USD', // TODO - won't always be USD
+      CVV: this.selectedCard.CVV,
+      MerchantID: this.context.appSettings.cardConnectMerchantID,
+    }
+    const cleanOrderID = await this.checkout.submit(ccPayment);
 
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(cleanOrderID);
@@ -114,11 +120,6 @@ export class OCMCheckout implements OnInit {
 
   setValidation(id: string, value: boolean): void {
     this.sections.find(x => x.id === id).valid = value;
-  }
-
-  async calculateAndToConfirm() {
-    await this.checkout.calculateOrder();
-    this.toSection('confirm');
   }
 
   toSection(id: string): void {

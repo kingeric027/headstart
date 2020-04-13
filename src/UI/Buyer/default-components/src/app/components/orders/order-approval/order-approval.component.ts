@@ -8,12 +8,11 @@ import { ShopperContextService } from 'marketplace';
   templateUrl: './order-approval.component.html',
   styleUrls: ['./order-approval.component.scss'],
 })
-export class OCMOrderApproval  implements OnInit {
+export class OCMOrderApproval implements OnInit {
   approved: boolean;
   form: FormGroup;
-  modalID = 'order-approval-comments';
   @Input() orderID: string;
-  approveModal = ModalState.Closed;
+  requestedConfirmation = false;
 
   constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
 
@@ -21,9 +20,14 @@ export class OCMOrderApproval  implements OnInit {
     this.form = new FormGroup({ comments: new FormControl('') });
   }
 
-  openModal(approved: boolean): void {
+  openConfirmation(approved: boolean): void {
     this.approved = approved;
-    this.approveModal = ModalState.Open;
+    this.requestedConfirmation = true;
+  }
+
+  closeConfirmation(): void {
+    this.requestedConfirmation = false;
+    this.form.controls.comments.setValue('');
   }
 
   async submitReview(): Promise<void> {
@@ -35,7 +39,7 @@ export class OCMOrderApproval  implements OnInit {
     }
 
     this.toasterService.success(`Order ${this.orderID} was ${this.approved ? 'Approved' : 'Declined'}`);
-    this.approveModal = ModalState.Closed;
+    this.requestedConfirmation = false;
     this.context.router.toOrdersToApprove();
   }
 }
