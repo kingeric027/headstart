@@ -163,9 +163,9 @@
     <div *ngIf="!editShipToAddress" class="col-sm-6">
         <span class="font-weight-bold d-block">Ship To</span>
         <span *ngIf="lineItems[0].ShippingAddress?.CompanyName" class="d-block">{{lineItems[0].ShippingAddress.CompanyName}}</span>
-        <span class="d-block">{{lineItems[0].ShippingAddress.Street1}}</span>
+        <span class="d-block">{{lineItems[0].ShippingAddress?.Street1}}</span>
         <span *ngIf="lineItems[0].ShippingAddress?.Street2" class="d-block">{{lineItems[0].ShippingAddress.Street2}}</span>
-        <span class="d-block">{{lineItems[0].ShippingAddress.City}}, {{lineItems[0].ShippingAddress.State}} {{lineItems[0].ShippingAddress.Zip}}</span>
+        <span class="d-block">{{lineItems[0].ShippingAddress?.City}}, {{lineItems[0].ShippingAddress?.State}} {{lineItems[0].ShippingAddress?.Zip}}</span>
        
         <!-- TO-DO: Some starting code to allow a supplier to override the Ship To address, but we need a way to identify the buyer of the order. -->
         <!-- <button class="d-block mt-3 btn btn-outline-dark"
