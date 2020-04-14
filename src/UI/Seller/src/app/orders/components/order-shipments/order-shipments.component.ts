@@ -6,6 +6,8 @@ import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/produc
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AppAuthService } from '@app-seller/auth';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { OrderService } from '@app-seller/orders/order.service';
+import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 
 @Component({
   selector: 'app-order-shipments',
@@ -28,19 +30,23 @@ export class OrderShipmentsComponent implements OnChanges {
   quantities: number[] = [];
   lineItems: LineItem[];
   isSaving = false;
+  isSellerUser = false;
   @Input()
   order: Order;
   @Output()
   createOrViewShipmentEvent = new EventEmitter<boolean>();
 
   constructor(
+    private orderService: OrderService,
     private ocSupplierAddressService: OcSupplierAddressService,
     private ocShipmentService: OcShipmentService,
     private ocLineItemService: OcLineItemService,
     private httpClient: HttpClient,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-    ) { }
+    ) { 
+      this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER;
+    }
 
   ngOnChanges() {
     if (this.order.ID) {
@@ -87,6 +93,10 @@ export class OrderShipmentsComponent implements OnChanges {
   canCreateShipment(): boolean {
     let unshippedItem = this.lineItems.find(item => item.Quantity > item.QuantityShipped);
     return unshippedItem ? true : false;
+  }
+
+  isQuoteOrder(order: Order) {
+    return this.orderService.isQuoteOrder(order);
   }
 
   toggleViewShipments(): void {
