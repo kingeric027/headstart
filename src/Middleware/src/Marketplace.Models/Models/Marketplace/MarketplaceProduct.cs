@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Marketplace.Common.Models;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Helpers.Attributes;
 using Marketplace.Models.Extended;
@@ -12,11 +13,12 @@ namespace Marketplace.Models
     [SwaggerModel]
     public class SuperMarketplaceProduct : IMarketplaceObject
     {
+        public string ID { get; set; }
         public MarketplaceProduct Product { get; set; }
         public PriceSchedule PriceSchedule { get; set; }
-        public string ID { get; set; }
         public IList<Spec> Specs { get; set; }
         public IList<MarketplaceVariant> Variants { get; set; }
+        public IList<Image> Images { get; set; }
     }
 
     [SwaggerModel]
