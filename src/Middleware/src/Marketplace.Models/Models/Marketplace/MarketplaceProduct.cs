@@ -23,7 +23,8 @@ namespace Marketplace.Models
     public class PartialMarketplaceProduct : PartialProduct<ProductXp>
     {
     }
-
+    [SwaggerModel]
+    public class MarketplaceLineItemProduct : LineItemProduct<ProductXp> { }
     [SwaggerModel]
     public class MarketplaceProduct : Product<ProductXp>, IMarketplaceObject
     {
