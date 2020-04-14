@@ -24,7 +24,7 @@ export class ProductVariations {
   };
   @Input() areChanges: boolean;
   @Input() readonly = false;
-  @Input() checkForChanges = false;
+  @Input() checkForChanges;
   @Input() copyProductResource;
   @Input() isCreatingNew = false;
   get specsWithVariations() {
