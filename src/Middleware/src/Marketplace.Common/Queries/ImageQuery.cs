@@ -77,7 +77,7 @@ namespace Marketplace.Common.Queries
 
         public async Task<ListPage<Image>> GetProductImages(string productID)
         {
-            var productImages = new ListPage<Image>();
+            var productImages = new ListPage<Image>() { Items = new List<Image>() };
             var assignments = await _imageProductAssignmentStore.Query(new FeedOptions() { EnableCrossPartitionQuery = true }).Where(x => x.ProductID == productID).ToListAsync();
             await Throttler.RunAsync(assignments, 100, 5, async a =>
             {
