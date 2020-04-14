@@ -1,7 +1,7 @@
 import { Component, Inject, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { faShippingFast, faWindowClose, faPlus, faCog, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { LineItem, Shipment, OcSupplierAddressService, ListAddress, ListShipment, OcShipmentService, ListShipmentItem, OcLineItemService, Order } from '@ordercloud/angular-sdk';
+import { LineItem, Shipment, OcSupplierAddressService, ListAddress, ListShipment, OcShipmentService, ListShipmentItem, OcLineItemService, OcOrderService, Order } from '@ordercloud/angular-sdk';
 import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AppAuthService } from '@app-seller/auth';
@@ -32,12 +32,15 @@ export class OrderShipmentsComponent implements OnChanges {
   isSaving = false;
   isSellerUser = false;
   @Input()
+  orderDirection: string;
+  @Input()
   order: Order;
   @Output()
   createOrViewShipmentEvent = new EventEmitter<boolean>();
 
   constructor(
     private orderService: OrderService,
+    private ocOrderService: OcOrderService,
     private ocSupplierAddressService: OcSupplierAddressService,
     private ocShipmentService: OcShipmentService,
     private ocLineItemService: OcLineItemService,
@@ -115,11 +118,12 @@ export class OrderShipmentsComponent implements OnChanges {
   // }
 
   async getShipments(): Promise<void> {
-    this.shipments = await this.ocShipmentService.List({orderID: this.order.ID, sortBy: 'DateShipped'}).toPromise();
+    const shipments = await this.ocOrderService.ListShipments(this.orderDirection, this.order.ID).toPromise();
+    this.shipments = shipments;
   }
 
   async getLineItems(): Promise<void> {
-    const lineItemsResponse = await this.ocLineItemService.List('Incoming', this.order.ID).toPromise();
+    const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, this.order.ID).toPromise();
     this.lineItems = lineItemsResponse.Items;
   }
 
