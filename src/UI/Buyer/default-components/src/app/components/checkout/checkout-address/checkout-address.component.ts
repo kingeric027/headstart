@@ -48,7 +48,7 @@ export class OCMCheckoutAddress implements OnInit {
     if (newShippingAddress != null) {
       this.selectedShippingAddress = await this.saveNewShippingAddress(newShippingAddress);
     }
-    this.context.order.checkout.setAddressByID(OrderAddressType.Shipping, this.selectedShippingAddress.ID);
+    this.context.order.checkout.setShippingAddressByID(this.selectedShippingAddress.ID);
     this.continue.emit();
   }
 
