@@ -19,7 +19,7 @@ namespace Marketplace.Common.Queries
     {
         Task Delete(string id);
         Task<Image> Get(string id);
-        Task<List<Image>> GetProductImages(string productID);
+        Task<ListPage<Image>> GetProductImages(string productID);
         Task<ListPage<Image>> List(ListArgs<Image> args);
         Task<Image> Save(Image img);
         Task<List<Image>> SaveMany(List<Image> imgs);
@@ -75,15 +75,15 @@ namespace Marketplace.Common.Queries
             await _imageStore.RemoveByIdAsync(id, options);
         }
 
-        public async Task<List<Image>> GetProductImages(string productID)
+        public async Task<ListPage<Image>> GetProductImages(string productID)
         {
-            var productImages = new List<Image>();
+            var productImages = new ListPage<Image>();
             var assignments = await _imageProductAssignmentStore.Query(new FeedOptions() { EnableCrossPartitionQuery = true }).Where(x => x.ProductID == productID).ToListAsync();
             await Throttler.RunAsync(assignments, 100, 5, async a =>
             {
                 var options = new RequestOptions { PartitionKey = new PartitionKey(a.ImageID) };
                 var image = await _imageStore.FindAsync(a.ImageID, options);
-                productImages.Add(image);
+                productImages.Items.Add(image);
             });
             return productImages;
         }

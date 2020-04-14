@@ -47,7 +47,7 @@ namespace Marketplace.Common.Controllers
         }
         [DocName("GET a product's images")]
         [HttpGet, Route("product/{productID}")]
-        public async Task<List<Image>> GetProductImages(string productID)
+        public async Task<ListPage<Image>> GetProductImages(string productID)
         {
             return await _command.GetProductImages(productID);
         }
