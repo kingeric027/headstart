@@ -78,10 +78,16 @@ namespace Marketplace.Common.Services
 			};
 			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, partial, token);
 			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
+			var _specs = await _oc.Products.ListSpecsAsync(productID, null, null, null, 1, 100, null, token);
+			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(productID, null, null, null, 1, 100, null, token);
+			var _images = await _img.GetProductImages(productID);
 			return new SuperMarketplaceProduct
 			{
 				Product = _patchedProduct,
-				PriceSchedule = _priceSchedule
+				PriceSchedule = _priceSchedule,
+				Specs = _specs.Items,
+				Variants = _variants.Items,
+				Images = _images.Items,
 			};
 		}
 
@@ -90,15 +96,22 @@ namespace Marketplace.Common.Services
 			var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID, token);
 			var blobName = GetProductImageName(marketplaceID, fileName);
 			await _imageContainer.Delete(blobName);
-
+			// Delete the image and assignment record from the Cosmos store
+			await _img.Delete(fileName);
 			var Images = product.xp.Images.Where(img => !img.URL.EndsWith(fileName));
 
 			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { xp = new { Images } }, token);
 			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
+			var _specs = await _oc.Products.ListSpecsAsync(productID, null, null, null, 1, 100, null, token);
+			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(productID, null, null, null, 1, 100, null, token);
+			var _images = await _img.GetProductImages(productID);
 			return new SuperMarketplaceProduct
 			{
 				Product = _patchedProduct,
-				PriceSchedule = _priceSchedule
+				PriceSchedule = _priceSchedule,
+				Specs = _specs.Items,
+				Variants = _variants.Items,
+				Images = _images.Items,
 			};
 		}
 
@@ -126,10 +139,16 @@ namespace Marketplace.Common.Services
 			};
 			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, partial, token);
 			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
+			var _specs = await _oc.Products.ListSpecsAsync(productID, null, null, null, 1, 100, null, token);
+			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(productID, null, null, null, 1, 100, null, token);
+			var _images = await _img.GetProductImages(productID);
 			return new SuperMarketplaceProduct
 			{
 				Product = _patchedProduct,
-				PriceSchedule = _priceSchedule
+				PriceSchedule = _priceSchedule,
+				Specs = _specs.Items,
+				Variants = _variants.Items,
+				Images = _images.Items,
 			};
 		}
 
@@ -143,10 +162,16 @@ namespace Marketplace.Common.Services
 
 			var _patchedProduct = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { xp = new { StaticContent } }, token);
 			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
+			var _specs = await _oc.Products.ListSpecsAsync(productID, null, null, null, 1, 100, null, token);
+			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(productID, null, null, null, 1, 100, null, token);
+			var _images = await _img.GetProductImages(productID);
 			return new SuperMarketplaceProduct
 			{
 				Product = _patchedProduct,
-				PriceSchedule = _priceSchedule
+				PriceSchedule = _priceSchedule,
+				Specs = _specs.Items,
+				Variants = _variants.Items,
+				Images = _images.Items,
 			};
 		}
 
