@@ -53,7 +53,7 @@ namespace Marketplace.Common.Commands.Crud
                 PriceSchedule = _priceSchedule,
                 Specs = _specs.Items,
                 Variants = _variants.Items,
-                Images = _images
+                Images = _images.Items
             };
         }
 
@@ -77,7 +77,7 @@ namespace Marketplace.Common.Commands.Crud
                     PriceSchedule = priceSchedule,
                     Specs = _specs.Items,
                     Variants = _variants.Items,
-                    Images = _images
+                    Images = _images.Items
                 });
             });
             return new ListPage<SuperMarketplaceProduct>
@@ -203,7 +203,7 @@ namespace Marketplace.Common.Commands.Crud
                 PriceSchedule = _updatedPriceSchedule,
                 Specs = _specs.Items,
                 Variants = _variants.Items,
-                Images = _images,
+                Images = _images.Items,
             };
         }
 
@@ -212,7 +212,7 @@ namespace Marketplace.Common.Commands.Crud
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
             var _images = await _imgCommand.GetProductImages(id);
             // Delete specs and images associated with the requested product
-            await Throttler.RunAsync(_images, 100, 5, i => _imgCommand.Delete(i.id));
+            await Throttler.RunAsync(_images.Items, 100, 5, i => _imgCommand.Delete(i.id));
             await Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
             await _oc.Products.DeleteAsync(id, user.AccessToken);
         }

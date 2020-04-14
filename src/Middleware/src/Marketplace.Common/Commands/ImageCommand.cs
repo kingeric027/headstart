@@ -19,7 +19,7 @@ namespace Marketplace.Common.Commands
         Task<Image> Get(string id);
         Task<Image> Create(Image img);
         Task Delete(string ID);
-        Task<List<Image>> GetProductImages(string productID);
+        Task<ListPage<Image>> GetProductImages(string productID);
     }
 
     public class ImageCommand : IImageCommand
@@ -49,7 +49,7 @@ namespace Marketplace.Common.Commands
         {
             await _img.Delete(id);
         }
-        public async Task<List<Image>> GetProductImages(string productID)
+        public async Task<ListPage<Image>> GetProductImages(string productID)
         {
             return await _img.GetProductImages(productID);
         }
