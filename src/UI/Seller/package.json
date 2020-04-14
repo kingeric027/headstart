@@ -54,7 +54,7 @@
     "jspdf": "^1.5.3",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.4",
-    "marketplace-javascript-sdk": "^1.2.11",
+    "marketplace-javascript-sdk": "^1.2.12",
     "moment": "^2.20.0",
     "ngx-cookie": "^4.1.2",
     "ngx-perfect-scrollbar": "^8.0.0",
