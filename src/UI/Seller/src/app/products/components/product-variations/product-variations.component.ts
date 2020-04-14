@@ -16,16 +16,17 @@ export class ProductVariations {
   set superMarketplaceProductEditable(superProductEditable: SuperMarketplaceProduct) {
     this.superProductEditable = superProductEditable;
     this.variants = superProductEditable?.Variants;
-    superProductEditable?.Product?.ID ? this.canConfigureVariations = true : this.canConfigureVariations = false;
+    this.canConfigureVariations = !!superProductEditable?.Product?.ID;
   };
   @Input()
   set superMarketplaceProductStatic(superProductStatic: SuperMarketplaceProduct) {
     this.superProductStatic = superProductStatic;
   };
   @Input() areChanges: boolean;
-  @Input() checkForChanges;
+  @Input() readonly = false;
+  @Input() checkForChanges = false;
   @Input() copyProductResource;
-  @Input() isCreatingNew: boolean;
+  @Input() isCreatingNew = false;
   get specsWithVariations() {
     return this.superProductEditable?.Specs?.filter(s => s.DefinesVariant);
   };
@@ -90,7 +91,7 @@ export class ProductVariations {
     const updateProductResourceCopy = this.productService.copyResource(
         this.superProductEditable || this.productService.emptyResource
     );
-    updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, "");
+    updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, '');
     this.superProductEditable = updateProductResourceCopy;
     this.productVariationsChanged.emit(this.superProductEditable);
   }
@@ -99,17 +100,17 @@ export class ProductVariations {
     const updateProductResourceCopy = this.productService.copyResource(
         this.superProductEditable || this.productService.emptyResource
     );
-    let input = (document.getElementById('AddVariation') as any)
+    const input = (document.getElementById('AddVariation') as any)
     if (input.value === '') {
       this.toasterService.warning('Please name your variation');
       return;
     }
     const newSpec: Spec[] | any = [{
-      ID: `${updateProductResourceCopy.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, "")}`,
+      ID: `${updateProductResourceCopy.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, '')}`,
       Name: input.value,
       // If this.definesVariant - AllowOptenText _MUST_ be false (platform requirement)
       AllowOpenText: false,
-      Required: this.definesVariant ? true : false,
+      Required: this.definesVariant,
       DefinesVariant: this.definesVariant,
       ListOrder: (updateProductResourceCopy.Specs?.length || 0) + 1,
       Options: []
@@ -125,18 +126,18 @@ export class ProductVariations {
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
-    let input = (document.getElementById(`${spec.ID}`) as any)
-    let markup = (document.getElementById(`${spec.ID}Markup`) as any).value;
+    const input = (document.getElementById(`${spec.ID}`) as any)
+    const markup = (document.getElementById(`${spec.ID}Markup`) as any).value;
     if (input.value === '') {
       this.toasterService.warning('Please name your option');
       return;
     }
     const newOption = [{
-      ID: input.value.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, ""),
+      ID: input.value.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, ''),
       Value: input.value,
       ListOrder: spec.Options.length + 1,
       IsOpenText: false,
-      PriceMarkupType: markup ? 1 : "NoMarkup",
+      PriceMarkupType: markup ? 1 : 'NoMarkup',
       PriceMarkup: markup,
       xp: null
     }]
@@ -194,7 +195,7 @@ export class ProductVariations {
     specsDefiningVariants = specsDefiningVariants.sort((a, b) => a.ListOrder - b.ListOrder);
     const firstSpec = specsDefiningVariants[0];
     let variants = this.createVariantsForFirstSpec(firstSpec);
-    for (var i = 1; i < specsDefiningVariants.length; i++) {
+    for (let i = 1; i < specsDefiningVariants.length; i++) {
       variants = this.combineSpecOptions(variants, specsDefiningVariants[i])
     }
     return variants;
@@ -220,7 +221,7 @@ export class ProductVariations {
   }
 
   combineSpecOptions(workingVariantList: Variant[], spec: Spec): Variant[] {
-    let newVariantList = [];
+    const newVariantList = [];
     workingVariantList.forEach(variant => {
       spec.Options.forEach(opt => {
         newVariantList.push({
