@@ -125,6 +125,10 @@ export class ProductVariations {
     );
     let input = (document.getElementById(`${spec.ID}`) as any)
     let markup = (document.getElementById(`${spec.ID}Markup`) as any).value;
+    if (input.value === '') {
+      this.toasterService.warning('Please name your option');
+      return;
+    }
     const newOption = [{
       ID: input.value.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, ""),
       Value: input.value,
@@ -135,6 +139,7 @@ export class ProductVariations {
       xp: null
     }]
     if (!updateProductResourceCopy.Specs[specIndex].Options.length) updateProductResourceCopy.Specs[specIndex].DefaultOptionID = newOption[0].ID;
+    if (!updateProductResourceCopy.Specs[specIndex].DefaultOptionID) updateProductResourceCopy.Specs[specIndex].DefaultOptionID = updateProductResourceCopy.Specs[specIndex].Options[0].ID;
     updateProductResourceCopy.Specs[specIndex].Options = updateProductResourceCopy.Specs[specIndex].Options.concat(newOption);
     this.superProductEditable = updateProductResourceCopy;
     this.productVariationsChanged.emit(this.superProductEditable);
@@ -146,6 +151,7 @@ export class ProductVariations {
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
+    if (updateProductResourceCopy.Specs[specIndex].DefaultOptionID === updateProductResourceCopy.Specs[specIndex].Options[optionIndex].ID) updateProductResourceCopy.Specs[specIndex].DefaultOptionID = null;
     updateProductResourceCopy.Specs[specIndex].Options.splice(optionIndex, 1);
     this.superProductEditable = updateProductResourceCopy;
     this.productVariationsChanged.emit(this.superProductEditable);

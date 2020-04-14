@@ -92,14 +92,14 @@
               <thead>
                 <tr>
                   <th>Option</th>
-                  <th>Price Markup</th>
                   <th>Default</th>
+                  <th>Price Markup</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let opt of spec.Options; let optionIndex = index">
                   <td>{{opt.Value}}</td>
-                  <td>{{getPriceMarkup(opt) | currency}}</td>
                   <td>
                     <label class="check-container mt-0">
                       <input type="checkbox"
@@ -109,6 +109,17 @@
                              id="DefaultSpecOption">
                       <span class="checkmark"></span>
                     </label>
+                  </td>
+                  <td>{{getPriceMarkup(opt) | currency}}</td>
+                  <td>
+                    <div class="icon-button ripple hover-btn"
+                         (click)="removeSpecOption(specIndex, optionIndex)">
+                      <div class="icon-wrapper">
+                        <fa-icon class="text-danger"
+                                 [icon]="faTrash">
+                        </fa-icon>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>
