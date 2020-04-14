@@ -1,9 +1,10 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { Variant, SpecOption, Spec, OcSpecService } from '@ordercloud/angular-sdk';
-import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faImages } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
 import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
 import { ToastrService } from 'ngx-toastr';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'product-variations-component',
@@ -46,11 +47,12 @@ export class ProductVariations {
   editSpecs = false;
   faTrash = faTrash;
   faCog = faCog;
+  faImages = faImages;
   faTimesCircle = faTimesCircle;
   faCheckDouble = faCheckDouble;
   faExclamationCircle = faExclamationCircle;
 
-  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef) {}
+  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private modalService: NgbModal,) {}
   getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
@@ -206,6 +208,7 @@ export class ProductVariations {
         Name: `${this.superProductEditable.Product.ID} ${opt.Value}`,
         Active: true,
         xp: {
+          SpecCombo: `${opt.ID}`,
           SpecValues:[{
             SpecName: spec.Name,
             SpecOptionValue: opt.Value,
@@ -225,6 +228,7 @@ export class ProductVariations {
           Name: `${variant.Name} ${opt.Value}`,
           Active: true,
           xp: {
+            SpecCombo: `${variant.xp.SpecCombo}-${opt.ID}`,
             SpecValues:[...variant.xp.SpecValues, {
               SpecName: spec.Name,
               SpecOptionValue: opt.Value,
@@ -257,5 +261,9 @@ export class ProductVariations {
     updateProductResourceCopy.Specs[specIndex].DefaultOptionID = optionID;
     this.superProductEditable.Specs = updateProductResourceCopy.Specs;
     await this.ocSpecService.Patch(specID, { DefaultOptionID: optionID }).toPromise();
+  }
+
+  async open(content) {
+    await this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
   }
 }
