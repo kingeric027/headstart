@@ -67,6 +67,14 @@ namespace Marketplace.Tests
             {
                 ocClient.Products.GetAsync<MarketplaceProduct>("mockProductID", "mockToken")
                     .Returns(Task.FromResult(Mocks.Products.ProductWithOneImage()));
+                
+                var mockSpecListPage = new ListPage<Spec>() { Meta = new ListPageMeta(), Items = new List<Spec>() };
+                ocClient.Products.ListSpecsAsync("mockProductID", null, null, null, 1, 100, null, "mockToken")
+                    .Returns(Task.FromResult(mockSpecListPage));
+                
+                var mockVariantListPage = new ListPage<MarketplaceVariant>() { Meta = new ListPageMeta(), Items = new List<MarketplaceVariant>() };
+                ocClient.Products.ListVariantsAsync<MarketplaceVariant>("mockProductID", null, null, null, 1, 100, null, "mockToken")
+                    .Returns(mockVariantListPage);
 
                 ocClient.Products.PatchAsync<MarketplaceProduct>("mockProductID", Arg.Any<PartialProduct>(), "mockToken")
                     .Returns(Task.FromResult(Mocks.Products.PatchResponse()));
@@ -83,6 +91,9 @@ namespace Marketplace.Tests
             {
                 imageQuery.Save(Arg.Any<Image>())
                     .Returns(Task.FromResult(new Image() { id = "blah" }));
+
+                var mockImageListPage = new ListPage<Image>() { Meta = new ListPageMeta(), Items = new List<Image>() };
+                imageQuery.GetProductImages("mockProductID").Returns(mockImageListPage);
             }
 
             var imageProductAssignmentQuery = imageProductAssignmentQuerySub ?? Substitute.For<IImageProductAssignmentQuery>();

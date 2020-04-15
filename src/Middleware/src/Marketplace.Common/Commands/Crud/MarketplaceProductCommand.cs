@@ -161,13 +161,20 @@ namespace Marketplace.Common.Commands.Crud
                 };
             };
             // Create new specs and Delete removed specs
-            await Throttler.RunAsync(specsToAdd, 100, 5, s => _oc.Specs.CreateAsync(s, accessToken: user.AccessToken));
+            var defaultSpecOptions = new List<DefaultOptionSpecAssignment>();
+            await Throttler.RunAsync(specsToAdd, 100, 5, s => {
+                defaultSpecOptions.Add(new DefaultOptionSpecAssignment { SpecID = s.ID, OptionID = s.DefaultOptionID });
+                s.DefaultOptionID = null;
+                return _oc.Specs.SaveAsync<Spec>(s.ID, s, accessToken: user.AccessToken);
+            });
             await Throttler.RunAsync(specsToDelete, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
             // Add spec options for new specs
             foreach (var spec in specsToAdd)
             {
                 await Throttler.RunAsync(spec.Options, 100, 5, o => _oc.Specs.CreateOptionAsync(spec.ID, o, accessToken: user.AccessToken));
             }
+            // Patch Specs with requested DefaultOptionID
+            await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
             // Make assignments for the new specs
             await Throttler.RunAsync(specsToAdd, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = id, SpecID = s.ID }, accessToken: user.AccessToken));
             // Check if Variants differ
