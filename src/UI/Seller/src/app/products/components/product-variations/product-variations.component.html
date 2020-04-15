@@ -143,6 +143,23 @@
       <div class="variant-overlay"
            *ngIf="editSpecs"><span *ngIf="specsWithoutVariations?.length || specsWithVariations?.length">Pending Variation Changes...</span>
       </div>
+      <div class="variant-overlay"
+           *ngIf="assignVariantImages">
+        <div class="row">
+          <div class="col-md-12">
+            <img *ngFor="let img of superProductEditable?.Images"
+                 class="product-image"
+                 [class.selected-image]="isImageSelected(img)"
+                 [src]="img.URL"
+                 (click)="toggleAssignImage(img, variantInSelection.xp?.SpecCombo)"
+                 alt="" />
+            <div>
+              <button class="btn btn-outline-dark"
+                      (click)="updateProductImageTags()">Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="col-md-12">
         <div *ngIf="variants?.length > 0">
           <h6>The following product variations have unique SKU's associated with them. You can manage these product SKU's in the table inputs below.</h6>
@@ -151,6 +168,8 @@
             <table class="table mb-0">
               <thead class="bg-light">
                 <tr>
+                  <th *ngIf="!isCreatingNew && superProductEditable?.Images?.length"
+                      scope="col">Images</th>
                   <th *ngFor="let spec of specsWithVariations; let i = index"
                       scope="col">{{variants[0]?.xp?.SpecValues[i]?.SpecName}}</th>
                   <th scope="col">SKU</th>
@@ -158,7 +177,20 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let variant of variants; let i = index">
+                <tr *ngFor="let variant of variants; let i = index"
+                    [ngClass]="{'selected-variant': variant === variantInSelection}">
+                  <td *ngIf="!isCreatingNew && superProductEditable?.Images?.length">
+                    <fa-icon (click)="assignVariantImages = true"
+                             (click)="variantInSelection = variant"
+                             [icon]="faPlusCircle"
+                             class="mr-2"
+                             size="lg"></fa-icon>
+                    <img *ngFor="let img of getVariantImages(variant)"
+                         style="max-width: 50px"
+                         [src]="img.URL"
+                         (click)="toggleAssignImage(img, variantInSelection.xp?.SpecCombo)"
+                         alt="" />
+                  </td>
                   <td *ngFor="let specValue of variant.xp?.SpecValues">
                     {{specValue.SpecOptionValue}} <span class="font-weight-bold"
                           *ngIf="specValue.PriceMarkup">(+{{specValue.PriceMarkup | currency}})</span>

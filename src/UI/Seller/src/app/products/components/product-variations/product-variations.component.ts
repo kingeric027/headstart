@@ -1,10 +1,11 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { Variant, SpecOption, Spec, OcSpecService } from '@ordercloud/angular-sdk';
-import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faImages } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
+import { SuperMarketplaceProduct, Image } from 'marketplace-javascript-sdk/dist/models';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 
 @Component({
   selector: 'product-variations-component',
@@ -47,12 +48,15 @@ export class ProductVariations {
   editSpecs = false;
   faTrash = faTrash;
   faCog = faCog;
-  faImages = faImages;
+  faPlusCircle = faPlusCircle;
   faTimesCircle = faTimesCircle;
   faCheckDouble = faCheckDouble;
   faExclamationCircle = faExclamationCircle;
+  assignVariantImages = false;
+  variantInSelection: Variant;
+  imageInSelection: Image;
 
-  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private modalService: NgbModal,) {}
+  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef) {}
   getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
@@ -262,8 +266,28 @@ export class ProductVariations {
     this.superProductEditable.Specs = updateProductResourceCopy.Specs;
     await this.ocSpecService.Patch(specID, { DefaultOptionID: optionID }).toPromise();
   }
+  
+  isImageSelected(img: Image): boolean {
+    if (!img.Tags) img.Tags = []
+    return img.Tags.includes(this.variantInSelection?.xp?.SpecCombo);
+  }
 
-  async open(content) {
-    await this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
+  toggleAssignImage(img: Image, specCombo: string): void {
+    this.imageInSelection = img;
+    if (!this.imageInSelection.Tags) this.imageInSelection.Tags = [];
+    this.imageInSelection.Tags.includes(specCombo) ? this.imageInSelection.Tags.splice(this.imageInSelection.Tags.indexOf(specCombo), 1) : this.imageInSelection.Tags.push(specCombo);
+    console.log(this.imageInSelection)
+    console.log(this.superProductEditable?.Images)
+  }
+
+  updateProductImageTags(): void {
+    this.assignVariantImages = false;
+    this.variantInSelection = {};
+    
+  }
+
+  getVariantImages(variant: Variant): Image[] {
+    this.superProductEditable?.Images?.forEach(i => !i.Tags ? i.Tags = [] : null);
+    return this.superProductEditable?.Images?.filter(i => i.Tags.includes(variant?.xp?.SpecCombo));
   }
 }
