@@ -27,8 +27,12 @@
 
   <product-filters-component readonly="true"
                              [facetsOnProduct]="_superMarketplaceProduct?.Product?.xp?.Facets || []"></product-filters-component> <!-- /Product Details -->
-  <!-- Shipping Information -->
 
+  <product-variations-component readonly="true"
+                                [superMarketplaceProductEditable]="_superMarketplaceProduct">
+  </product-variations-component>
+
+  <!-- Shipping Information -->
   <div class="row pt-3 mt-5 border-top">
     <div class="col-md-5">
       <h5>Shipping Information</h5>
