@@ -13,6 +13,7 @@ import { OrderStateService } from './order-state.service';
 import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/ordercloud-sandbox.models';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
 import { MarketplaceSDK, CreditCardToken, CreditCardPayment, Address } from 'marketplace-javascript-sdk';
+import { onErrorResumeNext } from 'rxjs';
 
 export interface ICheckout {
   submit(card: CreditCardPayment, marketplaceID: string): Promise<string>;
@@ -46,19 +47,25 @@ export class CheckoutService implements ICheckout {
   async submit(payment: CreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
     await MarketplaceSDK.MePayments.Post(payment); // authorize card
-    const orderWithCleanID = await this.ocOrderService
-      .Patch('outgoing', this.order.ID, {
-        ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
-      })
-      .toPromise();
-    this.order = orderWithCleanID;
-    await this.ocOrderService.Submit('outgoing', orderWithCleanID.ID).toPromise();
+    await this.incrementOrderIfNeeded();
+    await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
     await this.state.reset();
-    return orderWithCleanID.ID;
+    return this.order.ID;
   }
 
   async addComment(comment: string): Promise<MarketplaceOrder> {
     return await this.patch({ Comments: comment });
+  }
+
+  async incrementOrderIfNeeded(): Promise<void> {
+    // 'as any' can be removed after sdk update
+    if (!(this.order.xp as any)?.IsResubmitting) {
+      this.order = await this.ocOrderService
+        .Patch('outgoing', this.order.ID, {
+          ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
+        })
+        .toPromise();
+    }
   }
 
   async setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder> {
