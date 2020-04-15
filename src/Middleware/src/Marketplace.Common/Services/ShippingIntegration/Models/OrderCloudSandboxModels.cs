@@ -16,16 +16,8 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 		public Task<Response<GetRatesData>> RateResponseTask { get; set; }
 	}
 
-
 	// should be able to remove with sdk update
-	public class OrderWorksheet<TOrder, TLineItem> : OrderWorksheet
-	{
-		public new TOrder Order { get; set; }
-		public new List<TLineItem> LineItems { get; set; }
-	}
-
-	// should be able to remove with sdk update
-	public class MarketplaceOrderWorksheet : OrderWorksheet<MarketplaceOrder, MarketplaceLineItem>
+	public class MarketplaceOrderWorksheet : OrderWorksheet<MarketplaceOrder, MarketplaceLineItem, ShipEstimateResponse, OrderCalculateResponse, OrderSubmitResponse>
 	{
 	}
 
