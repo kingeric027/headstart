@@ -126,7 +126,7 @@ export class OrderHistoryService implements IOrderHistory {
       // approver likely does not have the access required to get this information
       return null;
     } else {
-      return this.paymentHelper.ListPaymentsOnOrder(orderID);
+      return this.paymentHelper.ListPaymentsOnOrder(orderID, false);
     }
   }
 
