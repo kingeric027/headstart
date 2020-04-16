@@ -1,11 +1,13 @@
 import { Component, Inject, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { faShippingFast, faWindowClose, faPlus, faCog, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { LineItem, Shipment, OcSupplierAddressService, ListAddress, ListShipment, OcShipmentService, ListShipmentItem, OcLineItemService, Order } from '@ordercloud/angular-sdk';
+import { LineItem, Shipment, OcSupplierAddressService, ListAddress, ListShipment, OcShipmentService, ListShipmentItem, OcLineItemService, OcOrderService, Order } from '@ordercloud/angular-sdk';
 import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AppAuthService } from '@app-seller/auth';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { OrderService } from '@app-seller/orders/order.service';
+import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 
 @Component({
   selector: 'app-order-shipments',
@@ -28,19 +30,26 @@ export class OrderShipmentsComponent implements OnChanges {
   quantities: number[] = [];
   lineItems: LineItem[];
   isSaving = false;
+  isSellerUser = false;
+  @Input()
+  orderDirection: string;
   @Input()
   order: Order;
   @Output()
   createOrViewShipmentEvent = new EventEmitter<boolean>();
 
   constructor(
+    private orderService: OrderService,
+    private ocOrderService: OcOrderService,
     private ocSupplierAddressService: OcSupplierAddressService,
     private ocShipmentService: OcShipmentService,
     private ocLineItemService: OcLineItemService,
     private httpClient: HttpClient,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-    ) { }
+    ) { 
+      this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER;
+    }
 
   ngOnChanges() {
     if (this.order.ID) {
@@ -89,6 +98,10 @@ export class OrderShipmentsComponent implements OnChanges {
     return unshippedItem ? true : false;
   }
 
+  isQuoteOrder(order: Order) {
+    return this.orderService.isQuoteOrder(order);
+  }
+
   toggleViewShipments(): void {
     this.setSelectedShipment(0);
     this.viewShipments = !this.viewShipments;
@@ -105,11 +118,12 @@ export class OrderShipmentsComponent implements OnChanges {
   // }
 
   async getShipments(): Promise<void> {
-    this.shipments = await this.ocShipmentService.List({orderID: this.order.ID, sortBy: 'DateShipped'}).toPromise();
+    const shipments = await this.ocOrderService.ListShipments(this.orderDirection, this.order.ID).toPromise();
+    this.shipments = shipments;
   }
 
   async getLineItems(): Promise<void> {
-    const lineItemsResponse = await this.ocLineItemService.List('Incoming', this.order.ID).toPromise();
+    const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, this.order.ID).toPromise();
     this.lineItems = lineItemsResponse.Items;
   }
 

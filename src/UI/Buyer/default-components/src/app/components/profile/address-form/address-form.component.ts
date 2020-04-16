@@ -12,7 +12,7 @@ import { GeographyConfig } from '../../../config/geography.class';
 })
 export class OCMAddressForm implements OnInit {
   @Input() btnText: string;
-  @Input() suggestedAddresses: ListBuyerAddress;
+  @Input() suggestedAddresses: BuyerAddress[];
   @Input() showOptionToSave = false;
   @Output() formDismissed = new EventEmitter();
   @Output()

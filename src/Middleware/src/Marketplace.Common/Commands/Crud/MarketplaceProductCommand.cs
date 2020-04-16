@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using Marketplace.Models;
@@ -27,13 +28,15 @@ namespace Marketplace.Common.Commands.Crud
     public class MarketplaceProductCommand : IMarketplaceProductCommand
     {
         private readonly IOrderCloudClient _oc;
-        public MarketplaceProductCommand(AppSettings settings)
+        private readonly IImageCommand _imgCommand;
+        public MarketplaceProductCommand(AppSettings settings, IImageCommand imgCommand)
         {
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
                 ApiUrl = settings.OrderCloudSettings.ApiUrl,
                 AuthUrl = settings.OrderCloudSettings.AuthUrl,
             });
+            _imgCommand = imgCommand;
         }
 
         public async Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user)
@@ -42,13 +45,15 @@ namespace Marketplace.Common.Commands.Crud
             var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.DefaultPriceScheduleID, user.AccessToken);
             var _specs = await _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
             var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
-        
+            var _images = await _imgCommand.GetProductImages(_product.ID);
+
             return new SuperMarketplaceProduct
             {
                 Product = _product,
                 PriceSchedule = _priceSchedule,
                 Specs = _specs.Items,
-                Variants = _variants.Items
+                Variants = _variants.Items,
+                Images = _images.Items
             };
         }
 
@@ -65,12 +70,14 @@ namespace Marketplace.Common.Commands.Crud
                 var priceSchedule = await _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
                 var _specs = await _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, user.AccessToken);
                 var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, user.AccessToken);
+                var _images = await _imgCommand.GetProductImages(product.ID);
                 _superProductsList.Add(new SuperMarketplaceProduct
                 {
                     Product = product,
                     PriceSchedule = priceSchedule,
                     Specs = _specs.Items,
-                    Variants = _variants.Items
+                    Variants = _variants.Items,
+                    Images = _images.Items
                 });
             });
             return new ListPage<SuperMarketplaceProduct>
@@ -126,6 +133,7 @@ namespace Marketplace.Common.Commands.Crud
                 PriceSchedule = _priceSchedule,
                 Specs = _specs.Items,
                 Variants = _variants.Items,
+                Images = new List<Image>(),
             };
         }
 
@@ -153,13 +161,20 @@ namespace Marketplace.Common.Commands.Crud
                 };
             };
             // Create new specs and Delete removed specs
-            await Throttler.RunAsync(specsToAdd, 100, 5, s => _oc.Specs.CreateAsync(s, accessToken: user.AccessToken));
+            var defaultSpecOptions = new List<DefaultOptionSpecAssignment>();
+            await Throttler.RunAsync(specsToAdd, 100, 5, s => {
+                defaultSpecOptions.Add(new DefaultOptionSpecAssignment { SpecID = s.ID, OptionID = s.DefaultOptionID });
+                s.DefaultOptionID = null;
+                return _oc.Specs.SaveAsync<Spec>(s.ID, s, accessToken: user.AccessToken);
+            });
             await Throttler.RunAsync(specsToDelete, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
             // Add spec options for new specs
             foreach (var spec in specsToAdd)
             {
                 await Throttler.RunAsync(spec.Options, 100, 5, o => _oc.Specs.CreateOptionAsync(spec.ID, o, accessToken: user.AccessToken));
             }
+            // Patch Specs with requested DefaultOptionID
+            await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
             // Make assignments for the new specs
             await Throttler.RunAsync(specsToAdd, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = id, SpecID = s.ID }, accessToken: user.AccessToken));
             // Check if Variants differ
@@ -187,18 +202,24 @@ namespace Marketplace.Common.Commands.Crud
             var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: user.AccessToken);
             // List Product Specs
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
+            // List Product Images
+            var _images = await _imgCommand.GetProductImages(id);
             return new SuperMarketplaceProduct
             {
                 Product = _updatedProduct,
                 PriceSchedule = _updatedPriceSchedule,
                 Specs = _specs.Items,
                 Variants = _variants.Items,
+                Images = _images.Items,
             };
         }
 
         public async Task Delete(string id, VerifiedUserContext user)
         {
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
+            var _images = await _imgCommand.GetProductImages(id);
+            // Delete specs and images associated with the requested product
+            await Throttler.RunAsync(_images.Items, 100, 5, i => _imgCommand.Delete(i.id));
             await Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
             await _oc.Products.DeleteAsync(id, user.AccessToken);
         }

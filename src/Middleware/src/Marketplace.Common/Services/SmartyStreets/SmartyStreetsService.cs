@@ -14,8 +14,8 @@ namespace Marketplace.Common.Services.SmartyStreets
 {
 	public interface ISmartyStreetsService
 	{
-		Task<AddressValidation> ValidateAddress(Address address);
-		Task<AddressValidation> ValidateAddress(BuyerAddress address);
+		Task<AddressValidation<Address>> ValidateAddress(Address address);
+		Task<AddressValidation<BuyerAddress>> ValidateAddress(BuyerAddress address);
 	}
 
 	public class SmartyStreetsService : ISmartyStreetsService
@@ -30,49 +30,48 @@ namespace Marketplace.Common.Services.SmartyStreets
 			_builder = new ClientBuilder(_smartySettings.AuthID, _smartySettings.AuthToken);
 		}
 
-		public async Task<AddressValidation> ValidateAddress(BuyerAddress buyerAddress)
+		public async Task<AddressValidation<Address>> ValidateAddress(Address address)
 		{
-			var address = SmartyStreetMappers.Map(buyerAddress);
-			return await ValidateAddress(address);
+			var response = new AddressValidation<Address>(address);
+			var lookup = AddressMapper.MapToUSStreetLookup(address);
+			var candidate = await ValidateSingleUSAddress(lookup); // Always seems to return 1 or 0 candidates
+			if (candidate.Count > 0)
+			{
+				response.ValidAddress = AddressMapper.Map(candidate[0], address);
+				response.GapBeteenRawAndValid = candidate[0].Analysis.DpvFootnotes;
+			}
+			else
+			{
+				// no valid address found
+				var suggestions = await USAutoCompletePro($"{address.Street1} {address.Street2}");
+				response.SuggestedAddresses = AddressMapper.Map(suggestions, address);
+			}
+			return response;
 		}
 
-		public async Task<AddressValidation> ValidateAddress(Address address)
+		public async Task<AddressValidation<BuyerAddress>> ValidateAddress(BuyerAddress address)
 		{
-			var response = new AddressValidation()
+			var response = new AddressValidation<BuyerAddress>(address);
+			var lookup = BuyerAddressMapper.MapToUSStreetLookup(address);
+			var candidate = await ValidateSingleUSAddress(lookup); // Always seems to return 1 or 0 candidates
+			if (candidate.Count > 0)
 			{
-				RawAddress = address,
-				IsRawAddressValid = false,
-				AreSuggestionsValid = true
-			};
-			var candidate = await ValidateSingleUSAddress(address); // Always seems to return 1 or 0 candidates
-			if (candidate.Count == 0)
-			{
-				// Address not valid, no candiates found
-				var suggestions = await USAutoCompletePro($"{address.Street1} {address.Street2}");
-				response.AreSuggestionsValid = false; // Suggestions from this api do not include zip
-				response.SuggestedAddresses = SmartyStreetMappers.Map(suggestions, address);
+				response.ValidAddress = BuyerAddressMapper.Map(candidate[0], address);
+				response.GapBeteenRawAndValid = candidate[0].Analysis.DpvFootnotes;
 			}
-			// Valid candidate found, but may not match raw exactly. Want to show candidate to user to approve modifications
-			else 
+			else
 			{
-				var mappedCandidate = SmartyStreetMappers.Map(candidate[0], address);
-				if (DoesSubmittedAddressMatchSuggested(mappedCandidate, address))
-				{
-					response.IsRawAddressValid = true;
-				} else
-				{
-					response.SuggestedAddresses = new List<Address> { mappedCandidate };
-
-				}
+				// no valid address found
+				var suggestions = await USAutoCompletePro($"{address.Street1} {address.Street2}");
+				response.SuggestedAddresses = BuyerAddressMapper.Map(suggestions, address);
 			}
 			return response;
 		}
 
 		// returns 1 or 0 very complete addresses
-		private async Task<List<Candidate>> ValidateSingleUSAddress(Address address)
+		private async Task<List<Candidate>> ValidateSingleUSAddress(Lookup lookup)
 		{
 			var client = _builder.BuildUsStreetApiClient();
-			var lookup = SmartyStreetMappers.MapToUSStreet(address);
 			client.Send(lookup);
 			return await Task.FromResult(lookup.Result);
 		}
@@ -88,13 +87,6 @@ namespace Marketplace.Common.Services.SmartyStreets
 				.GetJsonAsync<AutoCompleteResponse>();
 
 			return suggestions;
-		}
-
-		private bool DoesSubmittedAddressMatchSuggested(Address mappedCandidate, Address address) 
-		{
-			var serializedMapped = JsonConvert.SerializeObject(mappedCandidate);
-			var serializedAddress = JsonConvert.SerializeObject(address);
-			return serializedMapped == serializedAddress;
 		}
 	}
 }

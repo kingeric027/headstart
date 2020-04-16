@@ -4,9 +4,5 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Models
 {
-    public class MarketplaceOrderDeclinePayload : WebhookPayload<OrderApprovalInfo, MarketplaceOrder, WebhookPayloads.Orders.Decline.DeclineRouteParams, dynamic>
-    {
-        public OrderDirection Direction { get; set; }
-        public string OrderID { get; set; }
-    }
+    public class MarketplaceOrderDeclinePayload : WebhookPayloads.Orders.Decline<dynamic, OrderApprovalInfo, MarketplaceOrder> { }
 }

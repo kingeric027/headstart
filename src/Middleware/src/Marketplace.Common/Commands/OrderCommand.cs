@@ -58,7 +58,7 @@ namespace Marketplace.Common.Commands
                 // creating relationship between the buyer order and the supplier order
                 // no relationship exists currently in the platform
                 var updatedSupplierOrders = await CreateOrderRelationshipsAndTransferXP(buyerOrder, supplierOrders);
-            
+                await _sendgridService.SendOrderSubmitEmail(orderWorksheet);
                 // quote orders do not need to flow into our integrations
                 if (buyerOrder.xp == null || buyerOrder.xp.OrderType != OrderType.Quote)
                 {
@@ -69,7 +69,6 @@ namespace Marketplace.Common.Commands
                     var zoho_salesorder = await _zoho.CreateSalesOrder(orderWorksheet);
                     await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
                 }
-                await _sendgridService.SendOrderSubmitEmail(orderWorksheet);
 
                 var response = new OrderSubmitResponse()
                 {

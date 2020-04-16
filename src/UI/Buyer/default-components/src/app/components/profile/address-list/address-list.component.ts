@@ -33,7 +33,7 @@ export class OCMAddressList implements OnInit {
   areYouSureModal = ModalState.Closed;
   showCreateAddressForm = false;
   isLoading = false;
-  suggestedAddresses: ListBuyerAddress;
+  suggestedAddresses: BuyerAddress[];
   constructor(private context: ShopperContextService, private toasterService: ToastrService) {}
 
   ngOnInit(): void {

@@ -12,6 +12,8 @@ using NSubstitute;
 using OrderCloud.SDK;
 using Marketplace.Helpers.Services;
 using Marketplace.Models;
+using Marketplace.Common.Queries;
+using Marketplace.Common.Models;
 
 namespace Marketplace.Tests
 {
@@ -49,7 +51,7 @@ namespace Marketplace.Tests
         /// Idea is that this object will have default return values suitable for most test cases
         /// If a test case needs to deviate from that, an overriden service can be provided
         /// </summary>
-        private TestSetup GetTestSetup(AppSettings settingsSub = null, IOrderCloudClient ocSub = null, IBlobService blobSub = null)
+        private TestSetup GetTestSetup(AppSettings settingsSub = null, IOrderCloudClient ocSub = null, IBlobService blobSub = null, IImageQuery imageQuerySub = null, IImageProductAssignmentQuery imageProductAssignmentQuerySub = null)
         {
             var settings = settingsSub ?? new AppSettings();
             if (settingsSub == null)
@@ -65,6 +67,14 @@ namespace Marketplace.Tests
             {
                 ocClient.Products.GetAsync<MarketplaceProduct>("mockProductID", "mockToken")
                     .Returns(Task.FromResult(Mocks.Products.ProductWithOneImage()));
+                
+                var mockSpecListPage = new ListPage<Spec>() { Meta = new ListPageMeta(), Items = new List<Spec>() };
+                ocClient.Products.ListSpecsAsync("mockProductID", null, null, null, 1, 100, null, "mockToken")
+                    .Returns(Task.FromResult(mockSpecListPage));
+                
+                var mockVariantListPage = new ListPage<MarketplaceVariant>() { Meta = new ListPageMeta(), Items = new List<MarketplaceVariant>() };
+                ocClient.Products.ListVariantsAsync<MarketplaceVariant>("mockProductID", null, null, null, 1, 100, null, "mockToken")
+                    .Returns(mockVariantListPage);
 
                 ocClient.Products.PatchAsync<MarketplaceProduct>("mockProductID", Arg.Any<PartialProduct>(), "mockToken")
                     .Returns(Task.FromResult(Mocks.Products.PatchResponse()));
@@ -75,10 +85,22 @@ namespace Marketplace.Tests
                 ConnectionString = TestConstants.StorageConnectionString,
                 Container = CONTAINER_NAME
             });
+            
+            var imageQuery = imageQuerySub ?? Substitute.For<IImageQuery>();
+            if (imageQuerySub == null)
+            {
+                imageQuery.Save(Arg.Any<Image>())
+                    .Returns(Task.FromResult(new Image() { id = "blah" }));
+
+                var mockImageListPage = new ListPage<Image>() { Meta = new ListPageMeta(), Items = new List<Image>() };
+                imageQuery.GetProductImages("mockProductID").Returns(mockImageListPage);
+            }
+
+            var imageProductAssignmentQuery = imageProductAssignmentQuerySub ?? Substitute.For<IImageProductAssignmentQuery>();
 
             return new TestSetup()
             {
-                contentManagementService = new ContentManagementService(settings, ocClient),
+                contentManagementService = new ContentManagementService(settings, ocClient, imageQuery, imageProductAssignmentQuery),
                 settings = settings,
                 occlient =  ocClient,
                 blob = blob

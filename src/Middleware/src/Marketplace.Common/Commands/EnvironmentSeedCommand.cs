@@ -232,7 +232,7 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPReportReader },
 			
 			// buyer
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPApprovalRuleAdmin , Roles = new[] { ApiRole.ApprovalRuleAdmin, ApiRole.BuyerUserAdmin, ApiRole.UserGroupAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPOrderApprover },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPNeedsApproval },
@@ -241,93 +241,6 @@ namespace Marketplace.Common.Commands
 		};
 
 		static readonly List<Webhook> DefaultWebhooks = new List<Webhook>() {
-			new Webhook() {
-			  Name = "Buyer Patch Address Validation Pre-webhook",
-			  Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
-			  Url = "/validatebuyeraddresspatch",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-
-				},
-
-			  BeforeProcessRequest = true,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/buyers/{buyerID}/addresses/{addressID}", Verb = "PATCH" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Me Patch Address Validation Pre-webhook",
-			  Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
-			  Url = "/validatemeaddresspatch",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = true,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/me/addresses/{addressID}", Verb = "PATCH" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Post and Put Address Validation Pre-webhook",
-			  Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
-			  Url = "/validateaddresspostput",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = true,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/addresses", Verb = "POST" },
-				new WebhookRoute() { Route = "v1/buyers/{buyerID}/addresses", Verb = "POST" },
-				new WebhookRoute() { Route = "v1/me/addresses", Verb = "POST" },
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/billto", Verb = "PUT" },
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/shipto", Verb = "PUT" },
-				new WebhookRoute() { Route = "v1/suppliers/{supplierID}/addresses/{addressID}", Verb = "PUT" },
-				new WebhookRoute() { Route = "v1/addresses/{addressID}", Verb = "PUT" },
-				new WebhookRoute() { Route = "v1/buyers/{buyerID}/addresses/{addressID}", Verb = "PUT" },
-				new WebhookRoute() { Route = "v1/me/addresses/{addressID}", Verb = "PUT" },
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/lineitems/{lineItemID}/shipto", Verb = "PUT" },
-				new WebhookRoute() { Route = "v1/suppliers/{supplierID}/addresses", Verb = "POST" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Seller Patch Address Validation Pre-webhook",
-			  Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
-			  Url = "/validateselleraddresspatch",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = true,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/addresses/{addressID}", Verb = "PATCH" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Supplier Patch Address Validation Pre-webhook",
-			  Description = "Address validation is performed with FreightPOP prior to creates or updates throughout the marketplace to ensure that rate requests do not fail during checkout. Ideally this same validation will prevent avalara calls from failing during checkout as well. We will need to revisit to ensure this validation works for both of these integrations",
-			  Url = "/validatesupplieraddresspatch",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = true,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/suppliers/{supplierID}/addresses/{addressID}", Verb = "PATCH" }
-			  }
-			},
 			new Webhook() {
 			  Name = "Order Approved",
 			  Description = "Triggers email letting user know the order was approved.",
