@@ -48,9 +48,9 @@ export class CheckoutService implements ICheckout {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
     await MarketplaceSDK.MePayments.Post(payment); // authorize card
     await this.incrementOrderIfNeeded();
-    await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
+    const submittedOrder = await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
     await this.state.reset();
-    return this.order.ID;
+    return submittedOrder.ID;
   }
 
   async addComment(comment: string): Promise<MarketplaceOrder> {
