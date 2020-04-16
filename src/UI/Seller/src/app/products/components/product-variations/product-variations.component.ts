@@ -276,14 +276,19 @@ export class ProductVariations {
     this.imageInSelection = img;
     if (!this.imageInSelection.Tags) this.imageInSelection.Tags = [];
     this.imageInSelection.Tags.includes(specCombo) ? this.imageInSelection.Tags.splice(this.imageInSelection.Tags.indexOf(specCombo), 1) : this.imageInSelection.Tags.push(specCombo);
-    console.log(this.imageInSelection)
-    console.log(this.superProductEditable?.Images)
   }
 
-  updateProductImageTags(): void {
+  async updateProductImageTags(img: Image): Promise<void> {
     this.assignVariantImages = false;
+    const { timeStamp, ... rest } = this.imageInSelection;
+    // Queue up image/content requests, then send them all at aonce
+    // TODO: optimize this so we aren't having to update all images, just 'changed' ones
+    const requests = this.superProductEditable.Images.map(i => MarketplaceSDK.Images.Post(i));
+    await Promise.all(requests);
+    // Ensure there is no mistaken change detection
+    Object.assign(this.superProductStatic.Images, this.superProductEditable.Images);
     this.variantInSelection = {};
-    
+    this.imageInSelection = {};
   }
 
   getVariantImages(variant: Variant): Image[] {
