@@ -2,6 +2,7 @@ using System;
 using Cosmonaut;
 using Cosmonaut.Extensions.Microsoft.DependencyInjection;
 using Marketplace.Helpers.Attributes;
+using Marketplace.Helpers.Helpers;
 using Marketplace.Helpers.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -12,6 +13,7 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using OrderCloud.SDK;
@@ -41,7 +43,11 @@ namespace Marketplace.Helpers.Extensions
                     ConnectionProtocol = Protocol.Tcp,
                     ConnectionMode = ConnectionMode.Direct
                 }, defaultCollectionThroughput: 400);
-            services.AddSingleton(typeof(TQuery), typeof(TQuery));
+			settings.JsonSerializerSettings = new JsonSerializerSettings()
+			{
+				ContractResolver = new CosmosContractResolver()
+			};
+			services.AddSingleton(typeof(TQuery), typeof(TQuery));
             return services.AddCosmosStore<TModel>(settings);
         }
 

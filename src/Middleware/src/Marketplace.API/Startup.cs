@@ -1,5 +1,6 @@
 ﻿using Flurl.Http;
 using Marketplace.CMS.Models;
+using Marketplace.CMS.Queries;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
@@ -57,7 +58,8 @@ namespace Marketplace.API
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
                 .InjectCosmosStore<ImageProductAssignmentQuery, ImageProductAssignment>(cosmosConfig)
-                .InjectCosmosStore<ImageQuery, Image>(cosmosConfig)
+				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
+				.InjectCosmosStore<ImageQuery, Image>(cosmosConfig)
                 .Inject<IOrchestrationCommand>()
                 .Inject<IOrchestrationLogCommand>()
                 .Inject<IOCShippingIntegration>()
@@ -67,7 +69,8 @@ namespace Marketplace.API
                 .Inject<IOrderCloudSandboxService>()
                 .Inject<IMarketplaceProductCommand>()
                 .Inject<ISupplierCategoryConfigQuery>()
-                .Inject<ISendgridService>()
+				.Inject<IAssetContainerQuery>()
+				.Inject<ISendgridService>()
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
                 {
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,

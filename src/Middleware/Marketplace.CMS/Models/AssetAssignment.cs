@@ -1,4 +1,6 @@
-﻿using Marketplace.Helpers.Attributes;
+﻿using Cosmonaut.Attributes;
+using Marketplace.Helpers.Attributes;
+using Marketplace.Helpers.Helpers.Attributes;
 using Marketplace.Helpers.Models;
 using OrderCloud.SDK;
 using System;
@@ -14,10 +16,11 @@ namespace Marketplace.CMS.Models
 	}
 
 	[SwaggerModel]
+	[CosmosCollection("assetassignments")]
 	public class AssetAssignment : CosmosObject
 	{
 		[Required]
-		public string ContainderID { get; set; }
+		public string ContainerID { get; set; }
 		[Required]
 		public string AssetID { get; set; }
 		[Required]

@@ -1,8 +1,13 @@
-﻿using Marketplace.Common;
+﻿using Marketplace.CMS.Models;
+using Marketplace.CMS.Queries;
+using Marketplace.Common;
 using Marketplace.Common.Controllers;
+using Marketplace.Helpers;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,17 +20,46 @@ namespace Marketplace.CMS.Controllers
 	[Route("containers")]
 	public class AssetContainerController : BaseController
 	{
-		public AssetContainerController(AppSettings settings) : base(settings)
+		private readonly IAssetContainerQuery _query;
+
+		public AssetContainerController(AppSettings settings, IAssetContainerQuery query) : base(settings)
 		{
+			_query = query;
 		}
 
 		[DocName("List Asset Containers")]
-		[HttpGet]
-		public async Task<object> Get()
+		[HttpGet, Route("")]
+		public async Task<ListPage<AssetContainer>> List(ListArgs<AssetContainer> args)
 		{
-			// Testing settings and routes work in different project.
-			var publicSettings = new { env = Settings.Env.ToString(), cosmosdb = Settings.CosmosSettings.DatabaseName };
-			return await Task.FromResult(publicSettings);
+			return await _query.List(args);
+		}
+
+		[DocName("Get an Asset Container")]
+		[HttpGet, Route("{containerID}")]
+		public async Task<AssetContainer> Get(string containerID)
+		{
+			return await _query.Get(containerID);
+		}
+
+		[DocName("Create an Asset Container")]
+		[HttpPost, Route("")]
+		public async Task<AssetContainer> Create([FromBody] AssetContainer container)
+		{
+			return await _query.Save(container);
+		}
+
+		[DocName("Save an Asset Container")]
+		[HttpPut, Route("{containerID}")]
+		public async Task<AssetContainer> Save(string containerID, AssetContainer container)
+		{
+			return await _query.Save(container);
+		}
+
+		[DocName("Delete an Asset Container")]
+		[HttpDelete, Route("{containerID}")]
+		public async Task Delete(string containerID)
+		{
+			await _query.Delete(containerID);
 		}
 	}
 }

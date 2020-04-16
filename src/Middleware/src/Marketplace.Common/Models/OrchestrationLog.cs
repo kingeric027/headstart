@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmonaut.Attributes;
 using Marketplace.Common.Exceptions;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
@@ -12,7 +13,8 @@ using OrderCloud.SDK;
 namespace Marketplace.Common.Models
 {
     [SwaggerModel]
-    public class OrchestrationLog : CosmosObject
+	[CosmosCollection("orchestrationlogs")]
+	public class OrchestrationLog : CosmosObject
     {
         public OrchestrationLog()
         {
