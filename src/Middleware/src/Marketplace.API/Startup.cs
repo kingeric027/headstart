@@ -1,4 +1,5 @@
 ﻿using Flurl.Http;
+using Marketplace.CMS.Models;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
