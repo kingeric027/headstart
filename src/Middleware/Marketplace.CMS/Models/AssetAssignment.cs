@@ -35,7 +35,7 @@ namespace Marketplace.CMS.Models
 		{
 			return new Collection<UniqueKey>
 			{
-				new UniqueKey() { Paths = new Collection<string> { "/AssetID", "/ResourceID", "ResourceType" }}
+				new UniqueKey() { Paths = new Collection<string> { "/AssetID", "/ResourceID", "/ResourceType" }}
 			};
 		}
 	}

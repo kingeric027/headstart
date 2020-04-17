@@ -63,5 +63,20 @@ namespace Marketplace.CMS.Controllers
 		{
 			await _query.Delete(containerID);
 		}
+
+		[DocName("Connect to storage Account")]
+		[HttpPost, Route("{containerID}/connect")]
+		public async Task<string> ConnectToStorage(string containerID, [FromBody] StorageAccount account)
+		{
+			// Block if Container is already connected to a storage account.
+			throw new NotImplementedException();
+		}
+
+		[DocName("Disconnect from storage Account")]
+		[HttpPost, Route("{containerID}/disconnect")]
+		public async Task DisconnectFromStorage(string containerID)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

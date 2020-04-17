@@ -21,12 +21,13 @@ namespace Marketplace.CMS.Models
 		public string SinglePartitionID => AssetContainerQuery.SinglePartitionID; // TODO - is there a better way to indicate there should only be one partition?
 		[JsonProperty("ID"), InteropID]
 		public string InteropID { get; set; }
-		public string Name { get; set; } // "Assets-{SellerID}"
-		public string BaseUrl { get; set; }
-		public int? MaxiumumSizeBytes { get; set; } = null;
+		[Required]
+		public string Name { get; set; }
+		public string HostUrlOverride { get; set; } = null;
 		[ApiReadOnly]
-		public AssetContainerMetadata Metadata { get; set; }
-
+		public bool StorageConnected { get; set; } = false;
+		[ApiReadOnly]
+		public StorageAccount StorageAccount { get; set; } = null;
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{
 			return new Collection<UniqueKey>
@@ -36,12 +37,13 @@ namespace Marketplace.CMS.Models
 		}
 	}
 
-	[SwaggerModel]
-	public class AssetContainerMetadata
-	{
-		public bool IsStorageInternal { get; set; } // stored in cosmos. How to do this?
-		public int AssetCount { get; set; } // generated
-		public int SizeBytes { get; set; } // generated
-	}
+	public enum StorageAccountType { DefaultBlob, ExternalBlob };
 
+	[SwaggerModel]
+	public class StorageAccount
+	{
+		public StorageAccountType Type { get; set; } 
+		public string HostUrl { get; set; }
+		public string ConnectionString { get; set; } // Need to figure out good security for this. Same as user password?
+	}
 }

@@ -22,7 +22,9 @@ namespace Marketplace.CMS.Models
 		public string InteropID { get; set; }
 		[Required, CosmosPartitionKey]
 		public string ContainerID { get; set; } // Don't need to set or return. Only goes into building the Url.
-		public string Url { get; set; } // Settable to support external storage. Generated if not set. 
+		[ApiReadOnly]
+		public string Url { get; set; } // Generated if not set. 
+		public string UrlPathOveride { get; set; } = null; // saved
 		public string Title { get; set; }
 		public List<string> Tags { get; set; }
 		public AssetType Type { get; set; }
