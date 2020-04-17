@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { OcMeService } from '@ordercloud/angular-sdk';
-import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +9,7 @@ export class OrdersToApproveStateService {
   public showAlert = new BehaviorSubject<number>(0);
   public numberOfOrdersToApprove = new BehaviorSubject<number>(0);
 
-  constructor(private ocMeService: OcMeService, private toastrService: ToastrService) {}
+  constructor(private ocMeService: OcMeService) {}
 
   async reset(): Promise<void> {
     const ordersToApproverResponse = await this.ocMeService.ListApprovableOrders().toPromise();
