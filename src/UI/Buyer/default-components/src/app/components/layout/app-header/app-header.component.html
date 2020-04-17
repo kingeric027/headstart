@@ -91,7 +91,11 @@
             </ng-template>
             <fa-layers class="fa-fw">
               <fa-icon [icon]="faUserCircle"></fa-icon>
-              <fa-layers-counter *ngIf="true" class="badge__counter--large" [content]="numberOfOrdersToApprove">
+              <fa-layers-counter
+                *ngIf="numberOfOrdersToApprove"
+                class="badge__counter--large"
+                [content]="numberOfOrdersToApprove"
+              >
               </fa-layers-counter>
             </fa-layers>
           </div>
@@ -118,7 +122,11 @@
                     {{ profileSection.displayText }}
                   </span>
                   <fa-layers class="fa-fw ml-n3">
-                    <fa-layers-counter *ngIf="true" class="badge__counter--large" [content]="numberOfOrdersToApprove">
+                    <fa-layers-counter
+                      *ngIf="numberOfOrdersToApprove"
+                      class="badge__counter--large"
+                      [content]="numberOfOrdersToApprove"
+                    >
                     </fa-layers-counter>
                   </fa-layers>
                 </a>
