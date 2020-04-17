@@ -44,11 +44,10 @@ import { Configuration } from 'marketplace-javascript-sdk';
 import { AppConfig } from './shopper-context';
 import { UserManagementWrapperComponent } from './wrapper-components/user-management-wrapper.component';
 import { OrdersToApproveStateService } from './services/order-history/order-to-approve-state.service';
-import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [MarketplaceRoutingModule, CommonModule, ToastrModule.forRoot()],
+  imports: [MarketplaceRoutingModule, CommonModule],
   providers: [
     FeaturedProductsResolver,
     MeListAddressResolver,
