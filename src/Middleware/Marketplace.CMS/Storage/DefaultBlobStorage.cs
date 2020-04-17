@@ -25,12 +25,14 @@ namespace Marketplace.CMS.Storage
 
 		public async Task<StorageAccount> Connect(string containerID)
 		{
+			// TODO - handle failure to connect
 			await BuildBlobService(containerID).Init();
 			return _account;
 		}
 
 		public async Task<Asset> UploadAsset(string containerID, IFormFile file, Asset asset)
 		{
+			// TODO - handle failure to connect
 			await BuildBlobService(containerID).Save(asset.id, file);
 			return asset;
 		}
