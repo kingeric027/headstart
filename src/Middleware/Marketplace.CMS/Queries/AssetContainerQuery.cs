@@ -56,13 +56,19 @@ namespace Marketplace.CMS.Queries
 		{
 			var item = await GetWithoutExceptions(container.InteropID);
 			if (item != null) throw new DuplicateIdException();
-			return await Save(container);
+			return await _store.AddAsync(container);
 		}
 
 		public async Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container)
 		{
-			var item = await GetWithoutExceptions(container.InteropID);
-			container.id = 
+			var item = await GetWithoutExceptions(interopID);
+			if (item != null) {
+				container.id = item.id;
+				return await _store.UpdateAsync(container);
+			} else
+			{
+				return await Create(container);
+			}
 		}
 
 		public async Task Delete(string interopID)
@@ -71,17 +77,9 @@ namespace Marketplace.CMS.Queries
 			await _store.RemoveByIdAsync(item.id, SinglePartitionID);
 		}
 
-		private async Task<AssetContainer> Save(AssetContainer container)
-		{
-			container.timeStamp = DateTime.Now;
-			var result = await _store.UpsertAsync(container);
-			return result.Entity;
-		}
-
 		private async Task<AssetContainer> GetWithoutExceptions(string interopID)
 		{
-			var item = await _store.Query($"select top 1 * from c where c.InteropID = @id", new { id = interopID }).FirstOrDefaultAsync();
-			return item;
+			return await _store.Query($"select top 1 * from c where c.InteropID = @id", new { id = interopID }).FirstOrDefaultAsync();
 		}
 	}
 }

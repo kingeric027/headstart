@@ -52,9 +52,9 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("Create or Update an Asset Container")]
 		[HttpPut, Route("{containerID}")]
-		public async Task<AssetContainer> CreateOrUpdate(string containerID, AssetContainer container)
+		public async Task<AssetContainer> CreateOrUpdate(string containerID, [FromBody] AssetContainer container)
 		{
-			return await _query.Save(container);
+			return await _query.CreateOrUpdate(containerID, container);
 		}
 
 		[DocName("Delete an Asset Container")]
