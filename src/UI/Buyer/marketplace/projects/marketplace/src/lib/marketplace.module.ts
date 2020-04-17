@@ -43,10 +43,12 @@ import { OrderStateService } from './services/order/order-state.service';
 import { Configuration } from 'marketplace-javascript-sdk';
 import { AppConfig } from './shopper-context';
 import { UserManagementWrapperComponent } from './wrapper-components/user-management-wrapper.component';
+import { OrdersToApproveStateService } from './services/order-history/order-to-approve-state.service';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [MarketplaceRoutingModule, CommonModule],
+  imports: [MarketplaceRoutingModule, CommonModule, ToastrModule.forRoot()],
   providers: [
     FeaturedProductsResolver,
     MeListAddressResolver,
@@ -60,6 +62,7 @@ import { UserManagementWrapperComponent } from './wrapper-components/user-manage
     CurrentOrderService,
     CurrentUserService,
     OrderHistoryService,
+    OrdersToApproveStateService,
     PaymentHelperService,
     ProductFilterService,
     ReorderHelperService,
