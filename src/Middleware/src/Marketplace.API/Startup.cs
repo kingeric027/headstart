@@ -68,10 +68,10 @@ namespace Marketplace.API
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IOrderCloudSandboxService>()
                 .Inject<IMarketplaceProductCommand>()
-                .Inject<ISupplierCategoryConfigQuery>()
-				.Inject<IAssetContainerQuery>()
 				.Inject<ISendgridService>()
-                .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
+				.Inject<IAssetContainerQuery>()
+				.Inject<ISupplierCategoryConfigQuery>()
+				.InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
                 {
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                     AuthUrl = _settings.OrderCloudSettings.AuthUrl,

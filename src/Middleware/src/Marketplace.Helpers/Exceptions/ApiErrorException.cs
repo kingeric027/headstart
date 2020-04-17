@@ -42,7 +42,12 @@ namespace Marketplace.Helpers.Exceptions
             public NotFoundException(string thingType, string interopID) : base("NotFound", 404, "Object not found.", new { ObjectType = thingType, ObjectID = interopID }) { }
         }
 
-        public class UserErrorException : ApiErrorException
+		public class DuplicateIdException : ApiErrorException
+		{
+			public DuplicateIdException() : base("IdExists", 409, "Object already exists.", null) { }
+		}
+
+		public class UserErrorException : ApiErrorException
         {
             public UserErrorException(string message) : base("InvalidRequest", 400, message, null) { }
         }

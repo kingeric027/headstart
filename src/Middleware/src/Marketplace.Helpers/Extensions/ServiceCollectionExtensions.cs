@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using Cosmonaut;
 using Cosmonaut.Extensions.Microsoft.DependencyInjection;
 using Marketplace.Helpers.Attributes;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -34,18 +36,25 @@ namespace Marketplace.Helpers.Extensions
             return services;
         }
 
-        public static IServiceCollection InjectCosmosStore<TQuery, TModel>(this IServiceCollection services, CosmosConfig config) 
-            where TQuery : class 
+        public static IServiceCollection InjectCosmosStore<TQuery, TModel>(this IServiceCollection services, CosmosConfig config)
+
+			where TQuery : class 
             where TModel : class
-        {
-            var settings = new CosmosStoreSettings(config.DatabaseName, config.EndpointUri, config.PrimaryKey, new ConnectionPolicy
-                {
-                    ConnectionProtocol = Protocol.Tcp,
-                    ConnectionMode = ConnectionMode.Direct
-                }, defaultCollectionThroughput: 400);
-			settings.JsonSerializerSettings = new JsonSerializerSettings()
+		{
+			var settings = new CosmosStoreSettings(config.DatabaseName, config.EndpointUri, config.PrimaryKey, new ConnectionPolicy
 			{
-				ContractResolver = new CosmosContractResolver()
+				ConnectionProtocol = Protocol.Tcp,
+				ConnectionMode = ConnectionMode.Direct
+			}, defaultCollectionThroughput: 400)
+			{
+				JsonSerializerSettings = new JsonSerializerSettings()
+				{
+					ContractResolver = new CosmosContractResolver()
+				},
+				UniqueKeyPolicy = new UniqueKeyPolicy()
+				{
+					UniqueKeys = (Collection<UniqueKey>)typeof(TModel).GetMethod("GetUniqueKeys")?.Invoke(null, null) ?? new Collection<UniqueKey>()
+				}
 			};
 			services.AddSingleton(typeof(TQuery), typeof(TQuery));
             return services.AddCosmosStore<TModel>(settings);

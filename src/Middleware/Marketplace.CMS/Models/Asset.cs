@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using Cosmonaut.Attributes;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Helpers.Attributes;
 using Marketplace.Helpers.Models;
+using Microsoft.Azure.Documents;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 
@@ -18,7 +20,7 @@ namespace Marketplace.CMS.Models
 	{
 		[JsonProperty("ID"), InteropID]
 		public string InteropID { get; set; }
-		[Required]
+		[Required, CosmosPartitionKey]
 		public string ContainerID { get; set; } // Don't need to set or return. Only goes into building the Url.
 		public string Url { get; set; } // Settable to support external storage. Generated if not set. 
 		public string Title { get; set; }
@@ -27,6 +29,14 @@ namespace Marketplace.CMS.Models
 		public string FileName { get; set; } // Defaults to the file name in the upload. Or should be required?
 		[ApiReadOnly]
 		public AssetMetadata Metadata { get; set; }
+
+		public new static Collection<UniqueKey> GetUniqueKeys()
+		{
+			return new Collection<UniqueKey>
+			{
+				new UniqueKey() { Paths = new Collection<string> { "/InteropID" }}
+			};
+		}
 	}
 
 	[SwaggerModel]

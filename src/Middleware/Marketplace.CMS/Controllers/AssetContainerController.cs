@@ -6,10 +6,12 @@ using Marketplace.Helpers;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Documents;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,12 +47,12 @@ namespace Marketplace.CMS.Controllers
 		[HttpPost, Route("")]
 		public async Task<AssetContainer> Create([FromBody] AssetContainer container)
 		{
-			return await _query.Save(container);
+			return await _query.Create(container);
 		}
 
-		[DocName("Save an Asset Container")]
+		[DocName("Create or Update an Asset Container")]
 		[HttpPut, Route("{containerID}")]
-		public async Task<AssetContainer> Save(string containerID, AssetContainer container)
+		public async Task<AssetContainer> CreateOrUpdate(string containerID, AssetContainer container)
 		{
 			return await _query.Save(container);
 		}
