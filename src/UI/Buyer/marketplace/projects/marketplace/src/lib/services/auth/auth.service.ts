@@ -19,6 +19,7 @@ import { CurrentUserService } from '../current-user/current-user.service';
 import { AppConfig } from '../../shopper-context';
 import { CurrentOrderService } from '../order/order.service';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service';
 
 export interface IAuthentication {
   profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
@@ -49,6 +50,7 @@ export class AuthService implements IAuthentication {
     private currentUser: CurrentUserService,
     private ocMeService: OcMeService,
     private ocPasswordResetService: OcPasswordResetService,
+    private ordersToApproveStateService: OrdersToApproveStateService,
     private appConfig: AppConfig
   ) {}
 
@@ -126,6 +128,8 @@ export class AuthService implements IAuthentication {
       this.setRememberMeStatus(true);
     }
     this.router.navigateByUrl('/home');
+    this.ordersToApproveStateService.alertIfOrdersToApprove();
+
     return creds;
   }
 

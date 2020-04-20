@@ -10,6 +10,7 @@ import { CurrentOrderService } from '../order/order.service';
 import { AddressService } from '../addresses/address.service';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { UserManagementService } from '../user-management/user-management.service';
+import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +27,7 @@ export class ShopperContextService {
     public appSettings: AppConfig,
     public categories: ProductCategoriesService,
     public userManagementService: UserManagementService,
-    public addresses: AddressService
+    public addresses: AddressService,
+    public ordersToApprove: OrdersToApproveStateService,
   ) {}
 }
