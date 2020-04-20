@@ -14,7 +14,7 @@
         </p>
       </div>
       <div class="col-md-7">
-        <button *ngIf="editSpecs && !readonly && !superProductEditable?.Specs?.length"
+        <button *ngIf="!editSpecs && !readonly && !superProductEditable?.Specs?.length"
                 [disabled]="!canConfigureVariations"
                 class="btn btn-outline-dark"
                 (click)="toggleEditSpecs()">
