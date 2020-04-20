@@ -76,3 +76,14 @@
         max-width: 50%;
     }
 }
+
+.selected-variant {
+    background-color: lightgrey;
+}
+
+.product-image {
+    max-width: 80px;
+    &.selected-image {
+        border: 2px solid $primary;
+    }
+}

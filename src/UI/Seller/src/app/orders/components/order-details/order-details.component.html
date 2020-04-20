@@ -23,6 +23,15 @@
          *ngIf="_order">
       <div class="col-6">
         <div *ngIf="_lineItems[0] && !isQuoteOrder(_order)">
+          <div *ngIf="_order.FromUser"
+                class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <span class="text-muted">Buyer</span>
+              <p class="mb-0 text-capitalize font-weight-bold">{{_order.FromUser.FirstName}} {{_order.FromUser.LastName}}</p>
+              <p class="mb-0" *ngIf="_order.FromUser.Phone">{{_order.FromUser.Phone | tel}}</p>
+              <p class="mb-0" *ngIf="_order.FromUser.Email">{{_order.FromUser.Email}}</p>
+            </div>
+          </div>
           <div *ngIf="_lineItems[0].ShippingAddress"
                class="d-flex justify-content-between align-items-center mb-4">
             <div>
