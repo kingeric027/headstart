@@ -1,20 +1,23 @@
 <div class="text-center mt-3">
-  <p>Already have an account? <button type="button"
+  <p translate>AUTHENTICATION.REGISTER.EXISTING_ACC<button type="button"
             class="btn btn-link"
-            routerLink="/login">Login</button></p>
+            routerLink="/login"
+            translate>COMMON.LOGIN</button></p>
   <h1 class="display-4">{{appName}}</h1>
 </div>
 <div class="row">
   <div class="col-lg-6 mx-auto"
        style="max-width:400px">
-    <h3 class="text-center headline-text mb-3">Sign Up</h3>
+    <h3 class="text-center headline-text mb-3"
+        translate>AUTHENTICATION.REGISTER.SIGN_UP</h3>
     <form (ngSubmit)="onSubmit()"
           novalidate
           [formGroup]="form"
           name="RegisterForm">
       <div class="form-group">
         <label class="sr-only"
-               for="Username">Username</label>
+               for="Username"
+               translate>COMMON.USERNAME</label>
         <input type="text"
                formControlName="Username"
                class="form-control"
@@ -26,7 +29,8 @@
       </div>
       <div class="form-group">
         <label class="sr-only"
-               for="FirstName">First Name</label>
+               for="FirstName"
+               translate>COMMON.FIRST</label>
         <input type="text"
                formControlName="FirstName"
                class="form-control"
@@ -37,7 +41,8 @@
       </div>
       <div class="form-group">
         <label class="sr-only"
-               for="LastName">Last Name</label>
+               for="LastName"
+               translate>COMMON.LAST</label>
         <input type="text"
                formControlName="LastName"
                class="form-control"
@@ -48,7 +53,8 @@
       </div>
       <div class="form-group">
         <label class="sr-only"
-               for="Email">Email</label>
+               for="Email"
+               translate>COMMON.EMAIL</label>
         <input type="email"
                formControlName="Email"
                class="form-control"
@@ -59,7 +65,8 @@
       </div>
       <div class="form-group">
         <label class="sr-only"
-               for="Phone">Phone Number</label>
+               for="Phone"
+               translate>COMMON.PHONE</label>
         <input type="text"
                formControlName="Phone"
                class="form-control"
@@ -70,7 +77,8 @@
       </div>
       <div class="form-group">
         <label class="sr-only"
-               for="Password">Password</label>
+               for="Password"
+               translate>COMMON.PASSWORD</label>
         <input type="password"
                formControlName="Password"
                class="form-control"
@@ -81,7 +89,8 @@
       </div>
       <div class="form-group">
         <label class="sr-only"
-               for="ConfirmPassword">Confirm Password</label>
+               for="ConfirmPassword"
+               translate>COMMON.CONFIRM_PASSWORD</label>
         <input type="password"
                formControlName="ConfirmPassword"
                class="form-control"
@@ -91,13 +100,14 @@
                showErrors />
       </div>
       <button type="submit"
-              class="btn btn-primary btn-lg btn-block mt-4">Register
+              class="btn btn-primary btn-lg btn-block mt-4"
+              translate>AUTHENTICATION.REGISTER.REGISTER
       </button>
     </form>
     <button type="button"
             class="btn btn-link btn-block"
-            routerLink="/forgot-password">Forgot
-      Password
+            routerLink="/forgot-password"
+            translate>AUTHENTICATION.REGISTER.FORGOT_PASS
     </button>
   </div>
 </div>

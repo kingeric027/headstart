@@ -1,7 +1,7 @@
 // angular
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-
+import { TranslateService } from '@ngx-translate/core';
 // angular libs
 
 // ordercloud
@@ -20,7 +20,9 @@ export class OCMResetPassword implements OnInit {
   resetCode: string;
   appName: string;
 
-  constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
+  constructor(private toasterService: ToastrService, private context: ShopperContextService, private translate: TranslateService) {
+    translate.setDefaultLang('en');
+  }
 
   ngOnInit(): void {
     // TODO - figure out how to access url.
