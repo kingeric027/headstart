@@ -402,6 +402,7 @@ export class ProductEditComponent implements OnInit {
     superMarketplaceProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
     superMarketplaceProduct.Product.xp.Status = 'Draft';
+    superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
     return await MarketplaceSDK.Products.Post(superMarketplaceProduct);
   }
