@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Marketplace.CMS.Controllers
 {
-	[DocComments("\"Integration\" represents Avalara Tax Functionality")]
+	[DocComments("\"Integration\" represents asset containers")]
 	[MarketplaceSection.Integration(ListOrder = 6)]
 	[Route("containers")]
 	public class AssetContainerController : BaseController
@@ -50,12 +50,12 @@ namespace Marketplace.CMS.Controllers
 			return await _query.Create(container);
 		}
 
-		[DocName("Create or Update an Asset Container")]
-		[HttpPut, Route("{containerID}")]
-		public async Task<AssetContainer> CreateOrUpdate(string containerID, [FromBody] AssetContainer container)
-		{
-			return await _query.CreateOrUpdate(containerID, container);
-		}
+		//[DocName("Create or Update an Asset Container")]
+		//[HttpPut, Route("{containerID}")]
+		//public async Task<AssetContainer> CreateOrUpdate(string containerID, [FromBody] AssetContainer container)
+		//{
+		//	return await _query.CreateOrUpdate(containerID, container);
+		//}
 
 		[DocName("Delete an Asset Container")]
 		[HttpDelete, Route("{containerID}")]
@@ -64,19 +64,19 @@ namespace Marketplace.CMS.Controllers
 			await _query.Delete(containerID);
 		}
 
-		[DocName("Connect to storage Account")]
-		[HttpPost, Route("{containerID}/connect")]
-		public async Task<string> ConnectToStorage(string containerID, [FromBody] StorageAccount account)
-		{
-			// Block if Container is already connected to a storage account.
-			throw new NotImplementedException();
-		}
+		//[DocName("Connect to storage Account")]
+		//[HttpPost, Route("{containerID}/connect")]
+		//public async Task<string> ConnectToStorage(string containerID, [FromBody] StorageAccount account)
+		//{
+		//	// Block if Container is already connected to a storage account.
+		//	throw new NotImplementedException();
+		//}
 
-		[DocName("Disconnect from storage Account")]
-		[HttpPost, Route("{containerID}/disconnect")]
-		public async Task DisconnectFromStorage(string containerID)
-		{
-			throw new NotImplementedException();
-		}
+		//[DocName("Disconnect from storage Account")]
+		//[HttpPost, Route("{containerID}/disconnect")]
+		//public async Task DisconnectFromStorage(string containerID)
+		//{
+		//	throw new NotImplementedException();
+		//}
 	}
 }

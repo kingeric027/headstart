@@ -23,7 +23,7 @@ namespace Marketplace.CMS.Storage
 			};
 		}
 
-		public async Task<StorageAccount> Connect(string containerID)
+		public async Task<StorageAccount> OnContainerConnected(string containerID)
 		{
 			// TODO - handle failure to connect
 			await BuildBlobService(containerID).Init();

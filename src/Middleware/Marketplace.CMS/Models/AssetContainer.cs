@@ -37,7 +37,7 @@ namespace Marketplace.CMS.Models
 		}
 	}
 
-	public enum StorageAccountType { DefaultBlob, ExternalBlob };
+	public enum StorageAccountType { DefaultBlob }; // ExternalBlob, ExternalS3
 
 	[SwaggerModel]
 	public class StorageAccount

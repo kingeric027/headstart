@@ -24,20 +24,20 @@ namespace Marketplace.CMS.Queries
 		Task<ListPage<AssetContainer>> List(IListArgs args);
 		Task<AssetContainer> Get(string interopID);
 		Task<AssetContainer> Create(AssetContainer container);
-		Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container);
+		// Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container);
 		Task Delete(string interopID);
 	}
 
 	public class AssetContainerQuery: IAssetContainerQuery
 	{
-		private readonly AppSettings _settings;
 		private readonly ICosmosStore<AssetContainer> _store;
+		private readonly IStorageFactory _storageFactory;
 		public const string SinglePartitionID = "SinglePartitionID"; // TODO - is there a better way?
 
-		public AssetContainerQuery(AppSettings settings, ICosmosStore<AssetContainer> store)
+		public AssetContainerQuery(ICosmosStore<AssetContainer> store, IStorageFactory storageFactory)
 		{
-			_settings = settings;
 			_store = store;
+			_storageFactory = storageFactory;
 		}
 
 		public async Task<ListPage<AssetContainer>> List(IListArgs args)
@@ -60,49 +60,36 @@ namespace Marketplace.CMS.Queries
 		public async Task<AssetContainer> Create(AssetContainer container)
 		{
 			if ((await GetWithoutExceptions(container.InteropID)) != null) throw new DuplicateIdException();
-			IStorage storage = new DefaultBlobStorage(_settings);
-			container.StorageAccount = await storage.Connect(container.id);
+			container.StorageAccount = await _storageFactory.GetStorage(container.StorageAccount).OnContainerConnected(container.id);
 			container.StorageConnected = true;
 
 			return await _store.AddAsync(container);
 		}
 
-		public async Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container)
-		{
-			var item = await GetWithoutExceptions(interopID);
-			if (item != null) {
-				container.id = item.id;
-				return await _store.UpdateAsync(container);
-			} else
-			{
-				return await Create(container);
-			}
-		}
+		//public async Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container)
+		//{
+		//	var item = await GetWithoutExceptions(interopID);
+		//	if (item != null) {
+		//		container.id = item.id;
+		//		// TODO - how to prevent overriding the readonly fields with null?
+		//		return await _store.UpdateAsync(container);
+		//	} else
+		//	{
+		//		return await Create(container);
+		//	}
+		//}
 
 		public async Task Delete(string interopID)
 		{
 			var item = await Get(interopID);
-			await GetStorage(item).OnContainerDeleted(item.id);
+			await _storageFactory.GetStorage(item.StorageAccount).OnContainerDeleted(item.id);
 			await _store.RemoveByIdAsync(item.id, SinglePartitionID);
-			// TODO - delete all the assets?
+			// TODO - delete all the asset records?
 		}
 
 		private async Task<AssetContainer> GetWithoutExceptions(string interopID)
 		{
 			return await _store.Query($"select top 1 * from c where c.InteropID = @id", new { id = interopID }).FirstOrDefaultAsync();
 		}
-
-		private IStorage GetStorage(AssetContainer container)
-		{
-			switch (container.StorageAccount.Type)
-			{
-				case StorageAccountType.DefaultBlob:
-					return new DefaultBlobStorage(_settings);
-				case StorageAccountType.ExternalBlob:
-					return new DefaultBlobStorage(_settings);
-				default:
-					return null;
-			}
-		} 
 	}
 }

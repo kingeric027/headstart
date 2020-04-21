@@ -1,6 +1,7 @@
 ﻿using Flurl.Http;
 using Marketplace.CMS.Models;
 using Marketplace.CMS.Queries;
+using Marketplace.CMS.Storage;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
@@ -43,33 +44,35 @@ namespace Marketplace.API
         {
             var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
                 _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
-            services
-                .ConfigureWebApiServices(_settings)
+			services
+				.ConfigureWebApiServices(_settings)
 				.ConfigureOpenApiSpec("v1", "Marketplace API")
-                .Inject<IAppSettings>()
-                .Inject<IDevCenterService>()
-                .Inject<IFlurlClient>()
-                .Inject<IZohoClient>()
-                .Inject<IZohoCommand>()
-                .Inject<ISyncCommand>()
-                .Inject<IAvalaraService>()
-                .Inject<IFreightPopService>()
-                .Inject<ISmartyStreetsService>()
-                .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-                .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
-                .InjectCosmosStore<ImageProductAssignmentQuery, ImageProductAssignment>(cosmosConfig)
+				.Inject<IAppSettings>()
+				.Inject<IDevCenterService>()
+				.Inject<IFlurlClient>()
+				.Inject<IZohoClient>()
+				.Inject<IZohoCommand>()
+				.Inject<ISyncCommand>()
+				.Inject<IAvalaraService>()
+				.Inject<IFreightPopService>()
+				.Inject<ISmartyStreetsService>()
+				.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
+				.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
+				.InjectCosmosStore<ImageProductAssignmentQuery, ImageProductAssignment>(cosmosConfig)
+				.InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
 				.InjectCosmosStore<ImageQuery, Image>(cosmosConfig)
-                .Inject<IOrchestrationCommand>()
-                .Inject<IOrchestrationLogCommand>()
-                .Inject<IOCShippingIntegration>()
-                .Inject<IShipmentCommand>()
-                .Inject<IValidatedAddressCommand>()
-                .Inject<IEnvironmentSeedCommand>()
-                .Inject<IOrderCloudSandboxService>()
-                .Inject<IMarketplaceProductCommand>()
+				.Inject<IOrchestrationCommand>()
+				.Inject<IOrchestrationLogCommand>()
+				.Inject<IOCShippingIntegration>()
+				.Inject<IShipmentCommand>()
+				.Inject<IValidatedAddressCommand>()
+				.Inject<IEnvironmentSeedCommand>()
+				.Inject<IOrderCloudSandboxService>()
+				.Inject<IMarketplaceProductCommand>()
 				.Inject<ISendgridService>()
 				.Inject<IAssetContainerQuery>()
+				.Inject<IStorageFactory>()
 				.Inject<ISupplierCategoryConfigQuery>()
 				.InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
                 {

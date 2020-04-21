@@ -9,7 +9,14 @@ namespace Marketplace.CMS.Storage
 {
 	public class ExternalS3Storage : IStorage
 	{
-		public async Task<StorageAccount> Connect(string containerID)
+		private readonly StorageAccount _account;
+
+		public ExternalS3Storage(StorageAccount account)
+		{
+			_account = account;
+		}
+
+		public async Task<StorageAccount> OnContainerConnected(string containerID)
 		{
 			throw new NotImplementedException();
 		}
