@@ -293,11 +293,16 @@
         <div class="d-flex justify-content-start align-items-center flex-wrap">
           <div *ngFor="let image of images; let i = index"
                class="product-img-wrapper mr-2">
-            <img class="product-img"
-                 [id]="i"
-                 [src]="image.URL"
-                 width="auto"
-                 height="100px">
+            <div class="product-img">
+              <img [id]="i"
+                   [src]="image.URL"
+                   width="auto"
+                   height="100px">
+              <span *ngIf="i === 0"
+                    class="badge badge-primary primary-badge position-absolute mt-1 ml-1">
+                Primary
+              </span>
+            </div>
             <div class="product-img-delete text-center">
               <button title="Delete photo"
                       class="btn btn-light btn-group-item"
