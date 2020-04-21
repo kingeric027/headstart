@@ -9,7 +9,6 @@ import {
   ValidateFieldMatches,
 } from '../../../validators/validators';
 import { ShopperContextService } from 'marketplace';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   templateUrl: './register.component.html',
@@ -19,9 +18,7 @@ export class OCMRegister implements OnInit {
   form: FormGroup;
   appName: string;
 
-  constructor(private context: ShopperContextService, private translate: TranslateService) {
-    translate.setDefaultLang('en');
-  }
+  constructor(private context: ShopperContextService) { }
 
   // TODO: validation isn't working
   ngOnInit(): void {

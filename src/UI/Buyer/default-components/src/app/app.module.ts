@@ -17,8 +17,7 @@ import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
 import { OrderCloudModule } from '@ordercloud/angular-sdk';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
-import { ToastrModule } from 'ngx-toastr';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -266,7 +265,8 @@ const components = [
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: any) {
+  constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: any, public translate: TranslateService) {
+    translate.setDefaultLang('en');
     this.buildWebComponent(OCMProfileNav, 'ocm-profile-nav');
     this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
     this.buildWebComponent(OCMProductCard, 'ocm-product-card');

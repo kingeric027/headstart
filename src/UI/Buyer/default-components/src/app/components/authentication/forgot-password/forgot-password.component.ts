@@ -2,7 +2,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ShopperContextService } from 'marketplace';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   templateUrl: './forgot-password.component.html',
@@ -12,9 +11,7 @@ export class OCMForgotPassword implements OnInit {
   form: FormGroup;
   appName: string;
 
-  constructor(private context: ShopperContextService, private translate: TranslateService) {
-    translate.setDefaultLang('en');
-  }
+  constructor(private context: ShopperContextService) { }
 
   ngOnInit(): void {
     this.appName = this.context.appSettings.appname;

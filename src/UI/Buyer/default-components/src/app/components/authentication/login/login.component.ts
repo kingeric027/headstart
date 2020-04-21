@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ShopperContextService } from 'marketplace';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   templateUrl: './login.component.html',
@@ -14,9 +13,7 @@ export class OCMLogin implements OnInit {
   appName: string;
   ssoLink: string; // TODO - remove from marketplace generic. Should be SEB specific.
 
-  constructor(private context: ShopperContextService, private toasterService: ToastrService, public translate: TranslateService) {
-    translate.setDefaultLang('en');
-  }
+  constructor(private context: ShopperContextService, private toasterService: ToastrService) { }
 
   ngOnInit(): void {
     this.ssoLink = this.context.appSettings.ssoLink;
