@@ -85,8 +85,6 @@ namespace Marketplace.Common.Commands
 
 		static readonly List<XpIndex> DefaultIndices = new List<XpIndex>() {
 			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Type" },       
-			new XpIndex { ThingType = XpThingType.Product, Key = "Images.URL" },       
-			new XpIndex { ThingType = XpThingType.Product, Key = "Status" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.ServiceCategory" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.VendorLevel" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
