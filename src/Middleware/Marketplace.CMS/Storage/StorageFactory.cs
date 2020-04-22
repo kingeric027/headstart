@@ -10,14 +10,14 @@ namespace Marketplace.CMS.Storage
 {
 	public interface IStorage
 	{
-		Task<StorageAccount> OnContainerConnected(string containerID);
-		Task<Asset> UploadAsset(string containerID, IFormFile file, Asset asset);
-		Task OnContainerDeleted(string containerID);
+		Task<AssetContainer> OnContainerConnected();
+		Task<Asset> UploadAsset(IFormFile file, Asset asset);
+		Task OnContainerDeleted();
 	}
 
 	public interface IStorageFactory
 	{
-		IStorage GetStorage(StorageAccount account);
+		IStorage GetStorage(AssetContainer container);
 	}
 
 	public class StorageFactory: IStorageFactory
@@ -29,18 +29,17 @@ namespace Marketplace.CMS.Storage
 			_settings = settings;
 		}
 
-		public IStorage GetStorage(StorageAccount account)
+		public IStorage GetStorage(AssetContainer container)
 		{
-			switch (account?.Type)
+			switch (container?.StorageAccount?.Type)
 			{
-				case StorageAccountType.DefaultBlob:
-					return new DefaultBlobStorage(_settings);
 				//case StorageAccountType.ExternalBlob:
 				//	return new ExternalBlobStorage(container.StorageAccount);
 				//case StorageAccountType.ExternalS3:
 				//	return new ExternalS3Storage(container.StorageAccount);
+				case StorageAccountType.DefaultBlob:
 				default:
-					return new DefaultBlobStorage(_settings);
+					return new DefaultBlobStorage(container, _settings);
 			}
 		}
 	}

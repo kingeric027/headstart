@@ -25,6 +25,7 @@ namespace Marketplace.Helpers.Models
 		public DateTimeOffset timeStamp { get; set; } = DateTimeOffset.Now; 
 		// Note, Cosmos Unqiue keys are only unique within the partition.
 		public static Collection<UniqueKey> GetUniqueKeys() => null;
+
 	}
 
 	public interface ICosmosQuery<T> where T : ICosmosObject

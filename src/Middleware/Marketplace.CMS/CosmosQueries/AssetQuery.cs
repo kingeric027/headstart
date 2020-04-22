@@ -5,6 +5,7 @@ using Marketplace.CMS.Models;
 using Marketplace.CMS.Storage;
 using Marketplace.Common;
 using Marketplace.Helpers;
+using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Documents;
@@ -43,7 +44,7 @@ namespace Marketplace.CMS.Queries
 		public async Task<ListPage<Asset>> List(string containerInteropID, IListArgs args)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var query = _store.Query(new FeedOptions() { PartitionKey = new PartitionKey(containerInteropID), EnableCrossPartitionQuery = false })
+			var query = _store.Query(new FeedOptions() { PartitionKey = new PartitionKey(container.id), EnableCrossPartitionQuery = false })
 				.Search(args)
 				.Filter(args)
 				.Sort(args);
@@ -55,7 +56,7 @@ namespace Marketplace.CMS.Queries
 		public async Task<Asset> Get(string containerInteropID, string assetInteropID)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var item = await GetWithoutExceptions(containerInteropID, assetInteropID);
+			var item = await GetWithoutExceptions(container.id, assetInteropID);
 			return item ?? throw new NotFoundException("AssetContainer", assetInteropID);
 		}
 
@@ -64,20 +65,23 @@ namespace Marketplace.CMS.Queries
 			var container = await _containers.Get(containerInteropID);
 			var (asset, file) = AssetMapper.Map(container, form);
 			if ((await GetWithoutExceptions(containerInteropID, asset.InteropID)) != null) throw new DuplicateIdException();
+			if (file != null) {			
+				await _storageFactory.GetStorage(container).UploadAsset(file, asset);
+			}
 
 			return await _store.AddAsync(asset);
 		}
 
 		public async Task Delete(string containerInteropID, string assetInteropID)
 		{
-			await _containers.Get(containerInteropID); // make sure container exists.
+			var container = await _containers.Get(containerInteropID); // make sure container exists.
 			var item = await Get(containerInteropID, assetInteropID);
-			await _store.RemoveByIdAsync(item.id, containerInteropID);
+			await _store.RemoveByIdAsync(item.id, container.id);
 		}
 
-		private async Task<Asset> GetWithoutExceptions(string containerInteropID, string assetInteropID)
+		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)
 		{
-			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(containerInteropID) };
+			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(containerID) };
 			return await _store.Query($"select top 1 * from c where c.InteropID = @id", new { id = assetInteropID }, feedOptions).FirstOrDefaultAsync();
 		}
 	}

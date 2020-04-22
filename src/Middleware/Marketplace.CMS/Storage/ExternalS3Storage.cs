@@ -9,24 +9,24 @@ namespace Marketplace.CMS.Storage
 {
 	public class ExternalS3Storage : IStorage
 	{
-		private readonly StorageAccount _account;
+		private readonly AssetContainer _container;
 
-		public ExternalS3Storage(StorageAccount account)
+		public ExternalS3Storage(AssetContainer container)
 		{
-			_account = account;
+			_container = container;
 		}
 
-		public async Task<StorageAccount> OnContainerConnected(string containerID)
-		{
-			throw new NotImplementedException();
-		}
-
-		public async Task<Asset> UploadAsset(string containerID, IFormFile file, Asset asset)
+		public async Task<AssetContainer> OnContainerConnected()
 		{
 			throw new NotImplementedException();
 		}
 
-		public async Task OnContainerDeleted(string containerID)
+		public async Task<Asset> UploadAsset(IFormFile file, Asset asset)
+		{
+			throw new NotImplementedException();
+		}
+
+		public async Task OnContainerDeleted()
 		{
 			throw new NotImplementedException();
 		}

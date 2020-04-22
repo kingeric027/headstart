@@ -10,39 +10,26 @@ namespace Marketplace.CMS.Storage
 {
 	public class ExternalBlobStorage : IStorage
 	{
-		private readonly StorageAccount _account;
+		private readonly AssetContainer _container;
 
-		public ExternalBlobStorage(StorageAccount account)
+		public ExternalBlobStorage(AssetContainer container)
 		{
-			_account = account;
- 		}
-
-		public async Task<StorageAccount> OnContainerConnected(string containerID)
-		{
-			// TODO - handle failure to connect
-			await BuildBlobService(containerID).Init();
-			return _account;
+			_container = container;
 		}
 
-		public async Task<Asset> UploadAsset(string containerID, IFormFile file, Asset asset)
+		public async Task<AssetContainer> OnContainerConnected()
 		{
-			// TODO - handle failure to connect
-			await BuildBlobService(containerID).Save(asset.id, file);
-			return asset;
+			throw new NotImplementedException();
 		}
 
-		public async Task OnContainerDeleted(string containerID)
+		public async Task<Asset> UploadAsset(IFormFile file, Asset asset)
 		{
-			// Do nothing - do not delete externally stored files.
+			throw new NotImplementedException();
 		}
 
-		private BlobService BuildBlobService(string containerID)
+		public async Task OnContainerDeleted()
 		{
-			return new BlobService(new BlobServiceConfig()
-			{
-				ConnectionString = _account.ConnectionString,
-				Container = $"assets-{containerID}"
-			});
+			throw new NotImplementedException();
 		}
 	}
 }

@@ -60,7 +60,7 @@ namespace Marketplace.CMS.Queries
 		public async Task<AssetContainer> Create(AssetContainer container)
 		{
 			if ((await GetWithoutExceptions(container.InteropID)) != null) throw new DuplicateIdException();
-			container.StorageAccount = await _storageFactory.GetStorage(container.StorageAccount).OnContainerConnected(container.id);
+			container = await _storageFactory.GetStorage(container).OnContainerConnected();
 			container.StorageConnected = true;
 
 			return await _store.AddAsync(container);
@@ -82,7 +82,7 @@ namespace Marketplace.CMS.Queries
 		public async Task Delete(string interopID)
 		{
 			var item = await Get(interopID);
-			await _storageFactory.GetStorage(item.StorageAccount).OnContainerDeleted(item.id);
+			await _storageFactory.GetStorage(item).OnContainerDeleted();
 			await _store.RemoveByIdAsync(item.id, SinglePartitionID);
 			// TODO - delete all the asset records?
 		}

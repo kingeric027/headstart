@@ -11,11 +11,12 @@ namespace Marketplace.CMS.Storage
 {
 	public class DefaultBlobStorage : IStorage
 	{
-		private readonly StorageAccount _account;
+		private readonly AssetContainer _container;
 
-		public DefaultBlobStorage(AppSettings settings)
+		public DefaultBlobStorage(AssetContainer container, AppSettings settings)
 		{
-			_account = new StorageAccount()
+			_container = container;
+			_container.StorageAccount = new StorageAccount()
 			{
 				Type = StorageAccountType.DefaultBlob,
 				HostUrl = settings.BlobSettings.HostUrl,
@@ -23,30 +24,48 @@ namespace Marketplace.CMS.Storage
 			};
 		}
 
-		public async Task<StorageAccount> OnContainerConnected(string containerID)
+		public async Task<AssetContainer> OnContainerConnected()
 		{
-			// TODO - handle failure to connect
-			await BuildBlobService(containerID).Init();
-			return _account;
+			try
+			{
+				await BuildBlobService(_container.id).Init();
+				return _container;
+			} catch (Exception ex)
+			{
+				throw new StorageConnectionException(_container.InteropID, ex);
+			}
 		}
 
-		public async Task<Asset> UploadAsset(string containerID, IFormFile file, Asset asset)
+		public async Task<Asset> UploadAsset(IFormFile file, Asset asset)
 		{
-			// TODO - handle failure to connect
-			await BuildBlobService(containerID).Save(asset.id, file);
-			return asset;
+			try
+			{
+				await BuildBlobService(_container.id).Save(asset.id, file);
+				return asset;
+			}
+			catch (Exception ex)
+			{
+				throw new StorageConnectionException(_container.InteropID, ex);
+			}
 		}
 
-		public async Task OnContainerDeleted(string containerID)
+		public async Task OnContainerDeleted()
 		{
-			await BuildBlobService(containerID).DeleteContainer();
+			try
+			{
+				await BuildBlobService(_container.id).DeleteContainer();
+			}
+			catch (Exception ex)
+			{
+				throw new StorageConnectionException(_container.InteropID, ex);
+			}
 		}
-
+	
 		private BlobService BuildBlobService(string containerID)
 		{
 			return new BlobService(new BlobServiceConfig()
 			{
-				ConnectionString = _account.ConnectionString,
+				ConnectionString = _container.StorageAccount.ConnectionString,
 				Container = $"assets-{containerID}"
 			});
 		}
