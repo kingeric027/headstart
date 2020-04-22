@@ -19,7 +19,8 @@ namespace Marketplace.Models
 	{
 		public List<DestinationAddressAccessorial> Accessorials { get; set; }
 		public string Email { get; set; }
-		public Coordinates Coordinates;
+        public string LocationID { get; set; }
+        public Coordinates Coordinates;
 		public int? AvalaraCertificateID { get; set; } // default value is null if no certificate
 		public DateTimeOffset? AvalaraCertificateExpiration { get; set; } // default value is null if no certificate 
 	}
