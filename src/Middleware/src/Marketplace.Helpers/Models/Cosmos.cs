@@ -53,4 +53,7 @@ namespace Marketplace.Helpers.Models
         public string EndpointUri { get; set; }
         public string PrimaryKey { get; set; }
     }
+
+	[AttributeUsage(AttributeTargets.Property)]
+	public class CosmosIgnoreAttribute : Attribute { }
 }

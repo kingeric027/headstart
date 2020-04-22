@@ -25,9 +25,7 @@ namespace Marketplace.CMS.Mappers
 
 		public static (Asset, IFormFile) MapFromUpload(AssetContainer container, AssetUploadForm form)
 		{
-			var hasFile = form.File != null;
-			var hasUrlOveride = form.UrlPathOveride != null;
-			if (!(hasFile ^ hasUrlOveride))
+			if (!(form.File == null ^ form.UrlPathOveride == null))
 			{
 				throw new AssetUploadValidationException("Asset upload must include either File or UrlPathOveride but not both.");
 			}
@@ -44,7 +42,6 @@ namespace Marketplace.CMS.Mappers
 				{
 					ContentType = form.File?.ContentType,
 					SizeBytes = form.File?.Length,
-					IsUrlOverridden = hasUrlOveride,
 				}
 			};
 			TypeSpecificMapping(ref asset, form);

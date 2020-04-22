@@ -22,7 +22,7 @@ namespace Marketplace.CMS.Models
 		public string InteropID { get; set; }
 		[Required, ApiIgnore, CosmosPartitionKey]
 		public string ContainerID { get; set; } // real id, not interop. Don't need to set or return.
-		[ApiReadOnly]
+		[ApiReadOnly, CosmosIgnore]
 		public string Url { get; set; } // Generated if not set. 
 		public string UrlPathOveride { get; set; } = null; // saved
 		public string Title { get; set; }
@@ -47,7 +47,6 @@ namespace Marketplace.CMS.Models
 	{
 		public string ContentType { get; set; }
 		public long? SizeBytes { get; set; }
-		public bool IsUrlOverridden { get; set; } // true if Url was set, false if it was generated
 		public int? ImageHeight { get; set; } = null; // null if asset not image
 		public int? ImageWidth { get; set; } = null; // null if asset not image
 	}

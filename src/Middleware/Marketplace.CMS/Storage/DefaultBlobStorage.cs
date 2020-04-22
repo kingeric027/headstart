@@ -2,6 +2,7 @@
 using Marketplace.Common;
 using Marketplace.Helpers.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,7 +29,8 @@ namespace Marketplace.CMS.Storage
 		{
 			try
 			{
-				await BuildBlobService(_container.id).Init();
+				// https://docs.microsoft.com/en-us/azure/storage/blobs/storage-manage-access-to-resources
+				await BuildBlobService(_container.id).Init(BlobContainerPublicAccessType.Container);
 				return _container;
 			} catch (Exception ex)
 			{

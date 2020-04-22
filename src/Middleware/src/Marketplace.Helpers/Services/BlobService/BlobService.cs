@@ -18,7 +18,7 @@ namespace Marketplace.Helpers.Services
 
     public interface IBlobService
     {
-		Task Init();
+		Task Init(BlobContainerPublicAccessType accessType);
 		Task<T> Get<T>(string id);
         Task<string> Get(string id);
         Task Save(string reference, string blob, string fileType = null);
@@ -60,9 +60,15 @@ namespace Marketplace.Helpers.Services
             }
         }
 
-        public async Task Init()
+        public async Task Init(BlobContainerPublicAccessType accessType = BlobContainerPublicAccessType.Off)
         {
-            await _container.CreateIfNotExistsAsync();
+            var created = await _container.CreateIfNotExistsAsync();
+			if (created)
+			{
+				var permissions = await _container.GetPermissionsAsync();
+				permissions.PublicAccess = accessType;
+				await _container.SetPermissionsAsync(permissions);
+			}
         }
 
         public async Task<string> Get(string id)
@@ -109,6 +115,7 @@ namespace Marketplace.Helpers.Services
 
 		public async Task Save(string reference, IFormFile blob, string fileType = null)
 		{
+			await this.Init();
 			var block = _container.GetBlockBlobReference(reference);
 			block.Properties.ContentType = fileType ?? blob.ContentType;
 			using (var stream = blob.OpenReadStream())

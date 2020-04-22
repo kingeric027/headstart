@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Marketplace.Helpers.Models;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,9 @@ namespace Marketplace.Helpers.Helpers
 					property.PropertyName = property.UnderlyingName; // typically "InteropID"
 				}
 			}
-			return properties;
+			return properties
+				.Where(prop => !prop.AttributeProvider.GetAttributes(true).Any(atr => atr.GetType() == typeof(CosmosIgnoreAttribute)))
+				.ToList();
 		}
 	}
 }
