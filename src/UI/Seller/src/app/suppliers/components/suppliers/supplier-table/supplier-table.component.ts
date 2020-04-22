@@ -11,6 +11,7 @@ import {
   ValidateSupplierCategorySelection,
 } from '@app-seller/validators/validators';
 import { SupplierService } from '../supplier.service';
+import { MarketplaceSupplier } from 'marketplace-javascript-sdk';
 
 export interface SupplierCategoryConfigFilters {
   Display: string;
@@ -24,7 +25,7 @@ export interface SupplierCategoryConfig {
   Filters: Array<SupplierCategoryConfigFilters>;
 }
 
-function createSupplierForm(supplier: Supplier) {
+function createSupplierForm(supplier: MarketplaceSupplier) {
   return new FormGroup({
     ID: new FormControl({ value: supplier.ID, disabled: !this.isCreatingNew }),
     Name: new FormControl(supplier.Name, Validators.required),
@@ -43,6 +44,7 @@ function createSupplierForm(supplier: Supplier) {
       (_get(supplier, 'xp.SupportContact') && _get(supplier, 'xp.SupportContact.Phone')) || ''
     ),
     Active: new FormControl(supplier.Active),
+    SyncFreightPop: new FormControl(supplier.xp?.SyncFreightPop || false),
   });
 }
 

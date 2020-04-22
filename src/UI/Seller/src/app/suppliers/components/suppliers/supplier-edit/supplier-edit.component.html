@@ -55,6 +55,21 @@
                                            (resourceUpdated)="updateResource.emit($event)">
           </reactive-quill-editor-component>
         </div>
+        <div class="form-group">
+          <p class="mb-1">Use FreightPOP for Shipping</p>
+          <label class="switch mb-0"
+                 for="SyncFreightPop">
+            <input type="checkbox"
+                   class="form-check-input"
+                   id="SyncFreightPop"
+                   showErrors
+                   [resourceForm]="resourceForm"
+                   aria-describedby="SyncFreightPop"
+                   formControlName="SyncFreightPop"
+                   (input)="updateResourceFromEvent($event, 'xp.SyncFreightPop')">
+            <span class="slider round cursor-pointer"></span>
+          </label>
+        </div>
       </div>
     </div>
     <div class="row pt-3">
