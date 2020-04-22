@@ -51,6 +51,7 @@ namespace Marketplace.Common.Commands
 			await CreateWebhooks(impersonation.access_token, seed.ApiUrl);
 			await CreateMarketPlaceRoles(impersonation.access_token);
 			await CreateBuyers(user, impersonation.access_token);
+			await CreateXPIndices(impersonation.access_token);
 			await CreateIncrementors(impersonation.access_token);
 			await CreateAndAssignIntegrationEvent(seed.ApiUrl, impersonation.access_token);
 			await CreateSuppliers(user, impersonation.access_token);
@@ -79,6 +80,24 @@ namespace Marketplace.Common.Commands
 			foreach (MarketplaceSupplier supplier in _seed.Suppliers)
 			{
 				await _supplierCommand.Create(supplier, user, token);
+			}
+		}
+
+		static readonly List<XpIndex> DefaultIndices = new List<XpIndex>() {
+			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Type" },       
+			new XpIndex { ThingType = XpThingType.Company, Key = "Data.ServiceCategory" },       
+			new XpIndex { ThingType = XpThingType.Company, Key = "Data.VendorLevel" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "OrderType" },       
+			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },       
+		};
+
+		public async Task CreateXPIndices(string token)
+		{
+			foreach (var index in DefaultIndices)
+			{
+				await _oc.XpIndices.PutAsync(index, token);
 			}
 		}
 
