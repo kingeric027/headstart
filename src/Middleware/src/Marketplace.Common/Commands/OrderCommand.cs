@@ -175,22 +175,26 @@ namespace Marketplace.Common.Commands
         {
 
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, supplierOrder.ID);
+            var firstLineItemOfSupplierOrder = lineItems.Items.First();
+            var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(firstLineItemOfSupplierOrder.SupplierID);
             
-            // we further split the supplier order into multiple orders for each shipfromaddressID before it goes into freightpop
-            var freightPopOrders = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
-
-            var freightPopOrderIDs = new List<string>();
-            foreach(var lineItemGrouping in freightPopOrders)
+            if(supplier.xp.SyncFreightPop)
             {
-                var firstLineItem = lineItemGrouping.First();
+                // we further split the supplier order into multiple orders for each shipfromaddressID before it goes into freightpop
+                var freightPopOrders = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
 
-                var freightPopOrderID = $"{supplierOrder.ID.Split('-').First()}-{firstLineItem.ShipFromAddressID}";
-                freightPopOrderIDs.Add(freightPopOrderID);
+                var freightPopOrderIDs = new List<string>();
+                foreach(var lineItemGrouping in freightPopOrders)
+                {
+                    var firstLineItem = lineItemGrouping.First();
 
-                var supplier = await _oc.Suppliers.GetAsync(firstLineItem.SupplierID);
-                var supplierAddress = await _oc.SupplierAddresses.GetAsync(supplier.ID, firstLineItem.ShipFromAddressID);
-                var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItemGrouping.ToList(), supplier, supplierAddress, freightPopOrderID);
-                await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
+                    var freightPopOrderID = $"{supplierOrder.ID.Split('-').First()}-{firstLineItem.ShipFromAddressID}";
+                    freightPopOrderIDs.Add(freightPopOrderID);
+
+                    var supplierAddress = await _oc.SupplierAddresses.GetAsync(supplier.ID, firstLineItem.ShipFromAddressID);
+                    var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItemGrouping.ToList(), supplier, supplierAddress, freightPopOrderID);
+                    await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
+                }
             }
         }
     }
