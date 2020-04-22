@@ -51,12 +51,12 @@ namespace Marketplace.CMS.Controllers
 			return await _query.Create(containerID, upload);
 		}
 
-		//[DocName("Create or Update an Asset")]
-		//[HttpPut, Route("{containerID}/assets/{assetID}")]
-		//public async Task<Asset> CreateOrUpdate(string containerID, string assetID, [FromBody] Asset container)
-		//{
-		//	throw new NotImplementedException();
-		//}
+		[DocName("Create or Update an Asset")]
+		[HttpPut, Route("{containerID}/assets/{assetID}")]
+		public async Task<Asset> CreateOrUpdate(string containerID, string assetID, [FromBody] Asset container)
+		{
+			throw new NotImplementedException();
+		}
 
 		[DocName("Delete an Asset Container")]
 		[HttpDelete, Route("{containerID}/assets/{assetID}")]

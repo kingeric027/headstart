@@ -12,9 +12,18 @@ namespace Marketplace.CMS.Mappers
 {
 	public static class AssetMapper
 	{
-		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jepg" };
+		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
 
-		public static (Asset, IFormFile) Map(AssetContainer container, AssetUploadForm form)
+		public static Asset MapToResponse(AssetContainer container, Asset asset)
+		{
+			if (asset == null || container == null) return null;
+			var host = container.HostUrlOverride ?? container.StorageAccount?.HostUrl;
+			var path = asset.UrlPathOveride ?? $"assets-{container.id}/{asset.id}";
+			asset.Url = $"{host}/{path}";
+			return asset;
+		} 
+
+		public static (Asset, IFormFile) MapFromUpload(AssetContainer container, AssetUploadForm form)
 		{
 			var hasFile = form.File != null;
 			var hasUrlOveride = form.UrlPathOveride != null;
@@ -52,6 +61,7 @@ namespace Marketplace.CMS.Mappers
 				case AssetType.StructuredData:
 				case AssetType.Attachment:
 				case AssetType.Theme:
+				default:
 					return;
 			}
 		}
@@ -65,8 +75,8 @@ namespace Marketplace.CMS.Mappers
 			using (var image = Image.FromStream(form.File.OpenReadStream()))
 			{
 				asset.Metadata.ImageWidth = image.Width;
-				asset.Metadata.ImageWidth = image.Width;
-				// TODO - this is where we could potentially do image resizing in the future?
+				asset.Metadata.ImageHeight = image.Height;
+				// TODO - potentially image resizing?
 			}
 		}
 	}

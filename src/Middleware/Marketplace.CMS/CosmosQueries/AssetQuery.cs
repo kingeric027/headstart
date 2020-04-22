@@ -13,6 +13,7 @@ using Microsoft.Azure.Documents.Client;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Marketplace.Helpers.Exceptions.ApiErrorException;
@@ -50,26 +51,29 @@ namespace Marketplace.CMS.Queries
 				.Sort(args);
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
-			return list.ToListPage(args.Page, args.PageSize, count);
+			var listPage = list.ToListPage(args.Page, args.PageSize, count);
+			listPage.Items = listPage.Items.Select(asset => AssetMapper.MapToResponse(container, asset)).ToList();
+			return listPage;
 		}
 
 		public async Task<Asset> Get(string containerInteropID, string assetInteropID)
 		{
 			var container = await _containers.Get(containerInteropID);
 			var item = await GetWithoutExceptions(container.id, assetInteropID);
-			return item ?? throw new NotFoundException("AssetContainer", assetInteropID);
+			return AssetMapper.MapToResponse(container, item) ?? throw new NotFoundException("AssetContainer", assetInteropID);
 		}
 
 		public async Task<Asset> Create(string containerInteropID, AssetUploadForm form)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var (asset, file) = AssetMapper.Map(container, form);
-			if ((await GetWithoutExceptions(containerInteropID, asset.InteropID)) != null) throw new DuplicateIdException();
+			var (asset, file) = AssetMapper.MapFromUpload(container, form);
+			if ((await GetWithoutExceptions(container.id, asset.InteropID)) != null) throw new DuplicateIdException();
 			if (file != null) {			
 				await _storageFactory.GetStorage(container).UploadAsset(file, asset);
 			}
 
-			return await _store.AddAsync(asset);
+			var newAsset = await _store.AddAsync(asset);
+			return AssetMapper.MapToResponse(container, newAsset);
 		}
 
 		public async Task Delete(string containerInteropID, string assetInteropID)

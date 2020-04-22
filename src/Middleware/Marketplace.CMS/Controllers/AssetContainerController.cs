@@ -50,12 +50,12 @@ namespace Marketplace.CMS.Controllers
 			return await _query.Create(container);
 		}
 
-		//[DocName("Create or Update an Asset Container")]
-		//[HttpPut, Route("{containerID}")]
-		//public async Task<AssetContainer> CreateOrUpdate(string containerID, [FromBody] AssetContainer container)
-		//{
-		//	return await _query.CreateOrUpdate(containerID, container);
-		//}
+		[DocName("Create or Update an Asset Container")]
+		[HttpPut, Route("{containerID}")]
+		public async Task<AssetContainer> CreateOrUpdate(string containerID, [FromBody] AssetContainer container)
+		{
+			return await _query.CreateOrUpdate(containerID, container);
+		}
 
 		[DocName("Delete an Asset Container")]
 		[HttpDelete, Route("{containerID}")]

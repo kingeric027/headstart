@@ -24,7 +24,7 @@ namespace Marketplace.CMS.Queries
 		Task<ListPage<AssetContainer>> List(IListArgs args);
 		Task<AssetContainer> Get(string interopID);
 		Task<AssetContainer> Create(AssetContainer container);
-		// Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container);
+		Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container);
 		Task Delete(string interopID);
 	}
 
@@ -66,18 +66,20 @@ namespace Marketplace.CMS.Queries
 			return await _store.AddAsync(container);
 		}
 
-		//public async Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container)
-		//{
-		//	var item = await GetWithoutExceptions(interopID);
-		//	if (item != null) {
-		//		container.id = item.id;
-		//		// TODO - how to prevent overriding the readonly fields with null?
-		//		return await _store.UpdateAsync(container);
-		//	} else
-		//	{
-		//		return await Create(container);
-		//	}
-		//}
+		public async Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container)
+		{
+			var item = await GetWithoutExceptions(interopID);
+			if (item != null)
+			{
+				container.id = item.id;
+				// TODO - how to prevent overriding the readonly fields with null?
+				return await _store.UpdateAsync(container);
+			}
+			else
+			{
+				return await Create(container);
+			}
+		}
 
 		public async Task Delete(string interopID)
 		{
