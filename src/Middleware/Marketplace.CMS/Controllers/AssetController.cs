@@ -37,7 +37,7 @@ namespace Marketplace.CMS.Controllers
 			return await _query.List(containerID, args);
 		}
 
-		[DocName("Get an Asset ")]
+		[DocName("Get an Asset")]
 		[HttpGet, Route("{containerID}/assets/{assetID}")]
 		public async Task<Asset> Get(string containerID, string assetID)
 		{
@@ -51,14 +51,14 @@ namespace Marketplace.CMS.Controllers
 			return await _query.Create(containerID, form);
 		}
 
-		[DocName("Create or Update an Asset")]
+		[DocName("Update an Asset")]
 		[HttpPut, Route("{containerID}/assets/{assetID}")]
 		public async Task<Asset> Update(string containerID, string assetID, [FromBody] Asset asset)
 		{
 			return await _query.Update(containerID, assetID, asset);
 		}
 
-		[DocName("Delete an Asset Container")]
+		[DocName("Delete an Asset")]
 		[HttpDelete, Route("{containerID}/assets/{assetID}")]
 		public async Task Delete(string containerID, string assetID)
 		{
