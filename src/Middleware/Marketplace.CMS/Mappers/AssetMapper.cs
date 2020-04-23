@@ -77,6 +77,10 @@ namespace Marketplace.CMS.Mappers
 			{
 				asset.Metadata.ImageWidth = image.Width;
 				asset.Metadata.ImageHeight = image.Height;
+				asset.Metadata.ImageHorizontalResolution = image.HorizontalResolution;
+				asset.Metadata.ImageVerticalResolution = image.VerticalResolution;
+
+
 				// TODO - potentially image resizing?
 			}
 		}

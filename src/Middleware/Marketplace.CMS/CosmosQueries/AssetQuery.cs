@@ -84,11 +84,11 @@ namespace Marketplace.CMS.Queries
 			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
 			if (existingAsset == null) throw new NotFoundException("Asset", assetInteropID);
 			existingAsset.InteropID = asset.InteropID;
-			existingAsset.UrlPathOveride = asset.UrlPathOveride;
 			existingAsset.Title = asset.Title;
 			existingAsset.Active = asset.Active;
-			existingAsset.Tags = asset.Tags;
+			existingAsset.UrlPathOveride = asset.UrlPathOveride;
 			existingAsset.Type = asset.Type;
+			existingAsset.Tags = asset.Tags;
 			existingAsset.FileName = asset.FileName;
 			var updatedAsset = await _store.UpdateAsync(existingAsset);
 			return AssetMapper.MapToResponse(container, updatedAsset);
