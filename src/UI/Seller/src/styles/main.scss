@@ -18,6 +18,10 @@ html {
   font-size: 0.9rem;
 }
 
+body > [uib-modal-window]:not([modal-render]) {
+  display: none;
+}
+
 .large-paddding-top {
   padding-top: 160px;
 }
@@ -28,6 +32,54 @@ html {
   font-size: 0.875rem;
   line-height: 0.5;
   border-radius: 0.2rem;
+}
+
+// Icon Buttons
+
+.icon-button {
+  padding: .75rem;
+  border-radius: 180px;
+  transition: background-color .25s;
+  &:hover {
+    background-color: rgba($gray-900, 0.1);
+    cursor: pointer;
+  }
+  .icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.ripple {
+  position: relative;
+  overflow: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.ripple:after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgb(73, 73, 73) 10%, transparent 5.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform .5s, opacity 1s;
+}
+
+.ripple:active:after {
+  transform: scale(0, 0);
+  opacity: .3;
+  transition: 0s;
 }
 
 // Styling for action icons

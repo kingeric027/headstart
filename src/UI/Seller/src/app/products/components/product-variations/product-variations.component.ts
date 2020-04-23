@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { Variant, SpecOption, Spec, OcSpecService } from '@ordercloud/angular-sdk';
-import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle, faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
 import { SuperMarketplaceProduct, Image } from 'marketplace-javascript-sdk/dist/models';
 import { ToastrService } from 'ngx-toastr';
@@ -52,8 +52,11 @@ export class ProductVariations {
   faPlusCircle = faPlusCircle;
   faTimesCircle = faTimesCircle;
   faCheckDouble = faCheckDouble;
+  faCaretRight = faCaretRight;
+  faCaretDown = faCaretDown;
   faExclamationCircle = faExclamationCircle;
   assignVariantImages = false;
+  viewVariantDetails = false;
   variantInSelection: Variant;
   imageInSelection: Image;
 
@@ -271,6 +274,16 @@ export class ProductVariations {
   isImageSelected(img: Image): boolean {
     if (!img.Tags) img.Tags = []
     return img.Tags.includes(this.variantInSelection?.xp?.SpecCombo);
+  }
+
+  openVariantDetails(variant: Variant): void {
+    this.viewVariantDetails = true;
+    this.variantInSelection = variant;
+  }
+
+  closeVariantDetails(): void {
+    this.viewVariantDetails = false;
+    this.variantInSelection = null;
   }
 
   toggleAssignImage(img: Image, specCombo: string): void {

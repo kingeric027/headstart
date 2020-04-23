@@ -43,6 +43,11 @@ import { ConfirmModal } from './components/confirm-modal/confirm-modal.component
 import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component';
 import { LocationIDInputDirective } from './directives/location-id-input.directive';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
   imports: [
@@ -63,6 +68,13 @@ import { LocationIDInputDirective } from './directives/location-id-input.directi
     NgbModalModule,
     NgbDatepickerModule,
     NgbTooltipModule,
+    // @angular/material
+    MatTabsModule,
+    MatChipsModule,
+    MatTooltipModule,
+    MatButtonModule,
+    MatBadgeModule,
+    // Quill
     QuillModule.forRoot(),
   ],
   exports: [
@@ -76,6 +88,12 @@ import { LocationIDInputDirective } from './directives/location-id-input.directi
     NgbPaginationModule,
     NgbTabsetModule,
     NgbDropdownModule,
+    // @angular/material
+    MatTabsModule,
+    MatChipsModule,
+    MatTooltipModule,
+    MatButtonModule,
+    MatBadgeModule,
 
     // app components
     SearchComponent,
