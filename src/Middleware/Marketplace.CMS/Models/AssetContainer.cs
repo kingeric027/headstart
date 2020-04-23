@@ -25,8 +25,6 @@ namespace Marketplace.CMS.Models
 		public string Name { get; set; }
 		public string HostUrlOverride { get; set; } = null;
 		[ApiReadOnly]
-		public bool StorageConnected { get; set; } = false;
-		[ApiReadOnly]
 		public StorageAccount StorageAccount { get; set; } = null;
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{
@@ -42,8 +40,10 @@ namespace Marketplace.CMS.Models
 	[SwaggerModel]
 	public class StorageAccount
 	{
+		public bool Connected { get; set; } = false;
 		public StorageAccountType Type { get; set; } 
 		public string HostUrl { get; set; }
-		public string ConnectionString { get; set; } // Need to figure out good security for this. Same as user password?
+		[ApiIgnore]
+		public string ConnectionString { get; set; } // Need to figure storage security for this. Same as user password?
 	}
 }

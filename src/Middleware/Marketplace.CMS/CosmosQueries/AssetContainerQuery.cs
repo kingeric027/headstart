@@ -24,7 +24,7 @@ namespace Marketplace.CMS.Queries
 		Task<ListPage<AssetContainer>> List(IListArgs args);
 		Task<AssetContainer> Get(string interopID);
 		Task<AssetContainer> Create(AssetContainer container);
-		Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container);
+		Task<AssetContainer> Update(string interopID, AssetContainer container);
 		Task Delete(string interopID);
 	}
 
@@ -53,40 +53,38 @@ namespace Marketplace.CMS.Queries
 
 		public async Task<AssetContainer> Get(string interopID)
 		{
-			var item = await GetWithoutExceptions(interopID);
-			return item ?? throw new NotFoundException("AssetContainer", interopID);
+			var container = await GetWithoutExceptions(interopID);
+			if (container == null) throw new NotFoundException("AssetContainer", interopID);
+			return container;
 		}
 
 		public async Task<AssetContainer> Create(AssetContainer container)
 		{
-			if ((await GetWithoutExceptions(container.InteropID)) != null) throw new DuplicateIdException();
+			var matchingID = await GetWithoutExceptions(container.InteropID);
+			if (matchingID != null) throw new DuplicateIdException();
 			container = await _storageFactory.GetStorage(container).OnContainerConnected();
-			container.StorageConnected = true;
+			container.StorageAccount.Connected = true;
 
-			return await _store.AddAsync(container);
+			var newContainer = await _store.AddAsync(container);
+			return newContainer;
 		}
 
-		public async Task<AssetContainer> CreateOrUpdate(string interopID, AssetContainer container)
+		public async Task<AssetContainer> Update(string interopID, AssetContainer container)
 		{
-			var item = await GetWithoutExceptions(interopID);
-			if (item != null)
-			{
-				container.id = item.id;
-				// TODO - how to prevent overriding the readonly fields with null?
-				return await _store.UpdateAsync(container);
-			}
-			else
-			{
-				return await Create(container);
-			}
+			var existingContainer = await Get(interopID);
+			existingContainer.InteropID = container.InteropID;
+			existingContainer.Name = container.Name;
+			existingContainer.HostUrlOverride = container.HostUrlOverride;
+			var updatedContainer = await _store.UpdateAsync(existingContainer);
+			return updatedContainer;
 		}
 
 		public async Task Delete(string interopID)
 		{
-			var item = await Get(interopID);
-			await _storageFactory.GetStorage(item).OnContainerDeleted();
-			await _store.RemoveByIdAsync(item.id, SinglePartitionID);
-			// TODO - delete all the asset records?
+			var container = await Get(interopID);
+			await _storageFactory.GetStorage(container).OnContainerDeleted();
+			await _store.RemoveByIdAsync(container.id, SinglePartitionID);
+			// TODO - delete all the asset records in cosmos?
 		}
 
 		private async Task<AssetContainer> GetWithoutExceptions(string interopID)

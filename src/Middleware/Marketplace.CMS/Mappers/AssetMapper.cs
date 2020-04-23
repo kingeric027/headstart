@@ -16,7 +16,6 @@ namespace Marketplace.CMS.Mappers
 
 		public static Asset MapToResponse(AssetContainer container, Asset asset)
 		{
-			if (asset == null || container == null) return null;
 			var host = container.HostUrlOverride ?? container.StorageAccount?.HostUrl;
 			var path = asset.UrlPathOveride ?? $"assets-{container.id}/{asset.id}";
 			asset.Url = $"{host}/{path}";
@@ -35,7 +34,7 @@ namespace Marketplace.CMS.Mappers
 				ContainerID = container.id,
 				UrlPathOveride = form.UrlPathOveride,
 				Title = form.Title,
-				Tags = form.Tags,
+				Tags = MapTags(form.Tags),
 				Type = form.Type,
 				FileName = form.FileName ?? form.File?.FileName,
 				Metadata = new AssetMetadata()
@@ -46,6 +45,11 @@ namespace Marketplace.CMS.Mappers
 			};
 			TypeSpecificMapping(ref asset, form);
 			return (asset, form.File);
+		}
+
+		private static List<string> MapTags(string tags)
+		{
+			return tags == null ? new List<string>() : tags.Split(",").Select(t => t.Trim()).Where(t => t != "").ToList();
 		}
 
 		private static void TypeSpecificMapping(ref Asset asset, AssetUploadForm form)

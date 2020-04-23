@@ -62,7 +62,20 @@ namespace Marketplace.CMS.Storage
 				throw new StorageConnectionException(_container.InteropID, ex);
 			}
 		}
-	
+
+		public async Task OnAssetDeleted(string assetID)
+		{
+			try
+			{
+				await BuildBlobService(_container.id).Delete(assetID);
+			}
+			catch (Exception ex)
+			{
+				throw new StorageConnectionException(_container.InteropID, ex);
+			}
+		}
+
+
 		private BlobService BuildBlobService(string containerID)
 		{
 			return new BlobService(new BlobServiceConfig()

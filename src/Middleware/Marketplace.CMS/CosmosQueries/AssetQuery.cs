@@ -25,7 +25,7 @@ namespace Marketplace.CMS.Queries
 		Task<ListPage<Asset>> List(string containerInteropID, IListArgs args);
 		Task<Asset> Get(string containerInteropID, string assetInteropID);
 		Task<Asset> Create(string containerInteropID, AssetUploadForm form);
-		//Task<Asset> CreateOrUpdate(string containerInteropID, string assetInteropID, Asset asset);
+		Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset);
 		Task Delete(string containerInteropID, string assetInteropID);
 	}
 
@@ -59,15 +59,17 @@ namespace Marketplace.CMS.Queries
 		public async Task<Asset> Get(string containerInteropID, string assetInteropID)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var item = await GetWithoutExceptions(container.id, assetInteropID);
-			return AssetMapper.MapToResponse(container, item) ?? throw new NotFoundException("AssetContainer", assetInteropID);
+			var asset = await GetWithoutExceptions(container.id, assetInteropID);
+			if (asset == null) throw new NotFoundException("Asset", assetInteropID);
+			return AssetMapper.MapToResponse(container, asset);
 		}
 
 		public async Task<Asset> Create(string containerInteropID, AssetUploadForm form)
 		{
 			var container = await _containers.Get(containerInteropID);
 			var (asset, file) = AssetMapper.MapFromUpload(container, form);
-			if ((await GetWithoutExceptions(container.id, asset.InteropID)) != null) throw new DuplicateIdException();
+			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
+			if (matchingID != null) throw new DuplicateIdException();
 			if (file != null) {			
 				await _storageFactory.GetStorage(container).UploadAsset(file, asset);
 			}
@@ -76,11 +78,29 @@ namespace Marketplace.CMS.Queries
 			return AssetMapper.MapToResponse(container, newAsset);
 		}
 
+		public async Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset)
+		{
+			var container = await _containers.Get(containerInteropID);
+			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
+			if (existingAsset == null) throw new NotFoundException("Asset", assetInteropID);
+			existingAsset.InteropID = asset.InteropID;
+			existingAsset.UrlPathOveride = asset.UrlPathOveride;
+			existingAsset.Title = asset.Title;
+			existingAsset.Active = asset.Active;
+			existingAsset.Tags = asset.Tags;
+			existingAsset.Type = asset.Type;
+			existingAsset.FileName = asset.FileName;
+			var updatedAsset = await _store.UpdateAsync(existingAsset);
+			return AssetMapper.MapToResponse(container, updatedAsset);
+		}
+
+
 		public async Task Delete(string containerInteropID, string assetInteropID)
 		{
 			var container = await _containers.Get(containerInteropID); // make sure container exists.
-			var item = await Get(containerInteropID, assetInteropID);
-			await _store.RemoveByIdAsync(item.id, container.id);
+			var asset = await Get(containerInteropID, assetInteropID);
+			await _store.RemoveByIdAsync(asset.id, container.id);
+			await _storageFactory.GetStorage(container).OnAssetDeleted(asset.id);
 		}
 
 		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)

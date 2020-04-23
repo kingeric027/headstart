@@ -13,6 +13,7 @@ namespace Marketplace.CMS.Storage
 		Task<AssetContainer> OnContainerConnected();
 		Task<Asset> UploadAsset(IFormFile file, Asset asset);
 		Task OnContainerDeleted();
+		Task OnAssetDeleted(string assetID);
 	}
 
 	public interface IStorageFactory

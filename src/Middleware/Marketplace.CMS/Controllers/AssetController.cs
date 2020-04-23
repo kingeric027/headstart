@@ -46,16 +46,16 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("Upoload an Asset")]
 		[HttpPost, Route("{containerID}/assets")]
-		public async Task<Asset> Upload(string containerID, [FromForm] AssetUploadForm upload)
+		public async Task<Asset> Create(string containerID, [FromForm] AssetUploadForm form)
 		{
-			return await _query.Create(containerID, upload);
+			return await _query.Create(containerID, form);
 		}
 
 		[DocName("Create or Update an Asset")]
 		[HttpPut, Route("{containerID}/assets/{assetID}")]
-		public async Task<Asset> CreateOrUpdate(string containerID, string assetID, [FromBody] Asset container)
+		public async Task<Asset> Update(string containerID, string assetID, [FromBody] Asset asset)
 		{
-			throw new NotImplementedException();
+			return await _query.Update(containerID, assetID, asset);
 		}
 
 		[DocName("Delete an Asset Container")]

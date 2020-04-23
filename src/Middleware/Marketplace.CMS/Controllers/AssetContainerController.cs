@@ -52,9 +52,9 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("Create or Update an Asset Container")]
 		[HttpPut, Route("{containerID}")]
-		public async Task<AssetContainer> CreateOrUpdate(string containerID, [FromBody] AssetContainer container)
+		public async Task<AssetContainer> Update(string containerID, [FromBody] AssetContainer container)
 		{
-			return await _query.CreateOrUpdate(containerID, container);
+			return await _query.Update(containerID, container);
 		}
 
 		[DocName("Delete an Asset Container")]
@@ -63,20 +63,5 @@ namespace Marketplace.CMS.Controllers
 		{
 			await _query.Delete(containerID);
 		}
-
-		//[DocName("Connect to storage Account")]
-		//[HttpPost, Route("{containerID}/connect")]
-		//public async Task<string> ConnectToStorage(string containerID, [FromBody] StorageAccount account)
-		//{
-		//	// Block if Container is already connected to a storage account.
-		//	throw new NotImplementedException();
-		//}
-
-		//[DocName("Disconnect from storage Account")]
-		//[HttpPost, Route("{containerID}/disconnect")]
-		//public async Task DisconnectFromStorage(string containerID)
-		//{
-		//	throw new NotImplementedException();
-		//}
 	}
 }

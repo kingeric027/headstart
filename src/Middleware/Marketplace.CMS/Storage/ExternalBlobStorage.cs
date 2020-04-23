@@ -31,5 +31,10 @@ namespace Marketplace.CMS.Storage
 		{
 			throw new NotImplementedException();
 		}
+
+		public async Task OnAssetDeleted(string assetID)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
