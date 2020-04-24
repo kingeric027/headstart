@@ -77,6 +77,9 @@ export class OCMCheckout implements OnInit {
   async doneWithShippingRates(): Promise<void> {
     await this.checkout.calculateOrder();
     this.cards = await this.context.currentUser.cards.List();
+    await this.context.order.reset();
+    this.order = this.context.order.get();
+    this.lineItems = this.context.order.cart.get();
     this.toSection('payment');
   }
 
