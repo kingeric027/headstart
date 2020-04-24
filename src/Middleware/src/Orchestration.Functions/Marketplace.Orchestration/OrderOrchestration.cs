@@ -17,6 +17,7 @@ using Action = Marketplace.Common.Models.Action;
 using LogLevel = Marketplace.Common.Models.LogLevel;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Models.Misc;
+using Marketplace.Common.Services.FreightPop.Models;
 
 namespace Marketplace.Orchestration
 {
@@ -47,19 +48,22 @@ namespace Marketplace.Orchestration
                     SupplierToken = supplierToken,
                 };
                 _supplierWorkItem = supplierWorkItem;
-                supplierWorkItem.OrdersToSync = await context.CallActivityAsync<List<MarketplaceOrder>>("GetOrdersNeedingShipment", supplierWorkItem);
-                supplierWorkItem.ShipmentSyncOrders = await context.CallActivityAsync<List<ShipmentSyncOrder>>("GetShipmentSyncOrders", supplierWorkItem);
-                supplierWorkItem.ShipmentSyncOrders = await context.CallActivityAsync<List<ShipmentSyncOrder>>("GetShipmentDetailsForShipmentSyncOrders", supplierWorkItem);
-                var shipmentSyncOrdersToUpdate = supplierWorkItem.ShipmentSyncOrders.Where(s => s.FreightPopShipmentResponses != null && s.FreightPopShipmentResponses.Data != null);
-                foreach (var shipmentSyncOrderToUpdate in shipmentSyncOrdersToUpdate)
+                
+                // because we currently only have one freightpop account all shipments for all suppliers will be returned here
+                supplierWorkItem.ShipmentsToSync = await context.CallActivityAsync<List<ShipmentDetails>>("GetFreightPopShipments", 3);
+
+                // filtering out shipments for other suppliers to simulate syncing from a supplier specific account
+                supplierWorkItem.ShipmentsToSync = supplierWorkItem.ShipmentsToSync.Where(shipment => shipment.Reference1.Split('-')[1] == supplier.ID).ToList();
+
+                foreach (var shipment in supplierWorkItem.ShipmentsToSync)
                 {
-                    var orderWorkItem = new OrderWorkItem()
+                    var shipmentWorkItem = new ShipmentWorkItem()
                     {
                         Supplier = supplier,
                         SupplierToken = supplierToken,
-                        ShipmentSyncOrder = shipmentSyncOrderToUpdate
+                        Shipment = shipment
                     };
-                    await context.CallActivityAsync<List<MarketplaceOrder>>("CreateShipmentsInOrderCloudIfNeeded", orderWorkItem);
+                    await context.CallActivityAsync<List<MarketplaceOrder>>("CreateShipmentsInOrderCloudIfNeeded", shipmentWorkItem);
 
                 }
                 await _log.Save(new OrchestrationLog()
@@ -84,17 +88,12 @@ namespace Marketplace.Orchestration
         [FunctionName("GetAccessToken")]
         public async Task<string> GetAccessToken([ActivityTrigger] string apiClientID) => await _orderOrchestrationCommand.GetAccessTokenAsync(apiClientID);
 
-        [FunctionName("GetOrdersNeedingShipment")]
-        public async Task<List<MarketplaceOrder>> GetOrdersNeedingShipment([ActivityTrigger] SupplierShipmentSyncWorkItem workItem) => await _orderOrchestrationCommand.GetOrdersNeedingShipmentAsync(workItem);
-
-        [FunctionName("GetShipmentSyncOrders")]
-        public async Task<List<ShipmentSyncOrder>> GetShipmentSyncOrders([ActivityTrigger] SupplierShipmentSyncWorkItem workItem) => await _orderOrchestrationCommand.GetShipmentSyncOrders(workItem);
-
-        [FunctionName("GetShipmentDetailsForShipmentSyncOrders")]
-        public async Task<List<ShipmentSyncOrder>> GetShipmentDetailsForShipmentSyncOrders([ActivityTrigger] SupplierShipmentSyncWorkItem workItem) => await _orderOrchestrationCommand.GetShipmentDetailsForShipmentSyncOrders(workItem);
+        [FunctionName("GetFreightPopShipments")]
+        public async Task<List<ShipmentDetails>> GetFreightPopShipments([ActivityTrigger] int numberOfDaysBack) => await _orderOrchestrationCommand.GetFreightPopShipments(numberOfDaysBack);
 
         [FunctionName("CreateShipmentsInOrderCloudIfNeeded")]
-        public async Task CreateShipmentsInOrderCloudIfNeeded([ActivityTrigger] OrderWorkItem workItem) => await _orderOrchestrationCommand.CreateShipmentsInOrderCloudIfNeeded(workItem);
+        public async Task CreateShipmentsInOrderCloudIfNeeded([ActivityTrigger] ShipmentWorkItem workItem) => await _orderOrchestrationCommand.CreateShipmentsInOrderCloudIfNeeded(workItem);
+        
 
 
     }
