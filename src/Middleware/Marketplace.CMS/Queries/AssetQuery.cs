@@ -27,17 +27,22 @@ namespace Marketplace.CMS.Queries
 		Task<Asset> Create(string containerInteropID, AssetUploadForm form);
 		Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset);
 		Task Delete(string containerInteropID, string assetInteropID);
+		Task<ListPage<AssetAssignment>> ListAssignments(string containerInteropID, ListArgs<Asset> args);
+		Task SaveAssignment(string containerInteropID, AssetAssignment assignment);
+		Task DeleteAssignment(string containerInteropID, AssetAssignment assignment);
 	}
 
 	public class AssetQuery : IAssetQuery
 	{
-		private readonly ICosmosStore<Asset> _store;
+		private readonly ICosmosStore<Asset> _assetStore;
+		private readonly ICosmosStore<AssetAssignment> _assignmentStore;
 		private readonly IAssetContainerQuery _containers;
 		private readonly IStorageFactory _storageFactory;
 
-		public AssetQuery(ICosmosStore<Asset> store, IAssetContainerQuery containers, IStorageFactory storageFactory)
+		public AssetQuery(ICosmosStore<Asset> assetStore, ICosmosStore<AssetAssignment> assignmentStore, IAssetContainerQuery containers, IStorageFactory storageFactory)
 		{
-			_store = store;
+			_assetStore = assetStore;
+			_assignmentStore = assignmentStore;
 			_containers = containers;
 			_storageFactory = storageFactory;
 		}
@@ -45,7 +50,7 @@ namespace Marketplace.CMS.Queries
 		public async Task<ListPage<Asset>> List(string containerInteropID, IListArgs args)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var query = _store.Query(new FeedOptions() { PartitionKey = new PartitionKey(container.id), EnableCrossPartitionQuery = false })
+			var query = _assetStore.Query(new FeedOptions() { PartitionKey = new PartitionKey(container.id), EnableCrossPartitionQuery = false })
 				.Search(args)
 				.Filter(args)
 				.Sort(args);
@@ -74,7 +79,7 @@ namespace Marketplace.CMS.Queries
 				await _storageFactory.GetStorage(container).UploadAsset(file, asset);
 			}
 
-			var newAsset = await _store.AddAsync(asset);
+			var newAsset = await _assetStore.AddAsync(asset);
 			return AssetMapper.MapToResponse(container, newAsset);
 		}
 
@@ -90,23 +95,51 @@ namespace Marketplace.CMS.Queries
 			existingAsset.Type = asset.Type;
 			existingAsset.Tags = asset.Tags;
 			existingAsset.FileName = asset.FileName;
-			var updatedAsset = await _store.UpdateAsync(existingAsset);
+			var updatedAsset = await _assetStore.UpdateAsync(existingAsset);
 			return AssetMapper.MapToResponse(container, updatedAsset);
 		}
-
 
 		public async Task Delete(string containerInteropID, string assetInteropID)
 		{
 			var container = await _containers.Get(containerInteropID); // make sure container exists.
 			var asset = await Get(containerInteropID, assetInteropID);
-			await _store.RemoveByIdAsync(asset.id, container.id);
+			await _assetStore.RemoveByIdAsync(asset.id, container.id);
 			await _storageFactory.GetStorage(container).OnAssetDeleted(asset.id);
 		}
+
+		#region Assignments
+		public async Task<ListPage<AssetAssignment>> ListAssignments(string containerInteropID, ListArgs<Asset> args)
+		{
+			var container = await _containers.Get(containerInteropID);
+			var query = _assignmentStore.Query(new FeedOptions() { PartitionKey = new PartitionKey(container.id), EnableCrossPartitionQuery = false })
+				.Search(args)
+				.Filter(args)
+				.Sort(args);
+			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
+			var count = await query.CountAsync();
+			return list.ToListPage(args.Page, args.PageSize, count);
+		}
+
+		public async Task SaveAssignment(string containerInteropID, AssetAssignment assignment)
+		{
+			// TODO - confirm OC resource exists?
+			var container = await _containers.Get(containerInteropID);
+			assignment.ContainerID = container.id;
+			await _assignmentStore.AddAsync(assignment);
+		}
+
+		public async Task DeleteAssignment(string containerInteropID, AssetAssignment assignment)
+		{
+			var container = await _containers.Get(containerInteropID);
+			assignment.ContainerID = container.id;
+			await _assignmentStore.RemoveAsync(assignment);
+		}
+		#endregion
 
 		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)
 		{
 			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(containerID) };
-			return await _store.Query($"select top 1 * from c where c.InteropID = @id", new { id = assetInteropID }, feedOptions).FirstOrDefaultAsync();
+			return await _assetStore.Query($"select top 1 * from c where c.InteropID = @id", new { id = assetInteropID }, feedOptions).FirstOrDefaultAsync();
 		}
 	}
 }

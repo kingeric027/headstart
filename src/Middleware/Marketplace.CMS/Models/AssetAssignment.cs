@@ -21,7 +21,7 @@ namespace Marketplace.CMS.Models
 	[CosmosCollection("assetassignments")]
 	public class AssetAssignment : CosmosObject
 	{
-		[Required, CosmosPartitionKey]
+		[ApiIgnore, CosmosPartitionKey]
 		public string ContainerID { get; set; }
 		[Required]
 		public string AssetID { get; set; }

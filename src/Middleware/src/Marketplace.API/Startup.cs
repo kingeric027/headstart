@@ -61,6 +61,7 @@ namespace Marketplace.API
 				.InjectCosmosStore<ImageProductAssignmentQuery, ImageProductAssignment>(cosmosConfig)
 				.InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
+				.InjectCosmosStore<AssetQuery, AssetAssignment>(cosmosConfig)
 				.InjectCosmosStore<ImageQuery, Image>(cosmosConfig)
 				.Inject<IOrchestrationCommand>()
 				.Inject<IOrchestrationLogCommand>()
@@ -71,8 +72,8 @@ namespace Marketplace.API
 				.Inject<IOrderCloudSandboxService>()
 				.Inject<IMarketplaceProductCommand>()
 				.Inject<ISendgridService>()
-				.Inject<IAssetContainerQuery>()
 				.Inject<IStorageFactory>()
+				.Inject<IAssetQuery>()
 				.Inject<ISupplierCategoryConfigQuery>()
 				.InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
                 {

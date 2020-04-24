@@ -47,7 +47,17 @@ namespace Marketplace.Helpers.Models
             get { return _c.Claims.First(c => c.Type == "buyer").Value; }
         }
 
-        public string AccessToken
+		public string AuthUrl
+		{
+			get { return _c.Claims.First(c => c.Type == "iss").Value; }
+		}
+
+		public string ApiUrl
+		{
+			get { return _c.Claims.First(c => c.Type == "aud").Value; }
+		}
+
+		public string AccessToken
         {
             get { return _c.Claims.First(c => c.Type == "accesstoken").Value; }
         }

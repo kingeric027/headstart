@@ -17,9 +17,8 @@ namespace Marketplace.CMS.Models
 		public bool Active { get; set; } = false;
 		public IFormFile File { get; set; }
 		public string UrlPathOveride { get; set; }
-		public AssetType Type { get; set; }
+		public AssetType? Type { get; set; } = null;
 		public string Tags { get; set; }
 		public string FileName { get; set; }
-
 	}
 }
