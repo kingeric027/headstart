@@ -95,7 +95,7 @@ namespace Marketplace.Common.Commands
             {
                 var orderCloudOrderID = await ValidAndGetOrderCloudOrder(shipmentWorkItem);
                 var buyerIDForOrder = await GetBuyerIDForSupplierOrder(orderCloudOrderID);
-                await AddShipmentToOrderCloud(shipmentWorkItem, orderCloudOrderID, buyerIDForOrder);
+                 await AddShipmentToOrderCloud(shipmentWorkItem, orderCloudOrderID, buyerIDForOrder);
             } catch (Exception ex)
             {
                 await _log.Save(new OrchestrationLog()
@@ -176,14 +176,33 @@ namespace Marketplace.Common.Commands
         
         private async Task AddShipmentToOrderCloud(ShipmentWorkItem shipmentWorkItem, string supplierOrderID, string buyerID)
         {
-            var ocShipment = await _oc.Shipments.CreateAsync(OCShipmentMapper.Map(shipmentWorkItem.Shipment, buyerID), accessToken: shipmentWorkItem.SupplierToken);
-
-            await Throttler.RunAsync(shipmentWorkItem.Shipment.Items, 100, 1,
-            (freightPopShipmentItem) =>
+            try
             {
-            // currently this creates two items in ordercloud inadvertantely, platform bug is being resolved
-                return _oc.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, supplierOrderID), accessToken: shipmentWorkItem.SupplierToken);
-            });
+                var ocShipment = await _oc.Shipments.CreateAsync(OCShipmentMapper.Map(shipmentWorkItem.Shipment, buyerID), accessToken: shipmentWorkItem.SupplierToken);
+
+                await Throttler.RunAsync(shipmentWorkItem.Shipment.Items, 100, 1,
+                (freightPopShipmentItem) =>
+                {
+                // currently this creates two items in ordercloud inadvertantely, platform bug is being resolved
+                    return _oc.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, supplierOrderID), accessToken: shipmentWorkItem.SupplierToken);
+                });
+            } catch (Exception ex)
+            {
+                if(ex.Message == "IdExists: Object already exists.")
+                {
+                    await _log.Save(new OrchestrationLog()
+                    {
+                        RecordType = RecordType.Order,
+                        Level = LogLevel.Progress,
+                        Action = Marketplace.Common.Models.Action.SyncShipments,
+                        Message = $"Shipment already created: {shipmentWorkItem.Shipment.ShipmentId}",
+                    });
+                }
+                else
+                {
+                    throw new OrchestrationException(OrchestrationErrorType.CreateShipmentsInOrderCloudIfNeeded, $"Error creating shipment in ordercloud. Error {ex.Message}");
+                }
+            }
         }
 
         private async Task<string> GetBuyerIDForSupplierOrder(string orderCloudSupplierOrderID)
