@@ -14,7 +14,7 @@ export class SupplierEditComponent {
   @Output()
   updateResource = new EventEmitter<any>();
   updateResourceFromEvent(event: any, field: string): void {
-    field === "Active" ? this.updateResource.emit({ value: event.target.checked, field }) :
-      this.updateResource.emit({ value: event.target.value, field });
+    const value = field === 'Active' || field === 'xp.SyncFreightPop' ? event.target.checked : event.target.value;
+    this.updateResource.emit({ value, field });
   }
 }

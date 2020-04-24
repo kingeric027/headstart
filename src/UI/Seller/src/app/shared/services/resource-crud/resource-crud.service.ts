@@ -383,6 +383,8 @@ export abstract class ResourceCrudService<ResourceType> {
     const piecesOfField = resourceUpdate.field.split('.');
     const depthOfField = piecesOfField.length;
     const updatedResourceCopy = this.copyResource(resoruceToUpdate);
+    // define xp if it is undefined
+    if((updatedResourceCopy as any).xp === null && piecesOfField[0] === 'xp') (updatedResourceCopy as any).xp = {};
     switch (depthOfField) {
       case 4:
         updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
