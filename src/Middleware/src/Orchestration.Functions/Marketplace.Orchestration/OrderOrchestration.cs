@@ -72,7 +72,7 @@ namespace Marketplace.Orchestration
                     Level = LogLevel.Success,
                     Action = Action.SyncShipments,
                     ErrorType = OrchestrationErrorType.AuthenticateSupplierError,
-                    Message = $"Supplier {supplierWorkItem.Supplier.ID} completed. OrderCloud Orders: {supplierWorkItem.OrdersToSync.Count()}. FreightPOP Orders To Update: {shipmentSyncOrdersToUpdate.Count()}",
+                    Message = $"Supplier {supplierWorkItem.Supplier.ID} completed. FreightPopShipments: {supplierWorkItem.ShipmentsToSync.Count()}",
                 });
             }
             catch (OrchestrationException ex)

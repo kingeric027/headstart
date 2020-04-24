@@ -86,6 +86,7 @@ namespace Marketplace.Common.Exceptions
         GetShipmentSyncOrders,
         GetShipmentDetailsForShipmentSyncOrders,
         CreateShipmentsInOrderCloudIfNeeded,
-        GetFreightPopShipments
+        GetFreightPopShipments,
+        NoRelatedOrderCloudOrderFound
     }
 }

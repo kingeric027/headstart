@@ -105,7 +105,7 @@ namespace Marketplace.Common.Commands
                     ErrorType = OrchestrationErrorType.CreateShipmentsInOrderCloudIfNeeded,
                     Message = $"Error creating ordercloud shipment for freightpop order id: {shipmentWorkItem.Shipment.ShipmentId}. Error: {ex.Message}",
                 });
-                throw new OrchestrationException(OrchestrationErrorType.CreateShipmentsInOrderCloudIfNeeded, $"Error creating ordercloud shipment for freightpop order id: {workItem.ShipmentSyncOrder.FreightPopOrderID}. Error: {ex.Message}");
+                throw new OrchestrationException(OrchestrationErrorType.CreateShipmentsInOrderCloudIfNeeded, $"Error creating ordercloud shipment for freightpop order id: {shipmentWorkItem.Shipment.ShipmentId}. Error: {ex.Message}");
             }
         }
 
@@ -149,6 +149,7 @@ namespace Marketplace.Common.Commands
                 {
                     return _freightPopService.GetShipmentsByDate(daysBack);
                 });
+                shipmentDetailsResponses = shipmentDetailsResponses.Where(shipmentDetailResponse => shipmentDetailResponse != null && shipmentDetailResponse.Data != null).ToList();
                 var shipmentsFromPastDays = shipmentDetailsResponses.SelectMany(response => response.Data).ToList();
                 return shipmentsFromPastDays;
             }
