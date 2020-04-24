@@ -18,7 +18,7 @@ namespace Marketplace.Helpers.Services
 
     public interface IBlobService
     {
-		Task Init(BlobContainerPublicAccessType accessType);
+		Task Init(BlobContainerPublicAccessType accessType = BlobContainerPublicAccessType.Off);
 		Task<T> Get<T>(string id);
         Task<string> Get(string id);
         Task Save(string reference, string blob, string fileType = null);
