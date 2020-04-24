@@ -24,9 +24,9 @@ namespace Marketplace.Orchestration
         }
 
         [FunctionName("OrderShipmentTimeTrigger")]
-        public async Task SyncOrders([TimerTrigger("0 */1 14-23 * * *")]TimerInfo myTimer, [OrchestrationClient]DurableOrchestrationClient client, ILogger logger)
+        public async Task SyncOrders([TimerTrigger("0 */30 14-23 * * *")]TimerInfo myTimer, [OrchestrationClient]DurableOrchestrationClient client, ILogger logger)
         {
-            // run every 10 minutes between 9am and 6pm CDT
+            // run every 30 minutes between 9am and 6pm CDT
             // determine if different schedule or order range is needed for production
             logger.LogInformation("Starting function");
             try
