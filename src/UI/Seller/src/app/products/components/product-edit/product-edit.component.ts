@@ -13,9 +13,9 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCircle, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
@@ -58,6 +58,7 @@ export class ProductEditComponent implements OnInit {
   faTimes = faTimes;
   faTrash = faTrash;
   faCircle = faCircle;
+  faHeart = faHeart;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
@@ -221,11 +222,12 @@ export class ProductEditComponent implements OnInit {
   }
 
   handleUpdateProduct(event: any, field: string, typeOfValue?: string): void {
+    console.log(event)
     const productUpdate = {
       field,
       value:
         (field === 'Product.Active' || field === 'Product.xp.IsResale')
-          ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
+          ? event.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
   }
@@ -448,5 +450,9 @@ export class ProductEditComponent implements OnInit {
     return this._superMarketplaceProductEditable?.Product?.xp?.IsResale;
   }
 
-
+  getProductPreviewImage(): string | SafeUrl {
+    return this._superMarketplaceProductEditable?.Images?.[0]?.URL || 
+    this.imageFiles[0]?.URL ||
+    'https://via.placeholder.com/300?text=Product+Image'
+  }
 }

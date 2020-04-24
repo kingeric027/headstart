@@ -2,106 +2,100 @@
      class="container-fluid resource-edit">
   <form [formGroup]="productForm">
     <mat-tab-group animationDuration="0ms">
+      <!-- Product Details -->
       <mat-tab label="Product">
         <div class="container">
           <div class="row pt-3">
-            <div class="col-md-3">
-              <img *ngIf="!isCreatingNew"
-                   [src]="_superMarketplaceProductEditable?.Images[0]?.URL"
-                   style="max-width: 100%;">
-              <img *ngIf="isCreatingNew || !_superMarketplaceProductEditable?.Images[0]"
-                   src="https://via.placeholder.com/300?text=Product+Image"
-                   style="max-width: 100%">
-            </div>
-            <div class="col-md-9 form-group">
+            <div class="col-md-8 form-group">
               <div class="form-group">
-                <p class="mb-1">Active</p>
-                <label class="switch mb-0"
-                       for="Active">
-                  <input type="checkbox"
-                         class="form-check-input"
-                         id="Active"
+                <mat-slide-toggle [resourceForm]="resourceForm"
+                                  aria-describedby="Active"
+                                  formControlName="Active"
+                                  color="warn"
+                                  (change)="handleUpdateProduct($event, 'Product.Active')">
+                  Active
+                </mat-slide-toggle>
+              </div>
+              <div class="form-group">
+                <mat-checkbox [resourceForm]="resourceForm"
+                              aria-describedby="IsResale"
+                              formControlName="IsResale"
+                              color="warn"
+                              (change)="handleUpdateProduct($event, 'Product.xp.IsResale')">
+                  This product is resale
+                </mat-checkbox>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6"
+                     *ngIf="isCreatingNew">
+                  <label for="ID">Product ID</label>
+                  <input type="text"
+                         class="form-control"
+                         id="ID"
                          showErrors
-                         [resourceForm]="resourceForm"
-                         aria-describedby="Active"
-                         formControlName="Active"
-                         (input)="handleUpdateProduct($event, 'Product.Active')">
-                  <span class="slider round cursor-pointer"></span>
-                </label>
-              </div>
-              <div class="form-group">
-                <label for="Name">Name</label>
-                <input type="text"
-                       class="form-control"
-                       id="Name"
-                       showErrors
-                       aria-describedby="Name"
-                       maxlength="100"
-                       [resourceForm]="productForm"
-                       formControlName="Name"
-                       (input)="handleUpdateProduct($event, 'Product.Name')"
-                       placeholder="Enter Name">
-              </div>
-              <div class="form-group"
-                   *ngIf="isCreatingNew">
-                <label for="ID">Product ID</label>
-                <input type="text"
-                       class="form-control"
-                       id="ID"
-                       showErrors
-                       aria-describedby="ID"
-                       maxlength="100"
-                       [resourceForm]="productForm"
-                       formControlName="ID"
-                       (input)="handleUpdateProduct($event, 'Product.ID')"
-                       placeholder="Enter Product ID">
-              </div>
-              <div class="form-group"
-                   *ngIf="!isCreatingNew && _superMarketplaceProductStatic">
-                <label for="ID">Product ID</label>
-                <input class="form-control"
-                       value="{{_superMarketplaceProductStatic.Product.ID}}"
-                       disabled>
-              </div>
-              <div class="form-group">
-                <label for="Description">Description</label>
-                <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
-                                                 [formControlForText]="productForm?.controls?.Description"
-                                                 resourceField="Description"
-                                                 pathOnResource="Description"
-                                                 (resourceUpdated)="updateResourceFromFieldValue($event.field, $event.value)">
-                </reactive-quill-editor-component>
-              </div>
-              <div class="form-group">
-                <label for="Note">Product Message</label>
-                <input type="text"
-                       class="form-control"
-                       id="Note"
-                       showErrors
-                       aria-describedby="Note"
-                       maxlength="240"
-                       [resourceForm]="productForm"
-                       formControlName="Note"
-                       (input)="handleUpdateProduct($event, 'Product.xp.Note')"
-                       placeholder="(Optional) Enter a note about this product">
-              </div>
-              <div class="form-group">
-                <label for="Price">Price</label>
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">$</span>
-                  </div>
-                  <input type="number"
-                         class="form-control currency"
-                         id="Price"
-                         showErrors
-                         aria-describedby="Price"
-                         min="1"
-                         step="0.01"
+                         aria-describedby="ID"
+                         maxlength="100"
                          [resourceForm]="productForm"
-                         formControlName="Price"
-                         (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
-                         placeholder="Price (USD)">
+                         formControlName="ID"
+                         (input)="handleUpdateProduct($event, 'Product.ID')"
+                         placeholder="Enter Product ID">
+                </div>
+                <div class="form-group col-md-6"
+                     *ngIf="!isCreatingNew && _superMarketplaceProductStatic">
+                  <label for="ID">Product ID</label>
+                  <input class="form-control"
+                         value="{{_superMarketplaceProductStatic.Product.ID}}"
+                         disabled>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="Name">Name</label>
+                  <input type="text"
+                         class="form-control"
+                         id="Name"
+                         showErrors
+                         aria-describedby="Name"
+                         maxlength="100"
+                         [resourceForm]="productForm"
+                         formControlName="Name"
+                         (input)="handleUpdateProduct($event, 'Product.Name')"
+                         placeholder="Enter Name">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="Price">Price</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">$</span>
+                    </div>
+                    <input type="number"
+                           class="form-control currency"
+                           id="Price"
+                           showErrors
+                           aria-describedby="Price"
+                           min="1"
+                           step="0.01"
+                           [resourceForm]="productForm"
+                           formControlName="Price"
+                           (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
+                           placeholder="Price (USD)">
+                  </div>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="ProductType">Product Type</label>
+                  <select type="dropdown"
+                          class="form-control"
+                          id="ProductType"
+                          aria-describedby="Product type"
+                          placeholder="Choose product type"
+                          (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
+                    <option [selected]="productType === undefined"
+                            disabled>Choose a product type</option>
+                    <option [selected]="productType === 'Standard'"
+                            value="Standard">Standard</option>
+                    <option [selected]="productType === 'Quote'"
+                            value="Quote">Quote</option>
+                  </select>
                 </div>
               </div>
               <div class="form-row">
@@ -167,83 +161,6 @@
                                                  (handleTaxCodesSearched)="searchTaxCodes($event)"
                                                  (onScrollEnd)="handleScrollEnd($event)">
               </product-tax-code-select-component>
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label for="IsResale">Resale</label>
-                  <label class="check-container">This is a resale product
-                    <input type="checkbox"
-                           [checked]="shouldIsResaleBeChecked()"
-                           (change)="handleUpdateProduct($event, 'Product.xp.IsResale')"
-                           id="IsResale">
-                    <span class="checkmark"></span>
-                  </label>
-                </div>
-                <div class="form-group col-md-6">
-                  <label for="ProductType">Product Type</label>
-                  <select type="dropdown"
-                          class="form-control"
-                          id="ProductType"
-                          aria-describedby="Product type"
-                          placeholder="Choose product type"
-                          (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
-                    <option [selected]="productType === undefined"
-                            disabled>Choose a product type</option>
-                    <option [selected]="productType === 'Standard'"
-                            value="Standard">Standard</option>
-                    <option [selected]="productType === 'Quote'"
-                            value="Quote">Quote</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span [matTooltip]="isCreatingNew ? 'Optional' : ''">Filters</span>
-        </ng-template>
-        <product-filters-component (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
-                                   [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []"></product-filters-component>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span matBadgeSize="medium"
-                matBadgeOverlap="false"
-                matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Variants?.length}} variants."
-                [matBadge]="_superMarketplaceProductEditable?.Variants?.length">Variants</span>
-        </ng-template>
-        <!-- Product Variations -->
-        <product-variations-component [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
-                                      [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
-                                      [areChanges]="areChanges"
-                                      [isCreatingNew]="isCreatingNew"
-                                      [checkForChanges]="checkForChanges"
-                                      [copyProductResource]="copyProductResource"
-                                      (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
-                                      (variantsValidated)="validateVariants($event)">
-        </product-variations-component>
-        <!-- /Product Variations -->
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span *ngIf="!_superMarketplaceProductEditable?.Product?.ShipFromAddressID"
-                matBadgeSize="medium"
-                matBadgeOverlap="false"
-                matBadgeDescription="Product shipping needs attention"
-                matBadge="!"
-                matTooltip="Needs attention">Shipping</span>
-          <span *ngIf="_superMarketplaceProductEditable?.Product?.ShipFromAddressID">Shipping</span>
-        </ng-template>
-
-        <!-- Shipping Information -->
-        <div class="container">
-          <div class="row pt-3">
-            <div class="col-md-5">
-              <h5>Shipping Information</h5>
-              <p class="font-italic">Provide accurate shipping weight and dimensions for the most accurate shipping estimates.</p>
-            </div>
-            <div class="col-md-7">
               <div class="form-group">
                 <label for="ShipFromAddressID">Which location will this product ship from?</label>
                 <select type="dropdown"
@@ -311,20 +228,114 @@
                 </div>
               </div>
             </div>
+            <div class="col-md-4">
+              <!-- Product Preview -->
+              <div class="sticky-top">
+                <p class="text-center font-weight-bold">Product Preview</p>
+                <div class="card w-100 border-hover cursor-pointer">
+                  <div class="ribbon ribbon-top-right bg-light">
+                    <fa-icon class="text-danger"
+                             [icon]="faHeart"
+                             style="cursor: pointer;"></fa-icon>
+                  </div>
+                  <div><img [src]="getProductPreviewImage()"
+                         style="max-width: 100%"
+                         [alt]="_superMarketplaceProductEditable?.Product?.Name">
+                    <div class="card-body d-flex flex-column justify-content-between bg-light">
+                      <h5 class="card-title"
+                          title="_superMarketplaceProductEditable?.Product?.Name">{{_superMarketplaceProductEditable?.Product?.Name}}</h5><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.ID}}</small>
+                      <p class="card-text">{{_superMarketplaceProductEditable?.Product?.DefaultSupplierID}}</p>
+                      <div class="d-flex flex-wrap justify-content-between align-items-center">
+                        <p class="card-text mb-0"> {{_superMarketplaceProductEditable?.PriceSchedule?.PriceBreaks[0]?.Price | currency }} </p><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Qty}} / {{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Unit}}</small><label class="sr-only"
+                               for="quantity">Quantity</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- / Product Preview -->
+            </div>
           </div>
         </div>
-        <!-- /Shipping Information -->
       </mat-tab>
+      <!-- Product Description -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Description
+        </ng-template>
+        <div class="container">
+          <div class="row pt-3">
+            <div class="col-12">
+              <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
+                                               [formControlForText]="productForm?.controls?.Description"
+                                               resourceField="Description"
+                                               pathOnResource="Description"
+                                               (resourceUpdated)="updateResourceFromFieldValue($event.field, $event.value)">
+              </reactive-quill-editor-component>
+              <div class="form-row pt-3">
+                <div class="form-group col-md-6">
+                  <label for="Note">Product Message</label>
+                  <input type="text"
+                         class="form-control"
+                         id="Note"
+                         showErrors
+                         aria-describedby="Note"
+                         maxlength="240"
+                         [resourceForm]="productForm"
+                         formControlName="Note"
+                         (input)="handleUpdateProduct($event, 'Product.xp.Note')"
+                         placeholder="(Optional) Enter a note about this product">
+                </div>
+                <div class="col-md-6">
+                  <p class="font-weight-bold mb-0">Message Preview</p>
+                  <div class="alert alert-info">
+                    Note: {{_superMarketplaceProductEditable?.Product?.xp?.Note}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <!-- / Product Description -->
+      <!-- / Product Details -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span [matTooltip]="isCreatingNew ? 'Optional' : ''">Filters</span>
+        </ng-template>
+        <product-filters-component (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
+                                   [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []"></product-filters-component>
+      </mat-tab>
+      <!-- Product Variations -->
+      <mat-tab [disabled]="!_superMarketplaceProductEditable?.Product?.ID">
+        <ng-template mat-tab-label>
+          <span matBadgeSize="medium"
+                matBadgeOverlap="false"
+                matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Variants?.length}} variants."
+                [matTooltip]="!_superMarketplaceProductEditable?.Product?.ID ? 'Product needs an ID' : ''"
+                [matBadge]="_superMarketplaceProductEditable?.Variants?.length || 0">Variants</span>
+        </ng-template>
+        <product-variations-component [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
+                                      [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
+                                      [areChanges]="areChanges"
+                                      [isCreatingNew]="isCreatingNew"
+                                      [checkForChanges]="checkForChanges"
+                                      [copyProductResource]="copyProductResource"
+                                      (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
+                                      (variantsValidated)="validateVariants($event)">
+        </product-variations-component>
+      </mat-tab>
+      <!-- /Product Variations -->
+      <!-- Product Images & Documents-->
       <mat-tab>
         <ng-template mat-tab-label>
           <span matBadgeSize="medium"
                 matBadgeOverlap="false"
-                matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Images?.length}} images."
-                [matBadge]="_superMarketplaceProductEditable?.Images?.length">Images</span>
+                matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Images?.length}} images and documents."
+                [matBadge]="_superMarketplaceProductEditable?.Images?.length + _superMarketplaceProductEditable?.Product?.xp?.StaticContent?.length + imageFiles?.length + staticContentFiles?.length">Images & Documents</span>
         </ng-template>
-        <!-- Product Images -->
         <div class="container">
-          <div class="row pt-3 mt-5 border-top">
+          <div class="row pt-3">
             <div class="col-md-5">
               <h5>Product Images</h5>
               <p class="font-italic">Drag and Drop or upload your product images to display on the buyer site.</p>
@@ -400,18 +411,6 @@
               </div>
             </div>
           </div>
-        </div>
-        <!-- /Product Images -->
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span matBadgeSize="medium"
-                matBadgeOverlap="false"
-                matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Variants?.length}} variants."
-                [matBadge]="_superMarketplaceProductEditable?.xp?.StaticContent?.length">Documents</span>
-        </ng-template>
-        <!-- Product Documents -->
-        <div class="container">
           <div class="row pt-3 mt-5 border-top">
             <div class="col-md-5">
               <h5>Product Documents</h5>
@@ -497,21 +496,10 @@
             </div>
           </div>
         </div>
-        <!-- /Product Documents -->
       </mat-tab>
+      <!-- /Product Images & Documents -->
     </mat-tab-group>
   </form>
-
-
-  <!-- Product Details -->
-  <!-- <div class="row pt-3">
-      <div class="col-md-5">
-        <h5>Product Details</h5>
-        <p class="font-italic">This is a description of the basic information section.</p>
-      </div>
-
-    </div> -->
-
   <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
   <div *ngIf="userContext?.UserType === 'SUPPLIER'"
        class="d-flex justify-content-between align-items-center py-2">
