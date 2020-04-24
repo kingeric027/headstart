@@ -68,14 +68,6 @@ namespace Marketplace.Common.Commands
 
 		private async Task CreateSuppliers(VerifiedUserContext user, string token)
 		{
-			var profile = await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
-			{
-				CustomRoles = new List<string>(),
-				ID = "supplierIntegration",
-				Name = "Supplier Integration Security Profile",
-				Roles = new List<ApiRole>() { ApiRole.FullAccess }
-			}, token);
-
 			// Create Suppliers and necessary user groups and security profile assignments
 			foreach (MarketplaceSupplier supplier in _seed.Suppliers)
 			{
