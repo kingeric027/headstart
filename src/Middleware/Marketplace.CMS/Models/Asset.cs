@@ -27,7 +27,7 @@ namespace Marketplace.CMS.Models
 		[ApiReadOnly, CosmosIgnore]
 		public string Url { get; set; } // Generated if not set. 
 		public string UrlPathOveride { get; set; } = null; // saved
-		public AssetType Type { get; set; }
+		public AssetType? Type { get; set; } = null;
 		public List<string> Tags { get; set; }
 		public string FileName { get; set; } // Defaults to the file name in the upload. Or should be required?
 		[ApiReadOnly]
