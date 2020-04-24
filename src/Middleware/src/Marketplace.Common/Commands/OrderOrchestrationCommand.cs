@@ -120,7 +120,7 @@ namespace Marketplace.Common.Commands
                 {
                     // this will recognize a reference number for a FreightPOP order (OC order to a specific supplier location)
                     // or an othercloud order
-                    potentialOrderCloudOrderID = refPieces[0] + refPieces[1];
+                    potentialOrderCloudOrderID = refPieces[0] + '-' + refPieces[1];
                 } else
                 {
                     throw new OrchestrationException(OrchestrationErrorType.NoRelatedOrderCloudOrderFound, $"Could not find ordercloud order for freightpop ref1: {ref1}.");
@@ -149,9 +149,17 @@ namespace Marketplace.Common.Commands
                 {
                     return _freightPopService.GetShipmentsByDate(daysBack);
                 });
+                // sometimes the values returned here are null for the response object which is not exactly what I would expect when there are no shipments
+                // regardless we are filtering those out
                 shipmentDetailsResponses = shipmentDetailsResponses.Where(shipmentDetailResponse => shipmentDetailResponse != null && shipmentDetailResponse.Data != null).ToList();
-                var shipmentsFromPastDays = shipmentDetailsResponses.SelectMany(response => response.Data).ToList();
-                return shipmentsFromPastDays;
+                if(shipmentDetailsResponses.Count() > 0)
+                {
+                    var shipmentsFromPastDays = shipmentDetailsResponses.SelectMany(response => response.Data).ToList();
+                    return shipmentsFromPastDays;
+                } else
+                {
+                    return new List<ShipmentDetails> { };
+                }
             }
             catch (Exception ex)
             {
