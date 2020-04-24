@@ -356,4 +356,6 @@ export class AppModule {
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/');
+  // uncomment to reference test file using XXX in place of words
+  // return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/', '-test.json');
 }

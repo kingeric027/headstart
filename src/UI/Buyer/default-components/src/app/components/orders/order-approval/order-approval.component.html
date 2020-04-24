@@ -32,9 +32,11 @@
               translate>ORDERS.APPROVAL.CANCEL</button>
       <button class="mt-3 ml-2 btn"
               (click)="submitReview()"
-              [ngClass]="{ 'btn-primary': approved, 'btn-danger': !approved }"
-              translate>
-        {{ approved ? ORDERS.APPROVAL.APPROVE : ORDERS.APPROVAL.REQUEST_CHANGES }}
+              [ngClass]="{ 'btn-primary': approved, 'btn-danger': !approved }">
+        <span *ngIf="approved"
+              translate>ORDERS.APPROVAL.APPROVE</span>
+        <span *ngIf="!approved"
+              translate>ORDERS.APPROVAL.REQUEST_CHANGES</span>
       </button>
     </div>
   </div>
