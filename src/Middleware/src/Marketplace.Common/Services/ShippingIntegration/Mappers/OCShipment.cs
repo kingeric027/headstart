@@ -1,5 +1,6 @@
 ﻿using Marketplace.Common.Services.FreightPop.Models;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using Marketplace.Models;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +14,17 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
             return new Shipment
             {
                 ID = freightPopShipment.ShipmentId,
-                Shipper = "Fedex",
+                Shipper = "FedEx",
                 DateShipped = freightPopShipment.ShipDate,
                 BuyerID = buyerID,
-                // when would there be more than one tracking number for a single freightpop shipment?
+                // when/why would there be more than one tracking number for a single freightpop shipment?
                 TrackingNumber = freightPopShipment.TrackingNumbers.First(),
                 Cost = freightPopShipment.Rate.DiscountedCost,
-                xp = freightPopShipment.Rate
+                xp = new ShipmentXp
+                {
+                    FreightPopShipmentRate = freightPopShipment.Rate,
+                    Service = freightPopShipment.Rate.Service
+                }
             };
         }
     }

@@ -27,7 +27,7 @@
             <span class="d-block"><b>Date Shipped:</b> {{selectedShipment.DateShipped | date}}</span>
             <span class="d-block" *ngIf="selectedShipment.Cost"><b>Cost:</b> {{selectedShipment.Cost | currency}}</span>
             <span class="d-block" *ngIf="selectedShipment.Shipper"><b>Carrier:</b> {{selectedShipment.Shipper}}</span>
-            <span class="d-block" *ngIf="selectedShipment.xp.ShippingService"><b>Shipping Service:</b> {{selectedShipment.xp.ShippingService}}</span>
+            <span class="d-block" *ngIf="selectedShipment.xp.Service"><b>Shipping Service:</b> {{selectedShipment.xp.Service}}</span>
             <!-- TO-DO: Work on formatting for this once we can update Ship From/Ship To address in the Portal -->
             <!-- <span class="d-block" *ngIf="selectedShipment.FromAddress">Ship From: {{selectedShipment.FromAddress}}</span>
             <span class="d-block" *ngIf="selectedShipment.ToAddress">Ship To: {{selectedShipment.ToAddress}}</span> -->
@@ -115,12 +115,12 @@
                    placeholder="Enter carrier name" />
     </div>
     <div class="col-sm-6">
-        <label for="ShippingService"
+        <label for="Service"
                 class="control-label font-weight-bold mt-1">Shipping Service</label>
             <input type="text"
-                   formControlName="ShippingService"
+                   formControlName="Service"
                    class="form-control"
-                   id="ShippingService"
+                   id="Service"
                    placeholder="Enter shipping service" />
     </div>
   </div>
