@@ -9,7 +9,7 @@
         <div *ngIf="isCreatingNew"
              class="form-group">
           <div class="form-group">
-            <label for="ID">Location ID (Optional)</label>
+            <label for="ID">Marketplace ID (Optional)</label>
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text">{{buyerID}}-</span>
@@ -31,7 +31,7 @@
         </div>
         <div class="form-group"
              *ngIf="!isCreatingNew && buyerLocationEditable">
-          <label for="ID">Location ID</label>
+          <label for="ID">Marketplace ID</label>
           <input class="form-control"
                  value="{{buyerLocationEditable.Address.ID}}"
                  disabled>
@@ -184,6 +184,19 @@
                    (input)="handleUpdateBuyerLocation($event, 'Address.xp.Email')"
                    placeholder="Contact Email">
           </div>
+        </div>
+        <div class="form-group">
+          <label for="LocationID">Location ID</label>
+          <input type="text"
+                 class="form-control"
+                 id="LocationID"
+                 showErrors
+                 aria-describedby="Location ID"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="LocationID"
+                 (input)="handleUpdateBuyerLocation($event, 'Address.xp.LocationID')"
+                 placeholder="Enter Location ID">
         </div>
       </div>
     </div>
