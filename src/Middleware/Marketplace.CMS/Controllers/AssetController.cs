@@ -13,7 +13,7 @@ namespace Marketplace.CMS.Controllers
 {
 	[DocComments("\"Integration\" represents Assets")]
 	[MarketplaceSection.Integration(ListOrder = 6)]
-	[Route("containers")]
+	[Route("containers/{containerID}/assets")]
 	public class AssetController : BaseController
 	{
 		private readonly IAssetQuery _assets;
@@ -24,35 +24,35 @@ namespace Marketplace.CMS.Controllers
 		}
 
 		[DocName("List Assets")]
-		[HttpGet, Route("{containerID}/assets")]
+		[HttpGet, Route("")]
 		public async Task<ListPage<Asset>> List(string containerID, ListArgs<Asset> args)
 		{
 			return await _assets.List(containerID, args);
 		}
 
 		[DocName("Get an Asset")]
-		[HttpGet, Route("{containerID}/assets/{assetID}")]
+		[HttpGet, Route("{assetID}")]
 		public async Task<Asset> Get(string containerID, string assetID)
 		{
 			return await _assets.Get(containerID, assetID);
 		}
 
 		[DocName("Upoload an Asset")]
-		[HttpPost, Route("{containerID}/assets")]
+		[HttpPost, Route("")]
 		public async Task<Asset> Create(string containerID, [FromForm] AssetUploadForm form)
 		{
 			return await _assets.Create(containerID, form);
 		}
 
 		[DocName("Update an Asset")]
-		[HttpPut, Route("{containerID}/assets/{assetID}")]
+		[HttpPut, Route("{assetID}")]
 		public async Task<Asset> Update(string containerID, string assetID, [FromBody] Asset asset)
 		{
 			return await _assets.Update(containerID, assetID, asset);
 		}
 
 		[DocName("Delete an Asset")]
-		[HttpDelete, Route("{containerID}/assets/{assetID}")]
+		[HttpDelete, Route("{assetID}")]
 		public async Task Delete(string containerID, string assetID)
 		{
 			await _assets.Delete(containerID, assetID);
