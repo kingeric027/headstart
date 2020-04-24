@@ -29,6 +29,7 @@ function createSupplierLocationForm(supplierLocation: Address) {
 export class SupplierLocationTableComponent extends ResourceCrudComponent<Address> {
   suggestedAddresses: ListAddress;
   selectedAddress: Address;
+  canBeDeleted: boolean;
 
   constructor(
     private supplierAddressService: SupplierAddressService,
@@ -48,6 +49,10 @@ export class SupplierLocationTableComponent extends ResourceCrudComponent<Addres
   discardChanges(): void {
     this.suggestedAddresses = null;
     this.setUpdatedResourceAndResourceForm(this.resourceInSelection);
+  }
+
+  determineIfDeletable(value: boolean): void {
+    this.canBeDeleted = value;
   }
 
   async updateExistingResource(): Promise<void> {

@@ -11,13 +11,15 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [canBeDeleted]="canBeDeleted">
   <app-supplier-location-edit class="resource-edit"
                               *ngIf="resourceForm"
                               [resourceForm]="resourceForm"
                               [suggestedAddresses]="suggestedAddresses"
                               [filterConfig]="filterConfig"
                               (updateResource)="updateResource($event)"
-                              (selectAddress)="handleAddressSelect($event)">
+                              (selectAddress)="handleAddressSelect($event)"
+                              (canDelete)="determineIfDeletable($event)">
   </app-supplier-location-edit>
 </resource-table-component>
