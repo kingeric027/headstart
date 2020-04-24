@@ -4,7 +4,8 @@
       name="ProfileForm">
   <div class="form-row">
     <div class="form-group col-md-6">
-      <label for="FirstName">First Name</label>
+      <label for="FirstName"
+             translate>PROFILE.PROFILE_FORM.FIRST</label>
       <input type="text"
              formControlName="FirstName"
              class="form-control"
@@ -14,7 +15,8 @@
              showErrors />
     </div>
     <div class="form-group col-md-6">
-      <label for="LastName">Last Name</label>
+      <label for="LastName"
+             translate>PROFILE.PROFILE_FORM.LAST</label>
       <input type="text"
              formControlName="LastName"
              class="form-control"
@@ -25,7 +27,8 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="Username">Username</label>
+    <label for="Username"
+           translate>PROFILE.PROFILE_FORM.USERNAME</label>
     <input type="text"
            formControlName="Username"
            class="form-control"
@@ -36,7 +39,8 @@
            showErrors />
   </div>
   <div class="form-group">
-    <label for="Email">Email</label>
+    <label for="Email"
+           translate>PROFILE.PROFILE_FORM.EMAIL</label>
     <input type="email"
            formControlName="Email"
            class="form-control"
@@ -46,7 +50,8 @@
            showErrors />
   </div>
   <div class="form-group">
-    <label for="Phone">Phone Number</label>
+    <label for="Phone"
+           translate>PROFILE.PROFILE_FORM.PHONE</label>
     <input type="text"
            formControlName="Phone"
            class="form-control"
@@ -58,13 +63,15 @@
   <div class="d-flex justify-content-start align-items-center">
     <button [disabled]="profileForm.status !== 'VALID'"
             type="submit"
-            class="btn btn-primary">
-      Save Changes
+            class="btn btn-primary"
+            translate>
+      PROFILE.PROFILE_FORM.SAVE
     </button>
     <button type="button"
             class="btn btn-link text-danger"
-            (click)="dismissForm()">
-      Cancel
+            (click)="dismissForm()"
+            translate>
+      PROFILE.PROFILE_FORM.CANCEL
     </button>
   </div>
 </form>

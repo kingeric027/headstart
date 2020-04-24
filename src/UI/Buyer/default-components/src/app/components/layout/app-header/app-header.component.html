@@ -107,8 +107,7 @@
           <div class="dropdown-menu account-dropdown-alignment"
                aria-labelledby="account-dropdown"
                ngbDropdownMenu>
-            <h6 class="dropdown-header"
-                translate>LAYOUT.APP_HEADER.GREETING, {{ user?.FirstName }}!</h6>
+            <h6 class="dropdown-header"><span translate>LAYOUT.APP_HEADER.GREETING</span>, {{ user?.FirstName }}!</h6>
             <ng-container *ngFor="let profileSection of profileSections">
               <span *ngIf="profileSection.routerCall !== 'toOrdersToApprove'">
                 <a *ngIf="profileSection.showInDropdown"

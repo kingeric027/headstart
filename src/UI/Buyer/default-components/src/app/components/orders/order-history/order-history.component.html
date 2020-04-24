@@ -1,6 +1,10 @@
 <ocm-profile-nav>
-  <h1 class="page-heading border-bottom pb-3"
-      translate>{{ approvalVersion ? ORDERS.HISTORY.TO_APPROVE : ORDERS.HISTORY.MY_ORDERS }}</h1>
+  <h1 *ngIf="approvalVersion"
+      class="page-heading border-bottom pb-3"
+      translate>ORDERS.HISTORY.TO_APPROVE</h1>
+  <h1 *ngIf="!approvalVersion"
+      class="page-heading border-bottom pb-3"
+      translate>ORDERS.HISTORY.MY_ORDERS</h1>
   <ocm-search placeholderText="Search Orders"
               [searchTermInput]="searchTerm"
               (searched)="filterBySearch($event.detail)"></ocm-search>

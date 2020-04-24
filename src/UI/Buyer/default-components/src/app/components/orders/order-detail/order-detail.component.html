@@ -11,8 +11,7 @@
       </nav>
       <div class="pb-2 mt-4 mb-2">
         <h2>
-          <span class="text-muted"
-                translate>ORDERS.DETAIL.ORDER #:</span> {{ order.ID }}
+          <span class="text-muted"><span translate>ORDERS.DETAIL.ORDER</span> #:</span> {{ order.ID }}
           <span *ngIf="order.xp.OrderType === 'Quote'"
                 class="badge badge-pill badge-primary ml-2">{{
             order.xp.OrderType
@@ -21,9 +20,8 @@
       </div>
       <div class="row">
         <div class="col-md-6">
-          <div translate>ORDERS.DETAIL.STATUS: <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{ order.Status }}</div>
-          <small class="float-left"
-                 translate>ORDERS.DETAIL.SUBMITTED {{ order.DateSubmitted | date: 'short' }}</small>
+          <div><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{ order.Status }}</div>
+          <small class="float-left"><span translate>ORDERS.DETAIL.SUBMITTED</span> {{ order.DateSubmitted | date: 'short' }}</small>
         </div>
         <div class="col-md-6">
           <ocm-order-approval *ngIf="approvalVersion"

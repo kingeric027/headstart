@@ -6,12 +6,14 @@
   <div *ngIf="_showCardDetails">
     <div class="row align-items-center">
       <label class="small text-muted col-12"
-             for="accepted-cards">Card Details</label>
+             for="accepted-cards"
+             translate>PAYMENTS.CC_FORM.DETAILS</label>
     </div>
     <div class="form-group d-flex justify-content-between mb-0">
       <div class="form-group flex-fill">
         <label class="sr-only"
-               for="name">Name on Card</label>
+               for="name"
+               translate>PAYMENTS.CC_FORM.NAME</label>
         <input type="text"
                formControlName="name"
                class="form-control"
@@ -24,7 +26,8 @@
     <div class="form-group d-flex justify-content-between mb-0">
       <div class="form-group card-number mr-2 flex-fill">
         <label class="sr-only"
-               for="cardNumber">Card Number</label>
+               for="cardNumber"
+               translate>PAYMENTS.CC_FORM.NUMBER</label>
         <input type="text"
                formControlName="number"
                class="form-control"
@@ -37,7 +40,8 @@
       </div>
       <div class="form-group mr-2 flex-fill">
         <label class="sr-only"
-               for="month">Expiration Month</label>
+               for="month"
+               translate>PAYMENTS.CC_FORM.EXP_MONTH</label>
         <select formControlName="month"
                 class="custom-select"
                 id="state">
@@ -47,7 +51,8 @@
       </div>
       <div class="form-group flex-fill">
         <label class="sr-only"
-               for="year">Expiration Year</label>
+               for="year"
+               translate>PAYMENTS.CC_FORM.EXP_YEAR</label>
         <select formControlName="year"
                 class="custom-select"
                 id="state">
@@ -61,7 +66,8 @@
        class="form-group d-flex justify-content-between mb-0">
     <div class="form-group card-name flex-fill">
       <label class="sr-only"
-             for="CVV">CVV</label>
+             for="CVV"
+             translate>PAYMENTS.CC_FORM.CVV</label>
       <input type="text"
              formControlName="cvv"
              class="form-control w-25"
@@ -75,12 +81,14 @@
   <div *ngIf="_showCardDetails">
     <div class="row align-items-center">
       <label class="small text-muted col-12"
-             for="accepted-cards">Billing Address</label>
+             for="accepted-cards"
+             translate>PAYMENTS.CC_FORM.BILLING_ADDRESS</label>
     </div>
     <div class="form-group d-flex justify-content-between mb-0">
       <div class="form-group w-100">
         <label class="sr-only"
-               for="Street1">Street</label>
+               for="Street1"
+               translate>PAYMENTS.CC_FORM.STREET</label>
         <input type="text"
                formControlName="street"
                class="form-control"
@@ -93,7 +101,8 @@
     <div class="form-group d-flex justify-content-between mb-0">
       <div class="form-group mr-2 flex-fill">
         <label class="sr-only"
-               for="City">City</label>
+               for="City"
+               translate>PAYMENTS.CC_FORM.CITY</label>
         <input type="text"
                formControlName="city"
                class="form-control"
@@ -104,14 +113,16 @@
       </div>
       <div class="form-group w-25 mr-2 flex-fill">
         <label class="sr-only"
-               for="State">State</label>
+               for="State"
+               translate>PAYMENTS.CC_FORM.STATE</label>
         <select *ngIf="stateOptions.length !== 0"
                 formControlName="state"
                 class="form-control"
                 id="State"
                 showErrors>
           <option [ngValue]="null"
-                  disabled>State</option>
+                  disabled
+                  translate>PAYMENTS.CC_FORM.STATE</option>
           <option *ngFor="let State of stateOptions"
                   [value]="State">{{ State }}</option>
         </select>
@@ -126,7 +137,8 @@
       <div class="form-group flex-fill"
            style="width: 30%;">
         <label class="sr-only"
-               for="zipCode">Zip</label>
+               for="zipCode"
+               translate>PAYMENTS.CC_FORM.ZIP</label>
         <input type="text"
                formControlName="zip"
                class="form-control"
@@ -138,14 +150,16 @@
     </div>
     <div class="form-group d-flex justify-content-between mb-0">
       <label class="sr-only"
-             for="country">Country</label>
+             for="country"
+             translate>PAYMENTS.CC_FORM.COUNTRY</label>
       <select formControlName="country"
               class="form-control"
               id="Country"
               showErrors
               (change)="onCountryChange($event)">
         <option [ngValue]="null"
-                disabled>Country</option>
+                disabled
+                translate>PAYMENTS.CC_FORM.COUNTRY</option>
         <option *ngFor="let country of countryOptions"
                 [value]="country.abbreviation">{{ country.label }}</option>
       </select>
@@ -159,5 +173,6 @@
   <button (click)="dismissForm()"
           *ngIf="!_showCVV"
           class="btn btn-link text-danger mt-4"
-          type="button">Cancel</button>
+          type="button"
+          translate>PAYMENTS.CC_FORM.CANCEL</button>
 </form>

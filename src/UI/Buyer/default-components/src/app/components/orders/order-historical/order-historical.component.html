@@ -22,7 +22,7 @@
        *ngIf="!isQuoteOrder(order)">
     <div *ngIf="order.Comments"
          class="alert alert-secondary small">
-      <strong translate>ORDERS.HISTORICAL.COMMENTS: </strong> {{order.Comments}}
+      <strong><span translate>ORDERS.HISTORICAL.COMMENTS</span>: </strong> {{order.Comments}}
     </div>
     <div class="d-flex justify-content-between align-items-center">
       <div>
@@ -48,7 +48,7 @@
     </div>
     <hr>
     <div class="text-right lead"
-         translate><b class="float-left">ORDERS.HISTORICAL.TOTAL:</b><span class="order-total">{{order.Total | currency}}</span></div>
+         translate><b class="float-left"><span translate>ORDERS.HISTORICAL.TOTAL</span>:</b><span class="order-total">{{order.Total | currency}}</span></div>
     <hr *ngIf="isOrderToApprove">
     <ocm-payment-list *ngIf="payments && !isOrderToApprove"
                       [payments]="payments"></ocm-payment-list>
@@ -64,7 +64,7 @@
   <!-- QUOTE ORDER DETAILS -->
   <div *ngIf="isQuoteOrder(order)"
        class="col-6">
-    <strong translate>ORDERS.HISTORICAL.SUBMITTED_BY: </strong>
+    <strong><span translate>ORDERS.HISTORICAL.SUBMITTED_BY</span>: </strong>
     <p>
       {{order.xp?.QuoteOrderInfo?.FirstName}}
       {{order.xp?.QuoteOrderInfo?.LastName}}
