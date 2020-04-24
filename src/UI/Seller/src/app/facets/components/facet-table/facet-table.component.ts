@@ -32,11 +32,7 @@ export class FacetTableComponent extends ResourceCrudComponent<ProductFacet> imp
     // dataIsSaving indicator is used in the resource table to conditionally tell the
     // submit button to disable
     // Add XpPath from Facet.Name
-    this.updatedResource.XpPath = this.updatedResource.Name.toLowerCase()
-      .split(' ')
-      .join('-')
-      .trim();
-    console.log(this.updatedResource);
+    this.updatedResource.XpPath = `Facets.${this.updatedResource.ID}`;
     try {
       this.dataIsSaving = true;
       const newResource = await this.ocService.createNewResource(this.updatedResource);

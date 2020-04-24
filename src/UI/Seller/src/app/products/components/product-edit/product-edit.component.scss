@@ -41,6 +41,12 @@
 .product-img-wrapper {
     position: relative;
     display: inline-block;
+    .primary-badge {
+        top: 0;
+        left: 0;
+        z-index: 12;
+        background-color: rgba($primary, .6)
+    }
     &:hover {
         .product-img-delete {
             opacity: 1;

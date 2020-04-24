@@ -6,6 +6,7 @@ import { groupBy as _groupBy } from 'lodash';
 import { ProductImage } from 'marketplace-javascript-sdk';
 import { PDFService } from '@app-seller/orders/pdf-render.service';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 @Component({
   selector: 'app-order-details',
@@ -27,6 +28,7 @@ export class OrderDetailsComponent {
   @Input()
   set order(order: Order) {
     if (Object.keys(order).length) {
+      this.createShipment = false;
       this.handleSelectedOrderChange(order);
     }
   }
@@ -35,7 +37,8 @@ export class OrderDetailsComponent {
     private ocPaymentService: OcPaymentService,
     private orderService: OrderService,
     private pdfService: PDFService,
-    private ocOrderService: OcOrderService
+    private ocOrderService: OcOrderService,
+    private middleware: MiddlewareAPIService
   ) { }
 
 
@@ -63,7 +66,7 @@ export class OrderDetailsComponent {
   }
 
   async setOrderStatus() {
-    await this.ocOrderService.Complete(this.orderDirection, this._order.ID).toPromise().then(patchedOrder => this.handleSelectedOrderChange(patchedOrder))
+    await this.middleware.acknowledgeQuoteOrder(this._order.ID).then(completedOrder => this.handleSelectedOrderChange(completedOrder));
   }
 
   isQuoteOrder(order: Order) {

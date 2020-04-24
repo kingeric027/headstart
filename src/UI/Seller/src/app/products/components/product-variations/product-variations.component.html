@@ -4,7 +4,7 @@
          id="product-options">
       <div class="col-md-5">
         <h5>Product Variations</h5>
-        <p class="font-italic mb-0">Does your product come in different varieties? Add the options here.</p>
+        <p class="font-italic mb-0">{{ readonly ? "Product varieties as defined by the supplier." : "Does your product come in different varieties? Add the options here."}}</p>
         <p class="mb-0"
            *ngIf="variants">This product has <span [ngClass]="{'text-danger': !variantsValid}"
                 class="font-weight-bold">{{variants?.length}}</span> variations. (Limit 100)</p>
@@ -14,13 +14,13 @@
         </p>
       </div>
       <div class="col-md-7">
-        <button *ngIf="!editSpecs && !superProductEditable?.Specs?.length"
+        <button *ngIf="!editSpecs && !readonly && !superProductEditable?.Specs?.length"
                 [disabled]="!canConfigureVariations"
                 class="btn btn-outline-dark"
                 (click)="toggleEditSpecs()">
           Configure Variations
         </button>
-        <button *ngIf="!editSpecs && superProductEditable?.Specs?.length"
+        <button *ngIf="!readonly && (!editSpecs && superProductEditable?.Specs?.length)"
                 class="btn btn-outline-dark"
                 (click)="toggleEditSpecs()">
           <fa-icon [icon]="faCog"></fa-icon> Edit Variations
@@ -71,7 +71,7 @@
                     <input class="form-control"
                            id="{{spec.ID}}"
                            type="text"
-                           maxlength="20"
+                           maxlength="30"
                            placeholder="Name">
                   </td>
                   <td>
@@ -92,14 +92,14 @@
               <thead>
                 <tr>
                   <th>Option</th>
-                  <th>Price Markup</th>
                   <th>Default</th>
+                  <th>Price Markup</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let opt of spec.Options; let optionIndex = index">
                   <td>{{opt.Value}}</td>
-                  <td>{{getPriceMarkup(opt) | currency}}</td>
                   <td>
                     <label class="check-container mt-0">
                       <input type="checkbox"
@@ -109,6 +109,17 @@
                              id="DefaultSpecOption">
                       <span class="checkmark"></span>
                     </label>
+                  </td>
+                  <td>{{getPriceMarkup(opt) | currency}}</td>
+                  <td>
+                    <div class="icon-button ripple hover-btn"
+                         (click)="removeSpecOption(specIndex, optionIndex)">
+                      <div class="icon-wrapper">
+                        <fa-icon class="text-danger"
+                                 [icon]="faTrash">
+                        </fa-icon>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -130,7 +141,25 @@
     <!-- Variant Matrix -->
     <div class="row pt-3 position-relative product-variations">
       <div class="variant-overlay"
-           *ngIf="editSpecs"><span *ngIf="specsWithoutVariations?.length || specsWithVariations?.length">Pending Variation Changes...</span>
+           *ngIf="editSpecs">
+        <span *ngIf="specsWithoutVariations?.length || specsWithVariations?.length">Pending Variation Changes...</span>
+      </div>
+      <div class="variant-overlay"
+           *ngIf="assignVariantImages">
+        <div class="row">
+          <div class="col-md-12">
+            <img *ngFor="let img of superProductEditable?.Images"
+                 class="product-image"
+                 [class.selected-image]="isImageSelected(img)"
+                 [src]="img.URL"
+                 (click)="toggleAssignImage(img, variantInSelection.xp?.SpecCombo)"
+                 alt="" />
+            <div>
+              <button class="btn btn-outline-dark"
+                      (click)="updateProductImageTags()">Done</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="col-md-12">
         <div *ngIf="variants?.length > 0">
@@ -140,6 +169,8 @@
             <table class="table mb-0">
               <thead class="bg-light">
                 <tr>
+                  <th *ngIf="!isCreatingNew && superProductEditable?.Images?.length"
+                      scope="col">Images</th>
                   <th *ngFor="let spec of specsWithVariations; let i = index"
                       scope="col">{{variants[0]?.xp?.SpecValues[i]?.SpecName}}</th>
                   <th scope="col">SKU</th>
@@ -147,7 +178,20 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let variant of variants; let i = index">
+                <tr *ngFor="let variant of variants; let i = index"
+                    [ngClass]="{'selected-variant': variant === variantInSelection}">
+                  <td *ngIf="!isCreatingNew && superProductEditable?.Images?.length">
+                    <fa-icon (click)="assignVariantImages = true"
+                             (click)="variantInSelection = variant"
+                             [icon]="faPlusCircle"
+                             class="mr-2"
+                             size="lg"></fa-icon>
+                    <img *ngFor="let img of getVariantImages(variant)"
+                         style="max-width: 50px"
+                         [src]="img.URL"
+                         (click)="toggleAssignImage(img, variantInSelection.xp?.SpecCombo)"
+                         alt="" />
+                  </td>
                   <td *ngFor="let specValue of variant.xp?.SpecValues">
                     {{specValue.SpecOptionValue}} <span class="font-weight-bold"
                           *ngIf="specValue.PriceMarkup">(+{{specValue.PriceMarkup | currency}})</span>

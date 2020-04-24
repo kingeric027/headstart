@@ -96,4 +96,8 @@ export class OCMOrderDetails implements OnInit {
     });
     await this.context.order.cart.addMany(items);
   }
+
+  async moveOrderToCart(): Promise<void> {
+    await this.context.order.cart.moveOrderToCart(this.order.ID);
+  }
 }

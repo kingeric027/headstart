@@ -6,7 +6,7 @@ using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribut
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceSpec : Spec<SpecXp>, IMarketplaceObject
+    public class MarketplaceSpec : Spec, IMarketplaceObject
     {
        
     }

@@ -16,15 +16,13 @@ namespace Marketplace.Common.Controllers
     {
         private readonly AppSettings _settings;
         private readonly ISendgridService _sendgridService;
-        private readonly IAddressValidationCommand _addressValidationCommand;
         private readonly IOrderCommand _orderCommand;
 
-        public WebhooksController(AppSettings settings, ISendgridService sendgridService, IAddressValidationCommand addressValidationCommand, IOrderCommand orderCommand) : base(settings)
+        public WebhooksController(AppSettings settings, ISendgridService sendgridService, IOrderCommand orderCommand) : base(settings)
         {
             _settings = settings;
             _sendgridService = sendgridService;
             _orderCommand = orderCommand;
-            _addressValidationCommand = addressValidationCommand;
         }
 
         // USING AN OC MESSAGE SENDER - NOT WEBHOOK
@@ -44,10 +42,10 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("ordersubmit")]
         [OrderCloudWebhookAuth]
-        public async void HandleOrderSubmit([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> payload)
+        public async Task<OrderSubmitResponse> HandleOrderSubmit([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> payload)
         {
-            await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
-            await _sendgridService.SendOrderSubmitEmail(payload.OrderWorksheet);
+            var response = await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
+            return response;
         }
 
         [HttpPost, Route("orderrequiresapproval")]
@@ -135,47 +133,6 @@ namespace Marketplace.Common.Controllers
         {
             // to mp manager when a supplier is updated
             await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "Supplier Updated", "<h1>this is a test email for supplier update</h1>");
-        }
-
-        [HttpPost, Route("validateaddresspostput")]
-        [OrderCloudWebhookAuth]
-        public async Task<WebhookResponse> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Create payload)
-        // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
-        {
-            var address = payload.Request.Body;
-            return await _addressValidationCommand.IsValidAddressAsync(address);
-        }
-
-        [HttpPost, Route("validateselleraddresspatch")]
-        [OrderCloudWebhookAuth]
-        public async Task<WebhookResponse> ValidateSellerAddressPatch([FromBody] WebhookPayloads.AdminAddresses.Patch payload)
-        // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
-        {
-            return await _addressValidationCommand.GetExpectedNewSellerAddressAndValidate(payload);
-        }
-
-        [HttpPost, Route("validatesupplieraddresspatch")]
-        [OrderCloudWebhookAuth]
-        public async Task<WebhookResponse> ValidateSupplierAddressPostPut([FromBody] WebhookPayloads.SupplierAddresses.Patch payload)
-        // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
-        {
-            return await _addressValidationCommand.GetExpectedNewSupplierAddressAndValidate(payload);
-        }
-
-        [HttpPost, Route("validatemeaddresspatch")]
-        [OrderCloudWebhookAuth]
-        public async Task<WebhookResponse> ValidateMeAddressPostPut([FromBody] WebhookPayloads.Me.PatchAddress payload)
-        // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
-        {
-            return await _addressValidationCommand.GetExpectedNewMeAddressAndValidate(payload);
-        }
-
-        [HttpPost, Route("validatebuyeraddresspatch")]
-        [OrderCloudWebhookAuth]
-        public async Task<WebhookResponse> ValidateAddressPostPut([FromBody] WebhookPayloads.Addresses.Patch payload)
-        // we are typing the body as a buyer address create but we are only accessing the body, works for puts, and posts for all address types
-        {
-            return await _addressValidationCommand.GetExpectedNewBuyerAddressAndValidate(payload);
         }
     }
 }

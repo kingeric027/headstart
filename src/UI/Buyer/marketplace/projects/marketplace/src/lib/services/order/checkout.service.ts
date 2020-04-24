@@ -12,7 +12,8 @@ import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
 import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/ordercloud-sandbox.models';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
-import { MarketplaceSDK, CreditCardToken, CreditCardPayment } from 'marketplace-javascript-sdk';
+import { MarketplaceSDK, CreditCardToken, CreditCardPayment, Address } from 'marketplace-javascript-sdk';
+import { onErrorResumeNext } from 'rxjs';
 
 export interface ICheckout {
   submit(card: CreditCardPayment, marketplaceID: string): Promise<string>;
@@ -46,26 +47,36 @@ export class CheckoutService implements ICheckout {
   async submit(payment: CreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
     await MarketplaceSDK.MePayments.Post(payment); // authorize card
-    const orderWithCleanID = await this.ocOrderService
-      .Patch('outgoing', this.order.ID, {
-        ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
-      })
-      .toPromise();
-    this.order = orderWithCleanID;
-    await this.ocOrderService.Submit('outgoing', orderWithCleanID.ID).toPromise();
+    await this.incrementOrderIfNeeded();
+    const submittedOrder = await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
     await this.state.reset();
-    return orderWithCleanID.ID;
+    return submittedOrder.ID;
   }
 
   async addComment(comment: string): Promise<MarketplaceOrder> {
     return await this.patch({ Comments: comment });
   }
 
+  async incrementOrderIfNeeded(): Promise<void> {
+    // 'as any' can be removed after sdk update
+    if (!(this.order.xp as any)?.IsResubmitting) {
+      this.order = await this.ocOrderService
+        .Patch('outgoing', this.order.ID, {
+          ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
+        })
+        .toPromise();
+    }
+  }
+
   async setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder> {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     address.ID = null;
-    this.order = await this.ocOrderService.SetShippingAddress('outgoing', this.order.ID, address).toPromise();
+    this.order = await MarketplaceSDK.ValidatedAddresses.SetShippingAddress(
+      'Outgoing',
+      this.order.ID,
+      address as Address
+    );
     return this.order;
   }
 

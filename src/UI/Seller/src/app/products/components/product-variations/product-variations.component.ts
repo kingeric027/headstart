@@ -1,9 +1,11 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { Variant, SpecOption, Spec, OcSpecService } from '@ordercloud/angular-sdk';
-import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
+import { SuperMarketplaceProduct, Image } from 'marketplace-javascript-sdk/dist/models';
 import { ToastrService } from 'ngx-toastr';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 
 @Component({
   selector: 'product-variations-component',
@@ -15,16 +17,17 @@ export class ProductVariations {
   set superMarketplaceProductEditable(superProductEditable: SuperMarketplaceProduct) {
     this.superProductEditable = superProductEditable;
     this.variants = superProductEditable?.Variants;
-    superProductEditable?.Product?.ID ? this.canConfigureVariations = true : this.canConfigureVariations = false;
+    this.canConfigureVariations = !!superProductEditable?.Product?.ID;
   };
   @Input()
   set superMarketplaceProductStatic(superProductStatic: SuperMarketplaceProduct) {
     this.superProductStatic = superProductStatic;
   };
   @Input() areChanges: boolean;
+  @Input() readonly = false;
   @Input() checkForChanges;
   @Input() copyProductResource;
-  @Input() isCreatingNew: boolean;
+  @Input() isCreatingNew = false;
   get specsWithVariations() {
     return this.superProductEditable?.Specs?.filter(s => s.DefinesVariant);
   };
@@ -46,9 +49,13 @@ export class ProductVariations {
   editSpecs = false;
   faTrash = faTrash;
   faCog = faCog;
+  faPlusCircle = faPlusCircle;
   faTimesCircle = faTimesCircle;
   faCheckDouble = faCheckDouble;
   faExclamationCircle = faExclamationCircle;
+  assignVariantImages = false;
+  variantInSelection: Variant;
+  imageInSelection: Image;
 
   constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef) {}
   getTotalMarkup = (specOptions: SpecOption[]): number => {
@@ -88,7 +95,7 @@ export class ProductVariations {
     const updateProductResourceCopy = this.productService.copyResource(
         this.superProductEditable || this.productService.emptyResource
     );
-    updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, "");
+    updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, '');
     this.superProductEditable = updateProductResourceCopy;
     this.productVariationsChanged.emit(this.superProductEditable);
   }
@@ -97,17 +104,17 @@ export class ProductVariations {
     const updateProductResourceCopy = this.productService.copyResource(
         this.superProductEditable || this.productService.emptyResource
     );
-    let input = (document.getElementById('AddVariation') as any)
+    const input = (document.getElementById('AddVariation') as any)
     if (input.value === '') {
       this.toasterService.warning('Please name your variation');
       return;
     }
     const newSpec: Spec[] | any = [{
-      ID: `${updateProductResourceCopy.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, "")}`,
+      ID: `${updateProductResourceCopy.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, '')}`,
       Name: input.value,
       // If this.definesVariant - AllowOptenText _MUST_ be false (platform requirement)
       AllowOpenText: false,
-      Required: this.definesVariant ? true : false,
+      Required: this.definesVariant,
       DefinesVariant: this.definesVariant,
       ListOrder: (updateProductResourceCopy.Specs?.length || 0) + 1,
       Options: []
@@ -123,18 +130,23 @@ export class ProductVariations {
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
-    let input = (document.getElementById(`${spec.ID}`) as any)
-    let markup = (document.getElementById(`${spec.ID}Markup`) as any).value;
+    const input = (document.getElementById(`${spec.ID}`) as any)
+    const markup = (document.getElementById(`${spec.ID}Markup`) as any).value;
+    if (input.value === '') {
+      this.toasterService.warning('Please name your option');
+      return;
+    }
     const newOption = [{
-      ID: input.value.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, ""),
+      ID: input.value.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, ''),
       Value: input.value,
       ListOrder: spec.Options.length + 1,
       IsOpenText: false,
-      PriceMarkupType: markup ? 1 : "NoMarkup",
+      PriceMarkupType: markup ? 1 : 'NoMarkup',
       PriceMarkup: markup,
       xp: null
     }]
     if (!updateProductResourceCopy.Specs[specIndex].Options.length) updateProductResourceCopy.Specs[specIndex].DefaultOptionID = newOption[0].ID;
+    if (!updateProductResourceCopy.Specs[specIndex].DefaultOptionID) updateProductResourceCopy.Specs[specIndex].DefaultOptionID = updateProductResourceCopy.Specs[specIndex].Options[0].ID;
     updateProductResourceCopy.Specs[specIndex].Options = updateProductResourceCopy.Specs[specIndex].Options.concat(newOption);
     this.superProductEditable = updateProductResourceCopy;
     this.productVariationsChanged.emit(this.superProductEditable);
@@ -146,6 +158,7 @@ export class ProductVariations {
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
+    if (updateProductResourceCopy.Specs[specIndex].DefaultOptionID === updateProductResourceCopy.Specs[specIndex].Options[optionIndex].ID) updateProductResourceCopy.Specs[specIndex].DefaultOptionID = null;
     updateProductResourceCopy.Specs[specIndex].Options.splice(optionIndex, 1);
     this.superProductEditable = updateProductResourceCopy;
     this.productVariationsChanged.emit(this.superProductEditable);
@@ -186,7 +199,7 @@ export class ProductVariations {
     specsDefiningVariants = specsDefiningVariants.sort((a, b) => a.ListOrder - b.ListOrder);
     const firstSpec = specsDefiningVariants[0];
     let variants = this.createVariantsForFirstSpec(firstSpec);
-    for (var i = 1; i < specsDefiningVariants.length; i++) {
+    for (let i = 1; i < specsDefiningVariants.length; i++) {
       variants = this.combineSpecOptions(variants, specsDefiningVariants[i])
     }
     return variants;
@@ -200,6 +213,7 @@ export class ProductVariations {
         Name: `${this.superProductEditable.Product.ID} ${opt.Value}`,
         Active: true,
         xp: {
+          SpecCombo: `${opt.ID}`,
           SpecValues:[{
             SpecName: spec.Name,
             SpecOptionValue: opt.Value,
@@ -211,7 +225,7 @@ export class ProductVariations {
   }
 
   combineSpecOptions(workingVariantList: Variant[], spec: Spec): Variant[] {
-    let newVariantList = [];
+    const newVariantList = [];
     workingVariantList.forEach(variant => {
       spec.Options.forEach(opt => {
         newVariantList.push({
@@ -219,6 +233,7 @@ export class ProductVariations {
           Name: `${variant.Name} ${opt.Value}`,
           Active: true,
           xp: {
+            SpecCombo: `${variant.xp.SpecCombo}-${opt.ID}`,
             SpecValues:[...variant.xp.SpecValues, {
               SpecName: spec.Name,
               SpecOptionValue: opt.Value,
@@ -251,5 +266,34 @@ export class ProductVariations {
     updateProductResourceCopy.Specs[specIndex].DefaultOptionID = optionID;
     this.superProductEditable.Specs = updateProductResourceCopy.Specs;
     await this.ocSpecService.Patch(specID, { DefaultOptionID: optionID }).toPromise();
+  }
+  
+  isImageSelected(img: Image): boolean {
+    if (!img.Tags) img.Tags = []
+    return img.Tags.includes(this.variantInSelection?.xp?.SpecCombo);
+  }
+
+  toggleAssignImage(img: Image, specCombo: string): void {
+    this.imageInSelection = img;
+    if (!this.imageInSelection.Tags) this.imageInSelection.Tags = [];
+    this.imageInSelection.Tags.includes(specCombo) ? this.imageInSelection.Tags.splice(this.imageInSelection.Tags.indexOf(specCombo), 1) : this.imageInSelection.Tags.push(specCombo);
+  }
+
+  async updateProductImageTags(img: Image): Promise<void> {
+    this.assignVariantImages = false;
+    const { timeStamp, ... rest } = this.imageInSelection;
+    // Queue up image/content requests, then send them all at aonce
+    // TODO: optimize this so we aren't having to update all images, just 'changed' ones
+    const requests = this.superProductEditable.Images.map(i => MarketplaceSDK.Images.Post(i));
+    await Promise.all(requests);
+    // Ensure there is no mistaken change detection
+    Object.assign(this.superProductStatic.Images, this.superProductEditable.Images);
+    this.variantInSelection = {};
+    this.imageInSelection = {};
+  }
+
+  getVariantImages(variant: Variant): Image[] {
+    this.superProductEditable?.Images?.forEach(i => !i.Tags ? i.Tags = [] : null);
+    return this.superProductEditable?.Images?.filter(i => i.Tags.includes(variant?.xp?.SpecCombo));
   }
 }

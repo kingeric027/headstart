@@ -23,6 +23,15 @@
          *ngIf="_order">
       <div class="col-6">
         <div *ngIf="_lineItems[0] && !isQuoteOrder(_order)">
+          <div *ngIf="_order.FromUser"
+                class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <span class="text-muted">Buyer</span>
+              <p class="mb-0 text-capitalize font-weight-bold">{{_order.FromUser.FirstName}} {{_order.FromUser.LastName}}</p>
+              <p class="mb-0" *ngIf="_order.FromUser.Phone">{{_order.FromUser.Phone | tel}}</p>
+              <p class="mb-0" *ngIf="_order.FromUser.Email">{{_order.FromUser.Email}}</p>
+            </div>
+          </div>
           <div *ngIf="_lineItems[0].ShippingAddress"
                class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -57,9 +66,9 @@
         </div>
         <!-- Since Outgoing Orders do not have a Shipping/Tax, using an *ngIf -->
         <div *ngIf="orderDirection === 'Incoming'">
-          <strong>Subtotal</strong> <span class="float-right">{{_order.Subtotal | currency}}</span><br>
-          <strong>Shipping</strong> <span class="float-right">{{_order.ShippingCost | currency}}</span><br>
-          <strong>Tax</strong> <span class="float-right">{{_order.TaxCost | currency}}</span><br>
+          <span class="d-block"><strong>Subtotal</strong> <span class="float-right">{{_order.Subtotal | currency}}</span></span>
+          <span class="d-block"><strong>Shipping</strong> <span class="float-right">{{_order.ShippingCost | currency}}</span><br/></span>
+          <span class="d-block"><strong>Tax</strong> <span class="float-right">{{_order.TaxCost | currency}}</span><br/></span>
           <div *ngIf="_order.PromotionDiscount">
             <strong class="text-danger">Promo Discount</strong> <span class="float-right text-danger">-{{_order.PromotionDiscount | currency}}</span>
           </div>
@@ -103,7 +112,8 @@
       </div>
     </div>
     <app-order-shipments (createOrViewShipmentEvent)="toggleCreateShipment($event)"
-                         [order]="_order">
+                         [order]="_order"
+                         [orderDirection]="orderDirection">
 
     </app-order-shipments>
     <div *ngIf="_liGroupedByShipFrom?.length > 0 && !createShipment">
@@ -143,47 +153,42 @@
             </div>
           </div>
         </div>
-        <div class="flex-none">
-          <div *ngFor="let li of liGroup; let i = index">
-            <div class="m-2 row align-items-center">
-              <div class="col-sm-7">
-                <div class="row align-items-sm-center">
-                  <div class="col-3 p-0">
-                    <img [id]="i"
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover display-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Description</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let li of liGroup; let i = index">
+                <td class="align-middle">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <img 
+                         [id]="i"
                          [src]="getImageUrl(li)"
                          width="auto"
                          height="100px"
                          class="d-print-none">
                   </div>
-                  <div class="col-9">
+                </td>
+                <td class="align-middle">
+                  <div class="d-flex align-items-center">
                     <h6>
                       <span>{{ li.Product.Name }}</span>
                       <small class="text-muted d-block">{{ li.Product.ID }}</small>
                     </h6>
                   </div>
-                </div>
-              </div>
-              <div class="col-sm-5"
-                   *ngIf="!isQuoteOrder">
-                <div class="row align-items-center pt-3 pt-sm-0">
-                  <div class="col-4 text-center">
-                    <span class="d-block d-sm-none">Unit Price</span>
-                    <span class="text-nowrap">{{ li.UnitPrice | currency }}</span>
-                  </div>
-                  <div class="col-4 text-center">
-                    <span class="d-block d-sm-none">Qty</span>
-                    <span class="text-nowrap">&times;{{ li.Quantity | number }}</span>
-                  </div>
-                  <div class="col-4 text-center">
-                    <span class="d-block d-sm-none">Total</span>
-                    <span class="text-nowrap">{{ li.LineTotal | currency }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- hr only visible on mobile to more clearly distinguish between line items -->
-            <hr class="pb-4 d-block d-sm-none">
-          </div>
+                </td>
+                <td class="align-middle text-center">
+                  {{ li.Quantity }}
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

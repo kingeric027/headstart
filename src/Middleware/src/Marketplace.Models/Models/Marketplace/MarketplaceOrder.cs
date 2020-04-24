@@ -6,7 +6,7 @@ using OrderCloud.SDK;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-	public class MarketplaceOrder : Order<OrderXp, UserXp, BuyerAddressXP>
+	public class MarketplaceOrder : Order<OrderXp, MarketplaceUser, MarketplaceAddressBuyer>
     {
 	}
 

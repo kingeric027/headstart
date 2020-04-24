@@ -31,6 +31,7 @@ namespace Marketplace.Common.Commands
         public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token)
         {
             // Create Supplier
+            supplier.ID = "{supplierIncrementor}";
             var ocSupplier = await _oc.Suppliers.CreateAsync(supplier, token);
             var ocSupplierID = ocSupplier.ID;
             // Create Integration User Group
@@ -58,7 +59,7 @@ namespace Marketplace.Common.Commands
                 AppName = $"Integration Client {ocSupplier.Name}",
                 Active = true,
                 DefaultContextUserName = supplierUser.Username,
-                ClientSecret = "d576450ca8f89967eea0d3477544ea4bee60af051a5c173be09db08c562b", // _settings.OrderCloudSettings.ClientSecret,
+                ClientSecret = _settings.OrderCloudSettings.ClientSecret,
                 AccessTokenDuration = 600,
                 RefreshTokenDuration = 43200,
                 AllowAnyBuyer = false,
