@@ -1,15 +1,16 @@
 <div *ngIf="productForm"
      class="container-fluid resource-edit">
   <form [formGroup]="productForm">
-    <mat-tab-group animationDuration="0ms">
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex"
+                   (selectedTabChange)="tabChanged($event, _superMarketplaceProductEditable?.Product?.ID)"
+                   animationDuration="0ms">
       <!-- Product Details -->
       <mat-tab label="Product">
         <div class="container">
           <div class="row pt-3">
             <div class="col-md-8 form-group">
               <div class="form-group">
-                <mat-slide-toggle [resourceForm]="resourceForm"
-                                  aria-describedby="Active"
+                <mat-slide-toggle aria-describedby="Active"
                                   formControlName="Active"
                                   color="warn"
                                   (change)="handleUpdateProduct($event, 'Product.Active')">
@@ -17,8 +18,7 @@
                 </mat-slide-toggle>
               </div>
               <div class="form-group">
-                <mat-checkbox [resourceForm]="resourceForm"
-                              aria-describedby="IsResale"
+                <mat-checkbox aria-describedby="IsResale"
                               formControlName="IsResale"
                               color="warn"
                               (change)="handleUpdateProduct($event, 'Product.xp.IsResale')">
@@ -35,7 +35,6 @@
                          showErrors
                          aria-describedby="ID"
                          maxlength="100"
-                         [resourceForm]="productForm"
                          formControlName="ID"
                          (input)="handleUpdateProduct($event, 'Product.ID')"
                          placeholder="Enter Product ID">
@@ -55,7 +54,6 @@
                          showErrors
                          aria-describedby="Name"
                          maxlength="100"
-                         [resourceForm]="productForm"
                          formControlName="Name"
                          (input)="handleUpdateProduct($event, 'Product.Name')"
                          placeholder="Enter Name">
@@ -106,7 +104,6 @@
                          id="UnitOfMeasureQty"
                          min="1"
                          aria-describedby="Max Quantity"
-                         [resourceForm]="productForm"
                          formControlName="UnitOfMeasureQty"
                          (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Qty')"
                          placeholder="How many of this item per unit?">
@@ -117,7 +114,6 @@
                          class="form-control"
                          id="UnitOfMeasureUnit"
                          aria-describedby="Min Quantity"
-                         [resourceForm]="productForm"
                          formControlName="UnitOfMeasureUnit"
                          (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Unit')"
                          placeholder="Measuring unit. (Ex: Per, Crate, etc..)">
@@ -133,7 +129,6 @@
                          aria-describedby="Min Quantity"
                          min="1"
                          step="1"
-                         [resourceForm]="productForm"
                          formControlName="MinQuantity"
                          (input)="handleUpdateProduct($event, 'PriceSchedule.MinQuantity', 'number')"
                          placeholder="Enter Min Quantity">
@@ -147,7 +142,6 @@
                          aria-describedby="Max Quantity"
                          min="{{productForm.controls.MinQuantity.value}}"
                          step="1"
-                         [resourceForm]="productForm"
                          formControlName="MaxQuantity"
                          (input)="handleUpdateProduct($event, 'PriceSchedule.MaxQuantity', 'number')"
                          placeholder="Enter Max Quantity">
@@ -183,7 +177,6 @@
                          id="ShipHeight"
                          showErrors
                          aria-describedby="Ship Height"
-                         [resourceForm]="productForm"
                          formControlName="ShipHeight"
                          (input)="handleUpdateProduct($event, 'Product.ShipHeight', 'number')"
                          placeholder="Enter Ship Height">
@@ -195,7 +188,6 @@
                          id="ShipWidth"
                          showErrors
                          aria-describedby="Ship Width"
-                         [resourceForm]="productForm"
                          formControlName="ShipWidth"
                          (input)="handleUpdateProduct($event, 'Product.ShipWidth', 'number')"
                          placeholder="Ship Width">
@@ -209,7 +201,6 @@
                          id="ShipLength"
                          showErrors
                          aria-describedby="Ship Length"
-                         [resourceForm]="productForm"
                          formControlName="ShipLength"
                          (input)="handleUpdateProduct($event, 'Product.ShipLength', 'number')"
                          placeholder="Enter Ship Length">
@@ -221,7 +212,6 @@
                          id="ShipWeight"
                          showErrors
                          aria-describedby="Ship Weight"
-                         [resourceForm]="productForm"
                          formControlName="ShipWeight"
                          (input)="handleUpdateProduct($event, 'Product.ShipWeight', 'number')"
                          placeholder="Ship Weight">
@@ -281,7 +271,6 @@
                          showErrors
                          aria-describedby="Note"
                          maxlength="240"
-                         [resourceForm]="productForm"
                          formControlName="Note"
                          (input)="handleUpdateProduct($event, 'Product.xp.Note')"
                          placeholder="(Optional) Enter a note about this product">

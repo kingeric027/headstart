@@ -294,9 +294,8 @@ export class ProductVariations {
     this.imageInSelection.Tags.includes(specCombo) ? this.imageInSelection.Tags.splice(this.imageInSelection.Tags.indexOf(specCombo), 1) : this.imageInSelection.Tags.push(specCombo);
   }
 
-  async updateProductImageTags(img: Image): Promise<void> {
+  async updateProductImageTags(): Promise<void> {
     this.assignVariantImages = false;
-    const { timeStamp, ... rest } = this.imageInSelection;
     // Queue up image/content requests, then send them all at aonce
     // TODO: optimize this so we aren't having to update all images, just 'changed' ones
     const requests = this.superProductEditable.Images.map(i => MarketplaceSDK.Images.Post(i));
@@ -316,8 +315,8 @@ export class ProductVariations {
   }
 
   async variantShippingDimensionUpdate(event: any, field: string): Promise<void> {
-    console.log(event)
     let partialVariant: PartialVariant = {};
+    if (event.target.value === '') return;
     const value = Number(event.target.value);
     switch(field) {
       case "ShipWeight": 
@@ -333,10 +332,7 @@ export class ProductVariations {
         partialVariant = { ShipLength: value }
         break;
     }
-    console.log(partialVariant)
     try {
-      console.log('should be making OC call')
-      console.log(this.variantInSelection.ID)
       await this.ocProductService.PatchVariant(this.superProductEditable.Product?.ID, this.variantInSelection.ID, partialVariant).toPromise();
       this._snackBar.open("Shipping dimensions updated", "OK", {
         duration: 2000,

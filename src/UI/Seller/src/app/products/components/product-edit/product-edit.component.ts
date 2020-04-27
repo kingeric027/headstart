@@ -24,6 +24,8 @@ import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOp
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
+import { Location } from '@angular/common'
+import { ProductEditTabMapper, TabIndexMapper } from './tab-mapper';
 
 @Component({
   selector: 'app-product-edit',
@@ -73,10 +75,12 @@ export class ProductEditComponent implements OnInit {
   staticContentFiles: FileHandle[] = [];
   staticContent: StaticContent[] = [];
   documentName: string;
+  selectedTabIndex = 0;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
+    private location: Location,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
     private ocProductService: OcProductService,
@@ -94,9 +98,20 @@ export class ProductEditComponent implements OnInit {
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
+    this.setProductEditTab();
   }
 
-  
+  setProductEditTab(): void {
+    const productDetailSection = this.router.url.split('/')[3];
+    this.selectedTabIndex = ProductEditTabMapper[productDetailSection];
+  }
+
+  tabChanged(event: any, productID: string): void {
+    if(productID === null) return;
+    event.index === 0 ? this.location.replaceState(`products/${productID}`)
+    :
+    this.location.replaceState(`products/${productID}/${TabIndexMapper[event.index]}`);
+  }
 
   async getAddresses(): Promise<void> {
     const context: UserContext = await this.currentUserService.getUserContext();

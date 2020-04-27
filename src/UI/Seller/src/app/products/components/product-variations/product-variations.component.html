@@ -197,6 +197,7 @@
                     <div class="input-group-sm">
                       <input class="form-control input-sm"
                              type="text"
+                             [disabled]="variant === variantInSelection"
                              (change)="updateSku($event, i)"
                              [value]="variant?.xp?.NewID || variant?.ID">
                     </div>
