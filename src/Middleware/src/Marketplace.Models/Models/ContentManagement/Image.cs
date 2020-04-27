@@ -1,4 +1,5 @@
-﻿using Marketplace.Helpers.Attributes;
+﻿using Cosmonaut.Attributes;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
 using Newtonsoft.Json;
 using System;
@@ -10,6 +11,7 @@ namespace Marketplace.Common.Models
     [SwaggerModel]
     public class Image : ICosmosObject
     {
+        [CosmosPartitionKey]
         [JsonProperty(PropertyName = "ID")]
         public string id { get; set; }
         [Sortable]
