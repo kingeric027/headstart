@@ -7,6 +7,10 @@ const routes: Routes = [
   { path: '', component: ProductTableComponent, pathMatch: 'prefix' },
   { path: 'new', component: ProductTableComponent, pathMatch: 'full' },
   { path: ':productID', component: ProductTableComponent, pathMatch: 'full' },
+  { path: ':productID/description', component: ProductTableComponent, pathMatch: 'full' },
+  { path: ':productID/filters', component: ProductTableComponent, pathMatch: 'full' },
+  { path: ':productID/variants', component: ProductTableComponent, pathMatch: 'full' },
+  { path: ':productID/images-and-documents', component: ProductTableComponent, pathMatch: 'full' },
 ];
 
 @NgModule({

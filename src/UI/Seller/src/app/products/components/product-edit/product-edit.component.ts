@@ -13,9 +13,9 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCircle, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
@@ -24,6 +24,8 @@ import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOp
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
+import { Location } from '@angular/common'
+import { ProductEditTabMapper, TabIndexMapper } from './tab-mapper';
 
 @Component({
   selector: 'app-product-edit',
@@ -58,6 +60,7 @@ export class ProductEditComponent implements OnInit {
   faTimes = faTimes;
   faTrash = faTrash;
   faCircle = faCircle;
+  faHeart = faHeart;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
@@ -72,10 +75,12 @@ export class ProductEditComponent implements OnInit {
   staticContentFiles: FileHandle[] = [];
   staticContent: StaticContent[] = [];
   documentName: string;
+  selectedTabIndex = 0;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
+    private location: Location,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
     private ocProductService: OcProductService,
@@ -93,9 +98,20 @@ export class ProductEditComponent implements OnInit {
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
+    this.setProductEditTab();
   }
 
-  
+  setProductEditTab(): void {
+    const productDetailSection = this.router.url.split('/')[3];
+    this.selectedTabIndex = ProductEditTabMapper[productDetailSection];
+  }
+
+  tabChanged(event: any, productID: string): void {
+    if(productID === null) return;
+    event.index === 0 ? this.location.replaceState(`products/${productID}`)
+    :
+    this.location.replaceState(`products/${productID}/${TabIndexMapper[event.index]}`);
+  }
 
   async getAddresses(): Promise<void> {
     const context: UserContext = await this.currentUserService.getUserContext();
@@ -221,11 +237,12 @@ export class ProductEditComponent implements OnInit {
   }
 
   handleUpdateProduct(event: any, field: string, typeOfValue?: string): void {
+    console.log(event)
     const productUpdate = {
       field,
       value:
         (field === 'Product.Active' || field === 'Product.xp.IsResale')
-          ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
+          ? event.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
   }
@@ -448,5 +465,9 @@ export class ProductEditComponent implements OnInit {
     return this._superMarketplaceProductEditable?.Product?.xp?.IsResale;
   }
 
-
+  getProductPreviewImage(): string | SafeUrl {
+    return this._superMarketplaceProductEditable?.Images?.[0]?.URL || 
+    this.imageFiles[0]?.URL ||
+    'https://via.placeholder.com/300?text=Product+Image'
+  }
 }

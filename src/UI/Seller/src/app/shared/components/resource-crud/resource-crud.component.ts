@@ -177,7 +177,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     // submit button to disable
     try {
       this.dataIsSaving = true;
-      const updatedResource = await this.ocService.updateResource((this.resourceInSelection as any).ID, this.updatedResource);
+      const updatedResource = await this.ocService.updateResource(
+        (this.resourceInSelection as any).ID,
+        this.updatedResource
+      );
       this.resourceInSelection = this.ocService.copyResource(updatedResource);
       this.setUpdatedResourceAndResourceForm(updatedResource);
       this.dataIsSaving = false;
