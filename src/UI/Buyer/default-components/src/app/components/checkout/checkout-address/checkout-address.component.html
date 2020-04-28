@@ -26,8 +26,8 @@
               disabled
               translate>CHECKOUT.CHECKOUT_ADDRESS.SELECT_ADDRESS</option>
       <option *ngFor="let address of existingShippingAddresses?.Items"
-              [selected]="(existingBuyerLocations?.Items.length === 1 && existingBuyerLocations?.Items[0].ID === address.ID) 
-                         || address.ID === selectedBuyerLocation.ID"
+              [selected]="(existingShippingAddresses?.Items.length === 1 && existingShippingAddresses?.Items[0].ID === address.ID) 
+                         || address.ID === selectedShippingAddress?.ID"
               [value]="address.ID">
         <span class="font-weight-bold">{{address.Street1}}<span *ngIf="address.Street2"> {{address.Street2}}</span>,
           {{address.City}} {{address.State}} {{address.Zip}}</span>
