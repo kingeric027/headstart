@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Marketplace.Helpers.Extensions;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -49,17 +50,25 @@ namespace Marketplace.Helpers.Models
 
 		public string AuthUrl
 		{
-			get { return _c.Claims.First(c => c.Type == "iss").Value; }
+			get { return _token.Payload.FirstOrDefault(t => t.Key == "iss").Value?.ToString(); }
 		}
 
 		public string ApiUrl
 		{
-			get { return _c.Claims.First(c => c.Type == "aud").Value; }
+			get { return _token.Payload.FirstOrDefault(t => t.Key == "aud").Value?.ToString(); }
 		}
 
 		public string AccessToken
         {
             get { return _c.Claims.First(c => c.Type == "accesstoken").Value; }
         }
-    }
+
+		public DateTime AccessTokenExpiresUTC
+		{
+			get 
+			{ 
+				return _token.Payload.FirstOrDefault(t => t.Key == "exp").Value.ToString().UnixToDateTime();
+			}
+		}
+	}
 }

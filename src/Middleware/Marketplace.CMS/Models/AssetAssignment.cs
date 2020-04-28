@@ -13,8 +13,8 @@ namespace Marketplace.CMS.Models
 {
 	public enum ResourceType
 	{
-		Product, Category, Catalog, Promotion, Supplier, Buyer, BuyerAddress, SupplierAddrress,
-		AdminAddress, BuyerUserGroup, SupplierUserGroup, AdminUserGroup, Facet
+		Products, Categories, Catalogs, Promotions, Suppliers, Buyers, Addresses, SupplierAddrresses,
+		AdminAddresses, UserGrousp, SupplierUserGroups, AdminUserGroups, ProductFacets
 	}
 
 	[SwaggerModel]
@@ -27,15 +27,16 @@ namespace Marketplace.CMS.Models
 		public string AssetID { get; set; }
 		[Required]
 		public string ResourceID { get; set; }
+		public string ResourceParentID { get; set; }
 		[Required]
-		public string ResourceType { get; set; }
+		public ResourceType ResourceType { get; set; }
 		public int AssetListOrder { get; set; } // Within the context of a single oc resource 
 
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{
 			return new Collection<UniqueKey>
 			{
-				new UniqueKey() { Paths = new Collection<string> { "/AssetID", "/ResourceID", "/ResourceType" }}
+				new UniqueKey() { Paths = new Collection<string> { "/AssetID", "/ResourceID", "/ResourceType", "/ResourceParentID" }}
 			};
 		}
 	}

@@ -7,6 +7,8 @@ using Marketplace.Common;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Helpers;
+using Marketplace.Helpers.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
@@ -28,7 +30,7 @@ namespace Marketplace.CMS.Queries
 		Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset);
 		Task Delete(string containerInteropID, string assetInteropID);
 		Task<ListPage<AssetAssignment>> ListAssignments(string containerInteropID, ListArgs<Asset> args);
-		Task SaveAssignment(string containerInteropID, AssetAssignment assignment);
+		Task SaveAssignment(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(string containerInteropID, AssetAssignment assignment);
 	}
 
@@ -47,6 +49,7 @@ namespace Marketplace.CMS.Queries
 			_storageFactory = storageFactory;
 		}
 
+		#region Assets
 		public async Task<ListPage<Asset>> List(string containerInteropID, IListArgs args)
 		{
 			var container = await _containers.Get(containerInteropID);
@@ -106,6 +109,7 @@ namespace Marketplace.CMS.Queries
 			await _assetStore.RemoveByIdAsync(asset.id, container.id);
 			await _storageFactory.GetStorage(container).OnAssetDeleted(asset.id);
 		}
+		#endregion
 
 		#region Assignments
 		public async Task<ListPage<AssetAssignment>> ListAssignments(string containerInteropID, ListArgs<Asset> args)
@@ -120,9 +124,9 @@ namespace Marketplace.CMS.Queries
 			return list.ToListPage(args.Page, args.PageSize, count);
 		}
 
-		public async Task SaveAssignment(string containerInteropID, AssetAssignment assignment)
+		public async Task SaveAssignment(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user)
 		{
-			// TODO - confirm OC resource exists?
+			await new MyOrderCloudClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID); // confirm OC resource exists
 			var container = await _containers.Get(containerInteropID);
 			assignment.ContainerID = container.id;
 			await _assignmentStore.AddAsync(assignment);

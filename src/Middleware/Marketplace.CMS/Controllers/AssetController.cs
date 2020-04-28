@@ -4,6 +4,8 @@ using Marketplace.Common;
 using Marketplace.Common.Controllers;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Attributes;
+using Marketplace.Helpers.Models;
+using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
@@ -59,21 +61,21 @@ namespace Marketplace.CMS.Controllers
 		}
 
 		[DocName("List Asset Assignments")]
-		[HttpGet, Route("{containerID}/assets/assignments")]
+		[HttpGet, Route("assignments")]
 		public async Task<ListPage<AssetAssignment>> ListAssignments(string containerID, ListArgs<Asset> args)
 		{
 			return await _assets.ListAssignments(containerID, args);
 		}
 
 		[DocName("Save Asset Assignment")]
-		[HttpPost, Route("{containerID}/assets/assignments")]
+		[HttpPost, Route("assignments"), MarketplaceUserAuth(ApiRole.BuyerReader)]
 		public async Task SaveAssignment(string containerID, [FromBody] AssetAssignment assignment)
 		{
-			await _assets.SaveAssignment(containerID, assignment);
+			await _assets.SaveAssignment(containerID, assignment, VerifiedUserContext);
 		}
 
 		[DocName("Delete Asset Assignment")]
-		[HttpDelete, Route("{containerID}/assets/assignments")]
+		[HttpDelete, Route("assignments")]
 		public async Task DeleteAssignment(string containerID, [FromBody] AssetAssignment assignment)
 		{
 			await _assets.DeleteAssignment(containerID, assignment);
