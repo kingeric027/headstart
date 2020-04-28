@@ -13,7 +13,7 @@ export class OCMLogin implements OnInit {
   appName: string;
   ssoLink: string; // TODO - remove from marketplace generic. Should be SEB specific.
 
-  constructor(private context: ShopperContextService, private toasterService: ToastrService) {}
+  constructor(private context: ShopperContextService, private toasterService: ToastrService) { }
 
   ngOnInit(): void {
     this.ssoLink = this.context.appSettings.ssoLink;

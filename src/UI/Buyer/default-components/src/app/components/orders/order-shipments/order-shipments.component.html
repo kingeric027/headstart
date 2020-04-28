@@ -13,35 +13,36 @@
     <div class="col-lg-7">
       <div *ngIf="selectedShipment">
         <header>
-          <h3>Shipment</h3>
+          <h3 translate>ORDERS.SHIPMENTS.SHIPMENT</h3>
         </header>
         <div class="card">
           <div class="card-body">
             <ul class="oc-list-items">
               <li>
-                <b>Shipper:</b> {{selectedShipment.Shipper}}
+                <b translate>ORDERS.SHIPMENTS.SHIPPER:</b> {{selectedShipment.Shipper}}
               </li>
               <li *ngIf="!(selectedShipment.Shipper | shipperTrackingSupported)">
-                <b>Tracking Number:</b> {{selectedShipment.TrackingNumber || 'N/A'}}
+                <b translate>ORDERS.SHIPMENTS.TRACKING:</b> {{selectedShipment.TrackingNumber || 'N/A'}}
               </li>
               <li *ngIf="(selectedShipment.Shipper | shipperTrackingSupported)">
                 <a href="{{selectedShipment.TrackingNumber | shipperTracking:selectedShipment.Shipper}}"
-                  target="_blank">{{selectedShipment.TrackingNumber}}</a>
+                   target="_blank">{{selectedShipment.TrackingNumber}}</a>
               </li>
               <li>
-                <b>Date Shipped:</b> {{selectedShipment.DateShipped | date: 'short'}}
+                <b translate>ORDERS.SHIPMENTS.DATE_SHIPPED:</b> {{selectedShipment.DateShipped | date: 'short'}}
               </li>
             </ul>
           </div>
         </div>
         <div class="table-responsive"
-            *ngIf="selectedShipment.ShipmentItems">
+             *ngIf="selectedShipment.ShipmentItems">
           <table class="table">
-            <caption class="sr-only">List of line items in this shipment</caption>
+            <caption class="sr-only"
+                     translate>ORDERS.SHIPMENTS.LINEITEMS</caption>
             <thead>
               <tr>
-                <th>Qty Shipped</th>
-                <th>Product</th>
+                <th translate>ORDERS.SHIPMENTS.QTY</th>
+                <th translate>ORDERS.SHIPMENTS.PRODUCT</th>
               </tr>
             </thead>
             <tbody>
@@ -57,6 +58,7 @@
   </div>
 </div>
 <div class="card bg-light p-3 flex-row justify-content-center"
-    *ngIf="shipments?.length === 0">
-  <p class="mb-0">There are currently no shipments for this order</p>
+     *ngIf="shipments?.length === 0">
+  <p class="mb-0"
+     translate>ORDERS.SHIPMENTS.NO_SHIPMENTS</p>
 </div>

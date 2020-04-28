@@ -35,6 +35,8 @@
     "@nguniversal/module-map-ngfactory-loader": "^8.1.1",
     "@ngx-progressbar/core": "^5.2.1",
     "@ngx-progressbar/http": "^5.2.1",
+    "@ngx-translate/core": "^12.1.2",
+    "@ngx-translate/http-loader": "^4.0.0",
     "@ordercloud/angular-sdk": "1.0.0-5",
     "@types/lodash": "^4.14.149",
     "@typescript-eslint/parser": "^2.19.2",

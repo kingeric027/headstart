@@ -11,7 +11,7 @@ export class OCMForgotPassword implements OnInit {
   form: FormGroup;
   appName: string;
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService) { }
 
   ngOnInit(): void {
     this.appName = this.context.appSettings.appname;

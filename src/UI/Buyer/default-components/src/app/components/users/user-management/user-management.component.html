@@ -1,11 +1,11 @@
 <ocm-profile-nav>
-  <h1 class="page-heading border-bottom pb-3">Order Approval Management</h1>
+  <h1 class="page-heading border-bottom pb-3"
+      translate>USERS.USER_MGMT.ORDER_APPROVAL</h1>
   <div *ngIf="!locations.length">
     <div class="row pt-3 mt-3 bg-white shadow-sm user-permissions-alert">
       <div class="pl-3">
-        <p class="font-italic">
-          You are an approval rule administrator but you are not currently a part of any locations. When you join a
-          location you can assign approval permissions here.
+        <p class="font-italic"
+           translate>USERS.USER_MGMTUSER_IS_ADMINISTRATOR
         </p>
       </div>
     </div>
@@ -15,26 +15,31 @@
     <!-- User Permissions -->
     <div class="row pt-3 mt-3 bg-white shadow-sm user-permissions-alert">
       <div class="col-md-5">
-        <h6>User Order Approval Permissions</h6>
-        <p class="font-italic">
-          As an approval rule administrator for this location you can set which users will require approval to submit
-          orders and which users have the authority to approve those orders.
+        <h6 translate>USERS.USER_MGMT.PERMISSIONS</h6>
+        <p class="font-italic"
+           translate>
+          USERS.USER_MGMT.SET_PERMISSIONS
         </p>
         <!-- could be refactored to use checkbox in table header with indeterminant state -->
         <button class="mt-3 btn btn-outline-primary"
                 (click)="toggleAllNeedingApproval()">
-          {{!areAllUsersAssignedToNeedsApproval ? 'Require Approval for All' : ' Require Approval for No One' }}
+          <span *ngIf="!areAllUsersAssignedToNeedsApproval"
+                translate>USERS.USER_MGMT.REQ_ALL</span>
+          <span *ngIf="areAllUsersAssignedToNeedsApproval"
+                translate>USERS.USER_MGMT.REQ_NONE</span>
         </button>
       </div>
       <div class="col-md-7">
         <table class="table table-hover">
           <thead>
             <tr>
-              <th scope="col">User</th>
-              <th scope="col">Can Approve Orders</th>
+              <th scope="col"
+                  translate>USERS.USER_MGMT.USER</th>
+              <th scope="col"
+                  translate>USERS.USER_MGMT.CAN_APPROVE</th>
               <th scope="col">
-                <div>
-                  Orders Need Approval
+                <div translate>
+                  USERS.USER_MGMT.NEEDS_APPROVAL
                 </div>
               </th>
             </tr>
@@ -65,20 +70,33 @@
         </table>
         <div class="pb-3">
           <button [disabled]="!areChanges"
+                  *ngIf="areChanges"
                   class="btn btn-link"
-                  (click)="discardUserUserGroupAssignmentChanges()">
-            {{ areChanges ? 'Cancel' : 'No Changes' }}
+                  (click)="discardUserUserGroupAssignmentChanges()"
+                  translate>
+            USERS.USER_MGMT.CANCEL
+          </button>
+          <button [disabled]="!areChanges"
+                  *ngIf="!areChanges"
+                  class="btn btn-link"
+                  (click)="discardUserUserGroupAssignmentChanges()"
+                  translate>
+            USERS.USER_MGMT.NO_CHANGES
           </button>
           <button *ngIf="areChanges && !requestedUserConfirmation"
                   [disabled]="!areChanges || requestedUserConfirmation"
                   class="btn btn-outline-primary"
                   (click)="requestUserConfirmation()">
-            {{ requestedUserConfirmation ? 'Pending Confirmation' : 'Save Changes' }}
+            <span *ngIf="requestedUserConfirmation"
+                  translate>USERS.USER_MGMT.PENDING_CONFIRMATION</span>
+            <span *ngIf="!requestedUserConfirmation"
+                  translate>USERS.USER_MGMT.SAVE</span>
           </button>
           <button *ngIf="requestedUserConfirmation && areChanges"
                   class="btn btn-primary"
-                  (click)="executeUserUserGroupAssignmentRequests()">
-            Confirm
+                  (click)="executeUserUserGroupAssignmentRequests()"
+                  translate>
+            USERS.USER_MGMT.CONFIRM
           </button>
           <div *ngIf="areChanges && requestedUserConfirmation"
                class="mt-3 pb-3 border-top">
@@ -87,7 +105,8 @@
                 <fa-icon [icon]="faExclamationCircle"
                          class="alert-icon mr-3"></fa-icon>
                 <p class="mb-0 d-flex flex-column">
-                  <small class="font-weight-bold">This is a potentially destructive action that affects order approvals.</small>
+                  <small class="font-weight-bold"
+                         translate>USERS.USER_MGMT.WARNING</small>
                 </p>
               </div>
             </div>
@@ -95,11 +114,9 @@
         </div>
       </div>
       <div class="col-md-5 border-top pt-3">
-        <h6>Order Approval Threshold</h6>
-        <p class="font-italic">
-          You have the ability to set an order total above which orders will require approval for the users indicated
-          above.
-        </p>
+        <h6 translate>USERS.USER_MGMT.THRESHOLD</h6>
+        <p class="font-italic"
+           translate>USERS.USER_MGMT.SET_THRESHOLD</p>
       </div>
       <div class="col-md-7 border-top pt-3">
         <div class="btn-group"
@@ -108,11 +125,13 @@
           <button type="button"
                   (click)="setThreshold(0)"
                   [ngClass]="{'active' : currentLocationApprovalThresholdEditable === 0}"
-                  class="btn btn-outline-primary">All Orders Require Approval</button>
+                  class="btn btn-outline-primary"
+                  translate>USERS.USER_MGMT.ALL_ORDERS</button>
           <button type="button"
                   (click)="setThreshold(currentLocationApprovalThresholdEditable || 100)"
                   [ngClass]="{'active' : !!currentLocationApprovalThresholdEditable}"
-                  class="btn btn-outline-primary">Only Orders Over Threshold</button>
+                  class="btn btn-outline-primary"
+                  translate>USERS.USER_MGMT.SOME_ORDERS</button>
         </div>
         <div class="row mt-3">
           <div class="input-group mb-3 col-md-6">
@@ -133,14 +152,23 @@
           <div class="col-md-6">
             <button [disabled]="currentLocationApprovalThresholdEditable === currentLocationApprovalThresholdStatic"
                     class="btn btn-link"
+                    *ngIf="currentLocationApprovalThresholdEditable !== currentLocationApprovalThresholdStatic"
                     (click)="currentLocationApprovalThresholdEditable = currentLocationApprovalThresholdStatic">
-              {{ currentLocationApprovalThresholdEditable !== currentLocationApprovalThresholdStatic ? 'Cancel' : 'No Changes' }}
+              <span *ngIf="currentLocationApprovalThresholdEditable !== currentLocationApprovalThresholdStatic"
+                    translate>
+                USERS.USER_MGMT.CANCEL
+              </span>
+              <span *ngIf="currentLocationApprovalThresholdEditable === currentLocationApprovalThresholdStatic"
+                    translate>
+                USERS.USER_MGMT.NO_CHANGES
+              </span>
             </button>
             <button *ngIf="currentLocationApprovalThresholdEditable !== currentLocationApprovalThresholdStatic"
                     [disabled]="currentLocationApprovalThresholdEditable === currentLocationApprovalThresholdStatic"
                     class="btn btn-outline-primary"
-                    (click)="saveNewThreshold()">
-              Save Changes
+                    (click)="saveNewThreshold()"
+                    translate>
+              USERS.USER_MGMT.SAVE
             </button>
           </div>
         </div>

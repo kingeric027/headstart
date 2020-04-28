@@ -6,36 +6,40 @@
         {{ address?.Street1 }}<span>, {{ address?.Street2 }}</span>
       </p>
       <p class="mb-0 text-capitalize font-weight-bold">{{ address?.City }}, {{ address?.State }} {{ address?.Zip }}</p>
-      <small class="mb-0"
-        >{{ getFullName(address) }}<span> | {{ address?.Phone }}</span></small
-      >
+      <small class="mb-0">{{ getFullName(address) }}<span> | {{ address?.Phone }}</span></small>
     </div>
     <div>
       <div *ngIf="hasCertificate()">
-        <p class="mb-0 text-capitalize font-weight-bold">
-          Resale Tax Certifcate
-          <a [href]="certificate.PDFUrl" target="_blank">
+        <p class="mb-0 text-capitalize font-weight-bold"
+           translate>
+          PROFILE.LOCATION_DETAILS.RESALE_TAX
+          <a [href]="certificate.PDFUrl"
+             target="_blank">
             <fa-icon [icon]="faDownload"></fa-icon>
           </a>
         </p>
-        <p class="mb-0 text-capitalize">
-          Expires <span class="font-weight-bold">{{ certificate.ExpirationDate | date: 'MM/dd/yyyy' }}</span>
+        <p class="mb-0 text-capitalize"
+           translate>
+          PROFILE.LOCATION_DETAILS.EXP <span class="font-weight-bold">{{ certificate.ExpirationDate | date: 'MM/dd/yyyy' }}</span>
         </p>
       </div>
-      <button
-        class="btn btn-outline-primary"
-        *ngIf="!showCertificateForm && userCanAdmin"
-        (click)="revealCertificateForm()"
-      >
-        {{ hasCertificate() ? 'Replace' : 'Add' }} Resale Cert
+      <button class="btn btn-outline-primary"
+              *ngIf="!showCertificateForm && userCanAdmin && hasCertificate()"
+              (click)="revealCertificateForm()"
+              translate> PROFILE.LOCATION_DETAILS.REPLACE
+      </button>
+      <button class="btn btn-outline-primary"
+              *ngIf="!showCertificateForm && userCanAdmin && !hasCertificate()"
+              (click)="revealCertificateForm()"
+              translate> PROFILE.LOCATION_DETAILS.ADD
       </button>
     </div>
   </div>
-  <div *ngIf="showCertificateForm" class="mx-2 px-2 py-2 my-2 bg-light">
-    <p class="font-weight-bold">New Resale Tax Certificate</p>
-    <ocm-certificate-form
-      (submitted)="saveCertificate($event.detail)"
-      (dismissed)="dismissCertificateForm()"
-    ></ocm-certificate-form>
+  <div *ngIf="showCertificateForm"
+       class="mx-2 px-2 py-2 my-2 bg-light">
+    <p class="font-weight-bold"
+       translate>PROFILE.LOCATION_DETAILS.NEW_CERT</p>
+    <ocm-certificate-form (submitted)="saveCertificate($event.detail)"
+                          (dismissed)="dismissCertificateForm()"></ocm-certificate-form>
   </div>
 </div>

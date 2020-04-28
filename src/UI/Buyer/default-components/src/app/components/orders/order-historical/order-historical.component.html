@@ -2,16 +2,17 @@
      *ngIf="order">
   <div class="col-6">
     <div *ngIf="buyerLocation?.CompanyName">
-      <span class="mb-3">Buyer Location</span>
+      <span class="mb-3"
+            translate>ORDERS.HISTORICAL.BUYER_LOCATION</span>
       <p><strong>{{buyerLocation?.CompanyName}}</strong></p>
     </div>
-    <span>Shipping Address</span>
+    <span translate>ORDERS.HISTORICAL.SHIPPING_ADDRESS</span>
     <ocm-address-card *ngIf="lineItems?.Items[0].ShippingAddress"
                       [address]="lineItems?.Items[0].ShippingAddress"
                       addressTitle="Shipping Address">
     </ocm-address-card>
     <br />
-    <span>Billing Address</span>
+    <span translate>ORDERS.HISTORICAL.BILLING_ADDRESS</span>
     <ocm-address-card [address]="order.BillingAddress"
                       addressTitle="Billing Address"
                       *ngIf="order?.BillingAddress">
@@ -21,37 +22,41 @@
        *ngIf="!isQuoteOrder(order)">
     <div *ngIf="order.Comments"
          class="alert alert-secondary small">
-      <strong>Comments: </strong> {{order.Comments}}
+      <strong><span translate>ORDERS.HISTORICAL.COMMENTS</span>: </strong> {{order.Comments}}
     </div>
     <div class="d-flex justify-content-between align-items-center">
       <div>
         <span class="mb-3">Buyer</span>
         <p class="mb-0 text-capitalize font-weight-bold">{{order.FromUser.FirstName}} {{order.FromUser.LastName}}</p>
-        <p *ngIf="order.FromUser.Phone" class="mb-0">
+        <p *ngIf="order.FromUser.Phone"
+           class="mb-0">
           <small class="mb-0">{{order.FromUser.Phone | phoneFormat}}</small>
         </p>
-        <p *ngIf="order.FromUser.Email" class="mb-0">
+        <p *ngIf="order.FromUser.Email"
+           class="mb-0">
           <small class="mb-0">{{order.FromUser.Email}}</small>
         </p>
       </div>
     </div>
     <hr>
-    <strong>Subtotal</strong> <span class="float-right">{{order.Subtotal | currency}}</span><br>
-    <strong>Shipping</strong> <span class="float-right">{{order.ShippingCost | currency}}</span><br>
-    <strong>Tax</strong> <span class="float-right">{{order.TaxCost | currency}}</span><br>
+    <strong translate>ORDERS.HISTORICAL.SUBTOTAL</strong> <span class="float-right">{{order.Subtotal | currency}}</span><br>
+    <strong translate>ORDERS.HISTORICAL.SHIPPING</strong> <span class="float-right">{{order.ShippingCost | currency}}</span><br>
+    <strong translate>ORDERS.HISTORICAL.TAX</strong> <span class="float-right">{{order.TaxCost | currency}}</span><br>
     <div *ngIf="order.PromotionDiscount">
-      <strong class="text-danger">Promo Discount</strong> <span class="float-right text-danger">-{{order.PromotionDiscount | currency}}</span>
+      <strong class="text-danger"
+              translate>ORDERS.HISTORICAL.PROMO</strong> <span class="float-right text-danger">-{{order.PromotionDiscount | currency}}</span>
     </div>
     <hr>
-    <div class="text-right lead"><b class="float-left">Total:</b><span class="order-total">{{order.Total | currency}}</span></div>
-    <hr *ngIf="isOrderToApprove"
-    >
+    <div class="text-right lead"
+         translate><b class="float-left"><span translate>ORDERS.HISTORICAL.TOTAL</span>:</b><span class="order-total">{{order.Total | currency}}</span></div>
+    <hr *ngIf="isOrderToApprove">
     <ocm-payment-list *ngIf="payments && !isOrderToApprove"
                       [payments]="payments"></ocm-payment-list>
     <hr>
     <ul>
-      <li *ngFor="let approval of approvals">
-        {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} on {{ approval.DateCreated | date: 'short' }}
+      <li *ngFor="let approval of approvals"
+          translate>
+        {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} ORDERS.HISTORICAL.ON {{ approval.DateCreated | date: 'short' }}
         <div><small *ngIf="approval.Comments">"{{ approval.Comments }}"</small></div>
       </li>
     </ul>
@@ -59,7 +64,7 @@
   <!-- QUOTE ORDER DETAILS -->
   <div *ngIf="isQuoteOrder(order)"
        class="col-6">
-    <strong>Submitted By: </strong>
+    <strong><span translate>ORDERS.HISTORICAL.SUBMITTED_BY</span>: </strong>
     <p>
       {{order.xp?.QuoteOrderInfo?.FirstName}}
       {{order.xp?.QuoteOrderInfo?.LastName}}
@@ -73,7 +78,7 @@
     </p>
     <div *ngIf="order?.xp?.QuoteOrderInfo?.Comments"
          class="alert alert-secondary small">
-      <strong>Comments: </strong> {{order.xp?.QuoteOrderInfo?.Comments}}
+      <strong translate>ORDERS.HISTORICAL.COMMENTS: </strong> {{order.xp?.QuoteOrderInfo?.Comments}}
     </div>
   </div>
 </div>
