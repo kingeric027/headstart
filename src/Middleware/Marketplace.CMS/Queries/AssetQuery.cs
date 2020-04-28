@@ -15,6 +15,7 @@ using Microsoft.Azure.Documents.Client;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,7 +54,8 @@ namespace Marketplace.CMS.Queries
 		public async Task<ListPage<Asset>> List(string containerInteropID, IListArgs args)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var query = _assetStore.Query(new FeedOptions() { PartitionKey = new PartitionKey(container.id), EnableCrossPartitionQuery = false })
+			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(container.id) };
+			var query = _assetStore.Query(feedOptions)
 				.Search(args)
 				.Filter(args)
 				.Sort(args);
@@ -115,20 +117,29 @@ namespace Marketplace.CMS.Queries
 		public async Task<ListPage<AssetAssignment>> ListAssignments(string containerInteropID, ListArgs<Asset> args)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var query = _assignmentStore.Query(new FeedOptions() { PartitionKey = new PartitionKey(container.id), EnableCrossPartitionQuery = false })
+			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(container.id) };
+			var query = _assignmentStore.Query(feedOptions)
 				.Search(args)
 				.Filter(args)
 				.Sort(args);
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
-			return list.ToListPage(args.Page, args.PageSize, count);
+			var listPage = list.ToListPage(args.Page, args.PageSize, count);
+			var assets = await List(container, listPage.Items.Select(assignment => assignment.AssetID));
+			for (int i = 0; i < assets.Count; i++)
+			{
+				listPage.Items[i].Asset = assets[i];
+				listPage.Items[i].AssetID = assets[i].InteropID;
+			}
+			return listPage;
 		}
 
 		public async Task SaveAssignment(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user)
 		{
 			await new MyOrderCloudClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID); // confirm OC resource exists
-			var container = await _containers.Get(containerInteropID);
-			assignment.ContainerID = container.id;
+			var asset = await Get(containerInteropID, assignment.AssetID);
+			assignment.ContainerID = asset.ContainerID;
+			assignment.AssetID = asset.id;
 			await _assignmentStore.AddAsync(assignment);
 		}
 
@@ -144,6 +155,20 @@ namespace Marketplace.CMS.Queries
 		{
 			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(containerID) };
 			return await _assetStore.Query($"select top 1 * from c where c.InteropID = @id", new { id = assetInteropID }, feedOptions).FirstOrDefaultAsync();
+		}
+
+		private async Task<IList<Asset>> List(AssetContainer container, IEnumerable<string> assetIDs)
+		{
+			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(container.id) };
+			var ids = assetIDs.ToList();
+			var query = $"select * from c where c.id IN ({string.Join(", ", ids)})";
+			var parameters = new ExpandoObject();
+			for (int i = 0; i < ids.Count; i++)
+			{
+				parameters.TryAdd($"id{i}", ids[i]);
+			}
+			var assets = await _assetStore.QueryMultipleAsync(query, parameters, feedOptions);
+			return assets.ToList();
 		}
 	}
 }

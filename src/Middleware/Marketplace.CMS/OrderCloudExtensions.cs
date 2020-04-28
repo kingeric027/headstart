@@ -21,7 +21,9 @@ namespace Marketplace.CMS
 			await (Task) getMethod.Invoke(resource, parameters);
 		}
 
-		// Want to change to a Get() method, but don't know how to fix this error
+		// Want to change to a Get() method, but this line produces an error I don't know how to fix 
+		// await (Task<object>) getMethod.Invoke(resource, parameters);
+		//
 		//"Unable to cast object of type 'AsyncStateMachineBox`1[OrderCloud.SDK.Product,Flurl.Http.HttpResponseMessageExtensions+<ReceiveJson>d__0`1[OrderCloud.SDK.Product]]' 
 		// to type 'System.Threading.Tasks.Task`1[System.Object]'."
 	}
