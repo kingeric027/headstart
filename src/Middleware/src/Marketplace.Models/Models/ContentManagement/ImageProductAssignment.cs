@@ -11,10 +11,11 @@ namespace Marketplace.Common.Models
     [SwaggerModel]
     public class ImageProductAssignment : ICosmosObject
     {
-        [CosmosPartitionKey, ApiIgnore]
+        [ApiIgnore]
         public string id { get; set; }
         [ApiIgnore]
         public DateTimeOffset timeStamp { get; set; }
+        [CosmosPartitionKey]
         public string ProductID { get; set; }
         public string ImageID { get; set; }
     }
