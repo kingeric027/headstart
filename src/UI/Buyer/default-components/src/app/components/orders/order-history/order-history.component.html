@@ -1,12 +1,17 @@
 <ocm-profile-nav>
-  <h1 class="page-heading border-bottom pb-3">{{ approvalVersion ? 'Orders To Appprove' : 'My Orders' }}</h1>
+  <h1 *ngIf="approvalVersion"
+      class="page-heading border-bottom pb-3"
+      translate>ORDERS.HISTORY.TO_APPROVE</h1>
+  <h1 *ngIf="!approvalVersion"
+      class="page-heading border-bottom pb-3"
+      translate>ORDERS.HISTORY.MY_ORDERS</h1>
   <ocm-search placeholderText="Search Orders"
               [searchTermInput]="searchTerm"
               (searched)="filterBySearch($event.detail)"></ocm-search>
   <div class="row mt-3">
     <div class="col-md-1 col-sm-6"
          *ngIf="!approvalVersion">
-      <div>Favorites</div>
+      <div translate>ORDERS.HISTORY.FAVORITES</div>
       <div class="mt-3 ml-3">
         <ocm-toggle-favorite [favorite]="showOnlyFavorites"
                              (favoriteChanged)="filterByFavorite($event.detail)">

@@ -41,6 +41,12 @@
 .product-img-wrapper {
     position: relative;
     display: inline-block;
+    .primary-badge {
+        top: 0;
+        left: 0;
+        z-index: 12;
+        background-color: rgba($primary, .6)
+    }
     &:hover {
         .product-img-delete {
             opacity: 1;
@@ -68,4 +74,11 @@
     border: 1px solid hsl(230, 20%, 94%);
     box-shadow: 0 3px 0 hsl(230, 20%, 94%);
     margin-bottom: 1.5rem;
+}
+// STICK THE TAB LABELS TO TOP ON SCROLL
+:host ::ng-deep .mat-tab-header {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 123456789
 }

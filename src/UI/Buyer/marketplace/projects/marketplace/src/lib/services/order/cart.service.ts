@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { LineItem, ListLineItem, OcOrderService, OcLineItemService } from '@ordercloud/angular-sdk';
+import { LineItem, ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
 import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { MarketplaceOrder } from '../../shopper-context';
+import { listAll } from '../../functions/listAll';
 
 export interface ICart {
   onAdd: Subject<LineItem>;
@@ -14,6 +15,7 @@ export interface ICart {
   addMany(lineItem: LineItem[]): Promise<LineItem[]>;
   empty(): Promise<void>;
   onChange(callback: (lineItems: ListLineItem) => void): void;
+  moveOrderToCart(orderID: string): Promise<void>;
 }
 
 @Injectable({
@@ -27,6 +29,7 @@ export class CartService implements ICart {
   constructor(
     private ocOrderService: OcOrderService,
     private ocLineItemService: OcLineItemService,
+    private ocMeService: OcMeService,
     private state: OrderStateService
   ) {}
 
@@ -69,6 +72,39 @@ export class CartService implements ICart {
   async addMany(lineItem: LineItem[]): Promise<LineItem[]> {
     const req = lineItem.map(li => this.add(li));
     return Promise.all(req);
+  }
+
+  async moveOrderToCart(orderID: string): Promise<void> {
+    /* this process is to move a order into the cart which was previously marked for
+     * changes by an approver. We are making the xp as IsResubmitting, then resetting the cart
+     * however so that the normal unsubmitted orders (orders which were not previously declined)
+     * do not repopulate in the cart after the resubmit we are deleting all of these
+     * unsubmitted orders */
+
+    const orderToUpdate = await this.ocOrderService
+      .Patch('Outgoing', orderID, { xp: { IsResubmitting: true } })
+      .toPromise();
+
+    const currentUnsubmittedOrders = await this.ocMeService
+      .ListOrders({
+        sortBy: '!DateCreated',
+        filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
+      })
+      .toPromise();
+
+    const deleteOrderRequests = currentUnsubmittedOrders.Items.map(c =>
+      this.ocOrderService.Delete('Outgoing', c.ID).toPromise()
+    );
+    await Promise.all(deleteOrderRequests);
+
+    // cannot use this.state.reset because the order index isn't ready immediately after the patch of IsResubmitting
+    this.state.order = orderToUpdate;
+    this.state.lineItems = await listAll(
+      this.ocLineItemService,
+      this.ocLineItemService.List,
+      'outgoing',
+      this.order.ID
+    );
   }
 
   async empty(): Promise<void> {

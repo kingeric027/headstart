@@ -74,6 +74,13 @@ shared-address-display {
   }
 }
 
+.orders-awaiting-approval-popover {
+  width: 30rem;
+  .popover-body {
+    padding: 0;
+  }
+}
+
 .shine {
   background: #f6f7f8;
   background-image: linear-gradient(to right, #f6f7f8 0%, #f4f5f7 20%, #fcfcfc 40%, #f7f7f7 100%);

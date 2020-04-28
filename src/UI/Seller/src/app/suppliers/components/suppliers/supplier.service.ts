@@ -26,6 +26,7 @@ export class SupplierService extends ResourceCrudService<Supplier> {
       Description: '',
       Images: [{ URL: '', Tag: null }],
       SupportContact: { Name: '', Email: '', Phone: '' },
+      SyncFrieghtPop: false
     },
   };
 

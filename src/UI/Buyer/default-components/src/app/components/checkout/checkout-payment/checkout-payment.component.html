@@ -6,7 +6,8 @@
         <div class="input-group">
           <div class="input-group-prepend">
             <label class="input-group-text"
-                   for="paymentMethodSelectId">Payment Method:</label>
+                   for="paymentMethodSelectId"
+                   translate>CHECKOUT.CHECKOUT_PAYMENT.PAYMENT_METHOD:</label>
           </div>
           <select class="custom-select"
                   id="paymentMethodSelectId"
@@ -22,6 +23,6 @@
   </div>
 </div>
 <ocm-payment-credit-card *ngIf="selectedPaymentMethod === 'CreditCard'"
-                          [cards]="cards"
-                          (cardSelected)="onCardSelected($event.detail)">
+                         [cards]="cards"
+                         (cardSelected)="onCardSelected($event.detail)">
 </ocm-payment-credit-card>

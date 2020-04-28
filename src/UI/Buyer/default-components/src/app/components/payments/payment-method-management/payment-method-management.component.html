@@ -1,13 +1,16 @@
 <ocm-profile-nav>
   <div *ngIf="!isLoading">
-    <h1 class="page-heading">Payment Methods</h1>
+    <h1 class="page-heading"
+        translate>PAYMENTS.PAYMENT_METHODS.PAYMENT_METHODS</h1>
     <div class="row mt-3">
-      <h2 class="col-6 h3 text-secondary">Credit Cards</h2>
+      <h2 class="col-6 h3 text-secondary"
+          translate>PAYMENTS.PAYMENT_METHODS.CC</h2>
       <div class="col-6 text-right">
         <button (click)="showAdd()"
                 *ngIf="!showCardForm"
-                class="btn btn-primary btn-sm">
-          <fa-icon [icon]="faPlus"></fa-icon> Add
+                class="btn btn-primary btn-sm"
+                translate>
+          <fa-icon [icon]="faPlus"></fa-icon> PAYMENTS.PAYMENT_METHODS.ADD
         </button>
       </div>
     </div>
@@ -16,9 +19,11 @@
                [modalTitle]="'Delete this Card?'">
       <div>
         <button class="btn btn-sm btn-primary"
-                (click)="deleteCard(currentCard)">Delete</button>
+                (click)="deleteCard(currentCard)"
+                translate>PAYMENTS.PAYMENT_METHODS.DELETE</button>
         <button class="btn btn-sm float-right"
-                (click)="closeAreYouSure()">Cancel</button>
+                (click)="closeAreYouSure()"
+                translate>PAYMENTS.PAYMENT_METHODS.CANCEL</button>
       </div>
     </ocm-modal>
     <div class="row">

@@ -276,10 +276,17 @@
           <!-- TODO: 1/2 Abstract into component to be used anywhere using inputs and outputs -->
           <div *ngIf="shouldShowResourceActions"
                class="d-flex justify-content-between align-items-center py-2 additional-item-edit-resource">
-            <delete-confirm-modal-component *ngIf="!isCreatingNew && !isMyResource"
+            <delete-confirm-modal-component *ngIf="!isCreatingNew && !isMyResource && canBeDeleted"
                                             buttonText="Delete {{_currentResourceNameSingular | titlecase}}"
                                             (deleteConfirmed)="handleDelete($event)">
             </delete-confirm-modal-component>
+            <div *ngIf="!canBeDeleted">
+              <button class="btn btn-link text-muted"
+                      ngbTooltip="This {{_currentResourceNameSingular}} is in use and cannot be deleted."
+                      placement="top">
+                      Delete {{_currentResourceNameSingular | titlecase}}
+                    </button>
+            </div>
             <div>
               <button *ngIf="areChanges"
                       class="btn btn-primary"

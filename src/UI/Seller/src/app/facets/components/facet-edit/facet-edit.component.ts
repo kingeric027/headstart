@@ -30,7 +30,6 @@ export class FacetEditComponent implements OnInit {
     }
 
     createProductFacetForm(facet: ProductFacet) {
-        console.log(facet)
         this.resourceForm = new FormGroup({
           ID: new FormControl(facet.ID, Validators.required),
           Name: new FormControl(facet.Name, Validators.required),

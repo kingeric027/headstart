@@ -41,6 +41,11 @@ export class OCMCheckoutAddress implements OnInit {
 
   onShippingAddressChange(shippingAddressID: string): void {
     this.showNewAddressForm = shippingAddressID === this.NEW_ADDRESS_CODE;
+    this.selectedShippingAddress = this.existingShippingAddresses.Items.find(address => shippingAddressID === address.ID);
+    const shippingAddress = this.existingShippingAddresses.Items.find(address => address.ID === this.selectedShippingAddress.ID);
+    if (shippingAddress) {
+      this.selectedShippingAddress = shippingAddress;
+    }
   }
 
   async saveAddressesAndContinue(newShippingAddress: Address = null): Promise<void> {

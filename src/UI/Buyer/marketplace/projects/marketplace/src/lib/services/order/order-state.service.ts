@@ -56,15 +56,36 @@ export class OrderStateService {
   }
 
   async reset(): Promise<void> {
-    // get the most recent unsubmitted order that is not an order that was previously declined
-    const orders = await this.ocMeService
-      .ListOrders({
-        sortBy: '!DateCreated',
-        filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
-      })
-      .toPromise();
-    if (orders.Items.length) {
-      this.order = orders.Items[0];
+    /* when an order is declined it will appear as an unsubmitted order with
+     * a date declined, we need to remove these from the normal order
+     * query so that it does not immediately affect a users cart by getting
+     * mixed into the normal unsubmitted orders
+     * however we also need to know when a user marks an order for
+     * resbumit which we are designating with xp.IsResubmitting
+     */
+
+    const orderQueries = [
+      // platform change to support quering by `true` may be coming
+      this.ocMeService
+        .ListOrders({
+          sortBy: '!DateCreated',
+          filters: { DateDeclined: '*', status: 'Unsubmitted', 'xp.IsResubmitting': 'True' },
+        })
+        .toPromise(),
+      await this.ocMeService
+        .ListOrders({
+          sortBy: '!DateCreated',
+          filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
+        })
+        .toPromise(),
+    ];
+
+    const [resubmittingOrders, normalUnsubmittedOrders] = await Promise.all(orderQueries);
+
+    if (resubmittingOrders.Items.length) {
+      this.order = resubmittingOrders.Items[0];
+    } else if (normalUnsubmittedOrders.Items.length) {
+      this.order = normalUnsubmittedOrders.Items[0];
     } else if (this.appConfig.anonymousShoppingEnabled) {
       this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
     } else {

@@ -18,7 +18,7 @@ export class OCMRegister implements OnInit {
   form: FormGroup;
   appName: string;
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService) { }
 
   // TODO: validation isn't working
   ngOnInit(): void {
@@ -33,7 +33,7 @@ export class OCMRegister implements OnInit {
       ConfirmPassword: new FormControl('', [Validators.required, ValidateFieldMatches('Password')]),
     });
   }
-  
+
   // TODO: requires anonymous token, but not checked for here
   async onSubmit(): Promise<void> {
     const me: MeUser = this.form.value;

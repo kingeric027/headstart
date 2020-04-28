@@ -1,19 +1,23 @@
 <ocm-profile-nav>
   <div *ngIf="!isLoading">
     <div class="d-flex justify-content-between align-items-center">
-      <h1 class="page-heading">Address Book</h1>
+      <h1 class="page-heading"
+          translate>PROFILE.ADDRESS_LIST.ADDRESS_BOOK</h1>
       <button (click)="showAddAddress()"
-              class="btn btn-primary btn-sm">
-        <fa-icon [icon]="faPlus"></fa-icon> Add
+              class="btn btn-primary btn-sm"
+              translate>
+        <fa-icon [icon]="faPlus"></fa-icon> PROFILE.ADDRESS_LIST.ADD
       </button>
     </div>
     <ocm-modal [state]="areYouSureModal"
                [modalTitle]="'Delete this Address?'">
       <div>
         <button class="btn btn-sm btn-primary"
-                (click)="deleteAddress(currentAddress)">Delete</button>
+                (click)="deleteAddress(currentAddress)"
+                translate>PROFILE.ADDRESS_LIST.DELETE</button>
         <button class="btn btn-sm float-right"
-                (click)="closeAreYouSure()">Cancel</button>
+                (click)="closeAreYouSure()"
+                translate>PROFILE.ADDRESS_LIST.CANCEL</button>
       </div>
     </ocm-modal>
     <div class="row">

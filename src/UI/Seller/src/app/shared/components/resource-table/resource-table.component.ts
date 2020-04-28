@@ -124,6 +124,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   shouldShowResourceActions = true;
   @Input()
   dataIsSaving = false;
+  @Input()
+  canBeDeleted = true;
 
   async ngOnInit() {
     this.determineViewingContext();

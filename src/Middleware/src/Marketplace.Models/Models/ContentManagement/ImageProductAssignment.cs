@@ -1,4 +1,5 @@
-﻿using Marketplace.Helpers.Attributes;
+﻿using Cosmonaut.Attributes;
+using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
 using Newtonsoft.Json;
 using System;
@@ -14,6 +15,7 @@ namespace Marketplace.Common.Models
         public string id { get; set; }
         [ApiIgnore]
         public DateTimeOffset timeStamp { get; set; }
+        [CosmosPartitionKey]
         public string ProductID { get; set; }
         public string ImageID { get; set; }
     }

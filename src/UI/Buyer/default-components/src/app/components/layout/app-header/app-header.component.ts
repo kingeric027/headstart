@@ -37,8 +37,10 @@ export class OCMAppHeader implements OnInit {
   screenSize = getScreenSizeBreakPoint();
   showCategoryDropdown = false;
   profileSections: ProfileSection[] = [];
+  numberOfOrdersToApprove = 0;
 
-  @ViewChild('addtocartPopover', { static: false }) public popover: NgbPopover;
+  @ViewChild('addToCartPopover', { static: false }) public addToCartPopover: NgbPopover;
+  @ViewChild('ordersToApprovePopover', { static: false }) public ordersToApprovePopover: NgbPopover;
   @ViewChild('cartIcon', { static: false }) cartIcon: ElementRef;
 
   faSearch = faSearch;
@@ -55,6 +57,7 @@ export class OCMAppHeader implements OnInit {
   }
 
   ngOnInit(): void {
+    this.buildShowOrdersNeedingApprovalAlertListener();
     this.screenSize = getScreenSizeBreakPoint();
     this.categories = this.context.categories.all;
     this.appName = this.context.appSettings.appname;
@@ -89,19 +92,56 @@ export class OCMAppHeader implements OnInit {
     this.context.order.cart.onAdd.subscribe((li: LineItem) => {
       clearTimeout(closePopoverTimeout);
       if (li) {
-        this.popover.ngbPopover = `Added ${li.Quantity} items to Cart`;
+        this.addToCartPopover.ngbPopover = `Added ${li.Quantity} items to Cart`;
         setTimeout(() => {
-          if (!this.popover.isOpen()) {
-            this.popover.open();
+          if (!this.addToCartPopover.isOpen()) {
+            this.addToCartPopover.open();
           }
           closePopoverTimeout = setTimeout(() => {
-            this.popover.close();
+            this.addToCartPopover.close();
           }, 3000);
         }, 300);
       }
     });
   }
 
+  routeToOrdersToApprove(event): void {
+    this.context.router.toOrdersToApprove();
+    event.stopPropagation();
+  }
+
+  buildShowOrdersNeedingApprovalAlertListener(): void {
+    this.buildShowOrdersNeedingApprovalListenerForAlert();
+    this.buildShowOrdersNeedingApprovalListenerForIndicator();
+  }
+
+  buildShowOrdersNeedingApprovalListenerForIndicator(): void {
+    this.context.ordersToApprove.numberOfOrdersToApprove.subscribe(num => {
+      this.numberOfOrdersToApprove = num;
+    });
+  }
+
+  buildShowOrdersNeedingApprovalListenerForAlert(): void {
+    /* the orders to approve behaviour subject will only receive a truthy
+     * value when OrdersToApproveStateService.alertIfOrdersToApprove is called.
+     * This currently only happens on login. In order to prevent the alert from
+     * showing again we set the value back to zero when this is called
+     */
+    this.context.ordersToApprove.showAlert.subscribe((num: number) => {
+      // brief timeout to allow the popover to be defined in the template
+      // additionally i think this slight timeout is a better ux
+      setTimeout(() => {
+        if (num) {
+          this.numberOfOrdersToApprove = num;
+          this.context.ordersToApprove.showAlert.next(0);
+          this.ordersToApprovePopover.open();
+          setTimeout(() => {
+            this.ordersToApprovePopover.close();
+          }, 10000);
+        }
+      }, 1500);
+    });
+  }
   searchProducts(searchStr: string): void {
     this.searchTermForProducts = searchStr;
     this.context.router.toProductList({ search: searchStr });

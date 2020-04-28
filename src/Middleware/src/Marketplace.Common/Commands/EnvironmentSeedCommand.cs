@@ -68,14 +68,6 @@ namespace Marketplace.Common.Commands
 
 		private async Task CreateSuppliers(VerifiedUserContext user, string token)
 		{
-			var profile = await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
-			{
-				CustomRoles = new List<string>(),
-				ID = "supplierIntegration",
-				Name = "Supplier Integration Security Profile",
-				Roles = new List<ApiRole>() { ApiRole.FullAccess }
-			}, token);
-
 			// Create Suppliers and necessary user groups and security profile assignments
 			foreach (MarketplaceSupplier supplier in _seed.Suppliers)
 			{
@@ -85,8 +77,6 @@ namespace Marketplace.Common.Commands
 
 		static readonly List<XpIndex> DefaultIndices = new List<XpIndex>() {
 			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Type" },       
-			new XpIndex { ThingType = XpThingType.Product, Key = "Images.URL" },       
-			new XpIndex { ThingType = XpThingType.Product, Key = "Status" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.ServiceCategory" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.VendorLevel" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       

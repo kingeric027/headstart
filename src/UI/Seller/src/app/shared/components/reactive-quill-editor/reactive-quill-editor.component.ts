@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { get as _get } from 'lodash';
 import { ValidateRichTextDescription } from '@app-seller/validators/validators';
@@ -7,6 +7,7 @@ import { ValidateRichTextDescription } from '@app-seller/validators/validators';
   selector: 'reactive-quill-editor-component',
   templateUrl: './reactive-quill-editor.component.html',
   styleUrls: ['./reactive-quill-editor.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ReactiveQuillComponent {
   _updatedResource: any;
