@@ -67,14 +67,14 @@ export class OrderShipmentsComponent implements OnChanges {
       // TO-DO: Use below line of code when it's possible to POST a supplier's address ID
       // FromAddressID: new FormControl(''),
       Shipper: new FormControl(''),
-      ShippingService: new FormControl(''),
+      Service: new FormControl(''),
     });
   }
 
   getCurrentDate(): string {
-    //Get local date of user, then format to lead with year and leading 0's for single-digit months/days
-    let date = new Date().toLocaleDateString();
-    let newDate = date.split('/');
+    // Get local date of user, then format to lead with year and leading 0's for single-digit months/days
+    const date = new Date().toLocaleDateString();
+    const newDate = date.split('/');
     if (newDate[0].length === 1) {
       newDate[0] = '0' + newDate[0];
     }
@@ -94,7 +94,7 @@ export class OrderShipmentsComponent implements OnChanges {
   }
 
   canCreateShipment(): boolean {
-    let unshippedItem = this.lineItems.find(item => item.Quantity > item.QuantityShipped);
+    const unshippedItem = this.lineItems.find(item => item.Quantity > item.QuantityShipped);
     return unshippedItem ? true : false;
   }
 
@@ -178,7 +178,7 @@ export class OrderShipmentsComponent implements OnChanges {
   }
 
   getQuantityDropdown(quantityToShip: number): number[] {
-    let quantityList = [];
+    const quantityList = [];
     for (let i = 1; i <= quantityToShip; i++) {
       quantityList.push(i);
     }
@@ -197,18 +197,18 @@ export class OrderShipmentsComponent implements OnChanges {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json',
-        'Authorization': 'Bearer ' + accessToken
+        Authorization: 'Bearer ' + accessToken
       })
     };
     const superShipment = {
-      Shipment: {...this.shipmentForm.value, xp: {ShippingService: this.shipmentForm.value.ShippingService}},
+      Shipment: {...this.shipmentForm.value, xp: {Service: this.shipmentForm.value.Service}},
       ShipmentItems: this.lineItems.map((li, i) => {
         if (this.quantities[i] > 0) {
           return { LineItemID: li.ID, OrderID: this.order.ID, QuantityShipped: this.quantities[i] }
         }
       }).filter(li => li !== undefined)
     }
-    let postedShipment:any = await this.httpClient.post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions ).toPromise();
+    const postedShipment: any = await this.httpClient.post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions ).toPromise();
     await this.ocShipmentService.Patch(postedShipment.Shipment.ID, {DateShipped: shipDate}).toPromise();
     this.getShipments();
     this.getLineItems();
@@ -220,7 +220,7 @@ export class OrderShipmentsComponent implements OnChanges {
     if (shipment.value.TrackingNumber === '') return true;
     if (shipment.value.ShipDate === '') return true;
     if (shipment.value.Shipper === '') return true;
-    let validQuantity = this.quantities.find(qty => qty > 0);
+    const validQuantity = this.quantities.find(qty => qty > 0);
     if (!validQuantity) return true;
     if (this.isSaving) return true;
   }

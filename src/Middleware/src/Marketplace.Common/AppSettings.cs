@@ -28,6 +28,10 @@ namespace Marketplace.Common
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
         public FreightPopSettings FreightPopSettings { get; set; }
+
+        // additional field for production settings because we can only test third
+        // party shipping on FreigthPOP prd
+        public FreightPopSettings FreightPopSettingsProd { get; set; }
         public CardConnectSettings CardConnectSettings { get; set; } = new CardConnectSettings();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
 		public SmartyStreetSettings SmartyStreetSettings { get; set; } = new SmartyStreetSettings();

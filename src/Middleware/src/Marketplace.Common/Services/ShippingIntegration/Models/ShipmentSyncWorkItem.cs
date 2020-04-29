@@ -12,22 +12,12 @@ namespace Marketplace.Models.Models.Misc
     {
         public MarketplaceSupplier Supplier { get; set; }
         public string SupplierToken { get; set; }
-        public List<MarketplaceOrder> OrdersToSync { get; set; }
-        public List<ShipmentSyncOrder> ShipmentSyncOrders { get; set; }
+        public List<ShipmentDetails> ShipmentsToSync { get; set; }
     }
-    [DocIgnore]
-    public class OrderWorkItem
+    public class ShipmentWorkItem
     {
         public MarketplaceSupplier Supplier { get; set; }
         public string SupplierToken { get; set; }
-        public ShipmentSyncOrder ShipmentSyncOrder { get; set; }
-    }
-    [DocIgnore]
-    public class ShipmentSyncOrder
-    {
-        public string OrderCloudOrderID { get; set; }
-        public string FreightPopOrderID { get; set; }
-        public MarketplaceOrder Order { get; set; }
-        public Response<List<ShipmentDetails>> FreightPopShipmentResponses { get; set; }
+        public ShipmentDetails Shipment { get; set; }
     }
 }
