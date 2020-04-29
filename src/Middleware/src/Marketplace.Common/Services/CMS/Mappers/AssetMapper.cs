@@ -22,7 +22,7 @@ namespace Marketplace.CMS.Mappers
 			return asset;
 		} 
 
-		public static (Asset, IFormFile) MapFromUpload(AssetContainer container, AssetUploadForm form)
+		public static (Asset, IFormFile) MapFromUpload(AssetContainer container, AssetUpload form)
 		{
 			if (!(form.File == null ^ form.UrlPathOveride == null))
 			{
@@ -52,7 +52,7 @@ namespace Marketplace.CMS.Mappers
 			return tags == null ? new List<string>() : tags.Split(",").Select(t => t.Trim()).Where(t => t != "").ToList();
 		}
 
-		private static void TypeSpecificMapping(ref Asset asset, AssetUploadForm form)
+		private static void TypeSpecificMapping(ref Asset asset, AssetUpload form)
 		{
 			switch (asset.Type)
 			{
@@ -67,7 +67,7 @@ namespace Marketplace.CMS.Mappers
 			}
 		}
 
-		private static void ImageSpecificMapping(ref Asset asset, AssetUploadForm form)
+		private static void ImageSpecificMapping(ref Asset asset, AssetUpload form)
 		{
 			if (!ValidImageFormats.Contains(form.File.ContentType)) 
 			{

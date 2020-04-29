@@ -28,7 +28,7 @@ namespace Marketplace.CMS.Queries
 		Task<ListPage<Asset>> List(string containerInteropID, IListArgs args);
 		Task<IDictionary<string, Asset>> List(AssetContainer container, ISet<string> assetIDs);
 		Task<Asset> Get(string containerInteropID, string assetInteropID);
-		Task<Asset> Create(string containerInteropID, AssetUploadForm form);
+		Task<Asset> Create(string containerInteropID, AssetUpload form);
 		Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset);
 		Task Delete(string containerInteropID, string assetInteropID);
 	}
@@ -68,7 +68,7 @@ namespace Marketplace.CMS.Queries
 			return AssetMapper.MapToResponse(container, asset);
 		}
 
-		public async Task<Asset> Create(string containerInteropID, AssetUploadForm form)
+		public async Task<Asset> Create(string containerInteropID, AssetUpload form)
 		{
 			var container = await _containers.Get(containerInteropID);
 			var (asset, file) = AssetMapper.MapFromUpload(container, form);
