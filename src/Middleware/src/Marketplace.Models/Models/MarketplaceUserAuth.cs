@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Marketplace.Helpers.Attributes;
+using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
@@ -27,14 +29,9 @@ namespace Marketplace.Models
 
 	public class MarketplaceUserAuthHandler : AuthenticationHandler<MarketplaceUserAuthOptions>
     {
-        private readonly IOrderCloudClient _oc;
-
         public MarketplaceUserAuthHandler(IOptionsMonitor<MarketplaceUserAuthOptions> options, ILoggerFactory logger,
-            UrlEncoder encoder, ISystemClock clock, IOrderCloudClient oc)
-            : base(options, logger, encoder, clock)
-        {
-            _oc = oc;
-        }
+            UrlEncoder encoder, ISystemClock clock)
+            : base(options, logger, encoder, clock) {}
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
@@ -47,7 +44,11 @@ namespace Marketplace.Models
 
                 var jwt = new JwtSecurityToken(token);
                 var clientId = jwt.Claims.FirstOrDefault(x => x.Type == "cid")?.Value;
-                var usrtype = jwt.Claims.FirstOrDefault(x => x.Type == "usrtype")?.Value;
+				var apiUrl = jwt.Claims.FirstOrDefault(x => x.Type == "aud")?.Value;
+				var authUrl = jwt.Claims.FirstOrDefault(x => x.Type == "iss")?.Value;
+				var tokenExpiresUTC = jwt.Claims.FirstOrDefault(t => t.Type == "exp").Value.ToString().UnixToDateTime();
+
+				var usrtype = jwt.Claims.FirstOrDefault(x => x.Type == "usrtype")?.Value;
                 if (clientId == null)
                     return AuthenticateResult.Fail("The provided bearer token does not contain a 'cid' (Client ID) claim.");
                 
@@ -57,7 +58,7 @@ namespace Marketplace.Models
                 cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
                 
-                var user = await _oc.Me.GetAsync(token);
+                var user = await new MyOrderCloudClient(token, apiUrl, authUrl, clientId, tokenExpiresUTC).Me.GetAsync(token);
                 if (!user.Active)
                     return AuthenticateResult.Fail("Authentication failure");
                 cid.AddClaim(new Claim("username", user.Username));

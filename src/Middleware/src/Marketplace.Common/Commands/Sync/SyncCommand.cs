@@ -53,6 +53,7 @@ namespace Marketplace.Common.Commands
                 ClientId = wi.ClientId
             });
 
+
             var type = Type.GetType($"{ASSEMBLY}{wi.RecordType}SyncCommand", true);
             var command = (IWorkItemCommand) Activator.CreateInstance(type, new object[] {_settings, _log, _oc});
             var method = command.GetType()

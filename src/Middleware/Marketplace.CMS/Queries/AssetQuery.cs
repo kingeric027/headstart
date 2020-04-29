@@ -7,12 +7,15 @@ using Marketplace.Common;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Exceptions;
 using Marketplace.Helpers.Extensions;
+using Marketplace.Helpers.Helpers;
+using Marketplace.Helpers.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +26,7 @@ namespace Marketplace.CMS.Queries
 	public interface IAssetQuery
 	{
 		Task<ListPage<Asset>> List(string containerInteropID, IListArgs args);
+		Task<IList<Asset>> List(AssetContainer container, IEnumerable<string> assetIDs);
 		Task<Asset> Get(string containerInteropID, string assetInteropID);
 		Task<Asset> Create(string containerInteropID, AssetUploadForm form);
 		Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset);
@@ -31,13 +35,13 @@ namespace Marketplace.CMS.Queries
 
 	public class AssetQuery : IAssetQuery
 	{
-		private readonly ICosmosStore<Asset> _store;
+		private readonly ICosmosStore<Asset> _assetStore;
 		private readonly IAssetContainerQuery _containers;
 		private readonly IStorageFactory _storageFactory;
 
-		public AssetQuery(ICosmosStore<Asset> store, IAssetContainerQuery containers, IStorageFactory storageFactory)
+		public AssetQuery(ICosmosStore<Asset> assetStore, IAssetContainerQuery containers, IStorageFactory storageFactory)
 		{
-			_store = store;
+			_assetStore = assetStore;
 			_containers = containers;
 			_storageFactory = storageFactory;
 		}
@@ -45,7 +49,7 @@ namespace Marketplace.CMS.Queries
 		public async Task<ListPage<Asset>> List(string containerInteropID, IListArgs args)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var query = _store.Query(new FeedOptions() { PartitionKey = new PartitionKey(container.id), EnableCrossPartitionQuery = false })
+			var query = _assetStore.Query(GetFeedOptions(container.id))
 				.Search(args)
 				.Filter(args)
 				.Sort(args);
@@ -74,7 +78,7 @@ namespace Marketplace.CMS.Queries
 				await _storageFactory.GetStorage(container).UploadAsset(file, asset);
 			}
 
-			var newAsset = await _store.AddAsync(asset);
+			var newAsset = await _assetStore.AddAsync(asset);
 			return AssetMapper.MapToResponse(container, newAsset);
 		}
 
@@ -90,23 +94,39 @@ namespace Marketplace.CMS.Queries
 			existingAsset.Type = asset.Type;
 			existingAsset.Tags = asset.Tags;
 			existingAsset.FileName = asset.FileName;
-			var updatedAsset = await _store.UpdateAsync(existingAsset);
+			var updatedAsset = await _assetStore.UpdateAsync(existingAsset);
 			return AssetMapper.MapToResponse(container, updatedAsset);
 		}
-
 
 		public async Task Delete(string containerInteropID, string assetInteropID)
 		{
 			var container = await _containers.Get(containerInteropID); // make sure container exists.
 			var asset = await Get(containerInteropID, assetInteropID);
-			await _store.RemoveByIdAsync(asset.id, container.id);
+			await _assetStore.RemoveByIdAsync(asset.id, container.id);
 			await _storageFactory.GetStorage(container).OnAssetDeleted(asset.id);
+		}
+
+		public async Task<IList<Asset>> List(AssetContainer container, IEnumerable<string> assetIDs)
+		{
+			var ids = assetIDs.ToList();
+			var paramNames = ids.Select((id, i) => $"@id{i}");
+			var query = $"select * from c where c.id IN ({string.Join(", ", paramNames)})";
+			var parameters = new ExpandoObject();
+			for (int i = 0; i < ids.Count; i++)
+			{
+				parameters.TryAdd($"@id{i}", ids[i]);
+			}
+			var assets = await _assetStore.QueryMultipleAsync(query, parameters, GetFeedOptions(container.id));
+			return assets.Select(asset => AssetMapper.MapToResponse(container, asset)).ToList();
 		}
 
 		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)
 		{
-			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(containerID) };
-			return await _store.Query($"select top 1 * from c where c.InteropID = @id", new { id = assetInteropID }, feedOptions).FirstOrDefaultAsync();
+			var query = $"select top 1 * from c where c.InteropID = @id";
+			var asset = await _assetStore.Query(query, new { id = assetInteropID }, GetFeedOptions(containerID)).FirstOrDefaultAsync();
+			return asset;
 		}
+
+		private FeedOptions GetFeedOptions(string containerID) => new FeedOptions() { PartitionKey = new PartitionKey(containerID) };
 	}
 }

@@ -20,6 +20,5 @@ namespace Marketplace.CMS.Models
 		public AssetType? Type { get; set; } = null;
 		public string Tags { get; set; }
 		public string FileName { get; set; }
-
 	}
 }
