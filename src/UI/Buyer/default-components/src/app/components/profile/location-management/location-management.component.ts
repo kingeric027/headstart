@@ -9,29 +9,34 @@ import {
 } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
 import { CertificateFormOutput } from '../certificate-form/certificate-form.component';
 import { GeographyConfig } from '../../../config/geography.class';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
-  templateUrl: './location-details.component.html',
-  styleUrls: ['./location-details.component.scss'],
+  templateUrl: './location-management.component.html',
+  styleUrls: ['./location-management.component.scss'],
 })
-export class OCMLocationDetails implements OnInit {
+export class OCMLocationManagement implements OnInit {
   faDownload = faDownload;
-  address: MarketplaceAddressBuyer;
-  certificate: TaxCertificate;
+  address: MarketplaceAddressBuyer = {};
+  certificate: TaxCertificate = {};
   showCertificateForm = false;
   userCanAdmin = false;
+  _locationID = '';
+  @Input() set locationID(locationID: string) {
+    this._locationID = locationID;
+    this.getLocationManagementDetails();
+  };
 
-  @Input() set location(value: BuyerLocationWithCert) {
-    this.address = value.location;
-    this.certificate = value.certificate;
-  }
-  @Input() highlight?: boolean;
-
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.userCanAdmin = this.context.currentUser.hasRoles('AddressAdmin');
+  }
+  
+  async getLocationManagementDetails(): Promise<void> {
+    this.address = await this.context.addresses.get(this._locationID);
+    this.certificate = await this.context.addresses.getCertificate(this.address);
   }
 
   // make into pipe?

@@ -1,13 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ShopperContextService, BuyerLocationWithCert } from 'marketplace';
+import { MarketplaceAddressBuyer } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
 
 @Component({
   templateUrl: './location-list.component.html',
   styleUrls: ['./location-list.component.scss'],
 })
 export class OCMLocationList implements OnInit {
-  @Input() locations: BuyerLocationWithCert[];
-  currentLocation: BuyerLocationWithCert;
+  @Input() locations: MarketplaceAddressBuyer[];
+  currentLocation: MarketplaceAddressBuyer;
   requestOptions: { page?: number; search?: string } = { page: undefined, search: undefined };
   resultsPerPage = 8;
   isLoading = false;
@@ -33,7 +34,8 @@ export class OCMLocationList implements OnInit {
 
   private async reloadAddresses(): Promise<void> {
     this.isLoading = true;
-    this.locations = await this.context.addresses.listBuyerLocationsWithCerts(this.requestOptions);
+    const locationsList = await this.context.addresses.listBuyerLocations(this.requestOptions);
+    this.locations = locationsList.Items;
     this.isLoading = false;
   }
 }
