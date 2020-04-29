@@ -58,7 +58,7 @@ namespace Marketplace.Models
                 cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
                 
-                var user = await new MyOrderCloudClient(token, apiUrl, authUrl, clientId, tokenExpiresUTC).Me.GetAsync(token);
+                var user = await new MultiTenantOCClient(token, apiUrl, authUrl, clientId, tokenExpiresUTC).Me.GetAsync(token);
                 if (!user.Active)
                     return AuthenticateResult.Fail("Authentication failure");
                 cid.AddClaim(new Claim("username", user.Username));

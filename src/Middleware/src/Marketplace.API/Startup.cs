@@ -61,7 +61,7 @@ namespace Marketplace.API
 				.InjectCosmosStore<ImageProductAssignmentQuery, ImageProductAssignment>(cosmosConfig)
 				.InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
-				.InjectCosmosStore<AssetQuery, AssetAssignment>(cosmosConfig)
+				.InjectCosmosStore<AssetAssignmentQuery, AssetAssignment>(cosmosConfig)
 				.InjectCosmosStore<ImageQuery, Image>(cosmosConfig)
 				.Inject<IOrchestrationCommand>()
 				.Inject<IOrchestrationLogCommand>()

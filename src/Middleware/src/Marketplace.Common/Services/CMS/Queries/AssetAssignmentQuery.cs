@@ -20,7 +20,7 @@ namespace Marketplace.CMS.Queries
 	{
 		Task<ListPage<AssetAssignment>> List(string containerInteropID, ListArgs<Asset> args);
 		Task Save(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user);
-		Task Delete(string containerInteropID, AssetAssignment assignment);
+		Task Delete(string containerInteropID, string assetInteropID, ResourceType resourceType, string resourceID);
 	}
 
 	public class AssetAssignmentQuery : IAssetAssignmentQuery
@@ -66,18 +66,16 @@ namespace Marketplace.CMS.Queries
 			await _assignmentStore.AddAsync(assignment);
 		}
 
-		public async Task Delete(string containerInteropID, AssetAssignment assignment)
+		public async Task Delete(string containerInteropID, string assetInteropID, ResourceType resourceType, string resourceID)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var asset = await _assets.Get(containerInteropID, assignment.AssetID);
-			assignment.ContainerID = container.id;
+			var asset = await _assets.Get(containerInteropID, assetInteropID);
 			await _assignmentStore.RemoveAsync(x =>
 				x.ContainerID == container.id &&
 				x.AssetID == asset.id &&
-				x.ResourceID == assignment.ResourceID &&
-				x.ResourceType == assignment.ResourceType
+				x.ResourceID == resourceID &&
+				x.ResourceType == resourceType
 			);
 		}
 	}
-
 }

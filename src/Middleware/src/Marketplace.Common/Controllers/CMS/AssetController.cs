@@ -78,10 +78,10 @@ namespace Marketplace.CMS.Controllers
 		}
 
 		[DocName("Delete Asset Assignment")]
-		[HttpDelete, Route("assignments")]
-		public async Task DeleteAssignment(string containerID, [FromBody] AssetAssignment assignment)
+		[HttpDelete, Route("{assetID}/assignments/{resourceType}/{resourceID}")]
+		public async Task DeleteAssignment(string containerID, string assetID, ResourceType resourceType, string resourceID)
 		{
-			await _assignments.Delete(containerID, assignment);
+			await _assignments.Delete(containerID, assetID, resourceType, resourceID);
 		}
 	}
 }

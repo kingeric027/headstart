@@ -117,7 +117,9 @@ namespace Marketplace.Helpers.OpenApiTools
 
         private static IEnumerable<ApiResource> GetResources<TController, TAttribute>(string sectionID) where TAttribute : Attribute, IApiAuthAttribute
         {
-               var resource = from c in Assembly.GetAssembly(typeof(TController)).GetExportedTypes()
+			var temp = Assembly.GetAssembly(typeof(TController)).GetExportedTypes();
+
+			   var resource = from c in Assembly.GetAssembly(typeof(TController)).GetExportedTypes()
                 where c.IsSubclassOf(typeof(TController))
                 where !c.IsAbstract
                 where !c.HasAttribute<DocIgnoreAttribute>(false)

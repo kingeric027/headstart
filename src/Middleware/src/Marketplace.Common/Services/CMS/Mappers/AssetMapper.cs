@@ -40,7 +40,7 @@ namespace Marketplace.CMS.Mappers
 				Metadata = new AssetMetadata()
 				{
 					ContentType = form.File?.ContentType,
-					SizeBytes = form.File?.Length,
+					SizeBytes = (int)form.File?.Length,
 				}
 			};
 			TypeSpecificMapping(ref asset, form);
@@ -77,9 +77,8 @@ namespace Marketplace.CMS.Mappers
 			{
 				asset.Metadata.ImageWidth = image.Width;
 				asset.Metadata.ImageHeight = image.Height;
-				asset.Metadata.ImageHorizontalResolution = image.HorizontalResolution;
-				asset.Metadata.ImageVerticalResolution = image.VerticalResolution;
-
+				asset.Metadata.ImageHorizontalResolution = (decimal) image.HorizontalResolution;
+				asset.Metadata.ImageVerticalResolution = (decimal) image.VerticalResolution;
 
 				// TODO - potentially image resizing?
 			}

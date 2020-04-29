@@ -10,9 +10,12 @@ using System.Threading.Tasks;
 
 namespace Marketplace.Helpers.Helpers
 {
-	public class MyOrderCloudClient : OrderCloudClient, IOrderCloudClient
+	/// <summary>A version of OrderCloudClient that takes all of its config data from an Ordercloud token.
+	/// It can be used to support multi-tenancy because it can remove the need to save OC credentials in config settings.
+	/// </summary>
+	public class MultiTenantOCClient : OrderCloudClient, IOrderCloudClient
 	{
-		public MyOrderCloudClient(VerifiedUserContext user) : base(
+		public MultiTenantOCClient(VerifiedUserContext user) : base(
 			new OrderCloudClientConfig()
 			{
 				ApiUrl = user.ApiUrl,
@@ -28,7 +31,7 @@ namespace Marketplace.Helpers.Helpers
 			};
 		}
 
-		public MyOrderCloudClient(string token, string apiUrl, string authUrl, string clientID, DateTime tokenExpiresUTC) : base(
+		public MultiTenantOCClient(string token, string apiUrl, string authUrl, string clientID, DateTime tokenExpiresUTC) : base(
 			new OrderCloudClientConfig()
 			{
 				ApiUrl = apiUrl,
