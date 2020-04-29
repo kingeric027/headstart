@@ -29,6 +29,9 @@ export class ReactiveQuillComponent {
     this.setQuillChangeEvent();
   }
 
+  @Input()
+  readonly: boolean;
+
   setQuillChangeEvent() {
     if (this._formControlForText) {
       this.quillChangeSubscription = this._formControlForText.valueChanges.subscribe(newFormValue => {

@@ -316,7 +316,9 @@ export class ProductVariations {
 
   async variantShippingDimensionUpdate(event: any, field: string): Promise<void> {
     let partialVariant: PartialVariant = {};
+    // If there's no value, or the value didn't change, don't send request.
     if (event.target.value === '') return;
+    if (Number(event.target.value) === this.variantInSelection[field]) return;
     const value = Number(event.target.value);
     switch(field) {
       case "ShipWeight": 

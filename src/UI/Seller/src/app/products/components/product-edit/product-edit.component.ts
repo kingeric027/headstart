@@ -26,6 +26,10 @@ import { ValidateMinMax } from '@app-seller/validators/validators';
 import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
 import { Location } from '@angular/common'
 import { ProductEditTabMapper, TabIndexMapper } from './tab-mapper';
+import { AppAuthService } from '@app-seller/auth';
+import { environment } from 'src/environments/environment';
+import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
+import { AssetAssignment } from 'marketplace-javascript-sdk/dist/models/AssetAssignment';
 
 @Component({
   selector: 'app-product-edit',
@@ -43,6 +47,7 @@ export class ProductEditComponent implements OnInit {
       this.createProductForm(this.productService.emptyResource);
     }
   }
+  @Input() readonly: boolean;
   @Input()
   filterConfig;
   @Output()
@@ -90,6 +95,7 @@ export class ProductEditComponent implements OnInit {
     private modalService: NgbModal,
     private middleware: MiddlewareAPIService,
     private toasterService: ToastrService,
+    private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) { }
 
@@ -99,6 +105,7 @@ export class ProductEditComponent implements OnInit {
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
     this.setProductEditTab();
+    console.log('is component readonly?', this.readonly)
   }
 
   setProductEditTab(): void {
@@ -166,7 +173,7 @@ export class ProductEditComponent implements OnInit {
         MinQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MinQuantity, Validators.min(1)),
         MaxQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MaxQuantity, Validators.min(1)),
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
-        ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType')),
+        ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType'), Validators.required),
         IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
@@ -186,7 +193,8 @@ export class ProductEditComponent implements OnInit {
   }
 
   async handleDelete(): Promise<void> {
-    await MarketplaceSDK.Products.Delete(this._superMarketplaceProductStatic.Product.ID);
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    await MarketplaceSDK.Products.Delete(this._superMarketplaceProductStatic.Product.ID, accessToken);
     this.router.navigateByUrl('/products');
   }
 
@@ -305,12 +313,27 @@ export class ProductEditComponent implements OnInit {
   }
 
   async addImages(files: FileHandle[], productID: string): Promise<void> {
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
     let superProduct;
     for (const file of files) {
-      superProduct = await this.middleware.uploadProductImage(file.File, productID);
+      const asset: AssetUpload = {
+        Active: true,
+        File: file.File,
+        Type: 'Image',
+        FileName: file.Filename
+      }
+      const newAsset = await MarketplaceSDK.Upload.UploadAsset('SEB', asset, accessToken);
+      const assetAssignment: AssetAssignment = {
+        ContainerID: 'SEB',
+        ResourceType: 'Products',
+        AssetID: newAsset.id,
+        ResourceID: productID
+      }
+      await MarketplaceSDK.Assets.SaveAssignment('SEB', assetAssignment, accessToken);
     }
     this.imageFiles = []
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
+    superProduct = await MarketplaceSDK.Products.Get(productID, accessToken);
     superProduct = Object.assign(this._superMarketplaceProductStatic || {}, superProduct);
     this.refreshProductData(superProduct);
   }
