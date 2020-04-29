@@ -37,7 +37,7 @@ export class OCMOrderApproval implements OnInit {
     } else {
       await this.context.orderHistory.declineOrder(this.orderID, comments);
     }
-
+    this.context.ordersToApprove.reset();
     this.toasterService.success(`Order ${this.orderID} was ${this.approved ? 'Approved' : 'Declined'}`);
     this.requestedConfirmation = false;
     this.context.router.toOrdersToApprove();
