@@ -19,10 +19,12 @@ namespace Marketplace.CMS.Controllers
 	public class AssetController : BaseController
 	{
 		private readonly IAssetQuery _assets;
+		private readonly IAssetAssignmentQuery _assignments;
 
-		public AssetController(AppSettings settings, IAssetQuery assets) : base(settings)
+		public AssetController(AppSettings settings, IAssetQuery assets, IAssetAssignmentQuery assignments) : base(settings)
 		{
 			_assets = assets;
+			_assignments = assignments;
 		}
 
 		[DocName("List Assets")]
@@ -64,21 +66,21 @@ namespace Marketplace.CMS.Controllers
 		[HttpGet, Route("assignments")]
 		public async Task<ListPage<AssetAssignment>> ListAssignments(string containerID, ListArgs<Asset> args)
 		{
-			return await _assets.ListAssignments(containerID, args);
+			return await _assignments.List(containerID, args);
 		}
 
 		[DocName("Save Asset Assignment")]
 		[HttpPost, Route("assignments"), MarketplaceUserAuth(ApiRole.BuyerReader)]
 		public async Task SaveAssignment(string containerID, [FromBody] AssetAssignment assignment)
 		{
-			await _assets.SaveAssignment(containerID, assignment, VerifiedUserContext);
+			await _assignments.Save(containerID, assignment, VerifiedUserContext);
 		}
 
 		[DocName("Delete Asset Assignment")]
 		[HttpDelete, Route("assignments")]
 		public async Task DeleteAssignment(string containerID, [FromBody] AssetAssignment assignment)
 		{
-			await _assets.DeleteAssignment(containerID, assignment);
+			await _assignments.Delete(containerID, assignment);
 		}
 	}
 }

@@ -26,36 +26,30 @@ namespace Marketplace.CMS.Queries
 	public interface IAssetQuery
 	{
 		Task<ListPage<Asset>> List(string containerInteropID, IListArgs args);
+		Task<IList<Asset>> List(AssetContainer container, IEnumerable<string> assetIDs);
 		Task<Asset> Get(string containerInteropID, string assetInteropID);
 		Task<Asset> Create(string containerInteropID, AssetUploadForm form);
 		Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset);
 		Task Delete(string containerInteropID, string assetInteropID);
-		Task<ListPage<AssetAssignment>> ListAssignments(string containerInteropID, ListArgs<Asset> args);
-		Task SaveAssignment(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user);
-		Task DeleteAssignment(string containerInteropID, AssetAssignment assignment);
 	}
 
 	public class AssetQuery : IAssetQuery
 	{
 		private readonly ICosmosStore<Asset> _assetStore;
-		private readonly ICosmosStore<AssetAssignment> _assignmentStore;
 		private readonly IAssetContainerQuery _containers;
 		private readonly IStorageFactory _storageFactory;
 
-		public AssetQuery(ICosmosStore<Asset> assetStore, ICosmosStore<AssetAssignment> assignmentStore, IAssetContainerQuery containers, IStorageFactory storageFactory)
+		public AssetQuery(ICosmosStore<Asset> assetStore, IAssetContainerQuery containers, IStorageFactory storageFactory)
 		{
 			_assetStore = assetStore;
-			_assignmentStore = assignmentStore;
 			_containers = containers;
 			_storageFactory = storageFactory;
 		}
 
-		#region Assets
 		public async Task<ListPage<Asset>> List(string containerInteropID, IListArgs args)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(container.id) };
-			var query = _assetStore.Query(feedOptions)
+			var query = _assetStore.Query(GetFeedOptions(container.id))
 				.Search(args)
 				.Filter(args)
 				.Sort(args);
@@ -111,64 +105,28 @@ namespace Marketplace.CMS.Queries
 			await _assetStore.RemoveByIdAsync(asset.id, container.id);
 			await _storageFactory.GetStorage(container).OnAssetDeleted(asset.id);
 		}
-		#endregion
 
-		#region Assignments
-		public async Task<ListPage<AssetAssignment>> ListAssignments(string containerInteropID, ListArgs<Asset> args)
+		public async Task<IList<Asset>> List(AssetContainer container, IEnumerable<string> assetIDs)
 		{
-			var container = await _containers.Get(containerInteropID);
-			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(container.id) };
-			var query = _assignmentStore.Query(feedOptions)
-				.Search(args)
-				.Filter(args)
-				.Sort(args);
-			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
-			var count = await query.CountAsync();
-			var listPage = list.ToListPage(args.Page, args.PageSize, count);
-			var assets = await List(container, listPage.Items.Select(assignment => assignment.AssetID));
-			for (int i = 0; i < assets.Count; i++)
-			{
-				listPage.Items[i].Asset = assets[i];
-				listPage.Items[i].AssetID = assets[i].InteropID;
-			}
-			return listPage;
-		}
-
-		public async Task SaveAssignment(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user)
-		{
-			await new MyOrderCloudClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID); // confirm OC resource exists
-			var asset = await Get(containerInteropID, assignment.AssetID);
-			assignment.ContainerID = asset.ContainerID;
-			assignment.AssetID = asset.id;
-			await _assignmentStore.AddAsync(assignment);
-		}
-
-		public async Task DeleteAssignment(string containerInteropID, AssetAssignment assignment)
-		{
-			var container = await _containers.Get(containerInteropID);
-			assignment.ContainerID = container.id;
-			await _assignmentStore.RemoveAsync(assignment);
-		}
-		#endregion
-
-		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)
-		{
-			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(containerID) };
-			return await _assetStore.Query($"select top 1 * from c where c.InteropID = @id", new { id = assetInteropID }, feedOptions).FirstOrDefaultAsync();
-		}
-
-		private async Task<IList<Asset>> List(AssetContainer container, IEnumerable<string> assetIDs)
-		{
-			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(container.id) };
 			var ids = assetIDs.ToList();
-			var query = $"select * from c where c.id IN ({string.Join(", ", ids)})";
+			var paramNames = ids.Select((id, i) => $"@id{i}");
+			var query = $"select * from c where c.id IN ({string.Join(", ", paramNames)})";
 			var parameters = new ExpandoObject();
 			for (int i = 0; i < ids.Count; i++)
 			{
-				parameters.TryAdd($"id{i}", ids[i]);
+				parameters.TryAdd($"@id{i}", ids[i]);
 			}
-			var assets = await _assetStore.QueryMultipleAsync(query, parameters, feedOptions);
-			return assets.ToList();
+			var assets = await _assetStore.QueryMultipleAsync(query, parameters, GetFeedOptions(container.id));
+			return assets.Select(asset => AssetMapper.MapToResponse(container, asset)).ToList();
 		}
+
+		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)
+		{
+			var query = $"select top 1 * from c where c.InteropID = @id";
+			var asset = await _assetStore.Query(query, new { id = assetInteropID }, GetFeedOptions(containerID)).FirstOrDefaultAsync();
+			return asset;
+		}
+
+		private FeedOptions GetFeedOptions(string containerID) => new FeedOptions() { PartitionKey = new PartitionKey(containerID) };
 	}
 }

@@ -18,7 +18,7 @@ namespace Marketplace.CMS
 				.FirstOrDefault(method => method.Name == "GetAsync" && method.IsGenericMethod == false);
 			var paramCount = getMethod.GetParameters().Length;
 			var parameters = paramCount == 2 ? new object[] { resourceID, null } : new object[] { parentID, resourceID, null };
-			await (Task) getMethod.Invoke(resource, parameters);
+			await (Task)getMethod.Invoke(resource, parameters);
 		}
 
 		// Want to change to a Get() method, but this line produces an error I don't know how to fix 
