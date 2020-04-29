@@ -69,8 +69,9 @@ namespace Marketplace.CMS.Controllers
 			return await _assignments.List(containerID, args);
 		}
 
+		// Route is available to anyone right now, but if your token does not give access to an OC resource, you will get 401 response.
 		[DocName("Save Asset Assignment")]
-		[HttpPost, Route("assignments"), MarketplaceUserAuth(ApiRole.BuyerReader)]
+		[HttpPost, Route("assignments"), MarketplaceUserAuth()]
 		public async Task SaveAssignment(string containerID, [FromBody] AssetAssignment assignment)
 		{
 			await _assignments.Save(containerID, assignment, VerifiedUserContext);
