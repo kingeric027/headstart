@@ -5,10 +5,12 @@
 export const environment = {
   hostedApp: false,
   appname: 'Marketplace Local',
-  clientID: '3A5DD92D-0B04-4E62-B8AC-197ADF10FBC4',
+  clientID: '870B3C9D-15E2-4A8D-9BEB-0BA885BAAB77',
+  //clientID: '3A5DD92D-0B04-4E62-B8AC-197ADF10FBC4',
   marketplaceID: 'SEB',
   baseUrl: 'https://localhost:4200',
-  middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  middlewareUrl: 'https://localhost:44343',
+  //middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
   cmsUrl: 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',

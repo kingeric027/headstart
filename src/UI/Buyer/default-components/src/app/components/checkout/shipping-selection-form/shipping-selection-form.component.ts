@@ -12,6 +12,7 @@ export class OCMShippingSelectionForm implements OnInit {
   _shipEstimate: ShipEstimate;
   @Input() set shipEstimate(value: ShipEstimate) {
     this._shipEstimate = value;
+    console.log(value)
     this.setSelectedRate(value.SelectedShipMethodID);
   }
   @Input() shipFromAddressID: string;
@@ -20,7 +21,7 @@ export class OCMShippingSelectionForm implements OnInit {
 
   form: FormGroup;
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     this.form = new FormGroup({ rateID: new FormControl(null) });
