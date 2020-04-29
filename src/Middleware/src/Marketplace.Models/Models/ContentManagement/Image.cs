@@ -19,6 +19,6 @@ namespace Marketplace.Common.Models
         public DateTimeOffset timeStamp { get; set; }
         public string URL { get; set; }
         public int ListOrder { get; set; }
-        public List<string> Tags = new List<string>();
+		public List<string> Tags { get; set; } = new List<string>();
     }
 }
