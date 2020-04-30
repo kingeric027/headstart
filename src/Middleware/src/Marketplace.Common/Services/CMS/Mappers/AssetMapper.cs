@@ -22,7 +22,7 @@ namespace Marketplace.CMS.Mappers
 			return asset;
 		} 
 
-		public static (Asset, IFormFile) MapFromUpload(AssetContainer container, AssetUploadForm form)
+		public static (Asset, IFormFile) MapFromUpload(AssetContainer container, AssetUpload form)
 		{
 			if (!(form.File == null ^ form.UrlPathOveride == null))
 			{
@@ -40,7 +40,7 @@ namespace Marketplace.CMS.Mappers
 				Metadata = new AssetMetadata()
 				{
 					ContentType = form.File?.ContentType,
-					SizeBytes = form.File?.Length,
+					SizeBytes = (int)form.File?.Length,
 				}
 			};
 			TypeSpecificMapping(ref asset, form);
@@ -52,7 +52,7 @@ namespace Marketplace.CMS.Mappers
 			return tags == null ? new List<string>() : tags.Split(",").Select(t => t.Trim()).Where(t => t != "").ToList();
 		}
 
-		private static void TypeSpecificMapping(ref Asset asset, AssetUploadForm form)
+		private static void TypeSpecificMapping(ref Asset asset, AssetUpload form)
 		{
 			switch (asset.Type)
 			{
@@ -67,7 +67,7 @@ namespace Marketplace.CMS.Mappers
 			}
 		}
 
-		private static void ImageSpecificMapping(ref Asset asset, AssetUploadForm form)
+		private static void ImageSpecificMapping(ref Asset asset, AssetUpload form)
 		{
 			if (!ValidImageFormats.Contains(form.File.ContentType)) 
 			{
@@ -77,9 +77,8 @@ namespace Marketplace.CMS.Mappers
 			{
 				asset.Metadata.ImageWidth = image.Width;
 				asset.Metadata.ImageHeight = image.Height;
-				asset.Metadata.ImageHorizontalResolution = image.HorizontalResolution;
-				asset.Metadata.ImageVerticalResolution = image.VerticalResolution;
-
+				asset.Metadata.ImageHorizontalResolution = (decimal) image.HorizontalResolution;
+				asset.Metadata.ImageVerticalResolution = (decimal) image.VerticalResolution;
 
 				// TODO - potentially image resizing?
 			}

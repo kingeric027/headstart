@@ -20,7 +20,7 @@ namespace Marketplace.CMS.Queries
 	{
 		Task<ListPage<AssetAssignment>> List(string containerInteropID, ListArgs<Asset> args);
 		Task Save(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user);
-		Task Delete(string containerInteropID, AssetAssignment assignment);
+		Task Delete(string containerInteropID, string assetInteropID, ResourceType resourceType, string resourceID);
 	}
 
 	public class AssetAssignmentQuery : IAssetAssignmentQuery
@@ -47,36 +47,35 @@ namespace Marketplace.CMS.Queries
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var listPage = list.ToListPage(args.Page, args.PageSize, count);
-			var assets = await _assets.List(container, listPage.Items.Select(assignment => assignment.AssetID));
-			for (int i = 0; i < assets.Count; i++)
+			var assetIDs = listPage.Items.Select(assignment => assignment.AssetID);
+			var assetDictionary = await _assets.List(container, new HashSet<string>(assetIDs));
+			foreach (var assignment in listPage.Items)
 			{
-				listPage.Items[i].Asset = assets[i];
-				listPage.Items[i].AssetID = assets[i].InteropID;
+				assignment.Asset = assetDictionary[assignment.AssetID];
+				assignment.AssetID = assignment.Asset.InteropID;
 			}
 			return listPage;
 		}
 
 		public async Task Save(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user)
 		{
-			await new MyOrderCloudClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID); // confirm OC resource exists
+			await new MultiTenantOCClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID); // confirm OC resource exists
 			var asset = await _assets.Get(containerInteropID, assignment.AssetID);
 			assignment.ContainerID = asset.ContainerID;
 			assignment.AssetID = asset.id;
 			await _assignmentStore.AddAsync(assignment);
 		}
 
-		public async Task Delete(string containerInteropID, AssetAssignment assignment)
+		public async Task Delete(string containerInteropID, string assetInteropID, ResourceType resourceType, string resourceID)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var asset = await _assets.Get(containerInteropID, assignment.AssetID);
-			assignment.ContainerID = container.id;
+			var asset = await _assets.Get(containerInteropID, assetInteropID);
 			await _assignmentStore.RemoveAsync(x =>
 				x.ContainerID == container.id &&
 				x.AssetID == asset.id &&
-				x.ResourceID == assignment.ResourceID &&
-				x.ResourceType == assignment.ResourceType
+				x.ResourceID == resourceID &&
+				x.ResourceType == resourceType
 			);
 		}
 	}
-
 }

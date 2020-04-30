@@ -1,4 +1,5 @@
-﻿using Marketplace.Helpers.Helpers.Attributes;
+﻿using Marketplace.Helpers.Attributes;
+using Marketplace.Helpers.Helpers.Attributes;
 using Microsoft.AspNetCore.Http;
 using OrderCloud.SDK;
 using System;
@@ -9,7 +10,7 @@ namespace Marketplace.CMS.Models
 {
 	// TODO - is there a way to get rid of this separate class and use normal asset?
 	// Because right now we don't have a way to make any of these feilds required. [Required] doesn't seem to work with forms.
-	public class AssetUploadForm
+	public class AssetUpload
 	{
 		[InteropID]
 		public string ID { get; set; }

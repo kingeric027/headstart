@@ -26,9 +26,9 @@ namespace Marketplace.CMS.Queries
 	public interface IAssetQuery
 	{
 		Task<ListPage<Asset>> List(string containerInteropID, IListArgs args);
-		Task<IList<Asset>> List(AssetContainer container, IEnumerable<string> assetIDs);
+		Task<IDictionary<string, Asset>> List(AssetContainer container, ISet<string> assetIDs);
 		Task<Asset> Get(string containerInteropID, string assetInteropID);
-		Task<Asset> Create(string containerInteropID, AssetUploadForm form);
+		Task<Asset> Create(string containerInteropID, AssetUpload form);
 		Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset);
 		Task Delete(string containerInteropID, string assetInteropID);
 	}
@@ -68,7 +68,7 @@ namespace Marketplace.CMS.Queries
 			return AssetMapper.MapToResponse(container, asset);
 		}
 
-		public async Task<Asset> Create(string containerInteropID, AssetUploadForm form)
+		public async Task<Asset> Create(string containerInteropID, AssetUpload form)
 		{
 			var container = await _containers.Get(containerInteropID);
 			var (asset, file) = AssetMapper.MapFromUpload(container, form);
@@ -106,18 +106,18 @@ namespace Marketplace.CMS.Queries
 			await _storageFactory.GetStorage(container).OnAssetDeleted(asset.id);
 		}
 
-		public async Task<IList<Asset>> List(AssetContainer container, IEnumerable<string> assetIDs)
+		public async Task<IDictionary<string, Asset>> List(AssetContainer container, ISet<string> assetIDs)
 		{
 			var ids = assetIDs.ToList();
 			var paramNames = ids.Select((id, i) => $"@id{i}");
-			var query = $"select * from c where c.id IN ({string.Join(", ", paramNames)})";
 			var parameters = new ExpandoObject();
 			for (int i = 0; i < ids.Count; i++)
 			{
 				parameters.TryAdd($"@id{i}", ids[i]);
 			}
+			var query = $"select * from c where c.id IN ({string.Join(", ", paramNames)})";
 			var assets = await _assetStore.QueryMultipleAsync(query, parameters, GetFeedOptions(container.id));
-			return assets.Select(asset => AssetMapper.MapToResponse(container, asset)).ToList();
+			return assets.Select(asset => AssetMapper.MapToResponse(container, asset)).ToDictionary(x => x.id);
 		}
 
 		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)

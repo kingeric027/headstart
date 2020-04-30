@@ -46,10 +46,10 @@ namespace Marketplace.CMS.Models
 	public class AssetMetadata
 	{
 		public string ContentType { get; set; }
-		public long? SizeBytes { get; set; }
+		public int? SizeBytes { get; set; }
 		public int? ImageHeight { get; set; } = null; // null if asset not image
 		public int? ImageWidth { get; set; } = null; // null if asset not image
-		public float? ImageVerticalResolution { get; set; } = null; // pixels per inch
-		public float? ImageHorizontalResolution { get; set; } = null; // pixels per inch
+		public decimal? ImageVerticalResolution { get; set; } = null; // pixels per inch
+		public decimal? ImageHorizontalResolution { get; set; } = null; // pixels per inch
 	}
 }
