@@ -23,12 +23,15 @@ namespace Marketplace.Models
 		{
 			AuthenticationSchemes = "MarketplaceUser";
 			ApiRoles = roles.Append(ApiRole.FullAccess).ToArray(); // Full Access is always included in the list of roles that give access to a resource.  
-			Roles = string.Join(",", ApiRoles);
-        }
+			var rolesString = string.Join(",", ApiRoles);
+			if (roles.Length == 0) rolesString += $",{MarketplaceUserAuthHandler.RoleForEveryone}"; // If no roles are provided, auth succeeds.
+			Roles = rolesString;
+		}
 	}
 
 	public class MarketplaceUserAuthHandler : AuthenticationHandler<MarketplaceUserAuthOptions>
     {
+		public const string RoleForEveryone = "RoleForEveryone";
         public MarketplaceUserAuthHandler(IOptionsMonitor<MarketplaceUserAuthOptions> options, ILoggerFactory logger,
             UrlEncoder encoder, ISystemClock clock)
             : base(options, logger, encoder, clock) {}
@@ -66,7 +69,9 @@ namespace Marketplace.Models
                 cid.AddClaim(new Claim("email", user.Email ?? ""));
                 cid.AddClaim(new Claim("buyer", user.Buyer?.ID ?? ""));
                 cid.AddClaim(new Claim("supplier", user.Supplier?.ID ?? ""));
-                cid.AddClaims(user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)));
+				var roles = user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)).ToList();
+				roles.Add(new Claim(ClaimTypes.Role, RoleForEveryone));
+				cid.AddClaims(roles);
 
                 var ticket = new AuthenticationTicket(new ClaimsPrincipal(cid), "MarketplaceUser");
                 return AuthenticateResult.Success(ticket);
