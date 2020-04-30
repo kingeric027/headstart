@@ -92,6 +92,14 @@ namespace Marketplace.Common.TemporaryAppConstants
                         CustomRole.MPNeedsApproval,
                     }
                 },
+                new MarketplaceUserType {
+                    UserGroupName = "View All Location Orders",
+                    UserGroupIDSuffix = "ViewAllLocationOrders",
+                    CustomRoles = new List<CustomRole>
+                    {
+                        CustomRole.MPViewAllLocationOrders,
+                    }
+                }
             };
         }
     }
