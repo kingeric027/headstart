@@ -12,9 +12,8 @@
             disabled
             translate>CHECKOUT.SHIPPING_SELECTION_FORM.HOW_FAST</option>
     <option *ngFor="let shipMethod of _shipEstimate?.ShipMethods"
-            [ngValue]="shipMethod.ID"
-            translate>
-      {{ shipMethod.EstimatedTransitDays }} CHECOUT.SHIPPING_SELECTION_FORM.DAY{{ detectPlural(shipMethod.EstimatedTransitDays) }} - {{ shipMethod.Cost | currency }}
+            [ngValue]="shipMethod.ID">
+      {{ shipMethod.EstimatedTransitDays }} <span translate>CHECKOUT.SHIPPING_SELECTION_FORM.DAY</span>{{ detectPlural(shipMethod.EstimatedTransitDays) }} - {{ shipMethod.Cost | currency }}
     </option>
   </select>
 </form>
