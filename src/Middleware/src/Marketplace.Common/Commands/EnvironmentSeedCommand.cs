@@ -226,6 +226,7 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPApprovalRuleAdmin , Roles = new[] { ApiRole.ApprovalRuleAdmin, ApiRole.BuyerUserAdmin, ApiRole.UserGroupAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPOrderApprover },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPNeedsApproval },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPViewAllLocationOrders },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCreditCardAdmin  , Roles = new[] { ApiRole.MeCreditCardAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPAddressAdmin  , Roles = new[] { ApiRole.MeAddressAdmin, ApiRole.AddressAdmin } },
 		};
