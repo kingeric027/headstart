@@ -12,7 +12,7 @@ import { Field } from '../field.interface';
       }}</label>
       <select [formControlName]="config.name" class="form-control form-control-sm" value="{{ config.value }}">
         <option *ngIf="!config.value" value=""></option>
-        <option *ngFor="let option of config.options"> {{ option }} </option>
+        <option *ngFor="let option of config.options" value="{{option.Value}}"> {{ option.Value }} <span *ngIf="option.PriceMarkup"> (+ {{option.PriceMarkup | currency}})</span> </option>
       </select>
     </div>
   `,
