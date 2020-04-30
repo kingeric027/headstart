@@ -20,7 +20,7 @@ export class OCMShippingSelectionForm implements OnInit {
 
   form: FormGroup;
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     this.form = new FormGroup({ rateID: new FormControl(null) });
