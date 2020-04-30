@@ -12,7 +12,6 @@ export class OCMShippingSelectionForm implements OnInit {
   _shipEstimate: ShipEstimate;
   @Input() set shipEstimate(value: ShipEstimate) {
     this._shipEstimate = value;
-    console.log(value)
     this.setSelectedRate(value.SelectedShipMethodID);
   }
   @Input() shipFromAddressID: string;
