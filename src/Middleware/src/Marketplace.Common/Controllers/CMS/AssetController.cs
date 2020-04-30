@@ -28,14 +28,14 @@ namespace Marketplace.CMS.Controllers
 		}
 
 		[DocName("List Assets")]
-		[HttpGet, Route("")]
+		[HttpGet, Route(""), MarketplaceUserAuth]
 		public async Task<ListPage<Asset>> List(string containerID, ListArgs<Asset> args)
 		{
 			return await _assets.List(containerID, args);
 		}
 
 		[DocName("Get an Asset")]
-		[HttpGet, Route("{assetID}")]
+		[HttpGet, Route("{assetID}"), MarketplaceUserAuth]
 		public async Task<Asset> Get(string containerID, string assetID)
 		{
 			return await _assets.Get(containerID, assetID);
@@ -43,27 +43,27 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("Upoload an Asset")]
 		[DocIgnoreAttribute] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
-		[HttpPost, Route("")]
+		[HttpPost, Route(""), MarketplaceUserAuth]
 		public async Task<Asset> Create(string containerID, [FromForm] AssetUpload form)
 		{
 			return await _assets.Create(containerID, form);
 		}
 
 		[DocName("Update an Asset")]
-		[HttpPut, Route("{assetID}")]
+		[HttpPut, Route("{assetID}"), MarketplaceUserAuth]
 		public async Task<Asset> Update(string containerID, string assetID, [FromBody] Asset asset)
 		{
 			return await _assets.Update(containerID, assetID, asset);
 		}
 
 		[DocName("Delete an Asset")]
-		[HttpDelete, Route("{assetID}")]
+		[HttpDelete, Route("{assetID}"), MarketplaceUserAuth]
 		public async Task Delete(string containerID, string assetID)
 		{
 			await _assets.Delete(containerID, assetID);
 		}
 
-		[DocName("List Asset Assignments")]
+		[DocName("List Asset Assignments"), MarketplaceUserAuth]
 		[HttpGet, Route("assignments")]
 		public async Task<ListPage<AssetAssignment>> ListAssignments(string containerID, ListArgs<Asset> args)
 		{
@@ -78,7 +78,7 @@ namespace Marketplace.CMS.Controllers
 			await _assignments.Save(containerID, assignment, VerifiedUserContext);
 		}
 
-		[DocName("Delete Asset Assignment")]
+		[DocName("Delete Asset Assignment"), MarketplaceUserAuth]
 		[HttpDelete, Route("{assetID}/assignments/{resourceType}/{resourceID}")]
 		public async Task DeleteAssignment(string containerID, string assetID, ResourceType resourceType, string resourceID)
 		{

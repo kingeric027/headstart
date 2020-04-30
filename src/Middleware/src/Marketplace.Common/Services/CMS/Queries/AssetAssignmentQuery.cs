@@ -47,12 +47,15 @@ namespace Marketplace.CMS.Queries
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var listPage = list.ToListPage(args.Page, args.PageSize, count);
-			var assetIDs = listPage.Items.Select(assignment => assignment.AssetID);
-			var assetDictionary = await _assets.List(container, new HashSet<string>(assetIDs));
-			foreach (var assignment in listPage.Items)
+			if (count != 0)
 			{
-				assignment.Asset = assetDictionary[assignment.AssetID];
-				assignment.AssetID = assignment.Asset.InteropID;
+				var assetIDs = listPage.Items.Select(assignment => assignment.AssetID);
+				var assetDictionary = await _assets.List(container, new HashSet<string>(assetIDs));
+				foreach (var assignment in listPage.Items)
+				{
+					assignment.Asset = assetDictionary[assignment.AssetID];
+					assignment.AssetID = assignment.Asset.InteropID;
+				}
 			}
 			return listPage;
 		}
