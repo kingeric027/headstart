@@ -181,3 +181,8 @@ ng-progress {
     }
   }
 }
+
+.info-edit-container {
+  border-radius: $border-radius;
+  border-left: 5px solid $primary;
+}

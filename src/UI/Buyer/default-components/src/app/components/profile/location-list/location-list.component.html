@@ -1,31 +1,31 @@
 <ocm-profile-nav>
   <div *ngIf="!isLoading">
-    <div class="d-flex justify-content-between align-items-center">
-      <h1 class="page-heading"
-          translate>PROFILE.LOCATION_LIST.LOCATIONS</h1>
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-3">
+      <h1 class="page-heading" translate>PROFILE.LOCATION_LIST.LOCATIONS</h1>
     </div>
     <div class="row">
       <div class="col-lg-12">
-        <ocm-generic-list [meta]="addresses?.Meta"
-                          [searchPlaceholder]="'locations'"
-                          (requestOptionsUpdated)="updateRequestOptions($event.detail)">
-          <div class="address-card pb-3 mb-3"
-               *ngFor="let location of locations">
-            <ocm-location-details [location]="location"
-                                  [highlight]="currentLocation === location">
-            </ocm-location-details>
+        <ocm-generic-list
+          [meta]="locations?.Meta"
+          [searchPlaceholder]="'locations'"
+          (requestOptionsUpdated)="updateRequestOptions($event.detail)"
+        >
+          <div class="address-card pb-3 mb-3" *ngFor="let location of locations">
+            <ocm-location-list-item [location]="location"> </ocm-location-list-item>
           </div>
         </ocm-generic-list>
       </div>
     </div>
   </div>
   <div *ngIf="isLoading">
-    <ocm-loading-layout height="335px"
-                        width="100%"
-                        mb="1.5rem"
-                        [resource]="addresses"
-                        [rows]="3"
-                        [columns]="3"
-                        [isLoading]="isLoading"></ocm-loading-layout>
+    <ocm-loading-layout
+      height="335px"
+      width="100%"
+      mb="1.5rem"
+      [resource]="addresses"
+      [rows]="3"
+      [columns]="3"
+      [isLoading]="isLoading"
+    ></ocm-loading-layout>
   </div>
 </ocm-profile-nav>

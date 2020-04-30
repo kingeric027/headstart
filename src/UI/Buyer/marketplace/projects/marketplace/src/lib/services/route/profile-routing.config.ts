@@ -28,13 +28,6 @@ export const ProfileSections: ProfileSection[] = [
     showInDropdown: true,
   },
   {
-    routerCall: 'toUsers',
-    displayText: 'User Approval Management',
-    url: '/profile/users',
-    rolesWithAccess: ['MPApprovalRuleAdmin'],
-    showInDropdown: true,
-  },
-  {
     routerCall: 'toMyPaymentMethods',
     displayText: 'My Credit Cards',
     url: '/profile/payment-methods',
