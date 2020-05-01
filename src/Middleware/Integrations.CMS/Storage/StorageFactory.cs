@@ -1,5 +1,5 @@
-﻿using Marketplace.CMS.Models;
-using Marketplace.Common;
+﻿using Integrations.CMS;
+using Marketplace.CMS.Models;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -23,9 +23,9 @@ namespace Marketplace.CMS.Storage
 
 	public class StorageFactory: IStorageFactory
 	{
-		private readonly AppSettings _settings;
+		private readonly CMSConfig _settings;
 
-		public StorageFactory(AppSettings settings)
+		public StorageFactory(CMSConfig settings)
 		{
 			_settings = settings;
 		}
