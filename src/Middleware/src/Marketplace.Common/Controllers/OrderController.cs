@@ -29,6 +29,6 @@ namespace Marketplace.Common.Controllers
         public async Task<Order> AcknowledgeQuoteOrder(string orderID)
         {
             return await _command.AcknowledgeQuoteOrder(orderID);
-        } 
+        }
     }
 }
