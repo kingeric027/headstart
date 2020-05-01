@@ -42,7 +42,7 @@ namespace Marketplace.CMS.Controllers
 		}
 
 		[DocName("Upoload an Asset")]
-		[DocIgnoreAttribute] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
+		[DocIgnore] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
 		[HttpPost, Route(""), MarketplaceUserAuth]
 		public async Task<Asset> Create(string containerID, [FromForm] AssetUpload form)
 		{
