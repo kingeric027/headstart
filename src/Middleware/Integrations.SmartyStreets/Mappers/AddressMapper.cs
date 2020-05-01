@@ -1,5 +1,4 @@
-﻿using Marketplace.Common.Extensions;
-using Marketplace.Models;
+﻿using Marketplace.Models;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 using SmartyStreets.USStreetApi;
@@ -11,10 +10,10 @@ using Lookup = SmartyStreets.USStreetApi.Lookup;
 
 namespace Marketplace.Common.Services.SmartyStreets.Mappers
 {
-	// TODO - exact same logic as AddressMapper - any way to merge?
-	public static class BuyerAddressMapper
+	// TODO - exact same logic as BuyerAddressMapper - any way to merge?
+	public static class AddressMapper
 	{
-		public static Lookup MapToUSStreetLookup(BuyerAddress address)
+		public static Lookup MapToUSStreetLookup(Address address)
 		{
 			var lookup = new Lookup()
 			{
@@ -29,10 +28,10 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 			return lookup;
 		}
 
-		public static List<BuyerAddress> Map(AutoCompleteResponse repsonse, BuyerAddress raw)
+		public static List<Address> Map(AutoCompleteResponse repsonse, Address raw)
 		{
 			var addresses = repsonse.suggestions.Select(suggestion => {
-				var rawCopy = JsonConvert.DeserializeObject<BuyerAddress>(JsonConvert.SerializeObject(raw));
+				var rawCopy = JsonConvert.DeserializeObject<Address>(JsonConvert.SerializeObject(raw));
 				rawCopy.Street1 = suggestion.street_line;
 				rawCopy.Street2 = suggestion.secondary;
 				rawCopy.City = suggestion.city;
@@ -43,10 +42,10 @@ namespace Marketplace.Common.Services.SmartyStreets.Mappers
 			return addresses;
 		}
 
-		public static BuyerAddress Map(Candidate candidate, BuyerAddress raw)
+		public static Address Map(Candidate candidate, Address raw)
 		{
 			// break reference which was causing pass by reference error
-			var rawCopy = JsonConvert.DeserializeObject<BuyerAddress>(JsonConvert.SerializeObject(raw));
+			var rawCopy = JsonConvert.DeserializeObject<Address>(JsonConvert.SerializeObject(raw));
 			rawCopy.Street1 = candidate.DeliveryLine1;
 			rawCopy.Street2 = candidate.DeliveryLine2;
 			rawCopy.City = candidate.Components.CityName;

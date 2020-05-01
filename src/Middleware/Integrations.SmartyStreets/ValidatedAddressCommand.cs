@@ -1,6 +1,4 @@
-﻿using Marketplace.Common.Models;
-using Marketplace.Common.Services.ShippingIntegration;
-using OrderCloud.SDK;
+﻿using OrderCloud.SDK;
 using System;
 using System.Threading.Tasks;
 using Marketplace.Common.Services;

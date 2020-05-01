@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
+using Integrations.SmartyStreets;
 using Marketplace.Common.Services.SmartyStreets.Mappers;
 using Marketplace.Models.Misc;
 using Newtonsoft.Json;
@@ -20,14 +21,14 @@ namespace Marketplace.Common.Services.SmartyStreets
 
 	public class SmartyStreetsService : ISmartyStreetsService
 	{
-		private readonly SmartyStreetSettings _smartySettings;
+		private readonly SmartyStreetsConfig _config;
 		private readonly ClientBuilder _builder;
 		private readonly string AutoCompleteBaseUrl = "https://us-autocomplete-pro.api.smartystreets.com";
 
-		public SmartyStreetsService(AppSettings settings)
+		public SmartyStreetsService(SmartyStreetsConfig config)
 		{
-			_smartySettings = settings.SmartyStreetSettings;
-			_builder = new ClientBuilder(_smartySettings.AuthID, _smartySettings.AuthToken);
+			_config = config;
+			_builder = new ClientBuilder(_config.AuthID, _config.AuthToken);
 		}
 
 		public async Task<AddressValidation<Address>> ValidateAddress(Address address)
@@ -81,9 +82,9 @@ namespace Marketplace.Common.Services.SmartyStreets
 		{
 			var suggestions = await AutoCompleteBaseUrl
 				.AppendPathSegment("lookup")
-				.SetQueryParam("key", _smartySettings.WebsiteKey)
+				.SetQueryParam("key", _config.WebsiteKey)
 				.SetQueryParam("search", search)
-				.WithHeader("Referer", _smartySettings.RefererHost)
+				.WithHeader("Referer", _config.RefererHost)
 				.GetJsonAsync<AutoCompleteResponse>();
 
 			return suggestions;

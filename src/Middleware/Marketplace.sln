@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integration
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integrations.CardConnect", "Integrations.CardConnect\Integrations.CardConnect.csproj", "{0E8012BE-C063-41EB-BC5E-06E65FA4D5A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integrations.SmartyStreets", "Integrations.SmartyStreets\Integrations.SmartyStreets.csproj", "{43A4CE3F-01B0-4E8F-B61A-D22A5A5A89B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +81,10 @@ Global
 		{0E8012BE-C063-41EB-BC5E-06E65FA4D5A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E8012BE-C063-41EB-BC5E-06E65FA4D5A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E8012BE-C063-41EB-BC5E-06E65FA4D5A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43A4CE3F-01B0-4E8F-B61A-D22A5A5A89B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43A4CE3F-01B0-4E8F-B61A-D22A5A5A89B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43A4CE3F-01B0-4E8F-B61A-D22A5A5A89B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43A4CE3F-01B0-4E8F-B61A-D22A5A5A89B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,6 +96,7 @@ Global
 		{24A962C2-814F-4946-8545-5E4585B5281D} = {E6DF6A0A-29DA-4FFC-A8A1-0C57E6674287}
 		{33CF0BFB-D879-46AB-A82A-E014153E602E} = {E6DF6A0A-29DA-4FFC-A8A1-0C57E6674287}
 		{0E8012BE-C063-41EB-BC5E-06E65FA4D5A4} = {E6DF6A0A-29DA-4FFC-A8A1-0C57E6674287}
+		{43A4CE3F-01B0-4E8F-B61A-D22A5A5A89B6} = {E6DF6A0A-29DA-4FFC-A8A1-0C57E6674287}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D28C7C46-780F-4A68-80B8-9789997A37F7}

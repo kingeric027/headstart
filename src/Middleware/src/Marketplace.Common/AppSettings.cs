@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Integrations.SmartyStreets;
 using Marketplace.Helpers.Attributes;
+using ordercloud.integrations.cardconnect;
 
 namespace Marketplace.Common
 {
@@ -32,9 +34,9 @@ namespace Marketplace.Common
         // additional field for production settings because we can only test third
         // party shipping on FreigthPOP prd
         public FreightPopSettings FreightPopSettingsProd { get; set; }
-        public CardConnectSettings CardConnectSettings { get; set; } = new CardConnectSettings();
+        public OrderCloudIntegrationsCardConnectConfig CardConnectSettings { get; set; } = new OrderCloudIntegrationsCardConnectConfig();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
-		public SmartyStreetSettings SmartyStreetSettings { get; set; } = new SmartyStreetSettings();
+		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
         public string SendgridApiKey { get; set; }
     }
 
@@ -93,11 +95,4 @@ namespace Marketplace.Common
 		public string EndpointUri { get; set; }
 		public string DatabaseName { get; set; }
 	}
-
-    public class CardConnectSettings
-    {
-        public string Site { get; set; }
-        public string BaseUrl { get; set; }
-        public string Authorization { get; set; }
-    }
 }

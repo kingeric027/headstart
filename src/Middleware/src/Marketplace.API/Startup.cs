@@ -2,6 +2,7 @@
 using Flurl.Http;
 using Integrations.Avalara;
 using Integrations.CMS;
+using Integrations.SmartyStreets;
 using Marketplace.CMS.Models;
 using Marketplace.CMS.Queries;
 using Marketplace.CMS.Storage;
@@ -60,12 +61,6 @@ namespace Marketplace.API
 				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
 				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
 			};
-			var cardConnectConfig = new OrderCloudIntegrationsCardConnectConfig()
-			{
-				Site = _settings.CardConnectSettings.Site,
-				BaseUrl = _settings.CardConnectSettings.BaseUrl,
-				Authorization = _settings.CardConnectSettings.Authorization
-			};
 			services
 				.ConfigureWebApiServices(_settings)
 				.ConfigureOpenApiSpec("v1", "Marketplace API")
@@ -77,24 +72,24 @@ namespace Marketplace.API
 				.Inject<ISyncCommand>()
 				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
 				.Inject<IFreightPopService>()
-				.Inject<ISmartyStreetsService>()
 				.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
 				.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
+				.InjectCosmosStore<ImageQuery, Image>(cosmosConfig)
 				.InjectCosmosStore<ImageProductAssignmentQuery, ImageProductAssignment>(cosmosConfig)
 				.InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
 				.InjectCosmosStore<AssetAssignmentQuery, AssetAssignment>(cosmosConfig)
-				.InjectCosmosStore<ImageQuery, Image>(cosmosConfig)
+				.AddSingleton<IStorageFactory>(x => new StorageFactory(cmsConfig))
 				.Inject<IOrchestrationCommand>()
 				.Inject<IOrchestrationLogCommand>()
 				.Inject<IOCShippingIntegration>()
 				.Inject<IShipmentCommand>()
+				.AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
 				.Inject<IValidatedAddressCommand>()
 				.Inject<IEnvironmentSeedCommand>()
 				.Inject<IOrderCloudSandboxService>()
 				.Inject<IMarketplaceProductCommand>()
 				.Inject<ISendgridService>()
-				.AddSingleton<IStorageFactory>(x => new StorageFactory(cmsConfig))
 				.Inject<IAssetQuery>()
 				.Inject<ISupplierCategoryConfigQuery>()
 				.InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
@@ -108,7 +103,7 @@ namespace Marketplace.API
                         ApiRole.FullAccess
                     }
                 })
-				.AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(cardConnectConfig))
+				.AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
