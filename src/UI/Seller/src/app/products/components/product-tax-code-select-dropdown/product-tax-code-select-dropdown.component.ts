@@ -13,6 +13,7 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
   taxCodes: ListPage<TaxCodes>;
   @Input()
   superMarketplaceProductEditable: SuperMarketplaceProduct;
+  @Input() readonly: boolean;
 
   @Output()
   taxCodesSearched = new EventEmitter<any>();

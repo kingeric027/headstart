@@ -14,11 +14,11 @@
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
-  <app-product-view *ngIf="userContext?.UserType === 'SELLER'"
+  <!-- <app-product-view *ngIf="userContext?.UserType === 'SELLER'"
                     class="resource-edit"
                     [orderCloudProduct]="resourceInSelection">
-  </app-product-view>
-  <app-product-edit *ngIf="userContext?.UserType === 'SUPPLIER'"
+  </app-product-view> -->
+  <app-product-edit [readonly]="userContext?.UserType === 'SELLER'"
                     class="resource-edit"
                     [dataIsSaving]="dataIsSaving"
                     [addresses]="addresses"
