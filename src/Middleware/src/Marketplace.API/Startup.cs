@@ -1,4 +1,6 @@
-﻿using Flurl.Http;
+﻿using Avalara.AvaTax.RestClient;
+using Flurl.Http;
+using Integrations.Avalara;
 using Marketplace.CMS.Models;
 using Marketplace.CMS.Queries;
 using Marketplace.CMS.Storage;
@@ -44,6 +46,13 @@ namespace Marketplace.API
         {
             var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
                 _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
+			var avalaraConfig = new AvalaraConfig()
+			{
+				Env = _settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox,
+				AccountID = _settings.AvalaraSettings.AccountID,
+				LicenseKey = _settings.AvalaraSettings.LicenseKey,
+				CompanyCode = _settings.AvalaraSettings.CompanyCode
+			};
 			services
 				.ConfigureWebApiServices(_settings)
 				.ConfigureOpenApiSpec("v1", "Marketplace API")
@@ -53,7 +62,7 @@ namespace Marketplace.API
 				.Inject<IZohoClient>()
 				.Inject<IZohoCommand>()
 				.Inject<ISyncCommand>()
-				.Inject<IAvalaraService>()
+				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
 				.Inject<IFreightPopService>()
 				.Inject<ISmartyStreetsService>()
 				.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)

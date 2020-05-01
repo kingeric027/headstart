@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.Avalara;
-using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
@@ -23,8 +22,8 @@ namespace Marketplace.Common.Services.ShippingIntegration
     public class OCShippingIntegration : IOCShippingIntegration
     {
         readonly IFreightPopService _freightPopService;
-        private readonly IAvalaraService _avatax;
-        public OCShippingIntegration(IFreightPopService freightPopService, IAvalaraService avatax)
+        private readonly IAvalaraCommand _avatax;
+        public OCShippingIntegration(IFreightPopService freightPopService, IAvalaraCommand avatax)
         {
             _freightPopService = freightPopService;
             _avatax = avatax;

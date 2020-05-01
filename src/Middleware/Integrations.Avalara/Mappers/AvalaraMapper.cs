@@ -1,8 +1,6 @@
 ﻿using Avalara.AvaTax.RestClient;
-using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Helpers;
 using Marketplace.Models.Misc;
-using Marketplace.Models.Models.Misc;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -91,5 +89,13 @@ namespace Marketplace.Common.Services.Avalara.Mappers
 				OrderBy = null
 			};
 		}
+	}
+	public class TaxCodeListArgs
+	{
+		public int Top { get; set; }
+		public int Skip { get; set; }
+		public string Filter { get; set; }
+		public string OrderBy { get; set; }
+		public string CodeCategory { get; set; }
 	}
 }

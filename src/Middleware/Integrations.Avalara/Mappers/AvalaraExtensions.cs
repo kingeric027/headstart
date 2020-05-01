@@ -1,6 +1,4 @@
 ﻿using Avalara.AvaTax.RestClient;
-using Marketplace.Common.Services.FreightPop;
-using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -10,7 +8,7 @@ namespace Marketplace.Common.Extensions
 {
 	public static class AvalaraExtensions
 	{
-		public static TransactionBuilder WithLineItem(this TransactionBuilder trans, MarketplaceLineItem lineItem)
+		public static TransactionBuilder WithLineItem(this TransactionBuilder trans, LineItem lineItem)
 		{
 			var line = new TransactionLineModel()
 			{
