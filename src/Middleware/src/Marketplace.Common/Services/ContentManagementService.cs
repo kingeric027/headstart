@@ -80,14 +80,12 @@ namespace Marketplace.Common.Services
 			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
 			var _specs = await _oc.Products.ListSpecsAsync(productID, null, null, null, 1, 100, null, token);
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(productID, null, null, null, 1, 100, null, token);
-			var _images = await _img.GetProductImages(productID);
 			return new SuperMarketplaceProduct
 			{
 				Product = _patchedProduct,
 				PriceSchedule = _priceSchedule,
 				Specs = _specs.Items,
 				Variants = _variants.Items,
-				Images = _images.Items,
 			};
 		}
 
@@ -104,14 +102,12 @@ namespace Marketplace.Common.Services
 			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID);
 			var _specs = await _oc.Products.ListSpecsAsync(productID, null, null, null, 1, 100, null, token);
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(productID, null, null, null, 1, 100, null, token);
-			var _images = await _img.GetProductImages(productID);
 			return new SuperMarketplaceProduct
 			{
 				Product = _patchedProduct,
 				PriceSchedule = _priceSchedule,
 				Specs = _specs.Items,
 				Variants = _variants.Items,
-				Images = _images.Items,
 			};
 		}
 
@@ -148,7 +144,6 @@ namespace Marketplace.Common.Services
 				PriceSchedule = _priceSchedule,
 				Specs = _specs.Items,
 				Variants = _variants.Items,
-				Images = _images.Items,
 			};
 		}
 
@@ -171,7 +166,6 @@ namespace Marketplace.Common.Services
 				PriceSchedule = _priceSchedule,
 				Specs = _specs.Items,
 				Variants = _variants.Items,
-				Images = _images.Items,
 			};
 		}
 

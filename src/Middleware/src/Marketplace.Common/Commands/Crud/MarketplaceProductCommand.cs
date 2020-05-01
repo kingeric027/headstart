@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.CMS.Models;
+using Marketplace.CMS.Queries;
 using Marketplace.Common.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
@@ -28,8 +30,9 @@ namespace Marketplace.Common.Commands.Crud
     public class MarketplaceProductCommand : IMarketplaceProductCommand
     {
         private readonly IOrderCloudClient _oc;
+        private readonly IAssetAssignmentQuery _assetAssignments;
         private readonly IImageCommand _imgCommand;
-        public MarketplaceProductCommand(AppSettings settings, IImageCommand imgCommand)
+        public MarketplaceProductCommand(AppSettings settings, IImageCommand imgCommand, IAssetAssignmentQuery assetAssignments)
         {
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
@@ -37,23 +40,49 @@ namespace Marketplace.Common.Commands.Crud
                 AuthUrl = settings.OrderCloudSettings.AuthUrl,
             });
             _imgCommand = imgCommand;
+            _assetAssignments = assetAssignments;
         }
-
+        private async Task<List<Asset>> GetProductImages(string productID, string containerID)
+        {
+            var imageArgs = new ListArgs<Asset>
+            {
+                Filters = new List<ListFilter>()
+                {
+                    new ListFilter()
+                    {
+                        Name="ResourceID",
+                        Values = new List<ListFilterValue>()
+                        {
+                            new ListFilterValue() { Operator = ListFilterOperator.Equal, Term = productID}
+                        }
+                    }
+                }
+            };
+            var imageAssignments = await _assetAssignments.List(containerID, imageArgs);
+            var imagesToReturn = new List<Asset>();
+            foreach (var a in imageAssignments.Items)
+            {
+                if (a.Asset.Type == AssetType.Image)
+                {
+                    imagesToReturn.Add(a.Asset);
+                }
+            };
+            return imagesToReturn;
+        }
         public async Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user)
         {
             var _product =  await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
             var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.DefaultPriceScheduleID, user.AccessToken);
             var _specs = await _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
             var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
-            var _images = await _imgCommand.GetProductImages(_product.ID);
-
+            var _images = await GetProductImages(_product.ID, "SEB");
             return new SuperMarketplaceProduct
             {
                 Product = _product,
                 PriceSchedule = _priceSchedule,
                 Specs = _specs.Items,
                 Variants = _variants.Items,
-                Images = _images.Items
+                Images = _images
             };
         }
 
@@ -70,14 +99,14 @@ namespace Marketplace.Common.Commands.Crud
                 var priceSchedule = await _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
                 var _specs = await _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, user.AccessToken);
                 var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, user.AccessToken);
-                var _images = await _imgCommand.GetProductImages(product.ID);
+                var _images = await GetProductImages(product.ID, "SEB");
                 _superProductsList.Add(new SuperMarketplaceProduct
                 {
                     Product = product,
                     PriceSchedule = priceSchedule,
                     Specs = _specs.Items,
                     Variants = _variants.Items,
-                    Images = _images.Items
+                    Images = _images
                 });
             });
             return new ListPage<SuperMarketplaceProduct>
@@ -133,7 +162,7 @@ namespace Marketplace.Common.Commands.Crud
                 PriceSchedule = _priceSchedule,
                 Specs = _specs.Items,
                 Variants = _variants.Items,
-                Images = new List<Image>(),
+                Images = new List<Asset>(),
             };
         }
 
@@ -203,14 +232,14 @@ namespace Marketplace.Common.Commands.Crud
             // List Product Specs
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
             // List Product Images
-            var _images = await _imgCommand.GetProductImages(id);
+            var _images = await GetProductImages(_updatedProduct.ID, "SEB");
             return new SuperMarketplaceProduct
             {
                 Product = _updatedProduct,
                 PriceSchedule = _updatedPriceSchedule,
                 Specs = _specs.Items,
                 Variants = _variants.Items,
-                Images = _images.Items,
+                Images = _images,
             };
         }
 
