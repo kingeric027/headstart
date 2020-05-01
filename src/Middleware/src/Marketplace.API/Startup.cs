@@ -51,7 +51,8 @@ namespace Marketplace.API
 				Env = _settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox,
 				AccountID = _settings.AvalaraSettings.AccountID,
 				LicenseKey = _settings.AvalaraSettings.LicenseKey,
-				CompanyCode = _settings.AvalaraSettings.CompanyCode
+				CompanyCode = _settings.AvalaraSettings.CompanyCode,
+				HostUrl = _settings.EnvironmentSettings.BaseUrl
 			};
 			services
 				.ConfigureWebApiServices(_settings)
