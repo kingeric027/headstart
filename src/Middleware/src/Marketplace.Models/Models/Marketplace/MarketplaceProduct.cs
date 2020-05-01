@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Marketplace.CMS.Models;
-using Marketplace.Common.Models;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Helpers.Attributes;
 using Marketplace.Models.Extended;

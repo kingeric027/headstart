@@ -76,7 +76,7 @@ namespace Marketplace.Common.Services.Avalara.Mappers
 
 		public static TaxCodeListArgs Map(ListArgs<TaxCode> source)
 		{
-			var taxCategory = source?.Filters?[0]?.Values?[0]?.Term ?? "";
+			var taxCategory = source?.Filters?[0]?.Values?[0]?.Term ?? ""; // TODO - error if no term provided
 			var taxCategorySearch = taxCategory.Trim('0');
 			var search = source.Search;
 			var filter = search != "" ? $"isActive eq true and taxCode startsWith '{taxCategorySearch}' and (taxCode contains '{search}' OR description contains '{search}')" : $"isActive eq true and taxCode startsWith '{taxCategorySearch}'";
@@ -90,12 +90,12 @@ namespace Marketplace.Common.Services.Avalara.Mappers
 			};
 		}
 	}
-	public class TaxCodeListArgs
-	{
-		public int Top { get; set; }
-		public int Skip { get; set; }
-		public string Filter { get; set; }
-		public string OrderBy { get; set; }
-		public string CodeCategory { get; set; }
-	}
+			public class TaxCodeListArgs
+		{
+			public int Top { get; set; }
+			public int Skip { get; set; }
+			public string Filter { get; set; }
+			public string OrderBy { get; set; }
+			public string CodeCategory { get; set; }
+		}
 }

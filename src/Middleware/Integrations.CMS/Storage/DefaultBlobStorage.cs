@@ -1,5 +1,5 @@
-﻿using Marketplace.CMS.Models;
-using Marketplace.Common;
+﻿using Integrations.CMS;
+using Marketplace.CMS.Models;
 using Marketplace.Helpers.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -14,14 +14,14 @@ namespace Marketplace.CMS.Storage
 	{
 		private readonly AssetContainer _container;
 
-		public DefaultBlobStorage(AssetContainer container, AppSettings settings)
+		public DefaultBlobStorage(AssetContainer container, CMSConfig config)
 		{
 			_container = container;
 			_container.StorageAccount = new StorageAccount()
 			{
 				Type = StorageAccountType.DefaultBlob,
-				HostUrl = settings.BlobSettings.HostUrl,
-				ConnectionString = settings.BlobSettings.ConnectionString,
+				HostUrl = config.BlobStorageHostUrl,
+				ConnectionString = config.BlobStorageHostUrl
 			};
 		}
 

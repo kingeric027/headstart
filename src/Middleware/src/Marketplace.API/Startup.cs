@@ -1,6 +1,7 @@
 ﻿using Avalara.AvaTax.RestClient;
 using Flurl.Http;
 using Integrations.Avalara;
+using Integrations.CMS;
 using Marketplace.CMS.Models;
 using Marketplace.CMS.Queries;
 using Marketplace.CMS.Storage;
@@ -54,6 +55,11 @@ namespace Marketplace.API
 				CompanyCode = _settings.AvalaraSettings.CompanyCode,
 				HostUrl = _settings.EnvironmentSettings.BaseUrl
 			};
+			var cmsConfig = new CMSConfig()
+			{
+				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
+				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
+			};
 			services
 				.ConfigureWebApiServices(_settings)
 				.ConfigureOpenApiSpec("v1", "Marketplace API")
@@ -82,7 +88,7 @@ namespace Marketplace.API
 				.Inject<IOrderCloudSandboxService>()
 				.Inject<IMarketplaceProductCommand>()
 				.Inject<ISendgridService>()
-				.Inject<IStorageFactory>()
+				.AddSingleton<IStorageFactory>(x => new StorageFactory(cmsConfig))
 				.Inject<IAssetQuery>()
 				.Inject<ISupplierCategoryConfigQuery>()
 				.InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
