@@ -103,8 +103,8 @@ namespace Marketplace.API
                         ApiRole.FullAccess
                     }
                 })
-				.AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
+				.AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .Inject<IMarketplaceSupplierCommand>()
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser")

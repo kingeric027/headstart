@@ -25,9 +25,9 @@ namespace ordercloud.integrations.cardconnect
         private readonly IFlurlClient _flurl;
         public OrderCloudIntegrationsCardConnectConfig Config { get; }
 
-        public OrderCloudIntegrationsCardConnectService() : this(new OrderCloudIntegrationsCardConnectConfig())
-        {
-        }
+        //public OrderCloudIntegrationsCardConnectService() : this(new OrderCloudIntegrationsCardConnectConfig())
+        //{
+        //}
 
         public OrderCloudIntegrationsCardConnectService(OrderCloudIntegrationsCardConnectConfig config)
         {
