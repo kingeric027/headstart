@@ -21,7 +21,7 @@ namespace Marketplace.CMS.Storage
 			{
 				Type = StorageAccountType.DefaultBlob,
 				HostUrl = config.BlobStorageHostUrl,
-				ConnectionString = config.BlobStorageConnectionString;
+				ConnectionString = config.BlobStorageConnectionString
 			};
 		}
 
