@@ -19,7 +19,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
     <PackageReference Include="OrderCloud.SDK" Version="0.9.0-pre1" />
     <PackageReference Include="SendGrid" Version="9.12.5" />
-    <PackageReference Include="smartystreets-dotnet-sdk" Version="8.4.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,6 +41,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Integrations.Avalara\Integrations.Avalara.csproj" />
+    <ProjectReference Include="..\..\Integrations.CardConnect\Integrations.CardConnect.csproj" />
+    <ProjectReference Include="..\..\Integrations.CMS\Integrations.CMS.csproj" />
+    <ProjectReference Include="..\..\Integrations.SmartyStreets\Integrations.SmartyStreets.csproj" />
     <ProjectReference Include="..\Marketplace.Helpers\Marketplace.Helpers.csproj" />
     <ProjectReference Include="..\Marketplace.Models\Marketplace.Models.csproj" />
   </ItemGroup>

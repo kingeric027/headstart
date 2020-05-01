@@ -1,9 +1,6 @@
 ﻿using Marketplace.Helpers.Exceptions;
 using Marketplace.Models.Misc;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Marketplace.Common.Services.SmartyStreets.Models
 {

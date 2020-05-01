@@ -1,6 +1,4 @@
-﻿using Marketplace.Common.Models;
-using Marketplace.Common.Services.ShippingIntegration;
-using OrderCloud.SDK;
+﻿using OrderCloud.SDK;
 using System;
 using System.Threading.Tasks;
 using Marketplace.Common.Services;
@@ -22,10 +20,10 @@ namespace Marketplace.Common.Commands
 	}
 
 	public class ValidatedAddressCommand : IValidatedAddressCommand
-    {
+	{
         private readonly IOrderCloudClient _oc;
-		private readonly ISmartyStreetsService _smartyStreets;
-		public ValidatedAddressCommand(IOrderCloudClient ocClient, ISmartyStreetsService smartyStreets)
+		private readonly ISmartyStreetsCommand _smartyStreets;
+		public ValidatedAddressCommand(IOrderCloudClient ocClient, ISmartyStreetsCommand smartyStreets)
         {
             _oc = ocClient;
 			_smartyStreets = smartyStreets;
