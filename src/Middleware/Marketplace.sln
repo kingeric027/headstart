@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Helpers.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0B969DE0-4342-474E-A83B-BF34DAF05600}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integrations.Avalara", "Integrations.Avalara\Integrations.Avalara.csproj", "{24A962C2-814F-4946-8545-5E4585B5281D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{81C36D0B-59F4-4820-AACA-61D96236A474}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81C36D0B-59F4-4820-AACA-61D96236A474}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81C36D0B-59F4-4820-AACA-61D96236A474}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24A962C2-814F-4946-8545-5E4585B5281D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24A962C2-814F-4946-8545-5E4585B5281D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24A962C2-814F-4946-8545-5E4585B5281D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24A962C2-814F-4946-8545-5E4585B5281D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

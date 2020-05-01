@@ -19,9 +19,9 @@ namespace Marketplace.Common.Controllers.Avalara
 	[Route("avalara")]
 	public class AvalaraController : BaseController
 	{
-		private readonly IAvalaraService _taxService;
+		private readonly IAvalaraCommand _taxService;
 
-		public AvalaraController(AppSettings settings, IAvalaraService taxService) : base(settings)
+		public AvalaraController(AppSettings settings, IAvalaraCommand taxService) : base(settings)
 		{
 			_taxService = taxService;
 		}

@@ -4,19 +4,18 @@ using System.Threading.Tasks;
 using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Services.Avalara.Mappers;
-using Marketplace.Common.Services.AvaTax.Models;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Helpers;
+using Marketplace.Helpers.Models;
 using Marketplace.Models.Misc;
-using Marketplace.Models.Models.Misc;
 using OrderCloud.SDK;
 using Flurl.Http;
 using Flurl;
 using System.IO;
+using Integrations.Avalara;
+using Marketplace.Helpers;
 
 namespace Marketplace.Common.Services.Avalara
 {
-	public interface IAvalaraService
+	public interface IAvalaraCommand
 	{
 		Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> marketplaceListArgs);
 		Task<TaxCertificate> GetCertificateAsync(int companyID, int certifitcateID);
@@ -24,32 +23,30 @@ namespace Marketplace.Common.Services.Avalara
 		Task<TaxCertificate> UpdateCertificateAsync(int companyID, int certificateID, TaxCertificate cert);
 		Task<byte[]> DownloadCertificatePdfAsync(int companyID, int certificateID);
 		// Use this before checkout. No records will be saved in avalara.
-		Task<decimal> GetEstimateAsync(MarketplaceOrderWorksheet orderWorksheet);
+		Task<decimal> GetEstimateAsync(OrderWorksheet orderWorksheet);
 		// Use this during submit.
-		Task<TransactionModel> CreateTransactionAsync(MarketplaceOrderWorksheet orderWorksheet);
+		Task<TransactionModel> CreateTransactionAsync(OrderWorksheet orderWorksheet);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
 		// When should we do this? 
 		Task<TransactionModel> CommitTransactionAsync(string transactionCode);
 	}
 
-	public class AvalaraService : IAvalaraService
+	public class AvalaraCommand : IAvalaraCommand
 	{
 		const string PROD_URL = "https://rest.avatax.com/api/v2";
 		const string SANDBOX_URL = "https://sandbox-rest.avatax.com/api/v2";
-		private readonly AppSettings _settings;
+		private readonly AvalaraConfig _settings;
 		private readonly AvaTaxClient _avaTax;
 		private readonly string _companyCode;
 		private readonly string _baseUrl;
 
-		public AvalaraService(AppSettings settings)
+		public AvalaraCommand(AvalaraConfig settings)
 		{
 			_settings = settings;
-			_companyCode = _settings.AvalaraSettings.CompanyCode;
-			_baseUrl = _settings.Env == AppEnvironment.Prod ? PROD_URL : SANDBOX_URL;
-			var env = _settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox;
-
-			_avaTax = new AvaTaxClient("four51 marketplace", "v1", _settings.Env.ToString(), env)
-					.WithSecurity(_settings.AvalaraSettings.AccountID, _settings.AvalaraSettings.LicenseKey);
+			_companyCode = _settings.CompanyCode;
+			_baseUrl = _settings.Env == AvaTaxEnvironment.Production ? PROD_URL : SANDBOX_URL;
+			_avaTax = new AvaTaxClient("four51 marketplace", "v1", "machine_name", _settings.Env)
+					.WithSecurity(_settings.AccountID, _settings.LicenseKey);
 		}
 
 		public async Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> marketplaceListArgs)
@@ -63,21 +60,21 @@ namespace Marketplace.Common.Services.Avalara
 		public async Task<TaxCertificate> GetCertificateAsync(int companyID, int certifitcateID)
 		{
 			var certificate = await _avaTax.GetCertificateAsync(companyID, certifitcateID, "");
-			var mappedCertificate = AvalaraMapper.Map(certificate, companyID, _settings.EnvironmentSettings.BaseUrl);
+			var mappedCertificate = AvalaraMapper.Map(certificate, companyID, "BaseUrl");
 			return mappedCertificate;
 		}
 
 		public async Task<TaxCertificate> CreateCertificateAsync(int companyID, TaxCertificate cert)
 		{
 			var certificates = await _avaTax.CreateCertificatesAsync(companyID, false, new List<CertificateModel> { AvalaraMapper.Map(cert) });
-			var mappedCertificate = AvalaraMapper.Map(certificates[0], companyID, _settings.EnvironmentSettings.BaseUrl);
+			var mappedCertificate = AvalaraMapper.Map(certificates[0], companyID, "BaseUrl");
 			return mappedCertificate;
 		}
 
 		public async Task<TaxCertificate> UpdateCertificateAsync(int companyID, int certifitcateID, TaxCertificate cert)
 		{
 			var certificate = await _avaTax.UpdateCertificateAsync(companyID, certifitcateID, AvalaraMapper.Map(cert));
-			var mappedCertificate = AvalaraMapper.Map(certificate, companyID, _settings.EnvironmentSettings.BaseUrl);
+			var mappedCertificate = AvalaraMapper.Map(certificate, companyID, "BaseUrl");
 			return mappedCertificate;
 		}
 
@@ -85,18 +82,18 @@ namespace Marketplace.Common.Services.Avalara
 		public async Task<byte[]> DownloadCertificatePdfAsync(int companyID, int certificateID)
 		{
 			var pdfBtyes = await new Url($"{_baseUrl}/companies/{companyID}/certificates/{certificateID}/attachment")
-				.WithBasicAuth(_settings.AvalaraSettings.AccountID.ToString(), _settings.AvalaraSettings.LicenseKey)
+				.WithBasicAuth(_settings.AccountID.ToString(), _settings.LicenseKey)
 				.GetBytesAsync();
 			return pdfBtyes;
 		}
 
-		public async Task<decimal> GetEstimateAsync(MarketplaceOrderWorksheet orderWorksheet)
+		public async Task<decimal> GetEstimateAsync(OrderWorksheet orderWorksheet)
 		{
 			var taxEstimate = (await CreateTransactionAsync(DocumentType.SalesOrder, orderWorksheet)).totalTax ?? 0;
 			return taxEstimate;
 		}
 
-		public async Task<TransactionModel> CreateTransactionAsync(MarketplaceOrderWorksheet orderWorksheet)
+		public async Task<TransactionModel> CreateTransactionAsync(OrderWorksheet orderWorksheet)
 		{
 			var transaction = await CreateTransactionAsync(DocumentType.SalesInvoice, orderWorksheet);
 			return transaction;
@@ -111,7 +108,7 @@ namespace Marketplace.Common.Services.Avalara
 
 		private string GetCustomerCode(Order order) => order.FromCompanyID;
 
-		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, MarketplaceOrderWorksheet orderWorksheet)
+		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)
 		{
 			var builder = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderWorksheet.Order));
 			builder.WithTransactionCode(orderWorksheet.Order.ID);
