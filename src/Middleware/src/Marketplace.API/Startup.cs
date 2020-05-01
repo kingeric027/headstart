@@ -64,7 +64,7 @@ namespace Marketplace.API
 			services
 				.ConfigureWebApiServices(_settings)
 				.ConfigureOpenApiSpec("v1", "Marketplace API")
-				.Inject<IAppSettings>()
+				.Inject<AppSettings>()
 				.Inject<IDevCenterService>()
 				.Inject<IFlurlClient>()
 				.Inject<IZohoClient>()
@@ -84,7 +84,7 @@ namespace Marketplace.API
 				.Inject<IOrchestrationLogCommand>()
 				.Inject<IOCShippingIntegration>()
 				.Inject<IShipmentCommand>()
-				.AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
+				.AddSingleton<ISmartyStreetsCommand>(x => new SmartyStreetsCommand(_settings.SmartyStreetSettings))
 				.Inject<IValidatedAddressCommand>()
 				.Inject<IEnvironmentSeedCommand>()
 				.Inject<IOrderCloudSandboxService>()

@@ -75,7 +75,6 @@ namespace Marketplace.CMS.Storage
 			}
 		}
 
-
 		private BlobService BuildBlobService(string containerID)
 		{
 			return new BlobService(new BlobServiceConfig()

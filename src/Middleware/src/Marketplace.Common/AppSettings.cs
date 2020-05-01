@@ -9,19 +9,8 @@ namespace Marketplace.Common
 {
 	public enum AppEnvironment { Qa, Demo, Prod }
 
-    public interface IAppSettings
-    {
-		AppEnvironment Env { get; }
-		EnvironmentSettings EnvironmentSettings { get; }
-		BlobSettings BlobSettings { get; }
-        CosmosSettings CosmosSettings { get;}
-        OrderCloudSettings OrderCloudSettings { get; }
-        FreightPopSettings FreightPopSettings { get; set; }
-        string SendgridApiKey { get; }
-    }
-
     [DocIgnore]
-    public class AppSettings : IAppSettings
+    public class AppSettings
     {
 		public AppEnvironment Env { get; set; }
 		public EnvironmentSettings EnvironmentSettings { get; set; } = new EnvironmentSettings();

@@ -19,11 +19,11 @@ namespace Marketplace.Common.Commands
 		Task<BuyerAddress> GetPatchedMeAddress(string addressID, BuyerAddress patch, string token);
 	}
 
-	public class ValidatedAddressCommand : IValidatedAddressCommand
-    {
+	public class ValidatedAddressCommand : ISmartyStreetsCommand
+	{
         private readonly IOrderCloudClient _oc;
-		private readonly ISmartyStreetsService _smartyStreets;
-		public ValidatedAddressCommand(IOrderCloudClient ocClient, ISmartyStreetsService smartyStreets)
+		private readonly ISmartyStreetsCommand _smartyStreets;
+		public ValidatedAddressCommand(IOrderCloudClient ocClient, ISmartyStreetsCommand smartyStreets)
         {
             _oc = ocClient;
 			_smartyStreets = smartyStreets;

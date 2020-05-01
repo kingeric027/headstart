@@ -13,19 +13,19 @@ using SmartyStreets.USStreetApi;
 
 namespace Marketplace.Common.Services.SmartyStreets
 {
-	public interface ISmartyStreetsService
+	public interface ISmartyStreetsCommand
 	{
 		Task<AddressValidation<Address>> ValidateAddress(Address address);
 		Task<AddressValidation<BuyerAddress>> ValidateAddress(BuyerAddress address);
 	}
 
-	public class SmartyStreetsService : ISmartyStreetsService
+	public class SmartyStreetsCommand : ISmartyStreetsCommand
 	{
 		private readonly SmartyStreetsConfig _config;
 		private readonly ClientBuilder _builder;
 		private readonly string AutoCompleteBaseUrl = "https://us-autocomplete-pro.api.smartystreets.com";
 
-		public SmartyStreetsService(SmartyStreetsConfig config)
+		public SmartyStreetsCommand(SmartyStreetsConfig config)
 		{
 			_config = config;
 			_builder = new ClientBuilder(_config.AuthID, _config.AuthToken);
