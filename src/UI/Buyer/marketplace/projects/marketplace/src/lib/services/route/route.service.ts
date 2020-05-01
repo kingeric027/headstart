@@ -33,6 +33,7 @@ export interface IRouter {
   toChangePassword(): void;
   getProfileSections(): ProfileSection[];
   toRoute(path: string): void;
+  toLocationManagement(addressID: string): void;
 }
 
 @Injectable({
@@ -115,6 +116,10 @@ export class RouteService implements IRouter {
 
   toMyLocations(): void {
     this.toRoute('/profile/locations');
+  }
+
+  toLocationManagement(addressID: string): void {
+    this.toRoute(`/profile/locations/${addressID}`);
   }
 
   toMyPaymentMethods(): void {

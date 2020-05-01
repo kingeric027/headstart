@@ -52,7 +52,7 @@ export class OCMCheckout implements OnInit {
     },
   ];
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService) { }
 
   ngOnInit(): void {
     this.context.order.onChange(order => (this.order = order));

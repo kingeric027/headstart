@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Cosmonaut;
 using Cosmonaut.Extensions.Microsoft.DependencyInjection;
 using Marketplace.Helpers.Attributes;
@@ -127,17 +128,16 @@ namespace Marketplace.Helpers.Extensions
         {
             var settings = new T();
             var builder = new ConfigurationBuilder();
-
+            if (host.Services.FirstOrDefault(d => d.ServiceType == typeof(IConfiguration))?.ImplementationInstance is IConfiguration configRoot)
+                builder.AddConfiguration(configRoot);
             var config = builder
                 .AddAzureAppConfiguration(appSettingsConnectionString)
                 .Build();
             config.GetSection(section).Bind(settings);
-
             host.Services
                 .Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config))
                 .BuildServiceProvider()
                 .GetService<IConfiguration>();
-
             host.Services.AddSingleton(settings);
             return host;
         }

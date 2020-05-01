@@ -11,6 +11,7 @@ namespace Marketplace.Common.Services.FreightPop
 		Task<Response<dynamic>> ImportOrderAsync(List<OrderRequest> orderRequestBody);
 		Task<Response<GetRatesData>> GetRatesAsync(RateRequestBody rateRequestBody);
 		Task<Response<List<ShipmentDetails>>> GetShipmentsForOrder(string orderID);
+		Task<Response<List<ShipmentDetails>>> GetShipmentsByDate(int daysAgo);
 	}
 
 	public class FreightPopService : IFreightPopService
@@ -69,6 +70,17 @@ namespace Marketplace.Common.Services.FreightPop
 			await AuthenticateAync();
 			var getShipmentResponse = await MakeRequest($"shipment/getShipment?id={orderID}&type={GetShipmentBy.OrderNo}").GetAsync().ReceiveJson<Response<List<ShipmentDetails>>>();
 			return getShipmentResponse;
+		}
+		public async Task<Response<List<ShipmentDetails>>> GetShipmentsByDate(int daysAgo)
+		{
+			await AuthenticateAync();
+			var getShipmentResponse = await MakeRequest($"shipment/getShipment?id={GetDateStringForQuery(daysAgo)}&type={GetShipmentBy.Date}").GetAsync().ReceiveJson<Response<List<ShipmentDetails>>>();
+			return getShipmentResponse;
+		}
+		private string GetDateStringForQuery(int daysAgo)
+		{
+			var dateToQuery = DateTime.Now.AddDays(-daysAgo);
+			return dateToQuery.ToString("MM/dd/yyyy");
 		}
 	}
 }

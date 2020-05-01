@@ -8,9 +8,9 @@
          (click)="toProductDetails(li.Product.ID)">{{ li | productNameWithSpecs }}</a>
       <div class="d-flex justify-content-between">
         <div><span class="text-muted"
-                translate>CART.MINI_CART.QTY:</span> {{ li.Quantity | number}}</div>
+                translate>CART.MINI_CART.QTY</span>: {{ li.Quantity | number}}</div>
         <div><span class="text-muted"
-                translate>CART.MINI_CART.UNIT_PRICE:</span> {{ li.UnitPrice || 0 | currency}}</div>
+                translate>CART.MINI_CART.UNIT_PRICE</span>: {{ li.UnitPrice || 0 | currency}}</div>
       </div>
     </div>
     <h4 *ngIf="lineItems.length > maxLines"
@@ -37,7 +37,7 @@
     <div>
       <button class="btn btn-sm btn-primary"
               (click)="toCheckout()"
-              translate>CART.MINI_CART.CHECKOIUT</button>
+              translate>CART.MINI_CART.CHECKOUT</button>
     </div>
   </div>
 </div>

@@ -4,6 +4,7 @@ import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { TaxCertificate, MarketplaceAddressBuyer, MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { ListMarketplaceAddressBuyer, AppConfig, BuyerLocationWithCert } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
+import { UserManagementService } from '../user-management/user-management.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,8 @@ export class AddressService {
     private ocMeService: OcMeService,
     private appConfig: AppConfig,
     private ocAddressService: OcAddressService,
-    private user: CurrentUserService
+    private user: CurrentUserService,
+    private userManagementService: UserManagementService
   ) {
     this.avalaraCompanyId = this.appConfig.avalaraCompanyId;
   }
@@ -66,7 +68,7 @@ export class AddressService {
     return created;
   }
 
-  private getCertificate = (address: MarketplaceAddressBuyer): Promise<TaxCertificate> => {
+  getCertificate = (address: MarketplaceAddressBuyer): Promise<TaxCertificate> => {
     const certificateID = address?.xp?.AvalaraCertificateID;
     if (certificateID === null || certificateID === undefined) return Promise.resolve(null);
     return MarketplaceSDK.Avalaras.GetCertificate(this.avalaraCompanyId, certificateID);

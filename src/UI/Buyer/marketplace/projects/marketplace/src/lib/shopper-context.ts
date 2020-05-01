@@ -14,6 +14,9 @@ import {
   ListAddress,
   ListBuyerCreditCard,
   BuyerCreditCard,
+  User,
+  UserGroupAssignment,
+  ApprovalRule,
 } from '@ordercloud/angular-sdk';
 import {
   ProductXp,

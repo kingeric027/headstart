@@ -124,8 +124,9 @@ import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.co
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
 import { OCMQuoteRequestForm } from './components/products/quote-request-form/quote-request-form.component';
 import { UnitOfMeasurePipe } from './pipes/unit-of-measure.pipe';
-import { OCMLocationDetails } from './components/profile/location-details/location-details.component';
+import { OCMLocationListItem } from './components/profile/location-list-item/location-list-item.component';
 import { OCMCertificateForm } from './components/profile/certificate-form/certificate-form.component';
+import { OCMLocationManagement } from './components/profile/location-management/location-management.component';
 
 const components = [
   OCMCategoryDropdown,
@@ -199,7 +200,8 @@ const components = [
   OCMShippingSelectionForm,
   ConfirmModal,
   OCMPaymentCreditCard,
-  OCMLocationDetails,
+  OCMLocationListItem,
+  OCMLocationManagement,
   OCMCertificateForm,
 ];
 
@@ -335,7 +337,8 @@ export class AppModule {
     this.buildWebComponent(OCMAddressSuggestion, 'address-suggestion');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
     this.buildWebComponent(ConfirmModal, 'confirm-modal');
-    this.buildWebComponent(OCMLocationDetails, 'ocm-location-details');
+    this.buildWebComponent(OCMLocationListItem, 'ocm-location-list-item');
+    this.buildWebComponent(OCMLocationManagement, 'ocm-location-management');
     this.buildWebComponent(OCMCertificateForm, 'ocm-certificate-form');
   }
 

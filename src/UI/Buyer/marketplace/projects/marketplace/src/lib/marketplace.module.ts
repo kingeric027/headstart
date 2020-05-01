@@ -42,8 +42,8 @@ import { CheckoutService } from './services/order/checkout.service';
 import { OrderStateService } from './services/order/order-state.service';
 import { Configuration } from 'marketplace-javascript-sdk';
 import { AppConfig } from './shopper-context';
-import { UserManagementWrapperComponent } from './wrapper-components/user-management-wrapper.component';
 import { OrdersToApproveStateService } from './services/order-history/order-to-approve-state.service';
+import { LocationManagementWrapperComponent } from './wrapper-components/location-management-wrapper.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -55,7 +55,6 @@ import { OrdersToApproveStateService } from './services/order-history/order-to-a
     MeProductResolver,
     MeListSpecsResolver,
     MeListRelatedProductsResolver,
-
     AuthService,
     CreditCardService,
     CurrentOrderService,
@@ -77,6 +76,7 @@ import { OrdersToApproveStateService } from './services/order-history/order-to-a
     CheckoutWrapperComponent,
     AddressListWrapperComponent,
     LocationListWrapperComponent,
+    LocationManagementWrapperComponent,
     ForgotPasswordWrapperComponent,
     HomeWrapperComponent,
     LoginWrapperComponent,
@@ -86,7 +86,6 @@ import { OrdersToApproveStateService } from './services/order-history/order-to-a
     ProductListWrapperComponent,
     ProfileWrapperComponent,
     RegisterWrapperComponent,
-    UserManagementWrapperComponent,
     ResetPasswordWrapperComponent,
     OrderDetailWrapperComponent,
     OrderShipmentsWrapperComponent,
