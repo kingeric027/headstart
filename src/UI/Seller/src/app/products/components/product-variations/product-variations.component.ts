@@ -7,6 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from 'src/environments/environment';
+import { AppAuthService } from '@app-seller/auth';
 
 @Component({
   selector: 'product-variations-component',
@@ -62,7 +64,7 @@ export class ProductVariations {
   variantInSelection: Variant;
   imageInSelection: Image;
 
-  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private _snackBar: MatSnackBar, private ocProductService: OcProductService) {}
+  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private _snackBar: MatSnackBar, private ocProductService: OcProductService, private appAuthService: AppAuthService,) {}
   getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
@@ -298,7 +300,8 @@ export class ProductVariations {
     this.assignVariantImages = false;
     // Queue up image/content requests, then send them all at aonce
     // TODO: optimize this so we aren't having to update all images, just 'changed' ones
-    const requests = this.superProductEditable.Images.map(i => MarketplaceSDK.Images.Post(i));
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    const requests = this.superProductEditable.Images.map(i => MarketplaceSDK.Assets.Update(environment.marketplaceID, (i as any).ID, i, accessToken));
     await Promise.all(requests);
     // Ensure there is no mistaken change detection
     Object.assign(this.superProductStatic.Images, this.superProductEditable.Images);

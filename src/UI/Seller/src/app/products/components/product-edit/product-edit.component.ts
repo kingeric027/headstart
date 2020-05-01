@@ -30,6 +30,7 @@ import { AppAuthService } from '@app-seller/auth';
 import { environment } from 'src/environments/environment';
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
 import { AssetAssignment } from 'marketplace-javascript-sdk/dist/models/AssetAssignment';
+import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 
 @Component({
   selector: 'app-product-edit',
@@ -60,7 +61,7 @@ export class ProductEditComponent implements OnInit {
   dataIsSaving = false;
   userContext = {};
   hasVariations = false;
-  images: ProductImage[] = [];
+  images: Asset[] = [];
   files: FileHandle[] = [];
   faTimes = faTimes;
   faTrash = faTrash;
@@ -105,7 +106,6 @@ export class ProductEditComponent implements OnInit {
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
     this.setProductEditTab();
-    console.log('is component readonly?', this.readonly)
   }
 
   setProductEditTab(): void {
@@ -147,9 +147,9 @@ export class ProductEditComponent implements OnInit {
       this.taxCodes = { Meta: {}, Items: [] };
     }
     this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
-    this.staticContent = this._superMarketplaceProductEditable.Product?.xp?.StaticContent;
+    this.staticContent = (this._superMarketplaceProductEditable as any).Attachments;
     this.createProductForm(this._superMarketplaceProductEditable);
-    this.images = ReplaceHostUrls(this._superMarketplaceProductEditable.Product);
+    this.images = this._superMarketplaceProductEditable.Images;
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
@@ -245,7 +245,6 @@ export class ProductEditComponent implements OnInit {
   }
 
   handleUpdateProduct(event: any, field: string, typeOfValue?: string): void {
-    console.log(event)
     const productUpdate = {
       field,
       value:
@@ -301,10 +300,30 @@ export class ProductEditComponent implements OnInit {
     this.checkForChanges();
   }
 
+  async uploadAsset(productID: string, file: FileHandle, assetType: string, containerID: string): Promise<SuperMarketplaceProduct> {
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    const asset: AssetUpload = {
+      Active: true,
+      File: file.File,
+      Type: (assetType as AssetUpload["Type"]),
+      FileName: file.Filename
+    }
+    const newAsset: Asset = await MarketplaceSDK.Upload.UploadAsset(containerID, asset, accessToken);
+    const assetAssignment: AssetAssignment = {
+      ContainerID: containerID,
+      ResourceType: "Products",
+      // TODO: Update when the MarketplaceSDK gets bumped again with SuperMarketplaceProduct model update
+      AssetID: (newAsset as any).ID,
+      ResourceID: productID
+    }
+    await MarketplaceSDK.Assets.SaveAssignment(containerID, assetAssignment, accessToken);
+    return await MarketplaceSDK.Products.Get(productID, accessToken);
+  }
+
   async addDocuments(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.middleware.uploadStaticContent(file.File, productID, file.Filename);
+      superProduct = await this.uploadAsset(productID, file, "Attachment", environment.marketplaceID);
     }
     this.staticContentFiles = [];
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -313,27 +332,12 @@ export class ProductEditComponent implements OnInit {
   }
 
   async addImages(files: FileHandle[], productID: string): Promise<void> {
-    const accessToken = await this.appAuthService.fetchToken().toPromise();
     let superProduct;
     for (const file of files) {
-      const asset: AssetUpload = {
-        Active: true,
-        File: file.File,
-        Type: 'Image',
-        FileName: file.Filename
-      }
-      const newAsset = await MarketplaceSDK.Upload.UploadAsset('SEB', asset, accessToken);
-      const assetAssignment: AssetAssignment = {
-        ContainerID: 'SEB',
-        ResourceType: 'Products',
-        AssetID: newAsset.id,
-        ResourceID: productID
-      }
-      await MarketplaceSDK.Assets.SaveAssignment('SEB', assetAssignment, accessToken);
+      superProduct = await this.uploadAsset(productID, file, "Image", environment.marketplaceID);
     }
     this.imageFiles = []
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
-    superProduct = await MarketplaceSDK.Products.Get(productID, accessToken);
     superProduct = Object.assign(this._superMarketplaceProductStatic || {}, superProduct);
     this.refreshProductData(superProduct);
   }
@@ -366,12 +370,6 @@ export class ProductEditComponent implements OnInit {
    * ******************************************/
 
   /* This url points to the document in blob storage in order for it to be downloadable. */
-  getDocumentUrl(url: string): string {
-    const spliturl = url.split('/')
-    spliturl.splice(4, 1);
-    const str = spliturl.join('/')
-    return str;
-  }
 
   getDocumentName(event: KeyboardEvent): void {
     this.documentName = (event.target as HTMLInputElement).value;
@@ -454,7 +452,8 @@ export class ProductEditComponent implements OnInit {
   };
 
   async handleSelectedProductChange(product: Product): Promise<void> {
-    const marketplaceProduct = await MarketplaceSDK.Products.Get(product.ID);
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    const marketplaceProduct = await MarketplaceSDK.Products.Get(product.ID, accessToken);
     this.refreshProductData(marketplaceProduct);
   }
 
@@ -489,7 +488,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   getProductPreviewImage(): string | SafeUrl {
-    return this._superMarketplaceProductEditable?.Images?.[0]?.URL || 
+    return this._superMarketplaceProductEditable?.Images?.[0]?.Url || 
     this.imageFiles[0]?.URL ||
     'https://via.placeholder.com/300?text=Product+Image'
   }

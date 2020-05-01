@@ -355,7 +355,7 @@
                      class="product-img-wrapper mr-2">
                   <div class="product-img">
                     <img [id]="i"
-                         [src]="image.URL"
+                         [src]="image.Url"
                          width="auto"
                          height="100px">
                     <span *ngIf="i === 0"
@@ -455,7 +455,7 @@
                 </div>
                 <div *ngFor="let file of staticContentFiles; let i = index"
                      class="product-img-wrapper mr-2">
-                  <a class="text-link">{{file.Filename}}</a>
+                  <a class="text-link">{{file.FileName}}</a>
                   <div *ngIf="!readonly"
                        class="float-right float-middle">
                     <button title="Un-stage file"
@@ -476,9 +476,11 @@
                   </thead>
                   <tbody>
                     <tr *ngFor="let file of staticContent">
-                      <td>{{file.Title}}</td>
-                      <td><a href="{{getDocumentUrl(file.URL)}}"
-                           download="file.Title">download</a></td>
+                      <td>{{file.FileName}}</td>
+                      <td><a class="btn-link"
+                           href="{{file.Url}}"
+                           target="_blank"
+                           download="file.FileName">download</a></td>
                       <td>
                         <button title="Delete file"
                                 class="btn btn-light btn-group-item"

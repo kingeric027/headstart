@@ -152,7 +152,7 @@
           <img *ngFor="let img of superProductEditable?.Images"
                class="product-image"
                [class.selected-image]="isImageSelected(img)"
-               [src]="img.URL"
+               [src]="img.Url"
                (click)="toggleAssignImage(img, variantInSelection.xp?.SpecCombo)"
                alt="" />
           <div>
@@ -214,7 +214,7 @@
                     </fa-icon>
                     <img *ngFor="let img of getVariantImages(variantInSelection)"
                          style="max-width: 50px"
-                         [src]="img.URL"
+                         [src]="img.Url"
                          alt="" />
                     <div class="d-flex justify-content-between align-items-center">
                       <mat-form-field appearance="standard">
