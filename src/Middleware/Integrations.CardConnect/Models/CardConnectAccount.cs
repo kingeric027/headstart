@@ -1,13 +1,13 @@
 ﻿
-namespace Marketplace.Common.Services.CardConnect.Models
+namespace ordercloud.integrations.cardconnect.Models
 {
-    public class AccountRequest
+    public class CardConnectAccountRequest
     {
         public string account { get; set; }
     }
 
 
-    public class AccountResponse
+    public class CardConnectAccountResponse
     {
         public string message { get; set; }
         public int errorcode { get; set; }

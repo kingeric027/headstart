@@ -1,10 +1,9 @@
-﻿
-namespace Marketplace.Common.Services.CardConnect.Models
+﻿namespace ordercloud.integrations.cardconnect.Models
 {
     /// <summary>
     /// https://developer.cardconnect.com/cardconnect-api?lang=json#inquire-merchant
     /// </summary>
-    public class Merchant
+    public class CardConnectMerchant
     {
         public string site { get; set; }
         public string cardproc { get; set; }

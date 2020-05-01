@@ -1,8 +1,7 @@
-﻿
-namespace Marketplace.Common.Services.CardConnect.Models
+﻿namespace ordercloud.integrations.cardconnect.Models
 {
 
-    public class AuthorizationRequest
+    public class CardConnectAuthorizationRequest
     {
         public string merchid { get; set; }
         public string orderid { get; set; }
@@ -25,7 +24,7 @@ namespace Marketplace.Common.Services.CardConnect.Models
     }
 
 
-    public class AuthorizationResponse
+    public class CardConnectAuthorizationResponse
     {
         public string respstat { get; set; }
         public string token { get; set; }

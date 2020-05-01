@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Globalization;
-using Marketplace.Common.Extensions;
-using Marketplace.Common.Services.CardConnect.Models;
 using Marketplace.Helpers.Extensions;
-using Marketplace.Models;
-using Marketplace.Models.Misc;
-using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.cardconnect.Models;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Mappers.CardConnect
+namespace ordercloud.integrations.cardconnect.Mappers
 {
     public static class CreditCardMapper
     {
-        public static MarketplaceCreditCard Map(CreditCardToken card, AccountResponse response)
+        public static CardConnectCreditCard Map(OrderCloudIntegrationsCreditCardToken card, CardConnectAccountResponse response)
         {
-			var cc = new MarketplaceCreditCard()
+			var cc = new CardConnectCreditCard()
 			{
 				CardType = card.CardType,
 				CardholderName = card.CardholderName,
@@ -32,9 +28,9 @@ namespace Marketplace.Common.Mappers.CardConnect
 
     public static class BuyerCreditCardMapper
     {
-        public static MarketplaceBuyerCreditCard Map(CreditCardToken card, AccountResponse response)
+        public static CardConnectBuyerCreditCard Map(OrderCloudIntegrationsCreditCardToken card, CardConnectAccountResponse response)
         {
-            var cc = new MarketplaceBuyerCreditCard()
+            var cc = new CardConnectBuyerCreditCard()
             {
                 CardType = card.CardType,
                 CardholderName = card.CardholderName,
@@ -53,31 +49,19 @@ namespace Marketplace.Common.Mappers.CardConnect
 
     public static class CardConnectMapper
     {
-        public static AccountRequest Map(CreditCardToken card)
+        public static CardConnectAccountRequest Map(OrderCloudIntegrationsCreditCardToken card)
         {
-            var acct = new AccountRequest()
+            var acct = new CardConnectAccountRequest()
             {
                 account = card.AccountNumber
             };
             return acct;
         }
 
-        //public static CreditCardToken Map(AccountResponse resp, CreditCardToken request)
-        //{
-        //    var cc = new CreditCardToken()
-        //    {
-        //        Token = resp.token,
-        //        PartialAccountNumber = request.AccountNumber.ToCreditCardDisplay(),
-        //        AccountNumber = request.AccountNumber.ToCreditCardDisplay(),
-        //        CardholderName = request.CardholderName
-        //    };
-        //    return cc;
-        //}
-
-        public static AuthorizationRequest Map(MarketplaceBuyerCreditCard card, MarketplaceOrder order, CreditCardPayment payment)
+        public static CardConnectAuthorizationRequest Map(BuyerCreditCard card, Order order, OrderCloudIntegrationsCreditCardPayment payment)
         {
 			var address = card.xp.CCBillingAddress;
-			var req = new AuthorizationRequest()
+			var req = new CardConnectAuthorizationRequest()
             {
                 name = $"{card.CardholderName}",
                 account = card.Token,
@@ -98,7 +82,7 @@ namespace Marketplace.Common.Mappers.CardConnect
             return req;
         }
 
-        public static PaymentTransaction Map(Order order, Payment payment, AuthorizationResponse response)
+        public static PaymentTransaction Map(Order order, Payment payment, CardConnectAuthorizationResponse response)
         {
             var t = new PaymentTransaction()
             {
@@ -111,40 +95,6 @@ namespace Marketplace.Common.Mappers.CardConnect
             };
             return t;
         }
-
-        //public static CreditCardAuthorization Map(AuthorizationResponse response, CreditCardAuthorization request)
-        //{
-        //    var cc = new CreditCardAuthorization()
-        //    {
-        //        Token = response.token,
-        //        Status = response.respstat.ToResponseStatus(),
-        //        Amount = response.amount,
-        //        Account = response.account,
-        //        CVV = request.CVV,
-        //        ReferenceNumber = response.retref,
-        //        ExpirationDate = response.expiry,
-        //        MerchantID = response.merchid,
-        //        ResponseCode = response.respcode,
-        //        ResponseText = response.resptext,
-        //        ResponseProcessor = response.respproc,
-        //        AVSResponseCode = response.avsresp,
-        //        CVVResponseCode = response.cvvresp.ToCvvResponse(),
-        //        BinType = response.bintype.ToBinType(),
-        //        AuthorizationCode = response.authcode,
-        //        Receipt = response.receipt,
-        //        CommercialCard = response.commcard == "Y",
-        //        OrderID = request.OrderID,
-        //        Currency = request.Currency,
-        //        CardHolderName = request.CardHolderName,
-        //        CardHolderEmail = request.CardHolderEmail,
-        //        Address = request.Address,
-        //        City = request.City,
-        //        Region = request.Region,
-        //        Country = request.Country,
-        //        PostalCode = request.PostalCode
-        //    };
-        //    return cc;
-        //}
     }
 
     public static class CreditCardAuthorizationExtensions
@@ -152,18 +102,21 @@ namespace Marketplace.Common.Mappers.CardConnect
         public static DateTime ToDateTime(this string value)
         {
             var month = value.Substring(0, 2).To<int>();
-            if (value.Length == 4)
+            switch (value.Length)
             {
-                var year = $"20{value.Substring(2, 2)}".To<int>();
-                return new DateTime(year, month, 1);
+                case 4:
+                {
+                    var year = $"20{value.Substring(2, 2)}".To<int>();
+                    return new DateTime(year, month, 1);
+                }
+                case 6:
+                {
+                    var year = value.Substring(2, 4).To<int>();
+                    return new DateTime(year, month, 1);
+                }
+                default:
+                    throw new Exception("Invalid format: MMYY MMYYYY");
             }
-            else if (value.Length == 6)
-            {
-                var year = value.Substring(2, 4).To<int>();
-                return new DateTime(year, month, 1);
-            }
-
-            throw new Exception("Invalid format: MMYY MMYYYY");
         }
 
         public static ResponseStatus ToResponseStatus(this string value)

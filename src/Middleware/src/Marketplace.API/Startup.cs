@@ -14,7 +14,6 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.Avalara;
-using Marketplace.Common.Services.CardConnect;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
@@ -28,6 +27,7 @@ using Marketplace.Models.Extended;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using ordercloud.integrations.cardconnect;
 using OrderCloud.SDK;
 
 namespace Marketplace.API
@@ -59,6 +59,12 @@ namespace Marketplace.API
 			{
 				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
 				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
+			};
+			var cardConnectConfig = new OrderCloudIntegrationsCardConnectConfig()
+			{
+				Site = _settings.CardConnectSettings.Site,
+				BaseUrl = _settings.CardConnectSettings.BaseUrl,
+				Authorization = _settings.CardConnectSettings.Authorization
 			};
 			services
 				.ConfigureWebApiServices(_settings)
@@ -102,8 +108,8 @@ namespace Marketplace.API
                         ApiRole.FullAccess
                     }
                 })
-                .Inject<ICardConnectService>()
-                .Inject<ICreditCardCommand>()
+				.AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(cardConnectConfig))
+                .Inject<IOrderCloudIntegrationsCardConnectCommand>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser")

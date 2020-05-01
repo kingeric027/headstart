@@ -42,6 +42,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Integrations.Avalara\Integrations.Avalara.csproj" />
+    <ProjectReference Include="..\..\Integrations.CardConnect\Integrations.CardConnect.csproj" />
+    <ProjectReference Include="..\..\Integrations.CMS\Integrations.CMS.csproj" />
     <ProjectReference Include="..\Marketplace.Helpers\Marketplace.Helpers.csproj" />
     <ProjectReference Include="..\Marketplace.Models\Marketplace.Models.csproj" />
   </ItemGroup>
