@@ -26,7 +26,8 @@
   </div>
 
   <product-filters-component readonly="true"
-                             [facetsOnProduct]="_superMarketplaceProduct?.Product?.xp?.Facets || []"></product-filters-component> <!-- /Product Details -->
+                             [facetsOnProduct]="_superMarketplaceProduct?.Product?.xp?.Facets || []">
+  </product-filters-component> <!-- /Product Details -->
 
   <product-variations-component readonly="true"
                                 [superMarketplaceProductEditable]="_superMarketplaceProduct">

@@ -2,7 +2,8 @@
   <div class="form-row">
     <div class="form-group col-6">
       <label for="TaxCodeCategory">Tax Category</label>
-      <select type="dropdown"
+      <select [attr.disabled]="readonly ? true : null"
+              type="dropdown"
               class="form-control"
               id="TaxCodeCategory"
               aria-describedby="Tax code category"
@@ -21,7 +22,8 @@
       </select>
     </div>
     <div class="form-group col-6">
-      <product-tax-code-select-dropdown class="btn-block resource-btn mr-1 mb-1"
+      <product-tax-code-select-dropdown [readonly]="readonly"
+                                        class="btn-block resource-btn mr-1 mb-1"
                                         [taxCodes]="taxCodes"
                                         [superMarketplaceProductEditable]="superMarketplaceProductEditable"
                                         (taxCodesSearched)="onTaxCodesSearched($event)"

@@ -6,11 +6,12 @@
                    animationDuration="0ms">
       <!-- Product Details -->
       <mat-tab label="Product">
-        <div class="container">
+        <div class="container-fluid">
           <div class="row pt-3">
             <div class="col-md-8 form-group">
               <div class="form-group">
-                <mat-slide-toggle aria-describedby="Active"
+                <mat-slide-toggle [disabled]="readonly"
+                                  aria-describedby="Active"
                                   formControlName="Active"
                                   color="warn"
                                   (change)="handleUpdateProduct($event, 'Product.Active')">
@@ -18,7 +19,8 @@
                 </mat-slide-toggle>
               </div>
               <div class="form-group">
-                <mat-checkbox aria-describedby="IsResale"
+                <mat-checkbox [disabled]="readonly"
+                              aria-describedby="IsResale"
                               formControlName="IsResale"
                               color="warn"
                               (change)="handleUpdateProduct($event, 'Product.xp.IsResale')">
@@ -48,7 +50,8 @@
                 </div>
                 <div class="form-group col-md-6">
                   <label for="Name">Name</label>
-                  <input type="text"
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="text"
                          class="form-control"
                          id="Name"
                          showErrors
@@ -66,7 +69,8 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text">$</span>
                     </div>
-                    <input type="number"
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="number"
                            class="form-control currency"
                            id="Price"
                            showErrors
@@ -81,7 +85,8 @@
                 </div>
                 <div class="form-group col-md-6">
                   <label for="ProductType">Product Type</label>
-                  <select type="dropdown"
+                  <select [attr.disabled]="readonly ? true : null"
+                          type="dropdown"
                           class="form-control"
                           id="ProductType"
                           aria-describedby="Product type"
@@ -99,7 +104,8 @@
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="UnitOfMeasureQty">Quantity per Unit</label>
-                  <input type="number"
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="number"
                          class="form-control"
                          id="UnitOfMeasureQty"
                          min="1"
@@ -110,7 +116,8 @@
                 </div>
                 <div class="form-group col-md-6">
                   <label for="UnitOfMeasureUnit">Unit of Measure</label>
-                  <input type="text"
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="text"
                          class="form-control"
                          id="UnitOfMeasureUnit"
                          aria-describedby="Min Quantity"
@@ -122,7 +129,8 @@
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="MinQuantity">Min Quantity</label>
-                  <input type="number"
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="number"
                          class="form-control"
                          id="MinQuantity"
                          showErrors
@@ -135,7 +143,8 @@
                 </div>
                 <div class="form-group col-md-6">
                   <label for="MaxQuantity">Max Quantity</label>
-                  <input type="number"
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="number"
                          class="form-control"
                          id="MaxQuantity"
                          showErrors
@@ -147,7 +156,8 @@
                          placeholder="Enter Max Quantity">
                 </div>
               </div>
-              <product-tax-code-select-component [productForm]="productForm"
+              <product-tax-code-select-component [readonly]="readonly"
+                                                 [productForm]="productForm"
                                                  [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
                                                  [taxCodes]="taxCodes"
                                                  (handleTaxCodeCategorySelection)="handleTaxCodeCategorySelection($event)"
@@ -157,7 +167,8 @@
               </product-tax-code-select-component>
               <div class="form-group">
                 <label for="ShipFromAddressID">Which location will this product ship from?</label>
-                <select type="dropdown"
+                <select [attr.disabled]="readonly ? true : null"
+                        type="dropdown"
                         class="form-control"
                         formControlName="ShipFromAddressID"
                         id="ShipFromAddressID"
@@ -172,7 +183,8 @@
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="ShipHeight">Ship Height</label>
-                  <input type="number"
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="number"
                          class="form-control"
                          id="ShipHeight"
                          showErrors
@@ -183,7 +195,8 @@
                 </div>
                 <div class="form-group col-md-6">
                   <label for="ShipWidth">Ship Width</label>
-                  <input type="number"
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="number"
                          class="form-control"
                          id="ShipWidth"
                          showErrors
@@ -196,7 +209,8 @@
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="ShipLength">Ship Length</label>
-                  <input type="number"
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="number"
                          class="form-control"
                          id="ShipLength"
                          showErrors
@@ -207,7 +221,8 @@
                 </div>
                 <div class="form-group col-md-6">
                   <label for="ShipWeight">Ship Weight</label>
-                  <input type="number"
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="number"
                          class="form-control"
                          id="ShipWeight"
                          showErrors
@@ -222,7 +237,7 @@
               <!-- Product Preview -->
               <div class="sticky-top">
                 <p class="text-center font-weight-bold">Product Preview</p>
-                <div class="card w-100 border-hover cursor-pointer">
+                <div class="card product-preview w-100 border-hover cursor-pointer">
                   <div class="ribbon ribbon-top-right bg-light">
                     <fa-icon class="text-danger"
                              [icon]="faHeart"
@@ -253,17 +268,19 @@
         <ng-template mat-tab-label>
           Description
         </ng-template>
-        <div class="container">
+        <div class="container-fluid">
           <div class="row pt-3">
             <div class="col-12">
-              <reactive-quill-editor-component [resourceInSelection]="resourceInSelection"
+              <reactive-quill-editor-component [readonly]="readonly"
+                                               [resourceInSelection]="resourceInSelection"
                                                [formControlForText]="productForm?.controls?.Description"
                                                resourceField="Description"
                                                pathOnResource="Description"
                                                (resourceUpdated)="updateResourceFromFieldValue($event.field, $event.value)">
               </reactive-quill-editor-component>
               <div class="form-row pt-3">
-                <div class="form-group col-md-6">
+                <div *ngIf="!readonly"
+                     class="form-group col-md-6">
                   <label for="Note">Product Message</label>
                   <input type="text"
                          class="form-control"
@@ -275,7 +292,7 @@
                          (input)="handleUpdateProduct($event, 'Product.xp.Note')"
                          placeholder="(Optional) Enter a note about this product">
                 </div>
-                <div class="col-md-6">
+                <div [ngClass]="{'col-md-6': !readonly, 'col-md-12': readonly}">
                   <p class="font-weight-bold mb-0">Message Preview</p>
                   <div class="alert alert-info">
                     Note: {{_superMarketplaceProductEditable?.Product?.xp?.Note}}
@@ -292,7 +309,8 @@
         <ng-template mat-tab-label>
           <span [matTooltip]="isCreatingNew ? 'Optional' : ''">Filters</span>
         </ng-template>
-        <product-filters-component (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
+        <product-filters-component [readonly]="readonly"
+                                   (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
                                    [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []"></product-filters-component>
       </mat-tab>
       <!-- Product Variations -->
@@ -304,7 +322,8 @@
                 [matTooltip]="!_superMarketplaceProductEditable?.Product?.ID ? 'Product needs an ID' : ''"
                 [matBadge]="_superMarketplaceProductEditable?.Variants?.length || 0">Variants</span>
         </ng-template>
-        <product-variations-component [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
+        <product-variations-component [readonly]="readonly"
+                                      [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
                                       [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
                                       [areChanges]="areChanges"
                                       [isCreatingNew]="isCreatingNew"
@@ -323,7 +342,7 @@
                 matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Images?.length}} images and documents."
                 [matBadge]="_superMarketplaceProductEditable?.Images?.length + _superMarketplaceProductEditable?.Product?.xp?.StaticContent?.length + imageFiles?.length + staticContentFiles?.length">Images & Documents</span>
         </ng-template>
-        <div class="container">
+        <div class="container-fluid">
           <div class="row pt-3">
             <div class="col-md-5">
               <h5>Product Images</h5>
@@ -344,7 +363,8 @@
                       Primary
                     </span>
                   </div>
-                  <div class="product-img-delete text-center">
+                  <div *ngIf="!readonly"
+                       class="product-img-delete text-center">
                     <button title="Delete photo"
                             class="btn btn-light btn-group-item"
                             data-ui="action-btn"
@@ -387,12 +407,14 @@
                     </button>
                   </div>
                 </div>
-                <label class="rmpm dropzone"
+                <label *ngIf="!readonly"
+                       class="rmpm dropzone"
                        for="imageUpload"
                        appDrag
                        (files)="stageImages($event)">
                 </label>
-                <input class="d-none"
+                <input [disabled]="readonly"
+                       class="d-none"
                        id="imageUpload"
                        type="file"
                        (change)="manualFileUpload($event, 'image')"
@@ -408,7 +430,8 @@
             <div class="col-md-7">
               <!--droped doc preview-->
               <div class="d-flex justify-content-start align-items-center flex-wrap">
-                <div class="input-group mb-3">
+                <div *ngIf="!readonly"
+                     class="input-group mb-3">
                   <input type="text"
                          required
                          class="form-control"
@@ -433,7 +456,8 @@
                 <div *ngFor="let file of staticContentFiles; let i = index"
                      class="product-img-wrapper mr-2">
                   <a class="text-link">{{file.Filename}}</a>
-                  <div class="float-right float-middle">
+                  <div *ngIf="!readonly"
+                       class="float-right float-middle">
                     <button title="Un-stage file"
                             class="btn btn-light btn-group-item"
                             data-ui="action-btn"
