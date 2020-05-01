@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Marketplace.Helpers.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -31,6 +32,7 @@ namespace Marketplace.Common.Services.FreightPop.Models
         public string[] TrackingURLs { get; set; }
     }
 
+	[SwaggerModel]
     public class ShipmentRate
     {
         public string Id { get; set; }
