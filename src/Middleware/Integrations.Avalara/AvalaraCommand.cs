@@ -60,21 +60,21 @@ namespace Marketplace.Common.Services.Avalara
 		public async Task<TaxCertificate> GetCertificateAsync(int companyID, int certifitcateID)
 		{
 			var certificate = await _avaTax.GetCertificateAsync(companyID, certifitcateID, "");
-			var mappedCertificate = AvalaraMapper.Map(certificate, companyID, "BaseUrl");
+			var mappedCertificate = AvalaraMapper.Map(certificate, companyID, _settings.HostUrl);
 			return mappedCertificate;
 		}
 
 		public async Task<TaxCertificate> CreateCertificateAsync(int companyID, TaxCertificate cert)
 		{
 			var certificates = await _avaTax.CreateCertificatesAsync(companyID, false, new List<CertificateModel> { AvalaraMapper.Map(cert) });
-			var mappedCertificate = AvalaraMapper.Map(certificates[0], companyID, "BaseUrl");
+			var mappedCertificate = AvalaraMapper.Map(certificates[0], companyID, _settings.HostUrl);
 			return mappedCertificate;
 		}
 
 		public async Task<TaxCertificate> UpdateCertificateAsync(int companyID, int certifitcateID, TaxCertificate cert)
 		{
 			var certificate = await _avaTax.UpdateCertificateAsync(companyID, certifitcateID, AvalaraMapper.Map(cert));
-			var mappedCertificate = AvalaraMapper.Map(certificate, companyID, "BaseUrl");
+			var mappedCertificate = AvalaraMapper.Map(certificate, companyID, _settings.HostUrl);
 			return mappedCertificate;
 		}
 
