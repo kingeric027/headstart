@@ -89,14 +89,13 @@ namespace Marketplace.Common.Services.Avalara.Mappers
 				OrderBy = null
 			};
 		}
-
-		public class TaxCodeListArgs
-		{
-			public int Top { get; set; }
-			public int Skip { get; set; }
-			public string Filter { get; set; }
-			public string OrderBy { get; set; }
-			public string CodeCategory { get; set; }
-		}
+	}
+	public class TaxCodeListArgs
+	{
+		public int Top { get; set; }
+		public int Skip { get; set; }
+		public string Filter { get; set; }
+		public string OrderBy { get; set; }
+		public string CodeCategory { get; set; }
 	}
 }
