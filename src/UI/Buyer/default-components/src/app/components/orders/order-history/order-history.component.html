@@ -1,7 +1,15 @@
 <div class="container mt-3">
   <div class="row w-100 border-bottom mb-3">
     <h1 class="page-heading col-3"
-        translate>{{ orderRoutes.length > 1 ? 'Orders' : 'My Orders' }}</h1>
+        translate>
+      <ng-container *ngIf="orderRoutes.length > 1; else myOrders"
+                    translate>
+        ORDERS.HISTORY.ORDERS
+      </ng-container>
+      <ng-template #myOrders
+                   translate>ORDERS.HISTORY.MY_ORDERS</ng-template>
+
+    </h1>
   </div>
   <ocm-search placeholderText="Search Orders"
               [searchTermInput]="searchTerm"
