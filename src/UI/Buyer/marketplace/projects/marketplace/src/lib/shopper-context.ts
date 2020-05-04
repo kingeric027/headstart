@@ -99,6 +99,7 @@ export interface OrderFilters {
    * mm-dd-yyyy
    */
   toDate?: string;
+  location?: string;
 }
 
 export enum OrderAddressType {
@@ -115,10 +116,10 @@ export enum OrderStatus {
   Canceled = 'Canceled',
 }
 
-export enum OrderContext {
-  Submitted = 'Submitted',
+export enum OrderViewContext {
+  MyOrders = 'MyOrders',
   Approve = 'Approve',
-  GetApproval = 'GetApproval',
+  Location = 'Location',
 }
 
 export interface CreditCard {
