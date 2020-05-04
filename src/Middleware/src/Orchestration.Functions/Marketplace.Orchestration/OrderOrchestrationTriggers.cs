@@ -16,43 +16,36 @@ namespace Marketplace.Orchestration
         private readonly LogQuery _log;
         private readonly AppSettings _appSettings;
         private DurableOrchestrationContext _orchestrationContext;
-        private IMarketplaceBuyerLocationCommand _marketplaceBuyerLocationCommand;
 
-        public OrderOrchestrationTrigger(AppSettings appSettings, IMarketplaceBuyerLocationCommand marketplaceBuyerLocationCommand, IOrderOrchestrationCommand orderOrchestrationCommand, ISyncCommand sync, LogQuery log)
+        public OrderOrchestrationTrigger(AppSettings appSettings, IOrderOrchestrationCommand orderOrchestrationCommand, ISyncCommand sync, LogQuery log)
         {
             _orderOrchestrationCommand = orderOrchestrationCommand;
             _log = log;
             _appSettings = appSettings;
-            _marketplaceBuyerLocationCommand = marketplaceBuyerLocationCommand;
         }
 
-        [FunctionName("RunMiscJob")]
-        public async Task RunMiscJob([HttpTrigger("get", Route = null)] HttpRequest req, ILogger logger)
+        [FunctionName("OrderShipmentTimeTrigger")]
+        public async Task SyncOrders([TimerTrigger("0 */30 14-23 * * *")]TimerInfo myTimer, [OrchestrationClient]DurableOrchestrationClient client, ILogger logger)
         {
-            await _marketplaceBuyerLocationCommand.AddNewUserType();
+            // run every 30 minutes between 9am and 6pm CDT
+            // determine if different schedule or order range is needed for production
+            logger.LogInformation("Starting function");
+            try
+            {
+                logger.LogInformation("Going to get suppliers");
+                var suppliersToSync = await _orderOrchestrationCommand.GetSuppliersNeedingSync();
+                logger.LogInformation($"Retrieved suppliers {suppliersToSync.Count()}");
+                foreach (var supplier in suppliersToSync)
+                {
+                    logger.LogInformation($"Starting supplier {supplier.ID}");
+                    await client.StartNewAsync("ShipmentSyncOrchestration", input: supplier);
+                    logger.LogInformation($"Finished supplier {supplier.ID}");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+            }
         }
-
-        //[FunctionName("OrderShipmentTimeTrigger")]
-        //public async Task SyncOrders([TimerTrigger("0 */30 14-23 * * *")]TimerInfo myTimer, [OrchestrationClient]DurableOrchestrationClient client, ILogger logger)
-        //{
-        //    // run every 30 minutes between 9am and 6pm CDT
-        //    // determine if different schedule or order range is needed for production
-        //    logger.LogInformation("Starting function");
-        //    try
-        //    {
-        //        logger.LogInformation("Going to get suppliers");
-        //        var suppliersToSync = await _orderOrchestrationCommand.GetSuppliersNeedingSync();
-        //        logger.LogInformation($"Retrieved suppliers {suppliersToSync.Count()}");
-        //        foreach (var supplier in suppliersToSync)
-        //        {
-        //            logger.LogInformation($"Starting supplier {supplier.ID}");
-        //            await client.StartNewAsync("ShipmentSyncOrchestration", input: supplier);
-        //            logger.LogInformation($"Finished supplier {supplier.ID}");
-        //        }
-        //    } catch (Exception ex)
-        //    {
-        //        logger.LogError(ex.Message);
-        //    }
-        //}
     }
 }
