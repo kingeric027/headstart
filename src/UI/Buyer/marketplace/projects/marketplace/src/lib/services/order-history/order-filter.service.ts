@@ -6,7 +6,7 @@ import { CurrentUserService } from '../current-user/current-user.service';
 import { OcMeService, ListOrder, OcOrderService, OcTokenService } from '@ordercloud/angular-sdk';
 import { filter } from 'rxjs/operators';
 import { RouteService } from '../route/route.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 export interface IOrderFilters {
   activeFiltersSubject: BehaviorSubject<OrderFilters>;
@@ -135,10 +135,29 @@ export class OrderFilterService implements IOrderFilters {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
     });
-    const url = `${this.appConfig.middlewareUrl}/order/location/${locationID}`;
+    const url = `${this.appConfig.middlewareUrl}/order/location/${this.activeFiltersSubject.value.location}`;
+    const httpParams = this.createHttpParams();
+    console.log(httpParams);
     return this.httpClient
-      .get<ListOrder>(url, { headers: headers })
+      .get<ListOrder>(url, { headers: headers, params: httpParams })
       .toPromise();
+  }
+
+  private createHttpParams(): HttpParams {
+    let params = new HttpParams();
+    Object.entries(this.createListOptions()).forEach(([key, value]) => {
+      if (key !== 'filters' && value) {
+        console.log(key, value);
+        params = params.append(key, value.toString());
+      }
+    });
+    Object.entries(this.createListOptions().filters).forEach(([key, value]) => {
+      if ((typeof value !== 'object' && value) || (value && value.length)) {
+        console.log(key, value);
+        params = params.append(key, value.toString());
+      }
+    });
+    return params;
   }
 
   async listApprovableOrders(): Promise<ListOrder> {
@@ -146,16 +165,7 @@ export class OrderFilterService implements IOrderFilters {
   }
 
   private createListOptions() {
-    const {
-      page,
-      sortBy,
-      search,
-      showOnlyFavorites,
-      status,
-      fromDate,
-      toDate,
-      location,
-    } = this.activeFiltersSubject.value;
+    const { page, sortBy, search, showOnlyFavorites, status, fromDate, toDate } = this.activeFiltersSubject.value;
     const from = fromDate ? `>${fromDate}` : undefined;
     const to = toDate ? `<${toDate}` : undefined;
     const favorites = this.currentUser.get().FavoriteOrderIDs.join('|') || undefined;
@@ -169,9 +179,6 @@ export class OrderFilterService implements IOrderFilters {
       },
     };
     listOptions = this.addStatusFilters(status, listOptions);
-    if (location) {
-      listOptions.filters['BillingAddress.ID'] = location;
-    }
     return listOptions;
   }
 

@@ -23,7 +23,7 @@ namespace Marketplace.Common.Commands
     {
         Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
         Task<Order> AcknowledgeQuoteOrder(string orderID);
-        Task<ListPage<Order>> ListOrdersForLocation(string locationID, VerifiedUserContext verifiedUser);
+        Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
     }
 
     public class OrderCommand : IOrderCommand
@@ -103,10 +103,18 @@ namespace Marketplace.Common.Commands
             return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
         }
 
-        public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, VerifiedUserContext verifiedUser)
+        public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
         {
             await EnsureUserCanAccessLocationOrders(locationID, verifiedUser);
-            return await _oc.Orders.ListAsync(OrderDirection.Incoming, opts => opts.AddFilter(o => o.BillingAddress.ID == locationID));
+            listArgs.Filters.Add(new ListFilter()
+            {
+                QueryParams = new List<Tuple<string, string>>() { new Tuple<string, string>("BillingAddress.ID", locationID) }
+            });
+            return await _oc.Orders.ListAsync(OrderDirection.Incoming,
+                page: listArgs.Page,
+                pageSize: listArgs.PageSize,
+                search: listArgs.Search,
+                filters: listArgs.ToFilterString());
         }
 
         private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser)
