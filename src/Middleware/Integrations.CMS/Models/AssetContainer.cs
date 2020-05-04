@@ -23,7 +23,6 @@ namespace Marketplace.CMS.Models
 		public string InteropID { get; set; }
 		[Required]
 		public string Name { get; set; }
-		public string HostUrlOverride { get; set; } = null;
 		[ApiReadOnly]
 		public StorageAccount StorageAccount { get; set; } = null;
 		public new static Collection<UniqueKey> GetUniqueKeys()

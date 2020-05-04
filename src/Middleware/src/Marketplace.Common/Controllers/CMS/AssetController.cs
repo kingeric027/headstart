@@ -16,7 +16,7 @@ namespace Marketplace.CMS.Controllers
 {
 	[DocComments("\"Integration\" represents Assets")]
 	[MarketplaceSection.Integration(ListOrder = 6)]
-	[Route("containers/{containerID}/assets")]
+	[Route("assets")]
 	public class AssetController : BaseController
 	{
 		private readonly IAssetQuery _assets;
@@ -30,60 +30,60 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("List Assets")]
 		[HttpGet, Route(""), MarketplaceUserAuth]
-		public async Task<ListPage<Asset>> List(string containerID, ListArgs<Asset> args)
+		public async Task<ListPage<Asset>> List(ListArgs<Asset> args)
 		{
-			return await _assets.List(containerID, args);
+			return await _assets.List(args, VerifiedUserContext);
 		}
 
 		[DocName("Get an Asset")]
 		[HttpGet, Route("{assetID}"), MarketplaceUserAuth]
 		public async Task<Asset> Get(string containerID, string assetID)
 		{
-			return await _assets.Get(containerID, assetID);
+			return await _assets.Get(assetID, VerifiedUserContext);
 		}
 
 		[DocName("Upoload an Asset")]
 		[DocIgnore] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
 		[HttpPost, Route(""), MarketplaceUserAuth]
-		public async Task<Asset> Create(string containerID, [FromForm] AssetUpload form)
+		public async Task<Asset> Create([FromForm] AssetUpload form)
 		{
-			return await _assets.Create(containerID, form);
+			return await _assets.Create(form, VerifiedUserContext);
 		}
 
 		[DocName("Update an Asset")]
 		[HttpPut, Route("{assetID}"), MarketplaceUserAuth]
-		public async Task<Asset> Update(string containerID, string assetID, [FromBody] Asset asset)
+		public async Task<Asset> Update(string assetID, [FromBody] Asset asset)
 		{
-			return await _assets.Update(containerID, assetID, asset);
+			return await _assets.Update(assetID, asset, VerifiedUserContext);
 		}
 
 		[DocName("Delete an Asset")]
 		[HttpDelete, Route("{assetID}"), MarketplaceUserAuth]
-		public async Task Delete(string containerID, string assetID)
+		public async Task Delete(string assetID)
 		{
-			await _assets.Delete(containerID, assetID);
+			await _assets.Delete(assetID, VerifiedUserContext);
 		}
 
 		[DocName("List Asset Assignments"), MarketplaceUserAuth]
 		[HttpGet, Route("assignments")]
-		public async Task<ListPage<AssetAssignment>> ListAssignments(string containerID, ListArgs<Asset> args)
+		public async Task<ListPage<AssetAssignment>> ListAssignments(ListArgs<Asset> args)
 		{
-			return await _assignments.List(containerID, args);
+			return await _assignments.List(args, VerifiedUserContext);
 		}
 
 		// Route is available to anyone right now, but if your token does not give access to an OC resource, you will get 401 response.
 		[DocName("Save Asset Assignment")]
 		[HttpPost, Route("assignments"), MarketplaceUserAuth]
-		public async Task SaveAssignment(string containerID, [FromBody] AssetAssignment assignment)
+		public async Task SaveAssignment([FromBody] AssetAssignment assignment)
 		{
-			await _assignments.Save(containerID, assignment, VerifiedUserContext);
+			await _assignments.Save(assignment, VerifiedUserContext);
 		}
 
 		[DocName("Delete Asset Assignment"), MarketplaceUserAuth]
 		[HttpDelete, Route("{assetID}/assignments/{resourceType}/{resourceID}/{resourceParentID}")]
-		public async Task DeleteAssignment(string containerID, string assetID, ResourceType resourceType, string resourceID, string resourceParentID)
+		public async Task DeleteAssignment(string assetID, ResourceType resourceType, string resourceID, string resourceParentID)
 		{
-			await _assignments.Delete(containerID, new AssetAssignment()
+			await _assignments.Delete(new AssetAssignment()
 			{
 				AssetID = assetID,
 				ResourceType = resourceType,

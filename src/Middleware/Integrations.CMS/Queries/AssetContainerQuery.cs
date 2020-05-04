@@ -20,6 +20,7 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetContainerQuery
 	{
+		Task<AssetContainer> CreateDefaultIfNotExists(VerifiedUserContext user);
 		Task<ListPage<AssetContainer>> List(IListArgs args);
 		Task<AssetContainer> Get(string interopID);
 		Task<AssetContainer> Create(AssetContainer container);
@@ -57,6 +58,18 @@ namespace Marketplace.CMS.Queries
 			return container;
 		}
 
+		public async Task<AssetContainer> CreateDefaultIfNotExists(VerifiedUserContext user)
+		{
+			var defaultContainer = new AssetContainer()
+			{
+				InteropID = user.ClientID,
+				Name = $"Container for API Client with ID {user.ClientID}"
+			};
+			var existingContainer = await GetWithoutExceptions(defaultContainer.InteropID);
+			return existingContainer ?? await Create(defaultContainer);
+		}
+
+
 		public async Task<AssetContainer> Create(AssetContainer container)
 		{
 			var matchingID = await GetWithoutExceptions(container.InteropID);
@@ -73,7 +86,6 @@ namespace Marketplace.CMS.Queries
 			var existingContainer = await Get(interopID);
 			existingContainer.InteropID = container.InteropID;
 			existingContainer.Name = container.Name;
-			existingContainer.HostUrlOverride = container.HostUrlOverride;
 			var updatedContainer = await _store.UpdateAsync(existingContainer);
 			return updatedContainer;
 		}

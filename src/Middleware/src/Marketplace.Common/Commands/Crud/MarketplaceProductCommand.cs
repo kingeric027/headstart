@@ -44,7 +44,7 @@ namespace Marketplace.Common.Commands.Crud
             _assetAssignments = assetAssignments;
             _assets = assets;
         }
-        private async Task<List<Asset>> GetProductImages(string productID)
+        private async Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user)
         {
             var imageArgs = new ListArgs<Asset>
             {
@@ -60,7 +60,7 @@ namespace Marketplace.Common.Commands.Crud
                     }
                 }
             };
-            var imageAssignments = await _assetAssignments.List("seb", imageArgs);
+            var imageAssignments = await _assetAssignments.List(imageArgs, user);
             var imagesToReturn = new List<Asset>();
             foreach (var a in imageAssignments.Items)
             {
@@ -71,7 +71,7 @@ namespace Marketplace.Common.Commands.Crud
             };
             return imagesToReturn;
         }
-        private async Task<List<Asset>> GetProductAttachments(string productID)
+        private async Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user)
         {
             var attachmentArgs = new ListArgs<Asset>
             {
@@ -87,7 +87,7 @@ namespace Marketplace.Common.Commands.Crud
                     }
                 }
             };
-            var attachmentAssignments = await _assetAssignments.List("seb", attachmentArgs);
+            var attachmentAssignments = await _assetAssignments.List(attachmentArgs, user);
             var attachmentsToReturn = new List<Asset>();
             foreach (var a in attachmentAssignments.Items)
             {
@@ -104,8 +104,8 @@ namespace Marketplace.Common.Commands.Crud
             var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.DefaultPriceScheduleID, user.AccessToken);
             var _specs = await _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
             var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
-            var _images = await GetProductImages(_product.ID);
-            var _attachments = await GetProductAttachments(_product.ID);
+            var _images = await GetProductImages(_product.ID, user);
+            var _attachments = await GetProductAttachments(_product.ID, user);
             return new SuperMarketplaceProduct
             {
                 Product = _product,
@@ -130,8 +130,8 @@ namespace Marketplace.Common.Commands.Crud
                 var priceSchedule = await _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
                 var _specs = await _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, user.AccessToken);
                 var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, user.AccessToken);
-                var _images = await GetProductImages(product.ID);
-                var _attachments = await GetProductAttachments(product.ID);
+                var _images = await GetProductImages(product.ID, user);
+                var _attachments = await GetProductAttachments(product.ID, user);
                 _superProductsList.Add(new SuperMarketplaceProduct
                 {
                     Product = product,
@@ -266,9 +266,9 @@ namespace Marketplace.Common.Commands.Crud
             // List Product Specs
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
             // List Product Images
-            var _images = await GetProductImages(_updatedProduct.ID);
+            var _images = await GetProductImages(_updatedProduct.ID, user);
             // List Product Attachments
-            var _attachments = await GetProductAttachments(_updatedProduct.ID);
+            var _attachments = await GetProductAttachments(_updatedProduct.ID, user);
             return new SuperMarketplaceProduct
             {
                 Product = _updatedProduct,
@@ -283,11 +283,11 @@ namespace Marketplace.Common.Commands.Crud
         public async Task Delete(string id, VerifiedUserContext user)
         {
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
-            var _images = await GetProductImages(id);
-            var _attachments = await GetProductAttachments(id);
+            var _images = await GetProductImages(id, user);
+            var _attachments = await GetProductAttachments(id, user);
             // Delete specs images and attachments associated with the requested product
-            await Throttler.RunAsync(_images, 100, 5, i => _assets.Delete("seb", i.InteropID));
-            await Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete("seb", i.InteropID));
+            await Throttler.RunAsync(_images, 100, 5, i => _assets.Delete(i.InteropID, user));
+            await Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.InteropID, user));
             await Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
             await _oc.Products.DeleteAsync(id, user.AccessToken);
         }

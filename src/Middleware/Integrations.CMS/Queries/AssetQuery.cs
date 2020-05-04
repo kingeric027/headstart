@@ -24,12 +24,12 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetQuery
 	{
-		Task<ListPage<Asset>> List(string containerInteropID, IListArgs args);
 		Task<IDictionary<string, Asset>> List(AssetContainer container, ISet<string> assetIDs);
-		Task<Asset> Get(string containerInteropID, string assetInteropID);
-		Task<Asset> Create(string containerInteropID, AssetUpload form);
-		Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset);
-		Task Delete(string containerInteropID, string assetInteropID);
+		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
+		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
+		Task<Asset> Create(AssetUpload form, VerifiedUserContext user);
+		Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user);
+		Task Delete(string assetInteropID, VerifiedUserContext user);
 	}
 
 	public class AssetQuery : IAssetQuery
@@ -45,9 +45,9 @@ namespace Marketplace.CMS.Queries
 			_storageFactory = storageFactory;
 		}
 
-		public async Task<ListPage<Asset>> List(string containerInteropID, IListArgs args)
+		public async Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
 			var query = _assetStore.Query(GetFeedOptions(container.id))
 				.Search(args)
 				.Filter(args)
@@ -59,17 +59,17 @@ namespace Marketplace.CMS.Queries
 			return listPage;
 		}
 
-		public async Task<Asset> Get(string containerInteropID, string assetInteropID)
+		public async Task<Asset> Get(string assetInteropID, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
 			if (asset == null) throw new NotFoundException("Asset", assetInteropID);
 			return AssetMapper.MapToResponse(container, asset);
 		}
 
-		public async Task<Asset> Create(string containerInteropID, AssetUpload form)
+		public async Task<Asset> Create(AssetUpload form, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
 			var (asset, file) = AssetMapper.MapFromUpload(container, form);
 			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
 			if (matchingID != null) throw new DuplicateIdException();
@@ -81,15 +81,15 @@ namespace Marketplace.CMS.Queries
 			return AssetMapper.MapToResponse(container, newAsset);
 		}
 
-		public async Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset)
+		public async Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
 			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
 			if (existingAsset == null) throw new NotFoundException("Asset", assetInteropID);
 			existingAsset.InteropID = asset.InteropID;
 			existingAsset.Title = asset.Title;
 			existingAsset.Active = asset.Active;
-			existingAsset.UrlPathOveride = asset.UrlPathOveride;
+			existingAsset.Url = asset.Url;
 			existingAsset.Type = asset.Type;
 			existingAsset.Tags = asset.Tags;
 			existingAsset.FileName = asset.FileName;
@@ -97,10 +97,10 @@ namespace Marketplace.CMS.Queries
 			return AssetMapper.MapToResponse(container, updatedAsset);
 		}
 
-		public async Task Delete(string containerInteropID, string assetInteropID)
+		public async Task Delete(string assetInteropID, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID); // make sure container exists.
-			var asset = await Get(containerInteropID, assetInteropID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
+			var asset = await Get(assetInteropID, user);
 			await _assetStore.RemoveByIdAsync(asset.id, container.id);
 			await _storageFactory.GetStorage(container).OnAssetDeleted(asset.id);
 		}
@@ -127,5 +127,5 @@ namespace Marketplace.CMS.Queries
 		}
 
 		private FeedOptions GetFeedOptions(string containerID) => new FeedOptions() { PartitionKey = new PartitionKey(containerID) };
-	}
+ 	}
 }

@@ -19,9 +19,9 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetAssignmentQuery
 	{
-		Task<ListPage<AssetAssignment>> List(string containerInteropID, ListArgs<Asset> args);
-		Task Save(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user);
-		Task Delete(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user);
+		Task<ListPage<AssetAssignment>> List(ListArgs<Asset> args, VerifiedUserContext user);
+		Task Save(AssetAssignment assignment, VerifiedUserContext user);
+		Task Delete(AssetAssignment assignment, VerifiedUserContext user);
 	}
 
 	public class AssetAssignmentQuery : IAssetAssignmentQuery
@@ -37,9 +37,9 @@ namespace Marketplace.CMS.Queries
 			_assets = assets;
 		}
 
-		public async Task<ListPage<AssetAssignment>> List(string containerInteropID, ListArgs<Asset> args)
+		public async Task<ListPage<AssetAssignment>> List(ListArgs<Asset> args, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
 			var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(container.id) };
 			var query = _assignmentStore.Query(feedOptions)
 				.Search(args)
@@ -61,20 +61,19 @@ namespace Marketplace.CMS.Queries
 			return listPage;
 		}
 
-		public async Task Save(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user)
+		public async Task Save(AssetAssignment assignment, VerifiedUserContext user)
 		{
-
 			await new MultiTenantOCClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID); // confirm OC resource exists
-			var asset = await _assets.Get(containerInteropID, assignment.AssetID);
+			var asset = await _assets.Get(assignment.AssetID, user);
 			assignment.ContainerID = asset.ContainerID;
 			assignment.AssetID = asset.id;
 			await _assignmentStore.AddAsync(assignment);
 		}
 
-		public async Task Delete(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user)
+		public async Task Delete(AssetAssignment assignment, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID);
-			var asset = await _assets.Get(containerInteropID, assignment.AssetID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
+			var asset = await _assets.Get(assignment.AssetID, user);
 			await _assignmentStore.RemoveAsync(x =>
 				x.ContainerID == container.id &&
 				x.AssetID == asset.id &&

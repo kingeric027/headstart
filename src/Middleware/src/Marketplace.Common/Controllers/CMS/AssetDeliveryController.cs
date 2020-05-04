@@ -1,13 +1,21 @@
-﻿using System;
+﻿using Marketplace.CMS.Models;
+using Marketplace.CMS.Queries;
+using Marketplace.Helpers;
+using Marketplace.Helpers.Attributes;
+using Marketplace.Models;
+using Marketplace.Models.Attributes;
+using Microsoft.AspNetCore.Mvc;
+using OrderCloud.SDK;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Marketplace.Common.Controllers.CMS
 {
 
 	[DocComments("\"Integration\" represents Asset Delivery")]
 	[MarketplaceSection.Integration(ListOrder = 6)]
-	[Route("containers/{containerID}/assets")]
 	public class AssetDeliveryController : BaseController
 	{
 		private readonly IAssetQuery _assets;
@@ -21,8 +29,9 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("List Assets")]
 		[HttpGet, Route(""), MarketplaceUserAuth]
-		public async Task<ListPage<Asset>> List(string containerID, ListArgs<Asset> args)
+		public async Task<ListPage<Asset>> List(ListArgs<Asset> args)
 		{
-			return await _assets.List(containerID, args);
+			return await _assets.List(args, VerifiedUserContext);
 		}
 	}
+}

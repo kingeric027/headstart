@@ -16,23 +16,21 @@ namespace Marketplace.CMS.Mappers
 
 		public static Asset MapToResponse(AssetContainer container, Asset asset)
 		{
-			var host = container.HostUrlOverride ?? container.StorageAccount?.HostUrl;
-			var path = asset.UrlPathOveride ?? $"assets-{container.id}/{asset.id}";
-			asset.Url = $"{host}/{path}";
+			asset.Url = asset.Url ?? $"{container.StorageAccount?.HostUrl}/assets -{container.id}/{asset.id}";
 			return asset;
 		} 
 
 		public static (Asset, IFormFile) MapFromUpload(AssetContainer container, AssetUpload form)
 		{
-			if (!(form.File == null ^ form.UrlPathOveride == null))
+			if (!(form.File == null ^ form.Url == null))
 			{
-				throw new AssetUploadValidationException("Asset upload must include either File or UrlPathOveride but not both.");
+				throw new AssetUploadValidationException("Asset upload must include either File or Url override but not both.");
 			}
 			var asset = new Asset()
 			{
 				InteropID = form.ID,
 				ContainerID = container.id,
-				UrlPathOveride = form.UrlPathOveride,
+				Url = form.Url,
 				Title = form.Title,
 				Tags = MapTags(form.Tags),
 				Type = form.Type,
