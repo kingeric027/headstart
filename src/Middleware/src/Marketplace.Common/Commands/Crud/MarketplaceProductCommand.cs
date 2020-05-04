@@ -31,8 +31,9 @@ namespace Marketplace.Common.Commands.Crud
     {
         private readonly IOrderCloudClient _oc;
         private readonly IAssetAssignmentQuery _assetAssignments;
+        private readonly IAssetQuery _assets;
         private readonly IImageCommand _imgCommand;
-        public MarketplaceProductCommand(AppSettings settings, IImageCommand imgCommand, IAssetAssignmentQuery assetAssignments)
+        public MarketplaceProductCommand(AppSettings settings, IImageCommand imgCommand, IAssetAssignmentQuery assetAssignments, IAssetQuery assets)
         {
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
@@ -41,8 +42,9 @@ namespace Marketplace.Common.Commands.Crud
             });
             _imgCommand = imgCommand;
             _assetAssignments = assetAssignments;
+            _assets = assets;
         }
-        private async Task<List<Asset>> GetProductImages(string productID, string containerID)
+        private async Task<List<Asset>> GetProductImages(string productID)
         {
             var imageArgs = new ListArgs<Asset>
             {
@@ -58,7 +60,7 @@ namespace Marketplace.Common.Commands.Crud
                     }
                 }
             };
-            var imageAssignments = await _assetAssignments.List(containerID, imageArgs);
+            var imageAssignments = await _assetAssignments.List("seb", imageArgs);
             var imagesToReturn = new List<Asset>();
             foreach (var a in imageAssignments.Items)
             {
@@ -69,20 +71,49 @@ namespace Marketplace.Common.Commands.Crud
             };
             return imagesToReturn;
         }
+        private async Task<List<Asset>> GetProductAttachments(string productID)
+        {
+            var attachmentArgs = new ListArgs<Asset>
+            {
+                Filters = new List<ListFilter>()
+                {
+                    new ListFilter()
+                    {
+                        Name="ResourceID",
+                        Values = new List<ListFilterValue>()
+                        {
+                            new ListFilterValue() { Operator = ListFilterOperator.Equal, Term = productID}
+                        }
+                    }
+                }
+            };
+            var attachmentAssignments = await _assetAssignments.List("seb", attachmentArgs);
+            var attachmentsToReturn = new List<Asset>();
+            foreach (var a in attachmentAssignments.Items)
+            {
+                if (a.Asset.Type == AssetType.Attachment)
+                {
+                    attachmentsToReturn.Add(a.Asset);
+                }
+            };
+            return attachmentsToReturn;
+        }
         public async Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user)
         {
             var _product =  await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
             var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.DefaultPriceScheduleID, user.AccessToken);
             var _specs = await _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
             var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
-            var _images = await GetProductImages(_product.ID, "SEB");
+            var _images = await GetProductImages(_product.ID);
+            var _attachments = await GetProductAttachments(_product.ID);
             return new SuperMarketplaceProduct
             {
                 Product = _product,
                 PriceSchedule = _priceSchedule,
                 Specs = _specs.Items,
                 Variants = _variants.Items,
-                Images = _images
+                Images = _images,
+                Attachments = _attachments
             };
         }
 
@@ -99,14 +130,16 @@ namespace Marketplace.Common.Commands.Crud
                 var priceSchedule = await _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
                 var _specs = await _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, user.AccessToken);
                 var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, user.AccessToken);
-                var _images = await GetProductImages(product.ID, "SEB");
+                var _images = await GetProductImages(product.ID);
+                var _attachments = await GetProductAttachments(product.ID);
                 _superProductsList.Add(new SuperMarketplaceProduct
                 {
                     Product = product,
                     PriceSchedule = priceSchedule,
                     Specs = _specs.Items,
                     Variants = _variants.Items,
-                    Images = _images
+                    Images = _images,
+                    Attachments = _attachments
                 });
             });
             return new ListPage<SuperMarketplaceProduct>
@@ -163,6 +196,7 @@ namespace Marketplace.Common.Commands.Crud
                 Specs = _specs.Items,
                 Variants = _variants.Items,
                 Images = new List<Asset>(),
+                Attachments = new List<Asset>()
             };
         }
 
@@ -232,7 +266,9 @@ namespace Marketplace.Common.Commands.Crud
             // List Product Specs
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
             // List Product Images
-            var _images = await GetProductImages(_updatedProduct.ID, "SEB");
+            var _images = await GetProductImages(_updatedProduct.ID);
+            // List Product Attachments
+            var _attachments = await GetProductAttachments(_updatedProduct.ID);
             return new SuperMarketplaceProduct
             {
                 Product = _updatedProduct,
@@ -240,15 +276,18 @@ namespace Marketplace.Common.Commands.Crud
                 Specs = _specs.Items,
                 Variants = _variants.Items,
                 Images = _images,
+                Attachments = _attachments
             };
         }
 
         public async Task Delete(string id, VerifiedUserContext user)
         {
             var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
-            var _images = await _imgCommand.GetProductImages(id);
-            // Delete specs and images associated with the requested product
-            await Throttler.RunAsync(_images.Items, 100, 5, i => _imgCommand.Delete(i.id));
+            var _images = await GetProductImages(id);
+            var _attachments = await GetProductAttachments(id);
+            // Delete specs images and attachments associated with the requested product
+            await Throttler.RunAsync(_images, 100, 5, i => _assets.Delete("seb", i.InteropID));
+            await Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete("seb", i.InteropID));
             await Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
             await _oc.Products.DeleteAsync(id, user.AccessToken);
         }

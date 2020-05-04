@@ -19,6 +19,7 @@ namespace Marketplace.Models
         public IList<Spec> Specs { get; set; }
         public IList<MarketplaceVariant> Variants { get; set; }
         public IList<Asset> Images { get; set; }
+        public IList<Asset> Attachments { get; set; }
     }
 
     [SwaggerModel]
