@@ -6,6 +6,7 @@ namespace Integrations.CMS.Models
 {
 	public enum ResourceType
 	{
-		Products, Categories, Catalogs, Promotions, Suppliers, Buyers, ProductFacets
+		Products, Categories, Catalogs, Promotions, Suppliers, Buyers, Addresses, SupplierAddrresses,
+		AdminAddresses, UserGroup, SupplierUserGroups, AdminUserGroups, ProductFacets
 	}
 }

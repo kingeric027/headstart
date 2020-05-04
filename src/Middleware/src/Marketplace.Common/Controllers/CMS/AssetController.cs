@@ -1,4 +1,5 @@
-﻿using Marketplace.CMS.Models;
+﻿using Integrations.CMS.Models;
+using Marketplace.CMS.Models;
 using Marketplace.CMS.Queries;
 using Marketplace.Common;
 using Marketplace.Common.Controllers;
@@ -79,10 +80,16 @@ namespace Marketplace.CMS.Controllers
 		}
 
 		[DocName("Delete Asset Assignment"), MarketplaceUserAuth]
-		[HttpDelete, Route("{assetID}/assignments/{resourceType}/{resourceID}")]
-		public async Task DeleteAssignment(string containerID, string assetID, ResourceType resourceType, string resourceID)
+		[HttpDelete, Route("{assetID}/assignments/{resourceType}/{resourceID}/{resourceParentID}")]
+		public async Task DeleteAssignment(string containerID, string assetID, ResourceType resourceType, string resourceID, string resourceParentID)
 		{
-			await _assignments.Delete(containerID, assetID, resourceType, resourceID);
+			await _assignments.Delete(containerID, new AssetAssignment()
+			{
+				AssetID = assetID,
+				ResourceType = resourceType,
+				ResourceID = resourceID,
+				ResourceParentID = resourceParentID
+			}, VerifiedUserContext);
 		}
 	}
 }
