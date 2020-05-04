@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { OrderStatus, OrderFilters, ShopperContextService, OrderContext } from 'marketplace';
+import { OrderStatus, OrderFilters, ShopperContextService, OrderViewContext } from 'marketplace';
 import { takeWhile } from 'rxjs/operators';
 
 @Component({
