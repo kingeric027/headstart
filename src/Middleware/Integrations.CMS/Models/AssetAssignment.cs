@@ -1,4 +1,5 @@
 ﻿using Cosmonaut.Attributes;
+using Integrations.CMS.Models;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Helpers.Attributes;
 using Marketplace.Helpers.Models;
@@ -11,12 +12,6 @@ using System.Text;
 
 namespace Marketplace.CMS.Models
 {
-	public enum ResourceType
-	{
-		Products, Categories, Catalogs, Promotions, Suppliers, Buyers, Addresses, SupplierAddrresses,
-		AdminAddresses, UserGrousp, SupplierUserGroups, AdminUserGroups, ProductFacets
-	}
-
 	[SwaggerModel]
 	[CosmosCollection("assetassignments")]
 	public class AssetAssignment : CosmosObject

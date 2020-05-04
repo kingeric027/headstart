@@ -1,5 +1,6 @@
 ﻿using Cosmonaut;
 using Cosmonaut.Extensions;
+using Integrations.CMS.Models;
 using Marketplace.CMS.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
@@ -20,7 +21,7 @@ namespace Marketplace.CMS.Queries
 	{
 		Task<ListPage<AssetAssignment>> List(string containerInteropID, ListArgs<Asset> args);
 		Task Save(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user);
-		Task Delete(string containerInteropID, string assetInteropID, ResourceType resourceType, string resourceID);
+		Task Delete(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user);
 	}
 
 	public class AssetAssignmentQuery : IAssetAssignmentQuery
@@ -62,6 +63,7 @@ namespace Marketplace.CMS.Queries
 
 		public async Task Save(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user)
 		{
+
 			await new MultiTenantOCClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID); // confirm OC resource exists
 			var asset = await _assets.Get(containerInteropID, assignment.AssetID);
 			assignment.ContainerID = asset.ContainerID;
@@ -69,16 +71,16 @@ namespace Marketplace.CMS.Queries
 			await _assignmentStore.AddAsync(assignment);
 		}
 
-		public async Task Delete(string containerInteropID, string assetInteropID, ResourceType resourceType, string resourceID)
+		public async Task Delete(string containerInteropID, AssetAssignment assignment, VerifiedUserContext user)
 		{
 			var container = await _containers.Get(containerInteropID);
-			var asset = await _assets.Get(containerInteropID, assetInteropID);
+			var asset = await _assets.Get(containerInteropID, assignment.AssetID);
 			await _assignmentStore.RemoveAsync(x =>
 				x.ContainerID == container.id &&
 				x.AssetID == asset.id &&
-				x.ResourceID == resourceID &&
-				x.ResourceType == resourceType
-			);
+				x.ResourceID == assignment.ResourceID &&
+				x.ResourceType == assignment.ResourceType &&
+				x.ResourceParentID == assignment.ResourceParentID);
 		}
 	}
 }
