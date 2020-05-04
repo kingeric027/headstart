@@ -6,7 +6,6 @@ using Marketplace.Common.Queries;
 using Marketplace.Common;
 using System.Threading.Tasks;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
 
 namespace Marketplace.Orchestration
 {
