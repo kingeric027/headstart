@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
-import { OrderStatus, OrderFilters } from '../../shopper-context';
+import { OrderStatus, OrderFilters, OrderViewContext } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { OcMeService, ListOrder } from '@ordercloud/angular-sdk';
+import { OcMeService, ListOrder, OcOrderService } from '@ordercloud/angular-sdk';
 import { filter } from 'rxjs/operators';
+import { RouteService } from '../route/route.service';
 
 export interface IOrderFilters {
   activeFiltersSubject: BehaviorSubject<OrderFilters>;
@@ -30,12 +31,14 @@ export class OrderFilterService implements IOrderFilters {
 
   constructor(
     private ocMeService: OcMeService,
+    private ocOrderService: OcOrderService,
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private routeService: RouteService
   ) {
     this.activatedRoute.queryParams
-      .pipe(filter(() => this.router.url.startsWith('/profile/orders')))
+      .pipe(filter(() => this.router.url.startsWith('/orders')))
       .subscribe(this.readFromUrlQueryParams);
   }
 
@@ -63,6 +66,10 @@ export class OrderFilterService implements IOrderFilters {
     this.patchFilterState({ status: status || undefined, page: undefined });
   }
 
+  filterByLocation(locationID: string): void {
+    this.patchFilterState({ location: locationID || undefined, page: undefined });
+  }
+
   filterByDateSubmitted(fromDate: string, toDate: string): void {
     this.patchFilterState({
       fromDate: fromDate || undefined,
@@ -75,10 +82,10 @@ export class OrderFilterService implements IOrderFilters {
   }
 
   private readFromUrlQueryParams = (params: Params): void => {
-    const { page, sortBy, search, fromDate, toDate } = params;
+    const { page, sortBy, search, fromDate, toDate, location } = params;
     const status = params.status;
     const showOnlyFavorites = !!params.favorites;
-    this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate });
+    this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate, location });
   };
 
   private getDefaultParms() {
@@ -90,20 +97,31 @@ export class OrderFilterService implements IOrderFilters {
       status: undefined,
       showOnlyFavorites: false,
       fromDate: undefined,
+      location: undefined,
       toDate: undefined,
     };
   }
 
   // Used to update the URL
   mapToUrlQueryParams(model: OrderFilters): Params {
-    const { page, sortBy, search, status, fromDate, toDate } = model;
+    const { page, sortBy, search, status, fromDate, toDate, location } = model;
     const favorites = model.showOnlyFavorites ? 'true' : undefined;
-    return { page, sortBy, search, status, favorites, fromDate, toDate };
+    return { page, sortBy, search, status, favorites, fromDate, toDate, location };
   }
 
   // Used in requests to the OC API
   async listOrders(): Promise<ListOrder> {
-    return await this.ocMeService.ListOrders(this.createListOptions()).toPromise();
+    const viewContext = this.routeService.getOrderViewContext();
+    switch (viewContext) {
+      case OrderViewContext.MyOrders:
+        return await this.ocMeService.ListOrders(this.createListOptions()).toPromise();
+      case OrderViewContext.Approve:
+        return await this.ocMeService.ListApprovableOrders(this.createListOptions()).toPromise();
+      case OrderViewContext.Location:
+        // enforcing a location is selected before filtering
+        if (this.activeFiltersSubject.value.location)
+          return await this.ocOrderService.List('outgoing', this.createListOptions()).toPromise();
+    }
   }
 
   async listApprovableOrders(): Promise<ListOrder> {
@@ -111,7 +129,16 @@ export class OrderFilterService implements IOrderFilters {
   }
 
   private createListOptions() {
-    const { page, sortBy, search, showOnlyFavorites, status, fromDate, toDate } = this.activeFiltersSubject.value;
+    const {
+      page,
+      sortBy,
+      search,
+      showOnlyFavorites,
+      status,
+      fromDate,
+      toDate,
+      location,
+    } = this.activeFiltersSubject.value;
     const from = fromDate ? `>${fromDate}` : undefined;
     const to = toDate ? `<${toDate}` : undefined;
     const favorites = this.currentUser.get().FavoriteOrderIDs.join('|') || undefined;
@@ -125,6 +152,9 @@ export class OrderFilterService implements IOrderFilters {
       },
     };
     listOptions = this.addStatusFilters(status, listOptions);
+    if (location) {
+      listOptions.filters['BillingAddress.ID'] = location;
+    }
     return listOptions;
   }
 
