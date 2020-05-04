@@ -19,8 +19,7 @@ namespace Marketplace.Common.Commands
         Task<MarketplaceBuyerLocation> Create(string buyerID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user, string token);
         Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID, VerifiedUserContext user);
         Task<MarketplaceBuyerLocation> Update(string buyerID, string buyerLocationID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user);
-        Task Delete(string buyerID, string buyerLocationID, VerifiedUserContext user);        Task AddNewUserType();
-    }
+        Task Delete(string buyerID, string buyerLocationID, VerifiedUserContext user);    }
 
     public class MarketplaceBuyerLocationCommand : IMarketplaceBuyerLocationCommand
     {
@@ -67,39 +66,12 @@ namespace Marketplace.Common.Commands
                 await AddUserTypeToLocation(token, buyerLocationID, userType);            }
             await _oc.ApprovalRules.CreateAsync(buyerID, new ApprovalRule()            {                ID = buyerLocationID,                ApprovingGroupID = approvingGroupID,                Description = "General Approval Rule for Location. Every Order Over a Certain Limit will Require Approval for the designated group of users.",                Name = $"{locationName} General Location Approval Rule",                RuleExpression = $"order.xp.ApprovalNeeded = '{buyerLocationID}' & order.Total > 0"            });        }
 
-        public async Task AddNewUserType()
-        {
-            _oc = new OrderCloudClient(new OrderCloudClientConfig
-            {
-                ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                AuthUrl = _settings.OrderCloudSettings.AuthUrl,
-                ClientId = _settings.OrderCloudSettings.ClientID,
-                ClientSecret = _settings.OrderCloudSettings.ClientSecret,
-                Roles = new[]
-                 {
-                    ApiRole.FullAccess
-                }
-            });
-            var buyers = await _oc.Buyers.ListAsync();
-            foreach(var buyer in buyers.Items)
-            {
-                var locations = await _oc.UserGroups.ListAsync<MarketplaceUserGroup>(buyer.ID, opts => opts.AddFilter(u => u.xp.Type == UserGroupType.BuyerLocation.ToString()));
-                var token = await _oc.AuthenticateAsync();
-                foreach(var location in locations.Items)
-                {
-                    await AddUserTypeToLocation(token.AccessToken, location.ID, SEBUserTypes.BuyerLocation().Last());
-                }
-            }
-        }
-
         public async Task AddUserTypeToLocation(string token, string buyerLocationID, MarketplaceUserType marketplaceUserType)
         {
             var buyerID = buyerLocationID.Split('-').First();            var userGroupID = $"{buyerLocationID}-{marketplaceUserType.UserGroupIDSuffix}";
-            await _oc.UserGroups.CreateAsync(buyerID, new UserGroup()
+            await _oc.UserGroups.CreateAsync(buyerID, new PartialUserGroup()
             {
-                ID = userGroupID,
-                Name = marketplaceUserType.UserGroupName,
-                xp =                        {                            Type = marketplaceUserType.UserGroupType,                            Location = buyerLocationID                        }
+                xp = new                        {                            Type = marketplaceUserType.UserGroupType,                        }
             }, token);
             foreach (var customRole in marketplaceUserType.CustomRoles)
             {
