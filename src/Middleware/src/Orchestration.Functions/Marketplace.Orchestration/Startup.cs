@@ -32,7 +32,6 @@ namespace Marketplace.Orchestration
                 .Inject<IOrderCloudClient>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<IOrderOrchestrationCommand>()
-                .Inject<IMarketplaceBuyerLocationCommand>()
                 .Inject<ISyncCommand>()
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(new CosmosConfig(
                         settings.CosmosSettings.DatabaseName, 
