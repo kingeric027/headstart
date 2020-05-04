@@ -18,6 +18,7 @@ namespace Marketplace.Models.Misc
 	public enum UserGroupType
 	{
 		UserPermissions,
+		OrderAccess,
 		Approval,
 		BuyerLocation
 	}

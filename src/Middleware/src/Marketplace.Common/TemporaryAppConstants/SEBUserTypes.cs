@@ -102,7 +102,7 @@ namespace Marketplace.Common.TemporaryAppConstants
                 },
                 new MarketplaceUserType {
                     UserGroupName = "View All Location Orders",
-                    UserGroupType = UserGroupType.UserPermissions,
+                    UserGroupType = UserGroupType.OrderAccess,
                     UserGroupIDSuffix = "ViewAllLocationOrders",
                     CustomRoles = new List<CustomRole>
                     {

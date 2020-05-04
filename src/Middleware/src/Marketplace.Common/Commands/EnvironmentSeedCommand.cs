@@ -82,6 +82,7 @@ namespace Marketplace.Common.Commands
 			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "OrderType" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "LocationID" },       
 			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },       
 		};
 
