@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Commands;
+using Marketplace.Common.Commands;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +29,13 @@ namespace Marketplace.Common.Controllers
         public async Task<Order> AcknowledgeQuoteOrder(string orderID)
         {
             return await _command.AcknowledgeQuoteOrder(orderID);
+        }
+
+        [DocName("LIST Acknowledge Quote Order")]
+        [HttpGet, Route("location/{locationID}"), MarketplaceUserAuth(ApiRole.Shopper)]
+        public async Task<ListPage<Order>> ListLocationOrders(string locationID)
+        {
+            return await _command.ListOrdersForLocation(locationID, VerifiedUserContext);
         }
     }
 }

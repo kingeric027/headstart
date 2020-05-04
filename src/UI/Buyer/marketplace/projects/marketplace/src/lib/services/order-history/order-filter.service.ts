@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
-import { OrderStatus, OrderFilters, OrderViewContext } from '../../shopper-context';
+import { OrderStatus, OrderFilters, OrderViewContext, AppConfig } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { OcMeService, ListOrder, OcOrderService } from '@ordercloud/angular-sdk';
+import { OcMeService, ListOrder, OcOrderService, OcTokenService } from '@ordercloud/angular-sdk';
 import { filter } from 'rxjs/operators';
 import { RouteService } from '../route/route.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 export interface IOrderFilters {
   activeFiltersSubject: BehaviorSubject<OrderFilters>;
@@ -35,7 +36,12 @@ export class OrderFilterService implements IOrderFilters {
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private routeService: RouteService
+    private routeService: RouteService,
+
+    // remove below when sdk is regenerated
+    private ocTokenService: OcTokenService,
+    private httpClient: HttpClient,
+    private appConfig: AppConfig
   ) {
     this.activatedRoute.queryParams
       .pipe(filter(() => this.router.url.startsWith('/orders')))
@@ -119,9 +125,20 @@ export class OrderFilterService implements IOrderFilters {
         return await this.ocMeService.ListApprovableOrders(this.createListOptions()).toPromise();
       case OrderViewContext.Location:
         // enforcing a location is selected before filtering
-        if (this.activeFiltersSubject.value.location)
-          return await this.ocOrderService.List('outgoing', this.createListOptions()).toPromise();
+        if (this.activeFiltersSubject.value.location) return await this.ListLocationOrders();
     }
+  }
+
+  async ListLocationOrders(): Promise<ListOrder> {
+    const locationID = this.activeFiltersSubject.value.location;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+    const url = `${this.appConfig.middlewareUrl}/order/location/${locationID}`;
+    return this.httpClient
+      .get<ListOrder>(url, { headers: headers })
+      .toPromise();
   }
 
   async listApprovableOrders(): Promise<ListOrder> {
