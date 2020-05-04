@@ -43,6 +43,7 @@ namespace Marketplace.CMS.Models
 	[SwaggerModel]
 	public class AssetMetadata
 	{
+		public bool IsUrlOverridden { get; set; } = false;
 		public string ContentType { get; set; }
 		public int? SizeBytes { get; set; }
 		public int? ImageHeight { get; set; } = null; // null if asset not image

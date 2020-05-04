@@ -16,7 +16,7 @@ namespace Marketplace.CMS.Mappers
 
 		public static Asset MapToResponse(AssetContainer container, Asset asset)
 		{
-			asset.Url = asset.Url ?? $"{container.StorageAccount?.HostUrl}/assets -{container.id}/{asset.id}";
+			asset.Url = asset.Metadata.IsUrlOverridden ? asset.Url : $"{container.StorageAccount?.HostUrl}/assets-{container.id}/{asset.id}";
 			return asset;
 		} 
 
@@ -38,7 +38,8 @@ namespace Marketplace.CMS.Mappers
 				Metadata = new AssetMetadata()
 				{
 					ContentType = form.File?.ContentType,
-					SizeBytes = (int)form.File?.Length,
+					SizeBytes = (int?)form.File?.Length,
+					IsUrlOverridden = form.Url != null
 				}
 			};
 			TypeSpecificMapping(ref asset, form);
@@ -67,6 +68,7 @@ namespace Marketplace.CMS.Mappers
 
 		private static void ImageSpecificMapping(ref Asset asset, AssetUpload form)
 		{
+			if (form.File == null) return;
 			if (!ValidImageFormats.Contains(form.File.ContentType)) 
 			{
 				throw new AssetUploadValidationException($"Image Uploads must be one of these file types - {string.Join(", ", ValidImageFormats)}");

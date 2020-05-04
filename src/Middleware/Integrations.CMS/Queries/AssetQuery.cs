@@ -89,7 +89,10 @@ namespace Marketplace.CMS.Queries
 			existingAsset.InteropID = asset.InteropID;
 			existingAsset.Title = asset.Title;
 			existingAsset.Active = asset.Active;
-			existingAsset.Url = asset.Url;
+			if (existingAsset.Metadata.IsUrlOverridden)
+			{
+				existingAsset.Url = asset.Url; // Don't allow changing the url if its generated.
+			}
 			existingAsset.Type = asset.Type;
 			existingAsset.Tags = asset.Tags;
 			existingAsset.FileName = asset.FileName;
