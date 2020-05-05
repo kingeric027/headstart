@@ -5,9 +5,9 @@
              translate>ORDERS.LIST.ORDER_LIST</caption>
     <thead>
       <tr>
-        <th *ngIf="columns.indexOf('Favorite') > -1"></th>
+        <th *ngIf="columns.includes('Favorite')"></th>
         <th (click)="updateSort('ID')"
-            *ngIf="columns.indexOf('ID') > -1">
+            *ngIf="columns.includes('ID')">
           <button class="btn btn-link font-weight-bold"
                   translate>
             ORDERS.LIST.ID
@@ -16,7 +16,7 @@
           </button>
         </th>
         <th (click)="updateSort('Status')"
-            *ngIf="columns.indexOf('Status') > -1">
+            *ngIf="columns.includes('Status')">
           <button class="btn btn-link font-weight-bold"
                   translate>
             ORDERS.LIST.STATUS
@@ -25,7 +25,7 @@
           </button>
         </th>
         <th (click)="updateSort('DateSubmitted')"
-            *ngIf="columns.indexOf('DateSubmitted') > -1">
+            *ngIf="columns.includes('DateSubmitted')">
           <button class="btn btn-link font-weight-bold"
                   translate>
             ORDERS.LIST.DATE_SUBMITTED
@@ -33,14 +33,14 @@
                      [icon]="sortBy === 'DateSubmitted' ? faCaretDown : faCaretUp"></fa-icon>
           </button>
         </th>
-        <th *ngIf="columns.indexOf('SubmittedBy') > -1">
+        <th *ngIf="columns.includes('SubmittedBy')">
           <button class="btn btn-link font-weight-bold"
                   translate>
             ORDERS.LIST.SUBMITTED_BY
           </button>
         </th>
         <th (click)="updateSort('Total')"
-            *ngIf="columns.indexOf('Total') > -1">
+            *ngIf="columns.includes('Total')">
           <button class="btn btn-link font-weight-bold"
                   translate>
             ORDERS.LIST.TOTAL
@@ -54,24 +54,24 @@
       <tr class="cursor-pointer"
           *ngFor="let order of orders?.Items"
           (click)="toOrderDetails(order.ID)">
-        <td *ngIf="columns.indexOf('Favorite') > -1"
+        <td *ngIf="columns.includes('Favorite')"
             (click)="$event.stopPropagation()">
           <ocm-toggle-favorite [favorite]="isFavorite(order.ID)"
                                (favoriteChanged)="setIsFavorite($event.detail, order.ID)">
           </ocm-toggle-favorite>
         </td>
-        <td *ngIf="columns.indexOf('ID')> -1"
+        <td *ngIf="columns.includes('ID')"
             class="text-primary">
           {{order.ID}}
           <span *ngIf="order.xp.OrderType === 'Quote'"
                 class="badge badge-pill badge-secondary ml-2">{{order.xp.OrderType}}</span>
         </td>
-        <td *ngIf="columns.indexOf('Status') > -1">
+        <td *ngIf="columns.includes('Status')">
           <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{order.Status}}
         </td>
-        <td *ngIf="columns.indexOf('DateSubmitted') > -1">{{order.DateSubmitted | date: 'short' || 'N/A'}}</td>
-        <td *ngIf="columns.indexOf('SubmittedBy') > -1">{{order.FromUser.FirstName}} {{order.FromUser.LastName}}</td>
-        <td *ngIf="columns.indexOf('Total') > -1">{{isQuoteOrder(order) ? 'N/A' : order.Total | currency}}</td>
+        <td *ngIf="columns.includes('DateSubmitted')">{{order.DateSubmitted | date: 'short' || 'N/A'}}</td>
+        <td *ngIf="columns.includes('SubmittedBy')">{{order.FromUser.FirstName}} {{order.FromUser.LastName}}</td>
+        <td *ngIf="columns.includes('Total')">{{isQuoteOrder(order) ? 'N/A' : order.Total | currency}}</td>
       </tr>
     </tbody>
   </table>

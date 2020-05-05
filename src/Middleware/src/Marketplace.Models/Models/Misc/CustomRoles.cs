@@ -30,6 +30,7 @@
 		MPCreditCardAdmin,
 		MPAddressAdmin,
 		MPOrderApprover,
-		MPNeedsApproval
+		MPNeedsApproval,
+		MPViewAllLocationOrders
 	}
 }

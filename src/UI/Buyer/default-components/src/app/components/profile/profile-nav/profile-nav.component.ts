@@ -1,6 +1,6 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { ShopperContextService } from 'marketplace';
-import { ProfileSection } from 'marketplace/projects/marketplace/src/lib/services/route/profile-routing.config';
+import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
 
 @Component({
   templateUrl: './profile-nav.component.html',
@@ -8,9 +8,9 @@ import { ProfileSection } from 'marketplace/projects/marketplace/src/lib/service
   encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class OCMProfileNav {
-  profileSections: ProfileSection[] = [];
+  profileRoutes: RouteConfig[] = [];
 
   constructor(public context: ShopperContextService) {
-    this.profileSections = context.router.getProfileSections()
+    this.profileRoutes = context.router.getProfileRoutes();
   }
 }

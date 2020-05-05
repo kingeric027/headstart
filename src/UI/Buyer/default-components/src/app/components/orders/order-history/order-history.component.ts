@@ -1,7 +1,8 @@
 import { Component, AfterViewInit, Input, OnDestroy, OnInit } from '@angular/core';
 import { ListOrder } from '@ordercloud/angular-sdk';
-import { OrderStatus, OrderFilters, ShopperContextService } from 'marketplace';
+import { OrderStatus, OrderFilters, ShopperContextService, OrderViewContext } from 'marketplace';
 import { takeWhile } from 'rxjs/operators';
+import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
 
 @Component({
   templateUrl: './order-history.component.html',
@@ -11,26 +12,35 @@ export class OCMOrderHistory implements OnInit, AfterViewInit, OnDestroy {
   alive = true;
   columns: string[] = ['ID', 'Status', 'DateSubmitted', 'Total'];
   @Input() orders: ListOrder;
-  @Input() approvalVersion: boolean;
+  viewContext: string;
   showOnlyFavorites = false;
   sortBy: string;
   searchTerm: string;
+  orderRoutes: RouteConfig[];
 
   constructor(private context: ShopperContextService) {}
 
   ngOnInit(): void {
-    this.context.orderHistory.filters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.handleFiltersChange);
+    this.orderRoutes = this.context.router.getOrderRoutes();
+    this.viewContext = this.context.router.getOrderViewContext();
+    this.context.orderHistory.filters.activeFiltersSubject
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(this.handleFiltersChange);
   }
 
   handleFiltersChange = (filters: OrderFilters): void => {
     this.sortBy = filters.sortBy;
     this.showOnlyFavorites = filters.showOnlyFavorites;
     this.searchTerm = filters.search;
-  }
+  };
 
   ngAfterViewInit(): void {
-    if (!this.approvalVersion) {
+    // cannot filter on favorite orders for orders to approve
+    if (this.viewContext === OrderViewContext.MyOrders) {
       this.columns.push('Favorite');
+    }
+    if (this.viewContext === OrderViewContext.Location) {
+      this.columns.push('Location');
     }
   }
 

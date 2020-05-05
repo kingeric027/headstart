@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Commands;
+using Marketplace.Common.Commands;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Misc;
+using Marketplace.Helpers;
 
 namespace Marketplace.Common.Controllers
 {
@@ -29,6 +30,13 @@ namespace Marketplace.Common.Controllers
         public async Task<Order> AcknowledgeQuoteOrder(string orderID)
         {
             return await _command.AcknowledgeQuoteOrder(orderID);
-        } 
+        }
+
+        [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
+        [HttpGet, Route("location/{locationID}"), MarketplaceUserAuth(ApiRole.Shopper)]
+        public async Task<ListPage<Order>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)
+        {
+            return await _command.ListOrdersForLocation(locationID, listArgs, VerifiedUserContext);
+        }
     }
 }

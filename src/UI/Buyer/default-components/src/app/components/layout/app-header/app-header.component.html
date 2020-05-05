@@ -19,6 +19,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <!-- /Mobile Toggle -->
+
     <!-- Inline Nav Items -->
     <div [ngClass]="{ collapse: isCollapsed, 'navbar-collapse': true }"
          id="navbarSupportedContent">
@@ -63,6 +64,8 @@
            (click)="context.router.toRegister()"
            translate>LAYOUT.APP_HEADER.REGISTER</a>
       </div>
+
+      <!-- Order -->
       <ul class="navbar-nav"
           *ngIf="!user.IsAnonymous && screenSize !== 'xs' && screenSize !== 'sm'">
         <li class="nav-item dropdown cursor-pointer"
@@ -78,7 +81,7 @@
                   popoverClass="orders-awaiting-approval-popover bg-info"
                   triggers="manual"
                   translate>
-              LAYOUT.APP_HEADER.ACCOUNT
+              LAYOUT.APP_HEADER.ORDERS
             </span>
             <ng-template #OrdersToApproveContent>
               <div (click)="routeToOrdersToApprove($event)"
@@ -89,15 +92,16 @@
                     <ocm-order-status-icon status="AwaitingApproval"></ocm-order-status-icon>
                     LAYOUT.APP_HEADER.NEEDS_ATTENTION
                   </h5>
-                  <h6 class="card-subtitle mb-2 text-muted p-2"
+                  <h4 class="card-subtitle mb-2 text-muted p-2"
                       translate>
-                    LAYOUT.APP_HEADER.AWAITING_ORDERS_1 {{ numberOfOrdersToApprove }} LAYOUT.APP_HEADER.AWAITING_ORDERS_2
-                  </h6>
+                    LAYOUT.APP_HEADER.AWAITING_ORDERS_1
+                    {{ numberOfOrdersToApprove }} LAYOUT.APP_HEADER.AWAITING_ORDERS_2
+                  </h4>
                 </div>
               </div>
             </ng-template>
             <fa-layers class="fa-fw">
-              <fa-icon [icon]="faUserCircle"></fa-icon>
+              <fa-icon [icon]="faBoxOpen"></fa-icon>
               <fa-layers-counter *ngIf="numberOfOrdersToApprove"
                                  class="badge__counter--large"
                                  [content]="numberOfOrdersToApprove">
@@ -107,21 +111,20 @@
           <div class="dropdown-menu account-dropdown-alignment"
                aria-labelledby="account-dropdown"
                ngbDropdownMenu>
-            <h6 class="dropdown-header"><span translate>LAYOUT.APP_HEADER.GREETING</span>, {{ user?.FirstName }}!</h6>
-            <ng-container *ngFor="let profileSection of profileSections">
-              <span *ngIf="profileSection.routerCall !== 'toOrdersToApprove'">
-                <a *ngIf="profileSection.showInDropdown"
+            <ng-container *ngFor="let orderRoute of orderRoutes">
+              <span *ngIf="orderRoute.routerCall !== 'toOrdersToApprove'">
+                <a *ngIf="orderRoute.showInDropdown"
                    class="nav-item dropdown-item cursor-pointer"
-                   [ngClass]="{ active: activePath === profileSection.url }"
-                   (click)="context.router[profileSection.routerCall]()">{{ profileSection.displayText }}</a>
+                   [ngClass]="{ active: activePath === orderRoute.url }"
+                   (click)="context.router[orderRoute.routerCall]()">{{ orderRoute.displayText }}</a>
               </span>
-              <span *ngIf="profileSection.routerCall === 'toOrdersToApprove'">
-                <a *ngIf="profileSection.showInDropdown"
+              <span *ngIf="orderRoute.routerCall === 'toOrdersToApprove'">
+                <a *ngIf="orderRoute.showInDropdown"
                    class="nav-item dropdown-item cursor-pointer"
-                   [ngClass]="{ active: activePath === profileSection.url }"
-                   (click)="context.router[profileSection.routerCall]()">
+                   [ngClass]="{ active: activePath === orderRoute.url }"
+                   (click)="context.router[orderRoute.routerCall]()">
                   <span>
-                    {{ profileSection.displayText }}
+                    {{ orderRoute.displayText }}
                   </span>
                   <fa-layers class="fa-fw ml-n3">
                     <fa-layers-counter *ngIf="numberOfOrdersToApprove"
@@ -130,6 +133,38 @@
                     </fa-layers-counter>
                   </fa-layers>
                 </a>
+              </span>
+            </ng-container>
+          </div>
+        </li>
+      </ul>
+      <!-- Order -->
+
+      <!-- Profile -->
+      <ul class="navbar-nav"
+          *ngIf="!user.IsAnonymous && screenSize !== 'xs' && screenSize !== 'sm'">
+        <li class="nav-item dropdown cursor-pointer"
+            ngbDropdown
+            placement="bottom-right">
+          <div class="nav-link dropdown-toggle text-nowrap"
+               id="account-dropdown"
+               ngbDropdownToggle>
+            <span class="d-none d-md-inline"
+                  translate>
+              LAYOUT.APP_HEADER.ACCOUNT
+            </span>
+            <fa-icon [icon]="faUserCircle"></fa-icon>
+          </div>
+          <div class="dropdown-menu account-dropdown-alignment"
+               aria-labelledby="account-dropdown"
+               ngbDropdownMenu>
+            <h4 class="dropdown-header"><span translate>LAYOUT.APP_HEADER.GREETING</span>, {{ user?.FirstName }}!</h4>
+            <ng-container *ngFor="let profileRoute of profileRoutes">
+              <span *ngIf="profileRoute.routerCall !== 'toOrdersToApprove'">
+                <a *ngIf="profileRoute.showInDropdown"
+                   class="nav-item dropdown-item cursor-pointer"
+                   [ngClass]="{ active: activePath === profileRoute.url }"
+                   (click)="context.router[profileRoute.routerCall]()">{{ profileRoute.displayText }}</a>
               </span>
             </ng-container>
             <div class="dropdown-divider"></div>
@@ -143,6 +178,7 @@
         </li>
       </ul>
     </div>
+    <!-- Profile -->
     <!-- /Inline Nav Items -->
   </div>
 </nav>

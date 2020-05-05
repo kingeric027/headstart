@@ -6,7 +6,7 @@ import {
   MarketplaceOrder,
   OrderReorderResponse,
   OrderType,
-  OrderContext,
+  OrderViewContext,
 } from 'marketplace';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
@@ -28,7 +28,7 @@ export class OCMOrderDetails implements OnInit {
   constructor(private context: ShopperContextService, private modalService: NgbModal) {}
 
   async ngOnInit(): Promise<void> {
-    this.approvalVersion = this.context.router.getOrderContext() === OrderContext.Approve;
+    this.approvalVersion = this.context.router.getOrderViewContext() === OrderViewContext.Approve;
     this.orderDetails = await this.context.orderHistory.getOrderDetails(this.approvalVersion);
     this.order = this.orderDetails.order;
     this.validateReorder(this.order.ID);

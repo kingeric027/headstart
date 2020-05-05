@@ -1,6 +1,6 @@
 // core services
 import { NgModule, Component, OnInit, OnDestroy } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, ActivatedRoute } from '@angular/router';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { HasTokenGuard } from './interceptors/has-token/has-token.guard';
@@ -33,12 +33,16 @@ import { LocationManagementWrapperComponent } from './wrapper-components/locatio
 
 // TODO - move or remove these
 @Component({
-  template: '<ocm-order-history [orders]="orders" [approvalVersion]="false"></ocm-order-history>',
+  template: '<ocm-order-history [orders]="orders"></ocm-order-history>',
 })
-export class MyOrdersWrapperComponent implements OnInit, OnDestroy {
+export class OrderHistoryWrapperComponent implements OnInit, OnDestroy {
   orders: ListOrder;
   alive = true;
-  constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
+  constructor(
+    public context: ShopperContextService,
+    private orderFilters: OrderFilterService,
+    private router: ActivatedRoute
+  ) {}
 
   async ngOnInit() {
     this.orderFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrders);
@@ -46,28 +50,6 @@ export class MyOrdersWrapperComponent implements OnInit, OnDestroy {
 
   setOrders = async () => {
     this.orders = await this.orderFilters.listOrders();
-  };
-
-  ngOnDestroy() {
-    this.alive = false;
-  }
-}
-
-@Component({
-  template: '<ocm-order-history [orders]="orders" [approvalVersion]="true"></ocm-order-history>',
-})
-export class OrdersToApproveWrapperComponent implements OnInit, OnDestroy {
-  orders: ListOrder;
-  alive = true;
-
-  constructor(public context: ShopperContextService, private orderFilters: OrderFilterService) {}
-
-  async ngOnInit() {
-    this.orderFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrders);
-  }
-
-  setOrders = async () => {
-    this.orders = await this.orderFilters.listApprovableOrders();
   };
 
   ngOnDestroy() {
@@ -143,10 +125,18 @@ export const MarketplaceRoutes: Routes = [
             },
           },
           { path: 'payment-methods', component: PaymentListWrapperComponent },
-          { path: 'orders', component: MyOrdersWrapperComponent },
-          { path: 'orders/approve/:orderID', component: OrderDetailWrapperComponent },
-          { path: 'orders/approve', component: OrdersToApproveWrapperComponent },
-          { path: 'orders/:orderID', component: OrderDetailWrapperComponent },
+        ],
+      },
+      {
+        path: 'orders',
+        canActivate: [IsProfiledUserGuard],
+        children: [
+          { path: 'approve/:orderID', component: OrderDetailWrapperComponent },
+          { path: 'approve', component: OrderHistoryWrapperComponent },
+          { path: 'location/:locationFilter', component: OrderDetailWrapperComponent },
+          { path: 'location', component: OrderHistoryWrapperComponent },
+          { path: ':orderID', component: OrderDetailWrapperComponent },
+          { path: '', component: OrderHistoryWrapperComponent },
         ],
       },
     ],

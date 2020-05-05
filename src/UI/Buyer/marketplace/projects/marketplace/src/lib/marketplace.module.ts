@@ -1,10 +1,6 @@
 // core services
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  MarketplaceRoutingModule,
-  MyOrdersWrapperComponent,
-  OrdersToApproveWrapperComponent,
-} from './marketplace-routing.module';
+import { MarketplaceRoutingModule, OrderHistoryWrapperComponent } from './marketplace-routing.module';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
@@ -89,8 +85,7 @@ import { LocationManagementWrapperComponent } from './wrapper-components/locatio
     ResetPasswordWrapperComponent,
     OrderDetailWrapperComponent,
     OrderShipmentsWrapperComponent,
-    MyOrdersWrapperComponent,
-    OrdersToApproveWrapperComponent,
+    OrderHistoryWrapperComponent,
     SupplierListWrapperComponent,
   ],
 })

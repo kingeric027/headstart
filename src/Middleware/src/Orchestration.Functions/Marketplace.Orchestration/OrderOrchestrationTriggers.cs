@@ -40,7 +40,8 @@ namespace Marketplace.Orchestration
                     await client.StartNewAsync("ShipmentSyncOrchestration", input: supplier);
                     logger.LogInformation($"Finished supplier {supplier.ID}");
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logger.LogError(ex.Message);
             }
