@@ -32,15 +32,13 @@ namespace Marketplace.Common.Commands.Crud
         private readonly IOrderCloudClient _oc;
         private readonly IAssetAssignmentQuery _assetAssignments;
         private readonly IAssetQuery _assets;
-        private readonly IImageCommand _imgCommand;
-        public MarketplaceProductCommand(AppSettings settings, IImageCommand imgCommand, IAssetAssignmentQuery assetAssignments, IAssetQuery assets)
+        public MarketplaceProductCommand(AppSettings settings, IAssetAssignmentQuery assetAssignments, IAssetQuery assets)
         {
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
                 ApiUrl = settings.OrderCloudSettings.ApiUrl,
                 AuthUrl = settings.OrderCloudSettings.AuthUrl,
             });
-            _imgCommand = imgCommand;
             _assetAssignments = assetAssignments;
             _assets = assets;
         }
@@ -170,7 +168,8 @@ namespace Marketplace.Common.Commands.Crud
             var _priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
             // Create Product
             superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
-            superProduct.Product.xp.Facets.Add("supplier", new List<string>() { user.SupplierID });
+            var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);
+            superProduct.Product.xp.Facets.Add("supplier", new List<string>() { supplierName });
             var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(superProduct.Product, user.AccessToken);
             // Make Spec Product Assignments
             await Throttler.RunAsync(superProduct.Specs, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = _product.ID, SpecID = s.ID }, accessToken: user.AccessToken));
@@ -290,6 +289,12 @@ namespace Marketplace.Common.Commands.Crud
             await Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.InteropID, user));
             await Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
             await _oc.Products.DeleteAsync(id, user.AccessToken);
+        }
+
+        private async Task<string> GetSupplierNameForXpFacet(string supplierID, string accessToken)
+        {
+            var supplier = await _oc.Suppliers.GetAsync(supplierID, accessToken);
+            return supplier.Name;
         }
     }
 }

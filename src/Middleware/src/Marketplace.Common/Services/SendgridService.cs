@@ -226,7 +226,7 @@ namespace Marketplace.Common.Services
           new
           {
               ProductName = lineItem.Product.Name,
-              ImageURL = lineItem.Product.xp.Images.Count > 0 ? lineItem.Product.xp.Images[0].URL.Remove(0,3) : null,
+              ImageURL = "",
               lineItem.ProductID,
               lineItem.Quantity,
               lineItem.LineTotal

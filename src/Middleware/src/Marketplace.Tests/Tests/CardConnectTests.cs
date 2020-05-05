@@ -63,7 +63,7 @@ namespace CardConnect.Tests
 		public void auth_failure_attempt_tests(string body)
 		{
 			_http.RespondWith(body);
-			var ex = Assert.ThrowsAsync<Exception>(() => _service.AuthWithoutCapture(new CardConnectAuthorizationRequest() { cvv2 = "112" }));
+			var ex = Assert.ThrowsAsync<Marketplace.Helpers.Exceptions.ApiErrorException>(() => _service.AuthWithoutCapture(new CardConnectAuthorizationRequest() { cvv2 = "112" }));
 		}
 
 		[Test]

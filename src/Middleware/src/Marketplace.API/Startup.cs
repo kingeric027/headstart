@@ -75,8 +75,6 @@ namespace Marketplace.API
 				.Inject<IFreightPopService>()
 				.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
 				.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
-				.InjectCosmosStore<ImageQuery, Image>(cosmosConfig)
-				.InjectCosmosStore<ImageProductAssignmentQuery, ImageProductAssignment>(cosmosConfig)
 				.InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
 				.InjectCosmosStore<AssetAssignmentQuery, AssetAssignment>(cosmosConfig)
