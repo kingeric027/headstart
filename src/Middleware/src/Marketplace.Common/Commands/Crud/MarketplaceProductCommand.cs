@@ -32,15 +32,13 @@ namespace Marketplace.Common.Commands.Crud
         private readonly IOrderCloudClient _oc;
         private readonly IAssetAssignmentQuery _assetAssignments;
         private readonly IAssetQuery _assets;
-        private readonly IImageCommand _imgCommand;
-        public MarketplaceProductCommand(AppSettings settings, IImageCommand imgCommand, IAssetAssignmentQuery assetAssignments, IAssetQuery assets)
+        public MarketplaceProductCommand(AppSettings settings, IAssetAssignmentQuery assetAssignments, IAssetQuery assets)
         {
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
                 ApiUrl = settings.OrderCloudSettings.ApiUrl,
                 AuthUrl = settings.OrderCloudSettings.AuthUrl,
             });
-            _imgCommand = imgCommand;
             _assetAssignments = assetAssignments;
             _assets = assets;
         }
