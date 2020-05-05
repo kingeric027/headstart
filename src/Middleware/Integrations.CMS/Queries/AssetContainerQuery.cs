@@ -69,7 +69,6 @@ namespace Marketplace.CMS.Queries
 			return existingContainer ?? await Create(defaultContainer);
 		}
 
-
 		public async Task<AssetContainer> Create(AssetContainer container)
 		{
 			var matchingID = await GetWithoutExceptions(container.InteropID);

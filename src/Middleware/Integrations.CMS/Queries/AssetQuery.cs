@@ -93,9 +93,9 @@ namespace Marketplace.CMS.Queries
 			{
 				existingAsset.Url = asset.Url; // Don't allow changing the url if its generated.
 			}
-			existingAsset.Type = asset.Type;
 			existingAsset.Tags = asset.Tags;
 			existingAsset.FileName = asset.FileName;
+			// Intentionally don't allow changing the type. Could mess with assignments.
 			var updatedAsset = await _assetStore.UpdateAsync(existingAsset);
 			return AssetMapper.MapToResponse(container, updatedAsset);
 		}
