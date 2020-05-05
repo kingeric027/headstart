@@ -7,6 +7,7 @@ namespace Marketplace.Models.Extended
     public enum ProductType
     {
         Standard,
-        Quote
+        Quote,
+        PurchaseOrder
     }
 }
