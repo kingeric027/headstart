@@ -103,7 +103,7 @@ export class OCMSpecForm {
               return option.ID === spec.DefaultOptionID;
             }).Value
             : null,
-          options: _map(spec.Options, 'Value'),
+          options: _map(spec.Options),
           validation: [spec.Required ? Validators.required : Validators.nullValidator],
         });
       } else if (spec.AllowOpenText) {
