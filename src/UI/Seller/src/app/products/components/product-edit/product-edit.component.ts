@@ -79,7 +79,7 @@ export class ProductEditComponent implements OnInit {
   fileType: string;
   imageFiles: FileHandle[] = [];
   staticContentFiles: FileHandle[] = [];
-  staticContent: StaticContent[] = [];
+  staticContent: Asset[] = [];
   documentName: string;
   selectedTabIndex = 0;
 
@@ -147,7 +147,7 @@ export class ProductEditComponent implements OnInit {
       this.taxCodes = { Meta: {}, Items: [] };
     }
     this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
-    this.staticContent = (this._superMarketplaceProductEditable as any).Attachments;
+    this.staticContent = this._superMarketplaceProductEditable.Attachments;
     this.createProductForm(this._superMarketplaceProductEditable);
     this.images = this._superMarketplaceProductEditable.Images;
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
@@ -310,10 +310,8 @@ export class ProductEditComponent implements OnInit {
     }
     const newAsset: Asset = await MarketplaceSDK.Upload.UploadAsset(containerID, asset, accessToken);
     const assetAssignment: AssetAssignment = {
-      ContainerID: containerID,
       ResourceType: "Products",
-      // TODO: Update when the MarketplaceSDK gets bumped again with SuperMarketplaceProduct model update
-      AssetID: (newAsset as any).ID,
+      AssetID: newAsset.ID,
       ResourceID: productID
     }
     await MarketplaceSDK.Assets.SaveAssignment(containerID, assetAssignment, accessToken);
