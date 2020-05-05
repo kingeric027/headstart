@@ -214,6 +214,7 @@ export class OrderShipmentsComponent implements OnChanges {
     this.getLineItems();
     this.createShipment = false;
     this.isSaving = false;
+    this.createOrViewShipmentEvent.emit(false);
   }
 
   shouldDisableSave(shipment: FormGroup): boolean {
