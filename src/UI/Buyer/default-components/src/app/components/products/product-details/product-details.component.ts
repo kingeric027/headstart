@@ -34,6 +34,7 @@ export class OCMProductDetails implements OnInit {
   currentUser: User;
   showRequestSubmittedMessage = false;
   submittedQuoteOrder: any;
+  isAddingToCart = false;
   constructor(
     private formService: SpecFormService,
     private context: ShopperContextService) {
@@ -72,12 +73,19 @@ export class OCMProductDetails implements OnInit {
     }
   }
 
-  addToCart(): void {
-    this.context.order.cart.add({
-      ProductID: this._product.ID,
-      Quantity: this.quantity,
-      Specs: this.specFormService.getLineItemSpecs(this._specs),
-    });
+  async addToCart(): Promise<void> {
+      this.isAddingToCart = true;
+      try {
+        await this.context.order.cart.add({
+          ProductID: this._product.ID,
+          Quantity: this.quantity,
+          Specs: this.specFormService.getLineItemSpecs(this._specs),
+        });
+        this.isAddingToCart = false;
+      } catch (ex) {
+        this.isAddingToCart = false;
+        throw ex;
+      }
   }
 
   getPriceBreakRange(index: number): string {
