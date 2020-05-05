@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   ShopperContextService,
   UserGroup,
@@ -9,16 +9,16 @@ import {
   OcApprovalRuleService,
 } from 'marketplace';
 import { ngModuleJitUrl } from '@angular/compiler';
-import { PromiseType } from 'protractor/built/plugins';
 
 @Component({
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
 })
-export class OCMUserManagement {
+export class OCMUserManagement implements OnInit {
+  locations: UserGroup[] = [];
   users: User[] = [];
-  permissionAssignmentsStatic: UserGroupAssignment[] = [];
-  permissionAssignmentsEditable: UserGroupAssignment[] = [];
+  approvalAssignmentsStatic: UserGroupAssignment[] = [];
+  approvalAssignmentsEditable: UserGroupAssignment[] = [];
   add: UserGroupAssignment[] = [];
   del: UserGroupAssignment[] = [];
   areChanges = false;
@@ -28,18 +28,16 @@ export class OCMUserManagement {
   currentLocationApprovalThresholdStatic = 0;
   currentLocationApprovalThresholdEditable = 0;
   areAllUsersAssignedToNeedsApproval = false;
-  _locationID = '';
-
-  @Input() set locationID(value: string) {
-    this._locationID = value;
-    this.fetchUserManagementInformation();
-  }
 
   constructor(
     private context: ShopperContextService,
     private ocOcUserGroupService: OcUserGroupService,
     private ocApprovalRuleService: OcApprovalRuleService
   ) {}
+
+  ngOnInit() {
+    this.fetchUserManagementInformation();
+  }
 
   toggleAllNeedingApproval(): void {
     if (this.areAllUsersAssignedToNeedsApproval) {
@@ -51,33 +49,39 @@ export class OCMUserManagement {
 
   checkIfAllUsersAreAssignedToNeedsApproval(): void {
     this.areAllUsersAssignedToNeedsApproval = this.users.every(u =>
-      this.permissionAssignmentsEditable.some(a => a.UserID === u.ID && a.UserGroupID.includes('NeedsApproval'))
+      this.approvalAssignmentsEditable.some(a => a.UserID === u.ID && a.UserGroupID.includes('NeedsApproval'))
     );
   }
 
   setNeedApprovalForAllUsers(): void {
     this.setNeedApprovalForNoUsers();
-    this.permissionAssignmentsEditable = [
-      ...this.permissionAssignmentsEditable,
+    this.approvalAssignmentsEditable = [
+      ...this.approvalAssignmentsEditable,
       ...this.users.map(u => {
-        return { UserID: u.ID, UserGroupID: `${this._locationID}-NeedsApproval` };
+        return { UserID: u.ID, UserGroupID: `${this.currentLocation.ID}-NeedsApproval` };
       }),
     ];
     this.checkForChanges();
   }
 
   setNeedApprovalForNoUsers(): void {
-    this.permissionAssignmentsEditable = this.permissionAssignmentsEditable.filter(
+    this.approvalAssignmentsEditable = this.approvalAssignmentsEditable.filter(
       c => !c.UserGroupID.includes('NeedsApproval')
     );
     this.checkForChanges();
   }
 
   async fetchUserManagementInformation(): Promise<void> {
-    this.users = await this.context.userManagementService.getLocationUsers(this._locationID);
-    await this.updateAssignments();
-    const currentApprovalRule = await this.context.userManagementService.getLocationApprovalRule(this._locationID);
-    this.setApprovalRuleValues(currentApprovalRule);
+    this.locations = await this.context.userManagementService.getLocations();
+    if (this.locations.length) {
+      this.currentLocation = this.locations[0];
+      this.users = await this.context.userManagementService.getLocationUsers(this.currentLocation.ID);
+      await this.updateAssignments();
+      const currentApprovalRule = await this.context.userManagementService.getLocationApprovalRule(
+        this.currentLocation.ID
+      );
+      this.setApprovalRuleValues(currentApprovalRule);
+    }
   }
 
   setApprovalRuleValues(approvalRule: ApprovalRule): void {
@@ -88,24 +92,14 @@ export class OCMUserManagement {
   }
 
   async updateAssignments(): Promise<void> {
-    const approverAssignmentsRequest = await this.context.userManagementService.getLocationApproverAssignments(
-      this._locationID
+    const approverAssignments = await this.context.userManagementService.getLocationApproverAssignments(
+      this.currentLocation.ID
     );
-    const needsApprovalAssignmentsRequest = await this.context.userManagementService.getLocationNeedsApprovalAssignments(
-      this._locationID
+    const needsApprovalAssignments = await this.context.userManagementService.getLocationNeedsApprovalAssignments(
+      this.currentLocation.ID
     );
-    const orderAccessAssignmentsRequest = await this.context.userManagementService.getLocationOrderAccessAssignments(
-      this._locationID
-    );
-    const responses = await Promise.all([
-      approverAssignmentsRequest,
-      needsApprovalAssignmentsRequest,
-      orderAccessAssignmentsRequest,
-    ]);
-    this.permissionAssignmentsStatic = responses.reduce((prev, current) => {
-      return [...prev, ...current];
-    }, []);
-    this.permissionAssignmentsEditable = [...this.permissionAssignmentsStatic];
+    this.approvalAssignmentsStatic = [...approverAssignments, ...needsApprovalAssignments];
+    this.approvalAssignmentsEditable = [...this.approvalAssignmentsStatic];
     this.checkForChanges();
   }
 
@@ -118,7 +112,7 @@ export class OCMUserManagement {
   }
 
   async saveNewThreshold(): Promise<void> {
-    const buyerID = this._locationID.split('-')[0];
+    const buyerID = this.currentLocation.ID.split('-')[0];
     const newRuleExpression = `${this.currentApprovalRule.RuleExpression.split('>')[0]}>${
       this.currentLocationApprovalThresholdEditable
     }`;
@@ -129,35 +123,35 @@ export class OCMUserManagement {
   }
 
   isAssigned(userID: string, assignmentType: string): boolean {
-    return this.permissionAssignmentsEditable.some(n => n.UserID === userID && n.UserGroupID.includes(assignmentType));
+    return this.approvalAssignmentsEditable.some(n => n.UserID === userID && n.UserGroupID.includes(assignmentType));
   }
 
   toggleAssignment(userID: string, assignmentType: string): void {
     if (this.isAssigned(userID, assignmentType)) {
-      this.permissionAssignmentsEditable = this.permissionAssignmentsEditable.filter(
+      this.approvalAssignmentsEditable = this.approvalAssignmentsEditable.filter(
         n => !(n.UserID === userID && n.UserGroupID.includes(assignmentType))
       );
     } else {
-      this.permissionAssignmentsEditable = [
-        ...this.permissionAssignmentsEditable,
-        { UserID: userID, UserGroupID: `${this._locationID}-${assignmentType}` },
+      this.approvalAssignmentsEditable = [
+        ...this.approvalAssignmentsEditable,
+        { UserID: userID, UserGroupID: `${this.currentLocation.ID}-${assignmentType}` },
       ];
     }
     this.checkForChanges();
   }
 
   checkForChanges(): void {
-    this.add = this.permissionAssignmentsEditable.filter(
+    this.add = this.approvalAssignmentsEditable.filter(
       editableAssignment =>
-        !this.permissionAssignmentsStatic.some(
+        !this.approvalAssignmentsStatic.some(
           staticAssignment =>
             staticAssignment.UserID === editableAssignment.UserID &&
             staticAssignment.UserGroupID === editableAssignment.UserGroupID
         )
     );
-    this.del = this.permissionAssignmentsStatic.filter(
+    this.del = this.approvalAssignmentsStatic.filter(
       staticAssignment =>
-        !this.permissionAssignmentsEditable.some(
+        !this.approvalAssignmentsEditable.some(
           editableAssignment =>
             staticAssignment.UserID === editableAssignment.UserID &&
             staticAssignment.UserGroupID === editableAssignment.UserGroupID
@@ -168,7 +162,7 @@ export class OCMUserManagement {
   }
 
   discardUserUserGroupAssignmentChanges(): void {
-    this.permissionAssignmentsEditable = this.permissionAssignmentsStatic;
+    this.approvalAssignmentsEditable = this.approvalAssignmentsStatic;
     this.checkForChanges();
   }
 
@@ -177,13 +171,13 @@ export class OCMUserManagement {
   }
 
   async executeUserUserGroupAssignmentRequests(): Promise<void> {
-    const buyerID = this._locationID.split('-')[0];
+    const buyerID = this.currentLocation.ID.split('-')[0];
     const assignmentRequests = [
       this.add.map(a => this.ocOcUserGroupService.SaveUserAssignment(buyerID, a).toPromise()),
       this.del.map(d => this.ocOcUserGroupService.DeleteUserAssignment(buyerID, d.UserGroupID, d.UserID).toPromise()),
     ];
     await Promise.all(assignmentRequests);
-    this.permissionAssignmentsStatic = this.permissionAssignmentsEditable;
+    this.approvalAssignmentsStatic = this.approvalAssignmentsEditable;
     this.requestedUserConfirmation = false;
     this.checkForChanges();
   }

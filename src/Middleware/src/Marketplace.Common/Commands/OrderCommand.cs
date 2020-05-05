@@ -14,6 +14,7 @@ using Marketplace.Models.Models.Marketplace;
 using System;
 using Newtonsoft.Json;
 using Marketplace.Helpers;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
@@ -21,6 +22,7 @@ namespace Marketplace.Common.Commands
     {
         Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
         Task<Order> AcknowledgeQuoteOrder(string orderID);
+        Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
     }
 
     public class OrderCommand : IOrderCommand
@@ -98,6 +100,28 @@ namespace Marketplace.Common.Commands
             string buyerOrderID = orderID.Substring(0, index);
             await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
             return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+        }
+
+        public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
+        {
+            await EnsureUserCanAccessLocationOrders(locationID, verifiedUser);
+            listArgs.Filters.Add(new ListFilter()
+            {
+                QueryParams = new List<Tuple<string, string>>() { new Tuple<string, string>("BillingAddress.ID", locationID) }
+            });
+            return await _oc.Orders.ListAsync(OrderDirection.Incoming,
+                page: listArgs.Page,
+                pageSize: listArgs.PageSize,
+                search: listArgs.Search,
+                filters: listArgs.ToFilterString());
+        }
+
+        private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser)
+        {
+            var buyerID = verifiedUser.BuyerID;
+            var userGroupID = $"{locationID}-ViewAllLocationOrders";
+            var userGroupAssignmentForAccess = await _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID, verifiedUser.UserID);
+            Require.That(userGroupAssignmentForAccess.Items.Count > 0, new ErrorCode("Insufficient Access", 403, $"User cannot access orders from this location: {locationID}"));
         }
 
         private async Task CleanIDLineItems(MarketplaceOrderWorksheet orderWorksheet)
@@ -226,5 +250,6 @@ namespace Marketplace.Common.Commands
                 }
             }
         }
+    
     }
 }

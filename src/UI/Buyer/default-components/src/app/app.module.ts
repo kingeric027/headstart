@@ -89,6 +89,7 @@ import { OCMLogin } from './components/authentication/login/login.component';
 import { OCMLoadingLayout } from './components/layout/loading-layout/loading-layout.component';
 import { OCMOrderList } from './components/orders/order-list/order-list.component';
 import { OCMOrderDateFilter } from './components/orders/order-date-filter/order-date-filter.component';
+import { OCMOrderLocationFilter } from './components/orders/order-location-filter/order-location-filter.component';
 import { OCMOrderStatusFilter } from './components/orders/order-status-filter/order-status-filter.component';
 import { OCMOrderStatusIcon } from './components/orders/order-status-icon/order-status-icon.component';
 import { OCMModal } from './components/layout/modal/modal.component';
@@ -127,6 +128,9 @@ import { UnitOfMeasurePipe } from './pipes/unit-of-measure.pipe';
 import { OCMLocationListItem } from './components/profile/location-list-item/location-list-item.component';
 import { OCMCertificateForm } from './components/profile/certificate-form/certificate-form.component';
 import { OCMLocationManagement } from './components/profile/location-management/location-management.component';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 const components = [
   OCMCategoryDropdown,
@@ -160,6 +164,7 @@ const components = [
   OCMOrderStatusIcon,
   OCMOrderStatusFilter,
   OCMOrderDateFilter,
+  OCMOrderLocationFilter,
   OCMOrderList,
   OCMLoadingLayout,
   OCMLogin,
@@ -236,12 +241,15 @@ const components = [
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
+        deps: [HttpClient],
+      },
     }),
     NgxImageZoomModule,
     ReactiveFormsModule,
     FormsModule,
+    MatListModule,
+    MatCardModule,
+    MatButtonModule,
     FontAwesomeModule,
     NgbCarouselModule,
     NgbCollapseModule,
@@ -267,7 +275,11 @@ const components = [
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: any, public translate: TranslateService) {
+  constructor(
+    private injector: Injector,
+    @Inject(PLATFORM_ID) private platformId: any,
+    public translate: TranslateService
+  ) {
     translate.setDefaultLang('en');
     this.buildWebComponent(OCMProfileNav, 'ocm-profile-nav');
     this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
@@ -303,6 +315,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderStatusIcon, 'ocm-order-status-icon');
     this.buildWebComponent(OCMOrderStatusFilter, 'ocm-order-status-filter');
     this.buildWebComponent(OCMOrderDateFilter, 'ocm-order-date-filter');
+    this.buildWebComponent(OCMOrderLocationFilter, 'ocm-order-location-filter');
     this.buildWebComponent(OCMOrderList, 'ocm-order-list');
     this.buildWebComponent(OCMLoadingLayout, 'ocm-loading-layout');
     this.buildWebComponent(OCMLogin, 'ocm-login');

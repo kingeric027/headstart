@@ -1,12 +1,12 @@
 <div>
   <!-- Facet Name -->
-  <h6 class="text-muted"
+  <h4 class="text-muted"
       (click)="toggleCollapsed()">
     <fa-icon class="text-muted"
              [icon]="isCollapsed ?  faPlusSquare : faMinusSquare"
              pull="right"></fa-icon>
     {{ _facet?.Name }}
-  </h6>
+  </h4>
 
   <!-- Facet Values -->
   <form id="facetValues"

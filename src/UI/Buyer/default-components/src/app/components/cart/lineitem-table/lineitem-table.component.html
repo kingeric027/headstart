@@ -31,13 +31,13 @@
         <div class="col-sm-5">
           <div class="row">
             <div class="col-4 text-center">
-              <h6 translate>CART.LINEITEM_TABLE.PRICE</h6>
+              <h4 translate>CART.LINEITEM_TABLE.PRICE</h4>
             </div>
             <div class="col-4 text-center">
-              <h6 translate>CART.LINEITEM_TABLE.QTY</h6>
+              <h4 translate>CART.LINEITEM_TABLE.QTY</h4>
             </div>
             <div class="col-4 text-center">
-              <h6 translate>CART.LINEITEM_TABLE.TOTAL</h6>
+              <h4 translate>CART.LINEITEM_TABLE.TOTAL</h4>
             </div>
           </div>
         </div>
@@ -54,11 +54,11 @@
                      [src]="getImageUrl(li.ID)">
               </div>
               <div class="col-9">
-                <h6>
+                <h4>
                   <a (click)="toProductDetails(li.Product.ID)"
                      class="text-primary link">{{li | productNameWithSpecs }}</a>
                   <small class="text-muted d-block">{{li.Product.ID}}</small>
-                </h6>
+                </h4>
                 <a class="text-danger btn btn-link px-0 link"
                    *ngIf="!readOnly"
                    (click)="removeLineItem(li.ID)"

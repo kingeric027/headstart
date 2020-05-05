@@ -1,14 +1,16 @@
 <div class="bg-white shadow-sm p-4 mt-3">
   <div class="row">
-    <div class="col-4">
+    <div class="col-3">
       <h5 class="mb-0 text-capitalize font-weight-bold">{{ location?.CompanyName }}</h5>
-      <h6 class="mb-0 text-capitalize">{{ location?.AddressName }}</h6>
+      <h4 class="mb-0 text-capitalize">{{ location?.AddressName }}</h4>
     </div>
-    <div class="col-4">
+    <div class="col-3">
       <p class="mb-0 text-capitalize font-weight-bold">
         {{ location?.Street1 }}<span>, {{ location?.Street2 }}</span>
       </p>
-      <p class="mb-0 text-capitalize font-weight-bold">{{ location?.City }}, {{ location?.State }} {{ location?.Zip }}</p>
+      <p class="mb-0 text-capitalize font-weight-bold">
+        {{ location?.City }}, {{ location?.State }} {{ location?.Zip }}
+      </p>
       <small *ngIf="getFullName(location) || location?.Phone"
              class="mb-0">
         <span>
@@ -22,11 +24,21 @@
         </span>
       </small>
     </div>
-    <div class="col-4">
+    <div class="col-3">
       <button *ngIf="userCanAdmin"
               type="button"
               (click)="toLocationManagement()"
-              class="btn btn-outline-primary">Manage Location</button>
+              class="btn btn-outline-primary">
+        Manage Location
+      </button>
+    </div>
+    <div class="col-3">
+      <button *ngIf="canViewOrders"
+              type="button"
+              (click)="toLocationOrders()"
+              class="btn btn-outline-primary">
+        View Orders
+      </button>
     </div>
   </div>
 </div>

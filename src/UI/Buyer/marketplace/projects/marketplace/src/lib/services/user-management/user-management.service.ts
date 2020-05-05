@@ -73,6 +73,17 @@ export class UserManagementService implements IUserManagement {
     return locationUsers.Items;
   }
 
+  async getLocationOrderAccessAssignments(locationID: string): Promise<UserGroupAssignment[]> {
+    const buyerID = this.currentUserService.get().Buyer.ID;
+
+    // todo accomodate more than 100 locations
+    const userGroupID = `${locationID}-ViewAllLocationOrders`;
+    const locationUsers = await this.ocUserGroupService
+      .ListUserAssignments(buyerID, { pageSize: 100, userGroupID: userGroupID })
+      .toPromise();
+    return locationUsers.Items;
+  }
+
   async getLocationApprovalRule(locationID: string): Promise<ApprovalRule> {
     const buyerID = this.currentUserService.get().Buyer.ID;
     const approvalRule = await this.ocApprovalRuleService.Get(buyerID, locationID).toPromise();

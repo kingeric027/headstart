@@ -6,6 +6,7 @@ import {
   faQuestionCircle,
   faUserCircle,
   faSignOutAlt,
+  faBoxOpen,
   faHome,
   faBars,
 } from '@fortawesome/free-solid-svg-icons';
@@ -15,8 +16,7 @@ import { takeWhile } from 'rxjs/operators';
 import { ProductFilters, ShopperContextService, MarketplaceOrder } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { CurrentUser } from 'marketplace/projects/marketplace/src/lib/services/current-user/current-user.service';
-import { ProfileSections } from '../../../../../../marketplace/projects/marketplace/src/lib/services/route/profile-routing.config';
-import { ProfileSection } from 'marketplace/projects/marketplace/src/lib/services/route/profile-routing.config';
+import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
 
 @Component({
   templateUrl: './app-header.component.html',
@@ -36,7 +36,8 @@ export class OCMAppHeader implements OnInit {
   categories: Category[] = [];
   screenSize = getScreenSizeBreakPoint();
   showCategoryDropdown = false;
-  profileSections: ProfileSection[] = [];
+  profileRoutes: RouteConfig[] = [];
+  orderRoutes: RouteConfig[] = [];
   numberOfOrdersToApprove = 0;
 
   @ViewChild('addToCartPopover', { static: false }) public addToCartPopover: NgbPopover;
@@ -51,9 +52,11 @@ export class OCMAppHeader implements OnInit {
   faUserCircle = faUserCircle;
   faHome = faHome;
   faBars = faBars;
+  faBoxOpen = faBoxOpen;
 
   constructor(public context: ShopperContextService) {
-    this.profileSections = context.router.getProfileSections();
+    this.profileRoutes = context.router.getProfileRoutes();
+    this.orderRoutes = context.router.getOrderRoutes();
   }
 
   ngOnInit(): void {

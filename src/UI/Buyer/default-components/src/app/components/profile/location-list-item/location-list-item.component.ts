@@ -15,6 +15,7 @@ export class OCMLocationListItem implements OnInit {
   userCanAdmin = false;
 
   @Input() location: MarketplaceAddressBuyer;
+  @Input() canViewOrders: boolean;
 
   constructor(private context: ShopperContextService) {}
 
@@ -30,5 +31,9 @@ export class OCMLocationListItem implements OnInit {
 
   toLocationManagement(): void {
     this.context.router.toLocationManagement(this.location.ID);
+  }
+
+  toLocationOrders(): void {
+    this.context.router.toOrdersByLocation({location: this.location.ID});
   }
 }

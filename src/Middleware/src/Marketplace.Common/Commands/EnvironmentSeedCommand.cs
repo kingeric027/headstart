@@ -82,6 +82,7 @@ namespace Marketplace.Common.Commands
 			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "OrderType" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "LocationID" },       
 			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },       
 		};
 
@@ -226,6 +227,7 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPApprovalRuleAdmin , Roles = new[] { ApiRole.ApprovalRuleAdmin, ApiRole.BuyerUserAdmin, ApiRole.UserGroupAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPOrderApprover },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPNeedsApproval },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPViewAllLocationOrders },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCreditCardAdmin  , Roles = new[] { ApiRole.MeCreditCardAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPAddressAdmin  , Roles = new[] { ApiRole.MeAddressAdmin, ApiRole.AddressAdmin } },
 		};
