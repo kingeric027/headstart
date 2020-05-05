@@ -204,9 +204,9 @@
                   </td>
                   <td>{{getTotalMarkup(variant.xp?.SpecValues) | currency}}</td>
                 </tr>
-                <tr *ngIf="!isCreatingNew && superProductEditable?.Images?.length && variantInSelection?.ID === variant.ID">
+                <tr *ngIf="!isCreatingNew && variantInSelection?.ID === variant.ID">
                   <td [attr.colspan]="getVariantDetailColSpan()">
-                    <fa-icon *ngIf="!readonly"
+                    <fa-icon *ngIf="superProductEditable?.Images?.length && !readonly"
                              (click)="assignVariantImages = true"
                              [icon]="faPlusCircle"
                              class="mr-2"
