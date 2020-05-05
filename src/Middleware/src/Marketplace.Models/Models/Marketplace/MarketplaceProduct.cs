@@ -43,7 +43,6 @@ namespace Marketplace.Models
         [OrchestrationIgnore]
         public dynamic IntegrationData { get; set; }
         public Dictionary<string, List<string>> Facets = new Dictionary<string, List<string>>();
-        public List<ProductImage> Images { get; set; } = new List<ProductImage>();
         #endregion
 
         [Required]
@@ -54,7 +53,6 @@ namespace Marketplace.Models
         public TaxProperties Tax { get; set; } = new TaxProperties();
         public UnitOfMeasure UnitOfMeasure { get; set; } = new UnitOfMeasure();
         public ProductType ProductType { get; set; }
-        public List<StaticContent> StaticContent { get; set; } = new List<StaticContent>();
         public bool IsResale { get; set; } = false;
         public List<ProductAccessorial> Accessorials { get; set; }
     }
