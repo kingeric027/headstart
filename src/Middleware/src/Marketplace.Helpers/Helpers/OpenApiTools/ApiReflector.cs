@@ -339,10 +339,11 @@ namespace Marketplace.Helpers.OpenApiTools
                 from p in type.GetProperties()
                 where p.PropertyType != typeof(object)
                 where !p.HasAttribute<DocIgnoreAttribute>()
-                where !p.HasAttribute<JsonIgnoreAttribute>()
+				where !p.HasAttribute<ApiIgnoreAttribute>()
+				where !p.HasAttribute<JsonIgnoreAttribute>()
                 let prop = new ApiProperty
                 {
-                    Name = p.Name,
+                    Name = p.HasAttribute<JsonPropertyAttribute>() ? p.GetAttribute<JsonPropertyAttribute>().PropertyName : p.Name,
                     PropInfo = p,
                     SimpleType = p.SimpleType(),
                     Required = p.HasAttribute<OrderCloud.SDK.RequiredAttribute>(),
