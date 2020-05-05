@@ -12,7 +12,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.CMS.Models
 {
-	public enum AssetType { Image, Theme, Attachment, StructuredData }
+	public enum AssetType { Image, OtherAsset }
 
 	[SwaggerModel]
 	[CosmosCollection("assets")]

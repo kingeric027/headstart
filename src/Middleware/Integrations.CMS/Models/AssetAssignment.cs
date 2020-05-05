@@ -16,24 +16,19 @@ namespace Marketplace.CMS.Models
 	[CosmosCollection("assetassignments")]
 	public class AssetAssignment : CosmosObject
 	{
-		[ApiIgnore, CosmosPartitionKey]
-		public string ContainerID { get; set; }
 		[Required]
 		public ResourceType ResourceType { get; set; }
-		[Required]
+		[Required, CosmosPartitionKey]
 		public string ResourceID { get; set; }
 		public string ResourceParentID { get; set; }
-		[Required]
-		public string AssetID { get; set; }
-		public int AssetListOrder { get; set; } // Within the context of a single oc resource 
-		[ApiReadOnly]
-		public Asset Asset { get; set; }
+		public List<string> ImageAssetIDs { get; set; }
+		public List<string> OtherAssetIDs { get; set; }
 
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{
 			return new Collection<UniqueKey>
 			{
-				new UniqueKey() { Paths = new Collection<string> { "/AssetID", "/ResourceID", "/ResourceType", "/ResourceParentID" }}
+				new UniqueKey() { Paths = new Collection<string> { "/ResourceID", "/ResourceType", "/ResourceParentID" }}
 			};
 		}
 	}

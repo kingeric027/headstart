@@ -19,9 +19,10 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetAssignmentQuery
 	{
+		Task<AssetAssignment> Get(ResourceType resourceType, string resourceID, string resourceParentID, VerifiedUserContext user);
 		Task<ListPage<AssetAssignment>> List(ListArgs<Asset> args, VerifiedUserContext user);
 		Task Save(AssetAssignment assignment, VerifiedUserContext user);
-		Task Delete(AssetAssignment assignment, VerifiedUserContext user);
+		Task Delete(ResourceType resourceType, string resourceID, string resourceParentID, VerifiedUserContext user);
 	}
 
 	public class AssetAssignmentQuery : IAssetAssignmentQuery
@@ -61,25 +62,40 @@ namespace Marketplace.CMS.Queries
 			return listPage;
 		}
 
+		public async Task<AssetAssignment> Get(ResourceType resourceType, string resourceID, string resourceParentID, VerifiedUserContext user)
+		{
+			var assignment = GetWithoutExceptions(ResourceType resourceType, string resourceID, string resourceParentID);
+			if (asset == null) throw new NotFoundException("Asset", assetInteropID);
+
+		}
+
 		public async Task Save(AssetAssignment assignment, VerifiedUserContext user)
 		{
 			await new MultiTenantOCClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID); // confirm OC resource exists
-			var asset = await _assets.Get(assignment.AssetID, user);
-			assignment.ContainerID = asset.ContainerID;
-			assignment.AssetID = asset.id;
+			var existing = await GetWithoutExceptions(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
+			var newImages = assignment.ImageAssetIDs.Except(existing.ImageAssetIDs);
+			var newOtherAssets = assignment.OtherAssetIDs.Except(existing.OtherAssetIDs);
+
 			await _assignmentStore.AddAsync(assignment);
 		}
 
 		public async Task Delete(AssetAssignment assignment, VerifiedUserContext user)
 		{
-			var container = await _containers.CreateDefaultIfNotExists(user);
-			var asset = await _assets.Get(assignment.AssetID, user);
 			await _assignmentStore.RemoveAsync(x =>
-				x.ContainerID == container.id &&
-				x.AssetID == asset.id &&
 				x.ResourceID == assignment.ResourceID &&
 				x.ResourceType == assignment.ResourceType &&
 				x.ResourceParentID == assignment.ResourceParentID);
+		}
+
+		private async Task<AssetAssignment> GetWithoutExceptions(ResourceType resourceType, string resourceID, string resourceParentID)
+		{
+			var parameters = new { 
+				ResourceType = resourceType, 
+				ResourceID = resourceID, 
+				ResourceParentID = resourceParentID
+			};
+			var query = $"select top 1 * from c where c.ResourceType = @ResourceType && c.ResourceID = @ResourceID && c.ResourceParentID = ResourceParentID";
+			return await _assignmentStore.Query(query, parameters).FirstOrDefaultAsync();
 		}
 	}
 }
