@@ -31,13 +31,13 @@ namespace Marketplace.CMS.Queries
 	public class AssetContainerQuery: IAssetContainerQuery
 	{
 		private readonly ICosmosStore<AssetContainer> _store;
-		private readonly IStorageFactory _storageFactory;
+		private readonly IBlobStorage _blob;
 		public const string SinglePartitionID = "SinglePartitionID"; // TODO - is there a better way?
 
-		public AssetContainerQuery(ICosmosStore<AssetContainer> store, IStorageFactory storageFactory)
+		public AssetContainerQuery(ICosmosStore<AssetContainer> store, IBlobStorage blob)
 		{
 			_store = store;
-			_storageFactory = storageFactory;
+			_blob = blob;
 		}
 
 		public async Task<ListPage<AssetContainer>> List(IListArgs args)
@@ -73,8 +73,7 @@ namespace Marketplace.CMS.Queries
 		{
 			var matchingID = await GetWithoutExceptions(container.InteropID);
 			if (matchingID != null) throw new DuplicateIdException();
-			container = await _storageFactory.GetStorage(container).OnContainerConnected();
-			container.StorageAccount.Connected = true;
+			container = await _blob.OnContainerConnected(container);
 
 			var newContainer = await _store.AddAsync(container);
 			return newContainer;
@@ -92,7 +91,7 @@ namespace Marketplace.CMS.Queries
 		public async Task Delete(string interopID)
 		{
 			var container = await Get(interopID);
-			await _storageFactory.GetStorage(container).OnContainerDeleted();
+			await _blob.OnContainerDeleted(container);
 			await _store.RemoveByIdAsync(container.id, SinglePartitionID);
 			// TODO - delete all the asset records in cosmos?
 		}

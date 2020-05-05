@@ -25,8 +25,8 @@ namespace Marketplace.CMS.Models
 		[CosmosPartitionKey]
 		public string ResourceID { get; set; }
 		public string ResourceParentID { get; set; }
-		public List<string> ImageAssetIDs { get; set; }
-		public List<string> OtherAssetIDs { get; set; }
+		public List<string> ImageAssetIDs { get; set; } = new List<string>();
+		public List<string> OtherAssetIDs { get; set; } = new List<string>();
 
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{

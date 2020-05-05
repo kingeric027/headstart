@@ -77,7 +77,7 @@ namespace Marketplace.API
 				.InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
 				.InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig)
-				.AddSingleton<IStorageFactory>(x => new StorageFactory(cmsConfig))
+				.AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
 				.Inject<IOrchestrationCommand>()
 				.Inject<IOrchestrationLogCommand>()
 				.Inject<IOCShippingIntegration>()

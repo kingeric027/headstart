@@ -1,4 +1,5 @@
-﻿using Marketplace.CMS.Models;
+﻿using Integrations.CMS;
+using Marketplace.CMS.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using Microsoft.AspNetCore.Http;
@@ -14,13 +15,7 @@ namespace Marketplace.CMS.Mappers
 	{
 		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
 
-		public static Asset MapToResponse(AssetContainer container, Asset asset)
-		{
-			asset.Url = asset.Metadata.IsUrlOverridden ? asset.Url : $"{container.StorageAccount?.HostUrl}/assets-{container.id}/{asset.id}";
-			return asset;
-		} 
-
-		public static (Asset, IFormFile) MapFromUpload(AssetContainer container, AssetUpload form)
+		public static (Asset, IFormFile) MapFromUpload(CMSConfig config, AssetContainer container, AssetUpload form)
 		{
 			if (!(form.File == null ^ form.Url == null))
 			{
@@ -42,6 +37,7 @@ namespace Marketplace.CMS.Mappers
 					IsUrlOverridden = form.Url != null
 				}
 			};
+			asset.Url = asset.Url ?? $"{config.BlobStorageHostUrl}/assets-{container.id}/{asset.id}";
 			TypeSpecificMapping(ref asset, form);
 			return (asset, form.File);
 		}

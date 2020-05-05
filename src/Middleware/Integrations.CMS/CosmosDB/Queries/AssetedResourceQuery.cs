@@ -19,6 +19,9 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetedResourceQuery
 	{
+		// TODO - need to check permissions for all these.
+		Task<List<Asset>> ListAssets(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user);
+		Task<string> GetPrimaryImageUrl(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user);
 		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task MoveAssignment(AssetAssignment assignment, int position, VerifiedUserContext user);
@@ -37,34 +40,38 @@ namespace Marketplace.CMS.Queries
 			_assets = assets;
 		}
 
-		//public async Task<ListPage<AssetAssignment>> List(ListArgs<Asset> args, VerifiedUserContext user)
-		//{
-		//	var container = await _containers.CreateDefaultIfNotExists(user);
-		//	var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(container.id) };
-		//	var query = _assignmentStore.Query(feedOptions)
-		//		.Search(args)
-		//		.Filter(args)
-		//		.Sort(args);
-		//	var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
-		//	var count = await query.CountAsync();
-		//	var listPage = list.ToListPage(args.Page, args.PageSize, count);
-		//	if (count != 0)
-		//	{
-		//		var assetIDs = listPage.Items.Select(assignment => assignment.AssetID);
-		//		var assetDictionary = await _assets.List(container, new HashSet<string>(assetIDs));
-		//		foreach (var assignment in listPage.Items)
-		//		{
-		//			assignment.Asset = assetDictionary[assignment.AssetID];
-		//			assignment.AssetID = assignment.Asset.InteropID;
-		//		}
-		//	}
-		//	return listPage;
-		//}
+		public async Task<List<Asset>> ListAssets(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user)
+		{
+			var assetedResource = await GetExistingOrDefault(type, resourceID, resourceParentID);
+			var assetIDs = new HashSet<string>(assetedResource.ImageAssetIDs.Concat(assetedResource.OtherAssetIDs));
+			List<Asset> toReturn = new List<Asset>();
+			//TODO - convert to listpage
+			if (assetIDs.Count > 0) { 
+				var assetDictionary = await _assets.ListAcrossContainers(assetIDs);
+				toReturn = assetIDs.Select(id => assetDictionary[id]).ToList();
+			}
+			return toReturn;
+		}
+
+		public async Task<string> GetPrimaryImageUrl(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user)
+		{
+			var assetedResource = await GetExistingOrDefault(type, resourceID, resourceParentID);
+			if (assetedResource.ImageAssetIDs.Count > 0)
+			{
+				var asset = await _assets.GetAcrossContainers(assetedResource.ImageAssetIDs.First());
+				return asset.Url;
+			} else
+			{
+				throw new NotImplementedException();
+			}
+		}
+
 
 		public async Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
+			await new MultiTenantOCClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
 			var asset = await _assets.Get(assignment.AssetID, user);
-			var assetedResource = await GetWithoutExceptions(assignment);
+			var assetedResource = await GetExistingOrDefault(assignment);
 			switch (asset.Type)
 			{
 				case AssetType.Image:
@@ -74,13 +81,14 @@ namespace Marketplace.CMS.Queries
 					if (!assetedResource.ImageAssetIDs.Contains((asset.id))) assetedResource.ImageAssetIDs.Add(asset.id);
 					break;
 			}
-			await _store.UpdateAsync(assetedResource);
+			await _store.UpsertAsync(assetedResource);
 		}
 
 		public async Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
+			await new MultiTenantOCClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
 			var asset = await _assets.Get(assignment.AssetID, user);
-			var assetedResource = await GetWithoutExceptions(assignment);
+			var assetedResource = await GetExistingOrDefault(assignment);
 			switch (asset.Type)
 			{
 				case AssetType.Image:
@@ -96,8 +104,9 @@ namespace Marketplace.CMS.Queries
 
 		public async Task MoveAssignment(AssetAssignment assignment, int position, VerifiedUserContext user)
 		{
+			await new MultiTenantOCClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
 			var asset = await _assets.Get(assignment.AssetID, user);
-			var assetedResource = await GetWithoutExceptions(assignment);
+			var assetedResource = await GetExistingOrDefault(assignment);
 			switch (asset.Type)
 			{
 				case AssetType.Image:
@@ -112,20 +121,26 @@ namespace Marketplace.CMS.Queries
 			await _store.UpdateAsync(assetedResource);
 		}
 
-		private async Task<AssetedResource> GetWithoutExceptions(AssetAssignment assignment)
+		private async Task<AssetedResource> GetExistingOrDefault(AssetAssignment assignment)
 		{
-			return await GetWithoutExceptions(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
+			return await GetExistingOrDefault(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
 		}
 
-		private async Task<AssetedResource> GetWithoutExceptions(ResourceType resourceType, string resourceID, string resourceParentID)
+		private async Task<AssetedResource> GetExistingOrDefault(ResourceType resourceType, string resourceID, string resourceParentID)
 		{
 			var parameters = new { 
 				ResourceType = resourceType, 
-				ResourceID = resourceID, 
+				ResourceID = resourceID,
 				ResourceParentID = resourceParentID
 			};
-			var query = $"select top 1 * from c where c.ResourceType = @ResourceType && c.ResourceID = @ResourceID && c.ResourceParentID = ResourceParentID";
-			return await _store.Query(query, parameters).FirstOrDefaultAsync();
+			var query = $"select top 1 * from c where c.ResourceType = @ResourceType AND c.ResourceID = @ResourceID AND c.ResourceParentID = @ResourceParentID";
+			var resource = await _store.QuerySingleAsync(query, parameters);
+			return resource ?? new AssetedResource()
+			{
+				ResourceType = resourceType,
+				ResourceID = resourceID,
+				ResourceParentID = resourceParentID
+			};
 		}
 	}
 }

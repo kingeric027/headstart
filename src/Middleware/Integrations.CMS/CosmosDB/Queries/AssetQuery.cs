@@ -24,7 +24,8 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetQuery
 	{
-		Task<IDictionary<string, Asset>> List(AssetContainer container, ISet<string> assetIDs);
+		Task<IDictionary<string, Asset>> ListAcrossContainers(ISet<string> assetIDs);
+		Task<Asset> GetAcrossContainers(string assetID);
 		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
 		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
 		Task<Asset> Create(AssetUpload form, VerifiedUserContext user);
@@ -36,13 +37,13 @@ namespace Marketplace.CMS.Queries
 	{
 		private readonly ICosmosStore<Asset> _assetStore;
 		private readonly IAssetContainerQuery _containers;
-		private readonly IStorageFactory _storageFactory;
+		private readonly IBlobStorage _blob;
 
-		public AssetQuery(ICosmosStore<Asset> assetStore, IAssetContainerQuery containers, IStorageFactory storageFactory)
+		public AssetQuery(ICosmosStore<Asset> assetStore, IAssetContainerQuery containers, IBlobStorage blob)
 		{
 			_assetStore = assetStore;
 			_containers = containers;
-			_storageFactory = storageFactory;
+			_blob = blob;
 		}
 
 		public async Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user)
@@ -55,7 +56,6 @@ namespace Marketplace.CMS.Queries
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var listPage = list.ToListPage(args.Page, args.PageSize, count);
-			listPage.Items = listPage.Items.Select(asset => AssetMapper.MapToResponse(container, asset)).ToList();
 			return listPage;
 		}
 
@@ -64,21 +64,21 @@ namespace Marketplace.CMS.Queries
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
 			if (asset == null) throw new NotFoundException("Asset", assetInteropID);
-			return AssetMapper.MapToResponse(container, asset);
+			return asset;
 		}
 
 		public async Task<Asset> Create(AssetUpload form, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
-			var (asset, file) = AssetMapper.MapFromUpload(container, form);
+			var (asset, file) = AssetMapper.MapFromUpload(_blob.Config, container, form);
 			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
 			if (matchingID != null) throw new DuplicateIdException();
 			if (file != null) {			
-				await _storageFactory.GetStorage(container).UploadAsset(file, asset);
+				await _blob.UploadAsset(container, file, asset);
 			}
 
 			var newAsset = await _assetStore.AddAsync(asset);
-			return AssetMapper.MapToResponse(container, newAsset);
+			return newAsset;
 		}
 
 		public async Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user)
@@ -97,7 +97,7 @@ namespace Marketplace.CMS.Queries
 			existingAsset.FileName = asset.FileName;
 			// Intentionally don't allow changing the type. Could mess with assignments.
 			var updatedAsset = await _assetStore.UpdateAsync(existingAsset);
-			return AssetMapper.MapToResponse(container, updatedAsset);
+			return updatedAsset;
 		}
 
 		public async Task Delete(string assetInteropID, VerifiedUserContext user)
@@ -105,10 +105,10 @@ namespace Marketplace.CMS.Queries
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await Get(assetInteropID, user);
 			await _assetStore.RemoveByIdAsync(asset.id, container.id);
-			await _storageFactory.GetStorage(container).OnAssetDeleted(asset.id);
+			await _blob.OnAssetDeleted(container, asset.id);
 		}
 
-		public async Task<IDictionary<string, Asset>> List(AssetContainer container, ISet<string> assetIDs)
+		public async Task<IDictionary<string, Asset>> ListAcrossContainers(ISet<string> assetIDs)
 		{
 			var ids = assetIDs.ToList();
 			var paramNames = ids.Select((id, i) => $"@id{i}");
@@ -118,8 +118,16 @@ namespace Marketplace.CMS.Queries
 				parameters.TryAdd($"@id{i}", ids[i]);
 			}
 			var query = $"select * from c where c.id IN ({string.Join(", ", paramNames)})";
-			var assets = await _assetStore.QueryMultipleAsync(query, parameters, GetFeedOptions(container.id));
-			return assets.Select(asset => AssetMapper.MapToResponse(container, asset)).ToDictionary(x => x.id);
+			var assets = await _assetStore.QueryMultipleAsync(query, parameters);
+			// TODO - need to map to include urls
+			return assets.ToDictionary(x => x.id);
+		}
+
+		public async Task<Asset> GetAcrossContainers(string assetID)
+		{
+			var asset = await _assetStore.Query($"select top 1 * from c where c.id = @id", new { id = assetID }).FirstOrDefaultAsync();
+			if (asset == null) throw new NotImplementedException();
+			return asset;
 		}
 
 		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)
