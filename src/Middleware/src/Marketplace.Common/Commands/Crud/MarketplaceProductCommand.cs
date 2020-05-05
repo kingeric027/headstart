@@ -170,7 +170,8 @@ namespace Marketplace.Common.Commands.Crud
             var _priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
             // Create Product
             superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
-            superProduct.Product.xp.Facets.Add("supplier", new List<string>() { user.SupplierID });
+            var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);
+            superProduct.Product.xp.Facets.Add("supplier", new List<string>() { supplierName });
             var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(superProduct.Product, user.AccessToken);
             // Make Spec Product Assignments
             await Throttler.RunAsync(superProduct.Specs, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = _product.ID, SpecID = s.ID }, accessToken: user.AccessToken));
@@ -290,6 +291,12 @@ namespace Marketplace.Common.Commands.Crud
             await Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete("seb", i.InteropID));
             await Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
             await _oc.Products.DeleteAsync(id, user.AccessToken);
+        }
+
+        private async Task<string> GetSupplierNameForXpFacet(string supplierID, string accessToken)
+        {
+            var supplier = await _oc.Suppliers.GetAsync(supplierID, accessToken);
+            return supplier.Name;
         }
     }
 }
