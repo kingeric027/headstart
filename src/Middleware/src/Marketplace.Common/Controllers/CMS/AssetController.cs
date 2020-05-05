@@ -20,12 +20,12 @@ namespace Marketplace.CMS.Controllers
 	public class AssetController : BaseController
 	{
 		private readonly IAssetQuery _assets;
-		private readonly IAssetAssignmentQuery _assignments;
+		private readonly IAssetedResourceQuery _assetedResources;
 
-		public AssetController(AppSettings settings, IAssetQuery assets, IAssetAssignmentQuery assignments) : base(settings)
-		{
+		public AssetController(AppSettings settings, IAssetQuery assets, IAssetedResourceQuery assetedResources) : base(settings)
+		{ 
 			_assets = assets;
-			_assignments = assignments;
+			_assetedResources = assetedResources;
 		}
 
 		[DocName("List Assets")]
@@ -64,26 +64,25 @@ namespace Marketplace.CMS.Controllers
 			await _assets.Delete(assetID, VerifiedUserContext);
 		}
 
-		[DocName("List Asset Assignments"), MarketplaceUserAuth]
-		[HttpGet, Route("assignments")]
-		public async Task<ListPage<AssetAssignment>> ListAssignments(ListArgs<Asset> args)
-		{
-			return await _assignments.List(args, VerifiedUserContext);
-		}
-
-		// Route is available to anyone right now, but if your token does not give access to an OC resource, you will get 401 response.
-		[DocName("Save Asset Assignment")]
+		[DocName("Create Asset Assignment")]
 		[HttpPost, Route("assignments"), MarketplaceUserAuth]
 		public async Task SaveAssignment([FromBody] AssetAssignment assignment)
 		{
-			await _assignments.Save(assignment, VerifiedUserContext);
+			await _assetedResources.SaveAssignment(assignment, VerifiedUserContext);
 		}
 
 		[DocName("Delete Asset Assignment"), MarketplaceUserAuth]
-		[HttpDelete, Route("assignments/{resourceType}/{resourceID}/{resourceParentID}")]
-		public async Task DeleteAssignment(ResourceType resourceType, string resourceID, string resourceParentID)
+		[HttpDelete, Route("assignments")]
+		public async Task DeleteAssignment([FromBody] AssetAssignment assignment)
 		{
-			await _assignments.Delete(resourceType, resourceID, resourceParentID, VerifiedUserContext);
+			await _assetedResources.DeleteAssignment(assignment, VerifiedUserContext);
+		}
+
+		[DocName("Reorder Asset Assignment"), MarketplaceUserAuth]
+		[HttpPost, Route("assignments/moveTo/{position}")]
+		public async Task MoveAssignment([FromBody] AssetAssignment assignment, int position)
+		{
+			await _assetedResources.MoveAssignment(assignment, position, VerifiedUserContext);
 		}
 	}
 }

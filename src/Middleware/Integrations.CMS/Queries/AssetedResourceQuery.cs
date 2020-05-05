@@ -17,20 +17,20 @@ using System.Threading.Tasks;
 
 namespace Marketplace.CMS.Queries
 {
-	public interface IAssetAssignmentQuery
+	public interface IAssetedResourceQuery
 	{
 		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task MoveAssignment(AssetAssignment assignment, int position, VerifiedUserContext user);
 	}
 
-	public class AssetAssignmentQuery : IAssetAssignmentQuery
+	public class AssetedResourceQuery : IAssetedResourceQuery
 	{
 		private readonly ICosmosStore<AssetedResource> _store;
 		private readonly IAssetQuery _assets;
 		private readonly IAssetContainerQuery _containers;
 
-		public AssetAssignmentQuery(ICosmosStore<AssetedResource> store, IAssetQuery assets, IAssetContainerQuery containers)
+		public AssetedResourceQuery(ICosmosStore<AssetedResource> store, IAssetQuery assets, IAssetContainerQuery containers)
 		{
 			_store = store;
 			_containers = containers;

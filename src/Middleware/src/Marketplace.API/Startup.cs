@@ -8,7 +8,6 @@ using Marketplace.CMS.Queries;
 using Marketplace.CMS.Storage;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
@@ -77,7 +76,7 @@ namespace Marketplace.API
 				.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
 				.InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
-				.InjectCosmosStore<AssetAssignmentQuery, AssetAssignment>(cosmosConfig)
+				.InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig)
 				.AddSingleton<IStorageFactory>(x => new StorageFactory(cmsConfig))
 				.Inject<IOrchestrationCommand>()
 				.Inject<IOrchestrationLogCommand>()
@@ -86,7 +85,7 @@ namespace Marketplace.API
 				.AddSingleton<ISmartyStreetsCommand>(x => new SmartyStreetsCommand(_settings.SmartyStreetSettings))
 				.Inject<IEnvironmentSeedCommand>()
 				.Inject<IOrderCloudSandboxService>()
-				.Inject<IMarketplaceProductCommand>()
+				//.Inject<IMarketplaceProductCommand>()
 				.Inject<ISendgridService>()
 				.Inject<IAssetQuery>()
 				.Inject<ISupplierCategoryConfigQuery>()
