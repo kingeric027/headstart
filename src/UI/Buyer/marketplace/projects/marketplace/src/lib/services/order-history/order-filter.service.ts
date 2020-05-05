@@ -137,7 +137,6 @@ export class OrderFilterService implements IOrderFilters {
     });
     const url = `${this.appConfig.middlewareUrl}/order/location/${this.activeFiltersSubject.value.location}`;
     const httpParams = this.createHttpParams();
-    console.log(httpParams);
     return this.httpClient
       .get<ListOrder>(url, { headers: headers, params: httpParams })
       .toPromise();
@@ -147,13 +146,11 @@ export class OrderFilterService implements IOrderFilters {
     let params = new HttpParams();
     Object.entries(this.createListOptions()).forEach(([key, value]) => {
       if (key !== 'filters' && value) {
-        console.log(key, value);
         params = params.append(key, value.toString());
       }
     });
     Object.entries(this.createListOptions().filters).forEach(([key, value]) => {
       if ((typeof value !== 'object' && value) || (value && value.length)) {
-        console.log(key, value);
         params = params.append(key, value.toString());
       }
     });
