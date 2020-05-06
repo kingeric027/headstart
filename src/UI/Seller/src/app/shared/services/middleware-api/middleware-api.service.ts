@@ -40,9 +40,4 @@ export class MiddlewareAPIService {
     const url = `${this.appConfig.middlewareUrl}/order/acknowledgequote/${orderID}`;
     return await this.http.post<Order>(url, this.headers).toPromise();
   }
-  //TODO: Make a separate service for the ocMiddeleware routes vs the Marketplace middleware routes
-  async getAvailableCurrencies(base: string): Promise<ExchangeRates> {
-    const url = `${this.appConfig.ocMiddlewareUrl}/exchangerates/${base}`;
-    return await this.http.get<ExchangeRates>(url).toPromise();
-  }
 }
