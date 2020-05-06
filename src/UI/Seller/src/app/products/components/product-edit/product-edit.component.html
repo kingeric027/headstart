@@ -5,6 +5,7 @@
                    (selectedTabChange)="tabChanged($event, _superMarketplaceProductEditable?.Product?.ID)"
                    animationDuration="0ms">
       <!-- Product Details -->
+
       <mat-tab label="Product">
         <div class="container-fluid">
           <div class="row pt-3">
@@ -265,6 +266,13 @@
             </div>
           </div>
         </div>
+      </mat-tab>
+      <!-- Catalog Assignments  -->
+      <mat-tab label="Catalog Assignments"
+               *ngIf="readonly">
+        <product-visibility-assignments-component *ngIf="_superMarketplaceProductStatic"
+                                                  [product]="_superMarketplaceProductStatic.Product">
+        </product-visibility-assignments-component>
       </mat-tab>
       <!-- Product Description -->
       <mat-tab>

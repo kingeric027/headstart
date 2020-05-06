@@ -55,20 +55,38 @@
                                            (resourceUpdated)="updateResource.emit($event)">
           </reactive-quill-editor-component>
         </div>
-        <div class="form-group">
-          <p class="mb-1">Use FreightPOP for Shipping</p>
-          <label class="switch mb-0"
-                 for="SyncFreightPop">
-            <input type="checkbox"
-                   class="form-check-input"
-                   id="SyncFreightPop"
-                   showErrors
-                   [resourceForm]="resourceForm"
-                   aria-describedby="SyncFreightPop"
-                   formControlName="SyncFreightPop"
-                   (input)="updateResourceFromEvent($event, 'xp.SyncFreightPop')">
-            <span class="slider round cursor-pointer"></span>
-          </label>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="Currency">Currency</label>
+            <select [attr.disabled]="readonly ? true : null"
+                    type="dropdown"
+                    class="form-control"
+                    formControlName="Currency"
+                    id="Currency"
+                    aria-describedby="Currency"
+                    placeholder="Choose Currency"
+                    (change)="setCurrency($event)">
+              <option [ngValue]="null"
+                      disabled>Choose a currency</option>
+              <option *ngFor="let currency of availableCurrencies"
+                      [value]="currency.Symbol">{{currency.Name}}</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <p class="mb-1">Use FreightPOP for Shipping</p>
+            <label class="switch mb-0"
+                   for="SyncFreightPop">
+              <input type="checkbox"
+                     class="form-check-input"
+                     id="SyncFreightPop"
+                     showErrors
+                     [resourceForm]="resourceForm"
+                     aria-describedby="SyncFreightPop"
+                     formControlName="SyncFreightPop"
+                     (input)="updateResourceFromEvent($event, 'xp.SyncFreightPop')">
+              <span class="slider round cursor-pointer"></span>
+            </label>
+          </div>
         </div>
       </div>
     </div>

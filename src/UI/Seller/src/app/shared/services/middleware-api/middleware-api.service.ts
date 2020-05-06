@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OcTokenService, Order } from '@ordercloud/angular-sdk';
 import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
+import { ExchangeRates } from '@app-seller/shared/models/exchange-rates.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -38,5 +39,10 @@ export class MiddlewareAPIService {
   async acknowledgeQuoteOrder(orderID: string): Promise<Order> {
     const url = `${this.appConfig.middlewareUrl}/order/acknowledgequote/${orderID}`;
     return await this.http.post<Order>(url, this.headers).toPromise();
+  }
+  //TODO: Make a separate service for the ocMiddeleware routes vs the Marketplace middleware routes
+  async getAvailableCurrencies(base: string): Promise<ExchangeRates> {
+    const url = `${this.appConfig.ocMiddlewareUrl}/exchangerates/${base}`;
+    return await this.http.get<ExchangeRates>(url).toPromise();
   }
 }
