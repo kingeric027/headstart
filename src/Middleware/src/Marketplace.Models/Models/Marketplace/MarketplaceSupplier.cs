@@ -2,6 +2,7 @@
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Extended;
 using Marketplace.Models.Marketplace.Extended;
+using Marketplace.Models.Models.Marketplace.Extended;
 using OrderCloud.SDK;
 
 namespace Marketplace.Models.Models.Marketplace
@@ -19,5 +20,6 @@ namespace Marketplace.Models.Models.Marketplace
         public Contact SupportContact { get; set; }
         public bool SyncFreightPop { get; set; }
         public string ApiClientID { get; set; }
+        public Currency Currency { get; set; }
     }
 }
