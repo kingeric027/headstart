@@ -12,10 +12,11 @@
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
 
-  <div class="resource-edit">
-    <resource-edit-component resourceType="Buyer"
-                             (updateResource)="updateResource($event)"
-                             [resource]="updatedResource">
-    </resource-edit-component>
-  </div>
+  <app-buyer-edit class="resource-edit"
+                  *ngIf="resourceForm"
+                  resourceType="Buyer"
+                  [resourceForm]="resourceForm"
+                  (updateResource)="updateResource($event)"
+                  [resource]="updatedResource">
+  </app-buyer-edit>
 </resource-table-component>
