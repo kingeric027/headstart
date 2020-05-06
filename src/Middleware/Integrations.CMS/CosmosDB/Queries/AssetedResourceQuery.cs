@@ -19,7 +19,7 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetedResourceQuery
 	{
-		Task<ListPage<AssetForDelivery>> DeliverAssets(ResourceType type, string resourceID, string resourceParentID, ListArgs<Asset> args, VerifiedUserContext user);
+		Task<List<AssetForDelivery>> DeliverAssets(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user);
 		Task<string> DeliverFirstImageUrl(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user);
 		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
@@ -37,18 +37,14 @@ namespace Marketplace.CMS.Queries
 			_assets = assets;
 		}
 
-		public async Task<ListPage<AssetForDelivery>> DeliverAssets(ResourceType type, string resourceID, string resourceParentID, ListArgs<Asset> args, VerifiedUserContext user)
+		public async Task<List<AssetForDelivery>> DeliverAssets(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user)
 		{
 			await new MultiTenantOCClient(user).Get(type, resourceID, resourceParentID);
 			var assetedResource = await GetExistingOrDefault(type, resourceID, resourceParentID);
 			var assetIDs = assetedResource.ImageAssetIDs.Concat(assetedResource.OtherAssetIDs).ToList();		
 
-			var assets = await _assets.ListAcrossContainers(assetIDs, args);
-			return new ListPage<AssetForDelivery>()
-			{
-				Meta = assets.Meta,
-				Items = assets.Items.Select(a => new AssetForDelivery(a, assetIDs.IndexOf(a.id))).OrderBy(a => a.ListOrder).ToList()
-			};
+			var assets = await _assets.ListAcrossContainers(assetIDs);
+			return assets.Select(a => new AssetForDelivery(a, assetIDs.IndexOf(a.id))).OrderBy(a => a.ListOrder).ToList();
 		}
 
 		public async Task<string> DeliverFirstImageUrl(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user)

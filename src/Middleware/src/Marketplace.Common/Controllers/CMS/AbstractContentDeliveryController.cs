@@ -15,8 +15,7 @@ namespace Marketplace.Common.Controllers.CMS
 	public class ContentControllerConfig
 	{
 		public ResourceType ResourceType { get; set; }
-		public string ResourceIDField { get; set; }
-		public string ResourceParentIDField { get; set; }
+		public string ResourceParentIDField { get; set; } = null;
 	}
 
 	public abstract class AbstractContentDeliveryController : BaseController
@@ -30,27 +29,27 @@ namespace Marketplace.Common.Controllers.CMS
 			_assetedResources = assetedResources;
 		}
 
-		[HttpGet, Route("assets"), MarketplaceUserAuth]
-		public async Task<ListPage<AssetForDelivery>> ListAssets(ListArgs<Asset> args)
+		// TODO - add list page and list args
+		[HttpGet, Route("{resourceID}/assets"), MarketplaceUserAuth]
+		public async Task<List<AssetForDelivery>> ListAssets(string resourceID)
 		{
 			//TODO - use list args
-			var (resourceID, resourceParentID) = GetResourceIDs();
-			return await _assetedResources.DeliverAssets(config.ResourceType, resourceID, resourceParentID, args, VerifiedUserContext);
+			var resourceParentID = GetResourceParentID();
+			return await _assetedResources.DeliverAssets(config.ResourceType, resourceID, resourceParentID, VerifiedUserContext);
 		}
 
-		[HttpGet, Route("image")] // No auth
-		public async Task GetFirstImage()
+		[HttpGet, Route("{resourceID}/image")] // No auth
+		public async Task GetFirstImage(string resourceID)
 		{
-			var (resourceID, resourceParentID) = GetResourceIDs();
+			var resourceParentID = GetResourceParentID();
 			var url = await _assetedResources.DeliverFirstImageUrl(config.ResourceType, resourceID, resourceParentID, VerifiedUserContext);
 			Response.Redirect(url);
 		}
 
-		private (string, string) GetResourceIDs()
+		private string GetResourceParentID()
 		{
-			var resourceID = RouteData.Values[config.ResourceIDField].ToString();
 			var resourceParentID = config.ResourceParentIDField == null ? null : RouteData.Values[config.ResourceParentIDField].ToString();
-			return (resourceID, resourceParentID);
+			return resourceParentID;
 		}
 	}
 

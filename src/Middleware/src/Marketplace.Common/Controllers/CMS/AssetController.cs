@@ -37,7 +37,7 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("Get an Asset")]
 		[HttpGet, Route("{assetID}"), MarketplaceUserAuth]
-		public async Task<Asset> Get(string containerID, string assetID)
+		public async Task<Asset> Get(string assetID)
 		{
 			return await _assets.Get(assetID, VerifiedUserContext);
 		}

@@ -24,7 +24,7 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetQuery
 	{
-		Task<ListPage<Asset>> ListAcrossContainers(IEnumerable<string> assetIDs, ListArgs<Asset> args);
+		Task<List<Asset>> ListAcrossContainers(IEnumerable<string> assetIDs);
 		Task<Asset> GetAcrossContainers(string assetID);
 		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
 		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
@@ -108,24 +108,18 @@ namespace Marketplace.CMS.Queries
 			await _blob.OnAssetDeleted(container, asset.id);
 		}
 
-		public async Task<ListPage<Asset>> ListAcrossContainers(IEnumerable<string> assetIDs, ListArgs<Asset> args)
+		public async Task<List<Asset>> ListAcrossContainers(IEnumerable<string> assetIDs)
 		{ 
 			var ids = new HashSet<string>(assetIDs).ToList(); // remove any duplicates
-			if (ids.Count == 0) return new ListPage<Asset>(); 
+			if (ids.Count == 0) return new List<Asset>(); 
 			var paramNames = ids.Select((id, i) => $"@id{i}");
 			var parameters = new ExpandoObject();
 			for (int i = 0; i < ids.Count; i++)
 			{
 				parameters.TryAdd($"@id{i}", ids[i]);
 			}
-			var query = _assetStore.Query($"select * from c where c.id IN ({string.Join(", ", paramNames)})", parameters)
-				.Search(args)
-				.Filter(args)
-				.Sort(args);
-			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
-			// TODO - var count = await query.CountAsync();
-			var listPage = list.ToListPage(args.Page, args.PageSize, list.Results.Count);
-			return listPage;
+			var assets = await _assetStore.QueryMultipleAsync($"select * from c where c.id IN ({string.Join(", ", paramNames)})", parameters);
+			return assets.ToList();
 		}
 
 		public async Task<Asset> GetAcrossContainers(string assetID)
