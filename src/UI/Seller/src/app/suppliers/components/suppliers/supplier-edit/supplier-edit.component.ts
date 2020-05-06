@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit } from '@angular/core';
 import { get as _get } from 'lodash';
 import { FormGroup } from '@angular/forms';
-import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { Rates } from '@app-seller/shared/models/exchange-rates.interface';
+import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
@@ -16,10 +16,10 @@ export class SupplierEditComponent implements OnInit {
   @Output()
   updateResource = new EventEmitter<any>();
   availableCurrencies: Rates[] = [];
-  constructor(public middleware: MiddlewareAPIService) {}
+  constructor(public ocIntegrations: OcIntegrationsAPIService) {}
 
   async ngOnInit(): Promise<void> {
-    this.availableCurrencies = (await this.middleware.getAvailableCurrencies('USD')).Rates;
+    this.availableCurrencies = (await this.ocIntegrations.getAvailableCurrencies('USD')).Rates;
   }
 
   updateResourceFromEvent(event: any, field: string): void {
