@@ -19,41 +19,39 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetedResourceQuery
 	{
-		// TODO - need to check permissions for all these.
-		Task<List<Asset>> ListAssets(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user);
-		Task<string> GetPrimaryImageUrl(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user);
+		Task<ListPage<AssetForDelivery>> DeliverAssets(ResourceType type, string resourceID, string resourceParentID, ListArgs<Asset> args, VerifiedUserContext user);
+		Task<string> DeliverFirstImageUrl(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user);
 		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
-		Task MoveAssignment(AssetAssignment assignment, int position, VerifiedUserContext user);
+		Task MoveAssignment(AssetAssignment assignment, int listOrder, VerifiedUserContext user);
 	}
 
 	public class AssetedResourceQuery : IAssetedResourceQuery
 	{
 		private readonly ICosmosStore<AssetedResource> _store;
 		private readonly IAssetQuery _assets;
-		private readonly IAssetContainerQuery _containers;
 
-		public AssetedResourceQuery(ICosmosStore<AssetedResource> store, IAssetQuery assets, IAssetContainerQuery containers)
+		public AssetedResourceQuery(ICosmosStore<AssetedResource> store, IAssetQuery assets)
 		{
 			_store = store;
-			_containers = containers;
 			_assets = assets;
 		}
 
-		public async Task<List<Asset>> ListAssets(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user)
+		public async Task<ListPage<AssetForDelivery>> DeliverAssets(ResourceType type, string resourceID, string resourceParentID, ListArgs<Asset> args, VerifiedUserContext user)
 		{
+			await new MultiTenantOCClient(user).Get(type, resourceID, resourceParentID);
 			var assetedResource = await GetExistingOrDefault(type, resourceID, resourceParentID);
-			var assetIDs = new HashSet<string>(assetedResource.ImageAssetIDs.Concat(assetedResource.OtherAssetIDs));
-			List<Asset> toReturn = new List<Asset>();
-			//TODO - convert to listpage
-			if (assetIDs.Count > 0) { 
-				var assetDictionary = await _assets.ListAcrossContainers(assetIDs);
-				toReturn = assetIDs.Select(id => assetDictionary[id]).ToList();
-			}
-			return toReturn;
+			var assetIDs = assetedResource.ImageAssetIDs.Concat(assetedResource.OtherAssetIDs).ToList();		
+
+			var assets = await _assets.ListAcrossContainers(assetIDs, args);
+			return new ListPage<AssetForDelivery>()
+			{
+				Meta = assets.Meta,
+				Items = assets.Items.Select(a => new AssetForDelivery(a, assetIDs.IndexOf(a.id))).OrderBy(a => a.ListOrder).ToList()
+			};
 		}
 
-		public async Task<string> GetPrimaryImageUrl(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user)
+		public async Task<string> DeliverFirstImageUrl(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user)
 		{
 			var assetedResource = await GetExistingOrDefault(type, resourceID, resourceParentID);
 			if (assetedResource.ImageAssetIDs.Count > 0)
@@ -66,10 +64,9 @@ namespace Marketplace.CMS.Queries
 			}
 		}
 
-
 		public async Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
+			await new MultiTenantOCClient(user).Get(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
 			var asset = await _assets.Get(assignment.AssetID, user);
 			var assetedResource = await GetExistingOrDefault(assignment);
 			switch (asset.Type)
@@ -78,7 +75,7 @@ namespace Marketplace.CMS.Queries
 					if (!assetedResource.ImageAssetIDs.Contains((asset.id))) assetedResource.ImageAssetIDs.Add(asset.id); // check if already exists
 					break;
 				default:
-					if (!assetedResource.ImageAssetIDs.Contains((asset.id))) assetedResource.ImageAssetIDs.Add(asset.id);
+					if (!assetedResource.OtherAssetIDs.Contains((asset.id))) assetedResource.OtherAssetIDs.Add(asset.id);
 					break;
 			}
 			await _store.UpsertAsync(assetedResource);
@@ -86,7 +83,7 @@ namespace Marketplace.CMS.Queries
 
 		public async Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
+			await new MultiTenantOCClient(user).Get(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
 			var asset = await _assets.Get(assignment.AssetID, user);
 			var assetedResource = await GetExistingOrDefault(assignment);
 			switch (asset.Type)
@@ -102,20 +99,20 @@ namespace Marketplace.CMS.Queries
 		}
 
 
-		public async Task MoveAssignment(AssetAssignment assignment, int position, VerifiedUserContext user)
+		public async Task MoveAssignment(AssetAssignment assignment, int listOrder, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).ConfirmExists(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
+			await new MultiTenantOCClient(user).Get(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
 			var asset = await _assets.Get(assignment.AssetID, user);
 			var assetedResource = await GetExistingOrDefault(assignment);
 			switch (asset.Type)
 			{
 				case AssetType.Image:
 					assetedResource.ImageAssetIDs.Remove(asset.id);
-					assetedResource.ImageAssetIDs.Insert(position, asset.id);
+					assetedResource.ImageAssetIDs.Insert(listOrder, asset.id);
 					break;
 				default:
-					assetedResource.ImageAssetIDs.Remove(asset.id);
-					assetedResource.ImageAssetIDs.Insert(position, asset.id); ;
+					assetedResource.OtherAssetIDs.Remove(asset.id);
+					assetedResource.OtherAssetIDs.Insert(listOrder, asset.id); ;
 					break;
 			}
 			await _store.UpdateAsync(assetedResource);

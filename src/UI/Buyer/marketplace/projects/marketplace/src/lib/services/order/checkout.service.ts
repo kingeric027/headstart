@@ -12,7 +12,7 @@ import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
 import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/ordercloud-sandbox.models';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
-import { MarketplaceSDK, CreditCardToken, CreditCardPayment, Address } from 'marketplace-javascript-sdk';
+import { MarketplaceSDK, Address, CreditCardPayment, CreditCardToken } from 'marketplace-javascript-sdk';
 import { onErrorResumeNext } from 'rxjs';
 
 export interface ICheckout {

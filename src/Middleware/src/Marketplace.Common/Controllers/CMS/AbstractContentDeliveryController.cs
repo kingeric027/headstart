@@ -1,4 +1,5 @@
-﻿using Marketplace.CMS.Models;
+﻿using Integrations.CMS.Models;
+using Marketplace.CMS.Models;
 using Marketplace.CMS.Queries;
 using Marketplace.Helpers;
 using Marketplace.Models;
@@ -18,31 +19,30 @@ namespace Marketplace.Common.Controllers.CMS
 		public string ResourceParentIDField { get; set; }
 	}
 
-	public abstract class AbstractContentController : BaseController
+	public abstract class AbstractContentDeliveryController : BaseController
 	{
 		private readonly IAssetedResourceQuery _assetedResources;
 
 		protected abstract ContentControllerConfig config { get; set; }
 
-		public AbstractContentController(AppSettings settings, IAssetedResourceQuery assetedResources) : base(settings)
+		public AbstractContentDeliveryController(AppSettings settings, IAssetedResourceQuery assetedResources) : base(settings)
 		{
 			_assetedResources = assetedResources;
 		}
 
 		[HttpGet, Route("assets"), MarketplaceUserAuth]
-		public async Task<List<Asset>> ListAssets(ListArgs<Asset> args)
+		public async Task<ListPage<AssetForDelivery>> ListAssets(ListArgs<Asset> args)
 		{
 			//TODO - use list args
 			var (resourceID, resourceParentID) = GetResourceIDs();
-			return await _assetedResources.ListAssets(config.ResourceType, resourceID, resourceParentID, VerifiedUserContext);
+			return await _assetedResources.DeliverAssets(config.ResourceType, resourceID, resourceParentID, args, VerifiedUserContext);
 		}
 
 		[HttpGet, Route("image")] // No auth
-		public async Task GetPrimaryImage()
+		public async Task GetFirstImage()
 		{
-			//TODO - use list args
 			var (resourceID, resourceParentID) = GetResourceIDs();
-			var url = await _assetedResources.GetPrimaryImageUrl(config.ResourceType, resourceID, resourceParentID, VerifiedUserContext);
+			var url = await _assetedResources.DeliverFirstImageUrl(config.ResourceType, resourceID, resourceParentID, VerifiedUserContext);
 			Response.Redirect(url);
 		}
 

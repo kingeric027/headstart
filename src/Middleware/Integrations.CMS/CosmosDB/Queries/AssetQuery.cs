@@ -24,7 +24,7 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetQuery
 	{
-		Task<IDictionary<string, Asset>> ListAcrossContainers(ISet<string> assetIDs);
+		Task<ListPage<Asset>> ListAcrossContainers(IEnumerable<string> assetIDs, ListArgs<Asset> args);
 		Task<Asset> GetAcrossContainers(string assetID);
 		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
 		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
@@ -108,19 +108,24 @@ namespace Marketplace.CMS.Queries
 			await _blob.OnAssetDeleted(container, asset.id);
 		}
 
-		public async Task<IDictionary<string, Asset>> ListAcrossContainers(ISet<string> assetIDs)
-		{
-			var ids = assetIDs.ToList();
+		public async Task<ListPage<Asset>> ListAcrossContainers(IEnumerable<string> assetIDs, ListArgs<Asset> args)
+		{ 
+			var ids = new HashSet<string>(assetIDs).ToList(); // remove any duplicates
+			if (ids.Count == 0) return new ListPage<Asset>(); 
 			var paramNames = ids.Select((id, i) => $"@id{i}");
 			var parameters = new ExpandoObject();
 			for (int i = 0; i < ids.Count; i++)
 			{
 				parameters.TryAdd($"@id{i}", ids[i]);
 			}
-			var query = $"select * from c where c.id IN ({string.Join(", ", paramNames)})";
-			var assets = await _assetStore.QueryMultipleAsync(query, parameters);
-			// TODO - need to map to include urls
-			return assets.ToDictionary(x => x.id);
+			var query = _assetStore.Query($"select * from c where c.id IN ({string.Join(", ", paramNames)})", parameters)
+				.Search(args)
+				.Filter(args)
+				.Sort(args);
+			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
+			// TODO - var count = await query.CountAsync();
+			var listPage = list.ToListPage(args.Page, args.PageSize, list.Results.Count);
+			return listPage;
 		}
 
 		public async Task<Asset> GetAcrossContainers(string assetID)

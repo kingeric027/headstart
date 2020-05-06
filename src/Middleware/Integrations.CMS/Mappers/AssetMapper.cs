@@ -1,4 +1,5 @@
 ﻿using Integrations.CMS;
+using Integrations.CMS.Models;
 using Marketplace.CMS.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;

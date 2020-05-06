@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marketplace.Common.Controllers.CMS
 {
-	[Route("catalog/{catalogID}")]
-	public class CatalogControllers : AbstractContentController
+	[Route("catalogs/{catalogID}")]
+	public class CatalogControllers : AbstractContentDeliveryController
 	{
 		protected override ContentControllerConfig config { get; set; } = new ContentControllerConfig()
 		{

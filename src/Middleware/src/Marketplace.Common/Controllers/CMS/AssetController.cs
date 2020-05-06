@@ -79,10 +79,10 @@ namespace Marketplace.CMS.Controllers
 		}
 
 		[DocName("Reorder Asset Assignment"), MarketplaceUserAuth]
-		[HttpPost, Route("assignments/moveTo/{position}")]
-		public async Task MoveAssignment([FromBody] AssetAssignment assignment, int position)
+		[HttpPost, Route("assignments/moveto/{listOrder}")]
+		public async Task MoveAssignment([FromBody] AssetAssignment assignment, int listOrder)
 		{
-			await _assetedResources.MoveAssignment(assignment, position, VerifiedUserContext);
+			await _assetedResources.MoveAssignment(assignment, listOrder, VerifiedUserContext);
 		}
 	}
 }
