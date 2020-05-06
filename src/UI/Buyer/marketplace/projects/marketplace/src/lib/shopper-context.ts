@@ -18,18 +18,15 @@ import {
   UserGroupAssignment,
   ApprovalRule,
 } from '@ordercloud/angular-sdk';
-import {
-  ProductXp,
-  CreditCardToken,
-  BuyerAddressXP,
-  MarketplaceAddressBuyer,
-  TaxCertificate,
-} from 'marketplace-javascript-sdk';
+import { ProductXp, BuyerAddressXP, MarketplaceAddressBuyer, TaxCertificate } from 'marketplace-javascript-sdk';
 
 export * from '@ordercloud/angular-sdk';
 export * from './services/shopper-context/shopper-context.service';
 export * from '../../src/lib/services/ordercloud-sandbox/ordercloud-sandbox.models';
-export { CreditCardPayment } from 'marketplace-javascript-sdk';
+export {
+  OrderCloudIntegrationsCreditCardToken,
+  OrderCloudIntegrationsCreditCardPayment,
+} from 'marketplace-javascript-sdk';
 
 export interface LineItemGroupSupplier {
   supplier: Supplier;
