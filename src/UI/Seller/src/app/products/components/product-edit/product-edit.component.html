@@ -88,11 +88,12 @@
                   <select [attr.disabled]="readonly ? true : null"
                           type="dropdown"
                           class="form-control"
+                          formControlName="ProductType"
                           id="ProductType"
                           aria-describedby="Product type"
                           placeholder="Choose product type"
                           (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
-                    <option [selected]="productType === undefined"
+                    <option [ngValue]="null"
                             disabled>Choose a product type</option>
                     <option [selected]="productType === 'Standard'"
                             value="Standard">Standard</option>
@@ -386,7 +387,7 @@
                                 (click)="modal.dismiss()">Cancel</button>
                         <button type="button"
                                 class="btn brand-button--danger"
-                                (click)="removeFile(image.URL, 'image')"
+                                (click)="removeFile(image)"
                                 (click)="modal.dismiss()">Yes, Delete</button>
                       </confirm-modal>
                     </ng-template>
@@ -502,7 +503,7 @@
                                   (click)="modal.dismiss()">Cancel</button>
                           <button type="button"
                                   class="btn brand-button--danger"
-                                  (click)="removeFile(file.Title, 'staticContent')"
+                                  (click)="removeFile(file)"
                                   (click)="modal.dismiss()">Yes, Delete</button>
                         </confirm-modal>
                       </ng-template>
