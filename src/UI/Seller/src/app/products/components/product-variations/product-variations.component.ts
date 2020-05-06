@@ -2,13 +2,14 @@ import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angu
 import { Variant, SpecOption, Spec, OcSpecService, OcProductService, PartialVariant } from '@ordercloud/angular-sdk';
 import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle, faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct, Image } from 'marketplace-javascript-sdk/dist/models';
+import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from 'src/environments/environment';
 import { AppAuthService } from '@app-seller/auth';
+import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 
 @Component({
   selector: 'product-variations-component',
@@ -62,7 +63,7 @@ export class ProductVariations {
   assignVariantImages = false;
   viewVariantDetails = false;
   variantInSelection: Variant;
-  imageInSelection: Image;
+  imageInSelection: Asset;
 
   constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private _snackBar: MatSnackBar, private ocProductService: OcProductService, private appAuthService: AppAuthService,) {}
   getTotalMarkup = (specOptions: SpecOption[]): number => {
@@ -275,7 +276,7 @@ export class ProductVariations {
     await this.ocSpecService.Patch(specID, { DefaultOptionID: optionID }).toPromise();
   }
   
-  isImageSelected(img: Image): boolean {
+  isImageSelected(img: Asset): boolean {
     if (!img.Tags) img.Tags = []
     return img.Tags.includes(this.variantInSelection?.xp?.SpecCombo);
   }
@@ -290,7 +291,7 @@ export class ProductVariations {
     this.variantInSelection = null;
   }
 
-  toggleAssignImage(img: Image, specCombo: string): void {
+  toggleAssignImage(img: Asset, specCombo: string): void {
     this.imageInSelection = img;
     if (!this.imageInSelection.Tags) this.imageInSelection.Tags = [];
     this.imageInSelection.Tags.includes(specCombo) ? this.imageInSelection.Tags.splice(this.imageInSelection.Tags.indexOf(specCombo), 1) : this.imageInSelection.Tags.push(specCombo);
@@ -308,7 +309,7 @@ export class ProductVariations {
     this.imageInSelection = {};
   }
 
-  getVariantImages(variant: Variant): Image[] {
+  getVariantImages(variant: Variant): Asset[] {
     this.superProductEditable?.Images?.forEach(i => !i.Tags ? i.Tags = [] : null);
     return this.superProductEditable?.Images?.filter(i => i.Tags.includes(variant?.xp?.SpecCombo));
   }
