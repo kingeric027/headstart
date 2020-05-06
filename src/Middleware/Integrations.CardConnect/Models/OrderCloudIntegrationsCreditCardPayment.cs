@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Marketplace.Helpers.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace ordercloud.integrations.cardconnect.Models
 {
+	[SwaggerModel]
     public class OrderCloudIntegrationsCreditCardPayment
     {
         [OrderCloud.SDK.Required]

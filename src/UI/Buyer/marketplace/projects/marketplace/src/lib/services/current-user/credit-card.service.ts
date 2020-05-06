@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { OcMeService } from '@ordercloud/angular-sdk';
-import { MarketplaceSDK, CreditCardToken } from 'marketplace-javascript-sdk';
+import { MarketplaceSDK, OrderCloudIntegrationsCreditCardToken } from 'marketplace-javascript-sdk';
 import { MarketplaceBuyerCreditCard, ListMarketplaceBuyerCreditCard } from '../../shopper-context';
 
 @Injectable({
@@ -20,7 +20,7 @@ export class CreditCardService {
 
   constructor(private ocMeService: OcMeService) {}
 
-  async Save(card: CreditCardToken): Promise<MarketplaceBuyerCreditCard> {
+  async Save(card: OrderCloudIntegrationsCreditCardToken): Promise<MarketplaceBuyerCreditCard> {
     card.CardType = this.getCardType(card.AccountNumber);
     return await MarketplaceSDK.MeCreditCardAuthorizations.MePost(card);
   }

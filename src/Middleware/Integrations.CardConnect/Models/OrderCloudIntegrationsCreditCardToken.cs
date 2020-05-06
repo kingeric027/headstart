@@ -1,9 +1,11 @@
-﻿using OrderCloud.SDK;
+﻿using Marketplace.Helpers.Attributes;
+using OrderCloud.SDK;
 using System.ComponentModel.DataAnnotations;
 using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
 namespace ordercloud.integrations.cardconnect.Models
 {
+	[SwaggerModel]
 	public class OrderCloudIntegrationsCreditCardToken
     {
         public string AccountNumber { get; set; }

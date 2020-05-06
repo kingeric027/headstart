@@ -1,5 +1,8 @@
-﻿namespace Marketplace.Models.Models.Marketplace.Extended
+﻿using Marketplace.Helpers.Attributes;
+
+namespace Marketplace.Models.Models.Marketplace.Extended
 {
+	[SwaggerModel]
     public class Currency
     {
         public string Name { get; set; }
