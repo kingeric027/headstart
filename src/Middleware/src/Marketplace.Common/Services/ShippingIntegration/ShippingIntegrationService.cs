@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.Avalara;
@@ -7,7 +8,9 @@ using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Helpers;
 using Marketplace.Models.Exceptions;
+using Marketplace.Models.Extended;
 using Marketplace.Models.Models.Marketplace;
+using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
 using static Marketplace.Models.ErrorCodes;
 
@@ -32,10 +35,11 @@ namespace Marketplace.Common.Services.ShippingIntegration
         public async Task<ShipEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload)
         {
             var orderWorksheet = orderCalculatePayload.OrderWorksheet;
-            var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(orderWorksheet.LineItems);
+            var lineItemsForShippingEstimates = GetLineItemsToIncludeInShipping(orderCalculatePayload.OrderWorksheet.LineItems, orderCalculatePayload.ConfigData);
+            var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(lineItemsForShippingEstimates);
             Require.That(productIDsWithInvalidDimensions.Count == 0, Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
 
-            var proposedShipmentRequests = ShipmentEstimateRequestsMapper.Map(orderWorksheet);
+            var proposedShipmentRequests = ShipmentEstimateRequestsMapper.Map(lineItemsForShippingEstimates);
             proposedShipmentRequests = proposedShipmentRequests.Select(proposedShipmentRequest =>
             {
                 proposedShipmentRequest.RateResponseTask = _freightPopService.GetRatesAsync(proposedShipmentRequest.RateRequestBody);
@@ -50,6 +54,19 @@ namespace Marketplace.Common.Services.ShippingIntegration
             {
                 ShipEstimates = shipEstimates as IList<ShipEstimate>
             };
+        }
+
+        private List<LineItem> GetLineItemsToIncludeInShipping(IList<LineItem> lineItems, CheckoutIntegrationConfiguration configData)
+        {
+            if(configData.ExcludePOProductsFromShipping)
+            {
+                return lineItems.Where(li =>
+                {
+                    return li.Product.xp.ProductType == ProductType.PurchaseOrder.ToString();
+                }).ToList();
+            } else {
+                return lineItems.ToList();
+            }
         }
 
         public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload)
