@@ -20,7 +20,8 @@ import {
 } from 'marketplace-javascript-sdk';
 
 export interface ICheckout {
-  submit(card: OrderCloudIntegrationsCreditCardPayment, marketplaceID: string): Promise<string>;
+  submitWithCreditCard(card: OrderCloudIntegrationsCreditCardPayment, marketplaceID: string): Promise<string>;
+  submitWithoutCreditCard(): Promise<string>;
   addComment(comment: string): Promise<MarketplaceOrder>;
   listPayments(): Promise<ListPayment>;
   createSavedCCPayment(card: MarketplaceBuyerCreditCard, amount: number): Promise<Payment>;
@@ -49,9 +50,20 @@ export class CheckoutService implements ICheckout {
     private appConfig: AppConfig
   ) {}
 
-  async submit(payment: OrderCloudIntegrationsCreditCardPayment): Promise<string> {
+  async submitWithCreditCard(payment: OrderCloudIntegrationsCreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
     await MarketplaceSDK.MePayments.Post(payment); // authorize card
+    const orderID = this.submit();
+    return orderID;
+  }
+
+  async submitWithoutCreditCard(): Promise<string> {
+    const orderID = this.submit();
+    return orderID;
+  }
+
+  private async submit(): Promise<string> {
+    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
     await this.incrementOrderIfNeeded();
     const submittedOrder = await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
     await this.state.reset();

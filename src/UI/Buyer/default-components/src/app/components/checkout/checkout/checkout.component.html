@@ -94,7 +94,8 @@
                                     [order]="order"
                                     [cards]="cards"
                                     [orderSummaryMeta]="orderSummaryMeta"
-                                    (cardSelected)="onCardSelected($event.detail)">
+                                    (cardSelected)="onCardSelected($event.detail)"
+                                    (continue)="onAcknowledgePurchaseOrder()">
               </ocm-checkout-payment>
             </ng-template>
           </ngb-panel>
