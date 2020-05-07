@@ -1,27 +1,21 @@
-<div class="row">
-  <div class="col-lg-8">
-    <form novalidate
-          [formGroup]="form">
-      <div class="form-group">
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <label class="input-group-text"
-                   for="paymentMethodSelectId"><span translate>CHECKOUT.CHECKOUT_PAYMENT.PAYMENT_METHOD</span>:</label>
-          </div>
-          <select class="custom-select"
-                  id="paymentMethodSelectId"
-                  formControlName="selectedPaymentMethod">
-            <option *ngFor="let method of availablePaymentMethods"
-                    [ngValue]="method">
-              {{ method | paymentMethodDisplay }}
-            </option>
-          </select>
-        </div>
-      </div>
-    </form>
-  </div>
+<div *ngIf="orderSummaryMeta">
+  <h4 *ngIf="!orderSummaryMeta.POLineItemCount">
+    All Items to Be Paid By Credit Card
+  </h4>
+  <h4 *ngIf="orderSummaryMeta.POLineItemCount">
+    {{orderSummaryMeta.StandardLineItemCount}} Item(s) to Be Paid By Credit Card at a total of
+    <span>
+      {{orderSummaryMeta.CreditCardTotal | currency}}
+    </span>
+
+  </h4>
+  <ocm-payment-credit-card [cards]="cards"
+                           (cardSelected)="onCardSelected($event.detail)">
+  </ocm-payment-credit-card>
+  <h4 *ngIf="orderSummaryMeta.POLineItemCount">
+    {{orderSummaryMeta.POLineItemCount}} Item(s) to Be Paid By Purchase Order at a total of
+    <span>
+      {{orderSummaryMeta.POTotal | currency}}
+    </span>
+  </h4>
 </div>
-<ocm-payment-credit-card *ngIf="selectedPaymentMethod === 'CreditCard'"
-                         [cards]="cards"
-                         (cardSelected)="onCardSelected($event.detail)">
-</ocm-payment-credit-card>

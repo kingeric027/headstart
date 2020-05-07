@@ -9,9 +9,11 @@ import {
   ListBuyerCreditCard,
   ShipMethodSelection,
   ShipEstimate,
+  LineItem,
 } from 'marketplace';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
+import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -22,6 +24,7 @@ export class OCMCheckout implements OnInit {
   isAnon: boolean;
   order: MarketplaceOrder;
   lineItems: ListLineItem;
+  orderSummaryMeta: OrderSummaryMeta;
   payments: ListPayment;
   cards: ListBuyerCreditCard;
   selectedCard: SelectedCreditCard;
@@ -60,6 +63,7 @@ export class OCMCheckout implements OnInit {
     this.lineItems = this.context.order.cart.get();
     this.isAnon = this.context.currentUser.isAnonymous();
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.lineItems.Items, this.currentPanel)
     this.setValidation('login', !this.isAnon);
   }
 
@@ -86,16 +90,16 @@ export class OCMCheckout implements OnInit {
   async onCardSelected(output: SelectedCreditCard): Promise<void> {
     this.selectedCard = output;
     if (output.SavedCard) {
-      await this.checkout.createSavedCCPayment(output.SavedCard);
+      await this.checkout.createSavedCCPayment(output.SavedCard, this.orderSummaryMeta.CreditCardTotal);
       delete this.selectedCard.NewCard;
     } else {
       // need to figure out how to use the platform. ran into creditCardID cannot be null.
       // so for now I always save any credit card in OC.
       // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
       this.selectedCard.SavedCard = await this.context.currentUser.cards.Save(output.NewCard);
-      await this.checkout.createSavedCCPayment(this.selectedCard.SavedCard);
+      await this.checkout.createSavedCCPayment(this.selectedCard.SavedCard, this.orderSummaryMeta.CreditCardTotal);
     }
-
+    await this.checkout.createPurchaseOrderPayment(this.orderSummaryMeta.POTotal);
     this.payments = await this.checkout.listPayments();
     this.toSection('confirm');
   }
@@ -126,6 +130,7 @@ export class OCMCheckout implements OnInit {
   }
 
   toSection(id: string): void {
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.lineItems.Items, id)
     const prevIdx = Math.max(this.sections.findIndex(x => x.id === id) - 1, 0);
     const prev = this.sections[prevIdx].id;
     this.setValidation(prev, true);

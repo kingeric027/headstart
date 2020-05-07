@@ -3,21 +3,17 @@ import { ListBuyerCreditCard } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
 import { MarketplaceOrder, MarketplaceBuyerCreditCard } from 'marketplace';
 import { OrderCloudIntegrationsCreditCardToken } from 'marketplace-javascript-sdk';
+import { OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 
 @Component({
   templateUrl: './checkout-payment.component.html',
   styleUrls: ['./checkout-payment.component.scss'],
 })
 export class OCMCheckoutPayment implements OnInit {
-  availablePaymentMethods = ['CreditCard'];
-  selectedPaymentMethod = 'CreditCard';
-  form = new FormGroup({
-    selectedPaymentMethod: new FormControl({ value: this.selectedPaymentMethod, disabled: true }),
-  });
-
   @Input() cards: ListBuyerCreditCard;
   @Input() isAnon: boolean;
   @Input() order: MarketplaceOrder;
+  @Input() orderSummaryMeta: OrderSummaryMeta;
   @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
 
   constructor() {}

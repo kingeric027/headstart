@@ -23,8 +23,9 @@ export interface ICheckout {
   submit(card: OrderCloudIntegrationsCreditCardPayment, marketplaceID: string): Promise<string>;
   addComment(comment: string): Promise<MarketplaceOrder>;
   listPayments(): Promise<ListPayment>;
-  createSavedCCPayment(card: MarketplaceBuyerCreditCard): Promise<Payment>;
-  createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken): Promise<Payment>;
+  createSavedCCPayment(card: MarketplaceBuyerCreditCard, amount: number): Promise<Payment>;
+  createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken, amount: number): Promise<Payment>;
+  createPurchaseOrderPayment(amount: number): Promise<Payment>;
   setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder>;
   setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
   setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder>;
@@ -117,15 +118,15 @@ export class CheckoutService implements ICheckout {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);
   }
 
-  async createSavedCCPayment(card: MarketplaceBuyerCreditCard): Promise<Payment> {
-    return await this.createCCPayment(card.PartialAccountNumber, card.CardType, card.ID);
+  async createSavedCCPayment(card: MarketplaceBuyerCreditCard, amount: number): Promise<Payment> {
+    return await this.createCCPayment(card.PartialAccountNumber, card.CardType, card.ID, amount);
   }
 
-  async createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken): Promise<Payment> {
+  async createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken, amount: number): Promise<Payment> {
     // This slice() is sooo crucial. Otherwise we would be storing creditcard numbers in xp.
     // Which would be really really bad.
     const partialAccountNum = card.AccountNumber.slice(-4);
-    return await this.createCCPayment(partialAccountNum, card.CardType, null);
+    return await this.createCCPayment(partialAccountNum, card.CardType, null, amount);
   }
 
   // Integration Methods
@@ -148,10 +149,14 @@ export class CheckoutService implements ICheckout {
 
   // Private Methods
 
-  private async createCCPayment(partialAccountNum: string, cardType: string, creditCardID: string): Promise<Payment> {
-    await this.deleteExistingPayments(); // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
+  private async createCCPayment(
+    partialAccountNum: string,
+    cardType: string,
+    creditCardID: string,
+    amount: number
+  ): Promise<Payment> {
     const payment = {
-      Amount: this.order.Total,
+      Amount: amount,
       DateCreated: new Date().toDateString(),
       Accepted: false,
       Type: 'CreditCard',
@@ -160,6 +165,15 @@ export class CheckoutService implements ICheckout {
         partialAccountNumber: partialAccountNum,
         cardType: cardType,
       },
+    };
+    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
+  }
+
+  async createPurchaseOrderPayment(amount: number): Promise<Payment> {
+    const payment = {
+      Amount: amount,
+      DateCreated: new Date().toDateString(),
+      Type: 'PurchaseOrder',
     };
     return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
   }

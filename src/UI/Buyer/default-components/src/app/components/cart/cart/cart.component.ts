@@ -1,16 +1,31 @@
 import { Component, Input } from '@angular/core';
 import { ListLineItemWithProduct, MarketplaceOrder, ShopperContextService } from 'marketplace';
+import { OrderSummaryMeta, getOrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 
 @Component({
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss'],
 })
 export class OCMCart {
-  @Input() order: MarketplaceOrder;
-  @Input() lineItems: ListLineItemWithProduct;
+  _order: MarketplaceOrder;
+  _lineItems: ListLineItemWithProduct;
+  orderSummaryMeta: OrderSummaryMeta;
+  @Input() set order(value: MarketplaceOrder) {
+    this._order = value;
+    this.setOrderSummaryMeta();
+  }
+  @Input() set lineItems(value: ListLineItemWithProduct) {
+    this._lineItems = value;
+    this.setOrderSummaryMeta();
+  }
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) {}
 
+  setOrderSummaryMeta(): void {
+    if (this._order && this._lineItems) {
+      this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._lineItems.Items, 'cart');
+    }
+  }
   toProductList(): void {
     this.context.router.toProductList();
   }

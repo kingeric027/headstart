@@ -62,7 +62,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
             {
                 return lineItems.Where(li =>
                 {
-                    return li.Product.xp.ProductType == ProductType.PurchaseOrder.ToString();
+                    return !(li.Product.xp.ProductType == ProductType.PurchaseOrder.ToString());
                 }).ToList();
             } else {
                 return lineItems.ToList();
