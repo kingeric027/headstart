@@ -1,17 +1,43 @@
 <div class="card mb-1"
-     *ngIf="order">
+     *ngIf="_order">
   <h5 class="card-header"
       translate>ORDERS.SUMMARY.SUMMARY</h5>
   <div class="card-body">
-    <h4 class="card-title">{{order.LineItemCount}} <span translate>ORDERS.SUMMARY.ITEM_COUNT</span></h4>
+    <h3 class="card-title">{{standardLineItemCount}}
+      <span *ngIf="!poLineItemCount"
+            translate>ORDERS.SUMMARY.ITEM_COUNT</span>
+      <span *ngIf="poLineItemCount"
+            translate>Item(s) paid by CC</span>
+    </h3>
     <div class="text-right"><b class="float-left"
-         translate>ORDERS.SUMMARY.SUBTOTAL</b><span class="sub-total">{{order.Subtotal | currency}}</span></div>
+         translate>ORDERS.SUMMARY.SUBTOTAL</b><span class="sub-total">{{subtotal | currency}}</span></div>
     <div class="text-right"><b class="float-left"
-         translate>ORDERS.SUMMARY.SHIPPING</b><span class="shipping-cost">{{ displayShipping() }}</span></div>
+         translate>ORDERS.SUMMARY.SHIPPING</b>
+      <span *ngIf="!overrideShippingAndTaxText"
+            class="shipping-cost">{{ _order.ShippingCost | currency }}</span>
+      <span *ngIf="overrideShippingAndTaxText"
+            class="shipping-cost">{{ overrideShippingAndTaxText }}</span>
+    </div>
     <div class="text-right"><b class="float-left"
-         translate>ORDERS.SUMMARY.TAX</b><span class="tax-cost">{{ displayTax() }}</span></div>
+         translate>ORDERS.SUMMARY.TAX</b>
+      <span *ngIf="!overrideShippingAndTaxText"
+            class="tax-cost">{{ _order.TaxCost | currency }}</span>
+      <span *ngIf="overrideShippingAndTaxText"
+            class="tax-cost">{{ overrideShippingAndTaxText }}</span>
+      <span class="tax-cost">{{ tax }}</span>
+    </div>
     <hr>
     <div class="text-right lead"><b class="float-left"
-         translate>ORDERS.SUMMARY.TOTAL</b><span class="order-total">{{ displayTotal() }}</span></div>
+         translate>ORDERS.SUMMARY.TOTAL</b><span class="order-total">{{ total | currency }}</span></div>
+  </div>
+
+  <div *ngIf="poLineItemCount"
+       class="card-body">
+    <h3 class="card-title">{{poLineItemCount}}
+      <span *ngIf="poLineItemCount"
+            translate>Item(s) paid by purchase order</span>
+    </h3>
+    <div class="text-right lead"><b class="float-left"
+         translate>ORDERS.SUMMARY.TOTAL</b><span class="order-total">{{ poTotal | currency }}</span></div>
   </div>
 </div>
