@@ -88,6 +88,7 @@ export class OCMCheckout implements OnInit {
   }
 
   async onCardSelected(output: SelectedCreditCard): Promise<void> {
+    await this.checkout.deleteExistingPayments(); // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
     this.selectedCard = output;
     if (output.SavedCard) {
       await this.checkout.createSavedCCPayment(output.SavedCard, this.orderSummaryMeta.CreditCardTotal);

@@ -1,4 +1,10 @@
 <div *ngIf="orderSummaryMeta">
+  <h4 *ngIf="orderSummaryMeta.POLineItemCount">
+    {{orderSummaryMeta.POLineItemCount}} Item(s) to Be Paid By Purchase Order at a total of
+    <span>
+      {{orderSummaryMeta.POTotal | currency}}
+    </span>
+  </h4>
   <h4 *ngIf="!orderSummaryMeta.POLineItemCount">
     All Items to Be Paid By Credit Card
   </h4>
@@ -7,15 +13,8 @@
     <span>
       {{orderSummaryMeta.CreditCardTotal | currency}}
     </span>
-
   </h4>
   <ocm-payment-credit-card [cards]="cards"
                            (cardSelected)="onCardSelected($event.detail)">
   </ocm-payment-credit-card>
-  <h4 *ngIf="orderSummaryMeta.POLineItemCount">
-    {{orderSummaryMeta.POLineItemCount}} Item(s) to Be Paid By Purchase Order at a total of
-    <span>
-      {{orderSummaryMeta.POTotal | currency}}
-    </span>
-  </h4>
 </div>

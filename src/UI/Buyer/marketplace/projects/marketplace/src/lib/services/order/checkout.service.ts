@@ -178,7 +178,7 @@ export class CheckoutService implements ICheckout {
     return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
   }
 
-  private async deleteExistingPayments(): Promise<any[]> {
+  async deleteExistingPayments(): Promise<any[]> {
     const payments = await this.ocPaymentService.List('outgoing', this.order.ID).toPromise();
     const deleteAll = payments.Items.map(payment =>
       this.ocPaymentService.Delete('outgoing', this.order.ID, payment.ID).toPromise()
