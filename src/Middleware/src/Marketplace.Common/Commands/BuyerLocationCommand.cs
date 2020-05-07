@@ -70,7 +70,11 @@ namespace Marketplace.Common.Commands
             var buyerID = buyerLocationID.Split('-').First();            var userGroupID = $"{buyerLocationID}-{marketplaceUserType.UserGroupIDSuffix}";
             await _oc.UserGroups.CreateAsync(buyerID, new PartialUserGroup()
             {
-                xp = new                        {                            Type = marketplaceUserType.UserGroupType,                        }
+                ID = userGroupID,
+                Name = marketplaceUserType.UserGroupName,
+                xp = new                {                    Type = marketplaceUserType.UserGroupType,
+                    Location = buyerLocationID
+                }
             }, token);
             foreach (var customRole in marketplaceUserType.CustomRoles)
             {
