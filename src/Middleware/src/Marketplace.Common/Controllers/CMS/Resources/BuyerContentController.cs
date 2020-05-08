@@ -1,10 +1,12 @@
 ﻿using Integrations.CMS.Models;
 using Marketplace.CMS.Models;
 using Marketplace.CMS.Queries;
+using Marketplace.Helpers;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,10 +31,13 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 		// TODO - add list page and list args
 		[DocName("Get Assets Assigned to Resource")]
 		[HttpGet, Route("assets"), MarketplaceUserAuth]
-		public async Task<List<AssetForDelivery>> ListAssets(string buyerID)
+		public async Task<ListPage<AssetForDelivery>> ListAssets(string buyerID, ListArgs<AssetForDelivery> args)
 		{
 			var resource = new Resource(type, buyerID);
-			return await _assetedResources.ListAssets(resource, VerifiedUserContext);
+			return new ListPage<AssetForDelivery>
+			{
+				Items = await _assetedResources.ListAssets(resource, VerifiedUserContext)
+			};
 		}
 
 		[DocName("Get Resource's primary image")]

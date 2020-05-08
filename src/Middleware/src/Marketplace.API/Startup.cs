@@ -8,6 +8,7 @@ using Marketplace.CMS.Queries;
 using Marketplace.CMS.Storage;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
+using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
@@ -85,7 +86,7 @@ namespace Marketplace.API
 				.AddSingleton<ISmartyStreetsCommand>(x => new SmartyStreetsCommand(_settings.SmartyStreetSettings))
 				.Inject<IEnvironmentSeedCommand>()
 				.Inject<IOrderCloudSandboxService>()
-				//.Inject<IMarketplaceProductCommand>()
+				.Inject<IMarketplaceProductCommand>()
 				.Inject<ISendgridService>()
 				.Inject<IAssetQuery>()
 				.Inject<ISupplierCategoryConfigQuery>()
