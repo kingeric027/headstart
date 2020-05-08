@@ -32,7 +32,8 @@ namespace Marketplace.CMS
 				await (Task)getMethod.Invoke(sdk, parameters);
 			} catch (Exception ex)
 			{
-				throw new TokenExpiredException(); // TODO - this is really a bug with MultiTenantOCClient() 
+				if (ex.Message == "username is required.") throw new TokenExpiredException(); // TODO - this is really a bug with MultiTenantOCClient()
+				throw ex;
 			}
 		}
 
@@ -50,7 +51,8 @@ namespace Marketplace.CMS
 				await (Task)getMethod.Invoke(sdk, parameters);
 			} catch (Exception ex)
 			{
-				throw new TokenExpiredException(); // TODO - this is really a bug with MultiTenantOCClient() 
+				if (ex.Message == "username is required.") throw new TokenExpiredException(); // TODO - this is really a bug with MultiTenantOCClient() 
+				throw ex;
 			}
 		}
 	}

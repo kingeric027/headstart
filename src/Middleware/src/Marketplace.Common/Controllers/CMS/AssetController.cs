@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Marketplace.CMS.Controllers
 {
 	[DocComments("\"Integration\" represents Assets")]
-	[MarketplaceSection.Integration(ListOrder = 6)]
+	[MarketplaceSection.Content(ListOrder = 1)]
 	[Route("assets")]
 	public class AssetController : BaseController
 	{

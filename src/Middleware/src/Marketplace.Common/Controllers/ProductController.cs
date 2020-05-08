@@ -5,6 +5,7 @@ using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Controllers.CMS;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Attributes;
+using Marketplace.Helpers.Models;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
@@ -15,12 +16,11 @@ namespace Marketplace.Common.Controllers
 	[DocComments("\"Products\" represents Products for Marketplace")]
 	[MarketplaceSection.Marketplace(ListOrder = 3)]
 	[Route("products")]
-	public class ProductController : AbstractContentController
+	public class ProductController : BaseController
 	{
-		protected override Resource ContentConfig { get; set; } = new Resource(ResourceType.Products);
 
 		private readonly IMarketplaceProductCommand _command;
-		public ProductController(AppSettings settings, IMarketplaceProductCommand command, IAssetedResourceQuery assetedResources) : base(settings, assetedResources)
+		public ProductController(AppSettings settings, IMarketplaceProductCommand command) : base(settings)
 		{
 			_command = command;
 		}
