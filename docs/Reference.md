@@ -17,3 +17,6 @@ Marketplace resources
 
 # Integration
 Integration resources
+
+# Content
+Content resources

@@ -8,7 +8,7 @@ namespace Integrations.CMS
 	{
 		public static void UniqueAdd(this List<string> list, string item)
 		{ 
-			if (list.Contains(item)) list.Add(item);
+			if (!list.Contains(item)) list.Add(item);
 		}
 
 		public static void MoveTo(this List<string> list, string item, int index)
