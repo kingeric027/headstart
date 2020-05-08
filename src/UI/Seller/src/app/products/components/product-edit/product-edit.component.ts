@@ -20,7 +20,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
@@ -340,16 +340,10 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(superProduct);
   }
 
-  async removeFile(fileDetail: string, fileType: string): Promise<void> {
-    // fileDetail for an image is the image URL. For static content, it is the file
-    const prodID = this._superMarketplaceProductStatic.Product.ID;
+  async removeFile(file: Asset): Promise<void> {
     let superProduct;
-    if (fileType === 'image') {
-      const imageName = fileDetail.split('/').slice(-1)[0];
-      superProduct = await MarketplaceSDK.ContentManagements.DeleteImage(this.appConfig.marketplaceID, prodID, imageName);
-    } else {
-      superProduct = await this.middleware.deleteStaticContent(fileDetail, prodID);
-    }
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    superProduct = await MarketplaceSDK.Assets.Delete(this.appConfig.marketplaceID, file.ID, accessToken);
     superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
     this.refreshProductData(superProduct);
   }

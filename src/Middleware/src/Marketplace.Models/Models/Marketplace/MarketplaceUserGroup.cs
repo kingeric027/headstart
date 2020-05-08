@@ -1,4 +1,5 @@
 ﻿using Marketplace.Helpers.Attributes;
+using Marketplace.Models.Models.Marketplace.Extended;
 using OrderCloud.SDK;
 
 namespace Marketplace.Models
@@ -12,5 +13,6 @@ namespace Marketplace.Models
     public class UserGroupXp
     {
         public string Type { get; set; }
+        public Currency Currency { get; set; }
     }
 }

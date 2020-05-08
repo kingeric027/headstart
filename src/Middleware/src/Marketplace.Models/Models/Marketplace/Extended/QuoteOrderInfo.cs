@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Marketplace.Helpers.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace Marketplace.Models.Extended
 {
+	[SwaggerModel]
     public class QuoteOrderInfo
     {
         [Required]

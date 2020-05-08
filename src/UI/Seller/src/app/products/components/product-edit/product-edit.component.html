@@ -5,6 +5,7 @@
                    (selectedTabChange)="tabChanged($event, _superMarketplaceProductEditable?.Product?.ID)"
                    animationDuration="0ms">
       <!-- Product Details -->
+
       <mat-tab label="Product">
         <div class="container-fluid">
           <div class="row pt-3">
@@ -88,11 +89,12 @@
                   <select [attr.disabled]="readonly ? true : null"
                           type="dropdown"
                           class="form-control"
+                          formControlName="ProductType"
                           id="ProductType"
                           aria-describedby="Product type"
                           placeholder="Choose product type"
                           (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
-                    <option [selected]="productType === undefined"
+                    <option [ngValue]="null"
                             disabled>Choose a product type</option>
                     <option [selected]="productType === 'Standard'"
                             value="Standard">Standard</option>
@@ -265,6 +267,13 @@
           </div>
         </div>
       </mat-tab>
+      <!-- Catalog Assignments  -->
+      <mat-tab label="Catalog Assignments"
+               *ngIf="readonly">
+        <product-visibility-assignments-component *ngIf="_superMarketplaceProductStatic"
+                                                  [product]="_superMarketplaceProductStatic.Product">
+        </product-visibility-assignments-component>
+      </mat-tab>
       <!-- Product Description -->
       <mat-tab>
         <ng-template mat-tab-label>
@@ -386,7 +395,7 @@
                                 (click)="modal.dismiss()">Cancel</button>
                         <button type="button"
                                 class="btn brand-button--danger"
-                                (click)="removeFile(image.URL, 'image')"
+                                (click)="removeFile(image)"
                                 (click)="modal.dismiss()">Yes, Delete</button>
                       </confirm-modal>
                     </ng-template>
@@ -502,7 +511,7 @@
                                   (click)="modal.dismiss()">Cancel</button>
                           <button type="button"
                                   class="btn brand-button--danger"
-                                  (click)="removeFile(file.Title, 'staticContent')"
+                                  (click)="removeFile(file)"
                                   (click)="modal.dismiss()">Yes, Delete</button>
                         </confirm-modal>
                       </ng-template>

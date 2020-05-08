@@ -16,6 +16,7 @@ export class OCMProductCard {
   shouldDisplayAddToCart = false;
   isViewOnlyProduct = true;
   hasSpecs = false;
+  isAddingToCart = false;
 
   constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) {}
 
@@ -30,8 +31,15 @@ export class OCMProductCard {
     this.cdr.detectChanges(); // TODO - remove. Solve another way.
   }
 
-  addToCart(): void {
-    this.context.order.cart.add({ ProductID: this._product.ID, Quantity: this.quantity });
+  async addToCart(): Promise<void> {
+    this.isAddingToCart = true;
+    try {
+      await this.context.order.cart.add({ ProductID: this._product.ID, Quantity: this.quantity });
+      this.isAddingToCart = false;
+    } catch (ex) {
+      this.isAddingToCart = false;
+      throw ex;
+    }
   }
 
   getImageUrl(): string {
