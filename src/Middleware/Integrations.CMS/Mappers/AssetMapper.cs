@@ -1,4 +1,6 @@
-﻿using Marketplace.CMS.Models;
+﻿using Integrations.CMS;
+using Integrations.CMS.Models;
+using Marketplace.CMS.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using Microsoft.AspNetCore.Http;
@@ -14,25 +16,17 @@ namespace Marketplace.CMS.Mappers
 	{
 		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
 
-		public static Asset MapToResponse(AssetContainer container, Asset asset)
+		public static (Asset, IFormFile) MapFromUpload(CMSConfig config, AssetContainer container, AssetUpload form)
 		{
-			var host = container.HostUrlOverride ?? container.StorageAccount?.HostUrl;
-			var path = asset.UrlPathOveride ?? $"assets-{container.id}/{asset.id}";
-			asset.Url = $"{host}/{path}";
-			return asset;
-		} 
-
-		public static (Asset, IFormFile) MapFromUpload(AssetContainer container, AssetUpload form)
-		{
-			if (!(form.File == null ^ form.UrlPathOveride == null))
+			if (!(form.File == null ^ form.Url == null))
 			{
-				throw new AssetUploadValidationException("Asset upload must include either File or UrlPathOveride but not both.");
+				throw new AssetUploadValidationException("Asset upload must include either File or Url override but not both.");
 			}
 			var asset = new Asset()
 			{
 				InteropID = form.ID,
 				ContainerID = container.id,
-				UrlPathOveride = form.UrlPathOveride,
+				Url = form.Url,
 				Title = form.Title,
 				Tags = MapTags(form.Tags),
 				Type = form.Type,
@@ -40,9 +34,11 @@ namespace Marketplace.CMS.Mappers
 				Metadata = new AssetMetadata()
 				{
 					ContentType = form.File?.ContentType,
-					SizeBytes = (int)form.File?.Length,
+					SizeBytes = (int?)form.File?.Length,
+					IsUrlOverridden = form.Url != null
 				}
 			};
+			asset.Url = asset.Url ?? $"{config.BlobStorageHostUrl}/assets-{container.id}/{asset.id}";
 			TypeSpecificMapping(ref asset, form);
 			return (asset, form.File);
 		}
@@ -59,9 +55,7 @@ namespace Marketplace.CMS.Mappers
 				case AssetType.Image:
 					ImageSpecificMapping(ref asset, form);
 					return;
-				case AssetType.StructuredData:
-				case AssetType.Attachment:
-				case AssetType.Theme:
+				case AssetType.OtherAsset:
 				default:
 					return;
 			}
@@ -69,6 +63,7 @@ namespace Marketplace.CMS.Mappers
 
 		private static void ImageSpecificMapping(ref Asset asset, AssetUpload form)
 		{
+			if (form.File == null) return;
 			if (!ValidImageFormats.Contains(form.File.ContentType)) 
 			{
 				throw new AssetUploadValidationException($"Image Uploads must be one of these file types - {string.Join(", ", ValidImageFormats)}");

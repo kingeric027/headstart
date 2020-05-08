@@ -20,6 +20,7 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetContainerQuery
 	{
+		Task<AssetContainer> CreateDefaultIfNotExists(VerifiedUserContext user);
 		Task<ListPage<AssetContainer>> List(IListArgs args);
 		Task<AssetContainer> Get(string interopID);
 		Task<AssetContainer> Create(AssetContainer container);
@@ -30,13 +31,13 @@ namespace Marketplace.CMS.Queries
 	public class AssetContainerQuery: IAssetContainerQuery
 	{
 		private readonly ICosmosStore<AssetContainer> _store;
-		private readonly IStorageFactory _storageFactory;
+		private readonly IBlobStorage _blob;
 		public const string SinglePartitionID = "SinglePartitionID"; // TODO - is there a better way?
 
-		public AssetContainerQuery(ICosmosStore<AssetContainer> store, IStorageFactory storageFactory)
+		public AssetContainerQuery(ICosmosStore<AssetContainer> store, IBlobStorage blob)
 		{
 			_store = store;
-			_storageFactory = storageFactory;
+			_blob = blob;
 		}
 
 		public async Task<ListPage<AssetContainer>> List(IListArgs args)
@@ -57,12 +58,22 @@ namespace Marketplace.CMS.Queries
 			return container;
 		}
 
+		public async Task<AssetContainer> CreateDefaultIfNotExists(VerifiedUserContext user)
+		{
+			var defaultContainer = new AssetContainer()
+			{
+				InteropID = user.ClientID,
+				Name = $"Container for API Client with ID {user.ClientID}"
+			};
+			var existingContainer = await GetWithoutExceptions(defaultContainer.InteropID);
+			return existingContainer ?? await Create(defaultContainer);
+		}
+
 		public async Task<AssetContainer> Create(AssetContainer container)
 		{
 			var matchingID = await GetWithoutExceptions(container.InteropID);
 			if (matchingID != null) throw new DuplicateIdException();
-			container = await _storageFactory.GetStorage(container).OnContainerConnected();
-			container.StorageAccount.Connected = true;
+			container = await _blob.OnContainerConnected(container);
 
 			var newContainer = await _store.AddAsync(container);
 			return newContainer;
@@ -73,7 +84,6 @@ namespace Marketplace.CMS.Queries
 			var existingContainer = await Get(interopID);
 			existingContainer.InteropID = container.InteropID;
 			existingContainer.Name = container.Name;
-			existingContainer.HostUrlOverride = container.HostUrlOverride;
 			var updatedContainer = await _store.UpdateAsync(existingContainer);
 			return updatedContainer;
 		}
@@ -81,7 +91,7 @@ namespace Marketplace.CMS.Queries
 		public async Task Delete(string interopID)
 		{
 			var container = await Get(interopID);
-			await _storageFactory.GetStorage(container).OnContainerDeleted();
+			await _blob.OnContainerDeleted(container);
 			await _store.RemoveByIdAsync(container.id, SinglePartitionID);
 			// TODO - delete all the asset records in cosmos?
 		}

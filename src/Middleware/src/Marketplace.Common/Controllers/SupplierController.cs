@@ -6,18 +6,22 @@ using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Attributes;
+using Marketplace.Common.Controllers.CMS;
+using Marketplace.CMS.Models;
+using Marketplace.CMS.Queries;
 
 namespace Marketplace.Common.Controllers
 {
     [DocComments("\"Marketplace Suppliers\" represents Supplier in Marketplace")]
     [MarketplaceSection.Marketplace(ListOrder = 2)]
     [Route("supplier")]
-    public class SupplierController : BaseController
+    public class SupplierController : AbstractContentController
     {
-        
-        private readonly IMarketplaceSupplierCommand _command;
+		protected override Resource ContentConfig { get; set; } = new Resource(ResourceType.Suppliers);
+
+		private readonly IMarketplaceSupplierCommand _command;
         private readonly IOrderCloudClient _oc;
-        public SupplierController(IMarketplaceSupplierCommand command, IOrderCloudClient oc, AppSettings settings) : base(settings)
+        public SupplierController(IMarketplaceSupplierCommand command, IOrderCloudClient oc, AppSettings settings, IAssetedResourceQuery assetedResources) : base(settings, assetedResources)
         {
             _command = command;
             _oc = oc;

@@ -15,4 +15,9 @@ namespace Marketplace.CMS
 	{
 		public AssetUploadValidationException(string message) : base("Asset Upload Validation", 400, message, null) { }
 	}
+
+	public class TokenExpiredException : ApiErrorException
+	{
+		public TokenExpiredException() : base("Token", 400, "Token has expired", null) { }
+	}
 }

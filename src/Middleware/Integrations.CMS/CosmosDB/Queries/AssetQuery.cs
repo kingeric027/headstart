@@ -24,30 +24,31 @@ namespace Marketplace.CMS.Queries
 {
 	public interface IAssetQuery
 	{
-		Task<ListPage<Asset>> List(string containerInteropID, IListArgs args);
-		Task<IDictionary<string, Asset>> List(AssetContainer container, ISet<string> assetIDs);
-		Task<Asset> Get(string containerInteropID, string assetInteropID);
-		Task<Asset> Create(string containerInteropID, AssetUpload form);
-		Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset);
-		Task Delete(string containerInteropID, string assetInteropID);
+		Task<List<Asset>> ListAcrossContainers(IEnumerable<string> assetIDs);
+		Task<Asset> GetAcrossContainers(string assetID);
+		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
+		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
+		Task<Asset> Create(AssetUpload form, VerifiedUserContext user);
+		Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user);
+		Task Delete(string assetInteropID, VerifiedUserContext user);
 	}
 
 	public class AssetQuery : IAssetQuery
 	{
 		private readonly ICosmosStore<Asset> _assetStore;
 		private readonly IAssetContainerQuery _containers;
-		private readonly IStorageFactory _storageFactory;
+		private readonly IBlobStorage _blob;
 
-		public AssetQuery(ICosmosStore<Asset> assetStore, IAssetContainerQuery containers, IStorageFactory storageFactory)
+		public AssetQuery(ICosmosStore<Asset> assetStore, IAssetContainerQuery containers, IBlobStorage blob)
 		{
 			_assetStore = assetStore;
 			_containers = containers;
-			_storageFactory = storageFactory;
+			_blob = blob;
 		}
 
-		public async Task<ListPage<Asset>> List(string containerInteropID, IListArgs args)
+		public async Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
 			var query = _assetStore.Query(GetFeedOptions(container.id))
 				.Search(args)
 				.Filter(args)
@@ -55,68 +56,77 @@ namespace Marketplace.CMS.Queries
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var listPage = list.ToListPage(args.Page, args.PageSize, count);
-			listPage.Items = listPage.Items.Select(asset => AssetMapper.MapToResponse(container, asset)).ToList();
 			return listPage;
 		}
 
-		public async Task<Asset> Get(string containerInteropID, string assetInteropID)
+		public async Task<Asset> Get(string assetInteropID, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
 			if (asset == null) throw new NotFoundException("Asset", assetInteropID);
-			return AssetMapper.MapToResponse(container, asset);
+			return asset;
 		}
 
-		public async Task<Asset> Create(string containerInteropID, AssetUpload form)
+		public async Task<Asset> Create(AssetUpload form, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID);
-			var (asset, file) = AssetMapper.MapFromUpload(container, form);
+			var container = await _containers.CreateDefaultIfNotExists(user);
+			var (asset, file) = AssetMapper.MapFromUpload(_blob.Config, container, form);
 			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
 			if (matchingID != null) throw new DuplicateIdException();
 			if (file != null) {			
-				await _storageFactory.GetStorage(container).UploadAsset(file, asset);
+				await _blob.UploadAsset(container, file, asset);
 			}
 
 			var newAsset = await _assetStore.AddAsync(asset);
-			return AssetMapper.MapToResponse(container, newAsset);
+			return newAsset;
 		}
 
-		public async Task<Asset> Update(string containerInteropID, string assetInteropID, Asset asset)
+		public async Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
 			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
 			if (existingAsset == null) throw new NotFoundException("Asset", assetInteropID);
 			existingAsset.InteropID = asset.InteropID;
 			existingAsset.Title = asset.Title;
 			existingAsset.Active = asset.Active;
-			existingAsset.UrlPathOveride = asset.UrlPathOveride;
-			existingAsset.Type = asset.Type;
+			if (existingAsset.Metadata.IsUrlOverridden)
+			{
+				existingAsset.Url = asset.Url; // Don't allow changing the url if its generated.
+			}
 			existingAsset.Tags = asset.Tags;
 			existingAsset.FileName = asset.FileName;
+			// Intentionally don't allow changing the type. Could mess with assignments.
 			var updatedAsset = await _assetStore.UpdateAsync(existingAsset);
-			return AssetMapper.MapToResponse(container, updatedAsset);
+			return updatedAsset;
 		}
 
-		public async Task Delete(string containerInteropID, string assetInteropID)
+		public async Task Delete(string assetInteropID, VerifiedUserContext user)
 		{
-			var container = await _containers.Get(containerInteropID); // make sure container exists.
-			var asset = await Get(containerInteropID, assetInteropID);
+			var container = await _containers.CreateDefaultIfNotExists(user);
+			var asset = await Get(assetInteropID, user);
 			await _assetStore.RemoveByIdAsync(asset.id, container.id);
-			await _storageFactory.GetStorage(container).OnAssetDeleted(asset.id);
+			await _blob.OnAssetDeleted(container, asset.id);
 		}
 
-		public async Task<IDictionary<string, Asset>> List(AssetContainer container, ISet<string> assetIDs)
-		{
-			var ids = assetIDs.ToList();
+		public async Task<List<Asset>> ListAcrossContainers(IEnumerable<string> assetIDs)
+		{ 
+			var ids = new HashSet<string>(assetIDs).ToList(); // remove any duplicates
+			if (ids.Count == 0) return new List<Asset>(); 
 			var paramNames = ids.Select((id, i) => $"@id{i}");
 			var parameters = new ExpandoObject();
 			for (int i = 0; i < ids.Count; i++)
 			{
 				parameters.TryAdd($"@id{i}", ids[i]);
 			}
-			var query = $"select * from c where c.id IN ({string.Join(", ", paramNames)})";
-			var assets = await _assetStore.QueryMultipleAsync(query, parameters, GetFeedOptions(container.id));
-			return assets.Select(asset => AssetMapper.MapToResponse(container, asset)).ToDictionary(x => x.id);
+			var assets = await _assetStore.QueryMultipleAsync($"select * from c where c.id IN ({string.Join(", ", paramNames)})", parameters);
+			return assets.ToList();
+		}
+
+		public async Task<Asset> GetAcrossContainers(string assetID)
+		{
+			var asset = await _assetStore.Query($"select top 1 * from c where c.id = @id", new { id = assetID }).FirstOrDefaultAsync();
+			if (asset == null) throw new NotImplementedException();
+			return asset;
 		}
 
 		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)
@@ -127,5 +137,5 @@ namespace Marketplace.CMS.Queries
 		}
 
 		private FeedOptions GetFeedOptions(string containerID) => new FeedOptions() { PartitionKey = new PartitionKey(containerID) };
-	}
+ 	}
 }
