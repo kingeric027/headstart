@@ -41,7 +41,8 @@ namespace Marketplace.CMS.Queries
 
 		public async Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).Get(resource);
+			// Confirm user has access to resource.
+			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
 			var assetedResource = await GetExisting(resource);
 			if (assetedResource == null) return new List<AssetForDelivery>();
 			var assetIDs = assetedResource.ImageAssetIDs
