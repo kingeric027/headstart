@@ -12,7 +12,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.CMS.Models
 {
-	public enum AssetType { Image, OtherAsset }
+	public enum AssetType { Image, Theme, Attachment, Structured }
 
 	[SwaggerModel]
 	[CosmosCollection("assets")]
@@ -25,7 +25,7 @@ namespace Marketplace.CMS.Models
 		public string Title { get; set; }
 		public bool Active { get; set; } = false;
 		public string Url { get; set; } // Generated if not set. 
-		public AssetType? Type { get; set; } = null;
+		public AssetType Type { get; set; }
 		public List<string> Tags { get; set; }
 		public string FileName { get; set; } // Defaults to the file name in the upload. Or should be required?
 		[ApiReadOnly]

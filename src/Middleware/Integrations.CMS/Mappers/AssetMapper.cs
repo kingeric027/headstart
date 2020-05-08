@@ -55,7 +55,9 @@ namespace Marketplace.CMS.Mappers
 				case AssetType.Image:
 					ImageSpecificMapping(ref asset, form);
 					return;
-				case AssetType.OtherAsset:
+				case AssetType.Attachment:
+				case AssetType.Structured:
+				case AssetType.Theme:
 				default:
 					return;
 			}

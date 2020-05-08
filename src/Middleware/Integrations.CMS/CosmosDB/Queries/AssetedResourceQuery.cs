@@ -1,5 +1,6 @@
 ﻿using Cosmonaut;
 using Cosmonaut.Extensions;
+using Integrations.CMS;
 using Integrations.CMS.Models;
 using Marketplace.CMS.Models;
 using Marketplace.Helpers;
@@ -43,20 +44,14 @@ namespace Marketplace.CMS.Queries
 			await new MultiTenantOCClient(user).Get(resource);
 			var assetedResource = await GetExisting(resource);
 			if (assetedResource == null) return new List<AssetForDelivery>();
-			var assetIDs = assetedResource.ImageAssetIDs.Concat(assetedResource.OtherAssetIDs).ToList();
-
+			var assetIDs = assetedResource.ImageAssetIDs
+				.Concat(assetedResource.ThemeAssetIDs)
+				.Concat(assetedResource.AttachmentAssetIDs)
+				.Concat(assetedResource.StructuredAssetsIDs)
+				.ToList();
 			var assets = await _assets.ListAcrossContainers(assetIDs);
 			return assets.Select(asset => {
-				int indexWithinType;
-				switch (asset.Type)
-				{
-					case AssetType.Image:
-						indexWithinType = assetedResource.ImageAssetIDs.IndexOf(asset.id);
-						break;
-					default:
-						indexWithinType = assetedResource.OtherAssetIDs.IndexOf(asset.id);
-						break;
-				}
+				int indexWithinType = GetAssetIDs(assetedResource, asset.Type).IndexOf(asset.id);
 				return new AssetForDelivery(asset, indexWithinType);
 			}).OrderBy(c => c.Type).ThenBy(c => c.ListOrderWithinType).ToList();
 		}
@@ -80,15 +75,7 @@ namespace Marketplace.CMS.Queries
 			await new MultiTenantOCClient(user).EmptyPatch(resource);
 			var asset = await _assets.Get(assetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
-			switch (asset.Type)
-			{
-				case AssetType.Image:
-					if (!assetedResource.ImageAssetIDs.Contains((asset.id))) assetedResource.ImageAssetIDs.Add(asset.id); // check if already exists
-					break;
-				default:
-					if (!assetedResource.OtherAssetIDs.Contains((asset.id))) assetedResource.OtherAssetIDs.Add(asset.id);
-					break;
-			}
+			GetAssetIDs(assetedResource, asset.Type).UniqueAdd(asset.id); 
 			await _store.UpsertAsync(assetedResource);
 		}
 
@@ -97,15 +84,7 @@ namespace Marketplace.CMS.Queries
 			await new MultiTenantOCClient(user).EmptyPatch(resource);
 			var asset = await _assets.Get(assetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
-			switch (asset.Type)
-			{
-				case AssetType.Image:
-					assetedResource.ImageAssetIDs.Remove(asset.id);
-					break;
-				default:
-					assetedResource.OtherAssetIDs.Remove(asset.id);
-					break;
-			}
+			GetAssetIDs(assetedResource, asset.Type).Remove(asset.id);
 			await _store.UpdateAsync(assetedResource);
 		}
 
@@ -114,19 +93,7 @@ namespace Marketplace.CMS.Queries
 			await new MultiTenantOCClient(user).EmptyPatch(resource);
 			var asset = await _assets.Get(assetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
-			switch (asset.Type)
-			{
-				case AssetType.Image:
-					assetedResource.ImageAssetIDs.Remove(asset.id);
-					var index = Math.Min(listOrderWithinType, assetedResource.ImageAssetIDs.Count);
-					assetedResource.ImageAssetIDs.Insert(index, asset.id);
-					break;
-				default:
-					assetedResource.OtherAssetIDs.Remove(asset.id);
-					index = Math.Min(listOrderWithinType, assetedResource.ImageAssetIDs.Count);
-					assetedResource.OtherAssetIDs.Insert(index, asset.id);
-					break;
-			}
+			GetAssetIDs(assetedResource, asset.Type).MoveTo(asset.id, listOrderWithinType);
 			await _store.UpdateAsync(assetedResource);
 		}
 
@@ -140,6 +107,13 @@ namespace Marketplace.CMS.Queries
 			var query = $"select top 1 * from c where c.Resource.Type = @Type AND c.Resource.ID = @ID AND c.Resource.ParentID = @ParentID";
 			var assetedResource = await _store.QuerySingleAsync(query, resource);
 			return assetedResource;
+		}
+
+		public List<string> GetAssetIDs(AssetedResource assetedResource, AssetType assetType)
+		{
+			var property = assetedResource.GetType().GetProperty($"{assetType.ToString()}AssetIDs");
+			var list = (List<string>) property.GetValue(assetedResource, null) ?? new List<string>();
+			return list;
 		}
 	}
 }

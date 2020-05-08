@@ -15,7 +15,9 @@ namespace Marketplace.CMS.Models
 	{
 		public Resource Resource { get; set; }
 		public List<string> ImageAssetIDs { get; set; } = new List<string>();
-		public List<string> OtherAssetIDs { get; set; } = new List<string>();
+		public List<string> ThemeAssetIDs { get; set; } = new List<string>();
+		public List<string> AttachmentAssetIDs { get; set; } = new List<string>();
+		public List<string> StructuredAssetsIDs { get; set; } = new List<string>();
 
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{
@@ -28,7 +30,7 @@ namespace Marketplace.CMS.Models
 
 	public class Resource
 	{
-		public Resource(ResourceType type, string id = null, string parentID = null)
+		public Resource(ResourceType type, string id, string parentID = null)
 		{
 			Type = type;
 			ID = id;
