@@ -12,5 +12,6 @@ namespace Marketplace.Models
     public class UserGroupXp
     {
         public string Type { get; set; }
+        public string Currency { get; set; }
     }
 }
