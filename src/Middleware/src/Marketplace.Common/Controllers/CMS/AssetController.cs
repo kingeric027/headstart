@@ -63,26 +63,5 @@ namespace Marketplace.CMS.Controllers
 		{
 			await _assets.Delete(assetID, VerifiedUserContext);
 		}
-
-		[DocName("Create Asset Assignment")]
-		[HttpPost, Route("assignments"), MarketplaceUserAuth]
-		public async Task SaveAssignment([FromBody] AssetAssignment assignment)
-		{
-			await _assetedResources.SaveAssignment(assignment, VerifiedUserContext);
-		}
-
-		[DocName("Delete Asset Assignment"), MarketplaceUserAuth]
-		[HttpDelete, Route("assignments")]
-		public async Task DeleteAssignment([FromBody] AssetAssignment assignment)
-		{
-			await _assetedResources.DeleteAssignment(assignment, VerifiedUserContext);
-		}
-
-		[DocName("Reorder Asset Assignment"), MarketplaceUserAuth]
-		[HttpPost, Route("assignments/moveto/{listOrder}")]
-		public async Task MoveAssignment([FromBody] AssetAssignment assignment, int listOrder)
-		{
-			await _assetedResources.MoveAssignment(assignment, listOrder, VerifiedUserContext);
-		}
 	}
 }

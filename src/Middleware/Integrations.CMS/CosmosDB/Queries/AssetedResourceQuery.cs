@@ -14,16 +14,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Resource = Marketplace.CMS.Models.Resource;
 
 namespace Marketplace.CMS.Queries
 {
 	public interface IAssetedResourceQuery
 	{
-		Task<List<AssetForDelivery>> DeliverAssets(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user);
-		Task<string> DeliverFirstImageUrl(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user);
-		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
-		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
-		Task MoveAssignment(AssetAssignment assignment, int listOrder, VerifiedUserContext user);
+		Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user);
+		Task<string> GetFirstImage(Resource resource, VerifiedUserContext user);
+		Task SaveAssignment(Resource resource, string assetID, VerifiedUserContext user);
+		Task DeleteAssignment(Resource resource, string assetID, VerifiedUserContext user);
+		Task MoveAssignment(Resource resource, string assetID, int listOrderWithinType, VerifiedUserContext user);
 	}
 
 	public class AssetedResourceQuery : IAssetedResourceQuery
@@ -37,19 +38,33 @@ namespace Marketplace.CMS.Queries
 			_assets = assets;
 		}
 
-		public async Task<List<AssetForDelivery>> DeliverAssets(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user)
+		public async Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).Get(type, resourceID, resourceParentID);
-			var assetedResource = await GetExistingOrDefault(type, resourceID, resourceParentID);
-			var assetIDs = assetedResource.ImageAssetIDs.Concat(assetedResource.OtherAssetIDs).ToList();		
+			await new MultiTenantOCClient(user).Get(resource);
+			var assetedResource = await GetExisting(resource);
+			if (assetedResource == null) return new List<AssetForDelivery>();
+			var assetIDs = assetedResource.ImageAssetIDs.Concat(assetedResource.OtherAssetIDs).ToList();
 
 			var assets = await _assets.ListAcrossContainers(assetIDs);
-			return assets.Select(a => new AssetForDelivery(a, assetIDs.IndexOf(a.id))).OrderBy(a => a.ListOrder).ToList();
+			return assets.Select(asset => {
+				int indexWithinType;
+				switch (asset.Type)
+				{
+					case AssetType.Image:
+						indexWithinType = assetedResource.ImageAssetIDs.IndexOf(asset.id);
+						break;
+					default:
+						indexWithinType = assetedResource.OtherAssetIDs.IndexOf(asset.id);
+						break;
+				}
+				return new AssetForDelivery(asset, indexWithinType);
+			}).OrderBy(c => c.Type).ThenBy(c => c.ListOrderWithinType).ToList();
 		}
 
-		public async Task<string> DeliverFirstImageUrl(ResourceType type, string resourceID, string resourceParentID, VerifiedUserContext user)
+		public async Task<string> GetFirstImage(Resource resource, VerifiedUserContext user)
 		{
-			var assetedResource = await GetExistingOrDefault(type, resourceID, resourceParentID);
+			var assetedResource = await GetExisting(resource);
+			if (assetedResource == null) return "No Image";
 			if (assetedResource.ImageAssetIDs.Count > 0)
 			{
 				var asset = await _assets.GetAcrossContainers(assetedResource.ImageAssetIDs.First());
@@ -60,11 +75,11 @@ namespace Marketplace.CMS.Queries
 			}
 		}
 
-		public async Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user)
+		public async Task SaveAssignment(Resource resource, string assetID, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).Get(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
-			var asset = await _assets.Get(assignment.AssetID, user);
-			var assetedResource = await GetExistingOrDefault(assignment);
+			await new MultiTenantOCClient(user).EmptyPatch(resource);
+			var asset = await _assets.Get(assetID, user);
+			var assetedResource = await GetExistingOrDefault(resource);
 			switch (asset.Type)
 			{
 				case AssetType.Image:
@@ -77,11 +92,11 @@ namespace Marketplace.CMS.Queries
 			await _store.UpsertAsync(assetedResource);
 		}
 
-		public async Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user)
+		public async Task DeleteAssignment(Resource resource, string assetID, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).Get(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
-			var asset = await _assets.Get(assignment.AssetID, user);
-			var assetedResource = await GetExistingOrDefault(assignment);
+			await new MultiTenantOCClient(user).EmptyPatch(resource);
+			var asset = await _assets.Get(assetID, user);
+			var assetedResource = await GetExistingOrDefault(resource);
 			switch (asset.Type)
 			{
 				case AssetType.Image:
@@ -94,46 +109,37 @@ namespace Marketplace.CMS.Queries
 			await _store.UpdateAsync(assetedResource);
 		}
 
-
-		public async Task MoveAssignment(AssetAssignment assignment, int listOrder, VerifiedUserContext user)
+		public async Task MoveAssignment(Resource resource, string assetID, int listOrderWithinType, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).Get(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
-			var asset = await _assets.Get(assignment.AssetID, user);
-			var assetedResource = await GetExistingOrDefault(assignment);
+			await new MultiTenantOCClient(user).EmptyPatch(resource);
+			var asset = await _assets.Get(assetID, user);
+			var assetedResource = await GetExistingOrDefault(resource);
 			switch (asset.Type)
 			{
 				case AssetType.Image:
 					assetedResource.ImageAssetIDs.Remove(asset.id);
-					assetedResource.ImageAssetIDs.Insert(listOrder, asset.id);
+					var index = Math.Min(listOrderWithinType, assetedResource.ImageAssetIDs.Count);
+					assetedResource.ImageAssetIDs.Insert(index, asset.id);
 					break;
 				default:
 					assetedResource.OtherAssetIDs.Remove(asset.id);
-					assetedResource.OtherAssetIDs.Insert(listOrder, asset.id); ;
+					index = Math.Min(listOrderWithinType, assetedResource.ImageAssetIDs.Count);
+					assetedResource.OtherAssetIDs.Insert(index, asset.id);
 					break;
 			}
 			await _store.UpdateAsync(assetedResource);
 		}
 
-		private async Task<AssetedResource> GetExistingOrDefault(AssetAssignment assignment)
+		private async Task<AssetedResource> GetExistingOrDefault(Resource resource)
 		{
-			return await GetExistingOrDefault(assignment.ResourceType, assignment.ResourceID, assignment.ResourceParentID);
+			return await GetExisting(resource) ?? new AssetedResource() { Resource = resource };
 		}
 
-		private async Task<AssetedResource> GetExistingOrDefault(ResourceType resourceType, string resourceID, string resourceParentID)
+		private async Task<AssetedResource> GetExisting(Resource resource)
 		{
-			var parameters = new { 
-				ResourceType = resourceType, 
-				ResourceID = resourceID,
-				ResourceParentID = resourceParentID
-			};
-			var query = $"select top 1 * from c where c.ResourceType = @ResourceType AND c.ResourceID = @ResourceID AND c.ResourceParentID = @ResourceParentID";
-			var resource = await _store.QuerySingleAsync(query, parameters);
-			return resource ?? new AssetedResource()
-			{
-				ResourceType = resourceType,
-				ResourceID = resourceID,
-				ResourceParentID = resourceParentID
-			};
+			var query = $"select top 1 * from c where c.Resource.Type = @Type AND c.Resource.ID = @ID AND c.Resource.ParentID = @ParentID";
+			var assetedResource = await _store.QuerySingleAsync(query, resource);
+			return assetedResource;
 		}
 	}
 }

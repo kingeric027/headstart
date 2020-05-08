@@ -18,25 +18,40 @@ namespace Marketplace.CMS
 		//"Unable to cast object of type 'AsyncStateMachineBox`1[OrderCloud.SDK.Product,Flurl.Http.HttpResponseMessageExtensions+<ReceiveJson>d__0`1[OrderCloud.SDK.Product]]' 
 		// to type 'System.Threading.Tasks.Task`1[System.Object]'."
 
-		public static async Task Get(this OrderCloudClient oc, ResourceType resourceType, string resourceID, string parentID = null)
+
+		// Used to confirm resource exists and user has READ access
+		public static async Task Get(this OrderCloudClient oc, Resource resource)
 		{
-			var resource = (OrderCloudResource)oc.GetType().GetProperty(resourceType.ToString()).GetValue(oc);
-			var getMethod = resource.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+			var sdk = (OrderCloudResource)oc.GetType().GetProperty(resource.Type.ToString()).GetValue(oc);
+			var getMethod = sdk.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.FirstOrDefault(method => method.Name == "GetAsync" && method.IsGenericMethod == false);
 			var paramCount = getMethod.GetParameters().Length;
-			var parameters = paramCount == 2 ? new object[] { resourceID, null } : new object[] { parentID, resourceID, null };
-			await (Task)getMethod.Invoke(resource, parameters);
+			var parameters = paramCount == 2 ? new object[] { resource.ID, null } : new object[] { resource.ParentID, resource.ID, null };
+			try
+			{
+				await (Task)getMethod.Invoke(sdk, parameters);
+			} catch (Exception ex)
+			{
+				throw new TokenExpiredException(); // TODO - this is really a bug with MultiTenantOCClient() 
+			}
 		}
 
-		// Object of type '<>f__AnonymousType2' cannot be converted to type 'OrderCloud.SDK.PartialCatalog
-		//public static async Task EmptyPatch(this OrderCloudClient oc, ResourceType resourceType, string resourceID, string parentID = null)
-		//{
-		//	var resource = (OrderCloudResource)oc.GetType().GetProperty(resourceType.ToString()).GetValue(oc);
-		//	var getMethod = resource.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-		//		.FirstOrDefault(method => method.Name == "PatchAsync" && method.IsGenericMethod == false);
-		//	var paramCount = getMethod.GetParameters().Length;
-		//	var parameters = paramCount == 3 ? new object[] { resourceID, new { }, null } : new object[] { parentID, resourceID, new { }, null };
-		//	await (Task)getMethod.Invoke(resource, parameters);
-		//}
+		// Used to confirm resource exists and user has WRITE access
+		public static async Task EmptyPatch(this OrderCloudClient oc, Resource resource)
+		{
+			var sdk = (OrderCloudResource)oc.GetType().GetProperty(resource.Type.ToString()).GetValue(oc);
+			var getMethod = sdk.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.FirstOrDefault(method => method.Name == "PatchAsync" && method.IsGenericMethod == false);
+			var paramInfo = getMethod.GetParameters();
+			var emptyPatch = Activator.CreateInstance(paramInfo[paramInfo.Length - 2].ParameterType);
+			var parameters = paramInfo.Length == 3 ? new object[] { resource.ID, emptyPatch, null } : new object[] { resource.ParentID, resource.ID, emptyPatch, null };
+			try
+			{
+				await (Task)getMethod.Invoke(sdk, parameters);
+			} catch (Exception ex)
+			{
+				throw new TokenExpiredException(); // TODO - this is really a bug with MultiTenantOCClient() 
+			}
+		}
 	}
 }

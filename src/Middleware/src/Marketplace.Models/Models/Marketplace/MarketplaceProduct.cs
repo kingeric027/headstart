@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Integrations.CMS.Models;
 using Marketplace.CMS.Models;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Helpers.Attributes;
@@ -18,8 +19,8 @@ namespace Marketplace.Models
         public PriceSchedule PriceSchedule { get; set; }
         public IList<Spec> Specs { get; set; }
         public IList<MarketplaceVariant> Variants { get; set; }
-        public IList<Asset> Images { get; set; }
-        public IList<Asset> Attachments { get; set; }
+        public IList<AssetForDelivery> Images { get; set; }
+        public IList<AssetForDelivery> Attachments { get; set; }
     }
 
     [SwaggerModel]
