@@ -14,7 +14,7 @@ namespace Marketplace.Common.Controllers
 {
     [DocComments("\"Marketplace Suppliers\" represents Supplier in Marketplace")]
     [MarketplaceSection.Marketplace(ListOrder = 2)]
-    [Route("suppliers")]
+    [Route("supplier")]
     public class SupplierController: BaseController
     {
 
