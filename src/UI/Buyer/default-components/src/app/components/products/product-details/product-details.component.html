@@ -62,21 +62,23 @@
                   <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
                 </button>
               </div>
+              <div *ngIf="!isOrderable"
+                   class="alert alert-info"
+                   translate>
+                PRODUCTS.DETAILS.VIEW_ONLY
+              </div>
             </div>
-            <div>
-              <ocm-modal [state]="quoteFormModal"
-                         [modalTitle]="'Request Quote'">
-                <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
-                                        [CurrentUser]="currentUser"
-                                        (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
-              </ocm-modal>
+            <div *ngIf="showGrid">
+              <ocm-grid-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
+                                  [specs]="_specs"
+                                  [product]="_product"
+                                  [priceBreaks]="priceBreaks"
+                                  [price]="price">
+              </ocm-grid-spec-form>
+
             </div>
           </div>
-          <div *ngIf="!isOrderable"
-               class="alert alert-info"
-               translate>
-            PRODUCTS.DETAILS.VIEW_ONLY
-          </div>
+
         </div>
       </div>
       <div *ngIf="_priceSchedule?.PriceBreaks.length > 1">

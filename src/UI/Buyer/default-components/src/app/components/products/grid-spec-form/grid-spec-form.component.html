@@ -1,0 +1,33 @@
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th translate>PRODUCTS.GRID.QUANTITY</th>
+      <th translate>PRODUCTS.GRID.OPTIONS</th>
+      <th translate>PRODUCTS.GRID.ADJUSTMENTS</th>
+      <th translate>PRODUCTS.GRID.UNIT_PRICE</th>
+      <th translate>PRODUCTS.GRID.TOTAL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let spec of specOptions; let i = index">
+      <td>
+        <input class="form-control form-control-sm"
+               type="number"
+               placeholder="0"
+               min="0"
+               max="2500"
+               (change)="changeQuantity(specOptions[i], $event)">
+      </td>
+      <td><label for="{{ spec }}">{{spec}}</label></td>
+      <td>{{unitPrice}}</td>
+      <td *ngFor="let priceBreak of _product.PriceSchedule.PriceBreaks; let i = index">{{ getPriceBreakRange(i) }}: {{priceBreak.Price | currency}}</td>
+    </tr>
+  </tbody>
+</table>
+<button class="btn btn-block btn-primary mb-3"
+        type="submit"
+        (click)="addToCart()"
+        translate>
+  PRODUCTS.DETAILS.ADD_TO_CART
+  <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
+</button>

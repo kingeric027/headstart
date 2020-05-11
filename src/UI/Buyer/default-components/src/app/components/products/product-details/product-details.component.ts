@@ -42,6 +42,7 @@ export class OCMProductDetails implements OnInit {
   currentUser: User;
   showRequestSubmittedMessage = false;
   submittedQuoteOrder: any;
+  showGrid = false;
   isAddingToCart = false;
   constructor(
     private formService: SpecFormService,
@@ -78,6 +79,10 @@ export class OCMProductDetails implements OnInit {
       this.specFormService.event = event.detail;
       this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
     }
+  }
+
+  toggleGrid() {
+    this.showGrid = !this.showGrid;
   }
 
   qtyChange(event: { qty: number; valid: boolean }): void {
