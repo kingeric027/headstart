@@ -56,6 +56,7 @@ namespace Marketplace.Models
         public ProductType ProductType { get; set; }
         public bool IsResale { get; set; } = false;
         public List<ProductAccessorial> Accessorials { get; set; }
+        public string Currency { get; set; }
     }
 
     [SwaggerModel]
