@@ -6,9 +6,9 @@
         <p>These are the details of this Buyer Purchasing Location</p>
       </div>
       <div class="col-md-7 form-group">
-        <div *ngIf="isCreatingNew"
-             class="form-group">
-          <div class="form-group">
+        <div class="form-row">
+          <div class="form-group col-md-6"
+               *ngIf="isCreatingNew">
             <label for="ID">Marketplace ID (Optional)</label>
             <div class="input-group">
               <div class="input-group-prepend">
@@ -28,13 +28,24 @@
                      placeholder="Enter ID (optional)">
             </div>
           </div>
-        </div>
-        <div class="form-group"
-             *ngIf="!isCreatingNew && buyerLocationEditable">
-          <label for="ID">Marketplace ID</label>
-          <input class="form-control"
-                 value="{{buyerLocationEditable.Address.ID}}"
-                 disabled>
+          <div class="form-group col-md-6"
+               *ngIf="!isCreatingNew && buyerLocationEditable">
+            <label for="ID">Marketplace ID</label>
+            <input class="form-control"
+                   value="{{buyerLocationEditable.Address.ID}}"
+                   disabled>
+          </div>
+          <div class="form-group col-md-6">
+            <mat-form-field appearance="outline">
+              <mat-label>Currency</mat-label>
+              <mat-select (selectionChange)="handleUpdateBuyerLocation({target: { value: $event.value }}, 'UserGroup.xp.Currency')"
+                          formControlName="Currency">
+                <mat-option *ngFor="let currency of availableCurrencies"
+                            [value]="currency.Currency"><img [src]="currency.Icon"> {{currency.Name}}</mat-option>
+              </mat-select>
+              <mat-error>You must select a currency.</mat-error>
+            </mat-form-field>
+          </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
