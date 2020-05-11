@@ -428,7 +428,7 @@ export class ProductEditComponent implements OnInit {
   ): Promise<SuperMarketplaceProduct> {
     const supplier = await this.currentUserService.getMySupplier();
     superMarketplaceProduct.Product.xp.Status = 'Draft';
-    (superMarketplaceProduct?.Product?.xp as any).Currency = supplier?.xp?.Currency;
+    superMarketplaceProduct.Product.xp.Currency = supplier?.xp?.Currency;
     superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
     return await MarketplaceSDK.Products.Post(superMarketplaceProduct);
