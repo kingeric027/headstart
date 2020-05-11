@@ -45,6 +45,7 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
     ),
     Active: new FormControl(supplier.Active),
     SyncFreightPop: new FormControl(supplier.xp?.SyncFreightPop || false),
+    Currency: new FormControl(_get(supplier, 'xp.Currency'), Validators.required)
   });
 }
 
