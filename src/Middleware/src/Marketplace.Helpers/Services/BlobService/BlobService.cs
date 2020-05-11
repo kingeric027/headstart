@@ -18,7 +18,8 @@ namespace Marketplace.Helpers.Services
 
     public interface IBlobService
     {
-        Task<T> Get<T>(string id);
+		Task Init(BlobContainerPublicAccessType accessType = BlobContainerPublicAccessType.Off);
+		Task<T> Get<T>(string id);
         Task<string> Get(string id);
         Task Save(string reference, string blob, string fileType = null);
         Task Save(string reference, JObject blob, string fileType = null);
@@ -26,7 +27,8 @@ namespace Marketplace.Helpers.Services
         Task Save(string reference, byte[] bytes, string fileType = null);
         Task Save(BlobBase64Image base64Image);
         Task Delete(string id);
-    }
+		Task DeleteContainer();
+	}
 
     public class BlobService : IBlobService
     {
@@ -58,9 +60,15 @@ namespace Marketplace.Helpers.Services
             }
         }
 
-        private async Task Init()
+        public async Task Init(BlobContainerPublicAccessType accessType = BlobContainerPublicAccessType.Off)
         {
-            await _container.CreateIfNotExistsAsync();
+            var created = await _container.CreateIfNotExistsAsync();
+			if (created)
+			{
+				var permissions = await _container.GetPermissionsAsync();
+				permissions.PublicAccess = accessType;
+				await _container.SetPermissionsAsync(permissions);
+			}
         }
 
         public async Task<string> Get(string id)
@@ -107,6 +115,7 @@ namespace Marketplace.Helpers.Services
 
 		public async Task Save(string reference, IFormFile blob, string fileType = null)
 		{
+			await this.Init();
 			var block = _container.GetBlockBlobReference(reference);
 			block.Properties.ContentType = fileType ?? blob.ContentType;
 			using (var stream = blob.OpenReadStream())
@@ -128,5 +137,10 @@ namespace Marketplace.Helpers.Services
             await this.Init();
             await _container.GetBlockBlobReference(id).DeleteIfExistsAsync();
         }
-    }
+
+		public async Task DeleteContainer()
+		{
+			await _container.DeleteAsync();
+		}
+	}
 }

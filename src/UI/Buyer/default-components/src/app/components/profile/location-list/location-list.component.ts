@@ -1,13 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ShopperContextService, BuyerLocationWithCert } from 'marketplace';
+import { MarketplaceAddressBuyer } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
 
 @Component({
   templateUrl: './location-list.component.html',
   styleUrls: ['./location-list.component.scss'],
 })
 export class OCMLocationList implements OnInit {
-  @Input() locations: BuyerLocationWithCert[];
-  currentLocation: BuyerLocationWithCert;
+  locations: MarketplaceAddressBuyer[];
+  locationsUserCanViewOrders: MarketplaceAddressBuyer[] = [];
+  currentLocation: MarketplaceAddressBuyer;
   requestOptions: { page?: number; search?: string } = { page: undefined, search: undefined };
   resultsPerPage = 8;
   isLoading = false;
@@ -26,6 +28,10 @@ export class OCMLocationList implements OnInit {
     this.reloadAddresses();
   }
 
+  canViewOrders(location: MarketplaceAddressBuyer): boolean {
+    return this.locationsUserCanViewOrders.some(l => l.ID === location.ID);
+  }
+
   protected refresh(): void {
     this.currentLocation = null;
     this.reloadAddresses();
@@ -33,7 +39,9 @@ export class OCMLocationList implements OnInit {
 
   private async reloadAddresses(): Promise<void> {
     this.isLoading = true;
-    this.locations = await this.context.addresses.listBuyerLocationsWithCerts(this.requestOptions);
+    const locationsList = await this.context.addresses.listBuyerLocations(this.requestOptions);
+    this.locationsUserCanViewOrders = await this.context.orderHistory.getLocationsUserCanView();
+    this.locations = locationsList.Items;
     this.isLoading = false;
   }
 }

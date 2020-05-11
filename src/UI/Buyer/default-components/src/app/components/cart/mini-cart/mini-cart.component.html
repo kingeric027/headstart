@@ -1,13 +1,16 @@
 <div class="card">
-  <div class="card-header text-center">My Cart</div>
+  <div class="card-header text-center"
+       translate>CART.MINI_CART.MY_CART</div>
   <div class="list-group list-group-flush">
     <div class="list-group-item"
          *ngFor="let li of lineItems | slice:0:maxLines">
       <a class="link text-primary"
          (click)="toProductDetails(li.Product.ID)">{{ li | productNameWithSpecs }}</a>
       <div class="d-flex justify-content-between">
-        <div><span class="text-muted">Qty:</span> {{ li.Quantity | number}}</div>
-        <div><span class="text-muted">Unit Price:</span> {{ li.UnitPrice || 0 | currency}}</div>
+        <div><span class="text-muted"
+                translate>CART.MINI_CART.QTY</span>: {{ li.Quantity | number}}</div>
+        <div><span class="text-muted"
+                translate>CART.MINI_CART.UNIT_PRICE</span>: {{ li.UnitPrice || 0 | currency}}</div>
       </div>
     </div>
     <h4 *ngIf="lineItems.length > maxLines"
@@ -16,22 +19,25 @@
     </h4>
     <div class="list-group-item">
       <div class="d-flex justify-content-between">
-        <div>Subtotal</div>
+        <div translate>CART.MINI_CART.SUBTOTAL</div>
         <div>{{ order?.Subtotal | currency}}</div>
       </div>
     </div>
   </div>
   <div class="card-body"
-       *ngIf="lineItems.length === 0">No items in the cart</div>
+       *ngIf="lineItems.length === 0"
+       translate>CART.MINI_CART.CART_IS_EMPTY</div>
   <div *ngIf="lineItems.length > 0"
        class="d-flex justify-content-between card-footer">
     <div>
       <button class="btn btn-sm btn-primary"
-              (click)="toFullCart()">Edit Cart</button>
+              (click)="toFullCart()"
+              translate>CART.MINI_CART.EDIT_CART</button>
     </div>
     <div>
       <button class="btn btn-sm btn-primary"
-              (click)="toCheckout()">Checkout</button>
+              (click)="toCheckout()"
+              translate>CART.MINI_CART.CHECKOUT</button>
     </div>
   </div>
 </div>

@@ -1,12 +1,14 @@
 <div *ngIf="!isLoading">
   <div class="form-group">
     <div>
-      <label for="selectBuyerLocation">Buyer Location</label>
+      <label for="selectBuyerLocation"
+             translate>CHECKOUT.CHECKOUT_ADDRESS.BUYER_LOCATION</label>
       <select (change)="onBuyerLocationChange($event.target.value)"
               class="form-control"
               id="selectBuyerLocation">
         <option default
-                disabled>Select your buyer location to determine tax</option>
+                disabled
+                translate>CHECKOUT.CHECKOUT_ADDRESS.SELECT_BUYER_LOCATION</option>
         <option *ngFor="let location of existingBuyerLocations?.Items"
                 [value]="location.ID"
                 [selected]="existingBuyerLocations?.Items.length === 1">
@@ -15,25 +17,29 @@
       </select>
       <br />
     </div>
-    <label for="selectAddress">Shipping Address</label>
+    <label for="selectAddress"
+           translate>CHECKOUT.CHECKOUT_ADDRESS.SHIPPING_ADDRESS</label>
     <select (change)="onShippingAddressChange($event.target.value)"
             class="form-control"
             id="selectAddress">
       <option default
-              disabled>Choose from your saved addresses, or choose to enter a new address</option>
+              disabled
+              translate>CHECKOUT.CHECKOUT_ADDRESS.SELECT_ADDRESS</option>
       <option *ngFor="let address of existingShippingAddresses?.Items"
-              [selected]="(existingBuyerLocations?.Items.length === 1 && existingBuyerLocations?.Items[0].ID === address.ID) 
-                         || address.ID === selectedBuyerLocation.ID"
+              [selected]="(existingShippingAddresses?.Items.length === 1 && existingShippingAddresses?.Items[0].ID === address.ID) 
+                         || address.ID === selectedShippingAddress?.ID"
               [value]="address.ID">
         <span class="font-weight-bold">{{address.Street1}}<span *ngIf="address.Street2"> {{address.Street2}}</span>,
           {{address.City}} {{address.State}} {{address.Zip}}</span>
       </option>
-      <option [value]="NEW_ADDRESS_CODE">Add a New Address</option>
+      <option [value]="NEW_ADDRESS_CODE"
+              translate>CHECKOUT.CHECKOUT_ADDRESS.NEW_ADDRESS</option>
     </select>
     <button type="submit"
             *ngIf="!showNewAddressForm"
             (click)="saveAddressesAndContinue()"
-            class="btn btn-primary btn-sm mr-2 mt-3">Save and Continue</button>
+            class="btn btn-primary btn-sm mr-2 mt-3"
+            translate>CHECKOUT.CHECKOUT_ADDRESS.SAVE_CONTINUE</button>
   </div>
   <ocm-address-form *ngIf="showNewAddressForm"
                     [suggestedAddresses]="suggestedAddresses"

@@ -13,17 +13,24 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCircle, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
-import { ProductImage, SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
+import { Location } from '@angular/common'
+import { ProductEditTabMapper, TabIndexMapper } from './tab-mapper';
+import { AppAuthService } from '@app-seller/auth';
+import { environment } from 'src/environments/environment';
+import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
+import { AssetAssignment } from 'marketplace-javascript-sdk/dist/models/AssetAssignment';
+import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 
 @Component({
   selector: 'app-product-edit',
@@ -41,6 +48,7 @@ export class ProductEditComponent implements OnInit {
       this.createProductForm(this.productService.emptyResource);
     }
   }
+  @Input() readonly: boolean;
   @Input()
   filterConfig;
   @Output()
@@ -53,11 +61,12 @@ export class ProductEditComponent implements OnInit {
   dataIsSaving = false;
   userContext = {};
   hasVariations = false;
-  images: ProductImage[] = [];
+  images: Asset[] = [];
   files: FileHandle[] = [];
   faTimes = faTimes;
   faTrash = faTrash;
   faCircle = faCircle;
+  faHeart = faHeart;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   areChanges = false;
@@ -70,12 +79,14 @@ export class ProductEditComponent implements OnInit {
   fileType: string;
   imageFiles: FileHandle[] = [];
   staticContentFiles: FileHandle[] = [];
-  staticContent: StaticContent[] = [];
+  staticContent: Asset[] = [];
   documentName: string;
+  selectedTabIndex = 0;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
+    private location: Location,
     private currentUserService: CurrentUserService,
     private ocSupplierAddressService: OcSupplierAddressService,
     private ocProductService: OcProductService,
@@ -85,6 +96,7 @@ export class ProductEditComponent implements OnInit {
     private modalService: NgbModal,
     private middleware: MiddlewareAPIService,
     private toasterService: ToastrService,
+    private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) { }
 
@@ -93,9 +105,20 @@ export class ProductEditComponent implements OnInit {
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
+    this.setProductEditTab();
   }
 
-  
+  setProductEditTab(): void {
+    const productDetailSection = this.router.url.split('/')[3];
+    this.selectedTabIndex = ProductEditTabMapper[productDetailSection];
+  }
+
+  tabChanged(event: any, productID: string): void {
+    if(productID === null) return;
+    event.index === 0 ? this.location.replaceState(`products/${productID}`)
+    :
+    this.location.replaceState(`products/${productID}/${TabIndexMapper[event.index]}`);
+  }
 
   async getAddresses(): Promise<void> {
     const context: UserContext = await this.currentUserService.getUserContext();
@@ -124,9 +147,9 @@ export class ProductEditComponent implements OnInit {
       this.taxCodes = { Meta: {}, Items: [] };
     }
     this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
-    this.staticContent = this._superMarketplaceProductEditable.Product?.xp?.StaticContent;
+    this.staticContent = this._superMarketplaceProductEditable.Attachments;
     this.createProductForm(this._superMarketplaceProductEditable);
-    this.images = ReplaceHostUrls(this._superMarketplaceProductEditable.Product);
+    this.images = this._superMarketplaceProductEditable.Images;
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
@@ -150,7 +173,7 @@ export class ProductEditComponent implements OnInit {
         MinQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MinQuantity, Validators.min(1)),
         MaxQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MaxQuantity, Validators.min(1)),
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
-        ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType')),
+        ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType'), Validators.required),
         IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
@@ -170,7 +193,8 @@ export class ProductEditComponent implements OnInit {
   }
 
   async handleDelete(): Promise<void> {
-    await MarketplaceSDK.Products.Delete(this._superMarketplaceProductStatic.Product.ID);
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    await MarketplaceSDK.Products.Delete(this._superMarketplaceProductStatic.Product.ID, accessToken);
     this.router.navigateByUrl('/products');
   }
 
@@ -225,7 +249,7 @@ export class ProductEditComponent implements OnInit {
       field,
       value:
         (field === 'Product.Active' || field === 'Product.xp.IsResale')
-          ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
+          ? event.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
   }
@@ -276,10 +300,28 @@ export class ProductEditComponent implements OnInit {
     this.checkForChanges();
   }
 
+  async uploadAsset(productID: string, file: FileHandle, assetType: string, containerID: string): Promise<SuperMarketplaceProduct> {
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    const asset: AssetUpload = {
+      Active: true,
+      File: file.File,
+      Type: (assetType as AssetUpload["Type"]),
+      FileName: file.Filename
+    }
+    const newAsset: Asset = await MarketplaceSDK.Upload.UploadAsset(containerID, asset, accessToken);
+    const assetAssignment: AssetAssignment = {
+      ResourceType: "Products",
+      AssetID: newAsset.ID,
+      ResourceID: productID
+    }
+    await MarketplaceSDK.Assets.SaveAssignment(containerID, assetAssignment, accessToken);
+    return await MarketplaceSDK.Products.Get(productID, accessToken);
+  }
+
   async addDocuments(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.middleware.uploadStaticContent(file.File, productID, file.Filename);
+      superProduct = await this.uploadAsset(productID, file, "Attachment", environment.marketplaceID);
     }
     this.staticContentFiles = [];
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -290,7 +332,7 @@ export class ProductEditComponent implements OnInit {
   async addImages(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.middleware.uploadProductImage(file.File, productID);
+      superProduct = await this.uploadAsset(productID, file, "Image", environment.marketplaceID);
     }
     this.imageFiles = []
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -298,16 +340,10 @@ export class ProductEditComponent implements OnInit {
     this.refreshProductData(superProduct);
   }
 
-  async removeFile(fileDetail: string, fileType: string): Promise<void> {
-    // fileDetail for an image is the image URL. For static content, it is the file
-    const prodID = this._superMarketplaceProductStatic.Product.ID;
+  async removeFile(file: Asset): Promise<void> {
     let superProduct;
-    if (fileType === 'image') {
-      const imageName = fileDetail.split('/').slice(-1)[0];
-      superProduct = await MarketplaceSDK.ContentManagements.DeleteImage(this.appConfig.marketplaceID, prodID, imageName);
-    } else {
-      superProduct = await this.middleware.deleteStaticContent(fileDetail, prodID);
-    }
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    superProduct = await MarketplaceSDK.Assets.Delete(this.appConfig.marketplaceID, file.ID, accessToken);
     superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
     this.refreshProductData(superProduct);
   }
@@ -326,12 +362,6 @@ export class ProductEditComponent implements OnInit {
    * ******************************************/
 
   /* This url points to the document in blob storage in order for it to be downloadable. */
-  getDocumentUrl(url: string): string {
-    const spliturl = url.split('/')
-    spliturl.splice(4, 1);
-    const str = spliturl.join('/')
-    return str;
-  }
 
   getDocumentName(event: KeyboardEvent): void {
     this.documentName = (event.target as HTMLInputElement).value;
@@ -414,7 +444,8 @@ export class ProductEditComponent implements OnInit {
   };
 
   async handleSelectedProductChange(product: Product): Promise<void> {
-    const marketplaceProduct = await MarketplaceSDK.Products.Get(product.ID);
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    const marketplaceProduct = await MarketplaceSDK.Products.Get(product.ID, accessToken);
     this.refreshProductData(marketplaceProduct);
   }
 
@@ -448,5 +479,9 @@ export class ProductEditComponent implements OnInit {
     return this._superMarketplaceProductEditable?.Product?.xp?.IsResale;
   }
 
-
+  getProductPreviewImage(): string | SafeUrl {
+    return this._superMarketplaceProductEditable?.Images?.[0]?.Url || 
+    this.imageFiles[0]?.URL ||
+    'https://via.placeholder.com/300?text=Product+Image'
+  }
 }

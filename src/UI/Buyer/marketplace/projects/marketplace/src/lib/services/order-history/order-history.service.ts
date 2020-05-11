@@ -24,6 +24,7 @@ import {
   LineItemGroupSupplier,
 } from '../../shopper-context';
 import { OrderFilterService, IOrderFilters } from './order-filter.service';
+import { MarketplaceAddressBuyer, MarketplaceUserGroup } from 'marketplace-javascript-sdk';
 
 export interface IOrderHistory {
   activeOrderID: string;
@@ -52,6 +53,16 @@ export class OrderHistoryService implements IOrderHistory {
     private ocSupplierService: OcSupplierService,
     private ocSupplierAddressService: OcSupplierAddressService
   ) {}
+
+  async getLocationsUserCanView(): Promise<MarketplaceAddressBuyer[]> {
+    // add strong type when sdk is regenerated
+    const accessUserGroups = await this.ocMeService
+      .ListUserGroups({ filters: { 'xp.Type': 'OrderAccess' } })
+      .toPromise();
+    const locationRequests = accessUserGroups.Items.map(a => this.ocMeService.GetAddress(a.xp.Location).toPromise());
+    const locationResponses = await Promise.all(locationRequests);
+    return locationResponses;
+  }
 
   async approveOrder(
     orderID: string = this.activeOrderID,

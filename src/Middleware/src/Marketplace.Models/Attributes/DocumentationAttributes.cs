@@ -20,5 +20,10 @@ namespace Marketplace.Models.Attributes
         public class MarketplaceAttribute : DocSection { }
 
         public class IntegrationAttribute : DocSection { }
-    }
+
+		/// <summary>
+		/// Use on controllers to indicate that they belong in the Content section of the API reference docs.
+		/// </summary>
+		public class ContentAttribute : DocSection { }
+	}
 }

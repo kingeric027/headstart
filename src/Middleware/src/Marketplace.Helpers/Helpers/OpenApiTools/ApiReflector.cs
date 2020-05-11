@@ -117,24 +117,26 @@ namespace Marketplace.Helpers.OpenApiTools
 
         private static IEnumerable<ApiResource> GetResources<TController, TAttribute>(string sectionID) where TAttribute : Attribute, IApiAuthAttribute
         {
-               var resource = from c in Assembly.GetAssembly(typeof(TController)).GetExportedTypes()
-                where c.IsSubclassOf(typeof(TController))
-                where !c.IsAbstract
-                where !c.HasAttribute<DocIgnoreAttribute>(false)
-                let section = c.GetAttribute<DocSection>()
-                where section != null && section.ID == sectionID
-                let name = c.ControllerFriendlyName()
-                let endpoints = GetEndpoints<TController, TAttribute>(c, name).ToList()
-                where endpoints.Any()
-                orderby section.ListOrder, name
-                select new ApiResource
-                {
-                    Name = name,
-                    Description = c.GetAttribute<DocNameAttribute>()?.Name ?? name.Humanize(LetterCasing.Title),
-                    ControllerType = c,
-                    Comments = c.GetAttributes<DocCommentsAttribute>()?.SelectMany(a => a.Comments).ToList(),
-                    Endpoints = endpoints
-                };
+			var temp = Assembly.GetAssembly(typeof(TController)).GetExportedTypes();
+
+			var resource = from c in Assembly.GetAssembly(typeof(TController)).GetExportedTypes()
+						   where c.IsSubclassOf(typeof(TController))
+						   where !c.IsAbstract
+						   where !c.HasAttribute<DocIgnoreAttribute>(false)
+						   let section = c.GetAttribute<DocSection>()
+						   where section != null && section.ID == sectionID
+						   let name = c.ControllerFriendlyName()
+						   let endpoints = GetEndpoints<TController, TAttribute>(c, name).ToList()
+						   where endpoints.Any()
+						   orderby section.ListOrder, name
+						   select new ApiResource
+						   {
+							   Name = name,
+							   Description = c.GetAttribute<DocNameAttribute>()?.Name ?? name.Humanize(LetterCasing.Title),
+							   ControllerType = c,
+							   Comments = c.GetAttributes<DocCommentsAttribute>()?.SelectMany(a => a.Comments).ToList(),
+							   Endpoints = endpoints.Where(e => !e.MethodInfo.HasAttribute<DocIgnoreAttribute>()).ToList()
+						   };
             return resource;
         }
 
@@ -337,10 +339,11 @@ namespace Marketplace.Helpers.OpenApiTools
                 from p in type.GetProperties()
                 where p.PropertyType != typeof(object)
                 where !p.HasAttribute<DocIgnoreAttribute>()
-                where !p.HasAttribute<JsonIgnoreAttribute>()
+				where !p.HasAttribute<ApiIgnoreAttribute>()
+				where !p.HasAttribute<JsonIgnoreAttribute>()
                 let prop = new ApiProperty
                 {
-                    Name = p.Name,
+                    Name = p.HasAttribute<JsonPropertyAttribute>() ? p.GetAttribute<JsonPropertyAttribute>().PropertyName : p.Name,
                     PropInfo = p,
                     SimpleType = p.SimpleType(),
                     Required = p.HasAttribute<OrderCloud.SDK.RequiredAttribute>(),

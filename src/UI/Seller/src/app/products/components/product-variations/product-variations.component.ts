@@ -1,11 +1,15 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import { Variant, SpecOption, Spec, OcSpecService } from '@ordercloud/angular-sdk';
-import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { Variant, SpecOption, Spec, OcSpecService, OcProductService, PartialVariant } from '@ordercloud/angular-sdk';
+import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle, faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct, Image } from 'marketplace-javascript-sdk/dist/models';
+import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from 'src/environments/environment';
+import { AppAuthService } from '@app-seller/auth';
+import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 
 @Component({
   selector: 'product-variations-component',
@@ -17,6 +21,7 @@ export class ProductVariations {
   set superMarketplaceProductEditable(superProductEditable: SuperMarketplaceProduct) {
     this.superProductEditable = superProductEditable;
     this.variants = superProductEditable?.Variants;
+    this.variantInSelection = {};
     this.canConfigureVariations = !!superProductEditable?.Product?.ID;
   };
   @Input()
@@ -52,12 +57,15 @@ export class ProductVariations {
   faPlusCircle = faPlusCircle;
   faTimesCircle = faTimesCircle;
   faCheckDouble = faCheckDouble;
+  faCaretRight = faCaretRight;
+  faCaretDown = faCaretDown;
   faExclamationCircle = faExclamationCircle;
   assignVariantImages = false;
+  viewVariantDetails = false;
   variantInSelection: Variant;
-  imageInSelection: Image;
+  imageInSelection: Asset;
 
-  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef) {}
+  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private _snackBar: MatSnackBar, private ocProductService: OcProductService, private appAuthService: AppAuthService,) {}
   getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
@@ -268,32 +276,84 @@ export class ProductVariations {
     await this.ocSpecService.Patch(specID, { DefaultOptionID: optionID }).toPromise();
   }
   
-  isImageSelected(img: Image): boolean {
+  isImageSelected(img: Asset): boolean {
     if (!img.Tags) img.Tags = []
     return img.Tags.includes(this.variantInSelection?.xp?.SpecCombo);
   }
 
-  toggleAssignImage(img: Image, specCombo: string): void {
+  openVariantDetails(variant: Variant): void {
+    this.viewVariantDetails = true;
+    this.variantInSelection = variant;
+  }
+
+  closeVariantDetails(): void {
+    this.viewVariantDetails = false;
+    this.variantInSelection = null;
+  }
+
+  toggleAssignImage(img: Asset, specCombo: string): void {
     this.imageInSelection = img;
     if (!this.imageInSelection.Tags) this.imageInSelection.Tags = [];
     this.imageInSelection.Tags.includes(specCombo) ? this.imageInSelection.Tags.splice(this.imageInSelection.Tags.indexOf(specCombo), 1) : this.imageInSelection.Tags.push(specCombo);
   }
 
-  async updateProductImageTags(img: Image): Promise<void> {
+  async updateProductImageTags(): Promise<void> {
     this.assignVariantImages = false;
-    const { timeStamp, ... rest } = this.imageInSelection;
     // Queue up image/content requests, then send them all at aonce
     // TODO: optimize this so we aren't having to update all images, just 'changed' ones
-    const requests = this.superProductEditable.Images.map(i => MarketplaceSDK.Images.Post(i));
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    const requests = this.superProductEditable.Images.map(i => MarketplaceSDK.Assets.Update(environment.marketplaceID, (i as any).ID, i, accessToken));
     await Promise.all(requests);
     // Ensure there is no mistaken change detection
     Object.assign(this.superProductStatic.Images, this.superProductEditable.Images);
-    this.variantInSelection = {};
     this.imageInSelection = {};
   }
 
-  getVariantImages(variant: Variant): Image[] {
+  getVariantImages(variant: Variant): Asset[] {
     this.superProductEditable?.Images?.forEach(i => !i.Tags ? i.Tags = [] : null);
     return this.superProductEditable?.Images?.filter(i => i.Tags.includes(variant?.xp?.SpecCombo));
+  }
+
+  getVariantDetailColSpan(): number {
+    return 3+this.superProductEditable?.Specs?.length;
+  }
+
+  async variantShippingDimensionUpdate(event: any, field: string): Promise<void> {
+    let partialVariant: PartialVariant = {};
+    // If there's no value, or the value didn't change, don't send request.
+    if (event.target.value === '') return;
+    if (Number(event.target.value) === this.variantInSelection[field]) return;
+    const value = Number(event.target.value);
+    switch(field) {
+      case "ShipWeight": 
+        partialVariant = { ShipWeight: value}
+        break;
+      case "ShipHeight":
+        partialVariant = { ShipHeight: value}
+        break;
+      case "ShipWidth":
+        partialVariant = { ShipWidth: value }
+        break;
+      case "ShipLength":
+        partialVariant = { ShipLength: value }
+        break;
+    }
+    try {
+      await this.ocProductService.PatchVariant(this.superProductEditable.Product?.ID, this.variantInSelection.ID, partialVariant).toPromise();
+      this._snackBar.open("Shipping dimensions updated", "OK", {
+        duration: 2000,
+      });
+    } catch (err) {
+      console.log(err)
+      this._snackBar.open("Something went wrong", "OK", {
+        duration: 2000,
+      });
+    }
+  }
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 2000,
+    });
   }
 }

@@ -4,7 +4,8 @@
       <nav class="breadcrumb"
            aria-label="breadcrumb">
         <a class="breadcrumb-item link text-primary"
-           (click)="clearAllFilters()">All Products</a>
+           (click)="clearAllFilters()"
+           translate>PRODUCTS.LIST.ALL</a>
         <a *ngFor="let category of categoryCrumbs"
            class="breadcrumb-item link text-primary"
            (click)="setActiveCategory(category.ID)">
@@ -17,17 +18,18 @@
     <h2 class="text-primary"
         *ngIf="categoryCrumbs.length >= 1">{{ categoryCrumbs[categoryCrumbs.length-1].Name }}</h2>
     <h2 class="text-primary"
-        *ngIf="searchTermForProducts">Search Results: "{{ searchTermForProducts }}"</h2>
+        *ngIf="searchTermForProducts"><span translate>PRODUCTS.LIST.SEARCH_RESULTS</span>: "{{ searchTermForProducts }}"</h2>
   </div>
   <!-- Mobile section for filtering on favorites -->
   <div class="d-md-none mb-2">
     <div class="col-xs-6">
       <div (click)="toggleFilterByFavorites()">
-        <label>Refine By</label>
+        <label translate>PRODUCTS.LIST.REFINE</label>
         <button class="btn btn-block btn-default btn-outline-dark mb-2"
-                for="favorite">
+                for="favorite"
+                translate>
           <ocm-toggle-favorite [favorite]="showingFavoritesOnly"></ocm-toggle-favorite>
-          My Favorites
+          PRODUCTS.LIST.FAVORITES
         </button>
       </div>
     </div>
@@ -37,23 +39,26 @@
       <div class="card mb-4">
         <div class="card-header p-3">
           <h5 class="card-title mb-0">
-            <strong>Refine By</strong>
+            <strong translate>PRODUCTS.LIST.REFINE</strong>
           </h5>
         </div>
         <div class="p-3">
           <button *ngIf="hasFilters"
                   class="btn btn-block btn-sm btn-light mb-4"
                   type="button"
-                  (click)="clearAllFilters()">Clear All Filters
+                  (click)="clearAllFilters()"
+                  translate>PRODUCTS.LIST.CLEAR_FILTERS
           </button>
           <ocm-product-facet-list *ngIf="products?.Meta?.Facets?.length"
                                   [facetList]="products.Meta.Facets">
           </ocm-product-facet-list>
           <div (click)="toggleFilterByFavorites()">
-            <span class="sr-only">Sort By Favorites</span>
+            <span class="sr-only"
+                  translate>PRODUCTS.LIST.SORT_BY_FAV</span>
             <ocm-toggle-favorite [favorite]="showingFavoritesOnly"></ocm-toggle-favorite>
             <label class="ml-2"
-                   for="favorite"> My Favorites</label>
+                   for="favorite"
+                   translate> PRODUCTS.LIST.FAVORITES</label>
           </div>
         </div>
       </div>
@@ -65,17 +70,18 @@
                *ngIf="products">
             <span *ngIf="products && products.Meta.TotalPages > 1">
               {{ (products.Meta.Page - 1) * products.Meta.PageSize + 1 }}
-              - {{ products.Meta.Page * products.Meta.PageSize }} of
+              - {{ products.Meta.Page * products.Meta.PageSize }} <span translate>PRODUCTS.LIST.OF</span>
             </span>
-            {{ products?.Meta.TotalCount }} results
+            {{ products?.Meta.TotalCount }} <span translate>PRODUCTS.LIST.RESULTS</span>
           </div>
         </div>
         <div class="col-12 d-md-none mb-2">
           <button *ngIf="hasFilters"
                   class="btn btn-block btn-default btn-outline-dark mb-2"
                   type="button"
-                  (click)="clearAllFilters()">
-            Clear All Filters
+                  (click)="clearAllFilters()"
+                  translate>
+            PRODUCTS.LIST.CLEAR_FILTERS
           </button>
         </div>
         <div class="col-12 col-md-auto ">
@@ -85,11 +91,13 @@
       <div class="card"
            *ngIf="products && products.Items.length === 0">
         <div class="card">
-          <p class="card-body text-center">
-            No Products found.
+          <p class="card-body text-center"
+             translate>
+            PRODUCTS.LIST.NO_PRODUCTS
             <br>
             <a class="link"
-               (click)="clearAllFilters()">Clear all Filters</a>
+               (click)="clearAllFilters()"
+               translate>PRODUCTS.LIST.CLEAR_FILTERS</a>
           </p>
         </div>
       </div>

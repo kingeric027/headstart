@@ -7,7 +7,8 @@
       <div [hidden]="true"
            class="col-md-6 form-group">
         <label class="sr-only"
-               for="ID">ID</label>
+               for="ID"
+               translate>PROFILE.ADDRESS_FORM.ID</label>
         <input type="text"
                formControlName="ID"
                class="form-control"
@@ -16,7 +17,8 @@
       </div>
       <div class="col-md-6 form-group">
         <label class="sr-only"
-               for="FirstName">First Name</label>
+               for="FirstName"
+               translate>PROFILE.ADDRESS_FORM.FIRST</label>
         <input type="text"
                formControlName="FirstName"
                class="form-control"
@@ -28,7 +30,8 @@
       </div>
       <div class="col-md-6 form-group">
         <label class="sr-only"
-               for="LastName">Last Name</label>
+               for="LastName"
+               translate>PROFILE.ADDRESS_FORM.LAST</label>
         <input type="text"
                formControlName="LastName"
                class="form-control"
@@ -40,7 +43,8 @@
     </div>
     <div class="form-group">
       <label class="sr-only"
-             for="Street1">Address 1</label>
+             for="Street1"
+             translate>PROFILE.ADDRESS_FORM.ADDRESS1</label>
       <input type="text"
              formControlName="Street1"
              class="form-control"
@@ -51,7 +55,8 @@
     </div>
     <div class="form-group">
       <label class="sr-only"
-             for="Street2">Address 2</label>
+             for="Street2"
+             translate>PROFILE.ADDRESS_FORM.ADDRESS2</label>
       <input type="text"
              formControlName="Street2"
              class="form-control"
@@ -63,7 +68,8 @@
     <div class="row">
       <div class="col-md-5 form-group">
         <label class="sr-only"
-               for="City">City</label>
+               for="City"
+               translate>PROFILE.ADDRESS_FORM.CITY</label>
         <input type="text"
                formControlName="City"
                class="form-control"
@@ -74,14 +80,16 @@
       </div>
       <div class="col-md-3 form-group">
         <label class="sr-only"
-               for="State">State</label>
+               for="State"
+               translate>PROFILE.ADDRESS_FORM.STATE</label>
         <select *ngIf="stateOptions.length !== 0"
                 formControlName="State"
                 class="form-control"
                 id="State"
                 showErrors>
           <option [ngValue]="null"
-                  disabled>State</option>
+                  disabled
+                  translate>PROFILE.ADDRESS_FORM.STATE</option>
           <option *ngFor="let State of stateOptions"
                   [value]="State">{{ State }}</option>
         </select>
@@ -95,7 +103,8 @@
       </div>
       <div class="col-md-4 form-group">
         <label class="sr-only"
-               for="zipCode">Zip</label>
+               for="zipCode"
+               translate>PROFILE.ADDRESS_FORM.ZIP</label>
         <input type="text"
                formControlName="Zip"
                class="form-control"
@@ -108,21 +117,24 @@
     <div class="row">
       <div class="col-md-6 form-group">
         <label class="sr-only"
-               for="country">Country</label>
+               for="country"
+               translate>PROFILE.ADDRESS_FORM.COUNTRY</label>
         <select formControlName="Country"
                 class="form-control"
                 id="Country"
                 showErrors
                 (change)="onCountryChange($event)">
           <option [ngValue]="null"
-                  disabled>Country</option>
+                  disabled
+                  translate>PROFILE.ADDRESS_FORM.COUNTRY</option>
           <option *ngFor="let country of countryOptions"
                   [value]="country.abbreviation">{{ country.label }}</option>
         </select>
       </div>
       <div class="col-md-6 form-group">
         <label class="sr-only"
-               for="Phone">Phone Number</label>
+               for="Phone"
+               translate>PROFILE.ADDRESS_FORM.PHONE</label>
         <input type="text"
                formControlName="Phone"
                class="form-control"
@@ -140,12 +152,13 @@
           <div *ngIf="showOptionToSave && addressForm.dirty"
                class="form-check">
             <label class="sr-only form-check-label"
-                   for="shouldSaveAddress">Save Address</label>
+                   for="shouldSaveAddress"
+                   translate>PROFILE.ADDRESS_FORM.SAVE</label>
             <input type="checkbox"
                    formControlName="shouldSaveAddress"
                    class="form-check-input"
                    id="shouldSaveAddress" />
-            Save Address for Future Use
+            <span translate>PROFILE.ADDRESS_FORM.SAVE_ADDRESS</span>
           </div>
         </form>
       </div>
@@ -160,6 +173,7 @@
             class="btn btn-primary btn-sm mr-2">{{ btnText }}</button>
     <button type="button"
             class="btn btn-link text-danger"
-            (click)="dismissForm()">Cancel</button>
+            (click)="dismissForm()"
+            translate>PROFILE.ADDRESS_FORM.CANCEL</button>
   </div>
 </form>

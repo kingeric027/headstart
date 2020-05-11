@@ -17,6 +17,8 @@ import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
 import { OrderCloudModule } from '@ordercloud/angular-sdk';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -42,7 +44,7 @@ import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { ChildCategoryPipe } from './pipes/category-children.pipe';
 import { CreditCardFormatPipe } from './pipes/credit-card-format.pipe';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { OcSDKConfig } from './config/ordercloud-sdk.config';
 import { ComponentNgElementStrategyFactory } from 'src/lib/component-factory-strategy';
 import { NgbDateNativeAdapter } from './config/date-picker.config';
@@ -87,6 +89,7 @@ import { OCMLogin } from './components/authentication/login/login.component';
 import { OCMLoadingLayout } from './components/layout/loading-layout/loading-layout.component';
 import { OCMOrderList } from './components/orders/order-list/order-list.component';
 import { OCMOrderDateFilter } from './components/orders/order-date-filter/order-date-filter.component';
+import { OCMOrderLocationFilter } from './components/orders/order-location-filter/order-location-filter.component';
 import { OCMOrderStatusFilter } from './components/orders/order-status-filter/order-status-filter.component';
 import { OCMOrderStatusIcon } from './components/orders/order-status-icon/order-status-icon.component';
 import { OCMModal } from './components/layout/modal/modal.component';
@@ -122,8 +125,12 @@ import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.co
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
 import { OCMQuoteRequestForm } from './components/products/quote-request-form/quote-request-form.component';
 import { UnitOfMeasurePipe } from './pipes/unit-of-measure.pipe';
-import { OCMLocationDetails } from './components/profile/location-details/location-details.component';
+import { OCMLocationListItem } from './components/profile/location-list-item/location-list-item.component';
 import { OCMCertificateForm } from './components/profile/certificate-form/certificate-form.component';
+import { OCMLocationManagement } from './components/profile/location-management/location-management.component';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 const components = [
   OCMCategoryDropdown,
@@ -157,6 +164,7 @@ const components = [
   OCMOrderStatusIcon,
   OCMOrderStatusFilter,
   OCMOrderDateFilter,
+  OCMOrderLocationFilter,
   OCMOrderList,
   OCMLoadingLayout,
   OCMLogin,
@@ -197,7 +205,8 @@ const components = [
   OCMShippingSelectionForm,
   ConfirmModal,
   OCMPaymentCreditCard,
-  OCMLocationDetails,
+  OCMLocationListItem,
+  OCMLocationManagement,
   OCMCertificateForm,
 ];
 
@@ -228,9 +237,19 @@ const components = [
     OrderCloudModule.forRoot(OcSDKConfig),
     CookieModule.forRoot(),
     ToastrModule.forRoot(),
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
     NgxImageZoomModule,
     ReactiveFormsModule,
     FormsModule,
+    MatListModule,
+    MatCardModule,
+    MatButtonModule,
     FontAwesomeModule,
     NgbCarouselModule,
     NgbCollapseModule,
@@ -256,7 +275,12 @@ const components = [
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(private injector: Injector, @Inject(PLATFORM_ID) private platformId: any) {
+  constructor(
+    private injector: Injector,
+    @Inject(PLATFORM_ID) private platformId: any,
+    public translate: TranslateService
+  ) {
+    translate.setDefaultLang('en');
     this.buildWebComponent(OCMProfileNav, 'ocm-profile-nav');
     this.buildWebComponent(OCMQuantityInput, 'ocm-quantity-input');
     this.buildWebComponent(OCMProductCard, 'ocm-product-card');
@@ -291,6 +315,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderStatusIcon, 'ocm-order-status-icon');
     this.buildWebComponent(OCMOrderStatusFilter, 'ocm-order-status-filter');
     this.buildWebComponent(OCMOrderDateFilter, 'ocm-order-date-filter');
+    this.buildWebComponent(OCMOrderLocationFilter, 'ocm-order-location-filter');
     this.buildWebComponent(OCMOrderList, 'ocm-order-list');
     this.buildWebComponent(OCMLoadingLayout, 'ocm-loading-layout');
     this.buildWebComponent(OCMLogin, 'ocm-login');
@@ -325,7 +350,8 @@ export class AppModule {
     this.buildWebComponent(OCMAddressSuggestion, 'address-suggestion');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
     this.buildWebComponent(ConfirmModal, 'confirm-modal');
-    this.buildWebComponent(OCMLocationDetails, 'ocm-location-details');
+    this.buildWebComponent(OCMLocationListItem, 'ocm-location-list-item');
+    this.buildWebComponent(OCMLocationManagement, 'ocm-location-management');
     this.buildWebComponent(OCMCertificateForm, 'ocm-certificate-form');
   }
 
@@ -342,4 +368,10 @@ export class AppModule {
       }
     }
   }
+}
+
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/');
+  // uncomment to reference test file using XXX in place of words
+  // return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/', '-test.json');
 }

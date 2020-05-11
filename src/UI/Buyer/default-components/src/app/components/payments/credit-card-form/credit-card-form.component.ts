@@ -3,11 +3,11 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe';
 import { ValidateCreditCard, ValidateUSZip } from 'src/app/validators/validators';
 import { removeSpacesFrom } from 'src/app/services/card-validation.helper';
-import { CreditCardToken } from 'marketplace-javascript-sdk';
+import { OrderCloudIntegrationsCreditCardToken } from 'marketplace-javascript-sdk';
 import { GeographyConfig } from 'src/app/config/geography.class';
 
 export interface CreditCardFormOutput {
-  card: CreditCardToken;
+  card: OrderCloudIntegrationsCreditCardToken;
   cvv: string;
 }
 
@@ -18,7 +18,7 @@ export interface CreditCardFormOutput {
 export class OCMCreditCardForm implements OnInit {
   @Output() formSubmitted = new EventEmitter<CreditCardFormOutput>();
   @Output() formDismissed = new EventEmitter();
-  @Input() card: CreditCardToken;
+  @Input() card: OrderCloudIntegrationsCreditCardToken;
   @Input() submitText: string;
   @Input() set showCVV(value) {
     if (value && !this._showCVV) {
@@ -95,7 +95,7 @@ export class OCMCreditCardForm implements OnInit {
     this.cardForm.removeControl('cvv');
   }
 
-  private buildCardDetailsForm(card: CreditCardToken): void {
+  private buildCardDetailsForm(card: OrderCloudIntegrationsCreditCardToken): void {
     const form = {
       name: card?.CardholderName || '',
       number: card?.AccountNumber ?  this.creditCardFormatPipe.transform(card.AccountNumber) : '',

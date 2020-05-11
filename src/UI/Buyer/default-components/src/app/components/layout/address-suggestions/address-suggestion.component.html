@@ -1,5 +1,6 @@
 <div *ngIf="suggestedAddresses?.length > 0">
-  <h5 class="text-center font-weight-light border-bottom pb-3">Did you mean...</h5>
+  <h5 class="text-center font-weight-light border-bottom pb-3"
+      translate>LAYOUT.ADDRESS_SUGGESTIONS</h5>
   <div class="address-card pb-3 mb-3"
        *ngFor="let address of suggestedAddresses">
     <ocm-address-card [address]="address"

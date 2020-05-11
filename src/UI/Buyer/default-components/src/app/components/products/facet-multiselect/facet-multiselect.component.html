@@ -1,12 +1,12 @@
 <div>
   <!-- Facet Name -->
-  <h6 class="text-muted"
+  <h4 class="text-muted"
       (click)="toggleCollapsed()">
     <fa-icon class="text-muted"
              [icon]="isCollapsed ?  faPlusSquare : faMinusSquare"
              pull="right"></fa-icon>
     {{ _facet?.Name }}
-  </h6>
+  </h4>
 
   <!-- Facet Values -->
   <form id="facetValues"
@@ -24,7 +24,7 @@
     </div>
     <a *ngIf="visibleFacetLength < checkboxArray.length"
        (click)="showAll()"
-       class="pl-4 text-primary"><small>Show All</small> </a>
+       class="pl-4 text-primary"><small translate>PRODUCTS.FACETS</small> </a>
     <hr>
   </form>
 </div>

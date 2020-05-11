@@ -1,9 +1,9 @@
 ﻿using Marketplace.Common.Helpers;
-using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
 using Marketplace.Common.TemporaryAppConstants;
 using Marketplace.Helpers;using Marketplace.Helpers.Models;
 using Marketplace.Models;
+using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System;
@@ -18,11 +18,11 @@ namespace Marketplace.Common.Commands
         Task<MarketplaceBuyerLocation> Create(string buyerID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user, string token);
         Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID, VerifiedUserContext user);
         Task<MarketplaceBuyerLocation> Update(string buyerID, string buyerLocationID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user);
-        Task Delete(string buyerID, string buyerLocationID, VerifiedUserContext user);	}
+        Task Delete(string buyerID, string buyerLocationID, VerifiedUserContext user);    }
 
     public class MarketplaceBuyerLocationCommand : IMarketplaceBuyerLocationCommand
     {
-        private readonly IOrderCloudClient _oc;
+        private IOrderCloudClient _oc;
 		private readonly AppSettings _settings;
         public MarketplaceBuyerLocationCommand(AppSettings settings, IOrderCloudClient oc)
         {
@@ -36,7 +36,7 @@ namespace Marketplace.Common.Commands
             buyerLocation.UserGroup.ID = buyerAddress.ID;
             var buyerUserGroup = await _oc.UserGroups.CreateAsync<MarketplaceUserGroup>(buyerID, buyerLocation.UserGroup, accessToken: user.AccessToken);
             await CreateUserGroupAndAssignments(token, buyerID, buyerUserGroup.ID, buyerAddress.ID);
-            await CreateApprovalUserGroupsAndApprovalRule(token, buyerAddress.ID);
+            await CreateLocationUserGroupsAndApprovalRule(token, buyerAddress.ID, buyerAddress.AddressName);
             return new MarketplaceBuyerLocation            {                Address = buyerAddress,                UserGroup = buyerUserGroup,            };
         }
 
@@ -61,16 +61,30 @@ namespace Marketplace.Common.Commands
             var deleteUserGroupReq = _oc.UserGroups.DeleteAsync(buyerID, buyerLocationID, accessToken: user.AccessToken);
             await Task.WhenAll(deleteAddressReq, deleteUserGroupReq);
         }
-        public async Task CreateApprovalUserGroupsAndApprovalRule(string token, string buyerLocationID)
-        {            var buyerID = buyerLocationID.Split('-').First();            var approvingGroupID = $"{buyerLocationID}-OrderApprover";            foreach (var userType in SEBUserTypes.BuyerLocation())            {                var userGroupID = $"{buyerLocationID}-{userType.UserGroupIDSuffix}";                await _oc.UserGroups.CreateAsync(buyerID, new UserGroup()                {                    ID = userGroupID,                    Name = userType.UserGroupName,                    xp =                        {                            Type = "Approval",                            Location = buyerLocationID                        }                }, token);                foreach (var customRole in userType.CustomRoles)
+        public async Task CreateLocationUserGroupsAndApprovalRule(string token, string buyerLocationID, string locationName)        {            var buyerID = buyerLocationID.Split('-').First();            var approvingGroupID = $"{buyerLocationID}-OrderApprover";            foreach (var userType in SEBUserTypes.BuyerLocation())            {
+                await AddUserTypeToLocation(token, buyerLocationID, userType);            }
+            await _oc.ApprovalRules.CreateAsync(buyerID, new ApprovalRule()            {                ID = buyerLocationID,                ApprovingGroupID = approvingGroupID,                Description = "General Approval Rule for Location. Every Order Over a Certain Limit will Require Approval for the designated group of users.",                Name = $"{locationName} General Location Approval Rule",                RuleExpression = $"order.xp.ApprovalNeeded = '{buyerLocationID}' & order.Total > 0"            });        }
+
+        public async Task AddUserTypeToLocation(string token, string buyerLocationID, MarketplaceUserType marketplaceUserType)
+        {
+            var buyerID = buyerLocationID.Split('-').First();            var userGroupID = $"{buyerLocationID}-{marketplaceUserType.UserGroupIDSuffix}";
+            await _oc.UserGroups.CreateAsync(buyerID, new PartialUserGroup()
+            {
+                ID = userGroupID,
+                Name = marketplaceUserType.UserGroupName,
+                xp = new                {                    Type = marketplaceUserType.UserGroupType,
+                    Location = buyerLocationID
+                }
+            }, token);
+            foreach (var customRole in marketplaceUserType.CustomRoles)
+            {
+                await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
                 {
-                    await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-                    {
-                        BuyerID = buyerID,
-                        UserGroupID = userGroupID,
-                        SecurityProfileID = customRole.ToString()
-                    }, token);
-                }            }
-            await _oc.ApprovalRules.CreateAsync(buyerID, new ApprovalRule()            {                ID = buyerLocationID,                ApprovingGroupID = approvingGroupID,                Description = "General Approval Rule for Location. Every Order Over a Certain Limit will Require Approval for the designated group of users.",                Name = "General Location Approval Rule",                RuleExpression = $"order.xp.ApprovalNeeded = '{buyerLocationID}' & order.Total > 0"            });        }
+                    BuyerID = buyerID,
+                    UserGroupID = userGroupID,
+                    SecurityProfileID = customRole.ToString()
+                }, token);
+            }
+        }
     }
 }

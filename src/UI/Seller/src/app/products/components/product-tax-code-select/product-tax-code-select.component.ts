@@ -24,6 +24,8 @@ export class ProductTaxCodeSelect {
   handleTaxCodesSearched = new EventEmitter<string>();
   @Output()
   onScrollEnd = new EventEmitter<string>();
+  @Input()
+  readonly = false;
 
   onTaxCodeCategorySelection(event): void {
     this.handleTaxCodeCategorySelection.emit(event);

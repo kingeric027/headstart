@@ -25,7 +25,8 @@
         </p>
         <small class="card-text text-muted">{{ _product | UofM }}</small>
         <label for="quantity"
-               class="sr-only">Quantity</label>
+               class="sr-only"
+               translate>PRODUCTS.CARD.QUANTITY</label>
       </div>
     </div>
   </div>
@@ -38,10 +39,13 @@
                         (qtyChange)="setQuantity($event.detail)">
     </ocm-quantity-input>
     <button (click)="$event.stopPropagation()"
+            [disabled]="isAddingToCart"
             class="btn btn-primary btn-block small mt-2"
             type="submit"
-            (click)="addToCart()">
-      Add <span class="d-md-none d-lg-inline"> to Cart</span>
+            (click)="addToCart()"
+            translate>
+      PRODUCTS.CARD.ADD <span class="d-md-none d-lg-inline"
+            translate> PRODUCTS.CARD.TO_CART</span>
     </button>
   </div>
 </div>

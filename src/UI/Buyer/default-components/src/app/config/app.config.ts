@@ -24,6 +24,7 @@ export const ocAppConfig: AppConfig = {
     'MPApprovalRuleAdmin',
     'UserGroupAdmin',
     'MPNeedsApproval',
+    'MPViewAllLocationOrders',
     'MPOrderApprover',
     'ApprovalRuleAdmin',
     'Shopper',

@@ -1,5 +1,4 @@
 ﻿using Avalara.AvaTax.RestClient;
-using Marketplace.Common.Services.AvaTax.Models;
 using Marketplace.Helpers.Models;
 using System;
 using System.Collections.Generic;

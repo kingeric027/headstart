@@ -6,7 +6,6 @@ using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
-using Marketplace.Common.Services.AvaTax;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.ShippingIntegration.Models;
@@ -14,6 +13,8 @@ using System.Linq;
 using Marketplace.Models.Models.Marketplace;
 using System;
 using Newtonsoft.Json;
+using Marketplace.Helpers;
+using Marketplace.Helpers.Models;
 
 namespace Marketplace.Common.Commands
 {
@@ -21,6 +22,7 @@ namespace Marketplace.Common.Commands
     {
         Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
         Task<Order> AcknowledgeQuoteOrder(string orderID);
+        Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
     }
 
     public class OrderCommand : IOrderCommand
@@ -32,10 +34,10 @@ namespace Marketplace.Common.Commands
         // temporary service until we get updated sdk
         private readonly IOrderCloudSandboxService _ocSandboxService;
         private readonly IZohoCommand _zoho;
-        private readonly IAvalaraService _avatax;
+        private readonly IAvalaraCommand _avatax;
         private readonly ISendgridService _sendgridService;
         
-        public OrderCommand(IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraService avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        public OrderCommand(IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
@@ -52,18 +54,23 @@ namespace Marketplace.Common.Commands
             {
                 // forwarding
                 var buyerOrder = orderWorksheet.Order;
+                await CleanIDLineItems(orderWorksheet);
+
                 var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, buyerOrder.ID);
                 var supplierOrders = orderSplitResult.OutgoingOrders.ToList();
 
                 // creating relationship between the buyer order and the supplier order
                 // no relationship exists currently in the platform
                 var updatedSupplierOrders = await CreateOrderRelationshipsAndTransferXP(buyerOrder, supplierOrders);
+                
+                // leaving this in until the sdk supports type parameters on order worksheet
+                var updatedWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, buyerOrder.ID);
+                
                 await _sendgridService.SendOrderSubmitEmail(orderWorksheet);
+                
                 // quote orders do not need to flow into our integrations
                 if (buyerOrder.xp == null || buyerOrder.xp.OrderType != OrderType.Quote)
                 {
-                    // leaving this in until the sdk supports type parameters on order worksheet
-                    var updatedWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, buyerOrder.ID);
                     await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders);
                     await HandleTaxTransactionCreationAsync(orderWorksheet);
                     var zoho_salesorder = await _zoho.CreateSalesOrder(orderWorksheet);
@@ -93,6 +100,52 @@ namespace Marketplace.Common.Commands
             string buyerOrderID = orderID.Substring(0, index);
             await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
             return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+        }
+
+        public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
+        {
+            await EnsureUserCanAccessLocationOrders(locationID, verifiedUser);
+            listArgs.Filters.Add(new ListFilter()
+            {
+                QueryParams = new List<Tuple<string, string>>() { new Tuple<string, string>("BillingAddress.ID", locationID) }
+            });
+            return await _oc.Orders.ListAsync(OrderDirection.Incoming,
+                page: listArgs.Page,
+                pageSize: listArgs.PageSize,
+                search: listArgs.Search,
+                filters: listArgs.ToFilterString());
+        }
+
+        private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser)
+        {
+            var buyerID = verifiedUser.BuyerID;
+            var userGroupID = $"{locationID}-ViewAllLocationOrders";
+            var userGroupAssignmentForAccess = await _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID, verifiedUser.UserID);
+            Require.That(userGroupAssignmentForAccess.Items.Count > 0, new ErrorCode("Insufficient Access", 403, $"User cannot access orders from this location: {locationID}"));
+        }
+
+        private async Task CleanIDLineItems(MarketplaceOrderWorksheet orderWorksheet)
+        {
+            /* line item ids are significant for suppliers creating a relationship
+            * between their shipments and line items in ordercloud 
+            * we are sequentially labeling these ids for ease of shipping */
+  
+            var lineItemIDChanges = orderWorksheet.LineItems.Select((li, index) => (OldID: li.ID, NewID: CreateIDFromIndex(index)));
+            await Throttler.RunAsync(lineItemIDChanges, 100, 2, (lineItemIDChange) =>
+            {
+                return _oc.LineItems.PatchAsync(OrderDirection.Incoming, orderWorksheet.Order.ID, lineItemIDChange.OldID, new PartialLineItem { ID = lineItemIDChange.NewID });
+            });
+        }
+
+        private string CreateIDFromIndex(int index)
+        {
+            /* X was choosen as a prefix for the lineItem ID so that it is easy to 
+               * direct suppliers where to look for the ID. L and I are sometimes indistinguishable 
+               * from the number 1 so I avoided those. X is also difficult to confuse with other
+               * letters when verbally pronounced */
+            var countInList = index + 1;
+            var paddedCount = countInList.ToString().PadLeft(3, '0');
+            return 'X' + paddedCount;
         }
 
         private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrder buyerOrder, List<Order> supplierOrders)
@@ -175,23 +228,28 @@ namespace Marketplace.Common.Commands
         {
 
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, supplierOrder.ID);
+            var firstLineItemOfSupplierOrder = lineItems.Items.First();
+            var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(firstLineItemOfSupplierOrder.SupplierID);
             
-            // we further split the supplier order into multiple orders for each shipfromaddressID before it goes into freightpop
-            var freightPopOrders = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
-
-            var freightPopOrderIDs = new List<string>();
-            foreach(var lineItemGrouping in freightPopOrders)
+            if(supplier.xp.SyncFreightPop)
             {
-                var firstLineItem = lineItemGrouping.First();
+                // we further split the supplier order into multiple orders for each shipfromaddressID before it goes into freightpop
+                var freightPopOrders = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
 
-                var freightPopOrderID = $"{supplierOrder.ID.Split('-').First()}-{firstLineItem.ShipFromAddressID}";
-                freightPopOrderIDs.Add(freightPopOrderID);
+                var freightPopOrderIDs = new List<string>();
+                foreach(var lineItemGrouping in freightPopOrders)
+                {
+                    var firstLineItem = lineItemGrouping.First();
 
-                var supplier = await _oc.Suppliers.GetAsync(firstLineItem.SupplierID);
-                var supplierAddress = await _oc.SupplierAddresses.GetAsync(supplier.ID, firstLineItem.ShipFromAddressID);
-                var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItemGrouping.ToList(), supplier, supplierAddress, freightPopOrderID);
-                await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
+                    var freightPopOrderID = $"{supplierOrder.ID.Split('-').First()}-{firstLineItem.ShipFromAddressID}";
+                    freightPopOrderIDs.Add(freightPopOrderID);
+
+                    var supplierAddress = await _oc.SupplierAddresses.GetAsync(supplier.ID, firstLineItem.ShipFromAddressID);
+                    var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItemGrouping.ToList(), supplier, supplierAddress, freightPopOrderID);
+                    await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
+                }
             }
         }
+    
     }
 }

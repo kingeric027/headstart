@@ -1,14 +1,6 @@
-export interface ProfileSection {
-  routerCall: string;
-  displayText: string;
-  url: string;
-  showInDropdown: boolean;
+import { RouteConfig } from './route-config';
 
-  // no roles with access means all users will see
-  rolesWithAccess?: string[];
-}
-
-export const ProfileSections: ProfileSection[] = [
+export const ProfileRoutes: RouteConfig[] = [
   {
     routerCall: 'toMyProfile',
     displayText: 'My Profile',
@@ -28,29 +20,9 @@ export const ProfileSections: ProfileSection[] = [
     showInDropdown: true,
   },
   {
-    routerCall: 'toUsers',
-    displayText: 'User Approval Management',
-    url: '/profile/users',
-    rolesWithAccess: ['MPApprovalRuleAdmin'],
-    showInDropdown: true,
-  },
-  {
     routerCall: 'toMyPaymentMethods',
     displayText: 'My Credit Cards',
     url: '/profile/payment-methods',
-    showInDropdown: true,
-  },
-  {
-    routerCall: 'toMyOrders',
-    displayText: 'Orders Submitted',
-    url: '/profile/orders',
-    showInDropdown: true,
-  },
-  {
-    routerCall: 'toOrdersToApprove',
-    displayText: 'Orders To Approve',
-    url: '/profile/orders/approve',
-    rolesWithAccess: ['MPOrderApprover'],
     showInDropdown: true,
   },
   {

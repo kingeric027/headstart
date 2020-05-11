@@ -2,7 +2,7 @@ import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { ListOrder, Order } from '@ordercloud/angular-sdk';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import { OrderListColumn } from '../../../models/order-list-column';
-import { ShopperContextService, OrderType, OrderContext } from 'marketplace';
+import { ShopperContextService, OrderType, OrderViewContext } from 'marketplace';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 
 @Component({
@@ -52,7 +52,7 @@ export class OCMOrderList {
 
   toOrderDetails(orderID: string): void {
     const url = this.context.router.getActiveUrl();
-    const isOrderToApprove = this.context.router.getOrderContext() === OrderContext.Approve;
+    const isOrderToApprove = this.context.router.getOrderViewContext() === OrderViewContext.Approve;
     if (isOrderToApprove) {
       this.context.router.toOrderToAppoveDetails(orderID);
     } else {

@@ -1,25 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Integrations.SmartyStreets;
 using Marketplace.Helpers.Attributes;
+using ordercloud.integrations.cardconnect;
 
 namespace Marketplace.Common
 {
 	public enum AppEnvironment { Qa, Demo, Prod }
 
-    public interface IAppSettings
-    {
-		AppEnvironment Env { get; }
-		EnvironmentSettings EnvironmentSettings { get; }
-		BlobSettings BlobSettings { get; }
-        CosmosSettings CosmosSettings { get;}
-        OrderCloudSettings OrderCloudSettings { get; }
-        FreightPopSettings FreightPopSettings { get; set; }
-        string SendgridApiKey { get; }
-    }
-
     [DocIgnore]
-    public class AppSettings : IAppSettings
+    public class AppSettings
     {
 		public AppEnvironment Env { get; set; }
 		public EnvironmentSettings EnvironmentSettings { get; set; } = new EnvironmentSettings();
@@ -28,9 +19,13 @@ namespace Marketplace.Common
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
         public FreightPopSettings FreightPopSettings { get; set; }
-        public CardConnectSettings CardConnectSettings { get; set; } = new CardConnectSettings();
+
+        // additional field for production settings because we can only test third
+        // party shipping on FreigthPOP prd
+        public FreightPopSettings FreightPopSettingsProd { get; set; }
+        public OrderCloudIntegrationsCardConnectConfig CardConnectSettings { get; set; } = new OrderCloudIntegrationsCardConnectConfig();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
-		public SmartyStreetSettings SmartyStreetSettings { get; set; } = new SmartyStreetSettings();
+		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
         public string SendgridApiKey { get; set; }
     }
 
@@ -89,11 +84,4 @@ namespace Marketplace.Common
 		public string EndpointUri { get; set; }
 		public string DatabaseName { get; set; }
 	}
-
-    public class CardConnectSettings
-    {
-        public string Site { get; set; }
-        public string BaseUrl { get; set; }
-        public string Authorization { get; set; }
-    }
 }

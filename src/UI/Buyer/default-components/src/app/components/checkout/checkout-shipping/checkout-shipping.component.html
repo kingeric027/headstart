@@ -1,26 +1,28 @@
 <div *ngIf="_shipEstimates">
   <div *ngFor="let shipEstimate of _shipEstimates; let i = index">
-    <ocm-lineitem-table [lineItems]="_lineItemsByShipEstimate[i]" [readOnly]="true">
-      <ocm-shipping-selection-form
-        [shipEstimate]="shipEstimate"
-        [supplierID]="getSupplierID(shipEstimate)"
-        [shipFromAddressID]="getShipFromAddressID(shipEstimate)"
-        (selectionChanged)="selectRate($event.detail)"
-      >
+    <ocm-lineitem-table [lineItems]="_lineItemsByShipEstimate[i]"
+                        [readOnly]="true">
+      <ocm-shipping-selection-form [shipEstimate]="shipEstimate"
+                                   [supplierID]="getSupplierID(shipEstimate)"
+                                   [shipFromAddressID]="getShipFromAddressID(shipEstimate)"
+                                   (selectionChanged)="selectRate($event.detail)">
       </ocm-shipping-selection-form>
     </ocm-lineitem-table>
   </div>
   <div class="d-flex justify-content-start align-items-center">
-    <button *ngIf="!_areAllShippingSelectionsMade" type="submit" disabled="'true'" class="btn btn-primary btn-sm mr-2">
-      Make Shipping Speed Selections To Continue
+    <button *ngIf="!_areAllShippingSelectionsMade"
+            type="submit"
+            disabled="'true'"
+            class="btn btn-primary btn-sm mr-2"
+            translate>
+      CHECKOUT.CHECKOUT_SHIPPING.SHIPPING_SPEED
     </button>
-    <button
-      *ngIf="_areAllShippingSelectionsMade"
-      type="submit"
-      class="btn btn-primary btn-sm mr-2"
-      (click)="onContinueClicked()"
-    >
-      Save and Continue
+    <button *ngIf="_areAllShippingSelectionsMade"
+            type="submit"
+            class="btn btn-primary btn-sm mr-2"
+            (click)="onContinueClicked()"
+            translate>
+      CHECKOUT.CHECKOUT_SHIPPING.SAVE_CONTINUE
     </button>
   </div>
 </div>

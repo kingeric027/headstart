@@ -18,7 +18,7 @@
       </div>
       <div *ngIf="supplierNote"
            class="alert alert-info my-3"><b>
-        </b>Note: {{ supplierNote }}
+        </b><span translate>PRODUCTS.DETAILS.NOTE</span>: {{ supplierNote }}
       </div>
       <div>
         <div>
@@ -26,7 +26,8 @@
             <h4 class="font-weight-bold">{{ price  | currency}}</h4>
             <p class="text-muted ml-3">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
             <span class="badge badge-pill badge-warning"
-                  *ngIf="percentSavings > 0">You save {{ percentSavings }}%!
+                  *ngIf="percentSavings > 0"
+                  translate>PRODUCTS.DETAILS.SAVINGS {{ percentSavings }}%!
             </span>
           </div>
           <!--DISPLAY SHORT SPEC FORM -->
@@ -36,7 +37,7 @@
                            (specFormChange)="onSpecFormChange($event)">
             </ocm-spec-form>
             <div class="d-flex flex-column"
-                 *ngIf="isOrderable">Quantity: <br>
+                 *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>
               <div class="d-flex flex-row">
                 <ocm-quantity-input class="d-inline-block mb-3 mr-3"
                                     (qtyChange)="qtyChange($event.detail)"
@@ -45,15 +46,17 @@
                 <button *ngIf="isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
                         [disabled]="!specFormService.event?.valid || !qtyValid"
-                        (click)="openQuoteForm()">
-                  Request Quote
+                        (click)="openQuoteForm()"
+                        translate>
+                  PRODUCTS.DETAILS.REQ_QUOTE
                 </button>
                 <button *ngIf="!isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
                         type="submit"
-                        [disabled]="!specFormService.event?.valid || !qtyValid"
-                        (click)="addToCart()">
-                  Add to Cart
+                        [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid"
+                        (click)="addToCart()"
+                        translate>
+                  PRODUCTS.DETAILS.ADD_TO_CART
                   <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
                 </button>
               </div>
@@ -68,15 +71,16 @@
             </div>
           </div>
           <div *ngIf="!isOrderable"
-               class="alert alert-info">
-            This is a view-only product and cannot be ordered
+               class="alert alert-info"
+               translate>
+            PRODUCTS.DETAILS.VIEW_ONLY
           </div>
         </div>
       </div>
       <div *ngIf="_product.PriceSchedule.PriceBreaks.length > 1">
-        <strong>Tiered Pricing: </strong>
+        <strong><span translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</span>: </strong>
         <div class=" border border-medium border-radius mb-3 p-2">
-          <span>For select items, the more you order - the more you save! Details listed below. Pricing excludes additional charges for sizes and modifications.</span>
+          <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
             <span *ngFor="let priceBreak of _product.PriceSchedule.PriceBreaks; let i = index"
                   class="font-weight-bold d-flex mt-2">{{ getPriceBreakRange(i) }}:
@@ -87,18 +91,21 @@
       </div>
       <div class="alert alert-success my-3"
            *ngIf="showRequestSubmittedMessage && specFormService.event?.valid && qtyValid">
-        <span>Your quote request was successfully submitted.
+        <span translate>PRODUCTS.DETAILS.SUCCESS
           <button class="btn btn-link"
-                  (click)="toOrderDetail()">View quote request</button>
+                  (click)="toOrderDetail()"
+                  translate>PRODUCTS.DETAILS.VIEW_QUOTE</button>
         </span>
       </div>
-      <strong>Description:</strong>
+      <strong>
+        <span translate>PRODUCTS.DETAILS.DESCRIPTION</span>:
+      </strong>
       <div class="p-2 border border-medium border-radius">
         <p [innerHTML]="_product.Description || 'This product has no description.'">
         </p>
       </div>
       <div *ngIf="_product?.xp?.StaticContent?.length > 0">
-        <strong>Documents:</strong>
+        <strong><span translate>PRODUCTS.DETAILS.DOCS</span>:</strong>
         <div class="mt-2">
           <a class="border border-medium border-radius p-2 mr-2"
              *ngFor="let document of _product?.xp?.StaticContent"
@@ -114,7 +121,8 @@
       <div class="p-3 border border-medium border-radius">
         <div class="d-flex justify-content-between align-items-center">
           <span class="badge badge-pill badge-warning"
-                *ngIf="percentSavings > 0">You save {{ percentSavings }}%!
+                *ngIf="percentSavings > 0"
+                translate>PRODUCTS.DETAILS.SAVINGS {{ percentSavings }}%!
           </span>
         </div>
         <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
@@ -122,11 +130,12 @@
                        (specFormChange)="onSpecFormChange($event)">
         </ocm-spec-form>
         <div *ngIf="!isOrderable"
-             class="alert alert-info">
-          This is a view-only product and cannot be ordered
+             class="alert alert-info"
+             translate>
+          PRODUCTS.DETAILS.VIEW_ONLY
         </div>
         <div class="d-flex flex-column"
-             *ngIf="isOrderable">Quantity:
+             *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>:
           <ocm-quantity-input class="d-inline-block mb-3"
                               style="max-width: 100px"
                               (qtyChange)="qtyChange($event.detail)"
@@ -135,15 +144,17 @@
           <button *ngIf="isQuoteProduct()"
                   class="btn btn-block btn-primary mb-3"
                   [disabled]="!specFormService.event?.valid || !qtyValid"
-                  (click)="openQuoteForm()">
-            Request Quote
+                  (click)="openQuoteForm()"
+                  translate>
+            PRODUCTS.DETAILS.REQ_QUOTE
           </button>
           <button *ngIf="!isQuoteProduct()"
                   class="btn btn-block btn-primary"
                   type="submit"
-                  [disabled]="!specFormService.event?.valid || !qtyValid"
-                  (click)="addToCart($event)">
-            Add to Cart
+                  [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid"
+                  (click)="addToCart($event)"
+                  translate>
+            PRODUCTS.DETAILS.ADD_TO_CART
             <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
           </button>
         </div>

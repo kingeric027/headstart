@@ -21,10 +21,8 @@ namespace Marketplace.Common.Commands
     {
         Task<string> GetAccessTokenAsync(string apiClientID);
         Task<List<MarketplaceSupplier>> GetSuppliersNeedingSync();
-        Task<List<MarketplaceOrder>> GetOrdersNeedingShipmentAsync(SupplierShipmentSyncWorkItem workItem);
-        Task<List<ShipmentSyncOrder>> GetShipmentSyncOrders(SupplierShipmentSyncWorkItem workItem);
-        Task<List<ShipmentSyncOrder>> GetShipmentDetailsForShipmentSyncOrders(SupplierShipmentSyncWorkItem workItem);
-        Task CreateShipmentsInOrderCloudIfNeeded(OrderWorkItem workItem);
+        Task<List<ShipmentDetails>> GetFreightPopShipments(int numOfDaysBack);
+        Task CreateShipmentsInOrderCloudIfNeeded(ShipmentWorkItem shipmentWorkItem);
     }
 
     public class OrderOrchestrationCommand : IOrderOrchestrationCommand
@@ -91,126 +89,13 @@ namespace Marketplace.Common.Commands
             return suppliers.Items.ToList();
         }
 
-        public async Task<List<MarketplaceOrder>> GetOrdersNeedingShipmentAsync(SupplierShipmentSyncWorkItem workItem)
+        public async Task CreateShipmentsInOrderCloudIfNeeded(ShipmentWorkItem shipmentWorkItem)
         {
             try
             {
-                var currentPage = 1;
-                var allOrders = new List<MarketplaceOrder>();
-
-                var firstPage = await GetOrdersNeedingShipmentAsync(currentPage++, workItem.SupplierToken);
-                allOrders.AddRange(firstPage.Items);
-
-                if (firstPage.Meta.TotalPages > 0)
-                {
-                    var subsequentPages = await Throttler.RunAsync(new string[firstPage.Meta.TotalPages - 1], 100, 5,
-                        (s) =>
-                        {
-                            return GetOrdersNeedingShipmentAsync(currentPage++, workItem.SupplierToken);
-                        });
-
-                    foreach (var orderListPage in subsequentPages)
-                    {
-                        allOrders.AddRange(orderListPage.Items);
-                    }
-                }
-
-                return allOrders;
-            } catch (Exception ex)
-            {
-                await _log.Save(new OrchestrationLog()
-                {
-                    RecordType = RecordType.Supplier,
-                    Action = Marketplace.Common.Models.Action.SyncShipments,
-                    ErrorType = OrchestrationErrorType.GetOrdersNeedingShipmentError,
-                    Message = $"Failed to retrieve orders for supplier: {workItem.Supplier.ID}. Error: {ex.Message}",
-                });
-                throw new OrchestrationException(OrchestrationErrorType.GetOrdersNeedingShipmentError, $"Error retrieving orders for {workItem.Supplier.ID}");
-            }
-        }
-
-        public async Task<List<ShipmentSyncOrder>> GetShipmentSyncOrders(SupplierShipmentSyncWorkItem workItem)
-        {
-            try
-            {
-                var shipmentSyncOrders = new List<ShipmentSyncOrder>();
-                foreach (var order in workItem.OrdersToSync)
-                {
-                    if (order.xp.ShipFromAddressIDs == null || DateTimeOffset.Now.AddDays(-15) > order.DateSubmitted)
-                    {
-                        // stop sync and mark as needing attention if 
-                        // no freightpop order IDs on supplier order
-                        // or order is over 15 days old
-                        await _oc.Orders.PatchAsync(OrderDirection.Outgoing, order.ID, new PartialOrder() { xp = new { NeedsAttention = true, StopShipSync = true } });
-                    }
-                    else
-                    {
-                        foreach (var shipFromAddressID in order.xp.ShipFromAddressIDs)
-                        {
-                            shipmentSyncOrders.Add(new ShipmentSyncOrder()
-                            {
-                                OrderCloudOrderID = order.ID,
-                                FreightPopOrderID = $"{order.ID.Split('-').First()}-{shipFromAddressID}",
-                                Order = order,
-                                FreightPopShipmentResponses = new Response<List<ShipmentDetails>>()
-                            });
-                        }
-                    }
-                }
-                return shipmentSyncOrders;
-            } catch (Exception ex)
-            {
-                await _log.Save(new OrchestrationLog()
-                {
-                    RecordType = RecordType.Supplier,
-                    Action = Marketplace.Common.Models.Action.SyncShipments,
-                    ErrorType = OrchestrationErrorType.GetShipmentSyncOrders,
-                    Message = $"Error getting shipment sync orders for: {workItem.Supplier.ID}. Error: {ex.Message}",
-                });
-                throw new OrchestrationException(OrchestrationErrorType.GetOrdersNeedingShipmentError, $"getting shipment sync orders for {workItem.Supplier.ID}");
-            }
-        }
-
-        public async Task<List<ShipmentSyncOrder>> GetShipmentDetailsForShipmentSyncOrders(SupplierShipmentSyncWorkItem workItem)
-        {
-            try
-            {
-                // running slowly due to freightpop limits
-                var shipmentSyncOrdersWithResponses = await Throttler.RunAsync(workItem.ShipmentSyncOrders, 2000, 1,
-                 (shipmentSyncOrder) =>
-                 {
-                     return GetShipmentDetailsForShipmentSyncOrder(shipmentSyncOrder);
-                 });
-                return shipmentSyncOrdersWithResponses.ToList();
-            } catch (Exception ex)
-            {
-                await _log.Save(new OrchestrationLog()
-                {
-                    RecordType = RecordType.Supplier,
-                    Action = Marketplace.Common.Models.Action.SyncShipments,
-                    ErrorType = OrchestrationErrorType.GetShipmentDetailsForShipmentSyncOrders,
-                    Message = $"Error getting shipment sync orders for: {workItem.Supplier.ID}. Error: {ex.Message}",
-                });
-                throw new OrchestrationException(OrchestrationErrorType.GetShipmentDetailsForShipmentSyncOrders, $"getting shipment sync orders for {workItem.Supplier.ID}");
-            }
-        }
-
-        public async Task<ShipmentSyncOrder> GetShipmentDetailsForShipmentSyncOrder(ShipmentSyncOrder shipmentSyncOrder)
-        {
-            shipmentSyncOrder.FreightPopShipmentResponses = await _freightPopService.GetShipmentsForOrder(shipmentSyncOrder.FreightPopOrderID);
-            return shipmentSyncOrder;
-
-        }
-
-        public async Task CreateShipmentsInOrderCloudIfNeeded(OrderWorkItem workItem)
-        {
-            try
-            {
-                await Throttler.RunAsync(workItem.ShipmentSyncOrder.FreightPopShipmentResponses.Data, 100, 1,
-                (shipmentDetails) =>
-                {
-                    return CreateShipmentInOrderCloudIfNeeded(shipmentDetails, workItem.ShipmentSyncOrder.Order, workItem.SupplierToken);
-                });
+                var orderCloudOrderID = await ValidAndGetOrderCloudOrder(shipmentWorkItem);
+                var buyerIDForOrder = await GetBuyerIDForSupplierOrder(orderCloudOrderID);
+                 await AddShipmentToOrderCloud(shipmentWorkItem, orderCloudOrderID, buyerIDForOrder);
             } catch (Exception ex)
             {
                 await _log.Save(new OrchestrationLog()
@@ -218,39 +103,111 @@ namespace Marketplace.Common.Commands
                     RecordType = RecordType.Order,
                     Action = Marketplace.Common.Models.Action.SyncShipments,
                     ErrorType = OrchestrationErrorType.CreateShipmentsInOrderCloudIfNeeded,
-                    Message = $"Error creating ordercloud shipment for freightpop order id: {workItem.ShipmentSyncOrder.FreightPopOrderID}. Error: {ex.Message}",
+                    Message = $"Error creating ordercloud shipment for freightpop order id: {shipmentWorkItem.Shipment.ShipmentId}. Error: {ex.Message}",
                 });
-                throw new OrchestrationException(OrchestrationErrorType.CreateShipmentsInOrderCloudIfNeeded, $"Error creating ordercloud shipment for freightpop order id: {workItem.ShipmentSyncOrder.FreightPopOrderID}. Error: {ex.Message}");
+                throw new OrchestrationException(OrchestrationErrorType.CreateShipmentsInOrderCloudIfNeeded, $"Error creating ordercloud shipment for freightpop order id: {shipmentWorkItem.Shipment.ShipmentId}. Error: {ex.Message}");
             }
         }
 
-        private async Task CreateShipmentInOrderCloudIfNeeded(ShipmentDetails freightPopShipment, MarketplaceOrder relatedOrder, string supplierToken)
+        private async Task<string> ValidAndGetOrderCloudOrder(ShipmentWorkItem shipmentWorkItem)
         {
-            var orderCloudShipments = await _oc.Shipments.ListAsync(orderID: relatedOrder.ID, accessToken: supplierToken);
-            var buyerIDForOrder = await GetBuyerIDForSupplierOrder(relatedOrder);
-
-            // needs to be more complex in the future, logic pending discussion around split of orders by supplierid
-            if (!orderCloudShipments.Items.Any(o => o.ID == freightPopShipment.ShipmentId))
+            var ref1 = shipmentWorkItem.Shipment.Reference1;
+            var potentialOrderCloudOrderID = "";
+            if (ref1 != null && ref1.Length > 0)
             {
-                await AddShipmentToOrderCloud(freightPopShipment, relatedOrder, buyerIDForOrder, supplierToken);
+                var refPieces = ref1.Split('-');
+                if(refPieces.Length == 3 || refPieces.Length == 2)
+                {
+                    // this will recognize a reference number for a FreightPOP order (OC order to a specific supplier location)
+                    // or an othercloud order
+                    potentialOrderCloudOrderID = refPieces[0] + '-' + refPieces[1];
+                } else
+                {
+                    throw new OrchestrationException(OrchestrationErrorType.NoRelatedOrderCloudOrderFound, $"Could not find ordercloud order for freightpop ref1: {ref1}.");
+                }
+            }
+            try
+            {
+                await _oc.Orders.GetAsync(OrderDirection.Incoming, potentialOrderCloudOrderID, shipmentWorkItem.SupplierToken);
+            } catch (Exception ex)
+            {
+                throw new OrchestrationException(OrchestrationErrorType.NoRelatedOrderCloudOrderFound, $"Could not find ordercloud order for freightpop ref1: {ref1}. Error: {ex.Message}");
+            }
+            return potentialOrderCloudOrderID;
+        }
+
+        public async Task<List<ShipmentDetails>> GetFreightPopShipments(int numOfDaysBack)
+        {
+            try
+            {
+                var daysToGetShipments = new List<int> { };
+                for (var i = 0; i < numOfDaysBack; i++)
+                {
+                    daysToGetShipments.Add(i);
+                }
+                var shipmentDetailsResponses = await Throttler.RunAsync(daysToGetShipments, 100, 2, (daysBack) =>
+                {
+                    return _freightPopService.GetShipmentsByDate(daysBack);
+                });
+                // sometimes the values returned here are null for the response object which is not exactly what I would expect when there are no shipments
+                // regardless we are filtering those out
+                shipmentDetailsResponses = shipmentDetailsResponses.Where(shipmentDetailResponse => shipmentDetailResponse != null && shipmentDetailResponse.Data != null).ToList();
+                if(shipmentDetailsResponses.Count() > 0)
+                {
+                    var shipmentsFromPastDays = shipmentDetailsResponses.SelectMany(response => response.Data).ToList();
+                    return shipmentsFromPastDays;
+                } else
+                {
+                    return new List<ShipmentDetails> { };
+                }
+            }
+            catch (Exception ex)
+            {
+                await _log.Save(new OrchestrationLog()
+                {
+                    RecordType = RecordType.Order,
+                    Action = Marketplace.Common.Models.Action.SyncShipments,
+                    ErrorType = OrchestrationErrorType.GetFreightPopShipments,
+                    Message = $"Error retrieving shipments from FreightPOP. Error: {ex.Message}",
+                });
+                throw new OrchestrationException(OrchestrationErrorType.GetFreightPopShipments, $"Error retrieving shipments from FreightPOP. Error {ex.Message}");
             }
         }
         
-        private async Task AddShipmentToOrderCloud(ShipmentDetails freightPopShipment, MarketplaceOrder relatedOrder, string buyerID, string supplierToken)
+        private async Task AddShipmentToOrderCloud(ShipmentWorkItem shipmentWorkItem, string supplierOrderID, string buyerID)
         {
-            var ocShipment = await _oc.Shipments.CreateAsync(OCShipmentMapper.Map(freightPopShipment, buyerID), accessToken: supplierToken);
-
-            await Throttler.RunAsync(freightPopShipment.Items, 100, 1,
-            (freightPopShipmentItem) =>
+            try
             {
-            // currently this creates two items in ordercloud inadvertantely, platform bug is being resolved
-                return _oc.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, relatedOrder.ID), accessToken: supplierToken);
-            });
+                var ocShipment = await _oc.Shipments.CreateAsync(OCShipmentMapper.Map(shipmentWorkItem.Shipment, buyerID), accessToken: shipmentWorkItem.SupplierToken);
+
+                await Throttler.RunAsync(shipmentWorkItem.Shipment.Items, 100, 1,
+                (freightPopShipmentItem) =>
+                {
+                // currently this creates two items in ordercloud inadvertantely, platform bug is being resolved
+                    return _oc.Shipments.SaveItemAsync(ocShipment.ID, OCShipmentItemMapper.Map(freightPopShipmentItem, supplierOrderID), accessToken: shipmentWorkItem.SupplierToken);
+                });
+            } catch (Exception ex)
+            {
+                if(ex.Message == "IdExists: Object already exists.")
+                {
+                    await _log.Save(new OrchestrationLog()
+                    {
+                        RecordType = RecordType.Order,
+                        Level = LogLevel.Progress,
+                        Action = Marketplace.Common.Models.Action.SyncShipments,
+                        Message = $"Shipment already created: {shipmentWorkItem.Shipment.ShipmentId}",
+                    });
+                }
+                else
+                {
+                    throw new OrchestrationException(OrchestrationErrorType.CreateShipmentsInOrderCloudIfNeeded, $"Error creating shipment in ordercloud. Error {ex.Message}");
+                }
+            }
         }
 
-        private async Task<string> GetBuyerIDForSupplierOrder(MarketplaceOrder relatedOrder)
+        private async Task<string> GetBuyerIDForSupplierOrder(string orderCloudSupplierOrderID)
         {
-            var buyerOrderID = relatedOrder.ID.Split("-").First();
+            var buyerOrderID = orderCloudSupplierOrderID.Split("-").First();
             var relatedBuyerOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, buyerOrderID);
             return relatedBuyerOrder.FromCompanyID;
         }

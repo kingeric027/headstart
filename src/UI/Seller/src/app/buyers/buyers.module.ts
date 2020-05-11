@@ -10,11 +10,13 @@ import { BuyerCategoryTableComponent } from './components/categories/buyer-categ
 import { BuyerLocationEditComponent } from './components/locations/buyer-location-edit/buyer-location-edit.component';
 import { BuyerCategoryEditComponent } from './components/categories/buyer-category-edit/buyer-category-edit.component';
 import { BuyerUserEditComponent } from './components/users/buyer-user-edit/buyer-user-edit.component';
+import { BuyerEditComponent } from './components/buyers/buyer-edit/buyer-edit.component';
 
 @NgModule({
   imports: [SharedModule, BuyersRoutingModule],
   declarations: [
     BuyerTableComponent,
+    BuyerEditComponent,
     BuyerCategoryTableComponent,
     BuyerCategoryEditComponent,
     BuyerApprovalTableComponent,

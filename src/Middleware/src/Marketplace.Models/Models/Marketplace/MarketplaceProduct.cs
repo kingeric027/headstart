@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Marketplace.Common.Models;
+using Integrations.CMS.Models;
+using Marketplace.CMS.Models;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Helpers.Attributes;
 using Marketplace.Models.Extended;
@@ -18,7 +19,8 @@ namespace Marketplace.Models
         public PriceSchedule PriceSchedule { get; set; }
         public IList<Spec> Specs { get; set; }
         public IList<MarketplaceVariant> Variants { get; set; }
-        public IList<Image> Images { get; set; }
+        public IList<AssetForDelivery> Images { get; set; }
+        public IList<AssetForDelivery> Attachments { get; set; }
     }
 
     [SwaggerModel]
@@ -42,7 +44,6 @@ namespace Marketplace.Models
         [OrchestrationIgnore]
         public dynamic IntegrationData { get; set; }
         public Dictionary<string, List<string>> Facets = new Dictionary<string, List<string>>();
-        public List<ProductImage> Images { get; set; } = new List<ProductImage>();
         #endregion
 
         [Required]
@@ -53,7 +54,6 @@ namespace Marketplace.Models
         public TaxProperties Tax { get; set; } = new TaxProperties();
         public UnitOfMeasure UnitOfMeasure { get; set; } = new UnitOfMeasure();
         public ProductType ProductType { get; set; }
-        public List<StaticContent> StaticContent { get; set; } = new List<StaticContent>();
         public bool IsResale { get; set; } = false;
         public List<ProductAccessorial> Accessorials { get; set; }
     }

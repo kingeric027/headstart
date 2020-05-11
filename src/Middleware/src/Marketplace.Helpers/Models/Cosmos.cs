@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Cosmonaut.Attributes;
 using Marketplace.Helpers.Attributes;
+using Microsoft.Azure.Documents;
+using Newtonsoft.Json;
 using OrderCloud.SDK;
 
 namespace Marketplace.Helpers.Models
@@ -12,15 +16,19 @@ namespace Marketplace.Helpers.Models
         DateTimeOffset timeStamp { get; set; }
     }
 
-    public class CosmosObject : ICosmosObject
-    {
-        [ApiIgnore]
-        public string id { get; set; } = Guid.NewGuid().ToString();
-        [ApiIgnore]
-        public DateTimeOffset timeStamp { get; set; } = DateTimeOffset.Now;
-    }
+	public abstract class CosmosObject : ICosmosObject
+	{
+		[ApiIgnore]
+		[JsonProperty("id")]
+		public string id { get; set; } = Guid.NewGuid().ToString();
+		[ApiIgnore]
+		public DateTimeOffset timeStamp { get; set; } = DateTimeOffset.Now; 
+		// Note, Cosmos Unqiue keys are only unique within the partition.
+		public static Collection<UniqueKey> GetUniqueKeys() => null;
 
-    public interface ICosmosQuery<T> where T : ICosmosObject
+	}
+
+	public interface ICosmosQuery<T> where T : ICosmosObject
     {
         Task<ListPage<T>> List(IListArgs args);
         Task<T> Get(string id);
@@ -45,4 +53,7 @@ namespace Marketplace.Helpers.Models
         public string EndpointUri { get; set; }
         public string PrimaryKey { get; set; }
     }
+
+	[AttributeUsage(AttributeTargets.Property)]
+	public class CosmosIgnoreAttribute : Attribute { }
 }

@@ -36,7 +36,7 @@ namespace Marketplace.Helpers
             // don't serialize properties with [ApiReadOnly]
             //if (member.GetCustomAttribute(typeof(ApiReadOnlyAttribute)) != null)
             //    prop.ShouldDeserialize = o => false;
-            if (member.GetCustomAttribute(typeof(ApiWriteOnlyAttribute)) != null || member.GetCustomAttribute(typeof(ApiIgnore)) != null)
+            if (member.GetCustomAttribute(typeof(ApiWriteOnlyAttribute)) != null || member.GetCustomAttribute(typeof(ApiIgnoreAttribute)) != null)
                 prop.ShouldSerialize = o => false;
             return prop;
         }

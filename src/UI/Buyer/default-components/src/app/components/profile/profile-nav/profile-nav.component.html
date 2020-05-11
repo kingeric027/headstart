@@ -5,23 +5,24 @@
         <div ngbDropdown>
           <button class="btn btn-block btn-default btn-outline-dark mb-2"
                   id="dropdownBasic1"
-                  ngbDropdownToggle>Account Selections</button>
+                  ngbDropdownToggle
+                  translate>PROFILE.PROFILE_NAV.ACC_SELECTIONS</button>
           <div ngbDropdownMenu
                aria-labelledby="dropdownBasic1"
                class="w-100 text-center">
-            <button *ngFor="let profileSection of profileSections"
+            <button *ngFor="let profileRoute of profileRoutes"
                     class="dropdown-item"
-                    (click)="context.router[profileSection.routerCall]()">{{profileSection.displayText}}</button>
+                    (click)="context.router[profileRoute.routerCall]()">{{profileRoute.displayText}}</button>
           </div>
         </div>
       </div>
     </div>
     <div class="col-md-3  d-none d-md-flex">
       <ul class="nav flex-column">
-        <li *ngFor="let profileSection of profileSections"
+        <li *ngFor="let profileRoute of profileRoutes"
             class="nav-item side-nav-button mb-3 cursor-pointer">
           <a class="link text-primary"
-             (click)="context.router[profileSection.routerCall]()">{{profileSection.displayText}}</a>
+             (click)="context.router[profileRoute.routerCall]()">{{profileRoute.displayText}}</a>
         </li>
       </ul>
     </div>

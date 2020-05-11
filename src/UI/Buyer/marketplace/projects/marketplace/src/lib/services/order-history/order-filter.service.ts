@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
-import { OrderStatus, OrderFilters } from '../../shopper-context';
+import { OrderStatus, OrderFilters, OrderViewContext, AppConfig } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { OcMeService, ListOrder } from '@ordercloud/angular-sdk';
+import { OcMeService, ListOrder, OcOrderService, OcTokenService } from '@ordercloud/angular-sdk';
 import { filter } from 'rxjs/operators';
+import { RouteService } from '../route/route.service';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 export interface IOrderFilters {
   activeFiltersSubject: BehaviorSubject<OrderFilters>;
@@ -30,12 +32,19 @@ export class OrderFilterService implements IOrderFilters {
 
   constructor(
     private ocMeService: OcMeService,
+    private ocOrderService: OcOrderService,
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private routeService: RouteService,
+
+    // remove below when sdk is regenerated
+    private ocTokenService: OcTokenService,
+    private httpClient: HttpClient,
+    private appConfig: AppConfig
   ) {
     this.activatedRoute.queryParams
-      .pipe(filter(() => this.router.url.startsWith('/profile/orders')))
+      .pipe(filter(() => this.router.url.startsWith('/orders')))
       .subscribe(this.readFromUrlQueryParams);
   }
 
@@ -63,6 +72,10 @@ export class OrderFilterService implements IOrderFilters {
     this.patchFilterState({ status: status || undefined, page: undefined });
   }
 
+  filterByLocation(locationID: string): void {
+    this.patchFilterState({ location: locationID || undefined, page: undefined });
+  }
+
   filterByDateSubmitted(fromDate: string, toDate: string): void {
     this.patchFilterState({
       fromDate: fromDate || undefined,
@@ -75,10 +88,10 @@ export class OrderFilterService implements IOrderFilters {
   }
 
   private readFromUrlQueryParams = (params: Params): void => {
-    const { page, sortBy, search, fromDate, toDate } = params;
+    const { page, sortBy, search, fromDate, toDate, location } = params;
     const status = params.status;
     const showOnlyFavorites = !!params.favorites;
-    this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate });
+    this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate, location });
   };
 
   private getDefaultParms() {
@@ -90,20 +103,58 @@ export class OrderFilterService implements IOrderFilters {
       status: undefined,
       showOnlyFavorites: false,
       fromDate: undefined,
+      location: undefined,
       toDate: undefined,
     };
   }
 
   // Used to update the URL
   mapToUrlQueryParams(model: OrderFilters): Params {
-    const { page, sortBy, search, status, fromDate, toDate } = model;
+    const { page, sortBy, search, status, fromDate, toDate, location } = model;
     const favorites = model.showOnlyFavorites ? 'true' : undefined;
-    return { page, sortBy, search, status, favorites, fromDate, toDate };
+    return { page, sortBy, search, status, favorites, fromDate, toDate, location };
   }
 
   // Used in requests to the OC API
   async listOrders(): Promise<ListOrder> {
-    return await this.ocMeService.ListOrders(this.createListOptions()).toPromise();
+    const viewContext = this.routeService.getOrderViewContext();
+    switch (viewContext) {
+      case OrderViewContext.MyOrders:
+        return await this.ocMeService.ListOrders(this.createListOptions()).toPromise();
+      case OrderViewContext.Approve:
+        return await this.ocMeService.ListApprovableOrders(this.createListOptions()).toPromise();
+      case OrderViewContext.Location:
+        // enforcing a location is selected before filtering
+        if (this.activeFiltersSubject.value.location) return await this.ListLocationOrders();
+    }
+  }
+
+  async ListLocationOrders(): Promise<ListOrder> {
+    const locationID = this.activeFiltersSubject.value.location;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+    const url = `${this.appConfig.middlewareUrl}/order/location/${this.activeFiltersSubject.value.location}`;
+    const httpParams = this.createHttpParams();
+    return this.httpClient
+      .get<ListOrder>(url, { headers: headers, params: httpParams })
+      .toPromise();
+  }
+
+  private createHttpParams(): HttpParams {
+    let params = new HttpParams();
+    Object.entries(this.createListOptions()).forEach(([key, value]) => {
+      if (key !== 'filters' && value) {
+        params = params.append(key, value.toString());
+      }
+    });
+    Object.entries(this.createListOptions().filters).forEach(([key, value]) => {
+      if ((typeof value !== 'object' && value) || (value && value.length)) {
+        params = params.append(key, value.toString());
+      }
+    });
+    return params;
   }
 
   async listApprovableOrders(): Promise<ListOrder> {

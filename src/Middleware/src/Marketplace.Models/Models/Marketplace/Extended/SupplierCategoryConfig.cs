@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cosmonaut.Attributes;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Helpers.Models;
 
 namespace Marketplace.Models.Extended
 {
     [SwaggerModel]
-    public class SupplierCategoryConfig : ICosmosObject
+	[CosmosCollection("suppliercategoryconfigs")]
+	public class SupplierCategoryConfig : ICosmosObject
     {
         public SupplierCategoryConfig()
         {

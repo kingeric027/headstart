@@ -100,7 +100,7 @@ namespace Marketplace.Helpers.Attributes
     //public class ApiWriteOnlyAttribute : Attribute { }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
-    public class ApiIgnore : Attribute
+    public class ApiIgnoreAttribute : Attribute
     {
     }
 

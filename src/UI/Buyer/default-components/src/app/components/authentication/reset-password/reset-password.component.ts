@@ -1,7 +1,6 @@
 // angular
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-
 // angular libs
 
 // ordercloud
@@ -20,7 +19,7 @@ export class OCMResetPassword implements OnInit {
   resetCode: string;
   appName: string;
 
-  constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
+  constructor(private toasterService: ToastrService, private context: ShopperContextService) { }
 
   ngOnInit(): void {
     // TODO - figure out how to access url.

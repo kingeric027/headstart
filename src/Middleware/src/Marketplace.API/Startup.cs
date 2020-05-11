@@ -1,4 +1,11 @@
-﻿using Flurl.Http;
+﻿using Avalara.AvaTax.RestClient;
+using Flurl.Http;
+using Integrations.Avalara;
+using Integrations.CMS;
+using Integrations.SmartyStreets;
+using Marketplace.CMS.Models;
+using Marketplace.CMS.Queries;
+using Marketplace.CMS.Storage;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
@@ -8,7 +15,6 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.Avalara;
-using Marketplace.Common.Services.CardConnect;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
@@ -22,6 +28,7 @@ using Marketplace.Models.Extended;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using ordercloud.integrations.cardconnect;
 using OrderCloud.SDK;
 
 namespace Marketplace.API
@@ -41,33 +48,49 @@ namespace Marketplace.API
         {
             var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
                 _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
-            services
-                .ConfigureWebApiServices(_settings)
+			var avalaraConfig = new AvalaraConfig()
+			{
+				Env = _settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox,
+				AccountID = _settings.AvalaraSettings.AccountID,
+				LicenseKey = _settings.AvalaraSettings.LicenseKey,
+				CompanyCode = _settings.AvalaraSettings.CompanyCode,
+				HostUrl = _settings.EnvironmentSettings.BaseUrl
+			};
+			var cmsConfig = new CMSConfig()
+			{
+				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
+				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
+			};
+			services
+				.ConfigureWebApiServices(_settings)
 				.ConfigureOpenApiSpec("v1", "Marketplace API")
-                .Inject<IAppSettings>()
-                .Inject<IDevCenterService>()
-                .Inject<IFlurlClient>()
-                .Inject<IZohoClient>()
-                .Inject<IZohoCommand>()
-                .Inject<ISyncCommand>()
-                .Inject<IAvalaraService>()
-                .Inject<IFreightPopService>()
-                .Inject<ISmartyStreetsService>()
-                .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-                .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
-                .InjectCosmosStore<ImageProductAssignmentQuery, ImageProductAssignment>(cosmosConfig)
-                .InjectCosmosStore<ImageQuery, Image>(cosmosConfig)
-                .Inject<IOrchestrationCommand>()
-                .Inject<IOrchestrationLogCommand>()
-                .Inject<IOCShippingIntegration>()
-                .Inject<IShipmentCommand>()
-                .Inject<IValidatedAddressCommand>()
-                .Inject<IEnvironmentSeedCommand>()
-                .Inject<IOrderCloudSandboxService>()
-                .Inject<IMarketplaceProductCommand>()
-                .Inject<ISupplierCategoryConfigQuery>()
-                .Inject<ISendgridService>()
-                .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
+				.Inject<AppSettings>()
+				.Inject<IDevCenterService>()
+				.Inject<IFlurlClient>()
+				.Inject<IZohoClient>()
+				.Inject<IZohoCommand>()
+				.Inject<ISyncCommand>()
+				.Inject<IValidatedAddressCommand>()
+				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
+				.Inject<IFreightPopService>()
+				.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
+				.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
+				.InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
+				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
+				.InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig)
+				.AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
+				.Inject<IOrchestrationCommand>()
+				.Inject<IOrchestrationLogCommand>()
+				.Inject<IOCShippingIntegration>()
+				.Inject<IShipmentCommand>()
+				.AddSingleton<ISmartyStreetsCommand>(x => new SmartyStreetsCommand(_settings.SmartyStreetSettings))
+				.Inject<IEnvironmentSeedCommand>()
+				.Inject<IOrderCloudSandboxService>()
+				.Inject<IMarketplaceProductCommand>()
+				.Inject<ISendgridService>()
+				.Inject<IAssetQuery>()
+				.Inject<ISupplierCategoryConfigQuery>()
+				.InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
                 {
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                     AuthUrl = _settings.OrderCloudSettings.AuthUrl,
@@ -78,8 +101,8 @@ namespace Marketplace.API
                         ApiRole.FullAccess
                     }
                 })
-                .Inject<ICardConnectService>()
-                .Inject<ICreditCardCommand>()
+                .Inject<IOrderCloudIntegrationsCardConnectCommand>()
+				.AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .Inject<IMarketplaceSupplierCommand>()
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser")

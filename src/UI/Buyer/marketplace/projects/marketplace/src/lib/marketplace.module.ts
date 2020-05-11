@@ -1,10 +1,6 @@
 // core services
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  MarketplaceRoutingModule,
-  MyOrdersWrapperComponent,
-  OrdersToApproveWrapperComponent,
-} from './marketplace-routing.module';
+import { MarketplaceRoutingModule, OrderHistoryWrapperComponent } from './marketplace-routing.module';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
@@ -42,8 +38,8 @@ import { CheckoutService } from './services/order/checkout.service';
 import { OrderStateService } from './services/order/order-state.service';
 import { Configuration } from 'marketplace-javascript-sdk';
 import { AppConfig } from './shopper-context';
-import { UserManagementWrapperComponent } from './wrapper-components/user-management-wrapper.component';
 import { OrdersToApproveStateService } from './services/order-history/order-to-approve-state.service';
+import { LocationManagementWrapperComponent } from './wrapper-components/location-management-wrapper.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -55,7 +51,6 @@ import { OrdersToApproveStateService } from './services/order-history/order-to-a
     MeProductResolver,
     MeListSpecsResolver,
     MeListRelatedProductsResolver,
-
     AuthService,
     CreditCardService,
     CurrentOrderService,
@@ -77,6 +72,7 @@ import { OrdersToApproveStateService } from './services/order-history/order-to-a
     CheckoutWrapperComponent,
     AddressListWrapperComponent,
     LocationListWrapperComponent,
+    LocationManagementWrapperComponent,
     ForgotPasswordWrapperComponent,
     HomeWrapperComponent,
     LoginWrapperComponent,
@@ -86,12 +82,10 @@ import { OrdersToApproveStateService } from './services/order-history/order-to-a
     ProductListWrapperComponent,
     ProfileWrapperComponent,
     RegisterWrapperComponent,
-    UserManagementWrapperComponent,
     ResetPasswordWrapperComponent,
     OrderDetailWrapperComponent,
     OrderShipmentsWrapperComponent,
-    MyOrdersWrapperComponent,
-    OrdersToApproveWrapperComponent,
+    OrderHistoryWrapperComponent,
     SupplierListWrapperComponent,
   ],
 })

@@ -19,5 +19,6 @@ namespace Marketplace.Models.Models.Marketplace
         public Contact SupportContact { get; set; }
         public bool SyncFreightPop { get; set; }
         public string ApiClientID { get; set; }
+        public string Currency { get; set; }
     }
 }

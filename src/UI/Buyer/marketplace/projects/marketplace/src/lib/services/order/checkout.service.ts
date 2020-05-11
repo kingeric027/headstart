@@ -12,15 +12,19 @@ import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
 import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/ordercloud-sandbox.models';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
-import { MarketplaceSDK, CreditCardToken, CreditCardPayment, Address } from 'marketplace-javascript-sdk';
-import { onErrorResumeNext } from 'rxjs';
+import {
+  MarketplaceSDK,
+  Address,
+  OrderCloudIntegrationsCreditCardPayment,
+  OrderCloudIntegrationsCreditCardToken,
+} from 'marketplace-javascript-sdk';
 
 export interface ICheckout {
-  submit(card: CreditCardPayment, marketplaceID: string): Promise<string>;
+  submit(card: OrderCloudIntegrationsCreditCardPayment, marketplaceID: string): Promise<string>;
   addComment(comment: string): Promise<MarketplaceOrder>;
   listPayments(): Promise<ListPayment>;
   createSavedCCPayment(card: MarketplaceBuyerCreditCard): Promise<Payment>;
-  createOneTimeCCPayment(card: CreditCardToken): Promise<Payment>;
+  createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken): Promise<Payment>;
   setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder>;
   setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
   setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder>;
@@ -44,7 +48,7 @@ export class CheckoutService implements ICheckout {
     private appConfig: AppConfig
   ) {}
 
-  async submit(payment: CreditCardPayment): Promise<string> {
+  async submit(payment: OrderCloudIntegrationsCreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
     await MarketplaceSDK.MePayments.Post(payment); // authorize card
     await this.incrementOrderIfNeeded();
@@ -117,7 +121,7 @@ export class CheckoutService implements ICheckout {
     return await this.createCCPayment(card.PartialAccountNumber, card.CardType, card.ID);
   }
 
-  async createOneTimeCCPayment(card: CreditCardToken): Promise<Payment> {
+  async createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken): Promise<Payment> {
     // This slice() is sooo crucial. Otherwise we would be storing creditcard numbers in xp.
     // Which would be really really bad.
     const partialAccountNum = card.AccountNumber.slice(-4);

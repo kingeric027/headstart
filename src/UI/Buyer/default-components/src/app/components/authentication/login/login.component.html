@@ -1,19 +1,23 @@
 <div class="text-center">
-  <p *ngIf="showRegisterLink()">Don't have an account? <button type="button"
+  <p *ngIf="showRegisterLink()"
+     translate>AUTHENTICATION.LOGIN.NO_ACCOUNT<button type="button"
             class="btn btn-link"
-            routerLink="/register">Sign Up</button></p>
+            routerLink="/register"
+            translate>AUTHENTICATION.LOGIN.SIGN_UP</button></p>
   <img class="logo" />
 </div>
 <div class="mx-auto mt-4"
      style="max-width:350px;">
-  <h3 class="text-center headline-text">Account Login</h3>
+  <h3 class="text-center headline-text"
+      translate>AUTHENTICATION.LOGIN.ACCOUNT_LOGIN</h3>
   <form (ngSubmit)="onSubmit()"
         [formGroup]="form"
         name="LoginForm"
         autocomplete="off"
         novalidate>
     <div class="form-group">
-      <label for="username">Username</label>
+      <label for="username"
+             translate>COMMON.USERNAME</label>
       <input formControlName="username"
              id="username"
              type="text"
@@ -23,7 +27,8 @@
              autofocus />
     </div>
     <div class="form-group">
-      <label for="password">Password</label>
+      <label for="password"
+             translate>COMMON.PASSWORD</label>
       <input formControlName="password"
              type="password"
              class="form-control"
@@ -36,18 +41,21 @@
           <input formControlName="rememberMe"
                  type="checkbox"
                  id="rememberMeId">
-          Remember Me
+          <span translate>AUTHENTICATION.LOGIN.REMEMBER_ME</span>
         </label>
       </div>
     </div>
     <button id="submitBtn"
             type="submit"
             [disabled]="!form.valid"
-            class="btn btn-primary btn-lg btn-block">Submit</button>
+            class="btn btn-primary btn-lg btn-block"
+            translate>COMMON.SUBMIT</button>
   </form>
   <button type="button"
           class="btn btn-link btn-block text-center"
-          routerLink="/forgot-password">Reset Password</button>
+          routerLink="/forgot-password"
+          translate>AUTHENTICATION.LOGIN.RESET_PASS</button>
   <a class="btn btn-link btn-block text-center"
-          [href]="ssoLink">Login with Anytime Fitness Account</a>
+     [href]="ssoLink"
+     translate>AUTHENTICATION.LOGIN.LOGIN</a>
 </div>

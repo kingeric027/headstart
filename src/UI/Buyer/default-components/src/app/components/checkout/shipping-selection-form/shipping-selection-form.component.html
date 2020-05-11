@@ -1,12 +1,19 @@
-<form [formGroup]="form" class="p-3">
-  <p>Shipping Speed <fa-icon [icon]="faQuestionCircle"
-                              ngbTooltip="Shipping estimates are based on delivery speed after items have been shipped by the carrier."
-                              placement="right-bottom auto" >
-  </fa-icon></p>
-  <select class="custom-select" formControlName="ShipMethodID" (change)="onFormChanges()">
-    <option [ngValue]="null" disabled>How fast should this ship?</option>
-    <option *ngFor="let shipMethod of _shipEstimate?.ShipMethods" [ngValue]="shipMethod.ID">
-      {{ shipMethod.EstimatedTransitDays }} day{{ detectPlural(shipMethod.EstimatedTransitDays) }} - {{ shipMethod.Cost | currency }}
+<form [formGroup]="form"
+      class="p-3">
+  <p translate>CHECKOUT.SHIPPING_SELECTION_FORM.SHIPPING_SPEED <fa-icon [icon]="faQuestionCircle"
+             ngbTooltip="Shipping estimates are based on delivery speed after items have been shipped by the carrier."
+             placement="right-bottom auto">
+    </fa-icon>
+  </p>
+  <select class="custom-select"
+          formControlName="ShipMethodID"
+          (change)="onFormChanges()">
+    <option [ngValue]="null"
+            disabled
+            translate>CHECKOUT.SHIPPING_SELECTION_FORM.HOW_FAST</option>
+    <option *ngFor="let shipMethod of _shipEstimate?.ShipMethods"
+            [ngValue]="shipMethod.ID">
+      {{ shipMethod.EstimatedTransitDays }} <span translate>CHECKOUT.SHIPPING_SELECTION_FORM.DAY</span>{{ detectPlural(shipMethod.EstimatedTransitDays) }} - {{ shipMethod.Cost | currency }}
     </option>
   </select>
 </form>
