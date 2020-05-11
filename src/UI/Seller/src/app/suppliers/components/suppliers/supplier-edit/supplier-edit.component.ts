@@ -3,6 +3,7 @@ import { get as _get } from 'lodash';
 import { FormGroup } from '@angular/forms';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
+import { SupplierService } from '../supplier.service';
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
