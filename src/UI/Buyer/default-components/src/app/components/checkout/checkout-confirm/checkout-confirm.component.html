@@ -4,16 +4,14 @@
                     [payments]="payments"></ocm-payment-list>
   <div class="row">
     <div class="col-6">
-      <small class="font-weight-bold text-muted text-uppercase"
-             translate>CHECKOUT.CHECKOUT_CONFIRM.SHIP_TO:</small>
+      <small class="font-weight-bold text-muted text-uppercase"><span translate>CHECKOUT.CHECKOUT_CONFIRM.SHIP_TO</span>:</small>
       <ocm-address-card *ngIf="lineItems?.Items[0].ShippingAddress"
                         [address]="lineItems?.Items[0].ShippingAddress"
                         addressTitle="Shipping Address">
       </ocm-address-card>
     </div>
     <div class="col-6">
-      <small class="font-weight-bold text-muted text-uppercase"
-             translate>CHECKOUT.CHECKOUT_CONFIRM.BILL_TO:</small>
+      <small class="font-weight-bold text-muted text-uppercase"><span translate>CHECKOUT.CHECKOUT_CONFIRM.BILL_TO</span>:</small>
       <ocm-address-card [address]="order.BillingAddress"
                         addressTitle="Billing Address"
                         *ngIf="order?.BillingAddress">
