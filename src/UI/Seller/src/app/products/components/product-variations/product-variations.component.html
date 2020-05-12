@@ -108,7 +108,9 @@
                            (change)="isCreatingNew ? stageDefaultSpecOption(spec.ID, opt.ID, specIndex) : setDefaultSpecOption(spec.ID, opt.ID, specIndex)"
                            [disabled]="disableSpecOption(specIndex, opt)"
                            id="DefaultSpecOption">
-                    <span class="checkmark"></span>
+                    <span class="checkmark"
+                          [matTooltip]="disableSpecOption(specIndex, opt) ? 'Product must be saved before setting this new option as default' : ''" >
+                    </span>
                   </label>
                 </td>
                 <td>{{getPriceMarkup(opt) | currency}}</td>
