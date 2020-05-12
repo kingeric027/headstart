@@ -300,7 +300,7 @@ export class ProductEditComponent implements OnInit {
     this.checkForChanges();
   }
 
-  async uploadAsset(productID: string, file: FileHandle, assetType: string, containerID: string): Promise<SuperMarketplaceProduct> {
+  async uploadAsset(productID: string, file: FileHandle, assetType: string): Promise<SuperMarketplaceProduct> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
     const asset: AssetUpload = {
       Active: true,
@@ -308,20 +308,15 @@ export class ProductEditComponent implements OnInit {
       Type: (assetType as AssetUpload["Type"]),
       FileName: file.Filename
     }
-    const newAsset: Asset = await MarketplaceSDK.Upload.UploadAsset(containerID, asset, accessToken);
-    const assetAssignment: AssetAssignment = {
-      ResourceType: "Products",
-      AssetID: newAsset.ID,
-      ResourceID: productID
-    }
-    await MarketplaceSDK.Assets.SaveAssignment(containerID, assetAssignment, accessToken);
+    const newAsset: Asset = await MarketplaceSDK.Upload.UploadAsset(asset, accessToken);
+    await MarketplaceSDK.ProductContents.SaveAssetAssignment(productID, newAsset.ID, accessToken);
     return await MarketplaceSDK.Products.Get(productID, accessToken);
   }
 
   async addDocuments(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.uploadAsset(productID, file, "Attachment", environment.marketplaceID);
+      superProduct = await this.uploadAsset(productID, file, "Attachment");
     }
     this.staticContentFiles = [];
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -332,7 +327,7 @@ export class ProductEditComponent implements OnInit {
   async addImages(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.uploadAsset(productID, file, "Image", environment.marketplaceID);
+      superProduct = await this.uploadAsset(productID, file, "Image");
     }
     this.imageFiles = []
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -343,7 +338,7 @@ export class ProductEditComponent implements OnInit {
   async removeFile(file: Asset): Promise<void> {
     let superProduct;
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    superProduct = await MarketplaceSDK.Assets.Delete(this.appConfig.marketplaceID, file.ID, accessToken);
+    superProduct = await MarketplaceSDK.Assets.Delete(file.ID, accessToken);
     superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
     this.refreshProductData(superProduct);
   }
@@ -431,7 +426,9 @@ export class ProductEditComponent implements OnInit {
   async createNewSuperMarketplaceProduct(
     superMarketplaceProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
+    const supplier = await this.currentUserService.getMySupplier();
     superMarketplaceProduct.Product.xp.Status = 'Draft';
+    superMarketplaceProduct.Product.xp.Currency = supplier?.xp?.Currency;
     superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
     return await MarketplaceSDK.Products.Post(superMarketplaceProduct);
