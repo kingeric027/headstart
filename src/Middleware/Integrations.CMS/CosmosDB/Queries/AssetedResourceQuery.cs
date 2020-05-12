@@ -3,6 +3,7 @@ using Cosmonaut.Extensions;
 using Integrations.CMS;
 using Integrations.CMS.Models;
 using Marketplace.CMS.Models;
+using Marketplace.CMS.Storage;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Extensions;
 using Marketplace.Helpers.Helpers;
@@ -32,11 +33,13 @@ namespace Marketplace.CMS.Queries
 	{
 		private readonly ICosmosStore<AssetedResource> _store;
 		private readonly IAssetQuery _assets;
+		private readonly IBlobStorage _blob;
 
-		public AssetedResourceQuery(ICosmosStore<AssetedResource> store, IAssetQuery assets)
+		public AssetedResourceQuery(ICosmosStore<AssetedResource> store, IAssetQuery assets, IBlobStorage blob)
 		{
 			_store = store;
 			_assets = assets;
+			_blob = blob;
 		}
 
 		public async Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user)
@@ -60,15 +63,12 @@ namespace Marketplace.CMS.Queries
 		public async Task<string> GetFirstImage(Resource resource, VerifiedUserContext user)
 		{
 			var assetedResource = await GetExisting(resource);
-			if (assetedResource == null) return "No Image";
-			if (assetedResource.ImageAssetIDs.Count > 0)
+			if (assetedResource?.ImageAssetIDs == null || assetedResource.ImageAssetIDs.Count == 0)
 			{
-				var asset = await _assets.GetAcrossContainers(assetedResource.ImageAssetIDs.First());
-				return asset.Url;
-			} else
-			{
-				throw new NotImplementedException();
+				return GetPlaceholderImageUrl(resource.Type);
 			}
+			var asset = await _assets.GetAcrossContainers(assetedResource.ImageAssetIDs.First());
+			return asset.Url;
 		}
 
 		public async Task SaveAssignment(Resource resource, string assetID, VerifiedUserContext user)
@@ -110,11 +110,24 @@ namespace Marketplace.CMS.Queries
 			return assetedResource;
 		}
 
-		public List<string> GetAssetIDs(AssetedResource assetedResource, AssetType assetType)
+		private List<string> GetAssetIDs(AssetedResource assetedResource, AssetType assetType)
 		{
 			var property = assetedResource.GetType().GetProperty($"{assetType.ToString()}AssetIDs");
 			var list = (List<string>) property.GetValue(assetedResource, null) ?? new List<string>();
 			return list;
+		}
+
+		private string GetPlaceholderImageUrl(ResourceType type)
+		{
+			var url = $"{_blob.Config.BlobStorageHostUrl}/placeholder-images";
+			switch (type)
+			{
+				case ResourceType.Products:
+					return $"{url}/product";
+				default:
+					return $"{url}/generic";
+			}
+
 		}
 	}
 }
