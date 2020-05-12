@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Integrations.CMS.Models;
 using Marketplace.CMS.Models;
-using Marketplace.CMS.Queries;
 using Marketplace.Models;
+using ordercloud.integrations.CMS.Models;
+using ordercloud.integrations.CMS.Queries;
 using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 

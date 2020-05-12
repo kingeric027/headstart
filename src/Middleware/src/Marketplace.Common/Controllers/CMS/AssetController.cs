@@ -1,11 +1,13 @@
 ﻿using Marketplace.CMS.Models;
-using Marketplace.CMS.Queries;
 using Marketplace.Common;
 using Marketplace.Common.Controllers;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
+using ordercloud.integrations.CMS.Models;
+using ordercloud.integrations.CMS.Queries;
+using ordercloud.integrations.cosmos;
 using ordercloud.integrations.extensions;
 using ordercloud.integrations.openapispec;
 
@@ -27,7 +29,7 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("List Assets")]
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<ListPage<Asset>> List(ListArgs<Asset> args)
+		public async Task<ListPage<Asset>> List(CosmosListArgs<Asset> args)
 		{
 			return await _assets.List(args, VerifiedUserContext);
 		}

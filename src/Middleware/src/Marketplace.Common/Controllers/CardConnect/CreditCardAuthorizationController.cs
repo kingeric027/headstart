@@ -1,8 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Marketplace.Common.Commands;
-using Marketplace.Models;
 using Marketplace.Models.Attributes;
-using Marketplace.Models.Misc;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.extensions;

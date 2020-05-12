@@ -21,7 +21,7 @@ namespace Marketplace.Common.Queries
             _store = store;
         }
 
-        public async Task<ListPage<OrchestrationLog>> List(IListArgs args)
+        public async Task<ListPage<OrchestrationLog>> List(ICosmosListArgs args)
         {
             var query = _store.Query(new FeedOptions() { EnableCrossPartitionQuery = true })
                 .Search(args)

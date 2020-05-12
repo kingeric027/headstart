@@ -7,6 +7,7 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Exceptions;
+using Marketplace.Models.Extended;
 using ordercloud.integrations.extensions;
 using Newtonsoft.Json.Linq;
 using OrderCloud.SDK;
@@ -56,15 +57,9 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         private List<LineItem> GetLineItemsToIncludeInShipping(IList<LineItem> lineItems, CheckoutIntegrationConfiguration configData)
         {
-            if(configData.ExcludePOProductsFromShipping)
-            {
-                return lineItems.Where(li =>
-                {
-                    return !(li.Product.xp.ProductType == ProductType.PurchaseOrder.ToString());
-                }).ToList();
-            } else {
-                return lineItems.ToList();
-            }
+            return configData.ExcludePOProductsFromShipping ? 
+                lineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder.ToString()).ToList() : 
+                lineItems.ToList();
         }
 
         public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload)

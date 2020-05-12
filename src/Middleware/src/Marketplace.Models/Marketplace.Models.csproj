@@ -15,13 +15,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ordercloud.integrations.extensions" Version="0.0.7" />
+    <PackageReference Include="Cosmonaut" Version="2.11.3" />
     <PackageReference Include="OrderCloud.SDK" Version="0.9.0-pre1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-cms\src\ordercloud.integrations.CMS\ordercloud.integrations.CMS.csproj" />
+    <ProjectReference Include="..\..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-cosmos\src\ordercloud-integrations-cosmos\ordercloud-integrations-cosmos.csproj" />
     <ProjectReference Include="..\..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-openapispec\src\ordercloud-integrations-openapispec\ordercloud.integrations.openapispec.csproj" />
-    <ProjectReference Include="..\..\Integrations.CMS\Integrations.CMS.csproj" />
   </ItemGroup>
 
   <ItemGroup>

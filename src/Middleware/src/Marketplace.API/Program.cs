@@ -12,7 +12,7 @@ namespace Marketplace.API
 			// Set this in your visual studio Env Variables.
 			var connectionString = Environment.GetEnvironmentVariable("APP_CONFIG_CONNECTION"); 
 
-			Marketplace.Helpers.WebHostBuilder
+			ordercloud.integrations.extensions.WebHostBuilder
 				.CreateWebHostBuilder<Startup, AppSettings>(args, connectionString)
 				.Build()
 				.Run();

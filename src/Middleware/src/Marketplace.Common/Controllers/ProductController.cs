@@ -1,13 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Marketplace.CMS.Models;
-using Marketplace.CMS.Queries;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Controllers.CMS;
-using Marketplace.Models;
-using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.extensions;
 using ordercloud.integrations.openapispec;
+using Marketplace.Common.Commands.Crud;
+using Marketplace.Models;
+using Marketplace.Models.Attributes;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers

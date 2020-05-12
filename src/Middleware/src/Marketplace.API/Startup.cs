@@ -1,11 +1,11 @@
-﻿using Avalara.AvaTax.RestClient;
+﻿using System;
+using Avalara.AvaTax.RestClient;
 using Flurl.Http;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Integrations.Avalara;
-using Integrations.CMS;
-using Integrations.SmartyStreets;
 using Marketplace.CMS.Models;
-using Marketplace.CMS.Queries;
-using Marketplace.CMS.Storage;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
@@ -22,13 +22,14 @@ using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.SmartyStreets;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Models.Extended;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using ordercloud.integrations.cardconnect;
+using ordercloud.integrations.CMS;
+using ordercloud.integrations.CMS.Models;
+using ordercloud.integrations.CMS.Queries;
+using ordercloud.integrations.CMS.Storage;
 using ordercloud.integrations.cosmos;
-using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.API
 {
@@ -60,7 +61,8 @@ namespace Marketplace.API
 				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
 				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
 			};
-			services
+
+            services
 				.ConfigureWebApiServices(_settings, null)
 				.ConfigureOpenApiSpec("v1", "Marketplace API")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
@@ -68,52 +70,58 @@ namespace Marketplace.API
                 .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
                 .InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
-				.Inject<IDevCenterService>()
+                .Inject<IDevCenterService>()
 				.Inject<IFlurlClient>()
 				.Inject<IZohoClient>()
 				.Inject<IZohoCommand>()
 				.Inject<ISyncCommand>()
 				.Inject<IValidatedAddressCommand>()
-				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
 				.Inject<IFreightPopService>()
-				.AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
 				.Inject<IOrchestrationCommand>()
 				.Inject<IOrchestrationLogCommand>()
 				.Inject<IOCShippingIntegration>()
 				.Inject<IShipmentCommand>()
-				.AddSingleton<ISmartyStreetsCommand>(x => new SmartyStreetsCommand(_settings.SmartyStreetSettings))
-				.Inject<IEnvironmentSeedCommand>()
+                .Inject<IEnvironmentSeedCommand>()
 				.Inject<IOrderCloudSandboxService>()
 				.Inject<IMarketplaceProductCommand>()
 				.Inject<ISendgridService>()
 				.Inject<IAssetQuery>()
 				.Inject<ISupplierCategoryConfigQuery>()
-				.InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig
-                {
-                    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
-                    ClientId = _settings.OrderCloudSettings.ClientID,
-                    ClientSecret = _settings.OrderCloudSettings.ClientSecret,
-                    Roles = new[]
-                    {
-                        ApiRole.FullAccess
-                    }
-                })
-                .Inject<IOrderCloudIntegrationsCardConnectCommand>()
-				.AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .Inject<IMarketplaceSupplierCommand>()
+                .Inject<IOrderCloudIntegrationsCardConnectCommand>()
+                .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
+                .AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
+                .AddSingleton<ISmartyStreetsCommand>(x => new SmartyStreetsCommand(_settings.SmartyStreetSettings))
+                .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("MarketplaceUser")
                 .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>(
                     "OrderCloudWebhook",
                     opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
+                    .AddTransient<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
+                    {
+                        ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+                        AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                        ClientId = _settings.OrderCloudSettings.ClientID,
+                        ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                        Roles = new[]
+                    {
+                        ApiRole.FullAccess
+                    }
+                    }))
                 .AddAuthentication();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.ConfigureWebApp(env, "v1");
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            app.UseMiddleware<GlobalExceptionHandler>();
+            app.UseHttpsRedirection();
+            app.UseMvc();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

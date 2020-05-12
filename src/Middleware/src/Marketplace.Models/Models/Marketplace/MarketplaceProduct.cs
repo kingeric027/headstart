@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Integrations.CMS.Models;
-using Marketplace.CMS.Models;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
+using ordercloud.integrations.CMS.Models;
 using ordercloud.integrations.openapispec;
 using OrderCloud.SDK;
-using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
 namespace Marketplace.Models
 {
@@ -46,7 +44,7 @@ namespace Marketplace.Models
         public Dictionary<string, List<string>> Facets = new Dictionary<string, List<string>>();
         #endregion
 
-        [Required]
+        [System.ComponentModel.DataAnnotations.Required]
         public ObjectStatus? Status { get; set; }
         public bool HasVariants { get; set; }
         [MaxLength(500), OrchestrationIgnore]
