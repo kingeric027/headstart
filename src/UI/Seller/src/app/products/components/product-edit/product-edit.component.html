@@ -351,7 +351,7 @@
           <span matBadgeSize="medium"
                 matBadgeOverlap="false"
                 matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Images?.length}} images and documents."
-                [matBadge]="_superMarketplaceProductEditable?.Images?.length + _superMarketplaceProductEditable?.Product?.xp?.StaticContent?.length + imageFiles?.length + staticContentFiles?.length">Images & Documents</span>
+                [matBadge]="_superMarketplaceProductEditable?.Images?.length + _superMarketplaceProductEditable?.Attachments?.length + imageFiles?.length + staticContentFiles?.length">Images & Documents</span>
         </ng-template>
         <div class="container-fluid">
           <div class="row pt-3">
@@ -455,7 +455,7 @@
                     <label *ngIf="documentName?.length"
                            class="btn btn-outline-primary"
                            for="documentUpload"
-                           (files)="stageImages($event)">
+                           (files)="stageDocuments($event)">
                       choose file
                       <input id="documentUpload"
                              class="d-none"
@@ -466,7 +466,7 @@
                 </div>
                 <div *ngFor="let file of staticContentFiles; let i = index"
                      class="product-img-wrapper mr-2">
-                  <a class="text-link">{{file.FileName}}</a>
+                  <a class="text-link">{{file.Filename}}</a>
                   <div *ngIf="!readonly"
                        class="float-right float-middle">
                     <button title="Un-stage file"
