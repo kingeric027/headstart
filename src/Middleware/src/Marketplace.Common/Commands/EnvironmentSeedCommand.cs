@@ -163,7 +163,12 @@ namespace Marketplace.Common.Commands
 				EventType = IntegrationEventType.OrderCheckout,
 				CustomImplementationUrl = apiUrl,
 				Name = "FreightPOP Shipping",
-				HashKey = _settings.OrderCloudSettings.WebhookHashKey
+				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
+				ConfigData = new
+				{
+					ExcludePOProductsFromShipping = true,
+					ExcludePOProductsFromTax = true,
+				}
 			}, token);
 			var apiClients = await _oc.ApiClients.ListAsync(accessToken: token);
 			var buyerAppApiClientID = apiClients.Items.First(a => a.AppName.Contains("Buyer")).ID;
