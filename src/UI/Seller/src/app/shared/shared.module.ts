@@ -52,6 +52,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule, MatSelect } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
@@ -84,6 +85,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatIconModule,
     MatInputModule,
     MatSnackBarModule,
+    MatSelectModule,
 
     // Quill
     QuillModule.forRoot(),
@@ -110,6 +112,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatIconModule,
     MatInputModule,
     MatSnackBarModule,
+    MatSelectModule,
     // app components
     SearchComponent,
     SortColumnComponent,

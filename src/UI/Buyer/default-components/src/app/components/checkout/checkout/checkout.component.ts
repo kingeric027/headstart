@@ -9,9 +9,11 @@ import {
   ListBuyerCreditCard,
   ShipMethodSelection,
   ShipEstimate,
+  LineItem,
 } from 'marketplace';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
+import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -22,6 +24,7 @@ export class OCMCheckout implements OnInit {
   isAnon: boolean;
   order: MarketplaceOrder;
   lineItems: ListLineItem;
+  orderSummaryMeta: OrderSummaryMeta;
   payments: ListPayment;
   cards: ListBuyerCreditCard;
   selectedCard: SelectedCreditCard;
@@ -60,13 +63,18 @@ export class OCMCheckout implements OnInit {
     this.lineItems = this.context.order.cart.get();
     this.isAnon = this.context.currentUser.isAnonymous();
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.lineItems.Items, this.currentPanel)
     this.setValidation('login', !this.isAnon);
   }
 
   async doneWithShipToAddress(): Promise<void> {
     const orderWorksheet = await this.checkout.estimateShipping();
     this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
-    this.toSection('shippingSelection');
+    if(!this.orderSummaryMeta.StandardLineItemCount) {
+      this.toSection('payment');
+    } else {
+      this.toSection('shippingSelection');
+    }
   }
 
   async selectShipMethod(selection: ShipMethodSelection): Promise<void> {
@@ -84,34 +92,50 @@ export class OCMCheckout implements OnInit {
   }
 
   async onCardSelected(output: SelectedCreditCard): Promise<void> {
+    await this.checkout.deleteExistingPayments(); // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
     this.selectedCard = output;
     if (output.SavedCard) {
-      await this.checkout.createSavedCCPayment(output.SavedCard);
+      await this.checkout.createSavedCCPayment(output.SavedCard, this.orderSummaryMeta.CreditCardTotal);
       delete this.selectedCard.NewCard;
     } else {
       // need to figure out how to use the platform. ran into creditCardID cannot be null.
       // so for now I always save any credit card in OC.
       // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
       this.selectedCard.SavedCard = await this.context.currentUser.cards.Save(output.NewCard);
-      await this.checkout.createSavedCCPayment(this.selectedCard.SavedCard);
+      await this.checkout.createSavedCCPayment(this.selectedCard.SavedCard, this.orderSummaryMeta.CreditCardTotal);
     }
-
+    if(this.orderSummaryMeta.POLineItemCount) {
+      await this.checkout.createPurchaseOrderPayment(this.orderSummaryMeta.POTotal);
+    }
+    this.payments = await this.checkout.listPayments();
+    this.toSection('confirm');
+  }
+  
+  async onAcknowledgePurchaseOrder(): Promise<void> {
+    await this.checkout.deleteExistingPayments(); // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
+    await this.checkout.createPurchaseOrderPayment(this.orderSummaryMeta.POTotal);
     this.payments = await this.checkout.listPayments();
     this.toSection('confirm');
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
     await this.checkout.addComment(comment);
-    const ccPayment = {
-      OrderId: this.order.ID,
-      PaymentID: this.payments.Items[0].ID, // There's always only one at this point
-      CreditCardID: this.selectedCard?.SavedCard?.ID,
-      CreditCardDetails: this.selectedCard.NewCard,
-      Currency: 'USD', // TODO - won't always be USD
-      CVV: this.selectedCard.CVV,
-      MerchantID: this.context.appSettings.cardConnectMerchantID,
+
+    let cleanOrderID = '';
+    if(this.orderSummaryMeta.StandardLineItemCount) {
+      const ccPayment = {
+        OrderId: this.order.ID,
+        PaymentID: this.payments.Items[0].ID, // There's always only one at this point
+        CreditCardID: this.selectedCard?.SavedCard?.ID,
+        CreditCardDetails: this.selectedCard.NewCard,
+        Currency: 'USD', // TODO - won't always be USD
+        CVV: this.selectedCard.CVV,
+        MerchantID: this.context.appSettings.cardConnectMerchantID,
+      }
+      cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
+    } else {
+      cleanOrderID = await this.checkout.submitWithoutCreditCard();
     }
-    const cleanOrderID = await this.checkout.submit(ccPayment);
 
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(cleanOrderID);
@@ -126,9 +150,14 @@ export class OCMCheckout implements OnInit {
   }
 
   toSection(id: string): void {
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.lineItems.Items, id)
     const prevIdx = Math.max(this.sections.findIndex(x => x.id === id) - 1, 0);
-    const prev = this.sections[prevIdx].id;
-    this.setValidation(prev, true);
+    
+    // set validation to true on all previous sections
+    for(let i = 0; i <= prevIdx; i++) {
+      const prev = this.sections[i].id;
+      this.setValidation(prev, true);
+    }
     this.accordian.toggle(id);
   }
 

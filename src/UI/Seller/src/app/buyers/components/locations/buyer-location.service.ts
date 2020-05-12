@@ -14,6 +14,7 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
     UserGroup: {
       xp: {
         Type: '',
+        Currency: null,
       },
       ID: '',
       Name: '',

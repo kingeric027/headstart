@@ -3,7 +3,6 @@ import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OcTokenService, Order } from '@ordercloud/angular-sdk';
 import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
-import { ExchangeRates } from '@app-seller/shared/models/exchange-rates.interface';
 
 @Injectable({
   providedIn: 'root',

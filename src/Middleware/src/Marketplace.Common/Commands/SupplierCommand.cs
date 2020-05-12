@@ -32,6 +32,7 @@ namespace Marketplace.Common.Commands
             // Create Supplier
             supplier.ID = "{supplierIncrementor}";
             var ocSupplier = await _oc.Suppliers.CreateAsync(supplier, token);
+            supplier.ID = ocSupplier.ID;
             var ocSupplierID = ocSupplier.ID;
      
             // Create Integrations Supplier User

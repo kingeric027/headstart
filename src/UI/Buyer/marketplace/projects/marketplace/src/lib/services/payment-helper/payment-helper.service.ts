@@ -32,7 +32,7 @@ export class PaymentHelperService {
       case 'SpendingAccount':
         return this.ocMeService.GetSpendingAccount(payment.SpendingAccountID).toPromise();
       case 'PurchaseOrder':
-        return Promise.resolve({ PONumber: payment.xp.PONumber });
+        return Promise.resolve({ PONumber: payment.ID });
     }
   }
 }

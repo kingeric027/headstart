@@ -26,6 +26,7 @@ namespace Marketplace.Common.Commands
             buyer.ID = "{buyerIncrementor}";
             buyer.Active = true;
             var ocBuyer = await _oc.Buyers.CreateAsync(buyer, token);
+            buyer.ID = ocBuyer.ID;
             var ocBuyerID = ocBuyer.ID;
 
             // create base security profile assignment

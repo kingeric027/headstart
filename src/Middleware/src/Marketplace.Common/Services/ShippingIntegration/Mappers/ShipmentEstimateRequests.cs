@@ -8,13 +8,12 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
     public static class ShipmentEstimateRequestsMapper
     {
         // takes an order worksheet, groups up the line items and returns a list of rate requests
-        public static List<ShipmentEstimateRequest> Map(OrderWorksheet obj)
+        public static List<ShipmentEstimateRequest> Map(List<LineItem> lineItems)
         {
-            var proposedShipmentGroupings = obj.LineItems.GroupBy(li => li.ShipFromAddressID);
+            var proposedShipmentGroupings = lineItems.GroupBy(li => li.ShipFromAddressID);
             return proposedShipmentGroupings.Select(proposedShipmentGrouping =>
             {
-                var lineItems = proposedShipmentGrouping.ToList();
-                return ShipmentEstimateRequestMapper.Map(lineItems);
+                return ShipmentEstimateRequestMapper.Map(proposedShipmentGrouping.ToList());
             }).ToList();
         }
     }

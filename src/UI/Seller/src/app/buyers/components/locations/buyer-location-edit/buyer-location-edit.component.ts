@@ -10,6 +10,8 @@ import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interf
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
+import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',
@@ -42,12 +44,14 @@ export class BuyerLocationEditComponent implements OnInit {
   buyerLocationStatic: MarketplaceBuyerLocation;
   areChanges = false;
   dataIsSaving = false;
+  availableCurrencies: SupportedRates[] = [];
 
   constructor(
     private buyerLocationService: BuyerLocationService,
     private router: Router,
     private middleware: MiddlewareAPIService,
-    private currentUserService: CurrentUserService
+    private currentUserService: CurrentUserService,
+    private ocIntegrations: OcIntegrationsAPIService
   ) {}
 
   async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {
@@ -58,8 +62,9 @@ export class BuyerLocationEditComponent implements OnInit {
     this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
+    this.availableCurrencies = await this.ocIntegrations.getAvailableCurrencies();
   }
 
   createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation) {
@@ -78,6 +83,7 @@ export class BuyerLocationEditComponent implements OnInit {
       Email: new FormControl(buyerLocation.Address.xp.Email, ValidateEmail),
       // once sdk is regenerated we can remove
       LocationID: new FormControl((buyerLocation.Address.xp as any).LocationID),
+      Currency: new FormControl(buyerLocation.UserGroup.xp.Currency, Validators.required),
     });
   }
 
@@ -111,6 +117,7 @@ export class BuyerLocationEditComponent implements OnInit {
 
   async createNewBuyerLocation(): Promise<void> {
     try {
+      console.log(this.buyerLocationEditable)
       this.dataIsSaving = true;
       this.buyerLocationEditable.UserGroup.xp.Type = 'BuyerLocation';
       this.buyerLocationEditable.UserGroup.ID = this.buyerLocationEditable.Address.ID;
