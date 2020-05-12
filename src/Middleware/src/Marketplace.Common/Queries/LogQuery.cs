@@ -4,12 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
-using Marketplace.Common.Commands;
 using Marketplace.Common.Models;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Extensions;
-using Marketplace.Helpers.Models;
 using Microsoft.Azure.Documents.Client;
+using ordercloud.integrations.cosmos;
+using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Queries

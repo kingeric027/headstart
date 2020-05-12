@@ -6,11 +6,9 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Common.Services.Zoho.Mappers;
 using Marketplace.Common.Services.Zoho.Models;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Exceptions;
-using Marketplace.Helpers.Extensions;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 using ErrorCodes = Marketplace.Models.ErrorCodes;
 
@@ -75,7 +73,7 @@ namespace Marketplace.Common.Commands.Zoho
             }
             catch (Exception ex)
             {
-                throw new ApiErrorException(ErrorCodes.All["ZohoIntegrationError"], ex.Message);
+                throw new OrderCloudIntegrationException(ErrorCodes.All["ZohoIntegrationError"], ex.Message);
             }
         }
 
@@ -102,7 +100,7 @@ namespace Marketplace.Common.Commands.Zoho
             //TODO: evaluate if more specific throw type would be better for handling in command
             catch (Exception ex)
             {
-                throw new ApiErrorException(ErrorCodes.All["ZohoIntegrationError"], ex.Message);
+                throw new OrderCloudIntegrationException(ErrorCodes.All["ZohoIntegrationError"], ex.Message);
             }
         }
 

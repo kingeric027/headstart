@@ -5,7 +5,6 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
 using System.Linq;
 using Marketplace.Models.Models.Marketplace;
-using Marketplace.Helpers;
 using Marketplace.Common.Services.FreightPop.Models;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using System;
@@ -13,6 +12,7 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Models.Models.Misc;
+using ordercloud.integrations.extensions;
 using Action = System.Action;
 
 namespace Marketplace.Common.Commands

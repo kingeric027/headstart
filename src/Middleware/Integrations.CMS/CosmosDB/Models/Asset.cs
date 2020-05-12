@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using Cosmonaut.Attributes;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Helpers.Attributes;
-using Marketplace.Helpers.Models;
 using Microsoft.Azure.Documents;
 using Newtonsoft.Json;
+using ordercloud.integrations.cosmos;
+using ordercloud.integrations.openapispec;
 using OrderCloud.SDK;
 
 namespace Marketplace.CMS.Models
@@ -20,7 +19,7 @@ namespace Marketplace.CMS.Models
 	{
 		[JsonProperty("ID"), InteropID]
 		public string InteropID { get; set; }
-		[Required, ApiIgnore, CosmosPartitionKey]
+		[Required, ordercloud.integrations.extensions.ApiIgnore, CosmosPartitionKey]
 		public string ContainerID { get; set; } // real id, not interop. Don't need to set or return.
 		public string Title { get; set; }
 		public bool Active { get; set; } = false;

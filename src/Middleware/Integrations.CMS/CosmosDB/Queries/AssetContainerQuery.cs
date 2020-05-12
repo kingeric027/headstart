@@ -2,19 +2,11 @@
 using Cosmonaut.Extensions;
 using Marketplace.CMS.Models;
 using Marketplace.CMS.Storage;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Extensions;
-using Marketplace.Helpers.Models;
-using Marketplace.Helpers.Services;
-using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using static Marketplace.Helpers.Exceptions.ApiErrorException;
+using ordercloud.integrations.cosmos;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.CMS.Queries
 {
@@ -54,7 +46,7 @@ namespace Marketplace.CMS.Queries
 		public async Task<AssetContainer> Get(string interopID)
 		{
 			var container = await GetWithoutExceptions(interopID);
-			if (container == null) throw new NotFoundException("AssetContainer", interopID);
+			if (container == null) throw new OrderCloudIntegrationException.NotFoundException("AssetContainer", interopID);
 			return container;
 		}
 
@@ -72,7 +64,7 @@ namespace Marketplace.CMS.Queries
 		public async Task<AssetContainer> Create(AssetContainer container)
 		{
 			var matchingID = await GetWithoutExceptions(container.InteropID);
-			if (matchingID != null) throw new DuplicateIdException();
+			//if (matchingID != null) throw new OrderCloudIntegrationException.DuplicateIdException();
 			container = await _blob.OnContainerConnected(container);
 
 			var newContainer = await _store.AddAsync(container);

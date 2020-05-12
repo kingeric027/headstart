@@ -1,13 +1,11 @@
 using Marketplace.Common.Commands;
 using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Attributes;
-using Marketplace.Models.Misc;
-using Marketplace.Helpers;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common.Controllers
 {
@@ -33,7 +31,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
-        [HttpGet, Route("location/{locationID}"), MarketplaceUserAuth(ApiRole.Shopper)]
+        [HttpGet, Route("location/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<ListPage<Order>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)
         {
             return await _command.ListOrdersForLocation(locationID, listArgs, VerifiedUserContext);

@@ -21,9 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-cosmos\src\ordercloud-integrations-cosmos\ordercloud-integrations-cosmos.csproj" />
+    <ProjectReference Include="..\..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-extensions\src\ordercloud-integrations-extenions\ordercloud.integrations.extensions.csproj" />
     <ProjectReference Include="..\..\Integrations.CMS\Integrations.CMS.csproj" />
     <ProjectReference Include="..\Marketplace.Common\Marketplace.Common.csproj" />
-    <ProjectReference Include="..\Marketplace.Helpers\Marketplace.Helpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

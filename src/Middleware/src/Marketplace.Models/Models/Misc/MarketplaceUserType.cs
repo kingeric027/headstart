@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Marketplace.Helpers.Attributes;
 using Newtonsoft.Json.Converters;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Models.Misc
 {

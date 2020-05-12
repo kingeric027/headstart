@@ -4,8 +4,7 @@ using System.Threading.Tasks;
 using Flurl.Http.Testing;
 using NUnit.Framework;
 using ordercloud.integrations.cardconnect;
-using ordercloud.integrations.cardconnect.Mappers;
-using ordercloud.integrations.cardconnect.Models;
+using ordercloud.integrations.extensions;
 
 namespace CardConnect.Tests
 {
@@ -63,7 +62,7 @@ namespace CardConnect.Tests
 		public void auth_failure_attempt_tests(string body)
 		{
 			_http.RespondWith(body);
-			var ex = Assert.ThrowsAsync<Marketplace.Helpers.Exceptions.ApiErrorException>(() => _service.AuthWithoutCapture(new CardConnectAuthorizationRequest() { cvv2 = "112" }));
+			var ex = Assert.ThrowsAsync<OrderCloudIntegrationException>(() => _service.AuthWithoutCapture(new CardConnectAuthorizationRequest() { cvv2 = "112" }));
 		}
 
 		[Test]

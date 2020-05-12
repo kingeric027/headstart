@@ -1,10 +1,11 @@
 ﻿using Marketplace.Common.Commands;
-using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common.Controllers
 {
@@ -21,21 +22,21 @@ namespace Marketplace.Common.Controllers
 		}
 
 		// ME endpoints
-		[HttpPost, Route("me/addresses"), MarketplaceUserAuth(ApiRole.MeAddressAdmin)]
+		[HttpPost, Route("me/addresses"), OrderCloudIntegrationsAuth(ApiRole.MeAddressAdmin)]
 		public async Task<BuyerAddress> CreateMeAddress([FromBody] BuyerAddress address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);
 			return await _oc.Me.CreateAddressAsync(validation.ValidAddress, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpPut, Route("me/addresses/{addressID}"), MarketplaceUserAuth(ApiRole.MeAddressAdmin)]
+		[HttpPut, Route("me/addresses/{addressID}"), OrderCloudIntegrationsAuth(ApiRole.MeAddressAdmin)]
 		public async Task<BuyerAddress> SaveMeAddress(string addressID, [FromBody] BuyerAddress address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);
 			return await _oc.Me.SaveAddressAsync(addressID, validation.ValidAddress, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpPatch, Route("me/addresses/{addressID}"), MarketplaceUserAuth(ApiRole.MeAddressAdmin)]
+		[HttpPatch, Route("me/addresses/{addressID}"), OrderCloudIntegrationsAuth(ApiRole.MeAddressAdmin)]
 		public async Task PatchMeAddress(string addressID, [FromBody] BuyerAddress patch)
 		{
 			var address = await _addressCommand.GetPatchedMeAddress(addressID, patch, VerifiedUserContext.AccessToken);
@@ -45,21 +46,21 @@ namespace Marketplace.Common.Controllers
 
 		// BUYER endpoints
 
-		[HttpPost, Route("buyers/{buyerID}/addresses"), MarketplaceUserAuth(ApiRole.AddressAdmin)]
+		[HttpPost, Route("buyers/{buyerID}/addresses"), OrderCloudIntegrationsAuth(ApiRole.AddressAdmin)]
 		public async Task<Address> CreateBuyerAddress(string buyerID, [FromBody] Address address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);
 			return await _oc.Addresses.CreateAsync(buyerID, validation.ValidAddress, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpPut, Route("buyers/{buyerID}/addresses/{addressID}"), MarketplaceUserAuth(ApiRole.AddressAdmin)]
+		[HttpPut, Route("buyers/{buyerID}/addresses/{addressID}"), OrderCloudIntegrationsAuth(ApiRole.AddressAdmin)]
 		public async Task<Address> SaveBuyerAddress(string buyerID, string addressID, [FromBody] Address address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);
 			return await _oc.Addresses.SaveAsync(buyerID, addressID, validation.ValidAddress, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpPatch, Route("buyers/{buyerID}/addresses/{addressID}"), MarketplaceUserAuth(ApiRole.AddressAdmin)]
+		[HttpPatch, Route("buyers/{buyerID}/addresses/{addressID}"), OrderCloudIntegrationsAuth(ApiRole.AddressAdmin)]
 		public async Task<Address> PatchBuyerAddress(string buyerID, string addressID, [FromBody] Address patch)
 		{
 			var address = await _addressCommand.GetPatchedBuyerAddress(buyerID, addressID, patch, VerifiedUserContext.AccessToken);
@@ -69,21 +70,21 @@ namespace Marketplace.Common.Controllers
 
 		// SUPPLIER endpoints
 
-		[HttpPost, Route("suppliers/{supplierID}/addresses"), MarketplaceUserAuth(ApiRole.SupplierAddressAdmin)]
+		[HttpPost, Route("suppliers/{supplierID}/addresses"), OrderCloudIntegrationsAuth(ApiRole.SupplierAddressAdmin)]
 		public async Task<Address> CreateSupplierAddress(string supplierID, [FromBody] Address address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);
 			return await _oc.SupplierAddresses.CreateAsync(supplierID, validation.ValidAddress, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpPut, Route("suppliers/{supplierID}/addresses/{addressID}"), MarketplaceUserAuth(ApiRole.SupplierAddressAdmin)]
+		[HttpPut, Route("suppliers/{supplierID}/addresses/{addressID}"), OrderCloudIntegrationsAuth(ApiRole.SupplierAddressAdmin)]
 		public async Task<Address> SaveSupplierAddress(string supplierID, string addressID, [FromBody] Address address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);
 			return await _oc.SupplierAddresses.SaveAsync(supplierID, addressID, validation.ValidAddress, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpPatch, Route("suppliers/{supplierID}/addresses/{addressID}"), MarketplaceUserAuth(ApiRole.SupplierAddressAdmin)]
+		[HttpPatch, Route("suppliers/{supplierID}/addresses/{addressID}"), OrderCloudIntegrationsAuth(ApiRole.SupplierAddressAdmin)]
 		public async Task<Address> PatchSupplierAddress(string supplierID, string addressID, [FromBody] Address patch)
 		{
 			var address = await _addressCommand.GetPatchedSupplierAddress(supplierID, addressID, patch, VerifiedUserContext.AccessToken);
@@ -93,21 +94,21 @@ namespace Marketplace.Common.Controllers
 
 		// ADMIN endpoints
 
-		[HttpPost, Route("addresses"), MarketplaceUserAuth(ApiRole.AdminAddressAdmin)]
+		[HttpPost, Route("addresses"), OrderCloudIntegrationsAuth(ApiRole.AdminAddressAdmin)]
 		public async Task<Address> CreateAdminAddress([FromBody] Address address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);
 			return await _oc.AdminAddresses.CreateAsync(address, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpPut, Route("addresses/{addressID}"), MarketplaceUserAuth(ApiRole.AdminAddressAdmin)]
+		[HttpPut, Route("addresses/{addressID}"), OrderCloudIntegrationsAuth(ApiRole.AdminAddressAdmin)]
 		public async Task<Address> SaveAdminAddress(string addressID, [FromBody] Address address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);
 			return await _oc.AdminAddresses.SaveAsync(addressID, validation.ValidAddress, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpPatch, Route("addresses/{addressID}"), MarketplaceUserAuth(ApiRole.AdminAddressAdmin)]
+		[HttpPatch, Route("addresses/{addressID}"), OrderCloudIntegrationsAuth(ApiRole.AdminAddressAdmin)]
 		public async Task<Address> PatchAdminAddress(string addressID, [FromBody] Address patch)
 		{
 			var address = _addressCommand.GetPatchedAdminAddress(addressID, patch, VerifiedUserContext.AccessToken);
@@ -116,14 +117,14 @@ namespace Marketplace.Common.Controllers
 		}
 
 		// ORDER endpoints
-		[HttpPut, Route("order/{direction}/{orderID}/billto"), MarketplaceUserAuth(ApiRole.Shopper, ApiRole.OrderAdmin)]
+		[HttpPut, Route("order/{direction}/{orderID}/billto"), OrderCloudIntegrationsAuth(ApiRole.Shopper, ApiRole.OrderAdmin)]
 		public async Task<Order> SetBillingAddress(OrderDirection direction, string orderID, [FromBody] Address address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);
 			return await _oc.Orders.SetBillingAddressAsync(direction, orderID, validation.ValidAddress, VerifiedUserContext.AccessToken);
 		}
 
-		[HttpPut, Route("order/{direction}/{orderID}/shipto"), MarketplaceUserAuth(ApiRole.Shopper, ApiRole.OrderAdmin)]
+		[HttpPut, Route("order/{direction}/{orderID}/shipto"), OrderCloudIntegrationsAuth(ApiRole.Shopper, ApiRole.OrderAdmin)]
 		public async Task<Order> SetShippingAddress(OrderDirection direction, string orderID, [FromBody] Address address)
 		{
 			var validation = await _addressCommand.ValidateAddress(address);

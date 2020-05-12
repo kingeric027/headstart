@@ -1,16 +1,12 @@
 ﻿using Integrations.CMS.Models;
 using Marketplace.CMS.Models;
 using Marketplace.CMS.Queries;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common.Controllers.CMS.Resources
 {
@@ -30,7 +26,7 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 
 		// TODO - add list page and list args
 		[DocName("Get Assets Assigned to Resource")]
-		[HttpGet, Route("assets"), MarketplaceUserAuth]
+		[HttpGet, Route("assets"), OrderCloudIntegrationsAuth]
 		public async Task<ListPage<AssetForDelivery>> ListAssets(string productID, ListArgs<AssetForDelivery> args)
 		{
 			var resource = new Resource(type, productID);
@@ -51,14 +47,14 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 
 		// Content Admin
 		[DocName("Assign Asset to Resource")]
-		[HttpPost, Route("assets/{assetID}/assignments"), MarketplaceUserAuth]
+		[HttpPost, Route("assets/{assetID}/assignments"), OrderCloudIntegrationsAuth]
 		public async Task SaveAssetAssignment(string productID, string assetID)
 		{
 			var resource = new Resource(type, productID);
 			await _assetedResources.SaveAssignment(resource, assetID, VerifiedUserContext);
 		}
 
-		[DocName("Remove Asset from Resource"), MarketplaceUserAuth]
+		[DocName("Remove Asset from Resource"), OrderCloudIntegrationsAuth]
 		[HttpDelete, Route("assets/{assetID}/assignments")]
 		public async Task DeleteAssetAssignment(string productID, string assetID)
 		{
@@ -66,7 +62,7 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 			await _assetedResources.DeleteAssignment(resource, assetID, VerifiedUserContext);
 		}
 
-		[DocName("Reorder Asset Assignment"), MarketplaceUserAuth]
+		[DocName("Reorder Asset Assignment"), OrderCloudIntegrationsAuth]
 		[HttpPost, Route("assets/{assetID}/assignments/moveto/{listOrderWithinType}")]
 		public async Task MoveAssetAssignment(string productID, string assetID, int listOrderWithinType)
 		{

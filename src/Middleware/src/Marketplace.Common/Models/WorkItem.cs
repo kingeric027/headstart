@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Marketplace.Common.Exceptions;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common.Models
 {

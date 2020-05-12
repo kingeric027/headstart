@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Marketplace.Common.Commands;
-using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Misc;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.cardconnect;
-using ordercloud.integrations.cardconnect.Models;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers.CardConnect
@@ -22,7 +22,7 @@ namespace Marketplace.Common.Controllers.CardConnect
         }
 
         [DocName("POST Payment")]
-        [HttpPost, Route("me/payments"), MarketplaceUserAuth(ApiRole.Shopper)]
+        [HttpPost, Route("me/payments"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<Payment> Post([FromBody] OrderCloudIntegrationsCreditCardPayment payment)
         {
             return await _card.AuthorizePayment(payment, VerifiedUserContext);
@@ -40,7 +40,7 @@ namespace Marketplace.Common.Controllers.CardConnect
         }
 
         [DocName("POST Credit Card")]
-        [HttpPost, Route("me/creditcards"), MarketplaceUserAuth(ApiRole.MeCreditCardAdmin, ApiRole.CreditCardAdmin)]
+        [HttpPost, Route("me/creditcards"), OrderCloudIntegrationsAuth(ApiRole.MeCreditCardAdmin, ApiRole.CreditCardAdmin)]
         public async Task<BuyerCreditCard> MePost([FromBody] OrderCloudIntegrationsCreditCardToken card)
         {
             return await _card.MeTokenizeAndSave(card, this.VerifiedUserContext);
@@ -58,7 +58,7 @@ namespace Marketplace.Common.Controllers.CardConnect
         }
 
         [DocName("POST Credit Cards")]
-        [HttpPost, Route("buyers/{buyerID}/creditcards"), MarketplaceUserAuth(ApiRole.CreditCardAdmin)]
+        [HttpPost, Route("buyers/{buyerID}/creditcards"), OrderCloudIntegrationsAuth(ApiRole.CreditCardAdmin)]
         public async Task<CreditCard> Post([FromBody] OrderCloudIntegrationsCreditCardToken card, string buyerID)
         {
             return await _card.TokenizeAndSave(buyerID, card, VerifiedUserContext);

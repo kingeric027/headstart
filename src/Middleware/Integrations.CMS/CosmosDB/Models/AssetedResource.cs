@@ -1,12 +1,10 @@
 ﻿using Cosmonaut.Attributes;
 using Integrations.CMS.Models;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Helpers.Attributes;
-using Marketplace.Helpers.Models;
 using Microsoft.Azure.Documents;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using ordercloud.integrations.cosmos;
 
 namespace Marketplace.CMS.Models
 {

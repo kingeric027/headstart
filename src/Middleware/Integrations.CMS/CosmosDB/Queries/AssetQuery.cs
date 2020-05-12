@@ -1,24 +1,18 @@
-﻿using Cosmonaut;
+﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Threading.Tasks;
+using Cosmonaut;
 using Cosmonaut.Extensions;
 using Marketplace.CMS.Mappers;
 using Marketplace.CMS.Models;
 using Marketplace.CMS.Storage;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Exceptions;
-using Marketplace.Helpers.Extensions;
-using Marketplace.Helpers.Helpers;
-using Marketplace.Helpers.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using ordercloud.integrations.cosmos;
+using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Marketplace.Helpers.Exceptions.ApiErrorException;
 
 namespace Marketplace.CMS.Queries
 {
@@ -63,7 +57,7 @@ namespace Marketplace.CMS.Queries
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
-			if (asset == null) throw new NotFoundException("Asset", assetInteropID);
+			if (asset == null) throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID);
 			return asset;
 		}
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Integrations.CMS.Models;
 using Marketplace.CMS.Models;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Helpers.Attributes;
+using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
+using ordercloud.integrations.openapispec;
 using OrderCloud.SDK;
 using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 

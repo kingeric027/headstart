@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Marketplace.Helpers.Models;
+using ordercloud.integrations.extensions;
 
 namespace Orchestration.Tests
 {

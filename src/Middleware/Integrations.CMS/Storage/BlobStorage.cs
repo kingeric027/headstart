@@ -1,12 +1,10 @@
 ﻿using Integrations.CMS;
 using Marketplace.CMS.Models;
-using Marketplace.Helpers.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using ordercloud.integrations.blob;
 
 namespace Marketplace.CMS.Storage
 {
@@ -32,9 +30,11 @@ namespace Marketplace.CMS.Storage
 		{
 			try
 			{
+				//TODO: work with Oliver on this merge
 				// https://docs.microsoft.com/en-us/azure/storage/blobs/storage-manage-access-to-resources
-				await BuildBlobService(container).Init(BlobContainerPublicAccessType.Container);
-				return container;
+				//await BuildBlobService(container).Init(BlobContainerPublicAccessType.Container);
+				//return container;
+				return new AssetContainer();
 			} catch (Exception ex)
 			{
 				throw new StorageConnectionException(container.InteropID, ex);
@@ -78,9 +78,9 @@ namespace Marketplace.CMS.Storage
 			}
 		}
 
-		private BlobService BuildBlobService(AssetContainer container)
+		private OrderCloudIntegrationsBlobService BuildBlobService(AssetContainer container)
 		{
-			return new BlobService(new BlobServiceConfig()
+			return new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
 			{
 				ConnectionString = Config.BlobStorageConnectionString,
 				Container = $"assets-{container.id}"

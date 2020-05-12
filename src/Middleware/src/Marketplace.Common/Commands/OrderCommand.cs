@@ -13,8 +13,7 @@ using System.Linq;
 using Marketplace.Models.Models.Marketplace;
 using System;
 using Newtonsoft.Json;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Models;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.Common.Commands
 {

@@ -1,15 +1,12 @@
 ﻿using Cosmonaut.Attributes;
 using Marketplace.CMS.Queries;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Helpers.Attributes;
-using Marketplace.Helpers.Models;
 using Microsoft.Azure.Documents;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
+using ordercloud.integrations.cosmos;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.CMS.Models
 {
@@ -17,7 +14,7 @@ namespace Marketplace.CMS.Models
 	[CosmosCollection("assetcontainers")]
 	public class AssetContainer : CosmosObject 
 	{
-		[CosmosPartitionKey, ApiIgnore]
+		[CosmosPartitionKey, ordercloud.integrations.extensions.ApiIgnore]
 		public string SinglePartitionID => AssetContainerQuery.SinglePartitionID; // TODO - is there a better way to indicate there should only be one partition?
 		[JsonProperty("ID"), InteropID]
 		public string InteropID { get; set; }

@@ -1,13 +1,9 @@
-﻿using Marketplace.Helpers;
-using Marketplace.Common.TemporaryAppConstants;
-using Marketplace.Helpers.Models;
-using Marketplace.Models.Models.Marketplace;
-using OrderCloud.SDK;
+﻿using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using System.Linq;
-using Marketplace.Models;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.Common.Commands
 {
@@ -29,10 +25,11 @@ namespace Marketplace.Common.Commands
             var buyerID = await GetBuyerIDForSupplierOrder(firstShipmentItem.OrderID);
             superShipment.Shipment.BuyerID = buyerID;
             var ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
-            var shipmentItemResponses = await Throttler.RunAsync(superShipment.ShipmentItems, 100, 5, (shipmentItem) =>
-            {
-                return _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken);
-            });
+            var shipmentItemResponses = await Throttler.RunAsync(
+                superShipment.ShipmentItems, 
+                100, 
+                5, 
+                (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
             return new ShipmentCreateResponse()
             {
                 Shipment = ocShipment,

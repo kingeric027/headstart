@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Integrations.SmartyStreets;
-using Marketplace.Helpers.Attributes;
 using ordercloud.integrations.cardconnect;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common
 {

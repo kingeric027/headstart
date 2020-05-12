@@ -1,9 +1,8 @@
-﻿using Marketplace.Helpers;
-using Marketplace.Common.TemporaryAppConstants;
-using Marketplace.Helpers.Models;
+﻿using Marketplace.Common.TemporaryAppConstants;
 using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.Common.Commands
 {

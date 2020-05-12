@@ -1,15 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp2.2</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ordercloud-integrations-blobs" Version="0.0.15" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0-preview.3.20214.6" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Marketplace.Helpers\Marketplace.Helpers.csproj" />
+    <ProjectReference Include="..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-cosmos\src\ordercloud-integrations-cosmos\ordercloud-integrations-cosmos.csproj" />
+    <ProjectReference Include="..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-openapispec\src\ordercloud-integrations-openapispec\ordercloud.integrations.openapispec.csproj" />
   </ItemGroup>
 
 </Project>

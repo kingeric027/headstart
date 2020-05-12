@@ -3,10 +3,6 @@ using Cosmonaut.Extensions;
 using Integrations.CMS;
 using Integrations.CMS.Models;
 using Marketplace.CMS.Models;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Extensions;
-using Marketplace.Helpers.Helpers;
-using Marketplace.Helpers.Models;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using OrderCloud.SDK;
@@ -15,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ordercloud.integrations.extensions;
 using Resource = Marketplace.CMS.Models.Resource;
 
 namespace Marketplace.CMS.Queries

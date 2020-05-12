@@ -10,6 +10,7 @@ using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Commands.Zoho;
+using Marketplace.Common.Extensions;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
@@ -20,15 +21,13 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.SmartyStreets;
 using Marketplace.Common.Services.Zoho;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Extensions;
-using Marketplace.Helpers.Models;
-using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using ordercloud.integrations.cardconnect;
+using ordercloud.integrations.cosmos;
+using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 
 namespace Marketplace.API
@@ -62,9 +61,13 @@ namespace Marketplace.API
 				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
 			};
 			services
-				.ConfigureWebApiServices(_settings)
+				.ConfigureWebApiServices(_settings, null)
 				.ConfigureOpenApiSpec("v1", "Marketplace API")
-				.Inject<AppSettings>()
+                .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
+                .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
+                .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
+                .InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
+                .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
 				.Inject<IDevCenterService>()
 				.Inject<IFlurlClient>()
 				.Inject<IZohoClient>()
@@ -73,11 +76,6 @@ namespace Marketplace.API
 				.Inject<IValidatedAddressCommand>()
 				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
 				.Inject<IFreightPopService>()
-				.InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-				.InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
-				.InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
-				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
-				.InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig)
 				.AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
 				.Inject<IOrchestrationCommand>()
 				.Inject<IOrchestrationLogCommand>()
@@ -105,7 +103,7 @@ namespace Marketplace.API
 				.AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .Inject<IMarketplaceSupplierCommand>()
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
-                .AddAuthenticationScheme<MarketplaceUserAuthOptions, MarketplaceUserAuthHandler>("MarketplaceUser")
+                .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("MarketplaceUser")
                 .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>(
                     "OrderCloudWebhook",
                     opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
@@ -116,6 +114,12 @@ namespace Marketplace.API
         public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.ConfigureWebApp(env, "v1");
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint($"/swagger/v1/swagger.json", $"API v1");
+                c.RoutePrefix = string.Empty;
+            });
         }
     }
 }
