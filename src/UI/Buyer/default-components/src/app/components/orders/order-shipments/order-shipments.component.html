@@ -19,17 +19,17 @@
           <div class="card-body">
             <ul class="oc-list-items">
               <li>
-                <b translate>ORDERS.SHIPMENTS.SHIPPER:</b> {{selectedShipment.Shipper}}
+                <b><span translate>ORDERS.SHIPMENTS.SHIPPER</span>:</b> {{selectedShipment.Shipper}}
               </li>
               <li *ngIf="!(selectedShipment.Shipper | shipperTrackingSupported)">
-                <b translate>ORDERS.SHIPMENTS.TRACKING:</b> {{selectedShipment.TrackingNumber || 'N/A'}}
+                <b><span translate>ORDERS.SHIPMENTS.TRACKING</span>:</b> {{selectedShipment.TrackingNumber || 'N/A'}}
               </li>
               <li *ngIf="(selectedShipment.Shipper | shipperTrackingSupported)">
                 <a href="{{selectedShipment.TrackingNumber | shipperTracking:selectedShipment.Shipper}}"
                    target="_blank">{{selectedShipment.TrackingNumber}}</a>
               </li>
               <li>
-                <b translate>ORDERS.SHIPMENTS.DATE_SHIPPED:</b> {{selectedShipment.DateShipped | date: 'short'}}
+                <b><span translate>ORDERS.SHIPMENTS.DATE_SHIPPED</span>:</b> {{selectedShipment.DateShipped | date: 'short'}}
               </li>
             </ul>
           </div>
