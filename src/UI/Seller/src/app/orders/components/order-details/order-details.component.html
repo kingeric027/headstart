@@ -93,7 +93,7 @@
             </strong>
           </span>
           <span *ngIf="payment.Type === 'PurchaseOrder'">
-            Purchase Order <small *ngIf="payment.xp.PONumber">{{payment.xp.PONumber}}</small>
+            Purchase Order <small *ngIf="payment.ID">{{payment.ID}}</small>
           </span>
           <span *ngIf="payment.Type === 'SpendingAccount'">
             Spending Account: {{ payment.Details.Name }}
@@ -191,6 +191,11 @@
                     <h6>
                       <span>{{ li.Product.Name }}</span>
                       <small class="text-muted d-block">{{ li.Product.ID }}</small>
+                      <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
+                            class="
+                      badge
+                      badge-pill
+                      badge-primary">Purchase Order</span>
                     </h6>
                   </div>
                 </td>
