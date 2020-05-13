@@ -31,6 +31,12 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 	public class OrderCalculatePayload
 	{
 		public OrderWorksheet OrderWorksheet { get; set; }
-		public JRaw ConfigData { get; set; }
+		public CheckoutIntegrationConfiguration ConfigData { get; set; }
+	}
+
+	public class CheckoutIntegrationConfiguration
+	{
+		public bool ExcludePOProductsFromShipping { get; set; }
+		public bool ExcludePOProductsFromTax { get; set; }
 	}
 }

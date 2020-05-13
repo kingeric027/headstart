@@ -73,7 +73,7 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toExpandable: true,
   },
   orders: {
-    toPrimaryHeader: 'FromUser.Username',
+    toPrimaryHeader: 'ID',
     toSecondaryHeader: 'Status',
     toImage: '',
     toExpandable: false,

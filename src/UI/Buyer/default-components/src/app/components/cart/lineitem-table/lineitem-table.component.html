@@ -58,6 +58,11 @@
                   <a (click)="toProductDetails(li.Product.ID)"
                      class="text-primary link">{{li | productNameWithSpecs }}</a>
                   <small class="text-muted d-block">{{li.Product.ID}}</small>
+                  <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
+                        class="
+                        badge
+                        badge-pill
+                        badge-primary">Purchase Order</span>
                 </h4>
                 <a class="text-danger btn btn-link px-0 link"
                    *ngIf="!readOnly"
