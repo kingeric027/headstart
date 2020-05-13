@@ -52,32 +52,22 @@ export class UserManagementService implements IUserManagement {
   }
 
   async getLocationApproverAssignments(locationID: string): Promise<UserGroupAssignment[]> {
-    const buyerID = this.currentUserService.get().Buyer.ID;
-
-    // todo accomodate more than 100 locations
-    const userGroupID = `${locationID}-OrderApprover`;
-    const locationUsers = await this.ocUserGroupService
-      .ListUserAssignments(buyerID, { pageSize: 100, userGroupID: userGroupID })
-      .toPromise();
-    return locationUsers.Items;
+    return this.getLocationUserGroupAssignments(locationID, 'OrderApprover');
   }
 
   async getLocationNeedsApprovalAssignments(locationID: string): Promise<UserGroupAssignment[]> {
-    const buyerID = this.currentUserService.get().Buyer.ID;
-
-    // todo accomodate more than 100 locations
-    const userGroupID = `${locationID}-NeedsApproval`;
-    const locationUsers = await this.ocUserGroupService
-      .ListUserAssignments(buyerID, { pageSize: 100, userGroupID: userGroupID })
-      .toPromise();
-    return locationUsers.Items;
+    return this.getLocationUserGroupAssignments(locationID, 'NeedsApproval');
   }
 
   async getLocationOrderAccessAssignments(locationID: string): Promise<UserGroupAssignment[]> {
+    return this.getLocationUserGroupAssignments(locationID, 'ViewAllLocationOrders');
+  }
+
+  async getLocationUserGroupAssignments(locationID: string, userGroupSuffix: string): Promise<UserGroupAssignment[]> {
     const buyerID = this.currentUserService.get().Buyer.ID;
 
     // todo accomodate more than 100 locations
-    const userGroupID = `${locationID}-ViewAllLocationOrders`;
+    const userGroupID = `${locationID}-${userGroupSuffix}`;
     const locationUsers = await this.ocUserGroupService
       .ListUserAssignments(buyerID, { pageSize: 100, userGroupID: userGroupID })
       .toPromise();
