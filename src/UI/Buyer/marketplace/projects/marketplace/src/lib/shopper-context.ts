@@ -17,6 +17,7 @@ import {
   User,
   UserGroupAssignment,
   ApprovalRule,
+  ListOrderApproval,
 } from '@ordercloud/angular-sdk';
 import { ProductXp, BuyerAddressXP, MarketplaceAddressBuyer, TaxCertificate } from 'marketplace-javascript-sdk';
 
@@ -132,18 +133,21 @@ export interface OrderReorderResponse {
   InvalidLi: Array<LineItem>;
 }
 
+// remove with sdk update
 export interface OrderDetails {
-  order: MarketplaceOrder;
-  lineItems: ListLineItem;
-  promotions: ListPromotion;
-  payments: ListPayment;
-  approvals: OrderApproval[];
+  Order: MarketplaceOrder;
+  LineItems: ListLineItem;
+  Promotions: ListPromotion;
+  Payments: ListPayment;
+  Approvals: ListOrderApproval;
 }
 
+// to be replaced by new sdk
 export interface ShipmentWithItems extends Shipment {
   ShipmentItems: ShipmentItemWithLineItem[];
 }
 
+// to be replaced by new sdk
 export interface ShipmentItemWithLineItem extends ShipmentItem {
   LineItem: LineItem;
 }
