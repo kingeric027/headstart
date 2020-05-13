@@ -1,3 +1,8 @@
+export function setProductEditTab(section: string, readonly: boolean): number {
+  const index = ProductEditTabMapper[section];
+  return readonly ? index : index - 1;
+}
+
 export const ProductEditTabMapper = {
   undefined: 0,
   'catalog-assignments': 1,
