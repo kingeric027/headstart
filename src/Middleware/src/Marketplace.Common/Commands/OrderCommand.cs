@@ -122,6 +122,8 @@ namespace Marketplace.Common.Commands
         {
             var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);
+
+            // todo support >100 and figure out how to make these calls in parallel and 
             var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
             var promotions = await _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID);
             var payments = await _oc.Payments.ListAsync(OrderDirection.Incoming, order.ID);
@@ -140,6 +142,8 @@ namespace Marketplace.Common.Commands
         {
             var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);
+
+            // todo support >100 and figure out how to make these calls in parallel and 
             var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
             var shipments = await _oc.Orders.ListShipmentsAsync<MarketplaceShipmentWithItems>(OrderDirection.Incoming, orderID);
             var shipmentsWithItems = await Throttler.RunAsync(shipments.Items, 100, 5, (MarketplaceShipmentWithItems shipment) => GetShipmentWithItems(shipment, lineItems.Items.ToList()));
