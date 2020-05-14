@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Extended;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 
 namespace Marketplace.Models
@@ -20,6 +21,16 @@ namespace Marketplace.Models
         public bool StopShipSync { get; set; }
         public OrderType? OrderType { get; set; }
         public QuoteOrderInfo QuoteOrderInfo { get; set; }
+    }
+
+    [SwaggerModel]
+    public class OrderDetails
+    {
+        public MarketplaceOrder Order { get; set; }
+        public ListPage<LineItem> LineItems { get; set; } 
+        public ListPage<OrderPromotion> Promotions { get; set; } 
+        public ListPage<Payment> Payments { get; set; } 
+        public ListPage<OrderApproval> Approvals { get; set; } 
     }
 
     public class MarketplaceOrderSubmitPayload

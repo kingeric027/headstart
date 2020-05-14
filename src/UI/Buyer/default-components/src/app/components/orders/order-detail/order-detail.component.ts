@@ -7,6 +7,7 @@ import {
   OrderReorderResponse,
   OrderType,
   OrderViewContext,
+  LineItem,
 } from 'marketplace';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
@@ -29,9 +30,9 @@ export class OCMOrderDetails implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.approvalVersion = this.context.router.getOrderViewContext() === OrderViewContext.Approve;
-    this.orderDetails = await this.context.orderHistory.getOrderDetails(this.approvalVersion);
-    this.order = this.orderDetails.order;
-    this.validateReorder(this.order.ID);
+    this.orderDetails = await this.context.orderHistory.getOrderDetails();
+    this.order = this.orderDetails.Order;
+    this.validateReorder(this.order.ID, this.orderDetails.LineItems.Items);
   }
 
   open(content: HTMLTemplateElement): void {
@@ -40,8 +41,8 @@ export class OCMOrderDetails implements OnInit {
     }
   }
 
-  async validateReorder(orderID: string): Promise<void> {
-    this.reorderResponse = await this.context.orderHistory.validateReorder(orderID);
+  async validateReorder(orderID: string, lineItems: LineItem[]): Promise<void> {
+    this.reorderResponse = await this.context.orderHistory.validateReorder(orderID, lineItems);
     this.updateMessage(this.reorderResponse);
   }
 
