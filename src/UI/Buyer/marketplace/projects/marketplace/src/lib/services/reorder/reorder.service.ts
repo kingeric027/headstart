@@ -10,9 +10,11 @@ import { OrderReorderResponse, MarketplaceMeProduct } from '../../shopper-contex
 export class ReorderHelperService {
   constructor(private ocLineItemService: OcLineItemService, private meService: OcMeService) {}
 
-  public async validateReorder(orderID: string): Promise<OrderReorderResponse> {
+  public async validateReorder(orderID: string, lineItems: LineItem[]): Promise<OrderReorderResponse> {
+    // instead of moving all of this logic to the middleware to support orders not
+    // submitted by the current user we are adding line items as a paramter
+
     if (!orderID) throw new Error('Needs Order ID');
-    const lineItems = (await listAll(this.ocLineItemService, this.ocLineItemService.List, 'outgoing', orderID)).Items;
     const products = await this.ListProducts(lineItems);
     const [ValidLi, InvalidLi] = _partition(lineItems, item => this.isLineItemValid(item, products));
     return { ValidLi, InvalidLi };

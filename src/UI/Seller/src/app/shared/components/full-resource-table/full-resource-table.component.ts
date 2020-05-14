@@ -14,6 +14,7 @@ import { faCopy, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-sv
 import { ToastrService } from 'ngx-toastr';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { SortDirection } from './sort-direction.enum';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -47,9 +48,7 @@ export class FullResourceTableComponent {
   @Output()
   resourceSelected = new EventEmitter();
 
-  constructor(
-    private toastrService: ToastrService,
-  ) {}
+  constructor(private toastrService: ToastrService) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
     this.headers = this.getHeaders(resources);
@@ -93,11 +92,11 @@ export class FullResourceTableComponent {
       closeButton: true,
       tapToDismiss: true,
     });
-    let copy = document.createElement("textarea");
+    let copy = document.createElement('textarea');
     document.body.appendChild(copy);
     copy.value = JSON.stringify(resource);
     copy.select();
-    document.execCommand("copy");
+    document.execCommand('copy');
     document.body.removeChild(copy);
   }
 
@@ -106,13 +105,7 @@ export class FullResourceTableComponent {
   }
 
   getImage(resource: any, resourceConfiguration: ResourceConfiguration): string {
-    let imgUrl = '';
-    if (resourceConfiguration.imgPath === PRODUCT_IMAGE_PATH_STRATEGY) {
-      imgUrl = getProductMainImageUrlOrPlaceholder(resource);
-    } else {
-      imgUrl = this.getValueOnExistingResource(resource, FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].imgPath);
-    }
-    return imgUrl || PLACEHOLDER_URL;
+    return `${environment.middlewareUrl}/${this.resourceType}/${resource.ID}/image`;
   }
 
   selectResource(value: any) {

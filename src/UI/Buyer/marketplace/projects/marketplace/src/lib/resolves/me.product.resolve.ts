@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
-import { OcMeService, ListSpec, Spec } from '@ordercloud/angular-sdk';
+import { OcMeService, ListSpec, Spec, OcTokenService } from '@ordercloud/angular-sdk';
 import { each as _each } from 'lodash';
 import { Observable, of } from 'rxjs';
-import { ListMarketplaceMeProduct, MarketplaceMeProduct } from '../shopper-context';
+import { ListMarketplaceMeProduct, MarketplaceMeProduct, AppConfig } from '../shopper-context';
+import { MarketplaceSDK, SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable()
 export class MeListRelatedProductsResolver implements Resolve<ListMarketplaceMeProduct> {
@@ -25,11 +27,24 @@ export class MeListRelatedProductsResolver implements Resolve<ListMarketplaceMeP
 }
 
 @Injectable()
-export class MeProductResolver implements Resolve<MarketplaceMeProduct> {
-  constructor(private service: OcMeService) {}
+export class MeProductResolver implements Resolve<SuperMarketplaceProduct> {
+  constructor(
+    private service: OcMeService,
+    public ocTokenService: OcTokenService,
+    private appConfig: AppConfig,
+    public httpClient: HttpClient
+  ) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<MarketplaceMeProduct> | Promise<MarketplaceMeProduct> | any {
-    return this.service.GetProduct(route.params.productID);
+  resolve(route: ActivatedRouteSnapshot): Observable<SuperMarketplaceProduct> | Promise<SuperMarketplaceProduct> | any {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+    const url = `${this.appConfig.middlewareUrl}/me/products/${route.params.productID}`;
+    return this.httpClient
+      .get<SuperMarketplaceProduct>(url, { headers: headers })
+      .toPromise();
+    // return MarketplaceSDK.Products.MeGet(route.params.productID);
   }
 }
 

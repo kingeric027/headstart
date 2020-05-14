@@ -2,11 +2,12 @@ import { Component, Input, OnInit } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ListSpec, User } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
-import { LineItem, MarketplaceMeProduct, OrderType, ShopperContextService } from 'marketplace';
+import { LineItem, MarketplaceMeProduct, OrderType, ShopperContextService, PriceSchedule } from 'marketplace';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { getImageUrls } from 'src/app/services/images.helpers';
 import { SpecFormService } from '../spec-form/spec-form.service';
+import { SuperMarketplaceProduct } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -16,6 +17,7 @@ export class OCMProductDetails implements OnInit {
   faTimes = faTimes;
   _specs: ListSpec;
   _product: MarketplaceMeProduct;
+  _priceSchedule: PriceSchedule;
   specFormService: SpecFormService;
   isOrderable = false;
   quantity: number;
@@ -41,20 +43,20 @@ export class OCMProductDetails implements OnInit {
     this.specFormService = formService;
   }
 
-  @Input() set specs(value: ListSpec) {
-    this._specs = value;
+  @Input() set product(superProduct: SuperMarketplaceProduct) {
+    this._product = superProduct.Product;
+    this._priceSchedule = superProduct.PriceSchedule;
+    // Specs
+    this._specs = {Meta: {}, Items: superProduct.Specs};
     this.specFormService.event.valid = this._specs.Items.length === 0;
     this.specLength = this._specs.Items.length;
-  }
-
-  @Input() set product(value: MarketplaceMeProduct) {
-    this._product = value;
-    this.isOrderable = !!this._product.PriceSchedule;
-    this.imageUrls = this.getImageUrls();
+    // End Specs
+    this.imageUrls = superProduct.Images.map(img => img.Url);
+    this.isOrderable = !!superProduct.PriceSchedule;
     this.supplierNote = this._product.xp && this._product.xp.Note;
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.currentUser = this.context.currentUser.get();
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
@@ -127,8 +129,8 @@ export class OCMProductDetails implements OnInit {
     return str;
   }
 
-  getImageUrls(): string[] {
-    return getImageUrls(this._product);
+  async getImageUrls(): Promise<string[]> {
+    return await getImageUrls(this._product)
   }
 
   isFavorite(): boolean {

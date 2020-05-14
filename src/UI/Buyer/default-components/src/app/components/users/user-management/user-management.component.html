@@ -13,11 +13,11 @@
               translate>
         <ng-container *ngIf="areAllUsersAssignedToNeedsApproval; else reqNone"
                       translate>
-          USERS.USER_MGMT.REQ_ALL
+          USERS.USER_MGMT.REQ_NONE
         </ng-container>
         <ng-template #reqNone
                      translate>
-          USERS.USER_MGMT.REQ_NONE
+          USERS.USER_MGMT.REQ_ALL
         </ng-template>
       </button>
     </div>
@@ -110,19 +110,6 @@
                 translate>
           USERS.USER_MGMT.CONFIRM
         </button>
-        <div *ngIf="areChanges && requestedUserConfirmation"
-             class="mt-3 pb-3 border-top">
-          <div class="p-4 border-radius border-primary bg-light">
-            <div class="d-flex justify-content-start align-items-center">
-              <fa-icon [icon]="faExclamationCircle"
-                       class="alert-icon mr-3"></fa-icon>
-              <p class="mb-0 d-flex flex-column">
-                <small class="font-weight-bold"
-                       translate>USERS.USER_MGMT.WARNING</small>
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
     <div class="col-md-5 border-top pt-3">

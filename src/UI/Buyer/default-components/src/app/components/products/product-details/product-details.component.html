@@ -41,7 +41,8 @@
               <div class="d-flex flex-row">
                 <ocm-quantity-input class="d-inline-block mb-3 mr-3"
                                     (qtyChange)="qtyChange($event.detail)"
-                                    [product]="_product">
+                                    [product]="_product"
+                                    [priceSchedule]="_priceSchedule">
                 </ocm-quantity-input>
                 <button *ngIf="isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
@@ -77,7 +78,7 @@
           </div>
         </div>
       </div>
-      <div *ngIf="_product.PriceSchedule.PriceBreaks.length > 1">
+      <div *ngIf="_priceSchedule?.PriceBreaks.length > 1">
         <strong><span translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</span>: </strong>
         <div class=" border border-medium border-radius mb-3 p-2">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
@@ -139,7 +140,8 @@
           <ocm-quantity-input class="d-inline-block mb-3"
                               style="max-width: 100px"
                               (qtyChange)="qtyChange($event.detail)"
-                              [product]="_product">
+                              [product]="_product"
+                              [priceSchedule]="_priceSchedule">
           </ocm-quantity-input>
           <button *ngIf="isQuoteProduct()"
                   class="btn btn-block btn-primary mb-3"

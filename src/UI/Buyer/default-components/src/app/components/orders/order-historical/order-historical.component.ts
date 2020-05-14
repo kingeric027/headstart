@@ -17,15 +17,15 @@ export class OCMOrderHistorical {
   buyerLocation: BuyerAddress;
   @Input() isOrderToApprove = false;
   @Input() set orderDetails(value: OrderDetails) {
-    this.order = value.order;
-    this.lineItems = value.lineItems;
-    this.promotions = value.promotions.Items;
-    this.payments = value.payments;
-    this.approvals = value.approvals;
+    this.order = value.Order;
+    this.lineItems = value.LineItems;
+    this.promotions = value.Promotions.Items;
+    this.payments = value.Payments;
+    this.approvals = value.Approvals.Items.filter(a => a.Approver);
     this.getBuyerLocation(this.order.BillingAddressID);
   }
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) {}
 
   async getBuyerLocation(addressID): Promise<void> {
     if (!this.isQuoteOrder(this.order)) {

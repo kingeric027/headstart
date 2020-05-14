@@ -8,6 +8,7 @@ using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Misc;
 using Marketplace.Helpers;
+using System.Collections.Generic;
 
 namespace Marketplace.Common.Controllers
 {
@@ -37,6 +38,20 @@ namespace Marketplace.Common.Controllers
         public async Task<ListPage<Order>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)
         {
             return await _command.ListOrdersForLocation(locationID, listArgs, VerifiedUserContext);
+        }
+
+        [DocName("GET order details as buyer, ensures user has access to location orders or created the order themselves")]
+        [HttpGet, Route("{orderID}/details"), MarketplaceUserAuth(ApiRole.Shopper)]
+        public async Task<OrderDetails> GetOrderDetails(string orderID)
+        {
+            return await _command.GetOrderDetails(orderID, VerifiedUserContext);
+        }
+
+        [DocName("GET order shipments as buyer, ensures user has access to location orders or created the order themselves")]
+        [HttpGet, Route("{orderID}/shipmentswithitems"), MarketplaceUserAuth(ApiRole.Shopper)]
+        public async Task<List<MarketplaceShipmentWithItems>> GetOrderShipmentsWithItems(string orderID)
+        {
+            return await _command.GetMarketplaceShipmentWithItems(orderID, VerifiedUserContext);
         }
     }
 }
