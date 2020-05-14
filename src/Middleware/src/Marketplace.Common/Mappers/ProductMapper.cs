@@ -1,7 +1,10 @@
 ﻿using Marketplace.Models;
+using Marketplace.Models.Extended;
+using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,7 +12,7 @@ namespace Marketplace.Common.Mappers
 {
    public class ProductMapper
     {
-        public static MarketplaceProduct MeProductToProduct(BuyerProduct product)
+        public static MarketplaceProduct MeProductToProduct(BuyerProduct<ProductXp, PriceSchedule> product)
         {
             return new MarketplaceProduct
             {

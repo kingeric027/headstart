@@ -10,6 +10,7 @@ using Marketplace.Common.Models;
 using Marketplace.Helpers;
 using Marketplace.Helpers.Models;
 using Marketplace.Models;
+using Marketplace.Models.Models.Marketplace;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 
@@ -55,7 +56,7 @@ namespace Marketplace.Common.Commands.Crud
 		}
 		public async Task<SuperMarketplaceProduct> MeGet(string id, VerifiedUserContext user)
 		{
-			var _product = await _oc.Me.GetProductAsync(id, user.AccessToken);
+			var _product = await _oc.Me.GetProductAsync<BuyerProduct<ProductXp, PriceSchedule>>(id, user.AccessToken);
 			var _priceSchedule = _product.PriceSchedule;
 			var _specs = await _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null);
