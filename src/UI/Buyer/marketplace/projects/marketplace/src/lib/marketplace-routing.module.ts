@@ -18,7 +18,7 @@ import { LocationListWrapperComponent } from './wrapper-components/location-list
 import { MeListAddressResolver, MeListBuyerLocationResolver } from './resolves/me.resolve';
 import { PaymentListWrapperComponent } from './wrapper-components/payment-list-wrapper.component';
 import { ProductListWrapperComponent } from './wrapper-components/product-list-wrapper.component';
-import { MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
+import { MeProductResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
 import { ProductDetailWrapperComponent } from './wrapper-components/product-detail-wrapper.component';
 import { LoginWrapperComponent } from './wrapper-components/login-wrapper.component';
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component';
@@ -87,14 +87,12 @@ export const MarketplaceRoutes: Routes = [
         path: 'products/:productID',
         resolve: {
           product: MeProductResolver,
-          specList: MeListSpecsResolver,
         },
         children: [
           {
             path: '',
             component: ProductDetailWrapperComponent,
             resolve: {
-              specs: MeListSpecsResolver,
               relatedProducts: MeListRelatedProductsResolver,
             },
           },
