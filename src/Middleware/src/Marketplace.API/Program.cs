@@ -2,6 +2,7 @@ using System;
 using Marketplace.Common;
 using Marketplace.Common.Helpers;
 using Microsoft.AspNetCore.Hosting;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.API
 {

@@ -30,6 +30,7 @@ using ordercloud.integrations.CMS.Storage;
 using ordercloud.integrations.cosmos;
 using OrderCloud.SDK;
 using ordercloud.integrations.extensions;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Marketplace.API
 {
@@ -63,8 +64,7 @@ namespace Marketplace.API
 			};
 
             services
-				.ConfigureWebApiServices(_settings, null)
-				.ConfigureOpenApiSpec("v1", "Marketplace API")
+                .OrderCloudIntegrationsConfigureWebApiServices(_settings, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
                 .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
@@ -93,41 +93,37 @@ namespace Marketplace.API
                 .AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
                 .AddSingleton<ISmartyStreetsCommand>(x => new SmartyStreetsCommand(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
-                //.AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
-                //.AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("MarketplaceUser")
-                //.AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>(
-                //    "OrderCloudWebhook",
-                //    opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
-                //    .AddTransient<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
-                //    {
-                //        ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                //        AuthUrl = _settings.OrderCloudSettings.AuthUrl,
-                //        ClientId = _settings.OrderCloudSettings.ClientID,
-                //        ClientSecret = _settings.OrderCloudSettings.ClientSecret,
-                //        Roles = new[]
-                //    {
-                //        ApiRole.FullAccess
-                //    }
-                //    }))
+                .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
+                .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("MarketplaceUser")
+                .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>("OrderCloudWebhook", opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
+                .AddTransient<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
+                {
+                    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    ClientId = _settings.OrderCloudSettings.ClientID,
+                    ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                    Roles = new[]
+                    {
+                        ApiRole.FullAccess
+                    }
+                }))
+                .AddSwaggerGen(c =>
+                {
+                    c.SwaggerDoc("v1", new Info { Title = "Marketplace API", Version = "v1" });
+                    c.CustomSchemaIds(x => x.FullName);
+                })
                 .AddAuthentication();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            app.UseMiddleware<GlobalExceptionHandler>();
-            app.UseHttpsRedirection();
-            app.UseMvc();
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint($"/swagger/v1/swagger.json", $"API v1");
-                c.RoutePrefix = string.Empty;
-            });
+            app.OrderCloudIntegrationsConfigureWebApp(env, "v1")
+                .UseSwagger()
+                .UseSwaggerUI(c => {
+                    c.SwaggerEndpoint($"/swagger/v1/swagger.json", $"API v1");
+                    c.RoutePrefix = string.Empty;
+                });
         }
     }
 }

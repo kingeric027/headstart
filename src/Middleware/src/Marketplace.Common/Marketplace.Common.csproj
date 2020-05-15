@@ -43,7 +43,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-cardconnect\src\ordercloud.integrations.cardconnect\ordercloud.integrations.cardconnect.csproj" />
     <ProjectReference Include="..\..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-extensions\src\ordercloud-integrations-extenions\ordercloud.integrations.extensions.csproj" />
-    <ProjectReference Include="..\..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-openapispec\src\ordercloud-integrations-openapispec\ordercloud.integrations.openapispec.csproj" />
     <ProjectReference Include="..\..\Integrations.Avalara\Integrations.Avalara.csproj" />
     <ProjectReference Include="..\..\Integrations.SmartyStreets\Integrations.SmartyStreets.csproj" />
     <ProjectReference Include="..\Marketplace.Models\Marketplace.Models.csproj" />
