@@ -36,6 +36,7 @@
                         id="quantity"
                         [existingQty]="null"
                         [product]="_product"
+                        [priceSchedule]="_product.PriceSchedule"
                         (qtyChange)="setQuantity($event.detail)">
     </ocm-quantity-input>
     <button (click)="$event.stopPropagation()"

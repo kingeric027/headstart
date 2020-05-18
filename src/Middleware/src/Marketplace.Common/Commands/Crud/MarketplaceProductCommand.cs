@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Mappers;
 using Marketplace.Models;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.extensions;
@@ -12,6 +13,7 @@ namespace Marketplace.Common.Commands.Crud
 	public interface IMarketplaceProductCommand
 	{
 		Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user);
+		Task<SuperMarketplaceProduct> MeGet(string id, VerifiedUserContext user);
 		Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
 		Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct product, VerifiedUserContext user);
 		Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct product, VerifiedUserContext user);
@@ -28,15 +30,11 @@ namespace Marketplace.Common.Commands.Crud
 		private readonly IOrderCloudClient _oc;
 		private readonly IAssetedResourceQuery _assetedResources;
 		private readonly IAssetQuery _assets;
-		public MarketplaceProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets)
+		public MarketplaceProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets, IOrderCloudClient elevatedOc)
 		{
-			_oc = new OrderCloudClient(new OrderCloudClientConfig()
-			{
-				ApiUrl = settings.OrderCloudSettings.ApiUrl,
-				AuthUrl = settings.OrderCloudSettings.AuthUrl,
-			});
 			_assetedResources = assetedResources;
 			_assets = assets;
+			_oc = elevatedOc;
 		}
 		private async Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user)
 		{
@@ -49,6 +47,24 @@ namespace Marketplace.Common.Commands.Crud
 			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
 			var attachments = assets.Where(a => a.Type == AssetType.Attachment).ToList();
 			return attachments;
+		}
+		public async Task<SuperMarketplaceProduct> MeGet(string id, VerifiedUserContext user)
+		{
+			var _product = await _oc.Me.GetProductAsync<BuyerProduct<ProductXp, PriceSchedule>>(id, user.AccessToken);
+			var _priceSchedule = _product.PriceSchedule;
+			var _specs = await _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
+			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null);
+			var _images = await GetProductImages(_product.ID, user);
+			var _attachments = await GetProductAttachments(_product.ID, user);
+			return new SuperMarketplaceProduct
+			{
+				Product = ProductMapper.MeProductToProduct(_product),
+				PriceSchedule = _priceSchedule,
+				Specs = _specs.Items,
+				Variants = _variants.Items,
+				Images = _images,
+				Attachments = _attachments
+			};
 		}
 
 		public async Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user)

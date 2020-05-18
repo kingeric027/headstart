@@ -19,13 +19,12 @@ import { faTrash, faTimes, faCircle, faHeart } from '@fortawesome/free-solid-svg
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
-import { ReplaceHostUrls } from '@app-seller/products/product-image.helper';
 import { SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
 import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
 import { Location } from '@angular/common'
-import { ProductEditTabMapper, TabIndexMapper } from './tab-mapper';
+import { ProductEditTabMapper, TabIndexMapper, setProductEditTab } from './tab-mapper';
 import { AppAuthService } from '@app-seller/auth';
 import { environment } from 'src/environments/environment';
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
@@ -110,14 +109,14 @@ export class ProductEditComponent implements OnInit {
 
   setProductEditTab(): void {
     const productDetailSection = this.router.url.split('/')[3];
-    this.selectedTabIndex = ProductEditTabMapper[productDetailSection];
+    this.selectedTabIndex = setProductEditTab(productDetailSection, this.readonly);
   }
 
   tabChanged(event: any, productID: string): void {
     if(productID === null) return;
     event.index === 0 ? this.location.replaceState(`products/${productID}`)
     :
-    this.location.replaceState(`products/${productID}/${TabIndexMapper[event.index]}`);
+    this.location.replaceState(`products/${productID}/${TabIndexMapper[this.readonly ? event.index : event.index + 1]}`);
   }
 
   async getAddresses(): Promise<void> {
@@ -225,7 +224,10 @@ export class ProductEditComponent implements OnInit {
   async updateProduct(): Promise<void> {
     try {
       this.dataIsSaving = true;
-      const superProduct = await this.updateMarketplaceProduct(this._superMarketplaceProductEditable);
+      let superProduct = this._superMarketplaceProductStatic;
+      if (JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic)) {
+        superProduct = await this.updateMarketplaceProduct(this._superMarketplaceProductEditable);
+      }
       this.refreshProductData(superProduct);
       if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
       if (this.staticContentFiles.length > 0) {

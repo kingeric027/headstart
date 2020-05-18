@@ -4,15 +4,15 @@ import { ActivatedRoute } from '@angular/router';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { CurrentUserService } from '../services/current-user/current-user.service';
 import { MarketplaceMeProduct } from '../shopper-context';
+import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
 
 @Component({
   template: `
-    <ocm-product-details [product]="product" [specs]="specs"> </ocm-product-details>
+    <ocm-product-details [product]="product"> </ocm-product-details>
   `,
 })
 export class ProductDetailWrapperComponent implements OnInit {
-  specs: ListSpec;
-  product: MarketplaceMeProduct;
+  product: SuperMarketplaceProduct;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -22,6 +22,5 @@ export class ProductDetailWrapperComponent implements OnInit {
 
   ngOnInit(): void {
     this.product = this.activatedRoute.snapshot.data.product;
-    this.specs = this.activatedRoute.snapshot.data.specs || [];
   }
 }

@@ -87,6 +87,7 @@
                 <ocm-quantity-input *ngIf="!readOnly"
                                     [existingQty]="li.Quantity"
                                     [product]="li.Product"
+                                    [priceSchedule]="li.Product.PriceSchedule"
                                     (qtyChange)="changeQuantity(li.ID, $event.detail)"></ocm-quantity-input>
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>

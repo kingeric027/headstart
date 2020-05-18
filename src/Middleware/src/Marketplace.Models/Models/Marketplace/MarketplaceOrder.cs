@@ -22,6 +22,16 @@ namespace Marketplace.Models
         public QuoteOrderInfo QuoteOrderInfo { get; set; }
     }
 
+    [SwaggerModel]
+    public class OrderDetails
+    {
+        public MarketplaceOrder Order { get; set; }
+        public ListPage<LineItem> LineItems { get; set; } 
+        public ListPage<OrderPromotion> Promotions { get; set; } 
+        public ListPage<Payment> Payments { get; set; } 
+        public ListPage<OrderApproval> Approvals { get; set; } 
+    }
+
     public class MarketplaceOrderSubmitPayload
     {
         public MarketplaceOrderSubmitPayloadResponse Response { get; set; }

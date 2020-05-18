@@ -8,7 +8,7 @@
   </span>
   <span *ngIf="payment.Type === 'PurchaseOrder'"
         translate>
-    PAYMENTS.PAYMENT_LIST.PO <small *ngIf="payment.Details.PONumber">{{payment.Details.PONumber}}</small>
+    PAYMENTS.PAYMENT_LIST.PO <small>{{payment.ID}}</small>
   </span>
   <span *ngIf="payment.Type === 'SpendingAccount'"><span translate>PAYMENTS.PAYMENT_LIST.SPENDING_ACC</span>
     : {{ payment.Details.Name }}
