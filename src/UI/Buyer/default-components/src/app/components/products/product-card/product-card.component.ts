@@ -1,7 +1,13 @@
 import { Component, Input, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
-import { ShopperContextService, MarketplaceMeProduct } from 'marketplace';
+import { ShopperContextService, MarketplaceMeProduct, PriceSchedule } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
-
+import { ExchangeRates } from 'marketplace/projects/marketplace/src/lib/services/exchange-rates/exchange-rates.service';
+import { exchange } from 'src/app/services/currency.helper';
+import { ListPage } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+export interface BuyerCurrency {
+  Price: number;
+  Currency: string;
+}
 @Component({
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
@@ -12,16 +18,21 @@ export class OCMProductCard {
   _product: MarketplaceMeProduct = {
     PriceSchedule: {},
   };
+  _price: BuyerCurrency;
+  _rates: ListPage<ExchangeRates>;
   quantity: number;
   shouldDisplayAddToCart = false;
   isViewOnlyProduct = true;
   hasSpecs = false;
   isAddingToCart = false;
+  exchangeRates: ExchangeRates[];
 
   constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) {}
 
   @Input() set product(value: MarketplaceMeProduct) {
     this._product = value;
+    this._rates = this.context.exchangeRates.Get(); 
+    this.setPrice(this._product, this._product.PriceSchedule);
     this.isViewOnlyProduct = !value.PriceSchedule;
     this.hasSpecs = value.SpecCount > 0;
   }
@@ -29,6 +40,11 @@ export class OCMProductCard {
   @Input() set isFavorite(value: boolean) {
     this._isFavorite = value;
     this.cdr.detectChanges(); // TODO - remove. Solve another way.
+  }
+
+  async setPrice(product: MarketplaceMeProduct, priceSchedule: PriceSchedule<any>): Promise<void> {
+    const productPrice = priceSchedule?.PriceBreaks[0]?.Price;
+    this._price = exchange(this._rates, productPrice, this._product?.xp?.Currency);
   }
 
   async addToCart(): Promise<void> {

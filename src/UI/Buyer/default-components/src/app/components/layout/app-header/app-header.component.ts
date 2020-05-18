@@ -11,13 +11,12 @@ import {
   faBars,
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { MeUser, LineItem, Category } from '@ordercloud/angular-sdk';
+import { LineItem, Category } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
-import { ProductFilters, ShopperContextService, MarketplaceOrder } from 'marketplace';
+import { ProductFilters, ShopperContextService, MarketplaceOrder, AppConfig } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { CurrentUser } from 'marketplace/projects/marketplace/src/lib/services/current-user/current-user.service';
 import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
-
 @Component({
   templateUrl: './app-header.component.html',
   styleUrls: ['./app-header.component.scss'],
@@ -53,13 +52,14 @@ export class OCMAppHeader implements OnInit {
   faHome = faHome;
   faBars = faBars;
   faBoxOpen = faBoxOpen;
+  flagIcon: string;
 
-  constructor(public context: ShopperContextService) {
+  constructor(public context: ShopperContextService, private appConfig: AppConfig) {
     this.profileRoutes = context.router.getProfileRoutes();
     this.orderRoutes = context.router.getOrderRoutes();
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.buildShowOrdersNeedingApprovalAlertListener();
     this.screenSize = getScreenSizeBreakPoint();
     this.categories = this.context.categories.all;
@@ -72,6 +72,13 @@ export class OCMAppHeader implements OnInit {
       .subscribe(this.handleFiltersChange);
     this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
+    this.flagIcon = await this.getCurrencyFlag();
+  }
+
+  async getCurrencyFlag(): Promise<string> {
+    const rates = this.context.exchangeRates.Get();
+    const myRate = rates.Items.find(r => r.Rate === 1 || r.Rate === 0);
+    return myRate.Icon;
   }
 
   toggleCategoryDropdown(bool: boolean): void {

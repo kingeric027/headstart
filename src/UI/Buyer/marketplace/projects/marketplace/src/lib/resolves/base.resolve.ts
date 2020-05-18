@@ -4,6 +4,7 @@ import { CurrentUserService } from '../services/current-user/current-user.servic
 import { ProductCategoriesService } from '../services/product-categories/product-categories.service';
 import { CurrentOrderService } from '../services/order/order.service';
 import { OrdersToApproveStateService } from '../services/order-history/order-to-approve-state.service';
+import { ExchangeRatesService } from '../services/exchange-rates/exchange-rates.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,7 @@ export class BaseResolve implements Resolve<any> {
   constructor(
     private currentOrder: CurrentOrderService,
     private currentUser: CurrentUserService,
+    private exchangeRates: ExchangeRatesService,
     private ordersToApprove: OrdersToApproveStateService,
     private productCategories: ProductCategoriesService
   ) {}
@@ -21,6 +23,7 @@ export class BaseResolve implements Resolve<any> {
     const order = this.currentOrder.reset();
     const ordersToApprove = this.ordersToApprove.reset();
     const categories = this.productCategories.setCategories();
-    await Promise.all([user, order, ordersToApprove, categories]);
+    const exchangeRates = this.exchangeRates.reset();
+    await Promise.all([user, order, ordersToApprove, categories, exchangeRates]);
   }
 }

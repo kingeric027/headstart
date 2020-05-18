@@ -23,7 +23,7 @@
       <div>
         <div>
           <div class="d-flex justify-content-between align-items-center">
-            <h4 class="font-weight-bold">{{ price  | currency}}</h4>
+            <h4 class="font-weight-bold">{{ _price?.Price  | currency: _price?.Currency}}</h4>
             <p class="text-muted ml-3">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
             <span class="badge badge-pill badge-warning"
                   *ngIf="percentSavings > 0"
@@ -33,6 +33,7 @@
           <!--DISPLAY SHORT SPEC FORM -->
           <div *ngIf="specLength < 4">
             <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
+                           [currency]="_product?.xp?.Currency"
                            [specs]="_specs"
                            (specFormChange)="onSpecFormChange($event)">
             </ocm-spec-form>
@@ -105,14 +106,14 @@
         <p [innerHTML]="_product.Description || 'This product has no description.'">
         </p>
       </div>
-      <div *ngIf="_product?.xp?.StaticContent?.length > 0">
+      <div *ngIf="_attachments.length > 0">
         <strong><span translate>PRODUCTS.DETAILS.DOCS</span>:</strong>
         <div class="mt-2">
           <a class="border border-medium border-radius p-2 mr-2"
-             *ngFor="let document of _product?.xp?.StaticContent"
-             href="{{getDocumentUrl(document.URL)}}"
+             *ngFor="let attachment of _attachments"
+             [href]="attachment.Url"
              target="_blank"
-             download="document.Title">{{document.Title}}</a>
+             download="attachment.FileName">{{attachment.FileName}}</a>
         </div>
       </div>
     </div>
@@ -128,6 +129,7 @@
         </div>
         <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
                        [specs]="_specs"
+                       [currency]="_product?.xp?.Currency"
                        (specFormChange)="onSpecFormChange($event)">
         </ocm-spec-form>
         <div *ngIf="!isOrderable"

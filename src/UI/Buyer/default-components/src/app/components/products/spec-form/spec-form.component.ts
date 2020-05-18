@@ -6,6 +6,8 @@ import { map as _map, find as _find } from 'lodash';
 import { FieldConfig } from './field-config.interface';
 import { ListSpec, SpecOption } from '@ordercloud/angular-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
+import { exchange } from 'src/app/services/currency.helper';
+import { ShopperContextService } from 'marketplace';
 
 @Component({
   template: `
@@ -25,16 +27,28 @@ import { SpecFormEvent } from './spec-form-values.interface';
 export class OCMSpecForm {
   _specs: ListSpec;
   @Output() specFormChange: EventEmitter<any> = new EventEmitter<any>();
-
+  _myCurrency: string;
   config: FieldConfig[] = [];
   form: FormGroup;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private context: ShopperContextService) { }
 
   @Input() set specs(value: ListSpec) {
+    const rates = this.context.exchangeRates.Get();
+    this._myCurrency = rates.Items.find(r => r.Rate === 1 || r.Rate === 0).Currency;
+    console.log('my currency', this._myCurrency)
     this._specs = value;
+    // Exchange option markup prices based on currency of product/user
+    this._specs.Items = this._specs.Items.map(s => {
+      s.Options.map(o => {
+        o.PriceMarkup = exchange(rates, o.PriceMarkup, this.currency).Price;
+      })
+      return s;
+    })
     this.init();
   }
+
+  @Input() currency: string;
 
   init(): void {
     this.config = this.createFieldConfig();
@@ -105,6 +119,7 @@ export class OCMSpecForm {
             : null,
           options: _map(spec.Options),
           validation: [spec.Required ? Validators.required : Validators.nullValidator],
+          currency: this._myCurrency
         });
       } else if (spec.AllowOpenText) {
         c.push({
