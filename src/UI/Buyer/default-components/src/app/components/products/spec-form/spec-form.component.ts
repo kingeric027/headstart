@@ -36,7 +36,6 @@ export class OCMSpecForm {
   @Input() set specs(value: ListSpec) {
     const rates = this.context.exchangeRates.Get();
     this._myCurrency = rates.Items.find(r => r.Rate === 1 || r.Rate === 0).Currency;
-    console.log('my currency', this._myCurrency)
     this._specs = value;
     // Exchange option markup prices based on currency of product/user
     this._specs.Items = this._specs.Items.map(s => {

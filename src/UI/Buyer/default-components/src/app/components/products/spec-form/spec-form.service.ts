@@ -65,7 +65,6 @@ export class SpecFormService {
   }
 
   private getSpec(specs: ListSpec, value: any): Spec {
-    console.log('specs', specs);
     return _find(specs?.Items, item => item.Name.replace(/ /g, '') === value);
   }
 
