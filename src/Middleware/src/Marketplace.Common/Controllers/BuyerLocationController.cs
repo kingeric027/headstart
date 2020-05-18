@@ -1,14 +1,11 @@
 ﻿using Marketplace.Common.Commands;
-using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
-using Marketplace.Models.Models.Misc;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common.Controllers
 {
@@ -27,14 +24,14 @@ namespace Marketplace.Common.Controllers
         }
 
 		[DocName("GET a Buyer Location")]
-		[HttpGet, Route("{buyerID}/{buyerLocationID}"), MarketplaceUserAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
+		[HttpGet, Route("{buyerID}/{buyerLocationID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
         public async Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID)
         {
             return await _command.Get(buyerID, buyerLocationID, VerifiedUserContext);
         }
 
 		[DocName("POST a Buyer Location")]
-		[HttpPost, Route("{buyerID}"), MarketplaceUserAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
+		[HttpPost, Route("{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
         public async Task<MarketplaceBuyerLocation> Create(string buyerID, [FromBody] MarketplaceBuyerLocation buyerLocation)
         {
             // ocAuth is the token for the organization that is specified in the AppSettings
@@ -43,14 +40,14 @@ namespace Marketplace.Common.Controllers
         }
 
 		[DocName("PUT a Buyer Location")]
-		[HttpPut, Route("{buyerID}/{buyerLocationID}"), MarketplaceUserAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
+		[HttpPut, Route("{buyerID}/{buyerLocationID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
         public async Task<MarketplaceBuyerLocation> Update(string buyerID, string buyerLocationID, [FromBody] MarketplaceBuyerLocation buyerLocation)
         {
             return await _command.Update(buyerID, buyerLocationID, buyerLocation, VerifiedUserContext);
         }
 
 		[DocName("Delete a Buyer Location")]
-		[HttpDelete, Route("{buyerID}/{buyerLocationID}"), MarketplaceUserAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
+		[HttpDelete, Route("{buyerID}/{buyerLocationID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
         public async Task Delete(string buyerID, string buyerLocationID)
         {
             await _command.Delete(buyerID, buyerLocationID, VerifiedUserContext);

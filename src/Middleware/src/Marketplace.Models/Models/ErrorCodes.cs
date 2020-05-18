@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Models;
 using Marketplace.Models.Exceptions;
-using ErrorCode = Marketplace.Helpers.Models.ErrorCode;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.Models
 {
@@ -13,7 +11,7 @@ namespace Marketplace.Models
             { "Checkout.MissingShippingSelection", new  ErrorCode<MissingShippingSelectionError>("MissingShippingSelection", 404, "Cannot proceed until all shipping selections have been made.") },
             { "Checkout.InvalidShipFromAddress", new ErrorCode<InvalidShipFromAddressIDError>("InvalidShipFromAddress", 400, "This ShipFromAddressID does not match any products in the order") },
             { "Checkout.MissingProductDimensions", new ErrorCode<MissingProductDimensionsError>("MissingProductDimensions", 400, "Product dimensions are missing for a product") },
-            { "ZohoIntegrationError", new ErrorCode("ZohoIntegrationError", 400, "An error occurred in the Zoho Integration process")}
+            { "ZohoIntegrationError", new ErrorCode<ZohoIntegrationError>("ZohoIntegrationError", 400, "An error occurred in the Zoho Integration process")}
         };
 
         public static class Checkout
@@ -24,11 +22,6 @@ namespace Marketplace.Models
             public static ErrorCode<InvalidShipFromAddressIDError> InvalidShipFromAddress => All["Checkout.InvalidShipFromAddress"] as ErrorCode<InvalidShipFromAddressIDError>;
             /// <summary>Product dimensions are not set for a product on this order.</summary>
             public static ErrorCode<MissingProductDimensionsError> MissingProductDimensions => All["Checkout.MissingProductDimensions"] as ErrorCode<MissingProductDimensionsError>;
-        }
-
-        public static class Integrations
-        {
-            public static ErrorCode<ZohoIntegrationError> ZohoIntegrationError => All["ZohoIntegrationError"] as ErrorCode<ZohoIntegrationError>;
         }
     }
 }

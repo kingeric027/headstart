@@ -1,8 +1,6 @@
-﻿using Marketplace.Helpers.Attributes;
-using Marketplace.Models.Extended;
-using OrderCloud.SDK;
+﻿using OrderCloud.SDK;
 using System.Collections.Generic;
-using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Models
 {

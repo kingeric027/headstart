@@ -1,6 +1,6 @@
-﻿using Marketplace.Helpers.Attributes;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Models.Extended
 {

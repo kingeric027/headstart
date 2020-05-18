@@ -1,13 +1,14 @@
 ﻿using System;
 using Cosmonaut.Attributes;
 using Marketplace.Common.Exceptions;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Models;
 using Marketplace.Models;
 using Microsoft.Azure.WebJobs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using ordercloud.integrations.cosmos;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Models

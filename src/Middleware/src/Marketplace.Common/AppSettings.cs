@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Integrations.SmartyStreets;
-using Marketplace.Helpers.Attributes;
+using ordercloud.integrations.blobs;
 using ordercloud.integrations.cardconnect;
+using ordercloud.integrations.cosmos;
+//using ordercloud.integrations.cardconnect;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common
 {
@@ -69,19 +72,5 @@ namespace Marketplace.Common
 		public int AccountID { get; set; }
 		public string LicenseKey { get; set; }
 		public string CompanyCode { get; set; }
-	}
-    public class BlobSettings
-    {
-        public string ConnectionString { get; set; }
-        public string QueueName { get; set; }
-        public string CacheName { get; set; }
-		public string HostUrl { get; set; }
-    }
-
-	public class CosmosSettings
-	{
-		public string PrimaryKey { get; set; }
-		public string EndpointUri { get; set; }
-		public string DatabaseName { get; set; }
 	}
 }

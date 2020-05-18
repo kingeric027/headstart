@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cosmonaut.Attributes;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Models;
+using ordercloud.integrations.cosmos;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Models.Extended
 {

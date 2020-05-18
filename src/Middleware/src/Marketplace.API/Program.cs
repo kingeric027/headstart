@@ -1,6 +1,8 @@
 using System;
-using Microsoft.AspNetCore.Hosting;
 using Marketplace.Common;
+using Marketplace.Common.Helpers;
+using Microsoft.AspNetCore.Hosting;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.API
 {
@@ -12,7 +14,7 @@ namespace Marketplace.API
 			// Set this in your visual studio Env Variables.
 			var connectionString = Environment.GetEnvironmentVariable("APP_CONFIG_CONNECTION"); 
 
-			Marketplace.Helpers.WebHostBuilder
+			OrderCloudWebHostBuilder
 				.CreateWebHostBuilder<Startup, AppSettings>(args, connectionString)
 				.Build()
 				.Run();

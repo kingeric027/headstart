@@ -1,16 +1,13 @@
-﻿using Integrations.CMS.Models;
-using Marketplace.CMS.Models;
-using Marketplace.CMS.Queries;
-using Marketplace.Common;
+﻿using Marketplace.Common;
 using Marketplace.Common.Controllers;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Models;
-using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
+using ordercloud.integrations.cms;
+using ordercloud.integrations.cosmos;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.CMS.Controllers
 {
@@ -29,14 +26,14 @@ namespace Marketplace.CMS.Controllers
 		}
 
 		[DocName("List Assets")]
-		[HttpGet, Route(""), MarketplaceUserAuth]
-		public async Task<ListPage<Asset>> List(ListArgs<Asset> args)
+		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
+		public async Task<ListPage<Asset>> List(CosmosListArgs<Asset> args)
 		{
 			return await _assets.List(args, VerifiedUserContext);
 		}
 
 		[DocName("Get an Asset")]
-		[HttpGet, Route("{assetID}"), MarketplaceUserAuth]
+		[HttpGet, Route("{assetID}"), OrderCloudIntegrationsAuth]
 		public async Task<Asset> Get(string assetID)
 		{
 			return await _assets.Get(assetID, VerifiedUserContext);
@@ -44,21 +41,21 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("Upoload an Asset")]
 		[DocIgnore] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
-		[HttpPost, Route(""), MarketplaceUserAuth]
+		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
 		public async Task<Asset> Create([FromForm] AssetUpload form)
 		{
 			return await _assets.Create(form, VerifiedUserContext);
 		}
 
 		[DocName("Update an Asset")]
-		[HttpPut, Route("{assetID}"), MarketplaceUserAuth]
+		[HttpPut, Route("{assetID}"), OrderCloudIntegrationsAuth]
 		public async Task<Asset> Update(string assetID, [FromBody] Asset asset)
 		{
 			return await _assets.Update(assetID, asset, VerifiedUserContext);
 		}
 
 		[DocName("Delete an Asset")]
-		[HttpDelete, Route("{assetID}"), MarketplaceUserAuth]
+		[HttpDelete, Route("{assetID}"), OrderCloudIntegrationsAuth]
 		public async Task Delete(string assetID)
 		{
 			await _assets.Delete(assetID, VerifiedUserContext);

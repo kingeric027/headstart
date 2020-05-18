@@ -1,5 +1,5 @@
-﻿using Marketplace.Helpers.Attributes;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Models.Extended
 {

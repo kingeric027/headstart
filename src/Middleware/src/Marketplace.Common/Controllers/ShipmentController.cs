@@ -1,12 +1,11 @@
 ﻿using Marketplace.Common.Commands;
-using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Misc;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common.Controllers
 {
@@ -24,7 +23,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("POST Marketplace Shipment")]
         // todo update auth
-        [HttpPost, MarketplaceUserAuth(ApiRole.ShipmentAdmin)]
+        [HttpPost, OrderCloudIntegrationsAuth(ApiRole.ShipmentAdmin)]
         public async Task<ShipmentCreateResponse> Create([FromBody] SuperShipment superShipment)
         {
             // ocAuth is the token for the organization that is specified in the AppSettings

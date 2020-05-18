@@ -1,4 +1,4 @@
-﻿using Marketplace.Helpers.Attributes;
+﻿using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Models.Misc
 {
