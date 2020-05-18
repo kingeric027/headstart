@@ -6,12 +6,9 @@
 
   <ItemGroup>
     <PackageReference Include="Avalara.AvaTax" Version="20.1.1" />
+    <PackageReference Include="ordercloud.integrations.extensions" Version="0.0.8" />
+    <PackageReference Include="ordercloud.integrations.openapispec" Version="0.0.2" />
     <PackageReference Include="OrderCloud.SDK" Version="0.9.0-pre1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-extensions\src\ordercloud-integrations-extenions\ordercloud.integrations.extensions.csproj" />
-    <ProjectReference Include="..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-openapispec\src\ordercloud-integrations-openapispec\ordercloud.integrations.openapispec.csproj" />
   </ItemGroup>
 
 </Project>

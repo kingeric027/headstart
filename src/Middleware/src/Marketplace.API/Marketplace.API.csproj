@@ -21,8 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-cardconnect\src\ordercloud.integrations.cardconnect\ordercloud.integrations.cardconnect.csproj" />
-    <ProjectReference Include="..\..\..\..\..\ordercloud-integrations-projects\ordercloud-integrations-extensions\src\ordercloud-integrations-extenions\ordercloud.integrations.extensions.csproj" />
     <ProjectReference Include="..\Marketplace.Common\Marketplace.Common.csproj" />
   </ItemGroup>
 

@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using ordercloud.integrations.CMS.Models;
-using ordercloud.integrations.CMS.Queries;
+using ordercloud.integrations.cms;
 using ordercloud.integrations.extensions;
 using ordercloud.integrations.openapispec;
 
