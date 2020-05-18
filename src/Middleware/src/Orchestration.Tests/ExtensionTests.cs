@@ -1,12 +1,8 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using Marketplace.Common.Commands;
 using NUnit.Framework;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
-using Marketplace.Helpers.Extensions;
 using Marketplace.Models;
-using Marketplace.Models.Misc;
 
 namespace Orchestration.Tests
 {
@@ -15,16 +11,6 @@ namespace Orchestration.Tests
         [SetUp]
         public void Setup()
         {
-        }
-
-        [Test]
-        public void to_credit_card_display_test()
-        {
-            var visa = "4444333322221111".ToCreditCardDisplay();
-            Assert.AreEqual("1111", visa);
-
-            var amex = "373485467448025".ToCreditCardDisplay();
-            Assert.AreEqual("8025", amex);
         }
 
         [Test, TestCaseSource(typeof(TypeFactory), nameof(TypeFactory.TestCases))]
@@ -39,13 +25,6 @@ namespace Orchestration.Tests
             };
             var path = model.BuildPath("supplierid", "clientid");
             Assert.AreEqual(path, $"supplierid/clientid/{obj.Type().ToString().ToLower()}/id");
-        }
-
-        [Test]
-        public void join_string_words()
-        {
-            var list = new List<RecordType>() { RecordType.Product, RecordType.Spec};
-            Assert.IsTrue(list.JoinString("|") == "Product|Spec");
         }
 
         [Test, TestCaseSource(typeof(TypeFactory), nameof(TypeFactory.TestCases))]

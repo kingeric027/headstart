@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common.Controllers
 {
@@ -21,7 +21,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("GET SupplierCategoryConfig")]
-        [HttpGet, Route("marketplace/{marketplaceID}/supplier/category/config"), MarketplaceUserAuth(ApiRole.SupplierReader)]
+        [HttpGet, Route("marketplace/{marketplaceID}/supplier/category/config"), OrderCloudIntegrationsAuth(ApiRole.SupplierReader)]
         public async Task<SupplierCategoryConfig> Get(string marketplaceID)
         {
             return await _query.Get(marketplaceID);

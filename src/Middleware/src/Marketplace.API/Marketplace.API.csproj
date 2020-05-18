@@ -21,9 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Integrations.CMS\Integrations.CMS.csproj" />
     <ProjectReference Include="..\Marketplace.Common\Marketplace.Common.csproj" />
-    <ProjectReference Include="..\Marketplace.Helpers\Marketplace.Helpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

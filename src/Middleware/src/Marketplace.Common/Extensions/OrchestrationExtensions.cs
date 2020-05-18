@@ -1,9 +1,7 @@
-﻿using Marketplace.Common.Commands;
-using Marketplace.Common.Models;
-using Marketplace.Helpers.Exceptions;
+﻿using Marketplace.Common.Models;
 using Marketplace.Models;
-using Marketplace.Models.Misc;
-using ErrorCodes = Marketplace.Helpers.Exceptions.ErrorCodes;
+using ordercloud.integrations.extensions;
+using ErrorCodes = Marketplace.Models.ErrorCodes;
 
 namespace Marketplace.Common.Extensions
 {
@@ -49,7 +47,7 @@ namespace Marketplace.Common.Extensions
                 case nameof(MarketplaceCatalog):
                     return RecordType.Catalog;
                 default:
-                    throw new ApiErrorException(ErrorCodes.All["UnrecognizedType"], obj);
+                    throw new OrderCloudIntegrationException(ErrorCodes.All["UnrecognizedType"], obj);
             }
         }
     }

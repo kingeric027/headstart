@@ -1,14 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Marketplace.CMS.Models;
-using Marketplace.CMS.Queries;
 using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Controllers.CMS;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Models;
 using Marketplace.Models;
-using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers
@@ -25,7 +20,7 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[DocName("GET Super Product")]
-		[HttpGet, Route("products/{id}"), MarketplaceUserAuth(ApiRole.Shopper)]
+		[HttpGet, Route("products/{id}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
 		public async Task<SuperMarketplaceProduct> Get(string id)
 		{
 			return await _productCommand.MeGet(id, VerifiedUserContext);

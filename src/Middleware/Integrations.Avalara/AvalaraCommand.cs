@@ -4,14 +4,12 @@ using System.Threading.Tasks;
 using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Services.Avalara.Mappers;
-using Marketplace.Helpers.Models;
 using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 using Flurl.Http;
 using Flurl;
-using System.IO;
 using Integrations.Avalara;
-using Marketplace.Helpers;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.Common.Services.Avalara
 {

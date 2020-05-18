@@ -1,13 +1,9 @@
-﻿
-using Avalara.AvaTax.RestClient;
-using Marketplace.Common.Services.Avalara.Mappers;
-using Marketplace.Helpers;
+﻿using Marketplace.Common.Services.Avalara.Mappers;
 using Marketplace.Models.Misc;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Orchestration.Tests.Mocks;
 using OrderCloud.SDK;
-using System.Collections;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.Tests
 {

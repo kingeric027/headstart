@@ -1,11 +1,11 @@
 ﻿using Marketplace.Common.Commands;
 using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Attributes;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common.Controllers
 {
@@ -24,7 +24,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("POST Marketplace Buyer")]
-        [HttpPost, MarketplaceUserAuth(ApiRole.BuyerAdmin)]
+        [HttpPost, OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
         public async Task<MarketplaceBuyer> Create([FromBody] MarketplaceBuyer buyer)
         {
             // ocAuth is the token for the organization that is specified in the AppSettings

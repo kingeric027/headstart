@@ -63,7 +63,7 @@ namespace Marketplace.Common.Services
             var client = new SendGridClient(_settings.SendgridApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
-            var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, templateData); ;
+            var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, templateData);
             await client.SendEmailAsync(msg);
         }
 

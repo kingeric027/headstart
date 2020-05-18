@@ -18,7 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using OrderCloud.SDK;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -67,6 +66,7 @@ namespace Marketplace.Helpers.Extensions
             services.AddTransient<GlobalExceptionHandler>();
             services.Inject<IOrderCloudClient>();
             services.AddSingleton(settings);
+            //TODO: refactor for nuget. JsonOptions now a param
             services.AddMvc(options => { options.Filters.Add(typeof(ValidateModelAttribute)); })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(o =>
@@ -80,15 +80,7 @@ namespace Marketplace.Helpers.Extensions
             return services;
         }
 
-		public static IServiceCollection ConfigureOpenApiSpec(this IServiceCollection services, string version, string docsTitle)
-		{
-			services.AddSwaggerGen(c =>
-			{
-				c.SwaggerDoc(version, new Info { Title = docsTitle, Version = version });
-				c.CustomSchemaIds(x => x.FullName);
-			});
-			return services;
-		}
+	
 
 		public static IApplicationBuilder ConfigureWebApp(this IApplicationBuilder app, IHostingEnvironment env, string version)
         {

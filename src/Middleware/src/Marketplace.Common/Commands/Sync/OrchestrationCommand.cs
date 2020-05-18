@@ -6,13 +6,10 @@ using Newtonsoft.Json.Linq;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
-using Marketplace.Helpers.Models;
-using Marketplace.Helpers.Exceptions;
-using Marketplace.Helpers.Extensions;
-using Marketplace.Helpers.Services;
 using Marketplace.Models;
+using ordercloud.integrations.blob;
+using ordercloud.integrations.extensions;
 using Action = Marketplace.Common.Models.Action;
-using ErrorCodes = Marketplace.Helpers.Exceptions.ErrorCodes;
 
 namespace Marketplace.Common.Commands
 {
@@ -29,21 +26,21 @@ namespace Marketplace.Common.Commands
 
     public class OrchestrationCommand : IOrchestrationCommand
     {
-        private readonly IBlobService _blobQueue;
-        private readonly IBlobService _blobCache;
+        private readonly IOrderCloudIntegrationsBlobService _blobQueue;
+        private readonly IOrderCloudIntegrationsBlobService _blobCache;
         private readonly AppSettings _settings;
         private readonly LogQuery _log;
 
         public OrchestrationCommand(AppSettings settings, LogQuery log)
         {
             _settings = settings;
-            _blobQueue = new BlobService(new BlobServiceConfig()
+            _blobQueue = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
             {
                 ConnectionString = settings.BlobSettings.ConnectionString,
                 Container = settings.BlobSettings.QueueName
             });
 
-            _blobCache = new BlobService(new BlobServiceConfig()
+            _blobCache = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
             {
                 ConnectionString = settings.BlobSettings.ConnectionString,
                 Container = settings.BlobSettings.CacheName
@@ -65,9 +62,9 @@ namespace Marketplace.Common.Commands
                 await _blobQueue.Save(orch.BuildPath(resourceId, clientId), JsonConvert.SerializeObject(orch));
                 return await Task.FromResult(obj);
             }
-            catch (ApiErrorException ex)
+            catch (OrderCloudIntegrationException ex)
             {
-                throw new ApiErrorException(ex.ApiError);
+                throw new OrderCloudIntegrationException(ex.ApiError);
             }
             catch (Exception ex)
             {
@@ -77,7 +74,7 @@ namespace Marketplace.Common.Commands
                     Message = $"Failed to save blob to queue from API: {user.SupplierID} - {typeof(T)}:  {ex.Message}",
                     Current = JObject.FromObject(obj)
                 });
-                throw new ApiErrorException(ErrorCodes.All["WriteFailure"], obj);
+                throw new OrderCloudIntegrationException(Marketplace.Models.ErrorCodes.All["WriteFailure"], obj);
             }
         }
 

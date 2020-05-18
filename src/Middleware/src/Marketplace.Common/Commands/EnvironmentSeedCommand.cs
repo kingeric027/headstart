@@ -6,10 +6,9 @@ using Marketplace.Common.Helpers;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.DevCenter.Models;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Helpers.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
