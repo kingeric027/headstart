@@ -14,8 +14,8 @@ namespace Marketplace.Common.Controllers
 	[MarketplaceSection.Integration(ListOrder = 5)]
 	public class ValidatedAddressController: BaseController
 	{
-		private readonly IValidatedAddressCommand _command;
-		public ValidatedAddressController(IValidatedAddressCommand command, AppSettings settings) : base(settings)
+		private readonly ISmartyStreetsCommand _command;
+		public ValidatedAddressController(ISmartyStreetsCommand command, AppSettings settings) : base(settings)
 		{
 			_command = command;
 		}
@@ -88,10 +88,12 @@ namespace Marketplace.Common.Controllers
 		// ORDER endpoints
 		[HttpPut, Route("order/{direction}/{orderID}/billto"), OrderCloudIntegrationsAuth(ApiRole.Shopper, ApiRole.OrderAdmin)]
 		public async Task<Order> SetBillingAddress(OrderDirection direction, string orderID, [FromBody] Address address) =>
+			await _command.SetBillingAddress(direction, orderID, address, VerifiedUserContext);
 
 
 		[HttpPut, Route("order/{direction}/{orderID}/shipto"), OrderCloudIntegrationsAuth(ApiRole.Shopper, ApiRole.OrderAdmin)]
 		public async Task<Order> SetShippingAddress(OrderDirection direction, string orderID, [FromBody] Address address) =>
+			await _command.SetShippingAddress(direction, orderID, address, VerifiedUserContext);
 
 	}
 }

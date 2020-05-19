@@ -1,5 +1,4 @@
-﻿using Marketplace.Models.Misc;
-using ordercloud.integrations.extensions;
+﻿using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 
 namespace Integrations.SmartyStreets

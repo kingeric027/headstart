@@ -13,7 +13,7 @@ namespace Integrations.SmartyStreets
 		// returns many incomplete address suggestions
 		Task<AutoCompleteResponse> USAutoCompletePro(string search);
 		// returns one or zero very complete suggestions
-		Task<List<Candidate>> ValidateSingleUSAddress(Lookup lookup)
+		Task<List<Candidate>> ValidateSingleUSAddress(Lookup lookup);
 	}
 	public class SmartyStreetsService : ISmartyStreetsService
 	{

@@ -4,11 +4,12 @@ using System.Text;
 
 namespace Integrations.SmartyStreets
 {
+	// todo: add test for this function 
+	// todo: should this live in the extensions project?
 	public static class PatchHelper
 	{
 		public static T PatchObject<T>(T patch, T existing)
 		{
-			// todo: add test for this function 
 			var patchType = patch.GetType();
 			var propertiesInPatch = patchType.GetProperties();
 			foreach (var property in propertiesInPatch)

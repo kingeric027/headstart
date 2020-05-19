@@ -26,6 +26,7 @@ using ordercloud.integrations.cosmos;
 using OrderCloud.SDK;
 using ordercloud.integrations.extensions;
 using Swashbuckle.AspNetCore.Swagger;
+using Integrations.SmartyStreets;
 
 namespace Marketplace.API
 {
@@ -70,7 +71,7 @@ namespace Marketplace.API
 				.Inject<IZohoClient>()
 				.Inject<IZohoCommand>()
 				.Inject<ISyncCommand>()
-				.Inject<IValidatedAddressCommand>()
+				.Inject<ISmartyStreetsCommand>()
 				.Inject<IFreightPopService>()
 				.Inject<IOrchestrationCommand>()
 				.Inject<IOrchestrationLogCommand>()
@@ -83,10 +84,11 @@ namespace Marketplace.API
 				.Inject<IAssetQuery>()
 				.Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
-                .Inject<IOrderCloudIntegrationsCardConnectCommand>()
-                .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
+                .Inject<ISmartyStreetsCommand>()
+				.Inject<IOrderCloudIntegrationsCardConnectCommand>()
+				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
-                .AddSingleton<ISmartyStreetsCommand>(x => new ValidatedAddressCommand(_settings.SmartyStreetSettings))
+                .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("MarketplaceUser")

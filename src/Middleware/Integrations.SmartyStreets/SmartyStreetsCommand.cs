@@ -12,7 +12,7 @@ using SmartyStreets.USStreetApi;
 
 namespace Marketplace.Common.Services.SmartyStreets
 {
-	public interface IValidatedAddressCommand
+	public interface ISmartyStreetsCommand
 	{
 		Task<AddressValidation> ValidateAddress(Address address);
 		Task<BuyerAddressValidation> ValidateAddress(BuyerAddress address);
@@ -37,10 +37,10 @@ namespace Marketplace.Common.Services.SmartyStreets
 		Task<Order> SetShippingAddress(OrderDirection direction, string orderID, Address address, VerifiedUserContext user);
 	}
 
-	public class ValidatedAddressCommand : IValidatedAddressCommand
+	public class SmartyStreetsCommand : ISmartyStreetsCommand
 	{
 		private readonly ISmartyStreetsService _service;
-		public ValidatedAddressCommand(ISmartyStreetsService service)
+		public SmartyStreetsCommand(ISmartyStreetsService service)
 		{
 			_service = service;
 		}
