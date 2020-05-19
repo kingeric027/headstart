@@ -9,9 +9,9 @@ import { MarketplaceMeProduct, PriceSchedule } from 'marketplace';
 })
 export class OCMQuantityInput implements OnInit {
   @Input() existingQty: number;
+  @Input() gridDisplay?= false;
   @Output() qtyChange = new EventEmitter<{ qty: number; valid: boolean }>();
   // TODO - replace with real product info
-  @Input() gridDisplay?: boolean = false;
   form: FormGroup;
   isQtyRestricted = false;
   restrictedQuantities: number[] = [];
@@ -21,29 +21,30 @@ export class OCMQuantityInput implements OnInit {
   max: number;
   disabled = false;
 
-  @Input() product: MarketplaceMeProduct;
   @Input() priceSchedule: PriceSchedule;
+  @Input() set product(value: MarketplaceMeProduct) {
+    this.init(value);
+  }
 
   ngOnInit(): void {
-    this.product && this.priceSchedule && this.init(this.product, this.priceSchedule)
+    this.product && this.priceSchedule && this.init(this.product)
     this.form = new FormGroup({
-      quantity: new FormControl(0, [Validators.required]),
+      quantity: new FormControl(1, [Validators.required]),
     });
   }
 
-  init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
-    this.isQtyRestricted = this.priceSchedule.RestrictedQuantity;
+  init(product: MarketplaceMeProduct): void {
+    console.log(this.gridDisplay)
+    this.isQtyRestricted = this.priceSchedule?.RestrictedQuantity;
     this.inventory = this.getInventory(product);
     this.min = this.minQty(product);
     this.max = this.maxQty(product);
-    this.restrictedQuantities = this.priceSchedule.PriceBreaks.map(b => b.Quantity);
+    this.restrictedQuantities = this.priceSchedule?.PriceBreaks.map(b => b.Quantity);
     if (this.inventory < this.min) {
       this.errorMsg = 'Out of stock.';
       this.disabled = true;
     }
-    if (this.gridDisplay) this.form.setValue({ quantity: 0 });
-    if (!this.gridDisplay) this.form.setValue({ quantity: this.getDefaultQty(product) });
-    this.form.setValue({ quantity: this.getDefaultQty(product) });
+    this.form.setValue({ quantity: this.getDefaultQty() });
     this.quantityChangeListener();
     if (!this.existingQty) {
       this.emit(this.form.get('quantity').value);
@@ -78,8 +79,7 @@ export class OCMQuantityInput implements OnInit {
     return true;
   }
 
-  getDefaultQty(product: MarketplaceMeProduct): number {
-    console.log(this.gridDisplay);
+  getDefaultQty(): number {
     if (this.gridDisplay) return 0;
     if (this.existingQty) return this.existingQty;
     if (this.priceSchedule.RestrictedQuantity) return this.priceSchedule.PriceBreaks[0].Quantity;
@@ -87,7 +87,7 @@ export class OCMQuantityInput implements OnInit {
   }
 
   minQty(product: MarketplaceMeProduct): number {
-    return this.priceSchedule?.MinQuantity || 1
+    return this.priceSchedule?.MinQuantity || this.gridDisplay ? 0 : 1;
   }
 
   maxQty(product: MarketplaceMeProduct): number {

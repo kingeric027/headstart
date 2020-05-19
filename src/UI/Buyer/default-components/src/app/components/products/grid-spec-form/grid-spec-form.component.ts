@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ListSpec } from '@ordercloud/angular-sdk';
+import { ListSpec, PriceSchedule } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
 import { LineItem, MarketplaceMeProduct, ShopperContextService } from 'marketplace';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -8,17 +8,17 @@ import { SpecFormService } from '../spec-form/spec-form.service';
     templateUrl: `./grid-spec-form.component.html`,
 })
 export class OCMGridSpecForm {
+    @Input() priceBreaks: object;
+    @Input() priceSchedule: PriceSchedule;
     _specs: ListSpec;
     _product: MarketplaceMeProduct;
-    @Input() priceBreaks: object;
     quantity: number;
     selectedBreak: object;
     percentSavings: number;
     specOptions: any;
-    _lineItems = [];
     lineItems: LineItem[] = [];
     lineTotals: number[] = [];
-    unitPrices = [];
+    totalPrice: number = 0;
 
     constructor(private specFormService: SpecFormService, private context: ShopperContextService) { }
     @Input() set product(value: MarketplaceMeProduct) {
@@ -29,7 +29,7 @@ export class OCMGridSpecForm {
         this.getSpecOptions(value);
     }
 
-    getSpecOptions(specs: ListSpec) {
+    getSpecOptions(specs: ListSpec): void {
         // creates an object with each spec option and its values
         const obj = {};
         for (let i = 0; i < specs.Items.length; i++) {
@@ -41,7 +41,7 @@ export class OCMGridSpecForm {
         this.specOptions = this.getAllSpecCombinations(obj);
     }
 
-    getAllSpecCombinations(specOptions: object) {
+    getAllSpecCombinations(specOptions: object): string[] {
         // returns an array containing every combination of spec values
         const arr = [];
         for (let key in specOptions) {
@@ -61,7 +61,7 @@ export class OCMGridSpecForm {
         }
     }
 
-    changeQuantity(specs, event) {
+    changeQuantity(specs, event): void {
         const indexOfSpec = this.specOptions.indexOf(specs);
         specs = specs.split(',');
         specs = specs.map(x => x.replace(/\s/g, ''));
@@ -76,32 +76,28 @@ export class OCMGridSpecForm {
         if (i > -1) this.lineItems[i] = item;
         else this.lineItems.push(item);
         this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, liSpecs);
-        console.log(this.lineItems);
+        this.totalPrice = this.getTotalPrice();
     }
 
-    getLineTotal(qty: number, specs: any) {
+    getLineTotal(qty: number, specs: any): number {
         let markup = 0;
-        let price = this._product?.PriceSchedule?.PriceBreaks[0].Price;
+        let price = this.priceSchedule?.PriceBreaks[0].Price;
         specs.forEach(spec => markup += spec.Markup);
         return (markup + price) * qty;
     }
 
-    getLineItem(lineItemID: string): LineItem {
-        return this._lineItems.find(li => li.ID === lineItemID);
-    }
-
-    addToCart(): void {
-        this.lineItems.forEach(lineItem => {
-            if (lineItem.Quantity > 0) {
-                this.context.order.cart.add(lineItem);
-            }
-        });
+    async addToCart(): Promise<void> {
+        for (let i = 0; i < this.lineItems.length; i++) {
+            if (this.lineItems[i].Quantity > 0) {
+                await this.context.order.cart.add(this.lineItems[i]);
+            } else continue;
+        }
         this.lineItems = [];
     }
 
     getPriceBreakRange(index: number): string {
-        if (!this._product.PriceSchedule?.PriceBreaks.length) return '';
-        const priceBreaks = this._product.PriceSchedule.PriceBreaks;
+        if (!this.priceSchedule?.PriceBreaks.length) return '';
+        const priceBreaks = this.priceSchedule.PriceBreaks;
         const indexOfNextPriceBreak = index + 1;
         if (indexOfNextPriceBreak < priceBreaks.length) {
             return `${priceBreaks[index].Quantity} - ${priceBreaks[indexOfNextPriceBreak].Quantity - 1}`;
@@ -111,23 +107,6 @@ export class OCMGridSpecForm {
     }
 
     getTotalPrice(): number {
-        // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
-        // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
-        // is the cost per item.
-        if (!this._product.PriceSchedule?.PriceBreaks.length) return;
-
-        const priceBreaks = this._product.PriceSchedule.PriceBreaks;
-        this.priceBreaks = priceBreaks;
-        const startingBreak = _minBy(priceBreaks, 'Quantity');
-        const selectedBreak = priceBreaks.reduce((current, candidate) => {
-            return candidate.Quantity > current.Quantity && candidate.Quantity <= this.quantity ? candidate : current;
-        }, startingBreak);
-        this.selectedBreak = selectedBreak;
-        this.percentSavings = parseInt(
-            (((priceBreaks[0].Price - selectedBreak.Price) / priceBreaks[0].Price) * 100).toFixed(0), 10
-        );
-        return this.specFormService.event.valid
-            ? this.specFormService.getSpecMarkup(this._specs, selectedBreak, this.quantity || startingBreak.Quantity)
-            : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
+        return this.lineTotals.reduce((acc, curr) => { return acc + curr });
     }
 }
