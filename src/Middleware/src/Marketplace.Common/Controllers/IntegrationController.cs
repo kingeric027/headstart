@@ -29,7 +29,8 @@ namespace Marketplace.Common.Controllers
 		// todo auth on this endpoint
 		[Route("ordercalculate")]
 		[HttpPost]
-		[OrderCloudWebhookAuth]
+		// looking into why ordercloudwebhookauth is broken
+		//[OrderCloudWebhookAuth]
 		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload)
 		{
 			var orderCalculationResponse = await _OCShippingIntegration.CalculateOrder(orderCalculatePayload);
