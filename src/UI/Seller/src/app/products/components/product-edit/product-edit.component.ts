@@ -492,8 +492,6 @@ export class ProductEditComponent implements OnInit {
   }
 
   getProductPreviewImage(): string | SafeUrl {
-    return this._superMarketplaceProductEditable?.Images?.[0]?.Url || 
-    this.imageFiles[0]?.URL ||
-    'https://via.placeholder.com/300?text=Product+Image'
+    return this.imageFiles[0]?.URL || `${environment.middlewareUrl}/products/${this._superMarketplaceProductEditable?.Product?.ID}/image`;
   }
 }
