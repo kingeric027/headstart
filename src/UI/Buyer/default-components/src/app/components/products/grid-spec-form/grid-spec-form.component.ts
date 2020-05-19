@@ -1,28 +1,25 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ListSpec } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
-import { MarketplaceMeProduct, ShopperContextService, LineItem } from 'marketplace';
+import { LineItem, MarketplaceMeProduct, ShopperContextService } from 'marketplace';
 import { SpecFormService } from '../spec-form/spec-form.service';
-import { SpecFormTextAreaComponent } from '../spec-form/spec-form-textarea/spec-form-textarea.component';
 
 @Component({
     templateUrl: `./grid-spec-form.component.html`,
 })
 export class OCMGridSpecForm {
     _specs: ListSpec;
-    @Output() specFormChange: EventEmitter<any> = new EventEmitter<any>();
     _product: MarketplaceMeProduct;
     @Input() priceBreaks: object;
     quantity: number;
-    price: number;
-    priceBreakRange: string[];
     selectedBreak: object;
     percentSavings: number;
-    specOptions: object;
+    specOptions: any;
     _lineItems = [];
     lineItems: LineItem[] = [];
-    _specArray = [];
-    specObject: object;
+    lineTotals: number[] = [];
+    unitPrices = [];
+
     constructor(private specFormService: SpecFormService, private context: ShopperContextService) { }
     @Input() set product(value: MarketplaceMeProduct) {
         this._product = value;
@@ -33,6 +30,7 @@ export class OCMGridSpecForm {
     }
 
     getSpecOptions(specs: ListSpec) {
+        // creates an object with each spec option and its values
         const obj = {};
         for (let i = 0; i < specs.Items.length; i++) {
             specs.Items[i].Options.forEach(option => {
@@ -40,18 +38,17 @@ export class OCMGridSpecForm {
                 obj[name] ? obj[name].push(option.Value) : obj[name] = [option.Value];
             });
         }
-        this.specObject = obj;
         this.specOptions = this.getAllSpecCombinations(obj);
     }
 
     getAllSpecCombinations(specOptions: object) {
+        // returns an array containing every combination of spec values
         const arr = [];
         for (let key in specOptions) {
             arr.push(specOptions[key]);
         }
-        if (arr.length == 1) {
-            return arr[0];
-        } else {
+        if (arr.length == 1) return arr[0];
+        else {
             const result = [];
             const combinations = this.getAllSpecCombinations(arr.slice(1));
             for (let i = 0; i < combinations.length; i++) {
@@ -59,23 +56,34 @@ export class OCMGridSpecForm {
                     result.push(arr[0][j] + ', ' + combinations[i]);
                 }
             }
-            console.log(result);
+            result.forEach(() => this.lineTotals.push(0));
             return result;
         }
     }
 
-    changeQuantity(specs, event): void {
+    changeQuantity(specs, event) {
+        const indexOfSpec = this.specOptions.indexOf(specs);
         specs = specs.split(',');
         specs = specs.map(x => x.replace(/\s/g, ''));
-        var item = {
-            Quantity: event.target.value,
+        const liSpecs = this.specFormService.getGridLineItemSpecs(this._specs, specs);
+        const item = {
+            Quantity: event.qty,
             Product: this._product,
             ProductID: this._product.ID,
-            Specs: this.specFormService.getGridLineItemSpecs(this._specs, specs)
+            Specs: liSpecs
         };
         const i = this.lineItems.findIndex(obj => obj.Specs === specs);
         if (i > -1) this.lineItems[i] = item;
         else this.lineItems.push(item);
+        this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, liSpecs);
+        console.log(this.lineItems);
+    }
+
+    getLineTotal(qty: number, specs: any) {
+        let markup = 0;
+        let price = this._product?.PriceSchedule?.PriceBreaks[0].Price;
+        specs.forEach(spec => markup += spec.Markup);
+        return (markup + price) * qty;
     }
 
     getLineItem(lineItemID: string): LineItem {
@@ -85,14 +93,10 @@ export class OCMGridSpecForm {
     addToCart(): void {
         this.lineItems.forEach(lineItem => {
             if (lineItem.Quantity > 0) {
-                this.context.order.cart.add({
-                    ProductID: this._product.ID,
-                    Quantity: lineItem.Quantity,
-                    Specs: lineItem.Specs
-                });
+                this.context.order.cart.add(lineItem);
             }
-            console.log('li', lineItem);
-        })
+        });
+        this.lineItems = [];
     }
 
     getPriceBreakRange(index: number): string {
@@ -104,11 +108,6 @@ export class OCMGridSpecForm {
         } else {
             return `${priceBreaks[index].Quantity}+`;
         }
-    }
-
-    getLineTotal(qty: number, specs: any): number {
-
-        return 0;
     }
 
     getTotalPrice(): number {

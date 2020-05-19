@@ -16,6 +16,20 @@
                              (favoriteChanged)="setIsFavorite($event.detail)">
         </ocm-toggle-favorite>
       </div>
+      <div class="btn-group">
+        <button class="btn btn-sm btn-outline-secondary"
+                [ngClass]="{'active' : !showGrid}"
+                (click)="toggleGrid(false)">
+          <fa-icon [icon]="faListUl">
+          </fa-icon>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary"
+                [ngClass]="{'active' : showGrid}"
+                (click)="toggleGrid(true)">
+          <fa-icon [icon]="faTh">
+          </fa-icon>
+        </button>
+      </div>
       <div *ngIf="supplierNote"
            class="alert alert-info my-3"><b>
         </b><span translate>PRODUCTS.DETAILS.NOTE</span>: {{ supplierNote }}

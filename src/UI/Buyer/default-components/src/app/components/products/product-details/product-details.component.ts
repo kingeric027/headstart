@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { ListSpec, User } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
 import { LineItem, MarketplaceMeProduct, OrderType, ShopperContextService, PriceSchedule } from 'marketplace';
@@ -17,6 +17,8 @@ import { ExchangeRates } from 'marketplace/projects/marketplace/src/lib/services
   styleUrls: ['./product-details.component.scss'],
 })
 export class OCMProductDetails implements OnInit {
+  faTh = faTh;
+  faListUl = faListUl;
   faTimes = faTimes;
   _specs: ListSpec;
   _product: MarketplaceMeProduct;
@@ -81,8 +83,8 @@ export class OCMProductDetails implements OnInit {
     }
   }
 
-  toggleGrid() {
-    this.showGrid = !this.showGrid;
+  toggleGrid(bool) {
+    this.showGrid = bool;
   }
 
   qtyChange(event: { qty: number; valid: boolean }): void {
@@ -93,18 +95,18 @@ export class OCMProductDetails implements OnInit {
   }
 
   async addToCart(): Promise<void> {
-      this.isAddingToCart = true;
-      try {
-        await this.context.order.cart.add({
-          ProductID: this._product.ID,
-          Quantity: this.quantity,
-          Specs: this.specFormService.getLineItemSpecs(this._specs),
-        });
-        this.isAddingToCart = false;
-      } catch (ex) {
-        this.isAddingToCart = false;
-        throw ex;
-      }
+    this.isAddingToCart = true;
+    try {
+      await this.context.order.cart.add({
+        ProductID: this._product.ID,
+        Quantity: this.quantity,
+        Specs: this.specFormService.getLineItemSpecs(this._specs),
+      });
+      this.isAddingToCart = false;
+    } catch (ex) {
+      this.isAddingToCart = false;
+      throw ex;
+    }
   }
 
   getPriceBreakRange(index: number): string {

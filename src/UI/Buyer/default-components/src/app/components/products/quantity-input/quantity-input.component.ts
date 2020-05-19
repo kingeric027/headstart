@@ -8,10 +8,10 @@ import { MarketplaceMeProduct, PriceSchedule } from 'marketplace';
   styleUrls: ['./quantity-input.component.scss'],
 })
 export class OCMQuantityInput implements OnInit {
-  @Input() existingQty: number; 
+  @Input() existingQty: number;
   @Output() qtyChange = new EventEmitter<{ qty: number; valid: boolean }>();
   // TODO - replace with real product info
-
+  @Input() gridDisplay?: boolean = false;
   form: FormGroup;
   isQtyRestricted = false;
   restrictedQuantities: number[] = [];
@@ -27,7 +27,7 @@ export class OCMQuantityInput implements OnInit {
   ngOnInit(): void {
     this.product && this.priceSchedule && this.init(this.product, this.priceSchedule)
     this.form = new FormGroup({
-      quantity: new FormControl(1, [Validators.required]),
+      quantity: new FormControl(0, [Validators.required]),
     });
   }
 
@@ -41,6 +41,8 @@ export class OCMQuantityInput implements OnInit {
       this.errorMsg = 'Out of stock.';
       this.disabled = true;
     }
+    if (this.gridDisplay) this.form.setValue({ quantity: 0 });
+    if (!this.gridDisplay) this.form.setValue({ quantity: this.getDefaultQty(product) });
     this.form.setValue({ quantity: this.getDefaultQty(product) });
     this.quantityChangeListener();
     if (!this.existingQty) {
@@ -77,6 +79,8 @@ export class OCMQuantityInput implements OnInit {
   }
 
   getDefaultQty(product: MarketplaceMeProduct): number {
+    console.log(this.gridDisplay);
+    if (this.gridDisplay) return 0;
     if (this.existingQty) return this.existingQty;
     if (this.priceSchedule.RestrictedQuantity) return this.priceSchedule.PriceBreaks[0].Quantity;
     return this.priceSchedule.MinQuantity;

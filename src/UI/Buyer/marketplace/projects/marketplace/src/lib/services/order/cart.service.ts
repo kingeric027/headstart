@@ -31,7 +31,7 @@ export class CartService implements ICart {
     private ocLineItemService: OcLineItemService,
     private ocMeService: OcMeService,
     private state: OrderStateService
-  ) {}
+  ) { }
 
   get(): ListLineItem {
     return this.lineItems;
@@ -41,13 +41,13 @@ export class CartService implements ICart {
   async add(lineItem: LineItem): Promise<LineItem> {
     // order is well defined, line item can be added
     if (!_isUndefined(this.order.DateCreated)) {
-      return await this.createLineItem(lineItem);
+      return this.createLineItem(lineItem);
     }
     if (!this.initializingOrder) {
       this.initializingOrder = true;
-      await this.state.reset();
+      this.state.reset();
       this.initializingOrder = false;
-      return await this.createLineItem(lineItem);
+      return this.createLineItem(lineItem);
     }
   }
 
@@ -140,7 +140,7 @@ export class CartService implements ICart {
       }
       return lineItem;
     } finally {
-      await this.state.reset();
+      this.state.reset();
     }
   }
 
@@ -158,9 +158,8 @@ export class CartService implements ICart {
   // product ID and specs must be the same
   private LineItemsMatch(li1: LineItem, li2: LineItem): boolean {
     if (li1.ProductID !== li2.ProductID) return false;
-    if (!li1.Specs || !li2.Specs) return false;
     for (const spec1 of li1.Specs) {
-      const spec2 = li2.Specs?.find(s => s.SpecID === spec1.SpecID);
+      const spec2 = li2.Specs.find(s => s.SpecID === spec1.SpecID);
       if (spec1.Value !== spec2.Value) return false;
     }
     return true;

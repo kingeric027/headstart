@@ -51,8 +51,8 @@ export class SpecFormService {
     return specs;
   }
 
-  public getGridLineItemSpecs(buyerSpecs: ListSpec, specValues: string[]): Array<LineItemSpec> {
-    const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
+  public getGridLineItemSpecs(buyerSpecs: ListSpec, specValues: string[]): Array<object> {
+    const specs: Array<object> = new Array<object>();
     for (let i = 0; i < buyerSpecs.Items.length; i++) {
       let name = buyerSpecs.Items[i].Name.replace(/ /g, '')
       const spec = this.getSpec(buyerSpecs, name);
@@ -63,6 +63,8 @@ export class SpecFormService {
           SpecID: spec.ID,
           OptionID: option.ID,
           Value: option.Value,
+          MarkupType: option.PriceMarkupType,
+          Markup: option.PriceMarkup
         });
       }
     }

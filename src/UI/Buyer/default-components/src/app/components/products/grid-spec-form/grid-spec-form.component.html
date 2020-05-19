@@ -3,7 +3,6 @@
     <tr>
       <th translate>PRODUCTS.GRID.QUANTITY</th>
       <th translate>PRODUCTS.GRID.OPTIONS</th>
-      <th translate>PRODUCTS.GRID.ADJUSTMENTS</th>
       <th translate>PRODUCTS.GRID.UNIT_PRICE</th>
       <th translate>PRODUCTS.GRID.TOTAL</th>
     </tr>
@@ -11,16 +10,17 @@
   <tbody>
     <tr *ngFor="let spec of specOptions; let i = index">
       <td>
-        <input class="form-control form-control-sm"
-               type="number"
-               placeholder="0"
-               min="0"
-               max="2500"
-               (change)="changeQuantity(specOptions[i], $event)">
+        <ocm-quantity-input class="w-50"
+                            id="quantity"
+                            [existingQty]="null"
+                            [product]="_product"
+                            [gridDisplay]="true"
+                            (qtyChange)="changeQuantity(specOptions[i], $event.detail)">
+        </ocm-quantity-input>
       </td>
       <td><label for="{{ spec }}">{{spec}}</label></td>
-      <td>{{unitPrice}}</td>
-      <td *ngFor="let priceBreak of _product.PriceSchedule.PriceBreaks; let i = index">{{ getPriceBreakRange(i) }}: {{priceBreak.Price | currency}}</td>
+      <td *ngFor="let priceBreak of _product.PriceSchedule.PriceBreaks">{{priceBreak.Price | currency}}</td>
+      <td>{{lineTotals[i] | currency}}</td>
     </tr>
   </tbody>
 </table>
@@ -29,5 +29,4 @@
         (click)="addToCart()"
         translate>
   PRODUCTS.DETAILS.ADD_TO_CART
-  <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
 </button>
