@@ -110,7 +110,7 @@ export class ProductEditComponent implements OnInit {
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
     const rates = await this.ocIntegrations.getAvailableCurrencies();
-    if (!this.isCreatingNew) {
+    if (this.isCreatingNew) {
       // If a supplier, creating a product or viewing - grab currency from my supplier xp.
       const myCurrencyCode = await (await this.currentUserService.getMySupplier()).xp?.Currency;
       this._myCurrency = rates.find(r => r.Currency === myCurrencyCode);
