@@ -8,17 +8,14 @@ import { SpecFormService } from '../spec-form/spec-form.service';
     templateUrl: `./grid-spec-form.component.html`,
 })
 export class OCMGridSpecForm {
-    @Input() priceBreaks: object;
     @Input() priceSchedule: PriceSchedule;
     _specs: ListSpec;
     _product: MarketplaceMeProduct;
-    quantity: number;
-    selectedBreak: object;
-    percentSavings: number;
     specOptions: any;
     lineItems: LineItem[] = [];
     lineTotals: number[] = [];
     totalPrice: number = 0;
+    isAddingToCart = false;
 
     constructor(private specFormService: SpecFormService, private context: ShopperContextService) { }
     @Input() set product(value: MarketplaceMeProduct) {
@@ -89,9 +86,16 @@ export class OCMGridSpecForm {
     async addToCart(): Promise<void> {
         for (let i = 0; i < this.lineItems.length; i++) {
             if (this.lineItems[i].Quantity > 0) {
-                await this.context.order.cart.add(this.lineItems[i]);
+                try {
+                    this.isAddingToCart = true;
+                    await this.context.order.cart.add(this.lineItems[i]);
+                } catch (ex) {
+                    this.isAddingToCart = false;
+                    throw ex;
+                }
             } else continue;
         }
+        this.isAddingToCart = false;
         this.lineItems = [];
     }
 

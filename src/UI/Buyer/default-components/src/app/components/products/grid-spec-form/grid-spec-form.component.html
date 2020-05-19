@@ -26,9 +26,9 @@
   <h4 class="font-weight-bold">{{ totalPrice  | currency: _product?.xp?.Currency}}</h4>
   <p class="text-muted ml-3 float-right">{{ _product | UofM }}</p>
 </div>
-
 <button class="btn btn-block btn-primary mb-3"
         type="submit"
+        [disabled]="isAddingToCart"
         (click)="addToCart()"
         translate>
   PRODUCTS.DETAILS.ADD_TO_CART
