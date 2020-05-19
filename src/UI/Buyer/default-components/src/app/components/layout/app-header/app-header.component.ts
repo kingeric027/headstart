@@ -76,9 +76,11 @@ export class OCMAppHeader implements OnInit {
   }
 
   async getCurrencyFlag(): Promise<string> {
+    const rates = this.context.exchangeRates.Get();
     const currentUser = this.context.currentUser.get();
     // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    const myRate = currentUser.UserGroups[0].xp?.Currency || "USD";
+    const myCurrencyCode = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency || "USD";
+    const myRate = rates.Items.find(r => r.Currency === myCurrencyCode);
     return myRate.Icon;
   }
 
