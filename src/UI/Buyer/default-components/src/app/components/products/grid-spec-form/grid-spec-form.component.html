@@ -19,7 +19,7 @@
         </ocm-quantity-input>
       </td>
       <td><label for="{{ spec }}">{{spec}}</label></td>
-      <td *ngFor="let priceBreak of _product.PriceSchedule.PriceBreaks">{{priceBreak.Price | currency}}</td>
+      <td *ngFor="let priceBreak of _product?.PriceSchedule?.PriceBreaks">{{priceBreak.Price | currency}}</td>
       <td>{{lineTotals[i] | currency}}</td>
     </tr>
   </tbody>

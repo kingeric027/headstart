@@ -46,35 +46,45 @@
           </div>
           <!--DISPLAY SHORT SPEC FORM -->
           <div *ngIf="specLength < 4">
-            <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
-                           [currency]="_product?.xp?.Currency"
-                           [specs]="_specs"
-                           (specFormChange)="onSpecFormChange($event)">
-            </ocm-spec-form>
-            <div class="d-flex flex-column"
-                 *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>
-              <div class="d-flex flex-row">
-                <ocm-quantity-input class="d-inline-block mb-3 mr-3"
-                                    (qtyChange)="qtyChange($event.detail)"
-                                    [product]="_product"
-                                    [priceSchedule]="_priceSchedule">
-                </ocm-quantity-input>
-                <button *ngIf="isQuoteProduct()"
-                        class="btn btn-block btn-primary mb-3"
-                        [disabled]="!specFormService.event?.valid || !qtyValid"
-                        (click)="openQuoteForm()"
-                        translate>
-                  PRODUCTS.DETAILS.REQ_QUOTE
-                </button>
-                <button *ngIf="!isQuoteProduct()"
-                        class="btn btn-block btn-primary mb-3"
-                        type="submit"
-                        [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid"
-                        (click)="addToCart()"
-                        translate>
-                  PRODUCTS.DETAILS.ADD_TO_CART
-                  <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
-                </button>
+            <div *ngIf="!showGrid">
+              <ocm-spec-form *ngIf="isOrderable && _specs?.Items?.length > 0"
+                             [specs]="_specs"
+                             [currency]="_product?.xp?.Currency"
+                             (specFormChange)="onSpecFormChange($event)">
+              </ocm-spec-form>
+              <div class="d-flex flex-column"
+                   *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>
+                <div class="d-flex flex-row">
+                  <ocm-quantity-input class="d-inline-block mb-3 mr-3"
+                                      (qtyChange)="qtyChange($event.detail)"
+                                      [product]="_product"
+                                      [priceSchedule]="_priceSchedule">
+                  </ocm-quantity-input>
+                  <button *ngIf="isQuoteProduct()"
+                          class="btn btn-block btn-primary mb-3"
+                          [disabled]="!specFormService.event?.valid || !qtyValid"
+                          (click)="openQuoteForm()"
+                          translate>
+                    PRODUCTS.DETAILS.REQ_QUOTE
+                  </button>
+                  <button *ngIf="!isQuoteProduct()"
+                          class="btn btn-block btn-primary mb-3"
+                          type="submit"
+                          [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid"
+                          (click)="addToCart()"
+                          translate>
+                    PRODUCTS.DETAILS.ADD_TO_CART
+                    <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
+                  </button>
+                </div>
+                <div>
+                  <ocm-modal [state]="quoteFormModal"
+                             [modalTitle]="'Request Quote'">
+                    <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
+                                            [CurrentUser]="currentUser"
+                                            (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
+                  </ocm-modal>
+                </div>
               </div>
               <div *ngIf="!isOrderable"
                    class="alert alert-info"
@@ -136,7 +146,8 @@
     <!-- DISPLAY LONG SPEC FORM TO RIGHT -->
     <div class="col-xl-2 col-lg-3"
          *ngIf="specLength > 3">
-      <div class="p-3 border border-medium border-radius">
+      <div *ngIf="!showGrid"
+           class="p-3 border border-medium border-radius">
         <div class="d-flex justify-content-between align-items-center">
           <span class="badge badge-pill badge-warning"
                 *ngIf="percentSavings > 0"
@@ -178,6 +189,15 @@
             <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
           </button>
         </div>
+      </div>
+      <div *ngIf="showGrid">
+        <ocm-grid-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
+                            [specs]="_specs"
+                            [product]="_product"
+                            [priceBreaks]="priceBreaks"
+                            [price]="price">
+        </ocm-grid-spec-form>
+
       </div>
       <ocm-modal [state]="quoteFormModal"
                  [modalTitle]="'Request Quote'">
