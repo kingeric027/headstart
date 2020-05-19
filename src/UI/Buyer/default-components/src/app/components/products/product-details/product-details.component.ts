@@ -22,6 +22,7 @@ export class OCMProductDetails implements OnInit {
   _product: MarketplaceMeProduct;
   _priceSchedule: PriceSchedule;
   _rates: ListPage<ExchangeRates>;
+  _myCurrency: string;
   _attachments: Asset[] = [];
   specFormService: SpecFormService;
   isOrderable = false;
@@ -53,7 +54,10 @@ export class OCMProductDetails implements OnInit {
     this._priceSchedule = superProduct.PriceSchedule;
     this._rates = this.context.exchangeRates.Get();
     this._attachments = superProduct?.Attachments; 
-    this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency);
+    const currentUser = this.context.currentUser.get();
+    // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
+    this._myCurrency = currentUser.UserGroups[0].xp?.Currency || "USD";
+    this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
     // Specs
     this._specs = {Meta: {}, Items: superProduct.Specs};
     this.specFormService.event.valid = this._specs.Items.length === 0;
@@ -72,14 +76,14 @@ export class OCMProductDetails implements OnInit {
   onSpecFormChange(event): void {
     if (event.detail.type === 'Change') {
       this.specFormService.event = event.detail;
-      this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency);
+      this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
     }
   }
 
   qtyChange(event: { qty: number; valid: boolean }): void {
     if (event.valid) {
       this.quantity = event.qty;
-      this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency);
+      this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
     }
   }
 
