@@ -5,7 +5,7 @@
 export const environment = {
   hostedApp: true,
   appname: 'Marketplace Test',
-  clientID: '3A5DD92D-0B04-4E62-B8AC-197ADF10FBC4',
+  clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
   marketplaceID: 'SEB',
   baseUrl: 'https://localhost:4200',
   middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
