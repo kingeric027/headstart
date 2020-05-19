@@ -6,6 +6,8 @@ using Marketplace.Common.Queries;
 using Marketplace.Common;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace Marketplace.Orchestration
 {
@@ -14,7 +16,6 @@ namespace Marketplace.Orchestration
         private readonly IOrderOrchestrationCommand _orderOrchestrationCommand;
         private readonly LogQuery _log;
         private readonly AppSettings _appSettings;
-        private DurableOrchestrationContext _orchestrationContext;
 
         public OrderOrchestrationTrigger(AppSettings appSettings, IOrderOrchestrationCommand orderOrchestrationCommand, ISyncCommand sync, LogQuery log)
         {
@@ -45,6 +46,14 @@ namespace Marketplace.Orchestration
             {
                 logger.LogError(ex.Message);
             }
+        }
+
+        [FunctionName("GetSupplierOrder")]
+        public async Task<object> GetSupplierOrder([HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = "{supplierId}/{orderId}")]
+            HttpRequest req, string supplierId, string orderId, ILogger log)
+        {
+            log.LogInformation($"Supplier Order GET Request: {supplierId} {orderId}");
+            return await Task.FromResult(new { SupplierId = supplierId, OrderId = orderId });
         }
     }
 }
