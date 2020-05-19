@@ -30,7 +30,6 @@ import { environment } from 'src/environments/environment';
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
 import { AssetAssignment } from 'marketplace-javascript-sdk/dist/models/AssetAssignment';
 import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
-import { ExchangeRate } from '@app-seller/shared/models/exchange-rate.interface';
 import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 
@@ -72,6 +71,7 @@ export class ProductEditComponent implements OnInit {
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   _myCurrency: SupportedRates;
+  _exchangeRates: SupportedRates[];
   areChanges = false;
   taxCodeCategorySelected = false;
   taxCodes: ListPage<TaxCodes>;
@@ -109,14 +109,11 @@ export class ProductEditComponent implements OnInit {
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
-    const rates = await this.ocIntegrations.getAvailableCurrencies();
-    if (this.isCreatingNew) {
+    this._exchangeRates = await this.ocIntegrations.getAvailableCurrencies();
+    if (!this.readonly) {
       // If a supplier, creating a product or viewing - grab currency from my supplier xp.
       const myCurrencyCode = await (await this.currentUserService.getMySupplier()).xp?.Currency;
-      this._myCurrency = rates.find(r => r.Currency === myCurrencyCode);
-    } else {
-      // If a seller, and not editing the product, grab the currency from the product xp.
-      this._myCurrency = rates.find(r => r.Currency === this._superMarketplaceProductEditable.Product?.xp?.Currency);
+      this._myCurrency = this._exchangeRates.find(r => r.Currency === myCurrencyCode);
     }
     this.setProductEditTab();
   }
@@ -143,6 +140,8 @@ export class ProductEditComponent implements OnInit {
   }
 
   async refreshProductData(superProduct: SuperMarketplaceProduct): Promise<void> {
+    // If a seller, and not editing the product, grab the currency from the product xp.
+    this._myCurrency = this._exchangeRates.find(r => r.Currency === superProduct?.Product?.xp?.Currency);
     // copying to break reference bugs
     this._superMarketplaceProductStatic = JSON.parse(JSON.stringify(superProduct));
     this._superMarketplaceProductEditable = JSON.parse(JSON.stringify(superProduct));
@@ -190,8 +189,8 @@ export class ProductEditComponent implements OnInit {
         IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
-        UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit')),
-        UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty')),
+        UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit'), Validators.required),
+        UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'), Validators.required),
       }, { validators: ValidateMinMax }
       );
     }
