@@ -1,5 +1,4 @@
-﻿using Marketplace.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OrderCloud.SDK;
 using SmartyStreets.USStreetApi;
 using System;
@@ -8,7 +7,7 @@ using System.Linq;
 using System.Text;
 using Lookup = SmartyStreets.USStreetApi.Lookup;
 
-namespace Marketplace.Common.Services.SmartyStreets.Mappers
+namespace Integrations.SmartyStreets
 {
 	// TODO - exact same logic as AddressMapper - any way to merge?
 	public static class BuyerAddressMapper

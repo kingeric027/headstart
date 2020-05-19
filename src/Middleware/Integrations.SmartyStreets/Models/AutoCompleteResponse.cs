@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 
-namespace Marketplace.Common.Services.SmartyStreets.Mappers
+namespace Integrations.SmartyStreets
 {
 	public class AutoCompleteResponse
 	{

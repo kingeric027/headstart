@@ -86,7 +86,7 @@ namespace Marketplace.API
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
                 .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
-                .AddSingleton<ISmartyStreetsCommand>(x => new SmartyStreetsCommand(_settings.SmartyStreetSettings))
+                .AddSingleton<ISmartyStreetsCommand>(x => new ValidatedAddressCommand(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("MarketplaceUser")

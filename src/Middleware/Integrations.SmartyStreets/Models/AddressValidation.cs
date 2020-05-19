@@ -1,18 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using OrderCloud.SDK;
+using System.Collections.Generic;
 
-namespace Marketplace.Models.Misc
+namespace Integrations.SmartyStreets
 {
-	public class AddressValidation<TAddress>
+	public class AddressValidation
 	{
-		public AddressValidation(TAddress raw)
+		public AddressValidation(Address raw)
 		{
 			RawAddress = raw;
 		}
 
-		public TAddress RawAddress { get; set; }
-		public TAddress ValidAddress { get; set; }
+		public Address RawAddress { get; set; }
+		public Address ValidAddress { get; set; }
 		public bool ValidAddressFound => ValidAddress != null;
-		public List<TAddress> SuggestedAddresses { get; set; } = new List<TAddress>() { };
+		public List<Address> SuggestedAddresses { get; set; } = new List<Address>() { };
+		// https://smartystreets.com/docs/cloud/us-street-api#footnotes
+		public string GapBeteenRawAndValid { get; set; }
+	}
+
+	public class BuyerAddressValidation
+	{
+		public BuyerAddressValidation(BuyerAddress raw)
+		{
+			RawAddress = raw;
+		}
+
+		public BuyerAddress RawAddress { get; set; }
+		public BuyerAddress ValidAddress { get; set; }
+		public bool ValidAddressFound => ValidAddress != null;
+		public List<BuyerAddress> SuggestedAddresses { get; set; } = new List<BuyerAddress>() { };
 		// https://smartystreets.com/docs/cloud/us-street-api#footnotes
 		public string GapBeteenRawAndValid { get; set; }
 	}
