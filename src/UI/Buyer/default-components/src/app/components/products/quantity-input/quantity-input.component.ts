@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { MarketplaceMeProduct, PriceSchedule } from 'marketplace';
@@ -7,7 +7,7 @@ import { MarketplaceMeProduct, PriceSchedule } from 'marketplace';
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
 })
-export class OCMQuantityInput implements OnInit {
+export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() existingQty: number;
   @Input() gridDisplay?= false;
   @Output() qtyChange = new EventEmitter<{ qty: number; valid: boolean }>();
@@ -22,24 +22,24 @@ export class OCMQuantityInput implements OnInit {
   disabled = false;
 
   @Input() priceSchedule: PriceSchedule;
-  @Input() set product(value: MarketplaceMeProduct) {
-    this.init(value);
-  }
+  @Input() product: MarketplaceMeProduct;
 
   ngOnInit(): void {
-    this.product && this.priceSchedule && this.init(this.product)
     this.form = new FormGroup({
       quantity: new FormControl(1, [Validators.required]),
     });
   }
 
-  init(product: MarketplaceMeProduct): void {
-    console.log(this.gridDisplay)
-    this.isQtyRestricted = this.priceSchedule?.RestrictedQuantity;
+  ngOnChanges() {
+    this.product && this.priceSchedule && this.init(this.product, this.priceSchedule)
+  }
+
+  init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
+    this.isQtyRestricted = this.priceSchedule.RestrictedQuantity;
     this.inventory = this.getInventory(product);
     this.min = this.minQty(product);
     this.max = this.maxQty(product);
-    this.restrictedQuantities = this.priceSchedule?.PriceBreaks.map(b => b.Quantity);
+    this.restrictedQuantities = this.priceSchedule.PriceBreaks.map(b => b.Quantity);
     if (this.inventory < this.min) {
       this.errorMsg = 'Out of stock.';
       this.disabled = true;
@@ -87,11 +87,11 @@ export class OCMQuantityInput implements OnInit {
   }
 
   minQty(product: MarketplaceMeProduct): number {
-    return this.priceSchedule?.MinQuantity || this.gridDisplay ? 0 : 1;
+    return this.priceSchedule.MinQuantity || this.gridDisplay ? 0 : 1;
   }
 
   maxQty(product: MarketplaceMeProduct): number {
-    return this.priceSchedule?.MaxQuantity || Infinity
+    return this.priceSchedule.MaxQuantity || Infinity
   }
 
   getInventory(product: MarketplaceMeProduct): number {
