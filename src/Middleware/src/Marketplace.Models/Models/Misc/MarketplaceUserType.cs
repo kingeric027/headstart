@@ -18,8 +18,19 @@ namespace Marketplace.Models.Misc
 	public enum UserGroupType
 	{
 		UserPermissions,
-		OrderAccess,
-		Approval,
-		BuyerLocation
+		BuyerLocation,
+		LocationPermissions
+	}
+
+	[JsonConverter(typeof(StringEnumConverter))]
+	public enum UserGroupSuffix
+	{
+		OrderApprover,
+		PermissionAdmin,
+		NeedsApproval,
+		ViewAllOrders,
+		CreditCardAdmin,
+		AddressAdmin
+
 	}
 }
