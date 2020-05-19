@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { MeUser, OcMeService, User } from '@ordercloud/angular-sdk';
+import { MeUser, OcMeService, User, UserGroup } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { CreditCardService } from './credit-card.service';
+import { HttpClient } from '@angular/common/http';
+import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 
 export interface CurrentUser extends MeUser {
   FavoriteProductIDs: string[];
   FavoriteOrderIDs: string[];
+  UserGroups: UserGroup<any>[];
 }
 
 export interface ICurrentUser {
@@ -33,7 +36,8 @@ export class CurrentUserService implements ICurrentUser {
   constructor(
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
-    public cards: CreditCardService
+    public cards: CreditCardService,
+    public http: HttpClient
   ) {}
 
   get(): CurrentUser {
@@ -43,12 +47,12 @@ export class CurrentUserService implements ICurrentUser {
   async reset(): Promise<void> {
     const user = await this.ocMeService.Get().toPromise();
     this.isAnon = this.tokenHelper.isTokenAnonymous();
-    this.user = this.MapToCurrentUser(user);
+    this.user = await this.MapToCurrentUser(user);
   }
 
   async patch(user: MeUser): Promise<CurrentUser> {
     const patched = await this.ocMeService.Patch(user).toPromise();
-    this.user = this.MapToCurrentUser(patched);
+    this.user = await this.MapToCurrentUser(patched);
     return this.user;
   }
 
@@ -72,8 +76,10 @@ export class CurrentUserService implements ICurrentUser {
     return roles.every(role => this.user.AvailableRoles.includes(role));
   }
 
-  private MapToCurrentUser(user: MeUser): CurrentUser {
+  private async MapToCurrentUser(user: MeUser): Promise<CurrentUser> {
     const currentUser = user as CurrentUser;
+    const myUserGroups = await this.ocMeService.ListUserGroups().toPromise();
+    currentUser.UserGroups = myUserGroups.Items;
     currentUser.FavoriteOrderIDs = this.getFavorites(user, this.favOrdersXP);
     currentUser.FavoriteProductIDs = this.getFavorites(user, this.favProductsXP);
     return currentUser;

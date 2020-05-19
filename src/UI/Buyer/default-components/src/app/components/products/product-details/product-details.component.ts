@@ -7,7 +7,10 @@ import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { getImageUrls } from 'src/app/services/images.helpers';
 import { SpecFormService } from '../spec-form/spec-form.service';
-import { SuperMarketplaceProduct } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+import { SuperMarketplaceProduct, ListPage, Asset } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+import { exchange } from 'src/app/services/currency.helper';
+import { BuyerCurrency } from '../product-card/product-card.component';
+import { ExchangeRates } from 'marketplace/projects/marketplace/src/lib/services/exchange-rates/exchange-rates.service';
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -18,10 +21,13 @@ export class OCMProductDetails implements OnInit {
   _specs: ListSpec;
   _product: MarketplaceMeProduct;
   _priceSchedule: PriceSchedule;
+  _rates: ListPage<ExchangeRates>;
+  _myCurrency: string;
+  _attachments: Asset[] = [];
   specFormService: SpecFormService;
   isOrderable = false;
   quantity: number;
-  price: number;
+  _price: BuyerCurrency;
   percentSavings: number;
   priceBreaks: object;
   priceBreakRange: string[];
@@ -46,6 +52,12 @@ export class OCMProductDetails implements OnInit {
   @Input() set product(superProduct: SuperMarketplaceProduct) {
     this._product = superProduct.Product;
     this._priceSchedule = superProduct.PriceSchedule;
+    this._rates = this.context.exchangeRates.Get();
+    this._attachments = superProduct?.Attachments; 
+    const currentUser = this.context.currentUser.get();
+    // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
+    this._myCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
+    this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
     // Specs
     this._specs = {Meta: {}, Items: superProduct.Specs};
     this.specFormService.event.valid = this._specs.Items.length === 0;
@@ -64,14 +76,14 @@ export class OCMProductDetails implements OnInit {
   onSpecFormChange(event): void {
     if (event.detail.type === 'Change') {
       this.specFormService.event = event.detail;
-      this.price = this.getTotalPrice();
+      this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
     }
   }
 
   qtyChange(event: { qty: number; valid: boolean }): void {
     if (event.valid) {
       this.quantity = event.qty;
-      this.price = this.getTotalPrice();
+      this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
     }
   }
 
@@ -105,9 +117,9 @@ export class OCMProductDetails implements OnInit {
     // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
     // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
     // is the cost per item.
-    if (!this._product.PriceSchedule?.PriceBreaks.length) return;
+    if (!this._priceSchedule?.PriceBreaks.length) return;
 
-    const priceBreaks = this._product.PriceSchedule.PriceBreaks;
+    const priceBreaks = this._priceSchedule.PriceBreaks;
     this.priceBreaks = priceBreaks;
     const startingBreak = _minBy(priceBreaks, 'Quantity');
     const selectedBreak = priceBreaks.reduce((current, candidate) => {
@@ -120,13 +132,6 @@ export class OCMProductDetails implements OnInit {
     return this.specFormService.event.valid
       ? this.specFormService.getSpecMarkup(this._specs, selectedBreak, this.quantity || startingBreak.Quantity)
       : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
-  }
-
-  getDocumentUrl(url: string) {
-    const spliturl = url.split('/')
-    spliturl.splice(4, 1);
-    const str = spliturl.join('/')
-    return str;
   }
 
   async getImageUrls(): Promise<string[]> {
