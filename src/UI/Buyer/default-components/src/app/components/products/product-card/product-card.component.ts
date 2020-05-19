@@ -45,7 +45,7 @@ export class OCMProductCard {
   async setPrice(product: MarketplaceMeProduct, priceSchedule: PriceSchedule<any>): Promise<void> {
     const currentUser = this.context.currentUser.get();
     // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    const myRate = currentUser.UserGroups[0].xp?.Currency || "USD";
+    const myRate = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
     const productPrice = priceSchedule?.PriceBreaks[0]?.Price;
     this._price = exchange(this._rates, productPrice, this._product?.xp?.Currency, myRate);
   }

@@ -56,7 +56,7 @@ export class OCMProductDetails implements OnInit {
     this._attachments = superProduct?.Attachments; 
     const currentUser = this.context.currentUser.get();
     // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    this._myCurrency = currentUser.UserGroups[0].xp?.Currency || "USD";
+    this._myCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
     this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
     // Specs
     this._specs = {Meta: {}, Items: superProduct.Specs};
