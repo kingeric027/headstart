@@ -68,7 +68,7 @@
                   <label for="Price">Price</label>
                   <div class="input-group">
                     <div class="input-group-prepend">
-                      <span class="input-group-text">$</span>
+                      <span class="input-group-text">{{_myCurrency?.Symbol}}</span>
                     </div>
                     <input [attr.disabled]="readonly ? true : null"
                            type="number"
@@ -81,7 +81,7 @@
                            [resourceForm]="productForm"
                            formControlName="Price"
                            (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
-                           placeholder="Price (USD)">
+                           placeholder="Price ({{_myCurrency?.Name}})">
                   </div>
                 </div>
                 <div class="form-group col-md-6">
@@ -340,6 +340,7 @@
                                       [isCreatingNew]="isCreatingNew"
                                       [checkForChanges]="checkForChanges"
                                       [copyProductResource]="copyProductResource"
+                                      [myCurrency]="_myCurrency"
                                       (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
                                       (variantsValidated)="validateVariants($event)">
         </product-variations-component>

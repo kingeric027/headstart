@@ -30,6 +30,9 @@ import { environment } from 'src/environments/environment';
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
 import { AssetAssignment } from 'marketplace-javascript-sdk/dist/models/AssetAssignment';
 import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
+import { ExchangeRate } from '@app-seller/shared/models/exchange-rate.interface';
+import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
+import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 
 @Component({
   selector: 'app-product-edit',
@@ -68,6 +71,7 @@ export class ProductEditComponent implements OnInit {
   faHeart = faHeart;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
+  _myCurrency: SupportedRates;
   areChanges = false;
   taxCodeCategorySelected = false;
   taxCodes: ListPage<TaxCodes>;
@@ -94,6 +98,7 @@ export class ProductEditComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private modalService: NgbModal,
     private middleware: MiddlewareAPIService,
+    private ocIntegrations: OcIntegrationsAPIService,
     private toasterService: ToastrService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
@@ -104,6 +109,15 @@ export class ProductEditComponent implements OnInit {
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
+    const rates = await this.ocIntegrations.getAvailableCurrencies();
+    if (!this.isCreatingNew) {
+      // If a supplier, creating a product or viewing - grab currency from my supplier xp.
+      const myCurrencyCode = await (await this.currentUserService.getMySupplier()).xp?.Currency;
+      this._myCurrency = rates.find(r => r.Currency === myCurrencyCode);
+    } else {
+      // If a seller, and not editing the product, grab the currency from the product xp.
+      this._myCurrency = rates.find(r => r.Currency === this._superMarketplaceProductEditable.Product?.xp?.Currency);
+    }
     this.setProductEditTab();
   }
 
