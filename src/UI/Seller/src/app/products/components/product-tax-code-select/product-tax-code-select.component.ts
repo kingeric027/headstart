@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { SuperMarketplaceProduct, ListPage } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, ListPage, TaxProperties } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 
 @Component({
@@ -31,7 +31,7 @@ export class ProductTaxCodeSelect {
     this.handleTaxCodeCategorySelection.emit(event);
   }
 
-  handleSelectTaxCode(taxCodeSelection: TaxCodes): void {
+  handleSelectTaxCode(taxCodeSelection: TaxProperties): void {
     const event = {
       target: {
         value: taxCodeSelection,

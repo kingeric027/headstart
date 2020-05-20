@@ -109,11 +109,11 @@
                            [disabled]="disableSpecOption(specIndex, opt)"
                            id="DefaultSpecOption">
                     <span class="checkmark"
-                          [matTooltip]="disableSpecOption(specIndex, opt) ? 'Product must be saved before setting this new option as default' : ''" >
+                          [matTooltip]="disableSpecOption(specIndex, opt) ? 'Product must be saved before setting this new option as default' : ''">
                     </span>
                   </label>
                 </td>
-                <td>{{getPriceMarkup(opt) | currency}}</td>
+                <td>{{getPriceMarkup(opt) | currency: myCurrency?.Currency}}</td>
                 <td>
                   <div class="icon-button ripple hover-btn"
                        (click)="removeSpecOption(specIndex, optionIndex)">
@@ -193,7 +193,7 @@
                   </td>
                   <td *ngFor="let specValue of variant.xp?.SpecValues">
                     {{specValue.SpecOptionValue}} <span class="font-weight-bold"
-                          *ngIf="specValue.PriceMarkup">(+{{specValue.PriceMarkup | currency}})</span>
+                          *ngIf="specValue.PriceMarkup">(+{{specValue.PriceMarkup | currency: myCurrency?.Currency}})</span>
                   </td>
                   <td>
                     <div class="input-group-sm">
@@ -204,7 +204,7 @@
                              [value]="variant?.xp?.NewID || variant?.ID">
                     </div>
                   </td>
-                  <td>{{getTotalMarkup(variant.xp?.SpecValues) | currency}}</td>
+                  <td>{{getTotalMarkup(variant.xp?.SpecValues) | currency: myCurrency?.Currency}}</td>
                 </tr>
                 <tr *ngIf="!isCreatingNew && variantInSelection?.ID === variant.ID">
                   <td [attr.colspan]="getVariantDetailColSpan()">
@@ -276,7 +276,7 @@
               <tr *ngFor="let option of spec.Options">
                 <td>{{spec.Name}}</td>
                 <td>{{option.Value}}</td>
-                <td>{{option.PriceMarkup || 0 | currency}}</td>
+                <td>{{option.PriceMarkup || 0 | currency: myCurrency?.Currency}}</td>
               </tr>
             </tbody>
           </table>
