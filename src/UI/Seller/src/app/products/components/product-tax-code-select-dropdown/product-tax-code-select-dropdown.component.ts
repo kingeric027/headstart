@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
-import { SuperMarketplaceProduct, ListPage } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, ListPage, TaxProperties } from 'marketplace-javascript-sdk';
 
 @Component({
   selector: 'product-tax-code-select-dropdown',
@@ -10,7 +10,7 @@ import { SuperMarketplaceProduct, ListPage } from 'marketplace-javascript-sdk';
 })
 export class ProductTaxCodeSelectDropdown implements OnChanges {
   @Input()
-  taxCodes: ListPage<TaxCodes>;
+  taxCodes: ListPage<TaxProperties>;
   @Input()
   superMarketplaceProductEditable: SuperMarketplaceProduct;
   @Input() readonly: boolean;
@@ -20,7 +20,7 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
   @Output()
   onScrollEnd = new EventEmitter<string>();
   @Output()
-  onSelectTaxCode = new EventEmitter<TaxCodes>();
+  onSelectTaxCode = new EventEmitter<TaxProperties>();
 
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
@@ -42,13 +42,15 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
     this.taxCodesSearched.emit(this.searchTerm);
   }
 
-  selectTaxCode(taxCode: TaxCodes) {
+  selectTaxCode(taxCode: TaxProperties) {
     // To clear the tax code search term when a selection is made - to refresh the list back to the starting state.
     if (this.searchTerm !== '') {
       this.searchTerm = '';
       this.taxCodesSearched.emit(this.searchTerm);
     }
-    this.onSelectTaxCode.emit(taxCode);
+    const { Category, ...rest } = taxCode;
+    const Tax = { ...rest, Category: this.superMarketplaceProductEditable.Product.xp?.Tax.Category };
+    this.onSelectTaxCode.emit(Tax);
   }
 
   handleScrollEnd(event) {

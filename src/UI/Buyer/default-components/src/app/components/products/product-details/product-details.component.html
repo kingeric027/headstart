@@ -15,6 +15,20 @@
                              [favorite]="isFavorite()"
                              (favoriteChanged)="setIsFavorite($event.detail)">
         </ocm-toggle-favorite>
+        <div class="btn-group float-right">
+          <button class="btn btn-sm btn-outline-secondary"
+                  [ngClass]="{'active' : !showGrid}"
+                  (click)="toggleGrid(false)">
+            <fa-icon [icon]="faListUl">
+            </fa-icon>
+          </button>
+          <button class="btn btn-sm btn-outline-secondary"
+                  [ngClass]="{'active' : showGrid}"
+                  (click)="toggleGrid(true)">
+            <fa-icon [icon]="faTh">
+            </fa-icon>
+          </button>
+        </div>
       </div>
       <div *ngIf="supplierNote"
            class="alert alert-info my-3"><b>
@@ -23,17 +37,20 @@
       <div>
         <div>
           <div class="d-flex justify-content-between align-items-center">
-            <h4 class="font-weight-bold">{{ price  | currency}}</h4>
-            <p class="text-muted ml-3">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
+            <h4 *ngIf="!showGrid"
+                class="font-weight-bold">{{ _price?.Price  | currency: _price?.Currency}}</h4>
+            <p *ngIf="!showGrid"
+               class="text-muted ml-3 float-right">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
             <span class="badge badge-pill badge-warning"
                   *ngIf="percentSavings > 0"
                   translate>PRODUCTS.DETAILS.SAVINGS {{ percentSavings }}%!
             </span>
           </div>
           <!--DISPLAY SHORT SPEC FORM -->
-          <div *ngIf="specLength < 4">
-            <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
+          <div *ngIf="specLength < 4 && !showGrid">
+            <ocm-spec-form *ngIf="isOrderable && _specs?.Items?.length > 0"
                            [specs]="_specs"
+                           [currency]="_product?.xp?.Currency"
                            (specFormChange)="onSpecFormChange($event)">
             </ocm-spec-form>
             <div class="d-flex flex-column"
@@ -61,20 +78,27 @@
                   <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
                 </button>
               </div>
+              <div>
+                <ocm-modal [state]="quoteFormModal"
+                           [modalTitle]="'Request Quote'">
+                  <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
+                                          [CurrentUser]="currentUser"
+                                          (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
+                </ocm-modal>
+              </div>
             </div>
-            <div>
-              <ocm-modal [state]="quoteFormModal"
-                         [modalTitle]="'Request Quote'">
-                <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
-                                        [CurrentUser]="currentUser"
-                                        (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
-              </ocm-modal>
+            <div *ngIf="!isOrderable"
+                 class="alert alert-info"
+                 translate>
+              PRODUCTS.DETAILS.VIEW_ONLY
             </div>
           </div>
-          <div *ngIf="!isOrderable"
-               class="alert alert-info"
-               translate>
-            PRODUCTS.DETAILS.VIEW_ONLY
+          <div *ngIf="showGrid">
+            <ocm-grid-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
+                                [specs]="_specs"
+                                [product]="_product"
+                                [priceSchedule]="_priceSchedule">
+            </ocm-grid-spec-form>
           </div>
         </div>
       </div>
@@ -105,21 +129,22 @@
         <p [innerHTML]="_product.Description || 'This product has no description.'">
         </p>
       </div>
-      <div *ngIf="_product?.xp?.StaticContent?.length > 0">
+      <div *ngIf="_attachments.length > 0">
         <strong><span translate>PRODUCTS.DETAILS.DOCS</span>:</strong>
         <div class="mt-2">
           <a class="border border-medium border-radius p-2 mr-2"
-             *ngFor="let document of _product?.xp?.StaticContent"
-             href="{{getDocumentUrl(document.URL)}}"
+             *ngFor="let attachment of _attachments"
+             [href]="attachment.Url"
              target="_blank"
-             download="document.Title">{{document.Title}}</a>
+             download="attachment.FileName">{{attachment.FileName}}</a>
         </div>
       </div>
     </div>
     <!-- DISPLAY LONG SPEC FORM TO RIGHT -->
     <div class="col-xl-2 col-lg-3"
          *ngIf="specLength > 3">
-      <div class="p-3 border border-medium border-radius">
+      <div *ngIf="!showGrid"
+           class="p-3 border border-medium border-radius">
         <div class="d-flex justify-content-between align-items-center">
           <span class="badge badge-pill badge-warning"
                 *ngIf="percentSavings > 0"
@@ -128,6 +153,7 @@
         </div>
         <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
                        [specs]="_specs"
+                       [currency]="_product?.xp?.Currency"
                        (specFormChange)="onSpecFormChange($event)">
         </ocm-spec-form>
         <div *ngIf="!isOrderable"
@@ -160,6 +186,15 @@
             <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
           </button>
         </div>
+      </div>
+      <div *ngIf="showGrid">
+        <ocm-grid-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
+                            [specs]="_specs"
+                            [product]="_product"
+                            [priceBreaks]="priceBreaks"
+                            [price]="price">
+        </ocm-grid-spec-form>
+
       </div>
       <ocm-modal [state]="quoteFormModal"
                  [modalTitle]="'Request Quote'">

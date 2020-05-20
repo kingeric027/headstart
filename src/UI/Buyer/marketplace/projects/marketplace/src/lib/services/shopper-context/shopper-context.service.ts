@@ -11,6 +11,7 @@ import { AddressService } from '../addresses/address.service';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { UserManagementService } from '../user-management/user-management.service';
 import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service';
+import { ExchangeRatesService } from '../exchange-rates/exchange-rates.service';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,7 @@ export class ShopperContextService {
   constructor(
     public order: CurrentOrderService,
     public currentUser: CurrentUserService,
+    public exchangeRates: ExchangeRatesService,
     public router: RouteService,
     public productFilters: ProductFilterService,
     public supplierFilters: SupplierFilterService,
@@ -28,6 +30,6 @@ export class ShopperContextService {
     public categories: ProductCategoriesService,
     public userManagementService: UserManagementService,
     public addresses: AddressService,
-    public ordersToApprove: OrdersToApproveStateService,
+    public ordersToApprove: OrdersToApproveStateService
   ) {}
 }

@@ -18,7 +18,8 @@ namespace Marketplace.Common.Controllers
 		// todo auth on this endpoint
 		[Route("shippingrates")]
 		[HttpPost]
-		[OrderCloudWebhookAuth]
+		// looking into why ordercloudwebhookauth is broken
+		//[OrderCloudWebhookAuth]
 		public async Task<ShipEstimateResponse> GetShippingRates([FromBody] OrderCalculatePayload orderCalculatePayload)
 		{
 			var shipmentEstimates = await _OCShippingIntegration.GetRatesAsync(orderCalculatePayload);
@@ -28,7 +29,8 @@ namespace Marketplace.Common.Controllers
 		// todo auth on this endpoint
 		[Route("ordercalculate")]
 		[HttpPost]
-		[OrderCloudWebhookAuth]
+		// looking into why ordercloudwebhookauth is broken
+		//[OrderCloudWebhookAuth]
 		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload)
 		{
 			var orderCalculationResponse = await _OCShippingIntegration.CalculateOrder(orderCalculatePayload);
