@@ -1,0 +1,110 @@
+<div *ngIf="supplier">
+  <h3>{{ supplier.Name }}</h3>
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+    <!-- Checkbox Column -->
+    <ng-container matColumnDef="select">
+      <th mat-header-cell *matHeaderCellDef>
+        <mat-checkbox
+          (change)="$event ? masterToggle() : null"
+          [checked]="selection.hasValue() && isAllSelected()"
+          [indeterminate]="selection.hasValue() && !isAllSelected()"
+          [aria-label]="checkboxLabel()"
+        >
+        </mat-checkbox>
+      </th>
+      <td mat-cell *matCellDef="let row" [formGroup]="row">
+        <mat-checkbox
+          (change)="$event ? toggle(row) : null"
+          [checked]="selection.isSelected(row)"
+          formControlName="selected"
+          [aria-label]="checkboxLabel(row)"
+        >
+        </mat-checkbox>
+      </td>
+    </ng-container>
+
+    <!-- Product Image Column -->
+    <ng-container matColumnDef="product">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element; let i = index">
+        <img [id]="i" [src]="getImageUrl(element.value.lineItem.ID)" width="auto" height="100px" />
+      </td>
+    </ng-container>
+
+    <!-- Item ID Column -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>Product Details</th>
+      <td mat-cell *matCellDef="let element">
+        <!-- {{element.value.lineItem.ID}}  -->
+
+        <a (click)="toProductDetails(element.value.lineItem.Product.ID)" class="text-primary link">{{
+          element.value.lineItem | productNameWithSpecs
+        }}</a>
+        <small class="text-muted d-block">{{ element.value.lineItem.Product.ID }}</small>
+      </td>
+    </ng-container>
+
+    <!-- Product Image Column -->
+    <!-- <ng-container matColumnDef="product">
+          <th mat-header-cell *matHeaderCellDef> Image </th>
+          <td mat-cell *matCellDef="let element; let i = index;">
+                <img [id]="i"
+                    [src]="getImageUrl(element.value.lineItem.ID)"
+                    width="auto"
+                    height="100px">      
+            </td>
+        </ng-container> -->
+
+    <!-- Price Column -->
+    <ng-container matColumnDef="price">
+      <th mat-header-cell *matHeaderCellDef>Price</th>
+      <td mat-cell *matCellDef="let element">{{ element.value.lineItem.UnitPrice | currency }}</td>
+    </ng-container>
+
+    <!-- Quantity Ordered Column -->
+    <ng-container matColumnDef="quantityOrdered">
+      <th mat-header-cell *matHeaderCellDef>Ordered</th>
+      <td mat-cell *matCellDef="let element">{{ element.value.lineItem.Quantity | number }}</td>
+    </ng-container>
+
+    <!-- Quantity Returned Column -->
+    <ng-container matColumnDef="quantityReturned">
+      <th mat-header-cell *matHeaderCellDef>Returned</th>
+      <td mat-cell *matCellDef="let element">
+        {{ (element.value.lineItem.xp?.LineItemReturnInfo?.QuantityToReturn | number) || (0 | number) }}
+      </td>
+    </ng-container>
+
+    <!-- Quantity to Return Column -->
+    <ng-container matColumnDef="quantityToReturn">
+      <th mat-header-cell *matHeaderCellDef>Qty to Return</th>
+      <td mat-cell *matCellDef="let element; let i = index" [formGroup]="element">
+        <input
+          type="number"
+          class="form-control mat-quantityToReturn"
+          id="quantityToReturn"
+          formControlName="quantityToReturn"
+          showErrors
+        />
+      </td>
+    </ng-container>
+
+    <!-- Return Reason Column -->
+    <ng-container matColumnDef="returnReason">
+      <th mat-header-cell *matHeaderCellDef>Return Reason</th>
+      <td mat-cell *matCellDef="let element; let i = index" [formGroup]="element">
+        <input
+          type="text"
+          showErrors
+          class="form-control"
+          id="ReturnReason"
+          formControlName="returnReason"
+          placeholder="Enter return reason"
+        />
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+    <tr mat-row *matRowDef="let row; let index = index; columns: columnsToDisplay"></tr>
+  </table>
+</div>

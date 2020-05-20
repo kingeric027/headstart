@@ -30,13 +30,16 @@
         </div>
         <div class="col-sm-5">
           <div class="row">
-            <div class="col-4 text-center">
+            <div class="col-3 text-center">
               <h4 translate>CART.LINEITEM_TABLE.PRICE</h4>
             </div>
-            <div class="col-4 text-center">
+            <div class="col-3 text-center">
               <h4 translate>CART.LINEITEM_TABLE.QTY</h4>
             </div>
-            <div class="col-4 text-center">
+            <div class="col-3 text-center">
+              <h4 translate>CART.LINEITEM_TABLE.QTY_RETURNED</h4>
+            </div>
+            <div class="col-3 text-center">
               <h4 translate>CART.LINEITEM_TABLE.TOTAL</h4>
             </div>
           </div>
@@ -75,13 +78,13 @@
             <div class="row align-items-center pt-3 pt-sm-0"
                  *ngIf="orderType !== 'Quote'">
               <div class="
-                 col-4
+                 col-3
                  text-center">
                 <span class="d-block d-sm-none"
                       translate>CART.LINEITEM_TABLE.UNIT_PRICE</span>
                 <span class="text-nowrap">{{li.UnitPrice | currency}}</span>
               </div>
-              <div class="col-4 text-center">
+              <div class="col-3 text-center">
                 <span class="d-block d-sm-none"
                       translate>CART.LINEITEM_TABLE.QTY</span>
                 <ocm-quantity-input *ngIf="!readOnly"
@@ -92,7 +95,13 @@
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>
               </div>
-              <div class="col-4 text-right">
+              <div class="col-3 text-center">
+                <span class="d-block d-sm-none"
+                      translate>CART.LINEITEM_TABLE.QTY_RETURNED</span>
+                <span class="text-nowrap"
+                      *ngIf="readOnly">&times;{{ (li.xp?.LineItemReturnInfo?.QuantityToReturn | number) || 0 }}</span>
+              </div>
+              <div class="col-3 text-right">
                 <span class="d-block d-sm-none"
                       translate>CART.LINEITEM_TABLE.TOTAL</span>
                 <span class="text-nowrap">{{ li.LineTotal | currency }}</span>

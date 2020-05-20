@@ -41,6 +41,18 @@
                 translate>
           ORDERS.DETAIL.REORDER
         </button>
+        <button *ngIf="!showRequestReturn && !approvalVersion && !isQuoteOrder(order) && order.Status !== 'Unsubmitted'"
+                class="btn btn-secondary float-right mr-2"
+                (click)="toggleRequestReturn()"
+                translate>
+          ORDERS.DETAIL.REQUEST_A_RETURN
+        </button>
+        <button *ngIf="showRequestReturn && !approvalVersion && !isQuoteOrder(order) && order.Status !== 'Unsubmitted'"
+                class="btn btn-secondary float-right mr-2"
+                (click)="toggleRequestReturn()"
+                translate>
+          ORDERS.DETAIL.CANCEL_RETURN_REQUEST
+        </button>
         <button *ngIf="!approvalVersion && !isQuoteOrder(order) && order.Status === 'Unsubmitted'"
                 class="btn btn-secondary float-right mr-2"
                 (click)="open(updateOrderModal)"
@@ -126,8 +138,15 @@
     </li>
   </ul>
   <ocm-order-historical class="col-md-6"
-                        *ngIf="orderDetails && showDetails()"
+                        *ngIf="orderDetails && showDetails() && !showRequestReturn"
                         [isOrderToApprove]="isOrderToApprove"
                         [orderDetails]="orderDetails"></ocm-order-historical>
-  <ocm-order-shipments *ngIf="showShipments()"></ocm-order-shipments>
+  <ocm-order-shipments *ngIf="showShipments() && !showRequestReturn"></ocm-order-shipments>
+  <ocm-order-return class="col-md-6"
+                    *ngIf="showRequestReturn"
+                    (viewReturnFormEvent)="toggleShowRequestForm($event.detail)"
+                    [isOrderToApprove]="isOrderToApprove"
+                    [orderDetails]="orderDetails"
+                    [lineItems]="lineItems?.Items">
+  </ocm-order-return>
 </div>
