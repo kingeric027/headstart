@@ -16,6 +16,7 @@
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="1.8.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+    <PackageReference Include="ordercloud.integrations.smartystreets" Version="0.0.0" />
     <PackageReference Include="ordercloud.integrations.cardconnect" Version="0.0.4" />
     <PackageReference Include="ordercloud.integrations.exchangerates" Version="0.0.12" />
     <PackageReference Include="ordercloud.integrations.extensions" Version="0.0.10" />
@@ -44,7 +45,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Integrations.Avalara\Integrations.Avalara.csproj" />
-    <ProjectReference Include="..\..\Integrations.SmartyStreets\Integrations.SmartyStreets.csproj" />
     <ProjectReference Include="..\Marketplace.Models\Marketplace.Models.csproj" />
   </ItemGroup>
 
