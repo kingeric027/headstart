@@ -51,6 +51,26 @@ export class SpecFormService {
     return specs;
   }
 
+  public getGridLineItemSpecs(buyerSpecs: ListSpec, specValues: string[]): Array<object> {
+    const specs: Array<object> = new Array<object>();
+    for (let i = 0; i < buyerSpecs.Items.length; i++) {
+      let name = buyerSpecs.Items[i].Name.replace(/ /g, '')
+      const spec = this.getSpec(buyerSpecs, name);
+      if (!spec) continue;
+      const option = this.getOption(spec, specValues[i]);
+      if (option) {
+        specs.push({
+          SpecID: spec.ID,
+          OptionID: option.ID,
+          Value: option.Value,
+          MarkupType: option.PriceMarkupType,
+          Markup: option.PriceMarkup
+        });
+      }
+    }
+    return specs;
+  }
+
   private singleSpecMarkup(unitPrice: number, quantity: number, option: SpecOption): number {
     switch (option.PriceMarkupType) {
       case 'NoMarkup':
