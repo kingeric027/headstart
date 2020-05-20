@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Orchestration.Tests.Mocks;
 using OrderCloud.SDK;
 using ordercloud.integrations.extensions;
+using Integrations.Avalara.Models;
 
 namespace Marketplace.Tests
 {
@@ -14,7 +15,7 @@ namespace Marketplace.Tests
 		[TestCase(1, 100, 100, 0)]
 		public void map_oc_list_args_to_avalara(int page, int pageSize, int expectedTop, int expectedSkip)
         {
-			var result = AvalaraMapper.Map(new ListArgs<TaxCode>() { Filters = null, Page = page, PageSize = pageSize });
+			var result = TaxCodeMapper.Map(new ListArgs<TaxCode>() { Filters = null, Page = page, PageSize = pageSize });
 			Assert.AreEqual(expectedTop, result.Top);
 			Assert.AreEqual(expectedSkip, result.Skip);
 		}
@@ -26,8 +27,8 @@ namespace Marketplace.Tests
 		public void map_avalara_list_args_to_oc(int skip, int top, int page)
 		{
 			var avalaraTaxCodesFromApiCall = TaxCodes.taxCodeObjectFromAvalaraFirstRecord();
-			var args = new TaxCodeListArgs() { Skip = skip, Top = top };
-			var result = AvalaraMapper.Map(avalaraTaxCodesFromApiCall, args);
+			var args = new TaxCodesListArgs() { Skip = skip, Top = top };
+			var result = TaxCodeMapper.Map(avalaraTaxCodesFromApiCall, args);
 			var expectedMeta = new ListPageMeta
 			{
 				Page = page,

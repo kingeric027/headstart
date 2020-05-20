@@ -6,6 +6,7 @@ using Marketplace.Models.Attributes;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.extensions;
 using ordercloud.integrations.openapispec;
+using Avalara.AvaTax.RestClient;
 
 namespace Marketplace.Common.Controllers.Avalara
 {
@@ -19,6 +20,27 @@ namespace Marketplace.Common.Controllers.Avalara
 		public AvalaraController(AppSettings settings, IAvalaraCommand taxService) : base(settings)
 		{
 			_taxService = taxService;
+		}
+
+		[DocName("Get Tax Estimate")]
+		[HttpGet, Route("estimate"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task<decimal> GetTaxEstimate([FromBody] OrderWorksheet orderWorksheet)
+		{
+			return await _taxService.GetEstimateAsync(orderWorksheet);
+		}
+
+		[DocName("Create Tax Transaction")]
+		[HttpPost, Route("transaction"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
+		public async Task<TransactionModel> CreateTransaction([FromBody] OrderWorksheet orderWorksheet)
+		{
+			return await _taxService.CreateTransactionAsync(orderWorksheet);
+		}
+
+		[DocName("Commit Tax Transaction")]
+		[HttpPost, Route("transaction/{transactionCode}/commit"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
+		public async Task<TransactionModel> CommitTransaction(string transactionCode)
+		{
+			return await _taxService.CommitTransactionAsync(transactionCode);
 		}
 
 		[DocName("List Tax Codes")]

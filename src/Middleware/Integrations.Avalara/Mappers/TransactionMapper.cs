@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Marketplace.Common.Extensions
 {
-	public static class AvalaraExtensions
+	public static class TransactionMapper
 	{
 		public static TransactionBuilder WithLineItem(this TransactionBuilder trans, LineItem lineItem)
 		{
@@ -21,16 +21,15 @@ namespace Marketplace.Common.Extensions
 			return trans.WithLine(line, lineItem.ShipFromAddress, lineItem.ShippingAddress);
 		}
 
-		public static TransactionBuilder WithShippingRate(this TransactionBuilder trans, decimal rate, Address shipFrom, Address shipTo)
+		public static TransactionBuilder WithShippingRate(this TransactionBuilder trans, ShipMethod method, Address shipFrom, Address shipTo)
 		{
 			var shipping = new TransactionLineModel()
 			{
-				lineAmount = rate,
+				lineAmount = method.Cost,
 				taxCode = "FR",
-				// replace this itemCode with the proposedshipment ID when this is being generated from the platform
-				itemCode = shipFrom.ID,
+				itemCode = method.Name,
 				customerUsageType = null,
-				lineNumber = null
+				lineNumber = method.ID,
 			};
 			return trans.WithLine(shipping, shipFrom, shipTo);
 		}
