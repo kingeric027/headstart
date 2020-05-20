@@ -17,7 +17,6 @@ using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
-using Marketplace.Common.Services.SmartyStreets;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Models.Extended;
 using ordercloud.integrations.cardconnect;
@@ -26,7 +25,7 @@ using ordercloud.integrations.cosmos;
 using OrderCloud.SDK;
 using ordercloud.integrations.extensions;
 using Swashbuckle.AspNetCore.Swagger;
-using Integrations.SmartyStreets;
+using ordercloud.integrations.smartystreets;
 
 namespace Marketplace.API
 {
@@ -84,7 +83,6 @@ namespace Marketplace.API
 				.Inject<IAssetQuery>()
 				.Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
-                .Inject<ISmartyStreetsCommand>()
 				.Inject<IOrderCloudIntegrationsCardConnectCommand>()
 				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))

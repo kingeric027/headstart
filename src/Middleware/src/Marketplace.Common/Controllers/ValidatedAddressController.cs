@@ -6,7 +6,7 @@ using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.extensions;
 using ordercloud.integrations.openapispec;
-using Marketplace.Common.Services.SmartyStreets;
+using ordercloud.integrations.smartystreets;
 
 namespace Marketplace.Common.Controllers
 {
