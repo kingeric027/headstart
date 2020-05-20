@@ -8,23 +8,22 @@
         <thead>
           <tr>
             <th scope="col">User</th>
-            <th scope="col"
-                *ngFor="let permissionType of permissionTypes">{{permissionType.DisplayText}}</th>
+            <th scope="col" *ngFor="let permissionType of permissionTypes">{{ permissionType.DisplayText }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr class="cursor-pointer"
-              *ngFor="let user of locationUsers">
+          <tr class="cursor-pointer" *ngFor="let user of locationUsers">
             <td class="d-flex justify-content-start align-items-center">
-              {{user.Username}}
+              {{ user.Username }}
             </td>
-            <td *ngFor="let permissionType of permissionTypes"
-                class="">
+            <td *ngFor="let permissionType of permissionTypes" class="">
               <label class="switch mb-0">
-                <input class="form-check-input"
-                       type="checkbox"
-                       (click)="toggleUserUserGroupAssignment(user.ID, permissionType.UserGroupSuffix)"
-                       [checked]="isAssigned(user.ID, permissionType.UserGroupSuffix)">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  (click)="toggleUserUserGroupAssignment(user.ID, permissionType.UserGroupSuffix, $event)"
+                  [checked]="isAssigned(user.ID, permissionType.UserGroupSuffix)"
+                />
                 <span class="slider round"></span>
               </label>
             </td>
@@ -32,16 +31,24 @@
         </tbody>
       </table>
       <div class="pb-3">
-        <button [disabled]="!areChanges"
-                class="btn btn-link"
-                (click)="discardUserUserGroupAssignmentChanges()">{{areChanges ? 'Cancel' : 'No Changes'}}</button>
-        <button *ngIf="areChanges && !requestedUserConfirmation"
-                [disabled]="!areChanges || requestedUserConfirmation"
-                class="btn brand-button"
-                (click)="requestUserConfirmation()">{{requestedUserConfirmation ? 'Pending Confirmation' : 'Save Changes'}}</button>
-        <button *ngIf="requestedUserConfirmation && areChanges"
-                class="btn btn-primary"
-                (click)="executeUserUserGroupAssignmentRequests()">Confirm</button>
+        <button [disabled]="!areChanges" class="btn btn-link" (click)="discardUserUserGroupAssignmentChanges()">
+          {{ areChanges ? 'Cancel' : 'No Changes' }}
+        </button>
+        <button
+          *ngIf="areChanges && !requestedUserConfirmation"
+          [disabled]="!areChanges || requestedUserConfirmation"
+          class="btn brand-button"
+          (click)="requestUserConfirmation()"
+        >
+          {{ requestedUserConfirmation ? 'Pending Confirmation' : 'Save Changes' }}
+        </button>
+        <button
+          *ngIf="requestedUserConfirmation && areChanges"
+          class="btn btn-primary"
+          (click)="executeUserUserGroupAssignmentRequests()"
+        >
+          Confirm
+        </button>
       </div>
     </div>
   </div>

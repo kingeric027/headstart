@@ -44,12 +44,21 @@ export class OCMBuyerLocationPermissions {
     this.checkForUserUserGroupAssignmentChanges();
   }
 
-  toggleUserUserGroupAssignment(userID: string, userGroupSuffix: string): void {
+  toggleUserUserGroupAssignment(userID: string, userGroupSuffix: string, event: any): void {
     const userGroupID = `${this._locationID}-${userGroupSuffix}`;
     if (this.isAssigned(userID, userGroupSuffix)) {
-      this.locationPermissionsAssigmentsEditable = this.locationPermissionsAssigmentsEditable.filter(
-        groupAssignment => groupAssignment.UserGroupID !== userGroupID || groupAssignment.UserID !== userID
-      );
+      if (this.isLastPermissionAdmin(userID, userGroupSuffix)) {
+        // don't allow buyer user to remove the final permission admin otherwise the location
+        // permanently loses the ability to add or remove permissions without seller intervention
+        // event prevent default prevents the toggle switch from changing even tho we are
+        // already preventing the data from changing
+        event.preventDefault();
+        throw Error('Cannot remove the final permission admin');
+      } else {
+        this.locationPermissionsAssigmentsEditable = this.locationPermissionsAssigmentsEditable.filter(
+          groupAssignment => groupAssignment.UserGroupID !== userGroupID || groupAssignment.UserID !== userID
+        );
+      }
     } else {
       const newUserUserGroupAssignment = {
         UserID: userID,
@@ -61,6 +70,13 @@ export class OCMBuyerLocationPermissions {
       ];
     }
     this.checkForUserUserGroupAssignmentChanges();
+  }
+
+  isLastPermissionAdmin(userID: string, userGroupSuffix: string): boolean {
+    return (
+      userGroupSuffix === 'PermissionAdmin' &&
+      this.locationPermissionsAssigmentsEditable.filter(l => l.UserGroupID.includes('PermissionAdmin')).length === 1
+    );
   }
 
   isAssigned(userID: string, permissionType: string): boolean {
@@ -102,6 +118,7 @@ export class OCMBuyerLocationPermissions {
     this.requestedUserConfirmation = false;
     await this.context.userManagementService.updateUserUserGroupAssignments(
       this._locationID.split('-')[0],
+      this._locationID,
       this.add,
       this.del
     );

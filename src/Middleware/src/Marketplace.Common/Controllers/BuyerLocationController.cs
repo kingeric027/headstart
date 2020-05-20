@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ordercloud.integrations.extensions;
 using ordercloud.integrations.openapispec;
 using System.Collections.Generic;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.Controllers
 {
@@ -69,6 +70,13 @@ namespace Marketplace.Common.Controllers
         public async Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerLocationID, ListArgs<MarketplaceOrder> listArgs)
         {
             return await _locationPermissionCommand.ListLocationUsers(buyerLocationID, VerifiedUserContext);
+        }
+
+        [DocName("POST location permissions, add or delete access")]
+        [HttpPost, Route("{buyerID}/{buyerLocationID}/permissions"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task<List<UserGroupAssignment>> UpdateLocationPermissions(string buyerLocationID, [FromBody] LocationPermissionUpdate locationPermissionUpdate)
+        {
+            return await _locationPermissionCommand.UpdateLocationPermissions(buyerLocationID, locationPermissionUpdate, VerifiedUserContext);
         }
     }
 }

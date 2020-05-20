@@ -23,7 +23,7 @@ namespace Marketplace.Common.Commands
     {
         Task<List<UserGroupAssignment>> ListLocationPermissionAsssignments(string locationID, VerifiedUserContext verifiedUser);
         Task<ListPage<MarketplaceUser>> ListLocationUsers(string locationID, VerifiedUserContext verifiedUser);
-
+        Task<List<UserGroupAssignment>> UpdateLocationPermissions(string locationID, LocationPermissionUpdate locationPermissionUpdate, VerifiedUserContext verifiedUser);
         Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser);
     }
 
@@ -48,6 +48,23 @@ namespace Marketplace.Common.Commands
                 .Select(userGroupAssignmentResponse => userGroupAssignmentResponse.Items)
                 .SelectMany(l => l)
                 .ToList();
+        }
+
+        public async Task<List<UserGroupAssignment>> UpdateLocationPermissions(string locationID, LocationPermissionUpdate locationPermissionUpdate, VerifiedUserContext verifiedUser)
+        {
+            await EnsureUserIsLocationAdmin(locationID, verifiedUser);
+
+            var buyerID = locationID.Split('-')[0];
+            await Throttler.RunAsync(locationPermissionUpdate.AssignmentsToAdd, 100, 5, assignmentToAdd =>
+            {
+                return _oc.UserGroups.SaveUserAssignmentAsync(buyerID, assignmentToAdd);
+            });
+            await Throttler.RunAsync(locationPermissionUpdate.AssignmentsToDelete, 100, 5, assignmentToDelete =>
+            {
+                return _oc.UserGroups.DeleteUserAssignmentAsync(buyerID, assignmentToDelete.UserGroupID, assignmentToDelete.UserID);
+            });
+
+            return await ListLocationPermissionAsssignments(locationID, verifiedUser);
         }
 
         public async Task<ListPage<MarketplaceUser>> ListLocationUsers(string locationID, VerifiedUserContext verifiedUser)

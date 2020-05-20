@@ -22,6 +22,7 @@ export interface IUserManagement {
   getLocationApprovalRule(locationID: string): Promise<ApprovalRule>;
   updateUserUserGroupAssignments(
     buyerID: string,
+    locationID: string,
     add: UserGroupAssignment[],
     del: UserGroupAssignment[]
   ): Promise<void>;
@@ -81,24 +82,22 @@ export class UserManagementService implements IUserManagement {
 
   async updateUserUserGroupAssignments(
     buyerID: string,
+    locationID: string,
     add: UserGroupAssignment[],
     del: UserGroupAssignment[]
   ): Promise<void> {
-    const addRequests = add.map(newAssignment => this.addBuyerUserUserGroupAssignment(buyerID, newAssignment));
-    const deleteRequests = del.map(assignmentToRemove =>
-      this.removeBuyerUserUserGroupAssignment(buyerID, assignmentToRemove)
-    );
-    await Promise.all([...addRequests, ...deleteRequests]);
-  }
-
-  addBuyerUserUserGroupAssignment(buyerID: string, assignment: UserGroupAssignment): Promise<void> {
-    return this.ocUserGroupService
-      .SaveUserAssignment(buyerID, { UserID: assignment.UserID, UserGroupID: assignment.UserGroupID })
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+    const body = {
+      AssignmentsToAdd: add,
+      AssignmentsToDelete: del,
+    };
+    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/permissions`;
+    return this.httpClient
+      .post<void>(url, body, { headers: headers })
       .toPromise();
-  }
-
-  removeBuyerUserUserGroupAssignment(buyerID: string, assignment: UserGroupAssignment): Promise<void> {
-    return this.ocUserGroupService.DeleteUserAssignment(buyerID, assignment.UserGroupID, assignment.UserID).toPromise();
   }
 
   async getLocationApprovalRule(locationID: string): Promise<ApprovalRule> {
