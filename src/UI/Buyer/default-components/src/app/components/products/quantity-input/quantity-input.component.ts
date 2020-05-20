@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { MarketplaceMeProduct, PriceSchedule } from 'marketplace';
@@ -7,11 +7,11 @@ import { MarketplaceMeProduct, PriceSchedule } from 'marketplace';
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
 })
-export class OCMQuantityInput implements OnInit {
-  @Input() existingQty: number; 
+export class OCMQuantityInput implements OnInit, OnChanges {
+  @Input() existingQty: number;
+  @Input() gridDisplay?= false;
   @Output() qtyChange = new EventEmitter<{ qty: number; valid: boolean }>();
   // TODO - replace with real product info
-
   form: FormGroup;
   isQtyRestricted = false;
   restrictedQuantities: number[] = [];
@@ -21,14 +21,17 @@ export class OCMQuantityInput implements OnInit {
   max: number;
   disabled = false;
 
-  @Input() product: MarketplaceMeProduct;
   @Input() priceSchedule: PriceSchedule;
+  @Input() product: MarketplaceMeProduct;
 
   ngOnInit(): void {
-    this.product && this.priceSchedule && this.init(this.product, this.priceSchedule)
     this.form = new FormGroup({
       quantity: new FormControl(1, [Validators.required]),
     });
+  }
+
+  ngOnChanges() {
+    this.product && this.priceSchedule && this.init(this.product, this.priceSchedule)
   }
 
   init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
@@ -41,7 +44,7 @@ export class OCMQuantityInput implements OnInit {
       this.errorMsg = 'Out of stock.';
       this.disabled = true;
     }
-    this.form.setValue({ quantity: this.getDefaultQty(product) });
+    this.form.setValue({ quantity: this.getDefaultQty() });
     this.quantityChangeListener();
     if (!this.existingQty) {
       this.emit(this.form.get('quantity').value);
@@ -76,18 +79,19 @@ export class OCMQuantityInput implements OnInit {
     return true;
   }
 
-  getDefaultQty(product: MarketplaceMeProduct): number {
+  getDefaultQty(): number {
+    if (this.gridDisplay) return 0;
     if (this.existingQty) return this.existingQty;
     if (this.priceSchedule.RestrictedQuantity) return this.priceSchedule.PriceBreaks[0].Quantity;
     return this.priceSchedule.MinQuantity;
   }
 
   minQty(product: MarketplaceMeProduct): number {
-    return this.priceSchedule?.MinQuantity || 1
+    return this.priceSchedule.MinQuantity || this.gridDisplay ? 0 : 1;
   }
 
   maxQty(product: MarketplaceMeProduct): number {
-    return this.priceSchedule?.MaxQuantity || Infinity
+    return this.priceSchedule.MaxQuantity || Infinity
   }
 
   getInventory(product: MarketplaceMeProduct): number {

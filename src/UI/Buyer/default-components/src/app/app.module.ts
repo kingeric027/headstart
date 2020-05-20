@@ -79,6 +79,7 @@ import { OCMCheckoutPayment } from './components/checkout/checkout-payment/check
 import { OCMCheckoutAddress } from './components/checkout/checkout-address/checkout-address.component';
 import { OCMAddressForm } from './components/profile/address-form/address-form.component';
 import { OCMGenericList } from './components/layout/generic-list/generic-list.component';
+import { OCMGridSpecForm } from './components/products/grid-spec-form/grid-spec-form.component';
 import { OCMAddressList } from './components/profile/address-list/address-list.component';
 import { OCMLocationList } from './components/profile/location-list/location-list.component';
 import { OCMChangePasswordForm } from './components/profile/change-password-form/change-password-form.component';
@@ -175,6 +176,7 @@ const components = [
   OCMAddressList,
   OCMLocationList,
   OCMGenericList,
+  OCMGridSpecForm,
   OCMAddressForm,
   OCMProfileForm,
   OCMCheckoutConfirm,
@@ -326,6 +328,7 @@ export class AppModule {
     this.buildWebComponent(OCMAddressList, 'ocm-address-list');
     this.buildWebComponent(OCMLocationList, 'ocm-location-list');
     this.buildWebComponent(OCMGenericList, 'ocm-generic-list');
+    this.buildWebComponent(OCMGridSpecForm, 'ocm-grid-spec-form');
     this.buildWebComponent(OCMAddressForm, 'ocm-address-form');
     this.buildWebComponent(OCMProfileForm, 'ocm-profile-form');
 
