@@ -73,7 +73,6 @@ import { OCMProfile } from './components/profile/profile/profile.component';
 import { OCMProfileNav } from './components/profile/profile-nav/profile-nav.component';
 import { OCMAppFooter } from './components/layout/app-footer/app-footer.component';
 import { OCMOrderDetails } from './components/orders/order-detail/order-detail.component';
-import { OCMUserManagement } from './components/users/user-management/user-management.component';
 import { OCMPaymentMethodManagement } from './components/payments/payment-method-management/payment-method-management.component';
 import { OCMCheckoutPayment } from './components/checkout/checkout-payment/checkout-payment.component';
 import { OCMCheckoutAddress } from './components/checkout/checkout-address/checkout-address.component';
@@ -132,6 +131,7 @@ import { OCMLocationManagement } from './components/profile/location-management/
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { OCMBuyerLocationPermissions } from './components/buyer-location-permissions/buyer-location-permissions';
 
 const components = [
   OCMCategoryDropdown,
@@ -182,6 +182,7 @@ const components = [
   OCMCheckoutConfirm,
   OCMCheckoutAddress,
   OCMCheckoutPayment,
+  OCMBuyerLocationPermissions,
   OCMCheckout,
   OCMPaymentMethodManagement,
   OCMProfile,
@@ -192,7 +193,6 @@ const components = [
   OCMOrderShipments,
   OCMOrderHistorical,
   OCMOrderHistory,
-  OCMUserManagement,
   OCMAddressSuggestion,
   OCMAppFooter,
   SpecFormCheckboxComponent,
@@ -349,7 +349,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
     this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
-    this.buildWebComponent(OCMUserManagement, 'ocm-user-management');
+    this.buildWebComponent(OCMBuyerLocationPermissions, 'ocm-location-permissions-management');
     this.buildWebComponent(OCMAddressSuggestion, 'address-suggestion');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
     this.buildWebComponent(ConfirmModal, 'confirm-modal');
