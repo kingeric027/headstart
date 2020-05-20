@@ -140,7 +140,7 @@ export class CartService implements ICart {
       }
       return lineItem;
     } finally {
-      this.state.reset();
+      await this.state.reset();
     }
   }
 
@@ -159,7 +159,7 @@ export class CartService implements ICart {
   private LineItemsMatch(li1: LineItem, li2: LineItem): boolean {
     if (li1.ProductID !== li2.ProductID) return false;
     for (const spec1 of li1.Specs) {
-      const spec2 = li2.Specs.find(s => s.SpecID === spec1.SpecID);
+      const spec2 = li2.Specs?.find(s => s.SpecID === spec1.SpecID);
       if (spec1.Value !== spec2.Value) return false;
     }
     return true;
