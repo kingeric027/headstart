@@ -6,8 +6,11 @@ using Marketplace.Common.Queries;
 using Marketplace.Common;
 using System.Threading.Tasks;
 using System.Linq;
+using Marketplace.Common.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using ordercloud.integrations.extensions;
+using OrderCloud.SDK;
 
 namespace Marketplace.Orchestration
 {
@@ -16,12 +19,14 @@ namespace Marketplace.Orchestration
         private readonly IOrderOrchestrationCommand _orderOrchestrationCommand;
         private readonly LogQuery _log;
         private readonly AppSettings _appSettings;
+        private readonly IOrderCloudIntegrationsFunctionToken _token;
 
-        public OrderOrchestrationTrigger(AppSettings appSettings, IOrderOrchestrationCommand orderOrchestrationCommand, ISyncCommand sync, LogQuery log)
+        public OrderOrchestrationTrigger(AppSettings appSettings, IOrderCloudIntegrationsFunctionToken token, IOrderOrchestrationCommand orderOrchestrationCommand, ISyncCommand sync, LogQuery log)
         {
             _orderOrchestrationCommand = orderOrchestrationCommand;
             _log = log;
             _appSettings = appSettings;
+            _token = token;
         }
 
         [FunctionName("OrderShipmentTimeTrigger")]
@@ -53,7 +58,24 @@ namespace Marketplace.Orchestration
             HttpRequest req, string supplierId, string orderId, ILogger log)
         {
             log.LogInformation($"Supplier Order GET Request: {supplierId} {orderId}");
-            return await Task.FromResult(new { SupplierId = supplierId, OrderId = orderId });
+            try
+            {
+                var user = await _token.Authorize(req);
+                return await Task.FromResult(new {SupplierId = supplierId, OrderId = orderId});
+            }
+            catch (OrderCloudIntegrationException oex)
+            {
+                return await Task.FromResult(oex.ApiError);
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ApiError()
+                {
+                    ErrorCode = "500",
+                    Message = ex.Message
+                });
+            }
+            
         }
     }
 }
