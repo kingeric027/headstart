@@ -84,30 +84,16 @@ export class OCMGridSpecForm {
     }
 
     async addToCart(): Promise<void> {
-        for (let i = 0; i < this.lineItems.length; i++) {
-            if (this.lineItems[i].Quantity > 0) {
-                try {
-                    this.isAddingToCart = true;
-                    await this.context.order.cart.add(this.lineItems[i]);
-                } catch (ex) {
-                    this.isAddingToCart = false;
-                    throw ex;
-                }
-            } else continue;
+        const lineItems = this.lineItems.filter((li) => li.Quantity > 0);
+        try {
+            this.isAddingToCart = true;
+            await this.context.order.cart.addMany(lineItems);
+        } catch (ex) {
+            this.isAddingToCart = false;
+            throw ex;
         }
         this.isAddingToCart = false;
         this.lineItems = [];
-    }
-
-    getPriceBreakRange(index: number): string {
-        if (!this.priceSchedule?.PriceBreaks.length) return '';
-        const priceBreaks = this.priceSchedule.PriceBreaks;
-        const indexOfNextPriceBreak = index + 1;
-        if (indexOfNextPriceBreak < priceBreaks.length) {
-            return `${priceBreaks[index].Quantity} - ${priceBreaks[indexOfNextPriceBreak].Quantity - 1}`;
-        } else {
-            return `${priceBreaks[index].Quantity}+`;
-        }
     }
 
     getTotalPrice(): number {

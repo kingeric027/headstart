@@ -41,13 +41,13 @@ export class CartService implements ICart {
   async add(lineItem: LineItem): Promise<LineItem> {
     // order is well defined, line item can be added
     if (!_isUndefined(this.order.DateCreated)) {
-      return this.createLineItem(lineItem);
+      return await this.createLineItem(lineItem);
     }
     if (!this.initializingOrder) {
       this.initializingOrder = true;
-      this.state.reset();
+      await this.state.reset();
       this.initializingOrder = false;
-      return this.createLineItem(lineItem);
+      return await this.createLineItem(lineItem);
     }
   }
 
