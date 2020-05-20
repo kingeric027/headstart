@@ -11,7 +11,7 @@ namespace Marketplace.Common.Helpers
 {
     public interface IOrderCloudIntegrationsFunctionToken
     {
-        Task<VerifiedUserContext> Authorize(HttpRequest request);
+        Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles);
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ namespace Marketplace.Common.Helpers
             _oc = new OrderCloudClient();
         }
 
-        public async Task<VerifiedUserContext> Authorize(HttpRequest request)
+        public async Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles)
         {
             Require.That(request.Headers.ContainsKey(AUTH_HEADER_NAME), new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
             Require.That(request.Headers[AUTH_HEADER_NAME].ToString().StartsWith(BEARER_PREFIX), new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
@@ -38,6 +38,9 @@ namespace Marketplace.Common.Helpers
             var jwt = new JwtSecurityToken(token);
             var clientId = jwt.Claims.FirstOrDefault(x => x.Type == "cid")?.Value;
             var usrtype = jwt.Claims.FirstOrDefault(x => x.Type == "usrtype")?.Value;
+            var scope = jwt.Claims.Where(x => x.Type == "role").Select(x => x.Value)?.ToList();
+            // validate scope
+            Require.That(scope.Count(s => roles.Any(role => s == role.ToString())) > 0, new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
 
             var cid = new ClaimsIdentity("OrderCloudIntegrations");
             cid.AddClaim(new Claim("clientid", clientId));

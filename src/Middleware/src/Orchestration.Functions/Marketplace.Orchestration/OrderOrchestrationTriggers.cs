@@ -60,7 +60,7 @@ namespace Marketplace.Orchestration
             log.LogInformation($"Supplier Order GET Request: {supplierId} {orderId}");
             try
             {
-                var user = await _token.Authorize(req);
+                var user = await _token.Authorize(req, new [] { ApiRole.OrderAdmin, ApiRole.OrderReader });
                 return await Task.FromResult(new {SupplierId = supplierId, OrderId = orderId});
             }
             catch (OrderCloudIntegrationException oex)
