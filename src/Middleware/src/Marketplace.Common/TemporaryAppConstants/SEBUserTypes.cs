@@ -45,70 +45,64 @@ namespace Marketplace.Common.TemporaryAppConstants
                 
         }
 
-        public static List<MarketplaceUserType> Buyer()
-        {
-            return new List<MarketplaceUserType>()
-            {
-                new MarketplaceUserType {
-                    UserGroupName = "Approval Rule Admin",
-                    UserGroupType = UserGroupType.UserPermissions,
-                    UserGroupIDSuffix = "ApprovalRuleAdmin",
-                    CustomRoles = new List<CustomRole>
-                    {
-                        CustomRole.MPApprovalRuleAdmin,
-                    }
-                },
-                new MarketplaceUserType {
-                    UserGroupName = "Credit Card Admin",
-                    UserGroupType = UserGroupType.UserPermissions,
-                    UserGroupIDSuffix = "CreditCardAdmin",
-                    CustomRoles = new List<CustomRole>
-                    {
-                        CustomRole.MPCreditCardAdmin,
-                    }
-                },
-                new MarketplaceUserType {
-                    UserGroupName = "Address Admin",
-                    UserGroupType = UserGroupType.UserPermissions,
-                    UserGroupIDSuffix = "AddressAdmin",
-                    CustomRoles = new List<CustomRole>
-                    {
-                        CustomRole.MPAddressAdmin,
-                    }
-                },
-            };
-        }
         public static List<MarketplaceUserType> BuyerLocation()
         {
             return new List<MarketplaceUserType>()
             {
-                new MarketplaceUserType {
-                    UserGroupName = "Order Approver",
-                    UserGroupType = UserGroupType.Approval,
-                    UserGroupIDSuffix = "OrderApprover",
+                 new MarketplaceUserType {
+                    UserGroupName = "Location Permission Admin",
+                    UserGroupType = UserGroupType.LocationPermissions,
+                    UserGroupIDSuffix = UserGroupSuffix.PermissionAdmin.ToString(),
                     CustomRoles = new List<CustomRole>
                     {
-                        CustomRole.MPOrderApprover,
+                        CustomRole.MPLocationPermissionAdmin,
                     }
                 },
                 new MarketplaceUserType {
-                    UserGroupName = "Needs Approval",
-                    UserGroupType = UserGroupType.Approval,
-                    UserGroupIDSuffix = "NeedsApproval",
+                    UserGroupName = "Location Order Approver",
+                    UserGroupType = UserGroupType.LocationPermissions,
+                    UserGroupIDSuffix = UserGroupSuffix.OrderApprover.ToString(),
                     CustomRoles = new List<CustomRole>
                     {
-                        CustomRole.MPNeedsApproval,
+                        CustomRole.MPLocationApprovalRuleAdmin,
+                    }
+                },
+                new MarketplaceUserType {
+                    UserGroupName = "Location Needs Approval",
+                    UserGroupType = UserGroupType.LocationPermissions,
+                    UserGroupIDSuffix = UserGroupSuffix.NeedsApproval.ToString(),
+                    CustomRoles = new List<CustomRole>
+                    {
+                        CustomRole.MPLocationNeedsApproval,
                     }
                 },
                 new MarketplaceUserType {
                     UserGroupName = "View All Location Orders",
-                    UserGroupType = UserGroupType.OrderAccess,
-                    UserGroupIDSuffix = "ViewAllLocationOrders",
+                    UserGroupType = UserGroupType.LocationPermissions,
+                    UserGroupIDSuffix = UserGroupSuffix.ViewAllOrders.ToString(),
                     CustomRoles = new List<CustomRole>
                     {
-                        CustomRole.MPViewAllLocationOrders,
+                        CustomRole.MPLocationViewAllOrders,
                     }
-                }
+                },
+                new MarketplaceUserType {
+                    UserGroupName = "Credit Card Admin",
+                    UserGroupType = UserGroupType.LocationPermissions,
+                    UserGroupIDSuffix = UserGroupSuffix.CreditCardAdmin.ToString(),
+                    CustomRoles = new List<CustomRole>
+                    {
+                        CustomRole.MPLocationCreditCardAdmin,
+                    }
+                },
+                new MarketplaceUserType {
+                    UserGroupName = "Address Admin",
+                    UserGroupType = UserGroupType.LocationPermissions,
+                    UserGroupIDSuffix = UserGroupSuffix.AddressAdmin.ToString(),
+                    CustomRoles = new List<CustomRole>
+                    {
+                        CustomRole.MPLocationAddressAdmin,
+                    }
+                },
             };
         }
     }

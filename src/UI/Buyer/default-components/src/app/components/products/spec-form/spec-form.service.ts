@@ -65,7 +65,7 @@ export class SpecFormService {
   }
 
   private getSpec(specs: ListSpec, value: any): Spec {
-    return _find(specs.Items, item => item.Name.replace(/ /g, '') === value);
+    return _find(specs?.Items, item => item.Name.replace(/ /g, '') === value);
   }
 
   private getOption(spec: Spec, value: any): SpecOption {

@@ -199,6 +199,7 @@ export class AppConfig {
   orderCloudApiVersion: string;
   avalaraCompanyId: number;
   middlewareUrl: string;
+  ocMiddlewareUrl: string;
   /**
    * base path to CMS resources
    */

@@ -10,6 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from 'src/environments/environment';
 import { AppAuthService } from '@app-seller/auth';
 import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
+import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 
 @Component({
   selector: 'product-variations-component',
@@ -30,6 +31,7 @@ export class ProductVariations {
   };
   @Input() areChanges: boolean;
   @Input() readonly = false;
+  @Input() myCurrency: SupportedRates;
   @Input() checkForChanges;
   @Input() copyProductResource;
   @Input() isCreatingNew = false;

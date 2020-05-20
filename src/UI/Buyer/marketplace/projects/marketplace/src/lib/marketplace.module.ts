@@ -40,6 +40,7 @@ import { Configuration } from 'marketplace-javascript-sdk';
 import { AppConfig } from './shopper-context';
 import { OrdersToApproveStateService } from './services/order-history/order-to-approve-state.service';
 import { LocationManagementWrapperComponent } from './wrapper-components/location-management-wrapper.component';
+import { ExchangeRatesService } from './services/exchange-rates/exchange-rates.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -55,6 +56,7 @@ import { LocationManagementWrapperComponent } from './wrapper-components/locatio
     CreditCardService,
     CurrentOrderService,
     CurrentUserService,
+    ExchangeRatesService,
     OrderHistoryService,
     OrdersToApproveStateService,
     PaymentHelperService,
