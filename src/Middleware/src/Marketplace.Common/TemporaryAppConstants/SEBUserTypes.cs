@@ -103,6 +103,15 @@ namespace Marketplace.Common.TemporaryAppConstants
                         CustomRole.MPLocationAddressAdmin,
                     }
                 },
+                   new MarketplaceUserType {
+                    UserGroupName = "Resale Cert Admin",
+                    UserGroupType = UserGroupType.LocationPermissions,
+                    UserGroupIDSuffix = UserGroupSuffix.ResaleCertAdmin.ToString(),
+                    CustomRoles = new List<CustomRole>
+                    {
+                        CustomRole.MPLocationResaleCertAdmin,
+                    }
+                },
             };
         }
     }
