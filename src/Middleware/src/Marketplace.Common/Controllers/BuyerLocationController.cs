@@ -14,7 +14,6 @@ namespace Marketplace.Common.Controllers
 	[Route("buyerlocations")]
     public class BuyerLocationController : BaseController
     {
-
         private readonly IMarketplaceBuyerLocationCommand _command;
         private readonly IOrderCloudClient _oc;
         public BuyerLocationController(IMarketplaceBuyerLocationCommand command, IOrderCloudClient oc, AppSettings settings) : base(settings)
