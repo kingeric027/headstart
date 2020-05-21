@@ -16,23 +16,22 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './location-management.component.html',
   styleUrls: ['./location-management.component.scss'],
 })
-export class OCMLocationManagement implements OnInit {
+export class OCMLocationManagement {
   faDownload = faDownload;
   address: MarketplaceAddressBuyer = {};
   certificate: TaxCertificate = {};
   showCertificateForm = false;
-  userCanAdmin = false;
+  userCanAdminResaleCert = false;
+  userCanAdminPermissions = false;
   _locationID = '';
   @Input() set locationID(locationID: string) {
     this._locationID = locationID;
     this.getLocationManagementDetails();
+    this.userCanAdminResaleCert = this.context.currentUser.hasLocationAccess(this._locationID, "ResaleCertAdmin");
+    this.userCanAdminPermissions = this.context.currentUser.hasLocationAccess(this._locationID, "PermissionAdmin");
   };
 
   constructor(private context: ShopperContextService, private activatedRoute: ActivatedRoute) {}
-
-  ngOnInit(): void {
-    this.userCanAdmin = this.context.currentUser.hasRoles('AddressAdmin');
-  }
   
   async getLocationManagementDetails(): Promise<void> {
     this.address = await this.context.addresses.get(this._locationID);

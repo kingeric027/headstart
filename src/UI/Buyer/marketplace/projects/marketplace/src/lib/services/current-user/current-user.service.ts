@@ -3,8 +3,12 @@ import { BehaviorSubject } from 'rxjs';
 import { MeUser, OcMeService, User, UserGroup } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { CreditCardService } from './credit-card.service';
+<<<<<<< refs/remotes/origin/dev
 import { HttpClient } from '@angular/common/http';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+=======
+import { PermissionType } from '../../shopper-context';
+>>>>>>> remove uis for unpermissioned things
 
 export interface CurrentUser extends MeUser {
   FavoriteProductIDs: string[];
@@ -20,6 +24,7 @@ export interface ICurrentUser {
   isAnonymous(): boolean;
   setIsFavoriteProduct(isFav: boolean, productID: string): void;
   setIsFavoriteOrder(isFav: boolean, orderID: string): void;
+  hasLocationAccess(locationID: string, permissionType: string): boolean;
 }
 
 @Injectable({
@@ -33,6 +38,9 @@ export class CurrentUserService implements ICurrentUser {
   private isAnon: boolean = null;
   private userSubject: BehaviorSubject<CurrentUser> = new BehaviorSubject<CurrentUser>(null);
 
+  // users for determining location management permissions for a user
+  private userGroups: BehaviorSubject<UserGroup[]> = new BehaviorSubject<UserGroup[]>([]);
+
   constructor(
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
@@ -45,9 +53,11 @@ export class CurrentUserService implements ICurrentUser {
   }
 
   async reset(): Promise<void> {
-    const user = await this.ocMeService.Get().toPromise();
+    const requests: any[] = [this.ocMeService.Get().toPromise(), this.ocMeService.ListUserGroups().toPromise()];
+    const [user, userGroups] = await Promise.all(requests);
     this.isAnon = this.tokenHelper.isTokenAnonymous();
     this.user = await this.MapToCurrentUser(user);
+    this.userGroups.next(userGroups.Items);
   }
 
   async patch(user: MeUser): Promise<CurrentUser> {
@@ -76,6 +86,11 @@ export class CurrentUserService implements ICurrentUser {
     return roles.every(role => this.user.AvailableRoles.includes(role));
   }
 
+  hasLocationAccess(locationID: string, permissionType: string): boolean {
+    const userGroupIDNeeded = `${locationID}-${permissionType}`;
+    return this.userGroups.value.some(u => u.ID === userGroupIDNeeded);
+  }
+  
   private async MapToCurrentUser(user: MeUser): Promise<CurrentUser> {
     const currentUser = user as CurrentUser;
     const myUserGroups = await this.ocMeService.ListUserGroups().toPromise();
