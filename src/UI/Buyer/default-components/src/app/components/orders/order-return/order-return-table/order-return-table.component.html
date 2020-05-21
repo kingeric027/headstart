@@ -91,7 +91,8 @@
               disabled
               translate>ORDERS.RETURNS.SELECT_RETURN_REASON</option>
       <option *ngFor="let reason of returnReasons"
-              [value]="reason">{{ reason }}</option>
+              [value]="getReasonCode(reason)"
+              translate>{{ reason }}</option>
       </select>
       <input *ngIf="returnReasons.length === 0"
               type="text"

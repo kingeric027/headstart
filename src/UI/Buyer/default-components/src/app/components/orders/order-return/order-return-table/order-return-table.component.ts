@@ -4,7 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MarketplaceLineItem, Supplier, ShopperContextService, LineItem } from 'marketplace';
 import { FormGroup, FormArray } from '@angular/forms';
-import { LineItemForm } from './models/line-item-form.model';
+import { ReturnReason } from './return-reason-enum';
 
 @Component({
   templateUrl: './order-return-table.component.html',
@@ -15,7 +15,7 @@ export class OCMOrderReturnTable {
   selection = new SelectionModel<FormGroup>(true, []);
   _liGroup: MarketplaceLineItem[];
   quantitiesToReturn: number[] = [];
-  returnReasons = ['Purchased incorrect size/style', 'Incorrect product or size shipped', 'Product does not match description', 'Product is defective/damaged', 'Shipping box is damaged', 'Received extra product that I didn’t buy', 'Product arrived too late', 'Purchased by mistake', 'Product is no longer needed', 'Purchase was not approved', 'Discount was not applied', 'Product is missing from shipment'];
+  returnReasons: ReturnReason[] = [ReturnReason.IncorrectSizeOrStyle, ReturnReason.IncorrectShipment, ReturnReason.DoesNotMatchDescription, ReturnReason.ProductDefective, ReturnReason.PackagingDamaged, ReturnReason.ReceivedExtraProduct, ReturnReason.ArrivedLate, ReturnReason.PurchaseMistake, ReturnReason.NotNeeded, ReturnReason.NotApproved, ReturnReason.UnappliedDiscount, ReturnReason.ProductMissing];
   lineItems: FormArray;
   
   @Input() set liGroup(value: MarketplaceLineItem[]) {
@@ -43,6 +43,11 @@ export class OCMOrderReturnTable {
 
   getLineItem(lineItemID: string): MarketplaceLineItem {
     return this._liGroup.find(li => li.ID === lineItemID);
+  }
+
+  getReasonCode(reason: ReturnReason): string {
+    const reasonCode = Object.keys(ReturnReason).find(key => ReturnReason[key] === reason);
+    return reasonCode;
   }
 
   /** Whether the number of selected elements matches the total number of enabled rows. */
@@ -77,7 +82,6 @@ export class OCMOrderReturnTable {
     row.controls.returnReason.disable();
     row.controls.selected.setValue(false);
   }
-  
   
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle(): void {    
