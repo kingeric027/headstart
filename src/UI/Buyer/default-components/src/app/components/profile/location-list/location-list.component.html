@@ -11,7 +11,7 @@
           (requestOptionsUpdated)="updateRequestOptions($event.detail)"
         >
           <div class="address-card pb-3 mb-3" *ngFor="let location of locations">
-            <ocm-location-list-item [location]="location" [canViewOrders]="canViewOrders(location)"> </ocm-location-list-item>
+            <ocm-location-list-item [location]="location"> </ocm-location-list-item>
           </div>
         </ocm-generic-list>
       </div>

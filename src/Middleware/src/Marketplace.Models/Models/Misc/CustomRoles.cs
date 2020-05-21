@@ -32,6 +32,7 @@
 		MPLocationAddressAdmin,
 		MPLocationOrderApprover,
 		MPLocationNeedsApproval,
-		MPLocationViewAllOrders
+		MPLocationViewAllOrders,
+		MPLocationResaleCertAdmin
 	}
 }

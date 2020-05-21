@@ -14,7 +14,7 @@ using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.extensions;
 using Marketplace.Common.Services.ShippingIntegration;
 using ordercloud.integrations.avalara;
-
+using Marketplace.Models.Misc;
 namespace Marketplace.Common.Commands
 {
     public interface IOrderCommand
@@ -37,16 +37,18 @@ namespace Marketplace.Common.Commands
         private readonly IZohoCommand _zoho;
         private readonly IAvalaraCommand _avalara;
         private readonly ISendgridService _sendgridService;
+        private readonly ILocationPermissionCommand _locationPermissionCommand;
         
-        public OrderCommand(IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avalara, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        public OrderCommand(ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
             _ocShippingIntegration = ocShippingIntegration;
-            _avalara = avalara;
+            _avalara = avatax;
             _zoho = zoho;
             _sendgridService = sendgridService;
             _ocSandboxService = orderCloudSandboxService;
+            _locationPermissionCommand = locationPermissionCommand;
         }
 
         public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
@@ -163,21 +165,8 @@ namespace Marketplace.Common.Commands
 
         private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser, string overrideErrorMessage = "")
         {
-            var hasAccess = await IsUserInAccessGroup(locationID, "ViewAllLocationOrders", verifiedUser);
+            var hasAccess = await _locationPermissionCommand.IsUserInAccessGroup(locationID, UserGroupSuffix.ViewAllOrders.ToString(), verifiedUser);
             Require.That(hasAccess, new ErrorCode("Insufficient Access", 403, $"User cannot access orders from this location: {locationID}"));
-        }
-
-        private async Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser)
-        {
-            var buyerID = verifiedUser.BuyerID;
-            var userGroupID = $"{locationID}-{groupSuffix}";
-            return await IsUserInUserGroup(buyerID, userGroupID, verifiedUser);
-        }
-
-        private async Task<bool> IsUserInUserGroup(string buyerID, string userGroupID, VerifiedUserContext verifiedUser)
-        {
-            var userGroupAssignmentForAccess = await _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID, verifiedUser.UserID);
-            return userGroupAssignmentForAccess.Items.Count > 0;
         }
 
         private async Task EnsureUserCanAccessOrder(MarketplaceOrder order, VerifiedUserContext verifiedUser)
@@ -194,7 +183,7 @@ namespace Marketplace.Common.Commands
                 return;
             }
             
-            var isUserInLocationOrderAccessGroup = await IsUserInAccessGroup(order.BillingAddressID, "ViewAllLocationOrders", verifiedUser);
+            var isUserInLocationOrderAccessGroup = await _locationPermissionCommand.IsUserInAccessGroup(order.BillingAddressID, UserGroupSuffix.ViewAllOrders.ToString(), verifiedUser);
             if (isUserInLocationOrderAccessGroup)
             {
                 return;
@@ -203,7 +192,7 @@ namespace Marketplace.Common.Commands
             if(order.Status == OrderStatus.AwaitingApproval)
             {
                 // logic assumes there is only one approving group per location
-                var isUserInApprovalGroup = await IsUserInAccessGroup(order.BillingAddressID, "OrderApprover", verifiedUser);
+                var isUserInApprovalGroup = await _locationPermissionCommand.IsUserInAccessGroup(order.BillingAddressID, UserGroupSuffix.OrderApprover.ToString(), verifiedUser);
                 if(isUserInApprovalGroup)
                 {
                     return;
