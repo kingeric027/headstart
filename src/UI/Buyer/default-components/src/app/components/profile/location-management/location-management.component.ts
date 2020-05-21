@@ -26,16 +26,18 @@ export class OCMLocationManagement {
   _locationID = '';
   @Input() set locationID(locationID: string) {
     this._locationID = locationID;
-    this.getLocationManagementDetails();
     this.userCanAdminResaleCert = this.context.currentUser.hasLocationAccess(this._locationID, "ResaleCertAdmin");
     this.userCanAdminPermissions = this.context.currentUser.hasLocationAccess(this._locationID, "PermissionAdmin");
+    this.getLocationManagementDetails();
   };
   
   constructor(private context: ShopperContextService, private activatedRoute: ActivatedRoute) {}
   
   async getLocationManagementDetails(): Promise<void> {
     this.address = await this.context.addresses.get(this._locationID);
-    this.certificate = await this.context.addresses.getCertificate(this.address);
+    if(this.userCanAdminResaleCert) {
+      this.certificate = await this.context.addresses.getCertificate(this._locationID);
+    }
   }
 
   // make into pipe?
