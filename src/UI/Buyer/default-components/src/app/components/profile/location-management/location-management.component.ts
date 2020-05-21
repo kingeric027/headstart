@@ -23,16 +23,22 @@ export class OCMLocationManagement {
   showCertificateForm = false;
   userCanAdminResaleCert = false;
   userCanAdminPermissions = false;
+  userCanViewLocationOrders = false;
   _locationID = '';
   @Input() set locationID(locationID: string) {
     this._locationID = locationID;
     this.userCanAdminResaleCert = this.context.currentUser.hasLocationAccess(this._locationID, "ResaleCertAdmin");
     this.userCanAdminPermissions = this.context.currentUser.hasLocationAccess(this._locationID, "PermissionAdmin");
+    this.userCanViewLocationOrders = this.context.currentUser.hasLocationAccess(this._locationID, "ViewAllOrders");
     this.getLocationManagementDetails();
   };
   
   constructor(private context: ShopperContextService, private activatedRoute: ActivatedRoute) {}
   
+  toLocationOrders(): void {
+    this.context.router.toOrdersByLocation({location: this._locationID});
+  }
+
   async getLocationManagementDetails(): Promise<void> {
     this.address = await this.context.addresses.get(this._locationID);
     if(this.userCanAdminResaleCert) {
