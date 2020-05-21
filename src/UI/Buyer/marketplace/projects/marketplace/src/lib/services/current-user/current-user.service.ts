@@ -3,12 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { MeUser, OcMeService, User, UserGroup } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { CreditCardService } from './credit-card.service';
-<<<<<<< refs/remotes/origin/dev
 import { HttpClient } from '@angular/common/http';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
-=======
-import { PermissionType } from '../../shopper-context';
->>>>>>> remove uis for unpermissioned things
 
 export interface CurrentUser extends MeUser {
   FavoriteProductIDs: string[];
@@ -90,7 +85,7 @@ export class CurrentUserService implements ICurrentUser {
     const userGroupIDNeeded = `${locationID}-${permissionType}`;
     return this.userGroups.value.some(u => u.ID === userGroupIDNeeded);
   }
-  
+
   private async MapToCurrentUser(user: MeUser): Promise<CurrentUser> {
     const currentUser = user as CurrentUser;
     const myUserGroups = await this.ocMeService.ListUserGroups().toPromise();
