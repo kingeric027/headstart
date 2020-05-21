@@ -131,7 +131,8 @@ import { OCMLocationManagement } from './components/profile/location-management/
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { OCMBuyerLocationPermissions } from './components/buyer-location-permissions/buyer-location-permissions';
+import { OCMBuyerLocationPermissions } from './components/profile/buyer-location-permissions/buyer-location-permissions';
+import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
 
 const components = [
   OCMCategoryDropdown,
@@ -191,6 +192,7 @@ const components = [
   OCMAppFooter,
   OCMOrderApproval,
   OCMOrderShipments,
+  OCMOrderAccessManagement,
   OCMOrderHistorical,
   OCMOrderHistory,
   OCMAddressSuggestion,
@@ -350,6 +352,7 @@ export class AppModule {
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
     this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
     this.buildWebComponent(OCMBuyerLocationPermissions, 'ocm-location-permissions-management');
+    this.buildWebComponent(OCMOrderAccessManagement, 'ocm-order-access-management');
     this.buildWebComponent(OCMAddressSuggestion, 'address-suggestion');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
     this.buildWebComponent(ConfirmModal, 'confirm-modal');

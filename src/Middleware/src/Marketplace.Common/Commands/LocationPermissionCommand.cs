@@ -22,6 +22,9 @@ namespace Marketplace.Common.Commands
     public interface ILocationPermissionCommand
     {
         Task<List<UserGroupAssignment>> ListLocationPermissionAsssignments(string locationID, VerifiedUserContext verifiedUser);
+        Task<List<UserGroupAssignment>> ListLocationApprovalPermissionAsssignments(string locationID, VerifiedUserContext verifiedUser);
+        Task<decimal> GetApprovalThreshold(string locationID, VerifiedUserContext verifiedUser);
+        Task<decimal> SetLocationApprovalThreshold(string locationID, decimal newApprovalThreshold, VerifiedUserContext verifiedUser);
         Task<ListPage<MarketplaceUser>> ListLocationUsers(string locationID, VerifiedUserContext verifiedUser);
         Task<List<UserGroupAssignment>> UpdateLocationPermissions(string locationID, LocationPermissionUpdate locationPermissionUpdate, VerifiedUserContext verifiedUser);
         Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser);
@@ -40,7 +43,42 @@ namespace Marketplace.Common.Commands
         {
             await EnsureUserIsLocationAdmin(locationID, verifiedUser);
             var buyerID = locationID.Split('-')[0];
-            var locationUserTypes = SEBUserTypes.BuyerLocation();
+            var locationUserTypes = SEBUserTypes.BuyerLocation().Where(s => s.UserGroupIDSuffix != UserGroupSuffix.NeedsApproval.ToString() || s.UserGroupIDSuffix != UserGroupSuffix.OrderApprover.ToString());
+            var userGroupAssignmentResponses = await Throttler.RunAsync(locationUserTypes, 100, 5, locationUserType => {
+                return _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID: $"{locationID}-{locationUserType.UserGroupIDSuffix}", pageSize: 100);
+            });
+            return userGroupAssignmentResponses
+                .Select(userGroupAssignmentResponse => userGroupAssignmentResponse.Items)
+                .SelectMany(l => l)
+                .ToList();
+        }
+
+        public async Task<decimal> GetApprovalThreshold(string locationID, VerifiedUserContext verifiedUser)
+        {
+            await EnsureUserIsLocationAdmin(locationID, verifiedUser);
+            var buyerID = locationID.Split('-')[0];
+            var approvalRule = await _oc.ApprovalRules.GetAsync(buyerID, locationID);
+            var threshold = Convert.ToDecimal(approvalRule.RuleExpression.Split('>')[1]);
+            return threshold;
+        }
+
+        public async Task<decimal> SetLocationApprovalThreshold(string locationID, decimal newApprovalThreshold, VerifiedUserContext verifiedUser)
+        {
+            await EnsureUserIsLocationAdmin(locationID, verifiedUser);
+            var buyerID = locationID.Split('-')[0];
+            var approvalRulePatch = new PartialApprovalRule()
+            { 
+                RuleExpression = $"order.xp.ApprovalNeeded = '{locationID}' & order.Total > {newApprovalThreshold}"
+            };
+            await _oc.ApprovalRules.PatchAsync(buyerID, locationID, approvalRulePatch);
+            return newApprovalThreshold;
+        }
+
+        public async Task<List<UserGroupAssignment>> ListLocationApprovalPermissionAsssignments(string locationID, VerifiedUserContext verifiedUser)
+        {
+            await EnsureUserIsLocationAdmin(locationID, verifiedUser);
+            var buyerID = locationID.Split('-')[0];
+            var locationUserTypes = SEBUserTypes.BuyerLocation().Where(s => s.UserGroupIDSuffix == UserGroupSuffix.NeedsApproval.ToString() || s.UserGroupIDSuffix == UserGroupSuffix.OrderApprover.ToString());
             var userGroupAssignmentResponses = await Throttler.RunAsync(locationUserTypes, 100, 5, locationUserType => {
                 return _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID: $"{locationID}-{locationUserType.UserGroupIDSuffix}", pageSize: 100);
             });

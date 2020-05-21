@@ -16,7 +16,9 @@ export class OCMBuyerLocationPermissions {
   areChanges = false;
   locationUsers: User[];
   _locationID: string;
-  permissionTypes: PermissionType[] = PermissionTypes;
+  permissionTypes: PermissionType[] = PermissionTypes.filter(
+    p => p.UserGroupSuffix !== 'NeedsApproval' && p.UserGroupSuffix !== 'OrderApprover'
+  );
   requestedUserConfirmation = false;
 
   @Input()

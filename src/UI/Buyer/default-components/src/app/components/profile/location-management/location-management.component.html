@@ -62,6 +62,8 @@
     </div>
   </div>
 
+  <ocm-order-access-management *ngIf="_locationID"
+                               [locationID]="_locationID"> </ocm-order-access-management>
   <ocm-location-permissions-management *ngIf="_locationID"
                                        [locationID]="_locationID"> </ocm-location-permissions-management>
 </ocm-profile-nav>

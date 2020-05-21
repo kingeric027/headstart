@@ -8,6 +8,11 @@ namespace Marketplace.Models.Misc
         public List<UserGroupAssignment> AssignmentsToAdd { get; set; }
         public List<UserGroupAssignment> AssignmentsToDelete { get; set; }
     }
+
+    public class LocationApprovalThresholdUpdate
+    {
+        public decimal Threshold { get; set; }
+    }
 }
 
 

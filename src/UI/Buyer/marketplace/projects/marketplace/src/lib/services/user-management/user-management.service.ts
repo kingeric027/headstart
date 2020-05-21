@@ -19,7 +19,8 @@ export interface IUserManagement {
   getLocations(): Promise<UserGroup[]>;
   getLocationUsers(locationID: string): Promise<ListPage<MarketplaceUser>>;
   getLocationPermissions(locationID: string): Promise<UserGroupAssignment[]>;
-  getLocationApprovalRule(locationID: string): Promise<ApprovalRule>;
+  getLocationApprovalPermissions(locationID: string): Promise<UserGroupAssignment[]>;
+  getLocationApprovalThreshold(locationID: string): Promise<number>;
   updateUserUserGroupAssignments(
     buyerID: string,
     locationID: string,
@@ -80,6 +81,18 @@ export class UserManagementService implements IUserManagement {
       .toPromise();
   }
 
+  async getLocationApprovalPermissions(locationID: string): Promise<UserGroupAssignment[]> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+    const buyerID = locationID.split('-')[0];
+    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/approvalpermissions`;
+    return this.httpClient
+      .get<UserGroupAssignment[]>(url, { headers: headers })
+      .toPromise();
+  }
+
   async updateUserUserGroupAssignments(
     buyerID: string,
     locationID: string,
@@ -100,9 +113,30 @@ export class UserManagementService implements IUserManagement {
       .toPromise();
   }
 
-  async getLocationApprovalRule(locationID: string): Promise<ApprovalRule> {
+  async getLocationApprovalThreshold(locationID: string): Promise<number> {
     const buyerID = this.currentUserService.get().Buyer.ID;
-    const approvalRule = await this.ocApprovalRuleService.Get(buyerID, locationID).toPromise();
-    return approvalRule;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/approvalthreshold`;
+    return this.httpClient
+      .get<number>(url, { headers: headers })
+      .toPromise();
+  }
+
+  async setLocationApprovalThreshold(locationID: string, amount: number): Promise<number> {
+    const buyerID = this.currentUserService.get().Buyer.ID;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+    const body = {
+      Threshold: amount,
+    };
+    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/approvalthreshold`;
+    return this.httpClient
+      .post<number>(url, body, { headers: headers })
+      .toPromise();
   }
 }
