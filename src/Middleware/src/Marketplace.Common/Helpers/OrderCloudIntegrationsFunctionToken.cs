@@ -40,7 +40,8 @@ namespace Marketplace.Common.Helpers
             var usrtype = jwt.Claims.FirstOrDefault(x => x.Type == "usrtype")?.Value;
             var scope = jwt.Claims.Where(x => x.Type == "role").Select(x => x.Value)?.ToList();
             // validate scope
-            Require.That(scope.Count(s => roles.Any(role => s == role.ToString())) > 0, new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
+            if (!scope.Contains("FullAccess"))
+                Require.That(scope.Count(s => roles.Any(role => s == role.ToString())) > 0, new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
 
             var cid = new ClaimsIdentity("OrderCloudIntegrations");
             cid.AddClaim(new Claim("clientid", clientId));
