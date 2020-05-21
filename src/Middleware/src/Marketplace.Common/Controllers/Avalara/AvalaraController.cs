@@ -54,26 +54,30 @@ namespace Marketplace.Common.Controllers.Avalara
 		[HttpGet, Route("{companyID}/certificate/{certificateID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
 		public async Task<TaxCertificate> GetCertificate(int companyID, int certificateID)
 		{
+			// need to include auth for managing cert for a specific location somewhere
 			return await _avalara.GetCertificateAsync(companyID, certificateID);
 		}
 
 		[DocName("Create tax exeption certificate")]
-		[HttpPost, Route("{companyID}/certificate"), OrderCloudIntegrationsAuth(ApiRole.AddressAdmin)]
+		[HttpPost, Route("{companyID}/certificate"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
 		public async Task<TaxCertificate> CreateCertificate(int companyID, [FromBody] TaxCertificate cert)
 		{
+			// need to include auth for managing cert for a specific location somewhere
 			return await _avalara.CreateCertificateAsync(companyID, cert);
 		}
 
 		[DocName("Update tax exeption certificate")]
-		[HttpPut, Route("{companyID}/certificate/{certificateID}"), OrderCloudIntegrationsAuth(ApiRole.AddressAdmin)]
+		[HttpPut, Route("{companyID}/certificate/{certificateID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
 		public async Task<TaxCertificate> UpdateCertificate(int companyID, int certificateID, [FromBody] TaxCertificate cert)
 		{
+			// need to include auth for managing cert for a specific location somewhere
 			return await _avalara.UpdateCertificateAsync(companyID, certificateID, cert);
 		}
 
 		[HttpGet, Route("{companyID}/certificate/{certificateID}/pdf")]
 		public async Task<object> DownloadCertificate(int companyID, int certificateID)
 		{
+			// need to include auth for managing cert for a specific location somewhere
 			var pdf = await _avalara.DownloadCertificatePdfAsync(companyID, certificateID);
 			return File(pdf, "application/pdf");
 		}

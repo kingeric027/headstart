@@ -30,7 +30,7 @@ export class OCMLocationManagement {
     this.userCanAdminResaleCert = this.context.currentUser.hasLocationAccess(this._locationID, "ResaleCertAdmin");
     this.userCanAdminPermissions = this.context.currentUser.hasLocationAccess(this._locationID, "PermissionAdmin");
   };
-
+  
   constructor(private context: ShopperContextService, private activatedRoute: ActivatedRoute) {}
   
   async getLocationManagementDetails(): Promise<void> {
