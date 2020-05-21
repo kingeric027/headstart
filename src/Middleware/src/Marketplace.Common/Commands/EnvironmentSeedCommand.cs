@@ -240,6 +240,7 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationViewAllOrders },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationCreditCardAdmin },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationAddressAdmin },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationResaleCertAdmin }
 		};
 
 		static readonly List<Webhook> DefaultWebhooks = new List<Webhook>() {
