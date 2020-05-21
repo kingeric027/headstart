@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Marketplace.Common.Mappers
 {
    public class ProductMapper
-    {
+   {
         public static MarketplaceProduct MeProductToProduct(BuyerProduct<ProductXp, PriceSchedule> product)
         {
             return new MarketplaceProduct

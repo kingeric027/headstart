@@ -4,7 +4,6 @@ using Flurl.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Integrations.Avalara;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
@@ -13,7 +12,6 @@ using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Services;
-using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
@@ -26,6 +24,7 @@ using OrderCloud.SDK;
 using ordercloud.integrations.extensions;
 using Swashbuckle.AspNetCore.Swagger;
 using ordercloud.integrations.smartystreets;
+using ordercloud.integrations.avalara;
 
 namespace Marketplace.API
 {
