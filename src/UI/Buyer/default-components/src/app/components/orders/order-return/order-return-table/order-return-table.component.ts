@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MarketplaceLineItem, Supplier, ShopperContextService } from 'marketplace';
+import { MarketplaceLineItem, Supplier, ShopperContextService, LineItem } from 'marketplace';
 import { FormGroup, FormArray } from '@angular/forms';
 import { LineItemForm } from './models/line-item-form.model';
 
@@ -12,10 +12,10 @@ import { LineItemForm } from './models/line-item-form.model';
 })
 export class OCMOrderReturnTable {
   dataSource = new MatTableDataSource<any>([]);
-  selection = new SelectionModel<LineItemForm>(true, []);
+  selection = new SelectionModel<FormGroup>(true, []);
   _liGroup: MarketplaceLineItem[];
   quantitiesToReturn: number[] = [];
-  returnReasons: string[] = [];
+  returnReasons = ['Purchased incorrect size/style', 'Incorrect product or size shipped', 'Product does not match description', 'Product is defective/damaged', 'Shipping box is damaged', 'Received extra product that I didn’t buy', 'Product arrived too late', 'Purchased by mistake', 'Product is no longer needed', 'Purchase was not approved', 'Discount was not applied', 'Product is missing from shipment'];
   lineItems: FormArray;
   
   @Input() set liGroup(value: MarketplaceLineItem[]) {
@@ -45,55 +45,70 @@ export class OCMOrderReturnTable {
     return this._liGroup.find(li => li.ID === lineItemID);
   }
 
-  getQuantityDropdown(quantity: number): number[] {
-    const quantityList = [];
-    for (let i = 1; i <= quantity; i++) {
-      quantityList.push(i);
-    }
-    return quantityList;
+  /** Whether the number of selected elements matches the total number of enabled rows. */
+  isAllEnabledSelected(): boolean {
+    let numEnabledRows = 0;
+    let numSelectedRows = 0;
+    this.dataSource.data.forEach(row => {
+      if (this.isRowEnabled(row)) {
+        numEnabledRows++;
+      }
+      if (this.selection.isSelected(row)) {
+        numSelectedRows++;
+      }
+    });
+    return numEnabledRows === numSelectedRows;
   }
 
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected(): boolean {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
+  isRowEnabled(row: FormGroup): boolean {
+    return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToReturn;
   }
+
+  selectRow(row: FormGroup): void {
+    this.selection.select(row);
+    row.controls.quantityToReturn.enable();
+    row.controls.returnReason.enable();
+    row.controls.selected.setValue(true);
+  }
+
+  deselectRow(row: FormGroup): void {
+    this.selection.deselect(row);
+    row.controls.quantityToReturn.disable();
+    row.controls.returnReason.disable();
+    row.controls.selected.setValue(false);
+  }
+  
   
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle(): void {    
-    if (this.isAllSelected()) {
-      this.dataSource.data.forEach(row => this.toggle(row));
+    if (this.isAllEnabledSelected()) {
+      this.dataSource.data.forEach(row => {
+        if (this.isRowEnabled(row)) {
+          this.deselectRow(row);
+       }
+      });
     } else {
       this.dataSource.data.forEach(row => {
-        if (row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToReturn) {
-          this.selection.select(row);
-          row.controls.quantityToReturn.enable();
-          row.controls.returnReason.enable();
-          row.controls.selected.setValue(true);
+        if (this.isRowEnabled(row)) {
+          this.selectRow(row);
        }
       });
     }
   }
 
-  toggle(row?): void {
-    this.selection.toggle(row);
+  toggle(row?: FormGroup): void {
     if (this.selection.isSelected(row)) {
-      row.controls.quantityToReturn.enable();
-      row.controls.returnReason.enable();
-      row.controls.selected.setValue(true);
+      this.deselectRow(row);
     } else {
-      row.controls.quantityToReturn.disable();
-      row.controls.returnReason.disable();
-      row.controls.selected.setValue(false);
+      this.selectRow(row);
     }
   }
   
   /** The label for the checkbox on the passed row */
-  checkboxLabel(row?): string {
+  checkboxLabel(i: number, row?: FormGroup): string {
     if (!row) {
-      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+      return `${this.isAllEnabledSelected() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
+    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${i}`;
   }
 }

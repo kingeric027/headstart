@@ -74,10 +74,11 @@ export class OCMOrderReturn {
     );
     for (let i = 0; i < lineItemsToReturn.length; i++) {
         const lineItem = lineItemsToReturn[i];
+        const newSumToReturn = (lineItem.lineItem?.xp?.LineItemReturnInfo?.QuantityToReturn || 0) + lineItem.quantityToReturn;
         await this.context.orderHistory.returnLineItem(
           orderID,
           lineItem.id,
-          lineItem.quantityToReturn,
+          newSumToReturn,
           lineItem.returnReason
         )
       }

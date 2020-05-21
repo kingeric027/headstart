@@ -53,4 +53,8 @@ export class OCMLineitemTable {
     return this._lineItems.find(li => li.ID === lineItemID);
   }
 
+  hasReturnInfo() {
+    return this.liGroupedByShipFrom.find(liGroup => liGroup.find(li => li.xp?.LineItemReturnInfo));
+  }
+
 }
