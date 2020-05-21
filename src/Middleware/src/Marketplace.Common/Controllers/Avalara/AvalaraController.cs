@@ -78,7 +78,7 @@ namespace Marketplace.Common.Controllers.Avalara
 		public async Task<object> DownloadCertificate(int companyID, string locationID)
 		{
 			// need to include auth for managing cert for a specific location somewhere
-			var pdf = await _avalara.DownloadCertificatePdfAsync(companyID, certificateID);
+			var pdf = await _resaleCertCommand.DownloadPDFAsync(companyID, locationID, VerifiedUserContext);
 			return File(pdf, "application/pdf");
 		}
 	}
