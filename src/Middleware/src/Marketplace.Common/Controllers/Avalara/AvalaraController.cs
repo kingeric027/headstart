@@ -18,7 +18,6 @@ namespace Marketplace.Common.Controllers.Avalara
 	{
 		private readonly IAvalaraCommand _avalara;
 		private readonly IResaleCertCommand _resaleCertCommand;
-		s
 		public AvalaraController(AppSettings settings, IAvalaraCommand avalara, IResaleCertCommand resaleCertCommand, IOrderCloudClient oc) : base(settings)
 		{
 			_avalara = avalara;
