@@ -9,11 +9,11 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Services;
-using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.extensions;
 using Marketplace.Common.Services.ShippingIntegration;
+using ordercloud.integrations.avalara;
 
 namespace Marketplace.Common.Commands
 {
@@ -35,15 +35,15 @@ namespace Marketplace.Common.Commands
         // temporary service until we get updated sdk
         private readonly IOrderCloudSandboxService _ocSandboxService;
         private readonly IZohoCommand _zoho;
-        private readonly IAvalaraCommand _avatax;
+        private readonly IAvalaraCommand _avalara;
         private readonly ISendgridService _sendgridService;
         
-        public OrderCommand(IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        public OrderCommand(IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avalara, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
             _ocShippingIntegration = ocShippingIntegration;
-            _avatax = avatax;
+            _avalara = avalara;
             _zoho = zoho;
             _sendgridService = sendgridService;
             _ocSandboxService = orderCloudSandboxService;
@@ -298,7 +298,7 @@ namespace Marketplace.Common.Commands
 
         private async Task HandleTaxTransactionCreationAsync(MarketplaceOrderWorksheet orderWorksheet)
         {
-            var transaction = await _avatax.CreateTransactionAsync(orderWorksheet);
+            var transaction = await _avalara.CreateTransactionAsync(orderWorksheet);
             await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
             {
                 TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
