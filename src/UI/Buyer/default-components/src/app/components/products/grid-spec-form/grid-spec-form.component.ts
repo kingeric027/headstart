@@ -62,17 +62,16 @@ export class OCMGridSpecForm {
         const indexOfSpec = this.specOptions.indexOf(specs);
         specs = specs.split(',');
         specs = specs.map(x => x.replace(/\s/g, ''));
-        const liSpecs = this.specFormService.getGridLineItemSpecs(this._specs, specs);
         const item = {
             Quantity: event.qty,
             Product: this._product,
             ProductID: this._product.ID,
-            Specs: liSpecs
+            Specs: this.specFormService.getGridLineItemSpecs(this._specs, specs)
         };
-        const i = this.lineItems.findIndex(obj => obj.Specs === specs);
-        if (i > -1) this.lineItems[i] = item;
-        else this.lineItems.push(item);
-        this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, liSpecs);
+        const i = this.lineItems.findIndex(li => JSON.stringify(li.Specs) === JSON.stringify(item.Specs));
+        if (i === -1) this.lineItems.push(item);
+        else this.lineItems[i] = item;
+        this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, this.specFormService.getGridLineItemSpecs(this._specs, specs));
         this.totalPrice = this.getTotalPrice();
     }
 
