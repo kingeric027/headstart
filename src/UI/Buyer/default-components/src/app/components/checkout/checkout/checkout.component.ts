@@ -9,7 +9,6 @@ import {
   ListBuyerCreditCard,
   ShipMethodSelection,
   ShipEstimate,
-  LineItem,
 } from 'marketplace';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';

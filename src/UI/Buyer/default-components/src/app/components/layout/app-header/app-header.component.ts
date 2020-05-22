@@ -11,9 +11,9 @@ import {
   faBars,
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { LineItem, Category } from '@ordercloud/angular-sdk';
+import { MeUser, LineItem, Category } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
-import { ProductFilters, ShopperContextService, MarketplaceOrder, AppConfig } from 'marketplace';
+import { ProductFilters, ShopperContextService, MarketplaceOrder, MarketplaceLineItem, AppConfig } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { CurrentUser } from 'marketplace/projects/marketplace/src/lib/services/current-user/current-user.service';
 import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
@@ -102,7 +102,7 @@ export class OCMAppHeader implements OnInit {
 
   buildAddToCartListener(): void {
     let closePopoverTimeout;
-    this.context.order.cart.onAdd.subscribe((li: LineItem) => {
+    this.context.order.cart.onAdd.subscribe((li: MarketplaceLineItem) => {
       clearTimeout(closePopoverTimeout);
       if (li) {
         this.addToCartPopover.ngbPopover = `Added ${li.Quantity} items to Cart`;

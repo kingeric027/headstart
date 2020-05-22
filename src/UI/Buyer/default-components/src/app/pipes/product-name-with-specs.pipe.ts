@@ -1,11 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { LineItem } from '@ordercloud/angular-sdk';
+import { MarketplaceLineItem } from 'marketplace';
 
 @Pipe({
   name: 'productNameWithSpecs',
 })
 export class ProductNameWithSpecsPipe implements PipeTransform {
-  transform(lineItem: LineItem): any {
+  transform(lineItem: MarketplaceLineItem): any {
     // TODO - this check is needed because of the bare lineItem object that gets added right away.
     // If the activeProduct state was saved in some cache, this wouldn't be needed.
     if (!lineItem.Product) return '';

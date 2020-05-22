@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { LineItem, MarketplaceOrder, ShipEstimate, ShipMethodSelection, ListLineItem } from 'marketplace';
+import { MarketplaceOrder, ShipEstimate, ShipMethodSelection, ListLineItem, MarketplaceLineItem } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-shipping.component.html',
@@ -26,7 +26,7 @@ export class OCMCheckoutShipping implements OnInit {
 
   ngOnInit(): void {}
 
-  getLineItemsForShipEstimate(shipEstimate: ShipEstimate): LineItem[] {
+  getLineItemsForShipEstimate(shipEstimate: ShipEstimate): MarketplaceLineItem[] {
     return shipEstimate.ShipEstimateItems.map(shipEstimateItem => {
       return this.lineItems.Items.find(li => li.ID === shipEstimateItem.LineItemID);
     });
@@ -48,7 +48,7 @@ export class OCMCheckoutShipping implements OnInit {
     return line.ShipFromAddressID;
   }
 
-  getFirstLineItem(shipEstimate: ShipEstimate): LineItem {
+  getFirstLineItem(shipEstimate: ShipEstimate): MarketplaceLineItem {
     const firstLineItemID = shipEstimate.ShipEstimateItems[0].LineItemID;
     return this.lineItems.Items.find(lineItem => lineItem.ID === firstLineItemID);
   }

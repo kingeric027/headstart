@@ -14,6 +14,8 @@ export const ErrorDictionary = {
     one letter and one number. Password can also include special characters.`,
   creditCardNumber: 'Card number is invalid',
   creditCardLength: 'Card length is invalid',
+  min: 'Please enter a higher value',
+  max: 'Please enter a lower value',
 };
 
 // only alphanumic and space . '

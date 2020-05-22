@@ -9,7 +9,6 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Services;
-using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.extensions;

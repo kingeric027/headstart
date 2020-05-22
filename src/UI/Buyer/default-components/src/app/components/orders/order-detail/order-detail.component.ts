@@ -25,6 +25,7 @@ export class OCMOrderDetails implements OnInit {
   subView: 'details' | 'shipments' = 'details';
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
+  showRequestReturn = false;
   isQuoteOrder = isQuoteOrder;
   constructor(private context: ShopperContextService, private modalService: NgbModal) {}
 
@@ -53,6 +54,10 @@ export class OCMOrderDetails implements OnInit {
   toggleFavorite(order: MarketplaceOrder): void {
     const newValue = !this.isFavorite(order.ID);
     this.context.currentUser.setIsFavoriteOrder(newValue, order.ID);
+  }
+
+  toggleRequestReturn() {
+    this.showRequestReturn = !this.showRequestReturn;
   }
 
   toShipments(): void {
@@ -100,5 +105,10 @@ export class OCMOrderDetails implements OnInit {
 
   async moveOrderToCart(): Promise<void> {
     await this.context.order.cart.moveOrderToCart(this.order.ID);
+  }
+
+  async toggleShowRequestForm(showRequestReturn: boolean) {
+    this.ngOnInit();
+    this.showRequestReturn = showRequestReturn;
   }
 }
