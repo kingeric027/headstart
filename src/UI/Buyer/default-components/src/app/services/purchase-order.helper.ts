@@ -1,8 +1,8 @@
-import { LineItem, MarketplaceOrder } from 'marketplace';
+import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace';
 
 export interface OrderSummaryMeta {
-  StandardLineItems: LineItem[];
-  POLineItems: LineItem[];
+  StandardLineItems: MarketplaceLineItem[];
+  POLineItems: MarketplaceLineItem[];
   StandardLineItemCount: number;
   POLineItemCount: number;
 
@@ -19,11 +19,11 @@ export interface OrderSummaryMeta {
   OrderTotal: number;
 }
 
-const getPurchaseOrderLineItems = (lineItems: LineItem[]): LineItem[] => {
+const getPurchaseOrderLineItems = (lineItems: MarketplaceLineItem[]): MarketplaceLineItem[] => {
   return lineItems.filter(li => li.Product.xp?.ProductType ===  'PurchaseOrder');
 };
 
-const getStandardLineItems = (lineItems: LineItem[]): LineItem[] => {
+const getStandardLineItems = (lineItems: MarketplaceLineItem[]): MarketplaceLineItem[] => {
   return lineItems.filter(li => !(li.Product.xp?.ProductType ===  'PurchaseOrder'));
 };
 
@@ -51,7 +51,7 @@ const getCreditCardTotal = (subTotal: number, shippingCost: number, taxCost: num
 
 export const getOrderSummaryMeta = (
   order: MarketplaceOrder, 
-  lineItems: LineItem[], 
+  lineItems: MarketplaceLineItem[], 
   checkoutPanel: string, 
 ): OrderSummaryMeta => {
   const StandardLineItems = getStandardLineItems(lineItems);

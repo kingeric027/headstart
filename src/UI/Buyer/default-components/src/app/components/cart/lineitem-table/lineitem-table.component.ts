@@ -1,8 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { LineItem } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
-import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
+import { ShopperContextService, LineItemGroupSupplier, OrderType, MarketplaceLineItem } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Component({
@@ -11,7 +10,7 @@ import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 })
 export class OCMLineitemTable {
   closeIcon = faTimes;
-  @Input() set lineItems(value: LineItem[]) {
+  @Input() set lineItems(value: MarketplaceLineItem[]) {
     this._lineItems = value;
     this.liGroups = _groupBy(value, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(this.liGroups);
@@ -20,13 +19,13 @@ export class OCMLineitemTable {
   @Input() orderType: OrderType;
   @Input() readOnly: boolean;
   suppliers: LineItemGroupSupplier[];
-  liGroupedByShipFrom: LineItem[][];
+  liGroupedByShipFrom: MarketplaceLineItem[][];
   liGroups: any;
   _lineItems = [];
 
   constructor(private context: ShopperContextService) { }
 
-  async setSupplierInfo(liGroups: LineItem[][]): Promise<void> {
+  async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(liGroups);
   }
 
@@ -50,8 +49,12 @@ export class OCMLineitemTable {
     return getPrimaryImageUrl(li?.Product);
   }
 
-  getLineItem(lineItemID: string): LineItem {
+  getLineItem(lineItemID: string): MarketplaceLineItem {
     return this._lineItems.find(li => li.ID === lineItemID);
+  }
+
+  hasReturnInfo() {
+    return this.liGroupedByShipFrom.find(liGroup => liGroup.find(li => li.xp?.LineItemReturnInfo));
   }
 
 }

@@ -56,6 +56,8 @@ import { OCMOrderShipments } from './components/orders/order-shipments/order-shi
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
 import { OCMOrderHistorical } from './components/orders/order-historical/order-historical.component';
 import { OCMOrderHistory } from './components/orders/order-history/order-history.component';
+import { OCMOrderReturn } from './components/orders/order-return/order-return.component';
+import { OCMOrderReturnTable } from './components/orders/order-return/order-return-table/order-return-table.component';
 import { OCMAddressSuggestion } from './components/layout/address-suggestions/address-suggestion.component';
 import { SpecFieldDirective } from './components/products/spec-form/spec-field.directive';
 import { SpecFormCheckboxComponent } from './components/products/spec-form/spec-form-checkbox/spec-form-checkbox.component';
@@ -131,6 +133,8 @@ import { OCMLocationManagement } from './components/profile/location-management/
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { OCMBuyerLocationPermissions } from './components/profile/buyer-location-permissions/buyer-location-permissions';
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
 
@@ -195,6 +199,8 @@ const components = [
   OCMOrderAccessManagement,
   OCMOrderHistorical,
   OCMOrderHistory,
+  OCMOrderReturn,
+  OCMOrderReturnTable,
   OCMAddressSuggestion,
   OCMAppFooter,
   SpecFormCheckboxComponent,
@@ -253,6 +259,8 @@ const components = [
     FormsModule,
     MatListModule,
     MatCardModule,
+    MatTableModule,
+    MatCheckboxModule,
     MatButtonModule,
     FontAwesomeModule,
     NgbCarouselModule,
@@ -351,6 +359,8 @@ export class AppModule {
     this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
     this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
+    this.buildWebComponent(OCMOrderReturn, 'ocm-order-return');
+    this.buildWebComponent(OCMOrderReturnTable, 'ocm-order-return-table');
     this.buildWebComponent(OCMBuyerLocationPermissions, 'ocm-location-permissions-management');
     this.buildWebComponent(OCMOrderAccessManagement, 'ocm-order-access-management');
     this.buildWebComponent(OCMAddressSuggestion, 'address-suggestion');

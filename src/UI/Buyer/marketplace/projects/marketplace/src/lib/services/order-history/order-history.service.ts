@@ -6,7 +6,6 @@ import {
   OrderApproval,
   OcLineItemService,
   OcMeService,
-  LineItem,
   OcSupplierService,
   OcSupplierAddressService,
   Supplier,
@@ -24,6 +23,7 @@ import {
   MarketplaceOrder,
   LineItemGroupSupplier,
   AppConfig,
+  MarketplaceLineItem,
 } from '../../shopper-context';
 import { OrderFilterService, IOrderFilters } from './order-filter.service';
 import { MarketplaceAddressBuyer, MarketplaceUserGroup } from 'marketplace-javascript-sdk';
@@ -34,10 +34,12 @@ export interface IOrderHistory {
   filters: IOrderFilters;
   approveOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<MarketplaceOrder>;
   declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<MarketplaceOrder>;
-  validateReorder(orderID: string, lineItems: LineItem[]): Promise<OrderReorderResponse>;
+  validateReorder(orderID: string, lineItems: MarketplaceLineItem[]): Promise<OrderReorderResponse>;
   getOrderDetails(orderID?: string): Promise<OrderDetails>;
-  getLineItemSuppliers(liGroups: LineItem[][]): Promise<LineItemGroupSupplier[]>;
+  getLineItemSuppliers(liGroups: MarketplaceLineItem[][]): Promise<LineItemGroupSupplier[]>;
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
+  returnOrder(orderID?: string): Promise<MarketplaceOrder>;
+  returnLineItem(orderID?: string, lineItemID?: string, quantityToReturn?: number, returnReason?: string): Promise<MarketplaceLineItem>;
 }
 
 @Injectable({
@@ -88,7 +90,7 @@ export class OrderHistoryService implements IOrderHistory {
     return await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 
-  async validateReorder(orderID: string = this.activeOrderID, lineItems: LineItem[]): Promise<OrderReorderResponse> {
+  async validateReorder(orderID: string = this.activeOrderID, lineItems: MarketplaceLineItem[]): Promise<OrderReorderResponse> {
     return this.reorderHelper.validateReorder(orderID, lineItems);
   }
 
@@ -103,7 +105,7 @@ export class OrderHistoryService implements IOrderHistory {
       .toPromise();
   }
 
-  async getLineItemSuppliers(liGroups: LineItem[][]): Promise<LineItemGroupSupplier[]> {
+  async getLineItemSuppliers(liGroups: MarketplaceLineItem[][]): Promise<LineItemGroupSupplier[]> {
     const suppliers: LineItemGroupSupplier[] = [];
     for (const group of liGroups) {
       const line = group[0];
@@ -126,4 +128,28 @@ export class OrderHistoryService implements IOrderHistory {
       .get<ShipmentWithItems[]>(url, { headers: headers })
       .toPromise();
   }
+  
+  async returnOrder(orderID: string): Promise<MarketplaceOrder> {
+    return await this.ocOrderService.Patch('Outgoing', orderID, { 
+      xp: {
+        OrderReturnInfo: {
+          HasReturn: true,
+          Resolved: false
+        }
+      }
+    }).toPromise();
+  }
+
+  async returnLineItem(orderID: string, lineItemID: string, quantityToReturn: number, returnReason: string): Promise<MarketplaceLineItem> {
+    return await this.ocLineItemService.Patch('Outgoing', orderID, lineItemID, {
+      xp: {
+        LineItemReturnInfo: {
+          QuantityToReturn: quantityToReturn,
+          ReturnReason: returnReason,
+          Resolved: false
+        }
+      }
+    }).toPromise();
+  }
+
 }

@@ -54,11 +54,24 @@ export interface ShippingRate {
   TotalCost: number;
 }
 
+export interface MarketplaceLineItem extends LineItem<LineItemXp, ProductXp, any, any> {}
+
+export interface LineItemXp {
+  LineItemReturnInfo?: LineItemReturnInfo;
+}
+
+export interface LineItemReturnInfo {
+  QuantityToReturn: number;
+  ReturnReason: string;
+  Resolved: boolean;
+}
+
 export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
 export interface OrderXp {
   AvalaraTaxTransactionCode?: string;
   OrderType?: OrderType;
   QuoteOrderInfo?: QuoteOrderInfo;
+  OrderReturnInfo?: OrderReturnInfo;
 }
 
 export enum OrderType {
@@ -72,6 +85,12 @@ export interface QuoteOrderInfo {
   Phone: string;
   Email: string;
   Comments?: string;
+}
+
+export interface OrderReturnInfo {
+  HasReturn: boolean;
+  RMANumber: string;
+  Resolved: boolean;
 }
 
 export interface ProductFilters {
