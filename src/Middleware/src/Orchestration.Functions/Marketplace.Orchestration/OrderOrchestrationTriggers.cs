@@ -21,7 +21,8 @@ namespace Marketplace.Orchestration
         private readonly AppSettings _appSettings;
         private readonly IOrderCloudIntegrationsFunctionToken _token;
 
-        public OrderOrchestrationTrigger(AppSettings appSettings, IOrderCloudIntegrationsFunctionToken token, IOrderOrchestrationCommand orderOrchestrationCommand, ISyncCommand sync, LogQuery log)
+        public OrderOrchestrationTrigger(AppSettings appSettings, IOrderCloudIntegrationsFunctionToken token, 
+            IOrderOrchestrationCommand orderOrchestrationCommand, LogQuery log)
         {
             _orderOrchestrationCommand = orderOrchestrationCommand;
             _log = log;
@@ -61,6 +62,7 @@ namespace Marketplace.Orchestration
             try
             {
                 var user = await _token.Authorize(req, new [] { ApiRole.OrderAdmin, ApiRole.OrderReader });
+                var o = 
                 return await Task.FromResult(new {SupplierId = supplierId, OrderId = orderId});
             }
             catch (OrderCloudIntegrationException oex)
