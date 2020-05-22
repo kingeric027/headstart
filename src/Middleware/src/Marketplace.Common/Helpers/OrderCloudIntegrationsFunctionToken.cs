@@ -25,7 +25,7 @@ namespace Marketplace.Common.Helpers
 
         public OrderCloudIntegrationsFunctionToken(IOrderCloudClient oc)
         {
-            _oc = new OrderCloudClient();
+            _oc = oc;
         }
 
         public async Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles)
@@ -39,6 +39,7 @@ namespace Marketplace.Common.Helpers
             var clientId = jwt.Claims.FirstOrDefault(x => x.Type == "cid")?.Value;
             var usrtype = jwt.Claims.FirstOrDefault(x => x.Type == "usrtype")?.Value;
             var scope = jwt.Claims.Where(x => x.Type == "role").Select(x => x.Value)?.ToList();
+            var usr = jwt.Claims.FirstOrDefault(x => x.Type == "usr")?.Value;
             // validate scope
             if (!scope.Contains("FullAccess"))
                 Require.That(scope.Count(s => roles.Any(role => s == role.ToString())) > 0, new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
@@ -48,7 +49,7 @@ namespace Marketplace.Common.Helpers
             cid.AddClaim(new Claim("accesstoken", token));
 
             var user = await _oc.Me.GetAsync(token);
-            if (!user.Active)
+            if (!user.Active || user.Username != usr)
                 throw new Exception("Invalid User");
             cid.AddClaim(new Claim("username", user.Username));
             cid.AddClaim(new Claim("userid", user.ID));
