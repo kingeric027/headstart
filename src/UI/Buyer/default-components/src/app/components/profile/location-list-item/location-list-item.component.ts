@@ -26,8 +26,4 @@ export class OCMLocationListItem {
   toLocationManagement(): void {
     this.context.router.toLocationManagement(this.location.ID);
   }
-
-  toLocationOrders(): void {
-    this.context.router.toOrdersByLocation({location: this.location.ID});
-  }
 }

@@ -48,7 +48,10 @@ export class CurrentUserService implements ICurrentUser {
   }
 
   async reset(): Promise<void> {
-    const requests: any[] = [this.ocMeService.Get().toPromise(), this.ocMeService.ListUserGroups().toPromise()];
+    const requests: any[] = [
+      this.ocMeService.Get().toPromise(),
+      this.ocMeService.ListUserGroups({ pageSize: 100 }).toPromise(),
+    ];
     const [user, userGroups] = await Promise.all(requests);
     this.isAnon = this.tokenHelper.isTokenAnonymous();
     this.user = await this.MapToCurrentUser(user);
