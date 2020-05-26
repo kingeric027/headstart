@@ -281,9 +281,13 @@ export class ProductEditComponent implements OnInit {
   }
 
   addPriceBreak() {
-    const priceBreak = { Quantity: Number(this.newQty), Price: Number(this.newPrice) }
-    this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.push(priceBreak);
-    const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks }
+    this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.push({ Quantity: Number(this.newQty), Price: Number(this.newPrice) });
+    const uniqueBreaks = this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.filter((priceBreak, i, arr) =>
+      i === arr.findIndex((pb) => (
+        pb.Quantity === priceBreak.Quantity && pb.Price === priceBreak.Price
+      ))
+    );
+    const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: uniqueBreaks }
     this.updateProductResource(productUpdate);
   }
 
