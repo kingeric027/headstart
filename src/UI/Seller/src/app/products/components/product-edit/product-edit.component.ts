@@ -8,6 +8,7 @@ import {
   OcSupplierAddressService,
   OcAdminAddressService,
   OcProductService,
+  PriceBreak,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -85,7 +86,9 @@ export class ProductEditComponent implements OnInit {
   staticContent: Asset[] = [];
   documentName: string;
   selectedTabIndex = 0;
-
+  editPriceBreaks = false;
+  newPrice: number;
+  newQty: number;
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
@@ -124,15 +127,15 @@ export class ProductEditComponent implements OnInit {
   }
 
   tabChanged(event: any, productID: string): void {
-    if(productID === null) return;
+    if (productID === null) return;
     event.index === 0 ? this.location.replaceState(`products/${productID}`)
-    :
-    this.location.replaceState(`products/${productID}/${TabIndexMapper[this.readonly ? event.index : event.index + 1]}`);
+      :
+      this.location.replaceState(`products/${productID}/${TabIndexMapper[this.readonly ? event.index : event.index + 1]}`);
   }
 
   async getAddresses(): Promise<void> {
     const context: UserContext = await this.currentUserService.getUserContext();
-    if(context.Me.Supplier) {
+    if (context.Me.Supplier) {
       this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise();
     } else {
       this.addresses = await this.ocAdminAddressService.List().toPromise();
@@ -253,6 +256,10 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
+  toggleEditPriceBreaks() {
+    this.editPriceBreaks = !this.editPriceBreaks;
+  }
+
   updateProductResource(productUpdate: any): void {
     const resourceToUpdate = this._superMarketplaceProductEditable || this.productService.emptyResource;
     this._superMarketplaceProductEditable = this.productService.getUpdatedEditableResource(productUpdate, resourceToUpdate);
@@ -269,8 +276,19 @@ export class ProductEditComponent implements OnInit {
     this.updateProductResource(productUpdate);
   }
 
+  handleUpdatePriceBreaks(event: any, field: string): void {
+    field === "price" ? this.newPrice = event.target.value : this.newQty = event.target.value;
+  }
+
+  addPriceBreak() {
+    const priceBreak = { Quantity: Number(this.newQty), Price: Number(this.newPrice) }
+    this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.push(priceBreak);
+    const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks }
+    this.updateProductResource(productUpdate);
+  }
+
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
-  updateResourceFromFieldValue(field: string, value: any): void{
+  updateResourceFromFieldValue(field: string, value: any): void {
     const updateProductResourceCopy = this.productService.copyResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
     );
@@ -359,7 +377,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   unstageFile(index: number, fileType: string): void {
-    if(fileType === 'image') {
+    if (fileType === 'image') {
       this.imageFiles.splice(index, 1)
     } else {
       this.staticContentFiles.splice(index, 1);
