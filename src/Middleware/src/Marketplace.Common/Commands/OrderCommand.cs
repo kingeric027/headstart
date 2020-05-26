@@ -108,6 +108,10 @@ namespace Marketplace.Common.Commands
         public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
         {
             await EnsureUserCanAccessLocationOrders(locationID, verifiedUser);
+            if(listArgs.Filters == null)
+            {
+                listArgs.Filters = new List<ListFilter>() { };
+            }
             listArgs.Filters.Add(new ListFilter()
             {
                 QueryParams = new List<Tuple<string, string>>() { new Tuple<string, string>("BillingAddress.ID", locationID) }
