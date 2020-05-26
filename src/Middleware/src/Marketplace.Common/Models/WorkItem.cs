@@ -125,6 +125,7 @@ namespace Marketplace.Common.Models
                     // otherwise we want to PATCH the existing object
                     //TODO: figure this reference out
                     //return wi.Cache.HasDeletedXp(wi.Current) ? Action.Update : Action.Patch;
+                    return Action.Patch;
                 }
             }
             catch (Exception ex)
