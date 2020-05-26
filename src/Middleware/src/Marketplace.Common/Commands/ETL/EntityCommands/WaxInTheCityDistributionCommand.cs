@@ -6,11 +6,11 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.ETL.EntityCommands
 {
-    public class WaxInTheCityDistributionCommand : IOrderSyncCommand
+    public class WaxnTheCityDistributionCommand : IOrderSyncCommand
     {
         private readonly IOrderCloudClient _oc;
 
-        public WaxInTheCityDistributionCommand(AppSettings settings, IOrderCloudClient oc)
+        public WaxnTheCityDistributionCommand(AppSettings settings, IOrderCloudClient oc)
         {
             _oc = oc;
         }
