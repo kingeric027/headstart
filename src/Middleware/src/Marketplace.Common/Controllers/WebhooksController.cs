@@ -1,6 +1,5 @@
 using Marketplace.Common.Commands;
 using Marketplace.Common.Services;
-using Marketplace.Helpers;
 using Marketplace.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -9,6 +8,7 @@ using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.Common.Controllers
 {

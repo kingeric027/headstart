@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Marketplace.Common.Exceptions;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Helpers.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Common.Models
 {
@@ -124,7 +123,8 @@ namespace Marketplace.Common.Models
                     // cache exists, we want to force a PUT when xp has deleted properties because 
                     // it's the only way to delete the properties
                     // otherwise we want to PATCH the existing object
-                    return wi.Cache.HasDeletedXp(wi.Current) ? Action.Update : Action.Patch;
+                    //TODO: figure this reference out
+                    //return wi.Cache.HasDeletedXp(wi.Current) ? Action.Update : Action.Patch;
                 }
             }
             catch (Exception ex)

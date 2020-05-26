@@ -1,5 +1,5 @@
-﻿using Marketplace.Helpers.Attributes;
-using OrderCloud.SDK;
+﻿
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Models
 {

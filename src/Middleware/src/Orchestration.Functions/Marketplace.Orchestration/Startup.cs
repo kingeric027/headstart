@@ -3,14 +3,13 @@ using Flurl.Http;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
-using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
-using Marketplace.Helpers.Extensions;
-using Marketplace.Helpers.Models;
 using Marketplace.Orchestration;
 using OrderCloud.SDK;
 using Marketplace.Common.Services.FreightPop;
+using ordercloud.integrations.cosmos;
+using ordercloud.integrations.extensions;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration

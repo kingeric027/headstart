@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Marketplace.Helpers.Attributes;
 using Newtonsoft.Json.Converters;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Models.Misc
 {
@@ -18,8 +18,19 @@ namespace Marketplace.Models.Misc
 	public enum UserGroupType
 	{
 		UserPermissions,
-		OrderAccess,
-		Approval,
-		BuyerLocation
+		BuyerLocation,
+		LocationPermissions
+	}
+
+	[JsonConverter(typeof(StringEnumConverter))]
+	public enum UserGroupSuffix
+	{
+		OrderApprover,
+		PermissionAdmin,
+		NeedsApproval,
+		ViewAllOrders,
+		CreditCardAdmin,
+		AddressAdmin,
+		ResaleCertAdmin
 	}
 }

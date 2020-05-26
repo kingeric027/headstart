@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { OcMeService, LineItem, Inventory, PriceSchedule, OcLineItemService } from '@ordercloud/angular-sdk';
+import { OcMeService, Inventory, PriceSchedule, OcLineItemService } from '@ordercloud/angular-sdk';
 import { partition as _partition } from 'lodash';
 import { listAll } from '../../functions/listAll';
-import { OrderReorderResponse, MarketplaceMeProduct } from '../../shopper-context';
+import { OrderReorderResponse, MarketplaceMeProduct, MarketplaceLineItem } from '../../shopper-context';
 
 @Injectable({
   providedIn: 'root',
@@ -10,21 +10,23 @@ import { OrderReorderResponse, MarketplaceMeProduct } from '../../shopper-contex
 export class ReorderHelperService {
   constructor(private ocLineItemService: OcLineItemService, private meService: OcMeService) {}
 
-  public async validateReorder(orderID: string): Promise<OrderReorderResponse> {
+  public async validateReorder(orderID: string, lineItems: MarketplaceLineItem[]): Promise<OrderReorderResponse> {
+    // instead of moving all of this logic to the middleware to support orders not
+    // submitted by the current user we are adding line items as a paramter
+
     if (!orderID) throw new Error('Needs Order ID');
-    const lineItems = (await listAll(this.ocLineItemService, this.ocLineItemService.List, 'outgoing', orderID)).Items;
     const products = await this.ListProducts(lineItems);
     const [ValidLi, InvalidLi] = _partition(lineItems, item => this.isLineItemValid(item, products));
     return { ValidLi, InvalidLi };
   }
 
-  private async ListProducts(items: LineItem[]): Promise<MarketplaceMeProduct[]> {
+  private async ListProducts(items: MarketplaceLineItem[]): Promise<MarketplaceMeProduct[]> {
     const productIds = items.map(item => item.ProductID);
     // TODO - what if the url is too long?
     return (await this.meService.ListProducts({ filters: { ID: productIds.join('|') } }).toPromise()).Items;
   }
 
-  private isLineItemValid(item: LineItem, products: MarketplaceMeProduct[]): boolean {
+  private isLineItemValid(item: MarketplaceLineItem, products: MarketplaceMeProduct[]): boolean {
     const product = products.find(prod => prod.ID === item.ProductID);
     return product && !this.quantityInvalid(item.Quantity, product);
   }

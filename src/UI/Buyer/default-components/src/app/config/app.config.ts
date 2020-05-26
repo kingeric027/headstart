@@ -7,6 +7,7 @@ export const ocAppConfig: AppConfig = {
   marketplaceID: environment.marketplaceID,
   baseUrl: environment.baseUrl,
   middlewareUrl: environment.middlewareUrl,
+  ocMiddlewareUrl: environment.ocMiddlewareUrl,
   cmsUrl: environment.cmsUrl,
   ssoLink: environment.ssoLink,
   orderCloudApiUrl: environment.orderCloudApiUrl,
@@ -23,9 +24,6 @@ export const ocAppConfig: AppConfig = {
     'MeXpAdmin',
     'MPApprovalRuleAdmin',
     'UserGroupAdmin',
-    'MPNeedsApproval',
-    'MPViewAllLocationOrders',
-    'MPOrderApprover',
     'ApprovalRuleAdmin',
     'Shopper',
     'BuyerUserAdmin',
@@ -33,5 +31,15 @@ export const ocAppConfig: AppConfig = {
     'PasswordReset',
     'SupplierReader',
     'SupplierAddressReader',
+
+    // location roles, will appear on jwt if a user
+    // has this role for any location
+    'MPLocationPermissionAdmin',
+    'MPLocationOrderApprover',
+    'MPLocationNeedsApproval',
+    'MPLocationViewAllOrders',
+    'MPLocationCreditCardAdmin',
+    'MPLocationAddressAdmin',
+    'MPLocationResaleCertAdmin',
   ],
 };

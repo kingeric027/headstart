@@ -54,9 +54,67 @@ namespace Marketplace.Common.Services.FreightPop
 		}
 		public async Task<Response<GetRatesData>> GetRatesAsync(RateRequestBody rateRequestBody)
 		{
-			await AuthenticateAync();
-			var rateRequestResponse = await MakeRequest("rate/getRates").PostJsonAsync(rateRequestBody).ReceiveJson<Response<GetRatesData>>();
-			return rateRequestResponse;
+
+			// change back when freightpop test is back up
+			try
+			{
+				await AuthenticateAync();
+				var rateRequestResponse = await MakeRequest("rate/getRates").PostJsonAsync(rateRequestBody).ReceiveJson<Response<GetRatesData>>();
+				return rateRequestResponse;
+			} catch (Exception ex) { 
+				var mockRatesResponse = new Response<GetRatesData>()
+				{
+					Code = 200,
+					Data = new GetRatesData()
+					{
+						Rates = new List<ShippingRate>()
+						{
+							new ShippingRate()
+							{
+								AccountName = "mock rate account",
+								Currency = "USD",
+								ListCost = 10,
+								Carrier = "mock carrier",
+								CarrierQuoteId = "mock1",
+								DeliveryDays = 3,
+								QuoteId = "mockratequote1",
+								TotalCost = 10,
+								Id = "rate1",
+								Service = "Ground",
+							},
+							new ShippingRate()
+							{
+								AccountName = "mock rate account",
+								Currency = "USD",
+								ListCost = 20,
+								Carrier = "mock carrier",
+								CarrierQuoteId = "mock1",
+								DeliveryDays = 2,
+								QuoteId = "mockratequote2",
+								TotalCost = 20,
+								Id = "rate2",
+								Service = "Express",
+							},
+							new ShippingRate()
+							{
+								AccountName = "mock rate account",
+								Currency = "USD",
+								ListCost = 30,
+								Carrier = "mock carrier",
+								CarrierQuoteId = "mock1",
+								DeliveryDays = 1,
+								QuoteId = "mockratequote3",
+								TotalCost = 30,
+								Id = "rate3",
+								Service = "Air",
+							},
+
+						}
+					},
+					Message = "Mock Rate Response"
+				};
+				return mockRatesResponse;
+			}
 		}
 
 		public async Task<Response<dynamic>> ImportOrderAsync(List<OrderRequest> orderRequestBody)

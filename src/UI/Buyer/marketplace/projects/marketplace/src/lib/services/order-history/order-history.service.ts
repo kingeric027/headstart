@@ -6,11 +6,11 @@ import {
   OrderApproval,
   OcLineItemService,
   OcMeService,
-  LineItem,
   OcSupplierService,
   OcSupplierAddressService,
   Supplier,
   Address,
+  OcTokenService,
 } from '@ordercloud/angular-sdk';
 import { uniqBy as _uniqBy } from 'lodash';
 import { ReorderHelperService } from '../reorder/reorder.service';
@@ -22,19 +22,24 @@ import {
   ShipmentItemWithLineItem,
   MarketplaceOrder,
   LineItemGroupSupplier,
+  AppConfig,
+  MarketplaceLineItem,
 } from '../../shopper-context';
 import { OrderFilterService, IOrderFilters } from './order-filter.service';
 import { MarketplaceAddressBuyer, MarketplaceUserGroup } from 'marketplace-javascript-sdk';
+import { HttpHeaders, HttpClient } from '@angular/common/http';
 
 export interface IOrderHistory {
   activeOrderID: string;
   filters: IOrderFilters;
   approveOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<MarketplaceOrder>;
   declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<MarketplaceOrder>;
-  validateReorder(orderID?: string): Promise<OrderReorderResponse>;
-  getOrderDetails(isOrderToApprove: boolean, orderID?: string): Promise<OrderDetails>;
-  getLineItemSuppliers(liGroups: LineItem[][]): Promise<LineItemGroupSupplier[]>;
+  validateReorder(orderID: string, lineItems: MarketplaceLineItem[]): Promise<OrderReorderResponse>;
+  getOrderDetails(orderID?: string): Promise<OrderDetails>;
+  getLineItemSuppliers(liGroups: MarketplaceLineItem[][]): Promise<LineItemGroupSupplier[]>;
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
+  returnOrder(orderID?: string): Promise<MarketplaceOrder>;
+  returnLineItem(orderID?: string, lineItemID?: string, quantityToReturn?: number, returnReason?: string): Promise<MarketplaceLineItem>;
 }
 
 @Injectable({
@@ -51,7 +56,12 @@ export class OrderHistoryService implements IOrderHistory {
     private reorderHelper: ReorderHelperService,
     private ocLineItemService: OcLineItemService,
     private ocSupplierService: OcSupplierService,
-    private ocSupplierAddressService: OcSupplierAddressService
+    private ocSupplierAddressService: OcSupplierAddressService,
+
+    // remove below when sdk is regenerated
+    private ocTokenService: OcTokenService,
+    private httpClient: HttpClient,
+    private appConfig: AppConfig
   ) {}
 
   async getLocationsUserCanView(): Promise<MarketplaceAddressBuyer[]> {
@@ -80,22 +90,22 @@ export class OrderHistoryService implements IOrderHistory {
     return await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 
-  async validateReorder(orderID: string = this.activeOrderID): Promise<OrderReorderResponse> {
-    return this.reorderHelper.validateReorder(orderID);
+  async validateReorder(orderID: string = this.activeOrderID, lineItems: MarketplaceLineItem[]): Promise<OrderReorderResponse> {
+    return this.reorderHelper.validateReorder(orderID, lineItems);
   }
 
-  async getOrderDetails(isOrderToApprove: boolean, orderID: string = this.activeOrderID): Promise<OrderDetails> {
-    const res = await Promise.all([
-      this.ocOrderService.Get('outgoing', orderID).toPromise(),
-      this.ocLineItemService.List('outgoing', orderID).toPromise(),
-      this.getPromotions(orderID),
-      this.getPayments(isOrderToApprove, orderID),
-      this.getApprovals(orderID),
-    ]);
-    return { order: res[0], lineItems: res[1], promotions: res[2], payments: res[3], approvals: res[4] };
+  async getOrderDetails(orderID: string = this.activeOrderID): Promise<OrderDetails> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+    const url = `${this.appConfig.middlewareUrl}/order/${orderID}/details`;
+    return this.httpClient
+      .get<OrderDetails>(url, { headers: headers })
+      .toPromise();
   }
 
-  async getLineItemSuppliers(liGroups: LineItem[][]): Promise<LineItemGroupSupplier[]> {
+  async getLineItemSuppliers(liGroups: MarketplaceLineItem[][]): Promise<LineItemGroupSupplier[]> {
     const suppliers: LineItemGroupSupplier[] = [];
     for (const group of liGroups) {
       const line = group[0];
@@ -109,41 +119,37 @@ export class OrderHistoryService implements IOrderHistory {
   }
 
   async listShipments(orderID: string = this.activeOrderID): Promise<ShipmentWithItems[]> {
-    const [lineItems, shipments] = await Promise.all([
-      this.ocLineItemService.List('outgoing', orderID).toPromise(),
-      this.ocMeService.ListShipments({ orderID }).toPromise(),
-    ]);
-    const getShipmentItems = shipments.Items.map(shipment =>
-      this.ocMeService.ListShipmentItems(shipment.ID).toPromise()
-    );
-    const shipmentItems = (await Promise.all(getShipmentItems)).map(si => si.Items) as ShipmentItemWithLineItem[][];
-    shipments.Items.map((shipment: ShipmentWithItems, index) => {
-      shipment.ShipmentItems = shipmentItems[index];
-      shipment.ShipmentItems.map((shipmentItem: ShipmentItemWithLineItem) => {
-        shipmentItem.LineItem = lineItems.Items.find(li => li.ID === shipmentItem.LineItemID);
-        return shipmentItem;
-      });
-      return shipment;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
     });
-    return shipments.Items as ShipmentWithItems[];
+    const url = `${this.appConfig.middlewareUrl}/order/${orderID}/shipmentswithitems`;
+    return this.httpClient
+      .get<ShipmentWithItems[]>(url, { headers: headers })
+      .toPromise();
+  }
+  
+  async returnOrder(orderID: string): Promise<MarketplaceOrder> {
+    return await this.ocOrderService.Patch('Outgoing', orderID, { 
+      xp: {
+        OrderReturnInfo: {
+          HasReturn: true,
+          Resolved: false
+        }
+      }
+    }).toPromise();
   }
 
-  private async getPromotions(orderID: string): Promise<ListPromotion> {
-    return this.ocOrderService.ListPromotions('outgoing', orderID).toPromise();
+  async returnLineItem(orderID: string, lineItemID: string, quantityToReturn: number, returnReason: string): Promise<MarketplaceLineItem> {
+    return await this.ocLineItemService.Patch('Outgoing', orderID, lineItemID, {
+      xp: {
+        LineItemReturnInfo: {
+          QuantityToReturn: quantityToReturn,
+          ReturnReason: returnReason,
+          Resolved: false
+        }
+      }
+    }).toPromise();
   }
 
-  private async getPayments(isOrderToApprove: boolean, orderID: string): Promise<ListPayment> {
-    if (isOrderToApprove) {
-      // approver likely does not have the access required to get this information
-      return null;
-    } else {
-      return this.paymentHelper.ListPaymentsOnOrder(orderID, false);
-    }
-  }
-
-  private async getApprovals(orderID: string): Promise<OrderApproval[]> {
-    const approvals = await this.ocOrderService.ListApprovals('outgoing', orderID).toPromise();
-    approvals.Items = approvals.Items.filter(x => x.Approver);
-    return _uniqBy(approvals.Items, x => x.Comments);
-  }
 }

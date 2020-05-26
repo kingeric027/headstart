@@ -56,6 +56,8 @@ import { OCMOrderShipments } from './components/orders/order-shipments/order-shi
 import { ShipperTrackingPipe, ShipperTrackingSupportedPipe } from './pipes/shipperTracking.pipe';
 import { OCMOrderHistorical } from './components/orders/order-historical/order-historical.component';
 import { OCMOrderHistory } from './components/orders/order-history/order-history.component';
+import { OCMOrderReturn } from './components/orders/order-return/order-return.component';
+import { OCMOrderReturnTable } from './components/orders/order-return/order-return-table/order-return-table.component';
 import { OCMAddressSuggestion } from './components/layout/address-suggestions/address-suggestion.component';
 import { SpecFieldDirective } from './components/products/spec-form/spec-field.directive';
 import { SpecFormCheckboxComponent } from './components/products/spec-form/spec-form-checkbox/spec-form-checkbox.component';
@@ -73,12 +75,12 @@ import { OCMProfile } from './components/profile/profile/profile.component';
 import { OCMProfileNav } from './components/profile/profile-nav/profile-nav.component';
 import { OCMAppFooter } from './components/layout/app-footer/app-footer.component';
 import { OCMOrderDetails } from './components/orders/order-detail/order-detail.component';
-import { OCMUserManagement } from './components/users/user-management/user-management.component';
 import { OCMPaymentMethodManagement } from './components/payments/payment-method-management/payment-method-management.component';
 import { OCMCheckoutPayment } from './components/checkout/checkout-payment/checkout-payment.component';
 import { OCMCheckoutAddress } from './components/checkout/checkout-address/checkout-address.component';
 import { OCMAddressForm } from './components/profile/address-form/address-form.component';
 import { OCMGenericList } from './components/layout/generic-list/generic-list.component';
+import { OCMGridSpecForm } from './components/products/grid-spec-form/grid-spec-form.component';
 import { OCMAddressList } from './components/profile/address-list/address-list.component';
 import { OCMLocationList } from './components/profile/location-list/location-list.component';
 import { OCMChangePasswordForm } from './components/profile/change-password-form/change-password-form.component';
@@ -131,6 +133,10 @@ import { OCMLocationManagement } from './components/profile/location-management/
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { OCMBuyerLocationPermissions } from './components/profile/buyer-location-permissions/buyer-location-permissions';
+import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
 
 const components = [
   OCMCategoryDropdown,
@@ -175,11 +181,13 @@ const components = [
   OCMAddressList,
   OCMLocationList,
   OCMGenericList,
+  OCMGridSpecForm,
   OCMAddressForm,
   OCMProfileForm,
   OCMCheckoutConfirm,
   OCMCheckoutAddress,
   OCMCheckoutPayment,
+  OCMBuyerLocationPermissions,
   OCMCheckout,
   OCMPaymentMethodManagement,
   OCMProfile,
@@ -188,9 +196,11 @@ const components = [
   OCMAppFooter,
   OCMOrderApproval,
   OCMOrderShipments,
+  OCMOrderAccessManagement,
   OCMOrderHistorical,
   OCMOrderHistory,
-  OCMUserManagement,
+  OCMOrderReturn,
+  OCMOrderReturnTable,
   OCMAddressSuggestion,
   OCMAppFooter,
   SpecFormCheckboxComponent,
@@ -249,6 +259,8 @@ const components = [
     FormsModule,
     MatListModule,
     MatCardModule,
+    MatTableModule,
+    MatCheckboxModule,
     MatButtonModule,
     FontAwesomeModule,
     NgbCarouselModule,
@@ -326,6 +338,7 @@ export class AppModule {
     this.buildWebComponent(OCMAddressList, 'ocm-address-list');
     this.buildWebComponent(OCMLocationList, 'ocm-location-list');
     this.buildWebComponent(OCMGenericList, 'ocm-generic-list');
+    this.buildWebComponent(OCMGridSpecForm, 'ocm-grid-spec-form');
     this.buildWebComponent(OCMAddressForm, 'ocm-address-form');
     this.buildWebComponent(OCMProfileForm, 'ocm-profile-form');
 
@@ -346,7 +359,10 @@ export class AppModule {
     this.buildWebComponent(OCMOrderShipments, 'ocm-order-shipments');
     this.buildWebComponent(OCMOrderHistorical, 'ocm-order-historical');
     this.buildWebComponent(OCMOrderHistory, 'ocm-order-history');
-    this.buildWebComponent(OCMUserManagement, 'ocm-user-management');
+    this.buildWebComponent(OCMOrderReturn, 'ocm-order-return');
+    this.buildWebComponent(OCMOrderReturnTable, 'ocm-order-return-table');
+    this.buildWebComponent(OCMBuyerLocationPermissions, 'ocm-location-permissions-management');
+    this.buildWebComponent(OCMOrderAccessManagement, 'ocm-order-access-management');
     this.buildWebComponent(OCMAddressSuggestion, 'address-suggestion');
     this.buildWebComponent(OCMSupplierList, 'ocm-supplier-list');
     this.buildWebComponent(ConfirmModal, 'confirm-modal');

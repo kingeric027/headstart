@@ -4,10 +4,10 @@ using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Attributes;
-using Marketplace.Models.Misc;
-using Marketplace.Helpers;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
+using System.Collections.Generic;
 
 namespace Marketplace.Common.Controllers
 {
@@ -33,10 +33,24 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
-        [HttpGet, Route("location/{locationID}"), MarketplaceUserAuth(ApiRole.Shopper)]
+        [HttpGet, Route("location/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<ListPage<Order>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)
         {
             return await _command.ListOrdersForLocation(locationID, listArgs, VerifiedUserContext);
+        }
+
+        [DocName("GET order details as buyer, ensures user has access to location orders or created the order themselves")]
+        [HttpGet, Route("{orderID}/details"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task<OrderDetails> GetOrderDetails(string orderID)
+        {
+            return await _command.GetOrderDetails(orderID, VerifiedUserContext);
+        }
+
+        [DocName("GET order shipments as buyer, ensures user has access to location orders or created the order themselves")]
+        [HttpGet, Route("{orderID}/shipmentswithitems"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task<List<MarketplaceShipmentWithItems>> GetOrderShipmentsWithItems(string orderID)
+        {
+            return await _command.GetMarketplaceShipmentWithItems(orderID, VerifiedUserContext);
         }
     }
 }

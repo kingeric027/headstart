@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Helpers;
 using Marketplace.Models.Exceptions;
 using Marketplace.Models.Extended;
-using Marketplace.Models.Models.Marketplace;
-using Newtonsoft.Json.Linq;
+using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 using static Marketplace.Models.ErrorCodes;
+using ordercloud.integrations.avalara;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
@@ -25,11 +23,11 @@ namespace Marketplace.Common.Services.ShippingIntegration
     public class OCShippingIntegration : IOCShippingIntegration
     {
         readonly IFreightPopService _freightPopService;
-        private readonly IAvalaraCommand _avatax;
-        public OCShippingIntegration(IFreightPopService freightPopService, IAvalaraCommand avatax)
+        private readonly IAvalaraCommand _avalara;
+        public OCShippingIntegration(IFreightPopService freightPopService, IAvalaraCommand avalara)
         {
             _freightPopService = freightPopService;
-            _avatax = avatax;
+			_avalara = avalara;
         }
 
         public async Task<ShipEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload)
@@ -58,15 +56,9 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         private List<LineItem> GetLineItemsToIncludeInShipping(IList<LineItem> lineItems, CheckoutIntegrationConfiguration configData)
         {
-            if(configData.ExcludePOProductsFromShipping)
-            {
-                return lineItems.Where(li =>
-                {
-                    return !(li.Product.xp.ProductType == ProductType.PurchaseOrder.ToString());
-                }).ToList();
-            } else {
-                return lineItems.ToList();
-            }
+            return configData.ExcludePOProductsFromShipping ? 
+                lineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder.ToString()).ToList() : 
+                lineItems.ToList();
         }
 
         public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload)
@@ -77,7 +69,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 return new OrderCalculateResponse();
             } else
             {
-                var totalTax = await _avatax.GetEstimateAsync(orderCalculatePayload.OrderWorksheet);
+                var totalTax = await _avalara.GetEstimateAsync(orderCalculatePayload.OrderWorksheet);
 
                 return new OrderCalculateResponse
                 {

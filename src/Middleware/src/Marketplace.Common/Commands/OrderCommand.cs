@@ -1,21 +1,20 @@
-using Marketplace.Common.Services.ShippingIntegration;
-using OrderCloud.SDK;
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using OrderCloud.SDK;
 using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Services;
-using Marketplace.Common.Services.Avalara;
 using Marketplace.Common.Services.ShippingIntegration.Models;
-using System.Linq;
 using Marketplace.Models.Models.Marketplace;
-using System;
-using Newtonsoft.Json;
-using Marketplace.Helpers;
-using Marketplace.Helpers.Models;
-
+using ordercloud.integrations.extensions;
+using Marketplace.Common.Services.ShippingIntegration;
+using ordercloud.integrations.avalara;
+using Marketplace.Models.Misc;
 namespace Marketplace.Common.Commands
 {
     public interface IOrderCommand
@@ -23,6 +22,8 @@ namespace Marketplace.Common.Commands
         Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
         Task<Order> AcknowledgeQuoteOrder(string orderID);
         Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
+        Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceShipmentWithItems>> GetMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
     }
 
     public class OrderCommand : IOrderCommand
@@ -34,18 +35,20 @@ namespace Marketplace.Common.Commands
         // temporary service until we get updated sdk
         private readonly IOrderCloudSandboxService _ocSandboxService;
         private readonly IZohoCommand _zoho;
-        private readonly IAvalaraCommand _avatax;
+        private readonly IAvalaraCommand _avalara;
         private readonly ISendgridService _sendgridService;
+        private readonly ILocationPermissionCommand _locationPermissionCommand;
         
-        public OrderCommand(IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        public OrderCommand(ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
             _ocShippingIntegration = ocShippingIntegration;
-            _avatax = avatax;
+            _avalara = avatax;
             _zoho = zoho;
             _sendgridService = sendgridService;
             _ocSandboxService = orderCloudSandboxService;
+            _locationPermissionCommand = locationPermissionCommand;
         }
 
         public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
@@ -116,12 +119,88 @@ namespace Marketplace.Common.Commands
                 filters: listArgs.ToFilterString());
         }
 
-        private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser)
+        public async Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser)
         {
-            var buyerID = verifiedUser.BuyerID;
-            var userGroupID = $"{locationID}-ViewAllLocationOrders";
-            var userGroupAssignmentForAccess = await _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID, verifiedUser.UserID);
-            Require.That(userGroupAssignmentForAccess.Items.Count > 0, new ErrorCode("Insufficient Access", 403, $"User cannot access orders from this location: {locationID}"));
+            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+            await EnsureUserCanAccessOrder(order, verifiedUser);
+
+            // todo support >100 and figure out how to make these calls in parallel and 
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
+            var promotions = await _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID);
+            var payments = await _oc.Payments.ListAsync(OrderDirection.Incoming, order.ID);
+            var approvals = await _oc.Orders.ListApprovalsAsync(OrderDirection.Incoming, orderID);
+            return new OrderDetails
+            {
+                Order = order,
+                LineItems = lineItems,
+                Promotions = promotions,
+                Payments = payments,
+                Approvals = approvals
+            };
+        }
+
+        public async Task<List<MarketplaceShipmentWithItems>> GetMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser)
+        {
+            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+            await EnsureUserCanAccessOrder(order, verifiedUser);
+
+            // todo support >100 and figure out how to make these calls in parallel and 
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
+            var shipments = await _oc.Orders.ListShipmentsAsync<MarketplaceShipmentWithItems>(OrderDirection.Incoming, orderID);
+            var shipmentsWithItems = await Throttler.RunAsync(shipments.Items, 100, 5, (MarketplaceShipmentWithItems shipment) => GetShipmentWithItems(shipment, lineItems.Items.ToList()));
+            return shipmentsWithItems.ToList();
+        }
+
+        private async Task<MarketplaceShipmentWithItems> GetShipmentWithItems(MarketplaceShipmentWithItems shipment, List<LineItem> lineItems)
+        {
+            var shipmentItems = await _oc.Shipments.ListItemsAsync<MarketplaceShipmentItemWithLineItem>(shipment.ID);
+            shipment.ShipmentItems = shipmentItems.Items.Select(shipmentItem =>
+            {
+                shipmentItem.LineItem = lineItems.First(li => li.ID == shipmentItem.LineItemID);
+                return shipmentItem;
+            }).ToList();
+            return shipment;
+        }
+
+
+        private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser, string overrideErrorMessage = "")
+        {
+            var hasAccess = await _locationPermissionCommand.IsUserInAccessGroup(locationID, UserGroupSuffix.ViewAllOrders.ToString(), verifiedUser);
+            Require.That(hasAccess, new ErrorCode("Insufficient Access", 403, $"User cannot access orders from this location: {locationID}"));
+        }
+
+        private async Task EnsureUserCanAccessOrder(MarketplaceOrder order, VerifiedUserContext verifiedUser)
+        {
+            /* ensures user has access to order through at least 1 of 3 methods
+             * 1) user submitted the order
+             * 2) user has access to all orders from the location of the billingAddressID 
+             * 3) the order is awaiting approval and the user is in the approving group 
+             */ 
+
+            var isOrderSubmitter = order.FromUserID == verifiedUser.UserID;
+            if (isOrderSubmitter)
+            {
+                return;
+            }
+            
+            var isUserInLocationOrderAccessGroup = await _locationPermissionCommand.IsUserInAccessGroup(order.BillingAddressID, UserGroupSuffix.ViewAllOrders.ToString(), verifiedUser);
+            if (isUserInLocationOrderAccessGroup)
+            {
+                return;
+            } 
+            
+            if(order.Status == OrderStatus.AwaitingApproval)
+            {
+                // logic assumes there is only one approving group per location
+                var isUserInApprovalGroup = await _locationPermissionCommand.IsUserInAccessGroup(order.BillingAddressID, UserGroupSuffix.OrderApprover.ToString(), verifiedUser);
+                if(isUserInApprovalGroup)
+                {
+                    return;
+                }
+            }
+
+            // if function has not been exited yet we throw an insufficient access error
+            Require.That(false, new ErrorCode("Insufficient Access", 403, $"User cannot access order {order.ID}"));
         }
 
         private async Task CleanIDLineItems(MarketplaceOrderWorksheet orderWorksheet)
@@ -129,7 +208,7 @@ namespace Marketplace.Common.Commands
             /* line item ids are significant for suppliers creating a relationship
             * between their shipments and line items in ordercloud 
             * we are sequentially labeling these ids for ease of shipping */
-  
+
             var lineItemIDChanges = orderWorksheet.LineItems.Select((li, index) => (OldID: li.ID, NewID: CreateIDFromIndex(index)));
             await Throttler.RunAsync(lineItemIDChanges, 100, 2, (lineItemIDChange) =>
             {
@@ -200,7 +279,7 @@ namespace Marketplace.Common.Commands
             lineItems.ForEach(li => {
                 if (!shipFromAddressIDs.Contains(li.ShipFromAddressID))
                 {
-                    shipFromAddressIDs.Add(li.ShipFromAddressID);   
+                    shipFromAddressIDs.Add(li.ShipFromAddressID);
                 }
             });
             return shipFromAddressIDs;
@@ -208,7 +287,7 @@ namespace Marketplace.Common.Commands
 
         private async Task HandleTaxTransactionCreationAsync(MarketplaceOrderWorksheet orderWorksheet)
         {
-            var transaction = await _avatax.CreateTransactionAsync(orderWorksheet);
+            var transaction = await _avalara.CreateTransactionAsync(orderWorksheet);
             await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
             {
                 TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
@@ -218,7 +297,7 @@ namespace Marketplace.Common.Commands
 
         private async Task ImportSupplierOrdersIntoFreightPop(IList<MarketplaceOrder> supplierOrders)
         {
-            foreach(var supplierOrder in supplierOrders)
+            foreach (var supplierOrder in supplierOrders)
             {
                 await ImportSupplierOrderIntoFreightPop(supplierOrder);
             }
@@ -230,14 +309,14 @@ namespace Marketplace.Common.Commands
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, supplierOrder.ID);
             var firstLineItemOfSupplierOrder = lineItems.Items.First();
             var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(firstLineItemOfSupplierOrder.SupplierID);
-            
-            if(supplier.xp.SyncFreightPop)
+
+            if (supplier.xp.SyncFreightPop)
             {
                 // we further split the supplier order into multiple orders for each shipfromaddressID before it goes into freightpop
                 var freightPopOrders = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
 
                 var freightPopOrderIDs = new List<string>();
-                foreach(var lineItemGrouping in freightPopOrders)
+                foreach (var lineItemGrouping in freightPopOrders)
                 {
                     var firstLineItem = lineItemGrouping.First();
 
@@ -250,6 +329,5 @@ namespace Marketplace.Common.Commands
                 }
             }
         }
-    
-    }
+    };
 }

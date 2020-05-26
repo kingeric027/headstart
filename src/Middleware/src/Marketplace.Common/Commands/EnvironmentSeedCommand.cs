@@ -6,10 +6,9 @@ using Marketplace.Common.Helpers;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.DevCenter.Models;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Helpers.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -229,12 +228,19 @@ namespace Marketplace.Common.Commands
 			
 			// buyer
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPApprovalRuleAdmin , Roles = new[] { ApiRole.ApprovalRuleAdmin, ApiRole.BuyerUserAdmin, ApiRole.UserGroupAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPOrderApprover },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPNeedsApproval },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPViewAllLocationOrders },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCreditCardAdmin  , Roles = new[] { ApiRole.MeCreditCardAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPAddressAdmin  , Roles = new[] { ApiRole.MeAddressAdmin, ApiRole.AddressAdmin } },
+			
+			/* these roles don't do much, access to changing location information will be done through middleware calls that
+			*  confirm the user is in the location specific access user group. These roles will be assigned to the location 
+			*  specific user group and allow us to determine if a user has an admin role for at least one location through 
+			*  the users JWT
+			*/
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationPermissionAdmin },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationOrderApprover },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationNeedsApproval },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationViewAllOrders },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationCreditCardAdmin },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationAddressAdmin },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationResaleCertAdmin }
 		};
 
 		static readonly List<Webhook> DefaultWebhooks = new List<Webhook>() {

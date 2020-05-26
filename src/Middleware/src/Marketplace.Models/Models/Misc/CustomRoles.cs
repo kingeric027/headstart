@@ -26,11 +26,13 @@
 
 		// buyer
 		MPBaseBuyer,
-		MPApprovalRuleAdmin,
-		MPCreditCardAdmin,
-		MPAddressAdmin,
-		MPOrderApprover,
-		MPNeedsApproval,
-		MPViewAllLocationOrders
+		MPLocationPermissionAdmin,
+		MPLocationApprovalRuleAdmin,
+		MPLocationCreditCardAdmin,
+		MPLocationAddressAdmin,
+		MPLocationOrderApprover,
+		MPLocationNeedsApproval,
+		MPLocationViewAllOrders,
+		MPLocationResaleCertAdmin
 	}
 }

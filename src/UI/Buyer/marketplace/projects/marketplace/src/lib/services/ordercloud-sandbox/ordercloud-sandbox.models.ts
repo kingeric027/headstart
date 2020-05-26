@@ -1,5 +1,4 @@
-import { LineItem } from '@ordercloud/angular-sdk';
-import { MarketplaceOrder } from '../../shopper-context';
+import { MarketplaceOrder, MarketplaceLineItem } from '../../shopper-context';
 
 // tentative models to be overriden by ordercloud sdk
 export interface ShipMethodSelection {
@@ -30,7 +29,7 @@ export interface ShipMethod {
 
 export interface OrderWorksheet {
   Order: MarketplaceOrder;
-  LineItems: LineItem[];
+  LineItems: MarketplaceLineItem[];
   ShipEstimateResponse: ShipEstimateResponse;
   OrderCalculateResponse: OrderCalculateResponse;
 }

@@ -1,7 +1,7 @@
-﻿using Marketplace.Helpers.Models;
-using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using ordercloud.integrations.extensions;
 
 namespace Marketplace.Common.Controllers
 {

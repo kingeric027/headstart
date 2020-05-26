@@ -1,9 +1,32 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { OcAddressService, BuyerAddress } from '@ordercloud/angular-sdk';
+import {
+  OcAddressService,
+  BuyerAddress,
+  OcUserGroupService,
+  UserGroupAssignment,
+  User,
+  OcUserService,
+} from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { BUYER_SUB_RESOURCE_LIST } from '../buyers/buyer.service';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { BuyerUserService } from '../users/buyer-user.service';
+
+export interface PermissionType {
+  UserGroupSuffix: string;
+  DisplayText: string;
+}
+
+export const PermissionTypes: PermissionType[] = [
+  { UserGroupSuffix: 'PermissionAdmin', DisplayText: 'Permission Admin' },
+  { UserGroupSuffix: 'ResaleCertAdmin', DisplayText: 'Resale Cert Admin' },
+  { UserGroupSuffix: 'OrderApprover', DisplayText: 'Order Approver' },
+  { UserGroupSuffix: 'NeedsApproval', DisplayText: 'Needs Approval' },
+  { UserGroupSuffix: 'ViewAllOrders', DisplayText: 'View All Orders' },
+  { UserGroupSuffix: 'CreditCardAdmin', DisplayText: 'Credit Card Admin' },
+  { UserGroupSuffix: 'AddressAdmin', DisplayText: 'Address Admin' },
+];
 
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
 @Injectable({
@@ -40,7 +63,14 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
     },
   };
 
-  constructor(router: Router, activatedRoute: ActivatedRoute, ocAddressService: OcAddressService) {
+  constructor(
+    router: Router,
+    activatedRoute: ActivatedRoute,
+    ocAddressService: OcAddressService,
+    private ocUserGroupService: OcUserGroupService,
+    private ocUserService: OcUserService,
+    private buyerUserService: BuyerUserService
+  ) {
     super(router, activatedRoute, ocAddressService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'locations');
   }
 
@@ -64,5 +94,23 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;
+  }
+
+  async getLocationPermissions(locationID: string): Promise<UserGroupAssignment[]> {
+    const buyerID = locationID.split('-')[0];
+    const requests = PermissionTypes.map(p =>
+      // todo accomodate over 100 users
+      this.ocUserGroupService
+        .ListUserAssignments(buyerID, { userGroupID: `${locationID}-${p.UserGroupSuffix}`, pageSize: 100 })
+        .toPromise()
+    );
+    const responses = await Promise.all(requests);
+    return responses.reduce((acc, value) => acc.concat(value.Items), []);
+  }
+
+  async getLocationUsers(locationID: string): Promise<User[]> {
+    const buyerID = locationID.split('-')[0];
+    const userResponse = await this.ocUserService.List(buyerID, { userGroupID: locationID }).toPromise();
+    return userResponse.Items;
   }
 }

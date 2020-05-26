@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
-using Marketplace.Helpers.Attributes;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers
@@ -21,63 +22,63 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("POST Catalog")]
-        [HttpPost, Route("catalog"), MarketplaceUserAuth(ApiRole.CatalogAdmin)]
+        [HttpPost, Route("catalog"), OrderCloudIntegrationsAuth(ApiRole.CatalogAdmin)]
         public async Task<MarketplaceCatalog> PostCatalog([FromBody] MarketplaceCatalog obj, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID, clientId);
         }
 
         [DocName("POST Product")]
-        [HttpPost, Route("product"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        [HttpPost, Route("product"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceProduct> PostProduct([FromBody] MarketplaceProduct obj, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID, clientId);
         }
 
         [DocName("POST Product Facet")]
-        [HttpPost, Route("productfacet"), MarketplaceUserAuth(ApiRole.ProductFacetAdmin)]
+        [HttpPost, Route("productfacet"), OrderCloudIntegrationsAuth(ApiRole.ProductFacetAdmin)]
         public async Task<MarketplaceProductFacet> PostProductFacet([FromBody] MarketplaceProductFacet obj, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID, clientId);
         }
 
         [DocName("POST Price Schedule")]
-        [HttpPost, Route("priceschedule"), MarketplaceUserAuth(ApiRole.PriceScheduleAdmin)]
+        [HttpPost, Route("priceschedule"), OrderCloudIntegrationsAuth(ApiRole.PriceScheduleAdmin)]
         public async Task<MarketplacePriceSchedule> PostPriceSchedule([FromBody] MarketplacePriceSchedule obj, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID, clientId);
         }
 
         [DocName("POST Product Assignment")]
-        [HttpPost, Route("productassignment"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        [HttpPost, Route("productassignment"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceProductAssignment> PostProductAssignment([FromBody] MarketplaceProductAssignment obj, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID, clientId);
         }
 
         [DocName("POST Spec")]
-        [HttpPost, Route("spec"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        [HttpPost, Route("spec"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceSpec> PostSpec([FromBody] MarketplaceSpec obj, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID, clientId);
         }
 
         [DocName("POST Spec Option")]
-        [HttpPost, Route("specoption"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        [HttpPost, Route("specoption"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceSpecOption> PostSpecOption([FromBody] MarketplaceSpecOption obj, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID, clientId);
         }
 
         [DocName("POST Spec Product Assignment")]
-        [HttpPost, Route("specproductassignment"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+        [HttpPost, Route("specproductassignment"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceSpecProductAssignment> PostSpecProductAssignment([FromBody] MarketplaceSpecProductAssignment obj, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID, clientId);
         }
 
         [DocName("POST Catalog Product Assignment")]
-        [HttpPost, Route("catalogproductassignment"), MarketplaceUserAuth(ApiRole.CatalogAdmin)]
+        [HttpPost, Route("catalogproductassignment"), OrderCloudIntegrationsAuth(ApiRole.CatalogAdmin)]
         public async Task<MarketplaceCatalogAssignment> PostCatalogProductAssignment([FromBody] MarketplaceCatalogAssignment obj, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID, clientId);

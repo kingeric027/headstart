@@ -1,21 +1,18 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Queries;
-using System;
-using OrderCloud.SDK;
 using Marketplace.Common;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using System.Collections.Generic;
-using Marketplace.Common.Services.ShippingIntegration.Models;
 using System.Linq;
 using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Action = Marketplace.Common.Models.Action;
 using LogLevel = Marketplace.Common.Models.LogLevel;
-using Marketplace.Helpers.Attributes;
 using Marketplace.Models.Models.Misc;
 using Marketplace.Common.Services.FreightPop.Models;
 
@@ -23,7 +20,7 @@ namespace Marketplace.Orchestration
 {
     public class OrderOrchestration
     {
-        private IOrderOrchestrationCommand _orderOrchestrationCommand;
+        private readonly IOrderOrchestrationCommand _orderOrchestrationCommand;
         private readonly LogQuery _log;
         private readonly AppSettings _appSettings;
         private SupplierShipmentSyncWorkItem _supplierWorkItem;

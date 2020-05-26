@@ -1,8 +1,5 @@
-﻿using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Marketplace.Helpers.Attributes;
+﻿using ordercloud.integrations.openapispec;
+using OrderCloud.SDK;
 
 namespace Marketplace.Models.Models.Marketplace
 {
@@ -10,5 +7,14 @@ namespace Marketplace.Models.Models.Marketplace
 	public class MarketplaceLineItem : LineItem<LineItemXp, MarketplaceLineItemProduct, LineItemVariant, MarketplaceAddressBuyer, MarketplaceAddressSupplier> { }
 
     [SwaggerModel]
-	public class LineItemXp { }
+	public class LineItemXp {
+        public LineItemReturnInfo LineItemReturnInfo { get; set; }
+    }
+
+    public class LineItemReturnInfo
+    {
+        public int QuantityToReturn { get; set; }
+        public string ReturnReason { get; set; }
+        public bool Resolved { get; set; }
+    }
 }

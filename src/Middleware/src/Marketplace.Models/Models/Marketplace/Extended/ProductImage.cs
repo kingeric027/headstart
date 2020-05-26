@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Marketplace.Helpers.Attributes;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Models.Extended
 {

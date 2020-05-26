@@ -1,16 +1,13 @@
-﻿using Marketplace.Helpers;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.Avalara;
-using Marketplace.Helpers.Attributes;
-using Marketplace.Models;
 using Marketplace.Models.Attributes;
-using Marketplace.Models.Models.Misc;
 using Marketplace.Models.Misc;
-using System.Net.Http;
-using System.Net;
-using System.Text;
+using ordercloud.integrations.extensions;
+using ordercloud.integrations.openapispec;
+using Avalara.AvaTax.RestClient;
+using ordercloud.integrations.avalara;
+using Marketplace.Common.Commands;
 
 namespace Marketplace.Common.Controllers.Avalara
 {
@@ -19,45 +16,68 @@ namespace Marketplace.Common.Controllers.Avalara
 	[Route("avalara")]
 	public class AvalaraController : BaseController
 	{
-		private readonly IAvalaraCommand _taxService;
-
-		public AvalaraController(AppSettings settings, IAvalaraCommand taxService) : base(settings)
+		private readonly IAvalaraCommand _avalara;
+		private readonly IResaleCertCommand _resaleCertCommand;
+		public AvalaraController(AppSettings settings, IAvalaraCommand avalara, IResaleCertCommand resaleCertCommand, IOrderCloudClient oc) : base(settings)
 		{
-			_taxService = taxService;
+			_avalara = avalara;
+			_resaleCertCommand = resaleCertCommand;
+		}
+
+		[DocName("Get Tax Estimate")]
+		[HttpGet, Route("estimate"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task<decimal> GetTaxEstimate([FromBody] OrderWorksheet orderWorksheet)
+		{
+			return await _avalara.GetEstimateAsync(orderWorksheet);
+		}
+
+		[DocName("Create Tax Transaction")]
+		[HttpPost, Route("transaction"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
+		public async Task<TransactionModel> CreateTransaction([FromBody] OrderWorksheet orderWorksheet)
+		{
+			return await _avalara.CreateTransactionAsync(orderWorksheet);
+		}
+
+		[DocName("Commit Tax Transaction")]
+		[HttpPost, Route("transaction/{transactionCode}/commit"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
+		public async Task<TransactionModel> CommitTransaction(string transactionCode)
+		{
+			return await _avalara.CommitTransactionAsync(transactionCode);
 		}
 
 		[DocName("List Tax Codes")]
-		[HttpGet, Route("code"), MarketplaceUserAuth(ApiRole.ProductAdmin)]
+		[HttpGet, Route("code"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
 		public async Task<ListPage<TaxCode>> ListTaxCodes(ListArgs<TaxCode> marketplaceListArgs)
 		{
-			return await _taxService.ListTaxCodesAsync(marketplaceListArgs);
+			return await _avalara.ListTaxCodesAsync(marketplaceListArgs);
 		}
 
 		[DocName("Get tax exeption certificate details")]
-		[HttpGet, Route("{companyID}/certificate/{certificateID}"), MarketplaceUserAuth(ApiRole.Shopper)]
-		public async Task<TaxCertificate> GetCertificate(int companyID, int certificateID)
+		[HttpGet, Route("{companyID}/certificate/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task<TaxCertificate> GetCertificate(int companyID, string locationID)
 		{
-			return await _taxService.GetCertificateAsync(companyID, certificateID);
+			return await _resaleCertCommand.GetAsync(companyID, locationID, VerifiedUserContext);
 		}
 
 		[DocName("Create tax exeption certificate")]
-		[HttpPost, Route("{companyID}/certificate"), MarketplaceUserAuth(ApiRole.AddressAdmin)]
-		public async Task<TaxCertificate> CreateCertificate(int companyID, [FromBody] TaxCertificate cert)
+		[HttpPost, Route("{companyID}/certificate/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task<TaxCertificate> CreateCertificate(int companyID, string locationID, [FromBody] TaxCertificate cert)
 		{
-			return await _taxService.CreateCertificateAsync(companyID, cert);
+			return await _resaleCertCommand.CreateAsync(companyID, locationID, cert, VerifiedUserContext);
 		}
 
 		[DocName("Update tax exeption certificate")]
-		[HttpPut, Route("{companyID}/certificate/{certificateID}"), MarketplaceUserAuth(ApiRole.AddressAdmin)]
-		public async Task<TaxCertificate> UpdateCertificate(int companyID, int certificateID, [FromBody] TaxCertificate cert)
+		[HttpPut, Route("{companyID}/certificate/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task<TaxCertificate> UpdateCertificate(int companyID, string locationID, [FromBody] TaxCertificate cert)
 		{
-			return await _taxService.UpdateCertificateAsync(companyID, certificateID, cert);
+			return await _resaleCertCommand.UpdateAsync(companyID, locationID, cert, VerifiedUserContext);
 		}
 
-		[HttpGet, Route("{companyID}/certificate/{certificateID}/pdf")]
-		public async Task<object> DownloadCertificate(int companyID, int certificateID)
+		[HttpGet, Route("{companyID}/certificate/{locationID}/pdf")]
+		public async Task<object> DownloadCertificate(int companyID, string locationID)
 		{
-			var pdf = await _taxService.DownloadCertificatePdfAsync(companyID, certificateID);
+			// need to include auth for managing cert for a specific location somewhere
+			var pdf = await _resaleCertCommand.DownloadPDFAsync(companyID, locationID, VerifiedUserContext);
 			return File(pdf, "application/pdf");
 		}
 	}

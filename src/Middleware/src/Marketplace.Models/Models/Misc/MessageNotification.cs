@@ -1,7 +1,7 @@
-﻿using Marketplace.Helpers.Attributes;
-using Marketplace.Models.Models.Marketplace;
+﻿using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System.Collections.Generic;
+using ordercloud.integrations.openapispec;
 
 namespace Marketplace.Models.Misc
 {

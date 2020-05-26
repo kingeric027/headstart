@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
-import { LineItem, ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
+import { ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
 import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
-import { MarketplaceOrder } from '../../shopper-context';
+import { MarketplaceOrder, MarketplaceLineItem } from '../../shopper-context';
 import { listAll } from '../../functions/listAll';
 
 export interface ICart {
-  onAdd: Subject<LineItem>;
+  onAdd: Subject<MarketplaceLineItem>;
   get(): ListLineItem;
-  add(lineItem: LineItem): Promise<LineItem>;
+  add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem>;
   remove(lineItemID: string): Promise<void>;
-  setQuantity(lineItemID: string, newQuantity: number): Promise<LineItem>;
-  addMany(lineItem: LineItem[]): Promise<LineItem[]>;
+  setQuantity(lineItemID: string, newQuantity: number): Promise<MarketplaceLineItem>;
+  addMany(lineItem: MarketplaceLineItem[]): Promise<MarketplaceLineItem[]>;
   empty(): Promise<void>;
   onChange(callback: (lineItems: ListLineItem) => void): void;
   moveOrderToCart(orderID: string): Promise<void>;
@@ -22,7 +22,7 @@ export interface ICart {
   providedIn: 'root',
 })
 export class CartService implements ICart {
-  public onAdd = new Subject<LineItem>(); // need to make available as observable
+  public onAdd = new Subject<MarketplaceLineItem>(); // need to make available as observable
   public onChange = this.state.onLineItemsChange.bind(this.state);
   private initializingOrder = false;
 
@@ -31,14 +31,14 @@ export class CartService implements ICart {
     private ocLineItemService: OcLineItemService,
     private ocMeService: OcMeService,
     private state: OrderStateService
-  ) {}
+  ) { }
 
   get(): ListLineItem {
     return this.lineItems;
   }
 
   // TODO - get rid of the progress spinner for all Cart functions. Just makes it look slower.
-  async add(lineItem: LineItem): Promise<LineItem> {
+  async add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     // order is well defined, line item can be added
     if (!_isUndefined(this.order.DateCreated)) {
       return await this.createLineItem(lineItem);
@@ -61,7 +61,7 @@ export class CartService implements ICart {
     }
   }
 
-  async setQuantity(lineItemID: string, newQuantity: number): Promise<LineItem> {
+  async setQuantity(lineItemID: string, newQuantity: number): Promise<MarketplaceLineItem> {
     try {
       return await this.patchLineItem(lineItemID, { Quantity: newQuantity });
     } finally {
@@ -69,7 +69,7 @@ export class CartService implements ICart {
     }
   }
 
-  async addMany(lineItem: LineItem[]): Promise<LineItem[]> {
+  async addMany(lineItem: MarketplaceLineItem[]): Promise<MarketplaceLineItem[]> {
     const req = lineItem.map(li => this.add(li));
     return Promise.all(req);
   }
@@ -118,14 +118,14 @@ export class CartService implements ICart {
     }
   }
 
-  private async patchLineItem(lineItemID: string, patch: LineItem): Promise<LineItem> {
+  private async patchLineItem(lineItemID: string, patch: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     const existingLI = this.lineItems.Items.find(li => li.ID === lineItemID);
     Object.assign(existingLI, patch);
     Object.assign(this.order, this.calculateOrder());
     return await this.ocLineItemService.Patch('outgoing', this.order.ID, lineItemID, patch).toPromise();
   }
 
-  private async createLineItem(lineItem: LineItem): Promise<LineItem> {
+  private async createLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     // if line item exists simply update quantity, else create
     const existingLI = this.lineItems.Items.find(li => this.LineItemsMatch(li, lineItem));
 
@@ -156,9 +156,8 @@ export class CartService implements ICart {
   }
 
   // product ID and specs must be the same
-  private LineItemsMatch(li1: LineItem, li2: LineItem): boolean {
+  private LineItemsMatch(li1: MarketplaceLineItem, li2: MarketplaceLineItem): boolean {
     if (li1.ProductID !== li2.ProductID) return false;
-    if (!li1.Specs || !li2.Specs) return false;
     for (const spec1 of li1.Specs) {
       const spec2 = li2.Specs?.find(s => s.SpecID === spec1.SpecID);
       if (spec1.Value !== spec2.Value) return false;
