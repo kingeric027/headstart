@@ -9,6 +9,7 @@ namespace Marketplace.Models.Models.Marketplace
     [SwaggerModel]
 	public class LineItemXp {
         public LineItemReturnInfo LineItemReturnInfo { get; set; }
+        public decimal? ProductUnitPrice { get; set; }
     }
 
     public class LineItemReturnInfo

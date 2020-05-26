@@ -21,6 +21,7 @@ namespace Marketplace.Models
         public OrderType? OrderType { get; set; }
         public QuoteOrderInfo QuoteOrderInfo { get; set; }
         public OrderReturnInfo OrderReturnInfo { get; set; }
+        public string Currency { get; set; }
     }
 
     [SwaggerModel]
