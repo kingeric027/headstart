@@ -42,8 +42,7 @@ export class CartService implements ICart {
     private state: OrderStateService,
     private http: HttpClient,
     private ocTokenService: OcTokenService
-    private state: OrderStateService
-  ) { }
+  ) {}
 
   get(): ListLineItem {
     return this.lineItems;
@@ -137,7 +136,7 @@ export class CartService implements ICart {
     return await this.ocLineItemService.Patch('outgoing', this.order.ID, lineItemID, patch).toPromise();
   }
 
-  private async createLineItem(lineItem: LineItem): Promise<LineItem> {
+  private async createLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     this.onAdd.next(lineItem);
     const middlewareUrl = `https://localhost:44314`;
     const url = `${middlewareUrl}/order/${this.order?.ID}/lineitems`;
