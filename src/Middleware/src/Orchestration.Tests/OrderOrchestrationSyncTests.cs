@@ -45,7 +45,7 @@ namespace Orchestration.Tests
                 }
             });
             
-            var functionToken = new OrderCloudIntegrationsFunctionToken();
+            var functionToken = new OrderCloudIntegrationsFunctionToken(Substitute.For<AppSettings>());
             var verifiedUser = await functionToken.Authorize(mockHttpRequest, new[] { ApiRole.OrderAdmin }, mockOrderCloudClient);
             var command = new SupplierSyncCommand(Substitute.For<AppSettings>());
             Assert.ThrowsAsync<MissingMethodException>(async () => await command.GetOrderAsync("ID", verifiedUser));

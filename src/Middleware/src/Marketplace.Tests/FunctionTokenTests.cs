@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Marketplace.Common;
 using Marketplace.Common.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -31,7 +32,7 @@ namespace Marketplace.Tests
         public async Task valid_token_returns_user(MeUser user)
         {
             mockOrderCloudClient.Me.GetAsync().ReturnsForAnyArgs(user);
-            var functionToken = new OrderCloudIntegrationsFunctionToken();
+            var functionToken = new OrderCloudIntegrationsFunctionToken(Substitute.For<AppSettings>());
             var verifiedUser = await functionToken.Authorize(mockHttpRequest, new[] { ApiRole.OrderAdmin }, mockOrderCloudClient);
             Assert.IsTrue(user.ID == verifiedUser.UserID);
             if (user.Supplier != null)
@@ -47,7 +48,7 @@ namespace Marketplace.Tests
         {
             mockOrderCloudClient.Me.GetAsync().ReturnsForAnyArgs(new MeUser() { Active = false });
 
-            var functionToken = new OrderCloudIntegrationsFunctionToken();
+            var functionToken = new OrderCloudIntegrationsFunctionToken(Substitute.For<AppSettings>());
             Assert.ThrowsAsync<Exception>(async () => await functionToken.Authorize(mockHttpRequest, new[] { ApiRole.OrderAdmin }, mockOrderCloudClient));
         }
     }

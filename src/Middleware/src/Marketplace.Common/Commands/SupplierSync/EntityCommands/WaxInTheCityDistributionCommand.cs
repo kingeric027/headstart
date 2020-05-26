@@ -9,10 +9,12 @@ namespace Marketplace.Common.Commands.SupplierSync
     public class WaxInTheCityDistributionCommand : ISupplierSyncCommand
     {
         private readonly IOrderCloudClient _oc;
+        private AppSettings _settings;
 
         public WaxInTheCityDistributionCommand(AppSettings settings, IOrderCloudClient oc)
         {
             _oc = oc;
+            _settings = settings;
         }
 
         public async Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user)

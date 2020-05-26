@@ -21,9 +21,11 @@ namespace Marketplace.Common.Helpers
     {
         private const string AUTH_HEADER_NAME = "Authorization";
         private const string BEARER_PREFIX = "Bearer ";
+        private readonly AppSettings _settings;
 
-        public OrderCloudIntegrationsFunctionToken()
+        public OrderCloudIntegrationsFunctionToken(AppSettings settings)
         {
+            _settings = settings;
         }
 
         public async Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles, IOrderCloudClient oc = null)
@@ -47,7 +49,12 @@ namespace Marketplace.Common.Helpers
             cid.AddClaim(new Claim("accesstoken", token));
 
             if (oc == null)
-                oc = new OrderCloudClient(new OrderCloudClientConfig() { ClientId = clientId });
+                oc = new OrderCloudClient(new OrderCloudClientConfig()
+                {
+                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+                    ClientId = clientId
+                });
             var user = await oc.Me.GetAsync(token);
 
             if (!user.Active || user.Username != usr)

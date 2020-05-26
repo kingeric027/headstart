@@ -26,7 +26,12 @@ namespace Marketplace.Common.Commands.SupplierSync
         {
             try
             {
-                var oc = new OrderCloudClient(new OrderCloudClientConfig() {ClientId = user.ClientID});
+                var oc = new OrderCloudClient(new OrderCloudClientConfig()
+                {
+                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+                    ClientId = user.ClientID
+                });
                 var type = Type.GetType($"{ASSEMBLY}{user.SupplierID.ToLower()}Command", true, ignoreCase: true);
                 var command = (ISupplierSyncCommand) Activator.CreateInstance(type, _settings, oc);
                 var method = command.GetType().GetMethod($"GetOrderAsync", BindingFlags.Public | BindingFlags.Instance);
