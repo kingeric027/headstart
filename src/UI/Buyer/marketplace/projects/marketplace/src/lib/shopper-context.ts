@@ -54,11 +54,24 @@ export interface ShippingRate {
   TotalCost: number;
 }
 
+export interface MarketplaceLineItem extends LineItem<LineItemXp, ProductXp, any, any> {}
+
+export interface LineItemXp {
+  LineItemReturnInfo?: LineItemReturnInfo;
+}
+
+export interface LineItemReturnInfo {
+  QuantityToReturn: number;
+  ReturnReason: string;
+  Resolved: boolean;
+}
+
 export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
 export interface OrderXp {
   AvalaraTaxTransactionCode?: string;
   OrderType?: OrderType;
   QuoteOrderInfo?: QuoteOrderInfo;
+  OrderReturnInfo?: OrderReturnInfo;
 }
 
 export enum OrderType {
@@ -74,6 +87,12 @@ export interface QuoteOrderInfo {
   Comments?: string;
 }
 
+export interface OrderReturnInfo {
+  HasReturn: boolean;
+  RMANumber: string;
+  Resolved: boolean;
+}
+
 export interface ProductFilters {
   page?: number;
   sortBy?: string;
@@ -82,6 +101,21 @@ export interface ProductFilters {
   categoryID?: string;
   activeFacets?: any;
 }
+
+export interface PermissionType {
+  UserGroupSuffix: string;
+  DisplayText: string;
+}
+
+export const PermissionTypes: PermissionType[] = [
+  { UserGroupSuffix: 'PermissionAdmin', DisplayText: 'Permission Admin' },
+  { UserGroupSuffix: 'ResaleCertAdmin', DisplayText: 'Resale Cert Admin' },
+  { UserGroupSuffix: 'OrderApprover', DisplayText: 'Order Approver' },
+  { UserGroupSuffix: 'NeedsApproval', DisplayText: 'Needs Approval' },
+  { UserGroupSuffix: 'ViewAllOrders', DisplayText: 'View All Orders' },
+  { UserGroupSuffix: 'CreditCardAdmin', DisplayText: 'Credit Card Admin' },
+  { UserGroupSuffix: 'AddressAdmin', DisplayText: 'Address Admin' },
+];
 
 export interface OrderFilters {
   page?: number;

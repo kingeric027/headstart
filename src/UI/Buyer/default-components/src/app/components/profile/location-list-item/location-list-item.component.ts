@@ -11,17 +11,11 @@ import {
   templateUrl: './location-list-item.component.html',
   styleUrls: ['./location-list-item.component.scss'],
 })
-export class OCMLocationListItem implements OnInit {
-  userCanAdmin = false;
-
+export class OCMLocationListItem {
   @Input() location: MarketplaceAddressBuyer;
   @Input() canViewOrders: boolean;
 
   constructor(private context: ShopperContextService) {}
-
-  ngOnInit(): void {
-    this.userCanAdmin = this.context.currentUser.hasRoles('ApprovalRuleAdmin');
-  }
 
   // make into pipe?
   getFullName(address: Address): string {
@@ -31,9 +25,5 @@ export class OCMLocationListItem implements OnInit {
 
   toLocationManagement(): void {
     this.context.router.toLocationManagement(this.location.ID);
-  }
-
-  toLocationOrders(): void {
-    this.context.router.toOrdersByLocation({location: this.location.ID});
   }
 }

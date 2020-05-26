@@ -20,6 +20,7 @@ namespace Marketplace.Models
         public bool StopShipSync { get; set; }
         public OrderType? OrderType { get; set; }
         public QuoteOrderInfo QuoteOrderInfo { get; set; }
+        public OrderReturnInfo OrderReturnInfo { get; set; }
     }
 
     [SwaggerModel]
@@ -32,6 +33,13 @@ namespace Marketplace.Models
         public ListPage<OrderApproval> Approvals { get; set; } 
     }
 
+    public class OrderReturnInfo
+    {
+        public bool HasReturn { get; set; }
+        public string RMANumber { get; set; }
+        public bool Resolved { get; set; }
+    }
+    
     public class MarketplaceOrderSubmitPayload
     {
         public MarketplaceOrderSubmitPayloadResponse Response { get; set; }

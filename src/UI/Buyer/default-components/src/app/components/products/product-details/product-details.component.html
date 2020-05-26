@@ -15,7 +15,8 @@
                              [favorite]="isFavorite()"
                              (favoriteChanged)="setIsFavorite($event.detail)">
         </ocm-toggle-favorite>
-        <div class="btn-group float-right">
+        <div class="btn-group float-right"
+             *ngIf="_specs?.Items?.length > 0">
           <button class="btn btn-sm btn-outline-secondary"
                   [ngClass]="{'active' : !showGrid}"
                   (click)="toggleGrid(false)">

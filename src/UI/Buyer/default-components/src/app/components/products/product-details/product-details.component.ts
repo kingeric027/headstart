@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { ListSpec, User } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
-import { LineItem, MarketplaceMeProduct, OrderType, ShopperContextService, PriceSchedule } from 'marketplace';
+import { LineItem, MarketplaceMeProduct, OrderType, ShopperContextService, MarketplaceLineItem, PriceSchedule } from 'marketplace';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { getImageUrls } from 'src/app/services/images.helpers';
@@ -189,7 +189,7 @@ export class OCMProductDetails implements OnInit {
   async submitQuoteOrder(user) {
     try {
       const defaultOrder = this.getDefaultQuoteOrder(user);
-      const lineItem: LineItem = {};
+      const lineItem: MarketplaceLineItem = {};
       lineItem.ProductID = this._product.ID;
       lineItem.Product = this._product;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);

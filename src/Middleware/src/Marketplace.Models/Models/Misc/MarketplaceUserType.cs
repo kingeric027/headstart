@@ -30,7 +30,7 @@ namespace Marketplace.Models.Misc
 		NeedsApproval,
 		ViewAllOrders,
 		CreditCardAdmin,
-		AddressAdmin
-
+		AddressAdmin,
+		ResaleCertAdmin
 	}
 }
