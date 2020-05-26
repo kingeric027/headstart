@@ -64,6 +64,14 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
         Path: 'to',
         Type: 'DateFilter',
       },
+      {
+        Display: 'Has Claims',
+        Path: 'xp.OrderReturnInfo.HasReturn',
+        Values: ['true', 'false'],
+        ValueDisplayOverride: ['Yes', 'No'],
+        Type: 'Dropdown',
+        QueryRestriction: 'OrderDirection=Incoming'
+      }
     ],
   };
 }

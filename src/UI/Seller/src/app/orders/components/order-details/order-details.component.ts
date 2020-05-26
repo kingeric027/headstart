@@ -1,12 +1,16 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Inject } from '@angular/core';
 import { OrderService } from '@app-seller/orders/order.service';
 import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { Address, LineItem, OcLineItemService, OcOrderService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { ProductImage } from 'marketplace-javascript-sdk';
 import { PDFService } from '@app-seller/orders/pdf-render.service';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
+import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { AppAuthService } from '@app-seller/auth';
+import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-order-details',
@@ -15,6 +19,7 @@ import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api
 })
 export class OrderDetailsComponent {
   faDownload = faDownload;
+  faUndo = faUndo;
   _order: Order = {};
   _lineItems: LineItem[] = [];
   _payments: Payment[] = [];
@@ -24,6 +29,10 @@ export class OrderDetailsComponent {
   orderDirection: string;
   cardType: string;
   createShipment: boolean;
+  isSellerUser = false;
+  processReturn = false;
+  isSaving = false;
+  returnForm: FormGroup;
 
   @Input()
   set order(order: Order) {
@@ -38,9 +47,18 @@ export class OrderDetailsComponent {
     private orderService: OrderService,
     private pdfService: PDFService,
     private ocOrderService: OcOrderService,
-    private middleware: MiddlewareAPIService
-  ) { }
+    private middleware: MiddlewareAPIService,
+    private appAuthService: AppAuthService,
+    @Inject(applicationConfiguration) private appConfig: AppConfig
+  ) {
+    this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER;
+   }
 
+   setReturnForm(): void {
+    this.returnForm = new FormGroup({
+      Comment: new FormControl(this._order.xp?.OrderReturnInfo?.Comment || ''),
+    });
+  }
 
   setCardType(payment) {
     if (!payment.xp.cardType || payment.xp.cardType === null) {
@@ -86,6 +104,23 @@ export class OrderDetailsComponent {
 
   toggleCreateShipment(createShipment: boolean) {
     this.createShipment = createShipment;
+  }
+
+  toggleProcessReturn(): void {
+    this.processReturn = !this.processReturn;
+    if (this.processReturn) {
+      this.setReturnForm();
+    }
+  }
+
+  async onReturnFormSubmit(): Promise<void> {
+    this.isSaving = true;
+    const comment = this.returnForm.value.Comment;
+    await this.ocOrderService.Patch(this.orderDirection, this._order.ID, { xp: { OrderReturnInfo: { Comment: comment} } }).toPromise();
+    this._order = await this.ocOrderService.Get(this.orderDirection, this._order.ID).toPromise();
+    this.processReturn = false;
+    this.isSaving = false;
+
   }
 
   protected createAndSavePDF(): void {
