@@ -101,7 +101,7 @@
           <span class="float-right">-{{payment.Amount | currency}}</span>
           <hr>
         </div>
-        <div *ngIf="_order.xp?.OrderReturnInfo?.Comment">
+        <div *ngIf="_order.xp?.OrderReturnInfo?.Comment && isSellerUser">
          <div class="lead"
              *ngIf="orderDirection === 'Incoming'">
           <b>Returns</b>
