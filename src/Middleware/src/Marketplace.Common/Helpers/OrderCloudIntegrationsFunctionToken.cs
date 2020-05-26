@@ -25,7 +25,7 @@ namespace Marketplace.Common.Helpers
 
         public OrderCloudIntegrationsFunctionToken(IOrderCloudClient oc)
         {
-            _oc = oc;
+            _oc = new OrderCloudClient();
         }
 
         public async Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles)

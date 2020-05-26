@@ -5,27 +5,32 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.extensions;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.ETL
 {
-    public interface IOrderOrchestrationCommand
+    public interface IOrderSyncCommand
     {
         Task<JObject> GetAsync(string ID, VerifiedUserContext user);
     }
-    public class OrderOrchestrationCommand : IOrderOrchestrationCommand
+    public class OrderSyncCommand : IOrderSyncCommand
     {
-        private const string ASSEMBLY = "Marketplace.Common.Commands.";
+        private const string ASSEMBLY = "Marketplace.Common.Commands.ETL.EntityCommands.";
         private readonly AppSettings _settings;
 
-        public OrderOrchestrationCommand(AppSettings settings)
+        public OrderSyncCommand(AppSettings settings)
         {
             _settings = settings;
         }
 
         public async Task<JObject> GetAsync(string ID, VerifiedUserContext user)
         {
-            var type = Type.GetType($"{ASSEMBLY}{user.SupplierID}Command", true);
-            var command = (IWorkItemCommand)Activator.CreateInstance(type, _settings);
+            var oc = new OrderCloudClient(new OrderCloudClientConfig()
+            {
+                ClientId = user.ClientID
+            });
+            var type = Type.GetType($"{ASSEMBLY}{user.SupplierID.ToLower()}Command", true, ignoreCase: true);
+            var command = (IOrderSyncCommand)Activator.CreateInstance(type, _settings, oc);
             var method = command.GetType().GetMethod($"GetAsync", BindingFlags.Public | BindingFlags.Instance);
             if (method == null) throw new MissingMethodException($"{user.SupplierID}Command is missing");
 

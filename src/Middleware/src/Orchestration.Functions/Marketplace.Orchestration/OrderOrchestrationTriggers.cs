@@ -6,6 +6,7 @@ using Marketplace.Common.Queries;
 using Marketplace.Common;
 using System.Threading.Tasks;
 using System.Linq;
+using Marketplace.Common.Commands.ETL;
 using Marketplace.Common.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -20,14 +21,16 @@ namespace Marketplace.Orchestration
         private readonly LogQuery _log;
         private readonly AppSettings _appSettings;
         private readonly IOrderCloudIntegrationsFunctionToken _token;
+        private readonly IOrderSyncCommand _order;
 
         public OrderOrchestrationTrigger(AppSettings appSettings, IOrderCloudIntegrationsFunctionToken token, 
-            IOrderOrchestrationCommand orderOrchestrationCommand, LogQuery log)
+            IOrderOrchestrationCommand orderOrchestrationCommand, IOrderSyncCommand order, LogQuery log)
         {
             _orderOrchestrationCommand = orderOrchestrationCommand;
             _log = log;
             _appSettings = appSettings;
             _token = token;
+            _order = order;
         }
 
         [FunctionName("OrderShipmentTimeTrigger")]
@@ -62,8 +65,8 @@ namespace Marketplace.Orchestration
             try
             {
                 var user = await _token.Authorize(req, new [] { ApiRole.OrderAdmin, ApiRole.OrderReader });
-                var o = 
-                return await Task.FromResult(new {SupplierId = supplierId, OrderId = orderId});
+                var order = await _order.GetAsync(orderId, user);
+                return order;
             }
             catch (OrderCloudIntegrationException oex)
             {
@@ -77,7 +80,6 @@ namespace Marketplace.Orchestration
                     Message = ex.Message
                 });
             }
-            
         }
     }
 }
