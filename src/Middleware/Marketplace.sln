@@ -22,12 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.CMS", "..\..\..\OC-Integrations\cms\src\ordercloud.integrations.CMS\ordercloud.integrations.CMS.csproj", "{096827BC-6D90-49EC-AFF5-22F13D1C5801}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.extensions", "..\..\..\OC-Integrations\extensions\src\ordercloud-integrations-extenions\ordercloud.integrations.extensions.csproj", "{3E945C71-EACF-4656-9211-F89D1C13DF1E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.blobs", "..\..\..\OC-Integrations\blob\src\ordercloud-integrations-blobs\ordercloud.integrations.blobs.csproj", "{41EA1A79-C1EB-47F3-9096-424438745961}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
