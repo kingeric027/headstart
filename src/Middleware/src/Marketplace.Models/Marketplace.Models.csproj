@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ordercloud.integrations.cms" Version="0.0.4" />
+    <PackageReference Include="ordercloud.integrations.cms" Version="0.0.5" />
     <PackageReference Include="ordercloud.integrations.cosmos" Version="0.0.11" />
     <PackageReference Include="ordercloud.integrations.openapispec" Version="0.0.4" />
     <PackageReference Include="ordercloud.integrations.smartystreets" Version="0.0.4" />
