@@ -1,42 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands.ETL
+namespace Marketplace.Common.Commands.SupplierSync
 {
-    public interface IOrderSyncCommand
+    public interface ISupplierSyncCommand
     {
-        Task<JObject> GetAsync(string ID, VerifiedUserContext user);
+        Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user);
     }
 
-    public class OrderSyncCommand : IOrderSyncCommand
+    public class SupplierSyncCommand : ISupplierSyncCommand
     {
-        private const string ASSEMBLY = "Marketplace.Common.Commands.ETL.EntityCommands.";
+        private const string ASSEMBLY = "Marketplace.Common.Commands.SupplierSync.";
         private readonly AppSettings _settings;
 
-        public OrderSyncCommand(AppSettings settings)
+        public SupplierSyncCommand(AppSettings settings)
         {
             _settings = settings;
         }
 
-        public async Task<JObject> GetAsync(string ID, VerifiedUserContext user)
+        public async Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user)
         {
             try
             {
                 var oc = new OrderCloudClient(new OrderCloudClientConfig() {ClientId = user.ClientID});
                 var type = Type.GetType($"{ASSEMBLY}{user.SupplierID.ToLower()}Command", true, ignoreCase: true);
-                var command = (IOrderSyncCommand) Activator.CreateInstance(type, _settings, oc);
-                var method = command.GetType().GetMethod($"GetAsync", BindingFlags.Public | BindingFlags.Instance);
+                var command = (ISupplierSyncCommand) Activator.CreateInstance(type, _settings, oc);
+                var method = command.GetType().GetMethod($"GetOrderAsync", BindingFlags.Public | BindingFlags.Instance);
                 if (method == null) throw new MissingMethodException($"{user.SupplierID}Command is missing");
 
                 return await (Task<JObject>) method.Invoke(command, new object[] {ID, user});
             }
-            catch (Exception ex)
+            catch
             {
                 throw new MissingMethodException($"{user.SupplierID}Command is missing");
             }

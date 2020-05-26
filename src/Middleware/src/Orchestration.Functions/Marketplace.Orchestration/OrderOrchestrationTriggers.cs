@@ -6,7 +6,7 @@ using Marketplace.Common.Queries;
 using Marketplace.Common;
 using System.Threading.Tasks;
 using System.Linq;
-using Marketplace.Common.Commands.ETL;
+using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -20,17 +20,14 @@ namespace Marketplace.Orchestration
         private readonly IOrderOrchestrationCommand _orderOrchestrationCommand;
         private readonly LogQuery _log;
         private readonly AppSettings _appSettings;
-        private readonly IOrderCloudIntegrationsFunctionToken _token;
-        private readonly IOrderSyncCommand _order;
+       
 
         public OrderOrchestrationTrigger(AppSettings appSettings, IOrderCloudIntegrationsFunctionToken token, 
-            IOrderOrchestrationCommand orderOrchestrationCommand, IOrderSyncCommand order, LogQuery log)
+            IOrderOrchestrationCommand orderOrchestrationCommand, ISupplierSyncCommand supplier, LogQuery log)
         {
             _orderOrchestrationCommand = orderOrchestrationCommand;
             _log = log;
             _appSettings = appSettings;
-            _token = token;
-            _order = order;
         }
 
         [FunctionName("OrderShipmentTimeTrigger")]
@@ -57,29 +54,6 @@ namespace Marketplace.Orchestration
             }
         }
 
-        [FunctionName("GetSupplierOrder")]
-        public async Task<object> GetSupplierOrder([HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = "{supplierId}/{orderId}")]
-            HttpRequest req, string supplierId, string orderId, ILogger log)
-        {
-            log.LogInformation($"Supplier Order GET Request: {supplierId} {orderId}");
-            try
-            {
-                var user = await _token.Authorize(req, new [] { ApiRole.OrderAdmin, ApiRole.OrderReader });
-                var order = await _order.GetAsync(orderId, user);
-                return order;
-            }
-            catch (OrderCloudIntegrationException oex)
-            {
-                return await Task.FromResult(oex.ApiError);
-            }
-            catch (Exception ex)
-            {
-                return await Task.FromResult(new ApiError()
-                {
-                    ErrorCode = "500",
-                    Message = ex.Message
-                });
-            }
-        }
+        
     }
 }

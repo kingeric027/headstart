@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Marketplace.Common;
-using Marketplace.Common.Commands.ETL;
+using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Helpers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Razor.Language.CodeGeneration;
 using Microsoft.Extensions.Primitives;
 using NSubstitute;
 using NUnit.Framework;
-using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 
 namespace Orchestration.Tests
@@ -51,8 +46,8 @@ namespace Orchestration.Tests
             });
             var functionToken = new OrderCloudIntegrationsFunctionToken(mockOrderCloudClient);
             var verifiedUser = await functionToken.Authorize(mockHttpRequest, new[] { ApiRole.OrderAdmin });
-            var command = new OrderSyncCommand(Substitute.For<AppSettings>());
-            Assert.ThrowsAsync<MissingMethodException>(async () => await command.GetAsync("ID", verifiedUser));
+            var command = new SupplierSyncCommand(Substitute.For<AppSettings>());
+            Assert.ThrowsAsync<MissingMethodException>(async () => await command.GetOrderAsync("ID", verifiedUser));
         }
     }
 }

@@ -7,7 +7,7 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Orchestration;
 using Flurl.Http;
-using Marketplace.Common.Commands.ETL;
+using Marketplace.Common.Commands.SupplierSync;
 using OrderCloud.SDK;
 using Marketplace.Common.Services.FreightPop;
 using ordercloud.integrations.cosmos;
@@ -29,11 +29,12 @@ namespace Marketplace.Orchestration
 
             builder.Services
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
+                .Inject<IOrderCloudClient>()
                 .Inject<IFlurlClient>()
                 .Inject<IFreightPopService>()
                 .Inject<IOrderCloudClient>()
                 .Inject<IOrchestrationCommand>()
-                .Inject<IOrderSyncCommand>()
+                .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(new CosmosConfig(
                         settings.CosmosSettings.DatabaseName, 

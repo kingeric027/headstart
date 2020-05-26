@@ -1,15 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
-using ordercloud.integrations.extensions;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Marketplace.Models;
+using Newtonsoft.Json.Linq;
+using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands.ETL.EntityCommands
+namespace Marketplace.Common.Commands.SupplierSync
 {
-    public class FASTPlatformCommand : IOrderSyncCommand
+    public class FASTPlatformCommand : ISupplierSyncCommand
     {
         private readonly IOrderCloudClient _oc;
 
@@ -18,7 +15,7 @@ namespace Marketplace.Common.Commands.ETL.EntityCommands
             _oc = oc;
         }
 
-        public async Task<JObject> GetAsync(string ID, VerifiedUserContext user)
+        public async Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user)
         {
             var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, ID, user.AccessToken);
             return JObject.FromObject(order);

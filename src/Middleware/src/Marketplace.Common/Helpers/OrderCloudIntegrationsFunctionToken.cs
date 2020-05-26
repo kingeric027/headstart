@@ -21,7 +21,7 @@ namespace Marketplace.Common.Helpers
     {
         private const string AUTH_HEADER_NAME = "Authorization";
         private const string BEARER_PREFIX = "Bearer ";
-        private readonly IOrderCloudClient _oc;
+        private IOrderCloudClient _oc;
 
         public OrderCloudIntegrationsFunctionToken(IOrderCloudClient oc)
         {
@@ -48,6 +48,7 @@ namespace Marketplace.Common.Helpers
             cid.AddClaim(new Claim("clientid", clientId));
             cid.AddClaim(new Claim("accesstoken", token));
 
+            _oc = new OrderCloudClient(new OrderCloudClientConfig() { ClientId = clientId });
             var user = await _oc.Me.GetAsync(token);
             if (!user.Active || user.Username != usr)
                 throw new Exception("Invalid User");
