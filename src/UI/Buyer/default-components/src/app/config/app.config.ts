@@ -24,9 +24,6 @@ export const ocAppConfig: AppConfig = {
     'MeXpAdmin',
     'MPApprovalRuleAdmin',
     'UserGroupAdmin',
-    'MPNeedsApproval',
-    'MPViewAllLocationOrders',
-    'MPOrderApprover',
     'ApprovalRuleAdmin',
     'Shopper',
     'BuyerUserAdmin',
@@ -34,5 +31,15 @@ export const ocAppConfig: AppConfig = {
     'PasswordReset',
     'SupplierReader',
     'SupplierAddressReader',
+
+    // location roles, will appear on jwt if a user
+    // has this role for any location
+    'MPLocationPermissionAdmin',
+    'MPLocationOrderApprover',
+    'MPLocationNeedsApproval',
+    'MPLocationViewAllOrders',
+    'MPLocationCreditCardAdmin',
+    'MPLocationAddressAdmin',
+    'MPLocationResaleCertAdmin',
   ],
 };
