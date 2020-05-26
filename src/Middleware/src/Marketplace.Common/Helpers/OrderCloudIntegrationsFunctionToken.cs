@@ -11,7 +11,7 @@ namespace Marketplace.Common.Helpers
 {
     public interface IOrderCloudIntegrationsFunctionToken
     {
-        Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles);
+        Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles, IOrderCloudClient oc = null);
     }
 
     /// <summary>
@@ -21,14 +21,12 @@ namespace Marketplace.Common.Helpers
     {
         private const string AUTH_HEADER_NAME = "Authorization";
         private const string BEARER_PREFIX = "Bearer ";
-        private IOrderCloudClient _oc;
 
-        public OrderCloudIntegrationsFunctionToken(IOrderCloudClient oc)
+        public OrderCloudIntegrationsFunctionToken()
         {
-            _oc = oc;
         }
 
-        public async Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles)
+        public async Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles, IOrderCloudClient oc = null)
         {
             Require.That(request.Headers.ContainsKey(AUTH_HEADER_NAME), new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
             Require.That(request.Headers[AUTH_HEADER_NAME].ToString().StartsWith(BEARER_PREFIX), new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
@@ -48,8 +46,10 @@ namespace Marketplace.Common.Helpers
             cid.AddClaim(new Claim("clientid", clientId));
             cid.AddClaim(new Claim("accesstoken", token));
 
-            _oc = new OrderCloudClient(new OrderCloudClientConfig() { ClientId = clientId });
-            var user = await _oc.Me.GetAsync(token);
+            if (oc == null)
+                oc = new OrderCloudClient(new OrderCloudClientConfig() { ClientId = clientId });
+            var user = await oc.Me.GetAsync(token);
+
             if (!user.Active || user.Username != usr)
                 throw new Exception("Invalid User");
             cid.AddClaim(new Claim("username", user.Username));

@@ -44,8 +44,9 @@ namespace Orchestration.Tests
                     "FullAccess"
                 }
             });
-            var functionToken = new OrderCloudIntegrationsFunctionToken(mockOrderCloudClient);
-            var verifiedUser = await functionToken.Authorize(mockHttpRequest, new[] { ApiRole.OrderAdmin });
+            
+            var functionToken = new OrderCloudIntegrationsFunctionToken();
+            var verifiedUser = await functionToken.Authorize(mockHttpRequest, new[] { ApiRole.OrderAdmin }, mockOrderCloudClient);
             var command = new SupplierSyncCommand(Substitute.For<AppSettings>());
             Assert.ThrowsAsync<MissingMethodException>(async () => await command.GetOrderAsync("ID", verifiedUser));
         }
