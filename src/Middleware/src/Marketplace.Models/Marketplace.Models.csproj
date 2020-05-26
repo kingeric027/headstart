@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ordercloud.integrations.cms" Version="0.0.5" />
+    <PackageReference Include="ordercloud.integrations.cms" Version="0.0.8" />
     <PackageReference Include="ordercloud.integrations.cosmos" Version="0.0.11" />
     <PackageReference Include="ordercloud.integrations.openapispec" Version="0.0.4" />
     <PackageReference Include="ordercloud.integrations.smartystreets" Version="0.0.4" />

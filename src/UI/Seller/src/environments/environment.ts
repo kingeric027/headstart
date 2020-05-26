@@ -5,7 +5,7 @@
 export const environment = {
   hostedApp: false,
   clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
-  middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  middlewareUrl: 'https://localhost:44384',
   ocMiddlewareUrl: 'https://ordercloud-middleware-test.azurewebsites.net',
   appname: 'Marketplace Admin Local',
   marketplaceID: 'seb',

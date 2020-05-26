@@ -8,7 +8,7 @@ export const environment = {
   clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
   marketplaceID: 'SEB',
   baseUrl: 'https://localhost:4200',
-  middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  middlewareUrl: 'https://localhost:44384',
   ocMiddlewareUrl: 'https://ordercloud-middleware-test.azurewebsites.net',
   cmsUrl: 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product',
   ssoLink:
