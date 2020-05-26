@@ -24,7 +24,7 @@ export class OCMProductDetails implements OnInit {
   _product: MarketplaceMeProduct;
   _priceSchedule: PriceSchedule;
   _rates: ListPage<ExchangeRates>;
-  _myCurrency: string;
+  _orderCurrency: string;
   _attachments: Asset[] = [];
   specFormService: SpecFormService;
   isOrderable = false;
@@ -59,8 +59,9 @@ export class OCMProductDetails implements OnInit {
     this._attachments = superProduct?.Attachments; 
     const currentUser = this.context.currentUser.get();
     // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    this._myCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
-    this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
+    console.log(this._orderCurrency)
+    this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._orderCurrency);
     // Specs
     this._specs = {Meta: {}, Items: superProduct.Specs};
     this.specFormService.event.valid = this._specs.Items.length === 0;
@@ -79,7 +80,7 @@ export class OCMProductDetails implements OnInit {
   onSpecFormChange(event): void {
     if (event.detail.type === 'Change') {
       this.specFormService.event = event.detail;
-      this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
+      this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._orderCurrency);
     }
   }
 
@@ -90,23 +91,26 @@ export class OCMProductDetails implements OnInit {
   qtyChange(event: { qty: number; valid: boolean }): void {
     if (event.valid) {
       this.quantity = event.qty;
-      this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._myCurrency);
+      this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._orderCurrency);
     }
   }
 
   async addToCart(): Promise<void> {
-    this.isAddingToCart = true;
-    try {
-      await this.context.order.cart.add({
-        ProductID: this._product.ID,
-        Quantity: this.quantity,
-        Specs: this.specFormService.getLineItemSpecs(this._specs),
-      });
-      this.isAddingToCart = false;
-    } catch (ex) {
-      this.isAddingToCart = false;
-      throw ex;
-    }
+      this.isAddingToCart = true;
+      try {
+        await this.context.order.cart.add({
+          ProductID: this._product.ID,
+          Quantity: this.quantity,
+          Specs: this.specFormService.getLineItemSpecs(this._specs),
+          xp: {
+            OrderCurrency: this._orderCurrency
+          }
+        });
+        this.isAddingToCart = false;
+      } catch (ex) {
+        this.isAddingToCart = false;
+        throw ex;
+      }
   }
 
   getPriceBreakRange(index: number): string {

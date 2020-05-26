@@ -6,11 +6,11 @@ export function exchange(
   rates: ListPage<ExchangeRates>,
   price: number,
   productCurrency: string,
-  myCurrency: string
+  orderCurrency: string
 ): BuyerCurrency {
   const targetRate = rates.Items.find(r => r.Currency === (productCurrency || 'USD'));
   return {
     Price: price / targetRate.Rate,
-    Currency: myCurrency,
+    Currency: orderCurrency,
   };
 }

@@ -11,7 +11,6 @@ namespace Marketplace.Models.Models.Marketplace
         public LineItemReturnInfo LineItemReturnInfo { get; set; }
         public decimal? ProductUnitPrice { get; set; }
     }
-
     public class LineItemReturnInfo
     {
         public int QuantityToReturn { get; set; }

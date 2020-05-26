@@ -1,10 +1,19 @@
 import { Injectable } from '@angular/core';
-import { ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
+import {
+  LineItem,
+  ListLineItem,
+  OcOrderService,
+  OcLineItemService,
+  OcMeService,
+  OcTokenService,
+} from '@ordercloud/angular-sdk';
 import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { MarketplaceOrder, MarketplaceLineItem } from '../../shopper-context';
 import { listAll } from '../../functions/listAll';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ShopperContextService } from '../shopper-context/shopper-context.service';
 
 export interface ICart {
   onAdd: Subject<MarketplaceLineItem>;
@@ -30,6 +39,9 @@ export class CartService implements ICart {
     private ocOrderService: OcOrderService,
     private ocLineItemService: OcLineItemService,
     private ocMeService: OcMeService,
+    private state: OrderStateService,
+    private http: HttpClient,
+    private ocTokenService: OcTokenService
     private state: OrderStateService
   ) { }
 
@@ -125,20 +137,16 @@ export class CartService implements ICart {
     return await this.ocLineItemService.Patch('outgoing', this.order.ID, lineItemID, patch).toPromise();
   }
 
-  private async createLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
-    // if line item exists simply update quantity, else create
-    const existingLI = this.lineItems.Items.find(li => this.LineItemsMatch(li, lineItem));
-
+  private async createLineItem(lineItem: LineItem): Promise<LineItem> {
     this.onAdd.next(lineItem);
+    const middlewareUrl = `https://localhost:44314`;
+    const url = `${middlewareUrl}/order/${this.order?.ID}/lineitems`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
     try {
-      if (existingLI) {
-        lineItem = await this.setQuantity(existingLI.ID, lineItem.Quantity + existingLI.Quantity);
-      } else {
-        this.lineItems.Items.push(lineItem);
-        Object.assign(this.order, this.calculateOrder());
-        lineItem = await this.ocLineItemService.Create('outgoing', this.order.ID, lineItem).toPromise();
-      }
-      return lineItem;
+      return await this.http.post(url, lineItem, { headers: headers }).toPromise();
     } finally {
       await this.state.reset();
     }
