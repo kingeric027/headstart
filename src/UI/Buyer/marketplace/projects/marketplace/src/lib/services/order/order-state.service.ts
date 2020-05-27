@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { listAll } from '../../functions/listAll';
+import { CurrentUserService } from '../current-user/current-user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +19,7 @@ export class OrderStateService {
       AvalaraTaxTransactionCode: '',
       OrderType: OrderType.Standard,
       QuoteOrderInfo: null,
+      Currency: '',
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
@@ -28,6 +30,7 @@ export class OrderStateService {
     private ocLineItemService: OcLineItemService,
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
+    private currentUserService: CurrentUserService,
     private appConfig: AppConfig
   ) {}
 
@@ -81,7 +84,8 @@ export class OrderStateService {
     ];
 
     const [resubmittingOrders, normalUnsubmittedOrders] = await Promise.all(orderQueries);
-
+    const me = this.currentUserService.get();
+    const orderCurrency = me?.UserGroups.filter(ug => ug.xp.Type === 'BuyerLocation')[0].xp.Currency || 'USD';
     if (resubmittingOrders.Items.length) {
       this.order = resubmittingOrders.Items[0];
     } else if (normalUnsubmittedOrders.Items.length) {
@@ -89,6 +93,7 @@ export class OrderStateService {
     } else if (this.appConfig.anonymousShoppingEnabled) {
       this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
     } else {
+      this.DefaultOrder.xp.Currency = orderCurrency;
       this.order = await this.ocOrderService.Create('outgoing', this.DefaultOrder).toPromise();
     }
     if (this.order.DateCreated) {

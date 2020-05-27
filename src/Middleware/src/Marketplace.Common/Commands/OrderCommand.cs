@@ -187,13 +187,15 @@ namespace Marketplace.Common.Commands
             {
                 // POST new li
                 li = await _oc.LineItems.CreateAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, liReq, user.AccessToken);
+                // Get the order, for the order.xp.Currency value
+                var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID, user.AccessToken);
                 // Exchange the li.UnitPrice from li.Product.xp.Currency => li.xp.OrderCurrency
-                var exchangedUnitPrice = await ExchangeUnitPrice(li);
+                var exchangedUnitPrice = await ExchangeUnitPrice(li, order);
                 // PATCH the Line Item with exchanged Unit Price & add ProductUnitPrice to xp (OrderDirection.Incoming due to use of elevated token)
                 li = await _oc.LineItems
                     .PatchAsync<MarketplaceLineItem>
                     (OrderDirection.Incoming, orderID, li.ID, 
-                    new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { ProductUnitPrice = li.UnitPrice, OrderCurrency = li.xp.OrderCurrency} });
+                    new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { ProductUnitPrice = li.UnitPrice} });
             }
             return li;
         }
@@ -223,18 +225,20 @@ namespace Marketplace.Common.Commands
             await _oc.LineItems.DeleteAsync(OrderDirection.Outgoing, orderID, li.ID, user.AccessToken);
             // Create the new Li
             var newLi = await _oc.LineItems.CreateAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, newLiReq, user.AccessToken);
+            // Get the order, for the order.xp.Currency value
+            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID, user.AccessToken);
             // Exchange the newLi Unit Price
-            var exchangedUnitPrice = await ExchangeUnitPrice(newLi);
+            var exchangedUnitPrice = await ExchangeUnitPrice(newLi, order);
             // PATCH the Li with the new/exchanged Unit Price
             return await _oc.LineItems.PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, newLi.ID, new PartialLineItem { UnitPrice = exchangedUnitPrice });
         }
 
-        private async Task<decimal?> ExchangeUnitPrice(MarketplaceLineItem li)
+        private async Task<decimal?> ExchangeUnitPrice(MarketplaceLineItem li, MarketplaceOrder order)
         {
             // Exchange the li.UnitPrice from li.Product.xp.Currency => li.xp.OrderCurrency
             var url = OcIntegrationsApiBaseUrl + $"/exchangerates/{li.Product.xp.Currency}";
             var ExchangeRates = await url.GetJsonAsync<ListPage<OrderCloudIntegrationsConversionRate>>();
-            CurrencySymbols liCurrency = (CurrencySymbols)Enum.Parse(typeof(CurrencySymbols), li.xp.OrderCurrency);
+            CurrencySymbols liCurrency = (CurrencySymbols)Enum.Parse(typeof(CurrencySymbols), order.xp.Currency);
             var OrderRate = (ExchangeRates.Items as List<OrderCloudIntegrationsConversionRate>).Find(r => r.Currency == liCurrency);
             return (decimal)li.UnitPrice * (decimal)OrderRate.Rate;
         }
