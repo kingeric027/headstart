@@ -298,23 +298,27 @@
       <!-- Pricing -->
       <mat-tab label="Pricing">
         <div class="form-group">
-          <label for="Price">Price</label>
-          <div class="input-group col-md-6">
-            <div class="input-group-prepend">
-              <span class="input-group-text">{{_myCurrency?.Symbol}}</span>
+          <div class="form-row col-md-12">
+            <div class="form-group col-md-6">
+              <label for="Price">Base Price</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">{{_myCurrency?.Symbol}}</span>
+                </div>
+                <input [attr.disabled]="readonly ? true : null"
+                       type="number"
+                       class="form-control currency"
+                       id="Price"
+                       showErrors
+                       aria-describedby="Price"
+                       min="1"
+                       step="0.01"
+                       [resourceForm]="productForm"
+                       formControlName="Price"
+                       (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
+                       placeholder="Price ({{_myCurrency?.Name}})">
+              </div>
             </div>
-            <input [attr.disabled]="readonly ? true : null"
-                   type="number"
-                   class="form-control currency"
-                   id="Price"
-                   showErrors
-                   aria-describedby="Price"
-                   min="1"
-                   step="0.01"
-                   [resourceForm]="productForm"
-                   formControlName="Price"
-                   (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
-                   placeholder="Price ({{_myCurrency?.Name}})">
           </div>
           <div *ngIf="editPriceBreaks"
                class="form-row col-md-6">
@@ -357,7 +361,7 @@
                   (click)="toggleEditPriceBreaks()">Edit Price Breaks</button>
           <div *ngIf="_superMarketplaceProductStatic?.PriceSchedule?.PriceBreaks.length">
             <label for="PriceBreaks">Price Breaks</label>
-            <table class="table mb-0">
+            <table class="table mb-3">
               <thead class="bg-light">
                 <tr>
                   <th>Price</th>
