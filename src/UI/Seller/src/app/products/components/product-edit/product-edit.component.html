@@ -354,7 +354,7 @@
         <div class="col-md-6">
           <button *ngIf="!readonly"
                   class="btn btn-outline-primary float-right"
-                  (click)="toggleEditPriceBreaks()">Add Price Break</button>
+                  (click)="toggleEditPriceBreaks()">Edit Price Breaks</button>
           <div *ngIf="_superMarketplaceProductStatic?.PriceSchedule?.PriceBreaks.length">
             <label for="PriceBreaks">Price Breaks</label>
             <table class="table mb-0">
@@ -362,12 +362,31 @@
                 <tr>
                   <th>Price</th>
                   <th>Quantity</th>
+                  <th *ngIf="editPriceBreaks"></th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let priceBreak of _superMarketplaceProductStatic?.PriceSchedule?.PriceBreaks">
-                  <td>{{priceBreak.Price}}</td>
-                  <td>{{priceBreak.Quantity}}</td>
+                <tr *ngFor="let priceBreak of _superMarketplaceProductStatic?.PriceSchedule?.PriceBreaks; let i = index">
+                  <td>{{_myCurrency?.Symbol}} {{priceBreak.Price}}</td>
+                  <td>{{getPriceBreakRange(i)}}</td>
+                  <td *ngIf="editPriceBreaks"
+                      (click)="open(content)">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                    <ng-template #content
+                                 let-modal
+                                 class="confirm-modal">
+                      <confirm-modal modalTitle="Delete Price Break?"
+                                     description="Deleting this price break cannot be reversed.">
+                        <button type="button"
+                                class="btn btn-link text-dark"
+                                (click)="modal.dismiss()">Cancel</button>
+                        <button type="button"
+                                class="btn brand-button--danger"
+                                (click)="deletePriceBreak(priceBreak)"
+                                (click)="modal.dismiss()">Yes, Delete</button>
+                      </confirm-modal>
+                    </ng-template>
+                  </td>
                 </tr>
               </tbody>
             </table>

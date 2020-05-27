@@ -250,8 +250,10 @@ export class ProductEditComponent implements OnInit {
         await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
       }
       this.dataIsSaving = false;
+      this.editPriceBreaks = false;
     } catch (ex) {
       this.dataIsSaving = false;
+      this.editPriceBreaks = false;
       throw ex;
     }
   }
@@ -289,6 +291,26 @@ export class ProductEditComponent implements OnInit {
     );
     const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: uniqueBreaks }
     this.updateProductResource(productUpdate);
+    this.updateProduct();
+  }
+
+  getPriceBreakRange(index: number): string {
+    const priceBreaks = this._superMarketplaceProductStatic.PriceSchedule.PriceBreaks;
+    if (!priceBreaks.length) return '';
+    const indexOfNextPriceBreak = index + 1;
+    if (indexOfNextPriceBreak < priceBreaks.length) {
+      return `${priceBreaks[index].Quantity} - ${priceBreaks[indexOfNextPriceBreak].Quantity - 1}`;
+    } else {
+      return `${priceBreaks[index].Quantity}+`;
+    }
+  }
+
+  deletePriceBreak(priceBreak: PriceBreak) {
+    const i = this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.indexOf(priceBreak);
+    this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.splice(i, 1);
+    const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks }
+    this.updateProductResource(productUpdate);
+    this.updateProduct();
   }
 
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
