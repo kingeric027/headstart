@@ -16,7 +16,7 @@ import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCircle, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCircle, faHeart, faCog } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
@@ -68,6 +68,7 @@ export class ProductEditComponent implements OnInit {
   faTimes = faTimes;
   faTrash = faTrash;
   faCircle = faCircle;
+  faCog = faCog;
   faHeart = faHeart;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;

@@ -298,6 +298,13 @@
       <!-- Pricing -->
       <mat-tab label="Pricing">
         <div class="form-group">
+          <div class="col-md-6 my-3">
+            <button *ngIf="!readonly && !editPriceBreaks"
+                    class="btn btn-outline-dark"
+                    (click)="toggleEditPriceBreaks()">
+              <fa-icon [icon]="faCog"></fa-icon> Edit Price Breaks
+            </button>
+          </div>
           <div class="form-row col-md-12">
             <div class="form-group col-md-6">
               <label for="Price">Base Price</label>
@@ -321,8 +328,8 @@
             </div>
           </div>
           <div *ngIf="editPriceBreaks"
-               class="form-row col-md-6">
-            <div class="form-group col-md-6">
+               class="col-md-6 card p-2">
+            <div class="form-group">
               <label for="PriceBreaks">Price</label>
               <div class="input-group">
                 <div class="input-group-prepend">
@@ -338,7 +345,7 @@
                        placeholder="Price ({{_myCurrency?.Name}})">
               </div>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group">
               <label for="PriceBreaks">Quantity</label>
               <input type="number"
                      required
@@ -348,18 +355,15 @@
                      aria-label="Quantity"
                      aria-describedby="price break quantity">
             </div>
-            <button class="btn btn-sm btn-outline-primary"
-                    (click)="addPriceBreak()">Confirm</button>
+            <button class="btn btn-sm btn-outline-primary mr-2"
+                    (click)="addPriceBreak()">Add Price Break</button>
             <button type="button"
                     class="btn btn-link text-dark"
                     (click)="toggleEditPriceBreaks()">Cancel</button>
           </div>
         </div>
         <div class="col-md-6">
-          <button *ngIf="!readonly"
-                  class="btn btn-outline-primary float-right"
-                  (click)="toggleEditPriceBreaks()">Edit Price Breaks</button>
-          <div *ngIf="_superMarketplaceProductStatic?.PriceSchedule?.PriceBreaks.length">
+          <div *ngIf="_superMarketplaceProductStatic?.PriceSchedule?.PriceBreaks.length > 1">
             <label for="PriceBreaks">Price Breaks</label>
             <table class="table mb-3">
               <thead class="bg-light">
@@ -370,9 +374,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let priceBreak of _superMarketplaceProductStatic?.PriceSchedule?.PriceBreaks; let i = index">
-                  <td>{{_myCurrency?.Symbol}} {{priceBreak.Price}}</td>
-                  <td>{{getPriceBreakRange(i)}}</td>
+                <tr *ngFor="let priceBreak of _superMarketplaceProductStatic?.PriceSchedule?.PriceBreaks | slice:1; let i = index">
+                  <td>{{_myCurrency?.Symbol}}{{priceBreak.Price}}</td>
+                  <td>{{getPriceBreakRange(i+1)}}</td>
                   <td *ngIf="editPriceBreaks"
                       (click)="open(content)">
                     <fa-icon [icon]="faTrash"></fa-icon>
