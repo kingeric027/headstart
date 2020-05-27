@@ -6,6 +6,12 @@ using Marketplace.Common.Queries;
 using Marketplace.Common;
 using System.Threading.Tasks;
 using System.Linq;
+using Marketplace.Common.Commands.SupplierSync;
+using Marketplace.Common.Helpers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using ordercloud.integrations.extensions;
+using OrderCloud.SDK;
 
 namespace Marketplace.Orchestration
 {
@@ -14,9 +20,10 @@ namespace Marketplace.Orchestration
         private readonly IOrderOrchestrationCommand _orderOrchestrationCommand;
         private readonly LogQuery _log;
         private readonly AppSettings _appSettings;
-        private DurableOrchestrationContext _orchestrationContext;
+       
 
-        public OrderOrchestrationTrigger(AppSettings appSettings, IOrderOrchestrationCommand orderOrchestrationCommand, ISyncCommand sync, LogQuery log)
+        public OrderOrchestrationTrigger(AppSettings appSettings, IOrderCloudIntegrationsFunctionToken token, 
+            IOrderOrchestrationCommand orderOrchestrationCommand, ISupplierSyncCommand supplier, LogQuery log)
         {
             _orderOrchestrationCommand = orderOrchestrationCommand;
             _log = log;
@@ -46,5 +53,7 @@ namespace Marketplace.Orchestration
                 logger.LogError(ex.Message);
             }
         }
+
+        
     }
 }
