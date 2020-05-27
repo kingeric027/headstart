@@ -39,7 +39,12 @@ export interface IOrderHistory {
   getLineItemSuppliers(liGroups: MarketplaceLineItem[][]): Promise<LineItemGroupSupplier[]>;
   listShipments(orderID?: string): Promise<ShipmentWithItems[]>;
   returnOrder(orderID?: string): Promise<MarketplaceOrder>;
-  returnLineItem(orderID?: string, lineItemID?: string, quantityToReturn?: number, returnReason?: string): Promise<MarketplaceLineItem>;
+  returnLineItem(
+    orderID?: string,
+    lineItemID?: string,
+    quantityToReturn?: number,
+    returnReason?: string
+  ): Promise<MarketplaceLineItem>;
 }
 
 @Injectable({
@@ -67,7 +72,7 @@ export class OrderHistoryService implements IOrderHistory {
   async getLocationsUserCanView(): Promise<MarketplaceAddressBuyer[]> {
     // add strong type when sdk is regenerated
     const accessUserGroups = await this.ocMeService
-      .ListUserGroups({ filters: { 'xp.Type': 'OrderAccess' } })
+      .ListUserGroups({ filters: { 'xp.Role': 'ViewAllOrders' } })
       .toPromise();
     const locationRequests = accessUserGroups.Items.map(a => this.ocMeService.GetAddress(a.xp.Location).toPromise());
     const locationResponses = await Promise.all(locationRequests);
@@ -90,7 +95,10 @@ export class OrderHistoryService implements IOrderHistory {
     return await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
   }
 
-  async validateReorder(orderID: string = this.activeOrderID, lineItems: MarketplaceLineItem[]): Promise<OrderReorderResponse> {
+  async validateReorder(
+    orderID: string = this.activeOrderID,
+    lineItems: MarketplaceLineItem[]
+  ): Promise<OrderReorderResponse> {
     return this.reorderHelper.validateReorder(orderID, lineItems);
   }
 
@@ -128,28 +136,36 @@ export class OrderHistoryService implements IOrderHistory {
       .get<ShipmentWithItems[]>(url, { headers: headers })
       .toPromise();
   }
-  
+
   async returnOrder(orderID: string): Promise<MarketplaceOrder> {
-    return await this.ocOrderService.Patch('Outgoing', orderID, { 
-      xp: {
-        OrderReturnInfo: {
-          HasReturn: true,
-          Resolved: false
-        }
-      }
-    }).toPromise();
+    return await this.ocOrderService
+      .Patch('Outgoing', orderID, {
+        xp: {
+          OrderReturnInfo: {
+            HasReturn: true,
+            Resolved: false,
+          },
+        },
+      })
+      .toPromise();
   }
 
-  async returnLineItem(orderID: string, lineItemID: string, quantityToReturn: number, returnReason: string): Promise<MarketplaceLineItem> {
-    return await this.ocLineItemService.Patch('Outgoing', orderID, lineItemID, {
-      xp: {
-        LineItemReturnInfo: {
-          QuantityToReturn: quantityToReturn,
-          ReturnReason: returnReason,
-          Resolved: false
-        }
-      }
-    }).toPromise();
+  async returnLineItem(
+    orderID: string,
+    lineItemID: string,
+    quantityToReturn: number,
+    returnReason: string
+  ): Promise<MarketplaceLineItem> {
+    return await this.ocLineItemService
+      .Patch('Outgoing', orderID, lineItemID, {
+        xp: {
+          LineItemReturnInfo: {
+            QuantityToReturn: quantityToReturn,
+            ReturnReason: returnReason,
+            Resolved: false,
+          },
+        },
+      })
+      .toPromise();
   }
-
 }
