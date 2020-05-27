@@ -138,7 +138,8 @@ export class CartService implements ICart {
 
   private async createLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     this.onAdd.next(lineItem);
-    const middlewareUrl = `https://localhost:44314`;
+    // Will be replaced by an SDK call, eventually.
+    const middlewareUrl = `https://marketplace-middleware-test.azurewebsites.net`;
     const url = `${middlewareUrl}/order/${this.order?.ID}/lineitems`;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
