@@ -3,6 +3,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType, MarketplaceLineItem } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
+import { CurrentUserService } from 'marketplace/projects/marketplace/src/lib/services/current-user/current-user.service';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
@@ -22,8 +23,13 @@ export class OCMLineitemTable {
   liGroupedByShipFrom: MarketplaceLineItem[][];
   liGroups: any;
   _lineItems = [];
+  _orderCurrency: string;
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) { 
+    const currentUser = this.context.currentUser.get();
+    // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
+  }
 
   async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(liGroups);
