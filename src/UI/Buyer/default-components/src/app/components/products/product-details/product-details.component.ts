@@ -60,7 +60,6 @@ export class OCMProductDetails implements OnInit {
     const currentUser = this.context.currentUser.get();
     // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
     this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
-    console.log(this._orderCurrency)
     this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._orderCurrency);
     // Specs
     this._specs = {Meta: {}, Items: superProduct.Specs};
@@ -102,9 +101,7 @@ export class OCMProductDetails implements OnInit {
           ProductID: this._product.ID,
           Quantity: this.quantity,
           Specs: this.specFormService.getLineItemSpecs(this._specs),
-          xp: {
-            OrderCurrency: this._orderCurrency
-          }
+          xp: {}
         });
         this.isAddingToCart = false;
       } catch (ex) {
