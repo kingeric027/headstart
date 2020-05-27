@@ -91,6 +91,7 @@ export interface OrderReturnInfo {
   HasReturn: boolean;
   RMANumber: string;
   Resolved: boolean;
+  Comment: string;
 }
 
 export interface ProductFilters {
