@@ -108,7 +108,7 @@
         <div class=" border border-medium border-radius mb-3 p-2">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
-            <span *ngFor="let priceBreak of _product.PriceSchedule.PriceBreaks; let i = index"
+            <span *ngFor="let priceBreak of _priceSchedule?.PriceBreaks; let i = index"
                   class="font-weight-bold d-flex mt-2">{{ getPriceBreakRange(i) }}:
               <p class="font-weight-normal ml-1 mr-4">{{priceBreak.Price | currency}}</p>
             </span>
@@ -148,8 +148,7 @@
            class="p-3 border border-medium border-radius">
         <div class="d-flex justify-content-between align-items-center">
           <span class="badge badge-pill badge-warning"
-                *ngIf="percentSavings > 0"
-                translate>PRODUCTS.DETAILS.SAVINGS {{ percentSavings }}%!
+                *ngIf="percentSavings > 0"><span translate>PRODUCTS.DETAILS.SAVINGS</span> {{ percentSavings }}%!
           </span>
         </div>
         <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
