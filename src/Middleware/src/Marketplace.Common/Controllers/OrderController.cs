@@ -53,11 +53,11 @@ namespace Marketplace.Common.Controllers
             return await _command.GetMarketplaceShipmentWithItems(orderID, VerifiedUserContext);
         }
 
-        [DocName("Add a line item to an order")]
-        [HttpPost, Route("{orderID}/lineitems"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        [DocName("Add or update a line item to an order")]
+        [HttpPut, Route("{orderID}/lineitems"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<MarketplaceLineItem> CreateLineItem(string orderID, [FromBody] MarketplaceLineItem li)
         {
-            return await _command.CreateLineItem(orderID, li, VerifiedUserContext);
+            return await _command.UpsertLineItem(orderID, li, VerifiedUserContext);
         }
     }
 }
