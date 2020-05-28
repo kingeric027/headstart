@@ -187,15 +187,6 @@
           </button>
         </div>
       </div>
-      <div *ngIf="showGrid">
-        <ocm-grid-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
-                            [specs]="_specs"
-                            [product]="_product"
-                            [priceBreaks]="priceBreaks"
-                            [price]="price">
-        </ocm-grid-spec-form>
-
-      </div>
       <ocm-modal [state]="quoteFormModal"
                  [modalTitle]="'Request Quote'">
         <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
