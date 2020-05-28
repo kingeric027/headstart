@@ -101,7 +101,6 @@ export class OCMProductDetails implements OnInit {
           ProductID: this._product.ID,
           Quantity: this.quantity,
           Specs: this.specFormService.getLineItemSpecs(this._specs),
-          xp: {}
         });
         this.isAddingToCart = false;
       } catch (ex) {
