@@ -6,11 +6,11 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.SupplierSync
 {
-    public class FASTPlatformCommand : ISupplierSyncCommand
+    public class MPSupplierFASTPlatformCommand : ISupplierSyncCommand
     {
         private readonly IOrderCloudClient _oc;
 
-        public FASTPlatformCommand(AppSettings settings, IOrderCloudClient oc)
+        public MPSupplierFASTPlatformCommand(AppSettings settings, IOrderCloudClient oc)
         {
             _oc = oc;
         }

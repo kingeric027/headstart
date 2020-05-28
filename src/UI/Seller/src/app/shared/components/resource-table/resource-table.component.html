@@ -121,14 +121,15 @@
                 [formGroup]="filterForm">
             <div *ngFor="let filter of filterConfig?.Filters"
                  class="group mt-2">
+             <div *ngIf="shouldFilterDisplay(filter)">
               <label>{{filter.Display}}</label>
               <select class="form-control input-sm"
                       *ngIf="filter.Type === 'Dropdown'"
                       type="select"
                       required
                       [formControlName]="filter.Path">
-                <ng-container *ngFor="let option of filter.Values">
-                  <option value="{{option}}">{{option}}</option>
+                <ng-container *ngFor="let option of filter.Values; let i = index;">
+                  <option value="{{option}}">{{getFilterDisplayValue(filter, option, i)}}</option>
                 </ng-container>
               </select>
               <div class="input-group"
@@ -148,6 +149,7 @@
                              id="calendar-addon-from"></fa-icon>
                   </button>
                 </div>
+              </div>
               </div>
             </div>
           </form>
