@@ -65,26 +65,6 @@
               </div>
               <div class="form-row">
                 <div class="form-group col-md-6">
-                  <label for="Price">Price</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">{{_myCurrency?.Symbol}}</span>
-                    </div>
-                    <input [attr.disabled]="readonly ? true : null"
-                           type="number"
-                           class="form-control currency"
-                           id="Price"
-                           showErrors
-                           aria-describedby="Price"
-                           min="1"
-                           step="0.01"
-                           [resourceForm]="productForm"
-                           formControlName="Price"
-                           (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
-                           placeholder="Price ({{_myCurrency?.Name}})">
-                  </div>
-                </div>
-                <div class="form-group col-md-6">
                   <label for="ProductType">Product Type</label>
                   <select [attr.disabled]="readonly ? true : null"
                           type="dropdown"
@@ -315,6 +295,113 @@
         </div>
       </mat-tab>
       <!-- / Product Description -->
+      <!-- Pricing -->
+      <mat-tab label="Pricing">
+        <div class="form-group">
+          <div class="col-md-6 my-3">
+            <button *ngIf="!readonly && !editPriceBreaks"
+                    class="btn btn-outline-dark"
+                    (click)="toggleEditPriceBreaks()">
+              <fa-icon [icon]="faCog"></fa-icon> Edit Price Breaks
+            </button>
+          </div>
+          <div class="form-row col-md-12">
+            <div class="form-group col-md-6">
+              <label for="Price">Base Price</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">{{_myCurrency?.Symbol}}</span>
+                </div>
+                <input [attr.disabled]="readonly ? true : null"
+                       type="number"
+                       class="form-control currency"
+                       id="Price"
+                       showErrors
+                       aria-describedby="Price"
+                       min="1"
+                       step="0.01"
+                       [resourceForm]="productForm"
+                       formControlName="Price"
+                       (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
+                       placeholder="Price ({{_myCurrency?.Name}})">
+              </div>
+            </div>
+          </div>
+          <div *ngIf="editPriceBreaks"
+               class="col-md-6 card p-2">
+            <div class="form-group">
+              <label for="PriceBreaks">Price</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">{{_myCurrency?.Symbol}}</span>
+                </div>
+                <input type="number"
+                       class="form-control currency"
+                       id="PriceBreaks"
+                       aria-describedby="PriceBreaks"
+                       min="1"
+                       step="0.01"
+                       (input)="handleUpdatePriceBreaks($event, 'price')"
+                       placeholder="Price ({{_myCurrency?.Name}})">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="PriceBreaks">Quantity</label>
+              <input type="number"
+                     required
+                     (input)="handleUpdatePriceBreaks($event, 'qty')"
+                     class="form-control"
+                     placeholder="Quantity"
+                     aria-label="Quantity"
+                     aria-describedby="price break quantity">
+            </div>
+            <button class="btn btn-sm btn-outline-primary mr-2"
+                    (click)="addPriceBreak()">Add Price Break</button>
+            <button type="button"
+                    class="btn btn-link text-dark"
+                    (click)="toggleEditPriceBreaks()">Cancel</button>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div *ngIf="_superMarketplaceProductStatic?.PriceSchedule?.PriceBreaks.length > 1">
+            <label for="PriceBreaks">Price Breaks</label>
+            <table class="table mb-3">
+              <thead class="bg-light">
+                <tr>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th *ngIf="editPriceBreaks"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let priceBreak of _superMarketplaceProductStatic?.PriceSchedule?.PriceBreaks | slice:1; let i = index">
+                  <td>{{_myCurrency?.Symbol}}{{priceBreak.Price}}</td>
+                  <td>{{getPriceBreakRange(i+1)}}</td>
+                  <td *ngIf="editPriceBreaks"
+                      (click)="open(content)">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                    <ng-template #content
+                                 let-modal
+                                 class="confirm-modal">
+                      <confirm-modal modalTitle="Delete Price Break?"
+                                     description="Deleting this price break cannot be reversed.">
+                        <button type="button"
+                                class="btn btn-link text-dark"
+                                (click)="modal.dismiss()">Cancel</button>
+                        <button type="button"
+                                class="btn brand-button--danger"
+                                (click)="deletePriceBreak(priceBreak)"
+                                (click)="modal.dismiss()">Yes, Delete</button>
+                      </confirm-modal>
+                    </ng-template>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+      <!-- /Pricing -->
       <!-- / Product Details -->
       <mat-tab>
         <ng-template mat-tab-label>

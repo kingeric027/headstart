@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
-using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 using Action = Marketplace.Common.Models.Action;
 
@@ -58,7 +57,7 @@ namespace Marketplace.Common.Commands
             var command = (IWorkItemCommand) Activator.CreateInstance(type, new object[] {_settings, _log, _oc});
             var method = command.GetType()
                 .GetMethod($"{wi.Action}Async", BindingFlags.Public | BindingFlags.Instance);
-           
+            if (method == null) throw new MissingMethodException($"{wi.RecordType}SyncCommand is missing");
 
             return await (Task<JObject>) method.Invoke(command, new object[] { wi });
         }

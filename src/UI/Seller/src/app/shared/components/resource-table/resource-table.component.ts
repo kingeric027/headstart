@@ -298,6 +298,17 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     return (this.resourceOptions && this.resourceOptions.filters && this.resourceOptions.filters[pathOfFilter]) || '';
   }
 
+  shouldFilterDisplay(filter: any): boolean {
+    if (filter.QueryRestriction) {
+      return this.router.url.includes(filter.QueryRestriction) ? true : false;
+    }
+    return true;
+  }
+
+  getFilterDisplayValue(filter: any, option :string, i: number): string {
+    return filter.ValueDisplayOverride ? filter.ValueDisplayOverride[i] : option;
+  }
+
   searchedResources(event) {
     this.searched.emit(event);
   }
