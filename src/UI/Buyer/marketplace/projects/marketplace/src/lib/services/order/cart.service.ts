@@ -20,7 +20,7 @@ export interface ICart {
   get(): ListLineItem;
   add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem>;
   remove(lineItemID: string): Promise<void>;
-  setQuantity(lineItemID: string, newQuantity: number): Promise<MarketplaceLineItem>;
+  setQuantity(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem>;
   addMany(lineItem: MarketplaceLineItem[]): Promise<MarketplaceLineItem[]>;
   empty(): Promise<void>;
   onChange(callback: (lineItems: ListLineItem) => void): void;
@@ -72,9 +72,9 @@ export class CartService implements ICart {
     }
   }
 
-  async setQuantity(lineItemID: string, newQuantity: number): Promise<MarketplaceLineItem> {
+  async setQuantity(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     try {
-      return await this.patchLineItem(lineItemID, { Quantity: newQuantity });
+      return await this.add(lineItem);
     } finally {
       this.state.reset();
     }
@@ -129,13 +129,6 @@ export class CartService implements ICart {
     }
   }
 
-  private async patchLineItem(lineItemID: string, patch: MarketplaceLineItem): Promise<MarketplaceLineItem> {
-    const existingLI = this.lineItems.Items.find(li => li.ID === lineItemID);
-    Object.assign(existingLI, patch);
-    Object.assign(this.order, this.calculateOrder());
-    return await this.ocLineItemService.Patch('outgoing', this.order.ID, lineItemID, patch).toPromise();
-  }
-
   private async createLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     this.onAdd.next(lineItem);
     // Will be replaced by an SDK call, eventually.
@@ -146,7 +139,7 @@ export class CartService implements ICart {
       Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
     });
     try {
-      return await this.http.post(url, lineItem, { headers: headers }).toPromise();
+      return await this.http.put(url, lineItem, { headers: headers }).toPromise();
     } finally {
       await this.state.reset();
     }
@@ -161,16 +154,6 @@ export class CartService implements ICart {
     const Subtotal = this.lineItems.Items.reduce((sum, li) => sum + li.LineTotal, 0);
     const Total = Subtotal + this.order.TaxCost + this.order.ShippingCost;
     return { LineItemCount, Total, Subtotal };
-  }
-
-  // product ID and specs must be the same
-  private LineItemsMatch(li1: MarketplaceLineItem, li2: MarketplaceLineItem): boolean {
-    if (li1.ProductID !== li2.ProductID) return false;
-    for (const spec1 of li1.Specs) {
-      const spec2 = li2.Specs?.find(s => s.SpecID === spec1.SpecID);
-      if (spec1.Value !== spec2.Value) return false;
-    }
-    return true;
   }
 
   private get order(): MarketplaceOrder {
