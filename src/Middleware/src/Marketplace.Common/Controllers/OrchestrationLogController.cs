@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Models;
 using Marketplace.Models.Attributes;
-using ordercloud.integrations.cosmos;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers
@@ -22,7 +21,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("GET Orchestration Logs")]
         [HttpGet]
-        public async Task<ListPage<OrchestrationLog>> List(CosmosListArgs<OrchestrationLog> marketplaceListArgs)
+        public async Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> marketplaceListArgs)
         {
             return await _command.List(marketplaceListArgs);
         }

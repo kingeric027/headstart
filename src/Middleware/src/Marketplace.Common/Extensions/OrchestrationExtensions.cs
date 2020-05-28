@@ -1,6 +1,6 @@
 ﻿using Marketplace.Common.Models;
 using Marketplace.Models;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 using ErrorCodes = Marketplace.Models.ErrorCodes;
 
 namespace Marketplace.Common.Extensions

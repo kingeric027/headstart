@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.library", "src\ordercloud.integrations.library\ordercloud.integrations.library.csproj", "{854B7782-2147-4820-9237-86AE4FE741D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{D35D5FCC-FD41-4B28-9B62-4FF24C8271C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D35D5FCC-FD41-4B28-9B62-4FF24C8271C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D35D5FCC-FD41-4B28-9B62-4FF24C8271C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{854B7782-2147-4820-9237-86AE4FE741D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{854B7782-2147-4820-9237-86AE4FE741D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{854B7782-2147-4820-9237-86AE4FE741D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{854B7782-2147-4820-9237-86AE4FE741D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

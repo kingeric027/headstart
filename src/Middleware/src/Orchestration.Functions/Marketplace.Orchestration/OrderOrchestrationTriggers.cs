@@ -8,10 +8,6 @@ using System.Threading.Tasks;
 using System.Linq;
 using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Helpers;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using ordercloud.integrations.extensions;
-using OrderCloud.SDK;
 
 namespace Marketplace.Orchestration
 {

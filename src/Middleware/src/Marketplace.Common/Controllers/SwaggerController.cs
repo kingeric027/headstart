@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using ordercloud.integrations.extensions;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
+using ordercloud.integrations.library.OpenApiSpec;
 using ErrorCodes = Marketplace.Models.ErrorCodes;
 
 namespace Marketplace.Common.Controllers

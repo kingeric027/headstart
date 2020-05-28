@@ -7,8 +7,7 @@ using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Models;
-using ordercloud.integrations.blob;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 using Action = Marketplace.Common.Models.Action;
 
 namespace Marketplace.Common.Commands

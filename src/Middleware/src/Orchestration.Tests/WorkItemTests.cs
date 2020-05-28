@@ -6,7 +6,7 @@ using Marketplace.Common.Models;
 using Marketplace.Models.Attributes;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 
 namespace Orchestration.Tests
 {

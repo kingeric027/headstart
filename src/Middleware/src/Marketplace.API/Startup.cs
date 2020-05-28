@@ -19,12 +19,11 @@ using Marketplace.Common.Services.Zoho;
 using Marketplace.Models.Extended;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.cms;
-using ordercloud.integrations.cosmos;
 using OrderCloud.SDK;
-using ordercloud.integrations.extensions;
 using Swashbuckle.AspNetCore.Swagger;
 using ordercloud.integrations.smartystreets;
 using ordercloud.integrations.avalara;
+using ordercloud.integrations.library;
 
 namespace Marketplace.API
 {

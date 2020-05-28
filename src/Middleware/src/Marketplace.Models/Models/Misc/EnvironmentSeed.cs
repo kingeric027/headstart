@@ -1,7 +1,7 @@
 ﻿using Marketplace.Models.Models.Marketplace;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Models.Misc
 {

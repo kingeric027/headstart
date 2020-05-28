@@ -1,9 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
-using ordercloud.integrations.cardconnect;
-using ordercloud.integrations.extensions;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers.CardConnect

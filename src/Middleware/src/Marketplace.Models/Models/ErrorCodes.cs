@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Marketplace.Models.Exceptions;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Models
 {

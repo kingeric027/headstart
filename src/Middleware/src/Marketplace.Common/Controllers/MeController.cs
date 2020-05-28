@@ -2,8 +2,7 @@
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Models;
 using Microsoft.AspNetCore.Mvc;
-using ordercloud.integrations.extensions;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Controllers

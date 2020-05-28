@@ -8,7 +8,7 @@ using Marketplace.Common.Services.Zoho.Mappers;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using ErrorCodes = Marketplace.Models.ErrorCodes;
 

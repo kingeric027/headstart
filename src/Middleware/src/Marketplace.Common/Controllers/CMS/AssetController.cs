@@ -4,10 +4,7 @@ using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using ordercloud.integrations.cms;
-using ordercloud.integrations.cosmos;
-using ordercloud.integrations.extensions;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 
 namespace Marketplace.CMS.Controllers
 {
@@ -27,7 +24,7 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("List Assets")]
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<ListPage<Asset>> List(CosmosListArgs<Asset> args)
+		public async Task<ListPage<Asset>> List(ListArgs<Asset> args)
 		{
 			return await _assets.List(args, VerifiedUserContext);
 		}
