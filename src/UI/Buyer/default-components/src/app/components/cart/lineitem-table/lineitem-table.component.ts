@@ -26,9 +26,7 @@ export class OCMLineitemTable {
   _orderCurrency: string;
 
   constructor(private context: ShopperContextService) { 
-    const currentUser = this.context.currentUser.get();
-    // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
+    this._orderCurrency = this.context.currentUser.get().Currency;
   }
 
   async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
