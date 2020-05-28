@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Marketplace.Models;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.extensions;
@@ -6,12 +6,13 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.SupplierSync
 {
-    public class WaxInTheCityDistributionCommand : ISupplierSyncCommand
+    // class name will likely need to be changed for production supplier ID
+    public class MPSupplier007Command : ISupplierSyncCommand
     {
         private readonly IOrderCloudClient _oc;
         private AppSettings _settings;
 
-        public WaxInTheCityDistributionCommand(AppSettings settings, IOrderCloudClient oc)
+        public MPSupplier007Command(AppSettings settings, IOrderCloudClient oc)
         {
             _oc = oc;
             _settings = settings;
