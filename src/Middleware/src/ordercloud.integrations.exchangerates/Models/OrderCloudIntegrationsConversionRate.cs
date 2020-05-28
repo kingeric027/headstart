@@ -1,5 +1,8 @@
-﻿namespace ordercloud.integrations.exchangerates
+﻿using ordercloud.integrations.library;
+
+namespace ordercloud.integrations.exchangerates
 {
+    [SwaggerModel]
     public class OrderCloudIntegrationsConversionRate
     {
         public CurrencySymbols Currency { get; set; }

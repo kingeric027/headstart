@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.cms
 {
+	[SwaggerModel]
 	public class AssetForDelivery : Asset
 	{
 		public int ListOrderWithinType { get; set; }

@@ -255,7 +255,7 @@ namespace Orchestration.Tests
                     Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'key': 'value', 'missing': 'value' }}"),
                     Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'key': 'updated' }}"),
                     RecordType = RecordType.PriceSchedule
-                }).Returns(Action.Update);
+                }).Returns(Action.Patch);
 
                 // everything the same, except a new property in current xp and missing in cache xp
                 yield return new TestCaseData(new WorkItem()
@@ -263,7 +263,7 @@ namespace Orchestration.Tests
                     Cache = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'key': 'value', 'missing': 'value' }}"),
                     Current = JObject.Parse(@"{ 'ID': 'id', 'Name': 'name', 'xp': { 'key': 'updated', 'extra': 'value' }}"),
                     RecordType = RecordType.ProductFacet
-                }).Returns(Action.Update);
+                }).Returns(Action.Patch);
 
                 // base property change, xp with no change
                 yield return new TestCaseData(new WorkItem()
