@@ -6,6 +6,8 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.SupplierSync
 {
+    // TODO: consider more robust approach to sync that might not require supplier ID
+    // in the classname
     // class name will likely need to be changed for production supplier ID
     public class MPSupplier007Command : ISupplierSyncCommand
     {
