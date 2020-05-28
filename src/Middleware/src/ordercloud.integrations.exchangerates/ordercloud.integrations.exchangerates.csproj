@@ -10,8 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ordercloud.integrations.blobs" Version="0.0.19" />
-    <PackageReference Include="ordercloud.integrations.extensions" Version="0.0.15" />
     <PackageReference Include="OrderCloud.SDK" Version="0.9.0" />
   </ItemGroup>
 
@@ -120,6 +118,10 @@
     <EmbeddedResource Include="Icons\ZAR.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
   </ItemGroup>
 
 </Project>

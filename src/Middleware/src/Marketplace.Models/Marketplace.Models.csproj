@@ -19,6 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ordercloud.integrations.avalara\ordercloud.integrations.avalara.csproj" />
+    <ProjectReference Include="..\ordercloud.integrations.cms\ordercloud.integrations.cms.csproj" />
     <ProjectReference Include="..\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
   </ItemGroup>
 

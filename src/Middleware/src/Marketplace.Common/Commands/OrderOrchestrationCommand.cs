@@ -12,7 +12,7 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Models.Models.Misc;
-using Action = System.Action;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Commands
 {

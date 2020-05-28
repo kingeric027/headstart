@@ -1,13 +1,19 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Cosmonaut;
+using Cosmonaut.Extensions.Microsoft.DependencyInjection;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 #if NETCOREAPP3_1
 using System.Text.Json.Serialization;
-#endif
-#if NETCOREAPP2_2
-using Newtonsoft.Json;
 #endif
 
 namespace ordercloud.integrations.library

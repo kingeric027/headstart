@@ -315,14 +315,8 @@ namespace ordercloud.integrations.library
 
         public static Type WithoutNullable(this Type type)
         {
-            return IsNullable(type) ? Nullable.GetUnderlyingType(type) : type;
+            return type.IsNullable() ? Nullable.GetUnderlyingType(type) : type;
         }
-
-        public static bool IsNullable(this Type type)
-        {
-            return type != null && type.WithoutGenericArgs() == typeof(Nullable<>);
-        }
-
         
         public static bool IsListPage(this Type type)
         {

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Marketplace.Common;
 using Marketplace.Common.Commands.SupplierSync;

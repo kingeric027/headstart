@@ -17,12 +17,12 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Models.Extended;
-using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using Swashbuckle.AspNetCore.Swagger;
 using ordercloud.integrations.smartystreets;
 using ordercloud.integrations.avalara;
+using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.library;
 
 namespace Marketplace.API

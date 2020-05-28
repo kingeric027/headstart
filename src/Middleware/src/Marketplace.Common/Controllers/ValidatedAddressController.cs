@@ -1,6 +1,4 @@
-﻿using Marketplace.Common.Commands;
-using Marketplace.Models;
-using Marketplace.Models.Attributes;
+﻿using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;

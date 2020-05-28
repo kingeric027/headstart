@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Marketplace.Common\Marketplace.Common.csproj" />
+    <ProjectReference Include="..\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
+using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 

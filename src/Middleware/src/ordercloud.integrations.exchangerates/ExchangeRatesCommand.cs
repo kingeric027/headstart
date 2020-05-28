@@ -4,8 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using ordercloud.integrations.blob;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace ordercloud.integrations.exchangerates
@@ -15,10 +14,7 @@ namespace ordercloud.integrations.exchangerates
         Task<ListPage<OrderCloudIntegrationsConversionRate>> Get(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, CurrencySymbols currency);
         Task<OrderCloudIntegrationsExchangeRate> Get(CurrencySymbols symbol);
         Task<ListPage<OrderCloudIntegrationsConversionRate>> GetRateList();
-
-        ListPage<OrderCloudIntegrationsConversionRate> Filter(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs,
-            OrderCloudIntegrationsExchangeRate rates);
-
+        ListPage<OrderCloudIntegrationsConversionRate> Filter(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, OrderCloudIntegrationsExchangeRate rates);
         Task<double?> ConvertCurrency(CurrencySymbols from, CurrencySymbols to, double value);
     }
 
