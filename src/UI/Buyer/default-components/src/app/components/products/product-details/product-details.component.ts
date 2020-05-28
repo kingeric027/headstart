@@ -110,8 +110,8 @@ export class OCMProductDetails implements OnInit {
   }
 
   getPriceBreakRange(index: number): string {
-    if (!this._product.PriceSchedule?.PriceBreaks.length) return '';
-    const priceBreaks = this._product.PriceSchedule.PriceBreaks;
+    if (!this._priceSchedule?.PriceBreaks.length) return '';
+    const priceBreaks = this._priceSchedule.PriceBreaks;
     const indexOfNextPriceBreak = index + 1;
     if (indexOfNextPriceBreak < priceBreaks.length) {
       return `${priceBreaks[index].Quantity} - ${priceBreaks[indexOfNextPriceBreak].Quantity - 1}`;

@@ -108,7 +108,7 @@
         <div class=" border border-medium border-radius mb-3 p-2">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
-            <span *ngFor="let priceBreak of _product.PriceSchedule.PriceBreaks; let i = index"
+            <span *ngFor="let priceBreak of _priceSchedule?.PriceBreaks; let i = index"
                   class="font-weight-bold d-flex mt-2">{{ getPriceBreakRange(i) }}:
               <p class="font-weight-normal ml-1 mr-4">{{priceBreak.Price | currency}}</p>
             </span>
