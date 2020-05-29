@@ -8,6 +8,7 @@ import {
   OcSupplierAddressService,
   OcAdminAddressService,
   OcProductService,
+  PriceBreak,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,7 +16,7 @@ import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCircle, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCircle, faHeart, faCog } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
@@ -67,6 +68,7 @@ export class ProductEditComponent implements OnInit {
   faTimes = faTimes;
   faTrash = faTrash;
   faCircle = faCircle;
+  faCog = faCog;
   faHeart = faHeart;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
@@ -85,7 +87,9 @@ export class ProductEditComponent implements OnInit {
   staticContent: Asset[] = [];
   documentName: string;
   selectedTabIndex = 0;
-
+  editPriceBreaks = false;
+  newPrice: number;
+  newQty: number;
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
@@ -124,15 +128,15 @@ export class ProductEditComponent implements OnInit {
   }
 
   tabChanged(event: any, productID: string): void {
-    if(productID === null) return;
+    if (productID === null) return;
     event.index === 0 ? this.location.replaceState(`products/${productID}`)
-    :
-    this.location.replaceState(`products/${productID}/${TabIndexMapper[this.readonly ? event.index : event.index + 1]}`);
+      :
+      this.location.replaceState(`products/${productID}/${TabIndexMapper[this.readonly ? event.index : event.index + 1]}`);
   }
 
   async getAddresses(): Promise<void> {
     const context: UserContext = await this.currentUserService.getUserContext();
-    if(context.Me.Supplier) {
+    if (context.Me.Supplier) {
       this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise();
     } else {
       this.addresses = await this.ocAdminAddressService.List().toPromise();
@@ -247,10 +251,16 @@ export class ProductEditComponent implements OnInit {
         await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
       }
       this.dataIsSaving = false;
+      this.editPriceBreaks = false;
     } catch (ex) {
       this.dataIsSaving = false;
+      this.editPriceBreaks = false;
       throw ex;
     }
+  }
+
+  toggleEditPriceBreaks() {
+    this.editPriceBreaks = !this.editPriceBreaks;
   }
 
   updateProductResource(productUpdate: any): void {
@@ -269,8 +279,43 @@ export class ProductEditComponent implements OnInit {
     this.updateProductResource(productUpdate);
   }
 
+  handleUpdatePriceBreaks(event: any, field: string): void {
+    field === "price" ? this.newPrice = event.target.value : this.newQty = event.target.value;
+  }
+
+  addPriceBreak() {
+    this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.push({ Quantity: Number(this.newQty), Price: Number(this.newPrice) });
+    const uniqueBreaks = this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.filter((priceBreak, i, arr) =>
+      i === arr.findIndex((pb) => (
+        pb.Quantity === priceBreak.Quantity && pb.Price === priceBreak.Price
+      ))
+    );
+    const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: uniqueBreaks }
+    this.updateProductResource(productUpdate);
+    this.updateProduct();
+  }
+
+  getPriceBreakRange(index: number): string {
+    const priceBreaks = this._superMarketplaceProductStatic.PriceSchedule.PriceBreaks;
+    if (!priceBreaks.length) return '';
+    const indexOfNextPriceBreak = index + 1;
+    if (indexOfNextPriceBreak < priceBreaks.length) {
+      return `${priceBreaks[index].Quantity} - ${priceBreaks[indexOfNextPriceBreak].Quantity - 1}`;
+    } else {
+      return `${priceBreaks[index].Quantity}+`;
+    }
+  }
+
+  deletePriceBreak(priceBreak: PriceBreak) {
+    const i = this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.indexOf(priceBreak);
+    this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.splice(i, 1);
+    const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks }
+    this.updateProductResource(productUpdate);
+    this.updateProduct();
+  }
+
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
-  updateResourceFromFieldValue(field: string, value: any): void{
+  updateResourceFromFieldValue(field: string, value: any): void {
     const updateProductResourceCopy = this.productService.copyResource(
       this._superMarketplaceProductEditable || this.productService.emptyResource
     );
@@ -359,7 +404,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   unstageFile(index: number, fileType: string): void {
-    if(fileType === 'image') {
+    if (fileType === 'image') {
       this.imageFiles.splice(index, 1)
     } else {
       this.staticContentFiles.splice(index, 1);

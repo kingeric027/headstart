@@ -1,7 +1,7 @@
 ﻿using Marketplace.Common.Services.FreightPop.Models;
 using Marketplace.Models.Models.Marketplace;
 using System.Collections.Generic;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Models.Models.Misc
 {

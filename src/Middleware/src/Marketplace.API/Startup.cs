@@ -17,14 +17,14 @@ using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Models.Extended;
-using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.cms;
-using ordercloud.integrations.cosmos;
 using OrderCloud.SDK;
-using ordercloud.integrations.extensions;
 using Swashbuckle.AspNetCore.Swagger;
 using ordercloud.integrations.smartystreets;
 using ordercloud.integrations.avalara;
+using ordercloud.integrations.cardconnect;
+using ordercloud.integrations.exchangerates;
+using ordercloud.integrations.library;
 
 namespace Marketplace.API
 {
@@ -57,6 +57,12 @@ namespace Marketplace.API
 				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
 			};
 
+            var currencyConfig = new BlobServiceConfig()
+            {
+                ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
+                Container = _settings.ExchangeRatesSettings.Container
+            };
+
             services
                 .OrderCloudIntegrationsConfigureWebApiServices(_settings, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
@@ -83,6 +89,7 @@ namespace Marketplace.API
 				.Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
 				.Inject<IOrderCloudIntegrationsCardConnectCommand>()
+                .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
 				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))

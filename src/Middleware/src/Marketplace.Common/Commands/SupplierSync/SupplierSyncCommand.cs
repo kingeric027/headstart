@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.SupplierSync
@@ -32,7 +32,13 @@ namespace Marketplace.Common.Commands.SupplierSync
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                     ClientId = user.ClientID
                 });
-                var type = Type.GetType($"{ASSEMBLY}{user.SupplierID.ToLower()}Command", true, ignoreCase: true);
+
+                /*
+                 * first character in c# class cannot be a number, to handle suppliers 
+                 * with IDs starting in a number we are prepending it with 
+                 * MPSupplier which is an arbitrary string
+                 */
+                var type = Type.GetType($"{ASSEMBLY}MPSupplier{user.SupplierID.ToLower()}Command", true, ignoreCase: true);
                 var command = (ISupplierSyncCommand) Activator.CreateInstance(type, _settings, oc);
                 var method = command.GetType().GetMethod($"GetOrderAsync", BindingFlags.Public | BindingFlags.Instance);
                 if (method == null) throw new MissingMethodException($"{user.SupplierID}Command is missing");

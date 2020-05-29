@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
 using ordercloud.integrations.cms;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Models

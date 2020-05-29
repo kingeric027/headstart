@@ -92,13 +92,6 @@
   </form>
   <user-group-assignments *ngIf="selectedResource && isCreatingNew"
                           [isCreatingNew]="isCreatingNew"
-                          userGroupType="UserPermissions"
-                          [user]="selectedResource"
-                          (assignmentsToAdd)="addUserGroupAssignments($event)"
-                          [userPermissionsService]="buyerUserService">
-  </user-group-assignments>
-  <user-group-assignments *ngIf="selectedResource && isCreatingNew"
-                          [isCreatingNew]="isCreatingNew"
                           userGroupType="BuyerLocation"
                           [user]="selectedResource"
                           (assignmentsToAdd)="addUserGroupAssignments($event)"

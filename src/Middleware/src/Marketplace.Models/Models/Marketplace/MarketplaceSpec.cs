@@ -1,5 +1,5 @@
 ﻿using Marketplace.Models.Extended;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 

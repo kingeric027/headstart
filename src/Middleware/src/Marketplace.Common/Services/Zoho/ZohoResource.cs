@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Flurl.Http;
@@ -38,6 +39,9 @@ namespace Marketplace.Common.Services.Zoho
 
         protected internal async Task<T> Put<T>(object obj, params object[] segments) => 
             await Parse<T>(await _client.Put(obj, this.AppendSegments(segments)).PutAsync(null));
+
+        private async Task<T> Parse<T>(IFlurlResponse res) =>
+            JObject.Parse(await res.ResponseMessage.Content.ReadAsStringAsync()).SelectToken(_resource).ToObject<T>();
 
         private async Task<T> Parse<T>(HttpResponseMessage res) =>
             JObject.Parse(await res.Content.ReadAsStringAsync()).SelectToken(_resource).ToObject<T>();

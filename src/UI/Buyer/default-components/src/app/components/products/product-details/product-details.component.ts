@@ -56,13 +56,13 @@ export class OCMProductDetails implements OnInit {
     this._product = superProduct.Product;
     this._priceSchedule = superProduct.PriceSchedule;
     this._rates = this.context.exchangeRates.Get();
-    this._attachments = superProduct?.Attachments; 
+    this._attachments = superProduct?.Attachments;
     const currentUser = this.context.currentUser.get();
     // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
     this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
     this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._orderCurrency);
     // Specs
-    this._specs = {Meta: {}, Items: superProduct.Specs};
+    this._specs = { Meta: {}, Items: superProduct.Specs };
     this.specFormService.event.valid = this._specs.Items.length === 0;
     this.specLength = this._specs.Items.length;
     // End Specs
