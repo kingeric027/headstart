@@ -7,8 +7,8 @@
       <p><strong>{{buyerLocation?.CompanyName}}</strong></p>
     </div>
     <span translate>ORDERS.HISTORICAL.SHIPPING_ADDRESS</span>
-    <ocm-address-card *ngIf="lineItems?.Items[0].ShippingAddress"
-                      [address]="lineItems?.Items[0].ShippingAddress"
+    <ocm-address-card *ngIf="lineItems.length && lineItems[0].ShippingAddress"
+                      [address]="lineItems[0].ShippingAddress"
                       addressTitle="Shipping Address">
     </ocm-address-card>
     <br />
@@ -82,7 +82,7 @@
     </div>
   </div>
 </div>
-<ocm-lineitem-table [lineItems]="lineItems?.Items"
+<ocm-lineitem-table [lineItems]="lineItems"
                     [orderType]="order?.xp?.OrderType"
                     [readOnly]="true">
 </ocm-lineitem-table>

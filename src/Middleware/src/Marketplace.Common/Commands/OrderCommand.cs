@@ -133,19 +133,19 @@ namespace Marketplace.Common.Commands
             var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);
 
-            // todo support >100 and figure out how to make these calls in parallel and 
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
-            var promotions = await _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID);
-            var payments = await _oc.Payments.ListAsync(OrderDirection.Incoming, order.ID);
-            var approvals = await _oc.Orders.ListApprovalsAsync(OrderDirection.Incoming, orderID);
-            return new OrderDetails
+            // todo support >100 
+            var lineItems =  _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID, pageSize: 100);
+            var promotions = _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID, pageSize: 100);
+            var payments = _oc.Payments.ListAsync(OrderDirection.Incoming, order.ID, pageSize: 100);
+            var approvals = _oc.Orders.ListApprovalsAsync(OrderDirection.Incoming, orderID, pageSize: 100);
+			return new OrderDetails
             {
                 Order = order,
-                LineItems = lineItems,
-                Promotions = promotions,
-                Payments = payments,
-                Approvals = approvals
-            };
+                LineItems = (await lineItems).Items,
+                Promotions = (await promotions).Items,
+                Payments = (await payments).Items,
+                Approvals = (await approvals).Items
+			};
         }
 
         public async Task<List<MarketplaceShipmentWithItems>> GetMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser)

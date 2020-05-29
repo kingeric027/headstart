@@ -33,7 +33,6 @@ namespace ordercloud.integrations.library
 				}
 				else 
                 {
-
                     var schemaObj = new JObject { { "$ref", $"#/components/schemas/{returnType}" } };
                     responseObj.Add("content", new JObject(
                         new JProperty("application/json", new JObject(

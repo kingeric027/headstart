@@ -37,7 +37,7 @@ export class OCMOrderReturn {
   isSaving = false;
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.Order;
-    this.lineItems = value.LineItems.Items;
+    this.lineItems = value.LineItems;
     this.liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(this.liGroups);
     this.setSupplierInfo(this.liGroupedByShipFrom);
@@ -49,8 +49,8 @@ export class OCMOrderReturn {
   constructor(private context: ShopperContextService, private fb: FormBuilder) {}
 
   isAnyRowSelected() {
-    let liGroups = this.requestReturnForm.controls.liGroups as FormArray;
-    let selectedItem = liGroups.value.find(value => value.lineItems.find(lineItem => lineItem.selected === true));
+    const liGroups = this.requestReturnForm.controls.liGroups as FormArray;
+    const selectedItem = liGroups.value.find(value => value.lineItems.find(lineItem => lineItem.selected === true));
     return selectedItem;
   }
 

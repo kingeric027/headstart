@@ -33,7 +33,7 @@ export class OCMOrderDetails implements OnInit {
     this.approvalVersion = this.context.router.getOrderViewContext() === OrderViewContext.Approve;
     this.orderDetails = await this.context.orderHistory.getOrderDetails();
     this.order = this.orderDetails.Order;
-    this.validateReorder(this.order.ID, this.orderDetails.LineItems.Items);
+    this.validateReorder(this.order.ID, this.orderDetails.LineItems);
   }
 
   open(content: HTMLTemplateElement): void {

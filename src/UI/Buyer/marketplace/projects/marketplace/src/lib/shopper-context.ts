@@ -18,6 +18,8 @@ import {
   UserGroupAssignment,
   ApprovalRule,
   ListOrderApproval,
+  Promotion,
+  Payment,
 } from '@ordercloud/angular-sdk';
 import { ProductXp, BuyerAddressXP, MarketplaceAddressBuyer, TaxCertificate } from 'marketplace-javascript-sdk';
 
@@ -172,10 +174,10 @@ export interface OrderReorderResponse {
 // remove with sdk update
 export interface OrderDetails {
   Order: MarketplaceOrder;
-  LineItems: ListLineItem;
-  Promotions: ListPromotion;
-  Payments: ListPayment;
-  Approvals: ListOrderApproval;
+  LineItems: Array<LineItem>;
+  Promotions: Array<Promotion>;
+  Payments: Array<Payment>;
+  Approvals: Array<OrderApproval>;
 }
 
 // to be replaced by new sdk
