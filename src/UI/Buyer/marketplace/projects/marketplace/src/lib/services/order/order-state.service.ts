@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { MarketplaceOrder, AppConfig, OrderType } from '../../shopper-context';
+import { AppConfig, ListMarketplaceOrder } from '../../shopper-context';
 import { BehaviorSubject } from 'rxjs';
 import { ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { listAll } from '../../functions/listAll';
 import { CurrentUserService } from '../current-user/current-user.service';
+import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class OrderStateService {
   private readonly DefaultOrder: MarketplaceOrder = {
     xp: {
       AvalaraTaxTransactionCode: '',
-      OrderType: OrderType.Standard,
+      OrderType: 'Standard',
       QuoteOrderInfo: null,
       Currency: '',
     },
@@ -74,13 +75,13 @@ export class OrderStateService {
           sortBy: '!DateCreated',
           filters: { DateDeclined: '*', status: 'Unsubmitted', 'xp.IsResubmitting': 'True' },
         })
-        .toPromise(),
-      await this.ocMeService
+        .toPromise() as ListMarketplaceOrder,
+      (await this.ocMeService
         .ListOrders({
           sortBy: '!DateCreated',
           filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
         })
-        .toPromise(),
+        .toPromise()) as ListMarketplaceOrder,
     ];
 
     const [resubmittingOrders, normalUnsubmittedOrders] = await Promise.all(orderQueries);
@@ -94,7 +95,7 @@ export class OrderStateService {
       this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
     } else {
       this.DefaultOrder.xp.Currency = orderCurrency;
-      this.order = await this.ocOrderService.Create('outgoing', this.DefaultOrder).toPromise();
+      this.order = (await this.ocOrderService.Create('outgoing', this.DefaultOrder).toPromise()) as MarketplaceOrder;
     }
     if (this.order.DateCreated) {
       this.lineItems = await listAll(this.ocLineItemService, this.ocLineItemService.List, 'outgoing', this.order.ID);

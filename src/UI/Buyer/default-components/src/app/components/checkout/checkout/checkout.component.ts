@@ -3,13 +3,13 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
 import {
   ShopperContextService,
-  MarketplaceOrder,
   ListPayment,
   ListLineItem,
   ListBuyerCreditCard,
   ShipMethodSelection,
   ShipEstimate,
 } from 'marketplace';
+import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';

@@ -1,11 +1,9 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {
-  OrderDetails,
-  MarketplaceOrder,
   ShopperContextService,
   LineItemGroupSupplier,
-  MarketplaceLineItem,
 } from 'marketplace';
+import {MarketplaceOrder, MarketplaceLineItem, OrderDetails} from 'marketplace-javascript-sdk';
 import { ListLineItem } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';

@@ -46,7 +46,7 @@
     "bootstrap": "^4.3.1",
     "jwt-decode": "^2.2.0",
     "marketplace": "file:../marketplace/dist/marketplace",
-    "marketplace-javascript-sdk": "^1.3.9",
+    "marketplace-javascript-sdk": "^1.4.1",
     "moment": "^2.24.0",
     "ngx-cookie": "^4.1.2",
     "ngx-image-zoom": "^0.6.0",

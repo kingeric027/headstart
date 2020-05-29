@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ordercloud.integrations.library;
+using System.ComponentModel.DataAnnotations;
 
 namespace ordercloud.integrations.cardconnect
 {
-    public class OrderCloudIntegrationsCreditCardPayment
+	[SwaggerModel]
+	public class OrderCloudIntegrationsCreditCardPayment
     {
         [OrderCloud.SDK.Required]
         public string OrderID { get; set; }

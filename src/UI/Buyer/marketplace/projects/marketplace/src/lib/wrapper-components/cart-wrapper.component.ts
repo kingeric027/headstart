@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ListLineItem, OcMeService } from '@ordercloud/angular-sdk';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { ListLineItemWithProduct, MarketplaceOrder, MarketplaceMeProduct } from '../shopper-context';
+import { ListLineItemWithProduct, MarketplaceMeProduct } from '../shopper-context';
 import { CurrentOrderService } from '../services/order/order.service';
+import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 
 @Component({
   template: `

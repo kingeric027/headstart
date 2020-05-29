@@ -1,14 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { OrderDetails, MarketplaceOrder, ShopperContextService } from 'marketplace';
-import {
-  OrderApproval,
-  ListLineItem,
-  Promotion,
-  ListPayment,
-  BuyerAddress,
-  Payment,
-  LineItem,
-} from '@ordercloud/angular-sdk';
+import { ShopperContextService } from 'marketplace';
+import { OrderDetails, MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { OrderApproval, Promotion, BuyerAddress, Payment, LineItem } from '@ordercloud/angular-sdk';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 
 @Component({

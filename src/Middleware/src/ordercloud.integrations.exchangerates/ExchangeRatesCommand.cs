@@ -13,7 +13,7 @@ namespace ordercloud.integrations.exchangerates
     {
         Task<ListPage<OrderCloudIntegrationsConversionRate>> Get(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, CurrencySymbols currency);
         Task<OrderCloudIntegrationsExchangeRate> Get(CurrencySymbols symbol);
-        Task<ListPage<OrderCloudIntegrationsConversionRate>> GetRateList();
+        Task<List<OrderCloudIntegrationsConversionRate>> GetRateList();
         ListPage<OrderCloudIntegrationsConversionRate> Filter(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, OrderCloudIntegrationsExchangeRate rates);
         Task<double?> ConvertCurrency(CurrencySymbols from, CurrencySymbols to, double value);
     }
@@ -99,20 +99,10 @@ namespace ordercloud.integrations.exchangerates
             };
         }
 
-        public async Task<ListPage<OrderCloudIntegrationsConversionRate>> GetRateList()
+        public async Task<List<OrderCloudIntegrationsConversionRate>> GetRateList()
         {
-            var rates = MapRates();
-            return await Task.FromResult(new ListPage<OrderCloudIntegrationsConversionRate>()
-            {
-                Meta = new ListPageMeta()
-                {
-                    Page = 1,
-                    PageSize = 1,
-                    TotalCount = rates.Count,
-                    ItemRange = new[] { 1, rates.Count }
-                },
-                Items = rates
-            });
+			var rates = MapRates();
+			return await Task.FromResult(rates);
         }
 
         private static string GetIcon(CurrencySymbols symbol)

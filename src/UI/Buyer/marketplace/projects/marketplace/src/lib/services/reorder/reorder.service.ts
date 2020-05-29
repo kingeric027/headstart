@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { OcMeService, Inventory, PriceSchedule, OcLineItemService } from '@ordercloud/angular-sdk';
 import { partition as _partition } from 'lodash';
-import { listAll } from '../../functions/listAll';
-import { OrderReorderResponse, MarketplaceMeProduct, MarketplaceLineItem } from '../../shopper-context';
+import { OrderReorderResponse, MarketplaceMeProduct } from '../../shopper-context';
+import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',

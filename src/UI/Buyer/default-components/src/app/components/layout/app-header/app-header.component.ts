@@ -11,9 +11,10 @@ import {
   faBars,
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { MeUser, LineItem, Category } from '@ordercloud/angular-sdk';
+import { Category } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
-import { ProductFilters, ShopperContextService, MarketplaceOrder, MarketplaceLineItem, AppConfig } from 'marketplace';
+import { ProductFilters, ShopperContextService, AppConfig } from 'marketplace';
+import { MarketplaceOrder, MarketplaceLineItem} from 'marketplace-javascript-sdk'
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { CurrentUser } from 'marketplace/projects/marketplace/src/lib/services/current-user/current-user.service';
 import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
@@ -79,7 +80,7 @@ export class OCMAppHeader implements OnInit {
     const rates = this.context.exchangeRates.Get();
     const currentUser = this.context.currentUser.get();
     // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    const myCurrencyCode = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency || "USD";
+    const myCurrencyCode = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency || 'USD';
     const myRate = rates.Items.find(r => r.Currency === myCurrencyCode);
     return myRate.Icon;
   }

@@ -1,19 +1,11 @@
 import { Injectable } from '@angular/core';
-import {
-  LineItem,
-  ListLineItem,
-  OcOrderService,
-  OcLineItemService,
-  OcMeService,
-  OcTokenService,
-} from '@ordercloud/angular-sdk';
+import { ListLineItem, OcOrderService, OcLineItemService, OcMeService, OcTokenService } from '@ordercloud/angular-sdk';
 import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
-import { MarketplaceOrder, MarketplaceLineItem } from '../../shopper-context';
 import { listAll } from '../../functions/listAll';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ShopperContextService } from '../shopper-context/shopper-context.service';
+import { MarketplaceLineItem, MarketplaceOrder } from 'marketplace-javascript-sdk';
 
 export interface ICart {
   onAdd: Subject<MarketplaceLineItem>;
@@ -92,9 +84,9 @@ export class CartService implements ICart {
      * do not repopulate in the cart after the resubmit we are deleting all of these
      * unsubmitted orders */
 
-    const orderToUpdate = await this.ocOrderService
+    const orderToUpdate = (await this.ocOrderService
       .Patch('Outgoing', orderID, { xp: { IsResubmitting: true } })
-      .toPromise();
+      .toPromise()) as MarketplaceOrder;
 
     const currentUnsubmittedOrders = await this.ocMeService
       .ListOrders({

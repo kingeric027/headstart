@@ -2,7 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { ListSpec, User } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
-import { LineItem, MarketplaceMeProduct, OrderType, ShopperContextService, MarketplaceLineItem, PriceSchedule } from 'marketplace';
+import { MarketplaceMeProduct, ShopperContextService, PriceSchedule } from 'marketplace';
+import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { getImageUrls } from 'src/app/services/images.helpers';
@@ -59,7 +60,7 @@ export class OCMProductDetails implements OnInit {
     this._attachments = superProduct?.Attachments;
     const currentUser = this.context.currentUser.get();
     // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency || 'USD';
     this._price = exchange(this._rates, this.getTotalPrice(), this._product?.xp?.Currency, this._orderCurrency);
     // Specs
     this._specs = { Meta: {}, Items: superProduct.Specs };
@@ -191,7 +192,6 @@ export class OCMProductDetails implements OnInit {
       const defaultOrder = this.getDefaultQuoteOrder(user);
       const lineItem: MarketplaceLineItem = {};
       lineItem.ProductID = this._product.ID;
-      lineItem.Product = this._product;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);
       this.context.order.submitQuoteOrder(defaultOrder, lineItem).then(order => this.submittedQuoteOrder = order);
       this.quoteFormModal = ModalState.Closed;

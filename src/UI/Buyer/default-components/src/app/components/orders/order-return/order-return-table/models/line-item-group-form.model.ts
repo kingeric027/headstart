@@ -1,5 +1,5 @@
 import { FormArray, FormControl, FormBuilder } from '@angular/forms';
-import { MarketplaceLineItem } from 'marketplace';
+import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { LineItemForm } from './line-item-form.model';
 
 export class LineItemGroupForm {
