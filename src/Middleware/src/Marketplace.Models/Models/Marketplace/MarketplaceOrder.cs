@@ -34,6 +34,7 @@ namespace Marketplace.Models
         public ListPage<OrderApproval> Approvals { get; set; } 
     }
 
+	[SwaggerModel]
     public class OrderReturnInfo
     {
         public bool HasReturn { get; set; }

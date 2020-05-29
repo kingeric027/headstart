@@ -8,7 +8,6 @@ namespace ordercloud.integrations.cms
 {
 	// TODO - is there a way to get rid of this separate class and use normal asset?
 	// Because right now we don't have a way to make any of these feilds required. [Required] doesn't seem to work with forms.
-	[SwaggerModel]
     public class AssetUpload
 	{
 		public string ID { get; set; }

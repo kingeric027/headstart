@@ -1,9 +1,11 @@
-﻿using System;
+﻿using ordercloud.integrations.library;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ordercloud.integrations.avalara
 {
+	[SwaggerModel]
 	public class TaxCode
 	{
 		public string Category { get; set; }

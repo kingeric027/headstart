@@ -19,22 +19,22 @@ namespace ordercloud.integrations.library
                 .UnwrapGeneric(typeof(ListPage<>))
                 .UnwrapGeneric(typeof(ListPageWithFacets<>)).PropertySimpleName();
 
-            if (endpoint.IsList)
+			if (endpoint.IsList)
                 returnType = "List" + returnType;
 
             if (returnType != null && returnType != "Task")
             {
-                if (returnType != "object")
+				if (returnType.IsBasicType())
+				{
+					var schemaObj = new PropertyObject(endpoint.MethodInfo.ReturnType).ToJObject();
+					responseObj.Add("content", new JObject(
+						new JProperty("application/json", new JObject(
+							new JProperty("schema", schemaObj)))));
+				}
+				else 
                 {
 
                     var schemaObj = new JObject { { "$ref", $"#/components/schemas/{returnType}" } };
-                    responseObj.Add("content", new JObject(
-                        new JProperty("application/json", new JObject(
-                            new JProperty("schema", schemaObj)))));
-                }
-                else
-                {
-                    var schemaObj = new JObject { { "$ref", "#/components/schemas/Authentication" } };
                     responseObj.Add("content", new JObject(
                         new JProperty("application/json", new JObject(
                             new JProperty("schema", schemaObj)))));
