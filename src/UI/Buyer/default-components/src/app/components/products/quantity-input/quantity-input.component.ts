@@ -9,7 +9,7 @@ import { MarketplaceMeProduct, PriceSchedule } from 'marketplace';
 })
 export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() existingQty: number;
-  @Input() gridDisplay?= false;
+  @Input() gridDisplay? = false;
   @Output() qtyChange = new EventEmitter<{ qty: number; valid: boolean }>();
   // TODO - replace with real product info
   form: FormGroup;
@@ -31,7 +31,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    this.product && this.priceSchedule && this.init(this.product, this.priceSchedule)
+    this.product && this.priceSchedule && this.init(this.product, this.priceSchedule);
   }
 
   init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
@@ -44,7 +44,9 @@ export class OCMQuantityInput implements OnInit, OnChanges {
       this.errorMsg = 'Out of stock.';
       this.disabled = true;
     }
-    this.form.setValue({ quantity: this.getDefaultQty() });
+    if (this.form.controls.quantity.value !== this.getDefaultQty()) {
+      this.form.setValue({ quantity: this.getDefaultQty() });
+    }
     this.quantityChangeListener();
     if (!this.existingQty) {
       this.emit(this.form.get('quantity').value);
@@ -91,7 +93,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   }
 
   maxQty(product: MarketplaceMeProduct): number {
-    return this.priceSchedule.MaxQuantity || Infinity
+    return this.priceSchedule.MaxQuantity || Infinity;
   }
 
   getInventory(product: MarketplaceMeProduct): number {

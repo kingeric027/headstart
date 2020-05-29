@@ -1,17 +1,26 @@
 import { Injectable } from '@angular/core';
-import { ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
+import {
+  LineItem,
+  ListLineItem,
+  OcOrderService,
+  OcLineItemService,
+  OcMeService,
+  OcTokenService,
+} from '@ordercloud/angular-sdk';
 import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { MarketplaceOrder, MarketplaceLineItem } from '../../shopper-context';
 import { listAll } from '../../functions/listAll';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ShopperContextService } from '../shopper-context/shopper-context.service';
 
 export interface ICart {
   onAdd: Subject<MarketplaceLineItem>;
   get(): ListLineItem;
   add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem>;
   remove(lineItemID: string): Promise<void>;
-  setQuantity(lineItemID: string, newQuantity: number): Promise<MarketplaceLineItem>;
+  setQuantity(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem>;
   addMany(lineItem: MarketplaceLineItem[]): Promise<MarketplaceLineItem[]>;
   empty(): Promise<void>;
   onChange(callback: (lineItems: ListLineItem) => void): void;
@@ -30,8 +39,10 @@ export class CartService implements ICart {
     private ocOrderService: OcOrderService,
     private ocLineItemService: OcLineItemService,
     private ocMeService: OcMeService,
-    private state: OrderStateService
-  ) { }
+    private state: OrderStateService,
+    private http: HttpClient,
+    private ocTokenService: OcTokenService
+  ) {}
 
   get(): ListLineItem {
     return this.lineItems;
@@ -61,9 +72,9 @@ export class CartService implements ICart {
     }
   }
 
-  async setQuantity(lineItemID: string, newQuantity: number): Promise<MarketplaceLineItem> {
+  async setQuantity(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     try {
-      return await this.patchLineItem(lineItemID, { Quantity: newQuantity });
+      return await this.add(lineItem);
     } finally {
       this.state.reset();
     }
@@ -118,27 +129,17 @@ export class CartService implements ICart {
     }
   }
 
-  private async patchLineItem(lineItemID: string, patch: MarketplaceLineItem): Promise<MarketplaceLineItem> {
-    const existingLI = this.lineItems.Items.find(li => li.ID === lineItemID);
-    Object.assign(existingLI, patch);
-    Object.assign(this.order, this.calculateOrder());
-    return await this.ocLineItemService.Patch('outgoing', this.order.ID, lineItemID, patch).toPromise();
-  }
-
   private async createLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
-    // if line item exists simply update quantity, else create
-    const existingLI = this.lineItems.Items.find(li => this.LineItemsMatch(li, lineItem));
-
     this.onAdd.next(lineItem);
+    // Will be replaced by an SDK call, eventually.
+    const middlewareUrl = `https://marketplace-middleware-test.azurewebsites.net`;
+    const url = `${middlewareUrl}/order/${this.order?.ID}/lineitems`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
     try {
-      if (existingLI) {
-        lineItem = await this.setQuantity(existingLI.ID, lineItem.Quantity + existingLI.Quantity);
-      } else {
-        this.lineItems.Items.push(lineItem);
-        Object.assign(this.order, this.calculateOrder());
-        lineItem = await this.ocLineItemService.Create('outgoing', this.order.ID, lineItem).toPromise();
-      }
-      return lineItem;
+      return await this.http.put(url, lineItem, { headers: headers }).toPromise();
     } finally {
       await this.state.reset();
     }
@@ -153,16 +154,6 @@ export class CartService implements ICart {
     const Subtotal = this.lineItems.Items.reduce((sum, li) => sum + li.LineTotal, 0);
     const Total = Subtotal + this.order.TaxCost + this.order.ShippingCost;
     return { LineItemCount, Total, Subtotal };
-  }
-
-  // product ID and specs must be the same
-  private LineItemsMatch(li1: MarketplaceLineItem, li2: MarketplaceLineItem): boolean {
-    if (li1.ProductID !== li2.ProductID) return false;
-    for (const spec1 of li1.Specs) {
-      const spec2 = li2.Specs?.find(s => s.SpecID === spec1.SpecID);
-      if (spec1.Value !== spec2.Value) return false;
-    }
-    return true;
   }
 
   private get order(): MarketplaceOrder {

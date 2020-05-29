@@ -72,6 +72,7 @@ export interface OrderXp {
   OrderType?: OrderType;
   QuoteOrderInfo?: QuoteOrderInfo;
   OrderReturnInfo?: OrderReturnInfo;
+  Currency?: string;
 }
 
 export enum OrderType {

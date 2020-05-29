@@ -14,7 +14,9 @@ using Marketplace.Models.Models.Marketplace;
 using Marketplace.Common.Services.ShippingIntegration;
 using ordercloud.integrations.avalara;
 using Marketplace.Models.Misc;
+using Flurl.Http;
 using ordercloud.integrations.library;
+using ordercloud.integrations.exchangerates;
 
 namespace Marketplace.Common.Commands
 {
@@ -25,6 +27,7 @@ namespace Marketplace.Common.Commands
         Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> GetMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
+        Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
     }
 
     public class OrderCommand : IOrderCommand
@@ -32,6 +35,7 @@ namespace Marketplace.Common.Commands
         private readonly IFreightPopService _freightPopService;
         private readonly IOrderCloudClient _oc;
         private readonly IOCShippingIntegration _ocShippingIntegration;
+        private readonly string OcIntegrationsApiBaseUrl = "https://ordercloud-middleware-test.azurewebsites.net";
 
         // temporary service until we get updated sdk
         private readonly IOrderCloudSandboxService _ocSandboxService;
@@ -167,6 +171,52 @@ namespace Marketplace.Common.Commands
             return shipment;
         }
 
+        public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem liReq, VerifiedUserContext user)
+        {
+            var existingLineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, null, user.AccessToken);
+            // New a line item
+            var li = new MarketplaceLineItem();
+            // If line item exists, update quantity, else create
+            var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
+            if (preExistingLi != null)
+            {
+                // Delete the Li
+                await _oc.LineItems.DeleteAsync(OrderDirection.Outgoing, orderID, preExistingLi.ID, user.AccessToken);
+            }
+            // Create the new Li
+            li = await _oc.LineItems.CreateAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, liReq, user.AccessToken);
+            // Get the order, for the order.xp.Currency value
+            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID, user.AccessToken);
+            // Exchange the li.UnitPrice from li.Product.xp.Currency => li.xp.OrderCurrency
+            var exchangedUnitPrice = await ExchangeUnitPrice(li, order);
+            // PATCH the Line Item with exchanged Unit Price & add ProductUnitPrice to xp (OrderDirection.Incoming due to use of elevated token)
+            li = await _oc.LineItems
+                .PatchAsync<MarketplaceLineItem>
+                (OrderDirection.Incoming, orderID, li.ID, 
+                new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { ProductUnitPrice = li.UnitPrice} });
+            return li;
+        }
+
+        private bool LineItemsMatch(LineItem li1, LineItem li2)
+        {
+            if (li1.ProductID != li2.ProductID) return false;
+            if (li1.Specs.Count == 0 || li2.Specs.Count == 0) return false;
+            foreach (var spec1 in li1.Specs) {
+                var spec2 = (li2.Specs as List<LineItemSpec>)?.Find(s => s.SpecID == spec1.SpecID);
+                if (spec1.Value != spec2.Value) return false;
+            }
+            return true;
+        }
+
+        private async Task<decimal?> ExchangeUnitPrice(MarketplaceLineItem li, MarketplaceOrder order)
+        {
+            // Exchange the li.UnitPrice from li.Product.xp.Currency => li.xp.OrderCurrency
+            var url = OcIntegrationsApiBaseUrl + $"/exchangerates/{li.Product.xp.Currency}";
+            var ExchangeRates = await url.GetJsonAsync<ListPage<OrderCloudIntegrationsConversionRate>>();
+            CurrencySymbols liCurrency = (CurrencySymbols)Enum.Parse(typeof(CurrencySymbols), order.xp.Currency);
+            var OrderRate = (ExchangeRates.Items as List<OrderCloudIntegrationsConversionRate>).Find(r => r.Currency == liCurrency);
+            return (decimal)li.UnitPrice * (decimal)OrderRate.Rate;
+        }
 
         private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser, string overrideErrorMessage = "")
         {

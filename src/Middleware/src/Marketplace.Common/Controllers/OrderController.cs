@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Marketplace.Models.Attributes;
 using System.Collections.Generic;
 using ordercloud.integrations.library;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Controllers
 {
@@ -49,6 +50,13 @@ namespace Marketplace.Common.Controllers
         public async Task<List<MarketplaceShipmentWithItems>> GetOrderShipmentsWithItems(string orderID)
         {
             return await _command.GetMarketplaceShipmentWithItems(orderID, VerifiedUserContext);
+        }
+
+        [DocName("Add or update a line item to an order")]
+        [HttpPut, Route("{orderID}/lineitems"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task<MarketplaceLineItem> CreateLineItem(string orderID, [FromBody] MarketplaceLineItem li)
+        {
+            return await _command.UpsertLineItem(orderID, li, VerifiedUserContext);
         }
     }
 }

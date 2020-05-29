@@ -7,11 +7,11 @@ namespace Marketplace.Models.Models.Marketplace
 	public class MarketplaceLineItem : LineItem<LineItemXp, MarketplaceLineItemProduct, LineItemVariant, MarketplaceAddressBuyer, MarketplaceAddressSupplier> { }
 
     [SwaggerModel]
-	public class LineItemXp {
+	public class LineItemXp 
+    {
         public LineItemReturnInfo LineItemReturnInfo { get; set; }
         public decimal? ProductUnitPrice { get; set; }
     }
-
     public class LineItemReturnInfo
     {
         public int QuantityToReturn { get; set; }

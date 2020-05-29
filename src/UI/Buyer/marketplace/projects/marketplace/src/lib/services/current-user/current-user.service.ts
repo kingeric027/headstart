@@ -9,6 +9,7 @@ export interface CurrentUser extends MeUser {
   FavoriteProductIDs: string[];
   FavoriteOrderIDs: string[];
   UserGroups: UserGroup<any>[];
+  Currency: string;
 }
 
 export interface ICurrentUser {
@@ -95,6 +96,7 @@ export class CurrentUserService implements ICurrentUser {
     currentUser.UserGroups = myUserGroups.Items;
     currentUser.FavoriteOrderIDs = this.getFavorites(user, this.favOrdersXP);
     currentUser.FavoriteProductIDs = this.getFavorites(user, this.favProductsXP);
+    currentUser.Currency = myUserGroups.Items.filter(ug => ug.xp.Type === 'BuyerLocation')[0].xp?.Currency || 'USD';
     return currentUser;
   }
 
