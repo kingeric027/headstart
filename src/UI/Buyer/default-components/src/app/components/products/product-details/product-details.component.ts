@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { ListSpec, User } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
-import { MarketplaceMeProduct, ShopperContextService, PriceSchedule } from 'marketplace';
+import { MarketplaceMeProduct, ShopperContextService, PriceSchedule, OrderType } from 'marketplace';
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';

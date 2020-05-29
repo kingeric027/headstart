@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { groupBy as _groupBy } from 'lodash';
-import { ShopperContextService, LineItemGroupSupplier } from 'marketplace';
+import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 

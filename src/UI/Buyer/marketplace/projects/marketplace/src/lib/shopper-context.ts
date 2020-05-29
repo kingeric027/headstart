@@ -247,6 +247,12 @@ export interface BuyerLocationWithCert {
   certificate?: TaxCertificate;
 }
 
+// TODO - remove once SDK has enum types
+export enum OrderType {
+  Standard = 'Standard',
+  Quote = 'Quote',
+}
+
 // Product Model
 // a corresponding model in the C# product
 export type ListMarketplaceMeProduct = ListBuyerProduct<ProductXp>;
