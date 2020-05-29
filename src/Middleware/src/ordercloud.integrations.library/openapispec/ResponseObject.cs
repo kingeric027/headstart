@@ -14,26 +14,27 @@ namespace ordercloud.integrations.library
         {
             var responseObj = new JObject { { "description", string.Join(".", endpoint.Comments) } };
 
-            var returnType = endpoint.MethodInfo.ReturnType
-                .UnwrapGeneric(typeof(Task<>))
-                .UnwrapGeneric(typeof(ListPage<>))
-                .UnwrapGeneric(typeof(ListPageWithFacets<>)).PropertySimpleName();
+			var returnType = endpoint.MethodInfo.ReturnType
+				.UnwrapGeneric(typeof(Task<>))
+				.UnwrapGeneric(typeof(ListPage<>))
+				.UnwrapGeneric(typeof(ListPageWithFacets<>));
+			var returnTypeSimpleName = returnType.PropertySimpleName();
 
 			if (endpoint.IsList)
-                returnType = "List" + returnType;
+				returnTypeSimpleName = "List" + returnTypeSimpleName;
 
-            if (returnType != null && returnType != "Task")
+            if (returnTypeSimpleName != null && returnTypeSimpleName != "Task")
             {
-				if (returnType.IsBasicType())
+				if (returnTypeSimpleName.IsBasicType())
 				{
-					var schemaObj = new PropertyObject(endpoint.MethodInfo.ReturnType).ToJObject();
+					var schemaObj = new PropertyObject(returnType).ToJObject();
 					responseObj.Add("content", new JObject(
 						new JProperty("application/json", new JObject(
 							new JProperty("schema", schemaObj)))));
 				}
 				else 
                 {
-                    var schemaObj = new JObject { { "$ref", $"#/components/schemas/{returnType}" } };
+                    var schemaObj = new JObject { { "$ref", $"#/components/schemas/{returnTypeSimpleName}" } };
                     responseObj.Add("content", new JObject(
                         new JProperty("application/json", new JObject(
                             new JProperty("schema", schemaObj)))));
