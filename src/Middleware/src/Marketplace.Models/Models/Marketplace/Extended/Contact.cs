@@ -1,4 +1,4 @@
-﻿using ordercloud.integrations.openapispec;
+﻿using ordercloud.integrations.library;
 
 namespace Marketplace.Models.Marketplace.Extended
 {

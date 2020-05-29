@@ -1,16 +1,16 @@
 ﻿using System.Threading.Tasks;
 using Marketplace.Models;
 using Newtonsoft.Json.Linq;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.SupplierSync
 {
-    public class MPSupplierFASTPlatformCommand : ISupplierSyncCommand
+    public class FASTPlatformCommand : ISupplierSyncCommand
     {
         private readonly IOrderCloudClient _oc;
 
-        public MPSupplierFASTPlatformCommand(AppSettings settings, IOrderCloudClient oc)
+        public FASTPlatformCommand(AppSettings settings, IOrderCloudClient oc)
         {
             _oc = oc;
         }

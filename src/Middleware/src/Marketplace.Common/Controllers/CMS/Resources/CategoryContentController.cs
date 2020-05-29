@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.cms;
-using ordercloud.integrations.extensions;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Controllers.CMS.Resources
 {

@@ -7,10 +7,10 @@ using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Exceptions;
 using Marketplace.Models.Extended;
-using ordercloud.integrations.extensions;
 using OrderCloud.SDK;
 using static Marketplace.Models.ErrorCodes;
 using ordercloud.integrations.avalara;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {

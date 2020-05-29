@@ -10,8 +10,7 @@ using Flurl.Http;
 using Marketplace.Common.Commands.SupplierSync;
 using OrderCloud.SDK;
 using Marketplace.Common.Services.FreightPop;
-using ordercloud.integrations.cosmos;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration

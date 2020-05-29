@@ -2,7 +2,7 @@
 using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Commands
 {

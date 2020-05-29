@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Marketplace.Common.Mappers;
 using Marketplace.Models;
 using ordercloud.integrations.cms;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.Crud

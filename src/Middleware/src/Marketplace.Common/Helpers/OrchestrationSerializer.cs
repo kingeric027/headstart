@@ -5,7 +5,7 @@ using System.Text;
 using Marketplace.Models.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Helpers

@@ -4,7 +4,7 @@ using Marketplace.Common.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Models
 {

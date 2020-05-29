@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.SupplierSync
