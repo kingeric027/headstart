@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { OcMeService } from '@ordercloud/angular-sdk';
 import { HttpClient } from '@angular/common/http';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { AppConfig } from '../../shopper-context';
 
 export interface ExchangeRates {
@@ -32,8 +32,7 @@ export class ExchangeRatesService implements IExchangeRates {
   async reset(): Promise<void> {
     const myUserGroups = await this.ocMeService.ListUserGroups({ pageSize: 1 }).toPromise();
     const baseRate = myUserGroups.Items[0].xp?.Currency || 'USD';
-    const url = `${this.appConfig.ocMiddlewareUrl}/exchangeRates/${baseRate}`;
-    this.exchangeRates = await this.http.get(url).toPromise();
+    this.exchangeRates = await MarketplaceSDK.ExchangeRates.Get(baseRate);
   }
 
   private get exchangeRates(): ListPage<ExchangeRates> {

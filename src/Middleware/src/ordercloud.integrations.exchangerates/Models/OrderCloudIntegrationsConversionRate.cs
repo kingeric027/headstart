@@ -1,11 +1,14 @@
-﻿using ordercloud.integrations.library;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.exchangerates
 {
     [SwaggerModel]
     public class OrderCloudIntegrationsConversionRate
     {
-        public CurrencySymbols Currency { get; set; }
+		[JsonConverter(typeof(StringEnumConverter))]
+		public CurrencySymbol Currency { get; set; }
         public string Symbol { get; set; }
         public string Name { get; set; }
         public double? Rate { get; set; }

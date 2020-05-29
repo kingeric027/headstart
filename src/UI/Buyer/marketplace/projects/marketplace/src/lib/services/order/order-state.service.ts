@@ -20,7 +20,7 @@ export class OrderStateService {
       AvalaraTaxTransactionCode: '',
       OrderType: 'Standard',
       QuoteOrderInfo: null,
-      Currency: '',
+      Currency: 'USD', // Default value, overriden in reset() when app loads
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
@@ -85,8 +85,6 @@ export class OrderStateService {
     ];
 
     const [resubmittingOrders, normalUnsubmittedOrders] = await Promise.all(orderQueries);
-    const me = this.currentUserService.get();
-    const orderCurrency = me?.UserGroups.filter(ug => ug.xp.Type === 'BuyerLocation')[0].xp.Currency || 'USD';
     if (resubmittingOrders.Items.length) {
       this.order = resubmittingOrders.Items[0];
     } else if (normalUnsubmittedOrders.Items.length) {
@@ -94,7 +92,7 @@ export class OrderStateService {
     } else if (this.appConfig.anonymousShoppingEnabled) {
       this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
     } else {
-      this.DefaultOrder.xp.Currency = orderCurrency;
+      this.DefaultOrder.xp.Currency = this.currentUserService.get().Currency;
       this.order = (await this.ocOrderService.Create('outgoing', this.DefaultOrder).toPromise()) as MarketplaceOrder;
     }
     if (this.order.DateCreated) {

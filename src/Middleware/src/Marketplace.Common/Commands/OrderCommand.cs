@@ -41,10 +41,11 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudSandboxService _ocSandboxService;
         private readonly IZohoCommand _zoho;
         private readonly IAvalaraCommand _avalara;
+		private readonly IExchangeRatesCommand _exchangeRates;
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
         
-        public OrderCommand(ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
@@ -54,7 +55,9 @@ namespace Marketplace.Common.Commands
             _sendgridService = sendgridService;
             _ocSandboxService = orderCloudSandboxService;
             _locationPermissionCommand = locationPermissionCommand;
-        }
+			_exchangeRates = exchangeRates;
+
+		}
 
         public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
         {
@@ -200,22 +203,18 @@ namespace Marketplace.Common.Commands
         private bool LineItemsMatch(LineItem li1, LineItem li2)
         {
             if (li1.ProductID != li2.ProductID) return false;
-            if (li1.Specs.Count == 0 || li2.Specs.Count == 0) return false;
             foreach (var spec1 in li1.Specs) {
                 var spec2 = (li2.Specs as List<LineItemSpec>)?.Find(s => s.SpecID == spec1.SpecID);
-                if (spec1.Value != spec2.Value) return false;
+                if (spec1?.Value != spec2?.Value) return false;
             }
             return true;
         }
 
         private async Task<decimal?> ExchangeUnitPrice(MarketplaceLineItem li, MarketplaceOrder order)
         {
-            // Exchange the li.UnitPrice from li.Product.xp.Currency => li.xp.OrderCurrency
-            var url = OcIntegrationsApiBaseUrl + $"/exchangerates/{li.Product.xp.Currency}";
-            var ExchangeRates = await url.GetJsonAsync<ListPage<OrderCloudIntegrationsConversionRate>>();
-            CurrencySymbols liCurrency = (CurrencySymbols)Enum.Parse(typeof(CurrencySymbols), order.xp.Currency);
-            var OrderRate = (ExchangeRates.Items as List<OrderCloudIntegrationsConversionRate>).Find(r => r.Currency == liCurrency);
-            return (decimal)li.UnitPrice * (decimal)OrderRate.Rate;
+			var supplierCurrency = li.Product?.xp?.Currency ?? CurrencySymbol.USD; // Temporary default to work around bad data.
+			var buyerCurrency = order.xp.Currency;
+			return (decimal) await _exchangeRates.ConvertCurrency(supplierCurrency, buyerCurrency, (double)li.UnitPrice);
         }
 
         private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser, string overrideErrorMessage = "")

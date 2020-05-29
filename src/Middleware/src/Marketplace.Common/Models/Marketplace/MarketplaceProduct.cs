@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using ordercloud.integrations.cms;
+using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
@@ -54,7 +57,8 @@ namespace Marketplace.Models
         public ProductType ProductType { get; set; }
         public bool IsResale { get; set; } = false;
         public List<ProductAccessorial> Accessorials { get; set; }
-        public string Currency { get; set; }
+		[JsonConverter(typeof(StringEnumConverter))]
+		public CurrencySymbol Currency { get; set; }
     }
 
     [SwaggerModel]
