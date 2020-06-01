@@ -19,11 +19,13 @@ import {
   OrderCloudIntegrationsCreditCardToken,
   MarketplaceOrder,
 } from 'marketplace-javascript-sdk';
+import { OrderReturnInfo } from 'marketplace-javascript-sdk/dist/models/OrderReturnInfo';
 
 export interface ICheckout {
   submitWithCreditCard(card: OrderCloudIntegrationsCreditCardPayment, marketplaceID: string): Promise<string>;
   submitWithoutCreditCard(): Promise<string>;
   addComment(comment: string): Promise<MarketplaceOrder>;
+  initializeHasReturn(): Promise<MarketplaceOrder>;
   listPayments(): Promise<ListPayment>;
   createSavedCCPayment(card: MarketplaceBuyerCreditCard, amount: number): Promise<Payment>;
   createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken, amount: number): Promise<Payment>;
@@ -73,6 +75,10 @@ export class CheckoutService implements ICheckout {
 
   async addComment(comment: string): Promise<MarketplaceOrder> {
     return await this.patch({ Comments: comment });
+  }
+
+  async initializeHasReturn(): Promise<MarketplaceOrder> {
+    return await this.patch({ xp: { OrderReturnInfo: { HasReturn: false }}})
   }
 
   async incrementOrderIfNeeded(): Promise<void> {
