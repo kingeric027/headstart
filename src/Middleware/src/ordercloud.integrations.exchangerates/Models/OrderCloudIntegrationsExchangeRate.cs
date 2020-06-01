@@ -6,7 +6,7 @@ namespace ordercloud.integrations.exchangerates
     [SwaggerModel]
     public class OrderCloudIntegrationsExchangeRate
     {
-        public CurrencySymbols BaseSymbol { get; set; }
+        public CurrencySymbol BaseSymbol { get; set; }
         public List<OrderCloudIntegrationsConversionRate> Rates { get; set; }
     }
 }

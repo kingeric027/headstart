@@ -178,7 +178,10 @@ namespace ordercloud.integrations.library
             if (type.IsArray)
                 return type.GetElementType().PropertySimpleName();
 
-            if (type.IsNullable())
+			if (type.IsCollection())
+				return "array";
+
+			if (type.IsNullable())
                 return type.GetGenericArguments()[0].PropertySimpleName();
 
             type = type

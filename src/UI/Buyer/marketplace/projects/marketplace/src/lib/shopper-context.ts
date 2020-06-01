@@ -1,12 +1,6 @@
 import {
   LineItem,
-  Order,
   ListLineItem,
-  ListPayment,
-  ListPromotion,
-  OrderApproval,
-  Shipment,
-  ShipmentItem,
   BuyerProduct,
   Supplier,
   Address,
@@ -14,20 +8,21 @@ import {
   ListAddress,
   ListBuyerCreditCard,
   BuyerCreditCard,
-  User,
-  UserGroupAssignment,
-  ApprovalRule,
-  ListOrderApproval,
+  ListOrder,
 } from '@ordercloud/angular-sdk';
-import { ProductXp, BuyerAddressXP, MarketplaceAddressBuyer, TaxCertificate } from 'marketplace-javascript-sdk';
+import {
+  ProductXp,
+  BuyerAddressXP,
+  MarketplaceAddressBuyer,
+  TaxCertificate,
+  MarketplaceOrder,
+  ListPage,
+  MarketplaceLineItem,
+} from 'marketplace-javascript-sdk';
 
 export * from '@ordercloud/angular-sdk';
 export * from './services/shopper-context/shopper-context.service';
 export * from '../../src/lib/services/ordercloud-sandbox/ordercloud-sandbox.models';
-export {
-  OrderCloudIntegrationsCreditCardToken,
-  OrderCloudIntegrationsCreditCardPayment,
-} from 'marketplace-javascript-sdk';
 
 export interface LineItemGroupSupplier {
   supplier: Supplier;
@@ -52,47 +47,6 @@ export interface ShippingRate {
   CarrierQuoteId: string;
   Service: string;
   TotalCost: number;
-}
-
-export interface MarketplaceLineItem extends LineItem<LineItemXp, ProductXp, any, any> {}
-
-export interface LineItemXp {
-  LineItemReturnInfo?: LineItemReturnInfo;
-}
-
-export interface LineItemReturnInfo {
-  QuantityToReturn: number;
-  ReturnReason: string;
-  Resolved: boolean;
-}
-
-export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
-export interface OrderXp {
-  AvalaraTaxTransactionCode?: string;
-  OrderType?: OrderType;
-  QuoteOrderInfo?: QuoteOrderInfo;
-  OrderReturnInfo?: OrderReturnInfo;
-  Currency?: string;
-}
-
-export enum OrderType {
-  Standard = 'Standard',
-  Quote = 'Quote',
-}
-
-export interface QuoteOrderInfo {
-  FirstName: string;
-  LastName: string;
-  Phone: string;
-  Email: string;
-  Comments?: string;
-}
-
-export interface OrderReturnInfo {
-  HasReturn: boolean;
-  RMANumber: string;
-  Resolved: boolean;
-  Comment: string;
 }
 
 export interface ProductFilters {
@@ -169,25 +123,6 @@ export interface OrderReorderResponse {
   InvalidLi: Array<LineItem>;
 }
 
-// remove with sdk update
-export interface OrderDetails {
-  Order: MarketplaceOrder;
-  LineItems: ListLineItem;
-  Promotions: ListPromotion;
-  Payments: ListPayment;
-  Approvals: ListOrderApproval;
-}
-
-// to be replaced by new sdk
-export interface ShipmentWithItems extends Shipment {
-  ShipmentItems: ShipmentItemWithLineItem[];
-}
-
-// to be replaced by new sdk
-export interface ShipmentItemWithLineItem extends ShipmentItem {
-  LineItem: LineItem;
-}
-
 /**
  * LineItem with the full product details. Currently used in the cart page only.
  */
@@ -235,7 +170,6 @@ export class AppConfig {
   orderCloudApiVersion: string;
   avalaraCompanyId: number;
   middlewareUrl: string;
-  ocMiddlewareUrl: string;
   /**
    * base path to CMS resources
    */
@@ -312,6 +246,12 @@ export interface BuyerLocationWithCert {
   certificate?: TaxCertificate;
 }
 
+// TODO - remove once SDK has enum types
+export enum OrderType {
+  Standard = 'Standard',
+  Quote = 'Quote',
+}
+
 // Product Model
 // a corresponding model in the C# product
 export type ListMarketplaceMeProduct = ListBuyerProduct<ProductXp>;
@@ -324,6 +264,46 @@ export type ListMarketplaceBuyerCreditCard = ListBuyerCreditCard<CreditCardXP>;
 
 export type MarketplaceBuyerCreditCard = BuyerCreditCard<CreditCardXP>;
 
+export type ListMarketplaceOrder = ListPage<MarketplaceOrder>;
+
+export type ListMarketplaceLineItem = ListPage<MarketplaceLineItem>;
+
 export interface CreditCardXP {
   CCBillingAddress: Address;
 }
+
+// TODO - remove when sdk has enum types
+export type CurrenySymbol =
+  | 'CAD'
+  | 'HKD'
+  | 'ISK'
+  | 'PHP'
+  | 'DKK'
+  | 'HUF'
+  | 'CZK'
+  | 'GBP'
+  | 'RON'
+  | 'SEK'
+  | 'IDR'
+  | 'INR'
+  | 'BRL'
+  | 'RUB'
+  | 'HRK'
+  | 'JPY'
+  | 'THB'
+  | 'CHF'
+  | 'EUR'
+  | 'MYR'
+  | 'BGN'
+  | 'TRY'
+  | 'CNY'
+  | 'NOK'
+  | 'NZD'
+  | 'ZAR'
+  | 'USD'
+  | 'MXN'
+  | 'SGD'
+  | 'AUD'
+  | 'ILS'
+  | 'KRW'
+  | 'PLN';

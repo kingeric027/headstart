@@ -13,6 +13,7 @@ namespace ordercloud.integrations.cms
 {
 	public enum AssetType { Image, Theme, Attachment, Structured }
 
+	[SwaggerModel]
 	[CosmosCollection("assets")]
 	public class Asset : CosmosObject
 	{
@@ -38,6 +39,7 @@ namespace ordercloud.integrations.cms
 		}
 	}
 
+	[SwaggerModel]
 	public class AssetMetadata
 	{
 		public bool IsUrlOverridden { get; set; } = false;

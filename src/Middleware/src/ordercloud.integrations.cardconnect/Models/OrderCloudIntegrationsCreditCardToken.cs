@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace ordercloud.integrations.cardconnect
 {
+	[SwaggerModel]
 	public class OrderCloudIntegrationsCreditCardToken
     {
         public string AccountNumber { get; set; }

@@ -1,10 +1,12 @@
-﻿using OrderCloud.SDK;
+﻿using ordercloud.integrations.library;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ordercloud.integrations.avalara
 {
+	[SwaggerModel]
 	public class TaxCertificate
 	{
 		[ApiReadOnly]

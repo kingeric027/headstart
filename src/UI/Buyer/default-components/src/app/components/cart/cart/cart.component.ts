@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { ListLineItemWithProduct, MarketplaceOrder, ShopperContextService } from 'marketplace';
+import { ListLineItemWithProduct, ShopperContextService } from 'marketplace';
+import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 import { OrderSummaryMeta, getOrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 
 @Component({

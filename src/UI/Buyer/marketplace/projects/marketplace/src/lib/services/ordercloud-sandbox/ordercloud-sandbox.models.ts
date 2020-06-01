@@ -1,4 +1,4 @@
-import { MarketplaceOrder, MarketplaceLineItem } from '../../shopper-context';
+import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 // tentative models to be overriden by ordercloud sdk
 export interface ShipMethodSelection {

@@ -1,11 +1,12 @@
 // angular
 import { Injectable } from '@angular/core';
-import { MarketplaceOrder, AppConfig, MarketplaceLineItem } from '../../shopper-context';
+import { AppConfig } from '../../shopper-context';
 import { OrderStateService } from './order-state.service';
 import { CartService, ICart } from './cart.service';
 import { CheckoutService, ICheckout } from './checkout.service';
 import { OcLineItemService, OcOrderService, Order } from '@ordercloud/angular-sdk';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
+import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 export interface ICurrentOrder {
   cart: ICart;

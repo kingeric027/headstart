@@ -1,4 +1,4 @@
-import { MarketplaceOrder, AppConfig, MarketplaceBuyerCreditCard } from '../../shopper-context';
+import { AppConfig, MarketplaceBuyerCreditCard } from '../../shopper-context';
 import {
   ListPayment,
   Payment,
@@ -17,6 +17,7 @@ import {
   Address,
   OrderCloudIntegrationsCreditCardPayment,
   OrderCloudIntegrationsCreditCardToken,
+  MarketplaceOrder,
 } from 'marketplace-javascript-sdk';
 
 export interface ICheckout {
@@ -77,11 +78,11 @@ export class CheckoutService implements ICheckout {
   async incrementOrderIfNeeded(): Promise<void> {
     // 'as any' can be removed after sdk update
     if (!(this.order.xp as any)?.IsResubmitting) {
-      this.order = await this.ocOrderService
+      this.order = (await this.ocOrderService
         .Patch('outgoing', this.order.ID, {
           ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
         })
-        .toPromise();
+        .toPromise()) as MarketplaceOrder;
     }
   }
 
@@ -199,7 +200,9 @@ export class CheckoutService implements ICheckout {
   }
 
   private async patch(order: MarketplaceOrder): Promise<MarketplaceOrder> {
-    return (this.order = await this.ocOrderService.Patch('outgoing', this.order.ID, order).toPromise());
+    return (this.order = (await this.ocOrderService
+      .Patch('outgoing', this.order.ID, order)
+      .toPromise()) as MarketplaceOrder);
   }
 
   private get order(): MarketplaceOrder {

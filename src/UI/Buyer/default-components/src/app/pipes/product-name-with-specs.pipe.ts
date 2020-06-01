@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { MarketplaceLineItem } from 'marketplace';
+import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 @Pipe({
   name: 'productNameWithSpecs',

@@ -24,13 +24,13 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, Route("{currency}")]
-        public async Task<ListPage<OrderCloudIntegrationsConversionRate>> Get(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, CurrencySymbols currency)
+        public async Task<ListPage<OrderCloudIntegrationsConversionRate>> Get(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, CurrencySymbol currency)
         {
             return await _command.Get(rateArgs, currency);
         }
 
         [HttpGet, Route("supportedrates")]
-        public async Task<ListPage<OrderCloudIntegrationsConversionRate>> Get()
+        public async Task<List<OrderCloudIntegrationsConversionRate>> GetRateList()
         {
             var list = await _command.GetRateList();
             return list;

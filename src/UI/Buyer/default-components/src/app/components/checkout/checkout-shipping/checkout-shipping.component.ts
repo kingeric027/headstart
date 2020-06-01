@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { MarketplaceOrder, ShipEstimate, ShipMethodSelection, ListLineItem, MarketplaceLineItem } from 'marketplace';
+import { ShipEstimate, ShipMethodSelection, ListLineItem } from 'marketplace';
+import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk'
 
 @Component({
   templateUrl: './checkout-shipping.component.html',

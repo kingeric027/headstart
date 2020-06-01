@@ -1,4 +1,7 @@
-﻿using ordercloud.integrations.library;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using ordercloud.integrations.exchangerates;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Models
@@ -13,6 +16,7 @@ namespace Marketplace.Models
     {
         public string Type { get; set; }
         public string Role { get; set; }
-        public string Currency { get; set; }
+		[JsonConverter(typeof(StringEnumConverter))]
+		public CurrencySymbol Currency { get; set; }
     }
 }

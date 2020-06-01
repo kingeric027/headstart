@@ -8,7 +8,7 @@ namespace ordercloud.integrations.exchangerates
     /// </summary>
     public interface IOrderCloudIntegrationsExchangeRatesClient
     {
-        Task<ExchangeRatesBase> Get(CurrencySymbols symbol);
+        Task<ExchangeRatesBase> Get(CurrencySymbol symbol);
     }
 
     public class OrderCloudIntegrationsExchangeRatesClient: IOrderCloudIntegrationsExchangeRatesClient
@@ -28,7 +28,7 @@ namespace ordercloud.integrations.exchangerates
             return _flurl.Request(resource);
         }
        
-        public async Task<ExchangeRatesBase> Get(CurrencySymbols symbol)
+        public async Task<ExchangeRatesBase> Get(CurrencySymbol symbol)
         {
             return await this.Request("latest")
                 .SetQueryParam("base", symbol)

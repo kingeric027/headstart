@@ -54,7 +54,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("Add or update a line item to an order")]
         [HttpPut, Route("{orderID}/lineitems"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task<MarketplaceLineItem> CreateLineItem(string orderID, [FromBody] MarketplaceLineItem li)
+        public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, [FromBody] MarketplaceLineItem li)
         {
             return await _command.UpsertLineItem(orderID, li, VerifiedUserContext);
         }

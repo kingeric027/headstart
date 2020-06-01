@@ -1,14 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import {
-  OrderDetails,
-  ShopperContextService,
-  MarketplaceOrder,
-  OrderReorderResponse,
-  OrderType,
-  OrderViewContext,
-  LineItem,
-} from 'marketplace';
+import { ShopperContextService, OrderReorderResponse, OrderViewContext, LineItem } from 'marketplace';
+import { MarketplaceOrder, OrderDetails } from 'marketplace-javascript-sdk';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 
@@ -33,7 +26,7 @@ export class OCMOrderDetails implements OnInit {
     this.approvalVersion = this.context.router.getOrderViewContext() === OrderViewContext.Approve;
     this.orderDetails = await this.context.orderHistory.getOrderDetails();
     this.order = this.orderDetails.Order;
-    this.validateReorder(this.order.ID, this.orderDetails.LineItems.Items);
+    this.validateReorder(this.order.ID, this.orderDetails.LineItems);
   }
 
   open(content: HTMLTemplateElement): void {

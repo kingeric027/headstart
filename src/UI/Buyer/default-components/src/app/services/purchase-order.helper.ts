@@ -1,4 +1,4 @@
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace';
+import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 export interface OrderSummaryMeta {
   StandardLineItems: MarketplaceLineItem[];

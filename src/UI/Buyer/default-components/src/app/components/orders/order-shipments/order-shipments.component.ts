@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { ShipmentWithItems, ShopperContextService } from 'marketplace';
+import { ShopperContextService } from 'marketplace';
+import { MarketplaceShipmentWithItems } from 'marketplace-javascript-sdk';
 
 @Component({
   templateUrl: './order-shipments.component.html',
   styleUrls: ['./order-shipments.component.scss'],
 })
 export class OCMOrderShipments implements OnInit {
-  selectedShipment: ShipmentWithItems;
-  shipments: ShipmentWithItems[];
+  selectedShipment: MarketplaceShipmentWithItems;
+  shipments: MarketplaceShipmentWithItems[];
 
   constructor(private context: ShopperContextService) {}
 
@@ -16,8 +17,7 @@ export class OCMOrderShipments implements OnInit {
     this.selectedShipment = this.shipments[0];
   }
 
-  selectShipment(shipment: ShipmentWithItems): void {
+  selectShipment(shipment: MarketplaceShipmentWithItems): void {
     this.selectedShipment = shipment;
   }
 }
-

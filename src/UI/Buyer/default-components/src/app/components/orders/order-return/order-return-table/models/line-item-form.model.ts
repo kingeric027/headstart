@@ -1,5 +1,5 @@
 import { FormControl, Validators } from '@angular/forms';
-import { MarketplaceLineItem } from 'marketplace';
+import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 export class LineItemForm {
     id = new FormControl();

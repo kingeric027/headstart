@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Address, BuyerAddress, ListBuyerAddress, ListLineItem } from '@ordercloud/angular-sdk';
-import { MarketplaceOrder, ShopperContextService, OrderAddressType } from 'marketplace';
+import { ShopperContextService } from 'marketplace';
+import { MarketplaceOrder } from 'marketplace-javascript-sdk';
+
 import { getSuggestedAddresses } from '../../../services/address-suggestion.helper';
 // TODO - Make this component "Dumb" by removing the dependence on context service 
 // and instead have it use inputs and outputs to interact with the CheckoutComponent.

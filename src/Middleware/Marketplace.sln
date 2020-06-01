@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Orchestration",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.API", "src\Marketplace.API\Marketplace.API.csproj", "{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Models", "src\Marketplace.Models\Marketplace.Models.csproj", "{D35D5FCC-FD41-4B28-9B62-4FF24C8271C4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0B969DE0-4342-474E-A83B-BF34DAF05600}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{914CFF67-B4A4-464F-B3DB-23A8B09F88E2}"
@@ -66,10 +64,6 @@ Global
 		{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCC741E1-26B7-4AB3-9CA4-D74128C5EB10}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D35D5FCC-FD41-4B28-9B62-4FF24C8271C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D35D5FCC-FD41-4B28-9B62-4FF24C8271C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D35D5FCC-FD41-4B28-9B62-4FF24C8271C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D35D5FCC-FD41-4B28-9B62-4FF24C8271C4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{854B7782-2147-4820-9237-86AE4FE741D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{854B7782-2147-4820-9237-86AE4FE741D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{854B7782-2147-4820-9237-86AE4FE741D5}.Release|Any CPU.ActiveCfg = Release|Any CPU

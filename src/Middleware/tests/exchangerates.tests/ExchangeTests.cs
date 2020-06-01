@@ -50,8 +50,8 @@ namespace exchangerates.tests
         [Test]
         public async Task map_raw_api_rates_test()
         {
-            var rates = await _command.Get(CurrencySymbols.EUR);
-            Assert.IsTrue(rates.BaseSymbol == CurrencySymbols.EUR);
+            var rates = await _command.Get(CurrencySymbol.EUR);
+            Assert.IsTrue(rates.BaseSymbol == CurrencySymbol.EUR);
             Assert.IsTrue(rates.Rates.Count(r => r.Rate == 0) == 0); // make sure any errors in returned data (null rate for EUR) is set to 1
             Assert.IsFalse(rates.Rates.Any(r => r.Icon == null));
         }
@@ -76,27 +76,27 @@ namespace exchangerates.tests
             };
             var rates = new OrderCloudIntegrationsExchangeRate()
             {
-                BaseSymbol = CurrencySymbols.EUR,
+                BaseSymbol = CurrencySymbol.EUR,
                 Rates = new List<OrderCloudIntegrationsConversionRate>()
                 {
-                    new OrderCloudIntegrationsConversionRate() { Currency = CurrencySymbols.EUR, Icon = "", Name = "EUR", Rate = 1, Symbol = "€"},
-                    new OrderCloudIntegrationsConversionRate() { Currency = CurrencySymbols.USD, Icon = "", Name = "USD", Rate = 1.01456, Symbol = "$"},
-                    new OrderCloudIntegrationsConversionRate() { Currency = CurrencySymbols.CAD, Icon = "", Name = "CAD", Rate = 2.65487, Symbol = "$"},
-                    new OrderCloudIntegrationsConversionRate() { Currency = CurrencySymbols.BGN, Icon = "", Name = "BGN", Rate = 31.357, Symbol = "лв"}
+                    new OrderCloudIntegrationsConversionRate() { Currency = CurrencySymbol.EUR, Icon = "", Name = "EUR", Rate = 1, Symbol = "€"},
+                    new OrderCloudIntegrationsConversionRate() { Currency = CurrencySymbol.USD, Icon = "", Name = "USD", Rate = 1.01456, Symbol = "$"},
+                    new OrderCloudIntegrationsConversionRate() { Currency = CurrencySymbol.CAD, Icon = "", Name = "CAD", Rate = 2.65487, Symbol = "$"},
+                    new OrderCloudIntegrationsConversionRate() { Currency = CurrencySymbol.BGN, Icon = "", Name = "BGN", Rate = 31.357, Symbol = "лв"}
                 }
             };
             var filtered = _command.Filter(args, rates);
             Assert.IsTrue(filtered.Meta.TotalCount == 2);
             Assert.IsTrue(filtered.Items.Count == 2);
-            Assert.IsTrue(filtered.Items.Any(i => i.Currency == CurrencySymbols.USD));
-            Assert.IsTrue(filtered.Items.Any(i => i.Currency == CurrencySymbols.CAD));
-            Assert.IsFalse(filtered.Items.Any(i => i.Currency == CurrencySymbols.BGN));
+            Assert.IsTrue(filtered.Items.Any(i => i.Currency == CurrencySymbol.USD));
+            Assert.IsTrue(filtered.Items.Any(i => i.Currency == CurrencySymbol.CAD));
+            Assert.IsFalse(filtered.Items.Any(i => i.Currency == CurrencySymbol.BGN));
         }
 
         [Test]
         public async Task conversion_rate_by_currency()
         {
-            var rate = await _command.ConvertCurrency(CurrencySymbols.EUR, CurrencySymbols.MYR, 1.33);
+            var rate = await _command.ConvertCurrency(CurrencySymbol.EUR, CurrencySymbol.MYR, 1.33);
             Assert.IsTrue(rate == 1.33);
         }
     }

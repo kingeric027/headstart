@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using Marketplace.Models.Extended;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
@@ -21,19 +24,21 @@ namespace Marketplace.Models
         public OrderType? OrderType { get; set; }
         public QuoteOrderInfo QuoteOrderInfo { get; set; }
         public OrderReturnInfo OrderReturnInfo { get; set; }
-        public string Currency { get; set; }
+		[JsonConverter(typeof(StringEnumConverter))]
+		public CurrencySymbol Currency { get; set; }
     }
 
     [SwaggerModel]
     public class OrderDetails
     {
         public MarketplaceOrder Order { get; set; }
-        public ListPage<LineItem> LineItems { get; set; } 
-        public ListPage<OrderPromotion> Promotions { get; set; } 
-        public ListPage<Payment> Payments { get; set; } 
-        public ListPage<OrderApproval> Approvals { get; set; } 
+        public IList<LineItem> LineItems { get; set; } 
+        public IList<OrderPromotion> Promotions { get; set; } 
+        public IList<Payment> Payments { get; set; } 
+        public IList<OrderApproval> Approvals { get; set; } 
     }
 
+	[SwaggerModel]
     public class OrderReturnInfo
     {
         public bool HasReturn { get; set; }

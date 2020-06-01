@@ -1,19 +1,12 @@
 import { Injectable } from '@angular/core';
-import {
-  LineItem,
-  ListLineItem,
-  OcOrderService,
-  OcLineItemService,
-  OcMeService,
-  OcTokenService,
-} from '@ordercloud/angular-sdk';
+import { ListLineItem, OcOrderService, OcLineItemService, OcMeService, OcTokenService } from '@ordercloud/angular-sdk';
 import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
-import { MarketplaceOrder, MarketplaceLineItem } from '../../shopper-context';
 import { listAll } from '../../functions/listAll';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ShopperContextService } from '../shopper-context/shopper-context.service';
+import { MarketplaceLineItem, MarketplaceOrder, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { AppConfig } from '../../shopper-context';
 
 export interface ICart {
   onAdd: Subject<MarketplaceLineItem>;
@@ -41,7 +34,8 @@ export class CartService implements ICart {
     private ocMeService: OcMeService,
     private state: OrderStateService,
     private http: HttpClient,
-    private ocTokenService: OcTokenService
+    private ocTokenService: OcTokenService,
+    private appSettings: AppConfig
   ) {}
 
   get(): ListLineItem {
@@ -52,13 +46,13 @@ export class CartService implements ICart {
   async add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     // order is well defined, line item can be added
     if (!_isUndefined(this.order.DateCreated)) {
-      return await this.createLineItem(lineItem);
+      return await this.upsertLineItem(lineItem);
     }
     if (!this.initializingOrder) {
       this.initializingOrder = true;
       await this.state.reset();
       this.initializingOrder = false;
-      return await this.createLineItem(lineItem);
+      return await this.upsertLineItem(lineItem);
     }
   }
 
@@ -92,9 +86,9 @@ export class CartService implements ICart {
      * do not repopulate in the cart after the resubmit we are deleting all of these
      * unsubmitted orders */
 
-    const orderToUpdate = await this.ocOrderService
+    const orderToUpdate = (await this.ocOrderService
       .Patch('Outgoing', orderID, { xp: { IsResubmitting: true } })
-      .toPromise();
+      .toPromise()) as MarketplaceOrder;
 
     const currentUnsubmittedOrders = await this.ocMeService
       .ListOrders({
@@ -128,18 +122,12 @@ export class CartService implements ICart {
       this.state.reset();
     }
   }
+  y;
 
-  private async createLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
+  private async upsertLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     this.onAdd.next(lineItem);
-    // Will be replaced by an SDK call, eventually.
-    const middlewareUrl = `https://marketplace-middleware-test.azurewebsites.net`;
-    const url = `${middlewareUrl}/order/${this.order?.ID}/lineitems`;
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-    });
     try {
-      return await this.http.put(url, lineItem, { headers: headers }).toPromise();
+      return await MarketplaceSDK.Orders.UpsertLineItem(this.order?.ID, lineItem);
     } finally {
       await this.state.reset();
     }
