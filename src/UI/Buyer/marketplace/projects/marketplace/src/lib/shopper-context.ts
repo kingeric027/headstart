@@ -49,49 +49,6 @@ export interface ShippingRate {
   TotalCost: number;
 }
 
-<<<<<<< Updated upstream
-=======
-export interface MarketplaceLineItem extends LineItem<LineItemXp, ProductXp, any, any> {}
-
-export interface LineItemXp {
-  LineItemReturnInfo?: LineItemReturnInfo;
-}
-
-export interface LineItemReturnInfo {
-  QuantityToReturn: number;
-  ReturnReason: string;
-  Resolved: boolean;
-}
-
-export interface MarketplaceOrder extends Order<OrderXp, any, any> {}
-export interface OrderXp {
-  AvalaraTaxTransactionCode?: string;
-  OrderType?: OrderType;
-  QuoteOrderInfo?: QuoteOrderInfo;
-  OrderReturnInfo?: OrderReturnInfo;
-}
-
-export enum OrderType {
-  Standard = 'Standard',
-  Quote = 'Quote',
-}
-
-export interface QuoteOrderInfo {
-  FirstName: string;
-  LastName: string;
-  Phone: string;
-  Email: string;
-  Comments?: string;
-}
-
-export interface OrderReturnInfo {
-  HasReturn: boolean;
-  RMANumber?: string;
-  Resolved?: boolean;
-  Comment?: string;
-}
-
->>>>>>> Stashed changes
 export interface ProductFilters {
   page?: number;
   sortBy?: string;
