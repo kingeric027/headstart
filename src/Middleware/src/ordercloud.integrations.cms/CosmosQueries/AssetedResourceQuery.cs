@@ -60,7 +60,7 @@ namespace ordercloud.integrations.cms
 
 		public async Task SaveAssignment(Resource resource, string assetID, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).EmptyPatch(resource);
+			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var asset = await _assets.Get(assetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).UniqueAdd(asset.id); 
@@ -69,7 +69,7 @@ namespace ordercloud.integrations.cms
 
 		public async Task DeleteAssignment(Resource resource, string assetID, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).EmptyPatch(resource);
+			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var asset = await _assets.Get(assetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).Remove(asset.id);
@@ -78,7 +78,7 @@ namespace ordercloud.integrations.cms
 
 		public async Task MoveAssignment(Resource resource, string assetID, int listOrderWithinType, VerifiedUserContext user)
 		{
-			await new MultiTenantOCClient(user).EmptyPatch(resource);
+			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var asset = await _assets.Get(assetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).MoveTo(asset.id, listOrderWithinType);
