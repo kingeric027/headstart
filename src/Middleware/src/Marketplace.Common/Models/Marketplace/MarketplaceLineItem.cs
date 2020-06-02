@@ -1,4 +1,4 @@
-﻿using ordercloud.integrations.library;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Models.Models.Marketplace
@@ -10,6 +10,7 @@ namespace Marketplace.Models.Models.Marketplace
 	public class LineItemXp 
     {
         public LineItemReturnInfo LineItemReturnInfo { get; set; }
+        public string LineItemImageUrl { get; set; }
         public decimal? ProductUnitPrice { get; set; }
     }
 
