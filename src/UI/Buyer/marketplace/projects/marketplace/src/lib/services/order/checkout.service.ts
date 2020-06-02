@@ -19,7 +19,6 @@ import {
   OrderCloudIntegrationsCreditCardToken,
   MarketplaceOrder,
 } from 'marketplace-javascript-sdk';
-import { OrderReturnInfo } from 'marketplace-javascript-sdk/dist/models/OrderReturnInfo';
 
 export interface ICheckout {
   submitWithCreditCard(card: OrderCloudIntegrationsCreditCardPayment, marketplaceID: string): Promise<string>;

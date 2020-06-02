@@ -2,7 +2,6 @@ import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { ListPayment, ListLineItem } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
 import { MarketplaceOrder } from 'marketplace-javascript-sdk';
-import { ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './checkout-confirm.component.html',
@@ -18,13 +17,13 @@ export class OCMCheckoutConfirm implements OnInit {
   @Input() payments: ListPayment;
   @Output() submitOrderWithComment = new EventEmitter<string>();
 
-  constructor(private context: ShopperContextService) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.form = new FormGroup({ comments: new FormControl('') });
   }
 
-  async saveCommentsAndSubmitOrder(): Promise<void> {
+  saveCommentsAndSubmitOrder(): void {
     this.isSubmittingOrder = true;
     const Comments = this.form.get('comments').value;
     this.submitOrderWithComment.emit(Comments);
