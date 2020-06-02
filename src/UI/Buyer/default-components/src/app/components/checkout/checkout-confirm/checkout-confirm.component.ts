@@ -25,7 +25,6 @@ export class OCMCheckoutConfirm implements OnInit {
   }
 
   async saveCommentsAndSubmitOrder(): Promise<void> {
-    await this.context.order.checkout.initializeHasReturn();
     this.isSubmittingOrder = true;
     const Comments = this.form.get('comments').value;
     this.submitOrderWithComment.emit(Comments);
