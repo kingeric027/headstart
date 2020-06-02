@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using ordercloud.integrations.library.extensions;
 using OrderCloud.SDK;
 
 namespace ordercloud.integrations.library
@@ -32,14 +31,16 @@ namespace ordercloud.integrations.library
         }
     }
 
-	public class OrderCloudIntegrationsAuthHandler : AuthenticationHandler<OrderCloudIntegrationsAuthOptions>
+    public class OrderCloudIntegrationsAuthHandler : AuthenticationHandler<OrderCloudIntegrationsAuthOptions>
     {
+        private readonly IOrderCloudClient _oc;
         public const string BaseUserRole = "BaseUserRole"; // Everyone with a valid OC token has this role 
 
         public OrderCloudIntegrationsAuthHandler(IOptionsMonitor<OrderCloudIntegrationsAuthOptions> options, ILoggerFactory logger,
-            UrlEncoder encoder, ISystemClock clock)
+            UrlEncoder encoder, ISystemClock clock, IOrderCloudClient oc)
             : base(options, logger, encoder, clock)
         {
+            _oc = oc;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -52,8 +53,8 @@ namespace ordercloud.integrations.library
                     return AuthenticateResult.Fail("The Marketplace bearer token was not provided in the Authorization header.");
 
                 var jwt = new JwtSecurityToken(token);
-				var clientId = jwt.GetClientID();
-				var usrtype = jwt.GetUserType();
+                var clientId = jwt.Claims.FirstOrDefault(x => x.Type == "cid")?.Value;
+                var usrtype = jwt.Claims.FirstOrDefault(x => x.Type == "usrtype")?.Value;
                 if (clientId == null)
                     return AuthenticateResult.Fail("The provided bearer token does not contain a 'cid' (Client ID) claim.");
 
@@ -63,7 +64,7 @@ namespace ordercloud.integrations.library
                 cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
 
-				var user = await new MultiTenantOCClient(jwt).Me.GetAsync(token);
+                var user = await _oc.Me.GetAsync(token);
                 if (!user.Active)
                     return AuthenticateResult.Fail("Authentication failure");
                 cid.AddClaim(new Claim("username", user.Username));

@@ -1,5 +1,4 @@
-﻿using ordercloud.integrations.library.extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -22,8 +21,8 @@ namespace ordercloud.integrations.library
 
         public string UsrType
         {
-            get { return _token.GetClaim("usrtype"); }
-		}
+            get { return _token.Payload.FirstOrDefault(t => t.Key == "usrtype").Value?.ToString(); }
+        }
 
         public string UserID
         {
@@ -57,28 +56,20 @@ namespace ordercloud.integrations.library
 
         public string AuthUrl
         {
-            get { return _token.GetClaim("iss"); }
+            get { return _token.Payload.FirstOrDefault(t => t.Key == "iss").Value?.ToString(); }
         }
 
         public string ApiUrl
         {
-			get { return _token.GetClaim("aud"); }
-		}
+            get { return _token.Payload.FirstOrDefault(t => t.Key == "aud").Value?.ToString(); }
+        }
 
         public DateTime AccessTokenExpiresUTC
         {
             get
             {
-                return _token.GetClaim("exp").UnixToDateTime();
+                return _token.Payload.FirstOrDefault(t => t.Key == "exp").Value.ToString().UnixToDateTime();
             }
         }
-
-		public DateTime NotValidBeforeUTC
-		{
-			get
-			{
-				return _token.GetClaim("nbf").UnixToDateTime();
-			}
-		}
-	}
+    }
 }

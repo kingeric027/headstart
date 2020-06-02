@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using ordercloud.integrations.library.extensions;
 using OrderCloud.SDK;
 
 namespace ordercloud.integrations.library
@@ -10,16 +8,24 @@ namespace ordercloud.integrations.library
     /// </summary>
     public class MultiTenantOCClient : OrderCloudClient, IOrderCloudClient
     {
-		public MultiTenantOCClient(string token) :
-			this(new JwtSecurityToken(token)) { }
+        public MultiTenantOCClient(VerifiedUserContext user) : base(
+            new OrderCloudClientConfig()
+            {
+                ApiUrl = user.ApiUrl,
+                AuthUrl = user.AuthUrl,
+                ClientId = user.ClientID,
+                Roles = new[] { ApiRole.FullAccess }
+            }
+        )
+        {
+            TokenResponse = new TokenResponse()
+            {
+                AccessToken = user.AccessToken,
+                ExpiresUtc = user.AccessTokenExpiresUTC
+            };
+        }
 
-		public MultiTenantOCClient(JwtSecurityToken jwt) :
-			this(jwt.RawPayload, jwt.GetApiUrl(), jwt.GetAuthUrl(), jwt.GetClientID(), jwt.GetExpiresUTC()) { }
-
-		public MultiTenantOCClient(VerifiedUserContext user) :
-			this(user.AccessToken, user.ApiUrl, user.AuthUrl, user.ClientID, user.AccessTokenExpiresUTC) { }
-	
-		private MultiTenantOCClient(string token, string apiUrl, string authUrl, string clientID, DateTime tokenExpiresUTC) : base(
+        public MultiTenantOCClient(string token, string apiUrl, string authUrl, string clientID, DateTime tokenExpiresUTC) : base(
             new OrderCloudClientConfig()
             {
                 ApiUrl = apiUrl,
@@ -35,7 +41,5 @@ namespace ordercloud.integrations.library
                 ExpiresUtc = tokenExpiresUTC
             };
         }
-
-
-	}
+    }
 }
