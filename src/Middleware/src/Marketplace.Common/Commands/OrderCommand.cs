@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 using Marketplace.Common.Commands.Zoho;
-using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Services;
@@ -17,6 +16,7 @@ using Marketplace.Models.Misc;
 using Flurl.Http;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
+using ordercloud.integrations.freightpop;
 
 namespace Marketplace.Common.Commands
 {

@@ -14,7 +14,7 @@ using Marketplace.Common.Models;
 using Action = Marketplace.Common.Models.Action;
 using LogLevel = Marketplace.Common.Models.LogLevel;
 using Marketplace.Models.Models.Misc;
-using Marketplace.Common.Services.FreightPop.Models;
+using ordercloud.integrations.freightpop;
 
 namespace Marketplace.Orchestration
 {

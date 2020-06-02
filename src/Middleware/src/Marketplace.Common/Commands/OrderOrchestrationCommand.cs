@@ -1,11 +1,10 @@
 using OrderCloud.SDK;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
 using System.Linq;
 using Marketplace.Models.Models.Marketplace;
-using Marketplace.Common.Services.FreightPop.Models;
+using ordercloud.integrations.freightpop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using System;
 using Marketplace.Common.Exceptions;

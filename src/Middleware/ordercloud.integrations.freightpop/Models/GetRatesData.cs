@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Marketplace.Common.Services.FreightPop.Models
+namespace ordercloud.integrations.freightpop
 {
     public class GetRatesData
     {

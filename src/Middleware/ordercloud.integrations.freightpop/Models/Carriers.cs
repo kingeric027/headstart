@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Marketplace.Common.Services.FreightPop.Models
+namespace ordercloud.integrations.freightpop
 {
 
     public class CarrierService

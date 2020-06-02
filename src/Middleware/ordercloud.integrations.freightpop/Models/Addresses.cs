@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Marketplace.Common.Services.FreightPop.Models { 
+namespace ordercloud.integrations.freightpop { 
     // the address for getting rates is a condensed
     // version of the address used for order importing
 public class RateAddress
