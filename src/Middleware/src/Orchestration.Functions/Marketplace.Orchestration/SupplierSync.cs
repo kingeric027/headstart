@@ -27,6 +27,17 @@ namespace Marketplace.Orchestration
             _supplier = supplier;
         }
 
+        [FunctionName("UploadProductTemplate")]
+        public async Task<IActionResult> UploadProductTemplate(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "{supplierId}")]
+            HttpRequest req, string supplierId, ILogger log)
+        {
+            var form = await req.ReadFormAsync();
+            var file = form.Files.GetFile("file");
+            
+            return await Task.FromResult(new OkObjectResult(supplierId));
+        }
+
         [FunctionName("GetSupplierOrder")]
         public async Task<IActionResult> GetSupplierOrder([HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = "{supplierId}/{orderId}")]
             HttpRequest req, string supplierId, string orderId, ILogger log)
