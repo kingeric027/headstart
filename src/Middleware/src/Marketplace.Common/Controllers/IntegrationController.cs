@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using OrderCloud.SDK;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Controllers
 {
@@ -14,22 +15,18 @@ namespace Marketplace.Common.Controllers
 			_OCShippingIntegration = OCShippingIntegration;
 		}
 
-		// todo auth on this endpoint
 		[Route("shippingrates")]
 		[HttpPost]
-		// looking into why ordercloudwebhookauth is broken
-		//[OrderCloudWebhookAuth]
+		[OrderCloudWebhookAuth]
 		public async Task<ShipEstimateResponse> GetShippingRates([FromBody] OrderCalculatePayload orderCalculatePayload)
 		{
 			var shipmentEstimates = await _OCShippingIntegration.GetRatesAsync(orderCalculatePayload);
 			return shipmentEstimates;
 		}
 
-		// todo auth on this endpoint
 		[Route("ordercalculate")]
 		[HttpPost]
-		// looking into why ordercloudwebhookauth is broken
-		//[OrderCloudWebhookAuth]
+		[OrderCloudWebhookAuth]
 		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload)
 		{
 			var orderCalculationResponse = await _OCShippingIntegration.CalculateOrder(orderCalculatePayload);
