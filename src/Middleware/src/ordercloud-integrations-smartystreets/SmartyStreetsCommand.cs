@@ -85,97 +85,97 @@ namespace ordercloud.integrations.smartystreets
 		public async Task<BuyerAddress> CreateMeAddress(BuyerAddress address, VerifiedUserContext user)
 		{
 			var validation = await ValidateAddress(address);
-			return await new MultiTenantOCClient(user).Me.CreateAddressAsync(validation.ValidAddress);
+			return await new OrderCloudClientWithContext(user).Me.CreateAddressAsync(validation.ValidAddress);
 		}
 
 		public async Task<BuyerAddress> SaveMeAddress(string addressID, BuyerAddress address, VerifiedUserContext user)
 		{
 			var validation = await ValidateAddress(address);
-			return await new MultiTenantOCClient(user).Me.SaveAddressAsync(addressID, validation.ValidAddress);
+			return await new OrderCloudClientWithContext(user).Me.SaveAddressAsync(addressID, validation.ValidAddress);
 		}
 
 		public async Task PatchMeAddress(string addressID, BuyerAddress patch, VerifiedUserContext user)
 		{
-			var current = await new MultiTenantOCClient(user).Me.GetAddressAsync<BuyerAddress>(addressID);
+			var current = await new OrderCloudClientWithContext(user).Me.GetAddressAsync<BuyerAddress>(addressID);
 			var patched = PatchHelper.PatchObject(patch, current);
 			await ValidateAddress(patched);
-			await new MultiTenantOCClient(user).Me.PatchAddressAsync(addressID, (PartialBuyerAddress)patch);
+			await new OrderCloudClientWithContext(user).Me.PatchAddressAsync(addressID, (PartialBuyerAddress)patch);
 		}
 
 		// BUYER endpoints
 		public async Task<Address> CreateBuyerAddress(string buyerID, Address address, VerifiedUserContext user)
 		{
 			var validation = await ValidateAddress(address);
-			return await new MultiTenantOCClient(user).Addresses.CreateAsync(buyerID, validation.ValidAddress);
+			return await new OrderCloudClientWithContext(user).Addresses.CreateAsync(buyerID, validation.ValidAddress);
 		}
 
 		public async Task<Address> SaveBuyerAddress(string buyerID, string addressID, Address address, VerifiedUserContext user)
 		{
 			var validation = await ValidateAddress(address);
-			return await new MultiTenantOCClient(user).Addresses.SaveAsync(buyerID, addressID, validation.ValidAddress);
+			return await new OrderCloudClientWithContext(user).Addresses.SaveAsync(buyerID, addressID, validation.ValidAddress);
 		}
 
 		public async Task<Address> PatchBuyerAddress(string buyerID, string addressID, Address patch, VerifiedUserContext user)
 		{
-			var current = await new MultiTenantOCClient(user).Addresses.GetAsync<Address>(buyerID, addressID);
+			var current = await new OrderCloudClientWithContext(user).Addresses.GetAsync<Address>(buyerID, addressID);
 			var patched = PatchHelper.PatchObject(patch, current);
 			await ValidateAddress(patched);
-			return await new MultiTenantOCClient(user).Addresses.PatchAsync(buyerID, addressID, patch as PartialAddress);
+			return await new OrderCloudClientWithContext(user).Addresses.PatchAsync(buyerID, addressID, patch as PartialAddress);
 		}
 
 		// SUPPLIER endpoints
 		public async Task<Address> CreateSupplierAddress(string supplierID, Address address, VerifiedUserContext user)
 		{
 			var validation = await ValidateAddress(address);
-			return await new MultiTenantOCClient(user).SupplierAddresses.CreateAsync(supplierID, validation.ValidAddress);
+			return await new OrderCloudClientWithContext(user).SupplierAddresses.CreateAsync(supplierID, validation.ValidAddress);
 		}
 
 		public async Task<Address> SaveSupplierAddress(string supplierID, string addressID, Address address, VerifiedUserContext user)
 		{
 			var validation = await ValidateAddress(address);
-			return await new MultiTenantOCClient(user).SupplierAddresses.SaveAsync(supplierID, addressID, validation.ValidAddress);
+			return await new OrderCloudClientWithContext(user).SupplierAddresses.SaveAsync(supplierID, addressID, validation.ValidAddress);
 		}
 
 		public async Task<Address> PatchSupplierAddress(string supplierID, string addressID, Address patch, VerifiedUserContext user)
 		{
-			var current = await new MultiTenantOCClient(user).SupplierAddresses.GetAsync<Address>(supplierID, addressID);
+			var current = await new OrderCloudClientWithContext(user).SupplierAddresses.GetAsync<Address>(supplierID, addressID);
 			var patched = PatchHelper.PatchObject(patch, current);
 			await ValidateAddress(patched);
-			return await new MultiTenantOCClient(user).SupplierAddresses.PatchAsync(supplierID, addressID, patch as PartialAddress);
+			return await new OrderCloudClientWithContext(user).SupplierAddresses.PatchAsync(supplierID, addressID, patch as PartialAddress);
 		}
 
 		// ADMIN endpoints
 		public async Task<Address> CreateAdminAddress(Address address, VerifiedUserContext user)
 		{
 			var validation = await ValidateAddress(address);
-			return await new MultiTenantOCClient(user).AdminAddresses.CreateAsync(address);
+			return await new OrderCloudClientWithContext(user).AdminAddresses.CreateAsync(address);
 		}
 
 		public async Task<Address> SaveAdminAddress(string addressID, Address address, VerifiedUserContext user)
 		{
 			var validation = await ValidateAddress(address);
-			return await new MultiTenantOCClient(user).AdminAddresses.SaveAsync(addressID, validation.ValidAddress);
+			return await new OrderCloudClientWithContext(user).AdminAddresses.SaveAsync(addressID, validation.ValidAddress);
 		}
 
 		public async Task<Address> PatchAdminAddress(string addressID, Address patch, VerifiedUserContext user)
 		{
-			var current = await new MultiTenantOCClient(user).AdminAddresses.GetAsync<Address>(addressID);
+			var current = await new OrderCloudClientWithContext(user).AdminAddresses.GetAsync<Address>(addressID);
 			var patched = PatchHelper.PatchObject(patch, current);
 			await ValidateAddress(patched);
-			return await new MultiTenantOCClient(user).AdminAddresses.PatchAsync(addressID, patch as PartialAddress);
+			return await new OrderCloudClientWithContext(user).AdminAddresses.PatchAsync(addressID, patch as PartialAddress);
 		}
 
 		// ORDER endpoints
 		public async Task<Order> SetBillingAddress(OrderDirection direction, string orderID, Address address, VerifiedUserContext user)
 		{
 			var validation = await ValidateAddress(address);
-			return await new MultiTenantOCClient(user).Orders.SetBillingAddressAsync(direction, orderID, validation.ValidAddress);
+			return await new OrderCloudClientWithContext(user).Orders.SetBillingAddressAsync(direction, orderID, validation.ValidAddress);
 		}
 
 		public async Task<Order> SetShippingAddress(OrderDirection direction, string orderID, Address address, VerifiedUserContext user)
 		{
 			var validation = await ValidateAddress(address);
-			return await new MultiTenantOCClient(user).Orders.SetShippingAddressAsync(direction, orderID, validation.ValidAddress);
+			return await new OrderCloudClientWithContext(user).Orders.SetShippingAddressAsync(direction, orderID, validation.ValidAddress);
 		}
 		#endregion
 	}
