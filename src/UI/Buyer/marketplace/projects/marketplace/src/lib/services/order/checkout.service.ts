@@ -176,7 +176,7 @@ export class CheckoutService implements ICheckout {
       CreditCardID: creditCardID,
       xp: {
         partialAccountNumber: partialAccountNum,
-        cardType: cardType,
+        cardType,
       },
     };
     return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();

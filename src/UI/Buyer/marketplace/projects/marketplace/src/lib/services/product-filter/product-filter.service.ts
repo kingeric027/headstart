@@ -5,7 +5,6 @@ import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { ProductFilters } from '../../shopper-context';
 import { OcMeService, ListProduct } from '@ordercloud/angular-sdk';
-import { cloneDeep as _cloneDeep } from 'lodash';
 import { ProductCategoriesService } from '../product-categories/product-categories.service';
 
 export interface IProductFilters {
@@ -91,13 +90,13 @@ export class ProductFilterService implements IProductFilters {
       .toPromise();
   }
 
-  private patchFilterState(patch: ProductFilters) {
+  private patchFilterState(patch: ProductFilters): void {
     const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
     const queryParams = this.mapToUrlQueryParams(activeFilters);
     this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
   }
 
-  private getDefaultParms() {
+  private getDefaultParms(): ProductFilters {
     // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
     return {
       page: undefined,
@@ -109,49 +108,49 @@ export class ProductFilterService implements IProductFilters {
     };
   }
 
-  toPage(pageNumber: number) {
+  toPage(pageNumber: number): void {
     this.patchFilterState({ page: pageNumber || undefined });
   }
 
-  sortBy(field: string) {
+  sortBy(field: string): void {
     this.patchFilterState({ sortBy: field || undefined, page: undefined });
   }
 
-  searchBy(searchTerm: string) {
+  searchBy(searchTerm: string): void {
     this.patchFilterState({ search: searchTerm || undefined, page: undefined });
   }
 
-  filterByFacet(field: string, value: string) {
+  filterByFacet(field: string, value: string): void {
     const activeFacets = this.activeFiltersSubject.value.activeFacets || {};
     activeFacets[field] = value || undefined;
     this.patchFilterState({ activeFacets, page: undefined });
   }
 
-  filterByCategory(categoryID: string) {
+  filterByCategory(categoryID: string): void {
     this.patchFilterState({ categoryID: categoryID || undefined, page: undefined });
   }
 
-  filterByFavorites(showOnlyFavorites: boolean) {
+  filterByFavorites(showOnlyFavorites: boolean): void {
     this.patchFilterState({ showOnlyFavorites, page: undefined });
   }
 
-  clearSort() {
+  clearSort(): void {
     this.sortBy(undefined);
   }
 
-  clearSearch() {
+  clearSearch(): void {
     this.searchBy(undefined);
   }
 
-  clearFacetFilter(field: string) {
+  clearFacetFilter(field: string): void {
     this.filterByFacet(field, undefined);
   }
 
-  clearCategoryFilter() {
+  clearCategoryFilter(): void {
     this.filterByCategory(undefined);
   }
 
-  clearAllFilters() {
+  clearAllFilters(): void {
     this.patchFilterState(this.getDefaultParms());
   }
 

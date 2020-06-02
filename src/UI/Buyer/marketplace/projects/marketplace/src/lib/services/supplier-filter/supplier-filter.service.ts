@@ -4,7 +4,6 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { SupplierFilters } from '../../shopper-context';
 import { OcSupplierService, ListSupplier } from '@ordercloud/angular-sdk';
-import { cloneDeep as _cloneDeep } from 'lodash';
 
 export interface ISupplierFilters {
   activeFiltersSubject: BehaviorSubject<SupplierFilters>;
@@ -74,7 +73,7 @@ export class SupplierFilterService implements ISupplierFilters {
       .toPromise();
   }
 
-  private patchFilterState(patch: SupplierFilters) {
+  private patchFilterState(patch: SupplierFilters): void {
     const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
     const queryParams = this.mapToUrlQueryParams(activeFilters);
     this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
@@ -91,49 +90,49 @@ export class SupplierFilterService implements ISupplierFilters {
     };
   }
 
-  private createFilters(activeFilters, supplierID): any {
+  private createFilters(activeFilters: any, supplierID: string): any {
     const filters = _transform(
       activeFilters,
-      (result, value, key: any) => (result[key.toLocaleLowerCase()] = value),
+      (result, value, key: string) => (result[key.toLocaleLowerCase()] = value),
       {}
     );
     filters.ID = supplierID || undefined;
     return filters;
   }
 
-  toSupplier(supplierID: string) {
+  toSupplier(supplierID: string): void {
     this.patchFilterState({
       supplierID: supplierID || undefined,
       page: undefined,
     });
   }
 
-  toPage(pageNumber: number) {
+  toPage(pageNumber: number): void {
     this.patchFilterState({ page: pageNumber || undefined });
   }
 
-  sortBy(field: string) {
+  sortBy(field: string): void {
     this.patchFilterState({ sortBy: field || undefined, page: undefined });
   }
 
-  filterByFields(filter: any) {
+  filterByFields(filter: any): void {
     const activeFilters = this.activeFiltersSubject.value.activeFilters || {};
     const newActiveFilters = { ...activeFilters, ...filter };
     this.patchFilterState({ activeFilters: newActiveFilters, page: undefined });
   }
-  searchBy(searchTerm: string) {
+  searchBy(searchTerm: string): void {
     this.patchFilterState({ search: searchTerm || undefined, page: undefined });
   }
 
-  clearSort() {
+  clearSort(): void {
     this.sortBy(undefined);
   }
 
-  clearSearch() {
+  clearSearch(): void {
     this.searchBy(undefined);
   }
 
-  clearAllFilters() {
+  clearAllFilters(): void {
     this.patchFilterState(this.getDefaultParms());
   }
 

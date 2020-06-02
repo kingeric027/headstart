@@ -36,7 +36,7 @@ export class HasTokenGuard implements CanActivate {
         this.auth.setToken(match[1]);
         return true;
       } else {
-        throw Error("Missing url query param 'token'");
+        throw Error(`Missing url query param 'token'`);
       }
     }
 

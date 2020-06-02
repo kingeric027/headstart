@@ -44,15 +44,15 @@ export class OrderHistoryWrapperComponent implements OnInit, OnDestroy {
     private router: ActivatedRoute
   ) {}
 
-  async ngOnInit() {
+  ngOnInit(): void {
     this.orderFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(this.setOrders);
   }
 
-  setOrders = async () => {
+  setOrders = async (): Promise<void> => {
     this.orders = await this.orderFilters.listOrders();
   };
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
   }
 }

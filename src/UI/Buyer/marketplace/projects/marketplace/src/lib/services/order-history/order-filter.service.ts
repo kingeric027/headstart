@@ -7,6 +7,7 @@ import { OcMeService, ListOrder, OcOrderService, OcTokenService } from '@ordercl
 import { filter } from 'rxjs/operators';
 import { RouteService } from '../route/route.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 export interface IOrderFilters {
   activeFiltersSubject: BehaviorSubject<OrderFilters>;
@@ -94,7 +95,7 @@ export class OrderFilterService implements IOrderFilters {
     this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate, location });
   };
 
-  private getDefaultParms() {
+  private getDefaultParms(): OrderFilters {
     // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
     return {
       page: undefined,
@@ -135,10 +136,10 @@ export class OrderFilterService implements IOrderFilters {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
     });
-    const url = `${this.appConfig.middlewareUrl}/order/location/${this.activeFiltersSubject.value.location}`;
+    const url = `${this.appConfig.middlewareUrl}/order/location/${locationID}`;
     const httpParams = this.createHttpParams();
     return this.httpClient
-      .get<ListOrder>(url, { headers: headers, params: httpParams })
+      .get<ListOrder>(url, { headers, params: httpParams })
       .toPromise();
   }
 
@@ -161,12 +162,12 @@ export class OrderFilterService implements IOrderFilters {
     return await this.ocMeService.ListApprovableOrders(this.createListOptions()).toPromise();
   }
 
-  private createListOptions() {
+  private createListOptions(): ListArgs {
     const { page, sortBy, search, showOnlyFavorites, status, fromDate, toDate } = this.activeFiltersSubject.value;
     const from = fromDate ? `>${fromDate}` : undefined;
     const to = toDate ? `<${toDate}` : undefined;
     const favorites = this.currentUser.get().FavoriteOrderIDs.join('|') || undefined;
-    let listOptions = {
+    const listOptions = {
       page,
       search,
       sortBy,
@@ -175,11 +176,10 @@ export class OrderFilterService implements IOrderFilters {
         DateSubmitted: [from, to].filter(x => x),
       },
     };
-    listOptions = this.addStatusFilters(status, listOptions);
-    return listOptions;
+    return this.addStatusFilters(status, listOptions);
   }
 
-  private addStatusFilters(status: string, listOptions: any): any {
+  private addStatusFilters(status: string, listOptions: ListArgs): ListArgs {
     if (status === OrderStatus.ChangesRequested) {
       listOptions.filters.DateDeclined = '*';
     } else {
@@ -188,7 +188,7 @@ export class OrderFilterService implements IOrderFilters {
     return listOptions;
   }
 
-  private patchFilterState(patch: OrderFilters) {
+  private patchFilterState(patch: OrderFilters): void {
     if (this.isNewDateFilter(patch, this.activeFiltersSubject.value)) patch.page = undefined;
     const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
     const queryParams = this.mapToUrlQueryParams(activeFilters);

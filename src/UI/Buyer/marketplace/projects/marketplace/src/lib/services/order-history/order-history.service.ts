@@ -1,18 +1,12 @@
 import { Injectable } from '@angular/core';
 import {
   OcOrderService,
-  ListPromotion,
-  ListPayment,
-  OrderApproval,
   OcLineItemService,
   OcMeService,
   OcSupplierService,
   OcSupplierAddressService,
-  Supplier,
-  Address,
   OcTokenService,
 } from '@ordercloud/angular-sdk';
-import { uniqBy as _uniqBy } from 'lodash';
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderReorderResponse, LineItemGroupSupplier, AppConfig } from '../../shopper-context';
@@ -23,7 +17,6 @@ import {
   MarketplaceLineItem,
   OrderDetails,
   MarketplaceShipmentWithItems,
-  OrderXp,
 } from 'marketplace-javascript-sdk';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 
@@ -79,19 +72,19 @@ export class OrderHistoryService implements IOrderHistory {
 
   async approveOrder(
     orderID: string = this.activeOrderID,
-    Comments = '',
-    AllowResubmit = false
+    Comments: string = '',
+    AllowResubmit: boolean = false
   ): Promise<MarketplaceOrder> {
-    var order = await this.ocOrderService.Approve('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
+    const order = await this.ocOrderService.Approve('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
     return order as MarketplaceOrder;
   }
 
   async declineOrder(
     orderID: string = this.activeOrderID,
-    Comments = '',
-    AllowResubmit = true
+    Comments: string = '',
+    AllowResubmit: boolean = true
   ): Promise<MarketplaceOrder> {
-    var order = await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
+    const order = await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
     return order as MarketplaceOrder;
   }
 
@@ -109,7 +102,7 @@ export class OrderHistoryService implements IOrderHistory {
     });
     const url = `${this.appConfig.middlewareUrl}/order/${orderID}/details`;
     return this.httpClient
-      .get<OrderDetails>(url, { headers: headers })
+      .get<OrderDetails>(url, { headers })
       .toPromise();
   }
 
@@ -133,12 +126,12 @@ export class OrderHistoryService implements IOrderHistory {
     });
     const url = `${this.appConfig.middlewareUrl}/order/${orderID}/shipmentswithitems`;
     return this.httpClient
-      .get<MarketplaceShipmentWithItems[]>(url, { headers: headers })
+      .get<MarketplaceShipmentWithItems[]>(url, { headers })
       .toPromise();
   }
 
   async returnOrder(orderID: string): Promise<MarketplaceOrder> {
-    var order = await this.ocOrderService
+    const order = await this.ocOrderService
       .Patch('Outgoing', orderID, {
         xp: {
           OrderReturnInfo: {

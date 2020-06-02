@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { OcMeService, OcAddressService, OcTokenService } from '@ordercloud/angular-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { TaxCertificate, MarketplaceAddressBuyer, MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { ListMarketplaceAddressBuyer, AppConfig, BuyerLocationWithCert } from '../../shopper-context';
+import { ListMarketplaceAddressBuyer, AppConfig } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { UserManagementService } from '../user-management/user-management.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -58,7 +58,7 @@ export class AddressService {
     });
     const url = `${this.appConfig.middlewareUrl}/avalara/${this.avalaraCompanyId}/certificate/${locationID}`;
     return this.httpClient
-      .post<TaxCertificate>(url, certificate, { headers: headers })
+      .post<TaxCertificate>(url, certificate, { headers })
       .toPromise();
   }
 
@@ -69,7 +69,7 @@ export class AddressService {
     });
     const url = `${this.appConfig.middlewareUrl}/avalara/${this.avalaraCompanyId}/certificate/${locationID}`;
     return this.httpClient
-      .put<TaxCertificate>(url, certificate, { headers: headers })
+      .put<TaxCertificate>(url, certificate, { headers })
       .toPromise();
   }
 
@@ -80,7 +80,7 @@ export class AddressService {
     });
     const url = `${this.appConfig.middlewareUrl}/avalara/${this.avalaraCompanyId}/certificate/${locationID}`;
     return this.httpClient
-      .get<TaxCertificate>(url, { headers: headers })
+      .get<TaxCertificate>(url, { headers })
       .toPromise();
   };
 }

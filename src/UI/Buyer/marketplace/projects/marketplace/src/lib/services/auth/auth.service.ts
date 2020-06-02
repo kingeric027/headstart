@@ -112,7 +112,7 @@ export class AuthService implements IAuthentication {
     return result;
   }
 
-  async profiledLogin(userName: string, password: string, rememberMe = false): Promise<AccessToken> {
+  async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
     const creds = await this.ocAuthService
       .Login(userName, password, this.appConfig.clientID, this.appConfig.scope)
       .toPromise();

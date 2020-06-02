@@ -2,16 +2,14 @@ import { Injectable } from '@angular/core';
 import {
   OcUserService,
   UserGroup,
-  User,
   OcUserGroupService,
   UserGroupAssignment,
   OcMeService,
-  ApprovalRule,
   OcApprovalRuleService,
   OcTokenService,
 } from '@ordercloud/angular-sdk';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { PermissionTypes, AppConfig } from '../../shopper-context';
+import { AppConfig } from '../../shopper-context';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MarketplaceUser, ListPage } from 'marketplace-javascript-sdk';
 
@@ -65,7 +63,7 @@ export class UserManagementService implements IUserManagement {
     });
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/users`;
     return this.httpClient
-      .get<ListPage<MarketplaceUser>>(url, { headers: headers })
+      .get<ListPage<MarketplaceUser>>(url, { headers })
       .toPromise();
   }
 
@@ -77,7 +75,7 @@ export class UserManagementService implements IUserManagement {
     const buyerID = locationID.split('-')[0];
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/permissions`;
     return this.httpClient
-      .get<UserGroupAssignment[]>(url, { headers: headers })
+      .get<UserGroupAssignment[]>(url, { headers })
       .toPromise();
   }
 
@@ -89,7 +87,7 @@ export class UserManagementService implements IUserManagement {
     const buyerID = locationID.split('-')[0];
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/approvalpermissions`;
     return this.httpClient
-      .get<UserGroupAssignment[]>(url, { headers: headers })
+      .get<UserGroupAssignment[]>(url, { headers })
       .toPromise();
   }
 
@@ -109,7 +107,7 @@ export class UserManagementService implements IUserManagement {
     };
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/permissions`;
     return this.httpClient
-      .post<void>(url, body, { headers: headers })
+      .post<void>(url, body, { headers })
       .toPromise();
   }
 
@@ -121,7 +119,7 @@ export class UserManagementService implements IUserManagement {
     });
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/approvalthreshold`;
     return this.httpClient
-      .get<number>(url, { headers: headers })
+      .get<number>(url, { headers })
       .toPromise();
   }
 
@@ -136,7 +134,7 @@ export class UserManagementService implements IUserManagement {
     };
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/approvalthreshold`;
     return this.httpClient
-      .post<number>(url, body, { headers: headers })
+      .post<number>(url, body, { headers })
       .toPromise();
   }
 }
