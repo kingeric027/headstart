@@ -14,7 +14,7 @@ namespace ordercloud.integrations.library
 			this(new JwtSecurityToken(token)) { }
 
 		public OrderCloudClientWithContext(JwtSecurityToken jwt) :
-			this(jwt.RawPayload, jwt.GetApiUrl(), jwt.GetAuthUrl(), jwt.GetClientID(), jwt.GetExpiresUTC()) { }
+			this(jwt.RawData, jwt.GetApiUrl(), jwt.GetAuthUrl(), jwt.GetClientID(), jwt.GetExpiresUTC()) { }
 
 		public OrderCloudClientWithContext(VerifiedUserContext user) : 
 			this(user.AccessToken, user.ApiUrl, user.AuthUrl, user.ClientID, user.AccessTokenExpiresUTC) { } 
