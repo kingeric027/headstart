@@ -37,11 +37,9 @@ namespace ordercloud.integrations.library
         public const string BaseUserRole = "BaseUserRole"; // Everyone with a valid OC token has this role 
 
         public OrderCloudIntegrationsAuthHandler(IOptionsMonitor<OrderCloudIntegrationsAuthOptions> options, ILoggerFactory logger,
-            UrlEncoder encoder, ISystemClock clock, IOrderCloudClient oc)
+            UrlEncoder encoder, ISystemClock clock)
             : base(options, logger, encoder, clock)
-        {
-            _oc = oc;
-        }
+        { }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
@@ -64,7 +62,7 @@ namespace ordercloud.integrations.library
                 cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
 
-                var user = await _oc.Me.GetAsync(token);
+                var user = await new OrderCloudClient().Me.GetAsync(token);
                 if (!user.Active)
                     return AuthenticateResult.Fail("Authentication failure");
                 cid.AddClaim(new Claim("username", user.Username));
