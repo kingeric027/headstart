@@ -1,5 +1,7 @@
 ﻿
 using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Converters;
+using Marketplace.Common.Helpers;
 #if NETCOREAPP2_2
 using Microsoft.AspNetCore.Authentication;
 using System;
@@ -20,10 +22,11 @@ namespace ordercloud.integrations.library
             services.AddSingleton(settings);
             services.AddMvc(o => { o.Filters.Add(typeof(ValidateModelAttribute)); })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                .AddJsonOptions(jsonOptions =>
-                {
-                    jsonOptions.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                })
+				.AddJsonOptions(o =>
+				{
+					o.SerializerSettings.ContractResolver = new MarketplaceSerializer();
+					o.SerializerSettings.Converters.Add(new StringEnumConverter());
+				})
                 .AddNullableJsonOptions(options);
 
             services.AddCors(o => o.AddPolicy(cors_policy ?? Environment.GetEnvironmentVariable("CORS_POLICY"),
