@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Services.FreightPop.Models;
+﻿using ordercloud.integrations.freightpop;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using OrderCloud.SDK;
 using System.Collections.Generic;

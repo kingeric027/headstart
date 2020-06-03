@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Exceptions;
@@ -11,6 +10,7 @@ using OrderCloud.SDK;
 using static Marketplace.Models.ErrorCodes;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
+using ordercloud.integrations.freightpop;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {

@@ -6,16 +6,14 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.SupplierSync
 {
-    // TODO: consider more robust approach to sync that might not require supplier ID
-    // in the classname
-    // class name will likely need to be changed for production supplier ID
-    public class MPSupplier007Command : ISupplierSyncCommand
+    [SupplierSync("007"), SupplierSync("waxinthecitydistribution")]
+    public class WaxInTheCityDistributionCommand : ISupplierSyncCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly IOrderCloudClient _ocSeller;
         private AppSettings _settings;
 
-        public MPSupplier007Command(AppSettings settings, IOrderCloudClient oc)
+        public WaxInTheCityDistributionCommand(AppSettings settings, IOrderCloudClient oc)
         {
             _oc = oc;
             _settings = settings;

@@ -1,10 +1,9 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Flurl.Http;
-using Marketplace.Common.Services.FreightPop.Models;
 
-namespace Marketplace.Common.Services.FreightPop
+namespace ordercloud.integrations.freightpop
 {
 	public interface IFreightPopService
 	{
@@ -22,12 +21,12 @@ namespace Marketplace.Common.Services.FreightPop
 		private readonly IFlurlClient _flurl;
 		private string accessToken;
 		private DateTime tokenExpireDate;
-		public FreightPopService(AppSettings appSettings)
+		public FreightPopService(FreightPopConfig config)
 		{
 			_flurl = new FlurlClient();
-			_username = appSettings.FreightPopSettings.Username;
-			_password = appSettings.FreightPopSettings.Password;
-			_freightPopBaseUrl = appSettings.FreightPopSettings.BaseUrl;
+			_username = config.Username;
+			_password = config.Password;
+			_freightPopBaseUrl = config.BaseUrl;
 		}
 
 		private IFlurlRequest MakeRequest(string resource)

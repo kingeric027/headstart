@@ -10,6 +10,8 @@ namespace ordercloud.integrations.cms
 	{
 		public int ListOrderWithinType { get; set; }
 
+		public AssetForDelivery() { }
+
 		public AssetForDelivery(Asset asset, int listOrder)
 		{
 			ListOrderWithinType = listOrder;

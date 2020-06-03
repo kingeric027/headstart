@@ -1,6 +1,5 @@
-﻿namespace Marketplace.Common.Services.FreightPop.Models
+﻿namespace ordercloud.integrations.freightpop
 {
-
     public class Response<TData>
     {
         public TData Data { get; set; }

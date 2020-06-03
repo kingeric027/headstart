@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Services.FreightPop.Models;
+﻿using ordercloud.integrations.freightpop;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Mappers

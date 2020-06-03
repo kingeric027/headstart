@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.FreightPop.Models;
+using ordercloud.integrations.freightpop;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using Newtonsoft.Json.Linq;

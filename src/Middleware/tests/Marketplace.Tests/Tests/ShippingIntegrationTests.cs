@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using Marketplace.Common.Services.FreightPop.Models;
+using ordercloud.integrations.freightpop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Newtonsoft.Json;
