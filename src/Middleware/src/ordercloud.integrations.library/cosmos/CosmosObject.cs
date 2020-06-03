@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using Microsoft.Azure.Documents;
+using Newtonsoft.Json;
 
 namespace ordercloud.integrations.library
 {
@@ -12,13 +13,12 @@ namespace ordercloud.integrations.library
 
 	public abstract class CosmosObject : ICosmosObject
 	{
-		//[ApiIgnore]
-		//[JsonProperty("id")]
+		[ApiIgnore]
+		[JsonProperty("id")]
 		public string id { get; set; } = Guid.NewGuid().ToString();
-		//[ApiIgnore]
+		[ApiIgnore]
 		public DateTimeOffset timeStamp { get; set; } = DateTimeOffset.Now;
 		// Note, Cosmos unique keys are only unique within the partition.
 		public static Collection<UniqueKey> GetUniqueKeys() => null;
-
 	}
 }

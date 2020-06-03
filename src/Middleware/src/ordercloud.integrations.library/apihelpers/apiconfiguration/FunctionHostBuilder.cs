@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using Marketplace.Common.Helpers;
 #if NETCOREAPP3_1
 using System.Text.Json.Serialization;
 #endif
@@ -68,8 +69,8 @@ namespace ordercloud.integrations.library
             host
                 .Services.AddMvcCore().AddJsonOptions(opt =>
                 {
-                    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                    opt.JsonSerializerOptions.IgnoreNullValues = true;
+					opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+					opt.JsonSerializerOptions.IgnoreNullValues = true;
                     opt.JsonSerializerOptions.PropertyNamingPolicy = null;
                 })
                 .Services.Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config))
