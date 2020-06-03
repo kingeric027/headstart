@@ -33,8 +33,14 @@ module.exports = {
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-empty-interface": "error",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-inferrable-types": "error",
+        "@typescript-eslint/no-inferrable-types": ["error", {
+            "ignoreParameters": true,
+        }],
         "@typescript-eslint/no-misused-new": "error",
+        "@typescript-eslint/no-misused-promises": [
+            "error",
+            { "checksVoidReturn": false }
+        ],
         "@typescript-eslint/no-namespace": "error",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-parameter-properties": "off",
@@ -43,16 +49,27 @@ module.exports = {
         "@typescript-eslint/prefer-for-of": "error",
         "@typescript-eslint/prefer-function-type": "error",
         "@typescript-eslint/unbound-method": "off",
+        "@typescript-eslint/member-ordering": "off",
+        "@typescript-eslint/explicit-function-return-type": "error",
         "@typescript-eslint/prefer-namespace-keyword": "error",
         "@typescript-eslint/quotes": [
             "error",
-            "single"
+            "single",
+            { "allowTemplateLiterals": true }
         ],
         "@typescript-eslint/triple-slash-reference": "error",
         "@typescript-eslint/unified-signatures": "error",
+        "@typescript-eslint/no-explicit-any": "warn",
         "arrow-parens": [
             "off",
             "as-needed"
+        ],
+        "@typescript-eslint/typedef": [
+            "error",
+            {
+                "arrowParameter": false,
+                "memberVariableDeclaration": false
+            }
         ],
         "camelcase": "error",
         "comma-dangle": "off",
@@ -69,6 +86,7 @@ module.exports = {
         "id-match": "error",
         "import/order": "off",
         "max-classes-per-file": "off",
+        "max-lines-per-function": ["error", { "max": 30, "skipBlankLines": true }],
         "max-len": [
             "error",
             {

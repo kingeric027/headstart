@@ -86,6 +86,7 @@ module.exports = {
         "id-match": "error",
         "import/order": "off",
         "max-classes-per-file": "off",
+        "max-lines-per-function": ["error", { "max": 30, "skipBlankLines": true }],
         "max-len": [
             "error",
             {
