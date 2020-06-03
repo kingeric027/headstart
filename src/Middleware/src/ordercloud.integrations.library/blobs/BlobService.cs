@@ -138,6 +138,7 @@ namespace ordercloud.integrations.library
 
         public async Task Save(string reference, IFormFile blob, string fileType = null)
         {
+			await this.Init();
             var block = Container.GetBlockBlobReference(reference);
             block.Properties.ContentType = fileType ?? blob.ContentType;
 #if NETCOREAPP3_1
