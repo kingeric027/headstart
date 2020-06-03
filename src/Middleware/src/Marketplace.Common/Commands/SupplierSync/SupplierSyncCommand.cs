@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using Ganss.Excel;
 using Marketplace.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Npoi.Mapper;
 using NPOI.XSSF.UserModel;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
@@ -64,20 +66,21 @@ namespace Marketplace.Common.Commands.SupplierSync
 
         public async Task<List<SuperMarketplaceProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
         {
-            var book = new XSSFWorkbook();
-            using (var stream = file.OpenReadStream()) book = new XSSFWorkbook(stream);
-            var products = new ExcelMapper(book).Fetch<MarketplaceProduct>();
-            var ps = new ExcelMapper(book).Fetch<MarketplacePriceSchedule>(1);
-            var specs = new ExcelMapper(book).Fetch<MarketplaceSpec>(2);
-            var specoptions = new ExcelMapper(book).Fetch<MarketplaceSpecOption>(3);
-            var images = new ExcelMapper(book).Fetch<Asset>(4);
-            var attachments = new ExcelMapper(book).Fetch<Asset>(5);
-            var list = products.Select(p => new SuperMarketplaceProduct()
+            using var stream = file.OpenReadStream();
+            var mapper = new Mapper(stream);
+            var products = mapper.Take<MarketplaceProduct>("Products").ToList();
+            var prices = mapper.Take<MarketplacePriceSchedule>("PriceSchedules").ToList();
+            var specs = mapper.Take<MarketplaceSpec>("Specs").ToList();
+            var specoptions = mapper.Take<MarketplaceSpecOption>("SpecOptions").ToList();
+            var images = mapper.Take<Asset>("Images").ToList();
+            var attachments = mapper.Take<Asset>("Attachments").ToList();
+
+            var list = products.Select(info => new SuperMarketplaceProduct()
             {
-                Product = p,
-                PriceSchedule = ps.FirstOrDefault(s => s.ID == p.DefaultPriceScheduleID)
-            }).ToList();
-            return await Task.FromResult(list);
+                Product = info.Value,
+                PriceSchedule = prices.FirstOrDefault(row => row.Value.ID == info.Value.DefaultPriceScheduleID)?.Value
+            });
+            return await Task.FromResult(list.ToList());
         }
     }
 }
