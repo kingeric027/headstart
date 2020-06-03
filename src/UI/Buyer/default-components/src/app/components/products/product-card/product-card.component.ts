@@ -45,7 +45,6 @@ export class OCMProductCard {
   setPrice(product: MarketplaceMeProduct, priceSchedule: PriceSchedule<any>): void {
     const currentUser = this.context.currentUser.get();
     const productPrice = priceSchedule?.PriceBreaks[0]?.Price;
-    debugger;
     this._price = exchange(this._rates, productPrice, this._product?.xp?.Currency, currentUser.Currency);
   }
 

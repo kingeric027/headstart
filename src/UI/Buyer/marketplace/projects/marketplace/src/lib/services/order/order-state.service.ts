@@ -21,6 +21,9 @@ export class OrderStateService {
       OrderType: 'Standard',
       QuoteOrderInfo: null,
       Currency: 'USD', // Default value, overriden in reset() when app loads
+      OrderReturnInfo: {
+        HasReturn: false
+      }
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
