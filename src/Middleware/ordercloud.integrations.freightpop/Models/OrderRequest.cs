@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Marketplace.Common.Services.FreightPop.Models
+namespace ordercloud.integrations.freightpop
 {
 
     public class OrderRequest

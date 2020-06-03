@@ -1,4 +1,4 @@
-﻿namespace Marketplace.Common.Services.FreightPop.Models
+﻿namespace ordercloud.integrations.freightpop
 {
     public enum FreightPOPEnvironment
     {

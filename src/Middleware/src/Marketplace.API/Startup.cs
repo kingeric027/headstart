@@ -13,7 +13,6 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
-using Marketplace.Common.Services.FreightPop;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Models.Extended;
@@ -24,6 +23,7 @@ using ordercloud.integrations.smartystreets;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
+using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
 
 namespace Marketplace.API
@@ -56,11 +56,16 @@ namespace Marketplace.API
 				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
 				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
 			};
-
             var currencyConfig = new BlobServiceConfig()
             {
                 ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
                 Container = _settings.ExchangeRatesSettings.Container
+            };
+            var freightPopConfig = new FreightPopConfig()
+            {
+                BaseUrl = _settings.FreightPopSettings.BaseUrl,
+                Password = _settings.FreightPopSettings.Password,
+                Username = _settings.FreightPopSettings.Username
             };
 
             services
@@ -71,24 +76,24 @@ namespace Marketplace.API
                 .InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
                 .Inject<IDevCenterService>()
-				.Inject<IFlurlClient>()
-				.Inject<IZohoClient>()
-				.Inject<IZohoCommand>()
-				.Inject<ISyncCommand>()
-				.Inject<ISmartyStreetsCommand>()
-				.Inject<IFreightPopService>()
-				.Inject<IOrchestrationCommand>()
-				.Inject<IOrchestrationLogCommand>()
-				.Inject<IOCShippingIntegration>()
-				.Inject<IShipmentCommand>()
+                .Inject<IFlurlClient>()
+                .Inject<IZohoClient>()
+                .Inject<IZohoCommand>()
+                .Inject<ISyncCommand>()
+                .Inject<ISmartyStreetsCommand>()
+                .Inject<IOrchestrationCommand>()
+                .Inject<IOrchestrationLogCommand>()
+                .Inject<IOCShippingIntegration>()
+                .Inject<IShipmentCommand>()
                 .Inject<IEnvironmentSeedCommand>()
-				.Inject<IOrderCloudSandboxService>()
-				.Inject<IMarketplaceProductCommand>()
-				.Inject<ISendgridService>()
-				.Inject<IAssetQuery>()
-				.Inject<ISupplierCategoryConfigQuery>()
+                .Inject<IOrderCloudSandboxService>()
+                .Inject<IMarketplaceProductCommand>()
+                .Inject<ISendgridService>()
+                .Inject<IAssetQuery>()
+                .Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
-				.Inject<IOrderCloudIntegrationsCardConnectCommand>()
+                .Inject<IOrderCloudIntegrationsCardConnectCommand>()
+                .AddSingleton<IFreightPopService>(x => new FreightPopService(freightPopConfig))
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
 				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
