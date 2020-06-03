@@ -32,10 +32,13 @@ namespace Marketplace.Orchestration
             [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "{supplierId}")]
             HttpRequest req, string supplierId, ILogger log)
         {
+            var user = await _token.Authorize(req, new[] { ApiRole.OrderAdmin, ApiRole.OrderReader });
+            Require.That(user.SupplierID == supplierId, new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
+
             var form = await req.ReadFormAsync();
-            var file = form.Files.GetFile("file");
+            var result = await _supplier.ParseProductTemplate(form.Files.GetFile("file"), user);
             
-            return await Task.FromResult(new OkObjectResult(supplierId));
+            return await Task.FromResult(new OkObjectResult(result));
         }
 
         [FunctionName("GetSupplierOrder")]
