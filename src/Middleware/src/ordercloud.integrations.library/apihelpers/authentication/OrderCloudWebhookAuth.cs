@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -7,6 +7,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -38,8 +39,9 @@ namespace ordercloud.integrations.library
 
             var hash_header = Context.Request.Headers[OC_HASH].FirstOrDefault();
 
-            //TODO: research this
-            //Context.Request.EnableRewind();
+            // alternative to Context.Request.EnableRewind() which is no longer available
+            // allows us to set Request Body position back to 0
+            HttpRequestRewindExtensions.EnableBuffering(Context.Request);
 
             try
             {
