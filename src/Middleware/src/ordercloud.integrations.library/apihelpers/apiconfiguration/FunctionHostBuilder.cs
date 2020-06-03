@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Cosmonaut;
 using Cosmonaut.Extensions.Microsoft.DependencyInjection;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +14,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+
 #if NETCOREAPP3_1
 using System.Text.Json.Serialization;
 #endif
@@ -33,10 +38,16 @@ namespace ordercloud.integrations.library
             .AddAzureAppConfiguration(appSettingsConnectionString)
             .Build();
         config.GetSection(section).Bind(settings);
+
         host.Services
             .Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config))
             .BuildServiceProvider()
             .GetService<IConfiguration>();
+        host.Services.AddMvcCore().AddJsonFormatters(f =>
+        {
+            f.ContractResolver = new DefaultContractResolver();
+            f.Converters.Add(new StringEnumConverter());
+        }).AddJsonOptions(o => o.SerializerSettings.NullValueHandling = NullValueHandling.Ignore);
         host.Services.AddSingleton(settings);
         return host;
     }

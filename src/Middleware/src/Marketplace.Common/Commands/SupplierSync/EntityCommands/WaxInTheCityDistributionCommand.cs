@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ganss.Excel;
 using Marketplace.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
@@ -46,7 +45,7 @@ namespace Marketplace.Common.Commands.SupplierSync
             return JObject.FromObject(returnObject);
         }
 
-        public Task<List<SuperMarketplaceProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
+        public Task<List<MarketplaceHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
         {
             throw new System.NotImplementedException();
         }
