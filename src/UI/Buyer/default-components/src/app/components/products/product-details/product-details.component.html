@@ -43,8 +43,8 @@
             <p *ngIf="!showGrid"
                class="text-muted ml-3 float-right">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
             <span class="badge badge-pill badge-warning"
-                  *ngIf="percentSavings > 0"
-                  translate>PRODUCTS.DETAILS.SAVINGS {{ percentSavings }}%!
+                  *ngIf="percentSavings > 0">
+              <span translate>PRODUCTS.DETAILS.SAVINGS</span> {{ percentSavings }}%!
             </span>
           </div>
           <!--DISPLAY SHORT SPEC FORM -->
@@ -148,7 +148,8 @@
            class="p-3 border border-medium border-radius">
         <div class="d-flex justify-content-between align-items-center">
           <span class="badge badge-pill badge-warning"
-                *ngIf="percentSavings > 0"><span translate>PRODUCTS.DETAILS.SAVINGS</span> {{ percentSavings }}%!
+                *ngIf="percentSavings > 0">
+            <span translate>PRODUCTS.DETAILS.SAVINGS</span> {{ percentSavings }}%!
           </span>
         </div>
         <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
