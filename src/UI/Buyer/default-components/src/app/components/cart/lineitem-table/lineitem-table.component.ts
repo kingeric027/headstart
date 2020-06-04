@@ -52,7 +52,7 @@ export class OCMLineitemTable {
 
   getImageUrl(lineItemID: string): string {
     const li = this.getLineItem(lineItemID);
-    return getPrimaryImageUrl(li?.Product);
+    return li.xp.LineItemImageUrl;
   }
 
   getLineItem(lineItemID: string): MarketplaceLineItem {

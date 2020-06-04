@@ -91,7 +91,15 @@ export class OCMOrderDetails implements OnInit {
 
   async addToCart(): Promise<void> {
     const items = this.reorderResponse.ValidLi.map(li => {
-      return { ProductID: li.Product.ID, Quantity: li.Quantity, Specs: li.Specs };
+
+      return { 
+        ProductID: li.Product.ID, 
+        Quantity: li.Quantity, 
+        Specs: li.Specs,
+        xp: {
+          LineItemImageUrl: li.xp.LineItemImageUrl
+        } 
+      };
     });
     await this.context.order.cart.addMany(items);
   }

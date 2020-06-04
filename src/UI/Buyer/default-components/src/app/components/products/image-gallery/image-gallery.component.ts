@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { fromEvent } from 'rxjs';
 
@@ -6,8 +6,10 @@ import { fromEvent } from 'rxjs';
   templateUrl: './image-gallery.component.html',
   styleUrls: ['./image-gallery.component.scss'],
 })
-export class OCMImageGallery implements OnInit {
+export class OCMImageGallery implements OnInit, OnChanges {
   @Input() imgUrls: string[] = [];
+  @Input() imgs: any[] = [];
+  @Input() specs: any[] = [];
 
   // gallerySize can be changed and the component logic + behavior will all work. However, the UI may look wonky.
   readonly gallerySize = 5;
@@ -26,6 +28,12 @@ export class OCMImageGallery implements OnInit {
     fromEvent(window, 'resize').subscribe(() => this.onResize());
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.specs) {
+      this.onSpecsChange();
+    }
+  }
+
   onResize(): void {
     // this.isResponsiveView = window.innerWidth > 900;
     this.isResponsiveView = true;
@@ -35,12 +43,23 @@ export class OCMImageGallery implements OnInit {
     this.selectedIndex = this.imgUrls.indexOf(url);
   }
 
-  isSelected(url: string): boolean {
-    return this.imgUrls.indexOf(url) === this.selectedIndex;
+  isSelected(image): boolean {
+    return this.imgUrls.indexOf(image.Url) === this.selectedIndex;
+  }
+
+  isImageMatchingSpecs(image): boolean {
+    return this.specs.every(spec => image.Tags.includes(spec));
+  }
+
+  onSpecsChange() {
+   const image = this.imgs.find(img => (this.isImageMatchingSpecs(img)));
+   if (image) {
+     this.select(image.Url);
+   }
   }
 
   getGallery(): string[] {
-    return this.imgUrls.slice(this.startIndex, this.endIndex + 1);
+    return this.imgs.slice(this.startIndex, this.endIndex + 1);
   }
 
   forward(): void {
