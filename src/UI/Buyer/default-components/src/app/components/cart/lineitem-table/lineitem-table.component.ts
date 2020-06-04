@@ -1,8 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { groupBy as _groupBy } from 'lodash';
-import { ShopperContextService, LineItemGroupSupplier, OrderType, MarketplaceLineItem } from 'marketplace';
+import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
+import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
@@ -22,8 +23,11 @@ export class OCMLineitemTable {
   liGroupedByShipFrom: MarketplaceLineItem[][];
   liGroups: any;
   _lineItems = [];
+  _orderCurrency: string;
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) { 
+    this._orderCurrency = this.context.currentUser.get().Currency;
+  }
 
   async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(liGroups);
@@ -39,8 +43,10 @@ export class OCMLineitemTable {
 
   changeQuantity(lineItemID: string, event: { qty: number; valid: boolean }): void {
     if (event.valid) {
-      this.getLineItem(lineItemID).Quantity = event.qty;
-      this.context.order.cart.setQuantity(lineItemID, event.qty);
+      const li = this.getLineItem(lineItemID);
+      li.Quantity = event.qty;
+      const { ProductID, Specs, Quantity, ...rest } = li;
+      this.context.order.cart.add({ProductID, Specs, Quantity});
     }
   }
 

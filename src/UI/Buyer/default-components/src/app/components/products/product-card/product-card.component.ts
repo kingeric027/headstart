@@ -42,12 +42,10 @@ export class OCMProductCard {
     this.cdr.detectChanges(); // TODO - remove. Solve another way.
   }
 
-  async setPrice(product: MarketplaceMeProduct, priceSchedule: PriceSchedule<any>): Promise<void> {
+  setPrice(product: MarketplaceMeProduct, priceSchedule: PriceSchedule<any>): void {
     const currentUser = this.context.currentUser.get();
-    // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    const myRate = currentUser.UserGroups.filter(ug => ug.xp?.Type === "BuyerLocation")[0].xp?.Currency || "USD";
     const productPrice = priceSchedule?.PriceBreaks[0]?.Price;
-    this._price = exchange(this._rates, productPrice, this._product?.xp?.Currency, myRate);
+    this._price = exchange(this._rates, productPrice, this._product?.xp?.Currency, currentUser.Currency);
   }
 
   async addToCart(): Promise<void> {

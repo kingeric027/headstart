@@ -5,16 +5,19 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 using Marketplace.Common.Commands.Zoho;
-using Marketplace.Common.Services.FreightPop;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Models.Marketplace;
-using ordercloud.integrations.extensions;
 using Marketplace.Common.Services.ShippingIntegration;
 using ordercloud.integrations.avalara;
 using Marketplace.Models.Misc;
+using Flurl.Http;
+using ordercloud.integrations.library;
+using ordercloud.integrations.exchangerates;
+using ordercloud.integrations.freightpop;
+
 namespace Marketplace.Common.Commands
 {
     public interface IOrderCommand
@@ -24,6 +27,7 @@ namespace Marketplace.Common.Commands
         Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> GetMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
+        Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
     }
 
     public class OrderCommand : IOrderCommand
@@ -31,15 +35,17 @@ namespace Marketplace.Common.Commands
         private readonly IFreightPopService _freightPopService;
         private readonly IOrderCloudClient _oc;
         private readonly IOCShippingIntegration _ocShippingIntegration;
+        private readonly string OcIntegrationsApiBaseUrl = "https://ordercloud-middleware-test.azurewebsites.net";
 
         // temporary service until we get updated sdk
         private readonly IOrderCloudSandboxService _ocSandboxService;
         private readonly IZohoCommand _zoho;
         private readonly IAvalaraCommand _avalara;
+		private readonly IExchangeRatesCommand _exchangeRates;
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
         
-        public OrderCommand(ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IOCShippingIntegration ocShippingIntegration, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
@@ -49,7 +55,9 @@ namespace Marketplace.Common.Commands
             _sendgridService = sendgridService;
             _ocSandboxService = orderCloudSandboxService;
             _locationPermissionCommand = locationPermissionCommand;
-        }
+			_exchangeRates = exchangeRates;
+
+		}
 
         public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
         {
@@ -108,6 +116,10 @@ namespace Marketplace.Common.Commands
         public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
         {
             await EnsureUserCanAccessLocationOrders(locationID, verifiedUser);
+            if(listArgs.Filters == null)
+            {
+                listArgs.Filters = new List<ListFilter>() { };
+            }
             listArgs.Filters.Add(new ListFilter()
             {
                 QueryParams = new List<Tuple<string, string>>() { new Tuple<string, string>("BillingAddress.ID", locationID) }
@@ -124,19 +136,19 @@ namespace Marketplace.Common.Commands
             var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);
 
-            // todo support >100 and figure out how to make these calls in parallel and 
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
-            var promotions = await _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID);
-            var payments = await _oc.Payments.ListAsync(OrderDirection.Incoming, order.ID);
-            var approvals = await _oc.Orders.ListApprovalsAsync(OrderDirection.Incoming, orderID);
-            return new OrderDetails
+            // todo support >100 
+            var lineItems =  _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID, pageSize: 100);
+            var promotions = _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID, pageSize: 100);
+            var payments = _oc.Payments.ListAsync(OrderDirection.Incoming, order.ID, pageSize: 100);
+            var approvals = _oc.Orders.ListApprovalsAsync(OrderDirection.Incoming, orderID, pageSize: 100);
+			return new OrderDetails
             {
                 Order = order,
-                LineItems = lineItems,
-                Promotions = promotions,
-                Payments = payments,
-                Approvals = approvals
-            };
+                LineItems = (await lineItems).Items,
+                Promotions = (await promotions).Items,
+                Payments = (await payments).Items,
+                Approvals = (await approvals).Items
+			};
         }
 
         public async Task<List<MarketplaceShipmentWithItems>> GetMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser)
@@ -162,6 +174,48 @@ namespace Marketplace.Common.Commands
             return shipment;
         }
 
+        public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem liReq, VerifiedUserContext user)
+        {
+            var existingLineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, null, user.AccessToken);
+            // New a line item
+            var li = new MarketplaceLineItem();
+            // If line item exists, update quantity, else create
+            var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
+            if (preExistingLi != null)
+            {
+                // Delete the Li
+                await _oc.LineItems.DeleteAsync(OrderDirection.Outgoing, orderID, preExistingLi.ID, user.AccessToken);
+            }
+            // Create the new Li
+            li = await _oc.LineItems.CreateAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, liReq, user.AccessToken);
+            // Get the order, for the order.xp.Currency value
+            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID, user.AccessToken);
+            // Exchange the li.UnitPrice from li.Product.xp.Currency => li.xp.OrderCurrency
+            var exchangedUnitPrice = await ExchangeUnitPrice(li, order);
+            // PATCH the Line Item with exchanged Unit Price & add ProductUnitPrice to xp (OrderDirection.Incoming due to use of elevated token)
+            li = await _oc.LineItems
+                .PatchAsync<MarketplaceLineItem>
+                (OrderDirection.Incoming, orderID, li.ID, 
+                new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { ProductUnitPrice = li.UnitPrice} });
+            return li;
+        }
+
+        private bool LineItemsMatch(LineItem li1, LineItem li2)
+        {
+            if (li1.ProductID != li2.ProductID) return false;
+            foreach (var spec1 in li1.Specs) {
+                var spec2 = (li2.Specs as List<LineItemSpec>)?.Find(s => s.SpecID == spec1.SpecID);
+                if (spec1?.Value != spec2?.Value) return false;
+            }
+            return true;
+        }
+
+        private async Task<decimal?> ExchangeUnitPrice(MarketplaceLineItem li, MarketplaceOrder order)
+        {
+			var supplierCurrency = li.Product?.xp?.Currency ?? CurrencySymbol.USD; // Temporary default to work around bad data.
+			var buyerCurrency = order.xp.Currency;
+			return (decimal) await _exchangeRates.ConvertCurrency(supplierCurrency, buyerCurrency, (double)li.UnitPrice);
+        }
 
         private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser, string overrideErrorMessage = "")
         {

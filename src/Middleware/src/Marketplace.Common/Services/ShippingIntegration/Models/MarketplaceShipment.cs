@@ -1,6 +1,6 @@
-﻿using Marketplace.Common.Services.FreightPop.Models;
+﻿using ordercloud.integrations.freightpop;
 using Marketplace.Models;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Models

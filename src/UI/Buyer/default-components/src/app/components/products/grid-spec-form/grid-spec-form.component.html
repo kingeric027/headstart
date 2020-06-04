@@ -17,7 +17,7 @@
                             (qtyChange)="changeQuantity(specOptions[i], $event.detail)"></ocm-quantity-input>
       </td>
       <td><label for="{{ spec }}">{{spec}}</label></td>
-      <td *ngFor="let priceBreak of priceSchedule.PriceBreaks">{{priceBreak.Price | currency}}</td>
+      <td *ngFor="let priceBreak of priceSchedule?.PriceBreaks">{{priceBreak.Price | currency}}</td>
       <td>{{lineTotals[i] | currency}}</td>
     </tr>
   </tbody>

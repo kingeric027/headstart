@@ -4,10 +4,9 @@ using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using ordercloud.integrations.extensions;
-using ordercloud.integrations.openapispec;
 using System.Collections.Generic;
 using Marketplace.Models.Misc;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Controllers
 {
@@ -60,50 +59,50 @@ namespace Marketplace.Common.Controllers
         [HttpGet]
         [OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         [Route("{buyerID}/{buyerLocationID}/permissions")]
-        public async Task<List<UserGroupAssignment>> ListLocationPermissionUserGroups(string buyerLocationID)
+        public async Task<List<UserGroupAssignment>> ListLocationPermissionUserGroups(string buyerID, string buyerLocationID)
         {
-            return await _locationPermissionCommand.ListLocationPermissionAsssignments(buyerLocationID, VerifiedUserContext);
+            return await _locationPermissionCommand.ListLocationPermissionAsssignments(buyerID, buyerLocationID, VerifiedUserContext);
         }
 
         [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
         [HttpGet, Route("{buyerID}/{buyerLocationID}/users"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerLocationID, ListArgs<MarketplaceOrder> listArgs)
+        public async Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerID, string buyerLocationID, ListArgs<MarketplaceOrder> listArgs)
         {
-            return await _locationPermissionCommand.ListLocationUsers(buyerLocationID, VerifiedUserContext);
+            return await _locationPermissionCommand.ListLocationUsers(buyerID, buyerLocationID, VerifiedUserContext);
         }
 
         [DocName("POST location permissions, add or delete access")]
         [HttpPost, Route("{buyerID}/{buyerLocationID}/permissions"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task<List<UserGroupAssignment>> UpdateLocationPermissions(string buyerLocationID, [FromBody] LocationPermissionUpdate locationPermissionUpdate)
+        public async Task<List<UserGroupAssignment>> UpdateLocationPermissions(string buyerID, string buyerLocationID, [FromBody] LocationPermissionUpdate locationPermissionUpdate)
         {
-            return await _locationPermissionCommand.UpdateLocationPermissions(buyerLocationID, locationPermissionUpdate, VerifiedUserContext);
+            return await _locationPermissionCommand.UpdateLocationPermissions(buyerID, buyerLocationID, locationPermissionUpdate, VerifiedUserContext);
         }
 
         [DocName("GET List of location approval permission user groups")]
         [HttpGet]
         [OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         [Route("{buyerID}/{buyerLocationID}/approvalpermissions")]
-        public async Task<List<UserGroupAssignment>> ListLocationApprovalPermissionAsssignments(string buyerLocationID)
+        public async Task<List<UserGroupAssignment>> ListLocationApprovalPermissionAsssignments(string buyerID, string buyerLocationID)
         {
-            return await _locationPermissionCommand.ListLocationPermissionAsssignments(buyerLocationID, VerifiedUserContext);
+            return await _locationPermissionCommand.ListLocationPermissionAsssignments(buyerID, buyerLocationID, VerifiedUserContext);
         }
 
         [DocName("GET general approval threshold for location")]
         [HttpGet]
         [OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         [Route("{buyerID}/{buyerLocationID}/approvalthreshold")]
-        public async Task<decimal> GetApprovalThreshold(string buyerLocationID)
+        public async Task<decimal> GetApprovalThreshold(string buyerID, string buyerLocationID)
         {
-            return await _locationPermissionCommand.GetApprovalThreshold(buyerLocationID, VerifiedUserContext);
+            return await _locationPermissionCommand.GetApprovalThreshold(buyerID, buyerLocationID, VerifiedUserContext);
         }
 
         [DocName("POST set location approval threshold")]
         [HttpPost]
         [OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         [Route("{buyerID}/{buyerLocationID}/approvalthreshold")]
-        public async Task<decimal> SetLocationApprovalThreshold(string buyerLocationID, [FromBody] LocationApprovalThresholdUpdate locationApprovalThresholdUpdate)
+        public async Task<decimal> SetLocationApprovalThreshold(string buyerID, string buyerLocationID, [FromBody] LocationApprovalThresholdUpdate locationApprovalThresholdUpdate)
         {
-            return await _locationPermissionCommand.SetLocationApprovalThreshold(buyerLocationID, locationApprovalThresholdUpdate.Threshold, VerifiedUserContext);
+            return await _locationPermissionCommand.SetLocationApprovalThreshold(buyerID, buyerLocationID, locationApprovalThresholdUpdate.Threshold, VerifiedUserContext);
         }
     }
 }

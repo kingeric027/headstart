@@ -2,12 +2,10 @@
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Models.Attributes;
-using Marketplace.Models.Misc;
-using ordercloud.integrations.extensions;
-using ordercloud.integrations.openapispec;
 using Avalara.AvaTax.RestClient;
 using ordercloud.integrations.avalara;
 using Marketplace.Common.Commands;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Controllers.Avalara
 {
@@ -24,26 +22,28 @@ namespace Marketplace.Common.Controllers.Avalara
 			_resaleCertCommand = resaleCertCommand;
 		}
 
-		[DocName("Get Tax Estimate")]
-		[HttpGet, Route("estimate"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<decimal> GetTaxEstimate([FromBody] OrderWorksheet orderWorksheet)
-		{
-			return await _avalara.GetEstimateAsync(orderWorksheet);
-		}
+		// Commented out until swagger can reference the TransactionModel
 
-		[DocName("Create Tax Transaction")]
-		[HttpPost, Route("transaction"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
-		public async Task<TransactionModel> CreateTransaction([FromBody] OrderWorksheet orderWorksheet)
-		{
-			return await _avalara.CreateTransactionAsync(orderWorksheet);
-		}
+		//[DocName("Get Tax Estimate")]
+		//[HttpPost, Route("estimate"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		//public async Task<decimal> GetTaxEstimate([FromBody] OrderWorksheet orderWorksheet)
+		//{
+		//	return await _avalara.GetEstimateAsync(orderWorksheet);
+		//}
 
-		[DocName("Commit Tax Transaction")]
-		[HttpPost, Route("transaction/{transactionCode}/commit"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
-		public async Task<TransactionModel> CommitTransaction(string transactionCode)
-		{
-			return await _avalara.CommitTransactionAsync(transactionCode);
-		}
+		//[DocName("Create Tax Transaction")]
+		//[HttpPost, Route("transaction"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
+		//public async Task<TransactionModel> CreateTransaction([FromBody] OrderWorksheet orderWorksheet)
+		//{
+		//	return await _avalara.CreateTransactionAsync(orderWorksheet);
+		//}
+
+		//[DocName("Commit Tax Transaction")]
+		//[HttpPost, Route("transaction/{transactionCode}/commit"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
+		//public async Task<TransactionModel> CommitTransaction(string transactionCode)
+		//{
+		//	return await _avalara.CommitTransactionAsync(transactionCode);
+		//}
 
 		[DocName("List Tax Codes")]
 		[HttpGet, Route("code"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]

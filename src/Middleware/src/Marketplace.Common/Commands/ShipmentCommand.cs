@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using System.Linq;
 using Marketplace.Common.Services.ShippingIntegration.Models;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Commands
 {

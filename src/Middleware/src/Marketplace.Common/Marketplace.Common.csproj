@@ -10,17 +10,13 @@
   <ItemGroup>
     <PackageReference Include="Cosmonaut.Extensions.Microsoft.DependencyInjection" Version="2.3.0" />
     <PackageReference Include="CreditCardValidator" Version="1.4.6" />
+    <PackageReference Include="Flurl" Version="2.8.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="1.8.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
-    <PackageReference Include="ordercloud.integrations.avalara" Version="0.0.1" />
-    <PackageReference Include="ordercloud.integrations.cardconnect" Version="0.0.7" />
-    <PackageReference Include="ordercloud.integrations.exchangerates" Version="0.0.15" />
-    <PackageReference Include="ordercloud.integrations.smartystreets" Version="0.0.4" />
-    <PackageReference Include="ordercloud.integrations.extensions" Version="0.0.14" />
     <PackageReference Include="OrderCloud.SDK" Version="0.9.0" />
     <PackageReference Include="SendGrid" Version="9.12.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
@@ -45,7 +41,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Marketplace.Models\Marketplace.Models.csproj" />
+    <ProjectReference Include="..\..\ordercloud.integrations.freightpop\ordercloud.integrations.freightpop.csproj" />
+    <ProjectReference Include="..\ordercloud-integrations-smartystreets\ordercloud.integrations.smartystreets.csproj" />
+    <ProjectReference Include="..\ordercloud.integrations.avalara\ordercloud.integrations.avalara.csproj" />
+    <ProjectReference Include="..\ordercloud.integrations.cardconnect\ordercloud.integrations.cardconnect.csproj" />
+    <ProjectReference Include="..\ordercloud.integrations.cms\ordercloud.integrations.cms.csproj" />
+    <ProjectReference Include="..\ordercloud.integrations.exchangerates\ordercloud.integrations.exchangerates.csproj" />
+    <ProjectReference Include="..\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
   </ItemGroup>
 
 </Project>

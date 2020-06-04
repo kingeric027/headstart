@@ -1,13 +1,12 @@
 using Marketplace.Common.Commands;
 using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Models.Attributes;
-using ordercloud.integrations.extensions;
-using ordercloud.integrations.openapispec;
 using System.Collections.Generic;
+using ordercloud.integrations.library;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Controllers
 {
@@ -51,6 +50,13 @@ namespace Marketplace.Common.Controllers
         public async Task<List<MarketplaceShipmentWithItems>> GetOrderShipmentsWithItems(string orderID)
         {
             return await _command.GetMarketplaceShipmentWithItems(orderID, VerifiedUserContext);
+        }
+
+        [DocName("Add or update a line item to an order")]
+        [HttpPut, Route("{orderID}/lineitems"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, [FromBody] MarketplaceLineItem li)
+        {
+            return await _command.UpsertLineItem(orderID, li, VerifiedUserContext);
         }
     }
 }

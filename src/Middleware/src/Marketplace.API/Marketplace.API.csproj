@@ -21,7 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\ordercloud.integrations.freightpop\ordercloud.integrations.freightpop.csproj" />
     <ProjectReference Include="..\Marketplace.Common\Marketplace.Common.csproj" />
+    <ProjectReference Include="..\ordercloud-integrations-smartystreets\ordercloud.integrations.smartystreets.csproj" />
+    <ProjectReference Include="..\ordercloud.integrations.avalara\ordercloud.integrations.avalara.csproj" />
+    <ProjectReference Include="..\ordercloud.integrations.cardconnect\ordercloud.integrations.cardconnect.csproj" />
+    <ProjectReference Include="..\ordercloud.integrations.cms\ordercloud.integrations.cms.csproj" />
   </ItemGroup>
 
   <ItemGroup>

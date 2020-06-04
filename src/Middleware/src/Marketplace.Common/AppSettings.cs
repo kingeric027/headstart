@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using ordercloud.integrations.blobs;
 using ordercloud.integrations.cardconnect;
-using ordercloud.integrations.cosmos;
-//using ordercloud.integrations.cardconnect;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.exchangerates;
+using ordercloud.integrations.library;
 using ordercloud.integrations.smartystreets;
 
 namespace Marketplace.Common
@@ -29,6 +27,7 @@ namespace Marketplace.Common
         public OrderCloudIntegrationsCardConnectConfig CardConnectSettings { get; set; } = new OrderCloudIntegrationsCardConnectConfig();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
 		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
+        public ExchangeRatesSettings ExchangeRatesSettings { get; set; }
         public string SendgridApiKey { get; set; }
     }
 

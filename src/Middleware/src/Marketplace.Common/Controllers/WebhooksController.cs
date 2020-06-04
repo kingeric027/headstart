@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
-using ordercloud.integrations.extensions;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Controllers
 {

@@ -4,7 +4,7 @@ using Marketplace.Common.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using ordercloud.integrations.openapispec;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Models
 {
@@ -125,6 +125,7 @@ namespace Marketplace.Common.Models
                     // otherwise we want to PATCH the existing object
                     //TODO: figure this reference out
                     //return wi.Cache.HasDeletedXp(wi.Current) ? Action.Update : Action.Patch;
+                    return Action.Patch;
                 }
             }
             catch (Exception ex)

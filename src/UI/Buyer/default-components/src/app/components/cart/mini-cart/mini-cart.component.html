@@ -10,7 +10,7 @@
         <div><span class="text-muted"
                 translate>CART.MINI_CART.QTY</span>: {{ li.Quantity | number}}</div>
         <div><span class="text-muted"
-                translate>CART.MINI_CART.UNIT_PRICE</span>: {{ li.UnitPrice || 0 | currency}}</div>
+                translate>CART.MINI_CART.UNIT_PRICE</span>: {{ li.UnitPrice || 0 | currency: _orderCurrency}}</div>
       </div>
     </div>
     <h4 *ngIf="lineItems.length > maxLines"
@@ -20,7 +20,7 @@
     <div class="list-group-item">
       <div class="d-flex justify-content-between">
         <div translate>CART.MINI_CART.SUBTOTAL</div>
-        <div>{{ order?.Subtotal | currency}}</div>
+        <div>{{ order?.Subtotal | currency: _orderCurrency}}</div>
       </div>
     </div>
   </div>

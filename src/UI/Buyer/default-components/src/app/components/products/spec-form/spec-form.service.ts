@@ -57,7 +57,7 @@ export class SpecFormService {
       let name = buyerSpecs.Items[i].Name.replace(/ /g, '')
       const spec = this.getSpec(buyerSpecs, name);
       if (!spec) continue;
-      const option = this.getOption(spec, specValues[i]);
+      const option = this.getOption(spec, specValues[i], 'grid');
       if (option) {
         specs.push({
           SpecID: spec.ID,
@@ -88,7 +88,7 @@ export class SpecFormService {
     return _find(specs?.Items, item => item.Name.replace(/ /g, '') === value);
   }
 
-  private getOption(spec: Spec, value: any): SpecOption {
+  private getOption(spec: Spec, value: any, type?: string): SpecOption {
     if (value === undefined || value === null) {
       return null;
     }
@@ -107,7 +107,7 @@ export class SpecFormService {
       });
       return o as SpecOption;
     }
-
-    return _find(spec.Options, o => o.Value === value);
+    if (type === "grid") return _find(spec.Options, o => o.ID === value);
+    else return _find(spec.Options, o => o.Value === value);
   }
 }

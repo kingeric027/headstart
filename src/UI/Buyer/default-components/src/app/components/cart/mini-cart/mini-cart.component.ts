@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
-import { ShopperContextService, MarketplaceOrder, MarketplaceLineItem } from 'marketplace';
+import { ShopperContextService } from 'marketplace';
+import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 @Component({
   templateUrl: './mini-cart.component.html',
@@ -11,12 +12,14 @@ export class OCMMiniCart implements OnInit {
   order: MarketplaceOrder = {};
   maxLines = 5; // Limit the height for UI purposes
   faEllipsisH = faEllipsisH;
+  _orderCurrency: string;
 
   constructor(private context: ShopperContextService) {}
 
   ngOnInit(): void {
     this.order = this.context.order.get();
     this.lineItems = this.context.order.cart.get().Items;
+    this._orderCurrency = this.context.currentUser.get().Currency;
   }
 
   toFullCart(): void {

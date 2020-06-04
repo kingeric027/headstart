@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, from } from 'rxjs';
 import { MeUser, OcMeService, User, UserGroup } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { CreditCardService } from './credit-card.service';
 import { HttpClient } from '@angular/common/http';
+import { CurrenySymbol } from '../../shopper-context';
 
 export interface CurrentUser extends MeUser {
   FavoriteProductIDs: string[];
   FavoriteOrderIDs: string[];
   UserGroups: UserGroup<any>[];
+  Currency: CurrenySymbol;
 }
 
 export interface ICurrentUser {
@@ -95,6 +97,8 @@ export class CurrentUserService implements ICurrentUser {
     currentUser.UserGroups = myUserGroups.Items;
     currentUser.FavoriteOrderIDs = this.getFavorites(user, this.favOrdersXP);
     currentUser.FavoriteProductIDs = this.getFavorites(user, this.favProductsXP);
+    // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
+    currentUser.Currency = myUserGroups.Items.filter(ug => ug.xp.Type === 'BuyerLocation')[0].xp?.Currency || 'USD';
     return currentUser;
   }
 

@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { MarketplaceOrder, AppConfig, OrderType } from '../../shopper-context';
+import { AppConfig, ListMarketplaceOrder } from '../../shopper-context';
 import { BehaviorSubject } from 'rxjs';
 import { ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { listAll } from '../../functions/listAll';
+import { CurrentUserService } from '../current-user/current-user.service';
+import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -16,8 +18,12 @@ export class OrderStateService {
   private readonly DefaultOrder: MarketplaceOrder = {
     xp: {
       AvalaraTaxTransactionCode: '',
-      OrderType: OrderType.Standard,
+      OrderType: 'Standard',
       QuoteOrderInfo: null,
+      Currency: 'USD', // Default value, overriden in reset() when app loads
+      OrderReturnInfo: {
+        HasReturn: false
+      }
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
@@ -28,6 +34,7 @@ export class OrderStateService {
     private ocLineItemService: OcLineItemService,
     private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
+    private currentUserService: CurrentUserService,
     private appConfig: AppConfig
   ) {}
 
@@ -71,17 +78,16 @@ export class OrderStateService {
           sortBy: '!DateCreated',
           filters: { DateDeclined: '*', status: 'Unsubmitted', 'xp.IsResubmitting': 'True' },
         })
-        .toPromise(),
-      await this.ocMeService
+        .toPromise() as ListMarketplaceOrder,
+      (await this.ocMeService
         .ListOrders({
           sortBy: '!DateCreated',
           filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
         })
-        .toPromise(),
+        .toPromise()) as ListMarketplaceOrder,
     ];
 
     const [resubmittingOrders, normalUnsubmittedOrders] = await Promise.all(orderQueries);
-
     if (resubmittingOrders.Items.length) {
       this.order = resubmittingOrders.Items[0];
     } else if (normalUnsubmittedOrders.Items.length) {
@@ -89,7 +95,8 @@ export class OrderStateService {
     } else if (this.appConfig.anonymousShoppingEnabled) {
       this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
     } else {
-      this.order = await this.ocOrderService.Create('outgoing', this.DefaultOrder).toPromise();
+      this.DefaultOrder.xp.Currency = this.currentUserService.get().Currency;
+      this.order = (await this.ocOrderService.Create('outgoing', this.DefaultOrder).toPromise()) as MarketplaceOrder;
     }
     if (this.order.DateCreated) {
       this.lineItems = await listAll(this.ocLineItemService, this.ocLineItemService.List, 'outgoing', this.order.ID);
