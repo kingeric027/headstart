@@ -13,7 +13,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 // todo consider inner pieces
                 //InnerPieces =
 
-                Description = obj.Product.Description,
+                Description = $"{obj.Product.ID} - {obj.Product.Name}",
                 Height = obj.Product.ShipHeight ?? 0,
                 Width = obj.Product.ShipWidth ?? 0,
                 Length = obj.Product.ShipLength ?? 0,
