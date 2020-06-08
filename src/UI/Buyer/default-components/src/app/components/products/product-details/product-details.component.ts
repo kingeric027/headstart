@@ -3,10 +3,10 @@ import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { ListSpec, User } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
 import { MarketplaceMeProduct, ShopperContextService, PriceSchedule, OrderType } from 'marketplace';
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem, AssetForDelivery } from 'marketplace-javascript-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
-import { getImageUrls } from 'src/app/services/images.helpers';
+import { getImageUrls, getPrimaryImageUrl } from 'src/app/services/images.helpers';
 import { SpecFormService } from '../spec-form/spec-form.service';
 import { SuperMarketplaceProduct, ListPage, Asset } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
 import { exchange } from 'src/app/services/currency.helper';
@@ -36,6 +36,7 @@ export class OCMProductDetails implements OnInit {
   priceBreakRange: string[];
   selectedBreak: object;
   relatedProducts$: Observable<MarketplaceMeProduct[]>;
+  images: AssetForDelivery[] = [];
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
@@ -67,6 +68,7 @@ export class OCMProductDetails implements OnInit {
     this.specFormService.event.valid = this._specs.Items.length === 0;
     this.specLength = this._specs.Items.length;
     // End Specs
+    this.images = superProduct.Images.map(img => img);
     this.imageUrls = superProduct.Images.map(img => img.Url);
     this.isOrderable = !!superProduct.PriceSchedule;
     this.supplierNote = this._product.xp && this._product.xp.Note;
@@ -102,12 +104,25 @@ export class OCMProductDetails implements OnInit {
           ProductID: this._product.ID,
           Quantity: this.quantity,
           Specs: this.specFormService.getLineItemSpecs(this._specs),
+          xp: {
+            LineItemImageUrl: this.getLineItemImageUrl(this._product)
+          }
         });
         this.isAddingToCart = false;
       } catch (ex) {
         this.isAddingToCart = false;
         throw ex;
       }
+  }
+
+  getLineItemImageUrl(product: MarketplaceMeProduct): string {
+    const image = this.images.find(img => this.isImageMatchingSpecs(img));
+    return image ? image.Url : getPrimaryImageUrl(product);
+  }
+
+  isImageMatchingSpecs(image): boolean {
+    const specs = this.specFormService.getLineItemSpecs(this._specs);
+    return specs.every(spec => image.Tags.includes(spec.Value));
   }
 
   getPriceBreakRange(index: number): string {

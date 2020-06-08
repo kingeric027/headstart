@@ -2,7 +2,7 @@
      *ngIf="_product">
   <div class="row mb-5">
     <div class="col-xl-5 col-lg-5">
-      <ocm-image-gallery [imgUrls]="imageUrls"></ocm-image-gallery>
+      <ocm-image-gallery [imgUrls]="imageUrls" [imgs]="images" [specs]="specFormService?.event?.form?.ctrls"></ocm-image-gallery>
     </div>
     <div class="col-xl-5 col-lg-4">
       <div class="pb-3 border-bottom border-medium">

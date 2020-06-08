@@ -51,7 +51,13 @@ export class OCMProductCard {
   async addToCart(): Promise<void> {
     this.isAddingToCart = true;
     try {
-      await this.context.order.cart.add({ ProductID: this._product.ID, Quantity: this.quantity });
+      await this.context.order.cart.add({ 
+        ProductID: this._product.ID, 
+        Quantity: this.quantity,
+        xp: {
+          LineItemImageUrl: getPrimaryImageUrl(this._product)
+        } 
+      });
       this.isAddingToCart = false;
     } catch (ex) {
       this.isAddingToCart = false;
