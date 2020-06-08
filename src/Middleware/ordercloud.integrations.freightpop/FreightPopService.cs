@@ -10,7 +10,8 @@ namespace ordercloud.integrations.freightpop
 		Task<Response<dynamic>> ImportOrderAsync(List<OrderRequest> orderRequestBody);
 		Task<Response<GetRatesData>> GetRatesAsync(RateRequestBody rateRequestBody);
 		Task<Response<List<ShipmentDetails>>> GetShipmentsForOrder(string orderID);
-		Task<Response<List<ShipmentDetails>>> GetShipmentsByDate(int daysAgo);
+		Task<Response<List<ShipmentDetails>>> GetShipmentsByDate(int daysAgo, string token);
+		Task<string> AuthenticateAync();
 	}
 
 	public class FreightPopService : IFreightPopService
@@ -29,15 +30,20 @@ namespace ordercloud.integrations.freightpop
 			_freightPopBaseUrl = config.BaseUrl;
 		}
 
-		private IFlurlRequest MakeRequest(string resource)
+		private IFlurlRequest MakeRequest(string resource, string token = "")
 		{
+			if(token.Length == 0)
+			{
+				// use token that is passed in if it's available
+				token = accessToken;
+			}
 			return _flurl.Request($"{_freightPopBaseUrl}/{resource}")
-				.WithHeader("Authorization", $"Bearer {accessToken}");
+				.WithHeader("Authorization", $"Bearer {token}");
 		}
-		private async Task AuthenticateAync()
+		public async Task<string> AuthenticateAync()
 		{
 			// authenticate if more than 13 days from the previous token request
-			if(DateTime.Now > tokenExpireDate)
+			if(tokenExpireDate == null || DateTime.Now > tokenExpireDate)
 			{
 				var passwordGrantRequest = new PasswordGrantRequestData
 				{
@@ -50,6 +56,7 @@ namespace ordercloud.integrations.freightpop
 				tokenExpireDate = DateTime.Now.AddDays(13);
 				accessToken = passwordGrantResponse.Data.AccessToken;
 			}
+			return accessToken;
 		}
 		public async Task<Response<GetRatesData>> GetRatesAsync(RateRequestBody rateRequestBody)
 		{
@@ -128,10 +135,14 @@ namespace ordercloud.integrations.freightpop
 			var getShipmentResponse = await MakeRequest($"shipment/getShipment?id={orderID}&type={GetShipmentBy.OrderNo}").GetAsync().ReceiveJson<Response<List<ShipmentDetails>>>();
 			return getShipmentResponse;
 		}
-		public async Task<Response<List<ShipmentDetails>>> GetShipmentsByDate(int daysAgo)
+		public async Task<Response<List<ShipmentDetails>>> GetShipmentsByDate(int daysAgo, string token = "")
 		{
-			await AuthenticateAync();
-			var getShipmentResponse = await MakeRequest($"shipment/getShipment?id={GetDateStringForQuery(daysAgo)}&type={GetShipmentBy.Date}").GetAsync().ReceiveJson<Response<List<ShipmentDetails>>>();
+			if (token.Length == 0)
+			{
+				// allows a token to be passed into the request, will be important when there are multiple Supplier FreightPop accounts
+				 token = await AuthenticateAync();
+			}
+			var getShipmentResponse = await MakeRequest($"shipment/getShipment?id={GetDateStringForQuery(daysAgo)}&type={GetShipmentBy.Date}", token).GetAsync().ReceiveJson<Response<List<ShipmentDetails>>>();
 			return getShipmentResponse;
 		}
 		private string GetDateStringForQuery(int daysAgo)
