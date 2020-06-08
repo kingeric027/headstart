@@ -81,8 +81,7 @@ export class BuyerLocationEditComponent implements OnInit {
       Country: new FormControl(buyerLocation.Address.Country, Validators.required),
       Phone: new FormControl(buyerLocation.Address.Phone, ValidatePhone),
       Email: new FormControl(buyerLocation.Address.xp.Email, ValidateEmail),
-      // once sdk is regenerated we can remove
-      LocationID: new FormControl((buyerLocation.Address.xp as any).LocationID),
+      LocationID: new FormControl(buyerLocation.Address.xp.LocationID),
       Currency: new FormControl(buyerLocation.UserGroup.xp.Currency, Validators.required),
     });
   }
