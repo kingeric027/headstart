@@ -400,6 +400,21 @@
                   </tr>
                 </tbody>
               </table>
+              <div class="form-group mt-3">
+                <label for="UseCumulativeQuantity">Price Break Application</label>
+                <select [attr.disabled]="readonly ? true : null"
+                        type="dropdown"
+                        class="form-control"
+                        formControlName="UseCumulativeQuantity"
+                        id="UseCumulativeQuantity"
+                        aria-describedby="Use Cumulative Quantity"
+                        (change)="handleUpdateProduct($event, 'PriceSchedule.UseCumulativeQuantity')">
+                  <option [selected]="_superMarketplaceProductEditable.PriceSchedule.UseCumulativeQuantity"
+                          value="true">Apply Price Breaks Across Variations</option>
+                  <option [selected]="!_superMarketplaceProductEditable.PriceSchedule.UseCumulativeQuantity"
+                          value="false">Apply Price Breaks to Individual Variations</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
