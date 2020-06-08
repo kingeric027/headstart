@@ -45,7 +45,7 @@ namespace Marketplace.Common.Commands.SupplierSync
             return JObject.FromObject(returnObject);
         }
 
-        public Task<List<MarketplaceHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
+        public Task<List<TemplateHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
         {
             throw new System.NotImplementedException();
         }

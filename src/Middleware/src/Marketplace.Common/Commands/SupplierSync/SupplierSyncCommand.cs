@@ -17,7 +17,7 @@ namespace Marketplace.Common.Commands.SupplierSync
     public interface ISupplierSyncCommand
     {
         Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user);
-        Task<List<MarketplaceHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user);
+        Task<List<TemplateHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user);
     }
 
     public class SupplierSyncCommand : ISupplierSyncCommand
@@ -61,18 +61,19 @@ namespace Marketplace.Common.Commands.SupplierSync
             }
         }
 
-        public async Task<List<MarketplaceHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
+        public async Task<List<TemplateHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
         {
             using var stream = file.OpenReadStream();
-            var mapper = new Mapper(stream);
+            var mapper = new Mapper(stream).Map(info => { }, (info, o) => { }, (info, o) => { });
             var products = mapper.Take<TemplateProduct>("Products").ToList();
+            mapper.Map<TemplatePriceSchedule>("PriceBreaks", schedule => schedule.PriceBreaks)
             var prices = mapper.Take<TemplatePriceSchedule>("PriceSchedules").ToList();
             var specs = mapper.Take<TemplateSpec>("Specs").ToList();
             var specoptions = mapper.Take<TemplateSpecOption>("SpecOptions").ToList();
             var images = mapper.Take<TemplateAsset>("Images").ToList();
             var attachments = mapper.Take<TemplateAsset>("Attachments").ToList();
 
-            var list = products.Select(info => new MarketplaceHydratedProduct()
+            var list = products.Select(info => new TemplateHydratedProduct()
             {
                 Product = info.Value,
                 PriceSchedule = prices.FirstOrDefault(row => row.Value.ProductID == info.Value.ID)?.Value,
@@ -88,7 +89,7 @@ namespace Marketplace.Common.Commands.SupplierSync
         }
     }
 
-    public class MarketplaceHydratedProduct
+    public class TemplateHydratedProduct
     {
         public TemplateProduct Product { get; set; }
         public TemplatePriceSchedule PriceSchedule { get; set; }
@@ -99,7 +100,12 @@ namespace Marketplace.Common.Commands.SupplierSync
 
     public class TemplateProduct : MarketplaceProduct
     {
-
+        public string TaxCategory { get; set; }
+        public string TaxCode { get; set; }
+        public string TaxDescription { get; set; }
+        public string UnitOfMeasureQty { get; set; }
+        public string UnitOfMeasure { get; set; }
+        public bool IsResale { get; set; }
     }
 
     public class TemplatePriceSchedule : MarketplacePriceSchedule
