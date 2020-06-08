@@ -129,8 +129,8 @@
                       required
                       [formControlName]="filter.Path">
                 <ng-container *ngFor="let option of filter.Values;">
-                  <option *ngIf="option === true || option === false" value="{{option}}">{{option | yesNo }}</option>
-                  <option *ngIf="option !== true && option !== false" value="{{option}}">{{option}}</option>
+                  <option *ngIf="isBoolean(option)" value="{{option}}">{{option | yesNo }}</option>
+                  <option *ngIf="!isBoolean(option)" value="{{option}}">{{option}}</option>
                 </ng-container>
               </select>
               <div class="input-group"

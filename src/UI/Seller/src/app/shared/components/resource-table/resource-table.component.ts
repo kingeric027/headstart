@@ -349,6 +349,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.filterForm.reset();
   }
 
+  isBoolean(value: any): boolean {
+    return typeof value === 'boolean';
+  }
+
   getSaveBtnText(): string {
     return this._ocService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew);
   }
