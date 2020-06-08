@@ -52,11 +52,16 @@ export class OCMImageGallery implements OnInit, OnChanges {
   }
 
   onSpecsChange() {
-   const image = this.imgs.find(img => (this.isImageMatchingSpecs(img)));
-   if (image) {
-     this.select(image.Url);
+    let image;
+    if (this.imgs.length === 1) {
+     image = this.imgs[0];
+    } else {
+     image = this.imgs.find(img => (this.isImageMatchingSpecs(img)));
+    }
+    if (image) {
+      this.select(image.Url);
+    }
    }
-  }
 
   getGallery(): string[] {
     return this.imgs.slice(this.startIndex, this.endIndex + 1);
