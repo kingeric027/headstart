@@ -17,5 +17,15 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
                 QuantityShipped = freightPopShipmentItem.Quantity,
             };
         }
+
+        public static OrderCloud.SDK.ShipmentItem Map(LineItem lineItem, string ocOrderID)
+        {
+            return new OrderCloud.SDK.ShipmentItem
+            {
+                OrderID = ocOrderID,
+                LineItemID = lineItem.ID,
+                QuantityShipped = lineItem.Quantity,
+            };
+        }
     }
 }
