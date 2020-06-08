@@ -22,8 +22,8 @@ export class OrderStateService {
       QuoteOrderInfo: null,
       Currency: 'USD', // Default value, overriden in reset() when app loads
       OrderReturnInfo: {
-        HasReturn: false
-      }
+        HasReturn: false,
+      },
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
@@ -70,28 +70,14 @@ export class OrderStateService {
      * however we also need to know when a user marks an order for
      * resbumit which we are designating with xp.IsResubmitting
      */
-
-    const orderQueries = [
-      // platform change to support quering by `true` may be coming
-      this.ocMeService
-        .ListOrders({
-          sortBy: '!DateCreated',
-          filters: { DateDeclined: '*', status: 'Unsubmitted', 'xp.IsResubmitting': 'True' },
-        })
-        .toPromise() as ListMarketplaceOrder,
-      (await this.ocMeService
-        .ListOrders({
-          sortBy: '!DateCreated',
-          filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
-        })
-        .toPromise()) as ListMarketplaceOrder,
-    ];
-
-    const [resubmittingOrders, normalUnsubmittedOrders] = await Promise.all(orderQueries);
-    if (resubmittingOrders.Items.length) {
-      this.order = resubmittingOrders.Items[0];
-    } else if (normalUnsubmittedOrders.Items.length) {
-      this.order = normalUnsubmittedOrders.Items[0];
+    const [ordersForResubmit, ordersNeverSubmitted] = await Promise.all([
+      this.getOrdersForResubmit(),
+      this.getOrdersNeverSubmitted(),
+    ]);
+    if (ordersForResubmit.Items.length) {
+      this.order = ordersForResubmit.Items[0];
+    } else if (ordersNeverSubmitted.Items.length) {
+      this.order = ordersNeverSubmitted.Items[0];
     } else if (this.appConfig.anonymousShoppingEnabled) {
       this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
     } else {
@@ -101,5 +87,25 @@ export class OrderStateService {
     if (this.order.DateCreated) {
       this.lineItems = await listAll(this.ocLineItemService, this.ocLineItemService.List, 'outgoing', this.order.ID);
     }
+  }
+
+  private async getOrdersForResubmit(): Promise<ListMarketplaceOrder> {
+    const orders = await this.ocMeService
+      .ListOrders({
+        sortBy: '!DateCreated',
+        filters: { DateDeclined: '*', status: 'Unsubmitted', 'xp.IsResubmitting': 'True' },
+      })
+      .toPromise();
+    return orders as ListMarketplaceOrder;
+  }
+
+  private async getOrdersNeverSubmitted(): Promise<ListMarketplaceOrder> {
+    const orders = await this.ocMeService
+      .ListOrders({
+        sortBy: '!DateCreated',
+        filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
+      })
+      .toPromise();
+    return orders as ListMarketplaceOrder;
   }
 }
