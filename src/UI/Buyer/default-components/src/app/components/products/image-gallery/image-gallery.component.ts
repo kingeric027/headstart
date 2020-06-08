@@ -48,7 +48,7 @@ export class OCMImageGallery implements OnInit, OnChanges {
   }
 
   isImageMatchingSpecs(image): boolean {
-    return this.specs.every(spec => image.Tags.includes(spec));
+    return this.specs.every(spec => image.Tags.find(tag => tag.includes(spec)));
   }
 
   onSpecsChange() {
