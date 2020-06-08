@@ -23,6 +23,9 @@
         [ngClass]="{'selected-resource':selectedIndex === index}"
         select="table-body-row">
       <td class="align-middle" *ngFor="let cell of row.cells">
+        <span *ngIf="cell.type === 'BOOLEAN'">
+          {{cell.value | yesNo}}
+        </span>
         <span *ngIf="cell.type === 'BASIC_STRING'">
           {{cell.value}}
         </span>

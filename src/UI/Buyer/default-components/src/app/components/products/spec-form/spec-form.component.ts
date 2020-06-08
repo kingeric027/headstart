@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
@@ -24,32 +24,33 @@ import { ShopperContextService } from 'marketplace';
   `,
   styleUrls: ['./spec-form.component.scss'],
 })
-export class OCMSpecForm {
+export class OCMSpecForm implements OnChanges {
   _specs: ListSpec;
   @Output() specFormChange: EventEmitter<any> = new EventEmitter<any>();
-  _myCurrency: string;
   config: FieldConfig[] = [];
   form: FormGroup;
 
   constructor(private fb: FormBuilder, private context: ShopperContextService) { }
 
   @Input() set specs(value: ListSpec) {
-    const rates = this.context.exchangeRates.Get();
-    const currentUser = this.context.currentUser.get();
-    // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    this._myCurrency = currentUser.UserGroups[0].xp?.Currency || "USD";
     this._specs = value;
-    // Exchange option markup prices based on currency of product/user
-    this._specs.Items = this._specs.Items.map(s => {
-      s.Options.map(o => {
-        o.PriceMarkup = exchange(rates, o.PriceMarkup, this.currency, this._myCurrency).Price;
-      })
-      return s;
-    })
     this.init();
   }
 
   @Input() currency: string;
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.currency && changes.specs) {
+      // Exchange option markup prices based on currency of product/user
+      const rates = this.context.exchangeRates.Get();
+      this._specs.Items = this._specs.Items.map(s => {
+        s.Options.map(o => {
+          o.PriceMarkup = exchange(rates, o.PriceMarkup, changes.currency.currentValue, this.context.currentUser.get().Currency).Price;
+        })
+        return s;
+      })
+    }
+  }
 
   init(): void {
     this.config = this.createFieldConfig();
@@ -120,7 +121,7 @@ export class OCMSpecForm {
             : null,
           options: _map(spec.Options),
           validation: [spec.Required ? Validators.required : Validators.nullValidator],
-          currency: this._myCurrency
+          currency: this.context.currentUser.get().Currency
         });
       } else if (spec.AllowOpenText) {
         c.push({

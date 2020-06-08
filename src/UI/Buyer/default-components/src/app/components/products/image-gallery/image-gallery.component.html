@@ -19,10 +19,10 @@
         <fa-icon [icon]="faAngleLeft"></fa-icon>
       </div>
       <div class="col gallery-item"
-           [ngClass]="{'active' : isSelected(url) }"
-           *ngFor="let url of  getGallery()"
-           (click)="select(url)">
-        <img [src]="url">
+          *ngFor="let image of getGallery()"
+           [ngClass]="{'active' : isSelected(image) }"
+           (click)="select(image.Url)">
+        <img [src]="image.Url">
       </div>
       <div class="col carousel-arrow"
            (click)="forward()">

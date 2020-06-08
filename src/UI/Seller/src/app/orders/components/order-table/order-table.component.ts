@@ -67,11 +67,10 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
       {
         Display: 'Has Claims',
         Path: 'xp.OrderReturnInfo.HasReturn',
-        Values: ['true', 'false'],
-        ValueDisplayOverride: ['Yes', 'No'],
+        Values: [true, false],
         Type: 'Dropdown',
         QueryRestriction: 'OrderDirection=Incoming'
-      }
+      },
     ],
   };
 }

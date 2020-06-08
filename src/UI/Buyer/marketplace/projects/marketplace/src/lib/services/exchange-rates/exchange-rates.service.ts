@@ -30,8 +30,10 @@ export class ExchangeRatesService implements IExchangeRates {
   }
 
   async reset(): Promise<void> {
-    const myUserGroups = await this.ocMeService.ListUserGroups({ pageSize: 1 }).toPromise();
-    const baseRate = myUserGroups.Items[0].xp?.Currency || 'USD';
+    const myUserGroups = await this.ocMeService
+      .ListUserGroups({ pageSize: 1, filters: { 'xp.Type': 'BuyerLocation' } })
+      .toPromise();
+    const baseRate = myUserGroups.Items[0].xp?.Currency;
     this.exchangeRates = await MarketplaceSDK.ExchangeRates.Get(baseRate);
   }
 

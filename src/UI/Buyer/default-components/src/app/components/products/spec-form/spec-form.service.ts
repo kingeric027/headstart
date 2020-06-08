@@ -2,6 +2,7 @@ import { find as _find, sortBy as _sortBy } from 'lodash';
 import { SpecFormEvent } from './spec-form-values.interface';
 import { PriceBreak, SpecOption, Spec, ListSpec, LineItemSpec } from '@ordercloud/angular-sdk';
 import { Injectable } from '@angular/core';
+import { ExchangedPriceBreak } from 'src/app/models/currency.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class SpecFormService {
     };
   }
 
-  public getSpecMarkup(specs: ListSpec, selectedBreak: PriceBreak, qty: number): number {
+  public getSpecMarkup(specs: ListSpec, selectedBreak: ExchangedPriceBreak, qty: number): number {
     const markups: Array<number> = new Array<number>();
     for (const value in this.event.form) {
       if (this.event.form.hasOwnProperty(value)) {
@@ -25,11 +26,11 @@ export class SpecFormService {
         if (!spec) continue;
         const option = this.getOption(spec, this.event.form[value]);
         if (option) {
-          markups.push(this.singleSpecMarkup(selectedBreak.Price, qty, option));
+          markups.push(this.singleSpecMarkup(selectedBreak.Price.Price, qty, option));
         }
       }
     }
-    return (selectedBreak.Price + markups.reduce((x, acc) => x + acc, 0)) * qty;
+    return (selectedBreak.Price.Price + markups.reduce((x, acc) => x + acc, 0)) * qty;
   }
 
   public getLineItemSpecs(buyerSpecs: ListSpec): Array<LineItemSpec> {

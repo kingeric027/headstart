@@ -2,7 +2,7 @@
      *ngIf="_product">
   <div class="row mb-5">
     <div class="col-xl-5 col-lg-5">
-      <ocm-image-gallery [imgUrls]="imageUrls"></ocm-image-gallery>
+      <ocm-image-gallery [imgUrls]="imageUrls" [imgs]="images" [specs]="specFormService?.event?.form?.ctrls"></ocm-image-gallery>
     </div>
     <div class="col-xl-5 col-lg-4">
       <div class="pb-3 border-bottom border-medium">
@@ -39,7 +39,7 @@
         <div>
           <div class="d-flex justify-content-between align-items-center">
             <h4 *ngIf="!showGrid"
-                class="font-weight-bold">{{ _price?.Price  | currency: _price?.Currency}}</h4>
+                class="font-weight-bold">{{ _price  | currency: _priceBreaks[0]?.Price.Currency}}</h4>
             <p *ngIf="!showGrid"
                class="text-muted ml-3 float-right">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
             <span class="badge badge-pill badge-warning"
@@ -103,14 +103,14 @@
           </div>
         </div>
       </div>
-      <div *ngIf="_priceSchedule?.PriceBreaks.length > 1">
+      <div *ngIf="_priceBreaks.length > 1">
         <strong><span translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</span>: </strong>
         <div class=" border border-medium border-radius mb-3 p-2">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
-            <span *ngFor="let priceBreak of _priceSchedule?.PriceBreaks; let i = index"
+            <span *ngFor="let priceBreak of _priceBreaks; let i = index"
                   class="font-weight-bold d-flex mt-2">{{ getPriceBreakRange(i) }}:
-              <p class="font-weight-normal ml-1 mr-4">{{priceBreak.Price | currency}}</p>
+              <p class="font-weight-normal ml-1 mr-4">{{priceBreak?.Price?.Price | currency: priceBreak?.Price?.Currency}}</p>
             </span>
           </div>
         </div>
