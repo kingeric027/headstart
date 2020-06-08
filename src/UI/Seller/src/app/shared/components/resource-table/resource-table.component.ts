@@ -305,10 +305,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     return true;
   }
 
-  getFilterDisplayValue(filter: any, option :string, i: number): string {
-    return filter.ValueDisplayOverride ? filter.ValueDisplayOverride[i] : option;
-  }
-
   searchedResources(event) {
     this.searched.emit(event);
   }
@@ -351,6 +347,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.toDate = '';
     this.fromDate = '';
     this.filterForm.reset();
+  }
+
+  isBoolean(value: any): boolean {
+    return typeof value === 'boolean';
   }
 
   getSaveBtnText(): string {

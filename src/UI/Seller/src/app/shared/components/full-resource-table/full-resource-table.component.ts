@@ -15,6 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { SortDirection } from './sort-direction.enum';
 import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -32,6 +33,7 @@ export class FullResourceTableComponent {
   sortDirection: SortDirection = SortDirection.None;
   activeSort: string;
   objectPreviewText: string;
+  routeUrl: string;
   _resourceList = { Meta: {}, Items: [] };
 
   @Input()
@@ -40,6 +42,7 @@ export class FullResourceTableComponent {
   requestStatus: RequestStatus;
   @Input()
   set resourceList(value: any) {
+    this.routeUrl = this.router.routerState.snapshot.url;
     this._resourceList = value;
     this.setDisplayValuesForResource(value.Items);
   }
@@ -48,16 +51,21 @@ export class FullResourceTableComponent {
   @Output()
   resourceSelected = new EventEmitter();
 
-  constructor(private toastrService: ToastrService) {}
+  constructor(private router: Router,
+              private toastrService: ToastrService) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
-    this.headers = this.getHeaders(resources);
+    this.headers = this.getHeaders();
     this.rows = this.getRows(resources);
     this.numberOfColumns = this.getNumberOfColumns(this.resourceType);
   }
 
-  getHeaders(resources: any[]): object[] {
-    return FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].fields.map(r => r);
+  getHeaders(): object[] {
+    return FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType].fields.filter(r => this.isValidForDisplay(r));
+  }
+
+  isValidForDisplay(field: any): boolean {
+    return !(field?.queryRestriction && !this.routeUrl.includes(field?.queryRestriction));
   }
 
   getRows(resources: any[]): ResourceRow[] {
@@ -72,7 +80,7 @@ export class FullResourceTableComponent {
 
   createResourceRow(resource: any): ResourceRow {
     const resourceConfiguration = FULL_TABLE_RESOURCE_DICTIONARY[this.resourceType];
-    const fields = resourceConfiguration.fields;
+    const fields = resourceConfiguration.fields.filter(r => this.isValidForDisplay(r));
     const resourceCells = fields.map(fieldConfiguration => {
       return {
         type: fieldConfiguration.type,

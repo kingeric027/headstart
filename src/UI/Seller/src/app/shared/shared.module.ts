@@ -41,6 +41,7 @@ import { RequestStatus } from './components/request-status/request-status.compon
 import { DragDirective } from './directives/dragDrop.directive';
 import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
 import { PhoneFormatPipe } from './pipes/phone-format.pipe';
+import { YesNoFormatPipe } from './pipes/yes-no-format.pipe';
 import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component';
 import { LocationIDInputDirective } from './directives/location-id-input.directive';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -136,6 +137,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     DragDirective,
     DeleteConfirmModal,
     PhoneFormatPipe,
+    YesNoFormatPipe,
     ConfirmModal,
     UserGroupAssignments,
   ],
@@ -165,6 +167,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     UserGroupAssignments,
     // Pipes
     PhoneFormatPipe,
+    YesNoFormatPipe,
   ],
 })
 export class SharedModule {
