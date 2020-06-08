@@ -148,6 +148,12 @@ const BuyerApprovalRules: MPRoute = {
   route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/approvals`,
 };
 
+const BuyerCatalogs: MPRoute = {
+  rolesWithAccess: [MPRoles.MPBuyerAdmin, MPRoles.MPBuyerReader],
+  title: 'Catalogs',
+  route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/catalogs`,
+};
+
 const BuyerCategories: MPRoute = {
   rolesWithAccess: [MPRoles.MPBuyerAdmin, MPRoles.MPBuyerReader],
   title: 'Categories',
@@ -164,6 +170,7 @@ const BuyerNavGrouping = {
     BuyerPurchasingLocations,
     BuyerPaymentMethods,
     BuyerApprovalRules,
+    BuyerCatalogs,
     BuyerCategories,
   ],
 };

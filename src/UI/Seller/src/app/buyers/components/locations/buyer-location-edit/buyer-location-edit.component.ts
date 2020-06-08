@@ -117,7 +117,6 @@ export class BuyerLocationEditComponent implements OnInit {
 
   async createNewBuyerLocation(): Promise<void> {
     try {
-      console.log(this.buyerLocationEditable)
       this.dataIsSaving = true;
       this.buyerLocationEditable.UserGroup.xp.Type = 'BuyerLocation';
       this.buyerLocationEditable.UserGroup.ID = this.buyerLocationEditable.Address.ID;
