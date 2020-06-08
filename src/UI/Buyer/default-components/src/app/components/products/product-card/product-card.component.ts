@@ -4,10 +4,7 @@ import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 import { ExchangeRates } from 'marketplace/projects/marketplace/src/lib/services/exchange-rates/exchange-rates.service';
 import { exchange } from 'src/app/services/currency.helper';
 import { ListPage } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
-export interface BuyerCurrency {
-  Price: number;
-  Currency: string;
-}
+import { BuyerCurrency } from 'src/app/models/currency.interface';
 @Component({
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
@@ -32,7 +29,7 @@ export class OCMProductCard {
   @Input() set product(value: MarketplaceMeProduct) {
     this._product = value;
     this._rates = this.context.exchangeRates.Get(); 
-    this.setPrice(this._product, this._product.PriceSchedule);
+    this.setPrice(value, value.PriceSchedule);
     this.isViewOnlyProduct = !value.PriceSchedule;
     this.hasSpecs = value.SpecCount > 0;
   }
@@ -45,7 +42,7 @@ export class OCMProductCard {
   setPrice(product: MarketplaceMeProduct, priceSchedule: PriceSchedule<any>): void {
     const currentUser = this.context.currentUser.get();
     const productPrice = priceSchedule?.PriceBreaks[0]?.Price;
-    this._price = exchange(this._rates, productPrice, this._product?.xp?.Currency, currentUser.Currency);
+    this._price = exchange(this._rates, productPrice, product?.xp?.Currency, currentUser.Currency);
   }
 
   async addToCart(): Promise<void> {

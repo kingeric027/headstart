@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ShipEstimate, ShipMethodSelection } from 'marketplace';
+import { ShipEstimate, ShipMethodSelection, ShopperContextService } from 'marketplace';
 import { FormGroup, FormControl } from '@angular/forms';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 
@@ -10,6 +10,7 @@ import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 export class OCMShippingSelectionForm implements OnInit {
   faQuestionCircle = faQuestionCircle;
   _shipEstimate: ShipEstimate;
+  _orderCurrency: string;
   @Input() set shipEstimate(value: ShipEstimate) {
     this._shipEstimate = value;
     this.setSelectedRate(value.SelectedShipMethodID);
@@ -20,11 +21,12 @@ export class OCMShippingSelectionForm implements OnInit {
 
   form: FormGroup;
 
-  constructor() { }
+  constructor(private context: ShopperContextService) {}
 
   ngOnInit(): void {
     this.form = new FormGroup({ rateID: new FormControl(null) });
     this.form = new FormGroup({ ShipMethodID: new FormControl(null) });
+    this._orderCurrency = this.context.currentUser.get().Currency;
   }
 
   setSelectedRate(selectedShipMethodID: string): void {
