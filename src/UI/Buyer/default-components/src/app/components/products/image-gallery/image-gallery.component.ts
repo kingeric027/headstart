@@ -49,7 +49,12 @@ export class OCMImageGallery implements OnInit, OnChanges {
   }
 
   isImageMatchingSpecs(image: AssetForDelivery): boolean {
-    return this.specs.every(spec => image.Tags.find(tag => tag.split('-').includes(spec)));
+    //Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
+    return this.specs
+      .every(spec => image.Tags
+      .find(tag => tag
+      .split('-')
+      .includes(spec.replace(/\s/g, ''))));
   }
 
   onSpecsChange(): void {
