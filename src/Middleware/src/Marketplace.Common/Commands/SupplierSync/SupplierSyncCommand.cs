@@ -64,9 +64,8 @@ namespace Marketplace.Common.Commands.SupplierSync
         public async Task<List<TemplateHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
         {
             using var stream = file.OpenReadStream();
-            var mapper = new Mapper(stream).Map(info => { }, (info, o) => { }, (info, o) => { });
+            var mapper = new Mapper(stream);
             var products = mapper.Take<TemplateProduct>("Products").ToList();
-            mapper.Map<TemplatePriceSchedule>("PriceBreaks", schedule => schedule.PriceBreaks)
             var prices = mapper.Take<TemplatePriceSchedule>("PriceSchedules").ToList();
             var specs = mapper.Take<TemplateSpec>("Specs").ToList();
             var specoptions = mapper.Take<TemplateSpecOption>("SpecOptions").ToList();
