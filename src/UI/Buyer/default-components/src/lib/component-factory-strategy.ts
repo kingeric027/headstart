@@ -25,6 +25,47 @@ import { map } from 'rxjs/operators';
 
 import { isFunction, scheduler, strictEquals, isElement, matchesSelector } from './utils';
 
+function findMatchingIndex(node: Node, selectors: string[], defaultIndex: number): number {
+  let matchingIndex = defaultIndex;
+
+  if (isElement(node)) {
+    selectors.some((selector, i) => {
+      if (selector !== '*' && matchesSelector(node, selector)) {
+        matchingIndex = i;
+        return true;
+      }
+      return false;
+    });
+  }
+
+  return matchingIndex;
+}
+
+export function extractProjectableNodes(host: HTMLElement, ngContentSelectors: string[]): Node[][] {
+  const nodes = host.childNodes;
+  const projectableNodes: Node[][] = ngContentSelectors.map(() => []);
+  let wildcardIndex = -1;
+
+  ngContentSelectors.some((selector, i) => {
+    if (selector === '*') {
+      wildcardIndex = i;
+      return true;
+    }
+    return false;
+  });
+
+  for (let i = 0, ii = nodes.length; i < ii; ++i) {
+    const node = nodes[i];
+    const ngContentIndex = findMatchingIndex(node, ngContentSelectors, wildcardIndex);
+
+    if (ngContentIndex !== -1) {
+      projectableNodes[ngContentIndex].push(node);
+    }
+  }
+
+  return projectableNodes;
+}
+
 /** Time in milliseconds to wait before destroying the component ref when disconnected. */
 const DESTROY_DELAY = 10;
 
@@ -110,7 +151,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
       return this.initialInputValues.get(property);
     }
 
-    return (this.componentRef.instance)[property];
+    return this.componentRef.instance[property];
   }
 
   /**
@@ -128,7 +169,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
     }
 
     this.recordInputChange(property, value);
-    (this.componentRef.instance)[property] = value;
+    this.componentRef.instance[property] = value;
     this.scheduleDetectChanges();
   }
 
@@ -141,7 +182,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
     const projectableNodes = extractProjectableNodes(element, this.componentFactory.ngContentSelectors);
     this.componentRef = this.componentFactory.create(childInjector, projectableNodes, element);
 
-    this.implementsOnChanges = isFunction(((this.componentRef.instance) as OnChanges).ngOnChanges);
+    this.implementsOnChanges = isFunction((this.componentRef.instance as OnChanges).ngOnChanges);
 
     this.initializeInputs();
     this.initializeOutputs();
@@ -170,7 +211,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
   /** Sets up listeners for the component's outputs so that the events stream emits the events. */
   protected initializeOutputs(): void {
     const eventEmitters = this.componentFactory.outputs.map(({ propName, templateName }) => {
-      const emitter = (this.componentRef.instance)[propName] as EventEmitter<any>;
+      const emitter = this.componentRef.instance[propName] as EventEmitter<any>;
       return emitter.pipe(map((value: any) => ({ name: templateName, value })));
     });
 
@@ -187,7 +228,7 @@ export class ComponentNgElementStrategy implements NgElementStrategy {
     // during ngOnChanges.
     const inputChanges = this.inputChanges;
     this.inputChanges = null;
-    ((this.componentRef.instance) as OnChanges).ngOnChanges(inputChanges);
+    (this.componentRef.instance as OnChanges).ngOnChanges(inputChanges);
   }
 
   /**
@@ -295,45 +336,4 @@ export interface NgElementStrategy {
 export interface NgElementStrategyFactory {
   /** Creates a new instance to be used for an NgElement. */
   create(injector: Injector): NgElementStrategy;
-}
-
-export function extractProjectableNodes(host: HTMLElement, ngContentSelectors: string[]): Node[][] {
-  const nodes = host.childNodes;
-  const projectableNodes: Node[][] = ngContentSelectors.map(() => []);
-  let wildcardIndex = -1;
-
-  ngContentSelectors.some((selector, i) => {
-    if (selector === '*') {
-      wildcardIndex = i;
-      return true;
-    }
-    return false;
-  });
-
-  for (let i = 0, ii = nodes.length; i < ii; ++i) {
-    const node = nodes[i];
-    const ngContentIndex = findMatchingIndex(node, ngContentSelectors, wildcardIndex);
-
-    if (ngContentIndex !== -1) {
-      projectableNodes[ngContentIndex].push(node);
-    }
-  }
-
-  return projectableNodes;
-}
-
-function findMatchingIndex(node: Node, selectors: string[], defaultIndex: number): number {
-  let matchingIndex = defaultIndex;
-
-  if (isElement(node)) {
-    selectors.some((selector, i) => {
-      if (selector !== '*' && matchesSelector(node, selector)) {
-        matchingIndex = i;
-        return true;
-      }
-      return false;
-    });
-  }
-
-  return matchingIndex;
 }

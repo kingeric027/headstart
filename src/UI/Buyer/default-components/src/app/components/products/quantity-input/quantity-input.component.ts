@@ -3,6 +3,11 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { MarketplaceMeProduct, PriceSchedule } from 'marketplace';
 
+export interface QtyChangeEvent {
+  qty: number;
+  valid: boolean;
+}
+
 @Component({
   templateUrl: './quantity-input.component.html',
   styleUrls: ['./quantity-input.component.scss'],
@@ -10,7 +15,7 @@ import { MarketplaceMeProduct, PriceSchedule } from 'marketplace';
 export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() existingQty: number;
   @Input() gridDisplay? = false;
-  @Output() qtyChange = new EventEmitter<{ qty: number; valid: boolean }>();
+  @Output() qtyChange = new EventEmitter<QtyChangeEvent>();
   // TODO - replace with real product info
   form: FormGroup;
   isQtyRestricted = false;
@@ -30,16 +35,16 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges() {
-    this.product && this.priceSchedule && this.init(this.product, this.priceSchedule);
+  ngOnChanges(): void {
+    if (this.product && this.priceSchedule) this.init(this.product, this.priceSchedule);
   }
 
   init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
-    this.isQtyRestricted = this.priceSchedule.RestrictedQuantity;
+    this.isQtyRestricted = priceSchedule.RestrictedQuantity;
     this.inventory = this.getInventory(product);
     this.min = this.minQty(product);
     this.max = this.maxQty(product);
-    this.restrictedQuantities = this.priceSchedule.PriceBreaks.map(b => b.Quantity);
+    this.restrictedQuantities = priceSchedule.PriceBreaks.map(b => b.Quantity);
     if (this.inventory < this.min) {
       this.errorMsg = 'Out of stock.';
       this.disabled = true;
@@ -88,12 +93,12 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     return this.priceSchedule.MinQuantity;
   }
 
-  minQty(product: MarketplaceMeProduct): number {
-    return this.priceSchedule.MinQuantity || this.gridDisplay ? 0 : 1;
+  minQty(priceSchedule: PriceSchedule): number {
+    return priceSchedule.MinQuantity || this.gridDisplay ? 0 : 1;
   }
 
-  maxQty(product: MarketplaceMeProduct): number {
-    return this.priceSchedule.MaxQuantity || Infinity;
+  maxQty(priceSchedule: PriceSchedule): number {
+    return priceSchedule.MaxQuantity || Infinity;
   }
 
   getInventory(product: MarketplaceMeProduct): number {

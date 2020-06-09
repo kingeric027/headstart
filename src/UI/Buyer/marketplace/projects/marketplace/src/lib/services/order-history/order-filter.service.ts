@@ -88,27 +88,6 @@ export class OrderFilterService implements IOrderFilters {
     this.patchFilterState(this.getDefaultParms());
   }
 
-  private readFromUrlQueryParams = (params: Params): void => {
-    const { page, sortBy, search, fromDate, toDate, location } = params;
-    const status = params.status;
-    const showOnlyFavorites = !!params.favorites;
-    this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate, location });
-  };
-
-  private getDefaultParms(): OrderFilters {
-    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
-    return {
-      page: undefined,
-      sortBy: undefined,
-      search: undefined,
-      status: undefined,
-      showOnlyFavorites: false,
-      fromDate: undefined,
-      location: undefined,
-      toDate: undefined,
-    };
-  }
-
   // Used to update the URL
   mapToUrlQueryParams(model: OrderFilters): Params {
     const { page, sortBy, search, status, fromDate, toDate, location } = model;
@@ -143,6 +122,10 @@ export class OrderFilterService implements IOrderFilters {
       .toPromise();
   }
 
+  async listApprovableOrders(): Promise<ListOrder> {
+    return await this.ocMeService.ListApprovableOrders(this.createListOptions()).toPromise();
+  }
+
   private createHttpParams(): HttpParams {
     let params = new HttpParams();
     Object.entries(this.createListOptions()).forEach(([key, value]) => {
@@ -158,8 +141,25 @@ export class OrderFilterService implements IOrderFilters {
     return params;
   }
 
-  async listApprovableOrders(): Promise<ListOrder> {
-    return await this.ocMeService.ListApprovableOrders(this.createListOptions()).toPromise();
+  private readFromUrlQueryParams = (params: Params): void => {
+    const { page, sortBy, search, fromDate, toDate, location } = params;
+    const status = params.status;
+    const showOnlyFavorites = !!params.favorites;
+    this.activeFiltersSubject.next({ page, sortBy, search, showOnlyFavorites, status, fromDate, toDate, location });
+  };
+
+  private getDefaultParms(): OrderFilters {
+    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
+    return {
+      page: undefined,
+      sortBy: undefined,
+      search: undefined,
+      status: undefined,
+      showOnlyFavorites: false,
+      fromDate: undefined,
+      location: undefined,
+      toDate: undefined,
+    };
   }
 
   private createListOptions(): ListArgs {

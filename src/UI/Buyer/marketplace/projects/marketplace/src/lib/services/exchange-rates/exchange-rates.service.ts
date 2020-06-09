@@ -3,15 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { OcMeService } from '@ordercloud/angular-sdk';
 import { HttpClient } from '@angular/common/http';
 import { ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { AppConfig } from '../../shopper-context';
-
-export interface ExchangeRates {
-  Currency: string;
-  Symbol: string;
-  Name: string;
-  Rate: number;
-  Icon: string;
-}
+import { AppConfig, ExchangeRates } from '../../shopper-context';
 
 export interface IExchangeRates {
   Get(): ListPage<ExchangeRates>;

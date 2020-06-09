@@ -63,14 +63,6 @@ export class CheckoutService implements ICheckout {
     return orderID;
   }
 
-  private async submit(): Promise<string> {
-    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    await this.incrementOrderIfNeeded();
-    const submittedOrder = await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
-    await this.state.reset();
-    return submittedOrder.ID;
-  }
-
   async addComment(comment: string): Promise<MarketplaceOrder> {
     return await this.patch({ Comments: comment });
   }
@@ -160,7 +152,31 @@ export class CheckoutService implements ICheckout {
     return this.order;
   }
 
+  async createPurchaseOrderPayment(amount: number): Promise<Payment> {
+    const payment = {
+      Amount: amount,
+      DateCreated: new Date().toDateString(),
+      Type: 'PurchaseOrder',
+    };
+    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
+  }
+
+  async deleteExistingPayments(): Promise<any[]> {
+    const payments = await this.ocPaymentService.List('outgoing', this.order.ID).toPromise();
+    const deleteAll = payments.Items.map(payment =>
+      this.ocPaymentService.Delete('outgoing', this.order.ID, payment.ID).toPromise()
+    );
+    return Promise.all(deleteAll);
+  }
+
   // Private Methods
+  private async submit(): Promise<string> {
+    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
+    await this.incrementOrderIfNeeded();
+    const submittedOrder = await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
+    await this.state.reset();
+    return submittedOrder.ID;
+  }
 
   private async createCCPayment(
     partialAccountNum: string,
@@ -180,23 +196,6 @@ export class CheckoutService implements ICheckout {
       },
     };
     return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
-  }
-
-  async createPurchaseOrderPayment(amount: number): Promise<Payment> {
-    const payment = {
-      Amount: amount,
-      DateCreated: new Date().toDateString(),
-      Type: 'PurchaseOrder',
-    };
-    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
-  }
-
-  async deleteExistingPayments(): Promise<any[]> {
-    const payments = await this.ocPaymentService.List('outgoing', this.order.ID).toPromise();
-    const deleteAll = payments.Items.map(payment =>
-      this.ocPaymentService.Delete('outgoing', this.order.ID, payment.ID).toPromise()
-    );
-    return Promise.all(deleteAll);
   }
 
   private async patch(order: MarketplaceOrder): Promise<MarketplaceOrder> {

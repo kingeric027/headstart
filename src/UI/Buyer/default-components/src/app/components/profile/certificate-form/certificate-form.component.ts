@@ -43,7 +43,7 @@ export class OCMCertificateForm implements OnInit {
   }
 
   // Maybe we can make this function more general?
-  onFileChange(event): void {
+  onFileChange(event: any): void {
     const reader = new FileReader();
 
     if (event.target.files && event.target.files.length) {

@@ -22,11 +22,11 @@ export interface ISupplierFilters {
   providedIn: 'root',
 })
 export class SupplierFilterService implements ISupplierFilters {
-  private readonly nonFilterQueryParams = ['page', 'sortBy', 'search'];
-
   public activeFiltersSubject: BehaviorSubject<SupplierFilters> = new BehaviorSubject<SupplierFilters>(
     this.getDefaultParms()
   );
+
+  private readonly nonFilterQueryParams = ['page', 'sortBy', 'search'];
 
   constructor(
     private router: Router,
@@ -39,19 +39,6 @@ export class SupplierFilterService implements ISupplierFilters {
       } else {
         this.activeFiltersSubject.next(this.getDefaultParms());
       }
-    });
-  }
-
-  // Handle URL updates
-  private readFromUrlQueryParams(params: Params): void {
-    const { page, sortBy, search, supplierID } = params;
-    const activeFilters = _pickBy(params, (_value, _key) => !this.nonFilterQueryParams.includes(_key));
-    this.activeFiltersSubject.next({
-      page,
-      sortBy,
-      search,
-      supplierID,
-      activeFilters,
     });
   }
 
@@ -71,33 +58,6 @@ export class SupplierFilterService implements ISupplierFilters {
         filters: this.createFilters(activeFilters, supplierID),
       })
       .toPromise();
-  }
-
-  private patchFilterState(patch: SupplierFilters): void {
-    const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
-    const queryParams = this.mapToUrlQueryParams(activeFilters);
-    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
-  }
-
-  private getDefaultParms(): SupplierFilters {
-    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
-    return {
-      supplierID: undefined,
-      page: undefined,
-      sortBy: undefined,
-      search: undefined,
-      activeFilters: {},
-    };
-  }
-
-  private createFilters(activeFilters: any, supplierID: string): any {
-    const filters = _transform(
-      activeFilters,
-      (result, value, key: string) => (result[key.toLocaleLowerCase()] = value),
-      {}
-    );
-    filters.ID = supplierID || undefined;
-    return filters;
   }
 
   toSupplier(supplierID: string): void {
@@ -139,5 +99,45 @@ export class SupplierFilterService implements ISupplierFilters {
   hasFilters(): boolean {
     const filters = this.activeFiltersSubject.value;
     return Object.entries(filters).some(([key, value]) => !!value);
+  }
+
+  // Handle URL updates
+  private readFromUrlQueryParams(params: Params): void {
+    const { page, sortBy, search, supplierID } = params;
+    const activeFilters = _pickBy(params, (_value, _key) => !this.nonFilterQueryParams.includes(_key));
+    this.activeFiltersSubject.next({
+      page,
+      sortBy,
+      search,
+      supplierID,
+      activeFilters,
+    });
+  }
+
+  private getDefaultParms(): SupplierFilters {
+    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
+    return {
+      supplierID: undefined,
+      page: undefined,
+      sortBy: undefined,
+      search: undefined,
+      activeFilters: {},
+    };
+  }
+
+  private createFilters(activeFilters: any, supplierID: string): any {
+    const filters = _transform(
+      activeFilters,
+      (result, value, key: string) => (result[key.toLocaleLowerCase()] = value),
+      {}
+    );
+    filters.ID = supplierID || undefined;
+    return filters;
+  }
+
+  private patchFilterState(patch: SupplierFilters): void {
+    const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
+    const queryParams = this.mapToUrlQueryParams(activeFilters);
+    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
   }
 }

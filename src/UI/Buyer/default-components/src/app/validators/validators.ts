@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/quotes */
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { removeSpacesFrom, isValidLength, isValidPerLuhnAlgorithm } from '../services/card-validation.helper';
 

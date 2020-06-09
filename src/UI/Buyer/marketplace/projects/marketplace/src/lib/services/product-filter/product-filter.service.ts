@@ -28,12 +28,12 @@ export interface IProductFilters {
   providedIn: 'root',
 })
 export class ProductFilterService implements IProductFilters {
-  // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
-  private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
-
   public activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(
     this.getDefaultParms()
   );
+
+  // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
+  private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
 
   constructor(
     private router: Router,
@@ -49,15 +49,6 @@ export class ProductFilterService implements IProductFilters {
         this.activeFiltersSubject.next(this.getDefaultParms());
       }
     });
-  }
-
-  // Handle URL updates
-  private readFromUrlQueryParams(params: Params): void {
-    const { page, sortBy, search, categoryID } = params;
-    this.categories.setActiveCategoryID(categoryID);
-    const showOnlyFavorites = !!params.favorites;
-    const activeFacets = _pickBy(params, (_value, _key) => !this.nonFacetQueryParams.includes(_key));
-    this.activeFiltersSubject.next({ page, sortBy, search, categoryID, showOnlyFavorites, activeFacets });
   }
 
   // Used to update the URL
@@ -88,24 +79,6 @@ export class ProductFilterService implements IProductFilters {
         },
       })
       .toPromise();
-  }
-
-  private patchFilterState(patch: ProductFilters): void {
-    const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
-    const queryParams = this.mapToUrlQueryParams(activeFilters);
-    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
-  }
-
-  private getDefaultParms(): ProductFilters {
-    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
-    return {
-      page: undefined,
-      sortBy: undefined,
-      search: undefined,
-      categoryID: undefined,
-      showOnlyFavorites: false,
-      activeFacets: {},
-    };
   }
 
   toPage(pageNumber: number): void {
@@ -163,5 +136,32 @@ export class ProductFilterService implements IProductFilters {
         return !!value;
       }
     });
+  }
+
+  private patchFilterState(patch: ProductFilters): void {
+    const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
+    const queryParams = this.mapToUrlQueryParams(activeFilters);
+    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
+  }
+
+  private getDefaultParms(): ProductFilters {
+    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
+    return {
+      page: undefined,
+      sortBy: undefined,
+      search: undefined,
+      categoryID: undefined,
+      showOnlyFavorites: false,
+      activeFacets: {},
+    };
+  }
+
+  // Handle URL updates
+  private readFromUrlQueryParams(params: Params): void {
+    const { page, sortBy, search, categoryID } = params;
+    this.categories.setActiveCategoryID(categoryID);
+    const showOnlyFavorites = !!params.favorites;
+    const activeFacets = _pickBy(params, (_value, _key) => !this.nonFacetQueryParams.includes(_key));
+    this.activeFiltersSubject.next({ page, sortBy, search, categoryID, showOnlyFavorites, activeFacets });
   }
 }

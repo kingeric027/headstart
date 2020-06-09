@@ -49,7 +49,6 @@ module.exports = {
         "@typescript-eslint/prefer-for-of": "error",
         "@typescript-eslint/prefer-function-type": "error",
         "@typescript-eslint/unbound-method": "off",
-        "@typescript-eslint/member-ordering": "off",
         "@typescript-eslint/explicit-function-return-type": "error",
         "@typescript-eslint/prefer-namespace-keyword": "error",
         "@typescript-eslint/quotes": [
@@ -90,7 +89,8 @@ module.exports = {
         "max-len": [
             "error",
             {
-                "code": 140
+                "code": 140,
+                "ignoreStrings": true
             }
         ],
         "new-parens": "error",

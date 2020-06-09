@@ -49,7 +49,7 @@ export class OCMOrderDetails implements OnInit {
     this.context.currentUser.setIsFavoriteOrder(newValue, order.ID);
   }
 
-  toggleRequestReturn() {
+  toggleRequestReturn(): void {
     this.showRequestReturn = !this.showRequestReturn;
   }
 
@@ -91,14 +91,13 @@ export class OCMOrderDetails implements OnInit {
 
   async addToCart(): Promise<void> {
     const items = this.reorderResponse.ValidLi.map(li => {
-
-      return { 
-        ProductID: li.Product.ID, 
-        Quantity: li.Quantity, 
+      return {
+        ProductID: li.Product.ID,
+        Quantity: li.Quantity,
         Specs: li.Specs,
         xp: {
-          LineItemImageUrl: li.xp.LineItemImageUrl
-        } 
+          LineItemImageUrl: li.xp.LineItemImageUrl,
+        },
       };
     });
     await this.context.order.cart.addMany(items);
@@ -108,7 +107,7 @@ export class OCMOrderDetails implements OnInit {
     await this.context.order.cart.moveOrderToCart(this.order.ID);
   }
 
-  async toggleShowRequestForm(showRequestReturn: boolean) {
+  toggleShowRequestForm(showRequestReturn: boolean): void {
     this.ngOnInit();
     this.showRequestReturn = showRequestReturn;
   }

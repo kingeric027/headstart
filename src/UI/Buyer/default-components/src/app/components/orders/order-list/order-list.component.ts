@@ -22,7 +22,7 @@ export class OCMOrderList {
 
   constructor(private context: ShopperContextService) {}
 
-  updateSort(selectedSortBy): void {
+  updateSort(selectedSortBy: string): void {
     let sortBy;
     switch (this.sortBy) {
       case selectedSortBy:

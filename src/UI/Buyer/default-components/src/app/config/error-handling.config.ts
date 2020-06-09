@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { ErrorHandler, Inject, Injector, Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
@@ -43,6 +44,7 @@ export class AppErrorHandler extends ErrorHandler {
       message = ex.response.data.Message;
     } else if (ex?.error?.Message) {
       message = ex.error.Message;
+    // eslint-disable-next-line camelcase
     } else if (ex?.error?.error_description) {
       message = ex.error.error_description;
     } else if (ex.error) {

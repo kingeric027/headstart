@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { BrowserModule } from '@angular/platform-browser';
 import {
   NgModule,
@@ -137,6 +138,12 @@ import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { OCMBuyerLocationPermissions } from './components/profile/buyer-location-permissions/buyer-location-permissions';
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
+
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/');
+  // uncomment to reference test file using XXX in place of words
+  // return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/', '-test.json');
+}
 
 const components = [
   OCMCategoryDropdown,
@@ -384,10 +391,4 @@ export class AppModule {
       }
     }
   }
-}
-
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/');
-  // uncomment to reference test file using XXX in place of words
-  // return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/', '-test.json');
 }

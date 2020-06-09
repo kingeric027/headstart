@@ -22,10 +22,6 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
       .subscribe(this.handleFiltersChange);
   }
 
-  private handleFiltersChange = async (): Promise<void> => {
-    this.products = await this.context.productFilters.listProducts();
-  };
-
   configureRouter(): void {
     this.router.events.subscribe(evt => {
       if (evt instanceof NavigationEnd) {
@@ -38,4 +34,8 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.alive = false;
   }
+
+  private handleFiltersChange = async (): Promise<void> => {
+    this.products = await this.context.productFilters.listProducts();
+  };
 }

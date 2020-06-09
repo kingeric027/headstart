@@ -16,8 +16,9 @@ import { takeWhile } from 'rxjs/operators';
 import { ProductFilters, ShopperContextService, AppConfig } from 'marketplace';
 import { MarketplaceOrder, MarketplaceLineItem} from 'marketplace-javascript-sdk'
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
-import { CurrentUser } from 'marketplace/projects/marketplace/src/lib/services/current-user/current-user.service';
 import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
+import { CurrentUser } from 'marketplace';
+
 @Component({
   templateUrl: './app-header.component.html',
   styleUrls: ['./app-header.component.scss'],
@@ -60,7 +61,7 @@ export class OCMAppHeader implements OnInit {
     this.orderRoutes = context.router.getOrderRoutes();
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.buildShowOrdersNeedingApprovalAlertListener();
     this.screenSize = getScreenSizeBreakPoint();
     this.categories = this.context.categories.all;
@@ -73,10 +74,10 @@ export class OCMAppHeader implements OnInit {
       .subscribe(this.handleFiltersChange);
     this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
-    this.flagIcon = await this.getCurrencyFlag();
+    this.flagIcon = this.getCurrencyFlag();
   }
 
-  async getCurrencyFlag(): Promise<string> {
+  getCurrencyFlag(): string {
     const rates = this.context.exchangeRates.Get();
     const currentUser = this.context.currentUser.get();
     const myCurrencyCode = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
@@ -88,7 +89,7 @@ export class OCMAppHeader implements OnInit {
     this.showCategoryDropdown = bool;
   }
 
-  clickOutsideCategoryDropdown(event): void {
+  clickOutsideCategoryDropdown(event: any): void {
     const clickIsOutside = !event.target.closest('.categoryDropdown');
     if (clickIsOutside) {
       this.showCategoryDropdown = false;
@@ -118,7 +119,7 @@ export class OCMAppHeader implements OnInit {
     });
   }
 
-  routeToOrdersToApprove(event): void {
+  routeToOrdersToApprove(event: any): void {
     this.context.router.toOrdersToApprove();
     event.stopPropagation();
   }

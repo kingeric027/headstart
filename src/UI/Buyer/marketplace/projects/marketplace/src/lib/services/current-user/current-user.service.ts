@@ -4,14 +4,7 @@ import { MeUser, OcMeService, User, UserGroup } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { CreditCardService } from './credit-card.service';
 import { HttpClient } from '@angular/common/http';
-import { CurrenySymbol } from '../../shopper-context';
-
-export interface CurrentUser extends MeUser {
-  FavoriteProductIDs: string[];
-  FavoriteOrderIDs: string[];
-  UserGroups: UserGroup<any>[];
-  Currency: CurrenySymbol;
-}
+import { CurrentUser } from '../../shopper-context';
 
 export interface ICurrentUser {
   cards: CreditCardService;
@@ -50,7 +43,7 @@ export class CurrentUserService implements ICurrentUser {
   }
 
   async reset(): Promise<void> {
-    const requests: any[] = [
+    const requests: Promise<any>[] = [
       this.ocMeService.Get().toPromise(),
       this.ocMeService.ListUserGroups({ pageSize: 100 }).toPromise(),
     ];
