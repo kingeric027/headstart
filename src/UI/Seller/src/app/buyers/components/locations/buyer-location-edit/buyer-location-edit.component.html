@@ -223,7 +223,7 @@
         <button *ngIf="areChanges"
                 class="btn btn-primary"
                 type="submit"
-                [disabled]="productForm?.status === 'INVALID' || dataIsSaving"
+                [disabled]="productForm?.status === 'INVALID' || dataIsSaving || resourceForm.controls.Currency.value === null"
                 (click)="handleSave()">{{getSaveBtnText()}}</button>
         <button class="btn brand-button ml-3"
                 (click)="handleDiscardChanges()"

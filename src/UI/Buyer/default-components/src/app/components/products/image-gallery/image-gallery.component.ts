@@ -49,11 +49,16 @@ export class OCMImageGallery implements OnInit, OnChanges {
   }
 
   isImageMatchingSpecs(image: AssetForDelivery): boolean {
-    return this.specs.every(spec => image.Tags.includes(spec));
+    return this.specs.every(spec => image.Tags.find(tag => tag.split('-').includes(spec)));
   }
 
   onSpecsChange(): void {
-    const image = this.imgs.find(img => this.isImageMatchingSpecs(img));
+    let image;
+    if (this.imgs.length === 1) {
+      image = this.imgs[0];
+    } else {
+      image = this.imgs.find(img => this.isImageMatchingSpecs(img));
+    }
     if (image) {
       this.select(image.Url);
     }
