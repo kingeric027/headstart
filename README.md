@@ -25,3 +25,11 @@ We keep track of what needs to be done on a [Jira Board](https://four51.atlassia
 3.  **Commit** changes to your own branch
 4.  **Push** your work back up to your fork
 5.  Submit a **Pull request** so that we can review your changes
+
+## Environments
+
+In general we have three environments cooresponding to our three branchs, _dev_, _staging_ and _prod_.
+
+- **Test**, where QA happens. Builds automatically on PRs to _dev_.
+- **Staging**, for demos. Builds automatically on PRs to _staging_.
+- **Production**, the real deal. Manual builds from staging. Code gets merged to _prod_ after the release has been validated.
