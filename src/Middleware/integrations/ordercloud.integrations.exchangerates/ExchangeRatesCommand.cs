@@ -13,7 +13,7 @@ namespace ordercloud.integrations.exchangerates
     {
         Task<ListPage<OrderCloudIntegrationsConversionRate>> Get(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, CurrencySymbol currency);
         Task<OrderCloudIntegrationsExchangeRate> Get(CurrencySymbol symbol);
-        Task<List<OrderCloudIntegrationsConversionRate>> GetRateList();
+        Task<ListPage<OrderCloudIntegrationsConversionRate>> GetRateList();
         ListPage<OrderCloudIntegrationsConversionRate> Filter(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, OrderCloudIntegrationsExchangeRate rates);
         Task<double?> ConvertCurrency(CurrencySymbol from, CurrencySymbol to, double value);
     }
@@ -54,13 +54,13 @@ namespace ordercloud.integrations.exchangerates
 
         public ListPage<OrderCloudIntegrationsConversionRate> Filter(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, OrderCloudIntegrationsExchangeRate rates)
         {
-            if (rateArgs.Filters != null && rateArgs.Filters.Any(filter => filter.Name == "Symbol"))
+            if (rateArgs.Filters.Any(filter => filter.Name == "Symbol"))
             {
                 rates.Rates = (
-                        from rate in rates.Rates
-                        from s in rateArgs.Filters.FirstOrDefault(r => r.Name == "Symbol")?.Values
-                        where rate.Currency == s.Term.To<CurrencySymbol>()
-                        select rate).ToList();
+                    from rate in rates.Rates
+                    from s in rateArgs.Filters.FirstOrDefault(r => r.Name == "Symbol")?.Values
+                    where rate.Currency == s.Term.To<CurrencySymbol>()
+                    select rate).ToList();
             }
 
             var list = new ListPage<OrderCloudIntegrationsConversionRate>()
@@ -70,7 +70,7 @@ namespace ordercloud.integrations.exchangerates
                     Page = 1,
                     PageSize = 1,
                     TotalCount = rates.Rates.Count,
-                    ItemRange = new[] {1, rates.Rates.Count}
+                    ItemRange = new[] { 1, rates.Rates.Count }
                 },
                 Items = rates.Rates
             };
@@ -100,10 +100,20 @@ namespace ordercloud.integrations.exchangerates
             };
         }
 
-        public async Task<List<OrderCloudIntegrationsConversionRate>> GetRateList()
+        public async Task<ListPage<OrderCloudIntegrationsConversionRate>> GetRateList()
         {
-			var rates = MapRates();
-			return await Task.FromResult(rates);
+            var rates = MapRates();
+            return await Task.FromResult(new ListPage<OrderCloudIntegrationsConversionRate>()
+            {
+                Meta = new ListPageMeta()
+                {
+                    Page = 1,
+                    PageSize = 1,
+                    TotalCount = rates.Count,
+                    ItemRange = new[] { 1, rates.Count }
+                },
+                Items = rates
+            });
         }
 
         private static string GetIcon(CurrencySymbol symbol)
@@ -130,7 +140,9 @@ namespace ordercloud.integrations.exchangerates
         private static double? FixRate(ExchangeRatesValues values, CurrencySymbol e)
         {
             var t = values?.GetType().GetProperty($"{e}")?.GetValue(values, null).To<double?>();
-            return (t.HasValue && t.Value == 0) ? 1 : t.Value;
+            if (!t.HasValue)
+                return 1;
+            return t.Value == 0 ? 1 : t.Value;
         }
     }
 }
