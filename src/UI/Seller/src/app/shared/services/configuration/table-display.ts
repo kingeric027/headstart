@@ -66,6 +66,12 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toImage: '',
     toExpandable: false,
   },
+  catalogs: {
+    toPrimaryHeader: 'Name',
+    toSecondaryHeader: 'ID',
+    toImage: '',
+    toExpandable: false,
+  },
   categories: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
@@ -265,6 +271,23 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     imgPath: '',
   },
   approvals: {
+    fields: [
+      {
+        path: 'Name',
+        header: 'Name',
+        type: BASIC_STRING,
+        sortable: true,
+      },
+      {
+        path: 'ID',
+        header: 'ID',
+        type: BASIC_STRING,
+        sortable: true,
+      },
+    ],
+    imgPath: '',
+  },
+  catalogs: {
     fields: [
       {
         path: 'Name',
