@@ -11,7 +11,7 @@ The major pieces of this solution. Click the links for details, including build 
 - [Admin UI (Sellers and Suppliers)](./src/UI/Seller/README.md)
 - Marketplace API
   - [Docs](https://marketplace-middleware-test.azurewebsites.net/index.html)
-- Integrations
+- [Integrations](./src/Middleware/integrations)
 - [Orchestration](./src/Middleware/src/Orchestration.Functions/Marketplace.Orchestration/README.md)
 
 ## Issue Tracking
