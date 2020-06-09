@@ -20,7 +20,7 @@ namespace Marketplace.Common.Services
         Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData);
         Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData);
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
-        Task SendReturnRequestedEmail(MarketplaceOrderPatchPayload payload);
+        Task SendReturnRequestedEmail(string orderID);
         Task SendNewUserEmail(WebhookPayloads.Users.Create payload);
         Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
@@ -139,22 +139,21 @@ namespace Marketplace.Common.Services
             }
         }
 
-        public async Task SendReturnRequestedEmail(MarketplaceOrderPatchPayload payload)
+        public async Task SendReturnRequestedEmail(string orderID)
         {
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
+            MarketplaceOrder order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID);
             var productsList = lineItems.Items.Select(MapLineItemToProduct);
-            var dynamicTemplateData = new
-            {
-                payload.Response.Body.FromUser.FirstName,
-                payload.Response.Body.FromUser.LastName,
-                payload.Response.Body.ID,
-                payload.Response.Body.DateCreated,
-                ReturnID = payload.Response.Body.xp.OrderReturnInfo.RMANumber,
-                Comment = lineItems.Items[0].xp.LineItemReturnInfo.ReturnReason,
-                Products = productsList,
-                ReturnedQty = lineItems.Items[0].xp.LineItemReturnInfo.QuantityToReturn
+            var dynamicTemplateData = new {
+            order.FromUser.FirstName,
+            order.FromUser.LastName,
+            order.ID,
+            order.DateCreated,
+            ReturnID = order.xp.OrderReturnInfo.RMANumber,
+            Products = productsList
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_REFUND_REQUESTED_TEMPLATE_ID, dynamicTemplateData);
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, order.FromUser.Email, BUYER_REFUND_REQUESTED_TEMPLATE_ID, dynamicTemplateData);
+            // TODO: Get Seller's info for return requested email
         }
 
         public async Task SendSupplierOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
@@ -243,7 +242,9 @@ namespace Marketplace.Common.Services
               ImageURL = lineItem.xp.LineItemImageUrl,
               lineItem.ProductID,
               lineItem.Quantity,
-              lineItem.LineTotal
+              lineItem.LineTotal,
+              ReturnQuantity = lineItem.xp.LineItemReturnInfo.QuantityToReturn,
+              Comments = lineItem.xp.LineItemReturnInfo.ReturnReason
           };
         private object GetShippingAddress(IList<MarketplaceLineItem> lineItems) =>
           new

@@ -91,16 +91,6 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Cancelled", "<h1>this is a test email for order cancelled</h1>");
         }
 
-        [HttpPost, Route("orderupdated")]
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderUpdated([FromBody] MarketplaceOrderPatchPayload payload)
-        {
-            if (payload.Response.Body.xp.OrderReturnInfo.HasReturn == true)
-            {
-                await _sendgridService.SendReturnRequestedEmail(payload);
-            }
-        }
-
         [HttpPost, Route("newuser")] // TO DO: send email to mp manager
         [OrderCloudWebhookAuth]
         public async void HandleNewUser([FromBody] WebhookPayloads.Users.Create payload)
