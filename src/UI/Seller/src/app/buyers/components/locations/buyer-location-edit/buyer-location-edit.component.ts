@@ -10,7 +10,7 @@ import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interf
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
+import { SupportedRates, SupportedCurrencies } from '@app-seller/shared/models/supported-rates.interface';
 import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 @Component({
   selector: 'app-buyer-location-edit',
@@ -65,6 +65,7 @@ export class BuyerLocationEditComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
     this.availableCurrencies = await this.ocIntegrations.getAvailableCurrencies();
+    this.availableCurrencies = this.availableCurrencies.filter(c => Object.values(SupportedCurrencies).includes(SupportedCurrencies[c.Currency]));
   }
 
   createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation) {
