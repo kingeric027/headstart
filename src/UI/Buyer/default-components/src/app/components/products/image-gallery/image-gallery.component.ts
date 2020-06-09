@@ -66,6 +66,9 @@ export class OCMImageGallery implements OnInit, OnChanges {
     }
     if (image) {
       this.select(image.Url);
+    } else {
+      //If no specs/tags match, grab the primary image
+      this.select(this.imgs[0].Url);
     }
   }
 
