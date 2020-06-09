@@ -28,11 +28,11 @@ export class OCMQuoteRequestForm implements OnInit {
 
   setForms(): void {
     this.quoteRequestForm = new FormGroup({
-      FirstName: new FormControl(this.currentUser.FirstName || '', [Validators.required, ValidateName]),
-      LastName: new FormControl(this.currentUser.LastName || '', [Validators.required, ValidateName]),
+      FirstName: new FormControl(this.currentUser?.FirstName || '', [Validators.required, ValidateName]),
+      LastName: new FormControl(this.currentUser?.LastName || '', [Validators.required, ValidateName]),
       // BuyerLocation: new FormControl(this.currentUser.BuyerLocation || '', [Validators.required, ValidateName]),
-      Phone: new FormControl(this.currentUser.Phone || '', [Validators.required, ValidatePhone]),
-      Email: new FormControl(this.currentUser.Email || '', [Validators.required, ValidateEmail]),
+      Phone: new FormControl(this.currentUser?.Phone || '', [Validators.required, ValidatePhone]),
+      Email: new FormControl(this.currentUser?.Email || '', [Validators.required, ValidateEmail]),
       Comments: new FormControl(''),
     });
   }

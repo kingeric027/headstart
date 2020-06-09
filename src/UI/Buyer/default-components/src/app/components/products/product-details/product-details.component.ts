@@ -131,7 +131,7 @@ export class OCMProductDetails implements OnInit {
 
   isImageMatchingSpecs(image: AssetForDelivery): boolean {
     const specs = this.specFormService.getLineItemSpecs(this._specs);
-    return specs.every(spec => image.Tags.includes(spec.Value));
+    return specs.every(spec => image.Tags.find(tag => tag.split('-').includes(spec.Value)));
   }
 
   getPriceBreakRange(index: number): string {
