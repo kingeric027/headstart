@@ -40,5 +40,6 @@ In general we have three environments cooresponding to our three branchs, _dev_,
   - https://marketplace-middleware-staging.azurewebsites.net   
 - **Production**, the real deal. Manual builds from staging. Code gets merged to _master_ after the release has been validated.
   - https://marketplace-buyer-ui.azurewebsites.net      
-  - https://marketplace-admin-ui.azurewebsites.net      
+  - https://marketplace-admin-ui.azurewebsites.net
+  - https://marketplace-middleware.azurewebsites.net      
 
