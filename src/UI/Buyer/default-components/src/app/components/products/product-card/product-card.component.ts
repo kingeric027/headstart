@@ -1,9 +1,9 @@
 import { Component, Input, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { ShopperContextService, MarketplaceMeProduct, PriceSchedule } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
-import { ExchangeRates } from 'marketplace/projects/marketplace/src/lib/services/exchange-rates/exchange-rates.service';
 import { exchange } from 'src/app/services/currency.helper';
-import { ListPage } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+import { ListPage } from 'marketplace-javascript-sdk';
+import { ExchangeRates } from 'marketplace';
 import { BuyerCurrency } from 'src/app/models/currency.interface';
 @Component({
   templateUrl: './product-card.component.html',

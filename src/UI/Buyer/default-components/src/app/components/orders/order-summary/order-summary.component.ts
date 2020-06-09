@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ShopperContextService } from 'marketplace';
-import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 import { OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 
 @Component({
@@ -12,7 +11,7 @@ export class OCMOrderSummary implements OnInit {
   _orderCurrency: string;
   constructor(private context: ShopperContextService) {}
 
-  async ngOnInit() {
+  ngOnInit(): void {
     this._orderCurrency = this.context.currentUser.get().Currency;
   }
 }

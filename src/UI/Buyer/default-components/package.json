@@ -10,8 +10,8 @@
     "serve-staging": "ng serve --configuration=staging",
     "build-staging": "ng build --configuration=staging",
     "preinstall": "npm run build-marketplace",
-    "lint": "eslint src/**/*.ts",
-    "build-marketplace": "cd ../marketplace && ng build"
+    "lint": "eslint src/**/*.ts --quiet",
+    "build-marketplace": "cd ../marketplace && npm run build"
   },
   "private": true,
   "dependencies": {

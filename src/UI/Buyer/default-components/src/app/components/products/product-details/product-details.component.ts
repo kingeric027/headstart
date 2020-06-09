@@ -1,17 +1,18 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
-import { ListSpec, User, PriceBreak } from '@ordercloud/angular-sdk';
+import { ListSpec } from '@ordercloud/angular-sdk';
 import { minBy as _minBy } from 'lodash';
-import { MarketplaceMeProduct, ShopperContextService, PriceSchedule, OrderType } from 'marketplace';
-import { MarketplaceLineItem, AssetForDelivery } from 'marketplace-javascript-sdk';
+import { MarketplaceMeProduct, ShopperContextService, PriceSchedule, OrderType, ExchangeRates, CurrentUser } from 'marketplace';
+import { MarketplaceLineItem, AssetForDelivery, MarketplaceOrder, QuoteOrderInfo } from 'marketplace-javascript-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
-import { getImageUrls, getPrimaryImageUrl } from 'src/app/services/images.helpers';
+import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 import { SpecFormService } from '../spec-form/spec-form.service';
 import { SuperMarketplaceProduct, ListPage, Asset } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
 import { exchange } from 'src/app/services/currency.helper';
-import { ExchangeRates } from 'marketplace/projects/marketplace/src/lib/services/exchange-rates/exchange-rates.service';
 import { BuyerCurrency, ExchangedPriceBreak } from 'src/app/models/currency.interface';
+import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
+import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -44,7 +45,7 @@ export class OCMProductDetails implements OnInit {
   supplierNote: string;
   specLength: number;
   quoteFormModal = ModalState.Closed;
-  currentUser: User;
+  currentUser: CurrentUser;
   showRequestSubmittedMessage = false;
   submittedQuoteOrder: any;
   showGrid = false;
@@ -82,23 +83,23 @@ export class OCMProductDetails implements OnInit {
     this.supplierNote = this._product.xp && this._product.xp.Note;
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.currentUser = this.context.currentUser.get();
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
 
-  onSpecFormChange(event): void {
-    if (event.detail.type === 'Change') {
-      this.specFormService.event = event.detail;
+  onSpecFormChange(event: SpecFormEvent): void {
+    if (event.type === 'Change') {
+      this.specFormService.event = event;
       this._price = this.getTotalPrice();
     }
   }
 
-  toggleGrid(bool) {
-    this.showGrid = bool;
+  toggleGrid(showGrid: boolean): void {
+    this.showGrid = showGrid;
   }
 
-  qtyChange(event: { qty: number; valid: boolean }): void {
+  qtyChange(event: QtyChangeEvent): void {
     if (event.valid) {
       this.quantity = event.qty;
       this._price = this.getTotalPrice();
@@ -128,7 +129,7 @@ export class OCMProductDetails implements OnInit {
     return image ? image.Url : getPrimaryImageUrl(product);
   }
 
-  isImageMatchingSpecs(image): boolean {
+  isImageMatchingSpecs(image: AssetForDelivery): boolean {
     const specs = this.specFormService.getLineItemSpecs(this._specs);
     return specs.every(spec => image.Tags.includes(spec.Value));
   }
@@ -164,10 +165,6 @@ export class OCMProductDetails implements OnInit {
       : selectedBreak.Price.Price * (this.quantity || startingBreak.Quantity);
   }
 
-  async getImageUrls(): Promise<string[]> {
-    return await getImageUrls(this._product)
-  }
-
   isFavorite(): boolean {
     return this.favoriteProducts.includes(this._product.ID);
   }
@@ -180,7 +177,7 @@ export class OCMProductDetails implements OnInit {
     this.context.router.toProductList({ activeFacets: { Supplier: supplierId.toLowerCase() } });
   }
 
-  openQuoteForm() {
+  openQuoteForm(): void {
     this.quoteFormModal = ModalState.Open;
   }
 
@@ -188,11 +185,11 @@ export class OCMProductDetails implements OnInit {
     return this._product.xp.ProductType === 'Quote';
   }
 
-  dismissQuoteForm() {
+  dismissQuoteForm(): void {
     this.quoteFormModal = ModalState.Closed;
   }
 
-  getDefaultQuoteOrder(user) {
+  getDefaultQuoteOrder(user: QuoteOrderInfo): MarketplaceOrder {
     const defaultQuoteOrder = {
       xp: {
         AvalaraTaxTransactionCode: '',
@@ -209,13 +206,13 @@ export class OCMProductDetails implements OnInit {
     return defaultQuoteOrder;
   }
 
-  async submitQuoteOrder(user) {
+  async submitQuoteOrder(user: QuoteOrderInfo): Promise<void> {
     try {
       const defaultOrder = this.getDefaultQuoteOrder(user);
       const lineItem: MarketplaceLineItem = {};
       lineItem.ProductID = this._product.ID;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);
-      this.context.order.submitQuoteOrder(defaultOrder, lineItem).then(order => this.submittedQuoteOrder = order);
+      this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(defaultOrder, lineItem);
       this.quoteFormModal = ModalState.Closed;
       this.showRequestSubmittedMessage = true;
     } catch (ex) {
@@ -225,7 +222,7 @@ export class OCMProductDetails implements OnInit {
     }
   }
 
-  toOrderDetail() {
+  toOrderDetail(): void {
     this.context.router.toMyOrderDetails(this.submittedQuoteOrder.ID);
   }
 }

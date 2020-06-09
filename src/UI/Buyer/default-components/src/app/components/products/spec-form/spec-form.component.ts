@@ -4,7 +4,7 @@ import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
 
 import { FieldConfig } from './field-config.interface';
-import { ListSpec, SpecOption } from '@ordercloud/angular-sdk';
+import { ListSpec, SpecOption, Spec } from '@ordercloud/angular-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
 import { exchange } from 'src/app/services/currency.helper';
 import { ShopperContextService } from 'marketplace';
@@ -26,20 +26,19 @@ import { ShopperContextService } from 'marketplace';
 })
 export class OCMSpecForm implements OnChanges {
   _specs: ListSpec;
-  @Output() specFormChange: EventEmitter<any> = new EventEmitter<any>();
+  @Output() specFormChange: EventEmitter<SpecFormEvent> = new EventEmitter<SpecFormEvent>();
   config: FieldConfig[] = [];
   form: FormGroup;
-
-  constructor(private fb: FormBuilder, private context: ShopperContextService) { }
-
+ 
+  @Input() currency: string;
   @Input() set specs(value: ListSpec) {
     this._specs = value;
     this.init();
-  }
+  } 
 
-  @Input() currency: string;
+  constructor(private fb: FormBuilder, private context: ShopperContextService) { }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes.currency && changes.specs) {
       // Exchange option markup prices based on currency of product/user
       const rates = this.context.exchangeRates.Get();
@@ -80,57 +79,15 @@ export class OCMSpecForm implements OnChanges {
     if (!this._specs || !this._specs.Items) return c;
     for (const spec of this._specs.Items) {
       if (spec?.xp?.control === 'checkbox') {
-        c.push({
-          type: 'checkbox',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          value: spec.DefaultOptionID,
-          options: _map(spec.Options, 'Value'),
-          validation: [Validators.nullValidator],
-        });
+        c.push(this.createCheckboxField(spec));
       } else if (spec?.xp?.control === 'range') {
-        c.push({
-          type: 'range',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          value: spec.DefaultValue,
-          min: Math.min(..._map(spec.Options, (option: SpecOption) => +option.Value)),
-          max: Math.max(..._map(spec.Options, (option: SpecOption) => +option.Value)),
-          validation: [
-            spec.Required ? Validators.required : Validators.nullValidator,
-            Validators.min(Math.min(..._map(spec.Options, (option: SpecOption) => +option.Value))),
-            Validators.max(Math.max(..._map(spec.Options, (option: SpecOption) => +option.Value))),
-          ],
-        });
+        c.push(this.createRangeField(spec));
       } else if (spec?.Options.length === 1) {
-        c.unshift({
-          type: 'label',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          options: _map(spec.Options, 'Value'),
-        });
+        c.unshift(this.createLabelField(spec));
       } else if (spec?.Options.length > 1) {
-        c.push({
-          type: 'select',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          value: spec.DefaultOptionID
-            ? _find(spec.Options, option => {
-              return option.ID === spec.DefaultOptionID;
-            }).Value
-            : null,
-          options: _map(spec.Options),
-          validation: [spec.Required ? Validators.required : Validators.nullValidator],
-          currency: this.context.currentUser.get().Currency
-        });
+        c.push(this.createSelectField(spec));
       } else if (spec.AllowOpenText) {
-        c.push({
-          type: 'input',
-          label: spec.Name,
-          name: spec.Name.replace(/ /g, ''),
-          value: spec.DefaultValue,
-          validation: [spec.Required ? Validators.required : Validators.nullValidator],
-        });
+        c.push(this.createInputField(spec));
       }
     }
     return c;
@@ -147,5 +104,68 @@ export class OCMSpecForm implements OnChanges {
       valid: this.form.valid,
       form: this.form.value,
     } as SpecFormEvent);
+  }
+
+  private createCheckboxField(spec: Spec): FieldConfig {
+    return {
+      type: 'checkbox',
+      label: spec.Name,
+      name: spec.Name.replace(/ /g, ''),
+      value: spec.DefaultOptionID,
+      options: _map(spec.Options, 'Value'),
+      validation: [Validators.nullValidator],
+    }
+  }
+
+  private createRangeField(spec: Spec): FieldConfig {
+    return {
+      type: 'range',
+      label: spec.Name,
+      name: spec.Name.replace(/ /g, ''),
+      value: spec.DefaultValue,
+      min: Math.min(..._map(spec.Options, (option: SpecOption) => +option.Value)),
+      max: Math.max(..._map(spec.Options, (option: SpecOption) => +option.Value)),
+      validation: [
+        spec.Required ? Validators.required : Validators.nullValidator,
+        Validators.min(Math.min(..._map(spec.Options, (option: SpecOption) => +option.Value))),
+        Validators.max(Math.max(..._map(spec.Options, (option: SpecOption) => +option.Value))),
+      ],
+    }
+  }
+
+  private createSelectField(spec: Spec): FieldConfig {
+    return {
+      type: 'select',
+      label: spec.Name,
+      name: spec.Name.replace(/ /g, ''),
+      value: spec.DefaultOptionID
+        ? _find(spec.Options, option => {
+          return option.ID === spec.DefaultOptionID;
+        }).Value
+        : null,
+      options: _map(spec.Options),
+      validation: [spec.Required ? Validators.required : Validators.nullValidator],
+      currency: this.context.currentUser.get().Currency
+    }
+  }
+
+  private createLabelField(spec: Spec): FieldConfig {
+    return {
+      type: 'label',
+      label: spec.Name,
+      name: spec.Name.replace(/ /g, ''),
+      options: _map(spec.Options, 'Value'),
+    }
+  }
+
+  private createInputField(spec: Spec): FieldConfig
+  {
+    return {
+      type: 'input',
+      label: spec.Name,
+      name: spec.Name.replace(/ /g, ''),
+      value: spec.DefaultValue,
+      validation: [spec.Required ? Validators.required : Validators.nullValidator],
+    }
   }
 }

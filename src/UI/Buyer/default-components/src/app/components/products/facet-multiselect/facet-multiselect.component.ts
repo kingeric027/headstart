@@ -19,7 +19,7 @@ export class OCMFacetMultiSelect implements OnDestroy {
   faMinusSquare = faMinusSquare;
 
   private activeFacetValues: string[] = [];
-  
+
   constructor(private context: ShopperContextService) {}
 
   @Input() set facet(value: ListFacet) {
@@ -52,10 +52,10 @@ export class OCMFacetMultiSelect implements OnDestroy {
     const activeFacet = _get(filters.activeFacets, this._facet.Name, null);
     this.activeFacetValues = activeFacet ? activeFacet.split('|') : [];
     this.updateCheckBoxes(this.activeFacetValues);
-  }
+  };
 
   // TODO - there is this little flash when a checkbox is click. get rid of it.
-  private updateCheckBoxes(activeFacetValues: string[]) {
+  private updateCheckBoxes(activeFacetValues: string[]): void {
     this.checkboxArray = this._facet.Values.map(facet => {
       const checked = activeFacetValues.includes(facet.Value);
       return { facet, checked };

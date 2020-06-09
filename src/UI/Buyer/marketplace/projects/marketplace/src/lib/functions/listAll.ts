@@ -1,6 +1,7 @@
 import { flatten, range } from 'lodash';
 import { Meta } from '@ordercloud/angular-sdk';
 import { Observable } from 'rxjs';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 interface ListPage<T> {
   Items?: T[];
@@ -21,7 +22,7 @@ interface ListPage<T> {
 export async function listAll<T = any>(
   service: any,
   listFunc: (...args: any) => Observable<ListPage<T>>,
-  ...listArgs
+  ...listArgs: any[]
 ): Promise<ListPage<T>> {
   // get or create filters obj if it doesnt exist
   listFunc = listFunc.bind(service);

@@ -9,6 +9,8 @@ import {
   ListBuyerCreditCard,
   BuyerCreditCard,
   ListOrder,
+  MeUser,
+  UserGroup,
 } from '@ordercloud/angular-sdk';
 import {
   ProductXp,
@@ -18,6 +20,7 @@ import {
   MarketplaceOrder,
   ListPage,
   MarketplaceLineItem,
+  UserGroupXp,
 } from 'marketplace-javascript-sdk';
 
 export * from '@ordercloud/angular-sdk';
@@ -27,6 +30,21 @@ export * from '../../src/lib/services/ordercloud-sandbox/ordercloud-sandbox.mode
 export interface LineItemGroupSupplier {
   supplier: Supplier;
   shipFrom: Address;
+}
+
+export interface CurrentUser extends MeUser {
+  FavoriteProductIDs: string[];
+  FavoriteOrderIDs: string[];
+  UserGroups: UserGroup<UserGroupXp>[];
+  Currency: CurrenySymbol;
+}
+
+export interface ExchangeRates {
+  Currency: string;
+  Symbol: string;
+  Name: string;
+  Rate: number;
+  Icon: string;
 }
 
 export interface SupplierFilters {

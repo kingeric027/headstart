@@ -28,7 +28,7 @@ export class OCMPaymentCreditCard implements OnInit {
     this.cardSelected.emit({ SavedCard, CVV: output.cvv, NewCard: output.card });
   }
 
-  toggleShowCCForm(event): void {
+  toggleShowCCForm(event: any): void {
     this.showNewCCForm = event.target.value === 'new';
   }
 }

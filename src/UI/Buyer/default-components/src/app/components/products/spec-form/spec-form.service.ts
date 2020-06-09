@@ -1,6 +1,6 @@
 import { find as _find, sortBy as _sortBy } from 'lodash';
 import { SpecFormEvent } from './spec-form-values.interface';
-import { PriceBreak, SpecOption, Spec, ListSpec, LineItemSpec } from '@ordercloud/angular-sdk';
+import { SpecOption, Spec, ListSpec, LineItemSpec } from '@ordercloud/angular-sdk';
 import { Injectable } from '@angular/core';
 import { ExchangedPriceBreak } from 'src/app/models/currency.interface';
 
@@ -52,10 +52,10 @@ export class SpecFormService {
     return specs;
   }
 
-  public getGridLineItemSpecs(buyerSpecs: ListSpec, specValues: string[]): Array<object> {
-    const specs: Array<object> = new Array<object>();
+  public getGridLineItemSpecs(buyerSpecs: ListSpec, specValues: string[]): GridSpecOption[] {
+    const specs: GridSpecOption[] = [];
     for (let i = 0; i < buyerSpecs.Items.length; i++) {
-      let name = buyerSpecs.Items[i].Name.replace(/ /g, '')
+      const name = buyerSpecs.Items[i].Name.replace(/ /g, '')
       const spec = this.getSpec(buyerSpecs, name);
       if (!spec) continue;
       const option = this.getOption(spec, specValues[i], 'grid');
@@ -108,7 +108,15 @@ export class SpecFormService {
       });
       return o as SpecOption;
     }
-    if (type === "grid") return _find(spec.Options, o => o.ID === value);
+    if (type === 'grid') return _find(spec.Options, o => o.ID === value);
     else return _find(spec.Options, o => o.Value === value);
   }
+}
+
+export interface GridSpecOption {
+  SpecID: string;
+  OptionID: string;
+  Value: string;
+  MarkupType: string;
+  Markup: number;
 }
