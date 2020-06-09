@@ -415,11 +415,14 @@ export class ProductEditComponent implements OnInit {
   }
 
   async removeFile(file: Asset): Promise<void> {
-    let superProduct;
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    superProduct = await MarketplaceSDK.Assets.Delete(file.ID, accessToken);
-    superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
-    this.refreshProductData(superProduct);
+    await MarketplaceSDK.Assets.Delete(file.ID, accessToken);
+    if (file.Type === "Image") {
+      this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(i => i.ID !== file.ID); 
+    } else {
+      this._superMarketplaceProductStatic.Attachments = this._superMarketplaceProductStatic.Attachments.filter(a => a.ID !== file.ID);
+    }
+    this.refreshProductData(this._superMarketplaceProductStatic);
   }
 
   unstageFile(index: number, fileType: string): void {
