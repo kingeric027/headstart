@@ -31,5 +31,14 @@ We keep track of what needs to be done on a [Jira Board](https://four51.atlassia
 In general we have three environments cooresponding to our three branchs, _dev_, _staging_ and _prod_.
 
 - **Test**, where QA happens. Builds automatically on PRs to _dev_.
+  - https://marketplace-buyer-ui-test.azurewebsites.net    
+  - https://marketplace-admin-ui-test.azurewebsites.net  
+  - https://marketplace-middleware-test.azurewebsites.net   
 - **Staging**, for demos. Builds automatically on PRs to _staging_.
+  - https://marketplace-buyer-ui-staging.azurewebsites.net      
+  - https://marketplace-admin-ui-staging.azurewebsites.net      
+  - https://marketplace-middleware-staging.azurewebsites.net   
 - **Production**, the real deal. Manual builds from staging. Code gets merged to _prod_ after the release has been validated.
+  - https://marketplace-buyer-ui.azurewebsites.net      
+  - https://marketplace-admin-ui.azurewebsites.net      
+
