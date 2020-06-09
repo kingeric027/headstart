@@ -148,7 +148,7 @@ namespace Marketplace.Common.Services
             order.FromUser.FirstName,
             order.FromUser.LastName,
             order.ID,
-            order.DateCreated,
+            DateSubmitted = order.DateSubmitted.ToString(),
             ReturnID = order.xp.OrderReturnInfo.RMANumber,
             Products = productsList
             };
