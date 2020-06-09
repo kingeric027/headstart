@@ -130,8 +130,13 @@ export class OCMProductDetails implements OnInit {
   }
 
   isImageMatchingSpecs(image: AssetForDelivery): boolean {
+      //Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
     const specs = this.specFormService.getLineItemSpecs(this._specs);
-    return specs.every(spec => image.Tags.find(tag => tag.split('-').includes(spec.Value)));
+    return specs.
+      every(spec => image.Tags
+      .find(tag => tag
+      .split('-')
+      .includes(spec.Value.replace(/\s/g, ''))));
   }
 
   getPriceBreakRange(index: number): string {
