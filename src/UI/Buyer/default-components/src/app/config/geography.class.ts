@@ -101,7 +101,7 @@ export class GeographyConfig {
     { label: 'Yukon', abbreviation: 'YT', country: 'CA' },
   ];
 
-  static getStates(countryCode): StateDefinition[] {
+  static getStates(countryCode: string): StateDefinition[] {
     return this.states.filter(state => state.country === countryCode);
   }
 

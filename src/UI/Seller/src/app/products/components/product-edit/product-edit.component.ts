@@ -189,6 +189,7 @@ export class ProductEditComponent implements OnInit {
         Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null)),
         MinQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MinQuantity, Validators.min(1)),
         MaxQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MaxQuantity, Validators.min(1)),
+        UseCumulativeQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.UseCumulativeQuantity),
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
         ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType'), Validators.required),
         IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
@@ -414,11 +415,14 @@ export class ProductEditComponent implements OnInit {
   }
 
   async removeFile(file: Asset): Promise<void> {
-    let superProduct;
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    superProduct = await MarketplaceSDK.Assets.Delete(file.ID, accessToken);
-    superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
-    this.refreshProductData(superProduct);
+    await MarketplaceSDK.Assets.Delete(file.ID, accessToken);
+    if (file.Type === "Image") {
+      this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(i => i.ID !== file.ID); 
+    } else {
+      this._superMarketplaceProductStatic.Attachments = this._superMarketplaceProductStatic.Attachments.filter(a => a.ID !== file.ID);
+    }
+    this.refreshProductData(this._superMarketplaceProductStatic);
   }
 
   unstageFile(index: number, fileType: string): void {

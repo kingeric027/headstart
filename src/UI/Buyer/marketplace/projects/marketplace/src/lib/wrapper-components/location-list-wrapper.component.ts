@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ListAddress } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { BuyerCreditCard } from 'marketplace-javascript-sdk';
 import { BuyerLocationWithCert } from '../shopper-context';
 
 @Component({
@@ -15,7 +13,7 @@ export class LocationListWrapperComponent implements OnInit {
 
   constructor(public context: ShopperContextService, private activatedRoute: ActivatedRoute) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.locations = this.activatedRoute.snapshot.data.locations;
   }
 }

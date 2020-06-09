@@ -1,17 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, from } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { MeUser, OcMeService, User, UserGroup } from '@ordercloud/angular-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { CreditCardService } from './credit-card.service';
 import { HttpClient } from '@angular/common/http';
-import { CurrenySymbol } from '../../shopper-context';
-
-export interface CurrentUser extends MeUser {
-  FavoriteProductIDs: string[];
-  FavoriteOrderIDs: string[];
-  UserGroups: UserGroup<any>[];
-  Currency: CurrenySymbol;
-}
+import { CurrentUser } from '../../shopper-context';
 
 export interface ICurrentUser {
   cards: CreditCardService;
@@ -50,7 +43,7 @@ export class CurrentUserService implements ICurrentUser {
   }
 
   async reset(): Promise<void> {
-    const requests: any[] = [
+    const requests: Promise<any>[] = [
       this.ocMeService.Get().toPromise(),
       this.ocMeService.ListUserGroups({ pageSize: 100 }).toPromise(),
     ];
@@ -70,15 +63,15 @@ export class CurrentUserService implements ICurrentUser {
     return this.isAnon !== null ? this.isAnon : this.tokenHelper.isTokenAnonymous();
   }
 
-  onChange(callback: (user: CurrentUser) => void) {
+  onChange(callback: (user: CurrentUser) => void): void {
     this.userSubject.subscribe(callback);
   }
 
-  setIsFavoriteProduct(isFav: boolean, productID: string) {
+  setIsFavoriteProduct(isFav: boolean, productID: string): void {
     this.setFavoriteValue(this.favProductsXP, isFav, productID);
   }
 
-  setIsFavoriteOrder(isFav: boolean, orderID: string) {
+  setIsFavoriteOrder(isFav: boolean, orderID: string): void {
     this.setFavoriteValue(this.favOrdersXP, isFav, orderID);
   }
 
@@ -116,7 +109,7 @@ export class CurrentUserService implements ICurrentUser {
 
   private async setFavoriteValue(XpFieldName: string, isFav: boolean, ID: string): Promise<void> {
     if (!this.user.xp || !this.user.xp[XpFieldName]) {
-      this.patch({ xp: { [XpFieldName]: [] } });
+      await this.patch({ xp: { [XpFieldName]: [] } });
     }
     let favorites = this.user.xp[XpFieldName] || [];
     if (isFav && favorites.length >= this.MaxFavorites) {
@@ -127,6 +120,6 @@ export class CurrentUserService implements ICurrentUser {
     } else {
       favorites = favorites.filter(x => x !== ID);
     }
-    this.patch({ xp: { [XpFieldName]: favorites } });
+    await this.patch({ xp: { [XpFieldName]: favorites } });
   }
 }

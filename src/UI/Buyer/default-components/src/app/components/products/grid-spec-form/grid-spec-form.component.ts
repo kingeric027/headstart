@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { ListSpec, PriceSchedule } from '@ordercloud/angular-sdk';
-import { minBy as _minBy } from 'lodash';
 import { LineItem, MarketplaceMeProduct, ShopperContextService } from 'marketplace';
-import { SpecFormService } from '../spec-form/spec-form.service';
+import { SpecFormService, GridSpecOption } from '../spec-form/spec-form.service';
+import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 
 @Component({
     templateUrl: `./grid-spec-form.component.html`,
@@ -11,10 +11,10 @@ export class OCMGridSpecForm {
     @Input() priceSchedule: PriceSchedule;
     _specs: ListSpec;
     _product: MarketplaceMeProduct;
-    specOptions: any;
+    specOptions: string[];
     lineItems: LineItem[] = [];
     lineTotals: number[] = [];
-    totalPrice: number = 0;
+    totalPrice = 0;
     isAddingToCart = false;
 
     constructor(private specFormService: SpecFormService, private context: ShopperContextService) { }
@@ -29,11 +29,11 @@ export class OCMGridSpecForm {
     getSpecOptions(specs: ListSpec): void {
         // creates an object with each spec option and its values
         const obj = {};
-        for (let i = 0; i < specs.Items.length; i++) {
-            specs.Items[i].Options.forEach(option => {
-                let name = specs.Items[i].Name.replace(/ /g, '')
-                obj[name] ? obj[name].push(option.Value) : obj[name] = [option.Value];
-            });
+        for (const spec of specs.Items) {
+            for (const option of spec.Options) {
+                const name = spec.Name.replace(/ /g, '')
+                obj[name] = obj[name] ? obj[name].push(option.Value) : [option.Value];
+            }
         }
         this.specOptions = this.getAllSpecCombinations(obj);
     }
@@ -41,16 +41,18 @@ export class OCMGridSpecForm {
     getAllSpecCombinations(specOptions: object): string[] {
         // returns an array containing every combination of spec values
         const arr = [];
-        for (let key in specOptions) {
-            arr.push(specOptions[key]);
+        for (const specName in specOptions) {
+            if (specOptions.hasOwnProperty(specName)) {
+                arr.push(specOptions[specName]);
+            }
         }
-        if (arr.length == 1) return arr[0];
+        if (arr.length === 1) return arr[0];
         else {
             const result = [];
             const combinations = this.getAllSpecCombinations(arr.slice(1));
-            for (let i = 0; i < combinations.length; i++) {
-                for (let j = 0; j < arr[0].length; j++) {
-                    result.push(arr[0][j] + ', ' + combinations[i]);
+            for (const combination of combinations) {
+                for (const optionValue of arr[0]) {
+                    result.push(optionValue + ', ' + combination);
                 }
             }
             result.forEach(() => this.lineTotals.push(0));
@@ -58,27 +60,27 @@ export class OCMGridSpecForm {
         }
     }
 
-    changeQuantity(specs, event): void {
+    changeQuantity(specs: string, event: QtyChangeEvent): void {
         const indexOfSpec = this.specOptions.indexOf(specs);
-        specs = specs.split(',');
-        specs = specs.map(x => x.replace(/\s/g, ''));
+        let specArray = specs.split(',');
+        specArray = specArray.map(x => x.replace(/\s/g, ''));
         const item = {
             Quantity: event.qty,
             Product: this._product,
             ProductID: this._product.ID,
-            Specs: this.specFormService.getGridLineItemSpecs(this._specs, specs)
+            Specs: this.specFormService.getGridLineItemSpecs(this._specs, specArray)
         };
         const i = this.lineItems.findIndex(li => JSON.stringify(li.Specs) === JSON.stringify(item.Specs));
         if (i === -1) this.lineItems.push(item);
         else this.lineItems[i] = item;
-        this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, this.specFormService.getGridLineItemSpecs(this._specs, specs));
+        this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, this.specFormService.getGridLineItemSpecs(this._specs, specArray));
         this.totalPrice = this.getTotalPrice();
     }
 
-    getLineTotal(qty: number, specs: any): number {
+    getLineTotal(qty: number, options: GridSpecOption[]): number {
         let markup = 0;
-        let price = this.priceSchedule?.PriceBreaks[0].Price;
-        specs.forEach(spec => markup += spec.Markup);
+        const price = this.priceSchedule?.PriceBreaks[0].Price;
+        options.forEach(spec => markup += spec.Markup);
         return (markup + price) * qty;
     }
 

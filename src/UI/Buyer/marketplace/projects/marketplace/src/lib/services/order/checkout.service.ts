@@ -63,14 +63,6 @@ export class CheckoutService implements ICheckout {
     return orderID;
   }
 
-  private async submit(): Promise<string> {
-    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    await this.incrementOrderIfNeeded();
-    const submittedOrder = await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
-    await this.state.reset();
-    return submittedOrder.ID;
-  }
-
   async addComment(comment: string): Promise<MarketplaceOrder> {
     return await this.patch({ Comments: comment });
   }
@@ -160,28 +152,6 @@ export class CheckoutService implements ICheckout {
     return this.order;
   }
 
-  // Private Methods
-
-  private async createCCPayment(
-    partialAccountNum: string,
-    cardType: string,
-    creditCardID: string,
-    amount: number
-  ): Promise<Payment> {
-    const payment = {
-      Amount: amount,
-      DateCreated: new Date().toDateString(),
-      Accepted: false,
-      Type: 'CreditCard',
-      CreditCardID: creditCardID,
-      xp: {
-        partialAccountNumber: partialAccountNum,
-        cardType: cardType,
-      },
-    };
-    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
-  }
-
   async createPurchaseOrderPayment(amount: number): Promise<Payment> {
     const payment = {
       Amount: amount,
@@ -197,6 +167,35 @@ export class CheckoutService implements ICheckout {
       this.ocPaymentService.Delete('outgoing', this.order.ID, payment.ID).toPromise()
     );
     return Promise.all(deleteAll);
+  }
+
+  // Private Methods
+  private async submit(): Promise<string> {
+    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
+    await this.incrementOrderIfNeeded();
+    const submittedOrder = await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
+    await this.state.reset();
+    return submittedOrder.ID;
+  }
+
+  private async createCCPayment(
+    partialAccountNum: string,
+    cardType: string,
+    creditCardID: string,
+    amount: number
+  ): Promise<Payment> {
+    const payment = {
+      Amount: amount,
+      DateCreated: new Date().toDateString(),
+      Accepted: false,
+      Type: 'CreditCard',
+      CreditCardID: creditCardID,
+      xp: {
+        partialAccountNumber: partialAccountNum,
+        cardType,
+      },
+    };
+    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
   }
 
   private async patch(order: MarketplaceOrder): Promise<MarketplaceOrder> {

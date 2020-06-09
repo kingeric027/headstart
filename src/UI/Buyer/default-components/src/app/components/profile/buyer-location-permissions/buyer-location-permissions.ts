@@ -33,7 +33,6 @@ export class OCMBuyerLocationPermissions {
   constructor(private context: ShopperContextService) {}
 
   async updateLocationUsers(locationID: string): Promise<void> {
-    console.log(this.permissionTypes);
     const locationUsersListPage = await this.context.userManagementService.getLocationUsers(locationID);
     this.locationUsers = locationUsersListPage.Items;
   }

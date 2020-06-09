@@ -30,7 +30,6 @@ namespace Marketplace.Orchestration
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
                 .Inject<IOrderCloudClient>()
                 .Inject<IFlurlClient>()
-                .Inject<IFreightPopService>()
                 .Inject<IOrderCloudClient>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()

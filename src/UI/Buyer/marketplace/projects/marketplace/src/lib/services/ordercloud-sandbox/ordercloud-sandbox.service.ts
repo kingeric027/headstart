@@ -16,7 +16,7 @@ export class OrderCloudSandboxService {
     this.baseUrl = `${appSettings.orderCloudApiUrl}/v1`;
   }
 
-  generateHeaders() {
+  generateHeaders(): { headers: HttpHeaders } {
     return {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',

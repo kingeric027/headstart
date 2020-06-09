@@ -14,9 +14,9 @@ export class OCMAddressSuggestion implements OnInit {
   faCheckSquare = faCheckSquare;
   constructor(public context: ShopperContextService) {}
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 
-  setActiveAddress(address) {
+  setActiveAddress(address: BuyerAddress): void {
     this.activeAddress = address;
     this.selectedAddress.emit(address);
   }

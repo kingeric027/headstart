@@ -56,22 +56,31 @@ export const getOrderSummaryMeta = (
 ): OrderSummaryMeta => {
   const StandardLineItems = getStandardLineItems(lineItems);
   const POLineItems = getPurchaseOrderLineItems(lineItems);
-  const StandardLineItemCount = StandardLineItems.length;
-  const POLineItemCount = POLineItems.length;
 
   const ShippingAndTaxOverrideText = getOverrideText(checkoutPanel);
-  const ShouldHideShippingAndText = !!ShippingAndTaxOverrideText;
 
-  const ShippingCost = order.ShippingCost;
-  const TaxCost = order.TaxCost;
+  const shouldHideShippingAndText = !!ShippingAndTaxOverrideText;
 
   const CreditCardDisplaySubtotal = StandardLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
-  const CreditCardTotal = getCreditCardTotal(CreditCardDisplaySubtotal, ShippingCost, TaxCost, ShouldHideShippingAndText);
+  const CreditCardTotal = getCreditCardTotal(CreditCardDisplaySubtotal, order.ShippingCost, order.TaxCost, shouldHideShippingAndText);
 
   const POTotal = POLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
   const OrderTotal = POTotal + CreditCardTotal;
 
-  return {StandardLineItemCount, StandardLineItems, POLineItemCount, POLineItems, ShippingAndTaxOverrideText, ShouldHideShippingAndText, CreditCardDisplaySubtotal, ShippingCost, TaxCost, POTotal, CreditCardTotal, OrderTotal }
+  return {
+    StandardLineItemCount: StandardLineItems.length, 
+    StandardLineItems,
+    POLineItemCount: POLineItems.length,
+    POLineItems, 
+    ShippingAndTaxOverrideText, 
+    ShouldHideShippingAndText: shouldHideShippingAndText, 
+    CreditCardDisplaySubtotal, 
+    ShippingCost: order.ShippingCost, 
+    TaxCost: order.TaxCost, 
+    POTotal, 
+    CreditCardTotal, 
+    OrderTotal 
+  };
 }
 
 

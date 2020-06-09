@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 
 // 3rd party
-import { BuyerAddress, Address, ListBuyerAddress } from '@ordercloud/angular-sdk';
+import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
 import { ValidateName, ValidateUSZip, ValidatePhone } from '../../../validators/validators';
 import { GeographyConfig } from '../../../config/geography.class';
 
@@ -57,7 +57,7 @@ export class OCMAddressForm implements OnInit {
     this.onCountryChange();
   }
 
-  onCountryChange(event?): void {
+  onCountryChange(event?: any): void {
     const country = this.addressForm.value.Country;
     this.stateOptions = GeographyConfig.getStates(country).map(s => s.abbreviation);
     this.addressForm.get('Zip').setValidators([Validators.required, ValidateUSZip]);
@@ -66,8 +66,8 @@ export class OCMAddressForm implements OnInit {
     }
   }
 
-  useSuggestedAddress(event) {
-    this.selectedAddress = event.detail;
+  useSuggestedAddress(address: BuyerAddress): void {
+    this.selectedAddress = address;
   }
 
   onSubmit(): void {

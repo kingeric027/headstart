@@ -7,6 +7,7 @@ import { BuyerLocationTableComponent } from './components/locations/buyer-locati
 import { BuyerPaymentTableComponent } from './components/payments/buyer-payment-table/buyer-payment-table.component';
 import { BuyerApprovalTableComponent } from './components/approvals/buyer-approval-table/buyer-approval-table.component';
 import { BuyerCategoryTableComponent } from './components/categories/buyer-category-table/buyer-category-table.component';
+import { BuyerCatalogTableComponent } from './components/catalogs/buyer-catalog-table/buyer-catalog-table.component';
 
 const routes: Routes = [
   { path: '', component: BuyerTableComponent },
@@ -38,6 +39,12 @@ const routes: Routes = [
   {
     path: ':buyerID/categories/:categoryID',
     component: BuyerCategoryTableComponent,
+  },
+  { path: ':buyerID/catalogs', component: BuyerCatalogTableComponent },
+  { path: ':buyerID/catalogs/new', component: BuyerCatalogTableComponent },
+  {
+    path: ':buyerID/catalogs/:catalogID',
+    component: BuyerCatalogTableComponent,
   },
 ];
 

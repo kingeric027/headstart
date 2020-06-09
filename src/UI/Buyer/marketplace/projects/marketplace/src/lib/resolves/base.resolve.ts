@@ -18,7 +18,7 @@ export class BaseResolve implements Resolve<any> {
     private productCategories: ProductCategoriesService
   ) {}
 
-  async resolve() {
+  async resolve(): Promise<void> {
     const user = this.currentUser.reset();
     const order = this.currentOrder.reset();
     const ordersToApprove = this.ordersToApprove.reset();

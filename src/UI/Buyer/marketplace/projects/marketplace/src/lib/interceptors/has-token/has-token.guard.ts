@@ -18,26 +18,21 @@ export class HasTokenGuard implements CanActivate {
     @Inject(DOCUMENT) private document: any,
     private appConfig: AppConfig
   ) {}
-  async canActivate(): Promise<boolean> {
-    /**
-     * very simple test to make sure a token exists,
-     * can be parsed and has a valid expiration time.
-     *
-     * Shouldn't be depended on for actual token validation.
-     * The API will block invalid tokens
-     * and the client-side refresh-token interceptor will handle it correctly
-     */
 
+  /**
+   * very simple test to make sure a token exists,
+   * can be parsed and has a valid expiration time.
+   *
+   * Shouldn't be depended on for actual token validation.
+   * The API will block invalid tokens
+   * and the client-side refresh-token interceptor will handle it correctly
+   */
+  async canActivate(): Promise<boolean> {
     // check for impersonation superseeds existing tokens to allow impersonating buyers sequentially.
-    const isImpersonating = this.document.location.pathname === '/impersonation';
-    if (isImpersonating) {
-      const match = /token=([^&]*)/.exec(this.document.location.search);
-      if (match) {
-        this.auth.setToken(match[1]);
-        return true;
-      } else {
-        throw Error("Missing url query param 'token'");
-      }
+    if (this.isImpersonating()) {
+      const token = this.getImpersonationToken();
+      this.auth.setToken(token);
+      return true;
     }
 
     const isAccessTokenValid = this.isTokenValid();
@@ -59,6 +54,16 @@ export class HasTokenGuard implements CanActivate {
     }
     this.auth.isLoggedIn = true;
     return isAccessTokenValid;
+  }
+
+  private isImpersonating(): boolean {
+    return this.document.location.pathname === '/impersonation';
+  }
+
+  private getImpersonationToken(): string {
+    const match = /token=([^&]*)/.exec(this.document.location.search);
+    if (!match) throw Error(`Missing url query param 'token'`);
+    return match[1];
   }
 
   private isTokenValid(): boolean {

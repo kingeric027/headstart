@@ -4,7 +4,6 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { SupplierFilters } from '../../shopper-context';
 import { OcSupplierService, ListSupplier } from '@ordercloud/angular-sdk';
-import { cloneDeep as _cloneDeep } from 'lodash';
 
 export interface ISupplierFilters {
   activeFiltersSubject: BehaviorSubject<SupplierFilters>;
@@ -23,11 +22,11 @@ export interface ISupplierFilters {
   providedIn: 'root',
 })
 export class SupplierFilterService implements ISupplierFilters {
-  private readonly nonFilterQueryParams = ['page', 'sortBy', 'search'];
-
   public activeFiltersSubject: BehaviorSubject<SupplierFilters> = new BehaviorSubject<SupplierFilters>(
     this.getDefaultParms()
   );
+
+  private readonly nonFilterQueryParams = ['page', 'sortBy', 'search'];
 
   constructor(
     private router: Router,
@@ -40,19 +39,6 @@ export class SupplierFilterService implements ISupplierFilters {
       } else {
         this.activeFiltersSubject.next(this.getDefaultParms());
       }
-    });
-  }
-
-  // Handle URL updates
-  private readFromUrlQueryParams(params: Params): void {
-    const { page, sortBy, search, supplierID } = params;
-    const activeFilters = _pickBy(params, (_value, _key) => !this.nonFilterQueryParams.includes(_key));
-    this.activeFiltersSubject.next({
-      page,
-      sortBy,
-      search,
-      supplierID,
-      activeFilters,
     });
   }
 
@@ -74,10 +60,58 @@ export class SupplierFilterService implements ISupplierFilters {
       .toPromise();
   }
 
-  private patchFilterState(patch: SupplierFilters) {
-    const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
-    const queryParams = this.mapToUrlQueryParams(activeFilters);
-    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
+  toSupplier(supplierID: string): void {
+    this.patchFilterState({
+      supplierID: supplierID || undefined,
+      page: undefined,
+    });
+  }
+
+  toPage(pageNumber: number): void {
+    this.patchFilterState({ page: pageNumber || undefined });
+  }
+
+  sortBy(field: string): void {
+    this.patchFilterState({ sortBy: field || undefined, page: undefined });
+  }
+
+  filterByFields(filter: any): void {
+    const activeFilters = this.activeFiltersSubject.value.activeFilters || {};
+    const newActiveFilters = { ...activeFilters, ...filter };
+    this.patchFilterState({ activeFilters: newActiveFilters, page: undefined });
+  }
+  searchBy(searchTerm: string): void {
+    this.patchFilterState({ search: searchTerm || undefined, page: undefined });
+  }
+
+  clearSort(): void {
+    this.sortBy(undefined);
+  }
+
+  clearSearch(): void {
+    this.searchBy(undefined);
+  }
+
+  clearAllFilters(): void {
+    this.patchFilterState(this.getDefaultParms());
+  }
+
+  hasFilters(): boolean {
+    const filters = this.activeFiltersSubject.value;
+    return Object.entries(filters).some(([key, value]) => !!value);
+  }
+
+  // Handle URL updates
+  private readFromUrlQueryParams(params: Params): void {
+    const { page, sortBy, search, supplierID } = params;
+    const activeFilters = _pickBy(params, (_value, _key) => !this.nonFilterQueryParams.includes(_key));
+    this.activeFiltersSubject.next({
+      page,
+      sortBy,
+      search,
+      supplierID,
+      activeFilters,
+    });
   }
 
   private getDefaultParms(): SupplierFilters {
@@ -91,54 +125,19 @@ export class SupplierFilterService implements ISupplierFilters {
     };
   }
 
-  private createFilters(activeFilters, supplierID): any {
+  private createFilters(activeFilters: any, supplierID: string): any {
     const filters = _transform(
       activeFilters,
-      (result, value, key: any) => (result[key.toLocaleLowerCase()] = value),
+      (result, value, key: string) => (result[key.toLocaleLowerCase()] = value),
       {}
     );
     filters.ID = supplierID || undefined;
     return filters;
   }
 
-  toSupplier(supplierID: string) {
-    this.patchFilterState({
-      supplierID: supplierID || undefined,
-      page: undefined,
-    });
-  }
-
-  toPage(pageNumber: number) {
-    this.patchFilterState({ page: pageNumber || undefined });
-  }
-
-  sortBy(field: string) {
-    this.patchFilterState({ sortBy: field || undefined, page: undefined });
-  }
-
-  filterByFields(filter: any) {
-    const activeFilters = this.activeFiltersSubject.value.activeFilters || {};
-    const newActiveFilters = { ...activeFilters, ...filter };
-    this.patchFilterState({ activeFilters: newActiveFilters, page: undefined });
-  }
-  searchBy(searchTerm: string) {
-    this.patchFilterState({ search: searchTerm || undefined, page: undefined });
-  }
-
-  clearSort() {
-    this.sortBy(undefined);
-  }
-
-  clearSearch() {
-    this.searchBy(undefined);
-  }
-
-  clearAllFilters() {
-    this.patchFilterState(this.getDefaultParms());
-  }
-
-  hasFilters(): boolean {
-    const filters = this.activeFiltersSubject.value;
-    return Object.entries(filters).some(([key, value]) => !!value);
+  private patchFilterState(patch: SupplierFilters): void {
+    const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
+    const queryParams = this.mapToUrlQueryParams(activeFilters);
+    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
   }
 }

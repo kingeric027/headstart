@@ -38,12 +38,16 @@ export class ProductCategoriesService implements ICategories {
     return this.categoryBreadCrumbs;
   }
 
-  setActiveCategoryID(value: string) {
+  setActiveCategoryID(value: string): void {
     this.activeCategoryID = value;
     this.categoryBreadCrumbs = this.buildCategoryCrumbs(this.allCategories, value);
   }
 
-  private buildCategoryCrumbs(allCategories: Category[], activeCategoryID: string, progress = []): Category[] {
+  private buildCategoryCrumbs(
+    allCategories: Category[],
+    activeCategoryID: string,
+    progress: Category[] = []
+  ): Category[] {
     if (!activeCategoryID || !activeCategoryID || allCategories.length < 1) {
       return progress;
     }

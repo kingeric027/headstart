@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using ordercloud.integrations.freightpop;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
-using Marketplace.Common.Services.ShippingIntegration.Models;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
+using ordercloud.integrations.exchangerates;
+using ordercloud.integrations.freightpop;
 
 namespace Marketplace.Tests
 {
@@ -16,9 +16,11 @@ namespace Marketplace.Tests
         {
             // Arrange
             var testRates = GetShippingRatesFullList();
+            var orderCurrency = CurrencySymbol.USD;
+            var exchangeRates = new List<OrderCloudIntegrationsConversionRate>();
 
             // Act
-            var result = ShipmentEstimateMethodsMapper.Map(testRates);
+            var result = ShipmentEstimateMethodsMapper.Map(testRates, orderCurrency, exchangeRates);
 
             // Assert
             var expectedProposedShipments = GetProposedShipmentCheapestList();

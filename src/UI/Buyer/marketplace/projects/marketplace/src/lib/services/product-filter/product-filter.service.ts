@@ -5,7 +5,6 @@ import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { ProductFilters } from '../../shopper-context';
 import { OcMeService, ListProduct } from '@ordercloud/angular-sdk';
-import { cloneDeep as _cloneDeep } from 'lodash';
 import { ProductCategoriesService } from '../product-categories/product-categories.service';
 
 export interface IProductFilters {
@@ -29,12 +28,12 @@ export interface IProductFilters {
   providedIn: 'root',
 })
 export class ProductFilterService implements IProductFilters {
-  // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
-  private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
-
   public activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(
     this.getDefaultParms()
   );
+
+  // TODO - allow app devs to filter by custom xp that is not a facet. Create functions for this.
+  private readonly nonFacetQueryParams = ['page', 'sortBy', 'categoryID', 'search', 'favorites'];
 
   constructor(
     private router: Router,
@@ -50,15 +49,6 @@ export class ProductFilterService implements IProductFilters {
         this.activeFiltersSubject.next(this.getDefaultParms());
       }
     });
-  }
-
-  // Handle URL updates
-  private readFromUrlQueryParams(params: Params): void {
-    const { page, sortBy, search, categoryID } = params;
-    this.categories.setActiveCategoryID(categoryID);
-    const showOnlyFavorites = !!params.favorites;
-    const activeFacets = _pickBy(params, (_value, _key) => !this.nonFacetQueryParams.includes(_key));
-    this.activeFiltersSubject.next({ page, sortBy, search, categoryID, showOnlyFavorites, activeFacets });
   }
 
   // Used to update the URL
@@ -91,67 +81,49 @@ export class ProductFilterService implements IProductFilters {
       .toPromise();
   }
 
-  private patchFilterState(patch: ProductFilters) {
-    const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
-    const queryParams = this.mapToUrlQueryParams(activeFilters);
-    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
-  }
-
-  private getDefaultParms() {
-    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
-    return {
-      page: undefined,
-      sortBy: undefined,
-      search: undefined,
-      categoryID: undefined,
-      showOnlyFavorites: false,
-      activeFacets: {},
-    };
-  }
-
-  toPage(pageNumber: number) {
+  toPage(pageNumber: number): void {
     this.patchFilterState({ page: pageNumber || undefined });
   }
 
-  sortBy(field: string) {
+  sortBy(field: string): void {
     this.patchFilterState({ sortBy: field || undefined, page: undefined });
   }
 
-  searchBy(searchTerm: string) {
+  searchBy(searchTerm: string): void {
     this.patchFilterState({ search: searchTerm || undefined, page: undefined });
   }
 
-  filterByFacet(field: string, value: string) {
+  filterByFacet(field: string, value: string): void {
     const activeFacets = this.activeFiltersSubject.value.activeFacets || {};
     activeFacets[field] = value || undefined;
     this.patchFilterState({ activeFacets, page: undefined });
   }
 
-  filterByCategory(categoryID: string) {
+  filterByCategory(categoryID: string): void {
     this.patchFilterState({ categoryID: categoryID || undefined, page: undefined });
   }
 
-  filterByFavorites(showOnlyFavorites: boolean) {
+  filterByFavorites(showOnlyFavorites: boolean): void {
     this.patchFilterState({ showOnlyFavorites, page: undefined });
   }
 
-  clearSort() {
+  clearSort(): void {
     this.sortBy(undefined);
   }
 
-  clearSearch() {
+  clearSearch(): void {
     this.searchBy(undefined);
   }
 
-  clearFacetFilter(field: string) {
+  clearFacetFilter(field: string): void {
     this.filterByFacet(field, undefined);
   }
 
-  clearCategoryFilter() {
+  clearCategoryFilter(): void {
     this.filterByCategory(undefined);
   }
 
-  clearAllFilters() {
+  clearAllFilters(): void {
     this.patchFilterState(this.getDefaultParms());
   }
 
@@ -164,5 +136,32 @@ export class ProductFilterService implements IProductFilters {
         return !!value;
       }
     });
+  }
+
+  private patchFilterState(patch: ProductFilters): void {
+    const activeFilters = { ...this.activeFiltersSubject.value, ...patch };
+    const queryParams = this.mapToUrlQueryParams(activeFilters);
+    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
+  }
+
+  private getDefaultParms(): ProductFilters {
+    // default params are grabbed through a function that returns an anonymous object to avoid pass by reference bugs
+    return {
+      page: undefined,
+      sortBy: undefined,
+      search: undefined,
+      categoryID: undefined,
+      showOnlyFavorites: false,
+      activeFacets: {},
+    };
+  }
+
+  // Handle URL updates
+  private readFromUrlQueryParams(params: Params): void {
+    const { page, sortBy, search, categoryID } = params;
+    this.categories.setActiveCategoryID(categoryID);
+    const showOnlyFavorites = !!params.favorites;
+    const activeFacets = _pickBy(params, (_value, _key) => !this.nonFacetQueryParams.includes(_key));
+    this.activeFiltersSubject.next({ page, sortBy, search, categoryID, showOnlyFavorites, activeFacets });
   }
 }
