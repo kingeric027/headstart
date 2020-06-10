@@ -166,7 +166,7 @@
   </div>
   <div *ngIf="suggestedAddresses?.length > 0">
     <address-suggestion [suggestedAddresses]="suggestedAddresses"
-                        (selectedAddress)="useSuggestedAddress($event)"></address-suggestion>
+                        (selectedAddress)="useSuggestedAddress($event.detail)"></address-suggestion>
   </div>
   <div class="d-flex justify-content-start align-items-center">
     <button type="submit"

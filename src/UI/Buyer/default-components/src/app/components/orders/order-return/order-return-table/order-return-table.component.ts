@@ -16,7 +16,20 @@ export class OCMOrderReturnTable {
   selection = new SelectionModel<FormGroup>(true, []);
   _liGroup: MarketplaceLineItem[];
   quantitiesToReturn: number[] = [];
-  returnReasons: ReturnReason[] = [ReturnReason.IncorrectSizeOrStyle, ReturnReason.IncorrectShipment, ReturnReason.DoesNotMatchDescription, ReturnReason.ProductDefective, ReturnReason.PackagingDamaged, ReturnReason.ReceivedExtraProduct, ReturnReason.ArrivedLate, ReturnReason.PurchaseMistake, ReturnReason.NotNeeded, ReturnReason.NotApproved, ReturnReason.UnappliedDiscount, ReturnReason.ProductMissing];
+  returnReasons: ReturnReason[] = [
+    ReturnReason.IncorrectSizeOrStyle, 
+    ReturnReason.IncorrectShipment, 
+    ReturnReason.DoesNotMatchDescription, 
+    ReturnReason.ProductDefective, 
+    ReturnReason.PackagingDamaged, 
+    ReturnReason.ReceivedExtraProduct, 
+    ReturnReason.ArrivedLate, 
+    ReturnReason.PurchaseMistake, 
+    ReturnReason.NotNeeded, 
+    ReturnReason.NotApproved, 
+    ReturnReason.UnappliedDiscount, 
+    ReturnReason.ProductMissing
+  ];
   lineItems: FormArray;
   
   @Input() set liGroup(value: MarketplaceLineItem[]) {

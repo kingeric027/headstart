@@ -66,6 +66,12 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toImage: '',
     toExpandable: false,
   },
+  catalogs: {
+    toPrimaryHeader: 'Name',
+    toSecondaryHeader: 'ID',
+    toImage: '',
+    toExpandable: false,
+  },
   categories: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
@@ -85,6 +91,7 @@ export interface ResourceColumnConfiguration {
   header: string;
   type: string;
   sortable: boolean;
+  queryRestriction?: string;
 }
 
 export interface ResourceConfiguration {
@@ -108,6 +115,7 @@ export interface ResourceConfigurationDictionary {
 }
 
 export const STRING_WITH_IMAGE = 'STRING_WITH_IMAGE';
+export const BOOLEAN = 'BOOLEAN';
 export const BASIC_STRING = 'BASIC_STRING';
 export const DATE_TIME = 'DATE_TIME';
 export const CURRENCY = 'CURRENCY';
@@ -279,6 +287,23 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     ],
     imgPath: '',
   },
+  catalogs: {
+    fields: [
+      {
+        path: 'Name',
+        header: 'Name',
+        type: BASIC_STRING,
+        sortable: true,
+      },
+      {
+        path: 'ID',
+        header: 'ID',
+        type: BASIC_STRING,
+        sortable: true,
+      },
+    ],
+    imgPath: '',
+  },
   categories: {
     fields: [
       {
@@ -345,6 +370,20 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         header: 'Comments',
         type: BASIC_STRING,
         sortable: false,
+      },
+      {
+        path: 'xp.OrderReturnInfo.HasReturn',
+        header: 'Has Claims',
+        type: BOOLEAN,
+        sortable: false,
+        queryRestriction: 'OrderDirection=Incoming'
+      },
+      {
+        path: 'xp.OrderReturnInfo.Comment',
+        header: 'Return Comment',
+        type: BASIC_STRING,
+        sortable: false,
+        queryRestriction: 'OrderDirection=Incoming'
       },
     ],
     imgPath: '',

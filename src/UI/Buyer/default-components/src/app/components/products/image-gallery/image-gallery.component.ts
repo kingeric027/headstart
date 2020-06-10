@@ -1,13 +1,16 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { fromEvent } from 'rxjs';
+import { AssetForDelivery } from 'marketplace-javascript-sdk';
 
 @Component({
   templateUrl: './image-gallery.component.html',
   styleUrls: ['./image-gallery.component.scss'],
 })
-export class OCMImageGallery implements OnInit {
+export class OCMImageGallery implements OnInit, OnChanges {
   @Input() imgUrls: string[] = [];
+  @Input() imgs: AssetForDelivery[] = [];
+  @Input() specs: any[] = [];
 
   // gallerySize can be changed and the component logic + behavior will all work. However, the UI may look wonky.
   readonly gallerySize = 5;
@@ -26,6 +29,12 @@ export class OCMImageGallery implements OnInit {
     fromEvent(window, 'resize').subscribe(() => this.onResize());
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.specs) {
+      this.onSpecsChange();
+    }
+  }
+
   onResize(): void {
     // this.isResponsiveView = window.innerWidth > 900;
     this.isResponsiveView = true;
@@ -35,12 +44,36 @@ export class OCMImageGallery implements OnInit {
     this.selectedIndex = this.imgUrls.indexOf(url);
   }
 
-  isSelected(url: string): boolean {
-    return this.imgUrls.indexOf(url) === this.selectedIndex;
+  isSelected(image: AssetForDelivery): boolean {
+    return this.imgUrls.indexOf(image.Url) === this.selectedIndex;
   }
 
-  getGallery(): string[] {
-    return this.imgUrls.slice(this.startIndex, this.endIndex + 1);
+  isImageMatchingSpecs(image: AssetForDelivery): boolean {
+    //Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
+    return this.specs
+      .every(spec => image.Tags
+      .find(tag => tag
+      .split('-')
+      .includes(spec.replace(/\s/g, ''))));
+  }
+
+  onSpecsChange(): void {
+    let image;
+    if (this.imgs.length === 1) {
+      image = this.imgs[0];
+    } else {
+      image = this.imgs.find(img => this.isImageMatchingSpecs(img));
+    }
+    if (image) {
+      this.select(image.Url);
+    } else {
+      //If no specs/tags match, grab the primary image
+      this.select(this.imgs[0].Url);
+    }
+  }
+
+  getGallery(): AssetForDelivery[] {
+    return this.imgs.slice(this.startIndex, this.endIndex + 1);
   }
 
   forward(): void {

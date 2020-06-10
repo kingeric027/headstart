@@ -15,18 +15,14 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.products = this.activatedRoute.snapshot.data.products;
     this.context.productFilters.activeFiltersSubject
       .pipe(takeWhile(() => this.alive))
       .subscribe(this.handleFiltersChange);
   }
 
-  private handleFiltersChange = async () => {
-    this.products = await this.context.productFilters.listProducts();
-  };
-
-  configureRouter() {
+  configureRouter(): void {
     this.router.events.subscribe(evt => {
       if (evt instanceof NavigationEnd) {
         this.router.navigated = false; // TODO - what exactly does this line acomplish?
@@ -35,7 +31,11 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
   }
+
+  private handleFiltersChange = async (): Promise<void> => {
+    this.products = await this.context.productFilters.listProducts();
+  };
 }

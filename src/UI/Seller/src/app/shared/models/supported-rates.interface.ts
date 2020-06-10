@@ -4,3 +4,9 @@ export interface SupportedRates {
   Name: string;
   Icon?: string;
 }
+
+export enum SupportedCurrencies {
+  USD = 'USD',
+  CAD = 'CAD',
+  EUR = 'EUR',
+}

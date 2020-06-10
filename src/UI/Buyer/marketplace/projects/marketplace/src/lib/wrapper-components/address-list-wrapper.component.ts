@@ -13,7 +13,7 @@ export class AddressListWrapperComponent implements OnInit {
 
   constructor(public context: ShopperContextService, private activatedRoute: ActivatedRoute) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.addresses = this.activatedRoute.snapshot.data.addresses;
   }
 }

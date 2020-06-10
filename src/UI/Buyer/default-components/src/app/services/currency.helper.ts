@@ -1,6 +1,6 @@
-import { ExchangeRates } from 'marketplace/projects/marketplace/src/lib/services/exchange-rates/exchange-rates.service';
-import { BuyerCurrency } from '../components/products/product-card/product-card.component';
 import { ListPage } from '../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+import { BuyerCurrency } from '../models/currency.interface';
+import { ExchangeRates } from 'marketplace';
 
 export function exchange(
   rates: ListPage<ExchangeRates>,
@@ -8,9 +8,9 @@ export function exchange(
   productCurrency: string,
   orderCurrency: string
 ): BuyerCurrency {
-  const targetRate = rates.Items.find(r => r.Currency === (productCurrency || 'USD'));
+  const targetRate = rates.Items.find(r => r.Currency === productCurrency);
   return {
-    Price: price / targetRate.Rate,
+    Price: price / targetRate?.Rate,
     Currency: orderCurrency,
   };
 }

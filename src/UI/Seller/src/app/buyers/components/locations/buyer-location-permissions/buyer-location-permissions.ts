@@ -34,7 +34,6 @@ export class BuyerLocationPermissions {
 
   async updateLocationUsers(locationID: string): Promise<void> {
     this.locationUsers = await this.buyerLocationService.getLocationUsers(locationID);
-    console.log(this.locationUsers);
   }
 
   async updateUserPermissionAssignments(locationID: string): Promise<void> {

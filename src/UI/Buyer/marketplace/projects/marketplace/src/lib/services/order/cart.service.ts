@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { listAll } from '../../functions/listAll';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { MarketplaceLineItem, MarketplaceOrder, MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { AppConfig } from '../../shopper-context';
 
@@ -122,7 +122,6 @@ export class CartService implements ICart {
       this.state.reset();
     }
   }
-  y;
 
   private async upsertLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     this.onAdd.next(lineItem);

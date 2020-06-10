@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit } from '@angular/core';
 import { get as _get } from 'lodash';
 import { FormGroup } from '@angular/forms';
-import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
+import { SupportedRates, SupportedCurrencies } from '@app-seller/shared/models/supported-rates.interface';
 import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 import { SupplierService } from '../supplier.service';
 @Component({
@@ -24,6 +24,9 @@ export class SupplierEditComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.availableCurrencies = await this.ocIntegrations.getAvailableCurrencies();
+    this.availableCurrencies = this.availableCurrencies.filter(c =>
+      Object.values(SupportedCurrencies).includes(SupportedCurrencies[c.Currency])
+    );
   }
 
   updateResourceFromEvent(event: any, field: string): void {

@@ -30,7 +30,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, Route("supportedrates")]
-        public async Task<List<OrderCloudIntegrationsConversionRate>> GetRateList()
+        public async Task<ListPage<OrderCloudIntegrationsConversionRate>> GetRateList()
         {
             var list = await _command.GetRateList();
             return list;

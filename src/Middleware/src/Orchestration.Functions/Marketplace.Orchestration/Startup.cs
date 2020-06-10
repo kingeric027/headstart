@@ -9,8 +9,8 @@ using Marketplace.Orchestration;
 using Flurl.Http;
 using Marketplace.Common.Commands.SupplierSync;
 using OrderCloud.SDK;
-using Marketplace.Common.Services.FreightPop;
 using ordercloud.integrations.library;
+using ordercloud.integrations.freightpop;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration
@@ -30,7 +30,6 @@ namespace Marketplace.Orchestration
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
                 .Inject<IOrderCloudClient>()
                 .Inject<IFlurlClient>()
-                .Inject<IFreightPopService>()
                 .Inject<IOrderCloudClient>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()

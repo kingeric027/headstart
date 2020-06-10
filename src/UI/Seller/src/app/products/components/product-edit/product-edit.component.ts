@@ -88,8 +88,9 @@ export class ProductEditComponent implements OnInit {
   documentName: string;
   selectedTabIndex = 0;
   editPriceBreaks = false;
-  newPrice: number;
-  newQty: number;
+  newPriceBreakPrice: number = 0;
+  newPriceBreakQty: number = 2;
+  newProductPriceBreaks = [];
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
@@ -188,6 +189,7 @@ export class ProductEditComponent implements OnInit {
         Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null)),
         MinQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MinQuantity, Validators.min(1)),
         MaxQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MaxQuantity, Validators.min(1)),
+        UseCumulativeQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.UseCumulativeQuantity),
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
         ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType'), Validators.required),
         IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
@@ -224,11 +226,10 @@ export class ProductEditComponent implements OnInit {
   async createNewProduct(): Promise<void> {
     try {
       this.dataIsSaving = true;
+      this.newProductPriceBreaks.forEach(pb => this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.push(pb));
       const superProduct = await this.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
       if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
-      if (this.staticContentFiles.length > 0) {
-        await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
-      }
+      if (this.staticContentFiles.length > 0) await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
       this.refreshProductData(superProduct);
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
       this.dataIsSaving = false;
@@ -280,38 +281,56 @@ export class ProductEditComponent implements OnInit {
   }
 
   handleUpdatePriceBreaks(event: any, field: string): void {
-    field === "price" ? this.newPrice = event.target.value : this.newQty = event.target.value;
+    field === "price" ? this.newPriceBreakPrice = event.target.value : this.newPriceBreakQty = event.target.value;
+  }
+
+  handlePriceBreakErrors(priceBreaks: PriceBreak[]): boolean {
+    let hasError = false;
+    if (priceBreaks.some(pb => pb.Price === Number(this.newPriceBreakPrice))) {
+      this.toasterService.error('A Price Break with that price already exists');
+      hasError = true;
+    }
+    if (priceBreaks.some(pb => pb.Quantity === Number(this.newPriceBreakQty))) {
+      this.toasterService.error('A Price Break with that quantity already exists');
+      hasError = true;
+    }
+    if (this.newPriceBreakQty < 2) {
+      this.toasterService.error('Please enter a quantity of two or more');
+      hasError = true;
+    }
+    return hasError;
   }
 
   addPriceBreak() {
-    this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.push({ Quantity: Number(this.newQty), Price: Number(this.newPrice) });
-    const uniqueBreaks = this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.filter((priceBreak, i, arr) =>
-      i === arr.findIndex((pb) => (
-        pb.Quantity === priceBreak.Quantity && pb.Price === priceBreak.Price
-      ))
-    );
-    const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: uniqueBreaks }
-    this.updateProductResource(productUpdate);
-    this.updateProduct();
-  }
-
-  getPriceBreakRange(index: number): string {
-    const priceBreaks = this._superMarketplaceProductStatic.PriceSchedule.PriceBreaks;
-    if (!priceBreaks.length) return '';
-    const indexOfNextPriceBreak = index + 1;
-    if (indexOfNextPriceBreak < priceBreaks.length) {
-      return `${priceBreaks[index].Quantity} - ${priceBreaks[indexOfNextPriceBreak].Quantity - 1}`;
-    } else {
-      return `${priceBreaks[index].Quantity}+`;
+    const priceBreaks = this.isCreatingNew ? this.newProductPriceBreaks : this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks;
+    if (this.handlePriceBreakErrors(priceBreaks)) return;
+    priceBreaks.push({ Quantity: Number(this.newPriceBreakQty), Price: Number(this.newPriceBreakPrice) });
+    if (!this.isCreatingNew) {
+      const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: priceBreaks }
+      this.updateProductResource(productUpdate);
     }
   }
 
   deletePriceBreak(priceBreak: PriceBreak) {
-    const i = this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.indexOf(priceBreak);
-    this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.splice(i, 1);
-    const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks }
-    this.updateProductResource(productUpdate);
-    this.updateProduct();
+    const priceBreaks = this.isCreatingNew ? this.newProductPriceBreaks : this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks;
+    const i = priceBreaks.indexOf(priceBreak);
+    priceBreaks.splice(i, 1);
+    if (!this.isCreatingNew) {
+      const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: priceBreaks }
+      this.updateProductResource(productUpdate);
+    }
+  }
+
+  getPriceBreakRange(index: number): string {
+    const priceBreaks = this.isCreatingNew ? this.newProductPriceBreaks : this._superMarketplaceProductEditable?.PriceSchedule.PriceBreaks;
+    if (!priceBreaks.length) return '';
+    const indexOfNextPriceBreak = index + 1;
+    if (indexOfNextPriceBreak < priceBreaks.length) {
+      8
+      return `${priceBreaks[index].Quantity} - ${priceBreaks[indexOfNextPriceBreak].Quantity - 1}`;
+    } else {
+      return `${priceBreaks[index].Quantity}+`;
+    }
   }
 
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
@@ -396,11 +415,14 @@ export class ProductEditComponent implements OnInit {
   }
 
   async removeFile(file: Asset): Promise<void> {
-    let superProduct;
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    superProduct = await MarketplaceSDK.Assets.Delete(file.ID, accessToken);
-    superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
-    this.refreshProductData(superProduct);
+    await MarketplaceSDK.Assets.Delete(file.ID, accessToken);
+    if (file.Type === "Image") {
+      this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(i => i.ID !== file.ID); 
+    } else {
+      this._superMarketplaceProductStatic.Attachments = this._superMarketplaceProductStatic.Attachments.filter(a => a.ID !== file.ID);
+    }
+    this.refreshProductData(this._superMarketplaceProductStatic);
   }
 
   unstageFile(index: number, fileType: string): void {

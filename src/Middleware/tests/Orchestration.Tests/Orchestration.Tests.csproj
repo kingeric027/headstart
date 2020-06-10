@@ -41,7 +41,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Marketplace.Common\Marketplace.Common.csproj" />
-    <ProjectReference Include="..\..\src\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
   </ItemGroup>
 
 </Project>

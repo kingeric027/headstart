@@ -28,7 +28,7 @@ export class OCMOrderHistorical {
 
   constructor(private context: ShopperContextService) {}
 
-  async getBuyerLocation(addressID): Promise<void> {
+  async getBuyerLocation(addressID: string): Promise<void> {
     if (!this.isQuoteOrder(this.order)) {
       const buyerLocation = await this.context.addresses.get(addressID);
       this.buyerLocation = buyerLocation;

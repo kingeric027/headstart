@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Services.FreightPop.Models;
+﻿using ordercloud.integrations.freightpop;
 using Marketplace.Models.Models.Marketplace;
 using System.Collections.Generic;
 using ordercloud.integrations.library;
@@ -15,7 +15,12 @@ namespace Marketplace.Models.Models.Misc
     public class ShipmentWorkItem
     {
         public MarketplaceSupplier Supplier { get; set; }
-        public string SupplierToken { get; set; }
+        public string SupplierOCToken { get; set; }
         public ShipmentDetails Shipment { get; set; }
+    }
+
+    public enum ShipmentSyncType {
+        FedexShipManager,
+        SupplierFreightPopAccount
     }
 }

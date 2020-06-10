@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
 import { OcMeService, ListSpec, Spec, OcTokenService } from '@ordercloud/angular-sdk';
-import { each as _each } from 'lodash';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ListMarketplaceMeProduct, MarketplaceMeProduct, AppConfig } from '../shopper-context';
-import { MarketplaceSDK, SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable()
@@ -22,7 +21,7 @@ export class MeListRelatedProductsResolver implements Resolve<ListMarketplaceMeP
     // product.xp.RelatedProducts.forEach((id: string) => {
     //   calls.push(this.service.GetProduct(id).toPromise());
     // });
-    //return Promise.all(calls);
+    // return Promise.all(calls);
   }
 }
 
@@ -42,7 +41,7 @@ export class MeProductResolver implements Resolve<SuperMarketplaceProduct> {
     });
     const url = `${this.appConfig.middlewareUrl}/me/products/${route.params.productID}`;
     return this.httpClient
-      .get<SuperMarketplaceProduct>(url, { headers: headers })
+      .get<SuperMarketplaceProduct>(url, { headers })
       .toPromise();
     // return MarketplaceSDK.Products.MeGet(route.params.productID);
   }
