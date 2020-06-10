@@ -20,26 +20,10 @@ import {
   MarketplaceOrder,
 } from 'marketplace-javascript-sdk';
 
-export interface ICheckout {
-  submitWithCreditCard(card: OrderCloudIntegrationsCreditCardPayment, marketplaceID: string): Promise<string>;
-  submitWithoutCreditCard(): Promise<string>;
-  addComment(comment: string): Promise<MarketplaceOrder>;
-  listPayments(): Promise<ListPayment>;
-  createSavedCCPayment(card: MarketplaceBuyerCreditCard, amount: number): Promise<Payment>;
-  createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken, amount: number): Promise<Payment>;
-  createPurchaseOrderPayment(amount: number): Promise<Payment>;
-  setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder>;
-  setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
-  setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder>;
-  estimateShipping(): Promise<OrderWorksheet>;
-  selectShipMethod(selection: ShipMethodSelection): Promise<OrderWorksheet>;
-  calculateOrder(): Promise<MarketplaceOrder>;
-}
-
 @Injectable({
   providedIn: 'root',
 })
-export class CheckoutService implements ICheckout {
+export class CheckoutService {
   constructor(
     private ocOrderService: OcOrderService,
     private ocPaymentService: OcPaymentService,

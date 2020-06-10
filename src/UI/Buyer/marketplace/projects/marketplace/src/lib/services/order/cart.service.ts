@@ -1,29 +1,15 @@
 import { Injectable } from '@angular/core';
-import { ListLineItem, OcOrderService, OcLineItemService, OcMeService, OcTokenService } from '@ordercloud/angular-sdk';
+import { ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
 import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { listAll } from '../../functions/listAll';
-import { HttpClient } from '@angular/common/http';
 import { MarketplaceLineItem, MarketplaceOrder, MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { AppConfig } from '../../shopper-context';
-
-export interface ICart {
-  onAdd: Subject<MarketplaceLineItem>;
-  get(): ListLineItem;
-  add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem>;
-  remove(lineItemID: string): Promise<void>;
-  setQuantity(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem>;
-  addMany(lineItem: MarketplaceLineItem[]): Promise<MarketplaceLineItem[]>;
-  empty(): Promise<void>;
-  onChange(callback: (lineItems: ListLineItem) => void): void;
-  moveOrderToCart(orderID: string): Promise<void>;
-}
 
 @Injectable({
   providedIn: 'root',
 })
-export class CartService implements ICart {
+export class CartService {
   public onAdd = new Subject<MarketplaceLineItem>(); // need to make available as observable
   public onChange = this.state.onLineItemsChange.bind(this.state);
   private initializingOrder = false;
@@ -32,10 +18,7 @@ export class CartService implements ICart {
     private ocOrderService: OcOrderService,
     private ocLineItemService: OcLineItemService,
     private ocMeService: OcMeService,
-    private state: OrderStateService,
-    private http: HttpClient,
-    private ocTokenService: OcTokenService,
-    private appSettings: AppConfig
+    private state: OrderStateService
   ) {}
 
   get(): ListLineItem {

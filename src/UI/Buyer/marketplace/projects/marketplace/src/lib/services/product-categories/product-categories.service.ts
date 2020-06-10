@@ -2,17 +2,11 @@ import { Injectable } from '@angular/core';
 import { OcMeService, Category } from '@ordercloud/angular-sdk';
 import { listAll } from '../../functions/listAll';
 
-export interface ICategories {
-  activeID: string;
-  all: Category[];
-  breadCrumbs: Category[];
-}
-
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',
 })
-export class ProductCategoriesService implements ICategories {
+export class ProductCategoriesService {
   private activeCategoryID: string = undefined;
   private allCategories: Category[] = undefined;
   private categoryBreadCrumbs: Category[] = [];

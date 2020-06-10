@@ -2,31 +2,22 @@
 import { Injectable } from '@angular/core';
 import { AppConfig } from '../../shopper-context';
 import { OrderStateService } from './order-state.service';
-import { CartService, ICart } from './cart.service';
-import { CheckoutService, ICheckout } from './checkout.service';
+import { CartService } from './cart.service';
+import { CheckoutService } from './checkout.service';
 import { OcLineItemService, OcOrderService, Order } from '@ordercloud/angular-sdk';
 import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
 import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
-export interface ICurrentOrder {
-  cart: ICart;
-  checkout: ICheckout;
-  get(): MarketplaceOrder;
-  submitQuoteOrder(orderDetails: Order, lineItem: MarketplaceLineItem): Promise<Order>;
-  onChange(callback: (order: MarketplaceOrder) => void): void;
-  reset(): Promise<void>;
-}
-
 @Injectable({
   providedIn: 'root',
 })
-export class CurrentOrderService implements ICurrentOrder {
+export class CurrentOrderService {
   onChange = this.state.onOrderChange.bind(this.state);
   reset = this.state.reset.bind(this.state);
 
   constructor(
-    public cart: CartService,
-    public checkout: CheckoutService,
+    private cartService: CartService,
+    private checkoutService: CheckoutService,
     private state: OrderStateService,
     private ocLineItemService: OcLineItemService,
     private ocOrderService: OcOrderService,
@@ -37,6 +28,15 @@ export class CurrentOrderService implements ICurrentOrder {
   get(): MarketplaceOrder {
     return this.state.order;
   }
+
+  get cart(): CartService {
+    return this.cartService;
+  }
+
+  get checkout(): CheckoutService {
+    return this.checkoutService;
+  }
+
   async submitQuoteOrder(orderDetails: Order, lineItem: MarketplaceLineItem): Promise<Order> {
     orderDetails.ID = `${this.appConfig.marketplaceID}{orderIncrementor}`;
     const quoteOrder = await this.ocOrderService.Create('Outgoing', orderDetails).toPromise();

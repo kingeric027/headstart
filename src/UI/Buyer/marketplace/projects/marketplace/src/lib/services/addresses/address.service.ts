@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
-import { OcMeService, OcAddressService, OcTokenService } from '@ordercloud/angular-sdk';
+import { OcMeService, OcTokenService } from '@ordercloud/angular-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { TaxCertificate, MarketplaceAddressBuyer, MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { ListMarketplaceAddressBuyer, AppConfig } from '../../shopper-context';
-import { CurrentUserService } from '../current-user/current-user.service';
-import { UserManagementService } from '../user-management/user-management.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
@@ -15,10 +13,6 @@ export class AddressService {
   constructor(
     private ocMeService: OcMeService,
     private appConfig: AppConfig,
-    private ocAddressService: OcAddressService,
-    private user: CurrentUserService,
-    private userManagementService: UserManagementService,
-
     // remove below when sdk is regenerated
     private ocTokenService: OcTokenService,
     private httpClient: HttpClient

@@ -13,24 +13,10 @@ import { AppConfig } from '../../shopper-context';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MarketplaceUser, ListPage } from 'marketplace-javascript-sdk';
 
-export interface IUserManagement {
-  getLocations(): Promise<UserGroup[]>;
-  getLocationUsers(locationID: string): Promise<ListPage<MarketplaceUser>>;
-  getLocationPermissions(locationID: string): Promise<UserGroupAssignment[]>;
-  getLocationApprovalPermissions(locationID: string): Promise<UserGroupAssignment[]>;
-  getLocationApprovalThreshold(locationID: string): Promise<number>;
-  updateUserUserGroupAssignments(
-    buyerID: string,
-    locationID: string,
-    add: UserGroupAssignment[],
-    del: UserGroupAssignment[]
-  ): Promise<void>;
-}
-
 @Injectable({
   providedIn: 'root',
 })
-export class UserManagementService implements IUserManagement {
+export class UserManagementService {
   constructor(
     private ocUserGroupService: OcUserGroupService,
     private ocMeService: OcMeService,

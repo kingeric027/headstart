@@ -21,20 +21,10 @@ import { CurrentOrderService } from '../order/order.service';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service';
 
-export interface IAuthentication {
-  profiledLogin(username: string, password: string, rememberMe: boolean): Promise<AccessToken>;
-  logout(): Promise<void>;
-  validateCurrentPasswordAndChangePassword(newPassword: string, currentPassword: string): Promise<void>;
-  anonymousLogin(): Promise<AccessToken>;
-  forgotPasssword(email: string): Promise<any>;
-  register(me: MeUser): Promise<any>;
-  resetPassword(code: string, config: PasswordReset): Promise<any>;
-}
-
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService implements IAuthentication {
+export class AuthService {
   fetchingRefreshToken = false;
   failedRefreshAttempt = false;
   refreshToken: BehaviorSubject<string> = new BehaviorSubject<string>('');

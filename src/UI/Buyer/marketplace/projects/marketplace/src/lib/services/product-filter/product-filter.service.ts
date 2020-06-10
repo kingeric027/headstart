@@ -7,27 +7,11 @@ import { ProductFilters } from '../../shopper-context';
 import { OcMeService, ListProduct } from '@ordercloud/angular-sdk';
 import { ProductCategoriesService } from '../product-categories/product-categories.service';
 
-export interface IProductFilters {
-  activeFiltersSubject: BehaviorSubject<ProductFilters>;
-  toPage(pageNumber: number): void;
-  sortBy(field: string): void;
-  clearSort(): void;
-  searchBy(searchTerm: string): void;
-  clearSearch(): void;
-  filterByFacet(field: string, value: string, isFacet?: boolean): void;
-  clearFacetFilter(field: string): void;
-  filterByCategory(categoryID: string): void;
-  clearCategoryFilter(): void;
-  filterByFavorites(showOnlyFavorites: boolean): void;
-  clearAllFilters(): void;
-  hasFilters(): boolean;
-}
-
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',
 })
-export class ProductFilterService implements IProductFilters {
+export class ProductFilterService {
   public activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(
     this.getDefaultParms()
   );

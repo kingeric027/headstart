@@ -5,23 +5,11 @@ import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { SupplierFilters } from '../../shopper-context';
 import { OcSupplierService, ListSupplier } from '@ordercloud/angular-sdk';
 
-export interface ISupplierFilters {
-  activeFiltersSubject: BehaviorSubject<SupplierFilters>;
-  toPage(pageNumber: number): void;
-  sortBy(field: string): void;
-  searchBy(searchTerm: string): void;
-  clearSearch(): void;
-  toSupplier(supplierID: string): void;
-  clearAllFilters(): void;
-  hasFilters(): boolean;
-  filterByFields(filter: any): void;
-}
-
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',
 })
-export class SupplierFilterService implements ISupplierFilters {
+export class SupplierFilterService {
   public activeFiltersSubject: BehaviorSubject<SupplierFilters> = new BehaviorSubject<SupplierFilters>(
     this.getDefaultParms()
   );

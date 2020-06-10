@@ -8,7 +8,7 @@ import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
   providedIn: 'root',
 })
 export class ReorderHelperService {
-  constructor(private ocLineItemService: OcLineItemService, private meService: OcMeService) {}
+  constructor(private meService: OcMeService) {}
 
   public async validateReorder(orderID: string, lineItems: MarketplaceLineItem[]): Promise<OrderReorderResponse> {
     // instead of moving all of this logic to the middleware to support orders not

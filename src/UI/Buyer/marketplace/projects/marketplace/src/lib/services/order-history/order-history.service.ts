@@ -10,7 +10,7 @@ import {
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderReorderResponse, LineItemGroupSupplier, AppConfig } from '../../shopper-context';
-import { OrderFilterService, IOrderFilters } from './order-filter.service';
+import { OrderFilterService } from './order-filter.service';
 import {
   MarketplaceAddressBuyer,
   MarketplaceOrder,
@@ -20,28 +20,10 @@ import {
 } from 'marketplace-javascript-sdk';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 
-export interface IOrderHistory {
-  activeOrderID: string;
-  filters: IOrderFilters;
-  approveOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<MarketplaceOrder>;
-  declineOrder(orderID?: string, Comments?: string, AllowResubmit?: boolean): Promise<MarketplaceOrder>;
-  validateReorder(orderID: string, lineItems: MarketplaceLineItem[]): Promise<OrderReorderResponse>;
-  getOrderDetails(orderID?: string): Promise<OrderDetails>;
-  getLineItemSuppliers(liGroups: MarketplaceLineItem[][]): Promise<LineItemGroupSupplier[]>;
-  listShipments(orderID?: string): Promise<MarketplaceShipmentWithItems[]>;
-  returnOrder(orderID?: string): Promise<MarketplaceOrder>;
-  returnLineItem(
-    orderID?: string,
-    lineItemID?: string,
-    quantityToReturn?: number,
-    returnReason?: string
-  ): Promise<MarketplaceLineItem>;
-}
-
 @Injectable({
   providedIn: 'root',
 })
-export class OrderHistoryService implements IOrderHistory {
+export class OrderHistoryService {
   activeOrderID: string; // TODO - make this read-only in components
 
   constructor(

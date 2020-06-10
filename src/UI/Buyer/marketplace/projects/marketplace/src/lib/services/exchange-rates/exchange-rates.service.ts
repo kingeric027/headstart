@@ -1,21 +1,16 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { OcMeService } from '@ordercloud/angular-sdk';
-import { HttpClient } from '@angular/common/http';
 import { ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { AppConfig, ExchangeRates } from '../../shopper-context';
-
-export interface IExchangeRates {
-  Get(): ListPage<ExchangeRates>;
-}
+import { ExchangeRates } from '../../shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ExchangeRatesService implements IExchangeRates {
+export class ExchangeRatesService {
   private ratesSubject: BehaviorSubject<ListPage<ExchangeRates>> = new BehaviorSubject<ListPage<ExchangeRates>>(null);
 
-  constructor(private ocMeService: OcMeService, public http: HttpClient, private appConfig: AppConfig) {}
+  constructor(private ocMeService: OcMeService) {}
 
   Get(): ListPage<ExchangeRates> {
     return this.exchangeRates;

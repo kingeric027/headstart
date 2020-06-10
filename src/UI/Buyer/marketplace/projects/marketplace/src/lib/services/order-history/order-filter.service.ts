@@ -9,22 +9,10 @@ import { RouteService } from '../route/route.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
-export interface IOrderFilters {
-  activeFiltersSubject: BehaviorSubject<OrderFilters>;
-  toPage(pageNumber: number): void;
-  sortBy(field: string): void;
-  searchBy(searchTerm: string): void;
-  clearSearch(): void;
-  filterByFavorites(showOnlyFavorites: boolean): void;
-  filterByStatus(status: OrderStatus): void;
-  filterByDateSubmitted(fromDate: string, toDate: string): void;
-  clearAllFilters(): void;
-}
-
 @Injectable({
   providedIn: 'root',
 })
-export class OrderFilterService implements IOrderFilters {
+export class OrderFilterService {
   activeOrderID: string; // TODO - make this read-only in components
 
   public activeFiltersSubject: BehaviorSubject<OrderFilters> = new BehaviorSubject<OrderFilters>(

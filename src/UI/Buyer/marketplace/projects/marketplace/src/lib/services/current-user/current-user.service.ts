@@ -6,21 +6,10 @@ import { CreditCardService } from './credit-card.service';
 import { HttpClient } from '@angular/common/http';
 import { CurrentUser } from '../../shopper-context';
 
-export interface ICurrentUser {
-  cards: CreditCardService;
-  get(): CurrentUser;
-  patch(user: MeUser): Promise<CurrentUser>;
-  onChange(callback: (user: CurrentUser) => void): void; // TODO - replace all these onChange functions with real Observables. More powerful
-  isAnonymous(): boolean;
-  setIsFavoriteProduct(isFav: boolean, productID: string): void;
-  setIsFavoriteOrder(isFav: boolean, orderID: string): void;
-  hasLocationAccess(locationID: string, permissionType: string): boolean;
-}
-
 @Injectable({
   providedIn: 'root',
 })
-export class CurrentUserService implements ICurrentUser {
+export class CurrentUserService {
   private readonly MaxFavorites: number = 40;
   private readonly favOrdersXP = 'FavoriteOrders';
   private readonly favProductsXP = 'FavoriteProducts';
