@@ -18,7 +18,7 @@ namespace Marketplace.Common.Commands.Zoho
     {
         Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrderWorksheet orderWorksheet);
         Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, OrderSplitResult orders);
-        Task<ZohoContactList> GetContactList();
+        Task<ZohoOrganizationList> ListOrganizations();
     }
 
     public class ZohoCommand : IZohoCommand
@@ -53,10 +53,10 @@ namespace Marketplace.Common.Commands.Zoho
             _zoho.AuthenticateAsync();
         }
 
-        public async Task<ZohoContactList> GetContactList()
+        public async Task<ZohoOrganizationList> ListOrganizations()
         {
             await _zoho.AuthenticateAsync();
-            var results = await _zoho.Contacts.ListAsync();
+            var results = await _zoho.Organizations.ListAsync();
             return results;
         }
 

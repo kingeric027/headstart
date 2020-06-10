@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace Marketplace.Common.Services.Zoho.Models
 {
+    public class ZohoOrganizationList : ZohoListResponse
+    {
+        [JsonProperty(PropertyName = "organizations")]
+        public List<ZohoOrganization> Items { get; set; }
+    }
     public class ZohoOrganization
     {
         public string organization_id { get; set; }

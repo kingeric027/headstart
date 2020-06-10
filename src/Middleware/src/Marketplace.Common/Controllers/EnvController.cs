@@ -27,7 +27,7 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("zoho")]
         public async Task<dynamic> GetZoho()
         {
-            return await _zoho.GetContactList();
+            return await _zoho.ListOrganizations();
         }
     }
 }

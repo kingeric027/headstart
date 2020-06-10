@@ -18,6 +18,7 @@ namespace Marketplace.Common.Services.Zoho
         IZohoItemResource Items { get; }
         IZohoSalesOrderResource SalesOrders { get; }
         IZohoPurchaseOrderResource PurchaseOrders { get;  }
+        IZohoOrganizationResource Organizations { get; }
         Task<ZohoTokenResponse> AuthenticateAsync();
     }
     public partial class ZohoClient
@@ -43,8 +44,6 @@ namespace Marketplace.Common.Services.Zoho
         {
             try
             {
-                
-                
                 var response = await AuthClient.Request("token")
                     .SetQueryParam("client_id", Config.ClientId)
                     .SetQueryParam("client_secret", Config.ClientSecret)
@@ -112,7 +111,10 @@ namespace Marketplace.Common.Services.Zoho
             Items = new ZohoItemResource(this);
             SalesOrders = new ZohoSalesOrderResource(this);
             PurchaseOrders = new ZohoPurchaseOrderResource(this);
+            Organizations = new ZohoOrganizationResource(this);
         }
+
+        public IZohoOrganizationResource Organizations { get; private set; }
 
         public IZohoContactResource Contacts { get; private set; }
         public IZohoCurrencyResource Currencies { get; private set; }

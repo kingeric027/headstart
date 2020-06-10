@@ -8,8 +8,8 @@ namespace Marketplace.Common.Services.Zoho.Resources
 {
     public interface IZohoOrganizationResource
     {
-        //Task<ZohoOrganizationList> ListAsync(params ZohoFilter[] filters);
-        //Task<TZohoOrganizationList> ListAsync<TZohoOrganizationList>(params ZohoFilter[] filters) where TZohoOrganizationList : ZohoOrganizationList;
+        Task<ZohoOrganizationList> ListAsync(params ZohoFilter[] filters);
+        Task<TZohoOrganizationList> ListAsync<TZohoOrganizationList>(params ZohoFilter[] filters) where TZohoOrganizationList : ZohoOrganizationList;
         Task<ZohoOrganization> GetAsync(string id);
         Task<TZohoOrganization> GetAsync<TZohoOrganization>(string id) where TZohoOrganization : ZohoOrganization;
         Task<ZohoOrganization> SaveAsync(ZohoOrganization org);
@@ -21,12 +21,12 @@ namespace Marketplace.Common.Services.Zoho.Resources
 
     public class ZohoOrganizationResource : ZohoResource, IZohoOrganizationResource
     {
-        internal ZohoOrganizationResource(ZohoClient client) : base(client, "organizations") { }
+        internal ZohoOrganizationResource(ZohoClient client) : base(client, "organization", "organizations") { }
 
-        //public Task<ZohoOrganizationList> ListAsync(params ZohoFilter[] filters) => ListAsync<ZohoOrganizationList>(filters);
-        //public Task<TZohoOrganizationList> ListAsync<TZohoOrganizationList>(params ZohoFilter[] filters) where TZohoOrganizationList : ZohoOrganizationList => Get()
-        //        .SetQueryParams(filters?.Select(f => new KeyValuePair<string, object>(f.Key, f.Value)))
-        //        .GetJsonAsync<TZohoOrganizationList>();
+        public Task<ZohoOrganizationList> ListAsync(params ZohoFilter[] filters) => ListAsync<ZohoOrganizationList>(filters);
+        public Task<TZohoOrganizationList> ListAsync<TZohoOrganizationList>(params ZohoFilter[] filters) where TZohoOrganizationList : ZohoOrganizationList => Get()
+                .SetQueryParams(filters?.Select(f => new KeyValuePair<string, object>(f.Key, f.Value)))
+                .GetJsonAsync<TZohoOrganizationList>();
 
         public Task<ZohoOrganization> GetAsync(string id) => GetAsync<ZohoOrganization>(id);
         
