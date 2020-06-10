@@ -14,10 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\integrations\ordercloud.integrations.freightpop\ordercloud.integrations.freightpop.csproj" />
-    <ProjectReference Include="..\..\integrations\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
     <ProjectReference Include="..\..\src\Marketplace.Common\Marketplace.Common.csproj" />
-    <ProjectReference Include="..\..\src\ordercloud.integrations.freightpop\ordercloud.integrations.freightpop.csproj" />
   </ItemGroup>
 
 </Project>
