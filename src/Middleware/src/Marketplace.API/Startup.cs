@@ -78,7 +78,6 @@ namespace Marketplace.API
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()
-                .Inject<IZohoCommand>()
                 .Inject<ISyncCommand>()
                 .Inject<ISmartyStreetsCommand>()
                 .Inject<IOrchestrationCommand>()
@@ -93,6 +92,23 @@ namespace Marketplace.API
                 .Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
+                .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
+                    ApiUrl = "https://books.zoho.com/api/v3",
+                    AccessToken = _settings.ZohoSettings.AccessToken,
+                    ClientId = _settings.ZohoSettings.ClientId,
+                    ClientSecret = _settings.ZohoSettings.ClientSecret,
+                    OrganizationID = _settings.ZohoSettings.OrgID }, 
+                    new OrderCloudClientConfig {
+                        ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+                        AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                        ClientId = _settings.OrderCloudSettings.ClientID,
+                        ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                        Roles = new[]
+                            {
+                                ApiRole.FullAccess
+                            }
+                    }
+                ))
                 .AddSingleton<IFreightPopService>(x => new FreightPopService(freightPopConfig))
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
 				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
