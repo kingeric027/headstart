@@ -20,6 +20,7 @@ export class OCMCheckoutAddress implements OnInit {
   selectedShippingAddress: BuyerAddress;
   showNewAddressForm = false;
   suggestedAddresses: BuyerAddress[];
+  homeCountry: string;
   
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListLineItem;
@@ -44,7 +45,7 @@ export class OCMCheckoutAddress implements OnInit {
   onShippingAddressChange(shippingAddressID: string): void {
     this.showNewAddressForm = shippingAddressID === this.NEW_ADDRESS_CODE;
     this.selectedShippingAddress = this.existingShippingAddresses.Items.find(address => shippingAddressID === address.ID);
-    const shippingAddress = this.existingShippingAddresses.Items.find(address => address.ID === this.selectedShippingAddress.ID);
+    const shippingAddress = this.existingShippingAddresses.Items.find(address => address.ID === this.selectedShippingAddress?.ID);
     if (shippingAddress) {
       this.selectedShippingAddress = shippingAddress;
     }
@@ -61,6 +62,7 @@ export class OCMCheckoutAddress implements OnInit {
 
   private async listSavedBuyerLocations(): Promise<void> {
     this.existingBuyerLocations = await this.context.addresses.listBuyerLocations();
+    this.homeCountry = this.existingBuyerLocations.Items[0].Country;
     if (this.existingBuyerLocations?.Items.length === 1) {
       this.selectedBuyerLocation = this.selectedShippingAddress = this.existingBuyerLocations.Items[0];
     }

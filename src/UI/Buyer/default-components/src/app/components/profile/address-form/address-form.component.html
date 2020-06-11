@@ -123,12 +123,11 @@
                 class="form-control"
                 id="Country"
                 showErrors
+                disabled
                 (change)="onCountryChange($event)">
-          <option [ngValue]="null"
-                  disabled
-                  translate>PROFILE.ADDRESS_FORM.COUNTRY</option>
-          <option *ngFor="let country of countryOptions"
-                  [value]="country.abbreviation">{{ country.label }}</option>
+          <option [ngValue]="homeCountry"
+                  [selected]="homeCountry"
+                  translate>{{getCountryName(homeCountry)}}</option>
         </select>
       </div>
       <div class="col-md-6 form-group">
