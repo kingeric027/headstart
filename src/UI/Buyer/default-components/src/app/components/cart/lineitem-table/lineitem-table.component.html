@@ -65,6 +65,11 @@
                     li | productNameWithSpecs
                   }}</a>
                   <small class="text-muted d-block">{{ li.Product.ID }}</small>
+                  <small *ngIf="li.xp?.LineItemReturnInfo?.ReturnReason"
+                        class="text-dark d-block" translate>
+                        CART.LINEITEM_TABLE.RETURNED 
+                    <span class="text-muted" translate>{{ getReturnReason(li.xp?.LineItemReturnInfo?.ReturnReason) }}</span>
+                </small>
                   <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
                         class="
                         badge

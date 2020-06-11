@@ -81,5 +81,6 @@ export class OCMOrderReturn {
      }
     this.isSaving = false;
     this.viewReturnFormEvent.emit(false);
+    await this.context.order.sendReturnRequestEmail(orderID);
   }
 }
