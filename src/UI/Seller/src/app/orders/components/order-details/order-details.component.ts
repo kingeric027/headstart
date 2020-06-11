@@ -1,6 +1,5 @@
 import { Component, Input, Inject } from '@angular/core';
 import { OrderService } from '@app-seller/orders/order.service';
-import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { Address, LineItem, OcLineItemService, OcOrderService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { ProductImage } from 'marketplace-javascript-sdk';
@@ -66,11 +65,6 @@ export class OrderDetailsComponent {
     }
     this.cardType = payment.xp.cardType.charAt(0).toUpperCase() + payment.xp.cardType.slice(1);
     return this.cardType;
-  }
-
-  getImageUrl(lineItem: LineItem) {
-    const product = lineItem.Product;
-    return getProductMainImageUrlOrPlaceholder(product);
   }
 
   getFullName(address: Address) {
