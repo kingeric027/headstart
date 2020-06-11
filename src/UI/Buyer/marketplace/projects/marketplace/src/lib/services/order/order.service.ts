@@ -49,7 +49,7 @@ export class CurrentOrderService implements ICurrentOrder {
     return submittedQuoteOrder;
   }
 
-  async sendReturnRequestEmail(orderID: string) {
+  async sendReturnRequestEmail(orderID: string): Promise<Order> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
