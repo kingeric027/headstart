@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { ListMarketplaceMeProduct } from '../shopper-context';
+import { MarketplaceMeProduct } from '../shopper-context';
+import { ListPage } from 'marketplace-javascript-sdk';
 
 @Component({
   template: `
@@ -9,9 +9,9 @@ import { ListMarketplaceMeProduct } from '../shopper-context';
   `,
 })
 export class HomeWrapperComponent implements OnInit {
-  featuredProducts: ListMarketplaceMeProduct;
+  featuredProducts: ListPage<MarketplaceMeProduct>;
 
-  constructor(private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
+  constructor(private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.featuredProducts = this.activatedRoute.snapshot.data.featuredProducts;

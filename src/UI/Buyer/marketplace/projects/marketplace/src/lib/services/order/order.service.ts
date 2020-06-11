@@ -4,8 +4,7 @@ import { AppConfig } from '../../shopper-context';
 import { OrderStateService } from './order-state.service';
 import { CartService } from './cart.service';
 import { CheckoutService } from './checkout.service';
-import { OcLineItemService, OcOrderService, Order } from '@ordercloud/angular-sdk';
-import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
+import { LineItems, Orders, Order, LineItem, IntegrationEvents } from 'ordercloud-javascript-sdk';
 import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 @Injectable({
@@ -19,9 +18,6 @@ export class CurrentOrderService {
     private cartService: CartService,
     private checkoutService: CheckoutService,
     private state: OrderStateService,
-    private ocLineItemService: OcLineItemService,
-    private ocOrderService: OcOrderService,
-    private ocSandboxService: OrderCloudSandboxService,
     private appConfig: AppConfig
   ) {}
 
@@ -39,10 +35,10 @@ export class CurrentOrderService {
 
   async submitQuoteOrder(orderDetails: Order, lineItem: MarketplaceLineItem): Promise<Order> {
     orderDetails.ID = `${this.appConfig.marketplaceID}{orderIncrementor}`;
-    const quoteOrder = await this.ocOrderService.Create('Outgoing', orderDetails).toPromise();
-    await this.ocLineItemService.Create('Outgoing', quoteOrder.ID, lineItem).toPromise();
-    await this.ocSandboxService.calculateOrder(quoteOrder.ID);
-    const submittedQuoteOrder = await this.ocOrderService.Submit('Outgoing', quoteOrder.ID).toPromise();
+    const quoteOrder = await Orders.Create('Outgoing', orderDetails);
+    await LineItems.Create('Outgoing', quoteOrder.ID, lineItem as LineItem);
+    await IntegrationEvents.Calculate('Outgoing', quoteOrder.ID);
+    const submittedQuoteOrder = await Orders.Submit('Outgoing', quoteOrder.ID);
     return submittedQuoteOrder;
   }
 }

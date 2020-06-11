@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { OcMeService } from '@ordercloud/angular-sdk';
+import { Me } from 'ordercloud-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -9,10 +9,10 @@ export class OrdersToApproveStateService {
   public showAlert = new BehaviorSubject<number>(0);
   public numberOfOrdersToApprove = new BehaviorSubject<number>(0);
 
-  constructor(private ocMeService: OcMeService) {}
+  constructor() {}
 
   async reset(): Promise<void> {
-    const ordersToApproverResponse = await this.ocMeService.ListApprovableOrders().toPromise();
+    const ordersToApproverResponse = await Me.ListApprovableOrders();
     this.numberOfOrdersToApprove.next(ordersToApproverResponse.Meta.TotalCount);
   }
 

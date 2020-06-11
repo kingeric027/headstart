@@ -1,12 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  OcOrderService,
-  OcLineItemService,
-  OcMeService,
-  OcSupplierService,
-  OcSupplierAddressService,
-  OcTokenService,
-} from '@ordercloud/angular-sdk';
+import { Orders, LineItems, Me, Suppliers, SupplierAddresses, Tokens } from 'ordercloud-javascript-sdk';
 import { ReorderHelperService } from '../reorder/reorder.service';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderReorderResponse, LineItemGroupSupplier, AppConfig } from '../../shopper-context';
@@ -17,6 +10,7 @@ import {
   MarketplaceLineItem,
   OrderDetails,
   MarketplaceShipmentWithItems,
+  MarketplaceSDK,
 } from 'marketplace-javascript-sdk';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 
@@ -28,26 +22,16 @@ export class OrderHistoryService {
 
   constructor(
     public filters: OrderFilterService,
-    private ocOrderService: OcOrderService,
-    private ocMeService: OcMeService,
     private paymentHelper: PaymentHelperService,
     private reorderHelper: ReorderHelperService,
-    private ocLineItemService: OcLineItemService,
-    private ocSupplierService: OcSupplierService,
-    private ocSupplierAddressService: OcSupplierAddressService,
-
-    // remove below when sdk is regenerated
-    private ocTokenService: OcTokenService,
     private httpClient: HttpClient,
     private appConfig: AppConfig
   ) {}
 
   async getLocationsUserCanView(): Promise<MarketplaceAddressBuyer[]> {
     // add strong type when sdk is regenerated
-    const accessUserGroups = await this.ocMeService
-      .ListUserGroups({ filters: { 'xp.Role': 'ViewAllOrders' } })
-      .toPromise();
-    const locationRequests = accessUserGroups.Items.map(a => this.ocMeService.GetAddress(a.xp.Location).toPromise());
+    const accessUserGroups = await Me.ListUserGroups({ filters: { 'xp.Role': 'ViewAllOrders' } });
+    const locationRequests = accessUserGroups.Items.map(a => Me.GetAddress(a.xp.Location));
     const locationResponses = await Promise.all(locationRequests);
     return locationResponses;
   }
@@ -57,7 +41,7 @@ export class OrderHistoryService {
     Comments: string = '',
     AllowResubmit: boolean = false
   ): Promise<MarketplaceOrder> {
-    const order = await this.ocOrderService.Approve('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
+    const order = await Orders.Approve('Outgoing', orderID, { Comments, AllowResubmit });
     return order as MarketplaceOrder;
   }
 
@@ -66,7 +50,7 @@ export class OrderHistoryService {
     Comments: string = '',
     AllowResubmit: boolean = true
   ): Promise<MarketplaceOrder> {
-    const order = await this.ocOrderService.Decline('outgoing', orderID, { Comments, AllowResubmit }).toPromise();
+    const order = await Orders.Decline('Outgoing', orderID, { Comments, AllowResubmit });
     return order as MarketplaceOrder;
   }
 
@@ -78,14 +62,7 @@ export class OrderHistoryService {
   }
 
   async getOrderDetails(orderID: string = this.activeOrderID): Promise<OrderDetails> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-    });
-    const url = `${this.appConfig.middlewareUrl}/order/${orderID}/details`;
-    return this.httpClient
-      .get<OrderDetails>(url, { headers })
-      .toPromise();
+    return await MarketplaceSDK.Orders.GetOrderDetails(orderID);
   }
 
   async getLineItemSuppliers(liGroups: MarketplaceLineItem[][]): Promise<LineItemGroupSupplier[]> {
@@ -93,8 +70,8 @@ export class OrderHistoryService {
     for (const group of liGroups) {
       const line = group[0];
       if (line?.SupplierID) {
-        const supplier = await this.ocSupplierService.Get(line.SupplierID).toPromise();
-        const shipFrom = await this.ocSupplierAddressService.Get(line.SupplierID, line.ShipFromAddressID).toPromise();
+        const supplier = await Suppliers.Get(line.SupplierID);
+        const shipFrom = await SupplierAddresses.Get(line.SupplierID, line.ShipFromAddressID);
         suppliers.push({ supplier, shipFrom });
       }
     }
@@ -104,7 +81,7 @@ export class OrderHistoryService {
   async listShipments(orderID: string = this.activeOrderID): Promise<MarketplaceShipmentWithItems[]> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     });
     const url = `${this.appConfig.middlewareUrl}/order/${orderID}/shipmentswithitems`;
     return this.httpClient
@@ -113,16 +90,14 @@ export class OrderHistoryService {
   }
 
   async returnOrder(orderID: string): Promise<MarketplaceOrder> {
-    const order = await this.ocOrderService
-      .Patch('Outgoing', orderID, {
-        xp: {
-          OrderReturnInfo: {
-            HasReturn: true,
-            Resolved: false,
-          },
+    const order = await Orders.Patch('Outgoing', orderID, {
+      xp: {
+        OrderReturnInfo: {
+          HasReturn: true,
+          Resolved: false,
         },
-      })
-      .toPromise();
+      },
+    });
     return order as MarketplaceOrder;
   }
 
@@ -132,16 +107,14 @@ export class OrderHistoryService {
     quantityToReturn: number,
     returnReason: string
   ): Promise<MarketplaceLineItem> {
-    return await this.ocLineItemService
-      .Patch('Outgoing', orderID, lineItemID, {
-        xp: {
-          LineItemReturnInfo: {
-            QuantityToReturn: quantityToReturn,
-            ReturnReason: returnReason,
-            Resolved: false,
-          },
+    return await LineItems.Patch('Outgoing', orderID, lineItemID, {
+      xp: {
+        LineItemReturnInfo: {
+          QuantityToReturn: quantityToReturn,
+          ReturnReason: returnReason,
+          Resolved: false,
         },
-      })
-      .toPromise();
+      },
+    });
   }
 }

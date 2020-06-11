@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
-import { AppConfig, ListMarketplaceOrder } from '../../shopper-context';
+import { AppConfig } from '../../shopper-context';
 import { BehaviorSubject } from 'rxjs';
-import { ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
+import { Orders, LineItems, Me, Order } from 'ordercloud-javascript-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { listAll } from '../../functions/listAll';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, ListPage, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderStateService {
-  public readonly DefaultLineItems: ListLineItem = {
+  public readonly DefaultLineItems: ListPage<MarketplaceLineItem> = {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
   };
@@ -27,12 +27,9 @@ export class OrderStateService {
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
-  private lineItemSubject = new BehaviorSubject<ListLineItem>(this.DefaultLineItems);
+  private lineItemSubject = new BehaviorSubject<ListPage<MarketplaceLineItem>>(this.DefaultLineItems);
 
   constructor(
-    private ocOrderService: OcOrderService,
-    private ocLineItemService: OcLineItemService,
-    private ocMeService: OcMeService,
     private tokenHelper: TokenHelperService,
     private currentUserService: CurrentUserService,
     private appConfig: AppConfig
@@ -46,11 +43,11 @@ export class OrderStateService {
     this.orderSubject.next(value);
   }
 
-  get lineItems(): ListLineItem {
+  get lineItems(): ListPage<MarketplaceLineItem> {
     return this.lineItemSubject.value;
   }
 
-  set lineItems(value: ListLineItem) {
+  set lineItems(value: ListPage<MarketplaceLineItem>) {
     this.lineItemSubject.next(value);
   }
 
@@ -58,7 +55,7 @@ export class OrderStateService {
     this.orderSubject.subscribe(callback);
   }
 
-  onLineItemsChange(callback: (lineItems: ListLineItem) => void): void {
+  onLineItemsChange(callback: (lineItems: ListPage<MarketplaceLineItem>) => void): void {
     this.lineItemSubject.subscribe(callback);
   }
 
@@ -82,30 +79,26 @@ export class OrderStateService {
       this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
     } else {
       this.DefaultOrder.xp.Currency = this.currentUserService.get().Currency;
-      this.order = (await this.ocOrderService.Create('outgoing', this.DefaultOrder).toPromise()) as MarketplaceOrder;
+      this.order = (await Orders.Create('Outgoing', this.DefaultOrder as Order)) as MarketplaceOrder;
     }
     if (this.order.DateCreated) {
-      this.lineItems = await listAll(this.ocLineItemService, this.ocLineItemService.List, 'outgoing', this.order.ID);
+      this.lineItems = await listAll(LineItems, LineItems.List, 'outgoing', this.order.ID);
     }
   }
 
-  private async getOrdersForResubmit(): Promise<ListMarketplaceOrder> {
-    const orders = await this.ocMeService
-      .ListOrders({
-        sortBy: '!DateCreated',
-        filters: { DateDeclined: '*', status: 'Unsubmitted', 'xp.IsResubmitting': 'True' },
-      })
-      .toPromise();
-    return orders as ListMarketplaceOrder;
+  private async getOrdersForResubmit(): Promise<ListPage<MarketplaceOrder>> {
+    const orders = await Me.ListOrders({
+      sortBy: '!DateCreated',
+      filters: { DateDeclined: '*', status: 'Unsubmitted', 'xp.IsResubmitting': 'True' },
+    });
+    return orders;
   }
 
-  private async getOrdersNeverSubmitted(): Promise<ListMarketplaceOrder> {
-    const orders = await this.ocMeService
-      .ListOrders({
-        sortBy: '!DateCreated',
-        filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
-      })
-      .toPromise();
-    return orders as ListMarketplaceOrder;
+  private async getOrdersNeverSubmitted(): Promise<ListPage<MarketplaceOrder>> {
+    const orders = await Me.ListOrders({
+      sortBy: '!DateCreated',
+      filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
+    });
+    return orders;
   }
 }

@@ -5,14 +5,15 @@ import { Router } from '@angular/router';
 
 // 3rd party
 import {
-  OcTokenService,
-  OcAuthService,
+  Tokens,
   AccessToken,
-  OcMeService,
-  OcPasswordResetService,
+  Me,
+  Auth,
   MeUser,
+  ForgottenPassword,
   PasswordReset,
-} from '@ordercloud/angular-sdk';
+  AccessTokenBasic,
+} from 'ordercloud-javascript-sdk';
 // import { CookieService } from '@gorniv/ngx-universal';
 import { CookieService } from 'ngx-cookie';
 import { CurrentUserService } from '../current-user/current-user.service';
@@ -32,14 +33,10 @@ export class AuthService {
   private loggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(
-    private ocTokenService: OcTokenService,
-    private ocAuthService: OcAuthService,
     private cookieService: CookieService,
     private router: Router,
     private currentOrder: CurrentOrderService,
     private currentUser: CurrentUserService,
-    private ocMeService: OcMeService,
-    private ocPasswordResetService: OcPasswordResetService,
     private ordersToApproveStateService: OrdersToApproveStateService,
     private appConfig: AppConfig
   ) {}
@@ -84,28 +81,26 @@ export class AuthService {
 
   setToken(token: string): void {
     if (!token) return;
-    this.ocTokenService.SetAccess(token);
+    Tokens.SetAccessToken(token);
     this.isLoggedIn = true;
   }
 
-  async forgotPasssword(email: string): Promise<any> {
-    const reset = await this.ocPasswordResetService
-      .SendVerificationCode({ Email: email, ClientID: this.appConfig.clientID, URL: this.appConfig.baseUrl })
-      .toPromise();
+  async forgotPasssword(email: string): Promise<void> {
+    await ForgottenPassword.SendVerificationCode({
+      Email: email,
+      ClientID: this.appConfig.clientID,
+      URL: this.appConfig.baseUrl,
+    });
     this.router.navigateByUrl('/login');
-    return reset;
   }
 
-  async register(me: MeUser<any>): Promise<any> {
-    const token = this.ocTokenService.GetAccess();
-    const result = await this.ocMeService.Register(token, me).toPromise();
-    return result;
+  async register(me: MeUser<any>): Promise<AccessTokenBasic> {
+    const token = await Me.Register(me);
+    return token;
   }
 
   async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
-    const creds = await this.ocAuthService
-      .Login(userName, password, this.appConfig.clientID, this.appConfig.scope)
-      .toPromise();
+    const creds = await Auth.Login(userName, password, this.appConfig.clientID, this.appConfig.scope);
     MarketplaceSDK.Tokens.SetAccessToken(creds.access_token);
     this.setToken(creds.access_token);
     if (rememberMe && creds.refresh_token) {
@@ -114,7 +109,7 @@ export class AuthService {
        * refresh tokens are configured per clientID and initially set to 0
        * a refresh token of 0 means no refresh token is returned in OAuth response
        */
-      this.ocTokenService.SetRefresh(creds.refresh_token);
+      Tokens.SetRefreshToken(creds.refresh_token);
       this.setRememberMeStatus(true);
     }
     this.router.navigateByUrl('/home');
@@ -125,7 +120,7 @@ export class AuthService {
 
   async anonymousLogin(): Promise<AccessToken> {
     try {
-      const creds = await this.ocAuthService.Anonymous(this.appConfig.clientID, this.appConfig.scope).toPromise();
+      const creds = await Auth.Anonymous(this.appConfig.clientID, this.appConfig.scope);
       MarketplaceSDK.Tokens.SetAccessToken(creds.access_token);
       this.setToken(creds.access_token);
       return creds;
@@ -136,7 +131,7 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
-    this.ocTokenService.RemoveAccess();
+    Tokens.RemoveAccessToken();
     MarketplaceSDK.Tokens.RemoveAccessToken();
     this.isLoggedIn = false;
     if (this.appConfig.anonymousShoppingEnabled) {
@@ -150,15 +145,12 @@ export class AuthService {
 
   async validateCurrentPasswordAndChangePassword(newPassword: string, currentPassword: string): Promise<void> {
     // reset password route does not require old password, so we are handling that here through a login
-    await this.ocAuthService
-      .Login(this.currentUser.get().Username, currentPassword, this.appConfig.clientID, this.appConfig.scope)
-      .toPromise();
-    await this.ocMeService.ResetPasswordByToken({ NewPassword: newPassword }).toPromise();
+    await Auth.Login(this.currentUser.get().Username, currentPassword, this.appConfig.clientID, this.appConfig.scope);
+    await Me.ResetPasswordByToken({ NewPassword: newPassword });
   }
 
-  async resetPassword(code: string, config: PasswordReset): Promise<any> {
-    const reset = await this.ocPasswordResetService.ResetPasswordByVerificationCode(code, config).toPromise();
-    return reset;
+  async resetPassword(code: string, config: PasswordReset): Promise<void> {
+    await ForgottenPassword.ResetPasswordByVerificationCode(code, config);
   }
 
   setRememberMeStatus(status: boolean): void {
@@ -172,8 +164,8 @@ export class AuthService {
 
   private async refreshTokenLogin(): Promise<AccessToken> {
     try {
-      const refreshToken = this.ocTokenService.GetRefresh();
-      const creds = await this.ocAuthService.RefreshToken(refreshToken, this.appConfig.clientID).toPromise();
+      const refreshToken = Tokens.GetRefreshToken();
+      const creds = await Auth.RefreshToken(refreshToken, this.appConfig.clientID);
       this.setToken(creds.access_token);
       return creds;
     } catch (err) {

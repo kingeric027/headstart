@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { MeUser, OcMeService, User, UserGroup } from '@ordercloud/angular-sdk';
+import { MeUser, Me, User, UserGroup } from 'ordercloud-javascript-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { CreditCardService } from './credit-card.service';
 import { HttpClient } from '@angular/common/http';
@@ -20,22 +20,14 @@ export class CurrentUserService {
   // users for determining location management permissions for a user
   private userGroups: BehaviorSubject<UserGroup[]> = new BehaviorSubject<UserGroup[]>([]);
 
-  constructor(
-    private ocMeService: OcMeService,
-    private tokenHelper: TokenHelperService,
-    public cards: CreditCardService,
-    public http: HttpClient
-  ) {}
+  constructor(private tokenHelper: TokenHelperService, public cards: CreditCardService, public http: HttpClient) {}
 
   get(): CurrentUser {
     return this.user;
   }
 
   async reset(): Promise<void> {
-    const requests: Promise<any>[] = [
-      this.ocMeService.Get().toPromise(),
-      this.ocMeService.ListUserGroups({ pageSize: 100 }).toPromise(),
-    ];
+    const requests: Promise<any>[] = [Me.Get(), Me.ListUserGroups({ pageSize: 100 })];
     const [user, userGroups] = await Promise.all(requests);
     this.isAnon = this.tokenHelper.isTokenAnonymous();
     this.user = await this.MapToCurrentUser(user);
@@ -43,7 +35,7 @@ export class CurrentUserService {
   }
 
   async patch(user: MeUser): Promise<CurrentUser> {
-    const patched = await this.ocMeService.Patch(user).toPromise();
+    const patched = await Me.Patch(user);
     this.user = await this.MapToCurrentUser(patched);
     return this.user;
   }
@@ -75,7 +67,7 @@ export class CurrentUserService {
 
   private async MapToCurrentUser(user: MeUser): Promise<CurrentUser> {
     const currentUser = user as CurrentUser;
-    const myUserGroups = await this.ocMeService.ListUserGroups().toPromise();
+    const myUserGroups = await Me.ListUserGroups();
     currentUser.UserGroups = myUserGroups.Items;
     currentUser.FavoriteOrderIDs = this.getFavorites(user, this.favOrdersXP);
     currentUser.FavoriteProductIDs = this.getFavorites(user, this.favProductsXP);
@@ -92,7 +84,7 @@ export class CurrentUserService {
     this.userSubject.next(value);
   }
 
-  private getFavorites(user: User, XpFieldName: string): string[] {
+  private getFavorites(user: MeUser, XpFieldName: string): string[] {
     return user && user.xp && user.xp[XpFieldName] instanceof Array ? user.xp[XpFieldName] : [];
   }
 

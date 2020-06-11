@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { ListLineItem, OcOrderService, OcLineItemService, OcMeService } from '@ordercloud/angular-sdk';
+import { Orders, LineItems, Me } from 'ordercloud-javascript-sdk';
 import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { listAll } from '../../functions/listAll';
-import { MarketplaceLineItem, MarketplaceOrder, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem, MarketplaceOrder, MarketplaceSDK, ListPage } from 'marketplace-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -14,14 +14,9 @@ export class CartService {
   public onChange = this.state.onLineItemsChange.bind(this.state);
   private initializingOrder = false;
 
-  constructor(
-    private ocOrderService: OcOrderService,
-    private ocLineItemService: OcLineItemService,
-    private ocMeService: OcMeService,
-    private state: OrderStateService
-  ) {}
+  constructor(private state: OrderStateService) {}
 
-  get(): ListLineItem {
+  get(): ListPage<MarketplaceLineItem> {
     return this.lineItems;
   }
 
@@ -43,7 +38,7 @@ export class CartService {
     this.lineItems.Items = this.lineItems.Items.filter(li => li.ID !== lineItemID);
     Object.assign(this.state.order, this.calculateOrder());
     try {
-      await this.ocLineItemService.Delete('outgoing', this.order.ID, lineItemID).toPromise();
+      await LineItems.Delete('Outgoing', this.order.ID, lineItemID);
     } finally {
       this.state.reset();
     }
@@ -69,30 +64,21 @@ export class CartService {
      * do not repopulate in the cart after the resubmit we are deleting all of these
      * unsubmitted orders */
 
-    const orderToUpdate = (await this.ocOrderService
-      .Patch('Outgoing', orderID, { xp: { IsResubmitting: true } })
-      .toPromise()) as MarketplaceOrder;
+    const orderToUpdate = (await Orders.Patch('Outgoing', orderID, {
+      xp: { IsResubmitting: true },
+    })) as MarketplaceOrder;
 
-    const currentUnsubmittedOrders = await this.ocMeService
-      .ListOrders({
-        sortBy: '!DateCreated',
-        filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
-      })
-      .toPromise();
+    const currentUnsubmittedOrders = await Me.ListOrders({
+      sortBy: '!DateCreated',
+      filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
+    });
 
-    const deleteOrderRequests = currentUnsubmittedOrders.Items.map(c =>
-      this.ocOrderService.Delete('Outgoing', c.ID).toPromise()
-    );
+    const deleteOrderRequests = currentUnsubmittedOrders.Items.map(c => Orders.Delete('Outgoing', c.ID));
     await Promise.all(deleteOrderRequests);
 
     // cannot use this.state.reset because the order index isn't ready immediately after the patch of IsResubmitting
     this.state.order = orderToUpdate;
-    this.state.lineItems = await listAll(
-      this.ocLineItemService,
-      this.ocLineItemService.List,
-      'outgoing',
-      this.order.ID
-    );
+    this.state.lineItems = await listAll(LineItems, LineItems.List, 'Outgoing', this.order.ID);
   }
 
   async empty(): Promise<void> {
@@ -100,7 +86,7 @@ export class CartService {
     this.lineItems = this.state.DefaultLineItems;
     Object.assign(this.order, this.calculateOrder());
     try {
-      await this.ocOrderService.Delete('outgoing', ID).toPromise();
+      await Orders.Delete('Outgoing', ID);
     } finally {
       this.state.reset();
     }
@@ -117,7 +103,7 @@ export class CartService {
 
   private calculateOrder(): MarketplaceOrder {
     const LineItemCount = this.lineItems.Items.length;
-    this.lineItems.Items.forEach(li => {
+    this.lineItems.Items.forEach((li: any) => {
       li.LineTotal = li.Quantity * li.UnitPrice;
       if (isNaN(li.LineTotal)) li.LineTotal = undefined;
     });
@@ -134,11 +120,11 @@ export class CartService {
     this.state.order = value;
   }
 
-  private get lineItems(): ListLineItem {
+  private get lineItems(): ListPage<MarketplaceLineItem> {
     return this.state.lineItems;
   }
 
-  private set lineItems(value: ListLineItem) {
+  private set lineItems(value: ListPage<MarketplaceLineItem>) {
     this.state.lineItems = value;
   }
 }

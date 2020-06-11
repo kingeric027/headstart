@@ -3,10 +3,11 @@ import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { OrderStatus, OrderFilters, OrderViewContext, AppConfig } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { OcMeService, ListOrder, OcOrderService, OcTokenService } from '@ordercloud/angular-sdk';
+import { Me, Sortable } from 'ordercloud-javascript-sdk';
 import { filter } from 'rxjs/operators';
 import { RouteService } from '../route/route.service';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { MarketplaceSDK, ListPage, MarketplaceOrder } from 'marketplace-javascript-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 @Injectable({
@@ -20,15 +21,12 @@ export class OrderFilterService {
   );
 
   constructor(
-    private ocMeService: OcMeService,
-    private ocOrderService: OcOrderService,
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private routeService: RouteService,
 
     // remove below when sdk is regenerated
-    private ocTokenService: OcTokenService,
     private httpClient: HttpClient,
     private appConfig: AppConfig
   ) {
@@ -41,7 +39,7 @@ export class OrderFilterService {
     this.patchFilterState({ page: pageNumber || undefined });
   }
 
-  sortBy(field: string): void {
+  sortBy(field: Sortable<'Me.ListOrders'>): void {
     this.patchFilterState({ sortBy: field || undefined, page: undefined });
   }
 
@@ -84,49 +82,26 @@ export class OrderFilterService {
   }
 
   // Used in requests to the OC API
-  async listOrders(): Promise<ListOrder> {
+  async listOrders(): Promise<ListPage<MarketplaceOrder>> {
     const viewContext = this.routeService.getOrderViewContext();
     switch (viewContext) {
       case OrderViewContext.MyOrders:
-        return await this.ocMeService.ListOrders(this.createListOptions()).toPromise();
+        return await Me.ListOrders(this.createListOptions() as any);
       case OrderViewContext.Approve:
-        return await this.ocMeService.ListApprovableOrders(this.createListOptions()).toPromise();
+        return await Me.ListApprovableOrders(this.createListOptions() as any);
       case OrderViewContext.Location:
         // enforcing a location is selected before filtering
         if (this.activeFiltersSubject.value.location) return await this.ListLocationOrders();
     }
   }
 
-  async ListLocationOrders(): Promise<ListOrder> {
+  async ListLocationOrders(): Promise<ListPage<MarketplaceOrder>> {
     const locationID = this.activeFiltersSubject.value.location;
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-    });
-    const url = `${this.appConfig.middlewareUrl}/order/location/${locationID}`;
-    const httpParams = this.createHttpParams();
-    return this.httpClient
-      .get<ListOrder>(url, { headers, params: httpParams })
-      .toPromise();
+    return await MarketplaceSDK.Orders.ListLocationOrders(locationID, this.createListOptions() as any);
   }
 
-  async listApprovableOrders(): Promise<ListOrder> {
-    return await this.ocMeService.ListApprovableOrders(this.createListOptions()).toPromise();
-  }
-
-  private createHttpParams(): HttpParams {
-    let params = new HttpParams();
-    Object.entries(this.createListOptions()).forEach(([key, value]) => {
-      if (key !== 'filters' && value) {
-        params = params.append(key, value.toString());
-      }
-    });
-    Object.entries(this.createListOptions().filters).forEach(([key, value]) => {
-      if ((typeof value !== 'object' && value) || (value && value.length)) {
-        params = params.append(key, value.toString());
-      }
-    });
-    return params;
+  async listApprovableOrders(): Promise<ListPage<MarketplaceOrder>> {
+    return await Me.ListApprovableOrders(this.createListOptions() as any);
   }
 
   private readFromUrlQueryParams = (params: Params): void => {
@@ -150,7 +125,7 @@ export class OrderFilterService {
     };
   }
 
-  private createListOptions(): ListArgs {
+  private createListOptions(): ListArgs<MarketplaceOrder> {
     const { page, sortBy, search, showOnlyFavorites, status, fromDate, toDate } = this.activeFiltersSubject.value;
     const from = fromDate ? `>${fromDate}` : undefined;
     const to = toDate ? `<${toDate}` : undefined;
@@ -164,7 +139,7 @@ export class OrderFilterService {
         DateSubmitted: [from, to].filter(x => x),
       },
     };
-    return this.addStatusFilters(status, listOptions);
+    return this.addStatusFilters(status, listOptions as any);
   }
 
   private addStatusFilters(status: string, listOptions: ListArgs): ListArgs {

@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ListSupplier } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { MarketplaceSDK, SupplierCategoryConfig } from 'marketplace-javascript-sdk';
+import { MarketplaceSDK, SupplierCategoryConfig, ListPage } from 'marketplace-javascript-sdk';
+import { Supplier } from '../shopper-context';
 
 @Component({
   template: `
@@ -11,7 +11,7 @@ import { MarketplaceSDK, SupplierCategoryConfig } from 'marketplace-javascript-s
   `,
 })
 export class SupplierListWrapperComponent implements OnInit, OnDestroy {
-  suppliers: ListSupplier;
+  suppliers: ListPage<Supplier>;
   supplierCategoryConfig: SupplierCategoryConfig;
   alive = true;
 

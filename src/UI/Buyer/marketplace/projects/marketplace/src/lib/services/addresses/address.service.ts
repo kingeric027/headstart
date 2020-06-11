@@ -1,31 +1,23 @@
 import { Injectable } from '@angular/core';
-import { OcMeService, OcTokenService } from '@ordercloud/angular-sdk';
+import { Me } from 'ordercloud-javascript-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
-import { TaxCertificate, MarketplaceAddressBuyer, MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { ListMarketplaceAddressBuyer, AppConfig } from '../../shopper-context';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { TaxCertificate, MarketplaceAddressBuyer, MarketplaceSDK, ListPage } from 'marketplace-javascript-sdk';
+import { AppConfig } from '../../shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AddressService {
-  avalaraCompanyId: number;
   constructor(
-    private ocMeService: OcMeService,
-    private appConfig: AppConfig,
-    // remove below when sdk is regenerated
-    private ocTokenService: OcTokenService,
-    private httpClient: HttpClient
-  ) {
-    this.avalaraCompanyId = this.appConfig.avalaraCompanyId;
-  }
+    private appConfig: AppConfig // remove below when sdk is regenerated
+  ) {}
 
   async get(addressID: string): Promise<MarketplaceAddressBuyer> {
-    return this.ocMeService.GetAddress(addressID).toPromise();
+    return Me.GetAddress(addressID);
   }
 
-  async list(args: ListArgs): Promise<ListMarketplaceAddressBuyer> {
-    return this.ocMeService.ListAddresses(args).toPromise();
+  async list(args: ListArgs): Promise<ListPage<MarketplaceAddressBuyer>> {
+    return Me.ListAddresses(args as any);
   }
 
   async create(address: MarketplaceAddressBuyer): Promise<MarketplaceAddressBuyer> {
@@ -37,44 +29,23 @@ export class AddressService {
   }
 
   async delete(addressID: string): Promise<void> {
-    return this.ocMeService.DeleteAddress(addressID).toPromise();
+    return Me.DeleteAddress(addressID);
   }
 
-  async listBuyerLocations(args: ListArgs = {}): Promise<ListMarketplaceAddressBuyer> {
+  async listBuyerLocations(args: ListArgs = {}): Promise<ListPage<MarketplaceAddressBuyer>> {
     args.filters = { ...args.filters, Editable: 'false' };
     return await this.list(args);
   }
 
   async createCertificate(locationID: string, certificate: TaxCertificate): Promise<TaxCertificate> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-    });
-    const url = `${this.appConfig.middlewareUrl}/avalara/${this.avalaraCompanyId}/certificate/${locationID}`;
-    return this.httpClient
-      .post<TaxCertificate>(url, certificate, { headers })
-      .toPromise();
+    return await MarketplaceSDK.Avalaras.CreateCertificate(this.appConfig.avalaraCompanyId, locationID, certificate);
   }
 
-  async updateCertificate(locationID: number, certificate: TaxCertificate): Promise<TaxCertificate> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-    });
-    const url = `${this.appConfig.middlewareUrl}/avalara/${this.avalaraCompanyId}/certificate/${locationID}`;
-    return this.httpClient
-      .put<TaxCertificate>(url, certificate, { headers })
-      .toPromise();
+  async updateCertificate(locationID: string, certificate: TaxCertificate): Promise<TaxCertificate> {
+    return await MarketplaceSDK.Avalaras.UpdateCertificate(this.appConfig.avalaraCompanyId, locationID, certificate);
   }
 
-  getCertificate = (locationID: string): Promise<TaxCertificate> => {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-    });
-    const url = `${this.appConfig.middlewareUrl}/avalara/${this.avalaraCompanyId}/certificate/${locationID}`;
-    return this.httpClient
-      .get<TaxCertificate>(url, { headers })
-      .toPromise();
-  };
+  async getCertificate(locationID: string): Promise<TaxCertificate> {
+    return await MarketplaceSDK.Avalaras.GetCertificate(this.appConfig.avalaraCompanyId, locationID);
+  }
 }

@@ -1,6 +1,6 @@
 // core services
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { MarketplaceRoutingModule, OrderHistoryWrapperComponent } from './marketplace-routing.module';
+import { MarketplaceRoutingModule } from './marketplace-routing.module';
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component';
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component';
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component';
@@ -15,9 +15,8 @@ import { ProductListWrapperComponent } from './wrapper-components/product-list-w
 import { ProfileWrapperComponent } from './wrapper-components/profile-wrapper.component';
 import { RegisterWrapperComponent } from './wrapper-components/register-wrapper.component';
 import { ResetPasswordWrapperComponent } from './wrapper-components/reset-password-wrapper.component';
-import { FeaturedProductsResolver } from './resolves/features-products.resolve';
 import { MeListAddressResolver, MeListBuyerLocationResolver } from './resolves/me.resolve';
-import { MeProductResolver, MeListSpecsResolver, MeListRelatedProductsResolver } from './resolves/me.product.resolve';
+import { MeProductResolver } from './resolves/me.product.resolve';
 import { AuthService } from './services/auth/auth.service';
 import { CurrentUserService } from './services/current-user/current-user.service';
 import { OrderHistoryService } from './services/order-history/order-history.service';
@@ -41,17 +40,15 @@ import { AppConfig } from './shopper-context';
 import { OrdersToApproveStateService } from './services/order-history/order-to-approve-state.service';
 import { LocationManagementWrapperComponent } from './wrapper-components/location-management-wrapper.component';
 import { ExchangeRatesService } from './services/exchange-rates/exchange-rates.service';
+import { OrderHistoryWrapperComponent } from './wrapper-components/order-history-wrapper-component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [MarketplaceRoutingModule, CommonModule],
   providers: [
-    FeaturedProductsResolver,
     MeListAddressResolver,
     MeListBuyerLocationResolver,
     MeProductResolver,
-    MeListSpecsResolver,
-    MeListRelatedProductsResolver,
     AuthService,
     CreditCardService,
     CurrentOrderService,
