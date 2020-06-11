@@ -86,7 +86,7 @@ namespace Marketplace.Common.Commands
                     await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders);
                     await HandleTaxTransactionCreationAsync(orderWorksheet.Reserialize<OrderWorksheet>());
                     var zoho_salesorder = await _zoho.CreateSalesOrder(orderWorksheet);
-                    await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
+                    await _zoho.CreatePurchaseOrder(zoho_salesorder, updatedSupplierOrders);
                 }
 
                 var response = new OrderSubmitResponse()
@@ -97,7 +97,7 @@ namespace Marketplace.Common.Commands
             }
             catch (Exception ex)
             {
-                var response = new OrderSubmitResponse()
+                 var response = new OrderSubmitResponse()
                 {
                     HttpStatusCode = 500,
                     UnhandledErrorBody = JsonConvert.SerializeObject(ex),

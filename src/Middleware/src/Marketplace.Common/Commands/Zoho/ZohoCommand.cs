@@ -17,7 +17,7 @@ namespace Marketplace.Common.Commands.Zoho
     public interface IZohoCommand
     {
         Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrderWorksheet orderWorksheet);
-        Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, OrderSplitResult orders);
+        Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, List<MarketplaceOrder> orders);
         Task<ZohoOrganizationList> ListOrganizations();
     }
 
@@ -60,12 +60,12 @@ namespace Marketplace.Common.Commands.Zoho
             return results;
         }
 
-        public async Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, OrderSplitResult orders)
+        public async Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, List<MarketplaceOrder> orders)
         {
             try
             {
                 var results = new List<ZohoPurchaseOrder>();
-                foreach (var order in orders.OutgoingOrders)
+                foreach (var order in orders)
                 {
                     var delivery_address = z_order.shipping_address; //TODO: this is not good enough. Might even need to go back to SaleOrder and split out by delivery address
                     var supplier = await _oc.Suppliers.GetAsync(order.ToCompanyID);
@@ -95,6 +95,10 @@ namespace Marketplace.Common.Commands.Zoho
 
         public async Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrderWorksheet orderWorksheet)
         {
+            // consider more robust process for ensuring authentication
+            // this relies on this method being called before other methods in this command
+            // which might always be true
+            await _zoho.AuthenticateAsync();
             try
             {
                 // Step 1: Create contact (customer) in Zoho
@@ -107,9 +111,10 @@ namespace Marketplace.Common.Commands.Zoho
                 items.AddRange(await ApplyShipping(orderWorksheet));
 
                 // Step 4: create sales order with all objects from above
+                var saleorderforrequest = ZohoSalesOrderMapper.Map(orderWorksheet.Order, items.ToList(), contact,
+                        orderWorksheet.LineItems);
                 var salesOrder =
-                    await _zoho.SalesOrders.CreateAsync(ZohoSalesOrderMapper.Map(orderWorksheet.Order, items.ToList(), contact,
-                        orderWorksheet.LineItems));
+                    await _zoho.SalesOrders.CreateAsync(saleorderforrequest);
 
                 return salesOrder;
             }
@@ -213,7 +218,7 @@ namespace Marketplace.Common.Commands.Zoho
             var zContact = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = ocBuyer.Name });
             if (zContact.Items.Any())
             {
-                return await _zoho.Contacts.SaveAsync<ZohoContact>(
+               return await _zoho.Contacts.SaveAsync<ZohoContact>(
                     ZohoContactMapper.Map(
                         zContact.Items.FirstOrDefault(),
                         ocBuyer,

@@ -65,7 +65,8 @@ namespace Marketplace.Common.Services.Zoho
             
         }
 
-        internal IFlurlRequest Request(object[] segments, string access_token = null) => ApiClient
+        internal IFlurlRequest Request(object[] segments, string access_token = null) {
+            return ApiClient
             .Request(segments)
             .WithHeader("Authorization", $"Zoho-oauthtoken {access_token ?? this.TokenResponse.access_token}")
             .ConfigureRequest(settings =>
@@ -78,13 +79,14 @@ namespace Marketplace.Common.Services.Zoho
                     DefaultValueHandling = DefaultValueHandling.Ignore
                 });
             });
+        }
 
         internal IFlurlRequest Put(object obj, object[] segments) => WriteRequest(obj, segments);
         internal IFlurlRequest Post(object obj, object[] segments) => WriteRequest(obj, segments);
 
         private IFlurlRequest WriteRequest(object obj, object[] segments, string access_token = null) =>  ApiClient
             .Request(segments)
-            .SetQueryParam("Authorization", $"Zoho-oauthtoken {access_token ?? this.TokenResponse.access_token}")
+            .WithHeader("Authorization", $"Zoho-oauthtoken {access_token ?? this.TokenResponse.access_token}")
             .SetQueryParam("JSONString", JsonConvert.SerializeObject(obj, new JsonSerializerSettings()
             {
                 NullValueHandling = NullValueHandling.Ignore,
