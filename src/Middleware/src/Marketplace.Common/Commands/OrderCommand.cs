@@ -84,9 +84,9 @@ namespace Marketplace.Common.Commands
                 if (buyerOrder.xp == null || buyerOrder.xp.OrderType != OrderType.Quote)
                 {
                     await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders);
-                    await HandleTaxTransactionCreationAsync(orderWorksheet);
+                    await HandleTaxTransactionCreationAsync(orderWorksheet.Reserialize<OrderWorksheet>());
                     var zoho_salesorder = await _zoho.CreateSalesOrder(orderWorksheet);
-                    await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
+                    await _zoho.CreatePurchaseOrder(zoho_salesorder, updatedSupplierOrders);
                 }
 
                 var response = new OrderSubmitResponse()
@@ -97,7 +97,7 @@ namespace Marketplace.Common.Commands
             }
             catch (Exception ex)
             {
-                var response = new OrderSubmitResponse()
+                 var response = new OrderSubmitResponse()
                 {
                     HttpStatusCode = 500,
                     UnhandledErrorBody = JsonConvert.SerializeObject(ex),
@@ -345,7 +345,7 @@ namespace Marketplace.Common.Commands
             return shipFromAddressIDs;
         }
 
-        private async Task HandleTaxTransactionCreationAsync(MarketplaceOrderWorksheet orderWorksheet)
+        private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
         {
             var transaction = await _avalara.CreateTransactionAsync(orderWorksheet);
             await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()

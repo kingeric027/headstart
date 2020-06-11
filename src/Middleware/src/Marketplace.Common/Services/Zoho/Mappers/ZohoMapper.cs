@@ -240,7 +240,10 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return new ZohoSalesOrder()
             {
                 reference_number = order.ID,
-                salesorder_id = order.ID, // expecting this to fail
+
+                // salesorder id is not writable
+                // salesorder_id = order.ID
+                
                 date = order.DateSubmitted?.ToString("yyyy-MM-dd"),
                 line_items = items.Select(item =>
                 {
