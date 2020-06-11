@@ -28,6 +28,7 @@ namespace Marketplace.Common.Commands
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> GetMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
+        Task RequestReturnEmail(string OrderID);
     }
 
     public class OrderCommand : IOrderCommand
@@ -111,6 +112,11 @@ namespace Marketplace.Common.Commands
             string buyerOrderID = orderID.Substring(0, index);
             await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
             return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+        }
+
+        public async Task RequestReturnEmail(string orderID)
+        {
+            await _sendgridService.SendReturnRequestedEmail(orderID);
         }
 
         public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)

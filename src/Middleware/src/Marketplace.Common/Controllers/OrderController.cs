@@ -31,6 +31,15 @@ namespace Marketplace.Common.Controllers
             return await _command.AcknowledgeQuoteOrder(orderID);
         }
 
+        [DocName("PATCH Send return requested email")]
+        // todo update auth
+        [HttpPatch]
+        [Route("requestreturn/{orderID}")]
+        public async Task RequestReturnEmail(string orderID)
+        {
+            await _command.RequestReturnEmail(orderID);
+        }
+
         [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
         [HttpGet, Route("location/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<ListPage<Order>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)
