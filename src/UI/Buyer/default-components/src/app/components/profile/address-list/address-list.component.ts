@@ -37,7 +37,7 @@ export class OCMAddressList implements OnInit {
   homeCountry: string;
   constructor(private context: ShopperContextService, private toasterService: ToastrService) {}
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.reloadAddresses();
   }
 
