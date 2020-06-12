@@ -36,6 +36,7 @@ export class OCMAddressForm implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.homeCountry) {
       this.addressForm.controls.Country.setValue(this.homeCountry);
+      this.onCountryChange();
     }
   }
 
@@ -61,11 +62,10 @@ export class OCMAddressForm implements OnInit, OnChanges {
     this.shouldSaveAddressForm = new FormGroup({
       shouldSaveAddress: new FormControl(false),
     });
-    this.onCountryChange();
   }
 
   onCountryChange(event?: any): void {
-    const country = this.addressForm.value.Country;
+    const country = this.homeCountry;
     this.stateOptions = GeographyConfig.getStates(country).map(s => s.abbreviation);
     this.addressForm.get('Zip').setValidators([Validators.required, ValidateUSZip]);
     if (event) {

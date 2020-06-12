@@ -115,7 +115,8 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6 form-group">
+      <div class="col-md-6 form-group"
+           ngbTooltip="You are only able to ship to {{getCountryName(homeCountry)}} addresses.">
         <label class="sr-only"
                for="country"
                translate>PROFILE.ADDRESS_FORM.COUNTRY</label>
