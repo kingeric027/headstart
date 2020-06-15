@@ -213,7 +213,7 @@ namespace Marketplace.Common.Commands
         private async Task<decimal?> ExchangeUnitPrice(MarketplaceLineItem li, MarketplaceOrder order)
         {
 			var supplierCurrency = li.Product?.xp?.Currency ?? CurrencySymbol.USD; // Temporary default to work around bad data.
-			var buyerCurrency = order.xp.Currency;
+			var buyerCurrency = order.xp.Currency ?? CurrencySymbol.USD;
 			return (decimal) await _exchangeRates.ConvertCurrency(supplierCurrency, buyerCurrency, (double)li.UnitPrice);
         }
 

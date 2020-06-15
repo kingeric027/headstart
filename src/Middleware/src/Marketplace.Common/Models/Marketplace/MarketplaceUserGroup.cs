@@ -17,6 +17,6 @@ namespace Marketplace.Models
         public string Type { get; set; }
         public string Role { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
-		public CurrencySymbol? Currency { get; set; } = null
+		public CurrencySymbol? Currency { get; set; } = null;
     }
 }

@@ -23,6 +23,6 @@ namespace Marketplace.Models.Models.Marketplace
         public bool SyncFreightPop { get; set; }
         public string ApiClientID { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
-		public CurrencySymbol? Currency { get; set; } = null
+		public CurrencySymbol? Currency { get; set; } = null;
     }
 }
