@@ -193,6 +193,9 @@ export class ProductEditComponent implements OnInit {
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
         ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType'), Validators.required),
         IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
+        QuantityAvailable: new FormControl(superMarketplaceProduct.Product?.Inventory?.QuantityAvailable, Validators.min(1)),
+        InventoryEnabled: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.Enabled')),
+        OrderCanExceed: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.OrderCanExceed')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
         UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit'), Validators.required),
@@ -274,7 +277,7 @@ export class ProductEditComponent implements OnInit {
     const productUpdate = {
       field,
       value:
-        (field === 'Product.Active' || field === 'Product.xp.IsResale')
+        (field === 'Product.Active' || field === 'Product.xp.IsResale' || field === 'Product.Inventory.Enabled')
           ? event.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
