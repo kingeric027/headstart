@@ -78,25 +78,22 @@ export class ProductService extends ResourceCrudService<Product> {
     router: Router,
     activatedRoute: ActivatedRoute,
     private ocProductsService: OcProductService,
-    private ocPriceScheduleService: OcPriceScheduleService,
-    private ocCatalogService: OcCatalogService
+    private ocPriceScheduleService: OcPriceScheduleService
   ) {
     super(router, activatedRoute, ocProductsService, '/products', 'products');
   }
 
-  async updateProductCatalogAssignments(add: ProductAssignment[], del: ProductAssignment[]): Promise<void> {
-    const addRequests = add.map(newAssignment => this.addProductCatalogAssignment(newAssignment));
-    const deleteRequests = del.map(assignmentToRemove => this.removeProductCatalogAssignment(assignmentToRemove));
+  async updateProductCatalogAssignments(
+    add: ProductAssignment[],
+    del: ProductAssignment[],
+    buyerID: string
+  ): Promise<void> {
+    const addRequests = add.map(newAssignment => this.ocProductsService.SaveAssignment(newAssignment).toPromise());
+    const deleteRequests = del.map(assignmentToRemove =>
+      this.ocProductsService
+        .DeleteAssignment(assignmentToRemove.ProductID, buyerID, { userGroupID: assignmentToRemove.UserGroupID })
+        .toPromise()
+    );
     await Promise.all([...addRequests, ...deleteRequests]);
-  }
-
-  addProductCatalogAssignment(assignment: ProductCatalogAssignment): Promise<void> {
-    return this.ocCatalogService
-      .SaveProductAssignment({ CatalogID: assignment.CatalogID, ProductID: assignment.ProductID })
-      .toPromise();
-  }
-
-  removeProductCatalogAssignment(assignment: ProductCatalogAssignment) {
-    return this.ocCatalogService.DeleteProductAssignment(assignment.CatalogID, assignment.ProductID).toPromise();
   }
 }

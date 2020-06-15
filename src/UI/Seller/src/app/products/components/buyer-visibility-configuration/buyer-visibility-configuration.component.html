@@ -12,11 +12,11 @@
       </div>
       <div class="col-sm">
         <ng-container>
-          <span *ngIf="isAssignedStatic">
+          <span *ngIf="catalogAssignmentsStatic.length > 0">
             <div class="active-circle"></div>
-            Visible
+            Visible in {{catalogAssignmentsStatic.length}}/{{catalogs.length}} catalogs
           </span>
-          <span *ngIf="!isAssignedStatic">
+          <span *ngIf="catalogAssignmentsStatic.length === 0">
             <div class="inactive-circle"></div>
             Not Visible
           </span>
@@ -32,24 +32,12 @@
       <p class="font-italic">
         Within this buyer configure the category and catalogs in which the product will appear, and the price buyers will pay.
       </p>
-      
-      <h5>1) Determine if this Product Can Be Purchased by this Buyer</h5>
-      <div class="form-group">
-        <mat-slide-toggle [disabled]="readonly"
-        aria-describedby="Active"
-        [checked]="isAssignedEditable"
-        (change)="updateIsAssigned($event)">
-        Show Product to This Buyer
-      </mat-slide-toggle>
-    </div>
     <ng-container>
 
       <!-- todo -->
       <!-- <h5 *ngIf="isAssignedEditable">Category</h5> -->
 
-      <h5 *ngIf="isAssignedEditable">2) Determine in which Catalog inside this Buyer the product will appear </h5>
-
-      <table class="table table-hover">
+      <table *ngIf="catalogs.length" class="table table-hover">
         <thead>
           <tr>
             <th scope="col">Visible</th>
@@ -57,35 +45,38 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="cursor-pointer"
-              *ngFor="let catalog of catalogs"
-              (click)="toggleProductCatalogAssignment(catalog)">
+          <ng-container *ngFor="let catalog of catalogs">
+            <tr class="cursor-pointer"
+            (click)="toggleProductCatalogAssignment(catalog)">
             <td class="d-flex justify-content-start align-items-center">
               <label class="switch mb-0">
                 <input class="form-check-input"
-                       type="checkbox"
-                       (click)="toggleProductCatalogAssignment(buyer)"
-                       [checked]="isAssigned(buyer)">
+                type="checkbox"
+                [checked]="isAssigned(catalog.ID)">
                 <span class="slider round"></span>
               </label>
             </td>
-            <td>{{buyer.Name}}</td>
+            <td>{{catalog.Name}}</td>
           </tr>
+        </ng-container>
         </tbody>
       </table>
 
-      <div class="d-flex justify-content-end">
+      <p *ngIf="!catalogs.length" class="alert alert-info font-weight-bold mb-0">There are no catalogs for this buyer currently.</p>
+
+
+      <div class="mt-3 d-flex justify-content-end">
         <button *ngIf="areChanges"
                 class="btn btn-primary"
                 type="submit"
                 [disabled]="isValidBuyerAssignment || dataIsSaving"
-                (click)="handleSave()">Save</button>
-        <button class="btn brand-button ml-3"
+                (click)="executeProductCatalogAssignmentRequests()">Save</button>
+        <button *ngIf="areChanges" class="btn brand-button ml-3"
                 (click)="handleDiscardChanges()">Discard Changes</button>
+        <button *ngIf="!areChanges" class="btn brand-button ml-3"
+                (click)="handleClose()">Close</button>
       </div>
     </ng-container>
     </div>
-  </div>
-  <div>
   </div>
 </div>

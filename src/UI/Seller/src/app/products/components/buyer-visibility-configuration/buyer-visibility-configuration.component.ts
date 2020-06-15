@@ -8,6 +8,7 @@ import {
   UserGroup,
   OcProductService,
   ProductAssignment,
+  CatalogAssignment,
 } from '@ordercloud/angular-sdk';
 import { ProductService } from '@app-seller/products/product.service';
 import { MarketplaceBuyer, MarketplaceProduct } from 'marketplace-javascript-sdk';
@@ -21,19 +22,13 @@ export class BuyerVisibilityConfiguration {
   @Input()
   set buyer(value: MarketplaceBuyer) {
     this._buyer = value;
-  }
-  @Input()
-  set isAssigned(value: boolean) {
-    this.resetIsAssignedStatus(value);
+    this.fetchData();
   }
 
   @Input()
   product: MarketplaceProduct = {};
 
   _buyer: MarketplaceBuyer = {};
-
-  isAssignedEditable = false;
-  isAssignedStatic = false;
 
   add: ProductAssignment[];
   del: ProductAssignment[];
@@ -48,15 +43,22 @@ export class BuyerVisibilityConfiguration {
   categories: Category[] = [];
   catalogs: UserGroup[] = [];
 
+  // product must be assigned to the catalog for the usergroup and catagory asssignments,
+  // however none of the visibility functionality is based on this assignment
+  isAssignedToCatalog = false;
+
   constructor(
     private ocCategoryService: OcCategoryService,
+    private ocCatalogService: OcCatalogService,
     private ocUserGroupService: OcUserGroupService,
-    private ocProductService: OcProductService
+    private ocProductService: OcProductService,
+    private productService: ProductService
   ) {}
 
-  resetIsAssignedStatus(value: boolean): void {
-    this.isAssignedEditable = value;
-    this.isAssignedStatic = value;
+  async fetchData(): Promise<void> {
+    await this.getCatalogAssignments();
+    await this.getCatalogs();
+    await this.getCatalogAssignments();
   }
 
   resetCatalogAssignments(catalogAssignments: ProductAssignment[]): void {
@@ -64,35 +66,36 @@ export class BuyerVisibilityConfiguration {
     this.catalogAssignmentsStatic = catalogAssignments;
   }
 
-  toggleProductCatalogAssignment(catalog: ProductAssignment): void {
-    if (this.catalogAssignmentsEditable.some(c => c.UserGroupID === catalog.UserGroupID)) {
-      this.catalogAssignmentsEditable = this.catalogAssignmentsEditable.filter(
-        c => c.UserGroupID !== catalog.UserGroupID
-      );
-    } else {
-      const newCatalogAssignment: ProductAssignment = { ProductID: this.product.ID, UserGroupID: catalog.UserGroupID };
-      this.catalogAssignmentsEditable = [...this.catalogAssignmentsEditable, newCatalogAssignment];
-    }
+  isAssigned(userGroupID: string): boolean {
+    console.log(this.catalogAssignmentsEditable);
+    return this.catalogAssignmentsEditable.some(c => c.UserGroupID === userGroupID);
   }
 
-  updateIsAssigned(event: any): void {
-    this.isAssignedEditable = !this.isAssignedEditable;
-    this.updateStatus();
+  toggleProductCatalogAssignment(catalog: UserGroup): void {
+    if (this.isAssigned(catalog.ID)) {
+      this.catalogAssignmentsEditable = this.catalogAssignmentsEditable.filter(c => c.UserGroupID !== catalog.ID);
+    } else {
+      const newCatalogAssignment: ProductAssignment = {
+        ProductID: this.product.ID,
+        UserGroupID: catalog.ID,
+        BuyerID: this._buyer.ID,
+      };
+      this.catalogAssignmentsEditable = [...this.catalogAssignmentsEditable, newCatalogAssignment];
+    }
+    this.checkForProductCatalogAssignmentChanges();
   }
 
   updateStatus(): void {
-    this.areChanges = this.isAssignedEditable !== this.isAssignedStatic;
+    this.areChanges = this.add.length > 0 || this.del.length > 0;
   }
 
   edit(): void {
     this.isEditing = true;
     // this.getCategories();
-    this.getCatalogs();
   }
 
   handleDiscardChanges(): void {
     this.catalogAssignmentsEditable = this.catalogAssignmentsStatic;
-    this.isAssignedEditable = this.isAssignedStatic;
     this.isEditing = false;
   }
 
@@ -103,6 +106,13 @@ export class BuyerVisibilityConfiguration {
   //     .toPromise();
   //   this.categories = categoryResponse.Items;
   // }
+
+  async getCatalogAssignment(): Promise<void> {
+    const catalogAssignmentResponse = await this.ocCatalogService
+      .ListProductAssignments({ catalogID: this._buyer.ID, productID: this.product.ID })
+      .toPromise();
+    this.isAssignedToCatalog = catalogAssignmentResponse.Meta.TotalCount > 0;
+  }
 
   async getCatalogs(): Promise<void> {
     const catalogsResponse = await this.ocUserGroupService
@@ -121,17 +131,36 @@ export class BuyerVisibilityConfiguration {
       this.ocProductService.ListAssignments({ userGroupID: c.ID, productID: this.product.ID }).toPromise()
     );
     const catalogAssignmentResponses = await Promise.all(catalogAssignmentRequests);
-    const catalogAssignments = catalogAssignmentResponses.reduce((acc, curr) => acc.concat(curr), []);
+    const catalogAssignments = catalogAssignmentResponses.reduce((acc, curr) => acc.concat(curr.Items), []);
     this.resetCatalogAssignments(catalogAssignments);
   }
 
-  checkForProductCatalogAssignmentChanges() {
+  async assignToCatalogIfNecessary(): Promise<void> {
+    if (!this.isAssignedToCatalog) {
+      await this.ocCatalogService
+        .SaveProductAssignment({ CatalogID: this._buyer.ID, ProductID: this.product.ID })
+        .toPromise();
+    }
+  }
+
+  async executeProductCatalogAssignmentRequests(): Promise<void> {
+    await this.assignToCatalogIfNecessary();
+    await this.productService.updateProductCatalogAssignments(this.add, this.del, this._buyer.ID);
+    this.resetCatalogAssignments(this.catalogAssignmentsEditable);
+    this.checkForProductCatalogAssignmentChanges();
+  }
+
+  checkForProductCatalogAssignmentChanges(): void {
     this.add = this.catalogAssignmentsEditable.filter(
       assignment => !JSON.stringify(this.catalogAssignmentsStatic).includes(assignment.UserGroupID)
     );
     this.del = this.catalogAssignmentsStatic.filter(
       assignment => !JSON.stringify(this.catalogAssignmentsEditable).includes(assignment.UserGroupID)
     );
-    this.areChanges = this.add.length > 0 || this.del.length > 0;
+    this.updateStatus();
+  }
+
+  handleClose(): void {
+    this.isEditing = false;
   }
 }
