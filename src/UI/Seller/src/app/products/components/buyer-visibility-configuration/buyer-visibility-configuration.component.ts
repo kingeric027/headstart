@@ -67,7 +67,6 @@ export class BuyerVisibilityConfiguration {
   }
 
   isAssigned(userGroupID: string): boolean {
-    console.log(this.catalogAssignmentsEditable);
     return this.catalogAssignmentsEditable.some(c => c.UserGroupID === userGroupID);
   }
 
@@ -86,6 +85,7 @@ export class BuyerVisibilityConfiguration {
   }
 
   updateStatus(): void {
+    console.log(this.add, this.del);
     this.areChanges = this.add.length > 0 || this.del.length > 0;
   }
 
@@ -96,7 +96,7 @@ export class BuyerVisibilityConfiguration {
 
   handleDiscardChanges(): void {
     this.catalogAssignmentsEditable = this.catalogAssignmentsStatic;
-    this.isEditing = false;
+    this.checkForProductCatalogAssignmentChanges();
   }
 
   // todo
