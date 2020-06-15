@@ -1,5 +1,6 @@
 import { AppConfig } from 'marketplace';
 import { environment } from 'src/environments/environment';
+import { ApiRole } from '../../../../marketplace/node_modules/ordercloud-javascript-sdk/dist';
 
 export const ocAppConfig: AppConfig = {
   appname: environment.appname,
@@ -21,7 +22,6 @@ export const ocAppConfig: AppConfig = {
     'MeAdmin',
     'MeCreditCardAdmin',
     'MeXpAdmin',
-    'MPApprovalRuleAdmin',
     'UserGroupAdmin',
     'ApprovalRuleAdmin',
     'Shopper',
@@ -30,6 +30,7 @@ export const ocAppConfig: AppConfig = {
     'PasswordReset',
     'SupplierReader',
     'SupplierAddressReader',
+    'MPApprovalRuleAdmin',
 
     // location roles, will appear on jwt if a user
     // has this role for any location
@@ -40,5 +41,5 @@ export const ocAppConfig: AppConfig = {
     'MPLocationCreditCardAdmin',
     'MPLocationAddressAdmin',
     'MPLocationResaleCertAdmin',
-  ],
+  ] as ApiRole[],
 };

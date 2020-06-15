@@ -9,10 +9,7 @@ import {
   ApiRole,
   Sortable,
 } from 'ordercloud-javascript-sdk';
-import { ProductXp, MarketplaceAddressBuyer, TaxCertificate, UserGroupXp } from 'marketplace-javascript-sdk';
-
-export * from 'ordercloud-javascript-sdk';
-// export * from './services/shopper-context/shopper-context.service';
+import { UserGroupXp, ProductXp, TaxCertificate, MarketplaceAddressBuyer } from 'marketplace-javascript-sdk';
 
 export interface LineItemGroupSupplier {
   supplier: Supplier;

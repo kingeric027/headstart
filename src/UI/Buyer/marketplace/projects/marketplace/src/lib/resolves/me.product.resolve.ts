@@ -1,22 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
-import { Tokens } from 'ordercloud-javascript-sdk';
-import { AppConfig } from '../shopper-context';
-import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {} from 'ordercloud-javascript-sdk';
+import { SuperMarketplaceProduct, MarketplaceSDK } from 'marketplace-javascript-sdk';
 
 @Injectable()
 export class MeProductResolver implements Resolve<SuperMarketplaceProduct> {
-  constructor(private appConfig: AppConfig, public httpClient: HttpClient) {}
+  constructor() {}
 
   resolve(route: ActivatedRouteSnapshot): Promise<SuperMarketplaceProduct> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
-    });
-    const url = `${this.appConfig.middlewareUrl}/me/products/${route.params.productID}`;
-    return this.httpClient
-      .get<SuperMarketplaceProduct>(url, { headers })
-      .toPromise();
+    return MarketplaceSDK.Mes.GetSuperProduct(route.params.productID);
   }
 }

@@ -7,7 +7,7 @@ import {
   Me,
   OrderWorksheet,
   IntegrationEvents,
-  OrderShipMethodSelection,
+  ShipMethodSelection,
 } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
@@ -119,8 +119,10 @@ export class CheckoutService {
     return await IntegrationEvents.EstimateShipping('Outgoing', this.order.ID);
   }
 
-  async selectShipMethod(selection: OrderShipMethodSelection): Promise<OrderWorksheet> {
-    const orderWorksheet = await IntegrationEvents.SelectShipmethods('Outgoing', this.order.ID, selection);
+  async selectShipMethods(selections: ShipMethodSelection[]): Promise<OrderWorksheet> {
+    const orderWorksheet = await IntegrationEvents.SelectShipmethods('Outgoing', this.order.ID, {
+      ShipMethodSelections: selections,
+    });
     this.order = orderWorksheet.Order;
     return orderWorksheet;
   }

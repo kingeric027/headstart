@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Address, BuyerAddress, ListBuyerAddress, ListLineItem } from '@ordercloud/angular-sdk';
+import { Address, BuyerAddress, LineItem, ListPage } from 'ordercloud-javascript-sdk';
 import { ShopperContextService } from 'marketplace';
-import { MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceAddressBuyer } from 'marketplace-javascript-sdk';
 
 import { getSuggestedAddresses } from '../../../services/address-suggestion.helper';
 // TODO - Make this component "Dumb" by removing the dependence on context service 
@@ -14,15 +14,15 @@ import { getSuggestedAddresses } from '../../../services/address-suggestion.help
 })
 export class OCMCheckoutAddress implements OnInit {
   readonly NEW_ADDRESS_CODE = 'new';
-  existingBuyerLocations: ListBuyerAddress;
+  existingBuyerLocations: ListPage<BuyerAddress>;
   selectedBuyerLocation: BuyerAddress = {};
-  existingShippingAddresses: ListBuyerAddress;
+  existingShippingAddresses: ListPage<BuyerAddress>;
   selectedShippingAddress: BuyerAddress;
   showNewAddressForm = false;
   suggestedAddresses: BuyerAddress[];
   
   @Input() order: MarketplaceOrder;
-  @Input() lineItems: ListLineItem;
+  @Input() lineItems: ListPage<LineItem>;
   @Output() continue = new EventEmitter();
 
   constructor(private context: ShopperContextService) { }
@@ -70,7 +70,7 @@ export class OCMCheckoutAddress implements OnInit {
     this.existingShippingAddresses = await this.context.addresses.list({ filters: { Shipping: true }});
   }
 
-  private async saveNewShippingAddress(address: BuyerAddress): Promise<Address> {
+  private async saveNewShippingAddress(address: BuyerAddress): Promise<MarketplaceAddressBuyer> {
     address.Shipping = true;
     address.Billing = false;
     try {

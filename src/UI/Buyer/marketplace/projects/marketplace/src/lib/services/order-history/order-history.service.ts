@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Orders, LineItems, Me, Suppliers, SupplierAddresses, Tokens } from 'ordercloud-javascript-sdk';
 import { ReorderHelperService } from '../reorder/reorder.service';
-import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderReorderResponse, LineItemGroupSupplier, AppConfig } from '../../shopper-context';
 import { OrderFilterService } from './order-filter.service';
 import {
@@ -22,7 +21,6 @@ export class OrderHistoryService {
 
   constructor(
     public filters: OrderFilterService,
-    private paymentHelper: PaymentHelperService,
     private reorderHelper: ReorderHelperService,
     private httpClient: HttpClient,
     private appConfig: AppConfig
@@ -107,7 +105,7 @@ export class OrderHistoryService {
     quantityToReturn: number,
     returnReason: string
   ): Promise<MarketplaceLineItem> {
-    return await LineItems.Patch('Outgoing', orderID, lineItemID, {
+    const patch = {
       xp: {
         LineItemReturnInfo: {
           QuantityToReturn: quantityToReturn,
@@ -115,6 +113,9 @@ export class OrderHistoryService {
           Resolved: false,
         },
       },
-    });
+    };
+    const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
+    MarketplaceSDK.Orders.RequestReturnEmail(orderID); // Not awaited. Can return before email succeeds.
+    return line;
   }
 }

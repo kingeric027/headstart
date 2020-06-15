@@ -1,5 +1,5 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
-import { Address } from '@ordercloud/angular-sdk';
+import { Address } from 'ordercloud-javascript-sdk'
 
 @Component({
   templateUrl: './address-card.component.html',
@@ -7,7 +7,7 @@ import { Address } from '@ordercloud/angular-sdk';
   encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class OCMAddressCard {
-  @Input() address: Address = {};
+  @Input() address = {} as Address;
   @Input() highlight?: boolean;
 
   // make into pipe?

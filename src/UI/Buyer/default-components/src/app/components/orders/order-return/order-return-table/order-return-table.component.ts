@@ -2,7 +2,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Supplier, ShopperContextService } from 'marketplace';
+import { ShopperContextService } from 'marketplace';
+import { Supplier } from 'ordercloud-javascript-sdk'
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { FormGroup, FormArray } from '@angular/forms';
 import { ReturnReason } from './return-reason-enum';

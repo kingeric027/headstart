@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
-import { OrderStatus, OrderFilters, OrderViewContext, AppConfig } from '../../shopper-context';
+import { OrderStatus, OrderFilters, OrderViewContext } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { Me, Sortable } from 'ordercloud-javascript-sdk';
 import { filter } from 'rxjs/operators';
 import { RouteService } from '../route/route.service';
-import { HttpClient } from '@angular/common/http';
 import { MarketplaceSDK, ListPage, MarketplaceOrder } from 'marketplace-javascript-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
@@ -24,11 +23,7 @@ export class OrderFilterService {
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private routeService: RouteService,
-
-    // remove below when sdk is regenerated
-    private httpClient: HttpClient,
-    private appConfig: AppConfig
+    private routeService: RouteService
   ) {
     this.activatedRoute.queryParams
       .pipe(filter(() => this.router.url.startsWith('/orders')))

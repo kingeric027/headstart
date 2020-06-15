@@ -4,7 +4,7 @@ import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
 
 import { FieldConfig } from './field-config.interface';
-import { ListSpec, SpecOption, Spec } from '@ordercloud/angular-sdk';
+import { SpecOption, Spec, ListPage } from 'ordercloud-javascript-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
 import { exchange } from 'src/app/services/currency.helper';
 import { ShopperContextService } from 'marketplace';
@@ -25,13 +25,13 @@ import { ShopperContextService } from 'marketplace';
   styleUrls: ['./spec-form.component.scss'],
 })
 export class OCMSpecForm implements OnChanges {
-  _specs: ListSpec;
+  _specs: ListPage<Spec>;
   @Output() specFormChange: EventEmitter<SpecFormEvent> = new EventEmitter<SpecFormEvent>();
   config: FieldConfig[] = [];
   form: FormGroup;
  
   @Input() currency: string;
-  @Input() set specs(value: ListSpec) {
+  @Input() set specs(value: ListPage<Spec>) {
     this._specs = value;
     this.init();
   } 

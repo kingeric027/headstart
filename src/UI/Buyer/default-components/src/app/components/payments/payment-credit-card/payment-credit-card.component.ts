@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ListBuyerCreditCard } from 'marketplace';
+import { BuyerCreditCard, ListPage } from 'ordercloud-javascript-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { CreditCardFormOutput } from '../credit-card-form/credit-card-form.component';
 import { SelectedCreditCard } from '../../checkout/checkout-payment/checkout-payment.component';
@@ -11,7 +11,7 @@ import { SelectedCreditCard } from '../../checkout/checkout-payment/checkout-pay
 export class OCMPaymentCreditCard implements OnInit {
   showNewCCForm = false;
 
-  @Input() cards: ListBuyerCreditCard;
+  @Input() cards: ListPage<BuyerCreditCard>;
   @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
   form = new FormGroup({
     cardID: new FormControl(null, Validators.required),

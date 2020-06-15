@@ -28,7 +28,14 @@ namespace Marketplace.Models
 		public CurrencySymbol Currency { get; set; }
     }
 
-    [SwaggerModel]
+	[JsonConverter(typeof(StringEnumConverter))]
+	public enum OrderType
+	{
+		Standard,
+		Quote
+	}
+
+	[SwaggerModel]
     public class OrderDetails
     {
         public MarketplaceOrder Order { get; set; }

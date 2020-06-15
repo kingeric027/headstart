@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { takeWhile } from 'rxjs/operators';
-import { MarketplaceMeProduct, ListPage } from '../shopper-context';
+import { MarketplaceMeProduct } from '../shopper-context';
+import { ListPage } from 'ordercloud-javascript-sdk';
 
 @Component({
   template: `

@@ -1,4 +1,4 @@
-import { Configuration } from '@ordercloud/angular-sdk';
+import { Configuration } from 'ordercloud-javascript-sdk';
 import { environment } from 'src/environments/environment';
 
 export function OcSDKConfig(): Configuration {

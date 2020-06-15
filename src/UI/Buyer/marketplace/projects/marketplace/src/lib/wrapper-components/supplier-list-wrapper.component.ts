@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { MarketplaceSDK, SupplierCategoryConfig, ListPage } from 'marketplace-javascript-sdk';
-import { Supplier } from '../shopper-context';
+import { Supplier } from 'ordercloud-javascript-sdk';
 
 @Component({
   template: `

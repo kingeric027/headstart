@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MeUser } from '@ordercloud/angular-sdk';
+import { MeUser } from 'ordercloud-javascript-sdk';
 import { ToastrService } from 'ngx-toastr';
 import { ShopperContextService } from 'marketplace';
 import { faEdit, faUser, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
