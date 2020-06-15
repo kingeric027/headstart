@@ -322,7 +322,8 @@ namespace Marketplace.Common.Commands
                 SupplierIDs = new List<string>() { supplierID },
                 StopShipSync = false,
                 OrderType = buyerOrder.xp.OrderType,
-                QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo
+                QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
+				Currency = buyerOrder.xp.Currency
             };
             return supplierOrderXp;
         }
