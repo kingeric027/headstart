@@ -55,7 +55,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   areChanges: boolean;
   parentResources: ListPage<any>;
   requestStatus: RequestStatus;
-  selectedParentResourceName = 'Fetching Data';
+  selectedParentResourceName: string;
   selectedParentResourceID = '';
   breadCrumbs: BreadCrumb[] = [];
   isCreatingNew = false;
@@ -231,9 +231,12 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   private setParentResourceSelectionSubscription() {
+    console.log(this.activatedRoute);
+    console.log(this.parentResourceService);
     this.activatedRoute.params
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
       .subscribe(async params => {
+        console.log('here');
         await this.redirectToFirstParentIfNeeded();
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];

@@ -1,0 +1,17 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-7">
+      <form [formGroup]="resourceForm">
+        <label for="Code">Discount Code</label>
+        <input type="text"
+               class="form-control"
+               formControlName="Code"
+               placeholder="e.g. SUMMERFUN">
+        <small>Buyer users will use this code at checkout.</small>
+      </form>
+    </div>
+    <div class="col-md-5">
+      <p class="font-weight-bold">Summary</p>
+    </div>
+  </div>
+</div>

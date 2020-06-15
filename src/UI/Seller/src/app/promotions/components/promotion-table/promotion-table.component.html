@@ -34,8 +34,10 @@
     </tbody>
   </table>
   <div class="resource-edit">
-    <resource-edit-component resourceType="Promotion"
+    <app-promotion-edit [filterConfig]="filterConfig"
+                        [resourceInSelection]="resourceInSelection"></app-promotion-edit>
+    <!-- <resource-edit-component resourceType="Promotion"
                              (updateResource)="updateResource($event)"
-                             [resource]="updatedResource"></resource-edit-component>
+                             [resource]="updatedResource"></resource-edit-component> -->
   </div>
 </resource-table-component>
