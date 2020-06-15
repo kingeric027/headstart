@@ -11,7 +11,7 @@ namespace Marketplace.Models.Models.Marketplace
     {
         public LineItemReturnInfo LineItemReturnInfo { get; set; }
         public string LineItemImageUrl { get; set; }
-        public decimal? ProductUnitPrice { get; set; }
+        public decimal? UnitPriceInProductCurrency { get; set; }
     }
 
 	[SwaggerModel]
