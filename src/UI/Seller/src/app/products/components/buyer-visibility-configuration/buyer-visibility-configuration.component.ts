@@ -85,7 +85,6 @@ export class BuyerVisibilityConfiguration {
   }
 
   updateStatus(): void {
-    console.log(this.add, this.del);
     this.areChanges = this.add.length > 0 || this.del.length > 0;
   }
 
