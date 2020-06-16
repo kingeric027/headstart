@@ -38,7 +38,6 @@ namespace Marketplace.Common.Services
         private const string BUYER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
         private const string SUPPLIER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-5776a6c57b344aeda605444c96ff39e8";
         private const string BUYER_NEW_USER_TEMPLATE_ID = "d-f3831baa2beb4c19aeace19e48132768";
-        private const string BUYER_ORDER_UPDATED_TEMPLATE_ID = "d-ff15cd80bb934f90ae4fe90678d88d54";
         private const string BUYER_PASSWORD_RESET_TEMPLATE_ID = "d-ca6a6ff8c9ac4264bf86b5d6cdd3a038";
         private const string BUYER_ORDER_SUBMITTED_FOR_APPROVAL_TEMPLATE_ID = "d-4c674afcd6ef44e9b7793eb6c5b917ea";
         private const string BUYER_ORDER_APPROVED_TEMPLATE_ID = "d-2f3b92b95b7b45ea8f8fb94c8ac928e0";
@@ -143,7 +142,7 @@ namespace Marketplace.Common.Services
         {
             MarketplaceOrder order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID);
-            var productsList = lineItems.Items.Select(MapLineItemToProduct);
+            var productsList = lineItems.Items.Select(MapReturnedLineItemToProduct);
             var dynamicTemplateData = new {
             order.FromUser.FirstName,
             order.FromUser.LastName,
@@ -235,6 +234,18 @@ namespace Marketplace.Common.Services
             };
         }
 
+        private object MapReturnedLineItemToProduct(MarketplaceLineItem lineItem) =>
+        new
+        {
+            ProductName = lineItem.Product.Name,
+            ImageURL = lineItem.xp.LineItemImageUrl,
+            lineItem.ProductID,
+            lineItem.Quantity,
+            lineItem.LineTotal,
+            ReturnQuantity = lineItem.xp.LineItemReturnInfo.QuantityToReturn,
+            Comments = lineItem.xp.LineItemReturnInfo.ReturnReason
+        };
+
         private object MapLineItemToProduct(MarketplaceLineItem lineItem) =>
           new
           {
@@ -243,9 +254,8 @@ namespace Marketplace.Common.Services
               lineItem.ProductID,
               lineItem.Quantity,
               lineItem.LineTotal,
-              ReturnQuantity = lineItem.xp.LineItemReturnInfo.QuantityToReturn,
-              Comments = lineItem.xp.LineItemReturnInfo.ReturnReason
           };
+
         private object GetShippingAddress(IList<MarketplaceLineItem> lineItems) =>
           new
           {
