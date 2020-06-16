@@ -381,11 +381,14 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
 
-  getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resoruceToUpdate: any): T {
-    const piecesOfField = resourceUpdate.field.split('.');
-    const depthOfField = piecesOfField.length;
-    const updatedResourceCopy = this.copyResource(resoruceToUpdate);
-    return _set(updatedResourceCopy, resourceUpdate.field, resourceUpdate.value);
+  getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resoruceToUpdate: T): T {
+    const updatedResourceCopy: any = this.copyResource(resoruceToUpdate);
+    var update = _set(updatedResourceCopy, resourceUpdate.field, resourceUpdate.value);
+    if(resourceUpdate.field === 'Product.Inventory.Enabled' && resourceUpdate.value === false) {
+      update.Product.Inventory.QuantityAvailable = null 
+      update.Product.Inventory.OrderCanExceed = false;
+    }
+    return update;
   }
 
   copyResource<T>(resource: T): T {
