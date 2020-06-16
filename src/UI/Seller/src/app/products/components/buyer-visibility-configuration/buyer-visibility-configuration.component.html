@@ -52,6 +52,7 @@
               <label class="switch mb-0">
                 <input class="form-check-input"
                 type="checkbox"
+                (click)="toggleProductCatalogAssignment(catalog)"
                 [checked]="isAssigned(catalog.ID)">
                 <span class="slider round"></span>
               </label>
