@@ -118,7 +118,7 @@ export enum OrderStatus {
   AwaitingApproval = 'AwaitingApproval',
   ChangesRequested = 'ChangesRequested',
   Open = 'Open',
-  Completed = 'Completed',
+  Complete = 'Complete',
   Canceled = 'Canceled',
 }
 
@@ -127,6 +127,28 @@ export enum OrderViewContext {
   Approve = 'Approve',
   Location = 'Location',
 }
+
+export enum ShippingStatus {
+  Shipped = 'Shipped',
+  PartiallyShipped = 'PartiallyShipped',
+  Cancelled = 'Cancelled',
+  Processing = 'Processing'
+}
+
+export enum ClaimStatus {
+  Pending = 'Pending',
+  Complete = 'Complete'
+}
+
+export enum LineItemStatus {
+  Complete = 'Complete',
+  Submitted = 'Submitted',
+  Open = 'Open',
+  Backordered = 'Backordered',
+  Cancelled = 'Cancelled',
+  Returned = 'Returned'
+}
+
 
 export interface CreditCard {
   CardholderName: string;
