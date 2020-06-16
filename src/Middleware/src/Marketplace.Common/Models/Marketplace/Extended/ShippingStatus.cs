@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-namespace Marketplace.Common.Models.Marketplace.Extended
+namespace Marketplace.Models.Extended
 {
-    class Class1
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ShippingStatus
     {
+        Shipped,
+        PartiallyShipped,
+        Cancelled,
+        Processing
     }
 }
