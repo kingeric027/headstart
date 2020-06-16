@@ -1,0 +1,24 @@
+<div> 
+  
+  <mat-form-field *ngFor="let categories of categoryOptionTree">
+    <div>
+      <mat-label>Categories</mat-label>
+      <mat-select (selectionChange)="handleSelectionChange($event)">
+        <mat-option *ngFor="let category of categories" [value]="category.ID">
+          {{category.Name}}
+        </mat-option>
+      </mat-select>
+    </div>
+  </mat-form-field>
+
+  <ng-container *ngIf="areSubCategories && !showSubCategories">
+    <p class="font-italic">
+      You may assign the product at this level or get more specific with subcategories
+    </p>
+    <button 
+    class="btn btn-primary"
+    type="submit"
+    (click)="handleShowSubcategories()">Browse Subcategories</button>
+  </ng-container>
+    
+</div>
