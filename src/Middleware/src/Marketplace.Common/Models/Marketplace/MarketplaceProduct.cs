@@ -58,7 +58,7 @@ namespace Marketplace.Models
         public bool IsResale { get; set; } = false;
         public List<ProductAccessorial> Accessorials { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
-		public CurrencySymbol Currency { get; set; }
+		public CurrencySymbol? Currency { get; set; } = null;
     }
 
     [SwaggerModel]

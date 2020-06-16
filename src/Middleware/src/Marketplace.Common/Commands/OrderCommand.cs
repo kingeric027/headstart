@@ -28,6 +28,7 @@ namespace Marketplace.Common.Commands
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> GetMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
+        Task RequestReturnEmail(string OrderID);
     }
 
     public class OrderCommand : IOrderCommand
@@ -83,9 +84,9 @@ namespace Marketplace.Common.Commands
                 if (buyerOrder.xp == null || buyerOrder.xp.OrderType != OrderType.Quote)
                 {
                     await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders);
-                    await HandleTaxTransactionCreationAsync(orderWorksheet);
+                    await HandleTaxTransactionCreationAsync(orderWorksheet.Reserialize<OrderWorksheet>());
                     var zoho_salesorder = await _zoho.CreateSalesOrder(orderWorksheet);
-                    await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
+                    await _zoho.CreatePurchaseOrder(zoho_salesorder, updatedSupplierOrders);
                 }
 
                 var response = new OrderSubmitResponse()
@@ -96,7 +97,7 @@ namespace Marketplace.Common.Commands
             }
             catch (Exception ex)
             {
-                var response = new OrderSubmitResponse()
+                 var response = new OrderSubmitResponse()
                 {
                     HttpStatusCode = 500,
                     UnhandledErrorBody = JsonConvert.SerializeObject(ex),
@@ -111,6 +112,11 @@ namespace Marketplace.Common.Commands
             string buyerOrderID = orderID.Substring(0, index);
             await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
             return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+        }
+
+        public async Task RequestReturnEmail(string orderID)
+        {
+            await _sendgridService.SendReturnRequestedEmail(orderID);
         }
 
         public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
@@ -213,7 +219,7 @@ namespace Marketplace.Common.Commands
         private async Task<decimal?> ExchangeUnitPrice(MarketplaceLineItem li, MarketplaceOrder order)
         {
 			var supplierCurrency = li.Product?.xp?.Currency ?? CurrencySymbol.USD; // Temporary default to work around bad data.
-			var buyerCurrency = order.xp.Currency;
+			var buyerCurrency = order.xp.Currency ?? CurrencySymbol.USD;
 			return (decimal) await _exchangeRates.ConvertCurrency(supplierCurrency, buyerCurrency, (double)li.UnitPrice);
         }
 
@@ -322,7 +328,8 @@ namespace Marketplace.Common.Commands
                 SupplierIDs = new List<string>() { supplierID },
                 StopShipSync = false,
                 OrderType = buyerOrder.xp.OrderType,
-                QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo
+                QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
+				Currency = buyerOrder.xp.Currency
             };
             return supplierOrderXp;
         }
@@ -339,7 +346,7 @@ namespace Marketplace.Common.Commands
             return shipFromAddressIDs;
         }
 
-        private async Task HandleTaxTransactionCreationAsync(MarketplaceOrderWorksheet orderWorksheet)
+        private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
         {
             var transaction = await _avalara.CreateTransactionAsync(orderWorksheet);
             await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()

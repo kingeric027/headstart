@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ordercloud.integrations.library
 {
@@ -16,6 +17,7 @@ namespace ordercloud.integrations.library
         void ValidateAndNormalize();
     }
 
+    [ModelBinder(typeof(ListArgsModelBinder))]
     public class ListArgs<T> : IListArgs
     {
         public ListArgs()

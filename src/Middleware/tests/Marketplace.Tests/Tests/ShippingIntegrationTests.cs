@@ -2,9 +2,9 @@
 using NUnit.Framework;
 using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Newtonsoft.Json;
-using OrderCloud.SDK;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
+using OrderCloud.SDK;
 
 namespace Marketplace.Tests
 {

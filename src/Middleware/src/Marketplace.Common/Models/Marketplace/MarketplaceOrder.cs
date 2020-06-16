@@ -25,8 +25,9 @@ namespace Marketplace.Models
         public QuoteOrderInfo QuoteOrderInfo { get; set; }
         public OrderReturnInfo OrderReturnInfo { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
-		public CurrencySymbol Currency { get; set; }
-    }
+		public CurrencySymbol? Currency { get; set; } = null;
+
+	}
 
     [SwaggerModel]
     public class OrderDetails

@@ -13,8 +13,11 @@ namespace ordercloud.integrations.exchangerates
     {
         Task<ListPage<OrderCloudIntegrationsConversionRate>> Get(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, CurrencySymbol currency);
         Task<OrderCloudIntegrationsExchangeRate> Get(CurrencySymbol symbol);
-        Task<List<OrderCloudIntegrationsConversionRate>> GetRateList();
-        ListPage<OrderCloudIntegrationsConversionRate> Filter(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, OrderCloudIntegrationsExchangeRate rates);
+        Task<ListPage<OrderCloudIntegrationsConversionRate>> GetRateList();
+
+        ListPage<OrderCloudIntegrationsConversionRate> Filter(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs,
+            OrderCloudIntegrationsExchangeRate rates);
+
         Task<double?> ConvertCurrency(CurrencySymbol from, CurrencySymbol to, double value);
     }
 
@@ -54,7 +57,7 @@ namespace ordercloud.integrations.exchangerates
 
         public ListPage<OrderCloudIntegrationsConversionRate> Filter(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, OrderCloudIntegrationsExchangeRate rates)
         {
-            if (rateArgs.Filters != null && rateArgs.Filters.Any(filter => filter.Name == "Symbol"))
+            if (rateArgs.Filters.Any(filter => filter.Name == "Symbol"))
             {
                 rates.Rates = (
                         from rate in rates.Rates
@@ -70,7 +73,7 @@ namespace ordercloud.integrations.exchangerates
                     Page = 1,
                     PageSize = 1,
                     TotalCount = rates.Rates.Count,
-                    ItemRange = new[] {1, rates.Rates.Count}
+                    ItemRange = new[] { 1, rates.Rates.Count }
                 },
                 Items = rates.Rates
             };
@@ -81,8 +84,7 @@ namespace ordercloud.integrations.exchangerates
         public async Task<double?> ConvertCurrency(CurrencySymbol from, CurrencySymbol to, double value)
         {
             var rates = await this.Get(new ListArgs<OrderCloudIntegrationsConversionRate>(), from);
-            var rate = rates.Items.FirstOrDefault(r => r.Currency == to)?.Rate;
-			return rate * value;
+            return rates.Items.FirstOrDefault(r => r.Symbol == to.ToString())?.Rate;
         }
 
         /// <summary>
@@ -100,10 +102,20 @@ namespace ordercloud.integrations.exchangerates
             };
         }
 
-        public async Task<List<OrderCloudIntegrationsConversionRate>> GetRateList()
+        public async Task<ListPage<OrderCloudIntegrationsConversionRate>> GetRateList()
         {
-			var rates = MapRates();
-			return await Task.FromResult(rates);
+            var rates = MapRates();
+            return await Task.FromResult(new ListPage<OrderCloudIntegrationsConversionRate>()
+            {
+                Meta = new ListPageMeta()
+                {
+                    Page = 1,
+                    PageSize = 1,
+                    TotalCount = rates.Count,
+                    ItemRange = new[] { 1, rates.Count }
+                },
+                Items = rates
+            });
         }
 
         private static string GetIcon(CurrencySymbol symbol)
@@ -114,23 +126,25 @@ namespace ordercloud.integrations.exchangerates
             stream.CopyTo(ms);
             return $"data:image/jpg;base64,{Convert.ToBase64String(ms.ToArray())}";
         }
-        
+
         private static List<OrderCloudIntegrationsConversionRate> MapRates(ExchangeRatesValues ratesValues = null)
         {
             return Enum.GetValues(typeof(CurrencySymbol)).Cast<CurrencySymbol>().Select(e => new OrderCloudIntegrationsConversionRate()
-                {
-                    Currency = e,
-                    Icon = GetIcon(e),
-                    Symbol = SymbolLookup.CurrencySymbolLookup.FirstOrDefault(s => s.Key == e).Value.Symbol,
-                    Name = SymbolLookup.CurrencySymbolLookup.FirstOrDefault(s => s.Key == e).Value.Name,
-                    Rate = FixRate(ratesValues, e)
-                }).ToList();
+            {
+                Currency = e,
+                Icon = GetIcon(e),
+                Symbol = SymbolLookup.CurrencySymbolLookup.FirstOrDefault(s => s.Key == e).Value.Symbol,
+                Name = SymbolLookup.CurrencySymbolLookup.FirstOrDefault(s => s.Key == e).Value.Name,
+                Rate = FixRate(ratesValues, e)
+            }).ToList();
         }
 
         private static double? FixRate(ExchangeRatesValues values, CurrencySymbol e)
         {
             var t = values?.GetType().GetProperty($"{e}")?.GetValue(values, null).To<double?>();
-            return (t.HasValue && t.Value == 0) ? 1 : t.Value;
+            if (!t.HasValue)
+                return 1;
+            return t.Value == 0 ? 1 : t.Value;
         }
     }
 }

@@ -73,7 +73,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 return new OrderCalculateResponse();
             } else
             {
-                var totalTax = await _avalara.GetEstimateAsync(orderCalculatePayload.OrderWorksheet);
+                var totalTax = await _avalara.GetEstimateAsync(orderCalculatePayload.OrderWorksheet.Reserialize<OrderWorksheet>());
 
                 return new OrderCalculateResponse
                 {

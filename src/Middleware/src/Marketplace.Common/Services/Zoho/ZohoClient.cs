@@ -1,7 +1,13 @@
-﻿using Flurl.Http;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
+using Flurl.Http;
 using Flurl.Http.Configuration;
+using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Common.Services.Zoho.Resources;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using ordercloud.integrations.library;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.Zoho
 {
@@ -12,11 +18,17 @@ namespace Marketplace.Common.Services.Zoho
         IZohoItemResource Items { get; }
         IZohoSalesOrderResource SalesOrders { get; }
         IZohoPurchaseOrderResource PurchaseOrders { get;  }
+        IZohoOrganizationResource Organizations { get; }
+        Task<ZohoTokenResponse> AuthenticateAsync();
     }
     public partial class ZohoClient
     {
         private static readonly IFlurlClientFactory _clientFac = new PerBaseUrlFlurlClientFactory();
         private IFlurlClient ApiClient => _clientFac.Get(Config.ApiUrl);
+        private IFlurlClient AuthClient => _clientFac.Get("https://accounts.zoho.com/oauth/v2/");
+        public ZohoTokenResponse TokenResponse { get; set; }
+
+        public bool IsAuthenticated => TokenResponse?.access_token != null;
 
         public ZohoClientConfig Config { get; }
 
@@ -28,10 +40,35 @@ namespace Marketplace.Common.Services.Zoho
             InitResources();
         }
 
-        internal IFlurlRequest Request(object[] segments) => ApiClient
+        public async Task<ZohoTokenResponse> AuthenticateAsync()
+        {
+            try
+            {
+                var response = await AuthClient.Request("token")
+                    .SetQueryParam("client_id", Config.ClientId)
+                    .SetQueryParam("client_secret", Config.ClientSecret)
+                    .SetQueryParam("grant_type", "refresh_token")
+                    .SetQueryParam("refresh_token", Config.AccessToken)
+                    .SetQueryParam("redirect_uri", "https://ordercloud.io")
+                    .PostAsync(null);
+                this.TokenResponse = JObject.Parse(await response.Content.ReadAsStringAsync()).ToObject<ZohoTokenResponse>();
+                return this.TokenResponse;
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new OrderCloudIntegrationException(new ApiError()
+                {
+                    ErrorCode = ex.Call.Response.StatusCode.To<string>(),
+                    Message = ex.Message
+                });
+            }
+            
+        }
+
+        internal IFlurlRequest Request(object[] segments, string access_token = null) {
+            return ApiClient
             .Request(segments)
-            .SetQueryParam("authtoken", Config.AuthToken)
-            .SetQueryParam("organization_id", Config.OrganizationID)
+            .WithHeader("Authorization", $"Zoho-oauthtoken {access_token ?? this.TokenResponse.access_token}")
             .ConfigureRequest(settings =>
             {
                 settings.JsonSerializer = new NewtonsoftJsonSerializer(new JsonSerializerSettings
@@ -42,14 +79,14 @@ namespace Marketplace.Common.Services.Zoho
                     DefaultValueHandling = DefaultValueHandling.Ignore
                 });
             });
+        }
 
         internal IFlurlRequest Put(object obj, object[] segments) => WriteRequest(obj, segments);
         internal IFlurlRequest Post(object obj, object[] segments) => WriteRequest(obj, segments);
 
-        private IFlurlRequest WriteRequest(object obj, object[] segments) =>  ApiClient
+        private IFlurlRequest WriteRequest(object obj, object[] segments, string access_token = null) =>  ApiClient
             .Request(segments)
-            .SetQueryParam("authtoken", Config.AuthToken)
-            .SetQueryParam("organization_id", Config.OrganizationID)
+            .WithHeader("Authorization", $"Zoho-oauthtoken {access_token ?? this.TokenResponse.access_token}")
             .SetQueryParam("JSONString", JsonConvert.SerializeObject(obj, new JsonSerializerSettings()
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -76,7 +113,10 @@ namespace Marketplace.Common.Services.Zoho
             Items = new ZohoItemResource(this);
             SalesOrders = new ZohoSalesOrderResource(this);
             PurchaseOrders = new ZohoPurchaseOrderResource(this);
+            Organizations = new ZohoOrganizationResource(this);
         }
+
+        public IZohoOrganizationResource Organizations { get; private set; }
 
         public IZohoContactResource Contacts { get; private set; }
         public IZohoCurrencyResource Currencies { get; private set; }

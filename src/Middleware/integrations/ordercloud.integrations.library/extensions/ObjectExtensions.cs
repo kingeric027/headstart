@@ -49,5 +49,12 @@ namespace ordercloud.integrations.library
         {
             return new JRaw(JsonConvert.SerializeObject(obj));
         }
+
+        // Similar function to the To function above, but I have a situation where this works and To function didn't
+        public static T Reserialize<T>(this object obj)
+        {
+            var serialized = JsonConvert.SerializeObject(obj);
+            return JsonConvert.DeserializeObject<T>(serialized);
+        }
     }
 }
