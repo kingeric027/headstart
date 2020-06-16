@@ -136,6 +136,7 @@ export enum ShippingStatus {
 }
 
 export enum ClaimStatus {
+  NoClaim = 'NoClaim',
   Pending = 'Pending',
   Complete = 'Complete'
 }
