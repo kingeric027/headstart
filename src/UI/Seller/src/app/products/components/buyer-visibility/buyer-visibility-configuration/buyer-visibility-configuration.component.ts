@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output } from '@angular/core';
 import {
   OcCatalogService,
   OcCategoryService,
@@ -24,8 +24,12 @@ export class BuyerVisibilityConfiguration {
   }
 
   @Input()
-  product: MarketplaceProduct = {};
+  set product(value: MarketplaceProduct) {
+    this._product = value;
+    this.fetchData();
+  }
 
+  _product: MarketplaceProduct = {};
   _buyer: MarketplaceBuyer = {};
 
   add: ProductAssignment[];
@@ -34,8 +38,8 @@ export class BuyerVisibilityConfiguration {
   catalogAssignmentsEditable: ProductAssignment[] = [];
   catalogAssignmentsStatic: ProductAssignment[] = [];
 
-  assignedCategoryIDsStatic: string[] = [];
-  assignedCategoryIDsEditable: string[] = [];
+  assignedCategoriesStatic: Category[][] = [];
+  assignedCategoriesEditable: Category[][] = [];
 
   isEditing = false;
   isValidBuyerAssignment = false;
@@ -56,10 +60,11 @@ export class BuyerVisibilityConfiguration {
   ) {}
 
   async fetchData(): Promise<void> {
-    await this.getCatalogAssignments();
-    await this.getCatalogs();
-    await this.getCatalogAssignments();
-    await this.getCategoryAssignment();
+    if (Object.keys(this._product) && Object.keys(this._buyer)) {
+      await this.getCatalogAssignments();
+      await this.getCatalogs();
+      await this.getCatalogAssignments();
+    }
   }
 
   resetCatalogAssignments(catalogAssignments: ProductAssignment[]): void {
@@ -67,9 +72,9 @@ export class BuyerVisibilityConfiguration {
     this.catalogAssignmentsStatic = catalogAssignments;
   }
 
-  resetCategoryAssignment(categoryIDs: string[]): void {
-    this.assignedCategoryIDsEditable = categoryIDs;
-    this.assignedCategoryIDsStatic = this.assignedCategoryIDsEditable;
+  resetCategoryAssignments(categoryAssignments: Category[][]): void {
+    this.assignedCategoriesEditable = categoryAssignments;
+    this.assignedCategoriesStatic = this.assignedCategoriesEditable;
   }
 
   isAssigned(userGroupID: string): boolean {
@@ -81,7 +86,7 @@ export class BuyerVisibilityConfiguration {
       this.catalogAssignmentsEditable = this.catalogAssignmentsEditable.filter(c => c.UserGroupID !== catalog.ID);
     } else {
       const newCatalogAssignment: ProductAssignment = {
-        ProductID: this.product.ID,
+        ProductID: this._product.ID,
         UserGroupID: catalog.ID,
         BuyerID: this._buyer.ID,
       };
@@ -94,19 +99,20 @@ export class BuyerVisibilityConfiguration {
     this.areChanges = this.add.length > 0 || this.del.length > 0;
   }
 
-  edit(): void {
+  async edit(): Promise<void> {
     this.isEditing = true;
+    await this.getCategoryAssignments();
   }
 
   handleDiscardChanges(): void {
-    this.assignedCategoryIDsEditable = this.assignedCategoryIDsStatic;
+    this.assignedCategoriesEditable = this.assignedCategoriesStatic;
     this.catalogAssignmentsEditable = this.catalogAssignmentsStatic;
     this.checkForProductCatalogAssignmentChanges();
   }
 
   async getCatalogAssignment(): Promise<void> {
     const catalogAssignmentResponse = await this.ocCatalogService
-      .ListProductAssignments({ catalogID: this._buyer.ID, productID: this.product.ID })
+      .ListProductAssignments({ catalogID: this._buyer.ID, productID: this._product.ID })
       .toPromise();
     this.isAssignedToCatalog = catalogAssignmentResponse.Meta.TotalCount > 0;
   }
@@ -125,26 +131,50 @@ export class BuyerVisibilityConfiguration {
 
   async getCatalogAssignments(): Promise<void> {
     const catalogAssignmentRequests = this.catalogs.map(c =>
-      this.ocProductService.ListAssignments({ userGroupID: c.ID, productID: this.product.ID }).toPromise()
+      this.ocProductService.ListAssignments({ userGroupID: c.ID, productID: this._product.ID }).toPromise()
     );
     const catalogAssignmentResponses = await Promise.all(catalogAssignmentRequests);
     const catalogAssignments = catalogAssignmentResponses.reduce((acc, curr) => acc.concat(curr.Items), []);
     this.resetCatalogAssignments(catalogAssignments);
   }
 
-  async getCategoryAssignment(): Promise<void> {
+  async getCategoryAssignments(): Promise<void> {
     const categoryResponse = await this.ocCategoryService
       .ListProductAssignments(this._buyer.ID, {
-        productID: this.product.ID,
+        productID: this._product.ID,
       })
       .toPromise();
-    this.resetCategoryAssignment(categoryResponse.Items.map(c => c.CategoryID));
+    const categoryIDs = categoryResponse.Items.map(c => c.CategoryID);
+    const categoryAssignments = await this.getCategoryHierarchies(categoryIDs);
+    this.resetCategoryAssignments(categoryAssignments);
+  }
+
+  async getCategoryHierarchies(categoryIDs: string[]): Promise<Category[][]> {
+    const categoryHierarchyRequests = categoryIDs.map(c => this.getCategoryHierarchy(c));
+    const categoryHierarchyResponses = await Promise.all(categoryHierarchyRequests);
+    return categoryHierarchyResponses;
+  }
+
+  async getCategoryHierarchy(categoryID: string): Promise<Category[]> {
+    const asssignedCategory = await this.ocCategoryService.Get(this._buyer.ID, categoryID).toPromise();
+    return await this.addToCategoryHierarchy([], asssignedCategory);
+  }
+
+  async addToCategoryHierarchy(currentTree = [], category: Category): Promise<Category[]> {
+    // recursive function to add currently selected category and all parents to an array
+
+    if (!category.ParentID) {
+      return [...currentTree, category];
+    } else {
+      const parentCategory = await this.ocCategoryService.Get(this._buyer.ID, category.ParentID).toPromise();
+      await this.addToCategoryHierarchy(currentTree, parentCategory);
+    }
   }
 
   async assignToCatalogIfNecessary(): Promise<void> {
     if (!this.isAssignedToCatalog) {
       await this.ocCatalogService
-        .SaveProductAssignment({ CatalogID: this._buyer.ID, ProductID: this.product.ID })
+        .SaveProductAssignment({ CatalogID: this._buyer.ID, ProductID: this._product.ID })
         .toPromise();
     }
   }

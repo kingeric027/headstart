@@ -1,6 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { OcCategoryService, Category } from '@ordercloud/angular-sdk';
-
 
 @Component({
   selector: 'product-category-assignment',
@@ -10,60 +9,111 @@ import { OcCategoryService, Category } from '@ordercloud/angular-sdk';
 export class ProductCategoryAssignment {
   @Input()
   productID = '';
+
+  _assignedCategoriesStatic: Category[][] = [];
+  _assignedCategoriesEditable: Category[][] = [];
+
+  _catalogID = '';
+
   @Input()
-  selectedCategoryID = '';
+  set assignedCategoriesStatic(value: Category[][]) {
+    this.resetCategoryAssignment(value);
+  }
   @Input()
-  catalogID = '';
-  @Input()
-  set isEditing(value: boolean) {
-    console.log(value);
-    if (value) {
-      this.buildCategoryTree();
-    }
+  set catalogID(value: string) {
+    this._catalogID = value;
+    this.getTopLevelCategories();
   }
 
-  // array of categories in which the final category is the one the product is assigned to
-  // and prior categories are the parents of the assigned category or grandparents
-  assignedCategoryHierarchy: Category[] = [];
-  categoryOptionTree: Category[][] = [];
-  areSubCategories = false;
-  subCategories: Category[] = [];
-  showSubCategories = false;
+  @Output()
+  assignmentsUpdated = new EventEmitter();
+  // could this all have been done drier with the ability to handle any number of category depths probably
+  // just decided to keep do it with seperate variables for each level for simiplicity since there are only 3 levels
+
+  highLevelOptions: Category[] = [];
+  midLevelOptions: Category[] = [];
+  lowLevelOptions: Category[] = [];
+
+  highLevelSelection = '';
+  midLevelSelection = '';
+  lowLevelSelection = '';
+
+  showMidLevel = false;
+  showLowLevel = false;
+
+  assignedCategoryIDsStatic: string[] = [];
+  assignedCategoryIDsEditable: string[] = [];
 
   constructor(private ocCategoryService: OcCategoryService) {}
 
-  async buildCategoryTree(): Promise<void> {
-    await this.buildCategoryHierarchy();
-    await this.buildCategoryOptionTree();
+  async getTopLevelCategories(): Promise<void> {
+    const highLevelCategories = await this.ocCategoryService
+      .List(this._catalogID, { pageSize: 100, depth: '1' })
+      .toPromise();
+    this.highLevelOptions = highLevelCategories.Items;
   }
 
+  resetCategoryAssignment(categorys: Category[][]): void {
+    this._assignedCategoriesStatic = categorys;
+    this._assignedCategoriesEditable = this._assignedCategoriesStatic;
+  }
 
-  async checkForSubcategories(): Promise<void> {
-    const subCategories = await this.ocCategoryService
-      .List(this.catalogID, {
+  async getSubcategories(categoryID: string): Promise<Category[]> {
+    return (await this.ocCategoryService
+      .List(this._catalogID, {
         depth: '1',
         pageSize: 100,
-        filters: { parentID: this.selectedCategoryID },
+        filters: { ParentID: categoryID },
       })
-      .toPromise();
-
-    this.areSubCategories = subCategories.Meta.TotalCount > 0;
-    this.subCategories = subCategories.Items;
+      .toPromise()).Items;
   }
 
-  handleSelectionChange(event: any): void {
-    this.selectCategory(event.value);
+  async selectHighLevelCategory(event: any): Promise<void> {
+    const categoryID = event.value;
+    this.highLevelSelection = categoryID;
+    this.midLevelSelection = '';
+    this.lowLevelSelection = '';
+    this.showMidLevel = false;
+    this.showLowLevel = false;
+    const subCategories = await this.getSubcategories(categoryID);
+    this.midLevelOptions = subCategories;
   }
 
-  async selectCategory(categoryID: string): Promise<void> {
-    this.selectedCategoryID = categoryID;
-    this.subCategories = [];
-    this.showSubCategories = false;
-    await this.checkForSubcategories();
+  async selectMidLevelCategory(event: any): Promise<void> {
+    const categoryID = event.value;
+    this.midLevelSelection = categoryID;
+    this.lowLevelSelection = '';
+    this.showLowLevel = false;
+    const subCategories = await this.getSubcategories(categoryID);
+    this.lowLevelOptions = subCategories;
   }
 
-  handleShowSubcategories(): void {
-    this.categoryOptionTree = [...this.categoryOptionTree, this.subCategories];
-    this.showSubCategories = true;
+  selectLowLevelCategory(event: any): void {
+    const categoryID = event.value;
+    this.lowLevelSelection = categoryID;
+  }
+
+  addAssignment(): void {
+    const newAssignmentHierarchy = [this.highLevelOptions.find(h => h.ID === this.highLevelSelection)];
+    if (this.midLevelSelection) {
+      newAssignmentHierarchy.push(this.midLevelOptions.find(m => m.ID === this.midLevelSelection));
+    }
+    if (this.lowLevelSelection) {
+      newAssignmentHierarchy.push(this.lowLevelOptions.find(m => m.ID === this.lowLevelSelection));
+    }
+    this._assignedCategoriesEditable = [...this._assignedCategoriesEditable, newAssignmentHierarchy];
+    console.log('here1');
+    console.log(this._assignedCategoriesEditable);
+    this.assignmentsUpdated.emit(this._assignedCategoriesEditable);
+  }
+
+  getAssignedCategoryDislay(categoryHierarchy: Category[]): string {
+    return categoryHierarchy.map(c => c.Name).join('->');
+  }
+  removeAssignment(indexToRemove: number): void {
+    const assignedCategoriesCopy = JSON.parse(JSON.stringify(this._assignedCategoriesEditable));
+    assignedCategoriesCopy.splice(indexToRemove, 1);
+    this._assignedCategoriesEditable = assignedCategoriesCopy;
+    this.assignmentsUpdated.emit(assignedCategoriesCopy);
   }
 }
