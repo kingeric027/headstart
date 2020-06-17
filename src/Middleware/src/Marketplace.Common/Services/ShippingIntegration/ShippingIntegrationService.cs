@@ -12,6 +12,7 @@ using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.exchangerates;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
@@ -67,7 +68,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload)
         {
-            if(orderCalculatePayload.OrderWorksheet.Order.xp != null && orderCalculatePayload.OrderWorksheet.Order.xp.OrderType == Marketplace.Models.Extended.OrderType.Quote)
+            if(orderCalculatePayload.OrderWorksheet.Order.xp != null && orderCalculatePayload.OrderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
                 // quote orders do not have tax cost associated with them
                 return new OrderCalculateResponse();
@@ -80,7 +81,6 @@ namespace Marketplace.Common.Services.ShippingIntegration
                     TaxTotal = totalTax,
                 };
             }
-
         }
 
         private List<string> GetProductsWithInvalidDimensions(IList<LineItem> lineItems)
