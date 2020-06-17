@@ -11,7 +11,7 @@ import {
   faBars,
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { Category } from '@ordercloud/angular-sdk';
+import { Category } from 'ordercloud-javascript-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { ProductFilters, ShopperContextService, AppConfig } from 'marketplace';
 import { MarketplaceOrder, MarketplaceLineItem} from 'marketplace-javascript-sdk'

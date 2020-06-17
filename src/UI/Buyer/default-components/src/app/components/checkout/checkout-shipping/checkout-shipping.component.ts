@@ -1,6 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { ShipEstimate, ShipMethodSelection, ListLineItem } from 'marketplace';
 import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk'
+import { ShipEstimate, ListPage, ShipMethodSelection } from 'ordercloud-javascript-sdk';
 
 @Component({
   templateUrl: './checkout-shipping.component.html',
@@ -19,7 +19,7 @@ export class OCMCheckoutShipping implements OnInit {
     });
   }
   @Input() order: MarketplaceOrder;
-  @Input() lineItems: ListLineItem;
+  @Input() lineItems: ListPage<MarketplaceLineItem>;
   @Output() selectShipRate = new EventEmitter<ShipMethodSelection>();
   @Output() continue = new EventEmitter();
 

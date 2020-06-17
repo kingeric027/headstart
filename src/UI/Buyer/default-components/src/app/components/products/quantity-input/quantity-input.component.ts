@@ -1,7 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
-import { MarketplaceMeProduct, PriceSchedule } from 'marketplace';
+import { MarketplaceMeProduct } from 'marketplace';
+import { PriceSchedule } from 'ordercloud-javascript-sdk';
 
 export interface QtyChangeEvent {
   qty: number;
@@ -42,8 +43,8 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
     this.isQtyRestricted = priceSchedule.RestrictedQuantity;
     this.inventory = this.getInventory(product);
-    this.min = this.minQty(product);
-    this.max = this.maxQty(product);
+    this.min = this.minQty(priceSchedule);
+    this.max = this.maxQty(priceSchedule);
     this.restrictedQuantities = priceSchedule.PriceBreaks.map(b => b.Quantity);
     if (this.inventory < this.min) {
       this.errorMsg = 'Out of stock.';

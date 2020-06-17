@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { DOCUMENT } from '@angular/common';
 import { TokenHelperService } from '../../services/token-helper/token-helper.service';
-import { OcTokenService } from '@ordercloud/angular-sdk';
+import { Tokens } from 'ordercloud-javascript-sdk';
 import { AuthService } from '../../services/auth/auth.service';
 import { AppConfig } from '../../shopper-context';
 
@@ -14,7 +14,6 @@ export class HasTokenGuard implements CanActivate {
     private router: Router,
     private auth: AuthService,
     private tokenHelper: TokenHelperService,
-    private ocTokenService: OcTokenService,
     @Inject(DOCUMENT) private document: any,
     private appConfig: AppConfig
   ) {}
@@ -36,7 +35,7 @@ export class HasTokenGuard implements CanActivate {
     }
 
     const isAccessTokenValid = this.isTokenValid();
-    const refreshTokenExists = this.ocTokenService.GetRefresh() && this.auth.getRememberStatus();
+    const refreshTokenExists = Tokens.GetRefreshToken() && this.auth.getRememberStatus();
     if (!isAccessTokenValid && refreshTokenExists) {
       await this.auth.refresh().toPromise();
       return true;

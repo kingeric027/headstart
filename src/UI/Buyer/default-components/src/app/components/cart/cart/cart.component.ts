@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { ListLineItemWithProduct, ShopperContextService } from 'marketplace';
+import { LineItemWithProduct, ShopperContextService } from 'marketplace';
+import { ListPage } from 'ordercloud-javascript-sdk';
 import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 import { OrderSummaryMeta, getOrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 
@@ -9,13 +10,13 @@ import { OrderSummaryMeta, getOrderSummaryMeta } from 'src/app/services/purchase
 })
 export class OCMCart {
   _order: MarketplaceOrder;
-  _lineItems: ListLineItemWithProduct;
+  _lineItems: ListPage<LineItemWithProduct>;
   orderSummaryMeta: OrderSummaryMeta;
   @Input() set order(value: MarketplaceOrder) {
     this._order = value;
     this.setOrderSummaryMeta();
   }
-  @Input() set lineItems(value: ListLineItemWithProduct) {
+  @Input() set lineItems(value: ListPage<LineItemWithProduct>) {
     this._lineItems = value;
     this.setOrderSummaryMeta();
   }
