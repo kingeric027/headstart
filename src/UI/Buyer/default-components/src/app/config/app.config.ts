@@ -8,11 +8,8 @@ export const ocAppConfig: AppConfig = {
   marketplaceID: environment.marketplaceID,
   baseUrl: environment.baseUrl,
   middlewareUrl: environment.middlewareUrl,
-  cmsUrl: environment.cmsUrl,
   ssoLink: environment.ssoLink,
-  orderCloudApiUrl: environment.orderCloudApiUrl,
-  orderCloudAuthUrl: environment.orderCloudApiVersion,
-  orderCloudApiVersion: environment.orderCloudApiVersion,
+  ordercloudEnv: environment.ordercloudEnv,
   anonymousShoppingEnabled: false,
   cardConnectMerchantID: '840000000052', // TODO - look for somewhere else to put this.
   avalaraCompanyId: 280411,

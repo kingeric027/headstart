@@ -116,13 +116,13 @@ export enum ShippingStatus {
   Shipped = 'Shipped',
   PartiallyShipped = 'PartiallyShipped',
   Cancelled = 'Cancelled',
-  Processing = 'Processing'
+  Processing = 'Processing',
 }
 
 export enum ClaimStatus {
   NoClaim = 'NoClaim',
   Pending = 'Pending',
-  Complete = 'Complete'
+  Complete = 'Complete',
 }
 
 export enum LineItemStatus {
@@ -131,9 +131,8 @@ export enum LineItemStatus {
   Open = 'Open',
   Backordered = 'Backordered',
   Cancelled = 'Cancelled',
-  Returned = 'Returned'
+  Returned = 'Returned',
 }
-
 
 export interface CreditCard {
   CardholderName: string;
@@ -153,6 +152,12 @@ export interface OrderReorderResponse {
  */
 export interface LineItemWithProduct extends LineItem {
   Product?: BuyerProduct;
+}
+
+export enum OrdercloudEnv {
+  Production = 'Production',
+  Staging = 'Staging',
+  Sandbox = 'Sandbox',
 }
 
 export class AppConfig {
@@ -183,15 +188,9 @@ export class AppConfig {
    * base path to middleware
    */
 
-  orderCloudApiUrl: string;
-  orderCloudAuthUrl: string;
-  orderCloudApiVersion: string;
+  ordercloudEnv: OrdercloudEnv;
   avalaraCompanyId: number;
   middlewareUrl: string;
-  /**
-   * base path to CMS resources
-   */
-  cmsUrl: string;
   /**
    *  TODO - Link to identity provider's authorization server. this field should probably be SEB-specific.
    */

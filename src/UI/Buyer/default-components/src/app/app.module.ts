@@ -45,7 +45,6 @@ import { ChildCategoryPipe } from './pipes/category-children.pipe';
 import { CreditCardFormatPipe } from './pipes/credit-card-format.pipe';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
-import { OcSDKConfig } from './config/ordercloud-sdk.config';
 import { ComponentNgElementStrategyFactory } from 'src/lib/component-factory-strategy';
 import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
@@ -250,7 +249,6 @@ const components = [
     MarketplaceModule,
     AppRoutingModule,
     HttpClientModule,
-    OrderCloudModule.forRoot(OcSDKConfig),
     CookieModule.forRoot(),
     ToastrModule.forRoot(),
     TranslateModule.forRoot({
