@@ -12,9 +12,11 @@ import { ProductVariations } from './components/product-variations/product-varia
 import { ProductFilters } from './components/product-filters/product-filters.component';
 import { BuyerVisibilityConfiguration } from './components/buyer-visibility/buyer-visibility-configuration/buyer-visibility-configuration.component';
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipTrailingIcon, MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
-  imports: [SharedModule, ProductsRoutingModule, PerfectScrollbarModule],
+  imports: [SharedModule, ProductsRoutingModule, PerfectScrollbarModule, MatIconModule, MatChipsModule],
   declarations: [
     ProductTableComponent,
     ProductEditComponent,

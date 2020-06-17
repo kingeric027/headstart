@@ -7,6 +7,7 @@ import {
   UserGroup,
   OcProductService,
   ProductAssignment,
+  CategoryProductAssignment,
 } from '@ordercloud/angular-sdk';
 import { ProductService } from '@app-seller/products/product.service';
 import { MarketplaceBuyer, MarketplaceProduct } from 'marketplace-javascript-sdk';
@@ -32,8 +33,11 @@ export class BuyerVisibilityConfiguration {
   _product: MarketplaceProduct = {};
   _buyer: MarketplaceBuyer = {};
 
-  add: ProductAssignment[];
-  del: ProductAssignment[];
+  addCatalogAssignments: ProductAssignment[] = [];
+  delCatalogAssignments: ProductAssignment[] = [];
+
+  addCategoryAssignments: CategoryProductAssignment[];
+  delCategoryAssignments: CategoryProductAssignment[];
 
   catalogAssignmentsEditable: ProductAssignment[] = [];
   catalogAssignmentsStatic: ProductAssignment[] = [];
@@ -64,6 +68,7 @@ export class BuyerVisibilityConfiguration {
       await this.getCatalogAssignments();
       await this.getCatalogs();
       await this.getCatalogAssignments();
+      await this.getCategoryAssignments();
     }
   }
 
@@ -96,12 +101,15 @@ export class BuyerVisibilityConfiguration {
   }
 
   updateStatus(): void {
-    this.areChanges = this.add.length > 0 || this.del.length > 0;
+    this.areChanges =
+      !!this.addCatalogAssignments.length ||
+      !!this.delCatalogAssignments.length ||
+      !!this.addCategoryAssignments.length ||
+      !!this.delCategoryAssignments.length;
   }
 
   async edit(): Promise<void> {
     this.isEditing = true;
-    await this.getCategoryAssignments();
   }
 
   handleDiscardChanges(): void {
@@ -164,10 +172,10 @@ export class BuyerVisibilityConfiguration {
     // recursive function to add currently selected category and all parents to an array
 
     if (!category.ParentID) {
-      return [...currentTree, category];
+      return [category, ...currentTree];
     } else {
       const parentCategory = await this.ocCategoryService.Get(this._buyer.ID, category.ParentID).toPromise();
-      await this.addToCategoryHierarchy(currentTree, parentCategory);
+      return await this.addToCategoryHierarchy([category, ...currentTree], parentCategory);
     }
   }
 
@@ -181,19 +189,65 @@ export class BuyerVisibilityConfiguration {
 
   async executeProductCatalogAssignmentRequests(): Promise<void> {
     await this.assignToCatalogIfNecessary();
-    await this.productService.updateProductCatalogAssignments(this.add, this.del, this._buyer.ID);
+    await this.productService.updateProductCatalogAssignments(
+      this.addCatalogAssignments,
+      this.delCatalogAssignments,
+      this._buyer.ID
+    );
+    await this.productService.updateProductCategoryAssignments(
+      this.addCategoryAssignments,
+      this.delCategoryAssignments,
+      this._buyer.ID
+    );
     this.resetCatalogAssignments(this.catalogAssignmentsEditable);
+    this.resetCategoryAssignments(this.assignedCategoriesEditable);
     this.checkForProductCatalogAssignmentChanges();
+    this.checkForCategoryAssignmentChanges();
   }
 
   checkForProductCatalogAssignmentChanges(): void {
-    this.add = this.catalogAssignmentsEditable.filter(
+    this.addCatalogAssignments = this.catalogAssignmentsEditable.filter(
       assignment => !JSON.stringify(this.catalogAssignmentsStatic).includes(assignment.UserGroupID)
     );
-    this.del = this.catalogAssignmentsStatic.filter(
+    this.delCatalogAssignments = this.catalogAssignmentsStatic.filter(
       assignment => !JSON.stringify(this.catalogAssignmentsEditable).includes(assignment.UserGroupID)
     );
     this.updateStatus();
+  }
+
+  checkForCategoryAssignmentChanges(): void {
+    this.addCategoryAssignments = this.assignedCategoriesEditable
+      .filter(
+        editable =>
+          !this.assignedCategoriesStatic.some(
+            staticCategory => staticCategory[staticCategory.length - 1].ID === editable[editable.length - 1].ID
+          )
+      )
+      .map(a => {
+        return {
+          CategoryID: a[a.length - 1].ID,
+          ProductID: this._product.ID,
+        };
+      });
+    this.delCategoryAssignments = this.assignedCategoriesStatic
+      .filter(
+        staticCategory =>
+          !this.assignedCategoriesEditable.some(
+            editable => staticCategory[staticCategory.length - 1].ID === editable[editable.length - 1].ID
+          )
+      )
+      .map(a => {
+        return {
+          CategoryID: a[a.length - 1].ID,
+          ProductID: this._product.ID,
+        };
+      });
+    this.updateStatus();
+  }
+
+  updateCategoryAssignments(event: any): void {
+    this.assignedCategoriesEditable = event;
+    this.checkForCategoryAssignmentChanges();
   }
 
   handleClose(): void {

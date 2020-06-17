@@ -65,7 +65,7 @@
       <p *ngIf="!catalogs.length" class="alert alert-info font-weight-bold mb-0">There are no catalogs for this buyer currently.</p>
 
       <h5>Categories</h5>
-      <product-category-assignment [productID]="_product.ID" [assignedCategoriesStatic]="assignedCategoriesStatic" [catalogID]="_buyer.ID" [isEditing]="isEditing"></product-category-assignment>
+      <product-category-assignment [productID]="_product.ID" [assignedCategoriesStatic]="assignedCategoriesEditable" [catalogID]="_buyer.ID" [isEditing]="isEditing" (assignmentsUpdated)="updateCategoryAssignments($event)"></product-category-assignment>
       
 
       <div class="mt-3 d-flex justify-content-end">

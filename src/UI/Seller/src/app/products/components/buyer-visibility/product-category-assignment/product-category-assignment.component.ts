@@ -102,8 +102,6 @@ export class ProductCategoryAssignment {
       newAssignmentHierarchy.push(this.lowLevelOptions.find(m => m.ID === this.lowLevelSelection));
     }
     this._assignedCategoriesEditable = [...this._assignedCategoriesEditable, newAssignmentHierarchy];
-    console.log('here1');
-    console.log(this._assignedCategoriesEditable);
     this.assignmentsUpdated.emit(this._assignedCategoriesEditable);
   }
 

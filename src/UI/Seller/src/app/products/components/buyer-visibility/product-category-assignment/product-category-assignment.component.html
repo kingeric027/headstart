@@ -45,7 +45,7 @@
       
         <div>
           <mat-form-field *ngIf="showLowLevel">
-            <mat-label>Low Level Categort</mat-label>
+            <mat-label>Low Level Category</mat-label>
             <mat-select (selectionChange)="selectLowLevelCategory($event)">
               <mat-option *ngFor="let category of lowLevelOptions" [value]="category.ID">
                 {{category.Name}}
@@ -62,8 +62,20 @@
     <div class="col-9 assignments-container">
       <mat-chip-list>
         <mat-chip *ngFor="let category of _assignedCategoriesEditable; index as i"
-        [removable]="true" (removed)="removeAssignment(i)">{{getAssignedCategoryDislay(category)}}
-          <mat-icon matChipRemove>cancel</mat-icon>
+        [removable]="true" (removed)="removeAssignment(i)">
+        <span>{{category[0].Name}}</span>
+        <span *ngIf="category.length > 1" class="material-icons">
+          keyboard_arrow_right
+          </span>          
+        <span *ngIf="category.length > 1">
+          {{category[1].Name}}
+        </span>
+        <span *ngIf="category.length > 2" class="material-icons">
+          keyboard_arrow_right
+        </span>          
+        <span *ngIf="category.length > 2">
+          {{category[2].Name}}</span>
+        <mat-icon matChipRemove>cancel</mat-icon>
         </mat-chip>
       </mat-chip-list>
     </div>
