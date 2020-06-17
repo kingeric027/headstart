@@ -36,7 +36,11 @@ namespace Marketplace.Common.Services.Zoho.Models
         public string tax_exemption_id { get; set; }
         public string tax_authority_id { get; set; }
         public string tax_id { get; set; }
-        public bool is_taxable { get; set; } = true;
+
+        // commenting out this field for now, call currently fails when going into zoho now
+        // some configuration changes in zoho have the potential to allow us to use this
+        // but it's not entirely clear what is needed to be done
+        //public bool is_taxable { get; set; } = true;
         public string facebook { get; set; }
         public string twitter { get; set; }
     }

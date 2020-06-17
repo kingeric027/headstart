@@ -84,9 +84,9 @@ namespace Marketplace.Common.Commands
                 if (buyerOrder.xp == null || buyerOrder.xp.OrderType != OrderType.Quote)
                 {
                     await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders);
-                    await HandleTaxTransactionCreationAsync(orderWorksheet);
+                    await HandleTaxTransactionCreationAsync(orderWorksheet.Reserialize<OrderWorksheet>());
                     var zoho_salesorder = await _zoho.CreateSalesOrder(orderWorksheet);
-                    await _zoho.CreatePurchaseOrder(zoho_salesorder, orderSplitResult);
+                    await _zoho.CreatePurchaseOrder(zoho_salesorder, updatedSupplierOrders);
                 }
 
                 var response = new OrderSubmitResponse()
@@ -97,7 +97,7 @@ namespace Marketplace.Common.Commands
             }
             catch (Exception ex)
             {
-                var response = new OrderSubmitResponse()
+                 var response = new OrderSubmitResponse()
                 {
                     HttpStatusCode = 500,
                     UnhandledErrorBody = JsonConvert.SerializeObject(ex),
@@ -202,7 +202,7 @@ namespace Marketplace.Common.Commands
             li = await _oc.LineItems
                 .PatchAsync<MarketplaceLineItem>
                 (OrderDirection.Incoming, orderID, li.ID, 
-                new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { ProductUnitPrice = li.UnitPrice, LineItemImageUrl = li.xp.LineItemImageUrl } });
+                new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { UnitPriceInProductCurrency = li.UnitPrice, LineItemImageUrl = li.xp.LineItemImageUrl } });
             return li;
         }
 
@@ -219,7 +219,7 @@ namespace Marketplace.Common.Commands
         private async Task<decimal?> ExchangeUnitPrice(MarketplaceLineItem li, MarketplaceOrder order)
         {
 			var supplierCurrency = li.Product?.xp?.Currency ?? CurrencySymbol.USD; // Temporary default to work around bad data.
-			var buyerCurrency = order.xp.Currency;
+			var buyerCurrency = order.xp.Currency ?? CurrencySymbol.USD;
 			return (decimal) await _exchangeRates.ConvertCurrency(supplierCurrency, buyerCurrency, (double)li.UnitPrice);
         }
 
@@ -328,7 +328,8 @@ namespace Marketplace.Common.Commands
                 SupplierIDs = new List<string>() { supplierID },
                 StopShipSync = false,
                 OrderType = buyerOrder.xp.OrderType,
-                QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo
+                QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
+				Currency = buyerOrder.xp.Currency
             };
             return supplierOrderXp;
         }
@@ -345,7 +346,7 @@ namespace Marketplace.Common.Commands
             return shipFromAddressIDs;
         }
 
-        private async Task HandleTaxTransactionCreationAsync(MarketplaceOrderWorksheet orderWorksheet)
+        private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
         {
             var transaction = await _avalara.CreateTransactionAsync(orderWorksheet);
             await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()

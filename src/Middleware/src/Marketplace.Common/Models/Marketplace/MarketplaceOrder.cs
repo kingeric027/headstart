@@ -25,8 +25,11 @@ namespace Marketplace.Models
         public QuoteOrderInfo QuoteOrderInfo { get; set; }
         public OrderReturnInfo OrderReturnInfo { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
-		public CurrencySymbol Currency { get; set; }
-    }
+		public CurrencySymbol? Currency { get; set; } = null;
+        public ShippingStatus ShippingStatus { get; set; }
+        public LineItemStatus LineItemStatus { get; set; }
+        public ClaimStatus ClaimStatus { get; set; }
+	}
 
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum OrderType

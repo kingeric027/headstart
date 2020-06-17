@@ -10,6 +10,7 @@ import { ProductTaxCodeSelect } from './components/product-tax-code-select/produ
 import { ProductTaxCodeSelectDropdown } from './components/product-tax-code-select-dropdown/product-tax-code-select-dropdown.component';
 import { ProductVariations } from './components/product-variations/product-variations.component';
 import { ProductFilters } from './components/product-filters/product-filters.component';
+import { BuyerVisibilityConfiguration } from './components/buyer-visibility-configuration/buyer-visibility-configuration.component';
 
 @NgModule({
   imports: [SharedModule, ProductsRoutingModule, PerfectScrollbarModule],
@@ -17,6 +18,7 @@ import { ProductFilters } from './components/product-filters/product-filters.com
     ProductTableComponent,
     ProductEditComponent,
     ProductVisibilityAssignments,
+    BuyerVisibilityConfiguration,
     ProductTaxCodeSelect,
     ProductTaxCodeSelectDropdown,
     ProductVariations,

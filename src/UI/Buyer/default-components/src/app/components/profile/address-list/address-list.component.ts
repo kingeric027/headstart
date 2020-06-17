@@ -34,6 +34,7 @@ export class OCMAddressList implements OnInit {
   showCreateAddressForm = false;
   isLoading = false;
   suggestedAddresses: BuyerAddress[];
+  homeCountry: string;
   constructor(private context: ShopperContextService, private toasterService: ToastrService) {}
 
   ngOnInit(): void {
@@ -126,6 +127,10 @@ export class OCMAddressList implements OnInit {
   private async reloadAddresses(): Promise<void> {
     this.isLoading = true;
     this.addresses = await this.context.addresses.list(this.requestOptions);
+    if (!this.homeCountry) {
+      const buyerLocations = await this.context.addresses.listBuyerLocations();
+      this.homeCountry = buyerLocations.Items[0]?.Country;
+    }
     this.isLoading = false;
   }
 }
