@@ -11,7 +11,6 @@ export const ocAppConfig: AppConfig = {
   ssoLink: environment.ssoLink,
   ordercloudEnv: environment.ordercloudEnv,
   anonymousShoppingEnabled: false,
-  cardConnectMerchantID: '840000000052', // TODO - look for somewhere else to put this.
   avalaraCompanyId: 280411,
   scope: [
     'MeAddressAdmin',
