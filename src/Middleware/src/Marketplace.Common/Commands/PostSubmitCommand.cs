@@ -58,7 +58,7 @@ namespace Marketplace.Common.Commands
         {
             public bool Failed { get; set; }
             public ProcessType Type { get; set; }
-            public string ErrorDetail { get; set; }
+            public Exception ErrorDetail { get; set; }
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -109,7 +109,7 @@ namespace Marketplace.Common.Commands
                         {
                             Failed = true,
                             Type = ProcessType.Forwarding,
-                            ErrorDetail = JsonConvert.SerializeObject(ex)
+                            ErrorDetail = ex
                         }
                     };
                 return await CreateOrderSubmitResponse(processResults, ordersRelatingToProcess);
@@ -157,7 +157,7 @@ namespace Marketplace.Common.Commands
                          * know which integrations failed on the ui, and retrigger when the issue is resolved 
                          * through the ui potentially
                          */
-                        UnhandledErrorBody = JsonConvert.SerializeObject(errorResponse),
+                         xp = errorResponse
                     };
                     return response;
                 }
@@ -218,7 +218,6 @@ namespace Marketplace.Common.Commands
                 {
                     Failed = false,
                     Type = processType,
-                    ErrorDetail = "Success"
                 };
             } catch (Exception ex)
             {
@@ -226,7 +225,7 @@ namespace Marketplace.Common.Commands
                 {
                     Failed = true,
                     Type = processType,
-                    ErrorDetail = JsonConvert.SerializeObject(ex)
+                    ErrorDetail = ex
                 };
             }
         }
@@ -235,7 +234,7 @@ namespace Marketplace.Common.Commands
         {
             // forwarding
             var buyerOrder = orderWorksheet.Order;
-            await CleanIDLineItems(orderWorksheet);
+            //await CleanIDLineItems(orderWorksheet);
 
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, buyerOrder.ID);
             var supplierOrders = orderSplitResult.OutgoingOrders.ToList();
