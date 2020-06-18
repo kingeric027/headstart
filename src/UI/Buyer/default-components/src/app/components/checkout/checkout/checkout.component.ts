@@ -129,7 +129,7 @@ export class OCMCheckout implements OnInit {
         PaymentID: this.payments.Items[0].ID, // There's always only one at this point
         CreditCardID: this.selectedCard?.SavedCard?.ID,
         CreditCardDetails: this.selectedCard.NewCard,
-        Currency: 'USD', // TODO - won't always be USD
+        Currency: this.order.xp.Currency,
         CVV: this.selectedCard.CVV,
         MerchantID: this.context.appSettings.cardConnectMerchantID,
       }
