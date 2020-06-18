@@ -84,7 +84,8 @@ namespace ordercloud.integrations.exchangerates
         public async Task<double?> ConvertCurrency(CurrencySymbol from, CurrencySymbol to, double value)
         {
             var rates = await this.Get(new ListArgs<OrderCloudIntegrationsConversionRate>(), from);
-            return rates.Items.FirstOrDefault(r => r.Currency == to)?.Rate;
+            var rate = rates.Items.FirstOrDefault(r => r.Currency == to)?.Rate;
+			return value * rate;
         }
 
         /// <summary>
