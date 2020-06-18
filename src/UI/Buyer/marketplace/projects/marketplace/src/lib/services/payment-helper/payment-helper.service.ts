@@ -9,7 +9,7 @@ export class PaymentHelperService {
   constructor() {}
 
   async ListPaymentsOnOrder(orderID: string, includeDetails: boolean = true): Promise<ListPage<Payment>> {
-    const payments = await Payments.List('Incoming', orderID);
+    const payments = await Payments.List('Outgoing', orderID);
     const withDetails = payments.Items.map(payment => this.setPaymentDetails(payment, includeDetails));
     const Items = await Promise.all(withDetails);
     return { Items, Meta: payments.Meta };
