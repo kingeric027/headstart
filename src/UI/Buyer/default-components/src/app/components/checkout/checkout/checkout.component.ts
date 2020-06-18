@@ -13,6 +13,7 @@ import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/servic
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 import { ShopperContextService } from 'marketplace';
+import { MerchantConfig } from 'src/app/config/merchant.class';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -121,8 +122,8 @@ export class OCMCheckout implements OnInit {
 
   async submitOrderWithComment(comment: string): Promise<void> {
     await this.checkout.addComment(comment);
-
     let cleanOrderID = '';
+    const merchant = MerchantConfig.getMerchant(this.order.xp.Currency);
     if(this.orderSummaryMeta.StandardLineItemCount) {
       const ccPayment = {
         OrderId: this.order.ID,
@@ -131,7 +132,7 @@ export class OCMCheckout implements OnInit {
         CreditCardDetails: this.selectedCard.NewCard,
         Currency: this.order.xp.Currency,
         CVV: this.selectedCard.CVV,
-        MerchantID: this.context.appSettings.cardConnectMerchantID,
+        MerchantID: merchant.cardConnectMerchantID
       }
       cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
     } else {
