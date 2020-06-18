@@ -67,15 +67,15 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoContact Map(MarketplaceBuyer buyer, MarketplaceUser user, MarketplaceUserGroup group, ZohoCurrency currency, MarketplaceAddressBuyer address)
+        public static ZohoContact Map(MarketplaceBuyer buyer, MarketplaceUser user,ZohoCurrency currency, MarketplaceBuyerLocation location)
         {
             return new ZohoContact()
             {
                 company_name = buyer.ID,
                 contact_name = buyer.Name,
                 contact_type = "customer",
-                billing_address = ZohoAddressMapper.Map(address),
-                shipping_address = ZohoAddressMapper.Map(address),
+                billing_address = ZohoAddressMapper.Map(location.Address),
+                shipping_address = ZohoAddressMapper.Map(location.Address),
                 contact_persons = new List<ZohoContactPerson>()
                 {
                     new ZohoContactPerson()
@@ -94,14 +94,13 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoContact Map(ZohoContact contact, MarketplaceBuyer buyer, MarketplaceUser user, MarketplaceUserGroup group,
-            ZohoCurrency currency, MarketplaceAddressBuyer address)
+        public static ZohoContact Map(ZohoContact contact, MarketplaceBuyer buyer, MarketplaceUser user, ZohoCurrency currency, MarketplaceBuyerLocation location)
         {
             contact.company_name = buyer.ID;
             contact.contact_name = buyer.Name;
             contact.contact_type = "customer";
-            contact.billing_address = ZohoAddressMapper.Map(address);
-            contact.shipping_address = ZohoAddressMapper.Map(address);
+            contact.billing_address = ZohoAddressMapper.Map(location.Address);
+            contact.shipping_address = ZohoAddressMapper.Map(location.Address);
             contact.tax_authority_id = contact.tax_authority_id;
             contact.contact_persons = (contact.contact_persons != null && contact.contact_persons.Any(c => c.email == user.Email))
                 ? new List<ZohoContactPerson>()
@@ -220,6 +219,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     quantity = lineitems.Items.FirstOrDefault(l => l.ProductID == p.sku)?.Quantity
                 }).ToList(),
                 salesorder_id = salesorder.salesorder_id,
+                purchaseorder_number = order.ID,
                 reference_number = salesorder.reference_number,
                 sub_total = decimal.ToDouble(order.Subtotal),
                 tax_total = decimal.ToDouble(order.TaxCost),
@@ -240,10 +240,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return new ZohoSalesOrder()
             {
                 reference_number = order.ID,
-
-                // salesorder id is not writable
-                // salesorder_id = order.ID
-                
+                salesorder_number = order.ID,
                 date = order.DateSubmitted?.ToString("yyyy-MM-dd"),
                 line_items = items.Select(item =>
                 {
@@ -277,10 +274,28 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     },
                 customer_id = contact.contact_id,
                 currency_code = contact.currency_code,
-                currency_symbol = contact.currency_symbol
+                currency_symbol = contact.currency_symbol,
+                // same error as billing address
+                //shipping_address = new ZohoAddress() {
+                //    attention = $"{lineitems.FirstOrDefault()?.ShippingAddress.CompanyName}: {lineitems.FirstOrDefault()?.ShippingAddress.FirstName} {lineitems.FirstOrDefault()?.ShippingAddress.LastName}",
+                //    address = lineitems.FirstOrDefault()?.ShippingAddress.Street1,
+                //    street2 = lineitems.FirstOrDefault()?.ShippingAddress.Street2,
+                //    city = lineitems.FirstOrDefault()?.ShippingAddress.City,
+                //    state_code = lineitems.FirstOrDefault()?.ShippingAddress.State,
+                //    zip = lineitems.FirstOrDefault()?.ShippingAddress.Zip,
+                //    phone = lineitems.FirstOrDefault()?.ShippingAddress.Phone
+                //},
+                // weird Zoho error about billing address being more than 100 characters
+                //billing_address = new ZohoAddress()
+                //{
+                //    address = order.BillingAddress.Street1,
+                //    street2 = order.BillingAddress.Street2,
+                //    city = order.BillingAddress.City,
+                //    state_code = order.BillingAddress.State,
+                //    zip = order.BillingAddress.Zip,
+                //    attention = $"{order.BillingAddress.CompanyName}: {order.FromUser.FirstName} {order.FromUser.LastName}"
+                //}
                 //contact_persons = new List<string>() { person.contact_person_id },
-                //billing_address_id = order.BillingAddress.ID, //TODO: invalid billing address id
-                //salesperson_name = $"{person.first_name} {person.last_name}", //TODO: do we have default users for our Sellers?
                 //shipping_charge = decimal.ToDouble(order.ShippingCost), //TODO: Please mention any Shipping/miscellaneous charges as additional line items.
             };
         }
@@ -292,6 +307,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         {
             return new ZohoAddress()
             {
+                attention = address.CompanyName,
                 address = address.Street1,
                 street2 = address.Street2,
                 city = address.City,
@@ -307,6 +323,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         {
             return new ZohoAddress()
             {
+                attention = address.CompanyName,
                 address = address.Street1,
                 street2 = address.Street2,
                 city = address.City,

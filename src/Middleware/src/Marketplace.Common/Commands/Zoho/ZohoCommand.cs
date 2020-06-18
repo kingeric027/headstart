@@ -111,10 +111,7 @@ namespace Marketplace.Common.Commands.Zoho
                 items.AddRange(await ApplyShipping(orderWorksheet));
 
                 // Step 4: create sales order with all objects from above
-                var saleorderforrequest = ZohoSalesOrderMapper.Map(orderWorksheet.Order, items.ToList(), contact,
-                        orderWorksheet.LineItems);
-                var salesOrder =
-                    await _zoho.SalesOrders.CreateAsync(saleorderforrequest);
+                var salesOrder = await _zoho.SalesOrders.CreateAsync(ZohoSalesOrderMapper.Map(orderWorksheet.Order, items.ToList(), contact, orderWorksheet.LineItems));
 
                 return salesOrder;
             }
@@ -197,21 +194,17 @@ namespace Marketplace.Common.Commands.Zoho
 
         private async Task<ZohoContact> CreateOrUpdateContact(Order order)
         {
-            // as this routine evolves around model updates to avoid so much listing abstract this out into a routine for reuse
             var ocBuyer = await _oc.Buyers.GetAsync<MarketplaceBuyer>(order.FromCompanyID);
+            var buyerAddress = await _oc.Addresses.GetAsync<MarketplaceAddressBuyer>(order.FromCompanyID, order.BillingAddressID);
+            var buyerUserGroup = await _oc.UserGroups.GetAsync<MarketplaceUserGroup>(order.FromCompanyID, order.BillingAddressID);
+            var location = new MarketplaceBuyerLocation
+            {
+                Address = buyerAddress,
+                UserGroup = buyerUserGroup
+            };
+            
             // TODO: MODEL update ~ eventually add a filter to get the primary contact user
             var ocUsers = await _oc.Users.ListAsync<MarketplaceUser>(ocBuyer.ID);
-
-            // TODO: MODEL update ~ eventually we'll add a filter for the user group type that represents the location
-            var ocGroupAssignments = await Throttler.RunAsync(ocUsers.Items, 100, 5, marketplaceUser => _oc.UserGroups.ListUserAssignmentsAsync(ocBuyer.ID, userID: marketplaceUser.ID, pageSize: 100));
-            var ocGroupAssignmentList = new List<UserGroupAssignment>();
-            foreach (var ocGroupAssignment in ocGroupAssignments)
-                ocGroupAssignmentList.AddRange(ocGroupAssignment.Items);
-
-            var ocGroups = await Throttler.RunAsync(ocGroupAssignmentList, 100, 5,
-                assignment => _oc.UserGroups.GetAsync<MarketplaceUserGroup>(ocBuyer.ID, assignment.UserGroupID));
-            // TODO: MODEL update ~ make this use the Party property for currency
-            var addresses = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(ocBuyer.ID);
             var currencies = await _zoho.Currencies.ListAsync();
 
             // TODO: MODEL update ~ right now we don't have actual groups set up for locations, so this isn't accurate or complete
@@ -223,9 +216,8 @@ namespace Marketplace.Common.Commands.Zoho
                         zContact.Items.FirstOrDefault(),
                         ocBuyer,
                         ocUsers.Items.FirstOrDefault(),
-                        ocGroups.FirstOrDefault(),
-                        currencies.Items.FirstOrDefault(c => c.currency_code == "USD"),
-                        addresses.Items.FirstOrDefault()));
+                        currencies.Items.FirstOrDefault(c => c.currency_code == (location.UserGroup.xp.Currency != null ? location.UserGroup.xp.Currency.ToString() : "USD")),
+                        location));
             }
             else
             {
@@ -233,9 +225,8 @@ namespace Marketplace.Common.Commands.Zoho
                     ZohoContactMapper.Map(
                         ocBuyer,
                         ocUsers.Items.FirstOrDefault(),
-                        ocGroups.FirstOrDefault(),
-                        currencies.Items.FirstOrDefault(c => c.currency_code == "USD"),
-                        addresses.Items.FirstOrDefault()));
+                        currencies.Items.FirstOrDefault(c => c.currency_code == (location.UserGroup.xp.Currency != null ? location.UserGroup.xp.Currency.ToString() : "USD")),
+                        location));
             }
         }
     }
