@@ -4,7 +4,7 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 // angular libs
 
 // ordercloud
-import { PasswordReset } from '@ordercloud/angular-sdk';
+import { PasswordReset } from 'ordercloud-javascript-sdk';
 import { ValidateStrongPassword, ValidateFieldMatches } from '../../../validators/validators';
 import { ToastrService } from 'ngx-toastr';
 import { ShopperContextService } from 'marketplace';
@@ -19,7 +19,7 @@ export class OCMResetPassword implements OnInit {
   resetCode: string;
   appName: string;
 
-  constructor(private toasterService: ToastrService, private context: ShopperContextService) { }
+  constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
 
   ngOnInit(): void {
     // TODO - figure out how to access url.

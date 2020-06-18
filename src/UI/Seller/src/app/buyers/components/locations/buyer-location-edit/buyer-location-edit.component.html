@@ -7,7 +7,7 @@
       </div>
       <div class="col-md-7 form-group">
         <div class="form-row">
-          <div class="form-group col-md-6"
+          <div class="form-group col-md-12"
                *ngIf="isCreatingNew">
             <label for="ID">Marketplace ID (Optional)</label>
             <div class="input-group">
@@ -28,14 +28,16 @@
                      placeholder="Enter ID (optional)">
             </div>
           </div>
-          <div class="form-group col-md-6"
+          <div class="form-group col-md-12"
                *ngIf="!isCreatingNew && buyerLocationEditable">
             <label for="ID">Marketplace ID</label>
             <input class="form-control"
                    value="{{buyerLocationEditable.Address.ID}}"
                    disabled>
           </div>
-          <div class="form-group col-md-6">
+
+          <!-- COMMENTING OUT - GOOD REFERENCE IF WE SWITCH THESE FIELDS TO ANGULAR MATERIAL -->
+          <!-- <div class="form-group col-md-6">
             <mat-form-field appearance="outline">
               <mat-label>Currency</mat-label>
               <mat-select [disabled]="!isCreatingNew"
@@ -46,7 +48,8 @@
               </mat-select>
               <mat-error>You must select a currency.</mat-error>
             </mat-form-field>
-          </div>
+          </div> -->
+
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
@@ -114,7 +117,7 @@
                  maxlength="100"
                  [resourceForm]="resourceForm"
                  formControlName="Street2"
-                 (input)="updateResourceFromEvent($event, 'Street 2')"
+                 (input)="handleUpdateBuyerLocation($event, 'Address.Street2')"
                  placeholder="Enter Street 2">
         </div>
         <div class="form-row">
@@ -158,11 +161,26 @@
                    placeholder="Enter Zip">
           </div>
         </div>
-        <div class="form-group">
-          <label for="Country">Country Code</label>
-          <input type="text"
+        <div class="form-row">
+         <div class="form-group col-md-6">
+          <label for="Country">Country</label>
+          <select *ngIf="countryOptions.length !== 0"
+                  type="dropdown"
+                  class="form-control"
+                  formControlName="Country"
+                  id="Country"
+                  showErrors
+                  aria-describedby="Country"
+                  (change)="handleUpdateBuyerLocation($event, 'Address.Country')">
+            <option [ngValue]="''"
+                    disabled>Select a Country</option>
+            <option *ngFor="let country of countryOptions"
+                    [value]="country.abbreviation">{{ country.label }}</option>
+          </select>
+          <input *ngIf="countryOptions.length === 0"
+                 type="text"
                  class="form-control"
-                 id="CountryCode"
+                 id="Country"
                  showErrors
                  aria-describedby="Country"
                  maxlength="2"
@@ -170,6 +188,18 @@
                  formControlName="Country"
                  (input)="handleUpdateBuyerLocation($event, 'Address.Country')"
                  placeholder="Enter Country Code">
+         </div>
+         <div class="form-group col-md-6">
+          <label for="Currency">Currency</label>
+          <input type="text"
+                   class="form-control"
+                   id="Currency"
+                   showErrors
+                   aria-describedby="Currency"
+                   disabled
+                   [resourceForm]="resourceForm"
+                   formControlName="Currency">
+         </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">

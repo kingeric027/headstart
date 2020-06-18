@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import { ShopperContextService, OrderReorderResponse, OrderViewContext, LineItem } from 'marketplace';
-import { MarketplaceOrder, OrderDetails } from 'marketplace-javascript-sdk';
+import { ShopperContextService, OrderReorderResponse, OrderViewContext } from 'marketplace';
+import { MarketplaceOrder, OrderDetails, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 
@@ -35,7 +35,7 @@ export class OCMOrderDetails implements OnInit {
     }
   }
 
-  async validateReorder(orderID: string, lineItems: LineItem[]): Promise<void> {
+  async validateReorder(orderID: string, lineItems: MarketplaceLineItem[]): Promise<void> {
     this.reorderResponse = await this.context.orderHistory.validateReorder(orderID, lineItems);
     this.updateMessage(this.reorderResponse);
   }

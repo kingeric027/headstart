@@ -16,8 +16,7 @@ import { MarketplaceModule, AppConfig } from 'marketplace';
 import { createCustomElement } from '@angular/elements';
 import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
-import { OrderCloudModule } from '@ordercloud/angular-sdk';
-import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { ToastrModule } from 'ngx-toastr';
 import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -46,7 +45,6 @@ import { ChildCategoryPipe } from './pipes/category-children.pipe';
 import { CreditCardFormatPipe } from './pipes/credit-card-format.pipe';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
-import { OcSDKConfig } from './config/ordercloud-sdk.config';
 import { ComponentNgElementStrategyFactory } from 'src/lib/component-factory-strategy';
 import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
@@ -139,7 +137,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { OCMBuyerLocationPermissions } from './components/profile/buyer-location-permissions/buyer-location-permissions';
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
 
-export function HttpLoaderFactory(http: HttpClient) {
+export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/');
   // uncomment to reference test file using XXX in place of words
   // return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/', '-test.json');
@@ -251,7 +249,6 @@ const components = [
     MarketplaceModule,
     AppRoutingModule,
     HttpClientModule,
-    OrderCloudModule.forRoot(OcSDKConfig),
     CookieModule.forRoot(),
     ToastrModule.forRoot(),
     TranslateModule.forRoot({
@@ -378,7 +375,7 @@ export class AppModule {
     this.buildWebComponent(OCMCertificateForm, 'ocm-certificate-form');
   }
 
-  buildWebComponent(angularComponent, htmlTagName: string): void {
+  buildWebComponent(angularComponent: any, htmlTagName: string): void {
     const component = createCustomElement(angularComponent, {
       injector: this.injector,
       // See this issue for why this Factory, copied from Angular/elements source code is included.

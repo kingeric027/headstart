@@ -3,36 +3,21 @@ import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { SupplierFilters } from '../../shopper-context';
-import { OcSupplierService, ListSupplier } from '@ordercloud/angular-sdk';
-
-export interface ISupplierFilters {
-  activeFiltersSubject: BehaviorSubject<SupplierFilters>;
-  toPage(pageNumber: number): void;
-  sortBy(field: string): void;
-  searchBy(searchTerm: string): void;
-  clearSearch(): void;
-  toSupplier(supplierID: string): void;
-  clearAllFilters(): void;
-  hasFilters(): boolean;
-  filterByFields(filter: any): void;
-}
+import { Suppliers, Supplier, Sortable } from 'ordercloud-javascript-sdk';
+import { ListPage } from 'marketplace-javascript-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',
 })
-export class SupplierFilterService implements ISupplierFilters {
+export class SupplierFilterService {
   public activeFiltersSubject: BehaviorSubject<SupplierFilters> = new BehaviorSubject<SupplierFilters>(
     this.getDefaultParms()
   );
 
   private readonly nonFilterQueryParams = ['page', 'sortBy', 'search'];
 
-  constructor(
-    private router: Router,
-    private ocSupplierService: OcSupplierService,
-    private activatedRoute: ActivatedRoute
-  ) {
+  constructor(private router: Router, private activatedRoute: ActivatedRoute) {
     this.activatedRoute.queryParams.subscribe(params => {
       if (this.router.url.startsWith('/suppliers')) {
         this.readFromUrlQueryParams(params);
@@ -48,16 +33,14 @@ export class SupplierFilterService implements ISupplierFilters {
     return { page, sortBy, search, supplierID, ...activeFilters };
   }
 
-  async listSuppliers(): Promise<ListSupplier> {
+  async listSuppliers(): Promise<ListPage<Supplier>> {
     const { page, sortBy, search, supplierID, activeFilters } = this.activeFiltersSubject.value;
-    return await this.ocSupplierService
-      .List({
-        page,
-        search,
-        sortBy,
-        filters: this.createFilters(activeFilters, supplierID),
-      })
-      .toPromise();
+    return await Suppliers.List({
+      page,
+      search,
+      sortBy,
+      filters: this.createFilters(activeFilters, supplierID),
+    });
   }
 
   toSupplier(supplierID: string): void {
@@ -71,7 +54,7 @@ export class SupplierFilterService implements ISupplierFilters {
     this.patchFilterState({ page: pageNumber || undefined });
   }
 
-  sortBy(field: string): void {
+  sortBy(field: Sortable<'Suppliers.List'>): void {
     this.patchFilterState({ sortBy: field || undefined, page: undefined });
   }
 

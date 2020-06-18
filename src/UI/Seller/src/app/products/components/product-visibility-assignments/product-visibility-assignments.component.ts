@@ -101,11 +101,4 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
     this._productCatalogAssignmentsEditable = this._productCatalogAssignmentsStatic;
     this.checkForProductCatalogAssignmentChanges();
   }
-
-  async executeProductCatalogAssignmentRequests(): Promise<void> {
-    this.requestedUserConfirmation = false;
-    await this.productService.updateProductCatalogAssignments(this.add, this.del);
-    await this.getProductCatalogAssignments(this.product);
-    this.checkForProductCatalogAssignmentChanges();
-  }
 }

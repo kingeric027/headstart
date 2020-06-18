@@ -4,6 +4,7 @@ import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
+import { ReturnReason } from '../../orders/order-return/order-return-table/return-reason-enum';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
@@ -59,7 +60,10 @@ export class OCMLineitemTable {
   }
 
   hasReturnInfo(): boolean {
-    return this._lineItems.some(li => !!li.xp?.LineItemReturnInfo)
+    return this._lineItems.some(li => !!li.xp?.LineItemReturnInfo);
   }
 
+  getReturnReason(reasonCode: string): string {
+    return ReturnReason[reasonCode];
+  }
 }

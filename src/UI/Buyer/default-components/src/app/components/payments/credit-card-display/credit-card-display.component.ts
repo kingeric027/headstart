@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { BuyerCreditCard, Address } from '@ordercloud/angular-sdk';
+import { BuyerCreditCard, Address } from 'ordercloud-javascript-sdk';
 import { MarketplaceBuyerCreditCard } from 'marketplace';
 
 @Component({

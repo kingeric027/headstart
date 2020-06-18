@@ -193,13 +193,26 @@ export class ProductEditComponent implements OnInit {
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
         ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType'), Validators.required),
         IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
+        QuantityAvailable: new FormControl(superMarketplaceProduct.Product?.Inventory?.QuantityAvailable, null),
+        InventoryEnabled: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.Enabled')),
+        OrderCanExceed: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.OrderCanExceed')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
         UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit'), Validators.required),
         UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'), Validators.required),
       }, { validators: ValidateMinMax }
       );
+      this.setInventoryValidator();
     }
+  }
+
+  setInventoryValidator() {
+    const quantityControl = this.productForm.get("QuantityAvailable");
+    this.productForm.get("InventoryEnabled").valueChanges
+    .subscribe(inventory => {
+      inventory ? quantityControl.setValidators([Validators.required, Validators.min(1)]) : quantityControl.setValidators(null); 
+      quantityControl.updateValueAndValidity()
+    })
   }
 
   async handleSave(): Promise<void> {
@@ -274,7 +287,7 @@ export class ProductEditComponent implements OnInit {
     const productUpdate = {
       field,
       value:
-        (field === 'Product.Active' || field === 'Product.xp.IsResale')
+        ['Product.Active', 'Product.xp.IsResale', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed'].includes(field)
           ? event.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);

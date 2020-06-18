@@ -1,18 +1,19 @@
 import { Component, Input } from '@angular/core';
-import { ListSpec, PriceSchedule } from '@ordercloud/angular-sdk';
-import { LineItem, MarketplaceMeProduct, ShopperContextService } from 'marketplace';
+import { Spec, PriceSchedule, ListPage } from 'ordercloud-javascript-sdk';
+import { MarketplaceMeProduct, ShopperContextService } from 'marketplace';
 import { SpecFormService, GridSpecOption } from '../spec-form/spec-form.service';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
+import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 
 @Component({
     templateUrl: `./grid-spec-form.component.html`,
 })
 export class OCMGridSpecForm {
     @Input() priceSchedule: PriceSchedule;
-    _specs: ListSpec;
+    _specs: ListPage<Spec>;
     _product: MarketplaceMeProduct;
     specOptions: string[];
-    lineItems: LineItem[] = [];
+    lineItems: MarketplaceLineItem[] = [];
     lineTotals: number[] = [];
     totalPrice = 0;
     isAddingToCart = false;
@@ -21,12 +22,12 @@ export class OCMGridSpecForm {
     @Input() set product(value: MarketplaceMeProduct) {
         this._product = value;
     }
-    @Input() set specs(value: ListSpec) {
+    @Input() set specs(value: ListPage<Spec>) {
         this._specs = value;
         this.getSpecOptions(value);
     }
 
-    getSpecOptions(specs: ListSpec): void {
+    getSpecOptions(specs: ListPage<Spec>): void {
         // creates an object with each spec option and its values
         const obj = {};
         for (const spec of specs.Items) {

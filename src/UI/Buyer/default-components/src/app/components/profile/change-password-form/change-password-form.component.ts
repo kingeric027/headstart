@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { MeUser } from '@ordercloud/angular-sdk';
+import { MeUser } from 'ordercloud-javascript-sdk';
 import { ValidateStrongPassword, ValidateFieldMatches } from '../../../validators/validators';
 import { ToastrService } from 'ngx-toastr';
 import { ShopperContextService } from 'marketplace';

@@ -4,9 +4,11 @@ using Newtonsoft.Json.Converters;
 namespace Marketplace.Models.Extended
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum OrderType
+    public enum ShippingStatus
     {
-        Standard,
-        Quote
+        Shipped,
+        PartiallyShipped,
+        Cancelled,
+        Processing
     }
 }

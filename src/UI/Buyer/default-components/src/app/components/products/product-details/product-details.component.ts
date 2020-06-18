@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
-import { ListSpec } from '@ordercloud/angular-sdk';
+import { Spec } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
-import { MarketplaceMeProduct, ShopperContextService, PriceSchedule, OrderType, ExchangeRates, CurrentUser } from 'marketplace';
-import { MarketplaceLineItem, AssetForDelivery, MarketplaceOrder, QuoteOrderInfo } from 'marketplace-javascript-sdk';
+import { MarketplaceMeProduct, ShopperContextService, ExchangeRates, CurrentUser } from 'marketplace';
+import { PriceSchedule } from 'ordercloud-javascript-sdk';
+import { MarketplaceLineItem, AssetForDelivery, QuoteOrderInfo } from 'marketplace-javascript-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
@@ -22,7 +23,7 @@ export class OCMProductDetails implements OnInit {
   faTh = faTh;
   faListUl = faListUl;
   faTimes = faTimes;
-  _specs: ListSpec;
+  _specs: ListPage<Spec>;
   _product: MarketplaceMeProduct;
   _priceSchedule: PriceSchedule;
   _priceBreaks: ExchangedPriceBreak[];
@@ -58,7 +59,7 @@ export class OCMProductDetails implements OnInit {
 
   @Input() set product(superProduct: SuperMarketplaceProduct) {
     this._product = superProduct.Product;
-    this._priceSchedule = superProduct.PriceSchedule;
+    this._priceSchedule = superProduct.PriceSchedule as any;
     this._rates = this.context.exchangeRates.Get();
     this._attachments = superProduct?.Attachments;
     const currentUser = this.context.currentUser.get();
@@ -73,7 +74,7 @@ export class OCMProductDetails implements OnInit {
     });
     this._price = this.getTotalPrice();
     // Specs
-    this._specs = { Meta: {}, Items: superProduct.Specs };
+    this._specs = { Meta: {}, Items: superProduct.Specs as any };
     this.specFormService.event.valid = this._specs.Items.length === 0;
     this.specLength = this._specs.Items.length;
     // End Specs
@@ -130,7 +131,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   isImageMatchingSpecs(image: AssetForDelivery): boolean {
-      //Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
+      // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
     const specs = this.specFormService.getLineItemSpecs(this._specs);
     return specs.
       every(spec => image.Tags
@@ -194,30 +195,12 @@ export class OCMProductDetails implements OnInit {
     this.quoteFormModal = ModalState.Closed;
   }
 
-  getDefaultQuoteOrder(user: QuoteOrderInfo): MarketplaceOrder {
-    const defaultQuoteOrder = {
-      xp: {
-        AvalaraTaxTransactionCode: '',
-        OrderType: OrderType.Quote,
-        QuoteOrderInfo: {
-          FirstName: user.FirstName,
-          LastName: user.LastName,
-          Phone: user.Phone,
-          Email: user.Email,
-          Comments: user.Comments
-        }
-      }
-    };
-    return defaultQuoteOrder;
-  }
-
-  async submitQuoteOrder(user: QuoteOrderInfo): Promise<void> {
+  async submitQuoteOrder(info: QuoteOrderInfo): Promise<void> {
     try {
-      const defaultOrder = this.getDefaultQuoteOrder(user);
       const lineItem: MarketplaceLineItem = {};
       lineItem.ProductID = this._product.ID;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);
-      this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(defaultOrder, lineItem);
+      this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(info, lineItem);
       this.quoteFormModal = ModalState.Closed;
       this.showRequestSubmittedMessage = true;
     } catch (ex) {

@@ -18,11 +18,10 @@ namespace Marketplace.Models.Models.Marketplace
     public class SupplierXp
     {
         public string Description { get; set; }
-        public List<ProductImage> Images { get; set; } = new List<ProductImage>();
         public Contact SupportContact { get; set; }
         public bool SyncFreightPop { get; set; }
         public string ApiClientID { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
-		public CurrencySymbol Currency { get; set; }
+		public CurrencySymbol? Currency { get; set; } = null;
     }
 }
