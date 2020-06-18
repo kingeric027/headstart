@@ -8,7 +8,7 @@ namespace Marketplace.Models.Extended
     {
         Shipped,
         PartiallyShipped,
-        Cancelled,
+        Canceled,
         Processing,
         Backordered
     }

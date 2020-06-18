@@ -115,8 +115,9 @@ export enum OrderViewContext {
 export enum ShippingStatus {
   Shipped = 'Shipped',
   PartiallyShipped = 'PartiallyShipped',
-  Cancelled = 'Cancelled',
+  Canceled = 'Canceled',
   Processing = 'Processing',
+  Backordered = 'Backordered'
 }
 
 export enum ClaimStatus {
@@ -130,7 +131,7 @@ export enum LineItemStatus {
   Submitted = 'Submitted',
   Open = 'Open',
   Backordered = 'Backordered',
-  Cancelled = 'Cancelled',
+  Cancelled = 'Canceled',
   Returned = 'Returned',
 }
 

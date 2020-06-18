@@ -10,7 +10,7 @@ namespace Marketplace.Models.Extended
         Submitted,
         Open,
         Backordered,
-        Cancelled,
+        Canceled,
         Returned
     }
 }
