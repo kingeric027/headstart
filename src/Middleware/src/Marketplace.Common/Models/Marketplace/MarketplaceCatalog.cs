@@ -9,6 +9,11 @@ namespace Marketplace.Models
     }
 
     [SwaggerModel]
+    public class PartialMarketplaceCatalog : PartialUserGroup<CatalogXp>
+    {
+    }
+
+    [SwaggerModel]
     public class CatalogXp
     {
         public string Type { get; set; } = "Catalog";
