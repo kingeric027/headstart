@@ -14,6 +14,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+
 #if NETCOREAPP3_1
 using System.Text.Json.Serialization;
 #endif

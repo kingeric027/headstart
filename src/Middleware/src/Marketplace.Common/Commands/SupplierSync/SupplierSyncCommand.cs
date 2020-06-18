@@ -17,7 +17,6 @@ namespace Marketplace.Common.Commands.SupplierSync
     public interface ISupplierSyncCommand
     {
         Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user);
-        Task<List<TemplateHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user);
     }
 
     public class SupplierSyncCommand : ISupplierSyncCommand
@@ -60,71 +59,5 @@ namespace Marketplace.Common.Commands.SupplierSync
                 }));
             }
         }
-
-        public async Task<List<TemplateHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
-        {
-            using var stream = file.OpenReadStream();
-            var mapper = new Mapper(stream);
-            var products = mapper.Take<TemplateProduct>("Products").ToList();
-            var prices = mapper.Take<TemplatePriceSchedule>("PriceSchedules").ToList();
-            var specs = mapper.Take<TemplateSpec>("Specs").ToList();
-            var specoptions = mapper.Take<TemplateSpecOption>("SpecOptions").ToList();
-            var images = mapper.Take<TemplateAsset>("Images").ToList();
-            var attachments = mapper.Take<TemplateAsset>("Attachments").ToList();
-
-            var list = products.Select(info => new TemplateHydratedProduct()
-            {
-                Product = info.Value,
-                PriceSchedule = prices.FirstOrDefault(row => row.Value.ProductID == info.Value.ID)?.Value,
-                Specs = specs.Where(s => s.Value.ProductID == info.Value.ID).Select(s =>
-                {
-                    s.Value.SpecOptions = specoptions.Where(o => o.Value.SpecID == s.Value.ID).Select(o => o.Value).ToList();
-                    return s.Value;
-                }).ToList(),
-                Images = images.Where(s => s.Value.ProductID == info.Value.ID).Select(o => o.Value).ToList(),
-                Attachments = attachments.Where(s => s.Value.ProductID == info.Value.ID).Select(o => o.Value).ToList()
-            });
-            return await Task.FromResult(list.ToList());
-        }
-    }
-
-    public class TemplateHydratedProduct
-    {
-        public TemplateProduct Product { get; set; }
-        public TemplatePriceSchedule PriceSchedule { get; set; }
-        public IList<TemplateSpec> Specs { get; set; }
-        public IList<TemplateAsset> Images { get; set; }
-        public IList<TemplateAsset> Attachments { get; set; }
-    }
-
-    public class TemplateProduct : MarketplaceProduct
-    {
-        public string TaxCategory { get; set; }
-        public string TaxCode { get; set; }
-        public string TaxDescription { get; set; }
-        public string UnitOfMeasureQty { get; set; }
-        public string UnitOfMeasure { get; set; }
-        public bool IsResale { get; set; }
-    }
-
-    public class TemplatePriceSchedule : MarketplacePriceSchedule
-    {
-        public string ProductID { get; set; }
-    }
-
-    public class TemplateSpec : MarketplaceSpec
-    {
-        public string ProductID { get; set; }
-        public IList<TemplateSpecOption> SpecOptions { get; set; }
-    }
-
-    public class TemplateSpecOption : MarketplaceSpecOption
-    {
-        public string SpecID { get; set; }
-    }
-
-    public class TemplateAsset : Asset
-    {
-        public string ProductID { get; set; }
     }
 }
