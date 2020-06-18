@@ -4,7 +4,6 @@ import {
   LineItemGroupSupplier,
 } from 'marketplace';
 import {MarketplaceOrder, MarketplaceLineItem, OrderDetails} from 'marketplace-javascript-sdk';
-import { ListLineItem } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model';
@@ -18,7 +17,6 @@ export class OCMOrderReturn {
   lineItems: MarketplaceLineItem[];
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
-  liGroups: ListLineItem;
   quantitiesToReturn: number[] = [];
   displayedColumns: string[] = [
     'select',
@@ -36,8 +34,8 @@ export class OCMOrderReturn {
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.Order;
     this.lineItems = value.LineItems;
-    this.liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
-    this.liGroupedByShipFrom = Object.values(this.liGroups);
+    const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
+    this.liGroupedByShipFrom = Object.values(liGroups);
     this.setSupplierInfo(this.liGroupedByShipFrom);
     this.setRequestReturnForm();
   }
@@ -50,7 +48,7 @@ export class OCMOrderReturn {
     const liGroups = this.requestReturnForm.controls.liGroups as FormArray;
     const selectedItem = liGroups.value.find(value => value.lineItems.find(lineItem => lineItem.selected === true));
     return !!selectedItem;
-  }clear
+  }
 
   setRequestReturnForm(): void  {
     this.requestReturnForm = this.fb.group(new ReturnRequestForm(this.fb, this.order.ID, this.liGroupedByShipFrom));
@@ -81,6 +79,5 @@ export class OCMOrderReturn {
      }
     this.isSaving = false;
     this.viewReturnFormEvent.emit(false);
-    await this.context.order.sendReturnRequestEmail(orderID);
   }
 }

@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChange
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 
 // 3rd party
-import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
+import { BuyerAddress, Address } from 'ordercloud-javascript-sdk';
 import { ValidateName, ValidateUSZip, ValidatePhone } from '../../../validators/validators';
 import { GeographyConfig } from '../../../config/geography.class';
 

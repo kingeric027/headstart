@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ShipEstimate, ShipMethodSelection, ShopperContextService } from 'marketplace';
+import { ShopperContextService } from 'marketplace';
+import { ShipEstimate, ShipMethodSelection } from 'ordercloud-javascript-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 

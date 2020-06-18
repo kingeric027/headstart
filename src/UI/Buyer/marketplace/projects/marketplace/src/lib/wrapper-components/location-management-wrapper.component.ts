@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 
 @Component({
   template: `
@@ -9,7 +8,7 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
 })
 export class LocationManagementWrapperComponent {
   locationID: string;
-  constructor(public context: ShopperContextService, private activatedRoute: ActivatedRoute) {
+  constructor(private activatedRoute: ActivatedRoute) {
     this.locationID = this.activatedRoute.snapshot.params.locationID;
   }
 }

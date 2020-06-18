@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faEdit, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { faArrowLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { BuyerAddress, ListBuyerAddress } from '@ordercloud/angular-sdk';
+import { BuyerAddress, ListPage } from 'ordercloud-javascript-sdk';
 import { ShopperContextService } from 'marketplace';
 import { ToastrService } from 'ngx-toastr';
 import { ModalState } from '../../../models/modal-state.class';
@@ -12,7 +12,7 @@ import { getSuggestedAddresses } from '../../../services/address-suggestion.help
   styleUrls: ['./address-list.component.scss'],
 })
 export class OCMAddressList implements OnInit {
-  @Input() addresses: ListBuyerAddress;
+  @Input() addresses: ListPage<BuyerAddress>;
   faPlus = faPlus;
   faArrowLeft = faArrowLeft;
   faTrashAlt = faTrashAlt;
@@ -114,7 +114,7 @@ export class OCMAddressList implements OnInit {
     try {
       address.Shipping = true;
       address.Billing = true;
-      address.ID = this.currentAddress.ID;
+      (address as any).ID = this.currentAddress.ID;
       await this.context.addresses.edit(address.ID, address);
       this.showCreateAddressForm = false;
       this.suggestedAddresses = null;

@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { UserGroupAssignment, User } from '@ordercloud/angular-sdk';
-import { UserManagementService } from 'marketplace/projects/marketplace/src/lib/services/user-management/user-management.service';
+import { UserGroupAssignment } from 'ordercloud-javascript-sdk';
 import { PermissionType, PermissionTypes, ShopperContextService } from 'marketplace';
+import { MarketplaceUser } from 'marketplace-javascript-sdk';
 
 @Component({
   selector: 'buyer-location-permissions',
@@ -14,7 +14,7 @@ export class OCMBuyerLocationPermissions {
   add: UserGroupAssignment[];
   del: UserGroupAssignment[];
   areChanges = false;
-  locationUsers: User[];
+  locationUsers: MarketplaceUser[];
   _locationID: string;
   permissionTypes: PermissionType[] = PermissionTypes.filter(
     p => p.UserGroupSuffix !== 'NeedsApproval' && p.UserGroupSuffix !== 'OrderApprover'

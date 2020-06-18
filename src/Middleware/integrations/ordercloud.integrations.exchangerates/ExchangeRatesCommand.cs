@@ -57,7 +57,7 @@ namespace ordercloud.integrations.exchangerates
 
         public ListPage<OrderCloudIntegrationsConversionRate> Filter(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, OrderCloudIntegrationsExchangeRate rates)
         {
-            if (rateArgs.Filters.Any(filter => filter.Name == "Symbol"))
+            if (rateArgs.Filters?.Any(filter => filter.Name == "Symbol") ?? false)
             {
                 rates.Rates = (
                         from rate in rates.Rates

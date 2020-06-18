@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ListLineItem, OcMeService } from '@ordercloud/angular-sdk';
-import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { ListLineItemWithProduct, MarketplaceMeProduct } from '../shopper-context';
+import { MarketplaceMeProduct, LineItemWithProduct } from '../shopper-context';
 import { CurrentOrderService } from '../services/order/order.service';
-import { MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, ListPage, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { Me } from 'ordercloud-javascript-sdk';
 
 @Component({
   template: `
@@ -12,14 +11,10 @@ import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 })
 export class CartWrapperComponent implements OnInit {
   order: MarketplaceOrder;
-  lineItems: ListLineItemWithProduct;
+  lineItems: ListPage<LineItemWithProduct>;
   productCache: MarketplaceMeProduct[] = []; // TODO - move to cart service?
 
-  constructor(
-    private currentOrder: CurrentOrderService,
-    private ocMeService: OcMeService,
-    public context: ShopperContextService // used in template
-  ) {}
+  constructor(private currentOrder: CurrentOrderService) {}
 
   ngOnInit(): void {
     this.currentOrder.onChange(this.setOrder);
@@ -30,7 +25,7 @@ export class CartWrapperComponent implements OnInit {
     this.order = order;
   };
 
-  setLineItems = async (items: ListLineItem): Promise<void> => {
+  setLineItems = async (items: ListPage<MarketplaceLineItem>): Promise<void> => {
     // TODO - this requests all the products on navigation to the cart.
     // Fewer requests could be acomplished by moving this logic to the cart service so it runs only once.
     await this.updateProductCache(items.Items.map(li => li.ProductID));
@@ -43,8 +38,8 @@ export class CartWrapperComponent implements OnInit {
     this.productCache = [...this.productCache, ...(await this.requestProducts(toAdd))];
   }
 
-  mapToLineItemsWithProduct(lis: ListLineItem): ListLineItemWithProduct {
-    const Items = lis.Items.map(li => {
+  mapToLineItemsWithProduct(lis: ListPage<MarketplaceLineItem>): ListPage<LineItemWithProduct> {
+    const Items = lis.Items.map((li: LineItemWithProduct) => {
       const product = this.getCachedProduct(li.ProductID);
       li.Product = product;
       return li;
@@ -53,7 +48,7 @@ export class CartWrapperComponent implements OnInit {
   }
 
   async requestProducts(ids: string[]): Promise<MarketplaceMeProduct[]> {
-    return await Promise.all(ids.map(id => this.ocMeService.GetProduct(id).toPromise()));
+    return await Promise.all(ids.map(id => Me.GetProduct(id)));
   }
 
   getCachedProduct(id: string): MarketplaceMeProduct {
