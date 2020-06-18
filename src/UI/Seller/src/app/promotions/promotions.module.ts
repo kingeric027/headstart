@@ -5,9 +5,10 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PromotionsRoutingModule } from './promotions-routing.module';
 import { PromotionTableComponent } from './components/promotion-table/promotion-table.component';
 import { PromotionEditComponent } from './components/promotion-edit/promotion-edit.component';
+import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
-  imports: [SharedModule, PromotionsRoutingModule, PerfectScrollbarModule],
+  imports: [SharedModule, PromotionsRoutingModule, PerfectScrollbarModule, NgbDatepickerModule],
   declarations: [PromotionTableComponent, PromotionEditComponent],
 })
 export class PromotionsModule {}
