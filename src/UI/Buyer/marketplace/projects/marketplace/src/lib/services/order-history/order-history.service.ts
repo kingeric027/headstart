@@ -12,7 +12,7 @@ import {
   MarketplaceSDK,
 } from 'marketplace-javascript-sdk';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-
+import { ClaimStatus, LineItemStatus } from '../../../lib/shopper-context';
 @Injectable({
   providedIn: 'root',
 })
@@ -94,6 +94,7 @@ export class OrderHistoryService {
           HasReturn: true,
           Resolved: false,
         },
+        ClaimStatus: ClaimStatus.Pending
       },
     });
     return order as MarketplaceOrder;
@@ -112,10 +113,11 @@ export class OrderHistoryService {
           ReturnReason: returnReason,
           Resolved: false,
         },
+        LineItemStatus: LineItemStatus.Returned
       },
     };
     const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
-    MarketplaceSDK.Orders.RequestReturnEmail(orderID); // Not awaited. Can return before email succeeds.
+    await MarketplaceSDK.Orders.RequestReturnEmail(orderID);
     return line;
   }
 }
