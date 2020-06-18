@@ -11,10 +11,11 @@ namespace Marketplace.Common.Controllers
 	public class IntegrationController: BaseController
 	{
 		private readonly IOCShippingIntegration _OCShippingIntegration;
-		private readonly IOrderCommand _orderCommand;
-		public IntegrationController(AppSettings settings, IOCShippingIntegration OCShippingIntegration, IOrderCommand orderCommand) : base(settings) 
+		private readonly IPostSubmitCommand _postSubmitCommand;
+		public IntegrationController(AppSettings settings, IOCShippingIntegration OCShippingIntegration, IPostSubmitCommand postSubmitCommand) : base(settings) 
 		{
 			_OCShippingIntegration = OCShippingIntegration;
+			_postSubmitCommand = postSubmitCommand;
 		}
 
 		[Route("shippingrates")]
@@ -39,7 +40,7 @@ namespace Marketplace.Common.Controllers
 		[OrderCloudWebhookAuth]
 		public async Task<OrderSubmitResponse> HandleOrderSubmit([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> payload)
 		{
-			var response = await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
+			var response = await _postSubmitCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
 			return response;
 		}
 	}
