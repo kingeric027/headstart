@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Marketplace.Models.Extended
@@ -9,6 +9,7 @@ namespace Marketplace.Models.Extended
         Shipped,
         PartiallyShipped,
         Cancelled,
-        Processing
+        Processing,
+        Backordered
     }
 }

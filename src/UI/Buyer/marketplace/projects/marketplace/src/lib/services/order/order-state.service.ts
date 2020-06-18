@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { AppConfig } from '../../shopper-context';
+import { ListPage, MarketplaceLineItem, MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { LineItems, Me, Order, Orders } from 'ordercloud-javascript-sdk';
 import { BehaviorSubject } from 'rxjs';
-import { Orders, LineItems, Me, Order } from 'ordercloud-javascript-sdk';
-import { TokenHelperService } from '../token-helper/token-helper.service';
 import { listAll } from '../../functions/listAll';
+import { AppConfig, ClaimStatus, ShippingStatus } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { MarketplaceOrder, ListPage, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { TokenHelperService } from '../token-helper/token-helper.service';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +24,8 @@ export class OrderStateService {
       OrderReturnInfo: {
         HasReturn: false,
       },
+      ClaimStatus: ClaimStatus.NoClaim,
+      ShippingStatus: ShippingStatus.Processing
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
