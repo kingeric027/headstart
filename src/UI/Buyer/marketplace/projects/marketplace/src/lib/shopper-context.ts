@@ -131,7 +131,7 @@ export enum LineItemStatus {
   Submitted = 'Submitted',
   Open = 'Open',
   Backordered = 'Backordered',
-  Cancelled = 'Canceled',
+  Canceled = 'Canceled',
   Returned = 'Returned',
 }
 
