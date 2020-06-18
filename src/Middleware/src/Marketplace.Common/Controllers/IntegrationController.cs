@@ -4,13 +4,15 @@ using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
+using Marketplace.Common.Commands;
 
 namespace Marketplace.Common.Controllers
 {
 	public class IntegrationController: BaseController
 	{
 		private readonly IOCShippingIntegration _OCShippingIntegration;
-		public IntegrationController(AppSettings settings, IOCShippingIntegration OCShippingIntegration) : base(settings) 
+		private readonly IOrderCommand _orderCommand;
+		public IntegrationController(AppSettings settings, IOCShippingIntegration OCShippingIntegration, IOrderCommand orderCommand) : base(settings) 
 		{
 			_OCShippingIntegration = OCShippingIntegration;
 		}
@@ -31,6 +33,14 @@ namespace Marketplace.Common.Controllers
 		{
 			var orderCalculationResponse = await _OCShippingIntegration.CalculateOrder(orderCalculatePayload);
 			return orderCalculationResponse;
+		}
+
+		[HttpPost, Route("ordersubmit")]
+		[OrderCloudWebhookAuth]
+		public async Task<OrderSubmitResponse> HandleOrderSubmit([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> payload)
+		{
+			var response = await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
+			return response;
 		}
 	}
 }
