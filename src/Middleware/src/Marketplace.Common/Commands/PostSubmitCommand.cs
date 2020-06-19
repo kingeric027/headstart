@@ -121,19 +121,24 @@ namespace Marketplace.Common.Commands
             var ordersRelatingToProcess = new List<MarketplaceOrder> { updatedMarketplaceOrderWorksheet.Order };
             ordersRelatingToProcess.AddRange(updatedSupplierOrders);
 
-            var integrationResults = new List<ProcessResult> { };
-            
-            integrationResults.Add(await SafeIntegrationCall(ProcessType.Sengrid, async () => await _sendgridService.SendOrderSubmitEmail(updatedMarketplaceOrderWorksheet)));
+            var integrationRequests = new List<Task<ProcessResult>> { };
+
+            integrationRequests.Add(SafeIntegrationCall(ProcessType.Sengrid, async () => await _sendgridService.SendOrderSubmitEmail(updatedMarketplaceOrderWorksheet)));
 
             // quote orders do not need to flow into our integrations
             if (IsStandardOrder(updatedMarketplaceOrderWorksheet))
             {
-                integrationResults.Add(await SafeIntegrationCall(ProcessType.FreightPop, async () => await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders)));
-                integrationResults.Add(await SafeIntegrationCall(ProcessType.Avalara, async () => await HandleTaxTransactionCreationAsync(updatedMarketplaceOrderWorksheet.Reserialize<OrderWorksheet>())));
-                integrationResults.Add(await SafeIntegrationCall(ProcessType.Zoho, async () => await HandleZohoIntegration(updatedSupplierOrders, updatedMarketplaceOrderWorksheet)));
+                integrationRequests.Add(SafeIntegrationCall(ProcessType.FreightPop, async () => await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders)));
+                integrationRequests.Add(SafeIntegrationCall(ProcessType.Avalara, async () => await HandleTaxTransactionCreationAsync(updatedMarketplaceOrderWorksheet.Reserialize<OrderWorksheet>())));
+                integrationRequests.Add(SafeIntegrationCall(ProcessType.Zoho, async () => await HandleZohoIntegration(updatedSupplierOrders, updatedMarketplaceOrderWorksheet)));
             }
 
-            return await CreateOrderSubmitResponse(integrationResults, ordersRelatingToProcess);
+            var integrationResponses = await Throttler.RunAsync(integrationRequests, 100, 4, (request) =>
+            {
+                return request;
+            });
+
+            return await CreateOrderSubmitResponse(integrationResponses.ToList(), ordersRelatingToProcess);
         }
 
         private async Task<OrderSubmitResponse> CreateOrderSubmitResponse(List<ProcessResult> processResults, List<MarketplaceOrder> ordersRelatingToProcess)
