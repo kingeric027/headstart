@@ -340,7 +340,12 @@
     <div class="col-md-5">
       <div class="card py-2 px-3 mt-3 bg-white">
         <h6 class="font-weight-medium">Summary</h6>
-        <h5 class="font-weight-bold">{{_promotionEditable?.Code}}</h5>
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="font-weight-bold">{{_promotionEditable?.Code}}</h5>
+          <span *ngIf="!isCreatingNew"
+                class="badge badge-pill"
+                [ngClass]="{'badge-success': !isExpired, 'badge-light': isExpired}">{{isExpired ? 'Expired' : 'Active'}}</span>
+        </div>
         <p *ngIf="!_promotionEditable?.Code && !_promotionEditable?.xp?.Value">No information entered yet.</p>
         <ng-container *ngIf="_promotionEditable?.xp?.Value || _promotionEditable?.xp?.Type === 'FreeShipping'">
           <ul>

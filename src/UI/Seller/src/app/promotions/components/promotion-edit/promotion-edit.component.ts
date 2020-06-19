@@ -39,6 +39,7 @@ export class PromotionEditComponent implements OnInit {
   hasExpiration = false;
   capShipCost = false;
   areChanges = false;
+  isExpired = false;
   dataIsSaving = false;
   isCreatingNew: boolean;
   faTimesCircle = faTimesCircle;
@@ -51,6 +52,8 @@ export class PromotionEditComponent implements OnInit {
   }
 
   refreshPromoData(promo: Promotion<PromotionXp>): void {
+    const now = moment(Date.now()).format('YYYY-MM-DD[T]hh:mm');
+    promo.ExpirationDate ? (this.isExpired = Date.parse(promo.ExpirationDate) < Date.parse(now)) : (this.isExpired = false);
     // Modify the datetime to work with the UI
     promo.StartDate && (promo.StartDate = moment(promo.StartDate).format('YYYY-MM-DD[T]hh:mm'));
     if (promo.ExpirationDate) {
@@ -91,6 +94,8 @@ export class PromotionEditComponent implements OnInit {
   generateRandomCode(): void {
     const randomCode = Math.random().toString(36).slice(2).substr(0, 5).toUpperCase();
     this.handleUpdatePromo({target: {value: randomCode}}, 'Code');
+    this._promotionEditable.Code = randomCode;
+    this.resourceForm.controls['Code'].setValue(randomCode);
   }
 
   handleUpdatePromo(event: any, field: string, typeOfValue?: string): void {
@@ -157,7 +162,7 @@ export class PromotionEditComponent implements OnInit {
   }
 
   getMinDate(): string {
-    return moment().format("YYYY-MM-DD")
+    return moment().format("YYYY-MM-DD[T]hh:mm")
   }
 
   toggleHasRedemptionLimit(): void {
