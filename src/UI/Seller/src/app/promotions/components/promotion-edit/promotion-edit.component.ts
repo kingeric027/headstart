@@ -235,7 +235,11 @@ export class PromotionEditComponent implements OnInit {
         eligibleExpression = `${eligibleExpression}.LineItemCount > ${this._promotionEditable.xp?.MinReq?.Int}`
         break;
     }
-    if (this._promotionEditable.xp?.MaxShipCost) eligibleExpression = `Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
+    if (this._promotionEditable.xp?.MaxShipCost) {
+      this._promotionEditable.xp?.MinReq?.Type ? eligibleExpression = `${eligibleExpression} & Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
+      :
+      eligibleExpression = `Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
+    }
     this._promotionEditable.EligibleExpression = eligibleExpression;
   }
 
