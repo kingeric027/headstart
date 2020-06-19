@@ -17,20 +17,6 @@ namespace Marketplace.Models.Misc
 		public EventBodyType EventBody { get; set; }
 	}
 
-	public enum MessageType
-    {
-        OrderDeclined,
-        OrderSubmitted,
-        ShipmentCreated,
-        ForgottenPassword,
-        OrderSubmittedForYourApproval,
-        OrderSubmittedForApproval,
-        OrderApproved,
-        OrderSubmittedForYourApprovalHasBeenApproved,
-        OrderSubmittedForYourApprovalHasBeenDeclined,
-        NewUserInvitation
-    }
-
     public class OrderSubmitEventBody
     {
         public MarketplaceOrder Order { get; set; }
