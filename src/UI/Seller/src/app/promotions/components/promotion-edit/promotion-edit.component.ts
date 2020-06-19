@@ -166,39 +166,23 @@ export class PromotionEditComponent implements OnInit {
   }
 
   toggleHasRedemptionLimit(): void {
-    if (this.hasRedemptionLimit) {
-      this._promotionEditable.RedemptionLimit = null;
-      this.hasRedemptionLimit = false;
-    } else {
-      this.hasRedemptionLimit = true;
-    }
+    this.hasRedemptionLimit = !this.hasRedemptionLimit;
+    if (!this.hasRedemptionLimit) this._promotionEditable.RedemptionLimit = null;
   }
 
   toggleLimitPerUser(): void {
-    if (this.limitPerUser) {
-      this._promotionEditable.RedemptionLimitPerUser = null;
-      this.limitPerUser = false;
-    } else {
-      this.limitPerUser = true;
-    }
+    this.limitPerUser = !this.limitPerUser;
+    if(!this.limitPerUser) this._promotionEditable.RedemptionLimitPerUser = null;
   }
 
   toggleHasExpiration(): void {
-    if (this.hasExpiration) {
-      this._promotionEditable.ExpirationDate = null;
-      this.hasExpiration = false;
-    } else {
-      this.hasExpiration = true;
-    }
+    this.hasExpiration = !this.hasExpiration;
+    if (!this.hasExpiration) this._promotionEditable.ExpirationDate = null;
   }
 
   toggleCapShipCost(): void {
-    if (this.capShipCost) {
-      this._promotionEditable.xp.MaxShipCost = null;
-      this.capShipCost = false;
-    } else {
-      this.capShipCost = true;
-    }
+    this.capShipCost = !this.capShipCost;
+    if (!this.capShipCost) this._promotionEditable.xp.MaxShipCost = null;
   }
 
   getSaveBtnText(): string {
