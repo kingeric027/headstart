@@ -65,27 +65,20 @@ namespace Marketplace.Common.Commands
 		}
 
 		public async Task PostStagingRestore()
-		{
-			
-				var token = (await _oc.AuthenticateAsync()).AccessToken;
-				var baseUrl = _settings.EnvironmentSettings.BaseUrl;
+		{	
+			var token = (await _oc.AuthenticateAsync()).AccessToken;
+			var baseUrl = _settings.EnvironmentSettings.BaseUrl;
 			await SetApiClientIDs(token);
 
 			var deleteMS = DeleteAllMessageSenders(token);
-				var deleteWH = DeleteAllWebhooks(token);
-				var deleteIE = DeleteAllIntegrationEvents(token);
-				await Task.WhenAll(deleteMS, deleteWH, deleteIE);
+			var deleteWH = DeleteAllWebhooks(token);
+			var deleteIE = DeleteAllIntegrationEvents(token);
+			await Task.WhenAll(deleteMS, deleteWH, deleteIE);
 
-			try { 
-				var createMS = CreateMessageSenders(token, baseUrl);
-				var createWH = CreateWebhooks(token, baseUrl);
-				var createIE = CreateAndAssignIntegrationEvents(token, baseUrl);
-				await Task.WhenAll(createMS, createWH, createIE);
-			}
-			catch (Exception ex)
-			{
-				throw ex;
-			}
+			var createMS = CreateMessageSenders(token, baseUrl);
+			var createWH = CreateWebhooks(token, baseUrl);
+			var createIE = CreateAndAssignIntegrationEvents(token, baseUrl);
+			await Task.WhenAll(createMS, createWH, createIE);
 		}
 
 		private async Task<AdminCompany> CreateOrganization(string token)
