@@ -61,6 +61,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   isCreatingNew = false;
   isCreatingSubResource = false;
   isMyResource = false;
+  shouldDisplayList = false;
   alive = true;
   screenSize;
   myResourceHeight = 450;
@@ -197,6 +198,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   determineViewingContext() {
     this.isMyResource = this.router.url.startsWith('/my-');
+    this.shouldDisplayList = this.router.url.endsWith('locations') || this.router.url.endsWith('users');
   }
 
   private async initializeSubscriptions() {
@@ -238,6 +240,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
         this.selectedParentResourceID = parentResourceID;
+        if( this.isMyResource ) {
+          const parentResource = await this.parentResourceService.findOrGetResourceByID('008'); //need to add code to get my supplier id
+          if (parentResource) this.selectedParentResourceName = parentResource.Name;
+        }
         if (params && parentResourceID) {
           const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
           if (parentResource) this.selectedParentResourceName = parentResource.Name;

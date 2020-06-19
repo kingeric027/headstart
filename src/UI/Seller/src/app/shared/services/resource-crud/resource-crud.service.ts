@@ -177,6 +177,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   getParentResourceID(): string {
+    if(this.router.url.startsWith('/my-')) return '008'; // add function to get my supplier id
     const urlPieces = this.router.url.split('/');
     const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}`);
     return urlPieces[indexOfParent + 1];
@@ -199,7 +200,12 @@ export abstract class ResourceCrudService<ResourceType> {
       return [orderDirection || 'Incoming', ...options];
     }
     if (this.secondaryResourceLevel) {
-      const parentResourceID = this.getParentResourceID();
+      let parentResourceID;
+      if(this.router.url.startsWith('/my-')) {
+        parentResourceID = '008'; // add function to get my supplier id (possibly just remove this) 
+      } else {
+        parentResourceID = this.getParentResourceID();
+      }
       return [parentResourceID, ...options];
     } else {
       return [...options];

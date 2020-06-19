@@ -70,12 +70,12 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     });
   }
 
-  async determineViewingContext(): Promise<void> {
+  determineViewingContext(): void {
     this.isMyResource = this.router.url.startsWith('/my-');
-    if (this.isMyResource) {
-      const supplier = await this.ocService.getMyResource();
-      this.setResourceSelectionFromResource(supplier);
-    }
+    // if (this.isMyResource) {
+    //   const supplier = await this.ocService.getMyResource();
+    //   this.setResourceSelectionFromResource(supplier);
+    // }
   }
 
   subscribeToResourceSelection(): void {

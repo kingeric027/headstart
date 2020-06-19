@@ -8,6 +8,8 @@ import { SupplierUserTableComponent } from './components/users/supplier-user-tab
 const routes: Routes = [
   { path: '', component: SupplierTableComponent },
   { path: 'new', component: SupplierTableComponent },
+  { path: 'locations', component: SupplierLocationTableComponent},
+  { path: 'users', component: SupplierUserTableComponent },
   { path: ':supplierID', component: SupplierTableComponent },
   { path: ':supplierID/users', component: SupplierUserTableComponent },
   { path: ':supplierID/users/new', component: SupplierUserTableComponent },
