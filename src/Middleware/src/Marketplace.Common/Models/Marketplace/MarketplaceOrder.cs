@@ -27,7 +27,6 @@ namespace Marketplace.Models
 		[JsonConverter(typeof(StringEnumConverter))]
 		public CurrencySymbol? Currency { get; set; } = null;
         public ShippingStatus ShippingStatus { get; set; }
-        public LineItemStatus LineItemStatus { get; set; }
         public ClaimStatus ClaimStatus { get; set; }
 	}
 
