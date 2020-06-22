@@ -11,6 +11,7 @@ const routes: Routes = [
   { path: 'locations', component: SupplierLocationTableComponent},
   { path: 'users', component: SupplierUserTableComponent },
   { path: 'users/:userID', component: SupplierUserTableComponent },
+  { path: 'locations/:locationID', component: SupplierLocationTableComponent},
   { path: ':supplierID', component: SupplierTableComponent },
   { path: ':supplierID/users', component: SupplierUserTableComponent },
   { path: ':supplierID/users/new', component: SupplierUserTableComponent },

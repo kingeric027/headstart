@@ -14,17 +14,18 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
     router: Router,
     activatedRoute: ActivatedRoute,
     private ocSupplierAddressService: OcSupplierAddressService,
-    public currentUserService: CurrentUserService
+    public currentUserService: CurrentUserService,
   ) {
     super(
       router,
       activatedRoute,
       ocSupplierAddressService,
       currentUserService,
-      router.url.startsWith('/my-') ? '/my-supplier' : '/suppliers',
+      '/suppliers',
       'suppliers',
       SUPPLIER_SUB_RESOURCE_LIST,
-      'locations'
+      'locations',
+      '/my-supplier'
     );
   }
 

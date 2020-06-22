@@ -28,6 +28,7 @@ export abstract class ResourceCrudService<ResourceType> {
   public optionsSubject: BehaviorSubject<Options> = new BehaviorSubject<Options>({});
 
   route = '';
+  myRoute = '';
   primaryResourceLevel = '';
   // example: for supplier user service the primary is supplier and the secondary is users
   secondaryResourceLevel = '';
@@ -44,9 +45,11 @@ export abstract class ResourceCrudService<ResourceType> {
     route: string,
     primaryResourceLevel: string,
     subResourceList: string[] = [],
-    secondaryResourceLevel = ''
+    secondaryResourceLevel = '',
+    myRoute = '',
   ) {
     this.route = route;
+    this.myRoute = myRoute;
     this.primaryResourceLevel = primaryResourceLevel;
     this.secondaryResourceLevel = secondaryResourceLevel;
     this.subResourceList = subResourceList;
@@ -177,8 +180,8 @@ export abstract class ResourceCrudService<ResourceType> {
     let newUrl = '';
     const queryParams = this.activatedRoute.snapshot.queryParams;
     if (this.secondaryResourceLevel) {
-      newUrl += this.route.startsWith('/my-') ? 
-      `${this.route}/${this.secondaryResourceLevel}` : 
+      newUrl += this.router.url.startsWith('/my-') ? 
+      `${this.myRoute}/${this.secondaryResourceLevel}` : 
       `${this.route}/${this.getParentResourceID()}/${this.secondaryResourceLevel}`;
       // newUrl += `${this.route}/${this.getParentResourceID()}/${this.secondaryResourceLevel}`;
     } else {

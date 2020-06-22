@@ -39,10 +39,11 @@ export class SupplierUserService extends ResourceCrudService<User> {
       activatedRoute,
       ocSupplierUserService,
       currentUserService,
-      router.url.startsWith('/my-') ? '/my-supplier' : '/suppliers',
+      '/suppliers', 
       'suppliers',
       SUPPLIER_SUB_RESOURCE_LIST,
-      'users'
+      'users',
+      '/my-supplier'
     );
   }
   async updateUserUserGroupAssignments(
