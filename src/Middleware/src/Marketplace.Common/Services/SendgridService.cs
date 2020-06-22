@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dynamitey;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
@@ -19,8 +20,8 @@ namespace Marketplace.Common.Services
         Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData);
         Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData);
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
+        Task SendReturnRequestedEmail(string orderID);
         Task SendNewUserEmail(WebhookPayloads.Users.Create payload);
-        Task SendOrderUpdatedEmail(MarketplaceOrderPatchPayload payload);
         Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
@@ -37,12 +38,12 @@ namespace Marketplace.Common.Services
         private const string BUYER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
         private const string SUPPLIER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-5776a6c57b344aeda605444c96ff39e8";
         private const string BUYER_NEW_USER_TEMPLATE_ID = "d-f3831baa2beb4c19aeace19e48132768";
-        private const string BUYER_ORDER_UPDATED_TEMPLATE_ID = "d-ff15cd80bb934f90ae4fe90678d88d54";
         private const string BUYER_PASSWORD_RESET_TEMPLATE_ID = "d-ca6a6ff8c9ac4264bf86b5d6cdd3a038";
         private const string BUYER_ORDER_SUBMITTED_FOR_APPROVAL_TEMPLATE_ID = "d-4c674afcd6ef44e9b7793eb6c5b917ea";
         private const string BUYER_ORDER_APPROVED_TEMPLATE_ID = "d-2f3b92b95b7b45ea8f8fb94c8ac928e0";
         private const string BUYER_ORDER_DECLINED_TEMPLATE_ID = "d-3b6167f40d6b407b95759d1cb01fff30";
         private const string ORDER_REQUIRES_APPROVAL_TEMPLATE_ID = "d-fbe9f4e9fabd4a37ba2364201d238316";
+        private const string BUYER_REFUND_REQUESTED_TEMPLATE_ID = "d-e7327df33cd4412abaa2fa76a67f0f3e";
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
             _oc = ocClient;
@@ -137,6 +138,23 @@ namespace Marketplace.Common.Services
             }
         }
 
+        public async Task SendReturnRequestedEmail(string orderID)
+        {
+            MarketplaceOrder order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID);
+            var productsList = lineItems.Items.Select(MapReturnedLineItemToProduct);
+            var dynamicTemplateData = new {
+            order.FromUser.FirstName,
+            order.FromUser.LastName,
+            order.ID,
+            DateSubmitted = order.DateSubmitted.ToString(),
+            ReturnID = order.xp.OrderReturnInfo.RMANumber,
+            Products = productsList
+            };
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, order.FromUser.Email, BUYER_REFUND_REQUESTED_TEMPLATE_ID, dynamicTemplateData);
+            // TODO: Get Seller's info for return requested email
+        }
+
         public async Task SendSupplierOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
         {
             if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
@@ -154,12 +172,6 @@ namespace Marketplace.Common.Services
             {
                 await SendOrderSupplierEmails(orderWorksheet, SUPPLIER_ORDER_SUBMIT_TEMPLATE_ID, GetOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems));
             }
-        }
-
-        public async Task SendOrderUpdatedEmail(MarketplaceOrderPatchPayload payload)
-        {
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_UPDATED_TEMPLATE_ID, GetOrderTemplateData(payload.Response.Body, lineItems.Items)); ;
         }
 
         public async Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData)
@@ -222,15 +234,28 @@ namespace Marketplace.Common.Services
             };
         }
 
+        private object MapReturnedLineItemToProduct(MarketplaceLineItem lineItem) =>
+        new
+        {
+            ProductName = lineItem.Product.Name,
+            ImageURL = lineItem.xp.LineItemImageUrl,
+            lineItem.ProductID,
+            lineItem.Quantity,
+            lineItem.LineTotal,
+            ReturnQuantity = lineItem.xp.LineItemReturnInfo.QuantityToReturn,
+            Comments = lineItem.xp.LineItemReturnInfo.ReturnReason
+        };
+
         private object MapLineItemToProduct(MarketplaceLineItem lineItem) =>
           new
           {
               ProductName = lineItem.Product.Name,
-              ImageURL = "",
+              ImageURL = lineItem.xp.LineItemImageUrl,
               lineItem.ProductID,
               lineItem.Quantity,
-              lineItem.LineTotal
+              lineItem.LineTotal,
           };
+
         private object GetShippingAddress(IList<MarketplaceLineItem> lineItems) =>
           new
           {

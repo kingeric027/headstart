@@ -1,29 +1,21 @@
 import { Injectable } from '@angular/core';
-import { OcMeService, Category } from '@ordercloud/angular-sdk';
+import { Me, Category } from 'ordercloud-javascript-sdk';
 import { listAll } from '../../functions/listAll';
-
-export interface ICategories {
-  activeID: string;
-  all: Category[];
-  breadCrumbs: Category[];
-}
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',
 })
-export class ProductCategoriesService implements ICategories {
+export class ProductCategoriesService {
   private activeCategoryID: string = undefined;
   private allCategories: Category[] = undefined;
   private categoryBreadCrumbs: Category[] = [];
 
-  constructor(private ocMeService: OcMeService) {}
+  constructor() {}
 
   async setCategories(): Promise<void> {
     // We will have to enforce a maximum depth of 3 in the Admin UI.
-    this.allCategories = (
-      await listAll(this.ocMeService, this.ocMeService.ListCategories, { depth: '3', pageSize: 100 })
-    ).Items;
+    this.allCategories = (await listAll(Me, Me.ListCategories, { depth: '3', pageSize: 100 })).Items;
   }
 
   get activeID(): string {

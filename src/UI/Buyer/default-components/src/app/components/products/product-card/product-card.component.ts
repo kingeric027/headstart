@@ -1,10 +1,11 @@
 import { Component, Input, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
-import { ShopperContextService, MarketplaceMeProduct, PriceSchedule } from 'marketplace';
+import { ShopperContextService, MarketplaceMeProduct } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 import { exchange } from 'src/app/services/currency.helper';
 import { ListPage } from 'marketplace-javascript-sdk';
 import { ExchangeRates } from 'marketplace';
 import { BuyerCurrency } from 'src/app/models/currency.interface';
+import { PriceSchedule } from 'ordercloud-javascript-sdk';
 @Component({
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
@@ -13,7 +14,7 @@ import { BuyerCurrency } from 'src/app/models/currency.interface';
 export class OCMProductCard {
   _isFavorite = false;
   _product: MarketplaceMeProduct = {
-    PriceSchedule: {},
+    PriceSchedule: {} as PriceSchedule,
   };
   _price: BuyerCurrency;
   _rates: ListPage<ExchangeRates>;
@@ -39,7 +40,7 @@ export class OCMProductCard {
     this.cdr.detectChanges(); // TODO - remove. Solve another way.
   }
 
-  setPrice(product: MarketplaceMeProduct, priceSchedule: PriceSchedule<any>): void {
+  setPrice(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
     const currentUser = this.context.currentUser.get();
     const productPrice = priceSchedule?.PriceBreaks[0]?.Price;
     this._price = exchange(this._rates, productPrice, product?.xp?.Currency, currentUser.Currency);

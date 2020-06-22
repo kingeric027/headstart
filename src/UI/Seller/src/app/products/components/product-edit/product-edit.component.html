@@ -140,6 +140,42 @@
                          placeholder="Enter Max Quantity">
                 </div>
               </div>
+              <div class="form-row">
+                <div class="form-group col-md-12">
+                  <mat-checkbox [disabled]="readonly"
+                                aria-describedby="InventoryEnabled"
+                                formControlName="InventoryEnabled"
+                                color="warn"
+                                (change)="handleUpdateProduct($event, 'Product.Inventory.Enabled')">
+                    Enable inventory tracking
+                  </mat-checkbox>
+                </div>
+              </div>
+              <div *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled" class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="QuantityAvailable">Quantity Available</label>
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="number"
+                         class="form-control"
+                         id="QuantityAvailable"
+                         min="1"
+                         aria-describedby="Quantity Available"
+                         formControlName="QuantityAvailable"
+                         (input)="handleUpdateProduct($event, 'Product.Inventory.QuantityAvailable')"
+                         placeholder="What is the current available quantity?">
+                </div>
+                <div class="form-group col-md-6">
+                  <mat-checkbox [disabled]="readonly"
+                                class="center-checkbox"
+                                aria-describedby="OrderCanExceed"
+                                formControlName="OrderCanExceed"
+                                color="warn"
+                                (change)="handleUpdateProduct($event, 'Product.Inventory.OrderCanExceed')">
+                    Order can exceed inventory
+                  </mat-checkbox>
+                </div>
+              </div>
+              
               <product-tax-code-select-component [readonly]="readonly"
                                                  [productForm]="productForm"
                                                  [superMarketplaceProductEditable]="_superMarketplaceProductEditable"

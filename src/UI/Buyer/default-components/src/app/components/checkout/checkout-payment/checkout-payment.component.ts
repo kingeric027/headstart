@@ -1,5 +1,5 @@
 import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
-import { ListBuyerCreditCard } from '@ordercloud/angular-sdk';
+import { BuyerCreditCard, ListPage } from 'ordercloud-javascript-sdk';
 import { MarketplaceBuyerCreditCard } from 'marketplace';
 import { OrderCloudIntegrationsCreditCardToken, MarketplaceOrder } from 'marketplace-javascript-sdk';
 import { OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
@@ -9,7 +9,7 @@ import { OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
   styleUrls: ['./checkout-payment.component.scss'],
 })
 export class OCMCheckoutPayment implements OnInit {
-  @Input() cards: ListBuyerCreditCard;
+  @Input() cards: ListPage<BuyerCreditCard>;
   @Input() isAnon: boolean;
   @Input() order: MarketplaceOrder;
   @Input() orderSummaryMeta: OrderSummaryMeta;

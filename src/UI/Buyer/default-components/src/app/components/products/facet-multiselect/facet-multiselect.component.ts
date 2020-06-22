@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy } from '@angular/core';
-import { ListFacet, ListFacetValue } from '@ordercloud/angular-sdk';
+import { ListFacet, ListFacetValue } from 'ordercloud-javascript-sdk';
 import { get as _get, xor as _xor } from 'lodash';
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
 import { ProductFilters, ShopperContextService } from 'marketplace';

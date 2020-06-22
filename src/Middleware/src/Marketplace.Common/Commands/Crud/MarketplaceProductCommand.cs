@@ -6,6 +6,7 @@ using Marketplace.Common.Mappers;
 using Marketplace.Models;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
+using ordercloud.integrations.library.Cosmos;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.Crud
@@ -50,39 +51,39 @@ namespace Marketplace.Common.Commands.Crud
 		}
 		public async Task<SuperMarketplaceProduct> MeGet(string id, VerifiedUserContext user)
 		{
-			var _product = await _oc.Me.GetProductAsync<BuyerProduct<ProductXp, PriceSchedule>>(id, user.AccessToken);
-			var _priceSchedule = _product.PriceSchedule;
-			var _specs = await _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
-			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null);
-			var _images = await GetProductImages(_product.ID, user);
-			var _attachments = await GetProductAttachments(_product.ID, user);
+			var _product = _oc.Me.GetProductAsync<BuyerProduct<ProductXp, PriceSchedule>>(id, user.AccessToken);
+			var _specs = _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
+			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null);
+			var _images = GetProductImages(id, user);
+			var _attachments =  GetProductAttachments(id, user);
 			return new SuperMarketplaceProduct
 			{
-				Product = ProductMapper.MeProductToProduct(_product),
-				PriceSchedule = _priceSchedule,
-				Specs = _specs.Items,
-				Variants = _variants.Items,
-				Images = _images,
-				Attachments = _attachments
+				Product = ProductMapper.MeProductToProduct(await _product),
+				PriceSchedule = (await _product).PriceSchedule,
+				Specs = (await _specs).Items,
+				Variants =(await _variants).Items,
+				Images = await _images,
+				Attachments = await _attachments
 			};
 		}
 
 		public async Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user)
 		{
 			var _product = await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
-			var _priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.DefaultPriceScheduleID, user.AccessToken);
-			var _specs = await _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
-			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
-			var _images = await GetProductImages(_product.ID, user);
-			var _attachments = await GetProductAttachments(_product.ID, user);
+			// Once data is good, switch away from DefaultPriceScheduleID. See comment in Delete().
+			var _priceSchedule = _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.DefaultPriceScheduleID, user.AccessToken); 
+			var _specs = _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
+			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
+			var _images = GetProductImages(id, user);
+			var _attachments =  GetProductAttachments(id, user);
 			return new SuperMarketplaceProduct
 			{
 				Product = _product,
-				PriceSchedule = _priceSchedule,
-				Specs = _specs.Items,
-				Variants = _variants.Items,
-				Images = _images,
-				Attachments = _attachments
+				PriceSchedule = await _priceSchedule,
+				Specs = (await _specs).Items,
+				Variants = (await _variants).Items,
+				Images = await _images,
+				Attachments = await _attachments
 			};
 		}
 
@@ -97,19 +98,19 @@ namespace Marketplace.Common.Commands.Crud
 			var _superProductsList = new List<SuperMarketplaceProduct> { };
 			await Throttler.RunAsync(_productsList.Items, 100, 10, async product =>
 			{
-				var priceSchedule = await _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
-				var _specs = await _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, user.AccessToken);
-				var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, user.AccessToken);
-				var _images = await GetProductImages(product.ID, user);
-				var _attachments = await GetProductAttachments(product.ID, user);
+				var priceSchedule = _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
+				var _specs = _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, user.AccessToken);
+				var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, user.AccessToken);
+				var _images = GetProductImages(product.ID, user);
+				var _attachments = GetProductAttachments(product.ID, user);
 				_superProductsList.Add(new SuperMarketplaceProduct
 				{
 					Product = product,
-					PriceSchedule = priceSchedule,
-					Specs = _specs.Items,
-					Variants = _variants.Items,
-					Images = _images,
-					Attachments = _attachments
+					PriceSchedule = await priceSchedule,
+					Specs = (await _specs).Items,
+					Variants = (await _variants).Items,
+					Images = await _images,
+					Attachments = await _attachments
 				});
 			});
 			return new ListPage<SuperMarketplaceProduct>
@@ -121,8 +122,10 @@ namespace Marketplace.Common.Commands.Crud
 
 		public async Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct superProduct, VerifiedUserContext user)
 		{
-			var defaultSpecOptions = new List<DefaultOptionSpecAssignment>();
+			// Determine ID up front so price schedule ID can match
+			superProduct.Product.ID = superProduct.Product.ID ?? CosmosInteropID.New();
 			// Create Specs
+			var defaultSpecOptions = new List<DefaultOptionSpecAssignment>();
 			var specRequests = await Throttler.RunAsync(superProduct.Specs, 100, 5, s =>
 			{
 				defaultSpecOptions.Add(new DefaultOptionSpecAssignment { SpecID = s.ID, OptionID = s.DefaultOptionID });
@@ -137,6 +140,7 @@ namespace Marketplace.Common.Commands.Crud
 			// Patch Specs with requested DefaultOptionID
 			await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
 			// Create Price Schedule
+			superProduct.PriceSchedule.ID = superProduct.Product.ID;
 			var _priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
 			// Create Product
 			superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
@@ -254,14 +258,18 @@ namespace Marketplace.Common.Commands.Crud
 
 		public async Task Delete(string id, VerifiedUserContext user)
 		{
+			var product = await _oc.Products.GetAsync(id); // This is temporary to accommodate bad data where product.ID != product.DefaultPriceScheduleID
 			var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
 			var _images = await GetProductImages(id, user);
 			var _attachments = await GetProductAttachments(id, user);
 			// Delete specs images and attachments associated with the requested product
-			await Throttler.RunAsync(_images, 100, 5, i => _assets.Delete(i.InteropID, user));
-			await Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.InteropID, user));
-			await Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
-			await _oc.Products.DeleteAsync(id, user.AccessToken);
+			await Task.WhenAll(
+				_oc.PriceSchedules.DeleteAsync(product.DefaultPriceScheduleID),
+				Throttler.RunAsync(_images, 100, 5, i => _assets.Delete(i.InteropID, user)),
+				Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.InteropID, user)),
+				Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken)),
+				_oc.Products.DeleteAsync(id, user.AccessToken)
+			);
 		}
 
 		private async Task<string> GetSupplierNameForXpFacet(string supplierID, string accessToken)

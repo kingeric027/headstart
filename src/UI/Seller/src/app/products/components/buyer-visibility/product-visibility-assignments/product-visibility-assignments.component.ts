@@ -33,16 +33,16 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
     private productService: ProductService
   ) {}
 
-  async ngOnInit() {
+  ngOnInit(): void {
     this.getBuyers();
     this.getProductCatalogAssignments(this.product);
   }
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     this.getProductCatalogAssignments(this.product);
   }
 
-  requestUserConfirmation() {
+  requestUserConfirmation(): void {
     this.requestedUserConfirmation = true;
   }
 
@@ -59,7 +59,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
     this._productCatalogAssignmentsEditable = productCatalogAssignments.Items;
   }
 
-  toggleProductCatalogAssignment(buyer: Buyer) {
+  toggleProductCatalogAssignment(buyer: Buyer): void {
     if (this.isAssigned(buyer)) {
       this._productCatalogAssignmentsEditable = this._productCatalogAssignmentsEditable.filter(
         productAssignment => productAssignment.CatalogID !== buyer.DefaultCatalogID
@@ -77,7 +77,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
     this.checkForProductCatalogAssignmentChanges();
   }
 
-  isAssigned(buyer: Buyer) {
+  isAssigned(buyer: Buyer): boolean {
     return (
       this._productCatalogAssignmentsEditable &&
       this._productCatalogAssignmentsEditable.some(
@@ -86,7 +86,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
     );
   }
 
-  checkForProductCatalogAssignmentChanges() {
+  checkForProductCatalogAssignmentChanges(): void {
     this.add = this._productCatalogAssignmentsEditable.filter(
       assignment => !JSON.stringify(this._productCatalogAssignmentsStatic).includes(assignment.CatalogID)
     );
@@ -97,15 +97,8 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
     if (!this.areChanges) this.requestedUserConfirmation = false;
   }
 
-  discardProductCatalogAssignmentChanges() {
+  discardProductCatalogAssignmentChanges(): void {
     this._productCatalogAssignmentsEditable = this._productCatalogAssignmentsStatic;
-    this.checkForProductCatalogAssignmentChanges();
-  }
-
-  async executeProductCatalogAssignmentRequests(): Promise<void> {
-    this.requestedUserConfirmation = false;
-    await this.productService.updateProductCatalogAssignments(this.add, this.del);
-    await this.getProductCatalogAssignments(this.product);
     this.checkForProductCatalogAssignmentChanges();
   }
 }

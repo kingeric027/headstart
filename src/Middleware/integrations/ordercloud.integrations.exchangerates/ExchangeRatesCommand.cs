@@ -57,7 +57,7 @@ namespace ordercloud.integrations.exchangerates
 
         public ListPage<OrderCloudIntegrationsConversionRate> Filter(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, OrderCloudIntegrationsExchangeRate rates)
         {
-            if (rateArgs.Filters.Any(filter => filter.Name == "Symbol"))
+            if (rateArgs.Filters?.Any(filter => filter.Name == "Symbol") ?? false)
             {
                 rates.Rates = (
                         from rate in rates.Rates
@@ -84,7 +84,8 @@ namespace ordercloud.integrations.exchangerates
         public async Task<double?> ConvertCurrency(CurrencySymbol from, CurrencySymbol to, double value)
         {
             var rates = await this.Get(new ListArgs<OrderCloudIntegrationsConversionRate>(), from);
-            return rates.Items.FirstOrDefault(r => r.Symbol == to.ToString())?.Rate;
+            var rate = rates.Items.FirstOrDefault(r => r.Currency == to)?.Rate;
+			return value * rate;
         }
 
         /// <summary>

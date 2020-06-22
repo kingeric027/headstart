@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ListAddress } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
-import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
+import { ListPage, Address } from 'marketplace-javascript-sdk';
 
 @Component({
   template: `
@@ -9,9 +8,9 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
   `,
 })
 export class AddressListWrapperComponent implements OnInit {
-  addresses: ListAddress;
+  addresses: ListPage<Address>;
 
-  constructor(public context: ShopperContextService, private activatedRoute: ActivatedRoute) {}
+  constructor(private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.addresses = this.activatedRoute.snapshot.data.addresses;

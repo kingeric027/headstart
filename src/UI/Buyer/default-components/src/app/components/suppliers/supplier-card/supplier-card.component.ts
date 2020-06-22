@@ -1,5 +1,5 @@
 import { Input, Component } from '@angular/core';
-import { Supplier } from '@ordercloud/angular-sdk';
+import { Supplier } from 'ordercloud-javascript-sdk';
 import { ShopperContextService } from 'marketplace';
 
 @Component({
@@ -7,8 +7,8 @@ import { ShopperContextService } from 'marketplace';
   styleUrls: ['./supplier-card.component.scss'],
 })
 export class OCMSupplierCard {
-  @Input() supplier: Supplier = {};
-  
+  @Input() supplier = {} as Supplier;
+
   constructor(private context: ShopperContextService) {}
 
   shopSupplier(supplier: Supplier): void {

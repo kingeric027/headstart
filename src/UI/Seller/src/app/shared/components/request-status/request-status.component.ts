@@ -11,5 +11,5 @@ export class RequestStatus {
   @Input()
   subResourceName = '';
   @Input()
-  selectedParentResouceName = '';
+  selectedParentResouceName;
 }

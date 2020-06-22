@@ -1,0 +1,18 @@
+    <!-- /Product Details -->
+    <div class="container-fluid">
+      <div class="row pt-3">
+        <div>
+          <h5>Buyer Visibility</h5>
+          <p class="font-italic">Configure which buyers can purchase this product.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+            <ul class="list-group w-100">
+              <li *ngFor="let buyer of buyers" class="list-group-item">
+                  <buyer-visibility-configuration-component [product]="product" [buyer]="buyer" [isAssigned]="isAssigned(buyer)"></buyer-visibility-configuration-component>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </div>
