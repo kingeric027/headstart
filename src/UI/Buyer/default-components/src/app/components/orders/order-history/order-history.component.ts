@@ -30,7 +30,7 @@ export class OCMOrderHistory implements OnInit, AfterViewInit, OnDestroy {
   }
 
   handleFiltersChange = (filters: OrderFilters): void => {
-    this.sortBy = filters.sortBy[0];
+    this.sortBy = String(filters.sortBy);
     this.showOnlyFavorites = filters.showOnlyFavorites;
     this.searchTerm = filters.search;
   };
