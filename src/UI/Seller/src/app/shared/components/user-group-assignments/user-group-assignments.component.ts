@@ -35,7 +35,6 @@ export class UserGroupAssignments implements OnChanges {
   faExclamationCircle = faExclamationCircle;
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
-  //router: Router;
 
   constructor(
     private router: Router
@@ -51,16 +50,13 @@ export class UserGroupAssignments implements OnChanges {
       } else {
         this.userOrgID = this.userPermissionsService.getParentResourceID();
       }
-      debugger;
       //  this.userOrgID !== REDIRECT_TO_FIRST_PARENT && this.getUserGroups(this.userOrgID);
       if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
-        debugger; 
         this.getUserGroupAssignments(this.user.ID, this.userOrgID);
       }
     }
     if (this.userID && changes.user?.currentValue?.ID !== changes.user?.previousValue?.ID) {
       this.userID = this.user.ID
-      debugger;
       this.getUserGroupAssignments(this.user.ID, this.userOrgID);
     }
     if(this.isCreatingNew) {

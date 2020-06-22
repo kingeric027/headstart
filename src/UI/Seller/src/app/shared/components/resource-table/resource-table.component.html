@@ -190,7 +190,7 @@
         </perfect-scrollbar>
       </div>
       <!-- editing/creating view -->
-      <div *ngIf="(selectedResourceID || isCreatingNew) && !isMyResource"
+      <div *ngIf="(selectedResourceID || isCreatingNew) && (!isMyResource || shouldDisplayList)"
            class="row resource-table-container">
         <div class="col-3 p-0 d-md-block d-none">
 
@@ -260,7 +260,7 @@
               </a>
             </span>
           </div>
-          <div *ngIf="!isMyResource">
+          <div *ngIf="!isMyResource || shouldDisplayList">
             <ng-content *ngTemplateOutlet="editUnwrapped">
             </ng-content>
           </div>
@@ -270,7 +270,7 @@
       <!-- ng content can only be used once for transclusion, ngTemplatOutlets are required so that 
       we are only using the component once in the resource table -->
 
-      <ng-container *ngIf="isMyResource">
+      <ng-container *ngIf="isMyResource && !shouldDisplayList">
         <div *ngTemplateOutlet="editUnwrapped"></div>
       </ng-container>
       <ng-template #editUnwrapped>

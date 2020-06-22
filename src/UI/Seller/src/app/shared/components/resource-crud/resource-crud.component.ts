@@ -75,7 +75,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.isMyResource = this.router.url.startsWith('/my-');
     if (this.isMyResource) {
       const myResource = await this.ocService.getMyResource();
-      const shouldDisplayList = this.router.url.endsWith('locations') || this.router.url.endsWith('users');
+      const shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
       if(!shouldDisplayList) this.setResourceSelectionFromResource(myResource);
     }
   }

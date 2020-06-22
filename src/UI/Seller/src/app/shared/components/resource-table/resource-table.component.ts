@@ -195,7 +195,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   determineViewingContext() {
     this.isMyResource = this.router.url.startsWith('/my-');
-    this.shouldDisplayList = this.router.url.endsWith('locations') || this.router.url.endsWith('users');
+    this.shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
   }
 
   private async initializeSubscriptions() {
