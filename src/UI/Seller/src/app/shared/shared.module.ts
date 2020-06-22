@@ -55,6 +55,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule, MatSelect } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @NgModule({
   imports: [
@@ -87,6 +89,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatInputModule,
     MatSnackBarModule,
     MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
 
     // Quill
     QuillModule.forRoot(),
@@ -113,6 +117,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatIconModule,
     MatInputModule,
     MatSnackBarModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatSelectModule,
     // app components
     SearchComponent,

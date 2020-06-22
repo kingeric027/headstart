@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, ViewChild, OnDestroy } from '@angular/core';
-import { ListSupplier } from '@ordercloud/angular-sdk';
+import { Supplier, ListPage } from 'ordercloud-javascript-sdk';
 import { faTimes, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -12,7 +12,7 @@ import { SupplierCategoryConfig } from 'marketplace-javascript-sdk';
   styleUrls: ['./supplier-list.component.scss'],
 })
 export class OCMSupplierList implements OnChanges, OnDestroy {
-  @Input() suppliers: ListSupplier;
+  @Input() suppliers: ListPage<Supplier>;
   _supplierCategoryConfig: SupplierCategoryConfig;
   @ViewChild('popover', { static: false }) public popover: NgbPopover;
   alive = true;

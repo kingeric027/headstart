@@ -10,7 +10,7 @@ export class OrderStatusDisplayPipe implements PipeTransform {
     [OrderStatus.AwaitingApproval]: 'Awaiting Approval',
     [OrderStatus.ChangesRequested]: 'Changes Requested',
     [OrderStatus.Open]: 'Open',
-    [OrderStatus.Completed]: 'Completed',
+    [OrderStatus.Complete]: 'Complete',
     [OrderStatus.Canceled]: 'Canceled',
   };
 

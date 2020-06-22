@@ -88,8 +88,8 @@ export class ProductEditComponent implements OnInit {
   documentName: string;
   selectedTabIndex = 0;
   editPriceBreaks = false;
-  newPriceBreakPrice: number = 0;
-  newPriceBreakQty: number = 2;
+  newPriceBreakPrice = 0;
+  newPriceBreakQty = 2;
   newProductPriceBreaks = [];
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -118,7 +118,7 @@ export class ProductEditComponent implements OnInit {
     if (!this.readonly) {
       // If a supplier, creating a product or viewing - grab currency from my supplier xp.
       const myCurrencyCode = await (await this.currentUserService.getMySupplier()).xp?.Currency;
-      this._myCurrency = this._exchangeRates.find(r => r.Currency === myCurrencyCode);
+      this._myCurrency = this._exchangeRates?.find(r => r.Currency === myCurrencyCode);
     }
     this.setProductEditTab();
   }
@@ -146,7 +146,7 @@ export class ProductEditComponent implements OnInit {
 
   async refreshProductData(superProduct: SuperMarketplaceProduct): Promise<void> {
     // If a seller, and not editing the product, grab the currency from the product xp.
-    this._myCurrency = this._exchangeRates.find(r => r.Currency === superProduct?.Product?.xp?.Currency);
+    this._myCurrency = this._exchangeRates?.find(r => r.Currency === superProduct?.Product?.xp?.Currency);
     // copying to break reference bugs
     this._superMarketplaceProductStatic = JSON.parse(JSON.stringify(superProduct));
     this._superMarketplaceProductEditable = JSON.parse(JSON.stringify(superProduct));
@@ -294,7 +294,7 @@ export class ProductEditComponent implements OnInit {
   }
 
   handleUpdatePriceBreaks(event: any, field: string): void {
-    field === "price" ? this.newPriceBreakPrice = event.target.value : this.newPriceBreakQty = event.target.value;
+    field === 'price' ? this.newPriceBreakPrice = event.target.value : this.newPriceBreakQty = event.target.value;
   }
 
   handlePriceBreakErrors(priceBreaks: PriceBreak[]): boolean {
@@ -397,7 +397,7 @@ export class ProductEditComponent implements OnInit {
     const asset: AssetUpload = {
       Active: true,
       File: file.File,
-      Type: (assetType as AssetUpload["Type"]),
+      Type: (assetType as AssetUpload['Type']),
       FileName: file.Filename
     }
     const newAsset: Asset = await MarketplaceSDK.Upload.UploadAsset(asset, accessToken);
@@ -408,7 +408,7 @@ export class ProductEditComponent implements OnInit {
   async addDocuments(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.uploadAsset(productID, file, "Attachment");
+      superProduct = await this.uploadAsset(productID, file, 'Attachment');
     }
     this.staticContentFiles = [];
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -419,7 +419,7 @@ export class ProductEditComponent implements OnInit {
   async addImages(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.uploadAsset(productID, file, "Image");
+      superProduct = await this.uploadAsset(productID, file, 'Image');
     }
     this.imageFiles = []
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -428,11 +428,14 @@ export class ProductEditComponent implements OnInit {
   }
 
   async removeFile(file: Asset): Promise<void> {
-    let superProduct;
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    superProduct = await MarketplaceSDK.Assets.Delete(file.ID, accessToken);
-    superProduct = Object.assign(this._superMarketplaceProductStatic, superProduct);
-    this.refreshProductData(superProduct);
+    await MarketplaceSDK.Assets.Delete(file.ID, accessToken);
+    if (file.Type === 'Image') {
+      this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(i => i.ID !== file.ID); 
+    } else {
+      this._superMarketplaceProductStatic.Attachments = this._superMarketplaceProductStatic.Attachments.filter(a => a.ID !== file.ID);
+    }
+    this.refreshProductData(this._superMarketplaceProductStatic);
   }
 
   unstageFile(index: number, fileType: string): void {

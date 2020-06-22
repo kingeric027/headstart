@@ -5,45 +5,15 @@ import { filter, map } from 'rxjs/operators';
 import { ProductFilters, OrderFilters, SupplierFilters, OrderStatus, OrderViewContext } from '../../shopper-context';
 import { OrderFilterService } from '../order-history/order-filter.service';
 import { SupplierFilterService } from '../supplier-filter/supplier-filter.service';
-import { AuthService } from '../auth/auth.service';
 import { ProfileRoutes } from './profile-routing.config';
 import { OrderRoutes } from './order-routing.config';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { RouteConfig } from './route-config';
-export interface IRouter {
-  getActiveUrl(): string;
-  getOrderViewContext(): string;
-  onUrlChange(callback: (path: string) => void): void;
-  toProductDetails(productID: string): void;
-  toProductList(options?: ProductFilters): void;
-  toSupplierList(options?: SupplierFilters): void;
-  toCheckout(): void;
-  toHome(): void;
-  toCart(): void;
-  toLogin(): void;
-  toRegister(): void;
-  toForgotPassword(): void;
-  toMyProfile(): void;
-  toMyAddresses(): void;
-  toMyLocations(): void;
-  toUsers(): void;
-  toMyPaymentMethods(): void;
-  toMyOrders(): void;
-  toMyOrderDetails(orderID: string): void;
-  toOrdersToApprove(): void;
-  toOrderToAppoveDetails(orderID: string): void;
-  toOrdersByLocation(options: OrderFilters): void;
-  toChangePassword(): void;
-  getProfileRoutes(): RouteConfig[];
-  getOrderRoutes(): RouteConfig[];
-  toRoute(path: string): void;
-  toLocationManagement(addressID: string): void;
-}
 
 @Injectable({
   providedIn: 'root',
 })
-export class RouteService implements IRouter {
+export class RouteService {
   constructor(
     private router: Router,
     private supplierFilterService: SupplierFilterService,
@@ -57,16 +27,16 @@ export class RouteService implements IRouter {
   }
 
   getProfileRoutes(): RouteConfig[] {
-    var allSections = ProfileRoutes;
-    var roles = this.tokenHelperService.getDecodedOCToken().role;
+    const allSections = ProfileRoutes;
+    const roles = this.tokenHelperService.getDecodedOCToken().role;
     return allSections.filter(
       s => !s.rolesWithAccess || !s.rolesWithAccess.length || roles.some(r => s.rolesWithAccess.includes(r))
     );
   }
 
   getOrderRoutes(): RouteConfig[] {
-    var allSections = OrderRoutes;
-    var roles = this.tokenHelperService.getDecodedOCToken().role;
+    const allSections = OrderRoutes;
+    const roles = this.tokenHelperService.getDecodedOCToken().role;
     return allSections.filter(
       s => !s.rolesWithAccess || !s.rolesWithAccess.length || roles.some(r => s.rolesWithAccess.includes(r))
     );
@@ -101,11 +71,11 @@ export class RouteService implements IRouter {
     this.router.navigate(['/products'], { queryParams });
   }
 
-  toHome() {
+  toHome(): void {
     this.toRoute('/home');
   }
 
-  toUsers() {
+  toUsers(): void {
     this.toRoute('/profile/users');
   }
 
@@ -181,7 +151,7 @@ export class RouteService implements IRouter {
   }
 
   toSupplierList(options: SupplierFilters = {}): void {
-    const queryParams = this.productFilterService.mapToUrlQueryParams(options);
+    const queryParams = this.supplierFilterService.mapToUrlQueryParams(options);
     this.router.navigate(['/suppliers'], { queryParams });
   }
 

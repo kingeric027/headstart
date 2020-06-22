@@ -2,8 +2,9 @@ import { Component, Input } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
-import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
+import { ReturnReason } from '../../orders/order-return/order-return-table/return-reason-enum';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
@@ -13,15 +14,14 @@ export class OCMLineitemTable {
   closeIcon = faTimes;
   @Input() set lineItems(value: MarketplaceLineItem[]) {
     this._lineItems = value;
-    this.liGroups = _groupBy(value, li => li.ShipFromAddressID);
-    this.liGroupedByShipFrom = Object.values(this.liGroups);
+    const liGroups = _groupBy(value, li => li.ShipFromAddressID);
+    this.liGroupedByShipFrom = Object.values(liGroups);
     this.setSupplierInfo(this.liGroupedByShipFrom);
   }
   @Input() orderType: OrderType;
   @Input() readOnly: boolean;
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
-  liGroups: any;
   _lineItems = [];
   _orderCurrency: string;
 
@@ -41,11 +41,11 @@ export class OCMLineitemTable {
     this.context.router.toProductDetails(productID);
   }
 
-  changeQuantity(lineItemID: string, event: { qty: number; valid: boolean }): void {
+  changeQuantity(lineItemID: string, event: QtyChangeEvent): void {
     if (event.valid) {
       const li = this.getLineItem(lineItemID);
       li.Quantity = event.qty;
-      const { ProductID, Specs, Quantity, ...rest } = li;
+      const { ProductID, Specs, Quantity } = li;
       this.context.order.cart.add({ProductID, Specs, Quantity});
     }
   }
@@ -59,8 +59,11 @@ export class OCMLineitemTable {
     return this._lineItems.find(li => li.ID === lineItemID);
   }
 
-  hasReturnInfo() {
-    return this.liGroupedByShipFrom.find(liGroup => liGroup.find(li => li.xp?.LineItemReturnInfo));
+  hasReturnInfo(): boolean {
+    return this._lineItems.some(li => !!li.xp?.LineItemReturnInfo);
   }
 
+  getReturnReason(reasonCode: string): string {
+    return ReturnReason[reasonCode];
+  }
 }

@@ -46,7 +46,9 @@ namespace Marketplace.Common
 
     public class ZohoSettings
     {
-        public string AuthToken { get; set; }
+        public string AccessToken { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
         public string OrgID { get; set; }
     }
 

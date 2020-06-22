@@ -1,6 +1,6 @@
 import { find as _find, sortBy as _sortBy } from 'lodash';
 import { SpecFormEvent } from './spec-form-values.interface';
-import { PriceBreak, SpecOption, Spec, ListSpec, LineItemSpec } from '@ordercloud/angular-sdk';
+import { SpecOption, Spec, LineItemSpec, ListPage } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
 import { ExchangedPriceBreak } from 'src/app/models/currency.interface';
 
@@ -18,7 +18,7 @@ export class SpecFormService {
     };
   }
 
-  public getSpecMarkup(specs: ListSpec, selectedBreak: ExchangedPriceBreak, qty: number): number {
+  public getSpecMarkup(specs: ListPage<Spec>, selectedBreak: ExchangedPriceBreak, qty: number): number {
     const markups: Array<number> = new Array<number>();
     for (const value in this.event.form) {
       if (this.event.form.hasOwnProperty(value)) {
@@ -33,7 +33,7 @@ export class SpecFormService {
     return (selectedBreak.Price.Price + markups.reduce((x, acc) => x + acc, 0)) * qty;
   }
 
-  public getLineItemSpecs(buyerSpecs: ListSpec): Array<LineItemSpec> {
+  public getLineItemSpecs(buyerSpecs: ListPage<Spec>): Array<LineItemSpec> {
     const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
     for (const value in this.event.form) {
       if (this.event.form.hasOwnProperty(value)) {
@@ -52,10 +52,10 @@ export class SpecFormService {
     return specs;
   }
 
-  public getGridLineItemSpecs(buyerSpecs: ListSpec, specValues: string[]): Array<object> {
-    const specs: Array<object> = new Array<object>();
+  public getGridLineItemSpecs(buyerSpecs: ListPage<Spec>, specValues: string[]): GridSpecOption[] {
+    const specs: GridSpecOption[] = [];
     for (let i = 0; i < buyerSpecs.Items.length; i++) {
-      let name = buyerSpecs.Items[i].Name.replace(/ /g, '')
+      const name = buyerSpecs.Items[i].Name.replace(/ /g, '')
       const spec = this.getSpec(buyerSpecs, name);
       if (!spec) continue;
       const option = this.getOption(spec, specValues[i], 'grid');
@@ -85,7 +85,7 @@ export class SpecFormService {
     }
   }
 
-  private getSpec(specs: ListSpec, value: any): Spec {
+  private getSpec(specs: ListPage<Spec>, value: any): Spec {
     return _find(specs?.Items, item => item.Name.replace(/ /g, '') === value);
   }
 
@@ -108,7 +108,15 @@ export class SpecFormService {
       });
       return o as SpecOption;
     }
-    if (type === "grid") return _find(spec.Options, o => o.ID === value);
+    if (type === 'grid') return _find(spec.Options, o => o.ID === value);
     else return _find(spec.Options, o => o.Value === value);
   }
+}
+
+export interface GridSpecOption {
+  SpecID: string;
+  OptionID: string;
+  Value: string;
+  MarkupType: string;
+  Markup: number;
 }

@@ -58,10 +58,18 @@ namespace Marketplace.Models
         public bool IsResale { get; set; } = false;
         public List<ProductAccessorial> Accessorials { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
-		public CurrencySymbol Currency { get; set; }
+		public CurrencySymbol? Currency { get; set; } = null;
     }
 
-    [SwaggerModel]
+	[JsonConverter(typeof(StringEnumConverter))]
+	public enum ProductType
+	{
+		Standard,
+		Quote,
+		PurchaseOrder
+	}
+
+	[SwaggerModel]
     public class MarketplaceVariantXp
     {
         public string SpecCombo { get; set; }

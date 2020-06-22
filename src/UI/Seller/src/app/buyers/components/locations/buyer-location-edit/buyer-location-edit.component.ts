@@ -10,8 +10,8 @@ import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interf
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
+import { SupportedCountries, GeographyConfig } from '@app-seller/shared/models/supported-countries.interface';
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',
@@ -44,7 +44,7 @@ export class BuyerLocationEditComponent implements OnInit {
   buyerLocationStatic: MarketplaceBuyerLocation;
   areChanges = false;
   dataIsSaving = false;
-  availableCurrencies: SupportedRates[] = [];
+  countryOptions: SupportedCountries[];
 
   constructor(
     private buyerLocationService: BuyerLocationService,
@@ -52,7 +52,7 @@ export class BuyerLocationEditComponent implements OnInit {
     private middleware: MiddlewareAPIService,
     private currentUserService: CurrentUserService,
     private ocIntegrations: OcIntegrationsAPIService
-  ) {}
+  ) {this.countryOptions = GeographyConfig.getCountries();}
 
   async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {
     this.buyerLocationEditable = buyerLocation;
@@ -64,7 +64,6 @@ export class BuyerLocationEditComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
-    this.availableCurrencies = await this.ocIntegrations.getAvailableCurrencies();
   }
 
   createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation) {
@@ -81,15 +80,9 @@ export class BuyerLocationEditComponent implements OnInit {
       Country: new FormControl(buyerLocation.Address.Country, Validators.required),
       Phone: new FormControl(buyerLocation.Address.Phone, ValidatePhone),
       Email: new FormControl(buyerLocation.Address.xp.Email, ValidateEmail),
-      // once sdk is regenerated we can remove
-      LocationID: new FormControl((buyerLocation.Address.xp as any).LocationID),
+      LocationID: new FormControl(buyerLocation.Address.xp.LocationID),
       Currency: new FormControl(buyerLocation.UserGroup.xp.Currency, Validators.required),
     });
-  }
-
-  updateResourceFromEvent(event: any, field: string): void {
-    this.updateResource.emit({ value: event.target.value, field });
-    this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
   handleSelectedAddress(event: Address): void {
@@ -117,7 +110,6 @@ export class BuyerLocationEditComponent implements OnInit {
 
   async createNewBuyerLocation(): Promise<void> {
     try {
-      console.log(this.buyerLocationEditable)
       this.dataIsSaving = true;
       this.buyerLocationEditable.UserGroup.xp.Type = 'BuyerLocation';
       this.buyerLocationEditable.UserGroup.ID = this.buyerLocationEditable.Address.ID;
@@ -170,6 +162,15 @@ export class BuyerLocationEditComponent implements OnInit {
       value: field === 'Active' ? event.target.checked : event.target.value,
     };
     this.updateBuyerLocationResource(buyerLocationUpdate);
+    if (field === 'Address.Country') {
+      this.setCurrencyByCountry(buyerLocationUpdate.value);
+    }
+  }
+
+  setCurrencyByCountry(countryCode: string): void {
+    const selectedCountry = this.countryOptions.find(country => country.abbreviation === countryCode);
+    this.resourceForm.controls.Currency.setValue(selectedCountry.currency);
+    this.buyerLocationEditable.UserGroup.xp.Currency = this.resourceForm.value.Currency;
   }
 
   handleDiscardChanges(): void {

@@ -88,6 +88,13 @@ export abstract class ResourceCrudService<ResourceType> {
         pageSize: this.itemsPerPage,
         filters,
       };
+      if (this.secondaryResourceLevel === 'catalogs') {
+        // placeholder conditional for getting the supplier order list page running
+        // will need to integrate this with the filter on the order list page as a seller
+        // user and potentially refactor later
+        
+        options.filters = { 'xp.Type': 'Catalog'}
+      }
       const resourceResponse = await this.listWithStatusIndicator(options, OrderDirection);
       if (pageNumber === 1) {
         this.setNewResources(resourceResponse);

@@ -31,6 +31,15 @@ namespace Marketplace.Common.Controllers
             return await _command.AcknowledgeQuoteOrder(orderID);
         }
 
+        [DocName("PATCH Send return requested email")]
+        // todo update auth
+        [HttpPatch]
+        [Route("requestreturn/{orderID}")]
+        public async Task RequestReturnEmail(string orderID)
+        {
+            await _command.RequestReturnEmail(orderID);
+        }
+
         [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
         [HttpGet, Route("location/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<ListPage<Order>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)
@@ -47,9 +56,9 @@ namespace Marketplace.Common.Controllers
 
         [DocName("GET order shipments as buyer, ensures user has access to location orders or created the order themselves")]
         [HttpGet, Route("{orderID}/shipmentswithitems"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task<List<MarketplaceShipmentWithItems>> GetOrderShipmentsWithItems(string orderID)
+        public async Task<List<MarketplaceShipmentWithItems>> ListShipmentsWithItems(string orderID)
         {
-            return await _command.GetMarketplaceShipmentWithItems(orderID, VerifiedUserContext);
+            return await _command.ListMarketplaceShipmentWithItems(orderID, VerifiedUserContext);
         }
 
         [DocName("Add or update a line item to an order")]

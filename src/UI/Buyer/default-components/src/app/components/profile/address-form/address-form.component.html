@@ -115,7 +115,8 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6 form-group">
+      <div class="col-md-6 form-group"
+           ngbTooltip="You are only able to ship to {{getCountryName(homeCountry)}} addresses.">
         <label class="sr-only"
                for="country"
                translate>PROFILE.ADDRESS_FORM.COUNTRY</label>
@@ -123,12 +124,11 @@
                 class="form-control"
                 id="Country"
                 showErrors
+                disabled
                 (change)="onCountryChange($event)">
-          <option [ngValue]="null"
-                  disabled
-                  translate>PROFILE.ADDRESS_FORM.COUNTRY</option>
-          <option *ngFor="let country of countryOptions"
-                  [value]="country.abbreviation">{{ country.label }}</option>
+          <option [ngValue]="homeCountry"
+                  [selected]="homeCountry"
+                  translate>{{getCountryName(homeCountry)}}</option>
         </select>
       </div>
       <div class="col-md-6 form-group">
@@ -166,7 +166,7 @@
   </div>
   <div *ngIf="suggestedAddresses?.length > 0">
     <address-suggestion [suggestedAddresses]="suggestedAddresses"
-                        (selectedAddress)="useSuggestedAddress($event)"></address-suggestion>
+                        (selectedAddress)="useSuggestedAddress($event.detail)"></address-suggestion>
   </div>
   <div class="d-flex justify-content-start align-items-center">
     <button type="submit"

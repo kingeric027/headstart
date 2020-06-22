@@ -24,8 +24,11 @@ namespace Marketplace.Common.Services.Zoho.Models
         public string expense_id { get; set; }
         public string expense_receipt_name { get; set; }
         public string unit { get; set; }
-        public double? discount_amount { get; set; }
-        public string discount { get; set; }
+
+        // discount fields resulting in errror "Discount after tax cannot be applied when discount is given at the item level"
+        // reevaluation fields when handling promotions
+        //public double? discount_amount { get; set; }
+        //public string discount { get; set; }
         public string tax_id { get; set; }
         public string tax_name { get; set; }
         public string tax_type { get; set; }

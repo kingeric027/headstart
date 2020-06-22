@@ -121,36 +121,38 @@
                 [formGroup]="filterForm">
             <div *ngFor="let filter of filterConfig?.Filters"
                  class="group mt-2">
-             <div *ngIf="shouldFilterDisplay(filter)">
-              <label>{{filter.Display}}</label>
-              <select class="form-control input-sm"
-                      *ngIf="filter.Type === 'Dropdown'"
-                      type="select"
-                      required
-                      [formControlName]="filter.Path">
-                <ng-container *ngFor="let option of filter.Values;">
-                  <option *ngIf="isBoolean(option)" value="{{option}}">{{option | yesNo }}</option>
-                  <option *ngIf="!isBoolean(option)" value="{{option}}">{{option}}</option>
-                </ng-container>
-              </select>
-              <div class="input-group"
-                   *ngIf="filter.Type === 'DateFilter'">
-                <input class="form-control"
-                       placeholder="yyyy-mm-dd"
-                       value="{{filter.Path === 'from' ? fromDate : toDate}}"
-                       name="datePicker"
-                       [formControlName]="filter.Path"
-                       ngbDatepicker
-                       #d="ngbDatepicker">
-                <div class="input-group-append">
-                  <button class="btn btn-outline-primary calendar"
-                          (click)="d.toggle()"
-                          type="button">
-                    <fa-icon [icon]="faCalendar"
-                             id="calendar-addon-from"></fa-icon>
-                  </button>
+              <div *ngIf="shouldFilterDisplay(filter)">
+                <label>{{filter.Display}}</label>
+                <select class="form-control input-sm"
+                        *ngIf="filter.Type === 'Dropdown'"
+                        type="select"
+                        required
+                        [formControlName]="filter.Path">
+                  <ng-container *ngFor="let option of filter.Values;">
+                    <option *ngIf="isBoolean(option)"
+                            value="{{option}}">{{option | yesNo }}</option>
+                    <option *ngIf="!isBoolean(option)"
+                            value="{{option}}">{{option}}</option>
+                  </ng-container>
+                </select>
+                <div class="input-group"
+                     *ngIf="filter.Type === 'DateFilter'">
+                  <input class="form-control"
+                         placeholder="yyyy-mm-dd"
+                         value="{{filter.Path === 'from' ? fromDate : toDate}}"
+                         name="datePicker"
+                         [formControlName]="filter.Path"
+                         ngbDatepicker
+                         #d="ngbDatepicker">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-primary calendar"
+                            (click)="d.toggle()"
+                            type="button">
+                      <fa-icon [icon]="faCalendar"
+                               id="calendar-addon-from"></fa-icon>
+                    </button>
+                  </div>
                 </div>
-              </div>
               </div>
             </div>
           </form>
@@ -182,7 +184,7 @@
                                          [ocService]="_ocService">
           </full-resource-table-component>
           <request-status [requestStatus]="requestStatus"
-                          [subResourceName]="_ocService.secondaryResourceLevel || ''"
+                          [subResourceName]="_currentResourceNamePlural || ''"
                           [selectedParentResouceName]="selectedParentResourceName">
           </request-status>
         </perfect-scrollbar>
@@ -232,20 +234,23 @@
 
             </table>
             <request-status [requestStatus]="requestStatus"
-                            [subResourceName]="_ocService.secondaryResourceLevel || ''"
+                            [subResourceName]="_currentResourceNamePlural || ''"
                             [selectedParentResouceName]="selectedParentResourceName">
             </request-status>
           </perfect-scrollbar>
         </div>
-        <div class="col-md-9 col-sm-12">
+        <div class="col-md-9 col-sm-12 contents">
           <div class="pt-3 pb-3 border-bottom d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
             <span class="d-flex flex-row justify-content-start">
-              <button class="btn brand-button"
+              <button class="btn btn-link"
                       (click)="handleSelectResource({})">
                 <fa-icon [icon]="faChevronLeft"></fa-icon>
-                back
+                {{_currentResourceNamePlural | titlecase}}
               </button>
-              <h3 class="d-inline-block ml-5 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
+              <h3 *ngIf="isCreatingNew"
+                  class="d-inline-block ml-5 mb-0">New {{_currentResourceNameSingular}}</h3>
+              <h3 *ngIf="!isCreatingNew"
+                  class="d-inline-block ml-5 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>
             <span *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length && !isCreatingNew">
               <a class="btn brand-button ml-3"
@@ -287,8 +292,8 @@
               <button class="btn btn-link text-muted"
                       ngbTooltip="This {{_currentResourceNameSingular}} is in use and cannot be deleted."
                       placement="top">
-                      Delete {{_currentResourceNameSingular | titlecase}}
-                    </button>
+                Delete {{_currentResourceNameSingular | titlecase}}
+              </button>
             </div>
             <div>
               <button *ngIf="areChanges"

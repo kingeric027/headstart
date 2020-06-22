@@ -45,6 +45,7 @@
                     [suggestedAddresses]="suggestedAddresses"
                     [showOptionToSave]="true"
                     (formSubmitted)="saveAddressesAndContinue($event.detail.address)"
+                    [homeCountry]="homeCountry"
                     [btnText]="'Save and Continue'">
   </ocm-address-form>
 </div>

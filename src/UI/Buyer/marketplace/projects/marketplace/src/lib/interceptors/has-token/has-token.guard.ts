@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { DOCUMENT } from '@angular/common';
 import { TokenHelperService } from '../../services/token-helper/token-helper.service';
-import { OcTokenService } from '@ordercloud/angular-sdk';
+import { Tokens } from 'ordercloud-javascript-sdk';
 import { AuthService } from '../../services/auth/auth.service';
 import { AppConfig } from '../../shopper-context';
 
@@ -14,34 +14,28 @@ export class HasTokenGuard implements CanActivate {
     private router: Router,
     private auth: AuthService,
     private tokenHelper: TokenHelperService,
-    private ocTokenService: OcTokenService,
     @Inject(DOCUMENT) private document: any,
     private appConfig: AppConfig
   ) {}
-  async canActivate(): Promise<boolean> {
-    /**
-     * very simple test to make sure a token exists,
-     * can be parsed and has a valid expiration time.
-     *
-     * Shouldn't be depended on for actual token validation.
-     * The API will block invalid tokens
-     * and the client-side refresh-token interceptor will handle it correctly
-     */
 
+  /**
+   * very simple test to make sure a token exists,
+   * can be parsed and has a valid expiration time.
+   *
+   * Shouldn't be depended on for actual token validation.
+   * The API will block invalid tokens
+   * and the client-side refresh-token interceptor will handle it correctly
+   */
+  async canActivate(): Promise<boolean> {
     // check for impersonation superseeds existing tokens to allow impersonating buyers sequentially.
-    const isImpersonating = this.document.location.pathname === '/impersonation';
-    if (isImpersonating) {
-      const match = /token=([^&]*)/.exec(this.document.location.search);
-      if (match) {
-        this.auth.setToken(match[1]);
-        return true;
-      } else {
-        throw Error("Missing url query param 'token'");
-      }
+    if (this.isImpersonating()) {
+      const token = this.getImpersonationToken();
+      this.auth.setToken(token);
+      return true;
     }
 
     const isAccessTokenValid = this.isTokenValid();
-    const refreshTokenExists = this.ocTokenService.GetRefresh() && this.auth.getRememberStatus();
+    const refreshTokenExists = Tokens.GetRefreshToken() && this.auth.getRememberStatus();
     if (!isAccessTokenValid && refreshTokenExists) {
       await this.auth.refresh().toPromise();
       return true;
@@ -59,6 +53,16 @@ export class HasTokenGuard implements CanActivate {
     }
     this.auth.isLoggedIn = true;
     return isAccessTokenValid;
+  }
+
+  private isImpersonating(): boolean {
+    return this.document.location.pathname === '/impersonation';
+  }
+
+  private getImpersonationToken(): string {
+    const match = /token=([^&]*)/.exec(this.document.location.search);
+    if (!match) throw Error(`Missing url query param 'token'`);
+    return match[1];
   }
 
   private isTokenValid(): boolean {

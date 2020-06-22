@@ -26,8 +26,9 @@ namespace Marketplace.Common.Services.Zoho.Resources
         public Task<ZohoListCurrencyList> ListAsync(params ZohoFilter[] filters) => ListAsync<ZohoListCurrencyList>(filters);
         public Task<TZohoCurrencyList> ListAsync<TZohoCurrencyList>(params ZohoFilter[] filters) where TZohoCurrencyList : ZohoListCurrencyList
         {
+            var queryParams = filters?.Select(f => new KeyValuePair<string, object>(f.Key, f.Value));
             return Get()
-                .SetQueryParams(filters?.Select(f => new KeyValuePair<string,object>(f.Key, f.Value)))
+                .SetQueryParams(queryParams)
                 .GetJsonAsync<TZohoCurrencyList>();
         }
 

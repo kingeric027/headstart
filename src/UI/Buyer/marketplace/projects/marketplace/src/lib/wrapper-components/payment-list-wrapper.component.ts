@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 
 @Component({
   template: `
@@ -7,5 +6,5 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
   `,
 })
 export class PaymentListWrapperComponent {
-  constructor(public context: ShopperContextService) {}
+  constructor() {}
 }
