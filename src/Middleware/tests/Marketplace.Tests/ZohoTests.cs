@@ -673,26 +673,26 @@ namespace Marketplace.Tests
 		[Test]
 		public async Task Test()
 		{
-			var zoho_config = new ZohoClientConfig()
-			{
-				ClientId = "1000.LYTODQT800N5C6UWEMRKKRS3VM7RPH",
-				ClientSecret = "d6c6960a7d742efd8230bd010e83eb86fae6c2dc87",
-				AccessToken = "1000.e9b088c5a817701588daf498a8231d69.467c7b3949d6d37a9982c18d865a2749",
-				ApiUrl = "https://books.zoho.com/api/v3",
-				OrganizationID = "708781679"
-			};
-			var oc_config = new OrderCloudClientConfig()
-			{
-				AuthUrl = "https://stagingauth.ordercloud.io",
-				ApiUrl = "https://stagingapi.ordercloud.io",
-				ClientId = "0CC8282F-8EA9-4040-B1D9-BC03AC9FBB6B",
-				ClientSecret = "ulhq0P2DrdvzjBngQhv3DLus15V3VZEGYG0vYuVtBCRrruDNCpQXl11Sfinb",
-				GrantType = GrantType.ClientCredentials,
-				Roles = new[] { ApiRole.FullAccess }
-			};
-			var command = new ZohoCommand(zoho_config, oc_config);
-			var wk = JsonConvert.DeserializeObject<MarketplaceOrderWorksheet>(TWO_LINEITEMS_SAME_PRODUCT_ID);
-			var order = await command.CreateSalesOrder(wk);
+			//var zoho_config = new ZohoClientConfig()
+			//{
+			//	ClientId = "1000.LYTODQT800N5C6UWEMRKKRS3VM7RPH",
+			//	ClientSecret = "d6c6960a7d742efd8230bd010e83eb86fae6c2dc87",
+			//	AccessToken = "1000.e9b088c5a817701588daf498a8231d69.467c7b3949d6d37a9982c18d865a2749",
+			//	ApiUrl = "https://books.zoho.com/api/v3",
+			//	OrganizationID = "708781679"
+			//};
+			//var oc_config = new OrderCloudClientConfig()
+			//{
+			//	AuthUrl = "https://stagingauth.ordercloud.io",
+			//	ApiUrl = "https://stagingapi.ordercloud.io",
+			//	ClientId = "0CC8282F-8EA9-4040-B1D9-BC03AC9FBB6B",
+			//	ClientSecret = "ulhq0P2DrdvzjBngQhv3DLus15V3VZEGYG0vYuVtBCRrruDNCpQXl11Sfinb",
+			//	GrantType = GrantType.ClientCredentials,
+			//	Roles = new[] { ApiRole.FullAccess }
+			//};
+			//var command = new ZohoCommand(zoho_config, oc_config);
+			//var wk = JsonConvert.DeserializeObject<MarketplaceOrderWorksheet>(TWO_LINEITEMS_SAME_PRODUCT_ID);
+			//var order = await command.CreateSalesOrder(wk);
 		}
 	}
 }
