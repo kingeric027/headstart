@@ -10,7 +10,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
 {
-    public class CatalogSyncCommand : SyncCommand, IWorkItemCommand
+    public class CatalogSyncCommand : SyncCommand
     {
         private readonly IOrderCloudClient _oc;
         public CatalogSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
@@ -23,7 +23,8 @@ namespace Marketplace.Common.Commands
             var obj = wi.Current.ToObject<MarketplaceCatalog>();
             try
             {
-                await _oc.Catalogs.CreateAsync(obj, wi.Token);
+                obj.xp.Type = "Catalog";
+                await _oc.UserGroups.CreateAsync(wi.ResourceId, obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
@@ -64,7 +65,7 @@ namespace Marketplace.Common.Commands
             var obj = wi.Current.ToObject<MarketplaceCatalog>(OrchestrationSerializer.Serializer);
             try
             {
-                await _oc.Catalogs.SaveAsync<Catalog>(wi.RecordId, obj, wi.Token);
+                await _oc.UserGroups.SaveAsync<MarketplaceCatalog>(wi.ResourceId, wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException ex)
@@ -81,10 +82,10 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = wi.Diff.ToObject<PartialCatalog>(OrchestrationSerializer.Serializer);
+            var obj = wi.Diff.ToObject<PartialMarketplaceCatalog>(OrchestrationSerializer.Serializer);
             try
             {
-                await _oc.Catalogs.PatchAsync<Catalog>(wi.RecordId, obj, wi.Token);
+                await _oc.UserGroups.PatchAsync<MarketplaceCatalog>(wi.ResourceId, wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException ex)
@@ -108,7 +109,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Catalogs.GetAsync<Catalog>(wi.RecordId, wi.Token);
+                var response = await _oc.UserGroups.GetAsync<MarketplaceCatalog>(wi.ResourceId, wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)

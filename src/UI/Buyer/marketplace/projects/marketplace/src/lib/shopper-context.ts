@@ -1,31 +1,15 @@
 import {
   LineItem,
-  ListLineItem,
   BuyerProduct,
   Supplier,
   Address,
-  ListBuyerProduct,
-  ListAddress,
-  ListBuyerCreditCard,
   BuyerCreditCard,
-  ListOrder,
   MeUser,
   UserGroup,
-} from '@ordercloud/angular-sdk';
-import {
-  ProductXp,
-  BuyerAddressXP,
-  MarketplaceAddressBuyer,
-  TaxCertificate,
-  MarketplaceOrder,
-  ListPage,
-  MarketplaceLineItem,
-  UserGroupXp,
-} from 'marketplace-javascript-sdk';
-
-export * from '@ordercloud/angular-sdk';
-export * from './services/shopper-context/shopper-context.service';
-export * from '../../src/lib/services/ordercloud-sandbox/ordercloud-sandbox.models';
+  ApiRole,
+  Sortable,
+} from 'ordercloud-javascript-sdk';
+import { UserGroupXp, ProductXp, TaxCertificate, MarketplaceAddressBuyer } from 'marketplace-javascript-sdk';
 
 export interface LineItemGroupSupplier {
   supplier: Supplier;
@@ -50,7 +34,7 @@ export interface ExchangeRates {
 export interface SupplierFilters {
   supplierID?: string;
   page?: number;
-  sortBy?: string;
+  sortBy?: Sortable<'Suppliers.List'>;
   activeFilters?: any;
   search?: string;
 }
@@ -69,7 +53,7 @@ export interface ShippingRate {
 
 export interface ProductFilters {
   page?: number;
-  sortBy?: string;
+  sortBy?: string[];
   search?: string;
   showOnlyFavorites?: boolean;
   categoryID?: string;
@@ -93,7 +77,7 @@ export const PermissionTypes: PermissionType[] = [
 
 export interface OrderFilters {
   page?: number;
-  sortBy?: string;
+  sortBy?: Sortable<'Me.ListOrders'>;
   search?: string;
   showOnlyFavorites?: boolean;
   status?: OrderStatus;
@@ -118,7 +102,7 @@ export enum OrderStatus {
   AwaitingApproval = 'AwaitingApproval',
   ChangesRequested = 'ChangesRequested',
   Open = 'Open',
-  Completed = 'Completed',
+  Complete = 'Complete',
   Canceled = 'Canceled',
 }
 
@@ -126,6 +110,29 @@ export enum OrderViewContext {
   MyOrders = 'MyOrders',
   Approve = 'Approve',
   Location = 'Location',
+}
+
+export enum ShippingStatus {
+  Shipped = 'Shipped',
+  PartiallyShipped = 'PartiallyShipped',
+  Canceled = 'Canceled',
+  Processing = 'Processing',
+  Backordered = 'Backordered'
+}
+
+export enum ClaimStatus {
+  NoClaim = 'NoClaim',
+  Pending = 'Pending',
+  Complete = 'Complete',
+}
+
+export enum LineItemStatus {
+  Complete = 'Complete',
+  Submitted = 'Submitted',
+  Open = 'Open',
+  Backordered = 'Backordered',
+  Canceled = 'Canceled',
+  Returned = 'Returned',
 }
 
 export interface CreditCard {
@@ -148,11 +155,10 @@ export interface LineItemWithProduct extends LineItem {
   Product?: BuyerProduct;
 }
 
-/**
- * List of lineItems with full product details. Currently used in the cart page only.
- */
-export interface ListLineItemWithProduct extends ListLineItem {
-  Items: Array<LineItemWithProduct>;
+export enum OrdercloudEnv {
+  Production = 'Production',
+  Staging = 'Staging',
+  Sandbox = 'Sandbox',
 }
 
 export class AppConfig {
@@ -183,15 +189,9 @@ export class AppConfig {
    * base path to middleware
    */
 
-  orderCloudApiUrl: string;
-  orderCloudAuthUrl: string;
-  orderCloudApiVersion: string;
+  ordercloudEnv: OrdercloudEnv;
   avalaraCompanyId: number;
   middlewareUrl: string;
-  /**
-   * base path to CMS resources
-   */
-  cmsUrl: string;
   /**
    *  TODO - Link to identity provider's authorization server. this field should probably be SEB-specific.
    */
@@ -202,7 +202,7 @@ export class AppConfig {
    * To learn more about these roles and the security profiles that comprise them
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
-  scope: string[];
+  scope: ApiRole[];
 }
 
 export interface DecodedOCToken {
@@ -272,19 +272,9 @@ export enum OrderType {
 
 // Product Model
 // a corresponding model in the C# product
-export type ListMarketplaceMeProduct = ListBuyerProduct<ProductXp>;
-
 export type MarketplaceMeProduct = BuyerProduct<ProductXp>;
 
-export type ListMarketplaceAddressBuyer = ListAddress<BuyerAddressXP>;
-
-export type ListMarketplaceBuyerCreditCard = ListBuyerCreditCard<CreditCardXP>;
-
 export type MarketplaceBuyerCreditCard = BuyerCreditCard<CreditCardXP>;
-
-export type ListMarketplaceOrder = ListPage<MarketplaceOrder>;
-
-export type ListMarketplaceLineItem = ListPage<MarketplaceLineItem>;
 
 export interface CreditCardXP {
   CCBillingAddress: Address;

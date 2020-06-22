@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
-import { OcTokenService } from '@ordercloud/angular-sdk';
 import * as jwtDecode_ from 'jwt-decode';
 const jwtDecode = jwtDecode_;
 import { isUndefined as _isUndefined } from 'lodash';
 import { DecodedOCToken } from '../../shopper-context';
+import { Tokens } from 'ordercloud-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TokenHelperService {
-  constructor(private ocTokenService: OcTokenService) {}
+  constructor() {}
 
   getDecodedOCToken(): DecodedOCToken {
     try {
-      return jwtDecode(this.ocTokenService.GetAccess());
+      return jwtDecode(Tokens.GetAccessToken());
     } catch (e) {
       return null;
     }

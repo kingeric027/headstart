@@ -4,30 +4,15 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { ProductFilters } from '../../shopper-context';
-import { OcMeService, ListProduct } from '@ordercloud/angular-sdk';
+import { Me, Product } from 'ordercloud-javascript-sdk';
 import { ProductCategoriesService } from '../product-categories/product-categories.service';
-
-export interface IProductFilters {
-  activeFiltersSubject: BehaviorSubject<ProductFilters>;
-  toPage(pageNumber: number): void;
-  sortBy(field: string): void;
-  clearSort(): void;
-  searchBy(searchTerm: string): void;
-  clearSearch(): void;
-  filterByFacet(field: string, value: string, isFacet?: boolean): void;
-  clearFacetFilter(field: string): void;
-  filterByCategory(categoryID: string): void;
-  clearCategoryFilter(): void;
-  filterByFavorites(showOnlyFavorites: boolean): void;
-  clearAllFilters(): void;
-  hasFilters(): boolean;
-}
+import { ListPage } from 'marketplace-javascript-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',
 })
-export class ProductFilterService implements IProductFilters {
+export class ProductFilterService {
   public activeFiltersSubject: BehaviorSubject<ProductFilters> = new BehaviorSubject<ProductFilters>(
     this.getDefaultParms()
   );
@@ -37,7 +22,6 @@ export class ProductFilterService implements IProductFilters {
 
   constructor(
     private router: Router,
-    private ocMeService: OcMeService,
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute,
     private categories: ProductCategoriesService
@@ -59,7 +43,7 @@ export class ProductFilterService implements IProductFilters {
     return { page, sortBy, search, ...activeFacets };
   }
 
-  async listProducts(): Promise<ListProduct> {
+  async listProducts(): Promise<ListPage<Product>> {
     const { page, sortBy, search, categoryID, showOnlyFavorites, activeFacets = {} } = this.activeFiltersSubject.value;
     const facets = _transform(
       activeFacets,
@@ -67,26 +51,24 @@ export class ProductFilterService implements IProductFilters {
       {}
     );
     const favorites = this.currentUser.get().FavoriteProductIDs.join('|') || undefined;
-    return await this.ocMeService
-      .ListProducts({
-        categoryID,
-        page,
-        search,
-        sortBy,
-        filters: {
-          ...facets,
-          ID: showOnlyFavorites ? favorites : undefined,
-        },
-      })
-      .toPromise();
+    return await Me.ListProducts({
+      categoryID,
+      page,
+      search,
+      sortBy,
+      filters: {
+        ...facets,
+        ID: showOnlyFavorites ? favorites : undefined,
+      },
+    });
   }
 
   toPage(pageNumber: number): void {
     this.patchFilterState({ page: pageNumber || undefined });
   }
 
-  sortBy(field: string): void {
-    this.patchFilterState({ sortBy: field || undefined, page: undefined });
+  sortBy(fields: string[]): void {
+    this.patchFilterState({ sortBy: fields || undefined, page: undefined });
   }
 
   searchBy(searchTerm: string): void {

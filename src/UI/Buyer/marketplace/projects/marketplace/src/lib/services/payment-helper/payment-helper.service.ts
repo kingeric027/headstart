@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
-import { ListPayment, OcPaymentService, OcMeService, Payment } from '@ordercloud/angular-sdk';
+import { Payment, Payments, Me } from 'ordercloud-javascript-sdk';
+import { ListPage } from 'marketplace-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PaymentHelperService {
-  constructor(private ocPaymentService: OcPaymentService, private ocMeService: OcMeService) {}
+  constructor() {}
 
-  async ListPaymentsOnOrder(orderID: string, includeDetails: boolean = true): Promise<ListPayment> {
-    const payments = await this.ocPaymentService.List('outgoing', orderID).toPromise();
+  async ListPaymentsOnOrder(orderID: string, includeDetails: boolean = true): Promise<ListPage<Payment>> {
+    const payments = await Payments.List('Outgoing', orderID);
     const withDetails = payments.Items.map(payment => this.setPaymentDetails(payment, includeDetails));
     const Items = await Promise.all(withDetails);
     return { Items, Meta: payments.Meta };
@@ -28,9 +29,9 @@ export class PaymentHelperService {
   private async getPaymentDetails(payment: Payment): Promise<any> {
     switch (payment.Type) {
       case 'CreditCard':
-        return this.ocMeService.GetCreditCard(payment.CreditCardID).toPromise();
+        return Me.GetCreditCard(payment.CreditCardID);
       case 'SpendingAccount':
-        return this.ocMeService.GetSpendingAccount(payment.SpendingAccountID).toPromise();
+        return Me.GetSpendingAccount(payment.SpendingAccountID);
       case 'PurchaseOrder':
         return Promise.resolve({ PONumber: payment.ID });
     }

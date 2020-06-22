@@ -26,10 +26,18 @@ namespace Marketplace.Models
         public OrderReturnInfo OrderReturnInfo { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
 		public CurrencySymbol? Currency { get; set; } = null;
-
+        public ShippingStatus ShippingStatus { get; set; }
+        public ClaimStatus ClaimStatus { get; set; }
 	}
 
-    [SwaggerModel]
+	[JsonConverter(typeof(StringEnumConverter))]
+	public enum OrderType
+	{
+		Standard,
+		Quote
+	}
+
+	[SwaggerModel]
     public class OrderDetails
     {
         public MarketplaceOrder Order { get; set; }

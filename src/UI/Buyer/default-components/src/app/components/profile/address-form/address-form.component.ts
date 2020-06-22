@@ -1,8 +1,8 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 
 // 3rd party
-import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
+import { BuyerAddress, Address } from 'ordercloud-javascript-sdk';
 import { ValidateName, ValidateUSZip, ValidatePhone } from '../../../validators/validators';
 import { GeographyConfig } from '../../../config/geography.class';
 
@@ -10,10 +10,11 @@ import { GeographyConfig } from '../../../config/geography.class';
   templateUrl: './address-form.component.html',
   styleUrls: ['./address-form.component.scss'],
 })
-export class OCMAddressForm implements OnInit {
+export class OCMAddressForm implements OnInit, OnChanges {
   @Input() btnText: string;
   @Input() suggestedAddresses: BuyerAddress[];
   @Input() showOptionToSave = false;
+  @Input() homeCountry: string;
   @Output() formDismissed = new EventEmitter();
   @Output()
   formSubmitted = new EventEmitter<{ address: Address; shouldSaveAddress: boolean }>();
@@ -32,6 +33,13 @@ export class OCMAddressForm implements OnInit {
     this.setForms();
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.homeCountry) {
+      this.addressForm.controls.Country.setValue(this.homeCountry);
+      this.onCountryChange();
+    }
+  }
+
   @Input() set existingAddress(address: BuyerAddress) {
     this.ExistingAddress = address || {};
     this.setForms();
@@ -48,22 +56,26 @@ export class OCMAddressForm implements OnInit {
       State: new FormControl(this.ExistingAddress.State || null, Validators.required),
       Zip: new FormControl(this.ExistingAddress.Zip || '', [Validators.required, ValidateUSZip]),
       Phone: new FormControl(this.ExistingAddress.Phone || '', ValidatePhone),
-      Country: new FormControl(this.ExistingAddress.Country || 'US', Validators.required),
+      Country: new FormControl(this.homeCountry || '', Validators.required),
       ID: new FormControl(this.ExistingAddress.ID || ''),
     });
     this.shouldSaveAddressForm = new FormGroup({
       shouldSaveAddress: new FormControl(false),
     });
-    this.onCountryChange();
   }
 
   onCountryChange(event?: any): void {
-    const country = this.addressForm.value.Country;
+    const country = this.homeCountry;
     this.stateOptions = GeographyConfig.getStates(country).map(s => s.abbreviation);
     this.addressForm.get('Zip').setValidators([Validators.required, ValidateUSZip]);
     if (event) {
       this.addressForm.patchValue({ State: null, Zip: '' });
     }
+  }
+
+  getCountryName(countryCode: string): string {
+    const country = this.countryOptions.find(country => country.abbreviation === countryCode);
+    return country ? country.label : '';
   }
 
   useSuggestedAddress(address: BuyerAddress): void {

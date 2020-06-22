@@ -21,5 +21,11 @@ namespace Marketplace.Common.Controllers
         {
             return await _command.Seed(seed, this.VerifiedUserContext);
         }
-    }
+
+		[HttpPost, Route("post-staging-restore")] // TODO - add webhook auth
+		public async Task PostStagingRestore()
+		{
+			await _command.PostStagingRestore();
+		}
+	}
 }

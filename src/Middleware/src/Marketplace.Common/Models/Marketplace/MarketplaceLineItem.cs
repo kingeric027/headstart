@@ -1,5 +1,6 @@
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Models.Models.Marketplace
 {
@@ -9,6 +10,7 @@ namespace Marketplace.Models.Models.Marketplace
     [SwaggerModel]
 	public class LineItemXp 
     {
+        public LineItemStatus LineItemStatus { get; set; }
         public LineItemReturnInfo LineItemReturnInfo { get; set; }
         public string LineItemImageUrl { get; set; }
         public decimal? UnitPriceInProductCurrency { get; set; }

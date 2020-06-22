@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Address,  } from '@ordercloud/angular-sdk';
+import { Address,  } from 'ordercloud-javascript-sdk';
 import { ShopperContextService } from 'marketplace';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ListBuyerCreditCard, BuyerCreditCard, ListSpendingAccount } from '@ordercloud/angular-sdk';
+import { BuyerCreditCard, SpendingAccount, ListPage } from 'ordercloud-javascript-sdk';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { ShopperContextService } from 'marketplace';
@@ -21,8 +21,8 @@ export class OCMPaymentMethodManagement implements OnInit {
     search: undefined,
   };
   areYouSureModal = ModalState.Closed;
-  cards: ListBuyerCreditCard;
-  accounts: ListSpendingAccount;
+  cards: ListPage<BuyerCreditCard>;
+  accounts: ListPage<SpendingAccount>;
   currentCard: BuyerCreditCard = null;
 
   constructor(private context: ShopperContextService) {}
@@ -68,7 +68,7 @@ export class OCMPaymentMethodManagement implements OnInit {
     this.listCards();
   }
 
-  private async listCards(): Promise<void> { 
+  private async listCards(): Promise<void> {
     this.cards = await this.context.currentUser.cards.List();
   }
 }

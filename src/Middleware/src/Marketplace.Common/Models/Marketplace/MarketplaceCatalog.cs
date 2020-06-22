@@ -4,13 +4,18 @@ using OrderCloud.SDK;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceCatalog : Catalog<CatalogXp>, IMarketplaceObject
+    public class MarketplaceCatalog : UserGroup<CatalogXp>, IMarketplaceObject
     {
-        
+    }
+
+    [SwaggerModel]
+    public class PartialMarketplaceCatalog : PartialUserGroup<CatalogXp>
+    {
     }
 
     [SwaggerModel]
     public class CatalogXp
     {
+        public string Type { get; set; } = "Catalog";
     }
 }

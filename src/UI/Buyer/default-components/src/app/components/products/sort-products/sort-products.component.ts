@@ -22,13 +22,14 @@ export class OCMProductSort implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.form = new FormGroup({ sortBy: new FormControl(null) });
     this.context.productFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(filters => {
-      this.setForm(filters.sortBy);
+      const sortBy = !!filters.sortBy.length ? filters.sortBy[0] : undefined;
+      this.setForm(sortBy);
     });
   }
 
   sortStrategyChanged(): void {
     const sortValue = this.form.get('sortBy').value;
-    this.context.productFilters.sortBy(sortValue);
+    this.context.productFilters.sortBy([sortValue]);
   }
 
   ngOnDestroy(): void {

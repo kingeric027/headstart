@@ -16,6 +16,7 @@ import { BuyerAddress, ListBuyerAddress, ListAddress, Address } from '@orderclou
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { ListPage } from 'marketplace-javascript-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { set as _set } from 'lodash';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
@@ -386,28 +387,15 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
+
   getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resoruceToUpdate: T): T {
-    const piecesOfField = resourceUpdate.field.split('.');
-    const depthOfField = piecesOfField.length;
-    const updatedResourceCopy = this.copyResource(resoruceToUpdate);
-    // define xp if it is undefined
-    if((updatedResourceCopy as any).xp === null && piecesOfField[0] === 'xp') (updatedResourceCopy as any).xp = {};
-    switch (depthOfField) {
-      case 4:
-        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]][piecesOfField[3]] =
-          resourceUpdate.value;
-        break;
-      case 3:
-        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]][piecesOfField[2]] = resourceUpdate.value;
-        break;
-      case 2:
-        updatedResourceCopy[piecesOfField[0]][piecesOfField[1]] = resourceUpdate.value;
-        break;
-      default:
-        updatedResourceCopy[piecesOfField[0]] = resourceUpdate.value;
-        break;
+    const updatedResourceCopy: any = this.copyResource(resoruceToUpdate);
+    var update = _set(updatedResourceCopy, resourceUpdate.field, resourceUpdate.value);
+    if(resourceUpdate.field === 'Product.Inventory.Enabled' && resourceUpdate.value === false) {
+      update.Product.Inventory.QuantityAvailable = null 
+      update.Product.Inventory.OrderCanExceed = false;
     }
-    return updatedResourceCopy;
+    return update;
   }
 
   copyResource<T>(resource: T): T {
