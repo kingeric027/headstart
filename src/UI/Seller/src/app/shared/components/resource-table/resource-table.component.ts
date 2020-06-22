@@ -22,6 +22,7 @@ import { singular } from 'pluralize';
 import { filter, takeWhile } from 'rxjs/operators';
 import { ListPage } from 'marketplace-javascript-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
 
 interface BreadCrumb {
   displayText: string;
@@ -55,7 +56,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   areChanges: boolean;
   parentResources: ListPage<any>;
   requestStatus: RequestStatus;
-  selectedParentResourceName = 'Fetching Data';
+  selectedParentResourceName: string;
   selectedParentResourceID = '';
   breadCrumbs: BreadCrumb[] = [];
   isCreatingNew = false;
@@ -154,12 +155,12 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     if (typeof this.filterForm.value.from === 'object') {
       const fromDate = this.filterForm.value.from;
       this.fromDate = this.transformDateForUser(fromDate);
-      this.filterForm.value.from = this.transformDateForFilter(fromDate);
+      this.filterForm.value.from = transformDateMMDDYYYY(fromDate);
     }
     if (typeof this.filterForm.value.to === 'object') {
       const toDate = this.filterForm.value.to;
       this.toDate = this.transformDateForUser(toDate);
-      this.filterForm.value.to = this.transformDateForFilter(toDate);
+      this.filterForm.value.to = transformDateMMDDYYYY(toDate);
     }
     if (typeof this.filterForm.value.timeStamp === 'object') {
       const timeStamp = this.transformDateForUser(this.filterForm.value.timeStamp);
@@ -173,10 +174,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     const month = date.month.toString().length === 1 ? '0' + date.month : date.month;
     const day = date.day.toString().length === 1 ? '0' + date.day : date.day;
     return date.year + '-' + month + '-' + day;
-  }
-
-  transformDateForFilter(date: NgbDateStruct) {
-    return date.month + '-' + date.day + '-' + date.year;
   }
 
   removeFieldsWithNoValue(formValues: ListArgs) {

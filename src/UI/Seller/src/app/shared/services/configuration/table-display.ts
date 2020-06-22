@@ -31,8 +31,8 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toExpandable: false,
   },
   promotions: {
-    toPrimaryHeader: 'Name',
-    toSecondaryHeader: 'Code',
+    toPrimaryHeader: 'Code',
+    toSecondaryHeader: 'Description',
     toImage: '',
     toExpandable: false,
   },
@@ -188,14 +188,14 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
   promotions: {
     fields: [
       {
-        path: 'Name',
-        header: 'Name',
+        path: 'Code',
+        header: 'Code',
         type: BASIC_STRING,
         sortable: true,
       },
       {
-        path: 'ID',
-        header: 'ID',
+        path: 'Description',
+        header: 'Description',
         type: BASIC_STRING,
         sortable: true,
       },
@@ -376,14 +376,14 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         header: 'Has Claims',
         type: BOOLEAN,
         sortable: false,
-        queryRestriction: 'OrderDirection=Incoming'
+        queryRestriction: 'OrderDirection=Incoming',
       },
       {
         path: 'xp.OrderReturnInfo.Comment',
         header: 'Return Comment',
         type: BASIC_STRING,
         sortable: false,
-        queryRestriction: 'OrderDirection=Incoming'
+        queryRestriction: 'OrderDirection=Incoming',
       },
     ],
     imgPath: '',
