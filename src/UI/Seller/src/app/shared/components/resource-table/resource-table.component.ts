@@ -241,7 +241,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
         const parentResourceID = params[parentIDParamName];
         this.selectedParentResourceID = parentResourceID;
         if( this.isMyResource ) {
-          const parentResource = await this.parentResourceService.findOrGetResourceByID('008'); //need to add code to get my supplier id
+          // const parentResource = await this.parentResourceService.findOrGetResourceByID(); //need to add code to get my supplier id
+          const parentResource = await this._ocService.getMyResource();
           if (parentResource) this.selectedParentResourceName = parentResource.Name;
         }
         if (params && parentResourceID) {

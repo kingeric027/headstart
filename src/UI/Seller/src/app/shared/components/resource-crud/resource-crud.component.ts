@@ -56,10 +56,11 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  ngOnInit(): void {
-    this.determineViewingContext();
+  async ngOnInit(): Promise<void> {
+    await this.determineViewingContext();
     this.subscribeToResources();
     this.subscribeToResourceSelection();
+    console.log(this.updatedResource)
     this.setForm(this.updatedResource);
   }
 
@@ -70,12 +71,13 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     });
   }
 
-  determineViewingContext(): void {
+  async determineViewingContext(): Promise<void> {
     this.isMyResource = this.router.url.startsWith('/my-');
-    // if (this.isMyResource) {
-    //   const supplier = await this.ocService.getMyResource();
-    //   this.setResourceSelectionFromResource(supplier);
-    // }
+    if (this.isMyResource) {
+      const myResource = await this.ocService.getMyResource();
+      const shouldDisplayList = this.router.url.endsWith('locations') || this.router.url.endsWith('users');
+      if(!shouldDisplayList) this.setResourceSelectionFromResource(myResource);
+    }
   }
 
   subscribeToResourceSelection(): void {

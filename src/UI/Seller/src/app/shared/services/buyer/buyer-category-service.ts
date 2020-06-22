@@ -3,13 +3,15 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Category, OcCategoryService } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 import { BUYER_SUB_RESOURCE_LIST } from '@app-seller/buyers/components/buyers/buyer.service';
+import { CurrentUserService } from '../current-user/current-user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BuyerCategoryService extends ResourceCrudService<Category> {
-  constructor(router: Router, activatedRoute: ActivatedRoute, private ocCategoryService: OcCategoryService) {
-    super(router, activatedRoute, ocCategoryService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'categories');
+  constructor(router: Router, activatedRoute: ActivatedRoute, private ocCategoryService: OcCategoryService, 
+    currentUserService: CurrentUserService) {
+    super(router, activatedRoute, ocCategoryService, currentUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'categories');
   }
 
   async updateResource(originalID: string, resource: Category): Promise<Category> {

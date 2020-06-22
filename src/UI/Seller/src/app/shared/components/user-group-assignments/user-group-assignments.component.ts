@@ -4,6 +4,7 @@ import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { IUserPermissionsService } from '@app-seller/shared/models/user-permissions.interface';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { GetDisplayText } from './user-group-assignments.constants';
+import { Router } from '@angular/router';
 
 interface AssignmentsToAddUpdate {
   UserGroupType: string;
@@ -34,17 +35,32 @@ export class UserGroupAssignments implements OnChanges {
   faExclamationCircle = faExclamationCircle;
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
+  //router: Router;
+
+  constructor(
+    private router: Router
+  ) {}
   
-  ngOnChanges(changes: SimpleChanges): void {
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
     this.updateForUserGroupAssignmentType();
     if (changes.user?.currentValue.ID && !this.userID) {
       this.userID = this.user.ID
-      this.userOrgID = this.userPermissionsService.getParentResourceID();
-      this.userOrgID !== REDIRECT_TO_FIRST_PARENT && this.getUserGroups(this.userOrgID);
-      this.getUserGroupAssignments(this.user.ID, this.userOrgID);
+      if(this.router.url.startsWith('/my-')) {
+        const myResource = await this.userPermissionsService.getMyResource();
+        this.userOrgID = myResource.ID;
+      } else {
+        this.userOrgID = this.userPermissionsService.getParentResourceID();
+      }
+      debugger;
+      //  this.userOrgID !== REDIRECT_TO_FIRST_PARENT && this.getUserGroups(this.userOrgID);
+      if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
+        debugger; 
+        this.getUserGroupAssignments(this.user.ID, this.userOrgID);
+      }
     }
     if (this.userID && changes.user?.currentValue?.ID !== changes.user?.previousValue?.ID) {
       this.userID = this.user.ID
+      debugger;
       this.getUserGroupAssignments(this.user.ID, this.userOrgID);
     }
     if(this.isCreatingNew) {

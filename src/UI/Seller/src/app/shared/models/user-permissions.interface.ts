@@ -6,4 +6,5 @@ export interface IUserPermissionsService {
   listUserAssignments(userID: string, orgID: string): Promise<ListUserGroupAssignment>;
   updateUserUserGroupAssignments(orgID: string, add: UserGroupAssignment[], del: UserGroupAssignment[]): Promise<void>;
   getParentResourceID(): string;
+  getMyResource(): Promise<any>;
 }

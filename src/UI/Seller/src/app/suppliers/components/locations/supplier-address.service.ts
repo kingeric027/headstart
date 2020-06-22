@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { OcSupplierAddressService, Address, ListAddress } from '@ordercloud/angular-sdk';
+import { OcSupplierAddressService, Address, ListAddress, Supplier } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,13 +13,15 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    private ocSupplierAddressService: OcSupplierAddressService
+    private ocSupplierAddressService: OcSupplierAddressService,
+    public currentUserService: CurrentUserService
   ) {
     super(
       router,
       activatedRoute,
       ocSupplierAddressService,
-      '/suppliers',
+      currentUserService,
+      router.url.startsWith('/my-') ? '/my-supplier' : '/suppliers',
       'suppliers',
       SUPPLIER_SUB_RESOURCE_LIST,
       'locations'
