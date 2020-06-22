@@ -41,14 +41,6 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendOrderSubmittedForApprovalEmail(payload);
         }
 
-        [HttpPost, Route("ordersubmit")]
-        [OrderCloudWebhookAuth]
-        public async Task<OrderSubmitResponse> HandleOrderSubmit([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> payload)
-        {
-            var response = await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
-            return response;
-        }
-
         [HttpPost, Route("orderrequiresapproval")]
         [OrderCloudWebhookAuth]
         public async void HandleOrderRequiresApproval([FromBody] MessageNotification<OrderSubmitEventBody> payload)
