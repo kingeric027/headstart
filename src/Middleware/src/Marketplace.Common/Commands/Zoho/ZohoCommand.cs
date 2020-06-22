@@ -125,7 +125,7 @@ namespace Marketplace.Common.Commands.Zoho
         private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(IList<MarketplaceLineItem> lineitems)
         {
             // TODO: accomodate possibility of more than 100 line items
-            var products = await Throttler.RunAsync(lineitems.Select(item => item.ProductID).ToList(), 100, 5,
+            var products = await Throttler.RunAsync(lineitems.Select(item => item.ProductID).Distinct().ToList(), 100, 5,
                 s => _oc.Products.GetAsync<MarketplaceProduct>(s));
 
             var zItems = await Throttler.RunAsync(products.ToList(), 100, 5, product => _zoho.Items.ListAsync(new ZohoFilter()
@@ -137,13 +137,14 @@ namespace Marketplace.Common.Commands.Zoho
             foreach (var list in zItems)
                 list.Items.ForEach(item => z_items.Add(item.sku, item));
 
-            var items = await Throttler.RunAsync(products.Select(p => p).ToList(), 100, 5, async product =>
+            var items = await Throttler.RunAsync(lineitems.ToList(), 100, 5, async lineItem =>
             {
-                var z_item = z_items.FirstOrDefault(z => z.Key == product.ID);
+                var marketplaceProduct = lineItem.Product.Reserialize<MarketplaceProduct>();
+                var z_item = z_items.FirstOrDefault(z => z.Key == marketplaceProduct.ID);
                 if (z_item.Key != null)
                     return await _zoho.Items.SaveAsync(
-                        ZohoLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == product.ID), product));
-                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.First(i => i.ProductID == product.ID), product));
+                        ZohoLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == marketplaceProduct.ID), marketplaceProduct));
+                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.First(i => i.ProductID == marketplaceProduct.ID), marketplaceProduct));
             });
             return items.ToList();
         }
