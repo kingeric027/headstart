@@ -227,19 +227,19 @@ const Storefronts = {
 };
 
 const MySupplierProfile = {
-  rolesWithAccess: [MPRoles.MPSupplierAdmin],
+  rolesWithAccess: [MPRoles.MPMeSupplierAdmin],
   title: 'My Supplier',
   route: '/my-supplier',
 };
 
 const MySupplierLocations = {
-  rolesWithAccess: [MPRoles.MPSupplierAdmin],
+  rolesWithAccess: [MPRoles.MPMeSupplierAddressAdmin],
   title: 'My Supplier Locations',
   route: '/my-supplier/locations'
 }
 
 const MySupplerUsers = {
-  rolesWithAccess: [MPRoles.MPSupplierAdmin],
+  rolesWithAccess: [MPRoles.MPMeSupplierUserAdmin],
   title: 'My Suppler Users',
   route: '/my-supplier/users'
 }

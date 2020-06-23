@@ -129,8 +129,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   canBeDeleted = true;
 
-  async ngOnInit() {
-    this.determineViewingContext();
+  async ngOnInit(): Promise<void> {
+    await this.determineViewingContext();
     this.initializeSubscriptions();
     this.setFilterForm();
     this.subscribeToOptions();
@@ -193,9 +193,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.editResourceHeight = getPsHeight('additional-item-edit-resource');
   }
 
-  determineViewingContext() {
+  async determineViewingContext() {
     this.isMyResource = this.router.url.startsWith('/my-');
     this.shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
+    if(this.isMyResource) {
+      const resource = await this._ocService.getMyResource();
+      this.selectedParentResourceName = resource.Name;
+    }
   }
 
   private async initializeSubscriptions() {
