@@ -41,7 +41,7 @@
                         (qtyChange)="setQuantity($event.detail)">
     </ocm-quantity-input>
     <button (click)="$event.stopPropagation()"
-            [disabled]="isAddingToCart"
+            [disabled]="isAddingToCart || !qtyValid"
             class="btn btn-secondary btn-block small mt-2"
             type="submit"
             (click)="addToCart()"
