@@ -8,6 +8,7 @@ import { AppAuthService } from '@app-seller/auth';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OrderService } from '@app-seller/orders/order.service';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
+import { ShippingStatus, LineItemStatus } from '../../../shared/models/order-status.interface';
 
 @Component({
   selector: 'app-order-shipments',
@@ -210,6 +211,7 @@ export class OrderShipmentsComponent implements OnChanges {
     }
     const postedShipment: any = await this.httpClient.post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions ).toPromise();
     await this.ocShipmentService.Patch(postedShipment.Shipment.ID, {DateShipped: shipDate}).toPromise();
+    await this.ocOrderService.Patch(this.orderDirection, this.order.ID, { xp: { ShippingStatus: ShippingStatus.Shipped } }).toPromise();
     this.getShipments();
     this.getLineItems();
     this.createShipment = false;
