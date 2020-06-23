@@ -50,7 +50,6 @@ export class UserGroupAssignments implements OnChanges {
       } else {
         this.userOrgID = this.userPermissionsService.getParentResourceID();
       }
-      //  this.userOrgID !== REDIRECT_TO_FIRST_PARENT && this.getUserGroups(this.userOrgID);
       if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
         this.getUserGroupAssignments(this.user.ID, this.userOrgID);
       }

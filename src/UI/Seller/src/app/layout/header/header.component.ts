@@ -76,7 +76,7 @@ export class HeaderComponent implements OnInit {
 
   urlChange = (url: string) => {
     const activeNavGroup = this.headerConfig.find(grouping => {
-      return url.includes(grouping.route);
+      return (url.includes(grouping.route) && grouping.subRoutes) || grouping.route === url;
     });
     this.activeTitle = activeNavGroup && activeNavGroup.title;
   };
