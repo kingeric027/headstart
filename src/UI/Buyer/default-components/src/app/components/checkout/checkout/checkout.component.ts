@@ -2,17 +2,18 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
 import {
-  ShopperContextService,
-  ListPayment,
-  ListLineItem,
-  ListBuyerCreditCard,
   ShipMethodSelection,
   ShipEstimate,
-} from 'marketplace';
-import { MarketplaceOrder } from 'marketplace-javascript-sdk';
+  ListPage,
+  Payment,
+  BuyerCreditCard,
+} from 'ordercloud-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
+import { ShopperContextService } from 'marketplace';
+import { MerchantConfig } from 'src/app/config/merchant.class';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -22,10 +23,10 @@ export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
   isAnon: boolean;
   order: MarketplaceOrder;
-  lineItems: ListLineItem;
+  lineItems: ListPage<MarketplaceLineItem>;
   orderSummaryMeta: OrderSummaryMeta;
-  payments: ListPayment;
-  cards: ListBuyerCreditCard;
+  payments: ListPage<Payment>;
+  cards: ListPage<BuyerCreditCard>;
   selectedCard: SelectedCreditCard;
   shipEstimates: ShipEstimate[] = null;
   currentPanel: string;
@@ -77,7 +78,7 @@ export class OCMCheckout implements OnInit {
   }
 
   async selectShipMethod(selection: ShipMethodSelection): Promise<void> {
-    const orderWorksheet = await this.checkout.selectShipMethod(selection);
+    const orderWorksheet = await this.checkout.selectShipMethods([selection]);
     this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
   }
 
@@ -91,7 +92,8 @@ export class OCMCheckout implements OnInit {
   }
 
   async onCardSelected(output: SelectedCreditCard): Promise<void> {
-    await this.checkout.deleteExistingPayments(); // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
+    // TODO - is delete still needed? There used to be an OC bug with multiple payments on an order.
+    await this.checkout.deleteExistingPayments(); 
     this.selectedCard = output;
     if (output.SavedCard) {
       await this.checkout.createSavedCCPayment(output.SavedCard, this.orderSummaryMeta.CreditCardTotal);
@@ -111,7 +113,8 @@ export class OCMCheckout implements OnInit {
   }
   
   async onAcknowledgePurchaseOrder(): Promise<void> {
-    await this.checkout.deleteExistingPayments(); // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
+    // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
+    await this.checkout.deleteExistingPayments(); 
     await this.checkout.createPurchaseOrderPayment(this.orderSummaryMeta.POTotal);
     this.payments = await this.checkout.listPayments();
     this.toSection('confirm');
@@ -119,17 +122,17 @@ export class OCMCheckout implements OnInit {
 
   async submitOrderWithComment(comment: string): Promise<void> {
     await this.checkout.addComment(comment);
-
     let cleanOrderID = '';
+    const merchant = MerchantConfig.getMerchant(this.order.xp.Currency);
     if(this.orderSummaryMeta.StandardLineItemCount) {
       const ccPayment = {
         OrderId: this.order.ID,
         PaymentID: this.payments.Items[0].ID, // There's always only one at this point
         CreditCardID: this.selectedCard?.SavedCard?.ID,
         CreditCardDetails: this.selectedCard.NewCard,
-        Currency: 'USD', // TODO - won't always be USD
+        Currency: this.order.xp.Currency,
         CVV: this.selectedCard.CVV,
-        MerchantID: this.context.appSettings.cardConnectMerchantID,
+        MerchantID: merchant.cardConnectMerchantID
       }
       cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
     } else {
@@ -160,7 +163,7 @@ export class OCMCheckout implements OnInit {
     this.accordian.toggle(id);
   }
 
-  beforeChange($event): any {
+  beforeChange($event: any): void {
     if (this.currentPanel === $event.panelId) {
       return $event.preventDefault();
     }

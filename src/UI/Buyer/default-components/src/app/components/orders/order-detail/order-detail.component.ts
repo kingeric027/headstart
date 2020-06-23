@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import { ShopperContextService, OrderReorderResponse, OrderViewContext, LineItem } from 'marketplace';
-import { MarketplaceOrder, OrderDetails } from 'marketplace-javascript-sdk';
+import { ShopperContextService, OrderReorderResponse, OrderViewContext } from 'marketplace';
+import { MarketplaceOrder, OrderDetails, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 
@@ -35,7 +35,7 @@ export class OCMOrderDetails implements OnInit {
     }
   }
 
-  async validateReorder(orderID: string, lineItems: LineItem[]): Promise<void> {
+  async validateReorder(orderID: string, lineItems: MarketplaceLineItem[]): Promise<void> {
     this.reorderResponse = await this.context.orderHistory.validateReorder(orderID, lineItems);
     this.updateMessage(this.reorderResponse);
   }
@@ -49,7 +49,7 @@ export class OCMOrderDetails implements OnInit {
     this.context.currentUser.setIsFavoriteOrder(newValue, order.ID);
   }
 
-  toggleRequestReturn() {
+  toggleRequestReturn(): void {
     this.showRequestReturn = !this.showRequestReturn;
   }
 
@@ -91,14 +91,13 @@ export class OCMOrderDetails implements OnInit {
 
   async addToCart(): Promise<void> {
     const items = this.reorderResponse.ValidLi.map(li => {
-
-      return { 
-        ProductID: li.Product.ID, 
-        Quantity: li.Quantity, 
+      return {
+        ProductID: li.Product.ID,
+        Quantity: li.Quantity,
         Specs: li.Specs,
         xp: {
-          LineItemImageUrl: li.xp.LineItemImageUrl
-        } 
+          LineItemImageUrl: li.xp.LineItemImageUrl,
+        },
       };
     });
     await this.context.order.cart.addMany(items);
@@ -108,7 +107,7 @@ export class OCMOrderDetails implements OnInit {
     await this.context.order.cart.moveOrderToCart(this.order.ID);
   }
 
-  async toggleShowRequestForm(showRequestReturn: boolean) {
+  toggleShowRequestForm(showRequestReturn: boolean): void {
     this.ngOnInit();
     this.showRequestReturn = showRequestReturn;
   }

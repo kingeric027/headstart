@@ -9,6 +9,7 @@ using Marketplace.Models.Misc;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using ordercloud.integrations.library;
+using System;
 
 namespace Marketplace.Common.Controllers
 {
@@ -38,14 +39,6 @@ namespace Marketplace.Common.Controllers
         public async void HandleOrderSubmittedForApproval([FromBody] MessageNotification<OrderSubmitEventBody> payload)
         {
             await _sendgridService.SendOrderSubmittedForApprovalEmail(payload);
-        }
-
-        [HttpPost, Route("ordersubmit")]
-        [OrderCloudWebhookAuth]
-        public async Task<OrderSubmitResponse> HandleOrderSubmit([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> payload)
-        {
-            var response = await _orderCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
-            return response;
         }
 
         [HttpPost, Route("orderrequiresapproval")]
@@ -88,20 +81,6 @@ namespace Marketplace.Common.Controllers
         public async void HandleOrderCancelled([FromBody] WebhookPayloads.Orders.Cancel payload)
         {
             await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Cancelled", "<h1>this is a test email for order cancelled</h1>");
-        }
-
-        [HttpPost, Route("orderrefund")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderRefund(JObject payload)
-        {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Refunded", "<h1>this is a test email for order refunded</h1>");
-        }
-
-        [HttpPost, Route("orderupdated")]
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderUpdated([FromBody] MarketplaceOrderPatchPayload payload)
-        {
-            await _sendgridService.SendOrderUpdatedEmail(payload);
         }
 
         [HttpPost, Route("newuser")] // TO DO: send email to mp manager

@@ -1,8 +1,9 @@
 import { Component, AfterViewInit, Input, OnDestroy, OnInit } from '@angular/core';
-import { ListOrder } from '@ordercloud/angular-sdk';
 import { OrderStatus, OrderFilters, ShopperContextService, OrderViewContext } from 'marketplace';
+import { ListPage } from 'ordercloud-javascript-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
+import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 
 @Component({
   templateUrl: './order-history.component.html',
@@ -11,7 +12,7 @@ import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/r
 export class OCMOrderHistory implements OnInit, AfterViewInit, OnDestroy {
   alive = true;
   columns: string[] = ['ID', 'Status', 'DateSubmitted', 'Total'];
-  @Input() orders: ListOrder;
+  @Input() orders: ListPage<MarketplaceOrder>;
   viewContext: string;
   showOnlyFavorites = false;
   sortBy: string;
@@ -29,7 +30,7 @@ export class OCMOrderHistory implements OnInit, AfterViewInit, OnDestroy {
   }
 
   handleFiltersChange = (filters: OrderFilters): void => {
-    this.sortBy = filters.sortBy;
+    this.sortBy = String(filters.sortBy);
     this.showOnlyFavorites = filters.showOnlyFavorites;
     this.searchTerm = filters.search;
   };
@@ -45,7 +46,7 @@ export class OCMOrderHistory implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sortOrders(sortBy: string): void {
-    this.context.orderHistory.filters.sortBy(sortBy);
+    this.context.orderHistory.filters.sortBy([sortBy as any]);
   }
 
   changePage(page: number): void {

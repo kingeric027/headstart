@@ -1,38 +1,23 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { OcMeService } from '@ordercloud/angular-sdk';
-import { HttpClient } from '@angular/common/http';
+import { Me } from 'ordercloud-javascript-sdk';
 import { ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { AppConfig } from '../../shopper-context';
-
-export interface ExchangeRates {
-  Currency: string;
-  Symbol: string;
-  Name: string;
-  Rate: number;
-  Icon: string;
-}
-
-export interface IExchangeRates {
-  Get(): ListPage<ExchangeRates>;
-}
+import { ExchangeRates } from '../../shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ExchangeRatesService implements IExchangeRates {
+export class ExchangeRatesService {
   private ratesSubject: BehaviorSubject<ListPage<ExchangeRates>> = new BehaviorSubject<ListPage<ExchangeRates>>(null);
 
-  constructor(private ocMeService: OcMeService, public http: HttpClient, private appConfig: AppConfig) {}
+  constructor() {}
 
   Get(): ListPage<ExchangeRates> {
     return this.exchangeRates;
   }
 
   async reset(): Promise<void> {
-    const myUserGroups = await this.ocMeService
-      .ListUserGroups({ pageSize: 1, filters: { 'xp.Type': 'BuyerLocation' } })
-      .toPromise();
+    const myUserGroups = await Me.ListUserGroups({ pageSize: 1, filters: { 'xp.Type': 'BuyerLocation' } });
     const baseRate = myUserGroups.Items[0].xp?.Currency;
     this.exchangeRates = await MarketplaceSDK.ExchangeRates.Get(baseRate);
   }

@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { takeWhile } from 'rxjs/operators';
-import { ListMarketplaceMeProduct } from '../shopper-context';
+import { MarketplaceMeProduct } from '../shopper-context';
+import { ListPage } from 'ordercloud-javascript-sdk';
 
 @Component({
   template: `
@@ -10,23 +11,19 @@ import { ListMarketplaceMeProduct } from '../shopper-context';
   `,
 })
 export class ProductListWrapperComponent implements OnInit, OnDestroy {
-  products: ListMarketplaceMeProduct;
+  products: ListPage<MarketplaceMeProduct>;
   alive = true;
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.products = this.activatedRoute.snapshot.data.products;
     this.context.productFilters.activeFiltersSubject
       .pipe(takeWhile(() => this.alive))
       .subscribe(this.handleFiltersChange);
   }
 
-  private handleFiltersChange = async () => {
-    this.products = await this.context.productFilters.listProducts();
-  };
-
-  configureRouter() {
+  configureRouter(): void {
     this.router.events.subscribe(evt => {
       if (evt instanceof NavigationEnd) {
         this.router.navigated = false; // TODO - what exactly does this line acomplish?
@@ -35,7 +32,11 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.alive = false;
   }
+
+  private handleFiltersChange = async (): Promise<void> => {
+    this.products = await this.context.productFilters.listProducts();
+  };
 }

@@ -16,6 +16,7 @@ namespace Marketplace.Common.Commands
     public interface IEnvironmentSeedCommand
     {
 		Task<ImpersonationToken> Seed(EnvironmentSeed seed, VerifiedUserContext user);
+		Task PostStagingRestore();
     }
 	public class EnvironmentSeedCommand : IEnvironmentSeedCommand
 	{
@@ -25,8 +26,11 @@ namespace Marketplace.Common.Commands
 		private EnvironmentSeed _seed;
 		private readonly IMarketplaceSupplierCommand _supplierCommand;
 		private readonly IMarketplaceBuyerCommand _buyerCommand;
+		private readonly string _localWebhookUrl = "https://marketplaceteam.ngrok.io";
 		private readonly string _allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
+		private static string _adminUIApiClientID;
+		private static string _buyerUIApiClientID;
+		private static string _middlewareApiClientID;
 
 		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand, IOrderCloudSandboxService orderCloudSandboxService)
 		{
@@ -45,18 +49,57 @@ namespace Marketplace.Common.Commands
 
 			// at this point everything we do is as impersonation of the admin user on a new token
 			var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
-			await PatchDefaultApiClients(impersonation.access_token);
 			await CreateApiClients(impersonation.access_token);
+			await SetApiClientIDs(impersonation.access_token); // must be before patch api clients
+			await PatchDefaultApiClients(impersonation.access_token);
 			await CreateWebhooks(impersonation.access_token, seed.ApiUrl);
+			await CreateMessageSenders(impersonation.access_token, seed.ApiUrl);
 			await CreateMarketPlaceRoles(impersonation.access_token);
+			await CreateIncrementors(impersonation.access_token); // must be before create buyers
 			await CreateBuyers(user, impersonation.access_token);
 			await CreateXPIndices(impersonation.access_token);
-			await CreateIncrementors(impersonation.access_token);
-			await CreateAndAssignIntegrationEvent(seed.ApiUrl, impersonation.access_token);
+			await CreateAndAssignIntegrationEvents(seed.ApiUrl, impersonation.access_token);
 			await CreateSuppliers(user, impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
 			return impersonation;
 		}
+
+		public async Task PostStagingRestore()
+		{	
+			var token = (await _oc.AuthenticateAsync()).AccessToken;
+			var baseUrl = _settings.EnvironmentSettings.BaseUrl;
+			await SetApiClientIDs(token);
+
+			var deleteMS = DeleteAllMessageSenders(token);
+			var deleteWH = DeleteAllWebhooks(token);
+			var deleteIE = DeleteAllIntegrationEvents(token);
+			await Task.WhenAll(deleteMS, deleteWH, deleteIE);
+
+			var createMS = CreateMessageSenders(token, baseUrl);
+			var createWH = CreateWebhooks(token, baseUrl);
+			var createIE = CreateAndAssignIntegrationEvents(token, baseUrl);
+			await Task.WhenAll(createMS, createWH, createIE);
+		}
+
+		private async Task<AdminCompany> CreateOrganization(string token)
+		{
+			var org = new Organization()
+			{
+				Name = $"Marketplace.Print {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}",
+				Active = true,
+				BuyerID = "Default_Marketplace_Buyer",
+				BuyerApiClientName = $"Default Marketplace Buyer UI",
+				BuyerName = $"Default Marketplace Buyer",
+				BuyerUserName = $"Default_Buyer",
+				BuyerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
+				SellerApiClientName = $"Default Marketplace Admin UI",
+				SellerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
+				SellerUserName = $"Default_Admin"
+			};
+			var request = await _dev.PostOrganization(org, token);
+			return request;
+		}
+
 
 		private async Task CreateBuyers(VerifiedUserContext user, string token) {
 			foreach (var buyer in _seed.Buyers)
@@ -95,7 +138,8 @@ namespace Marketplace.Common.Commands
 
 		static readonly List<Incrementor> DefaultIncrementors = new List<Incrementor>() {
 			new Incrementor { ID = "orderIncrementor", Name = "Order Incrementor", LastNumber = 1, LeftPaddingCount = 6 },
-			new Incrementor { ID = "supplierIncrementor", Name = "Supplier Incrementor", LastNumber = 1, LeftPaddingCount = 3 }
+			new Incrementor { ID = "supplierIncrementor", Name = "Supplier Incrementor", LastNumber = 1, LeftPaddingCount = 3 },
+			new Incrementor { ID = "buyerIncrementor", Name = "Buyer Incrementor", LastNumber = 1, LeftPaddingCount = 4 }
 		};
 
 		public async Task CreateIncrementors(string token)
@@ -106,20 +150,35 @@ namespace Marketplace.Common.Commands
 			}
 		}
 
-		private async Task PatchDefaultApiClients(string token)
+		private async Task SetApiClientIDs(string token)
 		{
 			var list = await _oc.ApiClients.ListAsync(accessToken: token);
-			var tasks = list.Items.Select(client => _oc.ApiClients.PatchAsync(client.ID, new PartialApiClient()
+			_adminUIApiClientID = list.Items.First(a => a.AppName.Contains("Admin")).ID;
+			_buyerUIApiClientID = list.Items.First(a => a.AppName.Contains("Buyer")).ID;
+			_middlewareApiClientID = list.Items.First(a => a.AppName.Contains("Middleware")).ID;
+		}
+
+		private async Task PatchDefaultApiClients(string token)
+		{
+			var buyer = _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient()
 			{
 				Active = true,
-				AllowAnyBuyer = client.AppName.Contains("Buyer"),
-				AllowAnySupplier = client.AppName.Contains("Admin"),
-				AllowSeller = client.AppName.Contains("Admin"),
+				AllowAnyBuyer = true,
+				AllowAnySupplier = false,
+				AllowSeller = false,
 				AccessTokenDuration = 600,
 				RefreshTokenDuration = 43200,
-			}, accessToken: token))
-				.ToList();
-			await Task.WhenAll(tasks);
+			}, accessToken: token);
+			var admin = _oc.ApiClients.PatchAsync(_adminUIApiClientID, new PartialApiClient()
+			{
+				Active = true,
+				AllowAnyBuyer = true,
+				AllowAnySupplier = false,
+				AllowSeller = false,
+				AccessTokenDuration = 600,
+				RefreshTokenDuration = 43200,
+			}, accessToken: token);
+			await Task.WhenAll(buyer, admin);
 		}
 
 		private async Task CreateApiClients(string token)
@@ -140,24 +199,19 @@ namespace Marketplace.Common.Commands
 			await _oc.ApiClients.CreateAsync(integrationsClient, token);
 		}
 
-		private async Task CreateWebhooks(string accessToken, string baseURL)
+		private async Task CreateMessageSenders(string accessToken, string baseURL)
 		{
-
-			var apiClientResponse = await _oc.ApiClients.ListAsync(accessToken: accessToken);
-			foreach (Webhook webhook in DefaultWebhooks)
+			foreach (var messageSender in DefaultMessageSenders)
 			{
-				webhook.ApiClientIDs = apiClientResponse.Items.Select(apiClient => apiClient.ID).ToList();
-				webhook.Url = $"{baseURL}{webhook.Url}";
-				webhook.HashKey = _settings.OrderCloudSettings.WebhookHashKey;
-				await _oc.Webhooks.CreateAsync(webhook, accessToken);
+				messageSender.URL = $"{baseURL}{messageSender.URL}";
+				await _oc.MessageSenders.CreateAsync(messageSender, accessToken);
 			}
 		}
-
-		private async Task CreateAndAssignIntegrationEvent(string apiUrl, string token)
+		private async Task CreateAndAssignIntegrationEvents(string token, string apiUrl)
 		{
 			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
 			{
-				ElevatedRoles = new List<ApiRole>( ) { ApiRole.FullAccess },
+				ElevatedRoles = new [] { ApiRole.FullAccess },
 				ID = "freightpopshipping",
 				EventType = IntegrationEventType.OrderCheckout,
 				CustomImplementationUrl = apiUrl,
@@ -169,28 +223,21 @@ namespace Marketplace.Common.Commands
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
-			var apiClients = await _oc.ApiClients.ListAsync(accessToken: token);
-			var buyerAppApiClientID = apiClients.Items.First(a => a.AppName.Contains("Buyer")).ID;
-			await _oc.ApiClients.PatchAsync(buyerAppApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" });
-		}
-
-		private async Task<AdminCompany> CreateOrganization(string token)
-		{
-			var org = new Organization()
+			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
 			{
-				Name = $"Marketplace.Print {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}",
-				Active = true,
-				BuyerID = "Default_Marketplace_Buyer",
-				BuyerApiClientName = $"Default Marketplace Buyer UI",
-				BuyerName = $"Default Marketplace Buyer",
-				BuyerUserName = $"Default_Buyer",
-				BuyerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-				SellerApiClientName = $"Default Marketplace Admin UI",
-				SellerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-				SellerUserName = $"Default_Admin"
-			};
-			var request = await _dev.PostOrganization(org, token);
-			return request;
+				ElevatedRoles = new [] { ApiRole.FullAccess },
+				ID = "freightpopshippingLOCAL",
+				EventType = IntegrationEventType.OrderCheckout,
+				CustomImplementationUrl = _localWebhookUrl,
+				Name = "FreightPOP Shipping LOCAL",
+				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
+				ConfigData = new
+				{
+					ExcludePOProductsFromShipping = true,
+					ExcludePOProductsFromTax = true,
+				}
+			}, token);
+			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" });
 		}
 
 		public async Task CreateMarketPlaceRoles(string accessToken)
@@ -204,6 +251,188 @@ namespace Marketplace.Common.Commands
 			}
 		}
 
+		public async Task DeleteAllWebhooks(string token)
+		{
+			var webhooks = await _oc.Webhooks.ListAsync(pageSize: 100, accessToken: token);
+			await Throttler.RunAsync(webhooks.Items, 500, 20, webhook => 
+				_oc.Webhooks.DeleteAsync(webhook.ID, token));
+		}
+
+		public async Task DeleteAllMessageSenders(string token)
+		{
+			var messageSenders = await _oc.MessageSenders.ListAsync(pageSize: 100, accessToken: token);
+			await Throttler.RunAsync(messageSenders.Items, 500, 20, messageSender =>
+				_oc.MessageSenders.DeleteAsync(messageSender.ID));
+		}
+
+		public async Task DeleteAllIntegrationEvents(string token)
+		{
+			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = null });
+			var integrationEvents = await _oc.IntegrationEvents.ListAsync(pageSize: 100, accessToken: token);
+			await Throttler.RunAsync(integrationEvents.Items, 500, 20, integrationEvent =>
+				_oc.IntegrationEvents.DeleteAsync(integrationEvent.ID));
+		}
+
+		private async Task CreateWebhooks(string accessToken, string baseURL)
+		{
+			var DefaultWebhooks = new List<Webhook>() {
+			new Webhook() {
+			  Name = "Order Approved",
+			  Description = "Triggers email letting user know the order was approved.",
+			  Url = "/orderapproved",
+			  ElevatedRoles =
+				new List<ApiRole>
+				{
+					ApiRole.FullAccess
+				},
+			  BeforeProcessRequest = false,
+			  WebhookRoutes = new List<WebhookRoute>
+			  {
+				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/approve", Verb = "POST" }
+			  },
+			  ApiClientIDs = new [] { _buyerUIApiClientID }
+			},
+			new Webhook() {
+			  Name = "Order Declined",
+			  Description = "Triggers email letting user know the order was declined.",
+			  Url = "/orderdeclined",
+			  ElevatedRoles =
+				new List<ApiRole>
+				{
+					ApiRole.FullAccess
+				},
+			  BeforeProcessRequest = false,
+			  WebhookRoutes = new List<WebhookRoute>
+			  {
+				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/decline", Verb = "POST" }
+			  },
+			  ApiClientIDs = new [] { _buyerUIApiClientID }
+			},
+			new Webhook() {
+			  Name = "Order Shipped",
+			  Description = "Triggers email letting user know the order was shipped.",
+			  Url = "/ordershipped",
+			  ElevatedRoles =
+				new List<ApiRole>
+				{
+					ApiRole.FullAccess
+				},
+			  BeforeProcessRequest = false,
+			  WebhookRoutes = new List<WebhookRoute>
+			  {
+				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/ship", Verb = "POST" }
+			  },
+			  ApiClientIDs = new [] { _adminUIApiClientID }
+			},
+			new Webhook() {
+			  Name = "Order Cancelled",
+			  Description = "Triggers email letting user know the order has been cancelled.",
+			  Url = "/ordercancelled",
+			  ElevatedRoles =
+				new List<ApiRole>
+				{
+					ApiRole.FullAccess
+				},
+			  BeforeProcessRequest = false,
+			  WebhookRoutes = new List<WebhookRoute>
+			  {
+				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/cancel", Verb = "POST" }
+			  },
+			  ApiClientIDs = new [] { _adminUIApiClientID }
+			},
+			new Webhook() {
+			  Name = "New User",
+			  Description = "Triggers an email welcoming the buyer user.  Triggers an email letting admin know about the new buyer user.",
+			  Url = "/newuser",
+			  ElevatedRoles =
+				new List<ApiRole>
+				{
+					ApiRole.FullAccess
+				},
+			  BeforeProcessRequest = false,
+			  WebhookRoutes = new List<WebhookRoute>
+			  {
+				new WebhookRoute() { Route = "v1/buyers/{buyerID}/users", Verb = "POST" }
+			  },
+			  ApiClientIDs = new [] { _buyerUIApiClientID, _adminUIApiClientID }
+			},
+			new Webhook() {
+			  Name = "Product Created",
+			  Description = "Triggers email to user with details of newly created product.",
+			  Url = "/productcreated",
+			  ElevatedRoles =
+				new List<ApiRole>
+				{
+					ApiRole.FullAccess
+				},
+			  BeforeProcessRequest = false,
+			  WebhookRoutes = new List<WebhookRoute>
+			  {
+				new WebhookRoute() { Route = "v1/products", Verb = "POST" }
+			  },
+			  ApiClientIDs = new [] { _adminUIApiClientID }
+			},
+			new Webhook() {
+			  Name = "Product Update",
+			  Description = "Triggers email to user indicating that a product has been updated.",
+			  Url = "/productupdate",
+			  ElevatedRoles =
+				new List<ApiRole>
+				{
+					ApiRole.FullAccess
+				},
+			  BeforeProcessRequest = false,
+			  WebhookRoutes = new List<WebhookRoute>
+			  {
+				new WebhookRoute() { Route = "v1/products/{productID}", Verb = "PATCH" }
+			  },
+			  ApiClientIDs = new [] { _adminUIApiClientID }
+			},
+			new Webhook() {
+			  Name = "Supplier Updated",
+			  Description = "Triggers email letting user know the supplier has been updated.",
+			  Url = "/supplierupdated",
+			  ElevatedRoles =
+				new List<ApiRole>
+				{
+					ApiRole.FullAccess
+				},
+			  BeforeProcessRequest = false,
+			  WebhookRoutes = new List<WebhookRoute>
+			  {
+				new WebhookRoute() { Route = "v1/suppliers/{supplierID}", Verb = "PATCH" }
+			  },
+			 ApiClientIDs = new [] { _adminUIApiClientID }
+			},
+		};
+			foreach (Webhook webhook in DefaultWebhooks)
+			{
+				webhook.Url = $"{baseURL}{webhook.Url}";
+				webhook.HashKey = _settings.OrderCloudSettings.WebhookHashKey;
+				await _oc.Webhooks.CreateAsync(webhook, accessToken);
+			}
+		}
+
+		static readonly List<MessageSender> DefaultMessageSenders = new List<MessageSender>() 
+		{
+			new MessageSender()
+			{
+				Name = "Password Reset",
+				MessageTypes = new[] { MessageType.ForgottenPassword },
+				URL = "/passwordreset",
+				SharedKey = "wkaWSxPBBAABaxEp", // Where does this come from? Should it live somewhere else?
+				xp = new { 
+						MessageTypeConfig = new {
+							MessageType = "ForgottenPassword",
+							FromEmail = "noreply@ordercloud.io",
+							Subject = "Here is the link to reset your password",
+							TemplateName = "ForgottenPassword",
+							MainContent = "ForgottenPassword"
+						}
+				}
+			}
+		};
+		
 		static readonly List<MarketplaceSecurityProfile> DefaultSecurityProfiles = new List<MarketplaceSecurityProfile>() {
 			// seller/supplier
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin, ApiRole.InventoryAdmin, ApiRole.ProductFacetReader } },
@@ -227,7 +456,7 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPReportReader },
 			
 			// buyer
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeCreditCardAdmin, ApiRole.MeAddressAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
 			
 			/* these roles don't do much, access to changing location information will be done through middleware calls that
 			*  confirm the user is in the location specific access user group. These roles will be assigned to the location 
@@ -241,144 +470,6 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationCreditCardAdmin },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationAddressAdmin },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationResaleCertAdmin }
-		};
-
-		static readonly List<Webhook> DefaultWebhooks = new List<Webhook>() {
-			new Webhook() {
-			  Name = "Order Approved",
-			  Description = "Triggers email letting user know the order was approved.",
-			  Url = "/orderapproved",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/approve", Verb = "POST" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Order Declined",
-			  Description = "Triggers email letting user know the order was declined.",
-			  Url = "/orderdeclined",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/decline", Verb = "POST" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Order Shipped",
-			  Description = "Triggers email letting user know the order was shipped.",
-			  Url = "/ordershipped",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/ship", Verb = "POST" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Order Cancelled",
-			  Description = "Triggers email letting user know the order has been cancelled.",
-			  Url = "/ordercancelled",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/cancel", Verb = "POST" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Order Updated",
-			  Description = "Triggers email letting user know the order has been updated.",
-			  Url = "/orderupdated",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}", Verb = "PATCH" }
-			  }
-			},
-			new Webhook() {
-			  Name = "New User",
-			  Description = "Triggers an email welcoming the buyer user.  Triggers an email letting admin know about the new buyer user.",
-			  Url = "/newuser",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/buyers/{buyerID}/users", Verb = "POST" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Product Created",
-			  Description = "Triggers email to user with details of newly created product.",
-			  Url = "/productcreated",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/products", Verb = "POST" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Product Update",
-			  Description = "Triggers email to user indicating that a product has been updated.",
-			  Url = "/productupdate",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/products/{productID}", Verb = "PATCH" }
-			  }
-			},
-			new Webhook() {
-			  Name = "Supplier Updated",
-			  Description = "Triggers email letting user know the supplier has been updated.",
-			  Url = "/supplierupdated",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/suppliers/{supplierID}", Verb = "PATCH" }
-			  }
-			},
 		};
 	}
 }

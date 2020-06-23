@@ -37,7 +37,7 @@ namespace Marketplace.CMS.Controllers
 			return await _assets.Get(assetID, VerifiedUserContext);
 		}
 
-		[DocName("Upoload an Asset")]
+		[DocName("Upload an Asset")]
 		[DocIgnore] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
 		public async Task<Asset> Create([FromForm] AssetUpload form)

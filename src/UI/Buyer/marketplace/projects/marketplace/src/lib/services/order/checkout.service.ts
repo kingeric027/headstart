@@ -1,53 +1,34 @@
 import { AppConfig, MarketplaceBuyerCreditCard } from '../../shopper-context';
 import {
-  ListPayment,
   Payment,
-  OcOrderService,
-  OcPaymentService,
+  Orders,
+  Payments,
   BuyerAddress,
-  OcMeService,
-} from '@ordercloud/angular-sdk';
+  Me,
+  OrderWorksheet,
+  IntegrationEvents,
+  ShipMethodSelection,
+} from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
-import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/ordercloud-sandbox.models';
-import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
 import {
   MarketplaceSDK,
   Address,
   OrderCloudIntegrationsCreditCardPayment,
   OrderCloudIntegrationsCreditCardToken,
   MarketplaceOrder,
+  ListPage,
 } from 'marketplace-javascript-sdk';
-
-export interface ICheckout {
-  submitWithCreditCard(card: OrderCloudIntegrationsCreditCardPayment, marketplaceID: string): Promise<string>;
-  submitWithoutCreditCard(): Promise<string>;
-  addComment(comment: string): Promise<MarketplaceOrder>;
-  listPayments(): Promise<ListPayment>;
-  createSavedCCPayment(card: MarketplaceBuyerCreditCard, amount: number): Promise<Payment>;
-  createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken, amount: number): Promise<Payment>;
-  createPurchaseOrderPayment(amount: number): Promise<Payment>;
-  setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder>;
-  setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
-  setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder>;
-  estimateShipping(): Promise<OrderWorksheet>;
-  selectShipMethod(selection: ShipMethodSelection): Promise<OrderWorksheet>;
-  calculateOrder(): Promise<MarketplaceOrder>;
-}
 
 @Injectable({
   providedIn: 'root',
 })
-export class CheckoutService implements ICheckout {
+export class CheckoutService {
   constructor(
-    private ocOrderService: OcOrderService,
-    private ocPaymentService: OcPaymentService,
-    private ocMeService: OcMeService,
     private paymentHelper: PaymentHelperService,
     private appSettings: AppConfig,
     private state: OrderStateService,
-    private orderCloudSandBoxService: OrderCloudSandboxService,
     private appConfig: AppConfig
   ) {}
 
@@ -63,14 +44,6 @@ export class CheckoutService implements ICheckout {
     return orderID;
   }
 
-  private async submit(): Promise<string> {
-    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    await this.incrementOrderIfNeeded();
-    const submittedOrder = await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
-    await this.state.reset();
-    return submittedOrder.ID;
-  }
-
   async addComment(comment: string): Promise<MarketplaceOrder> {
     return await this.patch({ Comments: comment });
   }
@@ -78,18 +51,16 @@ export class CheckoutService implements ICheckout {
   async incrementOrderIfNeeded(): Promise<void> {
     // 'as any' can be removed after sdk update
     if (!(this.order.xp as any)?.IsResubmitting) {
-      this.order = (await this.ocOrderService
-        .Patch('outgoing', this.order.ID, {
-          ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
-        })
-        .toPromise()) as MarketplaceOrder;
+      this.order = (await Orders.Patch('Outgoing', this.order.ID, {
+        ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
+      })) as MarketplaceOrder;
     }
   }
 
   async setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder> {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
-    address.ID = null;
+    (address as any).ID = null;
     this.order = await MarketplaceSDK.ValidatedAddresses.SetShippingAddress(
       'Outgoing',
       this.order.ID,
@@ -123,11 +94,11 @@ export class CheckoutService implements ICheckout {
   }
 
   async isApprovalNeeded(locationID: string): Promise<boolean> {
-    const userGroups = await this.ocMeService.ListUserGroups({ searchOn: 'ID', search: locationID }).toPromise();
+    const userGroups = await Me.ListUserGroups({ searchOn: 'ID', search: locationID });
     return userGroups.Items.some(u => u.ID === `${locationID}-NeedsApproval`);
   }
 
-  async listPayments(): Promise<ListPayment> {
+  async listPayments(): Promise<ListPage<Payment>> {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);
   }
 
@@ -145,22 +116,46 @@ export class CheckoutService implements ICheckout {
   // Integration Methods
   // order cloud sandbox service methods, to be replaced by updated sdk in the future
   async estimateShipping(): Promise<OrderWorksheet> {
-    return await this.orderCloudSandBoxService.estimateShipping(this.order.ID);
+    return await IntegrationEvents.EstimateShipping('Outgoing', this.order.ID);
   }
 
-  async selectShipMethod(selection: ShipMethodSelection): Promise<OrderWorksheet> {
-    const orderWorksheet = await this.orderCloudSandBoxService.selectShipMethod(this.order.ID, selection);
+  async selectShipMethods(selections: ShipMethodSelection[]): Promise<OrderWorksheet> {
+    const orderWorksheet = await IntegrationEvents.SelectShipmethods('Outgoing', this.order.ID, {
+      ShipMethodSelections: selections,
+    });
     this.order = orderWorksheet.Order;
     return orderWorksheet;
   }
 
   async calculateOrder(): Promise<MarketplaceOrder> {
-    const orderCalculation = await this.orderCloudSandBoxService.calculateOrder(this.order.ID);
+    const orderCalculation = await IntegrationEvents.Calculate('Outgoing', this.order.ID);
     this.order = orderCalculation.Order;
     return this.order;
   }
 
+  async createPurchaseOrderPayment(amount: number): Promise<Payment> {
+    const payment: Payment = {
+      Amount: amount,
+      DateCreated: new Date().toDateString(),
+      Type: 'PurchaseOrder',
+    };
+    return await Payments.Create('Outgoing', this.order.ID, payment);
+  }
+
+  async deleteExistingPayments(): Promise<any[]> {
+    const payments = await Payments.List('Outgoing', this.order.ID);
+    const deleteAll = payments.Items.map(payment => Payments.Delete('Outgoing', this.order.ID, payment.ID));
+    return Promise.all(deleteAll);
+  }
+
   // Private Methods
+  private async submit(): Promise<string> {
+    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
+    await this.incrementOrderIfNeeded();
+    const submittedOrder = await Orders.Submit('Outgoing', this.order.ID);
+    await this.state.reset();
+    return submittedOrder.ID;
+  }
 
   private async createCCPayment(
     partialAccountNum: string,
@@ -168,7 +163,7 @@ export class CheckoutService implements ICheckout {
     creditCardID: string,
     amount: number
   ): Promise<Payment> {
-    const payment = {
+    const payment: Payment = {
       Amount: amount,
       DateCreated: new Date().toDateString(),
       Accepted: false,
@@ -176,33 +171,15 @@ export class CheckoutService implements ICheckout {
       CreditCardID: creditCardID,
       xp: {
         partialAccountNumber: partialAccountNum,
-        cardType: cardType,
+        cardType,
       },
     };
-    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
-  }
-
-  async createPurchaseOrderPayment(amount: number): Promise<Payment> {
-    const payment = {
-      Amount: amount,
-      DateCreated: new Date().toDateString(),
-      Type: 'PurchaseOrder',
-    };
-    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
-  }
-
-  async deleteExistingPayments(): Promise<any[]> {
-    const payments = await this.ocPaymentService.List('outgoing', this.order.ID).toPromise();
-    const deleteAll = payments.Items.map(payment =>
-      this.ocPaymentService.Delete('outgoing', this.order.ID, payment.ID).toPromise()
-    );
-    return Promise.all(deleteAll);
+    return await Payments.Create('Outgoing', this.order.ID, payment);
   }
 
   private async patch(order: MarketplaceOrder): Promise<MarketplaceOrder> {
-    return (this.order = (await this.ocOrderService
-      .Patch('outgoing', this.order.ID, order)
-      .toPromise()) as MarketplaceOrder);
+    this.order = (await Orders.Patch('Outgoing', this.order.ID, order)) as MarketplaceOrder;
+    return this.order;
   }
 
   private get order(): MarketplaceOrder {

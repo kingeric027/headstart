@@ -1,6 +1,6 @@
-import { ExchangeRates } from 'marketplace/projects/marketplace/src/lib/services/exchange-rates/exchange-rates.service';
 import { ListPage } from '../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
 import { BuyerCurrency } from '../models/currency.interface';
+import { ExchangeRates } from 'marketplace';
 
 export function exchange(
   rates: ListPage<ExchangeRates>,

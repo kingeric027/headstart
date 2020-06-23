@@ -4,7 +4,6 @@ import {
   LineItemGroupSupplier,
 } from 'marketplace';
 import {MarketplaceOrder, MarketplaceLineItem, OrderDetails} from 'marketplace-javascript-sdk';
-import { ListLineItem } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model';
@@ -18,7 +17,6 @@ export class OCMOrderReturn {
   lineItems: MarketplaceLineItem[];
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
-  liGroups: ListLineItem;
   quantitiesToReturn: number[] = [];
   displayedColumns: string[] = [
     'select',
@@ -36,8 +34,8 @@ export class OCMOrderReturn {
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.Order;
     this.lineItems = value.LineItems;
-    this.liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
-    this.liGroupedByShipFrom = Object.values(this.liGroups);
+    const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
+    this.liGroupedByShipFrom = Object.values(liGroups);
     this.setSupplierInfo(this.liGroupedByShipFrom);
     this.setRequestReturnForm();
   }
@@ -46,13 +44,13 @@ export class OCMOrderReturn {
 
   constructor(private context: ShopperContextService, private fb: FormBuilder) {}
 
-  isAnyRowSelected() {
+  isAnyRowSelected(): boolean {
     const liGroups = this.requestReturnForm.controls.liGroups as FormArray;
     const selectedItem = liGroups.value.find(value => value.lineItems.find(lineItem => lineItem.selected === true));
-    return selectedItem;
+    return !!selectedItem;
   }
 
-  setRequestReturnForm() {
+  setRequestReturnForm(): void  {
     this.requestReturnForm = this.fb.group(new ReturnRequestForm(this.fb, this.order.ID, this.liGroupedByShipFrom));
   }
 
@@ -60,18 +58,17 @@ export class OCMOrderReturn {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(liGroups);
   }
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     this.isSaving = true;
     const orderID = this.requestReturnForm.value.orderID;
-    const orderReturn = await this.context.orderHistory.returnOrder(orderID);
+    await this.context.orderHistory.returnOrder(orderID);
     const lineItemsToReturn = [];
     this.requestReturnForm.value.liGroups.forEach(liGroup =>
       liGroup.lineItems
         .filter(lineItem => lineItem.selected === true)
         .forEach(lineItem => lineItemsToReturn.push(lineItem))
     );
-    for (let i = 0; i < lineItemsToReturn.length; i++) {
-        const lineItem = lineItemsToReturn[i];
+    for (const lineItem of lineItemsToReturn) {
         const newSumToReturn = (lineItem.lineItem?.xp?.LineItemReturnInfo?.QuantityToReturn || 0) + lineItem.quantityToReturn;
         await this.context.orderHistory.returnLineItem(
           orderID,
@@ -79,7 +76,7 @@ export class OCMOrderReturn {
           newSumToReturn,
           lineItem.returnReason
         )
-      }
+     }
     this.isSaving = false;
     this.viewReturnFormEvent.emit(false);
   }

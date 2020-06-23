@@ -1,95 +1,53 @@
 import { Injectable } from '@angular/core';
-import {
-  OcUserService,
-  UserGroup,
-  User,
-  OcUserGroupService,
-  UserGroupAssignment,
-  OcMeService,
-  ApprovalRule,
-  OcApprovalRuleService,
-  OcTokenService,
-} from '@ordercloud/angular-sdk';
+import { UserGroup, UserGroupAssignment, Me, Tokens } from 'ordercloud-javascript-sdk';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { PermissionTypes, AppConfig } from '../../shopper-context';
+import { AppConfig } from '../../shopper-context';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MarketplaceUser, ListPage } from 'marketplace-javascript-sdk';
-
-export interface IUserManagement {
-  getLocations(): Promise<UserGroup[]>;
-  getLocationUsers(locationID: string): Promise<ListPage<MarketplaceUser>>;
-  getLocationPermissions(locationID: string): Promise<UserGroupAssignment[]>;
-  getLocationApprovalPermissions(locationID: string): Promise<UserGroupAssignment[]>;
-  getLocationApprovalThreshold(locationID: string): Promise<number>;
-  updateUserUserGroupAssignments(
-    buyerID: string,
-    locationID: string,
-    add: UserGroupAssignment[],
-    del: UserGroupAssignment[]
-  ): Promise<void>;
-}
+import { MarketplaceUser, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
-export class UserManagementService implements IUserManagement {
+export class UserManagementService {
   constructor(
-    private ocUserGroupService: OcUserGroupService,
-    private ocMeService: OcMeService,
     public currentUserService: CurrentUserService,
-    public ocApprovalRuleService: OcApprovalRuleService,
-    private ocUserService: OcUserService,
-
     // remove below when sdk is regenerated
-    private ocTokenService: OcTokenService,
     private httpClient: HttpClient,
     private appConfig: AppConfig
   ) {}
 
   async getLocations(): Promise<UserGroup[]> {
-    const buyerID = this.currentUserService.get().Buyer.ID;
-
     // todo accomodate more than 100 locations
-    const loctions = await this.ocMeService
-      .ListUserGroups({ pageSize: 100, filters: { 'xp.Type': 'BuyerLocation' } })
-      .toPromise();
+    const loctions = await Me.ListUserGroups({ pageSize: 100, filters: { 'xp.Type': 'BuyerLocation' } });
     return loctions.Items;
   }
 
   async getLocationUsers(locationID: string): Promise<ListPage<MarketplaceUser>> {
     const buyerID = this.currentUserService.get().Buyer.ID;
-
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-    });
-    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/users`;
-    return this.httpClient
-      .get<ListPage<MarketplaceUser>>(url, { headers: headers })
-      .toPromise();
+    return await MarketplaceSDK.BuyerLocations.ListLocationUsers(buyerID, locationID);
   }
 
   async getLocationPermissions(locationID: string): Promise<UserGroupAssignment[]> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     });
     const buyerID = locationID.split('-')[0];
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/permissions`;
     return this.httpClient
-      .get<UserGroupAssignment[]>(url, { headers: headers })
+      .get<UserGroupAssignment[]>(url, { headers })
       .toPromise();
   }
 
   async getLocationApprovalPermissions(locationID: string): Promise<UserGroupAssignment[]> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     });
     const buyerID = locationID.split('-')[0];
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/approvalpermissions`;
     return this.httpClient
-      .get<UserGroupAssignment[]>(url, { headers: headers })
+      .get<UserGroupAssignment[]>(url, { headers })
       .toPromise();
   }
 
@@ -99,29 +57,22 @@ export class UserManagementService implements IUserManagement {
     add: UserGroupAssignment[],
     del: UserGroupAssignment[]
   ): Promise<void> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-    });
     const body = {
       AssignmentsToAdd: add,
       AssignmentsToDelete: del,
     };
-    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/permissions`;
-    return this.httpClient
-      .post<void>(url, body, { headers: headers })
-      .toPromise();
+    return await MarketplaceSDK.BuyerLocations.UpdateLocationPermissions(buyerID, locationID, body);
   }
 
   async getLocationApprovalThreshold(locationID: string): Promise<number> {
     const buyerID = this.currentUserService.get().Buyer.ID;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     });
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/approvalthreshold`;
     return this.httpClient
-      .get<number>(url, { headers: headers })
+      .get<number>(url, { headers })
       .toPromise();
   }
 
@@ -129,14 +80,14 @@ export class UserManagementService implements IUserManagement {
     const buyerID = this.currentUserService.get().Buyer.ID;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     });
     const body = {
       Threshold: amount,
     };
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/${locationID}/approvalthreshold`;
     return this.httpClient
-      .post<number>(url, body, { headers: headers })
+      .post<number>(url, body, { headers })
       .toPromise();
   }
 }

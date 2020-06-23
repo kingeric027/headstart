@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Meta } from '@ordercloud/angular-sdk';
+import { Meta } from 'ordercloud-javascript-sdk';
 
 @Component({
   templateUrl: './generic-list.component.html',
