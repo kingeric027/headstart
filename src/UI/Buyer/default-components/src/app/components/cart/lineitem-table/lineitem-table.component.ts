@@ -45,8 +45,8 @@ export class OCMLineitemTable {
     if (event.valid) {
       const li = this.getLineItem(lineItemID);
       li.Quantity = event.qty;
-      const { ProductID, Specs, Quantity } = li;
-      this.context.order.cart.add({ProductID, Specs, Quantity});
+      const { ProductID, Specs, Quantity, xp } = li;
+      this.context.order.cart.add({ProductID, Specs, Quantity, xp});
     }
   }
 
