@@ -15,6 +15,7 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using Newtonsoft.Json.Converters;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Commands
 {
@@ -298,15 +299,30 @@ namespace Marketplace.Common.Commands
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
+            var lineItemPatch = new PartialLineItem()
+            {
+                xp = new
+                {
+                    LineItemStatus = LineItemStatus.Submitted
+                }
+            };
+
+            foreach (var li in lineItems.Items)
+            {
+                await _oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, li.ID, lineItemPatch);
+            };
 
             var buyerOrderPatch = new PartialOrder()
             {
                 xp = new
                 {
                     ShipFromAddressIDs = shipFromAddressIDs,
-                    SupplierIDs = supplierIDs
+                    SupplierIDs = supplierIDs,
+                    ClaimStatus = ClaimStatus.NoClaim,
+                    ShippingStatus = ShippingStatus.Processing
                 }
             };
+            
             await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, buyerOrderPatch);
             return updatedSupplierOrders;
         }

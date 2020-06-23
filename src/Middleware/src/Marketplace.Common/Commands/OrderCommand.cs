@@ -9,6 +9,7 @@ using Marketplace.Models.Models.Marketplace;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Commands
 {
@@ -20,6 +21,7 @@ namespace Marketplace.Common.Commands
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
         Task RequestReturnEmail(string OrderID);
+        Task SetOrderStatus(string orderID, string type);
     }
 
     public class OrderCommand : IOrderCommand
@@ -49,6 +51,34 @@ namespace Marketplace.Common.Commands
         public async Task RequestReturnEmail(string orderID)
         {
             await _sendgridService.SendReturnRequestedEmail(orderID);
+        }
+
+        public async Task SetOrderStatus(string orderID, string type)
+        {
+            if (type == "cancel")
+            {
+               await PatchStatuses(orderID, ShippingStatus.Canceled, ClaimStatus.NoClaim, LineItemStatus.Canceled);
+            }
+            if (type == "requiresapproval")
+            {
+               await PatchStatuses(orderID, ShippingStatus.Processing, ClaimStatus.NoClaim, LineItemStatus.Submitted);
+            }
+            if (type == "ordershipped")
+            {
+               await PatchStatuses(orderID, ShippingStatus.Shipped, ClaimStatus.NoClaim, LineItemStatus.Complete);
+            }
+        }
+
+        private async Task PatchStatuses(string orderID, ShippingStatus shippingStatus, ClaimStatus claimStatus, LineItemStatus lineItemStatus)
+        {
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
+            var partialOrder = new PartialOrder { xp = new { ShippingStatus = shippingStatus, ClaimStatus = claimStatus } };
+            var partialLi = new PartialLineItem { xp = new { LineItemStatus = lineItemStatus } };
+            await _oc.Orders.PatchAsync(OrderDirection.Incoming, orderID, partialOrder);
+            foreach (var li in lineItems.Items)
+            {
+                await _oc.LineItems.PatchAsync(OrderDirection.Incoming, orderID, li.ID, partialLi);
+            }
         }
 
         public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)

@@ -1,7 +1,7 @@
 <fa-icon [ngClass]="{
   'text-success': status === 'Complete' || status === 'Shipped',
   'text-warning': status === 'AwaitingApproval' || status === 'Processing' || status === 'Backordered',
-  'text-info': status === 'Open' || status === 'NoClaim',
+  'text-info': status === 'Open' || status === 'NoClaim' || status === 'Submitted',
   'text-danger': status === 'Declined' || status === 'Canceled' || status === 'Returned' 
 }"
          [icon]="statusIconMapping[status]"></fa-icon>
