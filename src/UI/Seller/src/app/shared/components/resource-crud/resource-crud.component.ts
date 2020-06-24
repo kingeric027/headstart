@@ -60,7 +60,6 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     await this.determineViewingContext();
     this.subscribeToResources();
     this.subscribeToResourceSelection();
-    console.log(this.updatedResource)
     this.setForm(this.updatedResource);
   }
 
