@@ -30,9 +30,9 @@ namespace Orchestration.Tests
         {
             if (File.Exists(RandomFlatFileName)) File.Delete(RandomFlatFileName);
             var mapper = new Mapper();
-            mapper.Save($"TemplateTests/{RandomFlatFileName}", RandomFlatProductObjectList(100), "TemplateFlat");
+            mapper.Save($"TemplateTests/{RandomFlatFileName}", RandomFlatProductObjectList(3), "TemplateFlat");
 
-            var products = RandomHydratedProductObjectList(3000);
+            var products = RandomHydratedProductObjectList(3);
             var hydrated = new Mapper();
             hydrated.Put(products.Select(y => y.Product).ToList(), "Products");
             hydrated.Put(products.Select(z => z.PriceSchedule).ToList(), "PriceSchedules");
