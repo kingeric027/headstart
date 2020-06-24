@@ -95,7 +95,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   }
 
   minQty(priceSchedule: PriceSchedule): number {
-    return priceSchedule.MinQuantity || this.gridDisplay ? 0 : 1;
+    return priceSchedule.MinQuantity || (this.gridDisplay ? 0 : 1);
   }
 
   maxQty(priceSchedule: PriceSchedule): number {
