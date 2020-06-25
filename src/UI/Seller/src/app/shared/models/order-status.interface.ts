@@ -19,4 +19,5 @@ export enum LineItemStatus {
     Backordered = 'Backordered',
     Canceled = 'Canceled',
     Returned = 'Returned',
+    ReturnRequested = 'ReturnRequested',
 }
