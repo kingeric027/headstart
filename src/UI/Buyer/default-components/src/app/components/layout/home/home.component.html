@@ -19,9 +19,11 @@
               class="btn btn-sm btn-info text-white">Shop Now</button>
     </div>
   </div>
-  <!-- Featured products can be managed in the seller application -->
-  <ocm-product-carousel *ngIf="featuredProducts?.length"
-                        [displayTitle]="'Featured Products'"
-                        [products]="featuredProducts">
-  </ocm-product-carousel>
+  <div class="container-fluid">
+    <!-- Featured products can be managed in the seller application -->
+    <ocm-product-carousel *ngIf="featuredProducts?.length"
+                          [displayTitle]="'Featured Products'"
+                          [products]="featuredProducts">
+    </ocm-product-carousel>
+  </div>
 </ng-container>
