@@ -42,8 +42,8 @@ export class BuyerVisibilityConfiguration {
   addCatalogAssignments: ProductAssignment[] = [];
   delCatalogAssignments: ProductAssignment[] = [];
 
-  addCategoryAssignments: CategoryProductAssignment[];
-  delCategoryAssignments: CategoryProductAssignment[];
+  addCategoryAssignments: CategoryProductAssignment[] = [];
+  delCategoryAssignments: CategoryProductAssignment[] = [];
 
   catalogAssignmentsEditable: ProductAssignment[] = [];
   catalogAssignmentsStatic: ProductAssignment[] = [];
