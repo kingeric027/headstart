@@ -1,28 +1,27 @@
-<div class="container">
-  <div *ngIf="annoucement"
-       class="alert alert-info my-3"><b>
-      <fa-icon class="pr-3"
-               [icon]="faBullhorn"></fa-icon>
-    </b>{{ annoucement }}
+<ng-container>
+  <div class="d-flex justify-content-center align-items-center">
+    <img class="wtc-image"
+         [src]="this.URL"
+         alt="">
   </div>
-  <ngb-carousel *ngIf="carouselSlides"
-                [wrap]="true"
-                [interval]="5000">
-    <ng-template ngbSlide
-                 *ngFor="let slide of carouselSlides">
-      <img class="img-fluid"
-           style="width:100%;"
-           [src]="slide.URL"
-           alt="Random first slide">
-      <div class="carousel-caption">
-        <h3>{{ slide.headerText }}</h3>
-        <p>{{ slide.bodyText }}</p>
-      </div>
-    </ng-template>
-  </ngb-carousel>
+  <!-- TODO: This should all be dynamic, and using the CMS.  It's hardcoded right now for display purposes. -->
+  <div class="supplier d-flex justify-content-center align-items-center">
+    <div class="supplier-featured d-flex flex-column align-items-center text-right">
+      <h4 class="supplier-featured-header">Studio Essentials</h4>
+      <p>Self Esteem Brands Distribution</p>
+      <button (click)="toSupplier('Self Esteem Brands Distribution')"
+              class="btn btn-sm btn-info text-white">Shop Now</button>
+    </div>
+    <div class="supplier-featured d-flex flex-column align-items-center text-left">
+      <h4 class="supplier-featured-header">Think clean</h4>
+      <p>Dyson</p>
+      <button (click)="toSupplier('Dyson')"
+              class="btn btn-sm btn-info text-white">Shop Now</button>
+    </div>
+  </div>
   <!-- Featured products can be managed in the seller application -->
   <ocm-product-carousel *ngIf="featuredProducts?.length"
                         [displayTitle]="'Featured Products'"
                         [products]="featuredProducts">
   </ocm-product-carousel>
-</div>
+</ng-container>

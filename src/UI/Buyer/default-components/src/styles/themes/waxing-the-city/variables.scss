@@ -2,20 +2,23 @@
 // This file should include variable overrides as well as custom variables
 //
 // we've included a subset of common bootstrap variables you might want to override
-// to start you off. want to see the full list of bootstrap variables? 
+// to start you off. want to see the full list of bootstrap variables?
 // check out node_modules/bootstrap/variables.scss
 // --------------------------------------------------------------------------------------
 
-$blue: #1C3F65;
+$blue: #1c3f65;
 $indigo: #6610f2;
 $purple: #6f42c1;
 $pink: #e83e8c;
 $red: #dc3545;
-$orange: #EE7421;
+$orange: #ee7421;
 $yellow: #ffc107;
 $teal: #20c997;
 $green: #28a745;
-$cyan: #94A8CD;
+$cyan: #94a8cd;
+$sky: #68cbdf;
+$plum: #652f6c;
+$blush: #f4e2e2;
 
 $logo: 'src/styles/themes/waxing-the-city/logo.png';
 
@@ -32,12 +35,14 @@ $gray-900: #212529;
 $black: #000;
 
 $primary: $orange;
-$secondary: $gray-300;
+$secondary: $plum;
 $success: $green;
-$info: $cyan;
+$info: $sky;
 $warning: $yellow;
 $danger: $red;
 $light: $gray-100;
 $medium: $gray-300;
 $dark: $gray-800;
 $logo: $logo;
+$sky: $sky;
+$blush: $blush;
