@@ -1,8 +1,5 @@
 import { Component, Input, Output } from '@angular/core';
-import {
-faEyeSlash,
-faEye,
-} from '@fortawesome/free-solid-svg-icons';
+import { faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
 import {
   OcCatalogService,
   OcCategoryService,
@@ -116,7 +113,7 @@ export class BuyerVisibilityConfiguration {
       !!this.delCategoryAssignments.length;
   }
 
-  async edit(): Promise<void> {
+  edit(): void {
     this.isEditing = true;
   }
 
@@ -207,6 +204,7 @@ export class BuyerVisibilityConfiguration {
       this.delCategoryAssignments,
       this._buyer.ID
     );
+    this.handleClose();
     this.resetCatalogAssignments(this.catalogAssignmentsEditable);
     this.resetCategoryAssignments(this.assignedCategoriesEditable);
     this.checkForProductCatalogAssignmentChanges();
