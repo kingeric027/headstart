@@ -35,7 +35,7 @@ export class OrderStateService {
     private tokenHelper: TokenHelperService,
     private currentUserService: CurrentUserService,
     private appConfig: AppConfig
-  ) {}
+  ) { }
 
   get order(): MarketplaceOrder {
     return this.orderSubject.value;
@@ -81,7 +81,6 @@ export class OrderStateService {
       this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
     } else {
       this.DefaultOrder.xp.Currency = this.currentUserService.get().Currency;
-      this.DefaultOrder.xp.ShippingStatus = ShippingStatus.Processing;
       this.order = (await Orders.Create('Outgoing', this.DefaultOrder as Order)) as MarketplaceOrder;
     }
     if (this.order.DateCreated) {

@@ -75,10 +75,13 @@ namespace Marketplace.Common.Commands
             var partialOrder = new PartialOrder { xp = new { ShippingStatus = shippingStatus, ClaimStatus = claimStatus } };
             var partialLi = new PartialLineItem { xp = new { LineItemStatus = lineItemStatus } };
             await _oc.Orders.PatchAsync(OrderDirection.Incoming, orderID, partialOrder);
+
+            List<Task> lineItemsToPatch = new List<Task>();
             foreach (var li in lineItems.Items)
             {
-                await _oc.LineItems.PatchAsync(OrderDirection.Incoming, orderID, li.ID, partialLi);
+                lineItemsToPatch.Add(_oc.LineItems.PatchAsync(OrderDirection.Incoming, orderID, li.ID, partialLi));
             }
+            await Task.WhenAll(lineItemsToPatch);
         }
 
         public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)

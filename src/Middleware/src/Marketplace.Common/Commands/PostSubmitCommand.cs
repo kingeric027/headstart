@@ -299,18 +299,14 @@ namespace Marketplace.Common.Commands
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
-            var lineItemPatch = new PartialLineItem()
-            {
-                xp = new
-                {
-                    LineItemStatus = LineItemStatus.Submitted
-                }
-            };
 
+            var lineItemPatch = new PartialLineItem() {  xp = new { LineItemStatus = LineItemStatus.Submitted } };
+            List<Task> lineItemsToPatch = new List<Task>();
             foreach (var li in lineItems.Items)
             {
-                await _oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, li.ID, lineItemPatch);
-            };
+                lineItemsToPatch.Add(_oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, li.ID, lineItemPatch));
+            }
+            await Task.WhenAll(lineItemsToPatch);
 
             var buyerOrderPatch = new PartialOrder()
             {
