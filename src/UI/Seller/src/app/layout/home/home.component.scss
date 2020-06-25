@@ -13,5 +13,13 @@
     color: var(--teal);
     text-align: center;
     font-weight: 900;
+    animation: float-in .5s .5s ease-in-out backwards;
+  }
+}
+
+@keyframes float-in {
+  0% {
+    opacity: 0;
+    transform: translateY(25px);
   }
 }
