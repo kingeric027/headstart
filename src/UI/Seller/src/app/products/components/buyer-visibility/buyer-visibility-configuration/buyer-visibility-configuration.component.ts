@@ -1,5 +1,9 @@
 import { Component, Input, Output } from '@angular/core';
 import {
+faEyeSlash,
+faEye,
+} from '@fortawesome/free-solid-svg-icons';
+import {
   OcCatalogService,
   OcCategoryService,
   OcUserGroupService,
@@ -18,6 +22,8 @@ import { MarketplaceBuyer, MarketplaceProduct } from 'marketplace-javascript-sdk
   styleUrls: ['./buyer-visibility-configuration.component.scss'],
 })
 export class BuyerVisibilityConfiguration {
+  faEyeSlash = faEyeSlash;
+  faEye = faEye;
   @Input()
   set buyer(value: MarketplaceBuyer) {
     this._buyer = value;
@@ -48,6 +54,7 @@ export class BuyerVisibilityConfiguration {
   isEditing = false;
   isValidBuyerAssignment = false;
   areChanges = false;
+  isFetching = true;
 
   catalogs: UserGroup[] = [];
 
@@ -69,6 +76,7 @@ export class BuyerVisibilityConfiguration {
       await this.getCatalogs();
       await this.getCatalogAssignments();
       await this.getCategoryAssignments();
+      this.isFetching = false;
     }
   }
 
