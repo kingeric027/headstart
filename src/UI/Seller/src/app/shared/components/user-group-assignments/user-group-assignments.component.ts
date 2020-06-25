@@ -42,14 +42,9 @@ export class UserGroupAssignments implements OnChanges {
   
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
     this.updateForUserGroupAssignmentType();
+    this.userOrgID = await this.userPermissionsService.getParentResourceID();
     if (changes.user?.currentValue.ID && !this.userID) {
       this.userID = this.user.ID
-      if(this.router.url.startsWith('/my-')) {
-        const myResource = await this.userPermissionsService.getMyResource();
-        this.userOrgID = myResource.ID;
-      } else {
-        this.userOrgID = this.userPermissionsService.getParentResourceID();
-      }
       if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
         this.getUserGroupAssignments(this.user.ID, this.userOrgID);
       }
@@ -59,7 +54,6 @@ export class UserGroupAssignments implements OnChanges {
       this.getUserGroupAssignments(this.user.ID, this.userOrgID);
     }
     if(this.isCreatingNew) {
-      this.userOrgID = this.userPermissionsService.getParentResourceID();
       this.getUserGroups(this.userOrgID);
     }
   }

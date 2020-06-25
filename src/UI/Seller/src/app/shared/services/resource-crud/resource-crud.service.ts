@@ -62,8 +62,9 @@ export abstract class ResourceCrudService<ResourceType> {
         this.optionsSubject.next({});
       }
     });
-    this.optionsSubject.subscribe((options: Options) => {
-      if (this.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
+    this.optionsSubject.subscribe(async (options: Options) => {
+      const parentResourceID = await this.getParentResourceID();
+      if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.listResources();
       }
     });
@@ -81,7 +82,8 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async listResources(pageNumber = 1, searchText = ''): Promise<void> {
-    if (this.shouldListResources()) {
+    const shouldList = await this.shouldListResources();
+    if (shouldList) {
       const { sortBy, search, filters, OrderDirection } = this.optionsSubject.value;
       const options = {
         page: pageNumber,
@@ -132,22 +134,23 @@ export abstract class ResourceCrudService<ResourceType> {
     return areFilters ? SUCCESSFUL_NO_ITEMS_WITH_FILTERS : SUCCESSFUL_NO_ITEMS_NO_FILTERS;
   }
 
-  shouldListResources(): boolean {
+  async shouldListResources(): Promise<boolean> {
     if (!this.secondaryResourceLevel) {
       // for primary resources list if on the route
       return this.router.url.startsWith(this.route);
     } else {
-      if(this.router.url.startsWith('/my-')) return true;
+      const parentResourceID = await this.getParentResourceID();
       // for secondary resources list there is a parent ID
-      return !!this.getParentResourceID() && this.router.url.includes(this.secondaryResourceLevel);
+      return !!parentResourceID && this.router.url.includes(this.secondaryResourceLevel);
     }
   }
 
-  constructResourceURLs(resourceID = ''): string[] {
+  async constructResourceURLs(resourceID = ''): Promise<string[]> {
     const newUrlPieces = [];
     newUrlPieces.push(this.route);
     if (this.secondaryResourceLevel) {
-      newUrlPieces.push(`/${this.getParentResourceID()}`);
+      const parentResourceID = await this.getParentResourceID();
+      newUrlPieces.push(`/${parentResourceID}`);
       newUrlPieces.push(`/${this.secondaryResourceLevel}`);
     }
     if (resourceID) {
@@ -176,14 +179,14 @@ export abstract class ResourceCrudService<ResourceType> {
     return newUrl;
   }
 
-  constructNewRouteInformation(resourceID = ''): any[] {
+  async constructNewRouteInformation(resourceID = ''): Promise<any[]> {
     let newUrl = '';
     const queryParams = this.activatedRoute.snapshot.queryParams;
     if (this.secondaryResourceLevel) {
+      const parentResourceID = await this.getParentResourceID();
       newUrl += this.router.url.startsWith('/my-') ? 
       `${this.myRoute}/${this.secondaryResourceLevel}` : 
-      `${this.route}/${this.getParentResourceID()}/${this.secondaryResourceLevel}`;
-      // newUrl += `${this.route}/${this.getParentResourceID()}/${this.secondaryResourceLevel}`;
+      `${this.route}/${parentResourceID}/${this.secondaryResourceLevel}`;
     } else {
       newUrl += `${this.route}`;
     }
@@ -193,11 +196,19 @@ export abstract class ResourceCrudService<ResourceType> {
     return [newUrl, queryParams];
   }
 
-  getParentResourceID(): string {
-    // if(this.router.url.startsWith('/my-')) return await this.ocService.getMyResourceID(); // add function to get my supplier id
-    const urlPieces = this.router.url.split('/');
-    const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}`);
-    return urlPieces[indexOfParent + 1];
+  private isMyResource(): boolean {
+    return this.router.url.startsWith('/my-');
+  }
+
+  async getParentResourceID(): Promise<string> {
+    if(this.isMyResource()) {
+      const myResource = await this.getMyResource();
+      return myResource.ID;
+    } else {
+      const urlPieces = this.router.url.split('/');
+      const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}`);
+      return urlPieces[indexOfParent + 1];
+    }
   }
 
   async getResourceById(resourceID: string): Promise<any> {
@@ -217,16 +228,8 @@ export abstract class ResourceCrudService<ResourceType> {
       // user and potentially refactor later
       return [orderDirection || 'Incoming', ...options];
     }
-    if(this.router.url.startsWith('/my-')) {
-      const parentResource = await this.getMyResource();
-      return [parentResource.ID, ...options];
-    }
-    if (this.secondaryResourceLevel) {
-      const parentResourceID = this.getParentResourceID();
-      return [parentResourceID, ...options];
-    } else {
-      return [...options];
-    }
+    const parentResourceID = await this.getParentResourceID();
+    return parentResourceID ? [parentResourceID, ...options] : [...options];
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {

@@ -59,7 +59,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   async ngOnInit(): Promise<void> {
     await this.determineViewingContext();
     this.subscribeToResources();
-    this.subscribeToResourceSelection();
+    await this.subscribeToResourceSelection();
     this.setForm(this.updatedResource);
   }
 
@@ -79,9 +79,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  subscribeToResourceSelection(): void {
+  async subscribeToResourceSelection(): Promise<void> {
+    const parentResourceID = await this.ocService.getParentResourceID();
     this.activatedRoute.params.subscribe(params => {
-      if (this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
+      if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
         const resourceIDSelected =
           params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
@@ -138,8 +139,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.setUpdatedResourceAndResourceForm(this.ocService.emptyResource);
   }
 
-  selectResource(resource: any): void {
-    const [newURL, queryParams] = this.ocService.constructNewRouteInformation(resource.ID || '');
+  async selectResource(resource: any): Promise<void> {
+    const [newURL, queryParams] = await this.ocService.constructNewRouteInformation(resource.ID || '');
     this.navigate(newURL, { queryParams });
   }
 

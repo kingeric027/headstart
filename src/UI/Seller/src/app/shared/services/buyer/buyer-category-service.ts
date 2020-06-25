@@ -26,7 +26,7 @@ export class BuyerCategoryService extends ResourceCrudService<Category> {
 
  async getResourceInformation(resource: Category): Promise<boolean> {
     if (resource.ParentID) {
-      const parentResourceID = this.getParentResourceID();
+      const parentResourceID = await this.getParentResourceID();
       let numberOfChecks = 0;
       const validDepth = await this.checkForDepth(parentResourceID, resource.ParentID, numberOfChecks);
       if (!validDepth) {

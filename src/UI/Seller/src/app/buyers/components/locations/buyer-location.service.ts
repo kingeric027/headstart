@@ -77,8 +77,9 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
   }
 
   async updateResource(originalID: string, resource: any): Promise<any> {
+    const resourceID = await this.getParentResourceID();
     const newResource = await MarketplaceSDK.ValidatedAddresses.SaveBuyerAddress(
-      this.getParentResourceID(),
+      resourceID,
       originalID,
       resource
     );
@@ -89,8 +90,9 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
   }
 
   async createNewResource(resource: any): Promise<any> {
+    const resourceID = await this.getParentResourceID();
     const newResource = await MarketplaceSDK.ValidatedAddresses.CreateBuyerAddress(
-      this.getParentResourceID(),
+      resourceID,
       resource
     );
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];

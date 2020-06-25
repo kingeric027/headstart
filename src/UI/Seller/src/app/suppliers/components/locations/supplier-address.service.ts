@@ -31,13 +31,13 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
 
   async createNewResource(resource: any): Promise<any> {
     // special iding process for supplier addresses
-    const parentResourceID = this.getParentResourceID();
+    const parentResourceID = await this.getParentResourceID();
     const existingAddresses = await this.ocSupplierAddressService.List(parentResourceID).toPromise();
     const newID = this.getIncrementedID(parentResourceID, existingAddresses);
     resource.ID = newID;
 
     const newResource = await MarketplaceSDK.ValidatedAddresses.CreateSupplierAddress(
-      this.getParentResourceID(),
+      parentResourceID,
       resource
     );
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
@@ -46,8 +46,9 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
   }
 
   async updateResource(originalID: string, resource: any): Promise<any> {
+    const parentResourceID = await this.getParentResourceID();
     const newResource = await MarketplaceSDK.ValidatedAddresses.SaveSupplierAddress(
-      this.getParentResourceID(),
+      parentResourceID,
       originalID,
       resource
     );

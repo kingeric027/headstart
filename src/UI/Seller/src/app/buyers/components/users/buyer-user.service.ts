@@ -70,7 +70,7 @@ export class BuyerUserService extends ResourceCrudService<User> implements IUser
   }
 
   async createNewResource(resource: any): Promise<any> {
-    const buyerID = this.getParentResourceID();
+    const buyerID = await this.getParentResourceID();
     resource.ID = buyerID + '-{' + buyerID + '-UserIncrementor' + '}';
     const args = await this.createListArgs([resource]);
     const newResource = await this.ocService.Create(...args).toPromise();
