@@ -239,8 +239,6 @@ namespace Marketplace.Common.Commands
         {
             // forwarding
             var buyerOrder = orderWorksheet.Order;
-            //await CleanIDLineItems(orderWorksheet);
-
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, buyerOrder.ID);
             var supplierOrders = orderSplitResult.OutgoingOrders.ToList();
 
@@ -252,30 +250,6 @@ namespace Marketplace.Common.Commands
             // need to get fresh order worksheet because this process has changed things about the worksheet
             var updatedWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, buyerOrder.ID);
             return new Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet>(updatedSupplierOrders, updatedWorksheet);
-        }
-
-        private async Task CleanIDLineItems(MarketplaceOrderWorksheet orderWorksheet)
-        {
-            /* line item ids are significant for suppliers creating a relationship
-            * between their shipments and line items in ordercloud 
-            * we are sequentially labeling these ids for ease of shipping */
-
-            var lineItemIDChanges = orderWorksheet.LineItems.Select((li, index) => (OldID: li.ID, NewID: CreateIDFromIndex(index)));
-            await Throttler.RunAsync(lineItemIDChanges, 100, 2, (lineItemIDChange) =>
-            {
-                return _oc.LineItems.PatchAsync(OrderDirection.Incoming, orderWorksheet.Order.ID, lineItemIDChange.OldID, new PartialLineItem { ID = lineItemIDChange.NewID });
-            });
-        }
-
-        private string CreateIDFromIndex(int index)
-        {
-            /* X was choosen as a prefix for the lineItem ID so that it is easy to 
-               * direct suppliers where to look for the ID. L and I are sometimes indistinguishable 
-               * from the number 1 so I avoided those. X is also difficult to confuse with other
-               * letters when verbally pronounced */
-            var countInList = index + 1;
-            var paddedCount = countInList.ToString().PadLeft(3, '0');
-            return 'X' + paddedCount;
         }
 
         private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrder buyerOrder, List<Order> supplierOrders)

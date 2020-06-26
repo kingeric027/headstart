@@ -68,6 +68,7 @@ export class OCMCheckout implements OnInit {
   }
 
   async doneWithShipToAddress(): Promise<void> {
+    await this.checkout.cleanLineItemIDs(this.order.ID, this.lineItems.Items);
     const orderWorksheet = await this.checkout.estimateShipping();
     this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
     if(!this.orderSummaryMeta.StandardLineItemCount) {
