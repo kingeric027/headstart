@@ -72,7 +72,7 @@ namespace Orchestration.Tests
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.UserGroup, new MarketplaceUserGroups()
+                yield return new TestCaseData(RecordType.UserGroup, new MarketplaceUserGroup()
                 {
                     ID = "id"
                 });
