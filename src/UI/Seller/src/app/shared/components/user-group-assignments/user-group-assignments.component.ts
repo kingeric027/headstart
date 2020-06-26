@@ -141,7 +141,7 @@ export class UserGroupAssignments implements OnChanges {
 
   async executeUserUserGroupAssignmentRequests(): Promise<void> {
     this.requestedUserConfirmation = false;
-    await this.userPermissionsService.updateUserUserGroupAssignments(this.userOrgID, this.add, this.del);
+    await this.userPermissionsService.updateUserUserGroupAssignments(this.userOrgID, this.add, this.del, this.userGroupType === "BuyerLocation");
     await this.getUserGroupAssignments(this.userID, this.userOrgID);
     this.checkForUserUserGroupAssignmentChanges();
   }
