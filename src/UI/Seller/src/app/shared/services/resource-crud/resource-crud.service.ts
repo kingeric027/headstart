@@ -228,8 +228,12 @@ export abstract class ResourceCrudService<ResourceType> {
       // user and potentially refactor later
       return [orderDirection || 'Incoming', ...options];
     }
-    const parentResourceID = await this.getParentResourceID();
-    return parentResourceID ? [parentResourceID, ...options] : [...options];
+    if (this.secondaryResourceLevel || this.isMyResource()) {
+      const parentResourceID = await this.getParentResourceID();
+      return [parentResourceID, ...options];
+    } else {
+      return [...options];
+    }
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
