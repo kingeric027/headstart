@@ -1,4 +1,4 @@
-﻿namespace Marketplace.Models.Misc
+namespace Marketplace.Models.Misc
 {
 	public enum CustomRole
 	{
@@ -19,6 +19,7 @@
 		MPBuyerReader,
 		MPSellerAdmin,
 		MPSupplierAdmin, 
+		MPMeSupplierAdmin,
 		MPMeSupplierAddressAdmin,
 		MPMeSupplierUserAdmin,
 		MPSupplierUserGroupAdmin,

@@ -56,10 +56,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  ngOnInit(): void {
-    this.determineViewingContext();
+  async ngOnInit(): Promise<void> {
+    await this.determineViewingContext();
     this.subscribeToResources();
-    this.subscribeToResourceSelection();
+    await this.subscribeToResourceSelection();
     this.setForm(this.updatedResource);
   }
 
@@ -73,14 +73,16 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   async determineViewingContext(): Promise<void> {
     this.isMyResource = this.router.url.startsWith('/my-');
     if (this.isMyResource) {
-      const supplier = await this.ocService.getMyResource();
-      this.setResourceSelectionFromResource(supplier);
+      const myResource = await this.ocService.getMyResource();
+      const shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
+      if(!shouldDisplayList) this.setResourceSelectionFromResource(myResource);
     }
   }
 
-  subscribeToResourceSelection(): void {
+  async subscribeToResourceSelection(): Promise<void> {
+    const parentResourceID = await this.ocService.getParentResourceID();
     this.activatedRoute.params.subscribe(params => {
-      if (this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
+      if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
         const resourceIDSelected =
           params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
@@ -137,8 +139,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.setUpdatedResourceAndResourceForm(this.ocService.emptyResource);
   }
 
-  selectResource(resource: any): void {
-    const [newURL, queryParams] = this.ocService.constructNewRouteInformation(resource.ID || '');
+  async selectResource(resource: any): Promise<void> {
+    const [newURL, queryParams] = await this.ocService.constructNewRouteInformation(resource.ID || '');
     this.navigate(newURL, { queryParams });
   }
 

@@ -3,6 +3,7 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { MarketplaceMeProduct } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
+import { Router } from '@angular/router';
 
 export interface QtyChangeEvent {
   qty: number;
@@ -16,6 +17,7 @@ export interface QtyChangeEvent {
 export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() existingQty: number;
   @Input() gridDisplay? = false;
+  @Input() isQtyChanging;
   @Output() qtyChange = new EventEmitter<QtyChangeEvent>();
   // TODO - replace with real product info
   form: FormGroup;
@@ -27,13 +29,29 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   max: number;
   disabled = false;
 
+  constructor(private router: Router) {}
+
   @Input() priceSchedule: PriceSchedule;
   @Input() product: MarketplaceMeProduct;
 
   ngOnInit(): void {
-    this.form = new FormGroup({
-      quantity: new FormControl(1, [Validators.required]),
-    });
+    const routeUrl = this.router.routerState.snapshot.url;
+    const splitUrl = routeUrl.split('/');
+    const endUrl = splitUrl[splitUrl.length - 1];
+    if (endUrl.includes('cart')) {
+      this.form = new FormGroup({
+        quantity: new FormControl(1, {
+          validators: Validators.required, 
+          updateOn: 'blur'
+        }),
+      });
+    } else {
+      this.form = new FormGroup({
+        quantity: new FormControl(1, {
+          validators: Validators.required,
+        }),
+      });
+    }
   }
 
   ngOnChanges(): void {
@@ -41,6 +59,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   }
 
   init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
+    this.disabled = this.isQtyChanging;
     this.isQtyRestricted = priceSchedule.RestrictedQuantity;
     this.inventory = this.getInventory(product);
     this.min = this.minQty(priceSchedule);
@@ -60,8 +79,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   }
 
   quantityChangeListener(): void {
-    // TODO - 200 might be too short for the cart page. But 500 was too long for product list.
-    this.form.valueChanges.pipe(debounceTime(200)).subscribe(() => {
+    this.form.valueChanges.subscribe(() => {
       this.emit(this.form.value.quantity);
     });
   }

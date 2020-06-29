@@ -25,16 +25,16 @@
   <div class="row base-layout-item">
     <div class="col-md-12">
       <div class="py-3">
-        <h1 class="resource-name mb-0">{{(parentResourceService ? _currentResourceNamePlural + ' - ' + selectedParentResourceName : _currentResourceNamePlural) | titlecase}}</h1>
+        <h1 class ="resource-name mb-0">{{
+          getTitle(isMyResource, _currentResourceNamePlural, selectedParentResouceName) | titlecase}}</h1>
       </div>
     </div>
     <!-- /Page Title -->
   </div>
   <!-- /Page Title -->
   <!-- Filter Bar -->
-  <div *ngIf="!isMyResource"
-       class="row additional-item-edit-resource additional-item-table">
-    <div *ngIf="parentResourceService"
+  <div *ngIf="!isMyResource || (_currentResourceNamePlural !== 'suppliers')" class="row additional-item-edit-resource additional-item-table">
+    <div *ngIf="parentResourceService && !isMyResource"
          class="col-lg-3 col-md-4 col-sm-5 parent-resources">
       <!-- parent resource dropdown -->
       <resource-select-dropdown-component class="btn-block resource-btn mr-1 mb-1"
@@ -64,7 +64,7 @@
          *ngIf="!isCreatingNew && shouldShowCreateNew">
       <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
       <button class="btn btn-block brand-button--orange"
-              routerLink="/{{_ocService.route}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new">
+              routerLink="/{{isMyResource ? _ocService.myRoute : _ocService.route}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new">
         Create New {{_currentResourceNameSingular | titlecase}}
       </button>
     </div>
@@ -171,7 +171,7 @@
   <div class="row">
     <div class="col-md-12">
       <!-- full table view -->
-      <div *ngIf="!selectedResourceID && !isCreatingNew && !isMyResource">
+      <div *ngIf="!selectedResourceID && !isCreatingNew && (!isMyResource || shouldDisplayList)">
         <perfect-scrollbar id="perfectScroll"
                            class="scrollbar-top"
                            style="width: 100%;"
@@ -190,7 +190,7 @@
         </perfect-scrollbar>
       </div>
       <!-- editing/creating view -->
-      <div *ngIf="(selectedResourceID || isCreatingNew) && !isMyResource"
+      <div *ngIf="(selectedResourceID || isCreatingNew) && (!isMyResource || shouldDisplayList)"
            class="row resource-table-container">
         <div class="col-3 p-0 d-md-block d-none">
 
@@ -260,7 +260,7 @@
               </a>
             </span>
           </div>
-          <div *ngIf="!isMyResource">
+          <div *ngIf="!isMyResource || shouldDisplayList">
             <ng-content *ngTemplateOutlet="editUnwrapped">
             </ng-content>
           </div>
@@ -270,7 +270,7 @@
       <!-- ng content can only be used once for transclusion, ngTemplatOutlets are required so that 
       we are only using the component once in the resource table -->
 
-      <ng-container *ngIf="isMyResource">
+      <ng-container *ngIf="isMyResource && !shouldDisplayList">
         <div *ngTemplateOutlet="editUnwrapped"></div>
       </ng-container>
       <ng-template #editUnwrapped>

@@ -101,6 +101,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   qtyChange(event: QtyChangeEvent): void {
+    this.qtyValid = event.valid;
     if (event.valid) {
       this.quantity = event.qty;
       this._price = this.getTotalPrice();
