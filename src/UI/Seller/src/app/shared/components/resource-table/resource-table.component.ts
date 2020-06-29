@@ -137,6 +137,22 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.screenSize = getScreenSizeBreakPoint();
   }
 
+  getTitle(isMyResource: boolean, resourceName: string, selectedParentResourceName: string): string {
+    if(isMyResource) {
+      if(resourceName === 'suppliers') {
+        return 'My Profile'
+      } else {
+        return resourceName;
+      }
+    } else {
+      if(selectedParentResourceName) {
+        return resourceName + ' - ' + selectedParentResourceName;
+      } else {
+        return resourceName;
+      }
+    } 
+  }
+
   ngAfterViewChecked() {
     this.setPsHeights();
     this.changeDetectorRef.detectChanges();
