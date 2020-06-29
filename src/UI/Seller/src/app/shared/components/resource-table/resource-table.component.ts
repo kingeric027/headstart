@@ -122,9 +122,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this._filterConfig = value;
     this.setFilterForm()
   };
-  // get filterConfig() {
-  //   return this._filterConfig.getValue();
-  // };
   @Input()
   resourceForm: FormGroup;
   @Input()
@@ -139,7 +136,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   ngOnInit() {
     this.determineViewingContext();
     this.initializeSubscriptions();
-    //this.setFilterForm();
     this.subscribeToOptions();
     this.screenSize = getScreenSizeBreakPoint();
   }

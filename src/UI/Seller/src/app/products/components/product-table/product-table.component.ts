@@ -37,6 +37,8 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
     const supplierFilterOptions = suppliers.Items.map(s => {
       return { Text: s.Name, Value: s.ID}
     })
+  // static filters that should apply to all marketplace orgs, custom filters for specific applications can be
+  // added to the filterconfig passed into the resourcetable in the future
     this.filterConfig = {
       Filters: [
         {
@@ -56,17 +58,4 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
       ]
     }
   }
-
-  // static filters that should apply to all marketplace orgs, custom filters for specific applications can be
-  // added to the filterconfig passed into the resourcetable in the future
-  // filterConfig = {
-  //   Filters: [
-  //     {
-  //       Display: 'Status',
-  //       Path: 'xp.Status',
-  //       Values: ['Draft', 'Published'],
-  //       Type: 'Dropdown',
-  //     },
-  //   ],
-  // };
 }
