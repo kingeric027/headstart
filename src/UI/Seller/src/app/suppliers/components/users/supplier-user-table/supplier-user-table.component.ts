@@ -32,7 +32,7 @@ export class SupplierUserTableComponent extends ResourceCrudComponent<User> {
       const supplierUser = await this.supplierUserService.createNewResource(this.updatedResource);
       this.userGroupAssignments.forEach(assignment => (assignment.UserID = supplierUser.ID));
       await this.executeSupplierUserSecurityProfileAssignmentRequests();
-      this.selectResource(supplierUser);
+      await this.selectResource(supplierUser);
       this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;
@@ -41,7 +41,7 @@ export class SupplierUserTableComponent extends ResourceCrudComponent<User> {
   }
 
   async executeSupplierUserSecurityProfileAssignmentRequests(): Promise<void> {
-    const supplierID = this.supplierUserService.getParentResourceID();
+    const supplierID = await this.supplierUserService.getParentResourceID();
     await this.supplierUserService.updateUserUserGroupAssignments(supplierID, this.userGroupAssignments, []);
   }
 }

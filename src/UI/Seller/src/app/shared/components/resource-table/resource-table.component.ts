@@ -62,6 +62,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   isCreatingNew = false;
   isCreatingSubResource = false;
   isMyResource = false;
+  shouldDisplayList = false;
   alive = true;
   screenSize;
   myResourceHeight = 450;
@@ -128,8 +129,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   canBeDeleted = true;
 
-  async ngOnInit() {
-    this.determineViewingContext();
+  async ngOnInit(): Promise<void> {
+    await this.determineViewingContext();
     this.initializeSubscriptions();
     this.setFilterForm();
     this.subscribeToOptions();
@@ -192,8 +193,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.editResourceHeight = getPsHeight('additional-item-edit-resource');
   }
 
-  determineViewingContext() {
+  async determineViewingContext() {
     this.isMyResource = this.router.url.startsWith('/my-');
+    this.shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
+    if(this.isMyResource) {
+      const resource = await this._ocService.getMyResource();
+      this.selectedParentResourceName = resource.Name;
+    }
   }
 
   private async initializeSubscriptions() {
@@ -206,7 +212,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   private async redirectToFirstParentIfNeeded() {
     if (this.parentResourceService) {
-      if (this.parentResourceService.getParentResourceID() === REDIRECT_TO_FIRST_PARENT) {
+      const parentResourceID = await this.parentResourceService.getParentResourceID(); 
+      if (parentResourceID === REDIRECT_TO_FIRST_PARENT) {
         await this.parentResourceService.listResources();
         this._ocService.selectParentResource(this.parentResourceService.resourceSubject.value.Items[0]);
       }
@@ -235,6 +242,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
         this.selectedParentResourceID = parentResourceID;
+        if( this.isMyResource ) {
+          const parentResource = await this._ocService.getMyResource();
+          if (parentResource) this.selectedParentResourceName = parentResource.Name;
+        }
         if (params && parentResourceID) {
           const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
           if (parentResource) this.selectedParentResourceName = parentResource.Name;
