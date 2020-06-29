@@ -78,7 +78,7 @@
                         badge-pill
                         badge-primary">Purchase Order</span>
                 </h4>
-                <div *ngIf="readOnly"><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="li.xp?.LineItemStatus"></ocm-order-status-icon> {{ li.xp?.LineItemStatus }}</div>
+                <div *ngIf="readOnly"><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="li.xp?.LineItemStatus"></ocm-order-status-icon> {{ li.xp?.LineItemStatus | orderStatusDisplay }}</div>
                 <a class="text-danger btn btn-link px-0 link"
                    *ngIf="!readOnly"
                    (click)="removeLineItem(li.ID)"

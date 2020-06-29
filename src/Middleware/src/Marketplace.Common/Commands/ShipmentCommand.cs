@@ -4,6 +4,8 @@ using Marketplace.Models.Misc;
 using System.Linq;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using ordercloud.integrations.library;
+using System;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Commands
 {
@@ -30,13 +32,30 @@ namespace Marketplace.Common.Commands
                 100, 
                 5, 
                 (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
+            await PatchShipmentStatus(firstShipmentItem.OrderID);
             return new ShipmentCreateResponse()
             {
                 Shipment = ocShipment,
                 ShipmentItems = shipmentItemResponses.ToList()
             };
         }
-        
+
+        private async Task PatchShipmentStatus(string supplierOrderID)
+        {
+            var buyerOrderID = supplierOrderID.Split("-").First();
+            var relatedBuyerOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, buyerOrderID);
+            var shipments = await _oc.Shipments.ListAsync(buyerOrderID);
+            var partiallyShippedOrder = new PartialOrder { xp = new { ShippingStatus = ShippingStatus.PartiallyShipped } };
+            var fullyShippedOrder = new PartialOrder { xp = new { ShippingStatus = ShippingStatus.Shipped } };
+            if (shipments.Meta.TotalCount == relatedBuyerOrder.LineItemCount)
+            {
+                await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrderID, fullyShippedOrder);
+            } else if (shipments.Meta.TotalCount < relatedBuyerOrder.LineItemCount)
+            {
+                await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrderID, partiallyShippedOrder);
+            }
+        }
+
         private async Task<string> GetBuyerIDForSupplierOrder(string supplierOrderID)
         {
             var buyerOrderID = supplierOrderID.Split("-").First();

@@ -48,9 +48,9 @@ export class OrderShipmentsComponent implements OnChanges {
     private httpClient: HttpClient,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-    ) { 
-      this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER;
-    }
+  ) {
+    this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER;
+  }
 
   ngOnChanges() {
     if (this.order.ID) {
@@ -114,7 +114,7 @@ export class OrderShipmentsComponent implements OnChanges {
   // toggleEditShipFromAddress() {
   //   this.editShipFromAddress = !this.editShipFromAddress;
   // }
-  
+
   // handleUpdateShipFromAddress(addressID) {
   // }
 
@@ -128,6 +128,17 @@ export class OrderShipmentsComponent implements OnChanges {
     this.lineItems = lineItemsResponse.Items;
   }
 
+  async patchLineItems(): Promise<void> {
+    const liCopy = this.lineItems;
+    this.lineItems.forEach(async (li, i) => {
+      if (this.quantities[i] > 0) {
+        let item = await this.ocLineItemService.Patch(this.orderDirection, this.order.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Complete } }).toPromise();
+        liCopy[i] = item;
+      }
+    });
+    this.lineItems = liCopy;
+  }
+
   setSelectedShipment(i: number): void {
     this.selectedShipment = this.shipments.Items[i];
     this.getShipmentItems(this.selectedShipment.ID);
@@ -135,7 +146,7 @@ export class OrderShipmentsComponent implements OnChanges {
 
   async getShipmentItems(shipmentID: string): Promise<void> {
     this.shipmentItems = await this.ocShipmentService.ListItems(shipmentID).toPromise();
- }
+  }
 
   populateLineItemQuantities(lineItems: LineItem[]): void {
     this.quantities = Array(lineItems.length).fill(0);
@@ -167,7 +178,7 @@ export class OrderShipmentsComponent implements OnChanges {
     return this.viewShipments ? faWindowClose : faShippingFast;
   }
 
-   // TO-DO - Use commented code for Ship From Address POST
+  // TO-DO - Use commented code for Ship From Address POST
   // getEditShipFromAddressButtonIcon() {
   //   return this.editShipFromAddress ? faWindowClose : faCog;
   // }
@@ -197,21 +208,21 @@ export class OrderShipmentsComponent implements OnChanges {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type':  'application/json',
+        'Content-Type': 'application/json',
         Authorization: 'Bearer ' + accessToken
       })
     };
     const superShipment = {
-      Shipment: {...this.shipmentForm.value, xp: {Service: this.shipmentForm.value.Service}},
+      Shipment: { ...this.shipmentForm.value, xp: { Service: this.shipmentForm.value.Service } },
       ShipmentItems: this.lineItems.map((li, i) => {
         if (this.quantities[i] > 0) {
           return { LineItemID: li.ID, OrderID: this.order.ID, QuantityShipped: this.quantities[i] }
         }
       }).filter(li => li !== undefined)
     }
-    const postedShipment: any = await this.httpClient.post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions ).toPromise();
-    await this.ocShipmentService.Patch(postedShipment.Shipment.ID, {DateShipped: shipDate}).toPromise();
-    await this.ocOrderService.Patch(this.orderDirection, this.order.ID, { xp: { ShippingStatus: ShippingStatus.Shipped } }).toPromise();
+    this.patchLineItems();
+    const postedShipment: any = await this.httpClient.post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions).toPromise();
+    await this.ocShipmentService.Patch(postedShipment.Shipment.ID, { DateShipped: shipDate }).toPromise();
     this.getShipments();
     this.getLineItems();
     this.createShipment = false;
