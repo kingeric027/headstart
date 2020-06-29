@@ -494,3 +494,12 @@ body > [uib-modal-window]:not([modal-render]) {
       @include ribbon-fold-bg($secondary);
   }
 }
+
+.card-highlight-border {
+  border-radius: $border-radius;
+  border-left: 5px solid $primary;
+  .alert-icon {
+      color: $light;
+      font-size: 1.4rem;
+  }
+}
