@@ -23,6 +23,7 @@ import { filter, takeWhile } from 'rxjs/operators';
 import { ListPage } from 'marketplace-javascript-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
+import { pipe } from 'rxjs';
 
 interface BreadCrumb {
   displayText: string;
@@ -53,6 +54,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   _currentResourceNamePlural: string;
   _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
+  _filterConfig: any;
   areChanges: boolean;
   parentResources: ListPage<any>;
   requestStatus: RequestStatus;
@@ -116,7 +118,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   selectedResourceID: string;
   @Input()
-  filterConfig: any;
+  set filterConfig(value: any) {
+    this._filterConfig = value;
+    this.setFilterForm()
+  };
+  // get filterConfig() {
+  //   return this._filterConfig.getValue();
+  // };
   @Input()
   resourceForm: FormGroup;
   @Input()
@@ -128,10 +136,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   canBeDeleted = true;
 
-  async ngOnInit() {
+  ngOnInit() {
     this.determineViewingContext();
     this.initializeSubscriptions();
-    this.setFilterForm();
+    //this.setFilterForm();
     this.subscribeToOptions();
     this.screenSize = getScreenSizeBreakPoint();
   }
@@ -282,8 +290,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   setFilterForm() {
     const formGroup = {};
-    if (this.filterConfig && this.filterConfig.Filters) {
-      this.filterConfig.Filters.forEach(filter => {
+    if (this._filterConfig && this._filterConfig.Filters) {
+      this._filterConfig.Filters.forEach(filter => {
         const value = this.getSelectedFilterValue(filter.Path);
         formGroup[filter.Path] = new FormControl(value);
       });
