@@ -4,17 +4,13 @@
 // TODO: Make dynamic upon build
 
 // TODO: Re-evaluate what is in here, and if it's all needed later to further optimize bundle sizes
-@import 'themes/anytime-fitness/variables.scss';
+@import 'themes/waxing-the-city/variables.scss';
 
 // Vendors
-@import 'vendor/bootstrap',
-'vendor/normalize',
-'vendor/ngx-toastr.scss';
+@import 'vendor/bootstrap', 'vendor/normalize', 'vendor/ngx-toastr.scss';
 
 // Abstracts
-@import 'abstracts/variables',
-'abstracts/functions',
-'abstracts/mixins';
+@import 'abstracts/variables', 'abstracts/functions', 'abstracts/mixins';
 
 // Scaffolding
 // @import 'base/base',
@@ -25,4 +21,4 @@
 @import '_shame';
 
 // Theme Styles
-@import 'themes/anytime-fitness/styles';
+@import 'themes/waxing-the-city/styles';
