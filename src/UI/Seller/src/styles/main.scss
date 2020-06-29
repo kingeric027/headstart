@@ -499,7 +499,7 @@ body > [uib-modal-window]:not([modal-render]) {
   border-radius: $border-radius;
   border-left: 5px solid $primary;
   .alert-icon {
-      color: $navy-100;
+      color: $light;
       font-size: 1.4rem;
   }
 }
