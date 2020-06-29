@@ -63,10 +63,6 @@ namespace Marketplace.Common.Commands
             {
                await PatchStatuses(orderID, ShippingStatus.Processing, ClaimStatus.NoClaim, LineItemStatus.Submitted);
             }
-            if (type == "ordershipped")
-            {
-               await PatchStatuses(orderID, ShippingStatus.Shipped, ClaimStatus.NoClaim, LineItemStatus.Complete);
-            }
         }
 
         private async Task PatchStatuses(string orderID, ShippingStatus shippingStatus, ClaimStatus claimStatus, LineItemStatus lineItemStatus)
