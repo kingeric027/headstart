@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { faPhone, faQuestionCircle, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import { ShopperContextService } from 'marketplace';
+import { ToastrService, ActiveToast } from 'ngx-toastr';
 
 @Component({
   templateUrl: './app-footer.component.html',
@@ -11,7 +12,7 @@ export class OCMAppFooter {
   faQuestionCircle = faQuestionCircle;
   faFileAlt = faFileAlt;
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService, private toastrService: ToastrService) {}
 
   toTermsAndConditions(): void {
     this.context.router.toRoute('/terms-and-conditions');
@@ -23,5 +24,9 @@ export class OCMAppFooter {
 
   toFAQ(): void {
     this.context.router.toRoute('/faq');
+  }
+
+  submitClaim(): ActiveToast<any> {
+    return this.toastrService.warning('Roadmap: navigate to claims page.');
   }
 }

@@ -47,14 +47,14 @@
       font-size: 0.5rem;
       margin-top: 0.2rem;
       font-family: FontAwesome;
-      color: $navy-300;
+      color: $primary-light;
     }
     .breadcrumb-link {
-      color: $navy-300;
+      color: $primary-light;
     }
     &:last-child {
       .breadcrumb-link {
-        color: $navy-100;
+        color: $light;
       }
     }
   }
@@ -92,11 +92,11 @@
   background-color: rgba($gray-900, 0.1);
 }
 .custom-day.range, .custom-day:hover {
-  background-color: $navy-300;
+  background-color: $primary-light;
   color: white;
 }
 .custom-day.faded {
-  background-color: $navy-300;
+  background-color: $primary-light;
 }
 
 .resource-table-container {

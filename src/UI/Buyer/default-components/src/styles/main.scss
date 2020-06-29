@@ -1,37 +1,23 @@
 @charset 'UTF-8';
 
 // Theme Variables - must come before vendor
-@import 'themes/anytime-fitness/variables.scss';
+@import 'themes/waxing-the-city/variables.scss';
 
 // Vendors
-@import 'vendor/bootstrap',
-'vendor/normalize',
-'vendor/ngx-toastr';
+@import 'vendor/bootstrap', 'vendor/normalize', 'vendor/ngx-toastr';
 
 // Abstracts
-@import 'abstracts/variables',
-'abstracts/functions',
-'abstracts/mixins';
+@import 'abstracts/variables', 'abstracts/functions', 'abstracts/mixins';
 
 // Scaffolding
-@import 'base/base',
-'base/fonts',
-'base/typography',
-'base/helpers';
+@import 'base/base', 'base/fonts', 'base/typography', 'base/helpers';
 
 // Layout
-@import 'layout/header',
-'layout/footer';
+@import 'layout/header', 'layout/footer';
 
 // Components
-@import 'components/button',
-'components/_forms',
-'components/_product-list',
-'components/_card-ribbon',
-'components/_card-hover',
-'components/_list-items.scss',
-'components/_carousel-arrow.scss',
-'components/_modal.scss';
+@import 'components/button', 'components/_forms', 'components/_product-list', 'components/_card-ribbon',
+  'components/_card-hover', 'components/_list-items.scss', 'components/_carousel-arrow.scss', 'components/_modal.scss';
 
 // Pages
 @import 'pages/_home';
@@ -39,10 +25,9 @@
 @import '_shame';
 
 // Theme Styles
-@import 'themes/anytime-fitness/styles';
+@import 'themes/waxing-the-city/styles';
 
-//@import '../app/ocm-default-components/shared.scss'; 
-
+//@import '../app/ocm-default-components/shared.scss';
 
 .cursor-pointer,
 .link,
@@ -54,7 +39,7 @@
   thead {
     color: $gray-600;
     text-transform: uppercase;
-    font-size: .8rem;
+    font-size: 0.8rem;
   }
 }
 
@@ -184,7 +169,7 @@
 
 /* Create the checkmark/indicator (hidden when not checked) */
 .checkmark:after {
-  content: "";
+  content: '';
   position: absolute;
   display: none;
 }
@@ -231,10 +216,10 @@
 }
 
 .md-cancel-chips:before {
-  content: "\f293";
+  content: '\f293';
   font-size: 19px;
   margin-right: 3px;
-  color: #A5A5A5;
+  color: #a5a5a5;
   -webkit-transition: all 150ms ease-in-out;
   -moz-transition: all 150ms ease-in-out;
   -ms-transition: all 150ms ease-in-out;
@@ -244,7 +229,7 @@
 
 .chip {
   height: 27px;
-  background: #E0E0E0;
+  background: #e0e0e0;
   display: inline-block;
   line-height: 26px;
   padding: 0 10px 0 12px;
@@ -264,9 +249,13 @@
 .chip:hover {
   background: #767577;
   color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.19)
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.19);
 }
 
 .chip:hover > .md:before {
   color: #fff;
+}
+
+#zsiqwidget {
+  bottom: 120px;
 }

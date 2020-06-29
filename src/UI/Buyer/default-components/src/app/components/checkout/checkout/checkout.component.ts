@@ -13,6 +13,7 @@ import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/servic
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 import { ShopperContextService } from 'marketplace';
+import { MerchantConfig } from 'src/app/config/merchant.class';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -67,6 +68,7 @@ export class OCMCheckout implements OnInit {
   }
 
   async doneWithShipToAddress(): Promise<void> {
+    await this.checkout.cleanLineItemIDs(this.order.ID, this.lineItems.Items);
     const orderWorksheet = await this.checkout.estimateShipping();
     this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
     if(!this.orderSummaryMeta.StandardLineItemCount) {
@@ -121,17 +123,17 @@ export class OCMCheckout implements OnInit {
 
   async submitOrderWithComment(comment: string): Promise<void> {
     await this.checkout.addComment(comment);
-
     let cleanOrderID = '';
+    const merchant = MerchantConfig.getMerchant(this.order.xp.Currency);
     if(this.orderSummaryMeta.StandardLineItemCount) {
       const ccPayment = {
         OrderId: this.order.ID,
         PaymentID: this.payments.Items[0].ID, // There's always only one at this point
         CreditCardID: this.selectedCard?.SavedCard?.ID,
         CreditCardDetails: this.selectedCard.NewCard,
-        Currency: 'USD', // TODO - won't always be USD
+        Currency: this.order.xp.Currency,
         CVV: this.selectedCard.CVV,
-        MerchantID: this.context.appSettings.cardConnectMerchantID,
+        MerchantID: merchant.cardConnectMerchantID
       }
       cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
     } else {

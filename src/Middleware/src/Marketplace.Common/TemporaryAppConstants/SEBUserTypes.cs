@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Models;
+using Marketplace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,7 +29,8 @@ namespace Marketplace.Common.TemporaryAppConstants
                     {
                         CustomRole.MPMeSupplierAddressAdmin,
                         CustomRole.MPMeSupplierUserAdmin,
-                        CustomRole.MPSupplierUserGroupAdmin
+                        CustomRole.MPSupplierUserGroupAdmin,
+                        CustomRole.MPMeSupplierAdmin
                     }
                 },
                 new MarketplaceUserType {

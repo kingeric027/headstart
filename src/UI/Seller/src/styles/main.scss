@@ -1,14 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
 
 // Third party libraries
-@import 'themes/theme_variables.scss';
+@import 'oc-theme/oc-bootstrap-variables';
 @import 'vendor/_bootstrap.scss';
+@import 'vendor/_material.scss';
 // bs4 alert styled design (uses bs4 variables)
 @import '~ngx-toastr/toastr-bs4-alert';
 
 // Components in this app
 @import 'components/_modal.scss';
 @import 'components/hover-select';
+
 
 html {
   font-size: 0.9rem;
@@ -96,7 +98,7 @@ body > [uib-modal-window]:not([modal-render]) {
 
 // invalid inputs
 .form-control.ng-dirty.ng-invalid {
-  border: solid 1px red;
+  border: solid 1px $danger;
 }
 
 .error-message {
@@ -105,39 +107,39 @@ body > [uib-modal-window]:not([modal-render]) {
 }
 
 .brand-button {
-  color: $navy-900;
-  background-color: $navy-100;
+  color: $primary-dark;
+  background-color: $light;
   transition: 200ms all ease;
   &:hover {
-    color: $navy-900;
-    background-color: $navy-200;
+    color: $primary-dark;
+    background-color: $primary-light;
   }
   &:focus {
-    box-shadow: 0 0 0 0.2rem $navy-200;
+    box-shadow: 0 0 0 0.2rem $primary-light;
   }
 }
 
 .brand-button--orange {
   color: $primary;
-  background-color: rgba($brand-orange, 0.2);
+  background-color: rgba($secondary, 0.2);
   transition: 200ms all ease;
   &:hover {
-    background-color: rgba($brand-orange, 0.3);
+    background-color: rgba($secondary, 0.3);
   }
   &:focus {
-    box-shadow: 0 0 0 0.2rem rgba($brand-orange,.3);
+    box-shadow: 0 0 0 0.2rem rgba($secondary,.3);
   }
 }
 
 .brand-button--danger {
-  color: darken($red, 50%);
-  background-color: rgba($red, 0.2);
+  color: darken($danger, 50%);
+  background-color: rgba($danger, 0.2);
   &:hover {
-    background-color: rgba($red, 0.3);
-    color: darken($red, 50%);
+    background-color: rgba($danger, 0.3);
+    color: darken($danger, 50%);
   }
   &:focus {
-    box-shadow: 0 0 0 0.2rem rgba($red,.3);
+    box-shadow: 0 0 0 0.2rem rgba($danger,.3);
   }
 }
 

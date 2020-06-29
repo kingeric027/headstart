@@ -183,7 +183,6 @@ export class AppConfig {
    * [learn more](https://developer.ordercloud.io/documentation/platform-guides/authentication/anonymous-shopping)
    */
   anonymousShoppingEnabled: boolean;
-  cardConnectMerchantID: string;
   baseUrl: string;
   /**
    * base path to middleware

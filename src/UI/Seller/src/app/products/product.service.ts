@@ -12,6 +12,7 @@ import {
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -82,9 +83,11 @@ export class ProductService extends ResourceCrudService<Product> {
     activatedRoute: ActivatedRoute,
     private ocProductsService: OcProductService,
     private ocCategoryService: OcCategoryService,
-    private ocPriceScheduleService: OcPriceScheduleService
+    private ocPriceScheduleService: OcPriceScheduleService,
+    private ocCatalogService: OcCatalogService,
+    public currentUserService: CurrentUserService
   ) {
-    super(router, activatedRoute, ocProductsService, '/products', 'products');
+    super(router, activatedRoute, ocProductsService, currentUserService, '/products', 'products');
   }
 
   async updateProductCatalogAssignments(
