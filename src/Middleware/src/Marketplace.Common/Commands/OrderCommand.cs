@@ -167,7 +167,7 @@ namespace Marketplace.Common.Commands
             li = await _oc.LineItems
                 .PatchAsync<MarketplaceLineItem>
                 (OrderDirection.Incoming, orderID, li.ID, 
-                new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { UnitPriceInProductCurrency = li.UnitPrice, LineItemImageUrl = li.xp.LineItemImageUrl } });
+                new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { UnitPriceInProductCurrency = li.UnitPrice, LineItemImageUrl = li.xp.LineItemImageUrl, LineItemStatus = LineItemStatus.Open } });
             return li;
         }
 

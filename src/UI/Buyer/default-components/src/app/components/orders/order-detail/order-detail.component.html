@@ -19,7 +19,7 @@
     </div>
     <div class="row">
       <div class="col-md-6">
-        <div><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{ order.Status | orderStatusDisplay}}</div>
+        <div><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{ order.Status }}</div>
         <div><span translate>ORDERS.DETAIL.SHIPPING_STATUS</span>: <ocm-order-status-icon [status]="order.xp.ShippingStatus"></ocm-order-status-icon> {{ order.xp.ShippingStatus | orderStatusDisplay}}</div>
         <div><span translate>ORDERS.DETAIL.CLAIM_STATUS</span>: <ocm-order-status-icon [status]="order.xp.ClaimStatus"></ocm-order-status-icon> {{ order.xp.ClaimStatus | orderStatusDisplay}}</div>
         <small class="float-left"><span translate>ORDERS.DETAIL.SUBMITTED</span> {{ order.DateSubmitted | date: 'short' }}</small>
