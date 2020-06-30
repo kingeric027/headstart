@@ -63,13 +63,6 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendOrderDeclinedEmail(payload);
         }
 
-        [HttpPost, Route("ordershipped")]
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderShipped([FromBody] WebhookPayloads.Orders.Ship payload)
-        {
-            await _orderCommand.SetOrderStatus(payload.Response.Body.ID, "ordershipped");
-        }
-
         [HttpPost, Route("orderdelivered")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS
         [OrderCloudWebhookAuth]
         public async void HandleOrderDelivered(JObject payload)

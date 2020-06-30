@@ -134,6 +134,9 @@ export class OrderShipmentsComponent implements OnChanges {
       if (this.quantities[i] > 0) {
         let item = await this.ocLineItemService.Patch(this.orderDirection, this.order.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Complete } }).toPromise();
         liCopy[i] = item;
+      } else {
+        let item = await this.ocLineItemService.Patch(this.orderDirection, this.order.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Submitted } }).toPromise();
+        liCopy[i] = item;
       }
     });
     this.lineItems = liCopy;
