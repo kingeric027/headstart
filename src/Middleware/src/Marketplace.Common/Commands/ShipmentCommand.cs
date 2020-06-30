@@ -28,7 +28,6 @@ namespace Marketplace.Common.Commands
             var buyerID = await GetBuyerIDForSupplierOrder(firstShipmentItem.OrderID);
             superShipment.Shipment.BuyerID = buyerID;
             var buyerOrderID = firstShipmentItem.OrderID.Split("-").First();
-            var relatedBuyerOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, buyerOrderID);
             var ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
             var shipmentItemResponses = await Throttler.RunAsync(
                 superShipment.ShipmentItems, 
