@@ -3,18 +3,14 @@ import { ShopperContextService } from 'marketplace';
 
 @Component({
   selector: 'app-root',
-  template: `
-    <ocm-app-header class="fixed-top" *ngIf="showHeader"></ocm-app-header>
-    <router-outlet></router-outlet>
-    <ocm-app-footer [showFooter]="showHeader" *ngIf="showHeader"></ocm-app-footer>
-    <ng-progress></ng-progress>
-  `,
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit { 
+export class AppComponent implements OnInit {
   showHeader = false;
   // TODO: this shouln't have hard coded routes. its gross.
   hiddenRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
-  
+
   constructor(public context: ShopperContextService) {}
 
   ngOnInit(): void {

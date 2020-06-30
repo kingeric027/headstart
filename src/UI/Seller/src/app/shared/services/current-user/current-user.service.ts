@@ -53,12 +53,22 @@ export class CurrentUserService {
   }
 
   async getUser(): Promise<MeUser> {
-    return this.me ? this.me : await this.ocMeService.Get().toPromise();
+    return this.me ? this.me : await this.refreshUser();
+  }
+
+  async refreshUser(): Promise<MeUser> {
+    this.me = await this.ocMeService.Get().toPromise();
+    return this.me;
   }
 
   async getMySupplier(): Promise<Supplier> {
     const me = await this.getUser();
-    return this.mySupplier ? this.mySupplier : await MarketplaceSDK.Suppliers.GetMySupplier(me.Supplier.ID);
+    return this.mySupplier && this.mySupplier.ID === me.Supplier.ID ? this.mySupplier : await this.refreshSupplier(me.Supplier.ID); 
+  }
+
+  async refreshSupplier(supplierID): Promise<Supplier> {
+    this.mySupplier = await MarketplaceSDK.Suppliers.GetMySupplier(supplierID);
+    return this.mySupplier;
   }
 
   async getUserContext(): Promise<UserContext> {
