@@ -35,6 +35,8 @@ export class UserGroupAssignments implements OnChanges {
   faExclamationCircle = faExclamationCircle;
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
+  readOnly = true;
+  areMultipleCountriesSelected: boolean;
 
   constructor(
     private router: Router
@@ -53,9 +55,7 @@ export class UserGroupAssignments implements OnChanges {
       this.userID = this.user.ID
       this.getUserGroupAssignments(this.user.ID, this.userOrgID);
     }
-    if(this.isCreatingNew) {
-      this.getUserGroups(this.userOrgID);
-    }
+    this.getUserGroups(this.userOrgID);
   }
 
   updateForUserGroupAssignmentType() {
@@ -93,6 +93,9 @@ export class UserGroupAssignments implements OnChanges {
         newUserUserGroupAssignment,
       ];
     }
+    if (this._userUserGroupAssignmentsEditable.length) {
+      this.validateAssignmentsShareCountry();
+    }
     this.checkForUserUserGroupAssignmentChanges();
   }
 
@@ -111,7 +114,17 @@ export class UserGroupAssignments implements OnChanges {
         newUserUserGroupAssignment,
       ];
     }
+    if (this._userUserGroupAssignmentsEditable.length) {
+      this.validateAssignmentsShareCountry();
+    }
     this.checkForUserUserGroupAssignmentChanges();
+  }
+
+  validateAssignmentsShareCountry(): void {
+    const countryToCompare = this.userGroups.find(userGroup => this._userUserGroupAssignmentsEditable[0].UserGroupID === userGroup.ID).xp.Country;
+    this.areMultipleCountriesSelected = this._userUserGroupAssignmentsEditable.some(
+      ugAssignment => this.userGroups.find(
+      ug => (ugAssignment.UserGroupID === ug.ID) && (ug.xp.Country !== countryToCompare)));
   }
 
   isAssigned(userGroup: UserGroup) {
