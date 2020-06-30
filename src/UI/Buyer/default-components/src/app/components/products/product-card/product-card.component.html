@@ -5,11 +5,12 @@
                          [favorite]="_isFavorite"
                          (favoriteChanged)="setIsFavorite($event.detail)"></ocm-toggle-favorite>
   </div>
-  <div (click)="toDetails()">
+  <div class="d-flex flex-1 flex-column"
+       (click)="toDetails()">
     <img class="card-img-top img-fluid flex-shrink-0"
          [src]="getImageUrl()"
          alt="{{ _product.ID }}" />
-    <div class="card-body d-flex flex-column justify-content-between bg-light">
+    <div class="card-body bg-light">
       <h5 class="card-title"
           title="{{ _product.Name }}">{{_product.Name}}
       </h5>
@@ -40,8 +41,8 @@
                         (qtyChange)="setQuantity($event.detail)">
     </ocm-quantity-input>
     <button (click)="$event.stopPropagation()"
-            [disabled]="isAddingToCart"
-            class="btn btn-primary btn-block small mt-2"
+            [disabled]="isAddingToCart || !qtyValid"
+            class="btn btn-secondary btn-block small mt-2"
             type="submit"
             (click)="addToCart()"
             translate>

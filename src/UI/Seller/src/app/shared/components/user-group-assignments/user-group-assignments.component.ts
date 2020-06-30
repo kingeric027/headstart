@@ -4,6 +4,7 @@ import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { IUserPermissionsService } from '@app-seller/shared/models/user-permissions.interface';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { GetDisplayText } from './user-group-assignments.constants';
+import { Router } from '@angular/router';
 
 interface AssignmentsToAddUpdate {
   UserGroupType: string;
@@ -34,21 +35,25 @@ export class UserGroupAssignments implements OnChanges {
   faExclamationCircle = faExclamationCircle;
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
+
+  constructor(
+    private router: Router
+  ) {}
   
-  ngOnChanges(changes: SimpleChanges): void {
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
     this.updateForUserGroupAssignmentType();
+    this.userOrgID = await this.userPermissionsService.getParentResourceID();
     if (changes.user?.currentValue.ID && !this.userID) {
       this.userID = this.user.ID
-      this.userOrgID = this.userPermissionsService.getParentResourceID();
-      this.userOrgID !== REDIRECT_TO_FIRST_PARENT && this.getUserGroups(this.userOrgID);
-      this.getUserGroupAssignments(this.user.ID, this.userOrgID);
+      if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
+        this.getUserGroupAssignments(this.user.ID, this.userOrgID);
+      }
     }
     if (this.userID && changes.user?.currentValue?.ID !== changes.user?.previousValue?.ID) {
       this.userID = this.user.ID
       this.getUserGroupAssignments(this.user.ID, this.userOrgID);
     }
     if(this.isCreatingNew) {
-      this.userOrgID = this.userPermissionsService.getParentResourceID();
       this.getUserGroups(this.userOrgID);
     }
   }
@@ -136,7 +141,7 @@ export class UserGroupAssignments implements OnChanges {
 
   async executeUserUserGroupAssignmentRequests(): Promise<void> {
     this.requestedUserConfirmation = false;
-    await this.userPermissionsService.updateUserUserGroupAssignments(this.userOrgID, this.add, this.del);
+    await this.userPermissionsService.updateUserUserGroupAssignments(this.userOrgID, this.add, this.del, this.userGroupType === "BuyerLocation");
     await this.getUserGroupAssignments(this.userID, this.userOrgID);
     this.checkForUserUserGroupAssignmentChanges();
   }

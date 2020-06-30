@@ -39,4 +39,9 @@ export class MiddlewareAPIService {
     const url = `${this.appConfig.middlewareUrl}/order/acknowledgequote/${orderID}`;
     return await this.http.post<Order>(url, this.headers).toPromise();
   }
+
+  async isLocationDeletable(locationID: string): Promise<boolean> {
+    const url = `${this.appConfig.middlewareUrl}/supplier/candelete/${locationID}`;
+    return await this.http.get<boolean>(url, this.headers).toPromise();
+  }
 }

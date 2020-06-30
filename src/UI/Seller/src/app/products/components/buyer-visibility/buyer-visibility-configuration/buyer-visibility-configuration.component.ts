@@ -1,4 +1,5 @@
 import { Component, Input, Output } from '@angular/core';
+import { faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
 import {
   OcCatalogService,
   OcCategoryService,
@@ -18,6 +19,8 @@ import { MarketplaceBuyer, MarketplaceProduct } from 'marketplace-javascript-sdk
   styleUrls: ['./buyer-visibility-configuration.component.scss'],
 })
 export class BuyerVisibilityConfiguration {
+  faEyeSlash = faEyeSlash;
+  faEye = faEye;
   @Input()
   set buyer(value: MarketplaceBuyer) {
     this._buyer = value;
@@ -36,8 +39,8 @@ export class BuyerVisibilityConfiguration {
   addCatalogAssignments: ProductAssignment[] = [];
   delCatalogAssignments: ProductAssignment[] = [];
 
-  addCategoryAssignments: CategoryProductAssignment[];
-  delCategoryAssignments: CategoryProductAssignment[];
+  addCategoryAssignments: CategoryProductAssignment[] = [];
+  delCategoryAssignments: CategoryProductAssignment[] = [];
 
   catalogAssignmentsEditable: ProductAssignment[] = [];
   catalogAssignmentsStatic: ProductAssignment[] = [];
@@ -48,6 +51,7 @@ export class BuyerVisibilityConfiguration {
   isEditing = false;
   isValidBuyerAssignment = false;
   areChanges = false;
+  isFetching = true;
 
   catalogs: UserGroup[] = [];
 
@@ -65,10 +69,13 @@ export class BuyerVisibilityConfiguration {
 
   async fetchData(): Promise<void> {
     if (Object.keys(this._product) && Object.keys(this._buyer)) {
+      this.isFetching = true;
+      this.isEditing = false;
       await this.getCatalogAssignments();
       await this.getCatalogs();
       await this.getCatalogAssignments();
       await this.getCategoryAssignments();
+      this.isFetching = false;
     }
   }
 
@@ -108,7 +115,7 @@ export class BuyerVisibilityConfiguration {
       !!this.delCategoryAssignments.length;
   }
 
-  async edit(): Promise<void> {
+  edit(): void {
     this.isEditing = true;
   }
 
@@ -199,6 +206,7 @@ export class BuyerVisibilityConfiguration {
       this.delCategoryAssignments,
       this._buyer.ID
     );
+    this.handleClose();
     this.resetCatalogAssignments(this.catalogAssignmentsEditable);
     this.resetCategoryAssignments(this.assignedCategoriesEditable);
     this.checkForProductCatalogAssignmentChanges();

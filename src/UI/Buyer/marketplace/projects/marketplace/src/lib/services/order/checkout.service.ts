@@ -8,6 +8,8 @@ import {
   OrderWorksheet,
   IntegrationEvents,
   ShipMethodSelection,
+  LineItem,
+  LineItems,
 } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
@@ -19,6 +21,7 @@ import {
   OrderCloudIntegrationsCreditCardToken,
   MarketplaceOrder,
   ListPage,
+  MarketplaceLineItem,
 } from 'marketplace-javascript-sdk';
 
 @Injectable({
@@ -117,6 +120,26 @@ export class CheckoutService {
   // order cloud sandbox service methods, to be replaced by updated sdk in the future
   async estimateShipping(): Promise<OrderWorksheet> {
     return await IntegrationEvents.EstimateShipping('Outgoing', this.order.ID);
+  }
+
+  async cleanLineItemIDs(orderID: string, lineItems: MarketplaceLineItem[]): Promise<void> {
+    /* line item ids are significant for suppliers creating a relationship
+     * between their shipments and line items in ordercloud
+     * we are sequentially labeling these ids for ease of shipping */
+    const lineItemIDChanges = lineItems.map((li, index) => {
+      return LineItems.Patch('Outgoing', orderID, li.ID, { ID: this.createIDFromIndex(index) });
+    });
+    await Promise.all(lineItemIDChanges);
+  }
+
+  createIDFromIndex(index: number): string {
+    /* X was choosen as a prefix for the lineItem ID so that it is easy to
+     * direct suppliers where to look for the ID. L and I are sometimes indistinguishable
+     * from the number 1 so I avoided those. X is also difficult to confuse with other
+     * letters when verbally pronounced */
+    const countInList = index + 1;
+    const paddedCount = countInList.toString().padStart(3, '0');
+    return 'X' + paddedCount;
   }
 
   async selectShipMethods(selections: ShipMethodSelection[]): Promise<OrderWorksheet> {

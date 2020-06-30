@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core
 import { FormGroup } from '@angular/forms';
 import { ListAddress, OcProductService } from '@ordercloud/angular-sdk';
 import { ProductService } from '@app-seller/products/product.service';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
+import { ActivatedRoute } from '@angular/router';
 @Component({
     selector: 'app-supplier-location-edit',
     templateUrl: './supplier-location-edit.component.html',
@@ -22,7 +24,8 @@ export class SupplierLocationEditComponent implements OnChanges {
     @Output()
     canDelete = new EventEmitter<boolean>();
 
-    constructor(private ocProductService: OcProductService) {}
+    constructor(private middleware: MiddlewareAPIService,
+        private activatedRoute: ActivatedRoute,) {}
 
     ngOnChanges() {
         this.setLocationID();
@@ -32,13 +35,15 @@ export class SupplierLocationEditComponent implements OnChanges {
         const url = window.location.href;
         const splitUrl = url.split('/');
         const endUrl = splitUrl[splitUrl.length - 1];
-        this.determineIfDeletable(endUrl);
+        const urlParams = this.activatedRoute.snapshot.params;
+        if(urlParams.locationID) {
+            this.determineIfDeletable(urlParams.locationID)
+        }
     }
 
     private async determineIfDeletable(locationID: string): Promise<void> {
-        const productList = await this.ocProductService.List({pageSize: 1, filters: {ShipFromAddressID: locationID}}).toPromise();
-        this.locationHasNoProducts = productList.Items.length ? false : true;
-        this.canDelete.emit(this.locationHasNoProducts);
+        const hasNoProducts = await this.middleware.isLocationDeletable(locationID)
+        this.canDelete.emit(hasNoProducts);
     }
 
     updateResourceFromEvent(event: any, field: string): void {

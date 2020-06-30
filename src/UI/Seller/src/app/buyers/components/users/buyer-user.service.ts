@@ -12,6 +12,8 @@ import {
 import { BUYER_SUB_RESOURCE_LIST } from '../buyers/buyer.service';
 import { IUserPermissionsService } from '@app-seller/shared/models/user-permissions.interface';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
 
 // TODO - this service is only relevent if you're already on the buyer details page. How can we enforce/inidcate that?
 @Injectable({
@@ -30,31 +32,67 @@ export class BuyerUserService extends ResourceCrudService<User> implements IUser
     router: Router,
     activatedRoute: ActivatedRoute,
     private ocUserService: OcUserService,
-    private ocBuyerUserGroupService: OcUserGroupService
+    private ocBuyerUserGroupService: OcUserGroupService,
+    public currentUserService: CurrentUserService,
+    private catalogsTempService: CatalogsTempService
   ) {
-    super(router, activatedRoute, ocUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'users');
+    super(
+      router,
+      activatedRoute,
+      ocUserService,
+      currentUserService,
+      '/buyers',
+      'buyers',
+      BUYER_SUB_RESOURCE_LIST,
+      'users'
+    );
   }
 
   async updateUserUserGroupAssignments(
     buyerID: string,
     add: UserGroupAssignment[],
-    del: UserGroupAssignment[]
+    del: UserGroupAssignment[],
+    shouldSyncUserCatalogAssignments = false
   ): Promise<void> {
-    const addRequests = add.map(newAssignment => this.addBuyerUserUserGroupAssignment(buyerID, newAssignment));
+    const addRequests = add.map(newAssignment =>
+      this.addBuyerUserUserGroupAssignment(buyerID, newAssignment, shouldSyncUserCatalogAssignments)
+    );
     const deleteRequests = del.map(assignmentToRemove =>
-      this.removeBuyerUserUserGroupAssignment(buyerID, assignmentToRemove)
+      this.removeBuyerUserUserGroupAssignment(buyerID, assignmentToRemove, shouldSyncUserCatalogAssignments)
     );
     await Promise.all([...addRequests, ...deleteRequests]);
   }
 
-  addBuyerUserUserGroupAssignment(buyerID: string, assignment: UserGroupAssignment): Promise<void> {
-    return this.ocBuyerUserGroupService
+  async addBuyerUserUserGroupAssignment(
+    buyerID: string,
+    assignment: UserGroupAssignment,
+    shouldSyncUserCatalogAssignments = false
+  ): Promise<void> {
+    await this.ocBuyerUserGroupService
       .SaveUserAssignment(buyerID, { UserID: assignment.UserID, UserGroupID: assignment.UserGroupID })
       .toPromise();
+    if (shouldSyncUserCatalogAssignments) {
+      await this.catalogsTempService.syncUserCatalogAssignmentsOnLocationAdd(
+        buyerID,
+        assignment.UserGroupID,
+        assignment.UserID
+      );
+    }
   }
 
-  removeBuyerUserUserGroupAssignment(buyerID: string, assignment: UserGroupAssignment): Promise<void> {
-    return this.ocBuyerUserGroupService
+  async removeBuyerUserUserGroupAssignment(
+    buyerID: string,
+    assignment: UserGroupAssignment,
+    shouldSyncUserCatalogAssignments = false
+  ): Promise<void> {
+    if (shouldSyncUserCatalogAssignments) {
+      await this.catalogsTempService.syncUserCatalogAssignmentsOnLocationRemove(
+        buyerID,
+        assignment.UserGroupID,
+        assignment.UserID
+      );
+    }
+    await this.ocBuyerUserGroupService
       .DeleteUserAssignment(buyerID, assignment.UserGroupID, assignment.UserID)
       .toPromise();
   }
@@ -68,9 +106,10 @@ export class BuyerUserService extends ResourceCrudService<User> implements IUser
   }
 
   async createNewResource(resource: any): Promise<any> {
-    const buyerID = this.getParentResourceID();
+    const buyerID = await this.getParentResourceID();
     resource.ID = buyerID + '-{' + buyerID + '-UserIncrementor' + '}';
-    const newResource = await this.ocService.Create(...this.createListArgs([resource])).toPromise();
+    const args = await this.createListArgs([resource]);
+    const newResource = await this.ocService.Create(...args).toPromise();
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;
