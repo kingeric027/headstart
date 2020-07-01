@@ -24,8 +24,8 @@
                             type="select"
                             required
                             [formControlName]="filter.Path">
-                      <option *ngFor="let option of filter.Values"
-                              value="{{option}}">{{option}}</option>
+                      <option *ngFor="let option of filter.Items"
+                              value="{{option.Value}}">{{option.Text}}</option>
                     </select>
                     <span class="highlight"></span>
                     <label>{{filter.Display}}</label>
