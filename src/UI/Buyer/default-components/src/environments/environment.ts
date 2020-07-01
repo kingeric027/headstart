@@ -19,9 +19,9 @@ export const environment: Environment = {
   hostedApp: false,
   appname: 'Print Marketplace Local',
   clientID: '4B4C2ECA-A21B-47DD-A974-5BA7FCDF0EDE',
-  marketplaceID: 'SEB',
-  baseUrl: 'https://localhost:4200',
-  middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  marketplaceID: 'storefront',
+  baseUrl: 'https://storefront-marketplace-buyer-staging.azurewebsites.net/',
+  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
   ordercloudEnv: OrdercloudEnv.Staging,
