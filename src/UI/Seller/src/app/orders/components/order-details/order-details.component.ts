@@ -29,9 +29,7 @@ export class OrderDetailsComponent {
   cardType: string;
   createShipment: boolean;
   isSellerUser = false;
-  processReturn = false;
   isSaving = false;
-  returnForm: FormGroup;
 
   @Input()
   set order(order: Order) {
@@ -45,18 +43,11 @@ export class OrderDetailsComponent {
     private ocPaymentService: OcPaymentService,
     private orderService: OrderService,
     private pdfService: PDFService,
-    private ocOrderService: OcOrderService,
     private middleware: MiddlewareAPIService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER;
-   }
-
-   setReturnForm(): void {
-    this.returnForm = new FormGroup({
-      Comment: new FormControl(this._order.xp?.OrderReturnInfo?.Comment || ''),
-    });
   }
 
   setCardType(payment) {
@@ -65,6 +56,10 @@ export class OrderDetailsComponent {
     }
     this.cardType = payment.xp.cardType.charAt(0).toUpperCase() + payment.xp.cardType.slice(1);
     return this.cardType;
+  }
+
+  showReturnInfo() {
+    return this.order?.xp?.OrderReturnInfo?.HasReturn && this.orderDirection === 'Incoming' && this.isSellerUser;
   }
 
   getFullName(address: Address) {
@@ -98,23 +93,6 @@ export class OrderDetailsComponent {
 
   toggleCreateShipment(createShipment: boolean) {
     this.createShipment = createShipment;
-  }
-
-  toggleProcessReturn(): void {
-    this.processReturn = !this.processReturn;
-    if (this.processReturn) {
-      this.setReturnForm();
-    }
-  }
-
-  async onReturnFormSubmit(): Promise<void> {
-    this.isSaving = true;
-    const comment = this.returnForm.value.Comment;
-    await this.ocOrderService.Patch(this.orderDirection, this._order.ID, { xp: { OrderReturnInfo: { Comment: comment} } }).toPromise();
-    this._order = await this.ocOrderService.Get(this.orderDirection, this._order.ID).toPromise();
-    this.processReturn = false;
-    this.isSaving = false;
-
   }
 
   protected createAndSavePDF(): void {
