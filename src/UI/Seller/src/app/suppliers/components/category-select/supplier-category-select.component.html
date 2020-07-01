@@ -6,8 +6,8 @@
               required
               (change)="makeSelection($event, 'ServiceCategory', i)"
               [value]="categorySelection.ServiceCategory">
-        <option *ngFor="let option of filterConfig.Filters[1].Values"
-                value="{{option}}">{{option}}</option>
+        <option *ngFor="let option of filterConfig.Filters[1].Items"
+                value="{{option.Value}}">{{option.Text}}</option>
       </select>
     </span>
     <span class="category-dropdown">
@@ -16,8 +16,8 @@
               (change)="makeSelection($event, 'VendorLevel', i)"
               required
               [value]="categorySelection.VendorLevel">
-        <option *ngFor="let option of filterConfig.Filters[0].Values"
-                value="{{option}}">{{option}}</option>
+        <option *ngFor="let option of filterConfig.Filters[0].Items"
+                value="{{option.Value}}">{{option.Text}}</option>
       </select>
     </span>
     <button class="btn brand-button--danger"
