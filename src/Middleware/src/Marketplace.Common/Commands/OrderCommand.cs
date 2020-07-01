@@ -22,6 +22,7 @@ namespace Marketplace.Common.Commands
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
         Task RequestReturnEmail(string OrderID);
         Task SetOrderStatus(string orderID, string type);
+        Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus);
     }
 
     public class OrderCommand : IOrderCommand
@@ -65,7 +66,7 @@ namespace Marketplace.Common.Commands
                 await PatchOrderStatus(orderID, ShippingStatus.Processing, ClaimStatus.NoClaim);
             }
         }
-        private async Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus)
+        public async Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus)
         {
             var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
             var partialLi = new PartialLineItem { xp = new { LineItemStatus = lineItemStatus } };

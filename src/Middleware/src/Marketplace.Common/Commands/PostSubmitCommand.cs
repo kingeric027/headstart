@@ -36,8 +36,9 @@ namespace Marketplace.Common.Commands
 		private readonly IExchangeRatesCommand _exchangeRates;
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
+        private readonly IOrderCommand _orderCommand;
         
-        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService, IOrderCommand orderCommand)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
@@ -47,6 +48,7 @@ namespace Marketplace.Common.Commands
             _ocSandboxService = orderCloudSandboxService;
             _locationPermissionCommand = locationPermissionCommand;
 			_exchangeRates = exchangeRates;
+            _orderCommand = orderCommand;
 
 		}
 
@@ -300,13 +302,7 @@ namespace Marketplace.Common.Commands
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
 
-            var lineItemPatch = new PartialLineItem() {  xp = new { LineItemStatus = LineItemStatus.Submitted } };
-            List<Task> lineItemsToPatch = new List<Task>();
-            foreach (var li in lineItems.Items)
-            {
-                lineItemsToPatch.Add(_oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, li.ID, lineItemPatch));
-            }
-            await Task.WhenAll(lineItemsToPatch);
+            await _orderCommand.PatchLineItemStatus(buyerOrder.ID, LineItemStatus.Submitted);
 
             var buyerOrderPatch = new PartialOrder()
             {
