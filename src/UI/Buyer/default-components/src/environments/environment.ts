@@ -17,8 +17,8 @@ export interface Environment {
 
 export const environment: Environment = {
   hostedApp: false,
-  appname: 'Marketplace Local',
-  clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+  appname: 'Print Marketplace Local',
+  clientID: '4B4C2ECA-A21B-47DD-A974-5BA7FCDF0EDE',
   marketplaceID: 'SEB',
   baseUrl: 'https://localhost:4200',
   middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
