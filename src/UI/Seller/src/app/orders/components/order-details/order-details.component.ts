@@ -1,6 +1,6 @@
 import { Component, Input, Inject } from '@angular/core';
 import { OrderService } from '@app-seller/orders/order.service';
-import { Address, LineItem, OcLineItemService, OcOrderService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
+import { Address, LineItem, OcLineItemService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { ProductImage } from 'marketplace-javascript-sdk';
 import { PDFService } from '@app-seller/orders/pdf-render.service';
@@ -9,7 +9,7 @@ import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { AppAuthService } from '@app-seller/auth';
-import { FormGroup, FormControl } from '@angular/forms';
+import { ReturnReason } from '@app-seller/shared/models/return-reason.interface';
 
 @Component({
   selector: 'app-order-details',
@@ -58,8 +58,12 @@ export class OrderDetailsComponent {
     return this.cardType;
   }
 
-  showReturnInfo() {
+  showReturnInfo(): boolean {
     return this._order?.xp?.OrderReturnInfo?.HasReturn && this.orderDirection === 'Incoming' && this.isSellerUser;
+  }
+
+  getReturnReason(reasonCode: string): string {
+    return ReturnReason[reasonCode];
   }
 
   getFullName(address: Address) {

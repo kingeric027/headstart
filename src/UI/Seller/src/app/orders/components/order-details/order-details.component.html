@@ -226,7 +226,7 @@
                   <div *ngIf="li.xp.LineItemReturnInfo?.QuantityToReturn > 0">
                     <div class="d-flex flex-column">
                       <span>Qty Returned: {{ li.xp.LineItemReturnInfo?.QuantityToReturn }}</span>
-                      <small>Reason: {{ li.xp.LineItemReturnInfo?.ReturnReason }}</small>
+                      <small>Reason: {{ getReturnReason(li.xp.LineItemReturnInfo?.ReturnReason) }}</small>
                     </div>
                   </div>
                   <div *ngIf="!li.xp.LineItemReturnInfo">
