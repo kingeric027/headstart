@@ -9,12 +9,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="JObjectTests\cache.json" />
+    <None Remove="JObjectTests\current.json" />
     <None Remove="TemplateTests\TemplateCsv.csv" />
     <None Remove="TemplateTests\TemplateExcel.xlsx" />
     <None Remove="TemplateTests\TemplateSheets.xlsx" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="JObjectTests\cache.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JObjectTests\current.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="TemplateTests\TemplateCsv.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
