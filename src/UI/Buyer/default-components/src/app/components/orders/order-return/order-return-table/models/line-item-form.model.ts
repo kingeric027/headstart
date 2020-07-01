@@ -9,14 +9,15 @@ export class LineItemForm {
     lineItem: MarketplaceLineItem;
 
     constructor(lineItem: MarketplaceLineItem) {
-        if (lineItem.ID)  this.id.setValue(lineItem.ID);
+        if (lineItem.ID) this.id.setValue(lineItem.ID);
         this.lineItem = lineItem;
         this.selected.setValue(false);
-        if (lineItem.Quantity === lineItem.xp?.LineItemReturnInfo?.QuantityToReturn) this.selected.disable();
+        if (lineItem.Quantity === lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || lineItem.QuantityShipped !== lineItem.Quantity) this.selected.disable();
+        debugger;
         this.quantityToReturn.disable();
         this.quantityToReturn.setValidators([
-            Validators.required, 
-            Validators.min(1), 
+            Validators.required,
+            Validators.min(1),
             Validators.max(lineItem.Quantity - (lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || 0))
         ]);
         this.returnReason.disable();

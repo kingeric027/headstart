@@ -72,6 +72,10 @@
                     <span class="text-muted"
                           translate>{{ getReturnReason(li.xp?.LineItemReturnInfo?.ReturnReason) }}</span>
                   </small>
+                  <small *ngIf="li.xp?.LineItemReturnInfo?.Comment">
+                    <span translate>CART.LINEITEM_TABLE.SELLER_COMMENT</span>:
+                    <span class="text-muted">{{li.xp?.LineItemReturnInfo?.Comment}}</span>
+                  </small>
                   <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
                         class="
                         badge
@@ -120,11 +124,13 @@
               <div class="col-3 text-right">
                 <span class="d-block d-sm-none"
                       translate>CART.LINEITEM_TABLE.TOTAL</span>
-                <span *ngIf="!isQtyChanging(li.ID)" class="text-nowrap">{{ li.LineTotal | currency: _orderCurrency }}</span>
-                <span *ngIf="isQtyChanging(li.ID)" class="text-nowrap">
+                <span *ngIf="!isQtyChanging(li.ID)"
+                      class="text-nowrap">{{ li.LineTotal | currency: _orderCurrency }}</span>
+                <span *ngIf="isQtyChanging(li.ID)"
+                      class="text-nowrap">
                   <mat-spinner *ngIf="isQtyChanging(li.ID)"
-                                diameter="20"
-                                class="spinner"></mat-spinner>
+                               diameter="20"
+                               class="spinner"></mat-spinner>
                 </span>
               </div>
             </div>

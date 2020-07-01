@@ -43,7 +43,7 @@
                 translate>
           ORDERS.DETAIL.REORDER
         </button>
-        <button *ngIf="!showRequestReturn && !approvalVersion && !isQuoteOrder(order) && order.Status !== 'Unsubmitted'"
+        <button *ngIf="!showRequestReturn && !approvalVersion && !isQuoteOrder(order) && order.Status !== 'Unsubmitted' && order.xp.ShippingStatus === 'PartiallyShipped' || order.xp.ShippingStatus === 'Shipped'"
                 class="btn btn-secondary float-right mr-2"
                 (click)="toggleRequestReturn()"
                 translate>

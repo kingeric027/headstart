@@ -95,6 +95,10 @@ export class OrderDetailsComponent {
     this._liGroupedByShipFrom = Object.values(this._liGroups);
   }
 
+  handleLineItemUpdate() {
+    this.handleSelectedOrderChange(this._order);
+  }
+
   toggleCreateShipment(createShipment: boolean) {
     this.createShipment = createShipment;
   }

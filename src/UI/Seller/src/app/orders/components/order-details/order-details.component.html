@@ -101,21 +101,6 @@
           <span class="float-right">-{{payment.Amount | currency}}</span>
           <hr>
         </div>
-        <div *ngIf="_order.xp?.OrderReturnInfo?.Comment && isSellerUser">
-          <div class="lead"
-               *ngIf="orderDirection === 'Incoming'">
-            <b>Returns</b>
-          </div>
-          <div class="mb-4">
-            <span>
-              <strong>
-                Comment
-              </strong>
-            </span>
-            <span class="float-right">{{_order.xp.OrderReturnInfo.Comment}}</span>
-            <hr>
-          </div>
-        </div>
       </div>
 
       <!--DISPLAY FOR QUOTE ORDERS-->
@@ -227,6 +212,7 @@
                     <div class="d-flex flex-column">
                       <span>Qty Returned: {{ li.xp.LineItemReturnInfo?.QuantityToReturn }}</span>
                       <small>Reason: {{ getReturnReason(li.xp.LineItemReturnInfo?.ReturnReason) }}</small>
+                      <small *ngIf="li.xp.LineItemReturnInfo.Comment">Comment: {{li.xp.LineItemReturnInfo.Comment}}</small>
                     </div>
                   </div>
                   <div *ngIf="!li.xp.LineItemReturnInfo">
@@ -234,7 +220,7 @@
                   </div>
                   <return-form *ngIf="li.xp.LineItemStatus === 'ReturnRequested'"
                                [order]="_order"
-                               [orderDirection]="orderDirection"
+                               (lineItemUpdate)="handleLineItemUpdate()"
                                [lineItem]="li"></return-form>
                 </td>
               </tr>
