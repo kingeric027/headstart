@@ -228,21 +228,21 @@ const Storefronts = {
 
 const MySupplierProfile = {
   rolesWithAccess: [MPRoles.MPMeSupplierAdmin],
-  title: 'My Supplier',
+  title: 'My Profile',
   route: '/my-supplier',
 };
 
 const MySupplierLocations = {
   rolesWithAccess: [MPRoles.MPMeSupplierAddressAdmin],
-  title: 'My Supplier Locations',
-  route: '/my-supplier/locations'
-}
+  title: 'Locations',
+  route: '/my-supplier/locations',
+};
 
 const MySupplerUsers = {
   rolesWithAccess: [MPRoles.MPMeSupplierUserAdmin],
-  title: 'My Suppler Users',
-  route: '/my-supplier/users'
-}
+  title: 'Users',
+  route: '/my-supplier/users',
+};
 
 const AllNavGroupings: MPRoute[] = [
   ProductNavGrouping,
@@ -253,9 +253,9 @@ const AllNavGroupings: MPRoute[] = [
   ReportsNavGrouping,
   SellerUsers,
   Storefronts,
-  MySupplierProfile, 
+  MySupplierProfile,
   MySupplierLocations,
-  MySupplerUsers
+  MySupplerUsers,
 ];
 
 export const getHeaderConfig = (userRoles: string[], orderCloudUserType: string): MPRoute[] => {

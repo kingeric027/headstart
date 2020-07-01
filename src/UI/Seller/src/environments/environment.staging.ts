@@ -8,7 +8,7 @@ export const environment = {
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   ocMiddlewareUrl: 'https://ordercloud-middleware-test.azurewebsites.net',
   appname: 'Marketplace Admin Staging',
-  marketplaceID: 'seb',
+  marketplaceID: 'SEB',
   cmsUrl: 'https://marktplacestaging.blob.core.windows.net',
   orderCloudApiUrl: 'https://api.ordercloud.io',
   orderCloudAuthUrl: 'https://auth.ordercloud.io/oauth/token',

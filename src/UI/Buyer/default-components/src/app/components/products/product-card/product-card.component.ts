@@ -19,6 +19,7 @@ export class OCMProductCard {
   _price: BuyerCurrency;
   _rates: ListPage<ExchangeRates>;
   quantity: number;
+  qtyValid = true;
   shouldDisplayAddToCart = false;
   isViewOnlyProduct = true;
   hasSpecs = false;
@@ -81,5 +82,6 @@ export class OCMProductCard {
 
   setQuantity(event: any): void {
     this.quantity = event.qty;
+    this.qtyValid = event.valid;
   }
 }

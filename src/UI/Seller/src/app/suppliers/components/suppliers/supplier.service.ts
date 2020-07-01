@@ -52,10 +52,4 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     this.resourceSubject.next(this.resourceSubject.value);
     return newSupplier;
   }
-
-  async getMyResource(): Promise<any> {
-    const me = await this.ocMeService.Get().toPromise();
-    const supplier = await this.ocSupplierService.Get(me.Supplier.ID).toPromise();
-    return supplier;
-  }
 }

@@ -23,6 +23,7 @@ import { filter, takeWhile } from 'rxjs/operators';
 import { ListPage } from 'marketplace-javascript-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
+import { pipe } from 'rxjs';
 
 interface BreadCrumb {
   displayText: string;
@@ -53,6 +54,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   _currentResourceNamePlural: string;
   _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
+  _filterConfig: any;
   areChanges: boolean;
   parentResources: ListPage<any>;
   requestStatus: RequestStatus;
@@ -117,7 +119,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   selectedResourceID: string;
   @Input()
-  filterConfig: any;
+  set filterConfig(value: any) {
+    this._filterConfig = value;
+    this.setFilterForm()
+  };
   @Input()
   resourceForm: FormGroup;
   @Input()
@@ -132,9 +137,24 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   async ngOnInit(): Promise<void> {
     await this.determineViewingContext();
     this.initializeSubscriptions();
-    this.setFilterForm();
     this.subscribeToOptions();
     this.screenSize = getScreenSizeBreakPoint();
+  }
+
+  getTitle(isMyResource: boolean, resourceName: string, selectedParentResourceName: string): string {
+    if(isMyResource) {
+      if(resourceName === 'suppliers') {
+        return 'My Profile'
+      } else {
+        return resourceName;
+      }
+    } else {
+      if(selectedParentResourceName) {
+        return resourceName + ' - ' + selectedParentResourceName;
+      } else {
+        return resourceName;
+      }
+    } 
   }
 
   ngAfterViewChecked() {
@@ -293,8 +313,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   setFilterForm() {
     const formGroup = {};
-    if (this.filterConfig && this.filterConfig.Filters) {
-      this.filterConfig.Filters.forEach(filter => {
+    if (this._filterConfig && this._filterConfig.Filters) {
+      this._filterConfig.Filters.forEach(filter => {
         const value = this.getSelectedFilterValue(filter.Path);
         formGroup[filter.Path] = new FormControl(value);
       });

@@ -51,7 +51,12 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
       {
         Display: 'Status',
         Path: 'Status',
-        Values: ['Open', 'AwaitingApproval', 'Completed', 'Declined', 'Canceled'],
+        Items: [
+          {Text: 'Open', Value: 'Open'},
+          {Text: 'Awaiting Approval', Value: 'AwaitingApproval'},
+          {Text: 'Completed', Value: 'Completed'},
+          {Text: 'Declined', Value: 'Declined'},
+          {Text: 'Canceled', Value: 'Canceled'}],
         Type: 'Dropdown',
       },
       {
@@ -67,7 +72,9 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
       {
         Display: 'Has Claims',
         Path: 'xp.OrderReturnInfo.HasReturn',
-        Values: [true, false],
+        Items: [
+          {Value: true},
+          {Value: false }],
         Type: 'Dropdown',
         QueryRestriction: 'OrderDirection=Incoming'
       },
