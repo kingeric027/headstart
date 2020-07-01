@@ -59,7 +59,7 @@ export class OrderDetailsComponent {
   }
 
   showReturnInfo() {
-    return this.order?.xp?.OrderReturnInfo?.HasReturn && this.orderDirection === 'Incoming' && this.isSellerUser;
+    return this._order?.xp?.OrderReturnInfo?.HasReturn && this.orderDirection === 'Incoming' && this.isSellerUser;
   }
 
   getFullName(address: Address) {
