@@ -32,8 +32,9 @@ export class OCMGridSpecForm {
         const obj = {};
         for (const spec of specs.Items) {
             for (const option of spec.Options) {
-                const name = spec.Name.replace(/ /g, '')
-                obj[name] = obj[name] ? obj[name].push(option.Value) : [option.Value];
+                const name = spec.Name.replace(/ /g, '');
+                if (obj[name]) obj[name].push(option.Value);
+                else obj[name] = [option.Value];
             }
         }
         this.specOptions = this.getAllSpecCombinations(obj);
