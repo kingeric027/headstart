@@ -19,4 +19,16 @@ namespace ordercloud.integrations.cms
 	{
 		public TokenExpiredException() : base("Token", "Token has expired", null) { }
 	}
+
+	public class AllowedResourceAssociationsEmptyException : OrderCloudIntegrationException
+	{
+		public AllowedResourceAssociationsEmptyException(string schemaInteropID) : 
+			base("Schema Error", $"AllowedResourceAssociations array cannot be empty", null) { }
+	}
+
+	public class DuplicateIDException : OrderCloudIntegrationException
+	{
+		public DuplicateIDException() : base("IdExists", "Object already exists.", null) { }
+	}
+
 }

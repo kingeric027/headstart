@@ -61,7 +61,7 @@ namespace ordercloud.integrations.cms
 		public async Task<AssetContainer> Create(AssetContainer container)
 		{
 			var matchingID = await GetWithoutExceptions(container.InteropID);
-			if (matchingID != null) throw new DuplicateIdException("IdExists", "Object already exists.", null);
+			if (matchingID != null) throw new DuplicateIDException();
 
 			var newContainer = await _store.AddAsync(container);
 			return newContainer;

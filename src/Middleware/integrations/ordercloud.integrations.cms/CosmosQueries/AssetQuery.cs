@@ -63,7 +63,7 @@ namespace ordercloud.integrations.cms
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var (asset, file) = AssetMapper.MapFromUpload(_blob.Config, container, form);
 			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
-			if (matchingID != null) throw new DuplicateIdException("IdExists", "Object already exists.", null);
+			if (matchingID != null) throw new DuplicateIDException();
 			if (file != null) {			
 				await _blob.UploadAsset(container, file, asset);
 			}

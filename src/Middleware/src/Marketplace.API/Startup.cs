@@ -25,6 +25,8 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
+using ordercloud.integrations.cms.Models;
+using ordercloud.integrations.cms.CosmosQueries;
 
 namespace Marketplace.API
 {
@@ -73,7 +75,8 @@ namespace Marketplace.API
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
                 .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
-                .InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
+				.InjectCosmosStore<DocumentSchema, DocumentSchema>(cosmosConfig)
+				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
@@ -90,7 +93,8 @@ namespace Marketplace.API
                 .Inject<IMarketplaceCatalogCommand>()
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
-                .Inject<ISupplierCategoryConfigQuery>()
+				.Inject<IDocumentSchemaQuery>()
+				.Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
