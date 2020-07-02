@@ -55,6 +55,7 @@ namespace Marketplace.API
 			};
 			var cmsConfig = new CMSConfig()
 			{
+				BaseUrl = _settings.EnvironmentSettings.BaseUrl,
 				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
 				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
 			};
@@ -93,6 +94,7 @@ namespace Marketplace.API
                 .Inject<IMarketplaceCatalogCommand>()
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
+				.Inject<IBlobStorage>()
 				.Inject<IDocumentSchemaQuery>()
 				.Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
@@ -114,10 +116,10 @@ namespace Marketplace.API
                             }
                     }
                 ))
+				.AddSingleton<CMSConfig>(x => cmsConfig)
                 .AddSingleton<IFreightPopService>(x => new FreightPopService(freightPopConfig))
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
 				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
-                .AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")

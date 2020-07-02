@@ -24,10 +24,12 @@ namespace ordercloud.integrations.cms.CosmosQueries
 	public class DocumentSchemaQuery : IDocumentSchemaQuery
 	{
 		private readonly ICosmosStore<DocumentSchema> _store;
+		private readonly CMSConfig _settings;
 
-		public DocumentSchemaQuery(ICosmosStore<DocumentSchema> schemaStore)
+		public DocumentSchemaQuery(ICosmosStore<DocumentSchema> schemaStore, CMSConfig settings)
 		{
 			_store = schemaStore;
+			_settings = settings;
 		}
 
 		public async Task<ListPage<DocumentSchema>> List(IListArgs args, VerifiedUserContext user)
@@ -52,7 +54,7 @@ namespace ordercloud.integrations.cms.CosmosQueries
 		{
 			var matchingID = await GetWithoutExceptions(schema.InteropID);
 			if (matchingID != null) throw new DuplicateIDException();
-			Validate(schema);
+			schema = Validate(schema);
 			var newSchema = await _store.AddAsync(schema);
 			return newSchema;
 		}
@@ -64,7 +66,8 @@ namespace ordercloud.integrations.cms.CosmosQueries
 			existingSchema.SellerOrgID = schema.SellerOrgID;
 			existingSchema.AllowedResourceAssociations = schema.AllowedResourceAssociations;
 			existingSchema.Schema = schema.Schema;
-			Validate(existingSchema);
+			existingSchema.Title = schema.Title;
+			existingSchema = Validate(existingSchema);
 			var updatedContainer = await _store.UpdateAsync(existingSchema);
 			return updatedContainer;
 		}
@@ -75,13 +78,13 @@ namespace ordercloud.integrations.cms.CosmosQueries
 			await _store.RemoveByIdAsync(schema.id, schema.SellerOrgID);
 		}
 
-		private void Validate(DocumentSchema schema)
+		private DocumentSchema Validate(DocumentSchema schema)
 		{
 			if (schema.AllowedResourceAssociations.Count < 1)
 			{
 				throw new AllowedResourceAssociationsEmptyException(schema.InteropID);
 			}
-			SchemaHelper.ValidateSchema(schema);
+			return SchemaHelper.ValidateSchema(schema, _settings);
 		}
 
 		private async Task<DocumentSchema> GetWithoutExceptions(string schemaInteropID)

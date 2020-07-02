@@ -1,5 +1,6 @@
 ﻿using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using ordercloud.integrations.cms.CosmosQueries;
 using ordercloud.integrations.cms.Models;
 using ordercloud.integrations.library;
@@ -57,6 +58,14 @@ namespace Marketplace.Common.Controllers.CMS
 		public async Task Delete(string schemaID)
 		{
 			await _schemas.Delete(schemaID, VerifiedUserContext);
+		}
+
+		[DocName("Get a formal Document Schema Specification")]
+		[HttpGet, Route("spec/{sellerOrgID}/{schemaID}")] // No auth is intentional. Make these available to anyone.
+		public async Task<JObject> GetSpecification(string sellerOrgID, string schemaID)
+		{
+			var schema = await _schemas.Get(schemaID, VerifiedUserContext);
+			return schema.Schema;
 		}
 	}
 }

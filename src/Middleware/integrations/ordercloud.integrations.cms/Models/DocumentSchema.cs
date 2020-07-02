@@ -18,11 +18,10 @@ namespace ordercloud.integrations.cms.Models
 	{
 		[JsonProperty("ID"), CosmosInteropID, Required]
 		public string InteropID { get; set; }
-		[MaxLength(100)]
-		public string Name { get; set; }
+		[Required, MaxLength(100)]
+		public string Title { get; set; }
 		[CosmosPartitionKey, Required]
 		public string SellerOrgID { get; set; } // This field only needs to be public until it can be read from a token or /me 
-
 		[Required]
 		public List<ResourceType> AllowedResourceAssociations { get; set; } // Cannot be empty
 		[Required]
