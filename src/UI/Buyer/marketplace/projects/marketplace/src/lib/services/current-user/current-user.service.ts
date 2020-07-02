@@ -72,7 +72,7 @@ export class CurrentUserService {
     currentUser.FavoriteOrderIDs = this.getFavorites(user, this.favOrdersXP);
     currentUser.FavoriteProductIDs = this.getFavorites(user, this.favProductsXP);
     // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    currentUser.Currency = myUserGroups.Items.filter(ug => ug.xp.Type === 'BuyerLocation')[0].xp?.Currency || 'USD';
+    currentUser.Currency = myUserGroups.Items.filter(ug => ug.xp.Type === 'BuyerLocation')[0]?.xp?.Currency || 'USD';
     return currentUser;
   }
 

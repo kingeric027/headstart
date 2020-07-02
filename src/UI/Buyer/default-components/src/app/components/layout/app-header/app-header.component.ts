@@ -80,8 +80,7 @@ export class OCMAppHeader implements OnInit {
   getCurrencyFlag(): string {
     const rates = this.context.exchangeRates.Get();
     const currentUser = this.context.currentUser.get();
-    const myCurrencyCode = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
-    const myRate = rates.Items.find(r => r.Currency === myCurrencyCode);
+    const myRate = rates.Items.find(r => r.Currency === currentUser.Currency);
     return myRate.Icon;
   }
 
