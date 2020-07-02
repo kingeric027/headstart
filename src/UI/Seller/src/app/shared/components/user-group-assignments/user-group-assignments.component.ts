@@ -21,7 +21,9 @@ export class UserGroupAssignments implements OnChanges {
   @Input() userGroupType: string;
   @Input() isCreatingNew: boolean;
   @Input() userPermissionsService: IUserPermissionsService;
+  @Input() homeCountry: string;
   @Output() assignmentsToAdd = new EventEmitter<AssignmentsToAddUpdate>();
+  @Output() hasAssignments = new EventEmitter<boolean>();
 
   userOrgID: string;
   userID: string;
@@ -36,15 +38,16 @@ export class UserGroupAssignments implements OnChanges {
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
   readOnly = true;
-  areMultipleCountriesSelected: boolean;
 
   constructor(
     private router: Router
   ) {}
   
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    this._userUserGroupAssignmentsEditable = [];
     this.updateForUserGroupAssignmentType();
     this.userOrgID = await this.userPermissionsService.getParentResourceID();
+    await this.getUserGroups(this.userOrgID);
     if (changes.user?.currentValue.ID && !this.userID) {
       this.userID = this.user.ID
       if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
@@ -55,7 +58,6 @@ export class UserGroupAssignments implements OnChanges {
       this.userID = this.user.ID
       this.getUserGroupAssignments(this.user.ID, this.userOrgID);
     }
-    this.getUserGroups(this.userOrgID);
   }
 
   updateForUserGroupAssignmentType() {
@@ -69,13 +71,17 @@ export class UserGroupAssignments implements OnChanges {
 
   async getUserGroups(ID: string): Promise<void> {
     const groups = await this.userPermissionsService.getUserGroups(ID, this.options);
-    this.userGroups = groups.Items;
+    const groupsInHomeCountry = groups.Items.filter(group => 
+    this.isCreatingNew ? group.xp?.Country === this.homeCountry : group.xp?.Country === this.user.xp?.Country);
+    this.userGroups = groupsInHomeCountry;
   }
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
     const userGroupAssignments = await this.userPermissionsService.listUserAssignments(userID, userOrgID);
     this._userUserGroupAssignmentsStatic = userGroupAssignments.Items;
     this._userUserGroupAssignmentsEditable = userGroupAssignments.Items;
+    const match = this._userUserGroupAssignmentsStatic.some(assignedUG => this.userGroups.find(ug => ug.ID === assignedUG.UserGroupID));
+    this.hasAssignments.emit(match);
   }
 
   toggleUserUserGroupAssignment(userGroup: UserGroup): void {
@@ -92,9 +98,6 @@ export class UserGroupAssignments implements OnChanges {
         ...this._userUserGroupAssignmentsEditable,
         newUserUserGroupAssignment,
       ];
-    }
-    if (this._userUserGroupAssignmentsEditable.length) {
-      this.validateAssignmentsShareCountry();
     }
     this.checkForUserUserGroupAssignmentChanges();
   }
@@ -114,17 +117,7 @@ export class UserGroupAssignments implements OnChanges {
         newUserUserGroupAssignment,
       ];
     }
-    if (this._userUserGroupAssignmentsEditable.length) {
-      this.validateAssignmentsShareCountry();
-    }
     this.checkForUserUserGroupAssignmentChanges();
-  }
-
-  validateAssignmentsShareCountry(): void {
-    const countryToCompare = this.userGroups.find(userGroup => this._userUserGroupAssignmentsEditable[0].UserGroupID === userGroup.ID).xp.Country;
-    this.areMultipleCountriesSelected = this._userUserGroupAssignmentsEditable.some(
-      ugAssignment => this.userGroups.find(
-      ug => (ugAssignment.UserGroupID === ug.ID) && (ug.xp.Country !== countryToCompare)));
   }
 
   isAssigned(userGroup: UserGroup) {

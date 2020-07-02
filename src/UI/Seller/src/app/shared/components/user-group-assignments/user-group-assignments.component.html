@@ -1,5 +1,6 @@
 <!-- User Permissions -->
-<div class="row pt-3 mt-3 bg-white shadow-sm card-highlight-border">
+<div *ngIf="userGroups"  
+     class="row pt-3 mt-3 bg-white shadow-sm card-highlight-border">
   <div class="col-md-5">
     <h5>{{displayText.Title}}</h5>
     <p class="font-italic">{{displayText.InfoText}}</p>
@@ -15,6 +16,11 @@
         </tr>
       </thead>
       <tbody>
+        <tr *ngIf="!userGroups?.length">
+          <td>
+             <span class="font-italic">There are no locations for this user's Home Country.</span>
+          </td>
+        </tr>
         <tr class="cursor-pointer"
             *ngFor="let group of userGroups">
           <td class="d-flex justify-content-start align-items-center">
@@ -31,15 +37,12 @@
         </tr>
       </tbody>
     </table>
-    <span *ngIf="areMultipleCountriesSelected"
-          class="font-italic text-danger">Users may not be assigned to locations in multiple countries.</span>
     <div *ngIf="!isCreatingNew"
          class="pb-3">
-      <button *ngIf="!areMultipleCountriesSelected"
-              [disabled]="!areChanges"
+      <button [disabled]="!areChanges"
               class="btn btn-link"
               (click)="discardUserUserGroupAssignmentChanges()">{{areChanges ? 'Cancel' : 'No Changes'}}</button>
-      <button *ngIf="areChanges && !requestedUserConfirmation && !areMultipleCountriesSelected"
+      <button *ngIf="areChanges && !requestedUserConfirmation"
               [disabled]="!areChanges || requestedUserConfirmation"
               class="btn brand-button"
               (click)="requestUserConfirmation()">{{requestedUserConfirmation ? 'Pending Confirmation' : 'Save Changes'}}</button>
