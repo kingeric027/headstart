@@ -37,7 +37,6 @@ export class UserGroupAssignments implements OnChanges {
   faExclamationCircle = faExclamationCircle;
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
-  readOnly = true;
 
   constructor(
     private router: Router
