@@ -1,6 +1,7 @@
 ﻿using Cosmonaut;
 using Cosmonaut.Extensions;
 using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json.Schema;
 using ordercloud.integrations.cms.Models;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -51,7 +52,7 @@ namespace ordercloud.integrations.cms.CosmosQueries
 		{
 			var matchingID = await GetWithoutExceptions(schema.InteropID);
 			if (matchingID != null) throw new DuplicateIDException();
-			ValidateSchema(schema);
+			Validate(schema);
 			var newSchema = await _store.AddAsync(schema);
 			return newSchema;
 		}
@@ -63,7 +64,7 @@ namespace ordercloud.integrations.cms.CosmosQueries
 			existingSchema.SellerOrgID = schema.SellerOrgID;
 			existingSchema.AllowedResourceAssociations = schema.AllowedResourceAssociations;
 			existingSchema.Schema = schema.Schema;
-			ValidateSchema(existingSchema);
+			Validate(existingSchema);
 			var updatedContainer = await _store.UpdateAsync(existingSchema);
 			return updatedContainer;
 		}
@@ -74,12 +75,13 @@ namespace ordercloud.integrations.cms.CosmosQueries
 			await _store.RemoveByIdAsync(schema.id, schema.SellerOrgID);
 		}
 
-		private void ValidateSchema(DocumentSchema schema)
+		private void Validate(DocumentSchema schema)
 		{
 			if (schema.AllowedResourceAssociations.Count < 1)
 			{
 				throw new AllowedResourceAssociationsEmptyException(schema.InteropID);
 			}
+			SchemaHelper.ValidateSchema(schema);
 		}
 
 		private async Task<DocumentSchema> GetWithoutExceptions(string schemaInteropID)
