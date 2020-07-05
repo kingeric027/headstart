@@ -61,15 +61,13 @@ namespace Marketplace.Common.Controllers.CMS
 			await _schemas.Delete(schemaID, VerifiedUserContext);
 		}
 
-		[DocName("Get a formal Document Schema Specification")]
-		[HttpGet, Route("schema-specs/{sellerOrgID}/{schemaID}")] // No auth is intentional. Make these available to anyone.
-		public async Task<JObject> GetSchemaSpec(string sellerOrgID, string schemaID)
+		[HttpGet, Route("schema-specs/{schemaID}")] // No auth is intentional. Make these available to anyone.
+		public async Task<JObject> GetSchemaSpec(string schemaID)
 		{
-			var schema = await _schemas.Get(schemaID, VerifiedUserContext);
+			var schema = await _schemas.Get(schemaID); // Not interopID!! real, immutable Id.
 			return schema.Schema;
 		}
 
-		[DocName("Get the schema that describes the correct structure of schemas")]
 		[HttpGet, Route("schema-specs/metaschema")] // No auth is intentional. Make this available to anyone.
 		public JObject GetMetaSchemaSpec()
 		{

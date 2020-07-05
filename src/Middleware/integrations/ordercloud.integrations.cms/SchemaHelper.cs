@@ -49,6 +49,6 @@ namespace ordercloud.integrations.cms
 		}
 
 		private static string SchemaSpecUrl(DocumentSchema schema, CMSConfig config) =>
-			$"{config.BaseUrl}/schema-specs/{schema.SellerOrgID}/{schema.InteropID}";
+			$"{config.BaseUrl}/schema-specs/{schema.id}"; // Real ID, not InteropID!!
 	}
 }

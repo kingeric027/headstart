@@ -37,7 +37,7 @@ namespace ordercloud.integrations.cms
 		{
 			return new Collection<UniqueKey>
 			{
-				new UniqueKey() { Paths = new Collection<string> { "/InteropID" }}
+				new UniqueKey() { Paths = new Collection<string> { "/InteropID", "/ContainerID" }}
 			};
 		}
 	}

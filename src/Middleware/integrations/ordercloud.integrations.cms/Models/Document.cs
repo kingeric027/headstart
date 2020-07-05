@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Documents;
+﻿using Cosmonaut.Attributes;
+using Microsoft.Azure.Documents;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
@@ -21,8 +22,8 @@ namespace ordercloud.integrations.cms.Models
 		public string SchemaID { get; set; }
 		[JsonProperty("$schema"), ApiReadOnly]
 		public string SchemaSpecUrl { get; set; }
-		[ApiIgnore]
-		public string SellerOrgID { get; set; } // This field only needs to be public until it can be read from a token or /me 
+		[CosmosPartitionKey, ApiIgnore]
+		public string OwnerClientID { get; set; }
 		[Required]
 		public JObject Doc { get; set; }
 
@@ -30,7 +31,7 @@ namespace ordercloud.integrations.cms.Models
 		{
 			return new Collection<UniqueKey>
 			{
-				new UniqueKey() { Paths = new Collection<string> { "/InteropID", "/SchemaID" }} // Should interopID be unique across schemas?
+				new UniqueKey() { Paths = new Collection<string> { "/InteropID", "/SchemaID", "/OwnerClientID" }}
 			};
 		}
 	}

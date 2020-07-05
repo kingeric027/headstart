@@ -40,5 +40,4 @@ namespace ordercloud.integrations.cms
 	{
 		public DocumentNotValidException(string schemaInteropID, IList<string> errors) : base("Document Invalid", $"This Document does not conform to schema {schemaInteropID}", errors) { }
 	}
-
 }

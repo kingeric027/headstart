@@ -20,8 +20,8 @@ namespace ordercloud.integrations.cms.Models
 		public string InteropID { get; set; }
 		[Required, MaxLength(100)]
 		public string Title { get; set; }
-		[CosmosPartitionKey, Required]
-		public string SellerOrgID { get; set; } // This field only needs to be public until it can be read from a token or /me 
+		[CosmosPartitionKey, ApiIgnore]
+		public string OwnerClientID { get; set; }
 		[Required]
 		public List<ResourceType> AllowedResourceAssociations { get; set; } // Cannot be empty
 		[Required]
@@ -30,7 +30,7 @@ namespace ordercloud.integrations.cms.Models
 		{
 			return new Collection<UniqueKey>
 			{
-				new UniqueKey() { Paths = new Collection<string> { "/InteropID" }}
+				new UniqueKey() { Paths = new Collection<string> { "/InteropID", "/OwnerClientID" }}
 			};
 		}
 	}
