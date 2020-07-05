@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\integrations\ordercloud.integrations.cms\ordercloud.integrations.cms.csproj" />
     <ProjectReference Include="..\..\src\ordercloud.integrations.cms\ordercloud.integrations.cms.csproj" />
   </ItemGroup>
 

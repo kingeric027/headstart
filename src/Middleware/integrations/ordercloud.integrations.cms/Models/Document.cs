@@ -19,7 +19,7 @@ namespace ordercloud.integrations.cms.Models
 		public string InteropID { get; set; }
 		[ApiIgnore]
 		public string SchemaID { get; set; }
-		[ApiReadOnly]
+		[JsonProperty("$schema"), ApiReadOnly]
 		public string SchemaSpecUrl { get; set; }
 		[ApiIgnore]
 		public string SellerOrgID { get; set; } // This field only needs to be public until it can be read from a token or /me 
