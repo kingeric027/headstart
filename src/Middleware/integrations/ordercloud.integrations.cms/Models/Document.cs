@@ -14,12 +14,12 @@ using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribut
 
 namespace ordercloud.integrations.cms.Models
 {
-	public class Document
+	public class Document: CosmosObject
 	{
 		[JsonProperty("ID"), CosmosInteropID, Required]
 		public string InteropID { get; set; }
 		[ApiIgnore]
-		public string SchemaID { get; set; }
+		public string SchemaID { get; set; } // real id, not interop. Don't need to set or return.
 		[JsonProperty("$schema"), ApiReadOnly]
 		public string SchemaSpecUrl { get; set; }
 		[CosmosPartitionKey, ApiIgnore]

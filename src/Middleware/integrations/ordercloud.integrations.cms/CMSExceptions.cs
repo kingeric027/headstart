@@ -7,7 +7,7 @@ namespace ordercloud.integrations.cms
 {
 	public class StorageConnectionException : OrderCloudIntegrationException
 	{
-		public StorageConnectionException(string containerInteropID, object ex) : base("Storage Connection", $"Container {containerInteropID} storage connection failed.", null) { }
+		public StorageConnectionException(string containerInteropID, object ex) : base("Storage Connection", $"Container \"{containerInteropID}\" storage connection failed.", null) { }
 	}
 
 	public class AssetUploadValidationException : OrderCloudIntegrationException
@@ -38,6 +38,6 @@ namespace ordercloud.integrations.cms
 
 	public class DocumentNotValidException : OrderCloudIntegrationException
 	{
-		public DocumentNotValidException(string schemaInteropID, IList<string> errors) : base("Document Invalid", $"This Document does not conform to schema {schemaInteropID}", errors) { }
+		public DocumentNotValidException(string schemaInteropID, IList<string> errors) : base("Document Invalid", $"This Document does not conform to schema \"{schemaInteropID}\"", errors) { }
 	}
 }
