@@ -90,7 +90,7 @@ namespace ordercloud.integrations.cms.CosmosQueries
 		{
 			if (schema.AllowedResourceAssociations.Count < 1)
 			{
-				throw new AllowedResourceAssociationsEmptyException(schema.InteropID);
+				throw new AllowedResourceAssociationsEmptyException();
 			}
 			return SchemaHelper.ValidateSchema(schema, _settings);
 		}

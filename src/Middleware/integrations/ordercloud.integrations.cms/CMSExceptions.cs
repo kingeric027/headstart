@@ -22,7 +22,7 @@ namespace ordercloud.integrations.cms
 
 	public class AllowedResourceAssociationsEmptyException : OrderCloudIntegrationException
 	{
-		public AllowedResourceAssociationsEmptyException(string schemaInteropID) : 
+		public AllowedResourceAssociationsEmptyException() : 
 			base("Schema Error", $"AllowedResourceAssociations array cannot be empty", null) { }
 	}
 
