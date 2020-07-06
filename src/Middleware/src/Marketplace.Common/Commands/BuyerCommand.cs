@@ -79,7 +79,7 @@ namespace Marketplace.Common.Commands
             {
                 BuyerID = ocBuyerID,
                 SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
-            }, token);
+            });
 
             await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor" });
             await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" });
@@ -93,7 +93,7 @@ namespace Marketplace.Common.Commands
             var updatedBuyer = await _oc.Buyers.PatchAsync(buyerID, new PartialBuyer() { xp = new { MarkupPercent = markup.Percent } });
             return new BuyerMarkup()
             {
-                Percent = updatedBuyer.xp.Markup
+                Percent = (int)updatedBuyer.xp.MarkupPercent
             };
         }
 
