@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Me } from 'ordercloud-javascript-sdk';
 import { ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { ExchangeRates } from '../../shopper-context';
+import { CurrentUserService } from '../current-user/current-user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,16 +10,15 @@ import { ExchangeRates } from '../../shopper-context';
 export class ExchangeRatesService {
   private ratesSubject: BehaviorSubject<ListPage<ExchangeRates>> = new BehaviorSubject<ListPage<ExchangeRates>>(null);
 
-  constructor() {}
+  constructor(private currentUser: CurrentUserService) {}
 
   Get(): ListPage<ExchangeRates> {
     return this.exchangeRates;
   }
 
   async reset(): Promise<void> {
-    const myUserGroups = await Me.ListUserGroups({ pageSize: 1, filters: { 'xp.Type': 'BuyerLocation' } });
-    const baseRate = myUserGroups.Items[0].xp?.Currency;
-    this.exchangeRates = await MarketplaceSDK.ExchangeRates.Get(baseRate);
+    const me = this.currentUser.get();
+    this.exchangeRates = await MarketplaceSDK.ExchangeRates.Get(me.Currency);
   }
 
   private get exchangeRates(): ListPage<ExchangeRates> {
