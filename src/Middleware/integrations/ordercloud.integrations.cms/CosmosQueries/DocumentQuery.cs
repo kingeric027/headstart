@@ -17,6 +17,7 @@ namespace ordercloud.integrations.cms
 	{
 		Task<ListPage<Document>> List(string schemaInteropID, IListArgs args, VerifiedUserContext user);
 		Task<Document> Get(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
+		Task<Document> Get(string documentID); // real id
 		Task<Document> GetWithSchemaDBID(string schemaID, string documentInteropID, VerifiedUserContext user);
 		Task<Document> Create(string schemaInteropID, Document document, VerifiedUserContext user);
 		Task<Document> Update(string schemaInteropID, string documentInteropID, Document document, VerifiedUserContext user);
@@ -53,6 +54,12 @@ namespace ordercloud.integrations.cms
 		{
 			var schema = await _schemas.Get(schemaInteropID, user);
 			return await GetWithSchemaDBID(schema.id, documentInteropID, user);
+		}
+
+		public async Task<Document> Get(string documentID) // real id
+		{
+			var doc = await _store.Query($"select top 1 * from c where c.id = @id", new { id = documentID }).FirstOrDefaultAsync();
+			return doc;
 		}
 
 		public async Task<Document> GetWithSchemaDBID(string schemaID, string documentInteropID, VerifiedUserContext user)

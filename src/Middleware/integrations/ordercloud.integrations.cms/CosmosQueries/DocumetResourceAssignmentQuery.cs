@@ -1,7 +1,10 @@
 ﻿using Cosmonaut;
+using Cosmonaut.Extensions;
 using ordercloud.integrations.library;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,6 +12,7 @@ namespace ordercloud.integrations.cms.CosmosQueries
 {
 	public interface IDocumentResourceAssignmentQuery
 	{
+		Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, IListArgs args, VerifiedUserContext user);
 		Task SaveAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user);
 		Task DeleteAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user);
 	}
@@ -25,6 +29,32 @@ namespace ordercloud.integrations.cms.CosmosQueries
 			_store = store;
 			_documents = documents;
 			_schemas = schemas;
+		}
+
+		public async Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, IListArgs args, VerifiedUserContext user) 
+		{
+			// Confirm user has access to resource.
+			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
+			var schema = await _schemas.Get(schemaInteropID, user);
+			var query = _store.Query()
+				.Search(args)
+				.Filter(args)
+				.Sort(args)
+				.Where(doc => 
+					doc.SchemaID == schema.id && 
+					doc.ResourceID == resource.ID &&
+					doc.ResourceParentID == resource.ParentID &&
+					doc.ResourceType == resource.Type
+				);
+			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
+			var count = await query.CountAsync();
+			var assignments = list.ToListPage(args.Page, args.PageSize, count);
+			var documents = await Throttler.RunAsync(assignments.Items, 5, 20, doc => _documents.Get(doc.id)); // maybe switch to SQL "IN"
+			return new ListPage<Document>()
+			{
+				Items = documents,
+				Meta = assignments.Meta
+			};
 		}
 
 		public async Task SaveAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user)
