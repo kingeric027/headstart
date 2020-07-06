@@ -3,7 +3,7 @@
        *ngFor="let liGroup of liGroupedByShipFrom; index as i">
     <div class="card-header p-3">
       <div class="row"
-           *ngIf="suppliers?.length > 0 && suppliers[i].shipFrom && suppliers[i].supplier">
+           *ngIf="suppliers?.length > 0 && suppliers[i]?.shipFrom && suppliers[i].supplier">
         <div class="col">
           <h5 class="card-title mb-0">
             {{ suppliers[i].supplier.Name }}
