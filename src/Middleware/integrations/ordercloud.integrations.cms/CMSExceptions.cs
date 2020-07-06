@@ -40,4 +40,9 @@ namespace ordercloud.integrations.cms
 	{
 		public DocumentNotValidException(string schemaInteropID, IList<string> errors) : base("Document Invalid", $"This Document does not conform to schema \"{schemaInteropID}\"", errors) { }
 	}
+
+	public class InvalidAssignmentException : OrderCloudIntegrationException
+	{
+		public InvalidAssignmentException() : base("Invalid Assignment", $"This type of document can not be assigned to this type of resource. This is set on the schema.", null) { }
+	}
 }
