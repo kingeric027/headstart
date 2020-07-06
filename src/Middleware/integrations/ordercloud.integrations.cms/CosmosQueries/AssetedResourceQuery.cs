@@ -11,9 +11,9 @@ namespace ordercloud.integrations.cms
 	{
 		Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user);
 		Task<string> GetFirstImage(Resource resource, VerifiedUserContext user);
-		Task SaveAssignment(Resource resource, string assetID, VerifiedUserContext user);
-		Task DeleteAssignment(Resource resource, string assetID, VerifiedUserContext user);
-		Task MoveAssignment(Resource resource, string assetID, int listOrderWithinType, VerifiedUserContext user);
+		Task SaveAssignment(Resource resource, string assetInteropID, VerifiedUserContext user);
+		Task DeleteAssignment(Resource resource, string assetInteropID, VerifiedUserContext user);
+		Task MoveAssignment(Resource resource, string assetInteropID, int listOrderWithinType, VerifiedUserContext user);
 	}
 
 	public class AssetedResourceQuery : IAssetedResourceQuery
@@ -58,28 +58,28 @@ namespace ordercloud.integrations.cms
 			return asset.Url;
 		}
 
-		public async Task SaveAssignment(Resource resource, string assetID, VerifiedUserContext user)
+		public async Task SaveAssignment(Resource resource, string assetInteropID, VerifiedUserContext user)
 		{
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assetID, user);
+			var asset = await _assets.Get(assetInteropID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).UniqueAdd(asset.id); 
 			await _store.UpsertAsync(assetedResource);
 		}
 
-		public async Task DeleteAssignment(Resource resource, string assetID, VerifiedUserContext user)
+		public async Task DeleteAssignment(Resource resource, string assetInteropID, VerifiedUserContext user)
 		{
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assetID, user);
+			var asset = await _assets.Get(assetInteropID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).Remove(asset.id);
 			await _store.UpdateAsync(assetedResource);
 		}
 
-		public async Task MoveAssignment(Resource resource, string assetID, int listOrderWithinType, VerifiedUserContext user)
+		public async Task MoveAssignment(Resource resource, string assetInteropID, int listOrderWithinType, VerifiedUserContext user)
 		{
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assetID, user);
+			var asset = await _assets.Get(assetInteropID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).MoveTo(asset.id, listOrderWithinType);
 			await _store.UpdateAsync(assetedResource);
@@ -87,12 +87,18 @@ namespace ordercloud.integrations.cms
 
 		private async Task<AssetedResource> GetExistingOrDefault(Resource resource)
 		{
-			return await GetExisting(resource) ?? new AssetedResource() { Resource = resource };
+			return await GetExisting(resource) ??
+				new AssetedResource()
+				{
+					ResourceID = resource.ID,
+					ResourceParentID = resource.ParentID,
+					ResourceType = resource.Type
+				};
 		}
 
 		private async Task<AssetedResource> GetExisting(Resource resource)
 		{
-			var query = $"select top 1 * from c where c.Resource.Type = @Type AND c.Resource.ID = @ID AND c.Resource.ParentID = @ParentID";
+			var query = $"select top 1 * from c where c.ResourceType = @Type AND c.ResourceID = @ID AND c.ResourceParentID = @ParentID";
 			var assetedResource = await _store.QuerySingleAsync(query, resource);
 			return assetedResource;
 		}

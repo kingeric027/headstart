@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.cms;
-using ordercloud.integrations.cms.CosmosQueries;
-using ordercloud.integrations.cms.Models;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System;

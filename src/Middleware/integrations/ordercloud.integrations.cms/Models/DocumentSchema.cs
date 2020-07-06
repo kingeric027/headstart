@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace ordercloud.integrations.cms.Models
+namespace ordercloud.integrations.cms
 {
 	[SwaggerModel]
 	[CosmosCollection("documentschemas")]

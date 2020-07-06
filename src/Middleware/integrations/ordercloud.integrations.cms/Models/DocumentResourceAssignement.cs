@@ -1,23 +1,23 @@
 ﻿using Cosmonaut.Attributes;
 using Microsoft.Azure.Documents;
+using ordercloud.integrations.library;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
-using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.cms
 {
-	[CosmosCollection("assetedresource")]
-	public class AssetedResource : CosmosObject
+	public class DocumentResourceAssignment : CosmosObject
 	{
-		[CosmosPartitionKey]
 		public string ResourceID { get; set; }
 		public string ResourceParentID { get; set; } = null;
 		public ResourceType ResourceType { get; set; }
-		public List<string> ImageAssetIDs { get; set; } = new List<string>();
-		public List<string> ThemeAssetIDs { get; set; } = new List<string>();
-		public List<string> AttachmentAssetIDs { get; set; } = new List<string>();
-		public List<string> StructuredAssetsIDs { get; set; } = new List<string>();
+
+		[CosmosPartitionKey, ApiIgnore]
+		public string OwnerClientID { get; set; }
+		public string SchemaID { get; set; } // real ID
+		public string DocumentID { get; set; } // real ID
 
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{

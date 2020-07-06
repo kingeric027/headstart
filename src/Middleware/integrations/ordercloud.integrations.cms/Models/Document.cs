@@ -12,7 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
-namespace ordercloud.integrations.cms.Models
+namespace ordercloud.integrations.cms
 {
 	public class Document: CosmosObject
 	{

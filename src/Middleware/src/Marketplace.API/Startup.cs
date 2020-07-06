@@ -25,9 +25,7 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
-using ordercloud.integrations.cms.Models;
-using ordercloud.integrations.cms.CosmosQueries;
-using Document = ordercloud.integrations.cms.Models.Document;
+using Document = ordercloud.integrations.cms.Document;
 
 namespace Marketplace.API
 {

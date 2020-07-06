@@ -1,15 +1,14 @@
 ﻿using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents.Linq;
-using ordercloud.integrations.cms.Models;
-using ordercloud.integrations.cms.CosmosQueries;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using IDocumentQuery = ordercloud.integrations.cms.CosmosQueries.IDocumentQuery;
+using ordercloud.integrations.cms;
+using IDocumentQuery = ordercloud.integrations.cms.IDocumentQuery;
 
 namespace Marketplace.Common.Controllers.CMS
 {

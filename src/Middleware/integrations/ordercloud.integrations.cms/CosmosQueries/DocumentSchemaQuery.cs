@@ -3,7 +3,6 @@ using Cosmonaut.Extensions;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Newtonsoft.Json.Schema;
-using ordercloud.integrations.cms.Models;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System;
@@ -11,7 +10,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ordercloud.integrations.cms.CosmosQueries
+namespace ordercloud.integrations.cms
 {
 	public interface IDocumentSchemaQuery
 	{
@@ -92,7 +91,10 @@ namespace ordercloud.integrations.cms.CosmosQueries
 			{
 				throw new AllowedResourceAssociationsEmptyException();
 			}
-			return SchemaHelper.ValidateSchema(schema, _settings);
+			schema.Schema["$schema"] = $"{_settings.BaseUrl}/schema-specs/metaschema";
+			schema.Schema["$id"] = $"{_settings.BaseUrl}/schema-specs/{schema.id}";
+			schema.Schema["title"] = schema.Title;
+			return SchemaHelper.ValidateSchema(schema);
 		}
 
 		private async Task<DocumentSchema> GetWithoutExceptions(string schemaInteropID, VerifiedUserContext user)
