@@ -57,6 +57,7 @@ import { MatSelectModule, MatSelect } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { ActionMenuComponent } from './components/action-menu/action-menu.component';
 
 @NgModule({
   imports: [
@@ -144,6 +145,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     DeleteConfirmModal,
     PhoneFormatPipe,
     YesNoFormatPipe,
+    ActionMenuComponent,
     ConfirmModal,
     UserGroupAssignments,
   ],
@@ -170,6 +172,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     LocationIDInputDirective,
     DragDirective,
     ConfirmModal,
+    ActionMenuComponent,
     UserGroupAssignments,
     // Pipes
     PhoneFormatPipe,
