@@ -8,6 +8,8 @@ import { getSupportedInputTypes } from '@angular/cdk/platform';
 })
 export class ActionMenuComponent {
   @Input()
+  dataIsSaving = false;
+  @Input()
   isCreatingNew = false;
   @Input()
   areChanges = false;
@@ -52,5 +54,18 @@ export class ActionMenuComponent {
 
   handleDiscard(): void {
     this.executeDiscardAction.emit();
+  }
+
+  getSaveText(): string {
+    if (this.dataIsSaving) {
+      return 'Saving';
+    }
+    if (this.showConfirm) {
+      return 'Pending Confirmation';
+    }
+    if (this.saveTextOverride) {
+      return this.saveTextOverride;
+    }
+    return this.isCreatingNew ? 'Create' : 'Save changes';
   }
 }

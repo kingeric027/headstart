@@ -11,14 +11,10 @@
               [disabled]="!areChanges"
               class="btn btn-link"
               (click)="handleDiscard()">{{areChanges ? 'Discard Changes' : 'No Changes'}}</button>
-      <button *ngIf="areChanges && !showConfirm && !isCreatingNew"
-              [disabled]="!areChanges || showConfirm"
+      <button *ngIf="areChanges && !showConfirm"
+              [disabled]="!areChanges || showConfirm || dataIsSaving"
               class="btn brand-button"
-              (click)="handleSavePressed()">{{showConfirm ? 'Pending Confirmation' : saveTextOverride || 'Save Changes'}}</button>
-      <button *ngIf="areChanges && !showConfirm && isCreatingNew"
-              [disabled]="!areChanges || showConfirm"
-              class="btn brand-button"
-              (click)="handleSavePressed()">{{showConfirm ? 'Pending Confirmation' : saveTextOverride || 'Create'}}</button>
+              (click)="handleSavePressed()">{{getSaveText()}}</button>
       <button *ngIf="showConfirm && areChanges"
               class="btn btn-primary"
               (click)="emitSave()">Confirm</button>

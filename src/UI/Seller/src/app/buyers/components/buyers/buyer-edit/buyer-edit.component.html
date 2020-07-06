@@ -35,7 +35,7 @@
           </label>
         </div>
         <div class="form-group">
-          <label for="Markup">Markup</label>
+          <label for="Markup">Product Markup Percent</label>
           <input type="number"
                  class="form-control"
                  id="Markup"
@@ -52,6 +52,7 @@
   </form>
   <action-menu-component
     [isCreatingNew]="isCreatingNew"
+    [dataIsSaving]="dataIsSaving"
     [areChanges]="areChanges"  
     [allowDiscard]="true"
     [isDeleteable]="true"
