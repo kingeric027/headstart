@@ -53,7 +53,7 @@ namespace Marketplace.Common.Commands
             var buyer = await _oc.Buyers.GetAsync<MarketplaceBuyer>(buyerID, token);
 
             // to move into content docs logic
-            var markupPercent = buyer.xp.MarkupPercent;
+            var markupPercent = buyer.xp?.MarkupPercent ?? 0;
             var markup = new BuyerMarkup()
             {
                 Percent = markupPercent
@@ -104,7 +104,7 @@ namespace Marketplace.Common.Commands
             var updatedBuyer = await _oc.Buyers.PatchAsync(buyerID, new PartialBuyer() { xp = new { MarkupPercent = markup.Percent } });
             return new BuyerMarkup()
             {
-                Percent = updatedBuyer.xp.Markup
+                Percent = (int)updatedBuyer.xp.MarkupPercent
             };
         }
     }
