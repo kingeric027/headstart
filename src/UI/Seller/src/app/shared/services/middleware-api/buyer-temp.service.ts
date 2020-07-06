@@ -7,7 +7,7 @@ import { MarketplaceBuyer } from 'marketplace-javascript-sdk';
 // WHOPLE FILE TO BE REPLACED BY SDK
 
 export interface SuperMarketplaceBuyer {
-  Buyer: MarketplaceBuyer[];
+  Buyer: MarketplaceBuyer;
   Markup: BuyerMarkup;
 }
 
@@ -31,18 +31,18 @@ export class BuyerTempService {
     });
   }
 
-  async get(buyerID: string, catalogID: string): Promise<SuperMarketplaceBuyer> {
+  async get(buyerID: string): Promise<SuperMarketplaceBuyer> {
     const url = `${this.appConfig.middlewareUrl}/buyer/${buyerID}`;
     return await this.http.get<SuperMarketplaceBuyer>(url, { headers: this.buildHeaders() }).toPromise();
   }
 
   async create(superBuyer: SuperMarketplaceBuyer): Promise<SuperMarketplaceBuyer> {
     const url = `${this.appConfig.middlewareUrl}/buyer`;
-    return await this.http.post<SuperMarketplaceBuyer>(url, { headers: this.buildHeaders() }).toPromise();
+    return await this.http.post<SuperMarketplaceBuyer>(url, superBuyer, { headers: this.buildHeaders() }).toPromise();
   }
 
-  async save(buyerIO: string, superBuyer: SuperMarketplaceBuyer): Promise<SuperMarketplaceBuyer> {
-    const url = `${this.appConfig.middlewareUrl}/buyer`;
-    return await this.http.put<SuperMarketplaceBuyer>(url, { headers: this.buildHeaders() }).toPromise();
+  async save(buyerID: string, superBuyer: SuperMarketplaceBuyer): Promise<SuperMarketplaceBuyer> {
+    const url = `${this.appConfig.middlewareUrl}/buyer/${buyerID}`;
+    return await this.http.put<SuperMarketplaceBuyer>(url, superBuyer, { headers: this.buildHeaders() }).toPromise();
   }
 }
