@@ -63,12 +63,17 @@ export class OCMCheckout implements OnInit {
     this.lineItems = this.context.order.cart.get();
     this.isAnon = this.context.currentUser.isAnonymous();
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
+    this.reIDLineItems();
     this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.lineItems.Items, this.currentPanel)
     this.setValidation('login', !this.isAnon);
   }
 
-  async doneWithShipToAddress(): Promise<void> {
+  async reIDLineItems(): Promise<void> {
     await this.checkout.cleanLineItemIDs(this.order.ID, this.lineItems.Items);
+    this.lineItems = this.context.order.cart.get();
+  }
+
+  async doneWithShipToAddress(): Promise<void> {
     const orderWorksheet = await this.checkout.estimateShipping();
     this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
     if(!this.orderSummaryMeta.StandardLineItemCount) {
