@@ -1,25 +1,39 @@
-<div class="py-4 mt-2 bg-light text-center">
-  <div class="col-sm-12 d-flex justify-content-around">
-    <a (click)="toTermsAndConditions()"
-       class="mr-1 text-muted link cursor-pointer">
-      <fa-icon class="mr-1 d-md-none"
-               [icon]="faFileAlt"></fa-icon>
-      <small translate>LAYOUT.APP_FOOTER.TERMS_CONDITIONS</small>
-    </a>
-    <a class="text-muted link cursor-pointer"
-       (click)="toSupport()">
-      <fa-icon class="mr-1"
-               [icon]="faPhone"></fa-icon>
-      <small translate>LAYOUT.APP_FOOTER.SUPPORT</small>
-    </a>
-    <a class="text-muted link cursor-pointer"
-       (click)="toFAQ()">
-      <fa-icon class="mr-1 text-muted"
-               [icon]="faQuestionCircle"></fa-icon>
-      <small translate>LAYOUT.APP_FOOTER.FAQ</small>
-    </a>
+<footer class="py-4 mt-2 bg-light">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3 d-flex flex-column">
+        <a class="text-muted link cursor-pointer"
+           (click)="toSupport()">
+          <fa-icon class="mr-1"
+                   [icon]="faPhone"></fa-icon>
+          <small translate>LAYOUT.APP_FOOTER.SUPPORT</small>
+        </a>
+        <a class="text-muted link cursor-pointer"
+           (click)="toFAQ()">
+          <fa-icon class="mr-1 text-muted"
+                   [icon]="faQuestionCircle"></fa-icon>
+          <small translate>LAYOUT.APP_FOOTER.FAQ</small>
+        </a>
+        <a (click)="toTermsAndConditions()"
+           class="mr-1 text-muted link cursor-pointer">
+          <fa-icon class="mr-1 d-md-none"
+                   [icon]="faFileAlt"></fa-icon>
+          <small translate>LAYOUT.APP_FOOTER.TERMS_CONDITIONS</small>
+        </a>
+      </div>
+      <div class="col-md-4">
+        <p class="mb-1 text-muted font-weight-bold text-uppercase">Questions or comments?</p>
+        <p class="mb-0">Ring: xxx-xxx-xxxx</p>
+        <p class="mb-0">Write: support@test.com</p>
+      </div>
+      <div class="col-md-5">
+        <button class="btn btn-sm btn-primary"
+                (click)="submitClaim()">Submit Claim</button>
+      </div>
+      <div class="col-md-12">
+        <small class="text-muted"
+               translate>LAYOUT.APP_FOOTER.CREATED_BY</small>
+      </div>
+    </div>
   </div>
-  <div class="p-0 mt-0 text-center text-muted col-sm-12">
-    <small translate>LAYOUT.APP_FOOTER.CREATED_BY</small>
-  </div>
-</div>
+</footer>

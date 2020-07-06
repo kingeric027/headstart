@@ -28,7 +28,7 @@ namespace Marketplace.Common.Commands
         public async Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID, VerifiedUserContext user)
         {
             var buyerAddress = await _oc.Addresses.GetAsync<MarketplaceAddressBuyer>(buyerID, buyerLocationID, accessToken: user.AccessToken);
-            var buyerUserGroup = await _oc.UserGroups.GetAsync<MarketplaceUserGroup>(buyerID, buyerLocationID, accessToken: user.AccessToken);
+            var buyerUserGroup = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocationID, accessToken: user.AccessToken);
             return new MarketplaceBuyerLocation
             {
                 Address = buyerAddress,
@@ -42,7 +42,7 @@ namespace Marketplace.Common.Commands
             var buyerAddress = await _oc.Addresses.CreateAsync<MarketplaceAddressBuyer>(buyerID, buyerLocation.Address, accessToken: user.AccessToken);
 
             buyerLocation.UserGroup.ID = buyerAddress.ID;
-            var buyerUserGroup = await _oc.UserGroups.CreateAsync<MarketplaceUserGroup>(buyerID, buyerLocation.UserGroup, accessToken: user.AccessToken);
+            var buyerUserGroup = await _oc.UserGroups.CreateAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocation.UserGroup, accessToken: user.AccessToken);
             await CreateUserGroupAndAssignments(token, buyerID, buyerUserGroup.ID, buyerAddress.ID);
             await CreateLocationUserGroupsAndApprovalRule(token, buyerAddress.ID, buyerAddress.AddressName);
 
@@ -86,7 +86,7 @@ namespace Marketplace.Common.Commands
         public async Task<MarketplaceBuyerLocation> Update(string buyerID, string buyerLocationID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user)
         {
             var updatedBuyerAddress = await _oc.Addresses.SaveAsync<MarketplaceAddressBuyer>(buyerID, buyerLocation.Address.ID, buyerLocation.Address, accessToken: user.AccessToken);
-            var updatedBuyerUserGroup = await _oc.UserGroups.SaveAsync<MarketplaceUserGroup>(buyerID, buyerLocation.UserGroup.ID, buyerLocation.UserGroup, accessToken: user.AccessToken);
+            var updatedBuyerUserGroup = await _oc.UserGroups.SaveAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocation.UserGroup.ID, buyerLocation.UserGroup, accessToken: user.AccessToken);
             return new MarketplaceBuyerLocation
             {
                 Address = updatedBuyerAddress,

@@ -23,6 +23,7 @@ import { filter, takeWhile } from 'rxjs/operators';
 import { ListPage } from 'marketplace-javascript-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
+import { pipe } from 'rxjs';
 
 interface BreadCrumb {
   displayText: string;
@@ -53,6 +54,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   _currentResourceNamePlural: string;
   _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
+  _filterConfig: any;
   areChanges: boolean;
   parentResources: ListPage<any>;
   requestStatus: RequestStatus;
@@ -62,6 +64,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   isCreatingNew = false;
   isCreatingSubResource = false;
   isMyResource = false;
+  shouldDisplayList = false;
   alive = true;
   screenSize;
   myResourceHeight = 450;
@@ -116,7 +119,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   selectedResourceID: string;
   @Input()
-  filterConfig: any;
+  set filterConfig(value: any) {
+    this._filterConfig = value;
+    this.setFilterForm()
+  };
   @Input()
   resourceForm: FormGroup;
   @Input()
@@ -128,12 +134,27 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   canBeDeleted = true;
 
-  async ngOnInit() {
-    this.determineViewingContext();
+  async ngOnInit(): Promise<void> {
+    await this.determineViewingContext();
     this.initializeSubscriptions();
-    this.setFilterForm();
     this.subscribeToOptions();
     this.screenSize = getScreenSizeBreakPoint();
+  }
+
+  getTitle(isMyResource: boolean, resourceName: string, selectedParentResourceName: string): string {
+    if(isMyResource) {
+      if(resourceName === 'suppliers') {
+        return 'My Profile'
+      } else {
+        return resourceName;
+      }
+    } else {
+      if(selectedParentResourceName) {
+        return resourceName + ' - ' + selectedParentResourceName;
+      } else {
+        return resourceName;
+      }
+    } 
   }
 
   ngAfterViewChecked() {
@@ -192,8 +213,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.editResourceHeight = getPsHeight('additional-item-edit-resource');
   }
 
-  determineViewingContext() {
+  async determineViewingContext() {
     this.isMyResource = this.router.url.startsWith('/my-');
+    this.shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
+    if(this.isMyResource) {
+      const resource = await this._ocService.getMyResource();
+      this.selectedParentResourceName = resource.Name;
+    }
   }
 
   private async initializeSubscriptions() {
@@ -206,7 +232,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   private async redirectToFirstParentIfNeeded() {
     if (this.parentResourceService) {
-      if (this.parentResourceService.getParentResourceID() === REDIRECT_TO_FIRST_PARENT) {
+      const parentResourceID = await this.parentResourceService.getParentResourceID(); 
+      if (parentResourceID === REDIRECT_TO_FIRST_PARENT) {
         await this.parentResourceService.listResources();
         this._ocService.selectParentResource(this.parentResourceService.resourceSubject.value.Items[0]);
       }
@@ -235,6 +262,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
         this.selectedParentResourceID = parentResourceID;
+        if( this.isMyResource ) {
+          const parentResource = await this._ocService.getMyResource();
+          if (parentResource) this.selectedParentResourceName = parentResource.Name;
+        }
         if (params && parentResourceID) {
           const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
           if (parentResource) this.selectedParentResourceName = parentResource.Name;
@@ -282,8 +313,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   setFilterForm() {
     const formGroup = {};
-    if (this.filterConfig && this.filterConfig.Filters) {
-      this.filterConfig.Filters.forEach(filter => {
+    if (this._filterConfig && this._filterConfig.Filters) {
+      this._filterConfig.Filters.forEach(filter => {
         const value = this.getSelectedFilterValue(filter.Path);
         formGroup[filter.Path] = new FormControl(value);
       });

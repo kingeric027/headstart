@@ -8,9 +8,11 @@ import {
   OcSupplierUserGroupService,
   ListUserGroup,
   ListUserGroupAssignment,
+  Supplier,
 } from '@ordercloud/angular-sdk';
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
 @Injectable({
@@ -29,16 +31,19 @@ export class SupplierUserService extends ResourceCrudService<User> {
     router: Router,
     activatedRoute: ActivatedRoute,
     ocSupplierUserService: OcSupplierUserService,
-    private ocSupplierUserGroupService: OcSupplierUserGroupService
+    private ocSupplierUserGroupService: OcSupplierUserGroupService,
+    public currentUserService: CurrentUserService
   ) {
     super(
       router,
       activatedRoute,
       ocSupplierUserService,
-      '/suppliers',
+      currentUserService,
+      '/suppliers', 
       'suppliers',
       SUPPLIER_SUB_RESOURCE_LIST,
-      'users'
+      'users',
+      '/my-supplier'
     );
   }
   async updateUserUserGroupAssignments(

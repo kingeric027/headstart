@@ -1,83 +1,91 @@
-<div class="container">
-  <div class="row">
-    <div class="col-3">
-      <div>
-        <mat-form-field>
-            <mat-label>High Level Category</mat-label>
-            <mat-select (selectionChange)="selectHighLevelCategory($event)">
-              <mat-option *ngFor="let category of highLevelOptions" [value]="category.ID">
-                {{category.Name}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      
-        <ng-container *ngIf="midLevelOptions.length && !showMidLevel && highLevelSelection">
-          <p class="font-italic">
-            You may assign the product at this level or get more specific with subcategories
-          </p>
-          <button 
-          class="btn btn-primary"
-          type="submit"
-          (click)="showMidLevel = true">Browse Subcategories</button>
-        </ng-container>
-      
-        <div>
-          <mat-form-field *ngIf="showMidLevel">
-              <mat-label>Mid Level Category</mat-label>
-              <mat-select (selectionChange)="selectMidLevelCategory($event)">
-                <mat-option *ngFor="let category of midLevelOptions" [value]="category.ID">
+<h5 class="mt-4">Categories</h5>
+<p *ngIf="!highLevelOptions.length"
+   class="alert alert-info font-weight-bold mb-0 p-3 shadow-sm">There are no categories for this buyer currently.</p>
+<ng-container *ngIf="highLevelOptions.length">
+  <div class="card shadow-sm p-4 my-3">
+    <div class="row">
+      <div class="col-md-5">
+        <div class="row">
+          <div class="col-md-6">
+            <mat-form-field class="w-100">
+              <mat-label>High Level Category</mat-label>
+              <mat-select (selectionChange)="selectHighLevelCategory($event)">
+                <mat-option *ngFor="let category of highLevelOptions"
+                            [value]="category.ID">
                   {{category.Name}}
                 </mat-option>
               </mat-select>
             </mat-form-field>
+            <ng-container *ngIf="midLevelOptions.length && !showMidLevel && highLevelSelection">
+              <button class="btn btn-sm btn-medium"
+                      type="submit"
+                      (click)="showMidLevel = true">Browse Subcategories</button>
+            </ng-container>
+            <div *ngIf="showMidLevel">
+              <mat-form-field class="w-100">
+                <mat-label>Mid Level Category</mat-label>
+                <mat-select (selectionChange)="selectMidLevelCategory($event)">
+                  <mat-option *ngFor="let category of midLevelOptions"
+                              [value]="category.ID">
+                    {{category.Name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <ng-container *ngIf="lowLevelOptions.length && !showLowLevel && midLevelSelection">
+              <button class="btn btn-sm btn-medium"
+                      type="submit"
+                      (click)="showLowLevel = true">Browse Subcategories</button>
+            </ng-container>
+            <div *ngIf="showLowLevel">
+              <mat-form-field class="w-100">
+                <mat-label>Low Level Category</mat-label>
+                <mat-select (selectionChange)="selectLowLevelCategory($event)">
+                  <mat-option *ngFor="let category of lowLevelOptions"
+                              [value]="category.ID">
+                    {{category.Name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-block btn-outline-primary mt-3 mt-md-0"
+                    type="submit"
+                    (click)="addAssignment()"
+                    [disabled]="!highLevelSelection">Add Assignment</button>
+            <small class="d-block font-italic mt-2">
+              You may assign the product at this level or get more specific with subcategories
+            </small>
+          </div>
         </div>
-        
-        <ng-container *ngIf="lowLevelOptions.length && !showLowLevel && midLevelSelection">
-          <p class="font-italic">
-            You may assign the product at this level or get more specific with subcategories
-          </p>
-          <button 
-          class="btn btn-primary"
-          type="submit"
-          (click)="showLowLevel = true">Browse Subcategories</button>
-        </ng-container>
-      
-        <div>
-          <mat-form-field *ngIf="showLowLevel">
-            <mat-label>Low Level Category</mat-label>
-            <mat-select (selectionChange)="selectLowLevelCategory($event)">
-              <mat-option *ngFor="let category of lowLevelOptions" [value]="category.ID">
-                {{category.Name}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>   
-        <button
-        *ngIf="highLevelSelection" 
-        class="btn btn-primary"
-        type="submit"
-        (click)="addAssignment()">Add Assignment</button>
       </div>
-    <div class="col-9 assignments-container">
-      <mat-chip-list>
-        <mat-chip *ngFor="let category of _assignedCategoriesEditable; index as i"
-        [removable]="true" (removed)="removeAssignment(i)">
-        <span>{{category[0].Name}}</span>
-        <span *ngIf="category.length > 1" class="material-icons">
-          keyboard_arrow_right
-          </span>          
-        <span *ngIf="category.length > 1">
-          {{category[1].Name}}
-        </span>
-        <span *ngIf="category.length > 2" class="material-icons">
-          keyboard_arrow_right
-        </span>          
-        <span *ngIf="category.length > 2">
-          {{category[2].Name}}</span>
-        <mat-icon matChipRemove>cancel</mat-icon>
-        </mat-chip>
-      </mat-chip-list>
+      <div class="col-md-7">
+        <div class="card shadow-sm p-3"
+             style="min-height:177px;">
+          <mat-chip-list>
+            <mat-chip *ngFor="let category of _assignedCategoriesEditable; index as i"
+                      [removable]="true"
+                      (removed)="removeAssignment(i)">
+              <span>{{category[0].Name}}</span>
+              <span *ngIf="category.length > 1"
+                    class="material-icons">
+                keyboard_arrow_right
+              </span>
+              <span *ngIf="category.length > 1">
+                {{category[1].Name}}
+              </span>
+              <span *ngIf="category.length > 2"
+                    class="material-icons">
+                keyboard_arrow_right
+              </span>
+              <span *ngIf="category.length > 2">
+                {{category[2].Name}}</span>
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+          </mat-chip-list>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</ng-container>

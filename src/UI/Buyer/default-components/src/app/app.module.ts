@@ -134,6 +134,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OCMBuyerLocationPermissions } from './components/profile/buyer-location-permissions/buyer-location-permissions';
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
 
@@ -265,6 +266,7 @@ const components = [
     MatCardModule,
     MatTableModule,
     MatCheckboxModule,
+    MatProgressSpinnerModule,
     MatButtonModule,
     FontAwesomeModule,
     NgbCarouselModule,

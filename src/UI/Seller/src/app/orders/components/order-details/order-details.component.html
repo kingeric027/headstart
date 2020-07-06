@@ -78,7 +78,12 @@
           </div>
           <hr>
         </div>
-        <div class="text-right lead"><b class="float-left">Total:</b><span class="_order-total">{{_order.Total | currency}}</span></div>
+        <div class="text-right lead"><b class="float-left">Total:</b><span class="_order-total">
+          <span *ngIf="_order.xp?.Currency"
+                  class="badge
+                      badge-pill
+                      badge-primary">{{_order.xp.Currency}}</span>
+                      {{_order.Total | currency}}</span></div>
         <hr>
         <!-- Since Outgoing Orders do not have Payment information, using an *ngIf -->
         <div class="lead"

@@ -40,7 +40,7 @@ const routes: Routes = [
         loadChildren: () => import('./suppliers/suppliers.module').then(m => m.SuppliersModule),
       },
       {
-        path: 'my-supplier-profile',
+        path: 'my-supplier',
         loadChildren: () => import('./suppliers/suppliers.module').then(m => m.SuppliersModule),
       },
       {

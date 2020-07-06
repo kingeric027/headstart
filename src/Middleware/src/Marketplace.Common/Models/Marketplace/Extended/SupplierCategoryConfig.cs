@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Cosmonaut.Attributes;
 using ordercloud.integrations.library;
@@ -24,7 +24,13 @@ namespace Marketplace.Models.Extended
     {
         public string Display { get; set; }
         public string Path { get; set; }
-        public IEnumerable<string> Values { get; set; }
+        public IEnumerable<SupplierCategoriesFilterItem> Items { get; set; }
+    }
+
+    public class SupplierCategoriesFilterItem
+    {
+        public string Text { get; set; }
+        public string Value { get; set; }
     }
 }
 
