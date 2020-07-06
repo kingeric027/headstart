@@ -8,6 +8,8 @@ import { getSupportedInputTypes } from '@angular/cdk/platform';
 })
 export class ActionMenuComponent {
   @Input()
+  isCreatingNew = false;
+  @Input()
   areChanges = false;
   @Input()
   allowDiscard = false;

@@ -1,0 +1,39 @@
+<div class="pb-3 d-flex justify-content-between">
+    <div *ngIf="allowDelete">
+        <delete-confirm-modal-component *ngIf="isDeletable"
+          buttonText="Delete {{resourceName | titlecase}}"
+          (deleteConfirmed)="handleDelete($event)">
+        </delete-confirm-modal-component>
+    </div>
+    <div *ngIf="!allowDelete"></div>
+    <div>
+      <button *ngIf="allowDiscard && !isCreatingNew"
+              [disabled]="!areChanges"
+              class="btn btn-link"
+              (click)="handleDiscard()">{{areChanges ? 'Discard Changes' : 'No Changes'}}</button>
+      <button *ngIf="areChanges && !showConfirm && !isCreatingNew"
+              [disabled]="!areChanges || showConfirm"
+              class="btn brand-button"
+              (click)="handleSavePressed()">{{showConfirm ? 'Pending Confirmation' : saveTextOverride || 'Save Changes'}}</button>
+      <button *ngIf="areChanges && !showConfirm && isCreatingNew"
+              [disabled]="!areChanges || showConfirm"
+              class="btn brand-button"
+              (click)="handleSavePressed()">{{showConfirm ? 'Pending Confirmation' : saveTextOverride || 'Create'}}</button>
+      <button *ngIf="showConfirm && areChanges"
+              class="btn btn-primary"
+              (click)="emitSave()">Confirm</button>
+    </div>
+    <div *ngIf="areChanges && showConfirm"
+         class="mt-3 pb-3 border-top">
+      <div class="p-4 border-radius border-primary bg-light">
+        <div class="d-flex justify-content-start align-items-center">
+          <fa-icon [icon]="faExclamationCircle"
+                   class="alert-icon mr-3"></fa-icon>
+          <p class="mb-0 d-flex flex-column">
+            <small class="font-weight-bold">This is a potentially destructive action that affects {{resourceName}}.</small>
+            {{confirmText}}
+          </p>
+        </div>
+      </div>
+    </div>
+</div>
