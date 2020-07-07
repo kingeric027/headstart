@@ -19,6 +19,9 @@ namespace Marketplace.Common.Models
             this.RecordId = split[split.Length - 1].Replace(".json", "");
             switch (split[2])
             {
+                case "hydratedproduct":
+                    this.RecordType = RecordType.HydratedProduct;
+                    break;
                 case "product":
                     this.RecordType = RecordType.Product;
                     break;

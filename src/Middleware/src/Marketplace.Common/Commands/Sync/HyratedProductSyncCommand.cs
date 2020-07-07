@@ -17,11 +17,9 @@ namespace Marketplace.Common.Commands
     public class HydratedProductSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        private readonly IMarketplaceProductCommand _product;
-        public HydratedProductSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, IMarketplaceProductCommand product) : base(settings, log)
+        public HydratedProductSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
         {
             _oc = oc;
-            _product = product;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
@@ -30,9 +28,9 @@ namespace Marketplace.Common.Commands
             try
             {
                 obj.ID = wi.RecordId;
-                var product = await _oc.Products.CreateAsync<MarketplaceProduct>(obj.Product, wi.Token);
                 var ps = await _oc.PriceSchedules.CreateAsync(obj.PriceSchedule, wi.Token);
-                await _oc.Products.SaveAssignmentAsync(new ProductAssignment()
+                var product = await _oc.Products.CreateAsync<MarketplaceProduct>(obj.Product, wi.Token);
+               await _oc.Products.SaveAssignmentAsync(new ProductAssignment()
                 {
                     ProductID = product.ID,
                     PriceScheduleID = ps.ID
@@ -46,7 +44,7 @@ namespace Marketplace.Common.Commands
                      }, wi.Token));
                 var list = obj.Specs.SelectMany(spec => spec.Options).ToList();
                 var options = Throttler.RunAsync(list, 100, 40, option => _oc.Specs.CreateOptionAsync(option.xp.SpecID, option, wi.Token));
-                // attempt to generate variants is option is set
+                // attempt to generate variants if option is set
                 if (specs.Any(s => s.DefinesVariant))
                 {
                     await _oc.Products.GenerateVariantsAsync<MarketplaceProduct>(product.ID, true, wi.Token);
