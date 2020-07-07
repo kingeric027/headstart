@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ordercloud.integrations.library;
 
@@ -20,12 +21,6 @@ namespace ordercloud.integrations.cms
 		public TokenExpiredException() : base("Token", "Token has expired", null) { }
 	}
 
-	public class AllowedResourceAssociationsEmptyException : OrderCloudIntegrationException
-	{
-		public AllowedResourceAssociationsEmptyException() : 
-			base("Schema Error", $"AllowedResourceAssociations array cannot be empty", null) { }
-	}
-
 	public class DuplicateIDException : OrderCloudIntegrationException
 	{
 		public DuplicateIDException() : base("IdExists", "Object already exists.", null) { }
@@ -43,6 +38,7 @@ namespace ordercloud.integrations.cms
 
 	public class InvalidAssignmentException : OrderCloudIntegrationException
 	{
-		public InvalidAssignmentException() : base("Invalid Assignment", $"This type of document can not be assigned to this type of resource. This is set on the schema.", null) { }
+		public InvalidAssignmentException(List<ResourceType> allowed) : 
+			base("Invalid Assignment", $"This type of document can only be assigned the following resources. This is set on the schema.", allowed.Select(r => Enum.GetName(r.GetType(), r))) { }
 	}
 }

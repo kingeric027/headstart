@@ -16,7 +16,7 @@ namespace ordercloud.integrations.cms
 	{
 		Task<ListPage<DocumentSchema>> List(IListArgs args, VerifiedUserContext user);
 		Task<DocumentSchema> Get(string schemaInteropID, VerifiedUserContext user);
-		Task<DocumentSchema> Get(string schemaID);
+		Task<DocumentSchema> GetByInternalID(string schemaID);
 		Task<DocumentSchema> Create(DocumentSchema schema, VerifiedUserContext user);
 		Task<DocumentSchema> Update(string schemaInteropID, DocumentSchema schema, VerifiedUserContext user);
 		Task Delete(string schemaInteropID, VerifiedUserContext user);
@@ -44,9 +44,9 @@ namespace ordercloud.integrations.cms
 			return list.ToListPage(args.Page, args.PageSize, count);
 		}
 
-		public async Task<DocumentSchema> Get(string ID)
+		public async Task<DocumentSchema> GetByInternalID(string schemaID)
 		{
-			var schema = await _store.Query($"select top 1 * from c where c.id = @id", new { id = ID }).FirstOrDefaultAsync();
+			var schema = await _store.Query($"select top 1 * from c where c.id = @id", new { id = schemaID }).FirstOrDefaultAsync();
 			return schema;
 		}
 
@@ -71,9 +71,8 @@ namespace ordercloud.integrations.cms
 		{
 			var existingSchema = await Get(schemaInteropID, user);
 			existingSchema.InteropID = schema.InteropID;
-			existingSchema.AllowedResourceAssociations = schema.AllowedResourceAssociations;
+			existingSchema.RestrictedAssignmentTypes = schema.RestrictedAssignmentTypes;
 			existingSchema.Schema = schema.Schema;
-			existingSchema.Title = schema.Title;
 			existingSchema = Validate(existingSchema);
 			var updatedContainer = await _store.UpdateAsync(existingSchema);
 			return updatedContainer;
@@ -87,13 +86,8 @@ namespace ordercloud.integrations.cms
 
 		private DocumentSchema Validate(DocumentSchema schema)
 		{
-			if (schema.AllowedResourceAssociations.Count < 1)
-			{
-				throw new AllowedResourceAssociationsEmptyException();
-			}
 			schema.Schema["$schema"] = $"{_settings.BaseUrl}/schema-specs/metaschema";
 			schema.Schema["$id"] = $"{_settings.BaseUrl}/schema-specs/{schema.id}";
-			schema.Schema["title"] = schema.Title;
 			return SchemaHelper.ValidateSchema(schema);
 		}
 

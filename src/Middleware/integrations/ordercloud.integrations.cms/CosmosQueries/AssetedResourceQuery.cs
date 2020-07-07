@@ -40,7 +40,7 @@ namespace ordercloud.integrations.cms
 				.Concat(assetedResource.AttachmentAssetIDs)
 				.Concat(assetedResource.StructuredAssetsIDs)
 				.ToList();
-			var assets = await _assets.ListAcrossContainers(assetIDs);
+			var assets = await _assets.ListByInternalIDs(assetIDs);
 			return assets.Select(asset => {
 				int indexWithinType = GetAssetIDs(assetedResource, asset.Type).IndexOf(asset.id);
 				return new AssetForDelivery(asset, indexWithinType);
@@ -54,7 +54,7 @@ namespace ordercloud.integrations.cms
 			{
 				return GetPlaceholderImageUrl(resource.Type);
 			}
-			var asset = await _assets.GetAcrossContainers(assetedResource.ImageAssetIDs.First());
+			var asset = await _assets.GetByInternalID(assetedResource.ImageAssetIDs.First());
 			return asset.Url;
 		}
 
@@ -87,13 +87,7 @@ namespace ordercloud.integrations.cms
 
 		private async Task<AssetedResource> GetExistingOrDefault(Resource resource)
 		{
-			return await GetExisting(resource) ??
-				new AssetedResource()
-				{
-					ResourceID = resource.ID,
-					ResourceParentID = resource.ParentID,
-					ResourceType = resource.Type
-				};
+			return await GetExisting(resource) ?? new AssetedResource() { Resource = resource };
 		}
 
 		private async Task<AssetedResource> GetExisting(Resource resource)

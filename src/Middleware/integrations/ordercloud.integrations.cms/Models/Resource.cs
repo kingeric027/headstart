@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace ordercloud.integrations.cms
 {
@@ -17,6 +18,7 @@ namespace ordercloud.integrations.cms
 		public ResourceType Type { get; set; }
 	}
 
+	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public enum ResourceType
 	{
 		Products, Categories, Catalogs, Promotions, Suppliers, Buyers, ProductFacets

@@ -10,7 +10,7 @@ namespace CMS.Tests
 {
 	public class SchemaTests
 	{
-		private DocumentSchema GetSchema(string json) => new DocumentSchema() { Schema = JObject.Parse(json), Title = "A Title" };
+		private DocumentSchema GetSchema(string json) => new DocumentSchema() { Schema = JObject.Parse(json) };
 		private Document GetDocument(string json) => new Document() { Doc = JObject.Parse(json) };
 
 		private const string ValidSchema = @"{ 

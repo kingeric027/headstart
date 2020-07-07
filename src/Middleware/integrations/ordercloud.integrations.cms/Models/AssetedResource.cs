@@ -10,10 +10,7 @@ namespace ordercloud.integrations.cms
 	[CosmosCollection("assetedresource")]
 	public class AssetedResource : CosmosObject
 	{
-		[CosmosPartitionKey]
-		public string ResourceID { get; set; }
-		public string ResourceParentID { get; set; } = null;
-		public ResourceType ResourceType { get; set; }
+		public Resource Resource { get; set; } // Resource.ID is partition key. TODO - break up resource object? 
 		public List<string> ImageAssetIDs { get; set; } = new List<string>();
 		public List<string> ThemeAssetIDs { get; set; } = new List<string>();
 		public List<string> AttachmentAssetIDs { get; set; } = new List<string>();

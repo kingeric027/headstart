@@ -71,13 +71,13 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocIgnore]
 		[HttpGet, Route("schema-specs/{schemaID}")] // No auth is intentional. Make these available to anyone.
-		public async Task<JObject> GetSchemaSpec(string schemaID)
+		public async Task<JObject> GetSchemaSpec(string schemaID) // Not interopID!! real, id.
 		{
 			if (schemaID == "metaschema")
 			{
 				return JObject.Parse(SchemaForSchemas.JSON);
 			}
-			var schema = await _schemas.Get(schemaID); // Not interopID!! real, immutable Id.
+			var schema = await _schemas.GetByInternalID(schemaID); 
 			return schema.Schema;
 		}
 	}

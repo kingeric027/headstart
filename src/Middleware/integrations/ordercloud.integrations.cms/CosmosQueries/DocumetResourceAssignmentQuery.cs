@@ -42,14 +42,15 @@ namespace ordercloud.integrations.cms
 				.Sort(args)
 				.Where(doc => 
 					doc.SchemaID == schema.id && 
-					doc.ResourceID == resource.ID &&
-					doc.ResourceParentID == resource.ParentID &&
-					doc.ResourceType == resource.Type
+					doc.RsrcID == resource.ID &&
+					doc.RsrcParentID == resource.ParentID &&
+					doc.RsrcType== resource.Type
 				);
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var assignments = list.ToListPage(args.Page, args.PageSize, count);
-			var documents = await Throttler.RunAsync(assignments.Items, 5, 20, assignment => _documents.Get(assignment.DocumentID)); // maybe switch to SQL "IN"
+			var documentIDs = assignments.Items.Select(assign => assign.DocID);
+			var documents = await _documents.ListByInternalIDs(documentIDs);
 			return new ListPage<Document>()
 			{
 				Items = documents,
@@ -61,47 +62,41 @@ namespace ordercloud.integrations.cms
 		{
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
-			if (!schema.AllowedResourceAssociations.Contains(resource.Type))
+			if (!isValidAssignment(schema.RestrictedAssignmentTypes, resource.Type))
 			{
-				throw new InvalidAssignmentException(); // TODO - Add AllowedResourceAssociations list to error
+				throw new InvalidAssignmentException(schema.RestrictedAssignmentTypes);
 			}
-			var document = await _documents.GetWithSchemaDBID(schema.id, documentInteropID, user);
+			var document = await _documents.GetByInternalSchemaID(schema.id, documentInteropID, user);
 			await _store.UpsertAsync(new DocumentResourceAssignment()
 			{
-				ResourceID = resource.ID,
-				ResourceParentID = resource.ParentID,
-				ResourceType = resource.Type,
-				OwnerClientID = user.ClientID,
+				RsrcID = resource.ID,
+				RsrcParentID = resource.ParentID,
+				RsrcType = resource.Type,
+				ClientID = user.ClientID,
 				SchemaID = schema.id,
-				DocumentID = document.id
+				DocID = document.id
 			});
+		}
+
+		private bool isValidAssignment(List<ResourceType> restrictedAssignmentTypes, ResourceType thisType)
+		{
+			return restrictedAssignmentTypes.Count == 0 || restrictedAssignmentTypes.Contains(thisType);
 		}
 
 		public async Task DeleteAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user)
 		{
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
-			var document = await _documents.GetWithSchemaDBID(schema.id, documentInteropID, user);
-			var assignment = new DocumentResourceAssignment()
-			{
-				ResourceID = resource.ID,
-				ResourceParentID = resource.ParentID,
-				ResourceType = resource.Type,
-				OwnerClientID = user.ClientID,
-				SchemaID = schema.id,
-				DocumentID = document.id
-			};
-			var query = @"select top 1 * from c where 
-							c.ResourceType = @ResourceType 
-							AND c.ResourceID = @ResourceID 
-							AND c.ResourceParentID = @ResourceParentID
-							AND c.SchemaID = @SchemaID
-							AND c.DocumentID = @DocumentID
-							AND c.OwnerClientID = @OwnerClientID";
-			assignment = await _store.QuerySingleAsync(query, assignment);
-			if (assignment != null) { // TODO - what is correct way to handle delete that doesn't exist?
-				await _store.RemoveByIdAsync(assignment.id, user.ClientID);
-			}
+			var document = await _documents.GetByInternalSchemaID(schema.id, documentInteropID, user);
+			// TODO - what is the correct way to handle delete that doesn't exist?
+			await _store.RemoveAsync(assign =>
+				assign.RsrcID == resource.ID &&
+				assign.RsrcParentID == resource.ParentID &&
+				assign.RsrcType == resource.Type &&
+				assign.ClientID == user.ClientID &&
+				assign.SchemaID == schema.id &&
+				assign.DocID == document.id
+			);
 		}
 	}
 }

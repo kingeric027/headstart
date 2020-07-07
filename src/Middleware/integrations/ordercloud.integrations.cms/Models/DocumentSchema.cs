@@ -18,12 +18,9 @@ namespace ordercloud.integrations.cms
 	{
 		[JsonProperty("ID"), CosmosInteropID, Required]
 		public string InteropID { get; set; }
-		[Required, MaxLength(100)]
-		public string Title { get; set; }
 		[CosmosPartitionKey, ApiIgnore]
 		public string OwnerClientID { get; set; }
-		[Required]
-		public List<ResourceType> AllowedResourceAssociations { get; set; } // Cannot be empty
+		public List<ResourceType> RestrictedAssignmentTypes { get; set; } = new List<ResourceType>(); // empty means no restrictions
 		[Required]
 		public JObject Schema { get; set; }
 		public new static Collection<UniqueKey> GetUniqueKeys()
