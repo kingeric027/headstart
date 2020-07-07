@@ -107,7 +107,7 @@ export enum OrderStatus {
   AwaitingApproval = 'AwaitingApproval',
   ChangesRequested = 'ChangesRequested',
   Open = 'Open',
-  Complete = 'Complete',
+  Completed = 'Completed',
   Canceled = 'Canceled',
 }
 
