@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ListPage, MarketplaceLineItem, MarketplaceOrder } from 'marketplace-javascript-sdk';
-import { LineItems, Me, Order, Orders } from 'ordercloud-javascript-sdk';
+import { LineItems, Me, Order, Orders, OrderPromotion } from 'ordercloud-javascript-sdk';
 import { BehaviorSubject } from 'rxjs';
 import { listAll } from '../../functions/listAll';
 import { AppConfig, ClaimStatus, ShippingStatus } from '../../shopper-context';
@@ -12,6 +12,10 @@ import { TokenHelperService } from '../token-helper/token-helper.service';
 })
 export class OrderStateService {
   public readonly DefaultLineItems: ListPage<MarketplaceLineItem> = {
+    Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
+    Items: [],
+  };
+  public readonly DefaultOrderPromos: ListPage<OrderPromotion> = {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
   };
@@ -29,6 +33,7 @@ export class OrderStateService {
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
+  private orderPromosSubject = new BehaviorSubject<ListPage<OrderPromotion>>(this.DefaultOrderPromos);
   private lineItemSubject = new BehaviorSubject<ListPage<MarketplaceLineItem>>(this.DefaultLineItems);
 
   constructor(
@@ -53,12 +58,24 @@ export class OrderStateService {
     this.lineItemSubject.next(value);
   }
 
+  get orderPromos(): ListPage<OrderPromotion> {
+    return this.orderPromosSubject.value;
+  }
+
+  set orderPromos(value: ListPage<OrderPromotion>) {
+    this.orderPromosSubject.next(value);
+  }
+
   onOrderChange(callback: (order: MarketplaceOrder) => void): void {
     this.orderSubject.subscribe(callback);
   }
 
   onLineItemsChange(callback: (lineItems: ListPage<MarketplaceLineItem>) => void): void {
     this.lineItemSubject.subscribe(callback);
+  }
+
+  onPromosChange(callback: (promos: ListPage<OrderPromotion>) => void): void {
+    this.orderPromosSubject.subscribe(callback);
   }
 
   async reset(): Promise<void> {
@@ -86,6 +103,7 @@ export class OrderStateService {
     if (this.order.DateCreated) {
       await this.resetLineItems();
     }
+    this.orderPromos = await Orders.ListPromotions('Outgoing', this.order.ID);
   }
 
   async resetLineItems(): Promise<void> {

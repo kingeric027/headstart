@@ -38,7 +38,34 @@
         orderSummaryMeta.ShippingAndTaxOverrideText
       }}</span>
     </div>
-    <hr />
+    <ng-container *ngIf="currentPanel === 'payment'">
+      <hr />
+      <label for="PromoCode">Discount Code</label>
+      <div class="input-group">
+        <input type="text"
+               class="form-control"
+               placeholder="e.g. SPRING20"
+               [value]="promoCode"
+               (input)="updatePromoCodeValue($event)"
+               id="PromoCode">
+        <div class="input-group-append">
+          <button class="btn btn-secondary"
+                  (click)="applyPromo()">Apply</button>
+        </div>
+      </div>
+      <hr />
+    </ng-container>
+    <ng-container *ngIf="_orderPromos?.length">
+      <h4 class="mb-0">Applied Promotions</h4>
+      <div *ngFor="let promo of _orderPromos">
+        <div class="d-flex justify-content-between align-items-center">
+          <p class="mb-0">{{promo.Code}}</p>
+          <small (click)="removePromo(promo.Code)"
+                 class="btn btn-link text-danger">Remove</small>
+        </div>
+        <small>{{promo.Description}}</small>
+      </div>
+    </ng-container>
     <div class="text-right lead">
       <b *ngIf="!orderSummaryMeta.POLineItemCount"
          class="float-left"

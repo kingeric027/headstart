@@ -10,6 +10,7 @@ import {
   ShipMethodSelection,
   LineItem,
   LineItems,
+  OrderPromotion,
 } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
@@ -23,6 +24,7 @@ import {
   ListPage,
   MarketplaceLineItem,
 } from 'marketplace-javascript-sdk';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +32,6 @@ import {
 export class CheckoutService {
   constructor(
     private paymentHelper: PaymentHelperService,
-    private appSettings: AppConfig,
     private state: OrderStateService,
     private appConfig: AppConfig
   ) {}

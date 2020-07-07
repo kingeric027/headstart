@@ -11,7 +11,9 @@
     <div class="row flex-lg-row-reverse"
          *ngIf="order.LineItemCount">
       <div class="col-lg-3">
-        <ocm-order-summary [orderSummaryMeta]="orderSummaryMeta"></ocm-order-summary>
+        <ocm-order-summary [orderSummaryMeta]="orderSummaryMeta"
+                           (promosChanged)="updateOrderMeta()"
+                           [currentPanel]="currentPanel"></ocm-order-summary>
       </div>
       <div class="col-lg-9">
         <ngb-accordion [closeOthers]="true"
@@ -61,6 +63,7 @@
               <ocm-checkout-address [isAnon]="isAnon"
                                     [order]="order"
                                     [lineItems]="lineItems"
+                                    [orderPromos]="orderPromotions"
                                     (continue)="doneWithShipToAddress()"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
@@ -75,6 +78,7 @@
             <ng-template ngbPanelContent>
               <ocm-checkout-shipping [order]="order"
                                      [lineItems]="lineItems"
+                                     [orderPromos]="orderPromotions"
                                      [shipEstimates]="shipEstimates"
                                      (selectShipRate)="selectShipMethod($event.detail)"
                                      (continue)="doneWithShippingRates()">
@@ -92,6 +96,7 @@
             <ng-template ngbPanelContent>
               <ocm-checkout-payment [isAnon]="isAnon"
                                     [order]="order"
+                                    [orderPromos]="orderPromotions"
                                     [cards]="cards"
                                     [orderSummaryMeta]="orderSummaryMeta"
                                     (cardSelected)="onCardSelected($event.detail)"
@@ -107,6 +112,7 @@
             <ng-template ngbPanelContent>
               <ocm-checkout-confirm [isAnon]="isAnon"
                                     [order]="order"
+                                    [orderPromos]="orderPromotions"
                                     [lineItems]="lineItems"
                                     [payments]="payments"
                                     (submitOrderWithComment)="submitOrderWithComment($event.detail)">
