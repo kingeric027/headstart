@@ -8,6 +8,8 @@ using System.Text;
 
 namespace ordercloud.integrations.cms
 {
+	[SwaggerModel]
+	[CosmosCollection("documentresourceassignments")]
 	public class DocumentResourceAssignment : CosmosObject
 	{
 		public string RsrcID { get; set; }   

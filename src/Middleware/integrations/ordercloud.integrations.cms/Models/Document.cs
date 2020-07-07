@@ -14,6 +14,8 @@ using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribut
 
 namespace ordercloud.integrations.cms
 {
+	[SwaggerModel]
+	[CosmosCollection("documents")]
 	public class Document: CosmosObject
 	{
 		[JsonProperty("ID"), CosmosInteropID, Required]
