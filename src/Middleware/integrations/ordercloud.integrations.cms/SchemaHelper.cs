@@ -9,6 +9,8 @@ namespace ordercloud.integrations.cms
 {
 	public static class SchemaHelper
 	{
+		// For for details see https://www.newtonsoft.com/jsonschema
+
 		public static DocumentSchema ValidateSchema(DocumentSchema schema)
 		{
 			IList<string> errors;

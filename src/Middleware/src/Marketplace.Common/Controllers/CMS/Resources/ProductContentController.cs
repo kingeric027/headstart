@@ -12,11 +12,13 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 	public class ProductContentController : BaseController
 	{
 		private readonly IAssetedResourceQuery _assetedResources;
+		private readonly IDocumentResourceAssignmentQuery _documentAssignments;
 		private ResourceType type { get; } = ResourceType.Products;
 
-		public ProductContentController(AppSettings settings, IAssetedResourceQuery assetedResources) : base(settings)
+		public ProductContentController(AppSettings settings, IAssetedResourceQuery assetedResources, IDocumentResourceAssignmentQuery documentAssignments) : base(settings)
 		{
 			_assetedResources = assetedResources;
+			_documentAssignments = documentAssignments;
 		}
 
 		// Content Delivery
@@ -65,6 +67,30 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 		{
 			var resource = new Resource(type, productID);
 			await _assetedResources.MoveAssignment(resource, assetID, listOrderWithinType, VerifiedUserContext);
+		}
+
+		[DocName("Get Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
+		[HttpGet, Route("schemas/{schemaID}/documents")]
+		public async Task<ListPage<Document>> ListDocuments(string productID, string schemaID, ListArgs<Document> args)
+		{
+			var resource = new Resource(type, productID);
+			return await _documentAssignments.ListDocuments(schemaID, resource, args, VerifiedUserContext);
+		}
+
+		[DocName("Assign Document to Resource"), OrderCloudIntegrationsAuth]
+		[HttpPost, Route("schemas/{schemaID}/documents/{documentID}/assignments")]
+		public async Task SaveDocumentAssignment(string productID, string schemaID, string documentID)
+		{
+			var resource = new Resource(type, productID);
+			await _documentAssignments.SaveAssignment(schemaID, documentID, resource, VerifiedUserContext);
+		}
+
+		[DocName("Remove Document from Resource"), OrderCloudIntegrationsAuth]
+		[HttpDelete, Route("schemas/{schemaID}/documents/{documentID}/assignments")]
+		public async Task DeleteDocumentAssignment(string productID, string schemaID, string documentID)
+		{
+			var resource = new Resource(type, productID);
+			await _documentAssignments.DeleteAssignment(schemaID, documentID, resource, VerifiedUserContext);
 		}
 	}
 }

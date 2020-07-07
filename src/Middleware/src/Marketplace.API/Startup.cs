@@ -77,6 +77,7 @@ namespace Marketplace.API
                 .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
 				.InjectCosmosStore<DocumentSchema, DocumentSchema>(cosmosConfig)
 				.InjectCosmosStore<Document, Document>(cosmosConfig)
+				.InjectCosmosStore<DocumentResourceAssignment, DocumentResourceAssignment>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
                 .Inject<IDevCenterService>()

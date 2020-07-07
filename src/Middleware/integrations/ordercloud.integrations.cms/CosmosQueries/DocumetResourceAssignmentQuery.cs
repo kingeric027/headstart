@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ordercloud.integrations.cms.CosmosQueries
+namespace ordercloud.integrations.cms
 {
 	public interface IDocumentResourceAssignmentQuery
 	{
@@ -49,7 +49,7 @@ namespace ordercloud.integrations.cms.CosmosQueries
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var assignments = list.ToListPage(args.Page, args.PageSize, count);
-			var documents = await Throttler.RunAsync(assignments.Items, 5, 20, doc => _documents.Get(doc.id)); // maybe switch to SQL "IN"
+			var documents = await Throttler.RunAsync(assignments.Items, 5, 20, assignment => _documents.Get(assignment.DocumentID)); // maybe switch to SQL "IN"
 			return new ListPage<Document>()
 			{
 				Items = documents,
@@ -92,14 +92,16 @@ namespace ordercloud.integrations.cms.CosmosQueries
 				DocumentID = document.id
 			};
 			var query = @"select top 1 * from c where 
-							c.ResourceType = @Type 
-							AND c.ResourceID = @ID 
-							AND c.ResourceParentID = @ParentID
+							c.ResourceType = @ResourceType 
+							AND c.ResourceID = @ResourceID 
+							AND c.ResourceParentID = @ResourceParentID
 							AND c.SchemaID = @SchemaID
 							AND c.DocumentID = @DocumentID
 							AND c.OwnerClientID = @OwnerClientID";
 			assignment = await _store.QuerySingleAsync(query, assignment);
-			await _store.RemoveByIdAsync(assignment.id, user.ClientID);
+			if (assignment != null) { // TODO - what is correct way to handle delete that doesn't exist?
+				await _store.RemoveByIdAsync(assignment.id, user.ClientID);
+			}
 		}
 	}
 }
