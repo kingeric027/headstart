@@ -74,20 +74,20 @@ export class PromotionEditComponent implements OnInit {
     this.resourceForm = new FormGroup({
       Code: new FormControl(promotion.Code, Validators.required),
       Type: new FormControl(_get(promotion, 'xp.Type')),
-      Value: new FormControl(_get(promotion, 'xp.Value')),
+      Value: new FormControl(_get(promotion, 'xp.Value'), Validators.min(0)),
       AppliesTo: new FormControl(_get(promotion, 'xp.AppliesTo')),
       Supplier: new FormControl(_get(promotion, 'xp.Supplier')),
-      RedemptionLimit: new FormControl(promotion.RedemptionLimit),
-      RedemptionLimitPerUser: new FormControl(promotion.RedemptionLimitPerUser),
+      RedemptionLimit: new FormControl(promotion.RedemptionLimit, Validators.min(0)),
+      RedemptionLimitPerUser: new FormControl(promotion.RedemptionLimitPerUser, Validators.min(0)),
       Description: new FormControl(promotion.Description),
       FinePrint: new FormControl(promotion.FinePrint),
       StartDate: new FormControl(promotion.StartDate, Validators.required),
       ExpirationDate: new FormControl(promotion.ExpirationDate),
       CanCombine: new FormControl(promotion.CanCombine),
       AllowAllBuyers: new FormControl(promotion.AllowAllBuyers),
-      MinReqType: new FormControl(_get(promotion, 'xp.MinReq.Type')),
-      MinReqInt: new FormControl(_get(promotion, 'xp.MinReq.Int')),
-      MaxShipCost: new FormControl(_get(promotion, 'xp.MaxShipCost'))
+      MinReqType: new FormControl(_get(promotion, 'xp.MinReq.Type'), Validators.min(0)),
+      MinReqInt: new FormControl(_get(promotion, 'xp.MinReq.Int'), Validators.min(0)),
+      MaxShipCost: new FormControl(_get(promotion, 'xp.MaxShipCost'), Validators.min(0))
     });
   }
 
