@@ -85,7 +85,7 @@ export class PromotionEditComponent implements OnInit {
       ExpirationDate: new FormControl(promotion.ExpirationDate),
       CanCombine: new FormControl(promotion.CanCombine),
       AllowAllBuyers: new FormControl(promotion.AllowAllBuyers),
-      MinReqType: new FormControl(_get(promotion, 'xp.MinReq.Type'), Validators.min(0)),
+      MinReqType: new FormControl(_get(promotion, 'xp.MinReq.Type')),
       MinReqInt: new FormControl(_get(promotion, 'xp.MinReq.Int'), Validators.min(0)),
       MaxShipCost: new FormControl(_get(promotion, 'xp.MaxShipCost'), Validators.min(0))
     });
