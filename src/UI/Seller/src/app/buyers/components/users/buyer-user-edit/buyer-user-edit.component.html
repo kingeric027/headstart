@@ -4,6 +4,7 @@
                           userGroupType="BuyerLocation"
                           [user]="selectedResource"
                           (assignmentsToAdd)="addUserGroupAssignments($event)"
+                          (hasAssignments)="userHasAssignments($event)"
                           [userPermissionsService]="buyerUserService">
   </user-group-assignments>
   <form *ngIf="resourceForm"
@@ -73,7 +74,7 @@
                    aria-describedby="FirstName"
                    formControlName="FirstName"
                    (input)="updateResourceFromEvent($event, 'FirstName')"
-                   placeholder="Enter FirstName">
+                   placeholder="Enter First Name">
           </div>
           <div class="form-group col-md-6">
             <label for="LastName">Last Name</label>
@@ -84,16 +85,48 @@
                    aria-describedby="LastName"
                    formControlName="LastName"
                    (input)="updateResourceFromEvent($event, 'LastName')"
-                   placeholder="Enter LastName">
+                   placeholder="Enter Last Name">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="Country">Home Country</label>
+           <select *ngIf="countryOptions.length"
+                  type="dropdown"
+                  class="form-control"
+                  formControlName="Country"
+                  id="Country"
+                  showErrors
+                  aria-describedby="Country"
+                  (change)="updateResourceFromEvent($event, 'xp.Country')">
+            <option [ngValue]="''"
+                    disabled>Select a Country</option>
+            <option *ngFor="let country of countryOptions"
+                    [value]="country.abbreviation">{{ country.label }}</option>
+            </select>
+            <input *ngIf="!countryOptions.length"
+                 type="text"
+                 class="form-control"
+                 id="Country"
+                 showErrors
+                 aria-describedby="Country"
+                 maxlength="2"
+                 [resourceForm]="resourceForm"
+                 formControlName="Country"
+                 (input)="updateResourceFromEvent($event, 'xp.Country')"
+                 placeholder="Enter Country Code">
+            <p *ngIf="isUserAssignedToGroups"
+                class="mt-2 font-italic text-muted">Unassign locations to change Home Country.</p>
           </div>
         </div>
       </div>
     </div>
   </form>
-  <user-group-assignments *ngIf="selectedResource && isCreatingNew"
+  <user-group-assignments *ngIf="selectedResource && isCreatingNew && this.resourceForm.controls.Country.value"
                           [isCreatingNew]="isCreatingNew"
                           userGroupType="BuyerLocation"
                           [user]="selectedResource"
+                          [homeCountry]="resourceForm.controls.Country.value"
                           (assignmentsToAdd)="addUserGroupAssignments($event)"
                           [userPermissionsService]="buyerUserService">
   </user-group-assignments>
