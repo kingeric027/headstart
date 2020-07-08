@@ -51,7 +51,7 @@ export class OCMLineitemTable {
       const { ProductID, Specs, Quantity, xp } = li;
       //ACTIVATE SPINNER/DISABLE INPUT IF QTY BEING UPDATED
       this.updatingLiIDs.push(lineItemID);
-      await this.context.order.cart.add({ProductID, Specs, Quantity, xp});
+      await this.context.order.cart.setQuantity({ProductID, Specs, Quantity, xp});
       //REMOVE SPINNER/ENABLE INPUT IF QTY NO LONGER BEING UPDATED
       this.updatingLiIDs.splice(this.updatingLiIDs.indexOf(lineItemID), 1);
     }
