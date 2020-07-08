@@ -21,7 +21,8 @@ namespace Marketplace.Common.Commands
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
         Task RequestReturnEmail(string OrderID);
-        Task SetOrderStatus(string orderID, string type);
+        Task PatchOrderCanceledStatus(string orderID);
+        Task PatchOrderRequiresApprovalStatus(string orderID);
         Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus);
     }
 
@@ -54,17 +55,14 @@ namespace Marketplace.Common.Commands
             await _sendgridService.SendReturnRequestedEmail(orderID);
         }
 
-        public async Task SetOrderStatus(string orderID, string type)
+        public async Task PatchOrderCanceledStatus(string orderID)
         {
-            if (type == "cancel")
-            {
                 await PatchOrderStatus(orderID, ShippingStatus.Canceled, ClaimStatus.NoClaim);
                 await PatchLineItemStatus(orderID, LineItemStatus.Canceled);
-            }
-            if (type == "requiresapproval")
-            {
+        }
+        public async Task PatchOrderRequiresApprovalStatus(string orderID)
+        {
                 await PatchOrderStatus(orderID, ShippingStatus.Processing, ClaimStatus.NoClaim);
-            }
         }
         public async Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus)
         {

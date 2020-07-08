@@ -45,7 +45,7 @@ namespace Marketplace.Common.Controllers
         [OrderCloudWebhookAuth]
         public async void HandleOrderRequiresApproval([FromBody] MessageNotification<OrderSubmitEventBody> payload)
         {
-            await _orderCommand.SetOrderStatus(payload.EventBody.Order.ID, "requiresapproval");
+            await _orderCommand.PatchOrderRequiresApprovalStatus(payload.EventBody.Order.ID);
             await _sendgridService.SendOrderRequiresApprovalEmail(payload);
         }
 
@@ -78,7 +78,7 @@ namespace Marketplace.Common.Controllers
         [OrderCloudWebhookAuth]
         public async void HandleOrderCancelled([FromBody] WebhookPayloads.Orders.Cancel payload)
         {
-            await _orderCommand.SetOrderStatus(payload.Response.Body.ID, "cancel");
+            await _orderCommand.PatchOrderCanceledStatus(payload.Response.Body.ID);
         }
 
         [HttpPost, Route("newuser")] // TO DO: send email to mp manager
