@@ -26,9 +26,9 @@ export class CartService {
     this.onAdd.next(lineItem);
     if (!_isUndefined(this.order.DateCreated)) {
       const lineItems = this.state.lineItems.Items;
-      const selectedItemQuantity = lineItems.find(li => li.ProductID === lineItem.ProductID)?.Quantity;
-      if (selectedItemQuantity) {
-        lineItem.Quantity += selectedItemQuantity;
+      const existingLiQuantity = lineItems.find(li => li.ProductID === lineItem.ProductID)?.Quantity;
+      if (existingLiQuantity) {
+        lineItem.Quantity += existingLiQuantity;
       }
       return await this.upsertLineItem(lineItem);
     }
