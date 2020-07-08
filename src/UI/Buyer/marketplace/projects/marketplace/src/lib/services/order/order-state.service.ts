@@ -35,7 +35,7 @@ export class OrderStateService {
     private tokenHelper: TokenHelperService,
     private currentUserService: CurrentUserService,
     private appConfig: AppConfig
-  ) {}
+  ) { }
 
   get order(): MarketplaceOrder {
     return this.orderSubject.value;

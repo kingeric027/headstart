@@ -32,6 +32,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ResourceSelectDropdown } from './components/resource-select-dropdown/resource-select-dropdown.component';
 import { SummaryResourceDisplay } from './components/summary-resource-display/summary-resource-display.component';
 import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-confirm-modal.component';
+import { ReturnForm } from './components/return-form/return-form.component';
 import { ResourceEditComponent } from './components/resource-edit/resource-edit.component';
 import { FullResourceTableComponent } from './components/full-resource-table/full-resource-table.component';
 import { QuillModule } from 'ngx-quill';
@@ -143,6 +144,7 @@ import { ActionMenuComponent } from './components/action-menu/action-menu.compon
     LocationIDInputDirective,
     DragDirective,
     DeleteConfirmModal,
+    ReturnForm,
     PhoneFormatPipe,
     YesNoFormatPipe,
     ActionMenuComponent,
@@ -164,6 +166,7 @@ import { ActionMenuComponent } from './components/action-menu/action-menu.compon
     ResourceTableComponent,
     RequestStatus,
     DeleteConfirmModal,
+    ReturnForm,
     SummaryResourceDisplay,
     FullResourceTableComponent,
     ResourceEditComponent,

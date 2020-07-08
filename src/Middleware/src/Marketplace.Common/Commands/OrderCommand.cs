@@ -9,6 +9,7 @@ using Marketplace.Models.Models.Marketplace;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Commands
 {
@@ -20,6 +21,9 @@ namespace Marketplace.Common.Commands
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
         Task RequestReturnEmail(string OrderID);
+        Task PatchOrderCanceledStatus(string orderID);
+        Task PatchOrderRequiresApprovalStatus(string orderID);
+        Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus);
     }
 
     public class OrderCommand : IOrderCommand
@@ -49,6 +53,33 @@ namespace Marketplace.Common.Commands
         public async Task RequestReturnEmail(string orderID)
         {
             await _sendgridService.SendReturnRequestedEmail(orderID);
+        }
+
+        public async Task PatchOrderCanceledStatus(string orderID)
+        {
+                await PatchOrderStatus(orderID, ShippingStatus.Canceled, ClaimStatus.NoClaim);
+                await PatchLineItemStatus(orderID, LineItemStatus.Canceled);
+        }
+        public async Task PatchOrderRequiresApprovalStatus(string orderID)
+        {
+                await PatchOrderStatus(orderID, ShippingStatus.Processing, ClaimStatus.NoClaim);
+        }
+        public async Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus)
+        {
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
+            var partialLi = new PartialLineItem { xp = new { LineItemStatus = lineItemStatus } };
+            List<Task> lineItemsToPatch = new List<Task>();
+            foreach (var li in lineItems.Items)
+            {
+                lineItemsToPatch.Add(_oc.LineItems.PatchAsync(OrderDirection.Incoming, orderID, li.ID, partialLi));
+            }
+            await Task.WhenAll(lineItemsToPatch);
+        }
+
+        private async Task PatchOrderStatus(string orderID, ShippingStatus shippingStatus, ClaimStatus claimStatus)
+        {
+            var partialOrder = new PartialOrder { xp = new { ShippingStatus = shippingStatus, ClaimStatus = claimStatus } };
+            await _oc.Orders.PatchAsync(OrderDirection.Incoming, orderID, partialOrder);
         }
 
         public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
@@ -134,7 +165,7 @@ namespace Marketplace.Common.Commands
             li = await _oc.LineItems
                 .PatchAsync<MarketplaceLineItem>
                 (OrderDirection.Incoming, orderID, li.ID, 
-                new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { UnitPriceInProductCurrency = li.UnitPrice, LineItemImageUrl = li.xp.LineItemImageUrl } });
+                new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { UnitPriceInProductCurrency = li.UnitPrice, LineItemImageUrl = li.xp.LineItemImageUrl, LineItemStatus = LineItemStatus.Open } });
             return li;
         }
 
