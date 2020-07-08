@@ -73,7 +73,6 @@ export class BuyerVisibilityConfiguration {
       this.isEditing = false;
       await this.getCatalogAssignments();
       await this.getCatalogs();
-      await this.getCatalogAssignments();
       await this.getCategoryAssignments();
       this.isFetching = false;
     }

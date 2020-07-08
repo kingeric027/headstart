@@ -6,6 +6,7 @@ using Marketplace.Common.Helpers;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.DevCenter.Models;
+using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.library;
@@ -104,7 +105,12 @@ namespace Marketplace.Common.Commands
 		private async Task CreateBuyers(VerifiedUserContext user, string token) {
 			foreach (var buyer in _seed.Buyers)
 			{
-				await _buyerCommand.Create(buyer, user, token);
+				var superBuyer = new SuperMarketplaceBuyer()
+				{
+					Buyer = buyer,
+					Markup = new BuyerMarkup() { Percent = 0 }
+				};
+				await _buyerCommand.Create(superBuyer, token);
 			}
 		}
 
