@@ -13,7 +13,6 @@ export class LineItemForm {
         this.lineItem = lineItem;
         this.selected.setValue(false);
         if (lineItem.Quantity === lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || lineItem.QuantityShipped !== lineItem.Quantity) this.selected.disable();
-        debugger;
         this.quantityToReturn.disable();
         this.quantityToReturn.setValidators([
             Validators.required,
