@@ -130,7 +130,8 @@ namespace Marketplace.Common.Commands
                 Name = marketplaceUserType.UserGroupName,
                 xp = new
                 {
-                    Type = marketplaceUserType.UserGroupType,
+                    Role = marketplaceUserType.UserGroupType,
+                    Type = marketplaceUserType.UserGroupIDSuffix,
                     Location = buyerLocationID
                 }
             }, token);
