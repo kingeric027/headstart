@@ -130,6 +130,7 @@ export class CheckoutService {
       return LineItems.Patch('Outgoing', orderID, li.ID, { ID: this.createIDFromIndex(index) });
     });
     await Promise.all(lineItemIDChanges);
+    await this.state.resetLineItems();
   }
 
   createIDFromIndex(index: number): string {

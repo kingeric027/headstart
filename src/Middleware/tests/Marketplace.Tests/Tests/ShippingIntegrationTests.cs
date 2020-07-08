@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Newtonsoft.Json;
-using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using OrderCloud.SDK;
+using ordercloud.integrations.exchangerates;
+using Marketplace.Common.Services.ShippingIntegration.Mappers;
 
 namespace Marketplace.Tests
 {

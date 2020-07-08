@@ -19,11 +19,11 @@ export class BaseResolve implements Resolve<any> {
   ) {}
 
   async resolve(): Promise<void> {
-    const user = this.currentUser.reset();
+    await this.currentUser.reset();
     const order = this.currentOrder.reset();
     const ordersToApprove = this.ordersToApprove.reset();
     const categories = this.productCategories.setCategories();
     const exchangeRates = this.exchangeRates.reset();
-    await Promise.all([user, order, ordersToApprove, categories, exchangeRates]);
+    await Promise.all([order, ordersToApprove, categories, exchangeRates]);
   }
 }

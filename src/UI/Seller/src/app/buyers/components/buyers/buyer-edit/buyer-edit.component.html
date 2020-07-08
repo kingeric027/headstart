@@ -1,4 +1,4 @@
-<div class="container-fluid resource-edit">
+<div *ngIf="resourceForm" class="container-fluid resource-edit">
   <form [formGroup]="resourceForm">
     <div class="row pt-3">
       <div class="col-md-5">
@@ -16,7 +16,7 @@
                  maxlength="100"
                  [resourceForm]="resourceForm"
                  formControlName="Name"
-                 (input)="updateResourceFromEvent($event, 'Name')"
+                 (input)="updateResourceFromEvent($event, 'Buyer.Name')"
                  placeholder="Enter Name">
         </div>
         <div class="form-group">
@@ -30,11 +30,36 @@
                    [resourceForm]="resourceForm"
                    aria-describedby="Active"
                    formControlName="Active"
-                   (input)="updateResourceFromEvent($event, 'Active')">
+                   (input)="updateResourceFromEvent($event, 'Buyer.Active')">
             <span class="slider round cursor-pointer"></span>
           </label>
+        </div>
+        <div class="form-group">
+          <label for="Markup">Product Markup Percent</label>
+          <input type="number"
+                 class="form-control"
+                 id="Markup"
+                 showErrors
+                 aria-describedby="Markup"
+                 maxlength="100"
+                 [resourceForm]="resourceForm"
+                 formControlName="Markup"
+                 (input)="updateResourceFromEvent($event, 'Markup.Percent')"
+                 placeholder="Enter Markup">
         </div>
       </div>
     </div>
   </form>
+  <action-menu-component
+    [isCreatingNew]="isCreatingNew"
+    [dataIsSaving]="dataIsSaving"
+    [areChanges]="areChanges"  
+    [allowDiscard]="true"
+    [isDeleteable]="true"
+    [allowDelete]="!isCreatingNew"
+    [requireConfirmation]="true"
+    [disableSave]="dataIsSaving || !areChanges"
+    (executeSaveAction)="handleSave()"
+    (executeDiscardAction)="discardChanges()"
+></action-menu-component>  
 </div>

@@ -69,9 +69,10 @@ export class BuyerVisibilityConfiguration {
 
   async fetchData(): Promise<void> {
     if (Object.keys(this._product) && Object.keys(this._buyer)) {
+      this.isFetching = true;
+      this.isEditing = false;
       await this.getCatalogAssignments();
       await this.getCatalogs();
-      await this.getCatalogAssignments();
       await this.getCategoryAssignments();
       this.isFetching = false;
     }

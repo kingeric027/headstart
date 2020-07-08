@@ -23,18 +23,14 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("POST Acknowledge Quote Order")]
-        // todo update auth
-        [HttpPost]
-        [Route("acknowledgequote/{orderID}")]
+        [HttpPost, Route("acknowledgequote/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
         public async Task<Order> AcknowledgeQuoteOrder(string orderID)
         {
             return await _command.AcknowledgeQuoteOrder(orderID);
         }
 
-        [DocName("PATCH Send return requested email")]
-        // todo update auth
-        [HttpPatch]
-        [Route("requestreturn/{orderID}")]
+        [DocName("Send return requested email")]
+        [HttpPost, Route("requestreturn/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task RequestReturnEmail(string orderID)
         {
             await _command.RequestReturnEmail(orderID);

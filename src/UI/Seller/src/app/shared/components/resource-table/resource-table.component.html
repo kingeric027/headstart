@@ -119,7 +119,7 @@
           <!-- <form *ngIf="filterForm" -->
           <form class="d-flex flex-column filters"
                 [formGroup]="filterForm">
-            <div *ngFor="let filter of filterConfig?.Filters"
+            <div *ngFor="let filter of _filterConfig?.Filters"
                  class="group mt-2">
               <div *ngIf="shouldFilterDisplay(filter)">
                 <label>{{filter.Display}}</label>
@@ -128,11 +128,11 @@
                         type="select"
                         required
                         [formControlName]="filter.Path">
-                  <ng-container *ngFor="let option of filter.Values;">
-                    <option *ngIf="isBoolean(option)"
-                            value="{{option}}">{{option | yesNo }}</option>
-                    <option *ngIf="!isBoolean(option)"
-                            value="{{option}}">{{option}}</option>
+                  <ng-container *ngFor="let option of filter.Items;">
+                    <option *ngIf="isBoolean(option.Value)"
+                            value="{{option.Value}}">{{option.Text | yesNo }}</option>
+                    <option *ngIf="!isBoolean(option.Value)"
+                            value="{{option.Value}}">{{option.Text}}</option>
                   </ng-container>
                 </select>
                 <div class="input-group"
@@ -256,7 +256,7 @@
               <a class="btn brand-button ml-3"
                  *ngFor="let subResource of _ocService.subResourceList"
                  [routerLink]="[subResource]">
-                Manage {{subResource}}
+                {{subResource.toUpperCase() | titlecase }}
               </a>
             </span>
           </div>

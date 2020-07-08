@@ -9,7 +9,12 @@ import {
   ApiRole,
   Sortable,
 } from 'ordercloud-javascript-sdk';
-import { UserGroupXp, ProductXp, TaxCertificate, MarketplaceAddressBuyer } from 'marketplace-javascript-sdk';
+import {
+  MarketplaceLocationUserGroup,
+  ProductXp,
+  TaxCertificate,
+  MarketplaceAddressBuyer,
+} from 'marketplace-javascript-sdk';
 
 export interface LineItemGroupSupplier {
   supplier: Supplier;
@@ -19,7 +24,7 @@ export interface LineItemGroupSupplier {
 export interface CurrentUser extends MeUser {
   FavoriteProductIDs: string[];
   FavoriteOrderIDs: string[];
-  UserGroups: UserGroup<UserGroupXp>[];
+  UserGroups: MarketplaceLocationUserGroup[];
   Currency: CurrenySymbol;
 }
 
@@ -102,7 +107,7 @@ export enum OrderStatus {
   AwaitingApproval = 'AwaitingApproval',
   ChangesRequested = 'ChangesRequested',
   Open = 'Open',
-  Complete = 'Complete',
+  Completed = 'Completed',
   Canceled = 'Canceled',
 }
 
@@ -117,7 +122,7 @@ export enum ShippingStatus {
   PartiallyShipped = 'PartiallyShipped',
   Canceled = 'Canceled',
   Processing = 'Processing',
-  Backordered = 'Backordered'
+  Backordered = 'Backordered',
 }
 
 export enum ClaimStatus {

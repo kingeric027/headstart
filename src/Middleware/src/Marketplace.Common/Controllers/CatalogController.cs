@@ -43,7 +43,7 @@ namespace Marketplace.Common.Controllers
 		}
 
 		[DocName("Get a list of catalog location assignments")]
-		[HttpPost, Route("{buyerID}/catalogs/assignments"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
+		[HttpGet, Route("{buyerID}/catalogs/assignments"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
 		public async Task<ListPage<MarketplaceCatalogAssignment>> GetAssignments(string buyerID, [FromQuery(Name = "catalogID")] string catalogID = "", [FromQuery(Name = "locationID")] string locationID = "")
 		{
 			return await _command.GetAssignments(buyerID, locationID, VerifiedUserContext);
