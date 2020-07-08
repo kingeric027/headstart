@@ -17,14 +17,14 @@ export class PromotionService extends ResourceCrudService<Promotion> {
     ID: null,
     Name: '',
     Description: '',
-    LineItemLevel: true,
+    LineItemLevel: false,
     Code: '',
     RedemptionLimit: null,
     RedemptionLimitPerUser: null,
     FinePrint: '',
     StartDate: '',
     ExpirationDate: '',
-    EligibleExpression: 'item.LineTotal >= 0',
+    EligibleExpression: 'true',
     ValueExpression: '',
     CanCombine: false,
     AllowAllBuyers: true,
@@ -41,10 +41,13 @@ export class PromotionService extends ResourceCrudService<Promotion> {
       MaxShipCost: null,
     },
   };
-  
-  constructor(router: Router, activatedRoute: ActivatedRoute, ocPromotionService: OcPromotionService, 
-    currentUserService: CurrentUserService) {
-    super(router, activatedRoute, ocPromotionService, currentUserService, '/promotions', 'promotions');
 
+  constructor(
+    router: Router,
+    activatedRoute: ActivatedRoute,
+    ocPromotionService: OcPromotionService,
+    currentUserService: CurrentUserService
+  ) {
+    super(router, activatedRoute, ocPromotionService, currentUserService, '/promotions', 'promotions');
   }
 }
