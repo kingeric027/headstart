@@ -23,7 +23,13 @@ export class CartService {
   // TODO - get rid of the progress spinner for all Cart functions. Just makes it look slower.
   async add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     // order is well defined, line item can be added
+    this.onAdd.next(lineItem);
     if (!_isUndefined(this.order.DateCreated)) {
+      const lineItems = this.state.lineItems.Items;
+      const existingLiQuantity = lineItems.find(li => li.ProductID === lineItem.ProductID)?.Quantity;
+      if (existingLiQuantity) {
+        lineItem.Quantity += existingLiQuantity;
+      }
       return await this.upsertLineItem(lineItem);
     }
     if (!this.initializingOrder) {
@@ -46,7 +52,7 @@ export class CartService {
 
   async setQuantity(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     try {
-      return await this.add(lineItem);
+      return await this.upsertLineItem(lineItem);
     } finally {
       this.state.reset();
     }
@@ -93,7 +99,6 @@ export class CartService {
   }
 
   private async upsertLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
-    this.onAdd.next(lineItem);
     try {
       return await MarketplaceSDK.Orders.UpsertLineItem(this.order?.ID, lineItem);
     } finally {
