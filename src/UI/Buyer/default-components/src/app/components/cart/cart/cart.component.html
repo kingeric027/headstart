@@ -24,8 +24,7 @@
   <div class="row flex-lg-row-reverse"
        *ngIf="_order?.LineItemCount">
     <div class="col-lg-4">
-      <ocm-order-summary [orderSummaryMeta]="orderSummaryMeta"
-                         (promosChanged)="updateOrderMeta()"></ocm-order-summary>
+      <ocm-order-summary [orderSummaryMeta]="orderSummaryMeta"></ocm-order-summary>
       <button class="btn btn-primary btn-block mb-4 font-weight-bold"
               (click)="toCheckout()"
               translate>CART.CART.CHECKOUT</button>

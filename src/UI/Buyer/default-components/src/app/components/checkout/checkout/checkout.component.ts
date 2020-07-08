@@ -24,7 +24,7 @@ export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
   isAnon: boolean;
   order: MarketplaceOrder;
-  orderPromotions: OrderPromotion[];
+  orderPromotions: OrderPromotion[] = [];
   lineItems: ListPage<MarketplaceLineItem>;
   orderSummaryMeta: OrderSummaryMeta;
   payments: ListPage<Payment>;
@@ -62,8 +62,10 @@ export class OCMCheckout implements OnInit {
   ngOnInit(): void {
     this.context.order.onChange(order => (this.order = order));
     this.order = this.context.order.get();
-    this.orderPromotions = this.context.order.promos.get().Items;
-    console.log('order promos', this.orderPromotions)
+    // If promos exist aleady, clear them first before returning to checkout
+    this.context.order.promos.get().Items.map(async promo => {
+      await this.context.order.promos.removePromo(promo.Code);
+    })
     this.lineItems = this.context.order.cart.get();
     this.isAnon = this.context.currentUser.isAnonymous();
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';

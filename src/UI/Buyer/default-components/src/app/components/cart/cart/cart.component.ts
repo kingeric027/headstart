@@ -14,7 +14,6 @@ export class OCMCart {
   _lineItems: ListPage<LineItemWithProduct>;
   orderSummaryMeta: OrderSummaryMeta;
   @Input() set order(value: MarketplaceOrder) {
-    console.log('setting order');
     this._order = value;
     this.setOrderSummaryMeta();
   }
@@ -24,7 +23,6 @@ export class OCMCart {
   }
 
   @Input() set orderPromos(value: OrderPromotion[]) {
-    console.log('there is value');
     this._orderPromos = value;
     this.setOrderSummaryMeta();
   }
@@ -33,7 +31,6 @@ export class OCMCart {
 
   setOrderSummaryMeta(): void {
     if (this._order && this._lineItems) {
-      console.log('firing normal');
       this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos, this._lineItems.Items, 'cart');
     }
   }

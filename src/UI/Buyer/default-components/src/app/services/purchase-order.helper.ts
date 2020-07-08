@@ -51,13 +51,10 @@ const getCreditCardTotal = (subTotal: number, shippingCost: number, taxCost: num
 }
 
 const getDiscountTotal = (orderPromos: OrderPromotion[]): number => {
-  console.log(`calc'ing order total`)
   let discountTotal = 0;
   if (orderPromos?.length) {
-    console.log('promos from helper', orderPromos)
     orderPromos.map(p => discountTotal = discountTotal + p.Amount)
   }
-  console.log('discount total', discountTotal);
   return discountTotal;
 }
 
@@ -81,7 +78,6 @@ export const getOrderSummaryMeta = (
   const POTotal = POLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
   const DiscountTotal = orderPromos.reduce((accumulator, promo) => (promo.Amount) + accumulator, 0);
   const OrderTotal = (POTotal + CreditCardTotal) - DiscountTotal;
-  console.log(OrderTotal)
 
   return {
     StandardLineItemCount: StandardLineItems.length, 
