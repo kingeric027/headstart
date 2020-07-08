@@ -127,6 +127,7 @@ export class BuyerLocationEditComponent implements OnInit {
   async updateBuyerLocation(): Promise<void> {
     try {
       this.dataIsSaving = true;
+      (this.buyerLocationEditable.UserGroup.xp as any).Country = this.buyerLocationEditable.Address.Country;
       const updatedBuyerLocation = await MarketplaceSDK.BuyerLocations.Update(
         this.buyerID,
         this.buyerLocationEditable.Address.ID,
