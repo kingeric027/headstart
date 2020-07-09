@@ -13,7 +13,7 @@ namespace Marketplace.Common.Commands
     public class BuyerSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public BuyerSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public BuyerSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
         {
             _oc = oc;
         }

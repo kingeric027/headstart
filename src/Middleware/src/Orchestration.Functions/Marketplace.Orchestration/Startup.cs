@@ -30,7 +30,11 @@ namespace Marketplace.Orchestration
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
                 .Inject<IOrderCloudClient>()
                 .Inject<IFlurlClient>()
-                .Inject<IOrderCloudClient>()
+                .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
+                {
+                    ApiUrl = settings.OrderCloudSettings.ApiUrl,
+                    AuthUrl = settings.OrderCloudSettings.AuthUrl
+                })
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()
@@ -40,6 +44,4 @@ namespace Marketplace.Orchestration
                         settings.CosmosSettings.PrimaryKey));
         }
     }
-
-    
 }

@@ -13,7 +13,7 @@ namespace Marketplace.Common.Commands
     public class ProductSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public ProductSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public ProductSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
         {
             _oc = oc;
         }

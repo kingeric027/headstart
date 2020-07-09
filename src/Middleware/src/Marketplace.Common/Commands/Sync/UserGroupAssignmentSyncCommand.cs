@@ -12,7 +12,7 @@ namespace Marketplace.Common.Commands
     public class UserGroupAssignmentSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public UserGroupAssignmentSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public UserGroupAssignmentSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
         {
             _oc = oc;
         }

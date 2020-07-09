@@ -17,7 +17,7 @@ namespace Marketplace.Common.Commands
     public class HydratedProductSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public HydratedProductSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public HydratedProductSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
         {
             _oc = oc;
         }
@@ -67,7 +67,8 @@ namespace Marketplace.Common.Commands
                 {
                     ErrorType = OrchestrationErrorType.CreateExistsError,
                     Message = exId.Message,
-                    Level = LogLevel.Error
+                    Level = LogLevel.Error, 
+                    OrderCloudErrors = exId.Errors
                 });
                 return await GetAsync(wi);
             }
@@ -77,7 +78,8 @@ namespace Marketplace.Common.Commands
                 {
                     ErrorType = OrchestrationErrorType.CreateGeneralError,
                     Message = ex.Message,
-                    Level = LogLevel.Error
+                    Level = LogLevel.Error, 
+                    OrderCloudErrors = ex.Errors
                 });
                 throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), ex);
             }

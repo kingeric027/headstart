@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
 using ordercloud.integrations.library;
+using OrderCloud.SDK;
 using Action = Marketplace.Common.Models.Action;
 
 namespace Orchestration.Tests
@@ -33,7 +34,7 @@ namespace Orchestration.Tests
                     AuthUrl = "auth"
                 }
             };
-            _command = new SyncCommand(_settings, Substitute.For<LogQuery>(Substitute.For<ICosmosStore<OrchestrationLog>>()));
+            _command = new SyncCommand(_settings, new OrderCloudClient(),  Substitute.For<LogQuery>(Substitute.For<ICosmosStore<OrchestrationLog>>()));
         }
 
         [Test]
@@ -45,7 +46,8 @@ namespace Orchestration.Tests
 
             var wi = new WorkItem("fourover/guid/hydratedproduct/guid")
             {
-                Action = Action.Create, ClientId = "clientid", RecordType = RecordType.HydratedProduct, Current = current
+                Action = Action.Create, ClientId = "clientid", RecordType = RecordType.HydratedProduct, Current = current["Model"] as JObject,
+                Token = current["Token"].ToString()
             };
             try
             {

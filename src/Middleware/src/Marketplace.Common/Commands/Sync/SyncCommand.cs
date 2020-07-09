@@ -28,12 +28,13 @@ namespace Marketplace.Common.Commands
         private const string ASSEMBLY = "Marketplace.Common.Commands.";
         protected readonly AppSettings _settings;
         protected readonly LogQuery _log;
-        private IOrderCloudClient _oc;
+        private readonly IOrderCloudClient _client;
         
-        public SyncCommand(AppSettings settings, LogQuery log)
+        public SyncCommand(AppSettings settings, IOrderCloudClient client, LogQuery log)
         {
             _settings = settings;
             _log = log;
+            _client = client;
         }
 
         public bool IdExists(OrderCloudException ex)
@@ -45,15 +46,15 @@ namespace Marketplace.Common.Commands
         {
             if (wi.Action == Action.Ignore) return null;
 
-            _oc = new OrderCloudClient(new OrderCloudClientConfig()
-            {
-                ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                AuthUrl = _settings.OrderCloudSettings.AuthUrl,
-                ClientId = wi.ClientId
-            });
-
+            //_oc = new OrderCloudClient(new OrderCloudClientConfig()
+            //{
+            //    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+            //    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+            //    ClientId = wi.ClientId
+            //});
+            _client.Config.ClientId = wi.ClientId;
             var type = Type.GetType($"{ASSEMBLY}{wi.RecordType}SyncCommand", true);
-            var command = (IWorkItemCommand) Activator.CreateInstance(type, new object[] {_settings, _log, _oc});
+            var command = (IWorkItemCommand) Activator.CreateInstance(type, _settings, _log, _client);
             var method = command.GetType()
                 .GetMethod($"{wi.Action}Async", BindingFlags.Public | BindingFlags.Instance);
             if (method == null) throw new MissingMethodException($"{wi.RecordType}SyncCommand is missing");
