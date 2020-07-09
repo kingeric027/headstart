@@ -193,7 +193,7 @@ export class AppConfig {
   /**
    * base path to middleware
    */
-
+  translateBlobUrl: string;
   ordercloudEnv: OrdercloudEnv;
   avalaraCompanyId: number;
   middlewareUrl: string;

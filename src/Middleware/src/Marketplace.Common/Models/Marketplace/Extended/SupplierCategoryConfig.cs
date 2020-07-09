@@ -27,6 +27,7 @@ namespace Marketplace.Models.Extended
         public IEnumerable<SupplierCategoriesFilterItem> Items { get; set; }
     }
 
+	[SwaggerModel]
     public class SupplierCategoriesFilterItem
     {
         public string Text { get; set; }
