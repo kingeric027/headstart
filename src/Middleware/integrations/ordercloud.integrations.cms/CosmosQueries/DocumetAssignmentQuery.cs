@@ -10,21 +10,21 @@ using System.Threading.Tasks;
 
 namespace ordercloud.integrations.cms
 {
-	public interface IDocumentResourceAssignmentQuery
+	public interface IDocumentAssignmentQuery
 	{
 		Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, IListArgs args, VerifiedUserContext user);
 		Task SaveAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user);
 		Task DeleteAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user);
 	}
 
-	public class DocumentResourceAssignmentQuery : IDocumentResourceAssignmentQuery
+	public class DocumentAssignmentQuery : IDocumentAssignmentQuery
 	{
-		private readonly ICosmosStore<DocumentResourceAssignment> _store;
+		private readonly ICosmosStore<DocumentAssignment> _store;
 		private readonly IDocumentQuery _documents;
 		private readonly IDocumentSchemaQuery _schemas;
 
 
-		public DocumentResourceAssignmentQuery(ICosmosStore<DocumentResourceAssignment> store, IDocumentQuery documents, IDocumentSchemaQuery schemas)
+		public DocumentAssignmentQuery(ICosmosStore<DocumentAssignment> store, IDocumentQuery documents, IDocumentSchemaQuery schemas)
 		{
 			_store = store;
 			_documents = documents;
@@ -67,7 +67,7 @@ namespace ordercloud.integrations.cms
 				throw new InvalidAssignmentException(schema.RestrictedAssignmentTypes);
 			}
 			var document = await _documents.GetByInternalSchemaID(schema.id, documentInteropID, user);
-			await _store.UpsertAsync(new DocumentResourceAssignment()
+			await _store.UpsertAsync(new DocumentAssignment()
 			{
 				RsrcID = resource.ID,
 				RsrcParentID = resource.ParentID,

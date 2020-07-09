@@ -9,8 +9,8 @@ using System.Text;
 namespace ordercloud.integrations.cms
 {
 	[SwaggerModel]
-	[CosmosCollection("documentresourceassignments")]
-	public class DocumentResourceAssignment : CosmosObject
+	[CosmosCollection("documentassignments")]
+	public class DocumentAssignment : CosmosObject
 	{
 		public string RsrcID { get; set; }   
 		public string RsrcParentID { get; set; } = null;

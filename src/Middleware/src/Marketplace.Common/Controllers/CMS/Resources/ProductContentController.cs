@@ -12,10 +12,10 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 	public class ProductContentController : BaseController
 	{
 		private readonly IAssetedResourceQuery _assetedResources;
-		private readonly IDocumentResourceAssignmentQuery _documentAssignments;
+		private readonly IDocumentAssignmentQuery _documentAssignments;
 		private ResourceType type { get; } = ResourceType.Products;
 
-		public ProductContentController(AppSettings settings, IAssetedResourceQuery assetedResources, IDocumentResourceAssignmentQuery documentAssignments) : base(settings)
+		public ProductContentController(AppSettings settings, IAssetedResourceQuery assetedResources, IDocumentAssignmentQuery documentAssignments) : base(settings)
 		{
 			_assetedResources = assetedResources;
 			_documentAssignments = documentAssignments;

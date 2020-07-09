@@ -18,7 +18,6 @@ namespace ordercloud.integrations.cms
 		public ResourceType Type { get; set; }
 	}
 
-	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public enum ResourceType
 	{
 		Products, Categories, Catalogs, Promotions, Suppliers, Buyers, ProductFacets
