@@ -18,6 +18,7 @@ export class OrderStatusDisplayPipe implements PipeTransform {
     [ShippingStatus.PartiallyShipped]: 'Partially Shipped',
     [LineItemStatus.ReturnRequested]: 'Return Requested',
     [LineItemStatus.Returned]: 'Returned',
+    [LineItemStatus.Complete]: 'Complete',
     [LineItemStatus.Submitted]: 'Submitted',
     [ClaimStatus.Pending]: 'Pending',
     [ClaimStatus.NoClaim]: 'No Claim'
