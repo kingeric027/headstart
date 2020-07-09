@@ -12,7 +12,7 @@ export class OCMOrderStatusIcon {
   faClock = faClock;
   faBan = faBan;
   statusIconMapping = {
-    [OrderStatus.Complete]: this.faCircle,
+    [OrderStatus.Completed]: this.faCircle,
     [OrderStatus.AwaitingApproval]: this.faClock,
     [OrderStatus.Open]: this.faCircle,
     // [OrderStatus.Declined]: this.faCircle,
