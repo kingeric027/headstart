@@ -15,10 +15,10 @@ namespace ordercloud.integrations.cms
 {
 	public interface IAssetQuery
 	{
-		Task<List<Asset>> ListAcrossContainers(IEnumerable<string> assetIDs);
-		Task<Asset> GetAcrossContainers(string assetID);
 		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
+		Task<List<Asset>> ListByInternalIDs(IEnumerable<string> assetIDs);
 		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
+		Task<Asset> GetByInternalID(string assetID); // real id
 		Task<Asset> Create(AssetUpload form, VerifiedUserContext user);
 		Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user);
 		Task Delete(string assetInteropID, VerifiedUserContext user);
@@ -63,7 +63,7 @@ namespace ordercloud.integrations.cms
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var (asset, file) = AssetMapper.MapFromUpload(_blob.Config, container, form);
 			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
-			if (matchingID != null) throw new DuplicateIdException("IdExists", "Object already exists.", null);
+			if (matchingID != null) throw new DuplicateIDException();
 			if (file != null) {			
 				await _blob.UploadAsset(container, file, asset);
 			}
@@ -99,24 +99,16 @@ namespace ordercloud.integrations.cms
 			await _blob.OnAssetDeleted(container, asset.id);
 		}
 
-		public async Task<List<Asset>> ListAcrossContainers(IEnumerable<string> assetIDs)
-		{ 
-			var ids = new HashSet<string>(assetIDs).ToList(); // remove any duplicates
-			if (ids.Count == 0) return new List<Asset>(); 
-			var paramNames = ids.Select((id, i) => $"@id{i}");
-			var parameters = new ExpandoObject();
-			for (int i = 0; i < ids.Count; i++)
-			{
-				parameters.TryAdd($"@id{i}", ids[i]);
-			}
-			var assets = await _assetStore.QueryMultipleAsync($"select * from c where c.id IN ({string.Join(", ", paramNames)})", parameters);
+		public async Task<List<Asset>> ListByInternalIDs(IEnumerable<string> assetIDs)
+		{
+			var assets = await _assetStore.FindMultipleAsync(assetIDs);
 			return assets.ToList();
 		}
 
-		public async Task<Asset> GetAcrossContainers(string assetID)
+		public async Task<Asset> GetByInternalID(string assetID)
 		{
 			var asset = await _assetStore.Query($"select top 1 * from c where c.id = @id", new { id = assetID }).FirstOrDefaultAsync();
-			if (asset == null) throw new NotImplementedException();
+			if (asset == null) throw new NotImplementedException(); // Why not implemented instead of not found?
 			return asset;
 		}
 
