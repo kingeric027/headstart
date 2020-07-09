@@ -92,7 +92,7 @@ namespace ordercloud.integrations.cms
 
 		private async Task<AssetedResource> GetExisting(Resource resource)
 		{
-			var query = $"select top 1 * from c where c.ResourceType = @Type AND c.ResourceID = @ID AND c.ResourceParentID = @ParentID";
+			var query = $"select top 1 * from c where c.Resource.Type = @Type AND c.Resource.ID = @ID AND c.Resource.ParentID = @ParentID";
 			var assetedResource = await _store.QuerySingleAsync(query, resource);
 			return assetedResource;
 		}
