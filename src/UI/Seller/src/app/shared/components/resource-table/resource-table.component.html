@@ -256,7 +256,7 @@
               <a class="btn brand-button ml-3"
                  *ngFor="let subResource of _ocService.subResourceList"
                  [routerLink]="[subResource]">
-                Manage {{subResource}}
+                {{subResource.toUpperCase() | titlecase }}
               </a>
             </span>
           </div>

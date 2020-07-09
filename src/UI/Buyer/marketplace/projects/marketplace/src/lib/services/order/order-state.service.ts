@@ -25,7 +25,7 @@ export class OrderStateService {
         HasReturn: false,
       },
       ClaimStatus: ClaimStatus.NoClaim,
-      ShippingStatus: ShippingStatus.Processing
+      ShippingStatus: ShippingStatus.Processing,
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
@@ -35,7 +35,7 @@ export class OrderStateService {
     private tokenHelper: TokenHelperService,
     private currentUserService: CurrentUserService,
     private appConfig: AppConfig
-  ) {}
+  ) { }
 
   get order(): MarketplaceOrder {
     return this.orderSubject.value;
@@ -84,8 +84,12 @@ export class OrderStateService {
       this.order = (await Orders.Create('Outgoing', this.DefaultOrder as Order)) as MarketplaceOrder;
     }
     if (this.order.DateCreated) {
-      this.lineItems = await listAll(LineItems, LineItems.List, 'outgoing', this.order.ID);
+      await this.resetLineItems();
     }
+  }
+
+  async resetLineItems(): Promise<void> {
+    this.lineItems = await listAll(LineItems, LineItems.List, 'outgoing', this.order.ID);
   }
 
   private async getOrdersForResubmit(): Promise<ListPage<MarketplaceOrder>> {

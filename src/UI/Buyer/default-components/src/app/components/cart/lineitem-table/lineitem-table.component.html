@@ -3,7 +3,7 @@
        *ngFor="let liGroup of liGroupedByShipFrom; index as i">
     <div class="card-header p-3">
       <div class="row"
-           *ngIf="suppliers?.length > 0 && suppliers[i].shipFrom && suppliers[i].supplier">
+           *ngIf="suppliers?.length > 0 && suppliers[i]?.shipFrom && suppliers[i]?.supplier">
         <div class="col">
           <h5 class="card-title mb-0">
             {{ suppliers[i].supplier.Name }}
@@ -66,16 +66,23 @@
                   }}</a>
                   <small class="text-muted d-block">{{ li.Product.ID }}</small>
                   <small *ngIf="li.xp?.LineItemReturnInfo?.ReturnReason"
-                        class="text-dark d-block" translate>
-                        CART.LINEITEM_TABLE.RETURNED 
-                    <span class="text-muted" translate>{{ getReturnReason(li.xp?.LineItemReturnInfo?.ReturnReason) }}</span>
-                </small>
+                         class="text-dark d-block"
+                         translate>
+                    CART.LINEITEM_TABLE.RETURNED
+                    <span class="text-muted"
+                          translate>{{ getReturnReason(li.xp?.LineItemReturnInfo?.ReturnReason) }}</span>
+                  </small>
+                  <small *ngIf="li.xp?.LineItemReturnInfo?.Comment">
+                    <span translate>CART.LINEITEM_TABLE.SELLER_COMMENT</span>:
+                    <span class="text-muted">{{li.xp?.LineItemReturnInfo?.Comment}}</span>
+                  </small>
                   <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
                         class="
                         badge
                         badge-pill
                         badge-primary">Purchase Order</span>
                 </h4>
+                <div *ngIf="readOnly"><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="li.xp?.LineItemStatus"></ocm-order-status-icon> {{ li.xp?.LineItemStatus | orderStatusDisplay }}</div>
                 <a class="text-danger btn btn-link px-0 link"
                    *ngIf="!readOnly"
                    (click)="removeLineItem(li.ID)"
@@ -117,11 +124,13 @@
               <div class="col-3 text-right">
                 <span class="d-block d-sm-none"
                       translate>CART.LINEITEM_TABLE.TOTAL</span>
-                <span *ngIf="!isQtyChanging(li.ID)" class="text-nowrap">{{ li.LineTotal | currency: _orderCurrency }}</span>
-                <span *ngIf="isQtyChanging(li.ID)" class="text-nowrap">
+                <span *ngIf="!isQtyChanging(li.ID)"
+                      class="text-nowrap">{{ li.LineTotal | currency: _orderCurrency }}</span>
+                <span *ngIf="isQtyChanging(li.ID)"
+                      class="text-nowrap">
                   <mat-spinner *ngIf="isQtyChanging(li.ID)"
-                                diameter="20"
-                                class="spinner"></mat-spinner>
+                               diameter="20"
+                               class="spinner"></mat-spinner>
                 </span>
               </div>
             </div>

@@ -84,6 +84,7 @@
             <input type="number"
                    class="form-control"
                    formControlName="Value"
+                   min="0"
                    (input)="handleUpdatePromo($event, 'xp.Value', 'number')"
                    id="Value">
             <div *ngIf="_promotionEditable?.xp?.Type === 'Percentage'"
@@ -169,6 +170,7 @@
             <input class="form-control"
                    type="number"
                    [value]="_promotionEditable?.xp?.MinReq?.Int"
+                   min="0"
                    (input)="handleUpdatePromo($event, 'xp.MinReq.Int', 'number')"
                    formControlName="MinReqInt"
                    name="MinReqInt">
@@ -192,6 +194,7 @@
             <input class="form-control"
                    type="number"
                    [value]="_promotionEditable?.xp?.MinReq?.Int"
+                   min="0"
                    (input)="handleUpdatePromo($event, 'xp.MinReq.Int', 'number')"
                    formControlName="MinReqInt"
                    name="MinReqInt">
@@ -216,6 +219,7 @@
               <input class="form-control"
                      type="number"
                      [value]="_promotionEditable?.xp?.MaxShipCost"
+                     min="0"
                      (input)="handleUpdatePromo($event, 'xp.MaxShipCost', 'number')"
                      formControlName="MaxShipCost"
                      name="MaxShipCost">
@@ -288,6 +292,7 @@
                  class="form-control w-25"
                  type="number"
                  [value]="_promotionEditable?.RedemptionLimit"
+                 min="0"
                  (input)="handleUpdatePromo($event, 'RedemptionLimit', 'number')"
                  formControlName="RedemptionLimit"
                  name="RedemptionLimit">
@@ -301,6 +306,7 @@
                  class="form-control w-25"
                  type="number"
                  [value]="_promotionEditable?.RedemptionLimitPerUser"
+                 min="0"
                  (input)="handleUpdatePromo($event, 'RedemptionLimitPerUser', 'number')"
                  formControlName="RedemptionLimitPerUser"
                  name="RedemptionLimitPerUser">

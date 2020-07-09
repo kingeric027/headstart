@@ -21,6 +21,7 @@ namespace Marketplace.Models.Models.Marketplace
     {
         public int QuantityToReturn { get; set; }
         public string ReturnReason { get; set; }
+        public string Comment { get; set; }
         public bool Resolved { get; set; }
     }
 }

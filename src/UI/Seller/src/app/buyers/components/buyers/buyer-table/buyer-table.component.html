@@ -2,6 +2,7 @@
                           [selectedResourceID]="selectedResourceID"
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
+                          [shouldShowResourceActions]="false"
                           [ocService]="ocService"
                           [dataIsSaving]="dataIsSaving"
                           [resourceForm]="resourceForm"
@@ -11,12 +12,8 @@
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)">
-
-  <app-buyer-edit class="resource-edit"
-                  *ngIf="resourceForm"
-                  resourceType="Buyer"
-                  [resourceForm]="resourceForm"
-                  (updateResource)="updateResource($event)"
-                  [resource]="updatedResource">
+  <app-buyer-edit 
+    class="resource-edit"
+    [orderCloudBuyer]="resourceInSelection">
   </app-buyer-edit>
 </resource-table-component>
