@@ -58,10 +58,6 @@ export class OrderDetailsComponent {
     return this.cardType;
   }
 
-  showReturnInfo(): boolean {
-    return this._order?.xp?.OrderReturnInfo?.HasReturn && this.orderDirection === 'Incoming' && this.isSellerUser;
-  }
-
   getReturnReason(reasonCode: string): string {
     return ReturnReason[reasonCode];
   }
