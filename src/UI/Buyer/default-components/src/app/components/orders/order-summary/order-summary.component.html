@@ -41,7 +41,7 @@
     <div *ngIf="orderSummaryMeta.DiscountTotal > 0"
          class="text-right text-danger">
       <b class="float-left"
-         translate>Discount Total</b>
+         translate>ORDERS.SUMMARY.DISCOUNT_TOTAL</b>
       <span class="discount-total">- {{ orderSummaryMeta.DiscountTotal | currency: _orderCurrency }}</span>
     </div>
     <div *ngIf="orderSummaryMeta.POLineItemCount"
