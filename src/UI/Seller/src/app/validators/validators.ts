@@ -21,6 +21,7 @@ export const ErrorDictionary = {
   richTextFormatError:
     'Descriptions can only be 1000 characters. Remember the character count includes HTML formatting text.',
   supplierCategoryError: 'Supplier category selections are invalid',
+  supplierProductTypeError: 'Please select at least one product type'
 };
 
 // only alphanumic and space . '
@@ -157,4 +158,19 @@ export function ValidateSupplierCategorySelection(control: AbstractControl): Val
   const isValidResource =
     control.value.length > 0 && areAllCategoriesComplete(control.value) && !areDuplicateCategories(control.value);
   return isValidResource ? null : { SupplierCategoryError: true };
+}
+
+export function RequireCheckboxesToBeChecked(minRequired = 1): ValidatorFn {
+  return function validate(formGroup: FormGroup): ValidationErrors | null {
+    let checked = 0;
+
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.controls[key];
+
+      if (control.value === true) {
+        checked ++;
+      }
+    });
+    return checked < minRequired ? { supplierProductTypeError: true } : null;
+  };
 }

@@ -2,11 +2,12 @@ import { Component, ChangeDetectorRef, NgZone, OnInit, AfterViewInit, ViewChild,
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Supplier } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { get as _get } from 'lodash';
 import {
   ValidateRichTextDescription,
   ValidateEmail,
+  RequireCheckboxesToBeChecked,
   ValidatePhone,
   ValidateSupplierCategorySelection,
 } from '@app-seller/validators/validators';
@@ -46,7 +47,13 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
     ),
     Active: new FormControl(supplier.Active),
     SyncFreightPop: new FormControl(supplier.xp?.SyncFreightPop || false),
-    Currency: new FormControl(_get(supplier, 'xp.Currency'), Validators.required)
+    Currency: new FormControl(_get(supplier, 'xp.Currency'), Validators.required),
+    ProductType: new FormGroup({
+      StandardProducts: new FormControl(supplier.xp?.StandardProducts || false),
+      QuoteProducts: new FormControl(supplier.xp?.QuoteProducts || false),
+      POProducts: new FormControl(supplier.xp?.StandardProducts || false)
+    }, RequireCheckboxesToBeChecked())
+
   });
 }
 

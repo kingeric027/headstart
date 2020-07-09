@@ -83,6 +83,27 @@
               <span class="slider round cursor-pointer"></span>
             </label>
           </div>
+          
+          <div class="form-group col-md-6" formGroupName="ProductType">
+            <div>
+              <label>Product Type (Select at least 1)</label>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <mat-checkbox color="primary" 
+              aria-describedby="StandardProducts" 
+              formControlName="StandardProducts"
+              (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.StandardProducts')">Standard</mat-checkbox>
+<mat-checkbox color="primary" 
+              aria-describedby="QuoteProducts" 
+              formControlName="QuoteProducts"
+              (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.QuoteProducts')">Quote</mat-checkbox>
+<mat-checkbox color="primary" 
+              aria-describedby="POProducts" 
+              formControlName="POProducts"
+              (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.POProducts')">PO</mat-checkbox>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
