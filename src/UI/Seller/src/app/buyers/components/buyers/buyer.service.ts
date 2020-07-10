@@ -5,7 +5,6 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { SuperMarketplaceBuyer, BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
-import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 export const BUYER_SUB_RESOURCE_LIST = ['users', 'locations', 'payments', 'approvals', 'catalogs', 'categories'];
 
@@ -29,8 +28,7 @@ export class BuyerService extends ResourceCrudService<Buyer> {
     ocBuyerService: OcBuyerService,
     currentUserService: CurrentUserService,
     private buyerTempService: BuyerTempService,
-    middleware: MiddlewareAPIService,
   ) {
-    super(router, activatedRoute, ocBuyerService, currentUserService, middleware, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST);
+    super(router, activatedRoute, ocBuyerService, currentUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST);
   }
 }

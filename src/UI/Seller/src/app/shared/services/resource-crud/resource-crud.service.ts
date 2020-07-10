@@ -18,7 +18,6 @@ import { ListPage } from 'marketplace-javascript-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { set as _set } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { MiddlewareAPIService } from '../middleware-api/middleware-api.service';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
@@ -43,7 +42,6 @@ export abstract class ResourceCrudService<ResourceType> {
     private activatedRoute: ActivatedRoute,
     public ocService: any,
     public currentUserService: CurrentUserService,
-    private middleware: MiddlewareAPIService,
     route: string,
     primaryResourceLevel: string,
     subResourceList: string[] = [],
@@ -255,14 +253,15 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async updateResource(originalID: string, resource: any): Promise<any> {
     const args = await this.createListArgs([originalID, resource]);
-    const isSupplierUser = await this.isSupplierUser();
-    //  if supplier user updating supplier need to call route in middleware because they dont have required role.
-    const newResource = (this.primaryResourceLevel === 'suppliers' && this.secondaryResourceLevel === '' && isSupplierUser) ? 
-      await this.middleware.updateSupplier(originalID, resource) : await this.ocService.Save(...args).toPromise()
+    const newResource =  await this.ocService.Save(...args).toPromise()
+    this.updateResourceSubject(newResource);
+    return newResource;
+  }
+
+  updateResourceSubject(newResource: any): void {
     const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
     this.resourceSubject.value.Items[resourceIndex] = newResource;
     this.resourceSubject.next(this.resourceSubject.value);
-    return newResource;
   }
 
   async deleteResource(resourceID: string): Promise<null> {

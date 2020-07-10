@@ -40,9 +40,9 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     private ocSupplierUserGroupService: OcSupplierUserGroupService,
     private ocMeService: OcMeService,
     public currentUserService: CurrentUserService,
-    middleware: MiddlewareAPIService,
+    private middleware: MiddlewareAPIService,
   ) {
-    super(router, activatedRoute, ocSupplierService, currentUserService, middleware, '/suppliers', 'suppliers', SUPPLIER_SUB_RESOURCE_LIST);
+    super(router, activatedRoute, ocSupplierService, currentUserService, '/suppliers', 'suppliers', SUPPLIER_SUB_RESOURCE_LIST);
     this.ocSupplierService = ocSupplierService;
   }
 
@@ -53,5 +53,12 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newSupplier];
     this.resourceSubject.next(this.resourceSubject.value);
     return newSupplier;
+  }
+
+  async updateResource(originalID: string, resource: any): Promise<any> {
+    //  if supplier user updating supplier need to call route in middleware because they dont have required role.
+    const newResource =  await this.middleware.updateSupplier(originalID, resource);
+    this.updateResourceSubject(newResource)
+    return newResource;
   }
 }

@@ -13,7 +13,6 @@ import { BUYER_SUB_RESOURCE_LIST } from '../buyers/buyer.service';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { BuyerUserService } from '../users/buyer-user.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 export interface PermissionType {
   UserGroupSuffix: string;
@@ -73,9 +72,8 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
     private ocUserService: OcUserService,
     private buyerUserService: BuyerUserService,
     public currentUserService: CurrentUserService,
-    middleware: MiddlewareAPIService,
   ) {
-    super(router, activatedRoute, ocAddressService, currentUserService, middleware, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'locations');
+    super(router, activatedRoute, ocAddressService, currentUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'locations');
   }
 
   async updateResource(originalID: string, resource: any): Promise<any> {
