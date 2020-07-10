@@ -101,18 +101,23 @@ namespace Marketplace.Common.Services
 
         public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
         {
-            // TODO: Figure out how to get the CID from the JWT token, then GET Client ID, and then get Buyer/Admin from there.
-            //var jwt = messageNotification.EventBody.PasswordRenewalAccessToken;
-            //var handler = new JwtSecurityTokenHandler();
-            //var token = handler.ReadJwtToken(jwt);
-            //var cid = await _oc.ApiClients.GetAsync("id");
-            var BaseUrl = _settings.UI.BaseAdminUrl;
+            string BaseAppURL = _settings.UI.BaseAdminUrl;
+            var jwt = messageNotification.EventBody.PasswordRenewalAccessToken;
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwt);
+            var cid = token.Claims.FirstOrDefault(c => c.Type == "cid");
+            var apiClient = await _oc.ApiClients.GetAsync(cid.Value);
+            // Overwrite with the buyer base url if token appname contans 'buyer'
+            if (apiClient.AppName.ToLower().Contains("buyer"))
+            {
+                BaseAppURL = _settings.UI.BaseBuyerUrl;
+            }
             var templateData = new
             {
                 messageNotification.Recipient.FirstName,
                 messageNotification.Recipient.LastName,
                 messageNotification.EventBody.PasswordRenewalAccessToken,
-                BaseUrl,
+                BaseAppURL,
                 messageNotification.EventBody.Username
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
