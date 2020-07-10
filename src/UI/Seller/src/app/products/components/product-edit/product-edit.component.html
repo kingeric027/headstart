@@ -77,7 +77,7 @@
                     <option [ngValue]="null"
                             disabled>Choose a product type</option>
                     <option *ngFor="let product of availableProductTypes" [selected]="productType === product"
-                            value="product">{{product}}</option>
+                            value="{{product}}">{{product}}</option>
                   </select>
                 </div>
               </div>
