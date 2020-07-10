@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Dynamitey;
@@ -21,7 +22,7 @@ namespace Marketplace.Common.Services
         Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData);
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
         Task SendReturnRequestedEmail(string orderID);
-        Task SendNewUserEmail(WebhookPayloads.Users.Create payload);
+        Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
         Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
@@ -73,7 +74,9 @@ namespace Marketplace.Common.Services
             var templateData = new
             {
                 messageNotification.Recipient.FirstName,
-                messageNotification.Recipient.LastName
+                messageNotification.Recipient.LastName,
+                messageNotification.EventBody.PasswordRenewalAccessToken,
+                messageNotification.EventBody.PasswordRenewalUrl
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
         }
@@ -96,15 +99,23 @@ namespace Marketplace.Common.Services
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, ORDER_REQUIRES_APPROVAL_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendNewUserEmail(WebhookPayloads.Users.Create payload)
+        public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
         {
+            // TODO: Figure out how to get the CID from the JWT token, then GET Client ID, and then get Buyer/Admin from there.
+            //var jwt = messageNotification.EventBody.PasswordRenewalAccessToken;
+            //var handler = new JwtSecurityTokenHandler();
+            //var token = handler.ReadJwtToken(jwt);
+            //var cid = await _oc.ApiClients.GetAsync("id");
+            var BaseUrl = _settings.UI.BaseAdminUrl;
             var templateData = new
             {
-                payload.Response.Body.FirstName,
-                payload.Response.Body.LastName,
-                payload.Response.Body.Username
+                messageNotification.Recipient.FirstName,
+                messageNotification.Recipient.LastName,
+                messageNotification.EventBody.PasswordRenewalAccessToken,
+                BaseUrl,
+                messageNotification.EventBody.Username
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload)
