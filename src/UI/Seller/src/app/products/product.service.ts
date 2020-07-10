@@ -13,6 +13,7 @@ import {
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -85,9 +86,10 @@ export class ProductService extends ResourceCrudService<Product> {
     private ocCategoryService: OcCategoryService,
     private ocPriceScheduleService: OcPriceScheduleService,
     private ocCatalogService: OcCatalogService,
+    middleware: MiddlewareAPIService,
     public currentUserService: CurrentUserService
   ) {
-    super(router, activatedRoute, ocProductsService, currentUserService, '/products', 'products');
+    super(router, activatedRoute, ocProductsService, currentUserService, middleware, '/products', 'products');
   }
 
   async updateProductCatalogAssignments(

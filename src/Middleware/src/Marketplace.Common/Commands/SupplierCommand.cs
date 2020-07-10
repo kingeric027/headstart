@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.TemporaryAppConstants;
+using Marketplace.Common.TemporaryAppConstants;
 using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
@@ -10,6 +10,7 @@ namespace Marketplace.Common.Commands
     {
         Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token);
         Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user, string token);
+        Task<MarketplaceSupplier> UpdateMySupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user, string token);
     }
     public class MarketplaceSupplierCommand : IMarketplaceSupplierCommand
     {
@@ -26,6 +27,12 @@ namespace Marketplace.Common.Commands
             Require.That(supplierID == user.SupplierID,
                 new ErrorCode("Unauthorized", 401, $"You are only authorized to view {user.SupplierID}."));
             return await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID, token);
+        }
+
+        public async Task<MarketplaceSupplier> UpdateMySupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user, string token)
+        {
+            Require.That(supplierID == user.SupplierID, new ErrorCode("Unauthorized", 401, $"You are not authorized to update supplier {supplierID}"));
+            return await _oc.Suppliers.PatchAsync<MarketplaceSupplier>(supplierID, supplier);
         }
         public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token)
         {

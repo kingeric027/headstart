@@ -91,6 +91,7 @@ export class ProductEditComponent implements OnInit {
   newPriceBreakPrice = 0;
   newPriceBreakQty = 2;
   newProductPriceBreaks = [];
+  availableProductTypes = [];
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
@@ -113,6 +114,7 @@ export class ProductEditComponent implements OnInit {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
+    await this.getAvailableProducTypes();
     this.userContext = await this.currentUserService.getUserContext();
     this._exchangeRates = await this.ocIntegrations.getAvailableCurrencies();
     if (!this.readonly) {
@@ -141,6 +143,16 @@ export class ProductEditComponent implements OnInit {
       this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise();
     } else {
       this.addresses = await this.ocAdminAddressService.List().toPromise();
+    }
+  }
+
+  async getAvailableProducTypes(): Promise<void> {
+    const supplier = await this.currentUserService.getMySupplier();
+    if(supplier.xp.ProductTypes) {
+      console.log(Object.keys(supplier.xp.ProductTypes))
+      Object.keys(supplier.xp.ProductTypes).forEach((key: string) => {
+        if(supplier.xp.ProductTypes[key]) this.availableProductTypes.push(key)
+      })
     }
   }
 

@@ -12,6 +12,7 @@ import {
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 export const SUPPLIER_SUB_RESOURCE_LIST = ['users', 'locations'];
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
@@ -38,9 +39,10 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     ocSupplierService: OcSupplierService,
     private ocSupplierUserGroupService: OcSupplierUserGroupService,
     private ocMeService: OcMeService,
-    public currentUserService: CurrentUserService
+    public currentUserService: CurrentUserService,
+    middleware: MiddlewareAPIService,
   ) {
-    super(router, activatedRoute, ocSupplierService, currentUserService, '/suppliers', 'suppliers', SUPPLIER_SUB_RESOURCE_LIST);
+    super(router, activatedRoute, ocSupplierService, currentUserService, middleware, '/suppliers', 'suppliers', SUPPLIER_SUB_RESOURCE_LIST);
     this.ocSupplierService = ocSupplierService;
   }
 

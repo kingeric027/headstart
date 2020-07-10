@@ -59,8 +59,7 @@
           <div class="form-group col-md-6">
             <mat-form-field appearance="outline">
               <mat-label>Currency</mat-label>
-              <mat-select [disabled]="!isCreatingNew"
-                          formControlName="Currency"
+              <mat-select formControlName="Currency"
                           (selectionChange)="updateResourceFromEvent({target: { value: $event.value }}, 'xp.Currency')">
                 <mat-option *ngFor="let currency of availableCurrencies"
                             [value]="currency.Currency"><img [src]="currency.Icon"> {{currency.Name}}</mat-option>
@@ -90,17 +89,17 @@
             </div>
             <div class="d-flex justify-content-between align-items-center">
               <mat-checkbox color="primary" 
-              aria-describedby="StandardProducts" 
-              formControlName="StandardProducts"
-              (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.StandardProducts')">Standard</mat-checkbox>
-<mat-checkbox color="primary" 
-              aria-describedby="QuoteProducts" 
-              formControlName="QuoteProducts"
-              (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.QuoteProducts')">Quote</mat-checkbox>
-<mat-checkbox color="primary" 
-              aria-describedby="POProducts" 
-              formControlName="POProducts"
-              (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.POProducts')">PO</mat-checkbox>
+                aria-describedby="Standard" 
+                formControlName="Standard"
+                (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Standard')">Standard</mat-checkbox>
+              <mat-checkbox color="primary" 
+                aria-describedby="Quote" 
+                formControlName="Quote"
+                (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Quote')">Quote</mat-checkbox>
+              <mat-checkbox color="primary" 
+                aria-describedby="PurchaseOrder" 
+                formControlName="PurchaseOrder"
+                (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.PurchaseOrder')">Purchase Order</mat-checkbox>
             </div>
 
           </div>

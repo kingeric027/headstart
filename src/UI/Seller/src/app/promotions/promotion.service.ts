@@ -7,6 +7,7 @@ import {
   MarketplacePromoEligibility,
 } from '@app-seller/shared/models/marketplace-promo.interface';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -43,8 +44,7 @@ export class PromotionService extends ResourceCrudService<Promotion> {
   };
   
   constructor(router: Router, activatedRoute: ActivatedRoute, ocPromotionService: OcPromotionService, 
-    currentUserService: CurrentUserService) {
-    super(router, activatedRoute, ocPromotionService, currentUserService, '/promotions', 'promotions');
-
+    currentUserService: CurrentUserService, middleware: MiddlewareAPIService,) {
+    super(router, activatedRoute, ocPromotionService, currentUserService, middleware, '/promotions', 'promotions');
   }
 }

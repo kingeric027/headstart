@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Commands;
+using Marketplace.Common.Commands;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
@@ -52,5 +52,15 @@ namespace Marketplace.Common.Controllers
 			var productList = await _oc.Products.ListAsync(filters: $"ShipFromAddressID={locationID}", accessToken: ocAuth.AccessToken);
 			return productList.Items.Count == 0;
 		}
+
+		[DocName("PATCH Supplier")]
+		[HttpPatch, Route("{supplierID}"), OrderCloudIntegrationsAuth]
+		public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, [FromBody] PartialSupplier supplier)
+		{
+			///ocAuth is the token for the organization that is specified in the AppSettings
+			var ocAuth = await _oc.AuthenticateAsync();
+			return await _command.UpdateMySupplier(supplierID, supplier, VerifiedUserContext, ocAuth.AccessToken);
+		}
+
 	}
 }

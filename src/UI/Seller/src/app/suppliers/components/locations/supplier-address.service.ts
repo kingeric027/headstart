@@ -5,6 +5,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,12 +16,14 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
     activatedRoute: ActivatedRoute,
     private ocSupplierAddressService: OcSupplierAddressService,
     public currentUserService: CurrentUserService,
+    middleware: MiddlewareAPIService,
   ) {
     super(
       router,
       activatedRoute,
       ocSupplierAddressService,
       currentUserService,
+      middleware,
       '/suppliers',
       'suppliers',
       SUPPLIER_SUB_RESOURCE_LIST,

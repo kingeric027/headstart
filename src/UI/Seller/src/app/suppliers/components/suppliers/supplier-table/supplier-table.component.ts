@@ -29,7 +29,7 @@ export interface SupplierCategoryConfig {
 
 function createSupplierForm(supplier: MarketplaceSupplier) {
   return new FormGroup({
-    ID: new FormControl({ value: supplier.ID, disabled: !this.isCreatingNew }),
+    ID: new FormControl({ value: supplier.ID, disabled: !this.isCreatingNew || this.isSupplierUser }),
     Name: new FormControl(supplier.Name, Validators.required),
     LogoUrl: new FormControl(_get(supplier, 'xp.Images') && _get(supplier, 'xp.Images')[0]?.URL),
     Description: new FormControl(_get(supplier, 'xp.Description'), ValidateRichTextDescription),
@@ -45,13 +45,13 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
     SupportContactPhone: new FormControl(
       (_get(supplier, 'xp.SupportContact') && _get(supplier, 'xp.SupportContact.Phone')) || ''
     ),
-    Active: new FormControl(supplier.Active),
-    SyncFreightPop: new FormControl(supplier.xp?.SyncFreightPop || false),
-    Currency: new FormControl(_get(supplier, 'xp.Currency'), Validators.required),
+    Active: new FormControl({value: supplier.Active, disabled: this.isSupplierUser || !this.isCreatingNew}), 
+    SyncFreightPop: new FormControl({value: supplier.xp?.SyncFreightPop || false, disabled: this.isSupplierUser}),
+    Currency: new FormControl({value: _get(supplier, 'xp.Currency'), disabled: !this.isCreatingNew || this.isSupplierUser}, Validators.required),
     ProductType: new FormGroup({
-      StandardProducts: new FormControl(supplier.xp?.StandardProducts || false),
-      QuoteProducts: new FormControl(supplier.xp?.QuoteProducts || false),
-      POProducts: new FormControl(supplier.xp?.StandardProducts || false)
+      Standard: new FormControl({value: supplier.xp?.ProductTypes?.Standard || false, disabled: this.isSupplierUser}),
+      Quote: new FormControl({value: supplier.xp?.ProductTypes?.Quote || false, disabled: this.isSupplierUser}),
+      PurchaseOrder: new FormControl({value: supplier.xp?.ProductTypes?.PurchaseOrder || false, disabled: this.isSupplierUser})
     }, RequireCheckboxesToBeChecked())
 
   });

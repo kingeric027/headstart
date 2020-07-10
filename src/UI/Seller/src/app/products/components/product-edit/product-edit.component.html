@@ -76,12 +76,8 @@
                           (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
                     <option [ngValue]="null"
                             disabled>Choose a product type</option>
-                    <option [selected]="productType === 'Standard'"
-                            value="Standard">Standard</option>
-                    <option [selected]="productType === 'Quote'"
-                            value="Quote">Quote</option>
-                    <option [selected]="productType === 'PurchaseOrder'"
-                            value="PurchaseOrder">Purchase Order</option>
+                    <option *ngFor="let product of availableProductTypes" [selected]="productType === product"
+                            value="product">{{product}}</option>
                   </select>
                 </div>
               </div>
