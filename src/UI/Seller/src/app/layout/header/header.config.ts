@@ -18,39 +18,39 @@ export interface MPRoute {
 // Products
 const AllProducts: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'All Products',
+  title: 'NAV.PRODUCTS.ALL_PRODUCTS',
   route: '/products',
 };
 
 const LiveProducts: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'Live Products',
+  title: 'NAV.PRODUCTS.LIVE_PRODUCTS',
   route: '/products',
   queryParams: { 'xp.Status': 'Published' },
 };
 
 const PendingProducts: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'Pending Products',
+  title: 'NAV.PRODUCTS.PENDING_PRODUCTS',
   route: '/products',
   queryParams: { 'xp.Status': 'Draft' },
 };
 
 const Promotions: MPRoute = {
   rolesWithAccess: [MPRoles.MPPromotionAdmin, MPRoles.MPPromotionReader],
-  title: 'Promotions',
+  title: 'NAV.PRODUCTS.PROMOTIONS',
   route: '/promotions',
 };
 
 const ProductFacets: MPRoute = {
   rolesWithAccess: [MPRoles.MPStoreFrontAdmin],
-  title: 'Facets',
+  title: 'NAV.PRODUCTS.FACETS',
   route: '/facets',
 };
 
 const ProductNavGrouping: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'Products',
+  title: 'NAV.PRODUCTS.PRODUCTS',
   route: '/products',
   subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, ProductFacets],
 };
@@ -79,7 +79,7 @@ const RequiringAttentionOrders: MPRoute = {
 
 const Orders: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'Orders',
+  title: 'NAV.ORDERS.ORDERS',
   route: '/orders',
 };
 

@@ -35,7 +35,8 @@
              data-toggle="dropdown"
              ngbDropdownToggle
              aria-haspopup="true"
-             aria-expanded="false">{{ nav.title }}
+             aria-expanded="false"
+             translate>{{ nav.title }}
           </a>
           <!-- Nav Item Dropdown -->
           <div ngbDropdownMenu
@@ -46,7 +47,8 @@
                [queryParams]="route.queryParams"
                (click)="isCollapsed = !isCollapsed"
                class="dropdown-item"
-               *ngFor="let route of nav.subRoutes">{{ route.title }}</a>
+               *ngFor="let route of nav.subRoutes"
+               translate>{{ route.title }}</a>
           </div>
           <!-- /Nav Item Dropdown -->
         </div>

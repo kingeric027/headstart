@@ -10,6 +10,7 @@ export const ocAppConfig: AppConfig = {
   ocMiddlewareUrl: environment.ocMiddlewareUrl,
   orderCloudApiUrl: environment.orderCloudApiUrl,
   orderCloudApiVersion: environment.orderCloudApiVersion,
+  translateBlobUrl: environment.translateBlobUrl,
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: 'SEB Seller',
   scope: [
@@ -108,6 +109,8 @@ export interface AppConfig {
   cmsUrl: string;
 
   marketplaceID: string;
+
+  translateBlobUrl: string;
 
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: string;
