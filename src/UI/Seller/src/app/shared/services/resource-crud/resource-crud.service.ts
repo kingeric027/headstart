@@ -300,7 +300,8 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   sortBy(field: string): void {
-    this.patchFilterState({ sortBy: field || undefined });
+    // temporarily as any until changed to latest oc sdk
+    this.patchFilterState({ sortBy: field || undefined } as any);
   }
 
   searchBy(searchTerm: string): void {
