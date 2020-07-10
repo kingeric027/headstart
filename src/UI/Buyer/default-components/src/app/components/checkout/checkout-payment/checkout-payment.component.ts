@@ -39,7 +39,6 @@ export class OCMCheckoutPayment implements OnInit {
   ngOnInit(): void {
     this._orderCurrency = this.context.currentUser.get().Currency;
     this._orderPromos = this.context.order.promos.get().Items;
-    console.log(this._orderPromos);
     this.createPromoForm(this.promoCode);
   }
 
@@ -51,7 +50,6 @@ export class OCMCheckoutPayment implements OnInit {
 
   updatePromoCodeValue(event: any): void {
     this.promoCode = event.target.value;
-    console.log(this.promoCode);
   }
 
   async applyPromo(): Promise<void> {
@@ -59,7 +57,6 @@ export class OCMCheckoutPayment implements OnInit {
       const promo = await this.context.order.promos.applyPromo(this.promoCode);
       this.promoCode = '';
       this._orderPromos.push(promo);
-      console.log(this._orderPromos);
     } catch (ex) {
       this.toastrService.error('Invalid or inelligible promotion.');
     } finally {
@@ -71,7 +68,6 @@ export class OCMCheckoutPayment implements OnInit {
     this._orderPromos = this._orderPromos.filter(p => p.Code !== promoCode);
     try {
       await this.context.order.promos.removePromo(promoCode);
-      console.log(this._orderPromos);
     } finally {
       this.promosChanged.emit();
     }
