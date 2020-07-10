@@ -12,11 +12,14 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 	public class CategoryContentController : BaseController
 	{
 		private readonly IAssetedResourceQuery _assetedResources;
+		private readonly IDocumentAssignmentQuery _documentAssignments;
+
 		private ResourceType type { get; } = ResourceType.Categories;
 
-		public CategoryContentController(AppSettings settings, IAssetedResourceQuery assetedResources) : base(settings)
+		public CategoryContentController(AppSettings settings, IAssetedResourceQuery assetedResources, IDocumentAssignmentQuery documentAssignments) : base(settings)
 		{
 			_assetedResources = assetedResources;
+			_documentAssignments = documentAssignments;
 		}
 
 		// Content Delivery
@@ -64,6 +67,30 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 		{
 			var resource = new Resource(type, categoryID, catalogID);
 			await _assetedResources.MoveAssignment(resource, assetID, listOrderWithinType, VerifiedUserContext);
+		}
+
+		[DocName("Get Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
+		[HttpGet, Route("schemas/{schemaID}/documents")]
+		public async Task<ListPage<Document>> ListDocuments(string catalogID, string categoryID, string schemaID, ListArgs<Document> args)
+		{
+			var resource = new Resource(type, categoryID, catalogID);
+			return await _documentAssignments.ListDocuments(schemaID, resource, args, VerifiedUserContext);
+		}
+
+		[DocName("Assign Document to Resource"), OrderCloudIntegrationsAuth]
+		[HttpPost, Route("schemas/{schemaID}/documents/{documentID}/assignments")]
+		public async Task SaveDocumentAssignment(string catalogID, string categoryID, string schemaID, string documentID)
+		{
+			var resource = new Resource(type, categoryID, catalogID);
+			await _documentAssignments.SaveAssignment(schemaID, documentID, resource, VerifiedUserContext);
+		}
+
+		[DocName("Remove Document from Resource"), OrderCloudIntegrationsAuth]
+		[HttpDelete, Route("schemas/{schemaID}/documents/{documentID}/assignments")]
+		public async Task DeleteDocumentAssignment(string catalogID, string categoryID, string schemaID, string documentID)
+		{
+			var resource = new Resource(type, categoryID, catalogID);
+			await _documentAssignments.DeleteAssignment(schemaID, documentID, resource, VerifiedUserContext);
 		}
 	}
 }

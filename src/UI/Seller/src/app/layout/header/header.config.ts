@@ -58,14 +58,14 @@ const ProductNavGrouping: MPRoute = {
 // Orders
 const BuyerOrders: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'Incoming Buyer Orders',
+  title: 'Sales Orders',
   route: '/orders',
   queryParams: { OrderDirection: 'Incoming' },
 };
 
 const SupplierPurchaseOrders: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'Outgoing Supplier Orders',
+  title: 'Purchase Orders',
   route: '/orders',
   queryParams: { OrderDirection: 'Outgoing' },
 };

@@ -21,11 +21,11 @@
     <button type="button"
             class="btn btn-outline-primary btn-sm"
             [ngClass]="{'active': activeOrderDirectionButton === 'Incoming'}"
-            (click)="setOrderDirection('Incoming')">Incoming Buyer Orders</button>
+            (click)="setOrderDirection('Incoming')">Sales Orders</button>
     <button type="button"
             class="btn btn-outline-primary btn-sm"
             [ngClass]="{'active': activeOrderDirectionButton === 'Outgoing'}"
-            (click)="setOrderDirection('Outgoing')">Outgoing Supplier Orders</button>
+            (click)="setOrderDirection('Outgoing')">Purchase Orders</button>
   </div>
   <app-order-details class="resource-edit"
                      [order]="resourceInSelection">

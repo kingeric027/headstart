@@ -138,10 +138,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OCMBuyerLocationPermissions } from './components/profile/buyer-location-permissions/buyer-location-permissions';
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
 
-export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/');
-  // uncomment to reference test file using XXX in place of words
-  // return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/', '-test.json');
+export function HttpLoaderFactory(http: HttpClient, appConfig: AppConfig): TranslateHttpLoader {
+  return new TranslateHttpLoader(http, appConfig.translateBlobUrl);
+  // return new TranslateHttpLoader(http, appConfig.translateBlobUrl, '-test.json');
 }
 
 const components = [
@@ -256,7 +255,7 @@ const components = [
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
+        deps: [HttpClient, AppConfig],
       },
     }),
     NgxImageZoomModule,
