@@ -4,6 +4,7 @@ using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
+using System.Linq;
 
 namespace Marketplace.Common.Commands
 {
@@ -80,6 +81,19 @@ namespace Marketplace.Common.Commands
                 BuyerID = ocBuyerID,
                 SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
             });
+
+            // list message senders
+            var msList = await _oc.MessageSenders.ListAsync();
+            // create message sender assignment
+            var assignmentList = msList.Items.Select(ms =>
+            {
+                return new MessageSenderAssignment
+                {
+                    MessageSenderID = ms.ID,
+                    BuyerID = ocBuyerID
+                };
+            });
+            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a));
 
             await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor" });
             await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" });
