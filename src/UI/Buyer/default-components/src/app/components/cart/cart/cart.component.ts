@@ -10,7 +10,7 @@ import { OrderSummaryMeta, getOrderSummaryMeta } from 'src/app/services/purchase
 })
 export class OCMCart {
   _order: MarketplaceOrder;
-  _orderPromos: OrderPromotion[];
+  _orderPromos: OrderPromotion[] = [];
   _lineItems: ListPage<LineItemWithProduct>;
   orderSummaryMeta: OrderSummaryMeta;
   @Input() set order(value: MarketplaceOrder) {

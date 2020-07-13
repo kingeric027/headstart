@@ -39,7 +39,6 @@ export async function loginTestSetup(authToken: string) {
 	await t.maximizeWindow()
 	const user: OrderCloudSDK.User = await createUser(authToken, '0007')
 	await saveUserAssignment(user.ID, '0007-0001', '0007', authToken)
-	await saveUserAssignment(user.ID, '0007-0003', '0007', authToken)
 	return user
 }
 

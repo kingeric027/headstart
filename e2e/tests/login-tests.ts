@@ -38,7 +38,7 @@ test
 	await t.expect(loginPage.submitButton.exists).ok()
 })
 
-test('Log In And Out With Existing User | 19701', async t => {
+test.skip('Log In And Out With Existing User | 19701', async t => {
 	await t.maximizeWindow()
 	await loginPage.login('erosen-buyer1', 'fails345')
 	await t.expect(getLocation()).contains('home')
