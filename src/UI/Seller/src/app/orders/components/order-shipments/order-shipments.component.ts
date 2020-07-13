@@ -132,10 +132,10 @@ export class OrderShipmentsComponent implements OnChanges {
     const lineItemsToPatch = [];
     this.lineItems.forEach(async (li, i) => {
       if (this.quantities[i] > 0) {
-        lineItemsToPatch.push(this.ocLineItemService.Patch(this.orderDirection, this.order.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Complete } }));
+        lineItemsToPatch.push(this.ocLineItemService.Patch(this.orderDirection, this.order.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Complete } }).toPromise());
       }
     });
-    Promise.all(lineItemsToPatch);
+    await Promise.all(lineItemsToPatch);
   }
 
   setSelectedShipment(i: number): void {
