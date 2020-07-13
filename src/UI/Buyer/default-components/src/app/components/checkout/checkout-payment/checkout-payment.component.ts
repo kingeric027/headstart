@@ -7,6 +7,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { groupBy as _groupBy } from 'lodash';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
+import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 
 interface IGroupedOrderPromo {
   [id: string]: IOrderPromotionDisplay;
@@ -27,6 +28,7 @@ export class OCMCheckoutPayment implements OnInit {
   @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
   @Output() continue = new EventEmitter<void>();
   @Output() promosChanged = new EventEmitter<null>();
+  checkout: CheckoutService = this.context.order.checkout;
   _orderCurrency: string;
   _orderPromos: OrderPromotion[];
   _groupedOrderPromos: IGroupedOrderPromo;
@@ -55,6 +57,7 @@ export class OCMCheckoutPayment implements OnInit {
   async applyPromo(): Promise<void> {
     try {
       const promo = await this.context.order.promos.applyPromo(this.promoCode);
+      await this.checkout.calculateOrder();
       this.promoCode = '';
       this._orderPromos.push(promo);
     } catch (ex) {
@@ -68,6 +71,7 @@ export class OCMCheckoutPayment implements OnInit {
     this._orderPromos = this._orderPromos.filter(p => p.Code !== promoCode);
     try {
       await this.context.order.promos.removePromo(promoCode);
+      await this.checkout.calculateOrder();
     } finally {
       this.promosChanged.emit();
     }
