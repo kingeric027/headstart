@@ -23,6 +23,7 @@ export class OCMOrderStatusIcon {
     [ShippingStatus.Processing]: this.faClock,
     [ShippingStatus.Shipped]: this.faCircle,
     [LineItemStatus.Backordered]: this.faClock,
+    [LineItemStatus.Complete]: this.faCircle,
     [LineItemStatus.Returned]: this.faCircle,
     [LineItemStatus.Submitted]: this.faCircle,
     [LineItemStatus.ReturnRequested]: this.faClock
