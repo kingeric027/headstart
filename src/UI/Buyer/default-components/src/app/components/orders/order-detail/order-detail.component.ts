@@ -44,14 +44,19 @@ export class OCMOrderDetails implements OnInit {
     return this.context.currentUser.get().FavoriteOrderIDs.includes(orderID);
   }
 
-  canRequestReturn() {
+  canRequestReturn(): boolean {
     let qtyReturned = 0;
     let total = 0;
-    this.orderDetails.LineItems.forEach(li => {
+    this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
       if (li.xp.LineItemReturnInfo) qtyReturned += li.xp.LineItemReturnInfo.QuantityToReturn;
       total += li.Quantity;
     });
-    return qtyReturned !== total && this.order.Status !== 'Unsubmitted' && this.order.xp.ShippingStatus === ShippingStatus.PartiallyShipped || this.order.xp.ShippingStatus === ShippingStatus.Shipped;
+    return (
+      (qtyReturned !== total &&
+        this.order.Status !== 'Unsubmitted' &&
+        this.order.xp.ShippingStatus === ShippingStatus.PartiallyShipped) ||
+      this.order.xp.ShippingStatus === ShippingStatus.Shipped
+    );
   }
 
   toggleFavorite(order: MarketplaceOrder): void {
