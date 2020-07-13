@@ -15,6 +15,9 @@ export interface QtyChangeEvent {
   styleUrls: ['./quantity-input.component.scss'],
 })
 export class OCMQuantityInput implements OnInit, OnChanges {
+  @Input() priceSchedule: PriceSchedule;
+  @Input() product: MarketplaceMeProduct;
+
   @Input() existingQty: number;
   @Input() gridDisplay? = false;
   @Input() isQtyChanging;
@@ -31,8 +34,6 @@ export class OCMQuantityInput implements OnInit, OnChanges {
 
   constructor(private router: Router) {}
 
-  @Input() priceSchedule: PriceSchedule;
-  @Input() product: MarketplaceMeProduct;
 
   ngOnInit(): void {
     const routeUrl = this.router.routerState.snapshot.url;
