@@ -25,44 +25,44 @@ export class OrchestrationLogsTableComponent extends ResourceCrudComponent<Orche
   filterConfig = {
     Filters: [
       {
-        Display: 'Logs On/Before',
+        Display: 'FILTERS.LOGS_ON_BEFORE',
         Path: 'timeStamp',
         Type: 'DateFilter',
       },
       // TO-DO - UPDATE MIDDLEWARE TO ACCEPT BOTH A FROM AND TO DATE
       {
-        Display: 'Record Type',
+        Display: 'FILTERS.RECORD_TYPE',
         Path: 'RecordType',
         Items: [
-          {Text: 'Catalog', Value: 'Catalog'},
-          {Text: 'PriceSchedule', Value: 'PriceSchedule'},
-          {Text: 'Product', Value: 'Product'},
-          {Text: 'ProductFacet', Value: 'ProductFacet'},
-          {Text: 'Spec', Value: 'Spec'},
-          {Text: 'SpecOption', Value: 'SpecOption'},
-          {Text: 'SpecProductAssignment', Value: 'Spec'},
-          {Text: 'User', Value: 'User'}
+          {Text: 'FILTER_OPTIONS.CATALOG', Value: 'Catalog'},
+          {Text: 'FILTER_OPTIONS.PRICE_SCHEDULE', Value: 'PriceSchedule'},
+          {Text: 'FILTER_OPTIONS.PRODUCT', Value: 'Product'},
+          {Text: 'FILTER_OPTIONS.PRODUCT_FACET', Value: 'ProductFacet'},
+          {Text: 'FILTER_OPTIONS.SPEC', Value: 'Spec'},
+          {Text: 'FILTER_OPTIONS.SPEC_OPTION', Value: 'SpecOption'},
+          {Text: 'FILTER_OPTIONS.SPEC_PRODUCT_ASSIGNMENT', Value: 'Spec'},
+          {Text: 'FILTER_OPTIONS.USER', Value: 'User'}
         ],
         Type: 'Dropdown',
       },
       {
-        Display: 'Action',
+        Display: 'FILTERS.ACTION',
         Path: 'Action',
         Items: [
-          {Text: 'Create', Value: 'Create'},
-          {Text: 'Delete', Value: 'Delete'},
-          {Text: 'Get', Value: 'Get'},
-          {Text: 'Ignore', Value: 'Ignore'},
-          {Text: 'Update', Value: 'Update'},],
+          {Text: 'FILTER_OPTIONS.CREATE', Value: 'Create'},
+          {Text: 'FILTER_OPTIONS.DELETE', Value: 'Delete'},
+          {Text: 'FILTER_OPTIONS.GET', Value: 'Get'},
+          {Text: 'FILTER_OPTIONS.IGNORE', Value: 'Ignore'},
+          {Text: 'FILTER_OPTIONS.UPDATE', Value: 'Update'},],
         Type: 'Dropdown',
       },
       {
-        Display: 'Result',
+        Display: 'FILTERS.RESULT',
         Path: 'Level',
         Items: [
-          {Text: 'Error', Value: 'Error'},
-          {Text: 'Success', Value: 'Success'},
-          {Text: 'Warn', Value: 'Warn'}],
+          {Text: 'FILTER_OPTIONS.ERROR', Value: 'Error'},
+          {Text: 'FILTER_OPTIONS.SUCCESS', Value: 'Success'},
+          {Text: 'FILTER_OPTIONS.WARN', Value: 'Warn'}],
         Type: 'Dropdown',
       },
     ],
