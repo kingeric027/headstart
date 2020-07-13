@@ -48,10 +48,10 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
     Active: new FormControl({value: supplier.Active, disabled: this.isSupplierUser || !this.isCreatingNew}), 
     SyncFreightPop: new FormControl({value: supplier.xp?.SyncFreightPop || false, disabled: this.isSupplierUser}),
     Currency: new FormControl({value: _get(supplier, 'xp.Currency'), disabled: !this.isCreatingNew || this.isSupplierUser}, Validators.required),
-    ProductType: new FormGroup({
-      Standard: new FormControl({value: supplier.xp?.ProductTypes?.Standard || false, disabled: this.isSupplierUser}),
-      Quote: new FormControl({value: supplier.xp?.ProductTypes?.Quote || false, disabled: this.isSupplierUser}),
-      PurchaseOrder: new FormControl({value: supplier.xp?.ProductTypes?.PurchaseOrder || false, disabled: this.isSupplierUser})
+    ProductTypes: new FormGroup({
+      Standard: new FormControl({value: supplier.xp?.ProductTypes?.includes('Standard') || false, disabled: this.isSupplierUser}),
+      Quote: new FormControl({value: supplier.xp?.ProductTypes?.includes('Quote') || false, disabled: this.isSupplierUser}),
+      PurchaseOrder: new FormControl({value: supplier.xp?.ProductTypes?.includes('PurchaseOrder') || false, disabled: this.isSupplierUser})
     }, RequireCheckboxesToBeChecked())
 
   });

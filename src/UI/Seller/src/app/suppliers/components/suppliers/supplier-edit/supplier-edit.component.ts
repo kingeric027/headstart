@@ -35,8 +35,17 @@ export class SupplierEditComponent implements OnInit {
   }
 
   updateResourceFromEvent(event: any, field: string): void {
-    const value = ['Active', 'xp.SyncFreightPop', 'xp.StandardProducts', 'xp.QuoteProducts','xp.POProducts'].includes(field) ?
+    if(field.startsWith('xp.ProductTypes')) {
+      const form = this.resourceForm.getRawValue();
+      const valueToArray = [];
+      Object.keys(form.ProductTypes).forEach(item => {
+        if(form.ProductTypes[item]) valueToArray.push(item);
+      })
+      this.updateResource.emit({field: 'xp.ProductTypes', value: valueToArray}) 
+    } else {
+      const value = ['Active', 'xp.SyncFreightPop'].includes(field) ?
       event.target.checked : event.target.value;
     this.updateResource.emit({ value, field });
+    }
   }
 }

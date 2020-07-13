@@ -24,6 +24,6 @@ namespace Marketplace.Models.Models.Marketplace
         public string ApiClientID { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
 		public CurrencySymbol? Currency { get; set; } = null;
-        public SupplierProductType ProductTypes { get; set; }
+        public List<SupplierProductType> ProductTypes { get; set; }
     }
 }
