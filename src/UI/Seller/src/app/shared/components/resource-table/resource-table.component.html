@@ -122,7 +122,7 @@
             <div *ngFor="let filter of _filterConfig?.Filters"
                  class="group mt-2">
               <div *ngIf="shouldFilterDisplay(filter)">
-                <label>{{filter.Display}}</label>
+                <label translate>{{filter.Display}}</label>
                 <select class="form-control input-sm"
                         *ngIf="filter.Type === 'Dropdown'"
                         type="select"
@@ -130,7 +130,8 @@
                         [formControlName]="filter.Path">
                   <ng-container *ngFor="let option of filter.Items;">
                     <option *ngIf="isBoolean(option.Value)"
-                            value="{{option.Value}}">{{option.Text | yesNo }}</option>
+                            value="{{option.Value}}"
+                            translate>{{option.Text | yesNo }}</option>
                     <option *ngIf="!isBoolean(option.Value)"
                             value="{{option.Value}}">{{option.Text}}</option>
                   </ng-container>

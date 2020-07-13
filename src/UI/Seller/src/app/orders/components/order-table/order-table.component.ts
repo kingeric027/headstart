@@ -49,28 +49,28 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
   filterConfig = {
     Filters: [
       {
-        Display: 'Status',
+        Display: 'FILTERS.STATUS',
         Path: 'Status',
         Items: [
-          {Text: 'Open', Value: 'Open'},
-          {Text: 'Awaiting Approval', Value: 'AwaitingApproval'},
-          {Text: 'Completed', Value: 'Completed'},
-          {Text: 'Declined', Value: 'Declined'},
-          {Text: 'Canceled', Value: 'Canceled'}],
+          {Text: 'FILTER_OPTIONS.OPEN', Value: 'Open'},
+          {Text: 'FILTER_OPTIONS.AWAITING_APPROVAL', Value: 'AwaitingApproval'},
+          {Text: 'FILTER_OPTIONS.COMPLETED', Value: 'Completed'},
+          {Text: 'FILTER_OPTIONS.DECLINED', Value: 'Declined'},
+          {Text: 'FILTER_OPTIONS.CANCELED', Value: 'Canceled'}],
         Type: 'Dropdown',
       },
       {
-        Display: 'From Date',
+        Display: 'FILTERS.FROM_DATE',
         Path: 'from',
         Type: 'DateFilter',
       },
       {
-        Display: 'To Date',
+        Display: 'FILTERS.TO_DATE',
         Path: 'to',
         Type: 'DateFilter',
       },
       {
-        Display: 'Has Claims',
+        Display: 'FILTERS.HAS_CLAIMS',
         Path: 'xp.OrderReturnInfo.HasReturn',
         Items: [
           {Value: true},
