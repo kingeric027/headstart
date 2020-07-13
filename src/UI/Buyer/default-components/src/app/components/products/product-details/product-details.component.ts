@@ -136,8 +136,7 @@ export class OCMProductDetails implements OnInit {
     const specs = this.specFormService.getLineItemSpecs(this._specs);
     return specs.
       every(spec => image.Tags
-      .find(tag => tag
-      .split('-')
+      .find(tag => tag?.split('-')
       .includes(spec.Value.replace(/\s/g, ''))));
   }
 
