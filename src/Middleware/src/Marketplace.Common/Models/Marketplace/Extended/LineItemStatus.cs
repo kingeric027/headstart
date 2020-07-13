@@ -11,6 +11,7 @@ namespace Marketplace.Models.Extended
         Open,
         Backordered,
         Canceled,
-        Returned
+        Returned,
+        ReturnRequested
     }
 }

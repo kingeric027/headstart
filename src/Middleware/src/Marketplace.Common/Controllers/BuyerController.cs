@@ -24,11 +24,23 @@ namespace Marketplace.Common.Controllers
 
         [DocName("POST Marketplace Buyer")]
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
-        public async Task<MarketplaceBuyer> Create([FromBody] MarketplaceBuyer buyer)
+        public async Task<SuperMarketplaceBuyer> Create([FromBody] SuperMarketplaceBuyer buyer)
         {
-            // ocAuth is the token for the organization that is specified in the AppSettings
-            var ocAuth = await _oc.AuthenticateAsync();
-            return await _command.Create(buyer, VerifiedUserContext, ocAuth.AccessToken);
-        } 
+            return await _command.Create(buyer, VerifiedUserContext.AccessToken);
+        }
+
+        [DocName("PUT Marketplace Buyer")]
+        [HttpPut, Route("{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
+        public async Task<SuperMarketplaceBuyer> Put([FromBody] SuperMarketplaceBuyer superBuyer, string buyerID)
+        {
+            return await _command.Update(buyerID, superBuyer, VerifiedUserContext.AccessToken);
+        }
+
+        [DocName("GET Marketplace Buyer")]
+        [HttpGet, Route("{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
+        public async Task<SuperMarketplaceBuyer> Get(string buyerID)
+        {
+            return await _command.Get(buyerID, VerifiedUserContext.AccessToken);
+        }
     }
 }

@@ -17,6 +17,7 @@ export class OCMLineitemTable {
     this.sortLineItems(this._lineItems);
     const liGroups = _groupBy(value, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(liGroups);
+    this.sortLineItemGroups(this.liGroupedByShipFrom);
     this.setSupplierInfo(this.liGroupedByShipFrom);
   }
   @Input() orderType: OrderType;
@@ -50,7 +51,7 @@ export class OCMLineitemTable {
       const { ProductID, Specs, Quantity, xp } = li;
       //ACTIVATE SPINNER/DISABLE INPUT IF QTY BEING UPDATED
       this.updatingLiIDs.push(lineItemID);
-      await this.context.order.cart.add({ProductID, Specs, Quantity, xp});
+      await this.context.order.cart.setQuantity({ProductID, Specs, Quantity, xp});
       //REMOVE SPINNER/ENABLE INPUT IF QTY NO LONGER BEING UPDATED
       this.updatingLiIDs.splice(this.updatingLiIDs.indexOf(lineItemID), 1);
     }
@@ -73,15 +74,16 @@ export class OCMLineitemTable {
     this._lineItems = lineItems.sort((a, b) => {
       let nameA = a.Product.Name.toUpperCase(); // ignore upper and lowercase
       let nameB = b.Product.Name.toUpperCase(); // ignore upper and lowercase
-      if (nameA < nameB) {
-        return -1;
-      }
-      if (nameA > nameB) {
-        return 1;
-      }
-      // names must be equal
-      return 0;
+      return nameA.localeCompare(nameB);
     });
+  }
+
+  sortLineItemGroups(liGroups: MarketplaceLineItem[][]): void {
+    this.liGroupedByShipFrom = liGroups.sort((a, b) => {
+      let nameA = a[0].ShipFromAddressID.toUpperCase(); // ignore upper and lowercase
+      let nameB = b[0].ShipFromAddressID.toUpperCase(); // ignore upper and lowercase
+      return nameA.localeCompare(nameB);
+    })
   }
 
   hasReturnInfo(): boolean {

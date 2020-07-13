@@ -74,11 +74,11 @@ export class PromotionEditComponent implements OnInit {
     this.resourceForm = new FormGroup({
       Code: new FormControl(promotion.Code, Validators.required),
       Type: new FormControl(_get(promotion, 'xp.Type')),
-      Value: new FormControl(_get(promotion, 'xp.Value')),
+      Value: new FormControl(_get(promotion, 'xp.Value'), Validators.min(0)),
       AppliesTo: new FormControl(_get(promotion, 'xp.AppliesTo')),
       Supplier: new FormControl(_get(promotion, 'xp.Supplier')),
-      RedemptionLimit: new FormControl(promotion.RedemptionLimit),
-      RedemptionLimitPerUser: new FormControl(promotion.RedemptionLimitPerUser),
+      RedemptionLimit: new FormControl(promotion.RedemptionLimit, Validators.min(0)),
+      RedemptionLimitPerUser: new FormControl(promotion.RedemptionLimitPerUser, Validators.min(0)),
       Description: new FormControl(promotion.Description),
       FinePrint: new FormControl(promotion.FinePrint),
       StartDate: new FormControl(promotion.StartDate, Validators.required),
@@ -86,8 +86,8 @@ export class PromotionEditComponent implements OnInit {
       CanCombine: new FormControl(promotion.CanCombine),
       AllowAllBuyers: new FormControl(promotion.AllowAllBuyers),
       MinReqType: new FormControl(_get(promotion, 'xp.MinReq.Type')),
-      MinReqInt: new FormControl(_get(promotion, 'xp.MinReq.Int')),
-      MaxShipCost: new FormControl(_get(promotion, 'xp.MaxShipCost'))
+      MinReqInt: new FormControl(_get(promotion, 'xp.MinReq.Int'), Validators.min(0)),
+      MaxShipCost: new FormControl(_get(promotion, 'xp.MaxShipCost'), Validators.min(0))
     });
   }
 
@@ -194,7 +194,7 @@ export class PromotionEditComponent implements OnInit {
   }
 
   buildValueExpression(): void {
-    let valueExpression: string = "item.LineSubtotal";
+    let valueExpression: string = "Order.Subtotal";
     switch(this._promotionEditable.xp?.Type) {
       case 'FixedAmount':
         valueExpression = `${this._promotionEditable.xp?.Value}`
@@ -210,7 +210,7 @@ export class PromotionEditComponent implements OnInit {
   }
 
   buildEligibleExpression(): void {
-    let eligibleExpression: string = `item.LineTotal >= 0 and Order`;
+    let eligibleExpression: string = `Order`;
     switch (this._promotionEditable.xp?.MinReq?.Type) {
       case 'MinPurchase':
         eligibleExpression = `${eligibleExpression}.Subtotal > ${this._promotionEditable.xp?.MinReq?.Int}`;
@@ -222,7 +222,7 @@ export class PromotionEditComponent implements OnInit {
     if (this._promotionEditable.xp?.MaxShipCost) {
       this._promotionEditable.xp?.MinReq?.Type ? eligibleExpression = `${eligibleExpression} & Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
       :
-      eligibleExpression = `item.LineTotal >= 0 and Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
+      eligibleExpression = `Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
     }
     this._promotionEditable.EligibleExpression = eligibleExpression;
   }

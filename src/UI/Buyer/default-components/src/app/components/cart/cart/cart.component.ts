@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { LineItemWithProduct, ShopperContextService } from 'marketplace';
-import { ListPage } from 'ordercloud-javascript-sdk';
+import { ListPage, OrderPromotion } from 'ordercloud-javascript-sdk';
 import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 import { OrderSummaryMeta, getOrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 
@@ -10,6 +10,7 @@ import { OrderSummaryMeta, getOrderSummaryMeta } from 'src/app/services/purchase
 })
 export class OCMCart {
   _order: MarketplaceOrder;
+  _orderPromos: OrderPromotion[];
   _lineItems: ListPage<LineItemWithProduct>;
   orderSummaryMeta: OrderSummaryMeta;
   @Input() set order(value: MarketplaceOrder) {
@@ -21,11 +22,16 @@ export class OCMCart {
     this.setOrderSummaryMeta();
   }
 
+  @Input() set orderPromos(value: OrderPromotion[]) {
+    this._orderPromos = value;
+    this.setOrderSummaryMeta();
+  }
+
   constructor(private context: ShopperContextService) {}
 
   setOrderSummaryMeta(): void {
     if (this._order && this._lineItems) {
-      this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._lineItems.Items, 'cart');
+      this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos, this._lineItems.Items, 'cart');
     }
   }
   toProductList(): void {
@@ -38,5 +44,9 @@ export class OCMCart {
 
   emptyCart(): void {
     this.context.order.cart.empty();
+  }
+
+  updateOrderMeta(): void {
+    this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos, this._lineItems.Items, 'cart');
   }
 }

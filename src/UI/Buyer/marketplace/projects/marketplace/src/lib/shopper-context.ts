@@ -107,7 +107,7 @@ export enum OrderStatus {
   AwaitingApproval = 'AwaitingApproval',
   ChangesRequested = 'ChangesRequested',
   Open = 'Open',
-  Complete = 'Complete',
+  Completed = 'Completed',
   Canceled = 'Canceled',
 }
 
@@ -138,6 +138,7 @@ export enum LineItemStatus {
   Backordered = 'Backordered',
   Canceled = 'Canceled',
   Returned = 'Returned',
+  ReturnRequested = 'ReturnRequested',
 }
 
 export interface CreditCard {
@@ -192,7 +193,7 @@ export class AppConfig {
   /**
    * base path to middleware
    */
-
+  translateBlobUrl: string;
   ordercloudEnv: OrdercloudEnv;
   avalaraCompanyId: number;
   middlewareUrl: string;

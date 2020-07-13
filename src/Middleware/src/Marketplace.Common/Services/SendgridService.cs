@@ -8,6 +8,7 @@ using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.freightpop;
 using OrderCloud.SDK;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -142,17 +143,17 @@ namespace Marketplace.Common.Services
         {
             MarketplaceOrder order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID);
-            var productsList = lineItems.Items.Select(MapReturnedLineItemToProduct);
+            var productsList = MapLineItemsToProducts(lineItems);
             var dynamicTemplateData = new {
-            order.FromUser.FirstName,
-            order.FromUser.LastName,
-            order.ID,
-            DateSubmitted = order.DateSubmitted.ToString(),
-            ReturnID = order.xp.OrderReturnInfo.RMANumber,
-            Products = productsList
+                order.FromUser.FirstName,
+                order.FromUser.LastName,
+                order.ID,
+                DateSubmitted = order.DateSubmitted.ToString(),
+                ReturnID = order.xp.OrderReturnInfo.RMANumber,
+                order.Comments,
+                Products = productsList
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, order.FromUser.Email, BUYER_REFUND_REQUESTED_TEMPLATE_ID, dynamicTemplateData);
-            // TODO: Get Seller's info for return requested email
         }
 
         public async Task SendSupplierOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
@@ -233,6 +234,22 @@ namespace Marketplace.Common.Services
                 order.Total
             };
         }
+        private List<object> MapLineItemsToProducts(ListPage<MarketplaceLineItem> lineItems)
+        {
+            List<object> products = new List<object>();
+
+            foreach(var lineItem in lineItems.Items)
+            {
+                if (lineItem.xp.LineItemReturnInfo != null)
+                {
+                    products.Add(MapReturnedLineItemToProduct(lineItem));
+                } else
+                {
+                    products.Add(MapLineItemToProduct(lineItem));
+                }
+            }
+            return products;
+        }
 
         private object MapReturnedLineItemToProduct(MarketplaceLineItem lineItem) =>
         new
@@ -243,7 +260,7 @@ namespace Marketplace.Common.Services
             lineItem.Quantity,
             lineItem.LineTotal,
             ReturnQuantity = lineItem.xp.LineItemReturnInfo.QuantityToReturn,
-            Comments = lineItem.xp.LineItemReturnInfo.ReturnReason
+            lineItem.xp.LineItemReturnInfo.ReturnReason
         };
 
         private object MapLineItemToProduct(MarketplaceLineItem lineItem) =>
@@ -255,6 +272,8 @@ namespace Marketplace.Common.Services
               lineItem.Quantity,
               lineItem.LineTotal,
           };
+        
+
 
         private object GetShippingAddress(IList<MarketplaceLineItem> lineItems) =>
           new

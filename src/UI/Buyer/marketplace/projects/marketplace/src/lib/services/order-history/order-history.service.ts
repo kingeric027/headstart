@@ -113,7 +113,7 @@ export class OrderHistoryService {
           ReturnReason: returnReason,
           Resolved: false,
         },
-        LineItemStatus: LineItemStatus.Returned
+        LineItemStatus: LineItemStatus.ReturnRequested
       },
     };
     const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);

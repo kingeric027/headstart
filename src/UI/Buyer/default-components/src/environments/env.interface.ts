@@ -8,5 +8,6 @@ export interface Environment {
   baseUrl: string;
   middlewareUrl: string;
   ssoLink: string;
+  translateBlobUrl: string;
   ordercloudEnv: OrdercloudEnv;
 }

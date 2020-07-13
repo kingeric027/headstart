@@ -6,6 +6,7 @@ import { CartService } from './cart.service';
 import { CheckoutService } from './checkout.service';
 import { LineItems, Orders, Order, LineItem, IntegrationEvents, Tokens } from 'ordercloud-javascript-sdk';
 import { MarketplaceOrder, MarketplaceLineItem, QuoteOrderInfo } from 'marketplace-javascript-sdk';
+import { PromoService } from './promo.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,7 @@ export class CurrentOrderService {
 
   constructor(
     private cartService: CartService,
+    private promoService: PromoService,
     private checkoutService: CheckoutService,
     private state: OrderStateService,
     private appConfig: AppConfig
@@ -27,6 +29,10 @@ export class CurrentOrderService {
 
   get cart(): CartService {
     return this.cartService;
+  }
+
+  get promos(): PromoService {
+    return this.promoService;
   }
 
   get checkout(): CheckoutService {

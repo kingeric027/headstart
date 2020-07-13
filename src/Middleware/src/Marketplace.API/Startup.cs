@@ -25,6 +25,7 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
+using Document = ordercloud.integrations.cms.Document;
 
 namespace Marketplace.API
 {
@@ -53,6 +54,7 @@ namespace Marketplace.API
 			};
 			var cmsConfig = new CMSConfig()
 			{
+				BaseUrl = _settings.EnvironmentSettings.BaseUrl,
 				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
 				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
 			};
@@ -73,7 +75,10 @@ namespace Marketplace.API
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
                 .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
-                .InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
+				.InjectCosmosStore<DocumentSchema, DocumentSchema>(cosmosConfig)
+				.InjectCosmosStore<Document, Document>(cosmosConfig)
+				.InjectCosmosStore<DocumentAssignment, DocumentAssignment>(cosmosConfig)
+				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
@@ -90,7 +95,10 @@ namespace Marketplace.API
                 .Inject<IMarketplaceCatalogCommand>()
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
-                .Inject<ISupplierCategoryConfigQuery>()
+				.Inject<IDocumentQuery>()
+				.Inject<IBlobStorage>()
+				.Inject<IDocumentSchemaQuery>()
+				.Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
@@ -110,10 +118,10 @@ namespace Marketplace.API
                             }
                     }
                 ))
+				.AddSingleton<CMSConfig>(x => cmsConfig)
                 .AddSingleton<IFreightPopService>(x => new FreightPopService(freightPopConfig))
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
 				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
-                .AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")

@@ -1,4 +1,4 @@
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem, OrderPromotion } from 'marketplace-javascript-sdk';
 
 export interface OrderSummaryMeta {
   StandardLineItems: MarketplaceLineItem[];
@@ -14,6 +14,7 @@ export interface OrderSummaryMeta {
   ShippingCost: number;
   TaxCost: number;
   CreditCardTotal: number;
+  DiscountTotal: number;
 
   POTotal: number;
   OrderTotal: number;
@@ -49,8 +50,17 @@ const getCreditCardTotal = (subTotal: number, shippingCost: number, taxCost: num
   }
 }
 
+const getDiscountTotal = (orderPromos: OrderPromotion[]): number => {
+  let discountTotal = 0;
+  if (orderPromos?.length) {
+    orderPromos.map(p => discountTotal = discountTotal + p.Amount)
+  }
+  return discountTotal;
+}
+
 export const getOrderSummaryMeta = (
   order: MarketplaceOrder, 
+  orderPromos: OrderPromotion[],
   lineItems: MarketplaceLineItem[], 
   checkoutPanel: string, 
 ): OrderSummaryMeta => {
@@ -63,9 +73,11 @@ export const getOrderSummaryMeta = (
 
   const CreditCardDisplaySubtotal = StandardLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
   const CreditCardTotal = getCreditCardTotal(CreditCardDisplaySubtotal, order.ShippingCost, order.TaxCost, shouldHideShippingAndText);
+  // const DiscountTotal = getDiscountTotal(orderPromos)
 
   const POTotal = POLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
-  const OrderTotal = POTotal + CreditCardTotal;
+  const DiscountTotal = orderPromos.reduce((accumulator, promo) => (promo.Amount) + accumulator, 0);
+  const OrderTotal = (POTotal + CreditCardTotal) - DiscountTotal;
 
   return {
     StandardLineItemCount: StandardLineItems.length, 
@@ -79,6 +91,7 @@ export const getOrderSummaryMeta = (
     TaxCost: order.TaxCost, 
     POTotal, 
     CreditCardTotal, 
+    DiscountTotal,
     OrderTotal 
   };
 }
