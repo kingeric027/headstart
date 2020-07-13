@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import { ShopperContextService, OrderReorderResponse, OrderViewContext } from 'marketplace';
+import { ShopperContextService, OrderReorderResponse, OrderViewContext, ShippingStatus } from 'marketplace';
 import { MarketplaceOrder, OrderDetails, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
@@ -42,6 +42,21 @@ export class OCMOrderDetails implements OnInit {
 
   isFavorite(orderID: string): boolean {
     return this.context.currentUser.get().FavoriteOrderIDs.includes(orderID);
+  }
+
+  canRequestReturn(): boolean {
+    let qtyReturned = 0;
+    let total = 0;
+    this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
+      if (li.xp.LineItemReturnInfo) qtyReturned += li.xp.LineItemReturnInfo.QuantityToReturn;
+      total += li.Quantity;
+    });
+    return (
+      (qtyReturned !== total &&
+        this.order.Status !== 'Unsubmitted' &&
+        this.order.xp.ShippingStatus === ShippingStatus.PartiallyShipped) ||
+      this.order.xp.ShippingStatus === ShippingStatus.Shipped
+    );
   }
 
   toggleFavorite(order: MarketplaceOrder): void {

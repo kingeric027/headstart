@@ -38,16 +38,23 @@
         orderSummaryMeta.ShippingAndTaxOverrideText
       }}</span>
     </div>
-    <hr />
-    <div class="text-right lead">
-      <b *ngIf="!orderSummaryMeta.POLineItemCount"
-         class="float-left"
-         translate>ORDERS.SUMMARY.TOTAL</b>
-      <b *ngIf="orderSummaryMeta.POLineItemCount"
-         class="float-left"
+    <div *ngIf="orderSummaryMeta.DiscountTotal > 0"
+         class="text-right text-danger">
+      <b class="float-left"
+         translate>ORDERS.SUMMARY.DISCOUNT_TOTAL</b>
+      <span class="discount-total">- {{ orderSummaryMeta.DiscountTotal | currency: _orderCurrency }}</span>
+    </div>
+    <div *ngIf="orderSummaryMeta.POLineItemCount"
+         class="text-right lead">
+      <b class="float-left"
          translate>CC total</b>
-
       <span class="order-total">{{ orderSummaryMeta.CreditCardTotal | currency: _orderCurrency }}</span>
+    </div>
+    <div *ngIf="!orderSummaryMeta.POLineItemCount"
+         class="text-right lead">
+      <b class="float-left"
+         translate>ORDERS.SUMMARY.TOTAL</b>
+      <span class="order-total">{{ orderSummaryMeta.OrderTotal | currency: _orderCurrency }}</span>
     </div>
   </div>
 

@@ -20,6 +20,7 @@ namespace Marketplace.Common.Commands
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
+        Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
         Task RequestReturnEmail(string OrderID);
         Task PatchOrderCanceledStatus(string orderID);
         Task PatchOrderRequiresApprovalStatus(string orderID);
@@ -167,6 +168,12 @@ namespace Marketplace.Common.Commands
                 (OrderDirection.Incoming, orderID, li.ID, 
                 new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { UnitPriceInProductCurrency = li.UnitPrice, LineItemImageUrl = li.xp.LineItemImageUrl, LineItemStatus = LineItemStatus.Open } });
             return li;
+        }
+
+        public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser)
+        {
+            var orderPromo = await _oc.Orders.AddPromotionAsync(OrderDirection.Incoming, orderID, promoCode);
+            return await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
         }
 
         private bool LineItemsMatch(LineItem li1, LineItem li2)

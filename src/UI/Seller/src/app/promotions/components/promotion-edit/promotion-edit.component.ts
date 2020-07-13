@@ -194,7 +194,7 @@ export class PromotionEditComponent implements OnInit {
   }
 
   buildValueExpression(): void {
-    let valueExpression: string = "item.LineSubtotal";
+    let valueExpression: string = "Order.Subtotal";
     switch(this._promotionEditable.xp?.Type) {
       case 'FixedAmount':
         valueExpression = `${this._promotionEditable.xp?.Value}`
@@ -210,7 +210,7 @@ export class PromotionEditComponent implements OnInit {
   }
 
   buildEligibleExpression(): void {
-    let eligibleExpression: string = `item.LineTotal >= 0 and Order`;
+    let eligibleExpression: string = `Order`;
     switch (this._promotionEditable.xp?.MinReq?.Type) {
       case 'MinPurchase':
         eligibleExpression = `${eligibleExpression}.Subtotal > ${this._promotionEditable.xp?.MinReq?.Int}`;
@@ -222,7 +222,7 @@ export class PromotionEditComponent implements OnInit {
     if (this._promotionEditable.xp?.MaxShipCost) {
       this._promotionEditable.xp?.MinReq?.Type ? eligibleExpression = `${eligibleExpression} & Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
       :
-      eligibleExpression = `item.LineTotal >= 0 and Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
+      eligibleExpression = `Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
     }
     this._promotionEditable.EligibleExpression = eligibleExpression;
   }

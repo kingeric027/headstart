@@ -171,7 +171,7 @@
                 <th>Product</th>
                 <th>Description</th>
                 <th>Quantity</th>
-                <th *ngIf="showReturnInfo()">Return Info</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -184,6 +184,7 @@
                       </h6>
                     </div>
                   </div>
+                </td>
                 <td class="align-middle">
                   <div class="d-flex align-items-center justify-content-center">
                     <img [id]="i"
@@ -211,19 +212,16 @@
                 <td class="align-middle text-center">
                   {{ li.Quantity }}
                 </td>
-                <td *ngIf="showReturnInfo()"
-                    class="align-middle">
+                <td class="align-middle">
+                  <span>Status: {{ li.xp.LineItemStatus === "ReturnRequested" ? "Return Requested" : li.xp.LineItemStatus }}</span>
                   <div *ngIf="li.xp.LineItemReturnInfo?.QuantityToReturn > 0">
                     <div class="d-flex flex-column">
-                      <span>Qty Returned: {{ li.xp.LineItemReturnInfo?.QuantityToReturn }}</span>
+                      <small>Qty Returned: {{ li.xp.LineItemReturnInfo?.QuantityToReturn }}</small>
                       <small>Reason: {{ getReturnReason(li.xp.LineItemReturnInfo?.ReturnReason) }}</small>
                       <small *ngIf="li.xp.LineItemReturnInfo.Comment">Comment: {{li.xp.LineItemReturnInfo.Comment}}</small>
                     </div>
                   </div>
-                  <div *ngIf="!li.xp.LineItemReturnInfo">
-                    <span>No Returns</span>
-                  </div>
-                  <return-form *ngIf="li.xp.LineItemStatus === 'ReturnRequested'"
+                  <return-form *ngIf="li.xp.LineItemStatus === 'ReturnRequested' && isSellerUser"
                                [order]="_order"
                                (lineItemUpdate)="handleLineItemUpdate()"
                                [lineItem]="li"></return-form>
