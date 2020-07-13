@@ -10,7 +10,7 @@ namespace Marketplace.Common.Commands
     {
         Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token);
         Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user, string token);
-        Task<MarketplaceSupplier> UpdateMySupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user, string token);
+        Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user, string token);
     }
     public class MarketplaceSupplierCommand : IMarketplaceSupplierCommand
     {
@@ -29,9 +29,9 @@ namespace Marketplace.Common.Commands
             return await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID, token);
         }
 
-        public async Task<MarketplaceSupplier> UpdateMySupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user, string token)
+        public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user, string token)
         {
-            Require.That(supplierID == user.SupplierID, new ErrorCode("Unauthorized", 401, $"You are not authorized to update supplier {supplierID}"));
+            Require.That(user.UsrType == "admin" || supplierID == user.SupplierID, new ErrorCode("Unauthorized", 401, $"You are not authorized to update supplier {supplierID}"));
             return await _oc.Suppliers.PatchAsync<MarketplaceSupplier>(supplierID, supplier);
         }
         public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token)

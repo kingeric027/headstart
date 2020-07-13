@@ -59,7 +59,7 @@ namespace Marketplace.Common.Controllers
 		{
 			///ocAuth is the token for the organization that is specified in the AppSettings
 			var ocAuth = await _oc.AuthenticateAsync();
-			return await _command.UpdateMySupplier(supplierID, supplier, VerifiedUserContext, ocAuth.AccessToken);
+			return await _command.UpdateSupplier(supplierID, supplier, VerifiedUserContext, ocAuth.AccessToken);
 		}
 
 	}

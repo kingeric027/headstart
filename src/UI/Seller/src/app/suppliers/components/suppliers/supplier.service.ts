@@ -57,7 +57,7 @@ export class SupplierService extends ResourceCrudService<Supplier> {
 
   async updateResource(originalID: string, resource: any): Promise<any> {
     //  if supplier user updating supplier need to call route in middleware because they dont have required role.
-    const newResource =  await this.middleware.updateSupplier(originalID, resource);
+    const newResource = await this.middleware.updateSupplier(originalID, resource);
     this.updateResourceSubject(newResource)
     return newResource;
   }

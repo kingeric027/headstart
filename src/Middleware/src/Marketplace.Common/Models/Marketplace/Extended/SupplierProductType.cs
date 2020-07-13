@@ -1,12 +1,12 @@
-﻿using ordercloud.integrations.library;
+﻿using System.Text.Json.Serialization;
 
 namespace Marketplace.Common.Models.Marketplace.Extended
 {
-    [SwaggerModel]
-    public class SupplierProductType
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum SupplierProductType
     {
-        public bool Standard { get; set; }
-        public bool Quote { get; set; }
-        public bool PurchaseOrder { get; set; }
+        Standard,
+        Quote,
+        PurchaseOrder
     }
 }
