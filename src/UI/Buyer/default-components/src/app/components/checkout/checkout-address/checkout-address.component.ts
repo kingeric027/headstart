@@ -62,7 +62,7 @@ export class OCMCheckoutAddress implements OnInit {
 
   private async listSavedBuyerLocations(): Promise<void> {
     this.existingBuyerLocations = await this.context.addresses.listBuyerLocations();
-    this.homeCountry = this.existingBuyerLocations.Items[0].Country;
+    this.homeCountry = this.existingBuyerLocations?.Items[0]?.Country || 'US';
     if (this.existingBuyerLocations?.Items.length === 1) {
       this.selectedBuyerLocation = this.selectedShippingAddress = this.existingBuyerLocations.Items[0];
     }
