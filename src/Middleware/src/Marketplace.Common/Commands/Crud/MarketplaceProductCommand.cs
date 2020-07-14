@@ -14,7 +14,6 @@ namespace Marketplace.Common.Commands.Crud
 	public interface IMarketplaceProductCommand
 	{
 		Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user);
-		Task<SuperMarketplaceProduct> MeGet(string id, VerifiedUserContext user);
 		Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
 		Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct product, VerifiedUserContext user);
 		Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct product, VerifiedUserContext user);
@@ -23,6 +22,8 @@ namespace Marketplace.Common.Commands.Crud
 		Task DeletePricingOverride(string id, string buyerID, VerifiedUserContext user);
 		Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
 		Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
+		Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user);
+		Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user);
 	}
 
 	public class DefaultOptionSpecAssignment
@@ -107,34 +108,17 @@ namespace Marketplace.Common.Commands.Crud
 			});
 		}
 
-		private async Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user)
+		public async Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user)
 		{
 			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
 			var images = assets.Where(a => a.Type == AssetType.Image).ToList();
 			return images;
 		}
-		private async Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user)
+		public async Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user)
 		{
 			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
 			var attachments = assets.Where(a => a.Type == AssetType.Attachment).ToList();
 			return attachments;
-		}
-		public async Task<SuperMarketplaceProduct> MeGet(string id, VerifiedUserContext user)
-		{
-			var _product = _oc.Me.GetProductAsync<BuyerProduct<ProductXp, PriceSchedule>>(id, user.AccessToken);
-			var _specs = _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
-			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null);
-			var _images = GetProductImages(id, user);
-			var _attachments =  GetProductAttachments(id, user);
-			return new SuperMarketplaceProduct
-			{
-				Product = ProductMapper.MeProductToProduct(await _product),
-				PriceSchedule = (await _product).PriceSchedule,
-				Specs = (await _specs).Items,
-				Variants =(await _variants).Items,
-				Images = await _images,
-				Attachments = await _attachments
-			};
 		}
 
 		public async Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user)

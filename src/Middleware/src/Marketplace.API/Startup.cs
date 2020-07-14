@@ -92,6 +92,7 @@ namespace Marketplace.API
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IOrderCloudSandboxService>()
                 .Inject<IMarketplaceProductCommand>()
+                .Inject<IMeProductCommand>()
                 .Inject<IMarketplaceCatalogCommand>()
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
