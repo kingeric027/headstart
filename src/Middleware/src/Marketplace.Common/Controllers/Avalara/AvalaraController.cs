@@ -73,7 +73,7 @@ namespace Marketplace.Common.Controllers.Avalara
 			return await _resaleCertCommand.UpdateAsync(companyID, locationID, cert, VerifiedUserContext);
 		}
 
-		[HttpGet, Route("{companyID}/certificate/{locationID}/pdf")]
+		[HttpGet, Route("{companyID}/certificate/{locationID}/pdf"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
 		public async Task<object> DownloadCertificate(int companyID, string locationID)
 		{
 			// need to include auth for managing cert for a specific location somewhere

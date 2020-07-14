@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Address,  } from 'ordercloud-javascript-sdk';
+import { Address, Tokens,  } from 'ordercloud-javascript-sdk';
 import { ShopperContextService } from 'marketplace';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
@@ -10,6 +10,7 @@ import {
 import { CertificateFormOutput } from '../certificate-form/certificate-form.component';
 import { GeographyConfig } from '../../../config/geography.class';
 import { ActivatedRoute } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 
 @Component({
@@ -33,7 +34,7 @@ export class OCMLocationManagement {
     this.getLocationManagementDetails();
   };
   
-  constructor(private context: ShopperContextService, private activatedRoute: ActivatedRoute) {}
+  constructor(private context: ShopperContextService, private activatedRoute: ActivatedRoute, private http: HttpClient) {}
   
   toLocationOrders(): void {
     this.context.router.toOrdersByLocation({location: this._locationID});
@@ -64,6 +65,10 @@ export class OCMLocationManagement {
     }; 
     this.certificate = await this.context.addresses.createCertificate(this.address.ID, certificate);
     this.dismissCertificateForm();
+  }
+
+  async downloadCertificate(): Promise<void> {
+    await this.context.addresses.downloadCertificate(this._locationID);
   }
 
   dismissCertificateForm(): void {
