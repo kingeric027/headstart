@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using ordercloud.integrations.library;
@@ -23,6 +23,7 @@ namespace ordercloud.integrations.cms
 			Tags = asset.Tags;
 			FileName = asset.FileName;
 			Metadata = asset.Metadata;
+			ContainerID = asset.ContainerID;
 		}
 	}
 }

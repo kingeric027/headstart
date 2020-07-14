@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
@@ -21,7 +21,7 @@ namespace ordercloud.integrations.cms
 	{
 		[JsonProperty("ID"), CosmosInteropID]
 		public string InteropID { get; set; }
-		[Required, ApiIgnore, CosmosPartitionKey]
+		[Required, CosmosPartitionKey]
 		public string ContainerID { get; set; } // real id, not interop. Don't need to set or return.
 		[MaxLength(100)]
 		public string Title { get; set; }
