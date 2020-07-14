@@ -43,6 +43,7 @@ import { LocationManagementWrapperComponent } from './wrapper-components/locatio
 import { ExchangeRatesService } from './services/exchange-rates/exchange-rates.service';
 import { OrderHistoryWrapperComponent } from './wrapper-components/order-history-wrapper-component';
 import { OrdercloudEnv } from './shopper-context';
+import { TempSdk } from './services/temp-sdk/temp-sdk.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -58,6 +59,7 @@ import { OrdercloudEnv } from './shopper-context';
     ExchangeRatesService,
     OrderHistoryService,
     OrdersToApproveStateService,
+    TempSdk,
     PaymentHelperService,
     ProductFilterService,
     ReorderHelperService,
