@@ -7,11 +7,13 @@
                           [resourceForm]="resourceForm"
                           [filterConfig]="filterConfig"
                           (searched)="searchResources($event)"
+                          [shouldShowCreateNew]="!isSupplierUser"
                           (hitScrollEnd)="handleScrollEnd()"
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [canBeDeleted]="!isSupplierUser">
   <app-supplier-edit class="resource-edit"
                      *ngIf="resourceForm"
                      [resourceForm]="resourceForm"

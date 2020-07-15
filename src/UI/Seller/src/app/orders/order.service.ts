@@ -9,7 +9,8 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
   providedIn: 'root',
 })
 export class OrderService extends ResourceCrudService<Order> {
-  constructor(router: Router, activatedRoute: ActivatedRoute, ocOrderService: OcOrderService, currentUserService: CurrentUserService) {
+  constructor(router: Router, activatedRoute: ActivatedRoute, ocOrderService: OcOrderService, 
+    currentUserService: CurrentUserService) {
     super(router, activatedRoute, ocOrderService, currentUserService, '/orders', 'orders');
   }
   setOrderDirection(orderDirection: string) {
