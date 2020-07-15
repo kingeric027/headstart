@@ -16,7 +16,7 @@
                  role="status">
             </div>
             <span class="text-muted font-italic ml-2"
-                  translate>PRODUCT_EDIT.FETCHING_VISIBILITY</span>
+                  translate>ADMIN.PRODUCT_EDIT.FETCHING_VISIBILITY</span>
           </div>
         </ng-container>
         <ng-container *ngIf="!isFetching">
@@ -25,9 +25,9 @@
               <fa-icon [icon]="faEye"
                        class="text-success mr-2"
                        aria-hidden="true"></fa-icon>
-              <span translate>PRODUCT_EDIT.VISIBLE_IN</span>&nbsp;
+              <span translate>ADMIN.PRODUCT_EDIT.VISIBLE_IN</span>&nbsp;
               <span>{{catalogAssignmentsStatic.length}}/{{catalogs.length}}</span>
-              &nbsp;<span translate>PRODUCT_EDIT.CATALOGS_LOWERCASE</span>
+              &nbsp;<span translate>ADMIN.PRODUCT_EDIT.CATALOGS_LOWERCASE</span>
             </div>
           </ng-container>
           <ng-container *ngIf="catalogAssignmentsStatic.length === 0">
@@ -35,7 +35,7 @@
               <fa-icon [icon]="faEyeSlash"
                        class="text-danger mr-2"
                        aria-hidden="true"></fa-icon>
-              <span translate> PRODUCT_EDIT.NOT_VISIBLE</span>
+              <span translate> ADMIN.PRODUCT_EDIT.NOT_VISIBLE</span>
             </div>
           </ng-container>
         </ng-container>
@@ -45,21 +45,21 @@
           <button type="button"
                   class="btn btn-primary"
                   (click)="edit()"
-                  translate>PRODUCT_EDIT.EDIT</button>
+                  translate>ADMIN.PRODUCT_EDIT.EDIT</button>
         </ng-container>
         <ng-container *ngIf="isEditing">
           <button class="btn btn-medium"
                   (click)="handleClose()"
-                  translate>PRODUCT_EDIT.CLOSE</button>
+                  translate>ADMIN.PRODUCT_EDIT.CLOSE</button>
         </ng-container>
       </div>
     </div>
     <div *ngIf="isEditing">
       <p class="py-3 font-italic"
          translate>
-        PRODUCT_EDIT.WITHIN_THIS_BUYER
+         ADMIN.PRODUCT_EDIT.WITHIN_THIS_BUYER
       </p>
-      <h5 translate>PRODUCT_EDIT.CATALOGS</h5>
+      <h5 translate>ADMIN.PRODUCT_EDIT.CATALOGS</h5>
       <div class="card shadow-sm p-3 table-responsive"
            *ngIf="catalogs.length">
         <table class="table table-hover mb-0">
@@ -67,10 +67,10 @@
             <tr>
               <th class="border-0"
                   scope="col"
-                  translate>PRODUCT_EDIT.VISIBLE</th>
+                  translate>ADMIN.PRODUCT_EDIT.VISIBLE</th>
               <th class="border-0"
                   scope="col"
-                  translate>PRODUCT_EDIT.CATALOG</th>
+                  translate>ADMIN.PRODUCT_EDIT.CATALOG</th>
             </tr>
           </thead>
           <tbody>
@@ -94,7 +94,7 @@
       </div>
       <p *ngIf="!catalogs.length"
          class="alert alert-info font-weight-bold mb-0 p-3 shadow-sm"
-         translate>PRODUCT_EDIT.NO_CATALOGS</p>
+         translate>ADMIN.PRODUCT_EDIT.NO_CATALOGS</p>
       <product-category-assignment [productID]="_product.ID"
                                    [assignedCategoriesStatic]="assignedCategoriesEditable"
                                    [catalogID]="_buyer.ID"
@@ -105,10 +105,10 @@
                 type="submit"
                 [disabled]="isValidBuyerAssignment || dataIsSaving || !areChanges"
                 (click)="executeProductCatalogAssignmentRequests()"
-                translate>PRODUCT_EDIT.SAVE</button>
+                translate>ADMIN.PRODUCT_EDIT.SAVE</button>
         <button *ngIf="areChanges"
                 class="btn btn-link text-danger ml-3"
                 (click)="handleDiscardChanges()"
-                translate>PRODUCT_EDIT.DISCARD_CHANGES</button>
+                translate>ADMIN.PRODUCT_EDIT.DISCARD_CHANGES</button>
       </div>
     </div>

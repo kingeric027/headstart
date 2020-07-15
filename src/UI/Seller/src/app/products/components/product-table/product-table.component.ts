@@ -42,15 +42,15 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
     this.filterConfig = {
       Filters: [
         {
-          Display: 'FILTERS.STATUS',
+          Display: 'ADMIN.FILTERS.STATUS',
           Path: 'xp.Status',
           Items: [
-            {Text: 'FILTER_OPTIONS.DRAFT', Value: 'Draft'},
-            {Text: 'FILTER_OPTIONS.PUBLISHED', Value: 'Published'}],
+            {Text: 'ADMIN.FILTER_OPTIONS.DRAFT', Value: 'Draft'},
+            {Text: 'ADMIN.FILTER_OPTIONS.PUBLISHED', Value: 'Published'}],
           Type: 'Dropdown',
         },
         {
-          Display: 'FILTERS.SUPPLIER',
+          Display: 'ADMIN.FILTERS.SUPPLIER',
           Path: 'DefaultSupplierID',
           Items: supplierFilterOptions,
           Type: 'Dropdown'

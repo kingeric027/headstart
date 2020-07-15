@@ -25,44 +25,44 @@ export class OrchestrationLogsTableComponent extends ResourceCrudComponent<Orche
   filterConfig = {
     Filters: [
       {
-        Display: 'FILTERS.LOGS_ON_BEFORE',
+        Display: 'ADMIN.FILTERS.LOGS_ON_BEFORE',
         Path: 'timeStamp',
         Type: 'DateFilter',
       },
       // TO-DO - UPDATE MIDDLEWARE TO ACCEPT BOTH A FROM AND TO DATE
       {
-        Display: 'FILTERS.RECORD_TYPE',
+        Display: 'ADMIN.FILTERS.RECORD_TYPE',
         Path: 'RecordType',
         Items: [
-          {Text: 'FILTER_OPTIONS.CATALOG', Value: 'Catalog'},
-          {Text: 'FILTER_OPTIONS.PRICE_SCHEDULE', Value: 'PriceSchedule'},
-          {Text: 'FILTER_OPTIONS.PRODUCT', Value: 'Product'},
-          {Text: 'FILTER_OPTIONS.PRODUCT_FACET', Value: 'ProductFacet'},
-          {Text: 'FILTER_OPTIONS.SPEC', Value: 'Spec'},
-          {Text: 'FILTER_OPTIONS.SPEC_OPTION', Value: 'SpecOption'},
-          {Text: 'FILTER_OPTIONS.SPEC_PRODUCT_ASSIGNMENT', Value: 'Spec'},
-          {Text: 'FILTER_OPTIONS.USER', Value: 'User'}
+          {Text: 'ADMIN.FILTER_OPTIONS.CATALOG', Value: 'Catalog'},
+          {Text: 'ADMIN.FILTER_OPTIONS.PRICE_SCHEDULE', Value: 'PriceSchedule'},
+          {Text: 'ADMIN.FILTER_OPTIONS.PRODUCT', Value: 'Product'},
+          {Text: 'ADMIN.FILTER_OPTIONS.PRODUCT_FACET', Value: 'ProductFacet'},
+          {Text: 'ADMIN.FILTER_OPTIONS.SPEC', Value: 'Spec'},
+          {Text: 'ADMIN.FILTER_OPTIONS.SPEC_OPTION', Value: 'SpecOption'},
+          {Text: 'ADMIN.FILTER_OPTIONS.SPEC_PRODUCT_ASSIGNMENT', Value: 'Spec'},
+          {Text: 'ADMIN.FILTER_OPTIONS.USER', Value: 'User'}
         ],
         Type: 'Dropdown',
       },
       {
-        Display: 'FILTERS.ACTION',
+        Display: 'ADMIN.FILTERS.ACTION',
         Path: 'Action',
         Items: [
-          {Text: 'FILTER_OPTIONS.CREATE', Value: 'Create'},
-          {Text: 'FILTER_OPTIONS.DELETE', Value: 'Delete'},
-          {Text: 'FILTER_OPTIONS.GET', Value: 'Get'},
-          {Text: 'FILTER_OPTIONS.IGNORE', Value: 'Ignore'},
-          {Text: 'FILTER_OPTIONS.UPDATE', Value: 'Update'},],
+          {Text: 'ADMIN.FILTER_OPTIONS.CREATE', Value: 'Create'},
+          {Text: 'ADMIN.FILTER_OPTIONS.DELETE', Value: 'Delete'},
+          {Text: 'ADMIN.FILTER_OPTIONS.GET', Value: 'Get'},
+          {Text: 'ADMIN.FILTER_OPTIONS.IGNORE', Value: 'Ignore'},
+          {Text: 'ADMIN.FILTER_OPTIONS.UPDATE', Value: 'Update'},],
         Type: 'Dropdown',
       },
       {
-        Display: 'FILTERS.RESULT',
+        Display: 'ADMIN.FILTERS.RESULT',
         Path: 'Level',
         Items: [
-          {Text: 'FILTER_OPTIONS.ERROR', Value: 'Error'},
-          {Text: 'FILTER_OPTIONS.SUCCESS', Value: 'Success'},
-          {Text: 'FILTER_OPTIONS.WARN', Value: 'Warn'}],
+          {Text: 'ADMIN.FILTER_OPTIONS.ERROR', Value: 'Error'},
+          {Text: 'ADMIN.FILTER_OPTIONS.SUCCESS', Value: 'Success'},
+          {Text: 'ADMIN.FILTER_OPTIONS.WARN', Value: 'Warn'}],
         Type: 'Dropdown',
       },
     ],

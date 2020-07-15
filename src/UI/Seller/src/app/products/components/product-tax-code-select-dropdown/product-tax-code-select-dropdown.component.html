@@ -1,6 +1,6 @@
 <!-- product tax code select dropdown -->
 <label for="productTaxCodeDropdown"
-       translate>PRODUCT_EDIT.TAX_CODE</label>
+       translate>ADMIN.PRODUCT_EDIT.TAX_CODE</label>
 <div ngbDropdown
      class="product-tax-code-dropdown btn-block w-100">
   <button class="product-tax-code-dropdown-toggle w-100 d-flex justify-content-between align-items-center resource-btn btn btn-outline-dark"
@@ -8,10 +8,10 @@
           ngbDropdownToggle
           [disabled]="!superMarketplaceProductEditable?.Product?.xp?.Tax?.Category || readonly">
     <span *ngIf="!superMarketplaceProductEditable?.Product?.xp?.Tax?.Category"
-           translate>PRODUCT_EDIT.FIRST_SELECT_CATEGORY</span>
+           translate>ADMIN.PRODUCT_EDIT.FIRST_SELECT_CATEGORY</span>
     <span class="product-tax-code-dropdown-toggle-text"
           *ngIf="superMarketplaceProductEditable?.Product?.xp?.Tax?.Category"
-          translate>{{superMarketplaceProductEditable?.Product?.xp?.Tax?.Description || 'PRODUCT_EDIT.SELECT_TAX_CODE'}}</span>
+          translate>{{superMarketplaceProductEditable?.Product?.xp?.Tax?.Description || 'ADMIN.PRODUCT_EDIT.SELECT_TAX_CODE'}}</span>
   </button>
   <div ngbDropdownMenu
        aria-labelledby="tax code select dropdown"

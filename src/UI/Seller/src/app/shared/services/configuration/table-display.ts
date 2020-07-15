@@ -126,19 +126,19 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'Name',
-        header: 'HEADERS.NAME',
+        header: 'ADMIN.HEADERS.NAME',
         type: STRING_WITH_IMAGE,
         sortable: true,
       },
       {
         path: 'ID',
-        header: 'HEADERS.ID',
+        header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'Active',
-        header: 'HEADERS.ACTIVE',
+        header: 'ADMIN.HEADERS.ACTIVE',
         type: BASIC_STRING,
         sortable: false,
       },
@@ -149,19 +149,19 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'Name',
-        header: 'HEADERS.NAME',
+        header: 'ADMIN.HEADERS.NAME',
         type: STRING_WITH_IMAGE,
         sortable: true,
       },
       {
         path: 'ID',
-        header: 'HEADERS.ID',
+        header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'Active',
-        header: 'HEADERS.ACTIVE',
+        header: 'ADMIN.HEADERS.ACTIVE',
         type: BASIC_STRING,
         sortable: false,
       },
@@ -172,13 +172,13 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'Username',
-        header: 'HEADERS.USERNAME',
+        header: 'ADMIN.HEADERS.USERNAME',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'ID',
-        header: 'HEADERS.ID',
+        header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
       },
@@ -189,13 +189,13 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'Code',
-        header: 'HEADERS.CODE',
+        header: 'ADMIN.HEADERS.CODE',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'Description',
-        header: 'HEADERS.DESCRIPTION',
+        header: 'ADMIN.HEADERS.DESCRIPTION',
         type: BASIC_STRING,
         sortable: true,
       },
@@ -206,13 +206,13 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'Name',
-        header: 'HEADERS.NAME',
+        header: 'ADMIN.HEADERS.NAME',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'ID',
-        header: 'HEADERS.ID',
+        header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
       },
@@ -223,13 +223,13 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'Name',
-        header: 'HEADERS.NAME',
+        header: 'ADMIN.HEADERS.NAME',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'ID',
-        header: 'HEADERS.ID',
+        header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
       },
@@ -240,13 +240,13 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'AddressName',
-        header: 'HEADERS.ADDRESS_NAME',
+        header: 'ADMIN.HEADERS.ADDRESS_NAME',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'ID',
-        header: 'HEADERS.ID',
+        header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
       },
@@ -257,13 +257,13 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'CardholderName',
-        header: 'HEADERS.CARDHOLDER_NAME',
+        header: 'ADMIN.HEADERS.CARDHOLDER_NAME',
         type: BASIC_STRING,
         sortable: false,
       },
       {
         path: 'CardType',
-        header: 'HEADERS.CARD_TYPE',
+        header: 'ADMIN.HEADERS.CARD_TYPE',
         type: BASIC_STRING,
         sortable: true,
       },
@@ -274,13 +274,13 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'Name',
-        header: 'HEADERS.NAME',
+        header: 'ADMIN.HEADERS.NAME',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'ID',
-        header: 'HEADERS.ID',
+        header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
       },
@@ -291,13 +291,13 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'Name',
-        header: 'HEADERS.NAME',
+        header: 'ADMIN.HEADERS.NAME',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'ID',
-        header: 'HEADERS.ID',
+        header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
       },
@@ -308,19 +308,19 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'Name',
-        header: 'HEADERS.NAME',
+        header: 'ADMIN.HEADERS.NAME',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'Description',
-        header: 'HEADERS.DESCRIPTION',
+        header: 'ADMIN.HEADERS.DESCRIPTION',
         type: BASIC_STRING,
         sortable: false,
       },
       {
         path: 'ID',
-        header: 'HEADERS.ID',
+        header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
       },
@@ -331,56 +331,56 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'FromUser.Username',
-        header: 'HEADERS.FROM_USER_USERNAME',
+        header: 'ADMIN.HEADERS.FROM_USER_USERNAME',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'ID',
-        header: 'HEADERS.ID',
+        header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'LineItemCount',
-        header: 'HEADERS.NUMBER_OF_LINE_ITEMS',
+        header: 'ADMIN.HEADERS.NUMBER_OF_LINE_ITEMS',
         type: BASIC_STRING,
         sortable: false,
       },
       {
         path: 'Total',
-        header: 'HEADERS.TOTAL_AMOUNT',
+        header: 'ADMIN.HEADERS.TOTAL_AMOUNT',
         type: CURRENCY,
         sortable: true,
       },
       {
         path: 'DateSubmitted',
-        header: 'HEADERS.TIME_SUBMITTED',
+        header: 'ADMIN.HEADERS.TIME_SUBMITTED',
         type: DATE_TIME,
         sortable: true,
       },
       {
         path: 'Status',
-        header: 'HEADERS.STATUS',
+        header: 'ADMIN.HEADERS.STATUS',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'Comments',
-        header: 'HEADERS.COMMENTS',
+        header: 'ADMIN.HEADERS.COMMENTS',
         type: BASIC_STRING,
         sortable: false,
       },
       {
         path: 'xp.OrderReturnInfo.HasReturn',
-        header: 'HEADERS.HAS_CLAIMS',
+        header: 'ADMIN.HEADERS.HAS_CLAIMS',
         type: BOOLEAN,
         sortable: false,
         queryRestriction: 'OrderDirection=Incoming',
       },
       {
         path: 'xp.OrderReturnInfo.Comment',
-        header: 'HEADERS.RETURN_COMMENT',
+        header: 'ADMIN.HEADERS.RETURN_COMMENT',
         type: BASIC_STRING,
         sortable: false,
         queryRestriction: 'OrderDirection=Incoming',
@@ -392,37 +392,37 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     fields: [
       {
         path: 'timeStamp',
-        header: 'HEADERS.TIME_STAMP',
+        header: 'ADMIN.HEADERS.TIME_STAMP',
         type: DATE_TIME,
         sortable: true,
       },
       {
         path: 'Action',
-        header: 'HEADERS.ACTION',
+        header: 'ADMIN.HEADERS.ACTION',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'RecordType',
-        header: 'HEADERS.RECORD_TYPE',
+        header: 'ADMIN.HEADERS.RECORD_TYPE',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'RecordId',
-        header: 'HEADERS.RECORD_ID',
+        header: 'ADMIN.HEADERS.RECORD_ID',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'Level',
-        header: 'HEADERS.RESULT',
+        header: 'ADMIN.HEADERS.RESULT',
         type: BASIC_STRING,
         sortable: true,
       },
       {
         path: 'Copy',
-        header: 'HEADERS.COPY',
+        header: 'ADMIN.HEADERS.COPY',
         type: COPY_OBJECT,
         sortable: false,
       },

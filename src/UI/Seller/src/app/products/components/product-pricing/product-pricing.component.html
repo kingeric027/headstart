@@ -1,6 +1,7 @@
   <div *ngIf="supplierPriceSchedule"
        class="container-fluid mb-5">
-    <h4 class="mt-3">{{!readonly ? 'Price Breaks' : 'Supplier Pricing (In Supplier Currency)'}} </h4>
+    <h4 class="mt-3" 
+        translate>{{!readonly ? 'ADMIN.PRODUCT_EDIT.PRICE_BREAKS' : 'ADMIN.PRODUCT_EDIT.SUPPLIER_PRICING'}} </h4>
     <price-break-editor [readonly]="readonly"
                         [currency]="supplierCurrency"
                         [priceSchedule]="supplierPriceSchedule"
@@ -10,8 +11,9 @@
     <div *ngIf="readonly"
          class="row pt-3 mt-3 bg-white shadow-sm card-highlight-border w-100 pl-3">
       <div class="w-100">
-        <h4>Buyer Pricing</h4>
-        <p class="font-italic">You may use default pricing based on the buyer markup percentage set on the buyer edit page or you can create a new price schedule in your currency.</p>
+        <h4 translate>ADMIN.PRODUCT_EDIT.BUYER_PRICING</h4>
+        <p class="font-italic"
+           translate>ADMIN.PRODUCT_EDIT.BUYER_PRICING_INSTRUCTION</p>
 
         <span>
           <div ngbDropdown
@@ -38,17 +40,29 @@
           <button type="button"
                   class="btn btn-outline-primary btn-sm"
                   [ngClass]="{'active': !isUsingPriceOverride}"
-                  (click)="setIsUsingPriceOverride(false)">Default Buyer Markup Percent Pricing</button>
+                  (click)="setIsUsingPriceOverride(false)"
+                  translate>ADMIN.PRODUCT_EDIT.DEFAULT_MARKUP_PRICING</button>
           <button type="button"
                   class="btn btn-outline-primary btn-sm"
                   [ngClass]="{'active': isUsingPriceOverride}"
-                  (click)="setIsUsingPriceOverride(true)">Pricing Override</button>
+                  (click)="setIsUsingPriceOverride(true)"
+                  translate>ADMIN.PRODUCT_EDIT.PRICING_OVERRIDE</button>
         </div>
 
         <ng-container *ngIf="!isUsingPriceOverride">
-          <p class="font-italic mt-2">Prices will be shown to the buyer in the buyer user's currency after your markup percentage set for the buyer is applied.</p>
-          <p class="font-italic">Prices shown below are after the buyer markup and are in your currency of {{sellerCurrency?.Currency}} which has an exchange rate of {{supplierToSellerCurrencyRate}} from the supplier's cost.</p>
-          <p class="font-italic">Default markup for products for {{selectedSuperMarketplaceBuyer?.Buyer?.Name}} is {{selectedSuperMarketplaceBuyer?.Markup?.Percent || 0}} %</p>
+          <p class="font-italic mt-2"
+             translate>ADMIN.PRODUCT_EDIT.HOW_PRICES_DISPLAY</p>
+          <p class="font-italic">
+            <span translate>ADMIN.PRODUCT_EDIT.PRICES_BELOW_1</span>
+            {{sellerCurrency?.Currency}}
+            <span translate>ADMIN.PRODUCT_EDIT.PRICES_BELOW_2</span>
+            {{supplierToSellerCurrencyRate}}
+            <span translate>ADMIN.PRODUCT_EDIT.PRICES_BELOW_3</span></p>
+          <p class="font-italic">
+            <span translate>ADMIN.PRODUCT_EDIT.DEFAULT_MARKUP_INFO_1</span>
+            {{selectedSuperMarketplaceBuyer?.Buyer?.Name}}
+            <span translate>ADMIN.PRODUCT_EDIT.DEFAULT_MARKUP_INFO_2</span>
+            {{selectedSuperMarketplaceBuyer?.Markup?.Percent || 0}}%.</p>
 
           <price-break-editor [readonly]="true"
                               [currency]="sellerCurrency"

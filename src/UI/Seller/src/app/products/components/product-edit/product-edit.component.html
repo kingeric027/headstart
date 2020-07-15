@@ -6,7 +6,7 @@
                    animationDuration="0ms">
       <!-- Product Details -->
 
-      <mat-tab label="{{'PRODUCT_EDIT.PRODUCT' | translate}}">
+      <mat-tab label="{{'ADMIN.PRODUCT_EDIT.PRODUCT' | translate}}">
         <div class="container-fluid">
           <div class="row pt-3">
             <div class="col-md-8 form-group">
@@ -16,7 +16,7 @@
                                   formControlName="Active"
                                   color="warn"
                                   (change)="handleUpdateProduct($event, 'Product.Active')">
-                  <span translate>PRODUCT_EDIT.ACTIVE</span>
+                  <span translate>ADMIN.PRODUCT_EDIT.ACTIVE</span>
                 </mat-slide-toggle>
               </div>
               <div class="form-group">
@@ -25,14 +25,14 @@
                               formControlName="IsResale"
                               color="warn"
                               (change)="handleUpdateProduct($event, 'Product.xp.IsResale')">
-                  <span translate>PRODUCT_EDIT.RESALE</span>
+                  <span translate>ADMIN.PRODUCT_EDIT.RESALE</span>
                 </mat-checkbox>
               </div>
               <div class="form-row">
                 <div class="form-group col-md-6"
                      *ngIf="isCreatingNew">
                   <label for="ID"
-                         translate>PRODUCT_EDIT.PRODUCT_ID</label>
+                         translate>ADMIN.PRODUCT_EDIT.PRODUCT_ID</label>
                   <input type="text"
                          class="form-control"
                          id="ID"
@@ -41,19 +41,19 @@
                          maxlength="100"
                          formControlName="ID"
                          (input)="handleUpdateProduct($event, 'Product.ID')"
-                         placeholder="{{'PRODUCT_EDIT.ENTER_PRODUCT_ID' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_PRODUCT_ID' | translate}}">
                 </div>
                 <div class="form-group col-md-6"
                      *ngIf="!isCreatingNew && _superMarketplaceProductStatic">
                   <label for="ID"
-                         translate>PRODUCT_EDIT.PRODUCT_ID</label>
+                         translate>ADMIN.PRODUCT_EDIT.PRODUCT_ID</label>
                   <input class="form-control"
                          value="{{_superMarketplaceProductStatic.Product.ID}}"
                          disabled>
                 </div>
                 <div class="form-group col-md-6">
                   <label for="Name"
-                         translate>PRODUCT_EDIT.NAME</label>
+                         translate>ADMIN.PRODUCT_EDIT.NAME</label>
                   <input [attr.disabled]="readonly ? true : null"
                          type="text"
                          class="form-control"
@@ -63,24 +63,24 @@
                          maxlength="100"
                          formControlName="Name"
                          (input)="handleUpdateProduct($event, 'Product.Name')"
-                         placeholder="{{'PRODUCT_EDIT.ENTER_NAME' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_NAME' | translate}}">
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="ProductType"
-                         translate>PRODUCT_EDIT.PRODUCT_TYPE</label>
+                         translate>ADMIN.PRODUCT_EDIT.PRODUCT_TYPE</label>
                   <select [attr.disabled]="readonly ? true : null"
                           type="dropdown"
                           class="form-control"
                           formControlName="ProductType"
                           id="ProductType"
                           aria-describedby="Product type"
-                          placeholder="{{'PRODUCT_EDIT.CHOOSE_PRODUCT_TYPE' | translate}}"
+                          placeholder="{{'ADMIN.PRODUCT_EDIT.CHOOSE_PRODUCT_TYPE' | translate}}"
                           (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
                     <option [ngValue]="null"
                             disabled
-                            translate>PRODUCT_EDIT.CHOOSE_PRODUCT_TYPE</option>
+                            translate>ADMIN.PRODUCT_EDIT.CHOOSE_PRODUCT_TYPE</option>
                     <option *ngFor="let product of availableProductTypes" [selected]="productType === product"
                             value="{{product}}">{{product}}</option>
                   </select>
@@ -89,7 +89,7 @@
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="UnitOfMeasureQty"
-                         translate>PRODUCT_EDIT.QUANTITY_PER_UNIT</label>
+                         translate>ADMIN.PRODUCT_EDIT.QUANTITY_PER_UNIT</label>
                   <input [attr.disabled]="readonly ? true : null"
                          type="number"
                          class="form-control"
@@ -98,11 +98,11 @@
                          aria-describedby="Max Quantity"
                          formControlName="UnitOfMeasureQty"
                          (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Qty')"
-                         placeholder="{{'PRODUCT_EDIT.HOW_MANY' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.HOW_MANY' | translate}}">
                 </div>
                 <div class="form-group col-md-6">
                   <label for="UnitOfMeasureUnit"
-                         translate>PRODUCT_EDIT.UNIT_OF_MEASURE</label>
+                         translate>ADMIN.PRODUCT_EDIT.UNIT_OF_MEASURE</label>
                   <input [attr.disabled]="readonly ? true : null"
                          type="text"
                          class="form-control"
@@ -110,13 +110,13 @@
                          aria-describedby="Min Quantity"
                          formControlName="UnitOfMeasureUnit"
                          (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Unit')"
-                         placeholder="{{'PRODUCT_EDIT.MEASURING_UNIT' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.MEASURING_UNIT' | translate}}">
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="MinQuantity"
-                         translate>PRODUCT_EDIT.MIN_QUANTITY</label>
+                         translate>ADMIN.PRODUCT_EDIT.MIN_QUANTITY</label>
                   <input [attr.disabled]="readonly ? true : null"
                          type="number"
                          class="form-control"
@@ -127,11 +127,11 @@
                          step="1"
                          formControlName="MinQuantity"
                          (input)="handleUpdateProduct($event, 'PriceSchedule.MinQuantity', 'number')"
-                         placeholder="{{'PRODUCT_EDIT.ENTER_MIN_QUANTITY' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_MIN_QUANTITY' | translate}}">
                 </div>
                 <div class="form-group col-md-6">
                   <label for="MaxQuantity"
-                         translate>PRODUCT_EDIT.MAX_QUANTITY</label>
+                         translate>ADMIN.PRODUCT_EDIT.MAX_QUANTITY</label>
                   <input [attr.disabled]="readonly ? true : null"
                          type="number"
                          class="form-control"
@@ -142,7 +142,7 @@
                          step="1"
                          formControlName="MaxQuantity"
                          (input)="handleUpdateProduct($event, 'PriceSchedule.MaxQuantity', 'number')"
-                         placeholder="{{'PRODUCT_EDIT.ENTER_MAX_QUANTITY' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_MAX_QUANTITY' | translate}}">
                 </div>
               </div>
               <div class="form-row">
@@ -152,14 +152,14 @@
                                 formControlName="InventoryEnabled"
                                 color="warn"
                                 (change)="handleUpdateProduct($event, 'Product.Inventory.Enabled')">
-                    <span translate>PRODUCT_EDIT.ENABLE_INVENTORY_TRACKING</span>
+                    <span translate>ADMIN.PRODUCT_EDIT.ENABLE_INVENTORY_TRACKING</span>
                   </mat-checkbox>
                 </div>
               </div>
               <div *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled" class="form-row">
                 <div class="form-group col-md-6">
                   <label for="QuantityAvailable"
-                         translate>PRODUCT_EDIT.QUANTITY_AVAILABLE</label>
+                         translate>ADMIN.PRODUCT_EDIT.QUANTITY_AVAILABLE</label>
                   <input [attr.disabled]="readonly ? true : null"
                          type="number"
                          class="form-control"
@@ -168,7 +168,7 @@
                          aria-describedby="Quantity Available"
                          formControlName="QuantityAvailable"
                          (input)="handleUpdateProduct($event, 'Product.Inventory.QuantityAvailable')"
-                         placeholder="{{'PRODUCT_EDIT.CURRENT_AVAILABLE_QUANTITY' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.CURRENT_AVAILABLE_QUANTITY' | translate}}">
                 </div>
                 <div class="form-group col-md-6">
                   <mat-checkbox [disabled]="readonly"
@@ -177,7 +177,7 @@
                                 formControlName="OrderCanExceed"
                                 color="warn"
                                 (change)="handleUpdateProduct($event, 'Product.Inventory.OrderCanExceed')">
-                    <span translate>PRODUCT_EDIT.ORDER_CAN_EXCEED</span>
+                    <span translate>ADMIN.PRODUCT_EDIT.ORDER_CAN_EXCEED</span>
                   </mat-checkbox>
                 </div>
               </div>
@@ -193,7 +193,7 @@
               </product-tax-code-select-component>
               <div class="form-group">
                 <label for="ShipFromAddressID"
-                       translate>PRODUCT_EDIT.WHICH_LOCATION_SHIP</label>
+                       translate>ADMIN.PRODUCT_EDIT.WHICH_LOCATION_SHIP</label>
                 <select [attr.disabled]="readonly ? true : null"
                         type="dropdown"
                         class="form-control"
@@ -203,7 +203,7 @@
                         (change)="handleUpdateProduct($event, 'Product.ShipFromAddressID')">
                   <option disabled
                           [ngValue]="null"
-                          translate>PRODUCT_EDIT.CHOOSE_AN_ADDRESS</option>
+                          translate>ADMIN.PRODUCT_EDIT.CHOOSE_AN_ADDRESS</option>
                   <option *ngFor="let address of addresses?.Items"
                           [value]="address.ID">{{address.AddressName}}</option>
                 </select>
@@ -211,7 +211,7 @@
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="ShipHeight"
-                         translate>PRODUCT_EDIT.SHIP_HEIGHT</label>
+                         translate>ADMIN.PRODUCT_EDIT.SHIP_HEIGHT</label>
                   <input [attr.disabled]="readonly ? true : null"
                          type="number"
                          class="form-control"
@@ -220,11 +220,11 @@
                          aria-describedby="Ship Height"
                          formControlName="ShipHeight"
                          (input)="handleUpdateProduct($event, 'Product.ShipHeight', 'number')"
-                         placeholder="{{'PRODUCT_EDIT.ENTER_SHIP_HEIGHT' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_HEIGHT' | translate}}">
                 </div>
                 <div class="form-group col-md-6">
                   <label for="ShipWidth"
-                         translate>PRODUCT_EDIT.SHIP_WIDTH</label>
+                         translate>ADMIN.PRODUCT_EDIT.SHIP_WIDTH</label>
                   <input [attr.disabled]="readonly ? true : null"
                          type="number"
                          class="form-control"
@@ -233,13 +233,13 @@
                          aria-describedby="Ship Width"
                          formControlName="ShipWidth"
                          (input)="handleUpdateProduct($event, 'Product.ShipWidth', 'number')"
-                         placeholder="{{'PRODUCT_EDIT.ENTER_SHIP_WIDTH' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_WIDTH' | translate}}">
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group col-md-6">
                   <label for="ShipLength"
-                         translate>PRODUCT_EDIT.SHIP_LENGTH</label>
+                         translate>ADMIN.PRODUCT_EDIT.SHIP_LENGTH</label>
                   <input [attr.disabled]="readonly ? true : null"
                          type="number"
                          class="form-control"
@@ -248,11 +248,11 @@
                          aria-describedby="Ship Length"
                          formControlName="ShipLength"
                          (input)="handleUpdateProduct($event, 'Product.ShipLength', 'number')"
-                         placeholder="{{'PRODUCT_EDIT.ENTER_SHIP_LENGTH' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_LENGTH' | translate}}">
                 </div>
                 <div class="form-group col-md-6">
                   <label for="ShipWeight"
-                         translate>PRODUCT_EDIT.SHIP_WEIGHT</label>
+                         translate>ADMIN.PRODUCT_EDIT.SHIP_WEIGHT</label>
                   <input [attr.disabled]="readonly ? true : null"
                          type="number"
                          class="form-control"
@@ -261,7 +261,7 @@
                          aria-describedby="Ship Weight"
                          formControlName="ShipWeight"
                          (input)="handleUpdateProduct($event, 'Product.ShipWeight', 'number')"
-                         placeholder="{{'PRODUCT_EDIT.ENTER_SHIP_WEIGHT' | translate}}">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_WEIGHT' | translate}}">
                 </div>
               </div>
             </div>
@@ -269,7 +269,7 @@
               <!-- Product Preview -->
               <div class="sticky-top">
                 <p class="text-center font-weight-bold"
-                   translate>PRODUCT_EDIT.PRODUCT_PREVIEW</p>
+                   translate>ADMIN.PRODUCT_EDIT.PRODUCT_PREVIEW</p>
                 <div class="card product-preview w-100 border-hover cursor-pointer">
                   <div class="ribbon ribbon-top-right bg-light">
                     <fa-icon class="text-danger"
@@ -286,7 +286,7 @@
                       <div class="d-flex flex-wrap justify-content-between align-items-center">
                         <p class="card-text mb-0"> {{_superMarketplaceProductEditable?.PriceSchedule?.PriceBreaks[0]?.Price | currency: supplierCurrency?.Currency }} </p><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Qty}} / {{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Unit}}</small><label class="sr-only"
                                for="quantity"
-                               translate>PRODUCT_EDIT.QUANTITY</label>
+                               translate>ADMIN.PRODUCT_EDIT.QUANTITY</label>
                       </div>
                     </div>
                   </div>
@@ -298,7 +298,7 @@
         </div>
       </mat-tab>
       <!-- Buyer Visibility  -->
-      <mat-tab label="{{'PRODUCT_EDIT.BUYER_VISIBILITY' | translate}}"
+      <mat-tab label="{{'ADMIN.PRODUCT_EDIT.BUYER_VISIBILITY' | translate}}"
                *ngIf="readonly">
         <product-visibility-assignments-component *ngIf="_superMarketplaceProductStatic?.Product?.ID"
                                                   [product]="_superMarketplaceProductStatic.Product">
@@ -307,7 +307,7 @@
       <!-- Product Description -->
       <mat-tab>
         <ng-template mat-tab-label>
-          <span translate>PRODUCT_EDIT.DESCRIPTION</span>
+          <span translate>ADMIN.PRODUCT_EDIT.DESCRIPTION</span>
         </ng-template>
         <div class="container-fluid">
           <div class="row pt-3">
@@ -322,7 +322,8 @@
               <div class="form-row pt-3">
                 <div *ngIf="!readonly"
                      class="form-group col-md-6">
-                  <label for="Note">Product Message</label>
+                  <label for="Note"
+                         translate>ADMIN.PRODUCT_EDIT.PRODUCT_MESSAGE</label>
                   <input type="text"
                          class="form-control"
                          id="Note"
@@ -331,12 +332,13 @@
                          maxlength="240"
                          formControlName="Note"
                          (input)="handleUpdateProduct($event, 'Product.xp.Note')"
-                         placeholder="(Optional) Enter a note about this product">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_PRODUCT_NOTE' | translate}}">
                 </div>
                 <div [ngClass]="{'col-md-6': !readonly, 'col-md-12': readonly}">
-                  <p class="font-weight-bold mb-0">Message Preview</p>
+                  <p class="font-weight-bold mb-0"
+                     translate>ADMIN.PRODUCT_EDIT.MESSAGE_PREVIEW</p>
                   <div class="alert alert-info">
-                    Note: {{_superMarketplaceProductEditable?.Product?.xp?.Note}}
+                    <span translate>ADMIN.PRODUCT_EDIT.NOTE</span>: {{_superMarketplaceProductEditable?.Product?.xp?.Note}}
                   </div>
                 </div>
               </div>
@@ -345,7 +347,7 @@
         </div>
       </mat-tab>
       <!-- / Product Description -->
-      <mat-tab label="Pricing">
+      <mat-tab label="{{'ADMIN.PRODUCT_EDIT.PRICING' | translate}}">
         <product-pricing-component
           [readonly]="readonly"
           [productForm]="productForm"
