@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Mappers;
 using Marketplace.Models;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
@@ -50,8 +49,11 @@ namespace Marketplace.Common.Commands
 
 		private async Task<SuperMarketplaceMeProduct> ApplyBuyerPricing(SuperMarketplaceMeProduct superMarketplaceProduct, VerifiedUserContext user)
 		{
-			var defaultMarkupMultiplier = await GetDefaultMarkupMultiplier(user);
-			var exchangeRates = await GetExchangeRates(user);
+			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
+			var exchangeRatesRequest = GetExchangeRates(user);
+
+			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
+			var exchangeRates = await exchangeRatesRequest;
 
 			var markedupProduct = ApplyBuyerProductPricing(superMarketplaceProduct.Product, defaultMarkupMultiplier, exchangeRates);
 			var productCurrency = superMarketplaceProduct.Product.xp.Currency;
@@ -83,10 +85,14 @@ namespace Marketplace.Common.Commands
 		{
 			// todo do more api calls in parallel, important route to optimize
 
-			var meProducts = await _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), accessToken: user.AccessToken);
+			var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), accessToken: user.AccessToken);
 
-			var defaultMarkupMultiplier = await GetDefaultMarkupMultiplier(user);
-			var exchangeRates = await GetExchangeRates(user);
+			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
+			var exchangeRatesRequest = GetExchangeRates(user);
+
+			var meProducts = await meProductsRequest;
+			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
+			var exchangeRates = await exchangeRatesRequest;
 
 			meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier, exchangeRates)).ToList();
 

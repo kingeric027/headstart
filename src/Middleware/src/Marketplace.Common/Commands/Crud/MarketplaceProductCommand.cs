@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Mappers;
 using Marketplace.Models;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
