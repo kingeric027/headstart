@@ -2,7 +2,9 @@ import { Component, Input, Inject } from '@angular/core';
 import { OrderService } from '@app-seller/orders/order.service';
 import { Address, LineItem, OcLineItemService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
-import { ProductImage } from 'marketplace-javascript-sdk';
+
+// temporarily any with sdk update
+// import { ProductImage } from 'marketplace-javascript-sdk';
 import { PDFService } from '@app-seller/orders/pdf-render.service';
 import { faDownload, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
@@ -24,7 +26,7 @@ export class OrderDetailsComponent {
   _payments: Payment[] = [];
   _liGroupedByShipFrom: LineItem[][];
   _liGroups: any;
-  images: ProductImage[] = [];
+  images: any[] = [];
   orderDirection: string;
   cardType: string;
   createShipment: boolean;
