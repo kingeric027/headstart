@@ -83,8 +83,6 @@ namespace Marketplace.Common.Commands
 
 		public async Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user)
 		{
-			// todo do more api calls in parallel, important route to optimize
-
 			var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), accessToken: user.AccessToken);
 
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
