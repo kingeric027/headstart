@@ -33,14 +33,15 @@ namespace Marketplace.Common.Commands
 		private readonly IExchangeRatesCommand _exchangeRates;
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
+        private readonly IMeProductCommand _meProductCommand;
         
-        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IOrderCloudClient oc)
+        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand)
         {
 			_oc = oc;
             _sendgridService = sendgridService;
             _locationPermissionCommand = locationPermissionCommand;
 			_exchangeRates = exchangeRates;
-
+            _meProductCommand = meProductCommand;
 		}
 
         public async Task<Order> AcknowledgeQuoteOrder(string orderID)
@@ -146,27 +147,32 @@ namespace Marketplace.Common.Commands
 
         public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem liReq, VerifiedUserContext user)
         {
-            var existingLineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, null, user.AccessToken);
-            // New a line item
+            // get me product with markedup prices correct currency and the existing line items in parellel
+            var productRequest = _meProductCommand.Get(liReq.ProductID, user);
+            var existingLineItemsRequest = _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, null, user.AccessToken);
+
+            var existingLineItems = await existingLineItemsRequest;
             var li = new MarketplaceLineItem();
+
             // If line item exists, update quantity, else create
             var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
             if (preExistingLi != null)
             {
-                // Delete the Li
                 await _oc.LineItems.DeleteAsync(OrderDirection.Outgoing, orderID, preExistingLi.ID, user.AccessToken);
             }
-            // Create the new Li
-            li = await _oc.LineItems.CreateAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, liReq, user.AccessToken);
-            // Get the order, for the order.xp.Currency value
-            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID, user.AccessToken);
-            // Exchange the li.UnitPrice from li.Product.xp.Currency => li.xp.OrderCurrency
-            var exchangedUnitPrice = await ExchangeUnitPrice(li, order);
-            // PATCH the Line Item with exchanged Unit Price & add ProductUnitPrice to xp (OrderDirection.Incoming due to use of elevated token)
+            
+            var product = await productRequest;
+            var markedUpPrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= liReq.Quantity).Price;
+
+            // evaluate if this is still needed
+            // might be able to delete
+            //li.xp.UnitPriceInProductCurrency = li.UnitPrice;
+            
+            liReq.UnitPrice = markedUpPrice;
+            liReq.xp.LineItemStatus = LineItemStatus.Open;
             li = await _oc.LineItems
-                .PatchAsync<MarketplaceLineItem>
-                (OrderDirection.Incoming, orderID, li.ID, 
-                new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { UnitPriceInProductCurrency = li.UnitPrice, LineItemImageUrl = li.xp.LineItemImageUrl, LineItemStatus = LineItemStatus.Open } });
+                .CreateAsync<MarketplaceLineItem>
+                (OrderDirection.Incoming, orderID, liReq);
             return li;
         }
 
