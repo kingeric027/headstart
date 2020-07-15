@@ -27,7 +27,7 @@ export class BuyerService extends ResourceCrudService<Buyer> {
     activatedRoute: ActivatedRoute,
     ocBuyerService: OcBuyerService,
     currentUserService: CurrentUserService,
-    private buyerTempService: BuyerTempService
+    private buyerTempService: BuyerTempService,
   ) {
     super(router, activatedRoute, ocBuyerService, currentUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST);
   }

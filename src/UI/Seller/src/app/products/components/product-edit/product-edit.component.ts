@@ -83,6 +83,11 @@ export class ProductEditComponent implements OnInit {
   staticContent: Asset[] = [];
   documentName: string;
   selectedTabIndex = 0;
+  editPriceBreaks = false;
+  newPriceBreakPrice = 0;
+  newPriceBreakQty = 2;
+  newProductPriceBreaks = [];
+  availableProductTypes = [];
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
@@ -104,6 +109,7 @@ export class ProductEditComponent implements OnInit {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
+    await this.getAvailableProductTypes();
     this.userContext = await this.currentUserService.getUserContext();
     this.setProductEditTab();
   }
@@ -190,9 +196,9 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
-  setInventoryValidator(): void {
-    const quantityControl = this.productForm.get('QuantityAvailable');
-    this.productForm.get('InventoryEnabled').valueChanges
+  setInventoryValidator() {
+    const quantityControl = this.productForm.get("QuantityAvailable");
+    this.productForm.get("InventoryEnabled").valueChanges
     .subscribe(inventory => {
       if(inventory) {
         quantityControl.setValidators([Validators.required, Validators.min(1)]);

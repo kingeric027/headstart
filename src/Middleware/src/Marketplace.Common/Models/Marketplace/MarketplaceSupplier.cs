@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Marketplace.Common.Models.Marketplace.Extended;
 using Marketplace.Models.Extended;
 using Marketplace.Models.Marketplace.Extended;
 using Newtonsoft.Json;
@@ -23,5 +24,6 @@ namespace Marketplace.Models.Models.Marketplace
         public string ApiClientID { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
 		public CurrencySymbol? Currency { get; set; } = null;
+        public List<ProductType> ProductTypes { get; set; }
     }
 }
