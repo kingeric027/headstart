@@ -1,7 +1,8 @@
 <form [formGroup]="productForm">
   <div class="form-row">
     <div class="form-group col-6">
-      <label for="TaxCodeCategory">Tax Category</label>
+      <label for="TaxCodeCategory"
+             translate>PRODUCT_EDIT.TAX_CATEGORY</label>
       <select [attr.disabled]="readonly ? true : null"
               type="dropdown"
               class="form-control"
@@ -9,16 +10,21 @@
               aria-describedby="Tax code category"
               (change)="onTaxCodeCategorySelection($event)"
               formControlName="TaxCodeCategory"
-              placeholder="Which category best describes this product?">
+              placeholder="{{'PRODUCT_EDIT.WHICH_CATEGORY' | translate}}">
         <option default
                 disabled
                 [ngValue]="null">Which category best describes this product?</option>
         <!-- These are the 5 'parent' tax categories.  They are always consistent. -->
-        <option value="D0000000">Digital Goods</option>
-        <option value="FR000000">Freight</option>
-        <option value="P0000000">Tangible Personal Property (TPP)</option>
-        <option value="S0000000">Services</option>
-        <option value="O0000000">Other</option>
+        <option value="D0000000"
+                translate>PRODUCT_EDIT.DIGITAL_GOODS</option>
+        <option value="FR000000"
+                translate>PRODUCT_EDIT.FREIGHT</option>
+        <option value="P0000000"
+                translate>PRODUCT_EDIT.TPP</option>
+        <option value="S0000000"
+                translate>PRODUCT_EDIT.SERVICES</option>
+        <option value="O0000000"
+                translate>PRODUCT_EDIT.OTHER</option>
       </select>
     </div>
     <div class="form-group col-6">
