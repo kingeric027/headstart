@@ -23,7 +23,6 @@ namespace ordercloud.integrations.cms
 			Tags = asset.Tags;
 			FileName = asset.FileName;
 			Metadata = asset.Metadata;
-			ContainerID = asset.ContainerID;
 		}
 	}
 }
