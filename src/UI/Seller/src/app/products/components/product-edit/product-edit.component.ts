@@ -43,7 +43,10 @@ export class ProductEditComponent implements OnInit {
     if (product.ID) {
       this.handleSelectedProductChange(product);
     } else {
+      this.setTaxCodes(this.productService.emptyResource.Product.xp.Tax.Category)
       this.createProductForm(this.productService.emptyResource);
+      this._superMarketplaceProductEditable = this.productService.emptyResource;
+      this._superMarketplaceProductStatic = this.productService.emptyResource;
     }
   }
   @Input() readonly: boolean;
@@ -128,6 +131,10 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
+  async setTaxCodes(taxCategory: string): Promise<any> {
+    this.taxCodes = await this.listTaxCodes(taxCategory, '', 1, 100);
+  }
+
   async refreshProductData(superProduct: SuperMarketplaceProduct): Promise<void> {
     // If a seller, and not editing the product, grab the currency from the product xp.
     this.supplierCurrency = this._exchangeRates?.find(r => r.Currency === superProduct?.Product?.xp?.Currency);
@@ -138,12 +145,7 @@ export class ProductEditComponent implements OnInit {
     if (
       this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
     ) {
-      const taxCategory =
-        this._superMarketplaceProductEditable.Product.xp.Tax.Category === 'FR000000'
-          ? this._superMarketplaceProductEditable.Product.xp.Tax.Category.substr(0, 2)
-          : this._superMarketplaceProductEditable.Product.xp.Tax.Category.substr(0, 1);
-      const avalaraTaxCodes = await this.listTaxCodes(taxCategory, '', 1, 100);
-      this.taxCodes = avalaraTaxCodes;
+      await this.setTaxCodes(this._superMarketplaceProductEditable.Product.xp.Tax.Category)
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
     }
@@ -411,8 +413,7 @@ export class ProductEditComponent implements OnInit {
     this.resetTaxCodeAndDescription();
     this.handleUpdateProduct(event, 'Product.xp.Tax.Category');
     this._superMarketplaceProductEditable.Product.xp.Tax.Code = '';
-    const avalaraTaxCodes = await this.listTaxCodes(event.target.value, '', 1, 100);
-    this.taxCodes = avalaraTaxCodes;
+    await this.setTaxCodes(event.target.value)
   }
   // Reset TaxCode Code and Description if a new TaxCode Category is selected
   resetTaxCodeAndDescription(): void {
@@ -423,8 +424,7 @@ export class ProductEditComponent implements OnInit {
   async searchTaxCodes(searchTerm: string): Promise<void> {
     if (searchTerm === undefined) searchTerm = '';
     const taxCodeCategory = this._superMarketplaceProductEditable.Product.xp.Tax.Category;
-    const avalaraTaxCodes = await this.listTaxCodes(taxCodeCategory, searchTerm, 1, 100);
-    this.taxCodes = avalaraTaxCodes;
+    await this.setTaxCodes(taxCodeCategory)
   }
 
   async handleScrollEnd(searchTerm: string): Promise<void> {
