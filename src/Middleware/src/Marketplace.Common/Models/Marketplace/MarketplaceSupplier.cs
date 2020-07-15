@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Marketplace.Common.Models.Marketplace.Extended;
-using Marketplace.Models.Extended;
 using Marketplace.Models.Marketplace.Extended;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
