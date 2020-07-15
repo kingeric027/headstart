@@ -63,7 +63,7 @@ export class OCMProductDetails implements OnInit {
     this._rates = this.context.exchangeRates.Get();
     this._attachments = superProduct?.Attachments;
     const currentUser = this.context.currentUser.get();
-    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
     this._priceBreaks = superProduct.PriceSchedule?.PriceBreaks.map(pb => {
       const newPrice: BuyerCurrency = exchange(this._rates, pb.Price, superProduct.Product?.xp?.Currency, this._orderCurrency);
       const exchanged: ExchangedPriceBreak = {
