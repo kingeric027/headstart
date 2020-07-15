@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Dynamitey;
@@ -22,7 +23,7 @@ namespace Marketplace.Common.Services
         Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData);
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
         Task SendReturnRequestedEmail(string orderID);
-        Task SendNewUserEmail(WebhookPayloads.Users.Create payload);
+        Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
         Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
@@ -74,7 +75,9 @@ namespace Marketplace.Common.Services
             var templateData = new
             {
                 messageNotification.Recipient.FirstName,
-                messageNotification.Recipient.LastName
+                messageNotification.Recipient.LastName,
+                messageNotification.EventBody.PasswordRenewalAccessToken,
+                messageNotification.EventBody.PasswordRenewalUrl
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
         }
@@ -97,15 +100,28 @@ namespace Marketplace.Common.Services
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, ORDER_REQUIRES_APPROVAL_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendNewUserEmail(WebhookPayloads.Users.Create payload)
+        public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
         {
+            string BaseAppURL = _settings.UI.BaseAdminUrl;
+            var jwt = messageNotification.EventBody.PasswordRenewalAccessToken;
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwt);
+            var cid = token.Claims.FirstOrDefault(c => c.Type == "cid");
+            var apiClient = await _oc.ApiClients.GetAsync(cid.Value);
+            // Overwrite with the buyer base url if token appname contans 'buyer'
+            if (apiClient.AppName.ToLower().Contains("buyer"))
+            {
+                BaseAppURL = _settings.UI.BaseBuyerUrl;
+            }
             var templateData = new
             {
-                payload.Response.Body.FirstName,
-                payload.Response.Body.LastName,
-                payload.Response.Body.Username
+                messageNotification.Recipient.FirstName,
+                messageNotification.Recipient.LastName,
+                messageNotification.EventBody.PasswordRenewalAccessToken,
+                BaseAppURL,
+                messageNotification.EventBody.Username
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload)

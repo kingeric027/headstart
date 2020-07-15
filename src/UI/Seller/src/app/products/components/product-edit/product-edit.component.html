@@ -267,7 +267,7 @@
                           title="_superMarketplaceProductEditable?.Product?.Name">{{_superMarketplaceProductEditable?.Product?.Name}}</h5><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.ID}}</small>
                       <p class="card-text">{{_superMarketplaceProductEditable?.Product?.DefaultSupplierID}}</p>
                       <div class="d-flex flex-wrap justify-content-between align-items-center">
-                        <p class="card-text mb-0"> {{_superMarketplaceProductEditable?.PriceSchedule?.PriceBreaks[0]?.Price | currency: _myCurrency?.Currency }} </p><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Qty}} / {{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Unit}}</small><label class="sr-only"
+                        <p class="card-text mb-0"> {{_superMarketplaceProductEditable?.PriceSchedule?.PriceBreaks[0]?.Price | currency: supplierCurrency?.Currency }} </p><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Qty}} / {{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Unit}}</small><label class="sr-only"
                                for="quantity">Quantity</label>
                       </div>
                     </div>
@@ -327,131 +327,18 @@
         </div>
       </mat-tab>
       <!-- / Product Description -->
-      <!-- Pricing -->
       <mat-tab label="Pricing">
-        <div class="container-fluid">
-          <div class="row pt-3">
-            <div class="col-md-7 form-group">
-              <button *ngIf="!readonly && !editPriceBreaks"
-                      class="btn btn-outline-dark mb-3"
-                      (click)="toggleEditPriceBreaks()">
-                <fa-icon [icon]="faCog"></fa-icon> Edit Price Breaks
-              </button>
-              <div class="col-md-7">
-                <div class="form-group">
-                  <label for="Price">Base Price</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">{{_myCurrency?.Symbol}}</span>
-                    </div>
-                    <input [attr.disabled]="readonly ? true : null"
-                           type="number"
-                           class="form-control currency"
-                           id="Price"
-                           showErrors
-                           aria-describedby="Price"
-                           min="1"
-                           step="0.01"
-                           [resourceForm]="productForm"
-                           formControlName="Price"
-                           (input)="handleUpdateProduct($event, 'PriceSchedule.PriceBreaks.0.Price', 'number')"
-                           placeholder="Price ({{_myCurrency?.Name}})">
-                  </div>
-                </div>
-              </div>
-              <div *ngIf="editPriceBreaks"
-                   class="col-md-7 card p-2">
-                <div class="form-group">
-                  <label for="PriceBreaks">Price</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">{{_myCurrency?.Symbol}}</span>
-                    </div>
-                    <input type="number"
-                           class="form-control currency"
-                           id="PriceBreaks"
-                           aria-describedby="PriceBreaks"
-                           value="{{newPriceBreakPrice}}"
-                           min="1"
-                           step="0.01"
-                           (input)="handleUpdatePriceBreaks($event, 'price')"
-                           placeholder="Price ({{_myCurrency?.Name}})">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="PriceBreaks">Quantity</label>
-                  <input type="number"
-                         required
-                         (input)="handleUpdatePriceBreaks($event, 'qty')"
-                         class="form-control"
-                         value="{{newPriceBreakQty}}"
-                         min="2"
-                         placeholder="Quantity"
-                         aria-label="Quantity"
-                         aria-describedby="price break quantity">
-                </div>
-                <button class="btn btn-sm btn-outline-primary mr-2"
-                        (click)="addPriceBreak()">Add Price Break</button>
-                <button *ngIf="!isCreatingNew"
-                        type="button"
-                        class="btn btn-link text-dark"
-                        (click)="toggleEditPriceBreaks()">Cancel</button>
-              </div>
-            </div>
-            <div class="col-md-5"
-                 *ngIf="!isCreatingNew && _superMarketplaceProductEditable?.PriceSchedule.PriceBreaks.length > 1 || isCreatingNew && newProductPriceBreaks.length > 0">
-              <label for="PriceBreaks">Price Breaks</label>
-              <table class="table">
-                <thead class="bg-light">
-                  <tr>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th *ngIf="editPriceBreaks"></th>
-                  </tr>
-                </thead>
-                <tbody *ngIf="!isCreatingNew">
-                  <tr *ngFor="let priceBreak of _superMarketplaceProductEditable?.PriceSchedule.PriceBreaks | slice:1; let i = index">
-                    <td>{{_myCurrency?.Symbol}}{{priceBreak.Price}}</td>
-                    <td>{{getPriceBreakRange(i+1)}}</td>
-                    <td *ngIf="editPriceBreaks">
-                      <fa-icon class="icon-button ripple hover-btn"
-                               (click)="deletePriceBreak(priceBreak)"
-                               [icon]="faTrash"></fa-icon>
-                    </td>
-                  </tr>
-                </tbody>
-                <tbody *ngIf="isCreatingNew">
-                  <tr *ngFor="let priceBreak of newProductPriceBreaks; let i = index">
-                    <td>{{_myCurrency?.Symbol}}{{priceBreak.Price}}</td>
-                    <td>{{getPriceBreakRange(i)}}</td>
-                    <td *ngIf="editPriceBreaks">
-                      <fa-icon (click)="deletePriceBreak(priceBreak)"
-                               class="icon-button ripple hover-btn"
-                               [icon]="faTrash"></fa-icon>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div class="form-group mt-3">
-                <label for="UseCumulativeQuantity">Price Break Application</label>
-                <select [attr.disabled]="readonly ? true : null"
-                        type="dropdown"
-                        class="form-control"
-                        formControlName="UseCumulativeQuantity"
-                        id="UseCumulativeQuantity"
-                        aria-describedby="Use Cumulative Quantity"
-                        (change)="handleUpdateProduct($event, 'PriceSchedule.UseCumulativeQuantity')">
-                  <option [selected]="_superMarketplaceProductEditable.PriceSchedule.UseCumulativeQuantity"
-                          value="true">Apply Price Breaks Across Variations</option>
-                  <option [selected]="!_superMarketplaceProductEditable.PriceSchedule.UseCumulativeQuantity"
-                          value="false">Apply Price Breaks to Individual Variations</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+        <product-pricing-component
+          [readonly]="readonly"
+          [productForm]="productForm"
+          [supplierCurrency]="supplierCurrency"
+          [sellerCurrency]="sellerCurrency"
+          [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
+          (updateProduct)="updateProductResource($event)"
+        >
+        </product-pricing-component>
       </mat-tab>
-      <!-- /Pricing -->
+
       <!-- / Product Details -->
       <mat-tab>
         <ng-template mat-tab-label>
@@ -477,7 +364,7 @@
                                       [isCreatingNew]="isCreatingNew"
                                       [checkForChanges]="checkForChanges"
                                       [copyProductResource]="copyProductResource"
-                                      [myCurrency]="_myCurrency"
+                                      [myCurrency]="supplierCurrency"
                                       (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
                                       (variantsValidated)="validateVariants($event)">
         </product-variations-component>

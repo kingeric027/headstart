@@ -3,6 +3,7 @@ using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
+using System.Linq;
 
 namespace Marketplace.Common.Commands
 {
@@ -75,7 +76,18 @@ namespace Marketplace.Common.Commands
                 ApiClientID = apiClient.ID,
                 SupplierID = ocSupplierID
             }, token);
-           
+            // list message senders
+            var msList = await _oc.MessageSenders.ListAsync();
+            // create message sender assignment
+            var assignmentList = msList.Items.Select(ms =>
+            {
+                return new MessageSenderAssignment
+                {
+                    MessageSenderID = ms.ID,
+                    SupplierID = ocSupplierID
+                };
+            });
+            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a));
             return supplier;
         }
     
