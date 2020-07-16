@@ -101,6 +101,7 @@
           <div *ngIf="showGrid">
             <ocm-grid-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
                                 [specs]="_specs"
+                                [superProduct]="_superProduct"
                                 [product]="_product"
                                 [priceSchedule]="_priceSchedule">
             </ocm-grid-spec-form>

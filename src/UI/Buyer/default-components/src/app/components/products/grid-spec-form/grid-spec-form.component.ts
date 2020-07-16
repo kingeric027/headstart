@@ -22,7 +22,9 @@ export class OCMGridSpecForm {
     constructor(private specFormService: SpecFormService, private context: ShopperContextService) { }
     @Input() set superProduct(value: SuperMarketplaceProduct) {
         this._superProduct = value;
-        this._product = value.Product;
+    }
+    @Input() set product(value: MarketplaceMeProduct) {
+        this._product = value;
     }
     @Input() set specs(value: ListPage<Spec>) {
         this._specs = value;
