@@ -21,7 +21,7 @@ namespace ordercloud.integrations.cms
 	{
 		[JsonProperty("ID"), CosmosInteropID]
 		public string InteropID { get; set; }
-		[ApiIgnore, CosmosPartitionKey]
+		[Required, ApiIgnore, CosmosPartitionKey]
 		public string ContainerID { get; set; } // real id, not interop. Don't need to set or return.
 		[MaxLength(100)]
 		public string Title { get; set; }
