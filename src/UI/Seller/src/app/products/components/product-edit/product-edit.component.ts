@@ -209,6 +209,11 @@ export class ProductEditComponent implements OnInit {
     })
   }
 
+  async getAvailableProductTypes(): Promise<void> {
+    const supplier = await this.currentUserService.getMySupplier();
+    this.availableProductTypes = supplier.xp.ProductTypes || []; 
+  }
+  
   async handleSave(): Promise<void> {
     if (this.isCreatingNew) {
       await this.createNewProduct();
