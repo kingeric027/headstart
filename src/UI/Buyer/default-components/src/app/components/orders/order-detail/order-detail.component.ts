@@ -52,10 +52,10 @@ export class OCMOrderDetails implements OnInit {
       total += li.Quantity;
     });
     return (
-      (qtyReturned !== total &&
-        this.order.Status !== 'Unsubmitted' &&
-        this.order.xp.ShippingStatus === ShippingStatus.PartiallyShipped) ||
-      this.order.xp.ShippingStatus === ShippingStatus.Shipped
+      qtyReturned !== total &&
+      this.order.Status !== 'Unsubmitted' &&
+      (this.order.xp.ShippingStatus === ShippingStatus.PartiallyShipped ||
+        this.order.xp.ShippingStatus === ShippingStatus.Shipped)
     );
   }
 
