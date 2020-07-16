@@ -162,18 +162,25 @@ namespace Marketplace.Common.Commands
             }
             
             var product = await productRequest;
-            var markedUpPrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= liReq.Quantity).Price;
-
-            // evaluate if this is still needed
-            // might be able to delete
-            //li.xp.UnitPriceInProductCurrency = li.UnitPrice;
-            
+            var markedUpPrice = GetLineItemUnitCost(product, liReq);
             liReq.UnitPrice = markedUpPrice;
             liReq.xp.LineItemStatus = LineItemStatus.Open;
             li = await _oc.LineItems
                 .CreateAsync<MarketplaceLineItem>
                 (OrderDirection.Incoming, orderID, liReq);
             return li;
+        }
+
+        private decimal GetLineItemUnitCost(SuperMarketplaceMeProduct product, MarketplaceLineItem li)
+        {
+            var markedUpBasePrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= li.Quantity).Price;
+            var totalSpecMarkup = li.Specs.Aggregate(0M, (accumulator, spec) =>
+            {
+                var relatedProductSpec = product.Specs.First(productSpec => productSpec.ID == spec.SpecID);
+                var relatedSpecMarkup = relatedProductSpec.Options.First(option => option.ID == spec.OptionID).PriceMarkup;
+                return accumulator + (relatedSpecMarkup ?? 0M);
+            });
+            return totalSpecMarkup + markedUpBasePrice;
         }
 
         public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser)
