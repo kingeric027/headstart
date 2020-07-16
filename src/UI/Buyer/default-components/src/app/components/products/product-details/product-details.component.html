@@ -52,6 +52,7 @@
           <!--DISPLAY SHORT SPEC FORM -->
           <div *ngIf="specLength < 4 && !showGrid">
             <ocm-spec-form *ngIf="isOrderable && _specs?.Items?.length > 0"
+                           [superProduct]="_superProduct"
                            [specs]="_specs"
                            [currency]="_product?.xp?.Currency"
                            (specFormChange)="onSpecFormChange($event.detail)">

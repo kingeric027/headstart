@@ -23,6 +23,7 @@ export class OCMProductDetails implements OnInit {
   faTh = faTh;
   faListUl = faListUl;
   faTimes = faTimes;
+  _superProduct: SuperMarketplaceProduct;
   _specs: ListPage<Spec>;
   _product: MarketplaceMeProduct;
   _priceSchedule: PriceSchedule;
@@ -58,6 +59,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   @Input() set product(superProduct: SuperMarketplaceProduct) {
+    this._superProduct = superProduct;
     this._product = superProduct.Product;
     this._priceSchedule = superProduct.PriceSchedule as any;
     this._rates = this.context.exchangeRates.Get();
@@ -116,7 +118,7 @@ export class OCMProductDetails implements OnInit {
           Quantity: this.quantity,
           Specs: this.specFormService.getLineItemSpecs(this._specs),
           xp: {
-            LineItemImageUrl: this.getLineItemImageUrl(this._product)
+            LineItemImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
           }
         });
         this.isAddingToCart = false;
@@ -126,19 +128,6 @@ export class OCMProductDetails implements OnInit {
       }
   }
 
-  getLineItemImageUrl(product: MarketplaceMeProduct): string {
-    const image = this.images.find(img => this.isImageMatchingSpecs(img));
-    return image ? image.Url : getPrimaryImageUrl(product);
-  }
-
-  isImageMatchingSpecs(image: AssetForDelivery): boolean {
-      // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
-    const specs = this.specFormService.getLineItemSpecs(this._specs);
-    return specs.
-      every(spec => image.Tags
-      .find(tag => tag?.split('-')
-      .includes(spec.Value.replace(/\s/g, ''))));
-  }
 
   getPriceBreakRange(index: number): string {
     if (!this._priceSchedule?.PriceBreaks.length) return '';

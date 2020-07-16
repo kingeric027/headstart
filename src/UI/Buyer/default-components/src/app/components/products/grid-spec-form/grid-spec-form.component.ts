@@ -3,7 +3,7 @@ import { Spec, PriceSchedule, ListPage } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService } from 'marketplace';
 import { SpecFormService, GridSpecOption } from '../spec-form/spec-form.service';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem, SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
 
 @Component({
     templateUrl: `./grid-spec-form.component.html`,
@@ -12,6 +12,7 @@ export class OCMGridSpecForm {
     @Input() priceSchedule: PriceSchedule;
     _specs: ListPage<Spec>;
     _product: MarketplaceMeProduct;
+    _superProduct: SuperMarketplaceProduct;
     specOptions: string[];
     lineItems: MarketplaceLineItem[] = [];
     lineTotals: number[] = [];
@@ -19,8 +20,9 @@ export class OCMGridSpecForm {
     isAddingToCart = false;
 
     constructor(private specFormService: SpecFormService, private context: ShopperContextService) { }
-    @Input() set product(value: MarketplaceMeProduct) {
-        this._product = value;
+    @Input() set superProduct(value: SuperMarketplaceProduct) {
+        this._superProduct = value;
+        this._product = value.Product;
     }
     @Input() set specs(value: ListPage<Spec>) {
         this._specs = value;
@@ -66,11 +68,15 @@ export class OCMGridSpecForm {
         const indexOfSpec = this.specOptions.indexOf(specs);
         let specArray = specs.split(',');
         specArray = specArray.map(x => x.replace(/\s/g, ''));
+        debugger;
         const item = {
             Quantity: event.qty,
             Product: this._product,
             ProductID: this._product.ID,
-            Specs: this.specFormService.getGridLineItemSpecs(this._specs, specArray)
+            Specs: this.specFormService.getGridLineItemSpecs(this._specs, specArray),
+            xp: {
+                LineItemImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
+            }
         };
         const i = this.lineItems.findIndex(li => JSON.stringify(li.Specs) === JSON.stringify(item.Specs));
         if (i === -1) this.lineItems.push(item);

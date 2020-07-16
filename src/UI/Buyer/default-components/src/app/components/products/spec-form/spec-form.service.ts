@@ -3,6 +3,8 @@ import { SpecFormEvent } from './spec-form-values.interface';
 import { SpecOption, Spec, LineItemSpec, ListPage } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
 import { ExchangedPriceBreak } from 'src/app/models/currency.interface';
+import { SuperMarketplaceProduct, AssetForDelivery } from 'marketplace-javascript-sdk';
+import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Injectable({
   providedIn: 'root',
@@ -71,6 +73,22 @@ export class SpecFormService {
     }
     return specs;
   }
+
+  public getLineItemImageUrl(product: SuperMarketplaceProduct): string {
+    const image = product.Images.find(img => this.isImageMatchingSpecs(img, product));
+    return image ? image.Url : getPrimaryImageUrl(product.Product);
+  }
+
+  private isImageMatchingSpecs(image: AssetForDelivery, product: SuperMarketplaceProduct): boolean {
+    // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
+  const specs = this.getLineItemSpecs({Meta: {}, Items: product.Specs as any});
+  return specs.
+    every(spec => image.Tags
+    .find(tag => tag?.split('-')
+    .includes(spec.Value.replace(/\s/g, ''))));
+}
+
+
 
   private singleSpecMarkup(unitPrice: number, quantity: number, option: SpecOption): number {
     switch (option.PriceMarkupType) {
