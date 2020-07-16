@@ -70,7 +70,6 @@ export class OCMGridSpecForm {
         const indexOfSpec = this.specOptions.indexOf(specs);
         let specArray = specs.split(',');
         specArray = specArray.map(x => x.replace(/\s/g, ''));
-        debugger;
         const item = {
             Quantity: event.qty,
             Product: this._product,
