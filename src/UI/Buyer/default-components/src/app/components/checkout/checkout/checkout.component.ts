@@ -62,11 +62,6 @@ export class OCMCheckout implements OnInit {
   ngOnInit(): void {
     this.context.order.onChange(order => (this.order = order));
     this.order = this.context.order.get();
-    // If promos exist aleady, clear them first before returning to checkout
-    const existingPromoArr = this.context.order.promos.get().Items.map(async promo => {
-      this.context.order.promos.removePromo(promo.Code);
-    });
-    Promise.all(existingPromoArr);
     this.lineItems = this.context.order.cart.get();
     this.isAnon = this.context.currentUser.isAnonymous();
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
