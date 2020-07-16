@@ -62,6 +62,18 @@ namespace Marketplace.Common.Commands
                 AllowSeller = false,
                 IsAnonBuyer = false,
             }, token);
+
+
+            // not adding api client ID on supplier Create because that approach would require creating the API client first
+            // but creating supplier first is preferable in case there are error in the request
+            ocSupplier = await _oc.Suppliers.PatchAsync(ocSupplier.ID, new PartialSupplier()
+            {
+                xp = new
+                {
+                    ApiClientID = apiClient.ID
+                }
+            });
+
             // Assign Supplier API Client to new supplier
             await _oc.ApiClients.SaveAssignmentAsync(new ApiClientAssignment()
             {
