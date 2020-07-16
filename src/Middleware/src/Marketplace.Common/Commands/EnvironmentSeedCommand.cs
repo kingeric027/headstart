@@ -61,6 +61,7 @@ namespace Marketplace.Common.Commands
 			await CreateXPIndices(impersonation.access_token);
 			await CreateAndAssignIntegrationEvents(seed.ApiUrl, impersonation.access_token);
 			await CreateSuppliers(user, impersonation.access_token);
+			await SetUpSellerAuthentication(impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
 			return impersonation;
 		}
@@ -80,6 +81,30 @@ namespace Marketplace.Common.Commands
 			var createWH = CreateWebhooks(token, baseUrl);
 			var createIE = CreateAndAssignIntegrationEvents(token, baseUrl);
 			await Task.WhenAll(createMS, createWH, createIE);
+		}
+
+		private async Task SetUpSellerAuthentication(string token)
+		{
+			// delete default security profiles if they exist
+			// try catches for idempotency
+			try
+			{
+				await _oc.SecurityProfiles.DeleteAsync("buyerProfile1", token);
+
+			} catch(Exception ex){}
+			try
+			{
+				await _oc.SecurityProfiles.DeleteAsync("sellerProfile1", token);
+			}
+			catch (Exception ex){}
+
+			foreach (var sellerCustomRole in SellerMarketplaceRoles)
+			{
+				await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+				{
+					SecurityProfileID = sellerCustomRole.ToString()
+				}, token);
+			}
 		}
 
 		private async Task<AdminCompany> CreateOrganization(string token)
@@ -478,6 +503,19 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationCreditCardAdmin },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationAddressAdmin },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationResaleCertAdmin }
+		};
+
+		static readonly List<CustomRole> SellerMarketplaceRoles = new List<CustomRole>() {
+			CustomRole.MPProductAdmin,
+			CustomRole.MPPromotionAdmin,
+			CustomRole.MPCategoryAdmin,
+			CustomRole.MPOrderAdmin,
+			CustomRole.MPShipmentAdmin,
+			CustomRole.MPBuyerAdmin,
+			CustomRole.MPSellerAdmin,
+			CustomRole.MPSupplierAdmin,
+			CustomRole.MPSupplierUserGroupAdmin,
+			CustomRole.MPReportReader
 		};
 	}
 }
