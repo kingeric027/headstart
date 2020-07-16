@@ -25,8 +25,9 @@
   <div class="row base-layout-item">
     <div class="col-md-12">
       <div class="py-3">
-        <h1 class ="resource-name mb-0">{{
-          getTitle(isMyResource, _currentResourceNamePlural, selectedParentResouceName) | titlecase}}</h1>
+        <h1 class ="resource-name mb-0"
+            translate>{{
+          getTitle(isMyResource, _currentResourceNamePlural, selectedParentResouceName)}}</h1>
       </div>
     </div>
     <!-- /Page Title -->
@@ -48,13 +49,15 @@
         <!-- change to currently selected option  -->
         <button class="btn btn-block btn-outline-dark"
                 id="parentresourcedropdown"
-                ngbDropdownToggle>{{_currentResourceNamePlural | titlecase}}</button>
+                ngbDropdownToggle>{{labelPlural | translate}}</button>
         <div ngbDropdownMenu
              aria-labelledby="parent resource dropdown"
              class="w-100">
           <button ngbDropdownItem
-                  *ngFor="let subResource of parentResourceService.subResourceList"><a routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{subResource}}">
-              {{subResource | titlecase}}
+                  *ngFor="let subResource of parentResourceService.subResourceList">
+                    <a routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{subResource.route}}" 
+                       translate>
+              {{subResource.display}}
             </a></button>
         </div>
       </div>
@@ -65,7 +68,7 @@
       <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
       <button class="btn btn-block brand-button--orange"
               routerLink="/{{isMyResource ? _ocService.myRoute : _ocService.route}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new">
-        Create New {{_currentResourceNameSingular | titlecase}}
+        Create New {{labelSingular | translate}}
       </button>
     </div>
     <div [ngClass]="{'col-lg-7 col-md-7': parentResourceService, 'col-lg-10 col-md-10': !parentResourceService && !isCreatingNew && shouldShowCreateNew, 'col-lg-12': !parentResourceService && !shouldShowCreateNew}">
@@ -75,7 +78,7 @@
           <div class="col-md-5 d-flex align-items-center">
             <search-component class="w-100"
                               id="product-search"
-                              [placeholderText]="'Search ' + _currentResourceNamePlural"
+                              [placeholderText]="labelPlural"
                               [searchTermInput]="searchTerm"
                               (searched)="searchedResources($event)">
             </search-component>
@@ -247,18 +250,18 @@
               <button class="btn btn-link"
                       (click)="handleSelectResource({})">
                 <fa-icon [icon]="faChevronLeft"></fa-icon>
-                {{_currentResourceNamePlural | titlecase}}
+                {{labelPlural | translate}}
               </button>
               <h3 *ngIf="isCreatingNew"
-                  class="d-inline-block ml-5 mb-0">New {{_currentResourceNameSingular}}</h3>
+                  class="d-inline-block ml-5 mb-0">{{'ADMIN.COMMON.NEW' | translate}} {{labelSingular | translate}}</h3>
               <h3 *ngIf="!isCreatingNew"
                   class="d-inline-block ml-5 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>
             <span *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length && !isCreatingNew">
               <a class="btn brand-button ml-3"
                  *ngFor="let subResource of _ocService.subResourceList"
-                 [routerLink]="[subResource]">
-                {{subResource.toUpperCase() | titlecase }}
+                 [routerLink]="[subResource.route]">
+                {{subResource.display | translate }}
               </a>
             </span>
           </div>
@@ -287,7 +290,7 @@
           <div *ngIf="shouldShowResourceActions"
                class="d-flex justify-content-between align-items-center py-2 additional-item-edit-resource">
             <delete-confirm-modal-component *ngIf="!isCreatingNew && !isMyResource && canBeDeleted"
-                                            buttonText="Delete {{_currentResourceNameSingular | titlecase}}"
+                                            buttonText="{{labelSingular}}"
                                             (deleteConfirmed)="handleDelete($event)">
             </delete-confirm-modal-component>
             <div *ngIf="!canBeDeleted">

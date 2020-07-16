@@ -11,7 +11,9 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [labelSingular]="'ADMIN.NAV.CATALOG'"
+                          [labelPlural]="'ADMIN.NAV.CATALOGS'">
     <div class="resource-edit">
         <form *ngIf="resourceForm" 
         [formGroup]="resourceForm">

@@ -362,7 +362,8 @@
       <!-- / Product Details -->
       <mat-tab>
         <ng-template mat-tab-label>
-          <span [matTooltip]="isCreatingNew ? 'Optional' : ''">Filters</span>
+          <span [matTooltip]="isCreatingNew ? 'Optional' : ''"
+                translate>ADMIN.PRODUCT_EDIT.FILTERS</span>
         </ng-template>
         <product-filters-component [readonly]="readonly"
                                    (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
@@ -373,7 +374,7 @@
         <ng-template mat-tab-label>
           <span matBadgeSize="medium"
                 matBadgeOverlap="false"
-                matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Variants?.length}} variants."
+                matBadgeDescription="{{'ADMIN.PRODUCT_EDIT.THIS_PRODUCT_HAS' | translate}} {{_superMarketplaceProductEditable?.Variants?.length}} {{'ADMIN.PRODUCT_EDIT.VARIANTS_LOWERCASE' | translate}}."
                 [matTooltip]="!_superMarketplaceProductEditable?.Product?.ID ? 'Product needs an ID' : ''"
                 [matBadge]="_superMarketplaceProductEditable?.Variants?.length || 0">Variants</span>
         </ng-template>
@@ -575,7 +576,7 @@
   <div *ngIf="userContext?.UserType === 'SUPPLIER'"
        class="d-flex justify-content-between align-items-center py-2">
     <delete-confirm-modal-component *ngIf="!isCreatingNew"
-                                    buttonText="Delete Product"
+                                    buttonText="ADMIN.NAV.PRODUCT"
                                     (deleteConfirmed)="handleDelete($event)">
     </delete-confirm-modal-component>
     <div class="d-flex flex-column justify-content-end">

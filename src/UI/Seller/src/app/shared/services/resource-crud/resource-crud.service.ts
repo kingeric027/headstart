@@ -32,7 +32,7 @@ export abstract class ResourceCrudService<ResourceType> {
   primaryResourceLevel = '';
   // example: for supplier user service the primary is supplier and the secondary is users
   secondaryResourceLevel = '';
-  subResourceList: string[];
+  subResourceList: any[];
   emptyResource: any = {};
 
   private itemsPerPage = 100;
@@ -44,7 +44,7 @@ export abstract class ResourceCrudService<ResourceType> {
     public currentUserService: CurrentUserService,
     route: string,
     primaryResourceLevel: string,
-    subResourceList: string[] = [],
+    subResourceList: any[] = [],
     secondaryResourceLevel = '',
     myRoute = '',
   ) {
@@ -407,7 +407,7 @@ export abstract class ResourceCrudService<ResourceType> {
     const isOnSubResource =
       this.subResourceList &&
       this.subResourceList.some(subResource => {
-        return this.router.url.includes(`/${subResource}`);
+        return this.router.url.includes(`/${subResource.route}`);
       });
     const isOnBaseRoute = this.router.url.includes(this.route);
     const isOnRelatedSubResource = this.router.url.includes(`/${this.secondaryResourceLevel}`);
@@ -423,8 +423,8 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
 
-  getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resoruceToUpdate: T): T {
-    const updatedResourceCopy: any = this.copyResource(resoruceToUpdate);
+  getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resourceToUpdate: T): T {
+    const updatedResourceCopy: any = this.copyResource(resourceToUpdate);
     const update = _set(updatedResourceCopy, resourceUpdate.field, resourceUpdate.value);
     if(resourceUpdate.field === 'Product.Inventory.Enabled' && resourceUpdate.value === false) {
       update.Product.Inventory.QuantityAvailable = null 

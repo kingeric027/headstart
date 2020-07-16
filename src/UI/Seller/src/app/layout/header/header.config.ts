@@ -18,39 +18,39 @@ export interface MPRoute {
 // Products
 const AllProducts: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'ADMIN.NAV.PRODUCTS.ALL_PRODUCTS',
+  title: 'ADMIN.NAV.ALL_PRODUCTS',
   route: '/products',
 };
 
 const LiveProducts: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'ADMIN.NAV.PRODUCTS.LIVE_PRODUCTS',
+  title: 'ADMIN.NAV.LIVE_PRODUCTS',
   route: '/products',
   queryParams: { 'xp.Status': 'Published' },
 };
 
 const PendingProducts: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'ADMIN.NAV.PRODUCTS.PENDING_PRODUCTS',
+  title: 'ADMIN.NAV.PENDING_PRODUCTS',
   route: '/products',
   queryParams: { 'xp.Status': 'Draft' },
 };
 
 const Promotions: MPRoute = {
   rolesWithAccess: [MPRoles.MPPromotionAdmin, MPRoles.MPPromotionReader],
-  title: 'ADMIN.NAV.PRODUCTS.PROMOTIONS',
+  title: 'ADMIN.NAV.PROMOTIONS',
   route: '/promotions',
 };
 
 const ProductFacets: MPRoute = {
   rolesWithAccess: [MPRoles.MPStoreFrontAdmin],
-  title: 'ADMIN.NAV.PRODUCTS.FACETS',
+  title: 'ADMIN.NAV.FACETS',
   route: '/facets',
 };
 
 const ProductNavGrouping: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'ADMIN.NAV.PRODUCTS.PRODUCTS',
+  title: 'ADMIN.NAV.PRODUCTS',
   route: '/products',
   subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, ProductFacets],
 };
@@ -58,52 +58,52 @@ const ProductNavGrouping: MPRoute = {
 // Orders
 const BuyerOrders: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'ADMIN.NAV.ORDERS.SALES_ORDERS',
+  title: 'ADMIN.NAV.SALES_ORDERS',
   route: '/orders',
   queryParams: { OrderDirection: 'Incoming' },
 };
 
 const SupplierPurchaseOrders: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'ADMIN.NAV.ORDERS.PURCHASE_ORDERS',
+  title: 'ADMIN.NAV.PURCHASE_ORDERS',
   route: '/orders',
   queryParams: { OrderDirection: 'Outgoing' },
 };
 
 const RequiringAttentionOrders: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'ADMIN.NAV.ORDERS.NEEDING_ATTENTION',
+  title: 'ADMIN.NAV.NEEDING_ATTENTION',
   route: '/orders',
   queryParams: { OrderDirection: 'Incoming', 'xp.NeedsAttention': 'true' },
 };
 
 const Orders: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'ADMIN.NAV.ORDERS.ORDERS',
+  title: 'ADMIN.NAV.ORDERS',
   route: '/orders',
 };
 
 const AwaitingApprovalOrders: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'ADMIN.NAV.ORDERS.AWAITING_APPROVAL_ORDERS',
+  title: 'ADMIN.NAV.AWAITING_APPROVAL_ORDERS',
   route: '/orders',
 };
 
 const ShippedOrders: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'ADMIN.NAV.ORDERS.SHIPPED_ORDERS',
+  title: 'ADMIN.NAV.SHIPPED_ORDERS',
   route: '/orders',
 };
 
 const CancelledOrders: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'ADMIN.NAV.ORDERS.CANCELLED_ORDERS',
+  title: 'ADMIN.NAV.CANCELLED_ORDERS',
   route: '/orders',
 };
 
 const SellerOrderNavGrouping: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'ADMIN.NAV.ORDERS.ORDERS',
+  title: 'ADMIN.NAV.ORDERS',
   route: '/orders',
   orderCloudUserTypesWithAccess: [SELLER],
   subRoutes: [BuyerOrders, SupplierPurchaseOrders, RequiringAttentionOrders],
@@ -111,7 +111,7 @@ const SellerOrderNavGrouping: MPRoute = {
 
 const SupplierOrderNavGrouping: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
-  title: 'ADMIN.NAV.ORDERS.ORDERS',
+  title: 'ADMIN.NAV.ORDERS',
   route: '/orders',
   orderCloudUserTypesWithAccess: [SUPPLIER],
   subRoutes: [Orders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders],
@@ -120,49 +120,49 @@ const SupplierOrderNavGrouping: MPRoute = {
 // Buyers
 const AllBuyers: MPRoute = {
   rolesWithAccess: [MPRoles.MPBuyerAdmin, MPRoles.MPBuyerReader],
-  title: 'ADMIN.NAV.BUYERS.ALL_BUYERS',
+  title: 'ALIAS.ALL_BUYERS',
   route: '/buyers',
 };
 
 const BuyerUsers: MPRoute = {
   rolesWithAccess: [MPRoles.MPBuyerAdmin, MPRoles.MPBuyerReader],
-  title: 'ADMIN.NAV.BUYERS.USERS',
+  title: 'ADMIN.NAV.USERS',
   route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/users`,
 };
 
 const BuyerPurchasingLocations: MPRoute = {
   rolesWithAccess: [MPRoles.MPBuyerAdmin, MPRoles.MPBuyerReader],
-  title: 'ADMIN.NAV.BUYERS.LOCATIONS',
+  title: 'ALIAS.BUYER_LOCATIONS',
   route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/locations`,
 };
 
 const BuyerPaymentMethods: MPRoute = {
   rolesWithAccess: [MPRoles.MPBuyerAdmin, MPRoles.MPBuyerReader],
-  title: 'ADMIN.NAV.BUYERS.PAYMENT_METHODS',
+  title: 'ADMIN.NAV.PAYMENT_METHODS',
   route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/payments`,
 };
 
 const BuyerApprovalRules: MPRoute = {
   rolesWithAccess: [MPRoles.MPBuyerAdmin, MPRoles.MPBuyerReader],
-  title: 'ADMIN.NAV.BUYERS.APPROVAL_RULES',
+  title: 'ADMIN.NAV.APPROVAL_RULES',
   route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/approvals`,
 };
 
 const BuyerCatalogs: MPRoute = {
   rolesWithAccess: [MPRoles.MPBuyerAdmin, MPRoles.MPBuyerReader],
-  title: 'ADMIN.NAV.BUYERS.CATALOGS',
+  title: 'ADMIN.NAV.CATALOGS',
   route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/catalogs`,
 };
 
 const BuyerCategories: MPRoute = {
   rolesWithAccess: [MPRoles.MPBuyerAdmin, MPRoles.MPBuyerReader],
-  title: 'ADMIN.NAV.BUYERS.CATEGORIES',
+  title: 'ADMIN.NAV.CATEGORIES',
   route: `/buyers/${REDIRECT_TO_FIRST_PARENT}/categories`,
 };
 
 const BuyerNavGrouping = {
   rolesWithAccess: [MPRoles.MPBuyerAdmin, MPRoles.MPBuyerReader],
-  title: 'ADMIN.NAV.BUYERS.BUYERS',
+  title: 'ALIAS.BUYERS',
   route: '/buyers',
   subRoutes: [
     AllBuyers,
@@ -178,38 +178,38 @@ const BuyerNavGrouping = {
 // Suppliers
 const AllSuppliers: MPRoute = {
   rolesWithAccess: [MPRoles.MPSupplierAdmin],
-  title: 'ADMIN.NAV.SUPPLIERS.ALL_SUPPLIERS',
+  title: 'ALIAS.ALL_SUPPLIERS',
   route: '/suppliers',
 };
 
 const SupplierUsers: MPRoute = {
   rolesWithAccess: [MPRoles.MPSupplierAdmin],
-  title: 'ADMIN.NAV.SUPPLIERS.USERS',
+  title: 'ADMIN.NAV.USERS',
   route: `/suppliers/${REDIRECT_TO_FIRST_PARENT}/users`,
 };
 
 const SupplierLocations: MPRoute = {
   rolesWithAccess: [MPRoles.MPSupplierAdmin, MPRoles.MPMeSupplierAdmin],
-  title: 'ADMIN.NAV.SUPPLIERS.LOCATIONS',
+  title: 'ALIAS.SUPPLIER_LOCATIONS',
   route: `/suppliers/${REDIRECT_TO_FIRST_PARENT}/locations`,
 };
 
 const SupplierNavGrouping: MPRoute = {
   rolesWithAccess: [MPRoles.MPSupplierAdmin],
-  title: 'ADMIN.NAV.SUPPLIERS.SUPPLIERS',
+  title: 'ALIAS.SUPPLIERS',
   route: '/suppliers',
   subRoutes: [AllSuppliers, SupplierUsers, SupplierLocations],
 };
 
 const OrchestrationLogs = {
   rolesWithAccess: [MPRoles.MPReportReader],
-  title: 'ADMIN.NAV.REPORTS.ORCHESTRATION_LOGS',
+  title: 'ADMIN.NAV.ORCHESTRATION_LOGS',
   route: 'reports/logs',
 };
 
 const ReportsNavGrouping = {
   rolesWithAccess: [MPRoles.MPReportReader],
-  title: 'ADMIN.NAV.REPORTS.REPORTS',
+  title: 'ADMIN.NAV.REPORTS',
   route: '/reports',
   subRoutes: [OrchestrationLogs],
 };

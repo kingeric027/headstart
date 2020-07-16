@@ -29,6 +29,8 @@ export class ActionMenuComponent {
   disableSave = false;
   @Input()
   confirmText = '';
+  @Input()
+  labelSingular: string;
   @Output()
   executeSaveAction = new EventEmitter<void>();
   @Output()
@@ -58,14 +60,14 @@ export class ActionMenuComponent {
 
   getSaveText(): string {
     if (this.dataIsSaving) {
-      return 'Saving';
+      return 'ADMIN.DELETE.SAVING';
     }
     if (this.showConfirm) {
-      return 'Pending Confirmation';
+      return 'ADMIN.DELETE.PENDING_CONFIRMATION';
     }
     if (this.saveTextOverride) {
       return this.saveTextOverride;
     }
-    return this.isCreatingNew ? 'Create' : 'Save changes';
+    return this.isCreatingNew ? 'ADMIN.DELETE.CREATE' : 'ADMIN.DELETE.SAVE_CHANGES';
   }
 }
