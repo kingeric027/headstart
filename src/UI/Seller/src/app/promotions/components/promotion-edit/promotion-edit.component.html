@@ -107,7 +107,6 @@
               Entire Order
             </label>
           </div>
-          <!-- Disabled until further development -->
           <div class="form-check">
             <input class="form-check-input"
                    type="radio"
@@ -116,6 +115,7 @@
                    value="SpecificSupplier"
                    formControlName="AppliesTo"
                    (change)="handleUpdatePromo($event, 'xp.AppliesTo')"
+                   (change)="toggleScopeToSupplier()"
                    [checked]="promoTypeCheck('SpecificSupplier')">
             <label class="form-check-label"
                    for="SpecificSupplier">
