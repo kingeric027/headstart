@@ -76,7 +76,7 @@ export const getOrderSummaryMeta = (
   // const DiscountTotal = getDiscountTotal(orderPromos)
 
   const POTotal = POLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
-  const DiscountTotal = orderPromos.reduce((accumulator, promo) => (promo.Amount) + accumulator, 0);
+  const DiscountTotal = orderPromos?.reduce((accumulator, promo) => (promo.Amount) + accumulator, 0);
   const OrderTotal = (POTotal + CreditCardTotal) - DiscountTotal;
 
   return {

@@ -3,10 +3,11 @@ import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { ProductFilters } from '../../shopper-context';
-import { Me, Product } from 'ordercloud-javascript-sdk';
+import { ProductFilters, MarketplaceMeProduct } from '../../shopper-context';
+import { Me, Product, ListPageWithFacets, BuyerProduct } from 'ordercloud-javascript-sdk';
 import { ProductCategoriesService } from '../product-categories/product-categories.service';
 import { ListPage } from 'marketplace-javascript-sdk';
+import { TempSdk } from '../temp-sdk/temp-sdk.service';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -24,7 +25,8 @@ export class ProductFilterService {
     private router: Router,
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute,
-    private categories: ProductCategoriesService
+    private categories: ProductCategoriesService,
+    private tempSdk: TempSdk
   ) {
     this.activatedRoute.queryParams.subscribe(params => {
       if (this.router.url.startsWith('/products')) {
@@ -43,7 +45,7 @@ export class ProductFilterService {
     return { page, sortBy, search, ...activeFacets };
   }
 
-  async listProducts(): Promise<ListPage<Product>> {
+  async listProducts(): Promise<ListPageWithFacets<MarketplaceMeProduct>> {
     const { page, sortBy, search, categoryID, showOnlyFavorites, activeFacets = {} } = this.activeFiltersSubject.value;
     const facets = _transform(
       activeFacets,
@@ -51,12 +53,12 @@ export class ProductFilterService {
       {}
     );
     const favorites = this.currentUser.get().FavoriteProductIDs.join('|') || undefined;
-    return await Me.ListProducts({
-      categoryID,
+    return await this.tempSdk.listMeProducts({
       page,
       search,
       sortBy,
       filters: {
+        categoryID,
         ...facets,
         ID: showOnlyFavorites ? favorites : undefined,
       },

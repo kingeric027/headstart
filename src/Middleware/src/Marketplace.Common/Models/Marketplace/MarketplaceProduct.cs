@@ -25,6 +25,19 @@ namespace Marketplace.Models
     }
 
     [SwaggerModel]
+    public class SuperMarketplaceMeProduct : IMarketplaceObject
+    {
+        public string ID { get; set; }
+        public MarketplaceMeProduct Product { get; set; }
+        public PriceSchedule PriceSchedule { get; set; }
+        public IList<Spec> Specs { get; set; }
+        public IList<MarketplaceVariant> Variants { get; set; }
+        public IList<AssetForDelivery> Images { get; set; }
+        public IList<AssetForDelivery> Attachments { get; set; }
+    }
+
+
+    [SwaggerModel]
     public class PartialMarketplaceProduct : PartialProduct<ProductXp>
     {
     }
@@ -33,6 +46,12 @@ namespace Marketplace.Models
     [SwaggerModel]
     public class MarketplaceProduct : Product<ProductXp>, IMarketplaceObject
     {
+    }
+
+    [SwaggerModel]
+    public class MarketplaceMeProduct: BuyerProduct<ProductXp, MarketplacePriceSchedule>
+    {
+
     }
 
     [SwaggerModel]

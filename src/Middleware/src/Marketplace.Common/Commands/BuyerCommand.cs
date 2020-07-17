@@ -11,7 +11,7 @@ namespace Marketplace.Common.Commands
     public interface IMarketplaceBuyerCommand
     {
         Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer buyer, string token);
-        Task<SuperMarketplaceBuyer> Get(string buyerID, string token);
+        Task<SuperMarketplaceBuyer> Get(string buyerID, string token = null);
         Task<SuperMarketplaceBuyer> Update(string buyerID, SuperMarketplaceBuyer buyer, string token);
     }
     public class MarketplaceBuyerCommand : IMarketplaceBuyerCommand
@@ -49,9 +49,10 @@ namespace Marketplace.Common.Commands
             };
         }
 
-        public async Task<SuperMarketplaceBuyer> Get(string buyerID, string token)
+        public async Task<SuperMarketplaceBuyer> Get(string buyerID, string token = null)
         {
-            var buyer = await _oc.Buyers.GetAsync<MarketplaceBuyer>(buyerID, token);
+            var request = token != null ? _oc.Buyers.GetAsync<MarketplaceBuyer>(buyerID, token) : _oc.Buyers.GetAsync<MarketplaceBuyer>(buyerID);
+            var buyer = await request;
 
             // to move into content docs logic
             var markupPercent = buyer.xp?.MarkupPercent ?? 0;

@@ -267,10 +267,11 @@ namespace Marketplace.Common.Commands
                 var supplierID = supplierOrder.ToCompanyID;
                 supplierIDs.Add(supplierID);
                 var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierID)).ToList();
+                var supplier = await _oc.Suppliers.GetAsync(supplierID);
                 var supplierOrderPatch = new PartialOrder()
                 {
                     ID = $"{buyerOrder.ID}-{supplierID}",
-                    xp = GetNewOrderXP(buyerOrder, supplierID, shipFromAddressIDsForSupplierOrder)
+                    xp = GetNewOrderXP(buyerOrder, supplier, shipFromAddressIDsForSupplierOrder)
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
@@ -293,16 +294,16 @@ namespace Marketplace.Common.Commands
             return updatedSupplierOrders;
         }
 
-        private OrderXp GetNewOrderXP(MarketplaceOrder buyerOrder, string supplierID, List<string> shipFromAddressIDsForSupplierOrder)
+        private OrderXp GetNewOrderXP(MarketplaceOrder buyerOrder, Supplier supplier, List<string> shipFromAddressIDsForSupplierOrder)
         {
             var supplierOrderXp = new OrderXp()
             {
                 ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
-                SupplierIDs = new List<string>() { supplierID },
+                SupplierIDs = new List<string>() { supplier.ID },
                 StopShipSync = false,
                 OrderType = buyerOrder.xp.OrderType,
                 QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
-				Currency = buyerOrder.xp.Currency
+				Currency = supplier.xp.Currency
             };
             return supplierOrderXp;
         }
