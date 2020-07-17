@@ -1,5 +1,4 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { SuperMarketplaceProduct, MarketplaceBuyer, MarketplaceSDK, MarketplacePriceSchedule } from 'marketplace-javascript-sdk';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { PriceSchedule, OcBuyerService } from '@ordercloud/angular-sdk';
 import { ToastrService } from 'ngx-toastr';
@@ -7,6 +6,7 @@ import { FormControl } from '@angular/forms';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { BuyerTempService, SuperMarketplaceBuyer } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
+import { SuperMarketplaceProduct, MarketplaceBuyer, MarketplaceSDK, MarketplacePriceSchedule } from 'marketplace-javascript-sdk';
 
 @Component({
   selector: 'product-pricing-component',

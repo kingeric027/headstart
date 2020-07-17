@@ -93,10 +93,6 @@
           </div>
           <hr />
           <h6 class="font-weight-medium">Applies To</h6>
-          <small>
-            <fa-icon style="color: #cccccc"
-                     [icon]="faExclamationCircle"></fa-icon> All promotions are eligible to all buyers at this time.
-          </small>
           <div class="form-check">
             <input class="form-check-input"
                    type="radio"
@@ -120,13 +116,31 @@
                    value="SpecificSupplier"
                    formControlName="AppliesTo"
                    (change)="handleUpdatePromo($event, 'xp.AppliesTo')"
-                   [checked]="promoTypeCheck('SpecificSupplier')"
-                   disabled>
+                   [checked]="promoTypeCheck('SpecificSupplier')">
             <label class="form-check-label"
                    for="SpecificSupplier">
               Specific Supplier
             </label>
           </div>
+          <span *ngIf="_promotionEditable?.xp?.AppliesTo === 'SpecificSupplier'">
+            <div ngbDropdown
+                 *ngIf="suppliers?.length && selectedSupplier"
+                 class="btn-block">
+              <button class="resource-btn btn btn-outline-dark"
+                      id="supplierSelectDropdown"
+                      ngbDropdownToggle>{{selectedSupplier.Name}}</button>
+              <div ngbDropdownMenu
+                   aria-labelledby="supplier select dropdown">
+                <button ngbDropdownItem
+                        *ngFor="let supplier of suppliers"
+                        (click)="selectSupplier(supplier)">
+                  <summary-resource-display-component [resource]="supplier"
+                                                      [resourceType]="'suppliers'">
+                  </summary-resource-display-component>
+                </button>
+              </div>
+            </div>
+          </span>
         </div>
         <div class="card py-2 px-3 mt-3 bg-white">
           <h6 class="font-weight-medium">Minimum Requirements</h6>

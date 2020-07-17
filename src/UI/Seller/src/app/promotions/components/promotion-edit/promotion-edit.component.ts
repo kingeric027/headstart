@@ -3,7 +3,7 @@ import { get as _get, kebabCase } from 'lodash';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { FacetService } from '@app-seller/facets/facet.service';
 import { faTimesCircle, faCalendar, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import { Promotion, OcPromotionService } from '@ordercloud/angular-sdk';
+import { Promotion, OcPromotionService, OcSupplierService } from '@ordercloud/angular-sdk';
 import { PromotionService } from '@app-seller/promotions/promotion.service';
 import { PromotionXp, MarketplacePromoType, MarketplacePromoEligibility } from '@app-seller/shared/models/marketplace-promo.interface';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
@@ -11,6 +11,7 @@ import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
 import { NgbDateStruct, NgbDate } from '@ng-bootstrap/ng-bootstrap';
 import * as moment from 'moment';
 import { Router } from '@angular/router';
+import { MarketplaceSupplier } from 'marketplace-javascript-sdk';
 @Component({
   selector: 'app-promotion-edit',
   templateUrl: './promotion-edit.component.html',
@@ -21,6 +22,7 @@ export class PromotionEditComponent implements OnInit {
   filterConfig;
   @Input()
   set resourceInSelection(promotion: Promotion) {
+    this.setUpSuppliers();
     if (promotion.ID) {
       this.refreshPromoData(promotion);
     } else {
@@ -31,6 +33,8 @@ export class PromotionEditComponent implements OnInit {
   updatedResource;
   @Output()
   updateResource = new EventEmitter<any>();
+  suppliers: MarketplaceSupplier[];
+  selectedSupplier: MarketplaceSupplier;
   resourceForm: FormGroup;
   _promotionEditable: Promotion<PromotionXp>;
   _promotionStatic: Promotion<PromotionXp>;
@@ -45,7 +49,8 @@ export class PromotionEditComponent implements OnInit {
   faTimesCircle = faTimesCircle;
   faExclamationCircle = faExclamationCircle;
   faCalendar = faCalendar;
-  constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private router: Router,) {}
+  scopeToSupplier: boolean = false;
+  constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private ocSupplierService: OcSupplierService, private router: Router,) {}
 
   ngOnInit(): void {
     this.isCreatingNew = this.promotionService.checkIfCreatingNew();
@@ -68,6 +73,17 @@ export class PromotionEditComponent implements OnInit {
     this._promotionEditable = JSON.parse(JSON.stringify(promo));
     this._promotionStatic = JSON.parse(JSON.stringify(promo));
     this.createPromotionForm(promo);
+  }
+
+  async setUpSuppliers(): Promise<void> {
+    const supplierResponse = await this.ocSupplierService.List({pageSize: 100}).toPromise();
+    this.suppliers = supplierResponse.Items;
+    await this.selectSupplier(this.suppliers[0]);
+  }
+
+  async selectSupplier(supplier: MarketplaceSupplier): Promise<void> {
+    const s = await this.ocSupplierService.Get(supplier.ID).toPromise();
+    this.selectedSupplier = s;
   }
 
   createPromotionForm(promotion: Promotion) {
