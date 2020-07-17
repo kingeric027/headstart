@@ -28,7 +28,6 @@ namespace Marketplace.Models.Misc
 		// buyer
 		MPBaseBuyer,
 		MPLocationPermissionAdmin,
-		MPLocationApprovalRuleAdmin,
 		MPLocationCreditCardAdmin,
 		MPLocationAddressAdmin,
 		MPLocationOrderApprover,
