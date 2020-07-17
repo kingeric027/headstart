@@ -15,9 +15,9 @@ import { getSuggestedAddresses } from '../../../services/address-suggestion.help
 export class OCMCheckoutAddress implements OnInit {
   readonly NEW_ADDRESS_CODE = 'new';
   existingBuyerLocations: ListPage<BuyerAddress>;
-  selectedBuyerLocation: BuyerAddress = {ID: null};
+  selectedBuyerLocation: BuyerAddress;
   existingShippingAddresses: ListPage<BuyerAddress>;
-  selectedShippingAddress: BuyerAddress = {ID: null};
+  selectedShippingAddress: BuyerAddress;
   showNewAddressForm = false;
   suggestedAddresses: BuyerAddress[];
   homeCountry: string;
@@ -28,10 +28,10 @@ export class OCMCheckoutAddress implements OnInit {
 
   constructor(private context: ShopperContextService) { }
 
-  ngOnInit(): void {
-    this.listSavedShippingAddresses();
-    this.listSavedBuyerLocations();
+  async ngOnInit(): Promise<void> {
     this.selectedShippingAddress = this.lineItems?.Items[0].ShippingAddress;
+    await this.listSavedShippingAddresses();
+    await this.listSavedBuyerLocations();
   }
 
   onBuyerLocationChange(buyerLocationID: string): void {
