@@ -282,7 +282,7 @@
       <!-- Buyer Visibility  -->
       <mat-tab label="Buyer Visibility"
                *ngIf="readonly">
-        <product-visibility-assignments-component *ngIf="_superMarketplaceProductStatic"
+        <product-visibility-assignments-component *ngIf="_superMarketplaceProductStatic?.Product?.ID"
                                                   [product]="_superMarketplaceProductStatic.Product">
         </product-visibility-assignments-component>
       </mat-tab>
