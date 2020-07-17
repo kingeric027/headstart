@@ -59,7 +59,7 @@ namespace Marketplace.Common.Commands
 			await CreateIncrementors(impersonation.access_token); // must be before create buyers
 			await CreateBuyers(user, impersonation.access_token);
 			await CreateXPIndices(impersonation.access_token);
-			await CreateAndAssignIntegrationEvents(seed.ApiUrl, impersonation.access_token);
+			await CreateAndAssignIntegrationEvents(impersonation.access_token, seed.ApiUrl);
 			await CreateSuppliers(user, impersonation.access_token);
 			await SetUpSellerAuthentication(impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
@@ -269,7 +269,7 @@ namespace Marketplace.Common.Commands
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
-			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" });
+			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" }, token);
 		}
 
 		public async Task CreateMarketPlaceRoles(string accessToken)
