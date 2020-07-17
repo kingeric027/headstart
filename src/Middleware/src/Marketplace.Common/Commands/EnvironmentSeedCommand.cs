@@ -86,25 +86,21 @@ namespace Marketplace.Common.Commands
 		private async Task SetUpSellerAuthentication(string token)
 		{
 			// delete default security profiles if they exist
-			// try catches for idempotency
-			try
-			{
-				await _oc.SecurityProfiles.DeleteAsync("buyerProfile1", token);
-
-			} catch(Exception ex){}
-			try
-			{
-				await _oc.SecurityProfiles.DeleteAsync("sellerProfile1", token);
-			}
-			catch (Exception ex){}
-
+			await _oc.SecurityProfiles.DeleteAsync("buyerProfile1", token);
+			await _oc.SecurityProfiles.DeleteAsync("sellerProfile1", token);
 			foreach (var sellerCustomRole in SellerMarketplaceRoles)
 			{
-				await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-				{
-					SecurityProfileID = sellerCustomRole.ToString()
-				}, token);
+					await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+					{
+						SecurityProfileID = sellerCustomRole.ToString()
+					}, token);
 			}
+			
+			await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+			{ 
+				SecurityProfileID = "DefaultContext",
+				UserID = "Default_Admin"
+			}, token);
 		}
 
 		private async Task<AdminCompany> CreateOrganization(string token)
@@ -281,6 +277,13 @@ namespace Marketplace.Common.Commands
 			{
 				await _oc.SecurityProfiles.CreateAsync(profile, accessToken);
 			}
+
+			await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
+			{
+				Roles = new List<ApiRole> { ApiRole.FullAccess },
+				Name = "DefaultContext",
+				ID = "Defaultcontext"
+			});
 		}
 
 		public async Task DeleteAllWebhooks(string token)
@@ -466,6 +469,7 @@ namespace Marketplace.Common.Commands
 		};
 		
 		static readonly List<MarketplaceSecurityProfile> DefaultSecurityProfiles = new List<MarketplaceSecurityProfile>() {
+			
 			// seller/supplier
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin, ApiRole.InventoryAdmin, ApiRole.ProductFacetReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.PriceScheduleReader, ApiRole.ProductFacetReader } },
