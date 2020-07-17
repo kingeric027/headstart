@@ -15,9 +15,9 @@ import { getSuggestedAddresses } from '../../../services/address-suggestion.help
 export class OCMCheckoutAddress implements OnInit {
   readonly NEW_ADDRESS_CODE = 'new';
   existingBuyerLocations: ListPage<BuyerAddress>;
-  selectedBuyerLocation: BuyerAddress = {};
+  selectedBuyerLocation: BuyerAddress = {ID: null};
   existingShippingAddresses: ListPage<BuyerAddress>;
-  selectedShippingAddress: BuyerAddress;
+  selectedShippingAddress: BuyerAddress = {ID: null};
   showNewAddressForm = false;
   suggestedAddresses: BuyerAddress[];
   homeCountry: string;
