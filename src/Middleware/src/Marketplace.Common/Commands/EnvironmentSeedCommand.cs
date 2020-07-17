@@ -86,8 +86,15 @@ namespace Marketplace.Common.Commands
 		private async Task SetUpSellerAuthentication(string token)
 		{
 			// delete default security profiles if they exist
-			await _oc.SecurityProfiles.DeleteAsync("buyerProfile1", token);
-			await _oc.SecurityProfiles.DeleteAsync("sellerProfile1", token);
+			try
+			{
+				await _oc.SecurityProfiles.DeleteAsync("buyerProfile1", token);
+			} catch(Exception ex){}
+
+			try
+			{
+				await _oc.SecurityProfiles.DeleteAsync("sellerProfile1", token);
+			} catch(Exception ex){}
 			foreach (var sellerCustomRole in SellerMarketplaceRoles)
 			{
 					await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
