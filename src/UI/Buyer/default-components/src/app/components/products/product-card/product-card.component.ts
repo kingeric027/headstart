@@ -1,10 +1,6 @@
 import { Component, Input, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { ShopperContextService, MarketplaceMeProduct } from 'marketplace';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
-import { exchange } from 'src/app/services/currency.helper';
-import { ListPage } from 'marketplace-javascript-sdk';
-import { ExchangeRates } from 'marketplace';
-import { BuyerCurrency } from 'src/app/models/currency.interface';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
 @Component({
   templateUrl: './product-card.component.html',
@@ -16,35 +12,28 @@ export class OCMProductCard {
   _product: MarketplaceMeProduct = {
     PriceSchedule: {} as PriceSchedule,
   };
-  _price: BuyerCurrency;
-  _rates: ListPage<ExchangeRates>;
+  _price: number;
+  _userCurrency: string;
   quantity: number;
   qtyValid = true;
   shouldDisplayAddToCart = false;
   isViewOnlyProduct = true;
   hasSpecs = false;
   isAddingToCart = false;
-  exchangeRates: ExchangeRates[];
 
   constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) {}
 
   @Input() set product(value: MarketplaceMeProduct) {
     this._product = value;
-    this._rates = this.context.exchangeRates.Get(); 
-    this.setPrice(value, value.PriceSchedule);
+    this._price = value.PriceSchedule?.PriceBreaks[0]?.Price
     this.isViewOnlyProduct = !value.PriceSchedule;
     this.hasSpecs = value.SpecCount > 0;
+    this._userCurrency = this.context.currentUser.get().Currency;
   }
 
   @Input() set isFavorite(value: boolean) {
     this._isFavorite = value;
     this.cdr.detectChanges(); // TODO - remove. Solve another way.
-  }
-
-  setPrice(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
-    const currentUser = this.context.currentUser.get();
-    const productPrice = priceSchedule?.PriceBreaks[0]?.Price;
-    this._price = exchange(this._rates, productPrice, product?.xp?.Currency, currentUser.Currency);
   }
 
   async addToCart(): Promise<void> {
