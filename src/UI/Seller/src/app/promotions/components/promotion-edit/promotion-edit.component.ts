@@ -1,31 +1,31 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { get as _get, kebabCase } from 'lodash';
+import { Component, Input, Output, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import { get as _get } from 'lodash';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { FacetService } from '@app-seller/facets/facet.service';
-import { faTimesCircle, faCalendar, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faCalendar, faExclamationCircle, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { Promotion, OcPromotionService, OcSupplierService } from '@ordercloud/angular-sdk';
 import { PromotionService } from '@app-seller/promotions/promotion.service';
 import { PromotionXp, MarketplacePromoType, MarketplacePromoEligibility } from '@app-seller/shared/models/marketplace-promo.interface';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
-import { NgbDateStruct, NgbDate } from '@ng-bootstrap/ng-bootstrap';
 import * as moment from 'moment';
 import { Router } from '@angular/router';
 import { MarketplaceSupplier } from 'marketplace-javascript-sdk';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-promotion-edit',
   templateUrl: './promotion-edit.component.html',
   styleUrls: ['./promotion-edit.component.scss'],
 })
 export class PromotionEditComponent implements OnInit {
+  @ViewChild('popover', { static: false })
+  public popover: NgbPopover;
   @Input()
   filterConfig;
   @Input()
-  set resourceInSelection(promotion: Promotion) {
-    this.setUpSuppliers();
+  set resourceInSelection(promotion: Promotion<PromotionXp>) {
     if (promotion.ID) {
+      this.setUpSuppliers(promotion.xp?.Supplier);
       this.refreshPromoData(promotion);
     } else {
+      this.setUpSuppliers();
       this.refreshPromoData(this.promotionService.emptyResource);
     }
   }
@@ -48,6 +48,7 @@ export class PromotionEditComponent implements OnInit {
   isCreatingNew: boolean;
   faTimesCircle = faTimesCircle;
   faExclamationCircle = faExclamationCircle;
+  faQuestionCircle = faQuestionCircle;
   faCalendar = faCalendar;
   scopeToSupplier: boolean = false;
   constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private ocSupplierService: OcSupplierService, private router: Router,) {}
@@ -75,22 +76,22 @@ export class PromotionEditComponent implements OnInit {
     this.createPromotionForm(promo);
   }
 
-  async setUpSuppliers(): Promise<void> {
-    const supplierResponse = await this.ocSupplierService.List({pageSize: 100}).toPromise();
-    this.suppliers = supplierResponse.Items;
-    await this.selectSupplier(this.suppliers[0]);
+  async setUpSuppliers(existingSupplierID?: string): Promise<void> {
+    if (!existingSupplierID) {
+      const supplierResponse = await this.ocSupplierService.List({pageSize: 100}).toPromise();
+      this.suppliers = supplierResponse.Items;
+      await this.selectSupplier(this.suppliers[0].ID);
+    } else {
+      await this.selectSupplier(existingSupplierID);
+    }
   }
 
-  async selectSupplier(supplier: MarketplaceSupplier): Promise<void> {
-    const s = await this.ocSupplierService.Get(supplier.ID).toPromise();
+  async selectSupplier(supplierID: string): Promise<void> {
+    const s = await this.ocSupplierService.Get(supplierID).toPromise();
     this.selectedSupplier = s;
+    this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
     this.buildEligibleExpression();
     this.buildValueExpression();
-  }
-
-  toggleScopeToSupplier(): void {
-    this.scopeToSupplier = !this.scopeToSupplier;
-    (this._promotionEditable as any).LineItemLevel = !(this._promotionEditable as any).LineItemLevel;
   }
 
   createPromotionForm(promotion: Promotion) {
@@ -99,6 +100,7 @@ export class PromotionEditComponent implements OnInit {
       Type: new FormControl(_get(promotion, 'xp.Type')),
       Value: new FormControl(_get(promotion, 'xp.Value'), Validators.min(0)),
       AppliesTo: new FormControl(_get(promotion, 'xp.AppliesTo')),
+      ScopeToSupplier: new FormControl(_get(promotion, 'xp.ScopeToSupplier')),
       Supplier: new FormControl(_get(promotion, 'xp.Supplier')),
       RedemptionLimit: new FormControl(promotion.RedemptionLimit, Validators.min(0)),
       RedemptionLimitPerUser: new FormControl(promotion.RedemptionLimitPerUser, Validators.min(0)),
@@ -125,7 +127,7 @@ export class PromotionEditComponent implements OnInit {
     const promoUpdate = {
       field,
       value:
-        (field === 'Type' || field === 'CanCombine') ? event.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value,
+        (field === 'Type' || field === 'CanCombine' || field === 'xp.ScopeToSupplier') ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value,
     };
     this.updatePromoResource(promoUpdate);
   }
@@ -151,11 +153,19 @@ export class PromotionEditComponent implements OnInit {
     const promo = this._promotionEditable;
     if (promo?.xp?.Type === "FixedAmount") valueString = `$${promo?.xp?.Value} ${valueString}`;
     if (promo?.xp?.Type === "Percentage") valueString = `${promo?.xp?.Value}% ${valueString}`;
-    if (this.scopeToSupplier) valueString = `${valueString} of ${this.selectedSupplier.Name} products`
     if (promo?.xp?.Type === "FreeShipping") valueString = `Free shipping on entire order`;
-    if (promo?.xp?.MinReq?.Type === "MinPurchase" && promo?.xp?.MinReq?.Int) valueString = `${valueString} over $${promo?.xp?.MinReq?.Int}`
-    if (promo?.xp?.MinReq?.Type === "MinItemQty" && promo?.xp?.MinReq?.Int) valueString = `${valueString} over ${this._promotionEditable?.xp?.MinReq?.Int} items`
-    if (this.scopeToSupplier) valueString = `${valueString}`
+    if (promo?.xp?.MinReq?.Type === "MinPurchase" && promo?.xp?.MinReq?.Int) {
+      promo?.xp?.ScopeToSupplier ? 
+      valueString = `${valueString} when you purhcase $${promo?.xp?.MinReq?.Int} or more worth of ${this.selectedSupplier?.Name} products`
+        :
+      valueString = `${valueString} over $${promo?.xp?.MinReq?.Int}`;
+    }
+    if (promo?.xp?.MinReq?.Type === "MinItemQty" && promo?.xp?.MinReq?.Int) {
+      valueString = promo?.xp?.ScopeToSupplier ? 
+      `${valueString} when you purchase ${this._promotionEditable?.xp?.MinReq?.Int} or more ${this.selectedSupplier?.Name} products`
+        :
+      `${valueString} over ${this._promotionEditable?.xp?.MinReq?.Int} items`
+    }
     // Update `promotion.Description` with this value string
     this.handleUpdatePromo({target: {value: valueString}}, 'Description');
     return valueString;
@@ -214,24 +224,24 @@ export class PromotionEditComponent implements OnInit {
     return this.promotionService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew)
   }
 
+  handleClearMinReq(): void {
+    this._promotionEditable.EligibleExpression = "true";
+    this.handleUpdatePromo({target: { value: {Type: null, Int: null} }}, "xp.MinReq");
+    this.handleUpdatePromo({target: { value: false }}, "xp.ScopeToSupplier");
+  }
+
   handleDiscardChanges(): void {
     this.refreshPromoData(this._promotionStatic)
   }
 
   buildValueExpression(): void {
-    let valueExpression: string = this.scopeToSupplier ? "item.LineSubtotal" : "Order.Subtotal";
+    let valueExpression: string = "Order.Subtotal";
     switch(this._promotionEditable.xp?.Type) {
       case 'FixedAmount':
-        valueExpression = this.scopeToSupplier ? 
-        `${this._promotionEditable.xp?.Value} / items.quantity(SupplierID = '${this.selectedSupplier.ID}')` 
-          : 
-        `${this._promotionEditable.xp?.Value}`
+        valueExpression = `${this._promotionEditable.xp?.Value}`
         break;
       case 'Percentage':
-        valueExpression = this.scopeToSupplier ? 
-        `(${valueExpression} * ${(this._promotionEditable.xp?.Value / 100)}) / items.quantity(SupplierID = '${this.selectedSupplier.ID}')}`
-          :
-        `${valueExpression} * ${(this._promotionEditable.xp?.Value / 100)}`
+        valueExpression = `${valueExpression} * ${(this._promotionEditable.xp?.Value / 100)}`
         break;
       case 'FreeShipping':
         valueExpression = `Order.ShippingCost`;
@@ -241,19 +251,19 @@ export class PromotionEditComponent implements OnInit {
   }
 
   buildEligibleExpression(): void {
-    let eligibleExpression: string = this.scopeToSupplier ? `item.SupplierID = '${this.selectedSupplier.ID}' and` : `Order`;
+    let eligibleExpression: string;
     switch (this._promotionEditable.xp?.MinReq?.Type) {
       case 'MinPurchase':
-        eligibleExpression = this.scopeToSupplier ? 
-        `${eligibleExpression} items.total(SupplierID = '${this.selectedSupplier.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
+        eligibleExpression = this._promotionEditable?.xp?.ScopeToSupplier ? 
+        `items.total(SupplierID = '${this.selectedSupplier?.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
           :
-        `${eligibleExpression}.Subtotal >= ${this._promotionEditable.xp?.MinReq?.Int}`;
+        `Order.Subtotal >= ${this._promotionEditable.xp?.MinReq?.Int}`;
         break;
       case 'MinItemQty':
-        eligibleExpression = this.scopeToSupplier ? 
-        `${eligibleExpression} items.Quantity(SupplierID = '${this.selectedSupplier.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
+        eligibleExpression = this._promotionEditable?.xp?.ScopeToSupplier ? 
+        `items.Quantity(SupplierID = '${this.selectedSupplier?.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
           :
-        `${eligibleExpression}.LineItemCount >= ${this._promotionEditable.xp?.MinReq?.Int}`
+        `Order.LineItemCount >= ${this._promotionEditable.xp?.MinReq?.Int}`
         break;
     }
     if (this._promotionEditable.xp?.MaxShipCost) {
@@ -303,10 +313,5 @@ export class PromotionEditComponent implements OnInit {
   async handleDelete(event: any): Promise<void> {
     await this.ocPromotionService.Delete(this._promotionStatic.ID).toPromise();
     this.router.navigateByUrl('/promotions');
-  }
-
-  handleClearMinReq(): void {
-    this._promotionEditable.EligibleExpression = "true";
-    this.handleUpdatePromo({target: { value: {Type: null, Int: null} }}, "xp.MinReq");
   }
 }
