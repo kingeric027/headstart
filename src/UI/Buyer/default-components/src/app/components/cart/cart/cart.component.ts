@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { LineItemWithProduct, ShopperContextService } from 'marketplace';
-import { ListPage, OrderPromotion } from 'ordercloud-javascript-sdk';
+import { ListPage, OrderPromotion, Orders } from 'ordercloud-javascript-sdk';
 import { MarketplaceOrder } from 'marketplace-javascript-sdk';
 import { OrderSummaryMeta, getOrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 
@@ -16,6 +16,10 @@ export class OCMCart {
   @Input() set order(value: MarketplaceOrder) {
     this._order = value;
     this.setOrderSummaryMeta();
+    const existingPromoArr = this.context.order.promos.get().Items.map(async promo => {
+      this.context.order.promos.removePromo(promo.Code);
+    });
+    Promise.all(existingPromoArr);
   }
   @Input() set lineItems(value: ListPage<LineItemWithProduct>) {
     this._lineItems = value;
