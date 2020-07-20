@@ -33,7 +33,7 @@ namespace ordercloud.integrations.avalara
 			};
 		}
 
-		public static TaxCertificate Map(CertificateModel source, int companyID, string baseUrl)
+		public static TaxCertificate Map(CertificateModel source, string base64pdf)
 		{
 			return new TaxCertificate()
 			{
@@ -43,7 +43,7 @@ namespace ordercloud.integrations.avalara
 				ExemptionNumber = source.exemptionNumber,
 				ExposureZoneName = source.exposureZone.name,
 				FileName = source.filename,
-				PDFUrl = $"{baseUrl}/avalara/{companyID}/certificate/{source.id}/pdf"
+				Base64UrlEncodedPDF = base64pdf
 			};
 		}
 	}

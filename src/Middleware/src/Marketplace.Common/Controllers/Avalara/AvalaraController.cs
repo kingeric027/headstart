@@ -6,6 +6,7 @@ using Avalara.AvaTax.RestClient;
 using ordercloud.integrations.avalara;
 using Marketplace.Common.Commands;
 using ordercloud.integrations.library;
+using System;
 
 namespace Marketplace.Common.Controllers.Avalara
 {
@@ -71,14 +72,6 @@ namespace Marketplace.Common.Controllers.Avalara
 		public async Task<TaxCertificate> UpdateCertificate(int companyID, string locationID, [FromBody] TaxCertificate cert)
 		{
 			return await _resaleCertCommand.UpdateAsync(companyID, locationID, cert, VerifiedUserContext);
-		}
-
-		[HttpGet, Route("{companyID}/certificate/{locationID}/pdf"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<object> DownloadCertificate(int companyID, string locationID)
-		{
-			// need to include auth for managing cert for a specific location somewhere
-			var pdf = await _resaleCertCommand.DownloadPDFAsync(companyID, locationID, VerifiedUserContext);
-			return File(pdf, "application/pdf");
 		}
 	}
 }

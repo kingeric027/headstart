@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { Address, Tokens,  } from 'ordercloud-javascript-sdk';
-import { ShopperContextService } from 'marketplace';
+import { Address } from 'ordercloud-javascript-sdk';
+import { ShopperContextService, AppConfig } from 'marketplace';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -9,8 +9,7 @@ import {
 } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
 import { CertificateFormOutput } from '../certificate-form/certificate-form.component';
 import { GeographyConfig } from '../../../config/geography.class';
-import { ActivatedRoute } from '@angular/router';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { downloadBase64String } from 'src/app/services/download.helper';
 
 
 @Component({
@@ -34,7 +33,7 @@ export class OCMLocationManagement {
     this.getLocationManagementDetails();
   };
   
-  constructor(private context: ShopperContextService, private activatedRoute: ActivatedRoute, private http: HttpClient) {}
+  constructor(private context: ShopperContextService, private appConfig: AppConfig) {}
   
   toLocationOrders(): void {
     this.context.router.toOrdersByLocation({location: this._locationID});
@@ -67,8 +66,8 @@ export class OCMLocationManagement {
     this.dismissCertificateForm();
   }
 
-  async downloadCertificate(): Promise<void> {
-    await this.context.addresses.downloadCertificate(this._locationID);
+  downloadCertificate(): void {
+    downloadBase64String(this.certificate.Base64UrlEncodedPDF, 'application/pdf', this.certificate.FileName);
   }
 
   dismissCertificateForm(): void {

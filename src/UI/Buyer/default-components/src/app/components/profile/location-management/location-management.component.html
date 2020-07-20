@@ -34,7 +34,7 @@
     </div>
     <div class="col-md-7">
       <div [ngClass]="{ 'bg-light': highlight }">
-        <div *ngIf="certificate?.PDFUrl"
+        <div *ngIf="!!certificate"
              class="d-flex justify-content-between align-items-center mb-2">
           <button class="btn btn-outline-primary"
                   (click)="downloadCertificate()"
