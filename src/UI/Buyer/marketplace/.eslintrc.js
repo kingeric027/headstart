@@ -123,7 +123,7 @@ module.exports = {
                 ]
             }
         ],
-        "no-debugger": "off",
+        "no-debugger": "error",
         "no-empty": "off",
         "no-eval": "error",
         "no-fallthrough": "error",
