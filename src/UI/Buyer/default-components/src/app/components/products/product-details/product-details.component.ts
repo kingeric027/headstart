@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
-import { Spec } from 'ordercloud-javascript-sdk';
+import { Spec, PriceBreak } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
-import { MarketplaceMeProduct, ShopperContextService, ExchangeRates, CurrentUser } from 'marketplace';
+import { MarketplaceMeProduct, ShopperContextService, CurrentUser } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
 import { MarketplaceLineItem, AssetForDelivery, QuoteOrderInfo } from 'marketplace-javascript-sdk';
 import { Observable } from 'rxjs';
@@ -10,8 +10,6 @@ import { ModalState } from 'src/app/models/modal-state.class';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 import { SpecFormService } from '../spec-form/spec-form.service';
 import { SuperMarketplaceProduct, ListPage, Asset } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
-import { exchange } from 'src/app/services/currency.helper';
-import { BuyerCurrency, ExchangedPriceBreak } from 'src/app/models/currency.interface';
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 
@@ -26,8 +24,7 @@ export class OCMProductDetails implements OnInit {
   _specs: ListPage<Spec>;
   _product: MarketplaceMeProduct;
   _priceSchedule: PriceSchedule;
-  _priceBreaks: ExchangedPriceBreak[];
-  _rates: ListPage<ExchangeRates>;
+  _priceBreaks: PriceBreak[];
   _orderCurrency: string;
   _attachments: Asset[] = [];
   specFormService: SpecFormService;
@@ -44,6 +41,7 @@ export class OCMProductDetails implements OnInit {
   favoriteProducts: string[] = [];
   qtyValid = true;
   supplierNote: string;
+  _userCurrency: string;
   specLength: number;
   quoteFormModal = ModalState.Closed;
   currentUser: CurrentUser;
@@ -60,18 +58,11 @@ export class OCMProductDetails implements OnInit {
   @Input() set product(superProduct: SuperMarketplaceProduct) {
     this._product = superProduct.Product;
     this._priceSchedule = superProduct.PriceSchedule as any;
-    this._rates = this.context.exchangeRates.Get();
     this._attachments = superProduct?.Attachments;
     const currentUser = this.context.currentUser.get();
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
     this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
-    this._priceBreaks = superProduct.PriceSchedule?.PriceBreaks.map(pb => {
-      const newPrice: BuyerCurrency = exchange(this._rates, pb.Price, superProduct.Product?.xp?.Currency, this._orderCurrency);
-      const exchanged: ExchangedPriceBreak = {
-        Quantity: pb.Quantity,
-        Price: newPrice
-      }
-      return exchanged;
-    });
+    this._priceBreaks = superProduct.PriceSchedule?.PriceBreaks;
     this._price = this.getTotalPrice();
     // Specs
     this._specs = { Meta: {}, Items: superProduct.Specs as any };
@@ -86,6 +77,7 @@ export class OCMProductDetails implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.context.currentUser.get();
+    this._userCurrency = this.context.currentUser.get().Currency;
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
 
@@ -164,11 +156,11 @@ export class OCMProductDetails implements OnInit {
     }, startingBreak);
     this.selectedBreak = selectedBreak;
     this.percentSavings = parseInt(
-      (((priceBreaks[0].Price.Price - selectedBreak.Price.Price) / priceBreaks[0].Price.Price) * 100).toFixed(0), 10
+      (((priceBreaks[0].Price - selectedBreak.Price) / priceBreaks[0].Price) * 100).toFixed(0), 10
     );
     return this.specFormService.event.valid
       ? this.specFormService.getSpecMarkup(this._specs, selectedBreak, this.quantity || startingBreak.Quantity)
-      : selectedBreak.Price.Price * (this.quantity || startingBreak.Quantity);
+      : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
   }
 
   isFavorite(): boolean {

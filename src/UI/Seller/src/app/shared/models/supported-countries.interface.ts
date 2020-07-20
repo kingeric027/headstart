@@ -1,3 +1,5 @@
+// replace with sdk in the future
+
 export interface SupportedCountries {
     label: string;
     abbreviation: string;

@@ -145,6 +145,10 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
+  async isSupplierUser(): Promise<boolean> {
+    return await this.currentUserService.isSupplierUser();
+  }
+
   async constructResourceURLs(resourceID = ''): Promise<string[]> {
     const newUrlPieces = [];
     newUrlPieces.push(this.route);
@@ -249,11 +253,15 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async updateResource(originalID: string, resource: any): Promise<any> {
     const args = await this.createListArgs([originalID, resource]);
-    const newResource = await this.ocService.Save(...args).toPromise();
+    const newResource =  await this.ocService.Save(...args).toPromise()
+    this.updateResourceSubject(newResource);
+    return newResource;
+  }
+
+  updateResourceSubject(newResource: any): void {
     const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
     this.resourceSubject.value.Items[resourceIndex] = newResource;
     this.resourceSubject.next(this.resourceSubject.value);
-    return newResource;
   }
 
   async deleteResource(resourceID: string): Promise<null> {
@@ -300,7 +308,8 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   sortBy(field: string): void {
-    this.patchFilterState({ sortBy: field || undefined });
+    // temporarily as any until changed to latest oc sdk
+    this.patchFilterState({ sortBy: field || undefined } as any);
   }
 
   searchBy(searchTerm: string): void {

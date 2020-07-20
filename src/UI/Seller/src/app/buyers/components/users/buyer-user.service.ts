@@ -98,7 +98,9 @@ export class BuyerUserService extends ResourceCrudService<User> implements IUser
   }
 
   async getUserGroups(buyerID: string, options: ListArgs): Promise<ListUserGroup> {
-    return await this.ocBuyerUserGroupService.List(buyerID, options).toPromise();
+    
+    // temporarily as any until changed to js sdk
+    return await this.ocBuyerUserGroupService.List(buyerID, options as any).toPromise();
   }
 
   async listUserAssignments(userID: string, buyerID: string): Promise<ListUserGroupAssignment> {

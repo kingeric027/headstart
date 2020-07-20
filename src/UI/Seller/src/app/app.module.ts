@@ -10,6 +10,7 @@ import { CookieModule } from 'ngx-cookie';
 import { ToastrModule } from 'ngx-toastr';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpModule } from '@ngx-progressbar/http';
+import { HttpClientModule } from '@angular/common/http';
 
 // app modules
 import { SharedModule } from '@app-seller/shared';
@@ -50,6 +51,7 @@ import { applicationConfiguration, AppConfig } from './config/app.config';
      * can live in shared
      */
     SharedModule,
+    HttpClientModule,
     NgProgressModule,
     NgProgressHttpModule,
     OrderCloudModule.forRoot(OcSDKConfig),

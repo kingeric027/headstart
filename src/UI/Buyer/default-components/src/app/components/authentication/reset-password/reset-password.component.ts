@@ -4,10 +4,11 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 // angular libs
 
 // ordercloud
-import { PasswordReset } from 'ordercloud-javascript-sdk';
+import { PasswordReset, TokenPasswordReset } from 'ordercloud-javascript-sdk';
 import { ValidateStrongPassword, ValidateFieldMatches } from '../../../validators/validators';
 import { ToastrService } from 'ngx-toastr';
 import { ShopperContextService } from 'marketplace';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   templateUrl: './reset-password.component.html',
@@ -16,16 +17,20 @@ import { ShopperContextService } from 'marketplace';
 export class OCMResetPassword implements OnInit {
   form: FormGroup;
   username: string;
-  resetCode: string;
+  token: string;
   appName: string;
 
-  constructor(private toasterService: ToastrService, private context: ShopperContextService) {}
+  constructor(
+    private toasterService: ToastrService,
+    private context: ShopperContextService,
+    private activatedRoute: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
     // TODO - figure out how to access url.
-    // const urlParams = this.activatedRoute.snapshot.queryParams;
+    const urlParams = this.activatedRoute.snapshot.queryParams;
+    this.token = urlParams['token'];
     // this.username = urlParams['user'];
-    // this.resetCode = urlParams['code'];
     this.appName = this.context.appSettings.appname;
     this.form = new FormGroup({
       password: new FormControl('', [Validators.required, ValidateStrongPassword]),
@@ -38,12 +43,10 @@ export class OCMResetPassword implements OnInit {
       return;
     }
 
-    const config: PasswordReset = {
-      ClientID: this.context.appSettings.clientID,
-      Password: this.form.get('password').value,
-      Username: this.username,
+    const config: TokenPasswordReset = {
+      NewPassword: this.form.get('password').value,
     };
-    await this.context.authentication.resetPassword(this.resetCode, config);
+    await this.context.authentication.resetPassword(this.token, config);
     this.toasterService.success('Password Reset', 'Success');
     this.context.router.toLogin();
   }

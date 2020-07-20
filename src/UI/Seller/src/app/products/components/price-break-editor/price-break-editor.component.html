@@ -1,0 +1,107 @@
+  <div *ngIf="priceScheduleEditable"
+       class="container-fluid mb-5">
+    <div class="row pt-3">
+      <div class="col-md-5"
+           *ngIf="priceScheduleEditable?.PriceBreaks.length > 0">
+        <table class="table">
+          <thead class="bg-light">
+            <tr>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let priceBreak of priceScheduleEditable.PriceBreaks; let i = index">
+              <td>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">{{currency?.Symbol}}</span>
+                  </div>
+                  <input [attr.disabled]="readonly ? true : null"
+                         type="number"
+                         class="form-control currency"
+                         id="Price"
+                         aria-describedby="Price"
+                         [value]="priceBreak?.Price"
+                         min="1"
+                         step="0.01"
+                         (change)="updateExistingBreakPrice($event, i)"
+                         placeholder="Price ({{currency?.Name}})">
+                </div>
+              </td>
+              <td>{{getPriceBreakRange(i)}}</td>
+              <td>
+                <fa-icon *ngIf="i !== 0 && !readonly"
+                         (click)="deletePriceBreak(priceBreak)"
+                         class="icon-button ripple hover-btn"
+                         [icon]="faTrash"></fa-icon>
+              </td>
+            </tr>
+            <tr *ngIf="isAddingPriceBreak">
+              <td>
+                <div class="form-group">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">{{currency?.Symbol}}</span>
+                    </div>
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="number"
+                           class="form-control currency"
+                           id="Price"
+                           aria-describedby="Price"
+                           min="1"
+                           step="0.01"
+                           [value]="newPriceBreak.Price"
+                           (change)="updateNewBreak($event, 'Price')"
+                           placeholder="Price ({{currency?.Name}})">
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="form-group">
+                  <div class="input-group">
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="number"
+                           class="form-control currency"
+                           id="Quantity"
+                           aria-describedby="Quantity"
+                           min="2"
+                           [value]="newPriceBreak.Quantity"
+                           (change)="updateNewBreak($event, 'Quantity')"
+                           placeholder="Quantity">
+                  </div>
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="btn btn-primary"
+                        (click)="addPriceBreak()">Add</button>
+              </td>
+            </tr>
+            <tr *ngIf="!isAddingPriceBreak && !readonly">
+              <td colspan="3">
+                <button type="button"
+                        class="w-100 btn btn-primary"
+                        (click)="isAddingPriceBreak = true">Add New Break</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="form-group mt-3">
+          <label for="UseCumulativeQuantity">Price Break Application</label>
+          <select [attr.disabled]="readonly ? true : null"
+                  type="dropdown"
+                  class="form-control"
+                  id="UseCumulativeQuantity"
+                  aria-describedby="Use Cumulative Quantity"
+                  (change)="handleUpdateUseCumulativeQuantity($event)">
+            <option [selected]="priceScheduleEditable.UseCumulativeQuantity"
+                    [value]="true">Apply Price Breaks Across Variations</option>
+            <option [selected]="priceScheduleEditable.UseCumulativeQuantity"
+                    [value]="false">Apply Price Breaks to Individual Variations</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>

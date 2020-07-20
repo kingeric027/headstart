@@ -71,7 +71,7 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
     private ocUserGroupService: OcUserGroupService,
     private ocUserService: OcUserService,
     private buyerUserService: BuyerUserService,
-    public currentUserService: CurrentUserService
+    public currentUserService: CurrentUserService,
   ) {
     super(router, activatedRoute, ocAddressService, currentUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'locations');
   }

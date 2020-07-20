@@ -8,7 +8,6 @@ import {
   OcSupplierAddressService,
   OcAdminAddressService,
   OcProductService,
-  PriceBreak,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -16,20 +15,17 @@ import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCircle, faHeart, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCircle, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
 import { ProductService } from '@app-seller/products/product.service';
 import { SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { ValidateMinMax } from '@app-seller/validators/validators';
-import { StaticContent } from 'marketplace-javascript-sdk/dist/models/StaticContent';
 import { Location } from '@angular/common'
-import { ProductEditTabMapper, TabIndexMapper, setProductEditTab } from './tab-mapper';
+import { TabIndexMapper, setProductEditTab } from './tab-mapper';
 import { AppAuthService } from '@app-seller/auth';
 import { environment } from 'src/environments/environment';
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
-import { AssetAssignment } from 'marketplace-javascript-sdk/dist/models/AssetAssignment';
 import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
@@ -47,7 +43,10 @@ export class ProductEditComponent implements OnInit {
     if (product.ID) {
       this.handleSelectedProductChange(product);
     } else {
+      this.setTaxCodes(this.productService.emptyResource.Product.xp.Tax.Category)
       this.createProductForm(this.productService.emptyResource);
+      this._superMarketplaceProductEditable = this.productService.emptyResource;
+      this._superMarketplaceProductStatic = this.productService.emptyResource;
     }
   }
   @Input() readonly: boolean;
@@ -68,11 +67,11 @@ export class ProductEditComponent implements OnInit {
   faTimes = faTimes;
   faTrash = faTrash;
   faCircle = faCircle;
-  faCog = faCog;
   faHeart = faHeart;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
-  _myCurrency: SupportedRates;
+  supplierCurrency: SupportedRates;
+  sellerCurrency: SupportedRates;
   _exchangeRates: SupportedRates[];
   areChanges = false;
   taxCodeCategorySelected = false;
@@ -91,6 +90,7 @@ export class ProductEditComponent implements OnInit {
   newPriceBreakPrice = 0;
   newPriceBreakQty = 2;
   newProductPriceBreaks = [];
+  availableProductTypes = [];
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
@@ -104,7 +104,6 @@ export class ProductEditComponent implements OnInit {
     private modalService: NgbModal,
     private middleware: MiddlewareAPIService,
     private ocIntegrations: OcIntegrationsAPIService,
-    private toasterService: ToastrService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) { }
@@ -113,13 +112,8 @@ export class ProductEditComponent implements OnInit {
     // TODO: Eventually move to a resolve so that they are there before the component instantiates.
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
+    await this.getAvailableProductTypes();
     this.userContext = await this.currentUserService.getUserContext();
-    this._exchangeRates = await this.ocIntegrations.getAvailableCurrencies();
-    if (!this.readonly) {
-      // If a supplier, creating a product or viewing - grab currency from my supplier xp.
-      const myCurrencyCode = await (await this.currentUserService.getMySupplier()).xp?.Currency;
-      this._myCurrency = this._exchangeRates?.find(r => r.Currency === myCurrencyCode);
-    }
     this.setProductEditTab();
   }
 
@@ -130,9 +124,8 @@ export class ProductEditComponent implements OnInit {
 
   tabChanged(event: any, productID: string): void {
     if (productID === null) return;
-    event.index === 0 ? this.location.replaceState(`products/${productID}`)
-      :
-      this.location.replaceState(`products/${productID}/${TabIndexMapper[this.readonly ? event.index : event.index + 1]}`);
+    const newLocation = event.index === 0 ? `products/${productID}` : `products/${productID}/${TabIndexMapper[this.readonly ? event.index : event.index + 1]}`;
+    this.location.replaceState(newLocation);
   }
 
   async getAddresses(): Promise<void> {
@@ -144,9 +137,13 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
+  async setTaxCodes(taxCategory: string): Promise<any> {
+    this.taxCodes = await this.listTaxCodes(taxCategory, '', 1, 100);
+  }
+
   async refreshProductData(superProduct: SuperMarketplaceProduct): Promise<void> {
     // If a seller, and not editing the product, grab the currency from the product xp.
-    this._myCurrency = this._exchangeRates?.find(r => r.Currency === superProduct?.Product?.xp?.Currency);
+    this.supplierCurrency = this._exchangeRates?.find(r => r.Currency === superProduct?.Product?.xp?.Currency);
     // copying to break reference bugs
     this._superMarketplaceProductStatic = JSON.parse(JSON.stringify(superProduct));
     this._superMarketplaceProductEditable = JSON.parse(JSON.stringify(superProduct));
@@ -154,12 +151,7 @@ export class ProductEditComponent implements OnInit {
     if (
       this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
     ) {
-      const taxCategory =
-        this._superMarketplaceProductEditable.Product.xp.Tax.Category === 'FR000000'
-          ? this._superMarketplaceProductEditable.Product.xp.Tax.Category.substr(0, 2)
-          : this._superMarketplaceProductEditable.Product.xp.Tax.Category.substr(0, 1);
-      const avalaraTaxCodes = await this.listTaxCodes(taxCategory, '', 1, 100);
-      this.taxCodes = avalaraTaxCodes;
+      await this.setTaxCodes(this._superMarketplaceProductEditable.Product.xp.Tax.Category)
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
     }
@@ -210,11 +202,20 @@ export class ProductEditComponent implements OnInit {
     const quantityControl = this.productForm.get("QuantityAvailable");
     this.productForm.get("InventoryEnabled").valueChanges
     .subscribe(inventory => {
-      inventory ? quantityControl.setValidators([Validators.required, Validators.min(1)]) : quantityControl.setValidators(null); 
+      if(inventory) {
+        quantityControl.setValidators([Validators.required, Validators.min(1)]);
+      } else {
+        quantityControl.setValidators(null); 
+      }
       quantityControl.updateValueAndValidity()
     })
   }
 
+  async getAvailableProductTypes(): Promise<void> {
+    const supplier = await this.currentUserService.getMySupplier();
+    this.availableProductTypes = supplier.xp.ProductTypes || []; 
+  }
+  
   async handleSave(): Promise<void> {
     if (this.isCreatingNew) {
       await this.createNewProduct();
@@ -239,7 +240,6 @@ export class ProductEditComponent implements OnInit {
   async createNewProduct(): Promise<void> {
     try {
       this.dataIsSaving = true;
-      this.newProductPriceBreaks.forEach(pb => this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks.push(pb));
       const superProduct = await this.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
       if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
       if (this.staticContentFiles.length > 0) await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
@@ -265,16 +265,10 @@ export class ProductEditComponent implements OnInit {
         await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
       }
       this.dataIsSaving = false;
-      this.editPriceBreaks = false;
     } catch (ex) {
       this.dataIsSaving = false;
-      this.editPriceBreaks = false;
       throw ex;
     }
-  }
-
-  toggleEditPriceBreaks() {
-    this.editPriceBreaks = !this.editPriceBreaks;
   }
 
   updateProductResource(productUpdate: any): void {
@@ -291,59 +285,6 @@ export class ProductEditComponent implements OnInit {
           ? event.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
-  }
-
-  handleUpdatePriceBreaks(event: any, field: string): void {
-    field === 'price' ? this.newPriceBreakPrice = event.target.value : this.newPriceBreakQty = event.target.value;
-  }
-
-  handlePriceBreakErrors(priceBreaks: PriceBreak[]): boolean {
-    let hasError = false;
-    if (priceBreaks.some(pb => pb.Price === Number(this.newPriceBreakPrice))) {
-      this.toasterService.error('A Price Break with that price already exists');
-      hasError = true;
-    }
-    if (priceBreaks.some(pb => pb.Quantity === Number(this.newPriceBreakQty))) {
-      this.toasterService.error('A Price Break with that quantity already exists');
-      hasError = true;
-    }
-    if (this.newPriceBreakQty < 2) {
-      this.toasterService.error('Please enter a quantity of two or more');
-      hasError = true;
-    }
-    return hasError;
-  }
-
-  addPriceBreak() {
-    const priceBreaks = this.isCreatingNew ? this.newProductPriceBreaks : this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks;
-    if (this.handlePriceBreakErrors(priceBreaks)) return;
-    priceBreaks.push({ Quantity: Number(this.newPriceBreakQty), Price: Number(this.newPriceBreakPrice) });
-    if (!this.isCreatingNew) {
-      const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: priceBreaks }
-      this.updateProductResource(productUpdate);
-    }
-  }
-
-  deletePriceBreak(priceBreak: PriceBreak) {
-    const priceBreaks = this.isCreatingNew ? this.newProductPriceBreaks : this._superMarketplaceProductEditable.PriceSchedule.PriceBreaks;
-    const i = priceBreaks.indexOf(priceBreak);
-    priceBreaks.splice(i, 1);
-    if (!this.isCreatingNew) {
-      const productUpdate = { field: 'PriceSchedule.PriceBreaks', value: priceBreaks }
-      this.updateProductResource(productUpdate);
-    }
-  }
-
-  getPriceBreakRange(index: number): string {
-    const priceBreaks = this.isCreatingNew ? this.newProductPriceBreaks : this._superMarketplaceProductEditable?.PriceSchedule.PriceBreaks;
-    if (!priceBreaks.length) return '';
-    const indexOfNextPriceBreak = index + 1;
-    if (indexOfNextPriceBreak < priceBreaks.length) {
-      8
-      return `${priceBreaks[index].Quantity} - ${priceBreaks[indexOfNextPriceBreak].Quantity - 1}`;
-    } else {
-      return `${priceBreaks[index].Quantity}+`;
-    }
   }
 
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
@@ -483,8 +424,7 @@ export class ProductEditComponent implements OnInit {
     this.resetTaxCodeAndDescription();
     this.handleUpdateProduct(event, 'Product.xp.Tax.Category');
     this._superMarketplaceProductEditable.Product.xp.Tax.Code = '';
-    const avalaraTaxCodes = await this.listTaxCodes(event.target.value, '', 1, 100);
-    this.taxCodes = avalaraTaxCodes;
+    await this.setTaxCodes(event.target.value)
   }
   // Reset TaxCode Code and Description if a new TaxCode Category is selected
   resetTaxCodeAndDescription(): void {
@@ -495,8 +435,7 @@ export class ProductEditComponent implements OnInit {
   async searchTaxCodes(searchTerm: string): Promise<void> {
     if (searchTerm === undefined) searchTerm = '';
     const taxCodeCategory = this._superMarketplaceProductEditable.Product.xp.Tax.Category;
-    const avalaraTaxCodes = await this.listTaxCodes(taxCodeCategory, searchTerm, 1, 100);
-    this.taxCodes = avalaraTaxCodes;
+    await this.setTaxCodes(taxCodeCategory)
   }
 
   async handleScrollEnd(searchTerm: string): Promise<void> {
@@ -536,6 +475,10 @@ export class ProductEditComponent implements OnInit {
   };
 
   async handleSelectedProductChange(product: Product): Promise<void> {
+    this._exchangeRates = await this.ocIntegrations.getAvailableCurrencies();
+    const currencyOnProduct = product.xp.Currency;
+    this.supplierCurrency = this._exchangeRates?.find(r => r.Currency === currencyOnProduct);
+    this.sellerCurrency = this._exchangeRates?.find(r => r.Currency === 'USD');
     const accessToken = await this.appAuthService.fetchToken().toPromise();
     const marketplaceProduct = await MarketplaceSDK.Products.Get(product.ID, accessToken);
     this.refreshProductData(marketplaceProduct);

@@ -41,7 +41,7 @@
         <div>
           <div class="d-flex justify-content-between align-items-center">
             <h4 *ngIf="!showGrid"
-                class="font-weight-bold">{{ _price  | currency: _priceBreaks[0]?.Price.Currency}}</h4>
+                class="font-weight-bold">{{ _price  | currency: _userCurrency}}</h4>
             <p *ngIf="!showGrid"
                class="text-muted ml-3 float-right">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
             <span class="badge badge-pill badge-warning"
@@ -62,7 +62,8 @@
                 <ocm-quantity-input class="d-inline-block mb-3 mr-3"
                                     (qtyChange)="qtyChange($event.detail)"
                                     [product]="_product"
-                                    [priceSchedule]="_priceSchedule">
+                                    [priceSchedule]="_priceSchedule"
+                                    [gridDisplay]="showGrid">
                 </ocm-quantity-input>
                 <button *ngIf="isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
@@ -105,14 +106,14 @@
           </div>
         </div>
       </div>
-      <div *ngIf="_priceBreaks.length > 1">
+      <div *ngIf="_priceBreaks && _priceBreaks.length > 1">
         <strong><span translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</span>: </strong>
         <div class=" border border-medium border-radius mb-3 p-2">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
             <span *ngFor="let priceBreak of _priceBreaks; let i = index"
                   class="font-weight-bold d-flex mt-2">{{ getPriceBreakRange(i) }}:
-              <p class="font-weight-normal ml-1 mr-4">{{priceBreak?.Price?.Price | currency: priceBreak?.Price?.Currency}}</p>
+              <p class="font-weight-normal ml-1 mr-4">{{priceBreak?.Price | currency: _userCurrency}}</p>
             </span>
           </div>
         </div>

@@ -4,13 +4,14 @@ using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
+using System.Linq;
 
 namespace Marketplace.Common.Commands
 {
     public interface IMarketplaceBuyerCommand
     {
         Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer buyer, string token);
-        Task<SuperMarketplaceBuyer> Get(string buyerID, string token);
+        Task<SuperMarketplaceBuyer> Get(string buyerID, string token = null);
         Task<SuperMarketplaceBuyer> Update(string buyerID, SuperMarketplaceBuyer buyer, string token);
     }
     public class MarketplaceBuyerCommand : IMarketplaceBuyerCommand
@@ -48,9 +49,10 @@ namespace Marketplace.Common.Commands
             };
         }
 
-        public async Task<SuperMarketplaceBuyer> Get(string buyerID, string token)
+        public async Task<SuperMarketplaceBuyer> Get(string buyerID, string token = null)
         {
-            var buyer = await _oc.Buyers.GetAsync<MarketplaceBuyer>(buyerID, token);
+            var request = token != null ? _oc.Buyers.GetAsync<MarketplaceBuyer>(buyerID, token) : _oc.Buyers.GetAsync<MarketplaceBuyer>(buyerID);
+            var buyer = await request;
 
             // to move into content docs logic
             var markupPercent = buyer.xp?.MarkupPercent ?? 0;
@@ -80,6 +82,19 @@ namespace Marketplace.Common.Commands
                 BuyerID = ocBuyerID,
                 SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
             });
+
+            // list message senders
+            var msList = await _oc.MessageSenders.ListAsync();
+            // create message sender assignment
+            var assignmentList = msList.Items.Select(ms =>
+            {
+                return new MessageSenderAssignment
+                {
+                    MessageSenderID = ms.ID,
+                    BuyerID = ocBuyerID
+                };
+            });
+            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a));
 
             await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor" });
             await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" });

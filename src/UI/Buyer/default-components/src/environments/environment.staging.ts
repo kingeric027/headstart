@@ -12,6 +12,7 @@ export const environment: Environment = {
   marketplaceID: 'SEB',
   baseUrl: 'http://marketplace-buyer-ui-staging.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
   ordercloudEnv: OrdercloudEnv.Production,
