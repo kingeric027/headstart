@@ -59,8 +59,9 @@ namespace Marketplace.Common.Commands
 			await CreateIncrementors(impersonation.access_token); // must be before create buyers
 			await CreateBuyers(user, impersonation.access_token);
 			await CreateXPIndices(impersonation.access_token);
-			await CreateAndAssignIntegrationEvents(seed.ApiUrl, impersonation.access_token);
+			await CreateAndAssignIntegrationEvents(impersonation.access_token, seed.ApiUrl);
 			await CreateSuppliers(user, impersonation.access_token);
+			await SetUpSellerAuthentication(impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
 			return impersonation;
 		}
@@ -80,6 +81,33 @@ namespace Marketplace.Common.Commands
 			var createWH = CreateWebhooks(token, baseUrl);
 			var createIE = CreateAndAssignIntegrationEvents(token, baseUrl);
 			await Task.WhenAll(createMS, createWH, createIE);
+		}
+
+		private async Task SetUpSellerAuthentication(string token)
+		{
+			// delete default security profiles if they exist
+			try
+			{
+				await _oc.SecurityProfiles.DeleteAsync("buyerProfile1", token);
+			} catch(Exception ex){}
+
+			try
+			{
+				await _oc.SecurityProfiles.DeleteAsync("sellerProfile1", token);
+			} catch(Exception ex){}
+			foreach (var sellerCustomRole in SellerMarketplaceRoles)
+			{
+					await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+					{
+						SecurityProfileID = sellerCustomRole.ToString()
+					}, token);
+			}
+			
+			await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+			{ 
+				SecurityProfileID = "DefaultContext",
+				UserID = "Default_Admin"
+			}, token);
 		}
 
 		private async Task<AdminCompany> CreateOrganization(string token)
@@ -244,7 +272,7 @@ namespace Marketplace.Common.Commands
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
-			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" });
+			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" }, token);
 		}
 
 		public async Task CreateMarketPlaceRoles(string accessToken)
@@ -256,6 +284,13 @@ namespace Marketplace.Common.Commands
 			{
 				await _oc.SecurityProfiles.CreateAsync(profile, accessToken);
 			}
+
+			await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
+			{
+				Roles = new List<ApiRole> { ApiRole.FullAccess },
+				Name = "DefaultContext",
+				ID = "Defaultcontext"
+			});
 		}
 
 		public async Task DeleteAllWebhooks(string token)
@@ -441,10 +476,11 @@ namespace Marketplace.Common.Commands
 		};
 		
 		static readonly List<MarketplaceSecurityProfile> DefaultSecurityProfiles = new List<MarketplaceSecurityProfile>() {
+			
 			// seller/supplier
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin, ApiRole.InventoryAdmin, ApiRole.ProductFacetReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.PriceScheduleReader, ApiRole.ProductFacetReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductAdmin, Roles = new[] { ApiRole.ProductReader, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin, ApiRole.AdminAddressReader, ApiRole.PriceScheduleAdmin  } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.CatalogReader, ApiRole.ProductFacetReader} },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPPromotionAdmin, Roles = new[] { ApiRole.PromotionAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPPromotionReader, Roles = new[] { ApiRole.PromotionReader } },
@@ -478,6 +514,19 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationCreditCardAdmin },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationAddressAdmin },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationResaleCertAdmin }
+		};
+
+		static readonly List<CustomRole> SellerMarketplaceRoles = new List<CustomRole>() {
+			CustomRole.MPProductAdmin,
+			CustomRole.MPPromotionAdmin,
+			CustomRole.MPCategoryAdmin,
+			CustomRole.MPOrderAdmin,
+			CustomRole.MPShipmentAdmin,
+			CustomRole.MPBuyerAdmin,
+			CustomRole.MPSellerAdmin,
+			CustomRole.MPSupplierAdmin,
+			CustomRole.MPSupplierUserGroupAdmin,
+			CustomRole.MPReportReader
 		};
 	}
 }
