@@ -48,15 +48,4 @@ export class AddressService {
   async getCertificate(locationID: string): Promise<TaxCertificate> {
     return await MarketplaceSDK.Avalaras.GetCertificate(this.appConfig.avalaraCompanyId, locationID);
   }
-
-  async downloadCertificate(locationID: string): Promise<void> {
-    const test = await MarketplaceSDK.Avalaras.DownloadCertificate(this.appConfig.avalaraCompanyId, locationID);
-    const linkSource = `data:application/pdf;base64,${test}`;
-    const downloadLink = document.createElement('a');
-    const fileName = 'vct_illustration.pdf';
-
-    downloadLink.href = linkSource;
-    downloadLink.download = fileName;
-    downloadLink.click();
-  }
 }
