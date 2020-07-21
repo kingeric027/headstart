@@ -11,6 +11,5 @@ export const environment = {
   marketplaceID: 'SEB',
   cmsUrl: 'https://marktplacetest.blob.core.windows.net',
   orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
-  orderCloudAuthUrl: 'https://stagingauth.ordercloud.io/oauth/token',
   orderCloudApiVersion: 'v1',
 };

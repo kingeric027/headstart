@@ -68,7 +68,6 @@ namespace Marketplace.Common
 
 	public class OrderCloudSettings
 	{
-		public string AuthUrl { get; set; }
 		public string ApiUrl { get; set; }
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
