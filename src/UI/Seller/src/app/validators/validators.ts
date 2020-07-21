@@ -70,7 +70,7 @@ export function ValidateCAZip(control: AbstractControl): ValidationErrors | null
 }
 
 export function ValidateUSZip(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^[0-9]{5}$/.test(control.value);
+  const isValid = /^[0-9]{5}(?:-[0-9]{4})?$/.test(control.value);
   if (!control.value || isValid) {
     return null;
   }
