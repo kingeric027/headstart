@@ -2,7 +2,6 @@
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Models.Attributes;
-using Avalara.AvaTax.RestClient;
 using ordercloud.integrations.avalara;
 using Marketplace.Common.Commands;
 using ordercloud.integrations.library;

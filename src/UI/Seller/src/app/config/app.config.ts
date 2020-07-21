@@ -9,7 +9,6 @@ export const ocAppConfig: AppConfig = {
   middlewareUrl: environment.middlewareUrl,
   ocMiddlewareUrl: environment.ocMiddlewareUrl,
   orderCloudApiUrl: environment.orderCloudApiUrl,
-  orderCloudAuthUrl: environment.orderCloudAuthUrl,
   orderCloudApiVersion: environment.orderCloudApiVersion,
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: 'SEB Seller',
@@ -121,7 +120,6 @@ export interface AppConfig {
    */
 
   orderCloudApiUrl: string;
-  orderCloudAuthUrl: string;
   orderCloudApiVersion: string;
 
   scope: string[];
