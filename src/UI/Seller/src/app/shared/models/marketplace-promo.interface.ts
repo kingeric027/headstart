@@ -2,6 +2,7 @@ export interface PromotionXp {
   Type?: MarketplacePromoType;
   Value?: number;
   AppliesTo?: MarketplacePromoEligibility;
+  ScopeToSupplier?: boolean;
   Supplier?: string;
   Automatic?: boolean;
   MinReq?: MarketplacePromoMinRequirement;

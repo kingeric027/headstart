@@ -12,9 +12,8 @@ import {
   ValidateSupplierCategorySelection,
 } from '@app-seller/validators/validators';
 import { SupplierService } from '../supplier.service';
-import { MarketplaceSupplier } from 'marketplace-javascript-sdk';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { MarketplaceSupplier, MarketplaceSDK } from 'marketplace-javascript-sdk';
 export interface SupplierCategoryConfigFilters {
   Display: string;
   Path: string;
