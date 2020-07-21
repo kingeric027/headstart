@@ -101,24 +101,24 @@ export class MarketplaceModule {
   }
 
   private getOrdercloudSDKConfig(config: AppConfig): SdkConfiguration {
+    const version = 'v1';
     const apiUrl = this.getApiUrl(config.ordercloudEnv);
     return {
-      baseApiUrl: apiUrl,
-      baseAuthUrl: apiUrl,
+      baseApiUrl: `${apiUrl}/${version}`,
+      baseAuthUrl: `${apiUrl}/oauth/token`,
       clientID: config.clientID,
       cookieOptions: { prefix: config.appname.replace(/ /g, '_').toLowerCase() },
     };
   }
 
   private getApiUrl(env: OrdercloudEnv): string {
-    const version = 'v1';
     switch (env) {
       case OrdercloudEnv.Sandbox:
-        return `https://sandboxapi.ordercloud.io/${version}`;
+        return `https://sandboxapi.ordercloud.io`;
       case OrdercloudEnv.Staging:
-        return `https://stagingapi.ordercloud.io/${version}`;
+        return `https://stagingapi.ordercloud.io`;
       case OrdercloudEnv.Production:
-        return `https://api.ordercloud.io/${version}`;
+        return `https://api.ordercloud.io`;
     }
   }
 }
