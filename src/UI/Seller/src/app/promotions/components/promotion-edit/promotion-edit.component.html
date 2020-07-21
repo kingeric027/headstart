@@ -226,6 +226,7 @@
               <input type="checkbox"
                      class="custom-control-input"
                      (input)="toggleCapShipCost()"
+                     [checked]="capShipCost"
                      id="MaxShipCost">
               <label class="custom-control-label"
                      for="MaxShipCost">Exclude shipping rates over certain cost</label>
@@ -367,6 +368,7 @@
                    type="checkbox"
                    class="custom-control-input"
                    (input)="toggleHasExpiration()"
+                   [checked]="hasExpiration"
                    id="HasExpiration">
             <label class="custom-control-label"
                    for="HasExpiration">Set Expiration Date</label>
@@ -408,7 +410,7 @@
             <li *ngIf="_promotionEditable?.StartDate && _promotionEditable?.ExpirationDate">{{getDateRangeDisplay()}}</li>
             <li *ngIf="_promotionEditable?.xp?.MaxShipCost">Applies to shipping rates under {{_promotionEditable?.xp?.MaxShipCost | currency}}</li>
             <li>{{getEligibilityDisplay()}}</li>
-            <li *ngIf="_promotionEditable?.RedemptionLimit">{{getUsageLimitDisplay()}}</li>
+            <li *ngIf="_promotionEditable?.RedemptionLimit || _promotionEditable?.RedemptionLimitPerUser">{{getUsageLimitDisplay()}}</li>
             <li>{{_promotionEditable?.CanCombine ? 'Can be combined with other promotions' : 'Cannot be combined with other promotions'}}</li>
           </ul>
         </ng-container>

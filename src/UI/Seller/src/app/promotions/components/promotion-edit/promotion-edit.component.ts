@@ -77,21 +77,15 @@ export class PromotionEditComponent implements OnInit {
   }
 
   async setUpSuppliers(existingSupplierID?: string): Promise<void> {
-    if (!existingSupplierID) {
-      const supplierResponse = await this.ocSupplierService.List({pageSize: 100}).toPromise();
-      this.suppliers = supplierResponse.Items;
-      await this.selectSupplier(this.suppliers[0].ID);
-    } else {
-      await this.selectSupplier(existingSupplierID);
-    }
+    const supplierResponse = await this.ocSupplierService.List({pageSize: 100}).toPromise();
+    this.suppliers = supplierResponse.Items;
+    await this.selectSupplier(existingSupplierID || this.suppliers[0].ID);
   }
 
   async selectSupplier(supplierID: string): Promise<void> {
     const s = await this.ocSupplierService.Get(supplierID).toPromise();
     this.selectedSupplier = s;
-    this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
-    this.buildEligibleExpression();
-    this.buildValueExpression();
+    if (this._promotionEditable?.xp?.ScopeToSupplier) this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
   }
 
   createPromotionForm(promotion: Promotion) {
@@ -137,7 +131,7 @@ export class PromotionEditComponent implements OnInit {
     this._promotionEditable = this.promotionService.getUpdatedEditableResource(promoUpdate, resourceToUpdate);
     this.areChanges = this.promotionService.checkForChanges(this._promotionEditable, this._promotionStatic);
     this.buildValueExpression();
-    if (this._promotionEditable.xp?.MinReq?.Type || this._promotionEditable.xp?.MaxShipCost) this.buildEligibleExpression();
+    this.buildEligibleExpression();
   }
 
   promoTypeCheck(type: MarketplacePromoType): boolean {
@@ -192,7 +186,8 @@ export class PromotionEditComponent implements OnInit {
   getUsageLimitDisplay(): string {
     let usageLimitString = "Limit of";
     if (this._promotionEditable.RedemptionLimit) usageLimitString = `${usageLimitString} ${this._promotionEditable.RedemptionLimit} ${this._promotionEditable.RedemptionLimit > 1 ? 'uses' : 'use'}`;
-    if (this._promotionEditable.RedemptionLimitPerUser) usageLimitString = `${usageLimitString}, ${this._promotionEditable.RedemptionLimitPerUser} per user`
+    if (this._promotionEditable.RedemptionLimitPerUser) usageLimitString = `${usageLimitString} ${this._promotionEditable.RedemptionLimitPerUser} per user`
+    if (this._promotionEditable.RedemptionLimit && this._promotionEditable.RedemptionLimitPerUser) usageLimitString = `Limit of ${this._promotionEditable.RedemptionLimit} uses, ${this._promotionEditable.RedemptionLimitPerUser} per user`
     return usageLimitString;
   }
 
