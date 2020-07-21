@@ -47,7 +47,7 @@
 
         <ng-container *ngIf="!isUsingPriceOverride">
           <p class="font-italic mt-2">Prices will be shown to the buyer in the buyer user's currency after your markup percentage set for the buyer is applied.</p>
-          <p class="font-italic">Prices shown below are after the buyer markup and are in your currency of {{sellerCurrency.Currency}} which has an exchange rate of {{supplierToSellerCurrencyRate}} from the supplier's cost.</p>
+          <p class="font-italic">Prices shown below are after the buyer markup and are in your currency of {{sellerCurrency?.Currency}} which has an exchange rate of {{supplierToSellerCurrencyRate}} from the supplier's cost.</p>
           <p class="font-italic">Default markup for products for {{selectedSuperMarketplaceBuyer?.Buyer?.Name}} is {{selectedSuperMarketplaceBuyer?.Markup?.Percent || 0}} %</p>
 
           <price-break-editor [readonly]="true"
