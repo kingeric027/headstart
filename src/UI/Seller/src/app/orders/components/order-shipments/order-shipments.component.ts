@@ -24,7 +24,6 @@ export class OrderShipmentsComponent implements OnChanges {
   viewShipments = false;
   editShipFromAddress = false; // TO-DO - Use for editing Ship From address.
   shipmentForm: FormGroup;
-  quantityForm: FormGroup;
   shipments: ListShipment;
   shipmentItems: ListShipmentItem;
   selectedShipment: Shipment;
