@@ -56,7 +56,8 @@
             <div class="row align-items-sm-center">
               <div class="col-3 p-0">
                 <img class="img-thumbnail"
-                     [src]="getImageUrl(li.ID)" />
+                     [src]="li.xp?.LineItemImageUrl || getImageUrl(li.ID)" 
+                     alt="{{ li.Product.ID }}" />
               </div>
               <div class="col-9">
                 <h4>
