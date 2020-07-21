@@ -67,7 +67,7 @@ namespace ordercloud.integrations.cms
 			if (file != null) {			
 				await _blob.UploadAsset(container, file, asset);
 			}
-
+			asset.History = HistoryBuilder.OnCreate(user);
 			var newAsset = await _assetStore.AddAsync(asset);
 			return newAsset;
 		}
@@ -86,6 +86,8 @@ namespace ordercloud.integrations.cms
 			}
 			existingAsset.Tags = asset.Tags;
 			existingAsset.FileName = asset.FileName;
+			existingAsset.History = HistoryBuilder.OnUpdate(existingAsset.History, user);
+
 			// Intentionally don't allow changing the type. Could mess with assignments.
 			var updatedAsset = await _assetStore.UpdateAsync(existingAsset);
 			return updatedAsset;

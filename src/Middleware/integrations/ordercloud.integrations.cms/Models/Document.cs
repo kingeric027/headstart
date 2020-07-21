@@ -28,6 +28,8 @@ namespace ordercloud.integrations.cms
 		public string OwnerClientID { get; set; }
 		[Required]
 		public JObject Doc { get; set; }
+		[ApiReadOnly]
+		public History History { get; set; }
 
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{

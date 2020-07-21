@@ -85,6 +85,7 @@ namespace ordercloud.integrations.cms
 			document.OwnerClientID = user.ClientID;
 			document.SchemaID = schema.id;
 			document.SchemaSpecUrl = schema.Schema.GetValue("$id").ToString();
+			document.History = HistoryBuilder.OnCreate(user);
 			var newDocument = await _store.AddAsync(document);
 			return newDocument;
 		}
@@ -96,6 +97,8 @@ namespace ordercloud.integrations.cms
 			existingDocument.InteropID = document.InteropID;
 			existingDocument.Doc = document.Doc;
 			existingDocument = SchemaHelper.ValidateDocumentAgainstSchema(schema, existingDocument);
+			existingDocument.History = HistoryBuilder.OnUpdate(existingDocument.History, user);
+
 			var updatedDocument = await _store.UpdateAsync(existingDocument);
 			return updatedDocument;
 		}

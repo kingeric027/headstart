@@ -12,8 +12,8 @@ namespace ordercloud.integrations.cms
 		Task<AssetContainer> CreateDefaultIfNotExists(VerifiedUserContext user);
 		Task<ListPage<AssetContainer>> List(IListArgs args);
 		Task<AssetContainer> Get(string interopID);
-		Task<AssetContainer> Create(AssetContainer container);
-		Task<AssetContainer> Update(string interopID, AssetContainer container);
+		Task<AssetContainer> Create(AssetContainer container, VerifiedUserContext user);
+		Task<AssetContainer> Update(string interopID, AssetContainer container, VerifiedUserContext user);
 		Task Delete(string interopID);
 	}
 
@@ -55,23 +55,24 @@ namespace ordercloud.integrations.cms
 				Name = $"Container for API Client with ID {user.ClientID}"
 			};
 			var existingContainer = await GetWithoutExceptions(defaultContainer.InteropID);
-			return existingContainer ?? await Create(defaultContainer);
+			return existingContainer ?? await Create(defaultContainer, user);
 		}
 
-		public async Task<AssetContainer> Create(AssetContainer container)
+		public async Task<AssetContainer> Create(AssetContainer container, VerifiedUserContext user)
 		{
 			var matchingID = await GetWithoutExceptions(container.InteropID);
 			if (matchingID != null) throw new DuplicateIDException();
-
+			container.History = HistoryBuilder.OnCreate(user);
 			var newContainer = await _store.AddAsync(container);
 			return newContainer;
 		}
 
-		public async Task<AssetContainer> Update(string interopID, AssetContainer container)
+		public async Task<AssetContainer> Update(string interopID, AssetContainer container, VerifiedUserContext user)
 		{
 			var existingContainer = await Get(interopID);
 			existingContainer.InteropID = container.InteropID;
 			existingContainer.Name = container.Name;
+			existingContainer.History = HistoryBuilder.OnUpdate(container.History, user);
 			var updatedContainer = await _store.UpdateAsync(existingContainer);
 			return updatedContainer;
 		}

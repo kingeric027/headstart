@@ -63,6 +63,7 @@ namespace ordercloud.integrations.cms
 			if (matchingID != null) throw new DuplicateIDException();
 			schema = Validate(schema);
 			schema.OwnerClientID = user.ClientID;
+			schema.History = HistoryBuilder.OnCreate(user);
 			var newSchema = await _store.AddAsync(schema);
 			return newSchema;
 		}
@@ -74,6 +75,8 @@ namespace ordercloud.integrations.cms
 			existingSchema.RestrictedAssignmentTypes = schema.RestrictedAssignmentTypes;
 			existingSchema.Schema = schema.Schema;
 			existingSchema = Validate(existingSchema);
+			existingSchema.History = HistoryBuilder.OnUpdate(existingSchema.History, user);
+
 			var updatedContainer = await _store.UpdateAsync(existingSchema);
 			return updatedContainer;
 		}

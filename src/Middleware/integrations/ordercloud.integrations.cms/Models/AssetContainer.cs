@@ -22,6 +22,8 @@ namespace ordercloud.integrations.cms
 		public string InteropID { get; set; }
 		[Required, MaxLength(100)]
 		public string Name { get; set; }
+		[ApiReadOnly]
+		public History History { get; set; }
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{
 			return new Collection<UniqueKey>

@@ -32,6 +32,8 @@ namespace ordercloud.integrations.cms
 		public string FileName { get; set; } // Defaults to the file name in the upload. Or should be required?
 		[ApiReadOnly]
 		public AssetMetadata Metadata { get; set; }
+		[ApiReadOnly]
+		public History History { get; set; }
 
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{
