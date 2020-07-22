@@ -14,7 +14,9 @@ import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
-export const SUPPLIER_SUB_RESOURCE_LIST = ['users', 'locations'];
+export const SUPPLIER_SUB_RESOURCE_LIST = [{route: 'users', display: 'ADMIN.NAV.USERS'},
+                                           {route: 'locations', display: 'ALIAS.SUPPLIER_LOCATIONS'}];
+
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',

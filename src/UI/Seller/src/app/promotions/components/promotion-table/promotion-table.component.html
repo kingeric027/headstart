@@ -11,12 +11,16 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [labelSingular]="'ADMIN.NAV.PROMOTION'"
+                          [labelPlural]="'ADMIN.NAV.PROMOTIONS'">
   <table class="table table-hover resource-table">
     <thead>
       <tr>
-        <th scope="col">Name</th>
-        <th scope="col">ID</th>
+        <th scope="col"
+            translate>ADMIN.PROMOTIONS.NAME</th>
+        <th scope="col"
+            translate>ADMIN.PROMOTIONS.ID</th>
       </tr>
     </thead>
     <tbody>
@@ -29,7 +33,7 @@
         <td>{{promotion?.ID}}</td>
       </tr>
       <tr *ngIf="resourceList?.Meta?.Page < resourceList?.Meta?.TotalPages">
-        <td>More promotions</td>
+        <td transalte>ADMIN.PROMOTIONS.MORE_PROMOTIONS</td>
         <td></td>
       </tr>
     </tbody>

@@ -33,13 +33,12 @@
             LAYOUT.APP_HEADER.PRODUCTS
           </a>
         </li>
-        <!-- TO-DO - Change "Vendors" back to translation. -->
         <li class="nav-item clickable cursor-pointer">
           <a class="nav-link"
              [ngClass]="{ active: activePath === '/suppliers' }"
              (click)="isCollapsed = !isCollapsed"
              (click)="context.router.toSupplierList()"
-             translate>Vendors</a>
+             translate>ALIAS.SUPPLIERS</a>
         </li>
         <!-- Mobile Profile Menu Items -->
         <div *ngIf="screenSize === 'xs' || screenSize === 'sm'">
@@ -210,7 +209,7 @@
     </button>
 
     <ocm-search class="ml-3 mr-3 w-100"
-                [placeholderText]="'Search Products...'"
+                [placeholderText]="'Products'"
                 [searchTermInput]="searchTermForProducts"
                 (searched)="searchProducts($event.detail)">
     </ocm-search>
