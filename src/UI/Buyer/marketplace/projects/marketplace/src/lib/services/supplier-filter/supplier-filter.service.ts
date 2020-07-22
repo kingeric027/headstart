@@ -14,6 +14,7 @@ export class SupplierFilterService {
   public activeFiltersSubject: BehaviorSubject<SupplierFilters> = new BehaviorSubject<SupplierFilters>(
     this.getDefaultParms()
   );
+  public activeHiddenFilters: any = {};
 
   private readonly nonFilterQueryParams = ['page', 'sortBy', 'search'];
 
@@ -35,12 +36,18 @@ export class SupplierFilterService {
 
   async listSuppliers(): Promise<ListPage<Supplier>> {
     const { page, sortBy, search, supplierID, activeFilters } = this.activeFiltersSubject.value;
+    const allFilters = { ...activeFilters, ...this.activeHiddenFilters };
+    console.log(allFilters);
     return await Suppliers.List({
       page,
       search,
       sortBy,
-      filters: this.createFilters(activeFilters, supplierID),
+      filters: this.createFilters(allFilters, supplierID),
     });
+  }
+
+  setNonURLFilter(key: string, value: string): void {
+    this.activeHiddenFilters = { ...this.activeHiddenFilters, [key]: value };
   }
 
   toSupplier(supplierID: string): void {
@@ -63,6 +70,9 @@ export class SupplierFilterService {
     const newActiveFilters = { ...activeFilters, ...filter };
     this.patchFilterState({ activeFilters: newActiveFilters, page: undefined });
   }
+
+  addHiddenFilter(filter: any): void {}
+
   searchBy(searchTerm: string): void {
     this.patchFilterState({ search: searchTerm || undefined, page: undefined });
   }
