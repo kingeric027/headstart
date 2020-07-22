@@ -48,7 +48,7 @@ export class OCMOrderDetails implements OnInit {
     let qtyReturned = 0;
     let total = 0;
     this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
-      if (li.xp.LineItemReturnInfo) qtyReturned += li.xp.LineItemReturnInfo.QuantityToReturn;
+      if (li.xp?.LineItemReturnInfo) qtyReturned += li.xp.LineItemReturnInfo.QuantityToReturn;
       total += li.Quantity;
     });
     return (
@@ -111,7 +111,7 @@ export class OCMOrderDetails implements OnInit {
         Quantity: li.Quantity,
         Specs: li.Specs,
         xp: {
-          LineItemImageUrl: li.xp.LineItemImageUrl,
+          LineItemImageUrl: li.xp?.LineItemImageUrl,
         },
       };
     });

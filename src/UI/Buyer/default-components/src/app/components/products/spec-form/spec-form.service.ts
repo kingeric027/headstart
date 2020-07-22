@@ -74,8 +74,8 @@ export class SpecFormService {
   }
 
   public getLineItemImageUrl(product: SuperMarketplaceProduct): string {
-    const image = product.Images.find(img => this.isImageMatchingSpecs(img, product));
-    return image ? image.Url : getPrimaryImageUrl(product.Product);
+    const image = product.Images?.find(img => this.isImageMatchingSpecs(img, product));
+    return image?.Url;
   }
 
   private isImageMatchingSpecs(image: AssetForDelivery, product: SuperMarketplaceProduct): boolean {
