@@ -37,4 +37,12 @@ namespace ordercloud.integrations.cms
 			};
 		}
 	}
+
+	[SwaggerModel]
+	[CosmosCollection("documents")]
+	public class Document<TDoc> : Document
+	{
+		public new TDoc Doc { get; set; }
+
+	}
 }
