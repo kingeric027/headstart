@@ -87,7 +87,11 @@ namespace ordercloud.integrations.cms
 
 		private async Task<AssetedResource> GetExistingOrDefault(Resource resource)
 		{
-			return await GetExisting(resource) ?? new AssetedResource() { Resource = resource };
+			return await GetExisting(resource) ?? new AssetedResource() { 
+				ResourceID = resource.ID, 
+				ResourceParentID = resource.ParentID, 
+				ResourceType = resource.Type 
+			};
 		}
 
 		private async Task<AssetedResource> GetExisting(Resource resource)

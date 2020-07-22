@@ -1,5 +1,6 @@
 ﻿using Cosmonaut;
 using Cosmonaut.Extensions;
+using ordercloud.integrations.cms.Mappers;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System;
@@ -12,26 +13,26 @@ namespace ordercloud.integrations.cms
 {
 	public interface IDocumentAssignmentQuery
 	{
-		Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, IListArgs args, VerifiedUserContext user);
-		Task SaveAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user);
-		Task DeleteAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user);
+		Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, ListArgs<DocumentAssignment> args, VerifiedUserContext user);
+		Task<ListPage<DocumentAssignment>> ListAssignments(string schemaInteropID, ListArgs<DocumentAssignment> args, VerifiedUserContext user);
+		Task SaveAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user);
+		Task DeleteAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user);
 	}
 
 	public class DocumentAssignmentQuery : IDocumentAssignmentQuery
 	{
-		private readonly ICosmosStore<DocumentAssignment> _store;
+		private readonly ICosmosStore<DocumentAssignmentDO> _store;
 		private readonly IDocumentQuery _documents;
 		private readonly IDocumentSchemaQuery _schemas;
 
-
-		public DocumentAssignmentQuery(ICosmosStore<DocumentAssignment> store, IDocumentQuery documents, IDocumentSchemaQuery schemas)
+		public DocumentAssignmentQuery(ICosmosStore<DocumentAssignmentDO> store, IDocumentQuery documents, IDocumentSchemaQuery schemas)
 		{
 			_store = store;
 			_documents = documents;
 			_schemas = schemas;
 		}
 
-		public async Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, IListArgs args, VerifiedUserContext user) 
+		public async Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, ListArgs<DocumentAssignment> args, VerifiedUserContext user) 
 		{
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
@@ -43,7 +44,7 @@ namespace ordercloud.integrations.cms
 				.Where(doc => 
 					doc.SchemaID == schema.id && 
 					doc.RsrcID == resource.ID &&
-					doc.RsrcParentID == resource.ParentID &&
+					doc.ParentRsrcID == resource.ParentID &&
 					doc.RsrcType== resource.Type
 				);
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
@@ -58,45 +59,62 @@ namespace ordercloud.integrations.cms
 			};
 		}
 
-		public async Task SaveAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user)
+		public async Task<ListPage<DocumentAssignment>> ListAssignments(string schemaInteropID, ListArgs<DocumentAssignment> args, VerifiedUserContext user)
 		{
+			var schema = await _schemas.Get(schemaInteropID, user);
+			var arguments = args.MapTo();
+			var query = _store.Query()
+				.Search(arguments)
+				.Filter(arguments)
+				.Sort(arguments)
+				.Where(doc => doc.SchemaID == schema.id);
+			var list = await query.WithPagination(arguments.Page, arguments.PageSize).ToPagedListAsync();
+			var count = await query.CountAsync();
+			var assignments = list.ToListPage(arguments.Page, arguments.PageSize, count);
+			return DocumentAssignmentMapper.MapTo(assignments);
+		}
+
+		public async Task SaveAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user)
+		{
+			var resource = new Resource(assignment.ResourceType, assignment.ResourceID, assignment.ParentResourceID);
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
-			if (!isValidAssignment(schema.RestrictedAssignmentTypes, resource.Type))
+			if (!isValidAssignment(schema.RestrictedAssignmentTypes, assignment.ResourceType))
 			{
 				throw new InvalidAssignmentException(schema.RestrictedAssignmentTypes);
 			}
-			var document = await _documents.GetByInternalSchemaID(schema.id, documentInteropID, user);
-			await _store.UpsertAsync(new DocumentAssignment()
+			var document = await _documents.GetByInternalSchemaID(schema.id, assignment.DocumentID, user);
+			await _store.UpsertAsync(new DocumentAssignmentDO()
 			{
-				RsrcID = resource.ID,
-				RsrcParentID = resource.ParentID,
-				RsrcType = resource.Type,
+				RsrcID = assignment.ResourceID,
+				ParentRsrcID = assignment.ParentResourceID,
+				RsrcType = assignment.ResourceType,
 				ClientID = user.ClientID,
 				SchemaID = schema.id,
 				DocID = document.id
 			});
 		}
 
-		private bool isValidAssignment(List<ResourceType> restrictedAssignmentTypes, ResourceType thisType)
+		public async Task DeleteAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user)
 		{
-			return restrictedAssignmentTypes.Count == 0 || restrictedAssignmentTypes.Contains(thisType);
-		}
-
-		public async Task DeleteAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user)
-		{
+			var resource = new Resource(assignment.ResourceType, assignment.ResourceID, assignment.ParentResourceID);
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
-			var document = await _documents.GetByInternalSchemaID(schema.id, documentInteropID, user);
+			var document = await _documents.GetByInternalSchemaID(schema.id, assignment.DocumentID, user);
 			// TODO - what is the correct way to handle delete that doesn't exist?
 			await _store.RemoveAsync(assign =>
-				assign.RsrcID == resource.ID &&
-				assign.RsrcParentID == resource.ParentID &&
-				assign.RsrcType == resource.Type &&
+				assign.RsrcID == assignment.ResourceID &&
+				assign.ParentRsrcID == assignment.ParentResourceID &&
+				assign.RsrcType == assignment.ResourceType &&
 				assign.ClientID == user.ClientID &&
 				assign.SchemaID == schema.id &&
 				assign.DocID == document.id
 			);
+		}
+
+		private bool isValidAssignment(List<ResourceType> restrictedAssignmentTypes, ResourceType thisType)
+		{
+			return restrictedAssignmentTypes.Count == 0 || restrictedAssignmentTypes.Contains(thisType);
 		}
 	}
 }

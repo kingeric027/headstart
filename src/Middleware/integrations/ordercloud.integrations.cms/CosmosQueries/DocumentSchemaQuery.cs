@@ -77,8 +77,8 @@ namespace ordercloud.integrations.cms
 			existingSchema = Validate(existingSchema);
 			existingSchema.History = HistoryBuilder.OnUpdate(existingSchema.History, user);
 
-			var updatedContainer = await _store.UpdateAsync(existingSchema);
-			return updatedContainer;
+			var updatedSchema = await _store.UpdateAsync(existingSchema);
+			return updatedSchema;
 		}
 
 		public async Task Delete(string schemaInteropID, VerifiedUserContext user)

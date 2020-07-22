@@ -10,7 +10,10 @@ namespace ordercloud.integrations.cms
 	[CosmosCollection("assetedresource")]
 	public class AssetedResource : CosmosObject
 	{
-		public Resource Resource { get; set; } // Resource.ID is partition key. TODO - break up resource object? 
+		[CosmosPartitionKey]
+		public string ResourceID { get; set; }
+		public string ResourceParentID { get; set; }
+		public ResourceType ResourceType { get; set; }
 		public List<string> ImageAssetIDs { get; set; } = new List<string>();
 		public List<string> ThemeAssetIDs { get; set; } = new List<string>();
 		public List<string> AttachmentAssetIDs { get; set; } = new List<string>();
@@ -20,7 +23,7 @@ namespace ordercloud.integrations.cms
 		{
 			return new Collection<UniqueKey>
 			{
-				new UniqueKey() { Paths = new Collection<string> { "/Resource/ID", "/Resource/Type", "/Resource/ParentID" }}
+				new UniqueKey() { Paths = new Collection<string> { "/ResourceID", "/ResourceType", "/ResourceParentID" }}
 			};
 		}
 	}

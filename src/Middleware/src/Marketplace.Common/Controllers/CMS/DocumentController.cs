@@ -18,10 +18,12 @@ namespace Marketplace.Common.Controllers.CMS
 	public class DocumentController : BaseController
 	{
 		private readonly IDocumentQuery _documents;
+		private readonly IDocumentAssignmentQuery _assignments;
 
-		public DocumentController(AppSettings settings, IDocumentQuery schemas) : base(settings)
+		public DocumentController(AppSettings settings, IDocumentQuery schemas, IDocumentAssignmentQuery assignments) : base(settings)
 		{
 			_documents = schemas;
+			_assignments = assignments;
 		}
 
 		[DocName("List Documents")]
@@ -58,6 +60,27 @@ namespace Marketplace.Common.Controllers.CMS
 		public async Task Delete(string schemaID, string documentID)
 		{
 			await _documents.Delete(schemaID, documentID, VerifiedUserContext);
+		}
+
+		[DocName("List Document Assignments")]
+		[HttpGet, Route("assignments"), OrderCloudIntegrationsAuth]
+		public async Task<ListPage<DocumentAssignment>> ListAssignments(string schemaID, ListArgs<DocumentAssignment> args)
+		{
+			return await _assignments.ListAssignments(schemaID, args, VerifiedUserContext);
+		}
+
+		[DocName("Create Document Assignment")]
+		[HttpPost, Route("assignments"), OrderCloudIntegrationsAuth]
+		public async Task SaveAssignment(string schemaID, [FromBody] DocumentAssignment assignment)
+		{
+			await _assignments.SaveAssignment(schemaID, assignment, VerifiedUserContext);
+		}
+
+		[DocName("Delete Document Assignment")]
+		[HttpDelete, Route("assignments"), OrderCloudIntegrationsAuth]
+		public async Task DeleteAssignment(string schemaID, [FromQuery] DocumentAssignment assignment)
+		{
+			await _assignments.DeleteAssignment(schemaID, assignment, VerifiedUserContext);
 		}
 	}
 }

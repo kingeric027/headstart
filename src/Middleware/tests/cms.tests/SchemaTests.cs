@@ -26,7 +26,7 @@ namespace CMS.Tests
 
 		[Test, TestCase(@"{
                 'name': 'Spider Man',
-				'roles': ['superhero', 'arachnid']
+				'roles': ['superhero', 'chnid']
 				}")]
 		public async Task valid_documents_produce_no_errors(string document)
 		{
