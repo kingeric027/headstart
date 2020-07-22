@@ -66,7 +66,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
-                var response = await _oc.Products.SaveAsync<Product>(wi.RecordId, obj, wi.Token);
+                var response = await _oc.Products.SaveAsync<Product>(wi.RecordId, obj.Product, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
@@ -86,7 +86,7 @@ namespace Marketplace.Common.Commands
             var obj = wi.Diff.ToObject<SuperMarketplaceProduct>(OrchestrationSerializer.Serializer);
             try
             {
-                var response = await _oc.Products.PatchAsync(wi.RecordId, obj, wi.Token);
+                var response = await _oc.Products.PatchAsync(wi.RecordId, new PartialMarketplaceProduct(), wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)
