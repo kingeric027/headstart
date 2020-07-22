@@ -22,6 +22,7 @@ export class OCMLineitemTable {
   }
   @Input() orderType: OrderType;
   @Input() readOnly: boolean;
+  @Input() hideStatus = false;
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
   updatingLiIDs: string[] = [];
