@@ -76,10 +76,11 @@ namespace ordercloud.integrations.cms
 
 		public async Task SaveAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user)
 		{
-			var resource = new Resource(assignment.ResourceType, assignment.ResourceID, assignment.ParentResourceID);
+			var resourceType = assignment.ResourceType ?? 0; // "Required" validation should prevent null ResourceType
+			var resource = new Resource(resourceType, assignment.ResourceID, assignment.ParentResourceID);
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
-			if (!isValidAssignment(schema.RestrictedAssignmentTypes, assignment.ResourceType))
+			if (!isValidAssignment(schema.RestrictedAssignmentTypes, resourceType))
 			{
 				throw new InvalidAssignmentException(schema.RestrictedAssignmentTypes);
 			}
@@ -88,7 +89,7 @@ namespace ordercloud.integrations.cms
 			{
 				RsrcID = assignment.ResourceID,
 				ParentRsrcID = assignment.ParentResourceID,
-				RsrcType = assignment.ResourceType,
+				RsrcType = resourceType,
 				ClientID = user.ClientID,
 				SchemaID = schema.id,
 				DocID = document.id
@@ -97,7 +98,8 @@ namespace ordercloud.integrations.cms
 
 		public async Task DeleteAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user)
 		{
-			var resource = new Resource(assignment.ResourceType, assignment.ResourceID, assignment.ParentResourceID);
+			var resourceType = assignment.ResourceType ?? 0; // "Required" validation should prevent null ResourceType
+			var resource = new Resource(resourceType, assignment.ResourceID, assignment.ParentResourceID);
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
 			var document = await _documents.GetByInternalSchemaID(schema.id, assignment.DocumentID, user);

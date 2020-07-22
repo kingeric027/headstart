@@ -15,7 +15,7 @@ namespace ordercloud.integrations.cms
 		[Required]
 		public string ResourceID { get; set; }
 		[Required]
-		public ResourceType ResourceType { get; set; }
+		public ResourceType? ResourceType { get; set; } // nullable so the required validation works
 		public string ParentResourceID { get; set; } = null;
 		[Required]
 		public string DocumentID { get; set; }
