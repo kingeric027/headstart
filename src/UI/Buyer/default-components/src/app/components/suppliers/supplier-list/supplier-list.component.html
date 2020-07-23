@@ -15,21 +15,23 @@
         <div class="d-flex align-items-center justify-content-start">
           <ng-template #filters>
             <div>
-              <div *ngIf="_supplierCategoryConfig">
+              <div *ngIf="_supplierFilterConfig">
                 <form class="d-flex flex-column"
                       [formGroup]="filterForm">
-                  <div *ngFor="let filter of _supplierCategoryConfig.Filters"
-                       class="group">
-                    <select class="form-control input-sm"
-                            type="select"
-                            required
-                            [formControlName]="filter.Path">
-                      <option *ngFor="let option of filter.Items"
-                              value="{{option.Value}}">{{option.Text}}</option>
-                    </select>
-                    <span class="highlight"></span>
-                    <label>{{filter.Display}}</label>
-                  </div>
+                  <ng-container *ngFor="let filter of _supplierFilterConfig">
+                    <div *ngIf="filter.BuyerAppFilterType === 'SelectOption'"
+                         class="group">
+                      <select class="form-control input-sm"
+                              type="select"
+                              required
+                              [formControlName]="filter.Path">
+                        <option *ngFor="let option of filter.Items"
+                                value="{{option.Value}}">{{option.Text}}</option>
+                      </select>
+                      <span class="highlight"></span>
+                      <label>{{filter.Display}}</label>
+                    </div>
+                  </ng-container>
                 </form>
               </div>
               <div class="d-flex justify-content-between align-items-center">
