@@ -102,8 +102,6 @@
                             formControlName="PurchaseOrder"
                             (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.PurchaseOrder')">Purchase Order</mat-checkbox>
             </div>
-
-            <div>{{supplierEditable | json}}</div>
             <ng-container *ngIf="countriesServicingOptions.length">
               <div>
                 <div class="mt-4 w-100">
