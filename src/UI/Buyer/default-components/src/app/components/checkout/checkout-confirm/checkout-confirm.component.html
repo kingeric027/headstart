@@ -19,7 +19,8 @@
     </div>
   </div>
   <ocm-lineitem-table [lineItems]="lineItems?.Items"
-                      [readOnly]="true">
+                      [readOnly]="true"
+                      [hideStatus]="true">
   </ocm-lineitem-table>
   <form *ngIf="!isAnon"
         novalidate
