@@ -28,10 +28,10 @@ export class OrderShipmentsComponent implements OnChanges {
   shipmentItems: ListShipmentItem;
   selectedShipment: Shipment;
   supplierAddresses: ListAddress;
-  quantities: number[] = [];
   lineItems: LineItem[];
   isSaving = false;
   isSellerUser = false;
+  shipAllItems = false;
   @Input()
   orderDirection: string;
   @Input()
@@ -69,7 +69,12 @@ export class OrderShipmentsComponent implements OnChanges {
       // FromAddressID: new FormControl(''),
       Shipper: new FormControl(''),
       Service: new FormControl(''),
+      Quantities: new FormGroup({})
     });
+    const group = this.shipmentForm.get('Quantities') as FormGroup;
+    this.lineItems.forEach((item) => {
+      group.addControl(item.ID, new FormControl(0))
+    })
   }
 
   getCurrentDate(): string {
@@ -86,7 +91,6 @@ export class OrderShipmentsComponent implements OnChanges {
   }
 
   toggleCreateShipment(): void {
-    this.populateLineItemQuantities(this.lineItems);
     this.getSupplierAddresses();
     this.setShipmentForm();
     this.createShipment = !this.createShipment;
@@ -130,8 +134,9 @@ export class OrderShipmentsComponent implements OnChanges {
 
   async patchLineItems(): Promise<void> {
     const lineItemsToPatch = [];
-    this.lineItems.forEach(async (li, i) => {
-      if (this.quantities[i] > 0 && this.quantities[i] === li.Quantity) {
+    const quantities = this.shipmentForm.value.Quantities;
+    this.lineItems.forEach(async (li) => {
+      if (quantities[li.ID] > 0 && quantities[li.ID] === li.Quantity) {
         lineItemsToPatch.push(this.ocLineItemService.Patch(this.orderDirection, this.order.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Complete } }).toPromise());
       }
     });
@@ -145,10 +150,6 @@ export class OrderShipmentsComponent implements OnChanges {
 
   async getShipmentItems(shipmentID: string): Promise<void> {
     this.shipmentItems = await this.ocShipmentService.ListItems(shipmentID).toPromise();
-  }
-
-  populateLineItemQuantities(lineItems: LineItem[]): void {
-    this.quantities = Array(lineItems.length).fill(0);
   }
 
   getImageUrl(lineItem: LineItem): string {
@@ -196,12 +197,22 @@ export class OrderShipmentsComponent implements OnChanges {
     return quantityList;
   }
 
-  setQuantityToShip(i: number, quantity: number): void {
-    this.quantities[i] = quantity;
+  toggleShipAllItems(): void {
+    this.shipAllItems = !this.shipAllItems;
+    if( this.shipAllItems ) {
+      this.lineItems.forEach(item => {
+        this.shipmentForm.patchValue({
+          Quantities: {
+            [item.ID]: (item.Quantity - item.QuantityShipped) 
+          }
+        })
+      })
+    }
   }
 
   async onSubmit(): Promise<void> {
     this.isSaving = true;
+    const shipment = this.shipmentForm.getRawValue();
     const shipDate = this.shipmentForm.value.ShipDate;
     this.shipmentForm.value.ShipDate = null;
     const accessToken = await this.appAuthService.fetchToken().toPromise();
@@ -212,11 +223,13 @@ export class OrderShipmentsComponent implements OnChanges {
       })
     };
     const superShipment = {
-      Shipment: { ...this.shipmentForm.value, xp: { Service: this.shipmentForm.value.Service } },
-      ShipmentItems: this.lineItems.map((li, i) => {
-        if (this.quantities[i] > 0) {
-          return { LineItemID: li.ID, OrderID: this.order.ID, QuantityShipped: this.quantities[i] }
-        }
+      Shipment: { TrackingNumber: shipment.TrackingNumber,
+                  ShipDate: shipment.ShipDate,
+                  Cost: shipment.Cost,
+                  Shipper: shipment.Shipper,
+                   xp: { Service: this.shipmentForm.value.Service } },
+      ShipmentItems: this.lineItems.map((li) => {
+          return { LineItemID: li.ID, OrderID: this.order.ID, QuantityShipped: shipment.Quantities[li.ID] }
       }).filter(li => li !== undefined)
     }
     this.patchLineItems();
@@ -233,7 +246,8 @@ export class OrderShipmentsComponent implements OnChanges {
     if (shipment.value.TrackingNumber === '') return true;
     if (shipment.value.ShipDate === '') return true;
     if (shipment.value.Shipper === '') return true;
-    const validQuantity = this.quantities.find(qty => qty > 0);
+    const quantities = this.shipmentForm.value.Quantities;
+    const validQuantity = Object.values(quantities).find(qty => qty > 0);
     if (!validQuantity) return true;
     if (this.isSaving) return true;
   }

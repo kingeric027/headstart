@@ -199,8 +199,13 @@
 
   </div>
   <hr/>
-  <h5 class="mt-4 mb-3 font-weight-bold">2) Set Quantity to Ship</h5>
-  <div *ngFor="let li of lineItems; let i = index">
+  <h5 class="mt-4 mb-3 font-weight-bold inline-header">2) Set Quantity to Ship</h5>
+  <mat-checkbox class="align-right"
+                aria-describedby="shipAllItems"
+                color="primary"
+                aria-checked="shipAllItems"
+                (change)="toggleShipAllItems()">Ship All Items</mat-checkbox>
+  <div *ngFor="let li of lineItems; let i = index" formGroupName="Quantities">
     <div *ngIf="li.Quantity !== li.QuantityShipped" 
           class="mt-5 row align-items-center">
       <div class="col-sm-12">
@@ -222,8 +227,10 @@
               <div class="float-right mr-2">
               <h6>Quantity</h6>
             <select type="dropdown"
+                    [attr.disabled]="shipAllItems ? true : null"
                     class="form-control"
-                    (change)="setQuantityToShip(i, $event.target.value)">
+                    formControlName="{{li.ID}}"
+                    id="{{li.ID}}">
                 <option [value]="0">Do Not Ship</option>
                 <option *ngFor="let j of getQuantityDropdown(li.Quantity - li.QuantityShipped)"
                         [value]="j">{{j}}
