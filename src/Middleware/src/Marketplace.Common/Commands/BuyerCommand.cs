@@ -103,7 +103,7 @@ namespace Marketplace.Common.Commands
             {
                 BuyerID = ocBuyer.ID,
                 CatalogID = ocBuyer.ID,
-                ViewAllCategories = false,
+                ViewAllCategories = true,
                 ViewAllProducts = false
             });
             return buyer;
