@@ -37,7 +37,6 @@ export class SupplierFilterService {
   async listSuppliers(): Promise<ListPage<Supplier>> {
     const { page, sortBy, search, supplierID, activeFilters } = this.activeFiltersSubject.value;
     const allFilters = { ...activeFilters, ...this.activeHiddenFilters };
-    console.log(allFilters);
     return await Suppliers.List({
       page,
       search,
