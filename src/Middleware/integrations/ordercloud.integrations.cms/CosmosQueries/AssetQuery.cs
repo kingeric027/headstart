@@ -15,29 +15,29 @@ namespace ordercloud.integrations.cms
 {
 	public interface IAssetQuery
 	{
-		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
-		Task<List<Asset>> ListByInternalIDs(IEnumerable<string> assetIDs);
-		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
-		Task<Asset> GetByInternalID(string assetID); // real id
-		Task<Asset> Create(AssetUpload form, VerifiedUserContext user);
-		Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user);
+		Task<ListPage<AssetDO>> List(IListArgs args, VerifiedUserContext user);
+		Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs);
+		Task<AssetDO> Get(string assetInteropID, VerifiedUserContext user);
+		Task<AssetDO> GetByInternalID(string assetID); // real id
+		Task<AssetDO> Create(AssetUpload form, VerifiedUserContext user);
+		Task<AssetDO> Update(string assetInteropID, AssetDO asset, VerifiedUserContext user);
 		Task Delete(string assetInteropID, VerifiedUserContext user);
 	}
 
 	public class AssetQuery : IAssetQuery
 	{
-		private readonly ICosmosStore<Asset> _assetStore;
+		private readonly ICosmosStore<AssetDO> _assetStore;
 		private readonly IAssetContainerQuery _containers;
 		private readonly IBlobStorage _blob;
 
-		public AssetQuery(ICosmosStore<Asset> assetStore, IAssetContainerQuery containers, IBlobStorage blob)
+		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers, IBlobStorage blob)
 		{
 			_assetStore = assetStore;
 			_containers = containers;
 			_blob = blob;
 		}
 
-		public async Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user)
+		public async Task<ListPage<AssetDO>> List(IListArgs args, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var query = _assetStore.Query(GetFeedOptions(container.id))
@@ -50,7 +50,7 @@ namespace ordercloud.integrations.cms
 			return listPage;
 		}
 
-		public async Task<Asset> Get(string assetInteropID, VerifiedUserContext user)
+		public async Task<AssetDO> Get(string assetInteropID, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
@@ -58,7 +58,7 @@ namespace ordercloud.integrations.cms
 			return asset;
 		}
 
-		public async Task<Asset> Create(AssetUpload form, VerifiedUserContext user)
+		public async Task<AssetDO> Create(AssetUpload form, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var (asset, file) = AssetMapper.MapFromUpload(_blob.Config, container, form);
@@ -72,7 +72,7 @@ namespace ordercloud.integrations.cms
 			return newAsset;
 		}
 
-		public async Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user)
+		public async Task<AssetDO> Update(string assetInteropID, AssetDO asset, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
@@ -101,20 +101,20 @@ namespace ordercloud.integrations.cms
 			await _blob.OnAssetDeleted(container, asset.id);
 		}
 
-		public async Task<List<Asset>> ListByInternalIDs(IEnumerable<string> assetIDs)
+		public async Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs)
 		{
 			var assets = await _assetStore.FindMultipleAsync(assetIDs);
 			return assets.ToList();
 		}
 
-		public async Task<Asset> GetByInternalID(string assetID)
+		public async Task<AssetDO> GetByInternalID(string assetID)
 		{
 			var asset = await _assetStore.Query($"select top 1 * from c where c.id = @id", new { id = assetID }).FirstOrDefaultAsync();
 			if (asset == null) throw new NotImplementedException(); // Why not implemented instead of not found?
 			return asset;
 		}
 
-		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)
+		private async Task<AssetDO> GetWithoutExceptions(string containerID, string assetInteropID)
 		{
 			var query = $"select top 1 * from c where c.InteropID = @id";
 			var asset = await _assetStore.Query(query, new { id = assetInteropID }, GetFeedOptions(containerID)).FirstOrDefaultAsync();

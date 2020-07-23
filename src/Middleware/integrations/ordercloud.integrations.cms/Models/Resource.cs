@@ -1,21 +1,26 @@
-﻿using System;
+﻿using ordercloud.integrations.library;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Json.Serialization;
 
 namespace ordercloud.integrations.cms
 {
+	[SwaggerModel]
 	public class Resource
 	{
 		public Resource(ResourceType type, string id, string parentID = null)
 		{
-			Type = type;
-			ID = id;
-			ParentID = parentID;
+			ResourceType = type;
+			ResourceID = id;
+			ParentResourceID = parentID;
 		}
-		public string ID { get; set; }
-		public string ParentID { get; set; } = null;
-		public ResourceType Type { get; set; }
+		[Required]
+		public string ResourceID { get; set; }
+		public string ParentResourceID { get; set; } = null;
+		[Required]
+		public ResourceType? ResourceType { get; set; }
 	}
 
 	public enum ResourceType

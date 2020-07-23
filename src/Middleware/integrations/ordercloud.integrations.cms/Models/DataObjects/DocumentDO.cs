@@ -16,7 +16,7 @@ namespace ordercloud.integrations.cms
 {
 	[SwaggerModel]
 	[CosmosCollection("documents")]
-	public class Document: CosmosObject
+	public class DocumentDO: CosmosObject
 	{
 		[JsonProperty("ID"), CosmosInteropID, Required]
 		public string InteropID { get; set; }

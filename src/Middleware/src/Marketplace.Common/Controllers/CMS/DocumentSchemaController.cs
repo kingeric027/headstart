@@ -25,14 +25,14 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("List Document Schemas")]
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<ListPage<DocumentSchema>> List(ListArgs<DocumentSchema> args)
+		public async Task<ListPage<DocumentSchemaDO>> List(ListArgs<DocumentSchemaDO> args)
 		{
 			return await _schemas.List(args, VerifiedUserContext);
 		}
 
 		[DocName("Get a Document Schema")]
 		[HttpGet, Route("{schemaID}"), OrderCloudIntegrationsAuth]
-		public async Task<DocumentSchema> Get(string schemaID)
+		public async Task<DocumentSchemaDO> Get(string schemaID)
 		{
 			return await _schemas.Get(schemaID, VerifiedUserContext);
 		}
@@ -40,14 +40,14 @@ namespace Marketplace.Common.Controllers.CMS
 		[DocName("Create a Document Schema")]
 		[DocIgnore]
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<DocumentSchema> Create([FromBody] DocumentSchema schema)
+		public async Task<DocumentSchemaDO> Create([FromBody] DocumentSchemaDO schema)
 		{
 			return await _schemas.Create(schema, VerifiedUserContext);
 		}
 
 		[DocName("Update a Document Schema")]
 		[HttpPut, Route("{schemaID}"), OrderCloudIntegrationsAuth]
-		public async Task<DocumentSchema> Update(string schemaID, [FromBody] DocumentSchema schema)
+		public async Task<DocumentSchemaDO> Update(string schemaID, [FromBody] DocumentSchemaDO schema)
 		{
 			return await _schemas.Update(schemaID, schema, VerifiedUserContext);
 		}

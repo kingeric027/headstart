@@ -13,7 +13,7 @@ namespace ordercloud.integrations.cms
 {
 	public interface IDocumentAssignmentQuery
 	{
-		Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, ListArgs<DocumentAssignment> args, VerifiedUserContext user);
+		Task<List<DocumentDO>> ListDocuments(string schemaInteropID, Resource resource, VerifiedUserContext user);
 		Task<ListPage<DocumentAssignment>> ListAssignments(string schemaInteropID, ListArgs<DocumentAssignment> args, VerifiedUserContext user);
 		Task SaveAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user);
@@ -32,31 +32,21 @@ namespace ordercloud.integrations.cms
 			_schemas = schemas;
 		}
 
-		public async Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, ListArgs<DocumentAssignment> args, VerifiedUserContext user) 
+		public async Task<List<DocumentDO>> ListDocuments(string schemaInteropID, Resource resource, VerifiedUserContext user) 
 		{
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
 			var schema = await _schemas.Get(schemaInteropID, user);
-			var query = _store.Query()
-				.Search(args)
-				.Filter(args)
-				.Sort(args)
+			var assignments = await _store.Query()
 				.Where(doc => 
 					doc.SchemaID == schema.id && 
-					doc.RsrcID == resource.ID &&
-					doc.ParentRsrcID == resource.ParentID &&
-					doc.RsrcType== resource.Type
-				);
-			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
-			var count = await query.CountAsync();
-			var assignments = list.ToListPage(args.Page, args.PageSize, count);
-			var documentIDs = assignments.Items.Select(assign => assign.DocID);
+					doc.RsrcID == resource.ResourceID &&
+					doc.ParentRsrcID == resource.ParentResourceID &&
+					doc.RsrcType== resource.ResourceType
+				).ToListAsync();
+			var documentIDs = assignments.Select(assign => assign.DocID);
 			var documents = await _documents.ListByInternalIDs(documentIDs);
-			return new ListPage<Document>()
-			{
-				Items = documents,
-				Meta = assignments.Meta
-			};
+			return documents;
 		}
 
 		public async Task<ListPage<DocumentAssignment>> ListAssignments(string schemaInteropID, ListArgs<DocumentAssignment> args, VerifiedUserContext user)
@@ -76,11 +66,10 @@ namespace ordercloud.integrations.cms
 
 		public async Task SaveAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user)
 		{
-			var resourceType = assignment.ResourceType ?? 0; // "Required" validation should prevent null ResourceType
-			var resource = new Resource(resourceType, assignment.ResourceID, assignment.ParentResourceID);
+			var resource = assignment.MapToResource();
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
-			if (!isValidAssignment(schema.RestrictedAssignmentTypes, resourceType))
+			if (!isValidAssignment(schema.RestrictedAssignmentTypes, resource.Type))
 			{
 				throw new InvalidAssignmentException(schema.RestrictedAssignmentTypes);
 			}
@@ -89,7 +78,7 @@ namespace ordercloud.integrations.cms
 			{
 				RsrcID = assignment.ResourceID,
 				ParentRsrcID = assignment.ParentResourceID,
-				RsrcType = resourceType,
+				RsrcType = resource.Type,
 				ClientID = user.ClientID,
 				SchemaID = schema.id,
 				DocID = document.id
@@ -98,8 +87,7 @@ namespace ordercloud.integrations.cms
 
 		public async Task DeleteAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user)
 		{
-			var resourceType = assignment.ResourceType ?? 0; // "Required" validation should prevent null ResourceType
-			var resource = new Resource(resourceType, assignment.ResourceID, assignment.ParentResourceID);
+			var resource = assignment.MapToResource();
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
 			var document = await _documents.GetByInternalSchemaID(schema.id, assignment.DocumentID, user);

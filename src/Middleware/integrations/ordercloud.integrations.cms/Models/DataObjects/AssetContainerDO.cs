@@ -14,7 +14,7 @@ using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribut
 namespace ordercloud.integrations.cms
 {
 	[CosmosCollection("assetcontainers")]
-	public class AssetContainer : CosmosObject 
+	public class AssetContainerDO : CosmosObject 
 	{
 		[CosmosPartitionKey, ApiIgnore]
 		public string SinglePartitionID => AssetContainerQuery.SinglePartitionID; // TODO - is there a better way to indicate there should only be one partition?

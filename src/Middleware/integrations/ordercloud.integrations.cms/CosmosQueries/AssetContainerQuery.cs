@@ -9,27 +9,27 @@ namespace ordercloud.integrations.cms
 {
 	public interface IAssetContainerQuery
 	{
-		Task<AssetContainer> CreateDefaultIfNotExists(VerifiedUserContext user);
-		Task<ListPage<AssetContainer>> List(IListArgs args);
-		Task<AssetContainer> Get(string interopID);
-		Task<AssetContainer> Create(AssetContainer container, VerifiedUserContext user);
-		Task<AssetContainer> Update(string interopID, AssetContainer container, VerifiedUserContext user);
+		Task<AssetContainerDO> CreateDefaultIfNotExists(VerifiedUserContext user);
+		Task<ListPage<AssetContainerDO>> List(IListArgs args);
+		Task<AssetContainerDO> Get(string interopID);
+		Task<AssetContainerDO> Create(AssetContainerDO container, VerifiedUserContext user);
+		Task<AssetContainerDO> Update(string interopID, AssetContainerDO container, VerifiedUserContext user);
 		Task Delete(string interopID);
 	}
 
 	public class AssetContainerQuery: IAssetContainerQuery
 	{
-		private readonly ICosmosStore<AssetContainer> _store;
+		private readonly ICosmosStore<AssetContainerDO> _store;
 		private readonly IBlobStorage _blob;
 		public const string SinglePartitionID = "SinglePartitionID"; // TODO - is there a better way?
 
-		public AssetContainerQuery(ICosmosStore<AssetContainer> store, IBlobStorage blob)
+		public AssetContainerQuery(ICosmosStore<AssetContainerDO> store, IBlobStorage blob)
 		{
 			_store = store;
 			_blob = blob;
 		}
 
-		public async Task<ListPage<AssetContainer>> List(IListArgs args)
+		public async Task<ListPage<AssetContainerDO>> List(IListArgs args)
 		{
 			var query = _store.Query(new FeedOptions() { EnableCrossPartitionQuery = false })
 				.Search(args)
@@ -40,16 +40,16 @@ namespace ordercloud.integrations.cms
 			return list.ToListPage(args.Page, args.PageSize, count);
 		}
 
-		public async Task<AssetContainer> Get(string interopID)
+		public async Task<AssetContainerDO> Get(string interopID)
 		{
 			var container = await GetWithoutExceptions(interopID);
 			if (container == null) throw new OrderCloudIntegrationException.NotFoundException("AssetContainer", interopID);
 			return container;
 		}
 
-		public async Task<AssetContainer> CreateDefaultIfNotExists(VerifiedUserContext user)
+		public async Task<AssetContainerDO> CreateDefaultIfNotExists(VerifiedUserContext user)
 		{
-			var defaultContainer = new AssetContainer()
+			var defaultContainer = new AssetContainerDO()
 			{
 				InteropID = user.ClientID,
 				Name = $"Container for API Client with ID {user.ClientID}"
@@ -58,7 +58,7 @@ namespace ordercloud.integrations.cms
 			return existingContainer ?? await Create(defaultContainer, user);
 		}
 
-		public async Task<AssetContainer> Create(AssetContainer container, VerifiedUserContext user)
+		public async Task<AssetContainerDO> Create(AssetContainerDO container, VerifiedUserContext user)
 		{
 			var matchingID = await GetWithoutExceptions(container.InteropID);
 			if (matchingID != null) throw new DuplicateIDException();
@@ -67,7 +67,7 @@ namespace ordercloud.integrations.cms
 			return newContainer;
 		}
 
-		public async Task<AssetContainer> Update(string interopID, AssetContainer container, VerifiedUserContext user)
+		public async Task<AssetContainerDO> Update(string interopID, AssetContainerDO container, VerifiedUserContext user)
 		{
 			var existingContainer = await Get(interopID);
 			existingContainer.InteropID = container.InteropID;
@@ -85,7 +85,7 @@ namespace ordercloud.integrations.cms
 			// TODO - delete all the asset records in cosmos?
 		}
 
-		private async Task<AssetContainer> GetWithoutExceptions(string interopID)
+		private async Task<AssetContainerDO> GetWithoutExceptions(string interopID)
 		{
 			return await _store.Query($"select top 1 * from c where c.InteropID = @id", new { id = interopID }).FirstOrDefaultAsync();
 		}

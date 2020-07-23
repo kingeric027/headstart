@@ -25,14 +25,14 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("List Assets")]
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<ListPage<Asset>> List(ListArgs<Asset> args)
+		public async Task<ListPage<AssetDO>> List(ListArgs<AssetDO> args)
 		{
 			return await _assets.List(args, VerifiedUserContext);
 		}
 
 		[DocName("Get an Asset")]
 		[HttpGet, Route("{assetID}"), OrderCloudIntegrationsAuth]
-		public async Task<Asset> Get(string assetID)
+		public async Task<AssetDO> Get(string assetID)
 		{
 			return await _assets.Get(assetID, VerifiedUserContext);
 		}
@@ -40,14 +40,14 @@ namespace Marketplace.CMS.Controllers
 		[DocName("Upload an Asset")]
 		[DocIgnore] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<Asset> Create([FromForm] AssetUpload form)
+		public async Task<AssetDO> Create([FromForm] AssetUpload form)
 		{
 			return await _assets.Create(form, VerifiedUserContext);
 		}
 
 		[DocName("Update an Asset")]
 		[HttpPut, Route("{assetID}"), OrderCloudIntegrationsAuth]
-		public async Task<Asset> Update(string assetID, [FromBody] Asset asset)
+		public async Task<AssetDO> Update(string assetID, [FromBody] AssetDO asset)
 		{
 			return await _assets.Update(assetID, asset, VerifiedUserContext);
 		}
@@ -57,6 +57,46 @@ namespace Marketplace.CMS.Controllers
 		public async Task Delete(string assetID)
 		{
 			await _assets.Delete(assetID, VerifiedUserContext);
+		}
+
+		[DocName("Create Asset Assignment")]
+		[HttpPost, Route("assignments"), OrderCloudIntegrationsAuth]
+		public async Task SaveAssetAssignment([FromBody] AssetAssignment assignment)
+		{
+			await _assetedResources.SaveAssignment(assignment, VerifiedUserContext);
+		}
+
+		[DocName("Delete Asset Assignment"), OrderCloudIntegrationsAuth]
+		[HttpDelete, Route("assignments")]
+		public async Task DeleteAssetAssignment([FromQuery] AssetAssignment assignment)
+		{
+			await _assetedResources.DeleteAssignment(assignment, VerifiedUserContext);
+		}
+
+		[DocName("Reorder Asset Assignment"), OrderCloudIntegrationsAuth]
+		[HttpPost, Route("assignments/moveto/{listOrderWithinType}")]
+		public async Task ReorderAssetAssignment(int listOrderWithinType, [FromBody] AssetAssignment assignment)
+		{
+			await _assetedResources.MoveAssignment(assignment, listOrderWithinType, VerifiedUserContext);
+		}
+
+		// TODO - add list page and list args
+		[DocName("List Assets Assigned to Resource")]
+		[HttpGet, Route("resource"), OrderCloudIntegrationsAuth]
+		public async Task<ListPage<AssetForDelivery>> ListAssets([FromQuery] Resource resource, ListArgs<AssetForDelivery> args)
+		{
+			return new ListPage<AssetForDelivery>
+			{
+				Items = await _assetedResources.ListAssets(resource, VerifiedUserContext)
+			};
+		}
+
+		[DocName("Get a Resource's primary image")]
+		[HttpGet, Route("resource/primary-image")] // No auth
+		public async Task GetFirstImage([FromQuery] Resource resource)
+		{
+			var url = await _assetedResources.GetFirstImage(resource, VerifiedUserContext);
+			Response.Redirect(url);
 		}
 	}
 }

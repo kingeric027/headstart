@@ -25,7 +25,7 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
-using Document = ordercloud.integrations.cms.Document;
+using DocumentDO = ordercloud.integrations.cms.DocumentDO;
 
 namespace Marketplace.API
 {
@@ -76,12 +76,12 @@ namespace Marketplace.API
                 .OrderCloudIntegrationsConfigureWebApiServices(_settings, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
-                .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
-				.InjectCosmosStore<DocumentSchema, DocumentSchema>(cosmosConfig)
-				.InjectCosmosStore<Document, Document>(cosmosConfig)
+                .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
+				.InjectCosmosStore<DocumentSchemaDO, DocumentSchemaDO>(cosmosConfig)
+				.InjectCosmosStore<DocumentDO, DocumentDO>(cosmosConfig)
 				.InjectCosmosStore<DocumentAssignmentDO, DocumentAssignmentDO>(cosmosConfig)
-				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
-                .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
+				.InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
+                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()

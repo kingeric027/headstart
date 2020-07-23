@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
+using ordercloud.integrations.cms.Mappers;
+using ordercloud.integrations.cms.Models;
 using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.cms
@@ -11,18 +13,18 @@ namespace ordercloud.integrations.cms
 	{
 		Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user);
 		Task<string> GetFirstImage(Resource resource, VerifiedUserContext user);
-		Task SaveAssignment(Resource resource, string assetInteropID, VerifiedUserContext user);
-		Task DeleteAssignment(Resource resource, string assetInteropID, VerifiedUserContext user);
-		Task MoveAssignment(Resource resource, string assetInteropID, int listOrderWithinType, VerifiedUserContext user);
+		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
+		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
+		Task MoveAssignment(AssetAssignment assignment, int listOrderWithinType, VerifiedUserContext user);
 	}
 
 	public class AssetedResourceQuery : IAssetedResourceQuery
 	{
-		private readonly ICosmosStore<AssetedResource> _store;
+		private readonly ICosmosStore<AssetedResourceDO> _store;
 		private readonly IAssetQuery _assets;
 		private readonly IBlobStorage _blob;
 
-		public AssetedResourceQuery(ICosmosStore<AssetedResource> store, IAssetQuery assets, IBlobStorage blob)
+		public AssetedResourceQuery(ICosmosStore<AssetedResourceDO> store, IAssetQuery assets, IBlobStorage blob)
 		{
 			_store = store;
 			_assets = assets;
@@ -58,50 +60,53 @@ namespace ordercloud.integrations.cms
 			return asset.Url;
 		}
 
-		public async Task SaveAssignment(Resource resource, string assetInteropID, VerifiedUserContext user)
+		public async Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
+			var resource = assignment.MapToResource();
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assetInteropID, user);
+			var asset = await _assets.Get(assignment.AssetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).UniqueAdd(asset.id); 
 			await _store.UpsertAsync(assetedResource);
 		}
 
-		public async Task DeleteAssignment(Resource resource, string assetInteropID, VerifiedUserContext user)
+		public async Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
+			var resource = assignment.MapToResource();
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assetInteropID, user);
+			var asset = await _assets.Get(assignment.AssetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).Remove(asset.id);
 			await _store.UpdateAsync(assetedResource);
 		}
 
-		public async Task MoveAssignment(Resource resource, string assetInteropID, int listOrderWithinType, VerifiedUserContext user)
+		public async Task MoveAssignment(AssetAssignment assignment, int listOrderWithinType, VerifiedUserContext user)
 		{
+			var resource = assignment.MapToResource();
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assetInteropID, user);
+			var asset = await _assets.Get(assignment.AssetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).MoveTo(asset.id, listOrderWithinType);
 			await _store.UpdateAsync(assetedResource);
 		}
 
-		private async Task<AssetedResource> GetExistingOrDefault(Resource resource)
+		private async Task<AssetedResourceDO> GetExistingOrDefault(Resource resource)
 		{
-			return await GetExisting(resource) ?? new AssetedResource() { 
+			return await GetExisting(resource) ?? new AssetedResourceDO() { 
 				ResourceID = resource.ID, 
 				ResourceParentID = resource.ParentID, 
 				ResourceType = resource.Type 
 			};
 		}
 
-		private async Task<AssetedResource> GetExisting(Resource resource)
+		private async Task<AssetedResourceDO> GetExisting(Resource resource)
 		{
 			var query = $"select top 1 * from c where c.Resource.Type = @Type AND c.Resource.ID = @ID AND c.Resource.ParentID = @ParentID";
 			var assetedResource = await _store.QuerySingleAsync(query, resource);
 			return assetedResource;
 		}
 
-		private List<string> GetAssetIDs(AssetedResource assetedResource, AssetType assetType)
+		private List<string> GetAssetIDs(AssetedResourceDO assetedResource, AssetType assetType)
 		{
 			var property = assetedResource.GetType().GetProperty($"{assetType.ToString()}AssetIDs");
 			var list = (List<string>)property.GetValue(assetedResource, null) ?? new List<string>();

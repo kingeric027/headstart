@@ -9,9 +9,9 @@ namespace ordercloud.integrations.cms
 	public interface IBlobStorage
 	{
 		CMSConfig Config { get; }
-		Task<Asset> UploadAsset(AssetContainer container, IFormFile file, Asset asset);
-		Task OnContainerDeleted(AssetContainer container);
-		Task OnAssetDeleted(AssetContainer container, string assetID);
+		Task<AssetDO> UploadAsset(AssetContainerDO container, IFormFile file, AssetDO asset);
+		Task OnContainerDeleted(AssetContainerDO container);
+		Task OnAssetDeleted(AssetContainerDO container, string assetID);
 	}
 
 	public class BlobStorage : IBlobStorage
@@ -23,7 +23,7 @@ namespace ordercloud.integrations.cms
 			Config = config;
 		}
 
-		public async Task<Asset> UploadAsset(AssetContainer container, IFormFile file, Asset asset)
+		public async Task<AssetDO> UploadAsset(AssetContainerDO container, IFormFile file, AssetDO asset)
 		{
 			try
 			{
@@ -36,7 +36,7 @@ namespace ordercloud.integrations.cms
 			}
 		}
 
-		public async Task OnContainerDeleted(AssetContainer container)
+		public async Task OnContainerDeleted(AssetContainerDO container)
 		{
 			try
 			{
@@ -48,7 +48,7 @@ namespace ordercloud.integrations.cms
 			}
 		}
 
-		public async Task OnAssetDeleted(AssetContainer container, string assetID)
+		public async Task OnAssetDeleted(AssetContainerDO container, string assetID)
 		{
 			try
 			{
@@ -60,7 +60,7 @@ namespace ordercloud.integrations.cms
 			}
 		}
 
-		private OrderCloudIntegrationsBlobService BuildBlobService(AssetContainer container)
+		private OrderCloudIntegrationsBlobService BuildBlobService(AssetContainerDO container)
 		{
 			return new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
 			{

@@ -8,7 +8,7 @@ using ordercloud.integrations.library;
 namespace ordercloud.integrations.cms
 {
 	[CosmosCollection("assetedresource")]
-	public class AssetedResource : CosmosObject
+	public class AssetedResourceDO : CosmosObject
 	{
 		[CosmosPartitionKey]
 		public string ResourceID { get; set; }

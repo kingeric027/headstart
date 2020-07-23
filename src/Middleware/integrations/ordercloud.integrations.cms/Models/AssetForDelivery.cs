@@ -6,13 +6,13 @@ using ordercloud.integrations.library;
 namespace ordercloud.integrations.cms
 {
 	[SwaggerModel]
-	public class AssetForDelivery : Asset
+	public class AssetForDelivery : AssetDO
 	{
 		public int ListOrderWithinType { get; set; }
 
 		public AssetForDelivery() { }
 
-		public AssetForDelivery(Asset asset, int listOrder)
+		public AssetForDelivery(AssetDO asset, int listOrder)
 		{
 			ListOrderWithinType = listOrder;
 			InteropID = asset.InteropID;

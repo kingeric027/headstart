@@ -1,4 +1,5 @@
-﻿using ordercloud.integrations.library;
+﻿using ordercloud.integrations.cms.Models;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,18 @@ namespace ordercloud.integrations.cms.Mappers
 				ParentResourceID = assignment.ParentRsrcID,
 				DocumentID = assignment.DocID
 			};
+		}
+
+		public static Resource MapToResource(this DocumentAssignment assignment)
+		{
+			var resourceType = assignment.ResourceType ?? 0; // "Required" validation should prevent null ResourceType
+			return new Resource(resourceType, assignment.ResourceID, assignment.ParentResourceID);
+		}
+
+		public static Resource MapToResource(this AssetAssignment assignment)
+		{
+			var resourceType = assignment.ResourceType ?? 0; // "Required" validation should prevent null ResourceType
+			return new Resource(resourceType, assignment.ResourceID, assignment.ParentResourceID);
 		}
 
 		public static IEnumerable<DocumentAssignment> MapTo(IEnumerable<DocumentAssignmentDO> assignments)

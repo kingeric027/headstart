@@ -14,26 +14,26 @@ namespace ordercloud.integrations.cms
 {
 	public interface IDocumentSchemaQuery
 	{
-		Task<ListPage<DocumentSchema>> List(IListArgs args, VerifiedUserContext user);
-		Task<DocumentSchema> Get(string schemaInteropID, VerifiedUserContext user);
-		Task<DocumentSchema> GetByInternalID(string schemaID);
-		Task<DocumentSchema> Create(DocumentSchema schema, VerifiedUserContext user);
-		Task<DocumentSchema> Update(string schemaInteropID, DocumentSchema schema, VerifiedUserContext user);
+		Task<ListPage<DocumentSchemaDO>> List(IListArgs args, VerifiedUserContext user);
+		Task<DocumentSchemaDO> Get(string schemaInteropID, VerifiedUserContext user);
+		Task<DocumentSchemaDO> GetByInternalID(string schemaID);
+		Task<DocumentSchemaDO> Create(DocumentSchemaDO schema, VerifiedUserContext user);
+		Task<DocumentSchemaDO> Update(string schemaInteropID, DocumentSchemaDO schema, VerifiedUserContext user);
 		Task Delete(string schemaInteropID, VerifiedUserContext user);
 	}
 
 	public class DocumentSchemaQuery : IDocumentSchemaQuery
 	{
-		private readonly ICosmosStore<DocumentSchema> _store;
+		private readonly ICosmosStore<DocumentSchemaDO> _store;
 		private readonly CMSConfig _settings;
 
-		public DocumentSchemaQuery(ICosmosStore<DocumentSchema> schemaStore, CMSConfig settings)
+		public DocumentSchemaQuery(ICosmosStore<DocumentSchemaDO> schemaStore, CMSConfig settings)
 		{
 			_store = schemaStore;
 			_settings = settings;
 		}
 
-		public async Task<ListPage<DocumentSchema>> List(IListArgs args, VerifiedUserContext user)
+		public async Task<ListPage<DocumentSchemaDO>> List(IListArgs args, VerifiedUserContext user)
 		{
 			var query = _store.Query(GetFeedOptions(user.ClientID))
 				.Search(args)
@@ -44,20 +44,20 @@ namespace ordercloud.integrations.cms
 			return list.ToListPage(args.Page, args.PageSize, count);
 		}
 
-		public async Task<DocumentSchema> GetByInternalID(string schemaID)
+		public async Task<DocumentSchemaDO> GetByInternalID(string schemaID)
 		{
 			var schema = await _store.Query($"select top 1 * from c where c.id = @id", new { id = schemaID }).FirstOrDefaultAsync();
 			return schema;
 		}
 
-		public async Task<DocumentSchema> Get(string schemaInteropID, VerifiedUserContext user)
+		public async Task<DocumentSchemaDO> Get(string schemaInteropID, VerifiedUserContext user)
 		{
 			var schema = await GetWithoutExceptions(schemaInteropID, user);
 			if (schema == null) throw new OrderCloudIntegrationException.NotFoundException("Schema", schemaInteropID);
 			return schema;
 		}
 
-		public async Task<DocumentSchema> Create(DocumentSchema schema, VerifiedUserContext user)
+		public async Task<DocumentSchemaDO> Create(DocumentSchemaDO schema, VerifiedUserContext user)
 		{
 			var matchingID = await GetWithoutExceptions(schema.InteropID, user);
 			if (matchingID != null) throw new DuplicateIDException();
@@ -68,7 +68,7 @@ namespace ordercloud.integrations.cms
 			return newSchema;
 		}
 
-		public async Task<DocumentSchema> Update(string schemaInteropID, DocumentSchema schema, VerifiedUserContext user)
+		public async Task<DocumentSchemaDO> Update(string schemaInteropID, DocumentSchemaDO schema, VerifiedUserContext user)
 		{
 			var existingSchema = await Get(schemaInteropID, user);
 			existingSchema.InteropID = schema.InteropID;
@@ -87,14 +87,14 @@ namespace ordercloud.integrations.cms
 			await _store.RemoveByIdAsync(schema.id, schema.OwnerClientID);
 		}
 
-		private DocumentSchema Validate(DocumentSchema schema)
+		private DocumentSchemaDO Validate(DocumentSchemaDO schema)
 		{
 			schema.Schema["$schema"] = $"{_settings.BaseUrl}/schema-specs/metaschema";
 			schema.Schema["$id"] = $"{_settings.BaseUrl}/schema-specs/{schema.id}";
 			return SchemaHelper.ValidateSchema(schema);
 		}
 
-		private async Task<DocumentSchema> GetWithoutExceptions(string schemaInteropID, VerifiedUserContext user)
+		private async Task<DocumentSchemaDO> GetWithoutExceptions(string schemaInteropID, VerifiedUserContext user)
 		{
 			var query = $"select top 1 * from c where c.InteropID = @id";
 			var schema = await _store.Query(query, new { id = schemaInteropID }, GetFeedOptions(user.ClientID)).FirstOrDefaultAsync();
