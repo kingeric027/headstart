@@ -23,6 +23,8 @@ export class ProductPricingComponent {
   @Input()
   sellerCurrency: SupportedRates;
   @Input()
+  isRequired: boolean;
+  @Input()
   set superMarketplaceProductStatic(value: SuperMarketplaceProduct) {
     this.superProduct = value;
     if (value) {

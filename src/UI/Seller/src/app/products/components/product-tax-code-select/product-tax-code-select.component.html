@@ -3,6 +3,7 @@
     <div class="form-group col-6">
       <label for="TaxCodeCategory"
              translate>ADMIN.PRODUCT_EDIT.TAX_CATEGORY</label>
+        <span *ngIf="!isRequired">- Optional</span>
       <select [attr.disabled]="readonly ? true : null"
               type="dropdown"
               class="form-control"
@@ -32,6 +33,7 @@
                                         class="btn-block resource-btn mr-1 mb-1"
                                         [taxCodes]="taxCodes"
                                         [superMarketplaceProductEditable]="superMarketplaceProductEditable"
+                                        [isRequired]="isRequired"
                                         (taxCodesSearched)="onTaxCodesSearched($event)"
                                         (onScrollEnd)="handleScrollEnd($event)"
                                         (onSelectTaxCode)="handleSelectTaxCode($event)">

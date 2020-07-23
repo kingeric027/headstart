@@ -26,6 +26,8 @@ export class ProductTaxCodeSelect {
   onScrollEnd = new EventEmitter<string>();
   @Input()
   readonly = false;
+  @Input()
+  isRequired: boolean;
 
   onTaxCodeCategorySelection(event): void {
     this.handleTaxCodeCategorySelection.emit(event);

@@ -9,7 +9,7 @@ import {
   OcAdminAddressService,
   OcProductService,
 } from '@ordercloud/angular-sdk';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
@@ -177,12 +177,12 @@ export class ProductEditComponent implements OnInit {
         Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(1000)),
         Inventory: new FormControl(superMarketplaceProduct.Product.Inventory),
         QuantityMultiplier: new FormControl(superMarketplaceProduct.Product.QuantityMultiplier),
-        ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID),
+        ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID, Validators.required),
         ShipHeight: new FormControl(superMarketplaceProduct.Product.ShipHeight, [Validators.required, Validators.min(0)]),
         ShipWidth: new FormControl(superMarketplaceProduct.Product.ShipWidth, [Validators.required, Validators.min(0)]),
         ShipLength: new FormControl(superMarketplaceProduct.Product.ShipLength, [Validators.required, Validators.min(0)]),
         ShipWeight: new FormControl(superMarketplaceProduct.Product.ShipWeight, [Validators.required, Validators.min(0)]),
-        Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null)),
+        Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null), Validators.required),
         MinQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MinQuantity, Validators.min(1)),
         MaxQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MaxQuantity, Validators.min(1)),
         UseCumulativeQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.UseCumulativeQuantity),
@@ -192,13 +192,14 @@ export class ProductEditComponent implements OnInit {
         QuantityAvailable: new FormControl(superMarketplaceProduct.Product?.Inventory?.QuantityAvailable, null),
         InventoryEnabled: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.Enabled')),
         OrderCanExceed: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.OrderCanExceed')),
-        TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null)),
-        TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null)),
+        TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null), Validators.required),
+        TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null), Validators.required),
         UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit'), Validators.required),
         UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'), Validators.required),
       }, { validators: ValidateMinMax }
       );
       this.setInventoryValidator();
+      this.setNonRequiredFields();
     }
   }
 
@@ -213,6 +214,39 @@ export class ProductEditComponent implements OnInit {
       }
       quantityControl.updateValueAndValidity()
     })
+  }
+
+  setNonRequiredFields(): void {
+    const optionalFieldsArray = ['TaxCodeCategory','TaxCode','ShipLength', 'ShipWidth', 'ShipHeight', 'ShipFromAddressID', 'Price'];
+    const optionalControls = optionalFieldsArray.map(item => (this.productForm.get(item)))
+    this.productForm.get('ProductType').valueChanges
+    .subscribe(productType => {
+      console.log(productType)
+      if(productType === 'Quote') {
+        optionalControls.forEach(control => {
+          control.setValidators(null);
+          control.updateValueAndValidity();
+        })
+      } else {
+        optionalControls.forEach(control => {
+          control.setValidators([Validators.required]);
+          control.updateValueAndValidity();
+        })
+      }
+    })
+    // const taxCodeCategory = this.productForm.get('TaxCodeCategory');
+    // const taxCode = this.productForm.get('TaxCode');
+    // const shipLength = this.productForm.get('ShipLength');
+  }
+
+  isRequired(control: string): boolean {
+    console.log(control)
+    const theControl = this.productForm.get(control);
+    console.log(theControl) 
+    if(theControl.validator === null) return false;
+    const validator = this.productForm.get(control).validator({} as AbstractControl);
+    console.log(validator)
+    return validator && validator.required;
   }
 
   async getAvailableProductTypes(): Promise<void> {
