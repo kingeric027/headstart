@@ -25,7 +25,7 @@
   <div class="row base-layout-item">
     <div class="col-md-12">
       <div class="py-3">
-        <h1 class ="resource-name mb-0"
+        <h1 class="resource-name mb-0"
             translate>{{
           getTitle(isMyResource, _currentResourceNamePlural, selectedParentResouceName)}}</h1>
       </div>
@@ -34,7 +34,8 @@
   </div>
   <!-- /Page Title -->
   <!-- Filter Bar -->
-  <div *ngIf="!isMyResource || (_currentResourceNamePlural !== 'suppliers')" class="row additional-item-edit-resource additional-item-table">
+  <div *ngIf="!isMyResource || (_currentResourceNamePlural !== 'suppliers')"
+       class="row additional-item-edit-resource additional-item-table">
     <div *ngIf="parentResourceService && !isMyResource"
          class="col-lg-3 col-md-4 col-sm-5 parent-resources">
       <!-- parent resource dropdown -->
@@ -55,8 +56,8 @@
              class="w-100">
           <button ngbDropdownItem
                   *ngFor="let subResource of parentResourceService.subResourceList">
-                    <a routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{subResource.route}}" 
-                       translate>
+            <a routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{subResource.route}}"
+               translate>
               {{subResource.display}}
             </a></button>
         </div>
@@ -127,7 +128,7 @@
               <div *ngIf="shouldFilterDisplay(filter)">
                 <label translate>{{filter.Display}}</label>
                 <select class="form-control input-sm"
-                        *ngIf="filter.Type === 'Dropdown'"
+                        *ngIf="filter?.Type === 'Dropdown' || filter?.BuyerAppFilterType === 'SelectOption' || filter?.BuyerAppFilterType === 'NonUI'"
                         type="select"
                         required
                         [formControlName]="filter.Path">
@@ -141,7 +142,7 @@
                   </ng-container>
                 </select>
                 <div class="input-group"
-                     *ngIf="filter.Type === 'DateFilter'">
+                     *ngIf="filter?.Type === 'DateFilter'">
                   <input class="form-control"
                          placeholder="yyyy-mm-dd"
                          value="{{filter.Path === 'from' ? fromDate : toDate}}"
