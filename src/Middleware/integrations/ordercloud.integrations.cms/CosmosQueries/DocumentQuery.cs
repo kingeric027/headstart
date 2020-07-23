@@ -20,11 +20,15 @@ namespace ordercloud.integrations.cms
 		Task<ListPage<TDoc>> List<TDoc>(string schemaInteropID, IListArgs args, VerifiedUserContext user) where TDoc : Document;
 		Task<List<Document>> ListByInternalIDs(IEnumerable<string> documentIDs);
 		Task<Document> Get(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
+		Task<TDoc> Get<TDoc>(string schemaInteropID, string documentInteropID, VerifiedUserContext user) where TDoc : Document;
 		Task<Document> GetByInternalID(string documentID); // real id
 		Task<Document> GetByInternalSchemaID(string schemaID, string documentInteropID, VerifiedUserContext user);
 		Task<Document> Create(string schemaInteropID, Document document, VerifiedUserContext user);
+		Task<TDoc> Create<TDoc>(string schemaInteropID, Document document, VerifiedUserContext user) where TDoc : Document;
 		Task<Document> Update(string schemaInteropID, string documentInteropID, Document document, VerifiedUserContext user);
+		Task<TDoc> Update<TDoc>(string schemaInteropID, string documentInteropID, Document document, VerifiedUserContext user) where TDoc : Document;
 		Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
+		Task Delete<TDoc>(string schemaInteropID, string documentInteropID, VerifiedUserContext user) where TDoc : Document;
 	}
 
 	public class DocumentQuery: IDocumentQuery
@@ -64,6 +68,11 @@ namespace ordercloud.integrations.cms
 			return list.ToListPage(args.Page, args.PageSize, count);
 		}
 
+		public async Task<TDoc> Get<TDoc>(string schemaInteropID, string documentInteropID, VerifiedUserContext user) where TDoc : Document
+		{
+			var getResponse = await Get(schemaInteropID, documentInteropID, user);
+			return getResponse.Reserialize<TDoc>();
+		}
 		public async Task<Document> Get(string schemaInteropID, string documentInteropID, VerifiedUserContext user)
 		{
 			var schema = await _schemas.Get(schemaInteropID, user);
@@ -81,6 +90,12 @@ namespace ordercloud.integrations.cms
 			var document = await GetWithoutExceptions(schemaID, documentInteropID, user);
 			if (document == null) throw new OrderCloudIntegrationException.NotFoundException("Document", documentInteropID);
 			return document;
+		}
+
+		public async Task<TDoc> Create<TDoc>(string schemaInteropID, Document document, VerifiedUserContext user) where TDoc : Document
+		{
+			var createResponse = await Create(schemaInteropID, document, user);
+			return createResponse.Reserialize<TDoc>();
 		}
 
 		public async Task<Document> Create(string schemaInteropID, Document document, VerifiedUserContext user)
@@ -106,7 +121,15 @@ namespace ordercloud.integrations.cms
 			var updatedDocument = await _store.UpdateAsync(existingDocument);
 			return updatedDocument;
 		}
-
+		public async Task<TDoc> Update<TDoc>(string schemaInteropID, string documentInteropID, Document document, VerifiedUserContext user) where TDoc : Document
+		{
+			var updateResponse = await Update(schemaInteropID, documentInteropID, document, user);
+			return updateResponse.Reserialize<TDoc>();
+		}
+		public async Task Delete<TDoc>(string schemaInteropID, string documentInteropID, VerifiedUserContext user) where TDoc : Document
+		{
+			await Delete(schemaInteropID, documentInteropID, user);
+		}
 		public async Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user)
 		{
 			var schema = await _schemas.Get(schemaInteropID, user);
