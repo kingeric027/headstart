@@ -42,20 +42,12 @@ const getOverrideText = (checkoutPanel: string): string => {
   }
 }
 
-const getCreditCardTotal = (subTotal: number, shippingCost: number, taxCost: number, shouldHideShippingAndText: boolean): number => {
+const getCreditCardTotal = (subTotal: number, shippingCost: number, taxCost: number, shouldHideShippingAndText: boolean, discountTotal: number): number => {
   if(shouldHideShippingAndText) {
-    return subTotal;
+    return subTotal - discountTotal;
   } else {
-    return subTotal + shippingCost + taxCost;
+    return (subTotal + shippingCost + taxCost) - discountTotal;
   }
-}
-
-const getDiscountTotal = (orderPromos: OrderPromotion[]): number => {
-  let discountTotal = 0;
-  if (orderPromos?.length) {
-    orderPromos.map(p => discountTotal = discountTotal + p.Amount)
-  }
-  return discountTotal;
 }
 
 export const getOrderSummaryMeta = (
@@ -72,12 +64,11 @@ export const getOrderSummaryMeta = (
   const shouldHideShippingAndText = !!ShippingAndTaxOverrideText;
 
   const CreditCardDisplaySubtotal = StandardLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
-  const CreditCardTotal = getCreditCardTotal(CreditCardDisplaySubtotal, order.ShippingCost, order.TaxCost, shouldHideShippingAndText);
-  // const DiscountTotal = getDiscountTotal(orderPromos)
+  const DiscountTotal = orderPromos.reduce((accumulator, promo) => (promo.Amount) + accumulator, 0);
+  const CreditCardTotal = getCreditCardTotal(CreditCardDisplaySubtotal, order.ShippingCost, order.TaxCost, shouldHideShippingAndText, DiscountTotal);
 
   const POTotal = POLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
-  const DiscountTotal = orderPromos.reduce((accumulator, promo) => (promo.Amount) + accumulator, 0);
-  const OrderTotal = (POTotal + CreditCardTotal) - DiscountTotal;
+  const OrderTotal = POTotal + CreditCardTotal;
 
   return {
     StandardLineItemCount: StandardLineItems.length, 

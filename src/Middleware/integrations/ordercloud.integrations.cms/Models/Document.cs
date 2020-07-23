@@ -37,4 +37,11 @@ namespace ordercloud.integrations.cms
 			};
 		}
 	}
+
+	[SwaggerModel]
+	public class Document<TDoc> : Document
+	{
+		public new TDoc Doc { get; set; }
+
+	}
 }

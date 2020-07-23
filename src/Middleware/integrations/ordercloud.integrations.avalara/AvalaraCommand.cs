@@ -23,7 +23,6 @@ namespace ordercloud.integrations.avalara
 		Task<TaxCertificate> GetCertificateAsync(int companyID, int certificateID);
 		Task<TaxCertificate> CreateCertificateAsync(int companyID, TaxCertificate cert);
 		Task<TaxCertificate> UpdateCertificateAsync(int companyID, int certificateID, TaxCertificate cert);
-		Task<byte[]> DownloadCertificatePdfAsync(int companyID, int certificateID);
 	}
 
 	public class AvalaraCommand : IAvalaraCommand
@@ -73,32 +72,35 @@ namespace ordercloud.integrations.avalara
 
 		public async Task<TaxCertificate> GetCertificateAsync(int companyID, int certificateID)
 		{
-			var certificate = await _avaTax.GetCertificateAsync(companyID, certificateID, "");
-			var mappedCertificate = TaxCertificateMapper.Map(certificate, companyID, _settings.HostUrl);
+			var certificate = _avaTax.GetCertificateAsync(companyID, certificateID, "");
+			var pdf = GetCertificateBase64String(companyID, certificateID);
+			var mappedCertificate = TaxCertificateMapper.Map(await certificate, await pdf);
 			return mappedCertificate;
 		}
 
 		public async Task<TaxCertificate> CreateCertificateAsync(int companyID, TaxCertificate cert)
 		{
 			var certificates = await _avaTax.CreateCertificatesAsync(companyID, false, new List<CertificateModel> { TaxCertificateMapper.Map(cert) });
-			var mappedCertificate = TaxCertificateMapper.Map(certificates[0], companyID, _settings.HostUrl);
+			var pdf = await GetCertificateBase64String(companyID, certificates[0].id ?? 0);
+			var mappedCertificate = TaxCertificateMapper.Map(certificates[0], pdf);
 			return mappedCertificate;
 		}
 
 		public async Task<TaxCertificate> UpdateCertificateAsync(int companyID, int certificateID, TaxCertificate cert)
 		{
-			var certificate = await _avaTax.UpdateCertificateAsync(companyID, certificateID, TaxCertificateMapper.Map(cert));
-			var mappedCertificate = TaxCertificateMapper.Map(certificate, companyID, _settings.HostUrl);
+			var certificate = _avaTax.UpdateCertificateAsync(companyID, certificateID, TaxCertificateMapper.Map(cert));
+			var pdf = GetCertificateBase64String(companyID, certificateID);
+			var mappedCertificate = TaxCertificateMapper.Map(await certificate, await pdf);
 			return mappedCertificate;
 		}
 
 		// The avalara SDK method for this was throwing an internal JSON parse exception.
-		public async Task<byte[]> DownloadCertificatePdfAsync(int companyID, int certificateID)
+		private async Task<string> GetCertificateBase64String(int companyID, int certificateID)
 		{
 			var pdfBtyes = await new Url($"{_baseUrl}/companies/{companyID}/certificates/{certificateID}/attachment")
 				.WithBasicAuth(_settings.AccountID.ToString(), _settings.LicenseKey)
 				.GetBytesAsync();
-			return pdfBtyes;
+			return Convert.ToBase64String(pdfBtyes);
 		}
 
 		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)

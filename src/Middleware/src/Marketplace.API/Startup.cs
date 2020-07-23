@@ -73,7 +73,6 @@ namespace Marketplace.API
             services
                 .OrderCloudIntegrationsConfigureWebApiServices(_settings, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-                .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
                 .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
 				.InjectCosmosStore<DocumentSchema, DocumentSchema>(cosmosConfig)
 				.InjectCosmosStore<Document, Document>(cosmosConfig)
@@ -92,13 +91,13 @@ namespace Marketplace.API
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IOrderCloudSandboxService>()
                 .Inject<IMarketplaceProductCommand>()
+                .Inject<IMeProductCommand>()
                 .Inject<IMarketplaceCatalogCommand>()
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
 				.Inject<IDocumentQuery>()
 				.Inject<IBlobStorage>()
 				.Inject<IDocumentSchemaQuery>()
-				.Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
@@ -109,7 +108,7 @@ namespace Marketplace.API
                     OrganizationID = _settings.ZohoSettings.OrgID }, 
                     new OrderCloudClientConfig {
                         ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                        AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                        AuthUrl = _settings.OrderCloudSettings.ApiUrl,
                         ClientId = _settings.OrderCloudSettings.ClientID,
                         ClientSecret = _settings.OrderCloudSettings.ClientSecret,
                         Roles = new[]
@@ -130,7 +129,7 @@ namespace Marketplace.API
                 .AddTransient<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
                 {
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    AuthUrl = _settings.OrderCloudSettings.ApiUrl,
                     ClientId = _settings.OrderCloudSettings.ClientID,
                     ClientSecret = _settings.OrderCloudSettings.ClientSecret,
                     Roles = new[]

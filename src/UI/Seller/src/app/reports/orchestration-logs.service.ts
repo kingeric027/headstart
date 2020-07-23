@@ -13,13 +13,17 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 export class OrchestrationLogsService extends ResourceCrudService<OrchestrationLog> {
   primaryResourceLevel = 'logs';
 
-  constructor(router: Router, activatedRoute: ActivatedRoute, service: OcBuyerService,
-    currentUserService: CurrentUserService) {
+  constructor(
+    router: Router,
+    activatedRoute: ActivatedRoute,
+    service: OcBuyerService,
+    currentUserService: CurrentUserService
+  ) {
     super(router, activatedRoute, service, currentUserService, '/reports/logs', 'Logs');
   }
 
   async list(args: any[]): Promise<ListPage<OrchestrationLog>> {
-    const listArgs: ListArgs = args[0];
+    const listArgs = args[0];
     listArgs.sortBy = listArgs.sortBy || '!timeStamp';
     return await MarketplaceSDK.OrchestrationLogs.List(listArgs);
   }

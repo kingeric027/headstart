@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
@@ -6,7 +6,6 @@ import { map as _map, find as _find } from 'lodash';
 import { FieldConfig } from './field-config.interface';
 import { SpecOption, Spec, ListPage } from 'ordercloud-javascript-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
-import { exchange } from 'src/app/services/currency.helper';
 import { ShopperContextService } from 'marketplace';
 
 @Component({
@@ -24,7 +23,7 @@ import { ShopperContextService } from 'marketplace';
   `,
   styleUrls: ['./spec-form.component.scss'],
 })
-export class OCMSpecForm implements OnChanges {
+export class OCMSpecForm {
   _specs: ListPage<Spec>;
   @Output() specFormChange: EventEmitter<SpecFormEvent> = new EventEmitter<SpecFormEvent>();
   config: FieldConfig[] = [];
@@ -37,19 +36,6 @@ export class OCMSpecForm implements OnChanges {
   } 
 
   constructor(private fb: FormBuilder, private context: ShopperContextService) { }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.currency && changes.specs) {
-      // Exchange option markup prices based on currency of product/user
-      const rates = this.context.exchangeRates.Get();
-      this._specs.Items = this._specs.Items.map(s => {
-        s.Options.map(o => {
-          o.PriceMarkup = exchange(rates, o.PriceMarkup, changes.currency.currentValue, this.context.currentUser.get().Currency).Price;
-        })
-        return s;
-      })
-    }
-  }
 
   init(): void {
     this.config = this.createFieldConfig();

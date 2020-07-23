@@ -10,7 +10,7 @@ export const environment = {
   appname: 'Marketplace Admin Test',
   marketplaceID: 'SEB',
   cmsUrl: 'https://marktplacetest.blob.core.windows.net',
+  translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
-  orderCloudAuthUrl: 'https://stagingauth.ordercloud.io/oauth/token',
   orderCloudApiVersion: 'v1',
 };

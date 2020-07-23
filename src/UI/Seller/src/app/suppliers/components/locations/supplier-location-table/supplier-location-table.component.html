@@ -12,7 +12,9 @@
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)"
-                          [canBeDeleted]="canBeDeleted">
+                          [canBeDeleted]="canBeDeleted"
+                          [labelSingular]="'ALIAS.SUPPLIER_LOCATION'"
+                          [labelPlural]="'ALIAS.SUPPLIER_LOCATIONS'">
   <app-supplier-location-edit class="resource-edit"
                               *ngIf="resourceForm"
                               [resourceForm]="resourceForm"

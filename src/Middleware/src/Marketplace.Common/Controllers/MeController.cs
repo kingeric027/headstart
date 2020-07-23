@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
@@ -14,17 +15,26 @@ namespace Marketplace.Common.Controllers
 	public class MeController : BaseController
 	{
 
+		private readonly IMeProductCommand _meProductCommand;
 		private readonly IMarketplaceProductCommand _productCommand;
-		public MeController(AppSettings settings, IMarketplaceProductCommand productCommand) : base(settings)
+		public MeController(AppSettings settings, IMarketplaceProductCommand productCommand, IMeProductCommand meProductCommand) : base(settings)
 		{
 			_productCommand = productCommand;
+			_meProductCommand = meProductCommand;
 		}
 
 		[DocName("GET Super Product")]
 		[HttpGet, Route("products/{productID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<SuperMarketplaceProduct> GetSuperProduct(string productID)
+		public async Task<SuperMarketplaceMeProduct> GetSuperProduct(string productID)
 		{
-			return await _productCommand.MeGet(productID, VerifiedUserContext);
+			return await _meProductCommand.Get(productID, VerifiedUserContext);
+		}
+
+		[DocName("LIST products")]
+		[HttpGet, Route("products"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task<ListPageWithFacets<MarketplaceMeProduct>> ListMeProducts(ListArgs<MarketplaceMeProduct> args)
+		{
+			return await _meProductCommand.List(args, VerifiedUserContext);
 		}
 	}
 }

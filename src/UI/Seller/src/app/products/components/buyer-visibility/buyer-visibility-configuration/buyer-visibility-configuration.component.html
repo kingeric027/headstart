@@ -15,7 +15,8 @@
                  class="spinner-grow spinner-grow-sm text-medium"
                  role="status">
             </div>
-            <span class="text-muted font-italic ml-2">Fetching Visibility...</span>
+            <span class="text-muted font-italic ml-2"
+                  translate>ADMIN.PRODUCT_EDIT.FETCHING_VISIBILITY</span>
           </div>
         </ng-container>
         <ng-container *ngIf="!isFetching">
@@ -24,7 +25,9 @@
               <fa-icon [icon]="faEye"
                        class="text-success mr-2"
                        aria-hidden="true"></fa-icon>
-              <span>Visible in {{catalogAssignmentsStatic.length}}/{{catalogs.length}} catalogs</span>
+              <span translate>ADMIN.PRODUCT_EDIT.VISIBLE_IN</span>&nbsp;
+              <span>{{catalogAssignmentsStatic.length}}/{{catalogs.length}}</span>
+              &nbsp;<span translate>ADMIN.PRODUCT_EDIT.CATALOGS_LOWERCASE</span>
             </div>
           </ng-container>
           <ng-container *ngIf="catalogAssignmentsStatic.length === 0">
@@ -32,7 +35,7 @@
               <fa-icon [icon]="faEyeSlash"
                        class="text-danger mr-2"
                        aria-hidden="true"></fa-icon>
-              <span> Not Visible</span>
+              <span translate> ADMIN.PRODUCT_EDIT.NOT_VISIBLE</span>
             </div>
           </ng-container>
         </ng-container>
@@ -41,28 +44,33 @@
         <ng-container *ngIf="!isEditing">
           <button type="button"
                   class="btn btn-primary"
-                  (click)="edit()">Edit</button>
+                  (click)="edit()"
+                  translate>ADMIN.PRODUCT_EDIT.EDIT</button>
         </ng-container>
         <ng-container *ngIf="isEditing">
           <button class="btn btn-medium"
-                  (click)="handleClose()">Close</button>
+                  (click)="handleClose()"
+                  translate>ADMIN.PRODUCT_EDIT.CLOSE</button>
         </ng-container>
       </div>
     </div>
     <div *ngIf="isEditing">
-      <p class="py-3 font-italic">
-        Within this buyer configure the categories and catalogs in which the product will appear, and the price buyers will pay.
+      <p class="py-3 font-italic"
+         translate>
+         ADMIN.PRODUCT_EDIT.WITHIN_THIS_BUYER
       </p>
-      <h5>Catalogs</h5>
+      <h5 translate>ADMIN.PRODUCT_EDIT.CATALOGS</h5>
       <div class="card shadow-sm p-3 table-responsive"
            *ngIf="catalogs.length">
         <table class="table table-hover mb-0">
           <thead>
             <tr>
               <th class="border-0"
-                  scope="col">Visible</th>
+                  scope="col"
+                  translate>ADMIN.PRODUCT_EDIT.VISIBLE</th>
               <th class="border-0"
-                  scope="col">Catalog</th>
+                  scope="col"
+                  translate>ADMIN.PRODUCT_EDIT.CATALOG</th>
             </tr>
           </thead>
           <tbody>
@@ -85,7 +93,8 @@
         </table>
       </div>
       <p *ngIf="!catalogs.length"
-         class="alert alert-info font-weight-bold mb-0 p-3 shadow-sm">There are no catalogs for this buyer currently.</p>
+         class="alert alert-info font-weight-bold mb-0 p-3 shadow-sm"
+         translate>ADMIN.PRODUCT_EDIT.NO_CATALOGS</p>
       <product-category-assignment [productID]="_product.ID"
                                    [assignedCategoriesStatic]="assignedCategoriesEditable"
                                    [catalogID]="_buyer.ID"
@@ -95,9 +104,11 @@
         <button class="btn btn-primary"
                 type="submit"
                 [disabled]="isValidBuyerAssignment || dataIsSaving || !areChanges"
-                (click)="executeProductCatalogAssignmentRequests()">Save</button>
+                (click)="executeProductCatalogAssignmentRequests()"
+                translate>ADMIN.PRODUCT_EDIT.SAVE</button>
         <button *ngIf="areChanges"
                 class="btn btn-link text-danger ml-3"
-                (click)="handleDiscardChanges()">Discard Changes</button>
+                (click)="handleDiscardChanges()"
+                translate>ADMIN.PRODUCT_EDIT.DISCARD_CHANGES</button>
       </div>
     </div>

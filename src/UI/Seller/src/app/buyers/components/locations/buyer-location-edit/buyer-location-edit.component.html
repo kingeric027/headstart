@@ -2,8 +2,8 @@
   <form [formGroup]="resourceForm">
     <div class="row pt-3">
       <div class="col-md-5">
-        <h5>Location Details</h5>
-        <p>These are the details of this Buyer Purchasing Location</p>
+        <h5>{{'ALIAS.BUYER_LOCATION' | translate}} Details</h5>
+        <p>These are the details of this {{'ALIAS.BUYER_LOCATION' | translate | lowercase}}.</p>
       </div>
       <div class="col-md-7 form-group">
         <div class="form-row">
@@ -53,7 +53,7 @@
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="LocationName">Location Name</label>
+            <label for="LocationName">{{'ALIAS.BUYER_LOCATION' | translate}} Name</label>
             <input type="text"
                    class="form-control"
                    id="LocationName"
@@ -84,8 +84,8 @@
     </div>
     <div class="row pt-3">
       <div class="col-md-5">
-        <h5>Location Address</h5>
-        <p>This is the address of the Buyer Purchasing Location</p>
+        <h5>{{'ALIAS.BUYER_LOCATION' | translate}} Address</h5>
+        <p>This is the address of the {{'ALIAS.BUYER_LOCATION' | translate | lowercase}}.</p>
       </div>
       <div class="col-md-7 form-group"
            *ngIf="suggestedAddresses && suggestedAddresses.length > 0">
@@ -228,7 +228,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="LocationID">Location ID</label>
+          <label for="LocationID">{{'ALIAS.BUYER_LOCATION' | translate}} ID</label>
           <input type="text"
                  class="form-control"
                  id="LocationID"
@@ -238,7 +238,7 @@
                  [resourceForm]="resourceForm"
                  formControlName="LocationID"
                  (input)="handleUpdateBuyerLocation($event, 'Address.xp.LocationID')"
-                 placeholder="Enter Location ID">
+                 placeholder="Enter {{'ALIAS.BUYER_LOCATION' | translate}} ID">
         </div>
       </div>
     </div>
@@ -247,7 +247,7 @@
     <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
     <div class="d-flex justify-content-between align-items-center py-2">
       <delete-confirm-modal-component *ngIf="!isCreatingNew"
-                                      buttonText="Delete Buyer Location"
+                                      buttonText="ALIAS.BUYER_LOCATION"
                                       (deleteConfirmed)="handleDelete($event)">
       </delete-confirm-modal-component>
       <div>

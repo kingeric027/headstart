@@ -51,7 +51,7 @@ namespace Marketplace.Common.Helpers
             if (oc == null)
                 oc = new OrderCloudClient(new OrderCloudClientConfig()
                 {
-                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    AuthUrl = _settings.OrderCloudSettings.ApiUrl,
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                     ClientId = clientId
                 });

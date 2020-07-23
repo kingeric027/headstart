@@ -26,7 +26,5 @@ namespace ordercloud.integrations.avalara
 		public string ExemptionNumber { get; set; }
 		[ApiReadOnly]
 		public bool Expired => ExpirationDate < DateTimeOffset.Now;
-		[ApiReadOnly]
-		public string PDFUrl { get; set; }
 	}
 }

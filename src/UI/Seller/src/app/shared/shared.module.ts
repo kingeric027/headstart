@@ -59,6 +59,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ActionMenuComponent } from './components/action-menu/action-menu.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -150,6 +151,7 @@ import { ActionMenuComponent } from './components/action-menu/action-menu.compon
     ActionMenuComponent,
     ConfirmModal,
     UserGroupAssignments,
+    TranslateModule
   ],
   declarations: [
     SearchComponent,

@@ -11,7 +11,9 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [labelSingular]="'ADMIN.NAV.PAYMENT'"
+                          [labelPlural]="'ADMIN.NAV.PAYMENTS'">
 
   <!-- edit product -->
   <div class="resource-edit">

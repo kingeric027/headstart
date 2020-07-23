@@ -9,8 +9,9 @@ import { ToastrService } from 'ngx-toastr';
 // ordercloud
 import { AppFormErrorService } from '@app-seller/shared';
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
-import { OcPasswordResetService, PasswordReset } from '@ordercloud/angular-sdk';
+import { OcPasswordResetService, PasswordReset, TokenPasswordReset, OcMeService } from '@ordercloud/angular-sdk';
 import { ValidateFieldMatches, ValidateStrongPassword } from '@app-seller/validators/validators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'auth-reset-password',
@@ -20,7 +21,7 @@ import { ValidateFieldMatches, ValidateStrongPassword } from '@app-seller/valida
 export class ResetPasswordComponent implements OnInit {
   resetPasswordForm: FormGroup;
   username: string;
-  resetCode: string;
+  token: string;
 
   constructor(
     private router: Router,
@@ -28,18 +29,23 @@ export class ResetPasswordComponent implements OnInit {
     private toasterService: ToastrService,
     private formBuilder: FormBuilder,
     private ocPasswordResetService: OcPasswordResetService,
+    private ocMeService: OcMeService,
     private formErrorService: AppFormErrorService,
+    private http: HttpClient,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
   ngOnInit() {
-    const urlParams = this.activatedRoute.snapshot.queryParams;
-    this.username = urlParams['user'];
-    this.resetCode = urlParams['code'];
-
     this.resetPasswordForm = new FormGroup({
       password: new FormControl('', [Validators.required, ValidateStrongPassword]),
       passwordConfirm: new FormControl('', [Validators.required, ValidateFieldMatches('password')]),
+    });
+  }
+
+  private buildHeaders(): HttpHeaders {
+    const urlParams = this.activatedRoute.snapshot.queryParams;
+    return new HttpHeaders({
+      Authorization: `Bearer ${urlParams['token']}`,
     });
   }
 
@@ -48,21 +54,32 @@ export class ResetPasswordComponent implements OnInit {
       return;
     }
 
-    const config: PasswordReset = {
-      ClientID: this.appConfig.clientID,
-      Password: this.resetPasswordForm.get('password').value,
-      Username: this.username,
+    const config: TokenPasswordReset = {
+      NewPassword: this.resetPasswordForm.get('password').value,
     };
 
-    this.ocPasswordResetService.ResetPasswordByVerificationCode(this.resetCode, config).subscribe(
+    const url = `${this.appConfig.orderCloudApiUrl}/${this.appConfig.orderCloudApiVersion}/me/password`;
+    this.http.post(url, config, { headers: this.buildHeaders() }).subscribe(
       () => {
         this.toasterService.success('Password Reset Successfully');
         this.router.navigateByUrl('/login');
       },
-      (error) => {
+      error => {
         throw error;
       }
     );
+    //TODO: We SHOULD be able to use this function from the SDK, but if you uncomment,
+    // ***  you'll see that you are unable to send along an accessToken ...
+
+    // this.ocMeService.ResetPasswordByToken(config, { accessToken: this.token }).subscribe(
+    //   () => {
+    //     this.toasterService.success('Password Reset Successfully');
+    //     this.router.navigateByUrl('/login');
+    //   },
+    //   error => {
+    //     throw error;
+    //   }
+    // );
   }
 
   // control visibility of password mismatch error

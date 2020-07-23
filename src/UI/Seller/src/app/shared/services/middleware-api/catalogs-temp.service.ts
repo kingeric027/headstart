@@ -2,7 +2,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OcTokenService, Order, CatalogAssignment } from '@ordercloud/angular-sdk';
-import { SuperMarketplaceProduct, MarketplaceCatalog, MarketplaceSDK, ListPage } from 'marketplace-javascript-sdk';
+import {
+  SuperMarketplaceProduct,
+  MarketplaceCatalog,
+  MarketplaceSDK,
+  ListPage,
+  MarketplacePriceSchedule,
+} from 'marketplace-javascript-sdk';
 
 // WHOPLE FILE TO BE REPLACED BY SDK
 
@@ -94,5 +100,33 @@ export class CatalogsTempService {
       this.appConfig.middlewareUrl
     }/buyers/${buyerID}/catalogs/user/${userID}/location/${locationID}/Remove`;
     return await this.http.post(url, {}, { headers: this.buildHeaders() }).toPromise();
+  }
+
+  async GetPricingOverride(productID: string, buyerID: string): Promise<MarketplacePriceSchedule> {
+    const url = `${this.appConfig.middlewareUrl}/products/${productID}/pricingoverride/buyer/${buyerID}`;
+    return await this.http.get(url, { headers: this.buildHeaders() }).toPromise();
+  }
+
+  async CreatePricingOverride(
+    productID: string,
+    buyerID: string,
+    priceSchedule: MarketplacePriceSchedule
+  ): Promise<MarketplacePriceSchedule> {
+    const url = `${this.appConfig.middlewareUrl}/products/${productID}/pricingoverride/buyer/${buyerID}`;
+    return await this.http.post(url, priceSchedule, { headers: this.buildHeaders() }).toPromise();
+  }
+
+  async UpdatePricingOverride(
+    productID: string,
+    buyerID: string,
+    priceSchedule: MarketplacePriceSchedule
+  ): Promise<MarketplacePriceSchedule> {
+    const url = `${this.appConfig.middlewareUrl}/products/${productID}/pricingoverride/buyer/${buyerID}`;
+    return await this.http.put(url, priceSchedule, { headers: this.buildHeaders() }).toPromise();
+  }
+
+  async DeletePricingOverride(productID: string, buyerID: string): Promise<any> {
+    const url = `${this.appConfig.middlewareUrl}/products/${productID}/pricingoverride/buyer/${buyerID}`;
+    return await this.http.delete(url, { headers: this.buildHeaders() }).toPromise();
   }
 }

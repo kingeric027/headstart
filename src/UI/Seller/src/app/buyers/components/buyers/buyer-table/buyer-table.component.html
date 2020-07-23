@@ -11,9 +11,12 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [labelSingular]="'ALIAS.BUYER'"
+                          [labelPlural]="'ALIAS.BUYERS'">
   <app-buyer-edit 
     class="resource-edit"
+    [labelSingular]="'ALIAS.BUYER'"
     [orderCloudBuyer]="resourceInSelection">
   </app-buyer-edit>
 </resource-table-component>

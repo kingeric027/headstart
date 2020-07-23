@@ -2,18 +2,18 @@ import { Component, ChangeDetectorRef, NgZone, OnInit, AfterViewInit, ViewChild,
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Supplier } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { get as _get } from 'lodash';
 import {
   ValidateRichTextDescription,
   ValidateEmail,
+  RequireCheckboxesToBeChecked,
   ValidatePhone,
   ValidateSupplierCategorySelection,
 } from '@app-seller/validators/validators';
 import { SupplierService } from '../supplier.service';
-import { MarketplaceSupplier } from 'marketplace-javascript-sdk';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { MarketplaceSupplier, MarketplaceSDK } from 'marketplace-javascript-sdk';
 export interface SupplierCategoryConfigFilters {
   Display: string;
   Path: string;
@@ -28,7 +28,7 @@ export interface SupplierCategoryConfig {
 
 function createSupplierForm(supplier: MarketplaceSupplier) {
   return new FormGroup({
-    ID: new FormControl({ value: supplier.ID, disabled: !this.isCreatingNew }),
+    ID: new FormControl({ value: supplier.ID, disabled: !this.isCreatingNew || this.isSupplierUser }),
     Name: new FormControl(supplier.Name, Validators.required),
     LogoUrl: new FormControl(_get(supplier, 'xp.Images') && _get(supplier, 'xp.Images')[0]?.URL),
     Description: new FormControl(_get(supplier, 'xp.Description'), ValidateRichTextDescription),
@@ -44,9 +44,15 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
     SupportContactPhone: new FormControl(
       (_get(supplier, 'xp.SupportContact') && _get(supplier, 'xp.SupportContact.Phone')) || ''
     ),
-    Active: new FormControl(supplier.Active),
-    SyncFreightPop: new FormControl(supplier.xp?.SyncFreightPop || false),
-    Currency: new FormControl(_get(supplier, 'xp.Currency'), Validators.required)
+    Active: new FormControl({value: supplier.Active, disabled: this.isSupplierUser || !this.isCreatingNew}), 
+    SyncFreightPop: new FormControl({value: supplier.xp?.SyncFreightPop || false, disabled: this.isSupplierUser}),
+    Currency: new FormControl({value: _get(supplier, 'xp.Currency'), disabled: !this.isCreatingNew || this.isSupplierUser}, Validators.required),
+    ProductTypes: new FormGroup({
+      Standard: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('Standard') || false, disabled: this.isSupplierUser}),
+      Quote: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('Quote') || false, disabled: this.isSupplierUser}),
+      PurchaseOrder: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('PurchaseOrder') || false, disabled: this.isSupplierUser})
+    }, RequireCheckboxesToBeChecked())
+
   });
 }
 
