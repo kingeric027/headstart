@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { UserGroupAssignment } from 'ordercloud-javascript-sdk';
 import { PermissionType, PermissionTypes, ShopperContextService } from 'marketplace';
-import { MarketplaceUser } from 'marketplace-javascript-sdk';
+import { MarketplaceUser } from '@ordercloud/headstart-sdk';
 
 @Component({
   selector: 'buyer-location-permissions',

@@ -5,7 +5,7 @@ import { OrderStateService } from './order-state.service';
 import { CartService } from './cart.service';
 import { CheckoutService } from './checkout.service';
 import { LineItems, Orders, Order, LineItem, IntegrationEvents, Tokens } from 'ordercloud-javascript-sdk';
-import { MarketplaceOrder, MarketplaceLineItem, QuoteOrderInfo } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem, QuoteOrderInfo } from '@ordercloud/headstart-sdk';
 import { PromoService } from './promo.service';
 
 @Injectable({

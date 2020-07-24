@@ -5,7 +5,7 @@ import {
   MarketplaceOrder,
   MarketplaceLineItem,
   MarketplaceAddressBuyer,
-} from 'marketplace-javascript-sdk';
+} from '@ordercloud/headstart-sdk';
 import { OrderApproval, Payment, OrderPromotion } from 'ordercloud-javascript-sdk';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 

@@ -14,7 +14,7 @@ import {
   ProductXp,
   TaxCertificate,
   MarketplaceAddressBuyer,
-} from 'marketplace-javascript-sdk';
+} from '@ordercloud/headstart-sdk';
 
 // todo replace with sdk
 export interface SupplierFilterConfigDocument extends Document {

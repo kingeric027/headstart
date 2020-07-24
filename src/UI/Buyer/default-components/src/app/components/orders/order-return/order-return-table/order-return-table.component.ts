@@ -4,7 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ShopperContextService, LineItemStatus } from 'marketplace';
 import { Supplier } from 'ordercloud-javascript-sdk'
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { FormGroup, FormArray } from '@angular/forms';
 import { ReturnReason } from './return-reason-enum';
 

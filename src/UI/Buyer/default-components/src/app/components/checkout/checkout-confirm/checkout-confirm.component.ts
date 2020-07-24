@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { Payment, ListPage } from 'ordercloud-javascript-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './checkout-confirm.component.html',

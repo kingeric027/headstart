@@ -35,7 +35,7 @@ import { CurrentOrderService } from './services/order/order.service';
 import { CartService } from './services/order/cart.service';
 import { CheckoutService } from './services/order/checkout.service';
 import { OrderStateService } from './services/order/order-state.service';
-import { Configuration as MktpConfiguration } from 'marketplace-javascript-sdk';
+import { Configuration as MktpConfiguration } from '@ordercloud/headstart-sdk';
 import { Configuration, SdkConfiguration } from 'ordercloud-javascript-sdk';
 import { AppConfig } from './shopper-context';
 import { OrdersToApproveStateService } from './services/order-history/order-to-approve-state.service';
