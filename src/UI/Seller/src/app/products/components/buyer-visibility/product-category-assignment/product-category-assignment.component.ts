@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { OcCategoryService, Category } from '@ordercloud/angular-sdk';
+import { faTimes, faAngleRight, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'product-category-assignment',
@@ -44,6 +45,9 @@ export class ProductCategoryAssignment {
   assignedCategoryIDsStatic: string[] = [];
   assignedCategoryIDsEditable: string[] = [];
 
+  faAngleRight = faAngleRight;
+  faTimesCircle = faTimesCircle;
+
   constructor(private ocCategoryService: OcCategoryService) {}
 
   async getTopLevelCategories(): Promise<void> {
@@ -69,7 +73,7 @@ export class ProductCategoryAssignment {
   }
 
   async selectHighLevelCategory(event: any): Promise<void> {
-    const categoryID = event.value;
+    const categoryID = event.target.value;
     this.highLevelSelection = categoryID;
     this.midLevelSelection = '';
     this.lowLevelSelection = '';
@@ -80,7 +84,7 @@ export class ProductCategoryAssignment {
   }
 
   async selectMidLevelCategory(event: any): Promise<void> {
-    const categoryID = event.value;
+    const categoryID = event.target.value;
     this.midLevelSelection = categoryID;
     this.lowLevelSelection = '';
     this.showLowLevel = false;
@@ -89,7 +93,7 @@ export class ProductCategoryAssignment {
   }
 
   selectLowLevelCategory(event: any): void {
-    const categoryID = event.value;
+    const categoryID = event.target.value;
     this.lowLevelSelection = categoryID;
   }
 

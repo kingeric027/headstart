@@ -1,6 +1,5 @@
-export function setProductEditTab(section: string, readonly: boolean): number {
-  const index = ProductEditTabMapper[section];
-  return readonly ? index : index - 1;
+export function setProductEditTab(section: string): number {
+  return ProductEditTabMapper[section];
 }
 
 export const ProductEditTabMapper = {

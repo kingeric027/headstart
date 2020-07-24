@@ -1,163 +1,197 @@
 <div *ngIf="productForm"
      class="container-fluid resource-edit">
   <form [formGroup]="productForm">
-    <mat-tab-group [(selectedIndex)]="selectedTabIndex"
-                   (selectedTabChange)="tabChanged($event, _superMarketplaceProductEditable?.Product?.ID)"
-                   animationDuration="0ms">
+    <ul ngbNav
+        #nav="ngbNav"
+        [(activeId)]="active"
+        (navChange)="tabChanged($event, _superMarketplaceProductEditable?.Product?.ID)"
+        class="nav-pills border-top border-bottom nav-fill">
       <!-- Product Details -->
-
-      <mat-tab label="{{'ADMIN.PRODUCT_EDIT.PRODUCT' | translate}}">
-        <div class="container-fluid">
-          <div class="row pt-3">
-            <div class="col-md-8 form-group">
-              <div class="form-group">
-                <mat-slide-toggle [disabled]="readonly"
-                                  aria-describedby="Active"
-                                  formControlName="Active"
-                                  color="warn"
-                                  (change)="handleUpdateProduct($event, 'Product.Active')">
-                  <span translate>ADMIN.PRODUCT_EDIT.ACTIVE</span>
-                </mat-slide-toggle>
-              </div>
-              <div class="form-group">
-                <mat-checkbox [disabled]="readonly"
-                              aria-describedby="IsResale"
-                              formControlName="IsResale"
-                              color="warn"
-                              (change)="handleUpdateProduct($event, 'Product.xp.IsResale')">
-                  <span translate>ADMIN.PRODUCT_EDIT.RESALE</span>
-                </mat-checkbox>
-              </div>
-              <div class="form-row">
-                <div class="form-group col-md-6"
-                     *ngIf="isCreatingNew">
-                  <label for="ID"
-                         translate>ADMIN.PRODUCT_EDIT.PRODUCT_ID</label>
-                  <input type="text"
-                         class="form-control"
-                         id="ID"
-                         showErrors
-                         aria-describedby="ID"
-                         maxlength="100"
-                         formControlName="ID"
-                         (input)="handleUpdateProduct($event, 'Product.ID')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_PRODUCT_ID' | translate}}">
+      <li [ngbNavItem]="0"
+          id="0">
+        <a class="text-muted"
+           ngbNavLink
+           translate>ADMIN.PRODUCT_EDIT.PRODUCT</a>
+        <ng-template ngbNavContent>
+          <div class="container-fluid">
+            <div class="row pt-3">
+              <div class="col-md-8 form-group">
+                <div class="form-row d-flex align-items-center">
+                  <div class="form-group col-6">
+                    <label for="Active"
+                           translate>ADMIN.PRODUCT_EDIT.ACTIVE</label>
+                    <label class="d-block switch mb-0">
+                      <input class="form-check-input"
+                             type="checkbox"
+                             (click)="handleUpdateProduct($event, 'Product.Active')"
+                             [checked]="_superMarketplaceProductEditable?.Product.Active">
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="form-group col-6">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox"
+                             class="custom-control-input"
+                             [resourceForm]="resourceForm"
+                             [disabled]="readonly"
+                             formControlName="IsResale"
+                             (input)="handleUpdateProduct($event, 'Product.xp.IsResale')"
+                             id="IsResale">
+                      <label class="custom-control-label"
+                             for="IsResale"
+                             translate>ADMIN.PRODUCT_EDIT.RESALE</label>
+                    </div>
+                  </div>
                 </div>
-                <div class="form-group col-md-6"
-                     *ngIf="!isCreatingNew && _superMarketplaceProductStatic">
-                  <label for="ID"
-                         translate>ADMIN.PRODUCT_EDIT.PRODUCT_ID</label>
-                  <input class="form-control"
-                         value="{{_superMarketplaceProductStatic.Product.ID}}"
-                         disabled>
+                <div class="form-row">
+                  <div class="form-group col-md-6"
+                       *ngIf="isCreatingNew">
+                    <label for="ID"
+                           translate>ADMIN.PRODUCT_EDIT.PRODUCT_ID</label>
+                    <input type="text"
+                           class="form-control"
+                           id="ID"
+                           showErrors
+                           aria-describedby="ID"
+                           maxlength="100"
+                           formControlName="ID"
+                           (input)="handleUpdateProduct($event, 'Product.ID')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_PRODUCT_ID' | translate}}">
+                  </div>
+                  <div class="form-group col-md-6"
+                       *ngIf="!isCreatingNew && _superMarketplaceProductStatic">
+                    <label for="ID"
+                           translate>ADMIN.PRODUCT_EDIT.PRODUCT_ID</label>
+                    <input class="form-control"
+                           value="{{_superMarketplaceProductStatic.Product.ID}}"
+                           disabled>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="Name"
+                           translate>ADMIN.PRODUCT_EDIT.NAME</label>
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="text"
+                           class="form-control"
+                           id="Name"
+                           showErrors
+                           aria-describedby="Name"
+                           maxlength="100"
+                           formControlName="Name"
+                           (input)="handleUpdateProduct($event, 'Product.Name')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_NAME' | translate}}">
+                  </div>
                 </div>
-                <div class="form-group col-md-6">
-                  <label for="Name"
-                         translate>ADMIN.PRODUCT_EDIT.NAME</label>
-                  <input [attr.disabled]="readonly ? true : null"
-                         type="text"
-                         class="form-control"
-                         id="Name"
-                         showErrors
-                         aria-describedby="Name"
-                         maxlength="100"
-                         formControlName="Name"
-                         (input)="handleUpdateProduct($event, 'Product.Name')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_NAME' | translate}}">
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="ProductType"
+                           translate>ADMIN.PRODUCT_EDIT.PRODUCT_TYPE</label>
+                    <select [attr.disabled]="readonly ? true : null"
+                            type="dropdown"
+                            class="form-control"
+                            formControlName="ProductType"
+                            id="ProductType"
+                            aria-describedby="Product type"
+                            placeholder="{{'ADMIN.PRODUCT_EDIT.CHOOSE_PRODUCT_TYPE' | translate}}"
+                            (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
+                      <option [ngValue]="null"
+                              disabled
+                              translate>ADMIN.PRODUCT_EDIT.CHOOSE_PRODUCT_TYPE</option>
+                      <option *ngFor="let product of availableProductTypes"
+                              [selected]="productType === product"
+                              value="{{product}}">{{product}}</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label for="ProductType"
-                         translate>ADMIN.PRODUCT_EDIT.PRODUCT_TYPE</label>
-                  <select [attr.disabled]="readonly ? true : null"
-                          type="dropdown"
-                          class="form-control"
-                          formControlName="ProductType"
-                          id="ProductType"
-                          aria-describedby="Product type"
-                          placeholder="{{'ADMIN.PRODUCT_EDIT.CHOOSE_PRODUCT_TYPE' | translate}}"
-                          (change)="handleUpdateProduct($event, 'Product.xp.ProductType')">
-                    <option [ngValue]="null"
-                            disabled
-                            translate>ADMIN.PRODUCT_EDIT.CHOOSE_PRODUCT_TYPE</option>
-                    <option *ngFor="let product of availableProductTypes" [selected]="productType === product"
-                            value="{{product}}">{{product}}</option>
-                  </select>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="UnitOfMeasureQty"
+                           translate>ADMIN.PRODUCT_EDIT.QUANTITY_PER_UNIT</label>
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="number"
+                           class="form-control"
+                           id="UnitOfMeasureQty"
+                           min="1"
+                           aria-describedby="Max Quantity"
+                           formControlName="UnitOfMeasureQty"
+                           (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Qty')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.HOW_MANY' | translate}}">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="UnitOfMeasureUnit"
+                           translate>ADMIN.PRODUCT_EDIT.UNIT_OF_MEASURE</label>
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="text"
+                           class="form-control"
+                           id="UnitOfMeasureUnit"
+                           aria-describedby="Min Quantity"
+                           formControlName="UnitOfMeasureUnit"
+                           (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Unit')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.MEASURING_UNIT' | translate}}">
+                  </div>
                 </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label for="UnitOfMeasureQty"
-                         translate>ADMIN.PRODUCT_EDIT.QUANTITY_PER_UNIT</label>
-                  <input [attr.disabled]="readonly ? true : null"
-                         type="number"
-                         class="form-control"
-                         id="UnitOfMeasureQty"
-                         min="1"
-                         aria-describedby="Max Quantity"
-                         formControlName="UnitOfMeasureQty"
-                         (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Qty')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.HOW_MANY' | translate}}">
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="MinQuantity"
+                           translate>ADMIN.PRODUCT_EDIT.MIN_QUANTITY</label>
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="number"
+                           class="form-control"
+                           id="MinQuantity"
+                           showErrors
+                           aria-describedby="Min Quantity"
+                           min="1"
+                           step="1"
+                           formControlName="MinQuantity"
+                           (input)="handleUpdateProduct($event, 'PriceSchedule.MinQuantity', 'number')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_MIN_QUANTITY' | translate}}">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="MaxQuantity">ADMIN.PRODUCT_EDIT.MAX_QUANTITY</label>
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="number"
+                           class="form-control"
+                           id="MaxQuantity"
+                           showErrors
+                           aria-describedby="Max Quantity"
+                           min="{{productForm.controls.MinQuantity.value}}"
+                           step="1"
+                           formControlName="MaxQuantity"
+                           (input)="handleUpdateProduct($event, 'PriceSchedule.MaxQuantity', 'number')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_MAX_QUANTITY' | translate}}">
+                  </div>
                 </div>
-                <div class="form-group col-md-6">
-                  <label for="UnitOfMeasureUnit"
-                         translate>ADMIN.PRODUCT_EDIT.UNIT_OF_MEASURE</label>
-                  <input [attr.disabled]="readonly ? true : null"
-                         type="text"
-                         class="form-control"
-                         id="UnitOfMeasureUnit"
-                         aria-describedby="Min Quantity"
-                         formControlName="UnitOfMeasureUnit"
-                         (input)="handleUpdateProduct($event, 'Product.xp.UnitOfMeasure.Unit')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.MEASURING_UNIT' | translate}}">
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox"
+                             class="custom-control-input"
+                             [resourceForm]="resourceForm"
+                             [disabled]="readonly"
+                             formControlName="InventoryEnabled"
+                             (input)="handleUpdateProduct($event, 'Product.Inventory.Enabled')"
+                             id="InventoryEnabled">
+                      <label class="custom-control-label"
+                             for="InventoryEnabled"
+                             translate>ADMIN.PRODUCT_EDIT.ENABLE_INVENTORY_TRACKING</label>
+                    </div>
+                  </div>
+                  <div *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled"
+                       class="form-group col-md-6">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox"
+                             class="custom-control-input"
+                             [resourceForm]="resourceForm"
+                             formControlName="OrderCanExceed"
+                             (input)="handleUpdateProduct($event, 'Product.Inventory.OrderCanExceed')"
+                             id="OrderCanExceed">
+                      <label class="custom-control-label"
+                             for="OrderCanExceed"
+                             translate>ADMIN.PRODUCT_EDIT.ORDER_CAN_EXCEED</label>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label for="MinQuantity"
-                         translate>ADMIN.PRODUCT_EDIT.MIN_QUANTITY</label>
-                  <input [attr.disabled]="readonly ? true : null"
-                         type="number"
-                         class="form-control"
-                         id="MinQuantity"
-                         showErrors
-                         aria-describedby="Min Quantity"
-                         min="1"
-                         step="1"
-                         formControlName="MinQuantity"
-                         (input)="handleUpdateProduct($event, 'PriceSchedule.MinQuantity', 'number')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_MIN_QUANTITY' | translate}}">
-                </div>
-                <div class="form-group col-md-6">
-                  <label for="MaxQuantity"
-                         translate>ADMIN.PRODUCT_EDIT.MAX_QUANTITY</label>
-                  <input [attr.disabled]="readonly ? true : null"
-                         type="number"
-                         class="form-control"
-                         id="MaxQuantity"
-                         showErrors
-                         aria-describedby="Max Quantity"
-                         min="{{productForm.controls.MinQuantity.value}}"
-                         step="1"
-                         formControlName="MaxQuantity"
-                         (input)="handleUpdateProduct($event, 'PriceSchedule.MaxQuantity', 'number')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_MAX_QUANTITY' | translate}}">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group col-md-12">
-                  <mat-checkbox [disabled]="readonly"
-                                aria-describedby="InventoryEnabled"
-                                formControlName="InventoryEnabled"
-                                color="warn"
-                                (change)="handleUpdateProduct($event, 'Product.Inventory.Enabled')">
-                    <span translate>ADMIN.PRODUCT_EDIT.ENABLE_INVENTORY_TRACKING</span>
-                  </mat-checkbox>
-                </div>
-              </div>
-              <div *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled" class="form-row">
-                <div class="form-group col-md-6">
+                <div *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled"
+                     class="form-group">
                   <label for="QuantityAvailable"
                          translate>ADMIN.PRODUCT_EDIT.QUANTITY_AVAILABLE</label>
                   <input [attr.disabled]="readonly ? true : null"
@@ -170,407 +204,434 @@
                          (input)="handleUpdateProduct($event, 'Product.Inventory.QuantityAvailable')"
                          placeholder="{{'ADMIN.PRODUCT_EDIT.CURRENT_AVAILABLE_QUANTITY' | translate}}">
                 </div>
-                <div class="form-group col-md-6">
-                  <mat-checkbox [disabled]="readonly"
-                                class="center-checkbox"
-                                aria-describedby="OrderCanExceed"
-                                formControlName="OrderCanExceed"
-                                color="warn"
-                                (change)="handleUpdateProduct($event, 'Product.Inventory.OrderCanExceed')">
-                    <span translate>ADMIN.PRODUCT_EDIT.ORDER_CAN_EXCEED</span>
-                  </mat-checkbox>
+
+                <product-tax-code-select-component [readonly]="readonly"
+                                                   [productForm]="productForm"
+                                                   [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
+                                                   [taxCodes]="taxCodes"
+                                                   (handleTaxCodeCategorySelection)="handleTaxCodeCategorySelection($event)"
+                                                   (handleTaxCodeSelection)="handleUpdateProduct($event, 'Product.xp.Tax')"
+                                                   (handleTaxCodesSearched)="searchTaxCodes($event)"
+                                                   (onScrollEnd)="handleScrollEnd($event)">
+                </product-tax-code-select-component>
+                <div class="form-group">
+                  <label for="ShipFromAddressID"
+                         translate>ADMIN.PRODUCT_EDIT.WHICH_LOCATION_SHIP</label>
+                  <select [attr.disabled]="readonly ? true : null"
+                          type="dropdown"
+                          class="form-control"
+                          formControlName="ShipFromAddressID"
+                          id="ShipFromAddressID"
+                          aria-describedby="Ship From Address ID"
+                          (change)="handleUpdateProduct($event, 'Product.ShipFromAddressID')">
+                    <option disabled
+                            [ngValue]="null"
+                            translate>ADMIN.PRODUCT_EDIT.CHOOSE_AN_ADDRESS</option>
+                    <option *ngFor="let address of addresses?.Items"
+                            [value]="address.ID">{{address.AddressName}}</option>
+                  </select>
                 </div>
-              </div>
-              
-              <product-tax-code-select-component [readonly]="readonly"
-                                                 [productForm]="productForm"
-                                                 [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
-                                                 [taxCodes]="taxCodes"
-                                                 (handleTaxCodeCategorySelection)="handleTaxCodeCategorySelection($event)"
-                                                 (handleTaxCodeSelection)="handleUpdateProduct($event, 'Product.xp.Tax')"
-                                                 (handleTaxCodesSearched)="searchTaxCodes($event)"
-                                                 (onScrollEnd)="handleScrollEnd($event)">
-              </product-tax-code-select-component>
-              <div class="form-group">
-                <label for="ShipFromAddressID"
-                       translate>ADMIN.PRODUCT_EDIT.WHICH_LOCATION_SHIP</label>
-                <select [attr.disabled]="readonly ? true : null"
-                        type="dropdown"
-                        class="form-control"
-                        formControlName="ShipFromAddressID"
-                        id="ShipFromAddressID"
-                        aria-describedby="Ship From Address ID"
-                        (change)="handleUpdateProduct($event, 'Product.ShipFromAddressID')">
-                  <option disabled
-                          [ngValue]="null"
-                          translate>ADMIN.PRODUCT_EDIT.CHOOSE_AN_ADDRESS</option>
-                  <option *ngFor="let address of addresses?.Items"
-                          [value]="address.ID">{{address.AddressName}}</option>
-                </select>
-              </div>
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label for="ShipHeight"
-                         translate>ADMIN.PRODUCT_EDIT.SHIP_HEIGHT</label>
-                  <input [attr.disabled]="readonly ? true : null"
-                         type="number"
-                         class="form-control"
-                         id="ShipHeight"
-                         showErrors
-                         aria-describedby="Ship Height"
-                         formControlName="ShipHeight"
-                         (input)="handleUpdateProduct($event, 'Product.ShipHeight', 'number')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_HEIGHT' | translate}}">
-                </div>
-                <div class="form-group col-md-6">
-                  <label for="ShipWidth"
-                         translate>ADMIN.PRODUCT_EDIT.SHIP_WIDTH</label>
-                  <input [attr.disabled]="readonly ? true : null"
-                         type="number"
-                         class="form-control"
-                         id="ShipWidth"
-                         showErrors
-                         aria-describedby="Ship Width"
-                         formControlName="ShipWidth"
-                         (input)="handleUpdateProduct($event, 'Product.ShipWidth', 'number')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_WIDTH' | translate}}">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label for="ShipLength"
-                         translate>ADMIN.PRODUCT_EDIT.SHIP_LENGTH</label>
-                  <input [attr.disabled]="readonly ? true : null"
-                         type="number"
-                         class="form-control"
-                         id="ShipLength"
-                         showErrors
-                         aria-describedby="Ship Length"
-                         formControlName="ShipLength"
-                         (input)="handleUpdateProduct($event, 'Product.ShipLength', 'number')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_LENGTH' | translate}}">
-                </div>
-                <div class="form-group col-md-6">
-                  <label for="ShipWeight"
-                         translate>ADMIN.PRODUCT_EDIT.SHIP_WEIGHT</label>
-                  <input [attr.disabled]="readonly ? true : null"
-                         type="number"
-                         class="form-control"
-                         id="ShipWeight"
-                         showErrors
-                         aria-describedby="Ship Weight"
-                         formControlName="ShipWeight"
-                         (input)="handleUpdateProduct($event, 'Product.ShipWeight', 'number')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_WEIGHT' | translate}}">
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <!-- Product Preview -->
-              <div class="sticky-top">
-                <p class="text-center font-weight-bold"
-                   translate>ADMIN.PRODUCT_EDIT.PRODUCT_PREVIEW</p>
-                <div class="card product-preview w-100 border-hover cursor-pointer">
-                  <div class="ribbon ribbon-top-right bg-light">
-                    <fa-icon class="text-danger"
-                             [icon]="faHeart"
-                             style="cursor: pointer;"></fa-icon>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="ShipHeight"
+                           translate>ADMIN.PRODUCT_EDIT.SHIP_HEIGHT</label>
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="number"
+                           class="form-control"
+                           id="ShipHeight"
+                           showErrors
+                           aria-describedby="Ship Height"
+                           formControlName="ShipHeight"
+                           (input)="handleUpdateProduct($event, 'Product.ShipHeight', 'number')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_HEIGHT' | translate}}">
                   </div>
-                  <div><img [src]="getProductPreviewImage()"
-                         style="max-width: 100%"
-                         [alt]="_superMarketplaceProductEditable?.Product?.Name">
-                    <div class="card-body d-flex flex-column justify-content-between bg-light">
-                      <h5 class="card-title"
-                          title="_superMarketplaceProductEditable?.Product?.Name">{{_superMarketplaceProductEditable?.Product?.Name}}</h5><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.ID}}</small>
-                      <p class="card-text">{{_superMarketplaceProductEditable?.Product?.DefaultSupplierID}}</p>
-                      <div class="d-flex flex-wrap justify-content-between align-items-center">
-                        <p class="card-text mb-0"> {{_superMarketplaceProductEditable?.PriceSchedule?.PriceBreaks[0]?.Price | currency: supplierCurrency?.Currency }} </p><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Qty}} / {{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Unit}}</small><label class="sr-only"
-                               for="quantity"
-                               translate>ADMIN.PRODUCT_EDIT.QUANTITY</label>
+                  <div class="form-group col-md-6">
+                    <label for="ShipWidth"
+                           translate>ADMIN.PRODUCT_EDIT.SHIP_WIDTH</label>
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="number"
+                           class="form-control"
+                           id="ShipWidth"
+                           showErrors
+                           aria-describedby="Ship Width"
+                           formControlName="ShipWidth"
+                           (input)="handleUpdateProduct($event, 'Product.ShipWidth', 'number')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_WIDTH' | translate}}">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="ShipLength"
+                           translate>ADMIN.PRODUCT_EDIT.SHIP_LENGTH</label>
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="number"
+                           class="form-control"
+                           id="ShipLength"
+                           showErrors
+                           aria-describedby="Ship Length"
+                           formControlName="ShipLength"
+                           (input)="handleUpdateProduct($event, 'Product.ShipLength', 'number')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_LENGTH' | translate}}">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="ShipWeight"
+                           translate>ADMIN.PRODUCT_EDIT.SHIP_WEIGHT</label>
+                    <input [attr.disabled]="readonly ? true : null"
+                           type="number"
+                           class="form-control"
+                           id="ShipWeight"
+                           showErrors
+                           aria-describedby="Ship Weight"
+                           formControlName="ShipWeight"
+                           (input)="handleUpdateProduct($event, 'Product.ShipWeight', 'number')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_SHIP_WEIGHT' | translate}}">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <!-- Product Preview -->
+                <div class="sticky-top">
+                  <p class="text-center font-weight-bold"
+                     translate>ADMIN.PRODUCT_EDIT.PRODUCT_PREVIEW</p>
+                  <div class="card product-preview w-100 border-hover cursor-pointer">
+                    <div class="ribbon ribbon-top-right bg-light">
+                      <fa-icon class="text-danger"
+                               [icon]="faHeart"
+                               style="cursor: pointer;"></fa-icon>
+                    </div>
+                    <div><img [src]="getProductPreviewImage()"
+                           style="max-width: 100%"
+                           [alt]="_superMarketplaceProductEditable?.Product?.Name">
+                      <div class="card-body d-flex flex-column justify-content-between bg-light">
+                        <h5 class="card-title"
+                            title="_superMarketplaceProductEditable?.Product?.Name">{{_superMarketplaceProductEditable?.Product?.Name}}</h5><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.ID}}</small>
+                        <p class="card-text">{{_superMarketplaceProductEditable?.Product?.DefaultSupplierID}}</p>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center">
+                          <p class="card-text mb-0"> {{_superMarketplaceProductEditable?.PriceSchedule?.PriceBreaks[0]?.Price | currency: supplierCurrency?.Currency }} </p><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Qty}} / {{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Unit}}</small><label class="sr-only"
+                                 for="quantity"
+                                 translate>ADMIN.PRODUCT_EDIT.QUANTITY</label>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <!-- / Product Preview -->
-            </div>
-          </div>
-        </div>
-      </mat-tab>
-      <!-- Buyer Visibility  -->
-      <mat-tab label="{{'ADMIN.PRODUCT_EDIT.BUYER_VISIBILITY' | translate}}"
-               *ngIf="readonly">
-        <product-visibility-assignments-component *ngIf="_superMarketplaceProductStatic?.Product?.ID"
-                                                  [product]="_superMarketplaceProductStatic.Product">
-        </product-visibility-assignments-component>
-      </mat-tab>
-      <!-- Product Description -->
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span translate>ADMIN.PRODUCT_EDIT.DESCRIPTION</span>
-        </ng-template>
-        <div class="container-fluid">
-          <div class="row pt-3">
-            <div class="col-12">
-              <reactive-quill-editor-component [readonly]="readonly"
-                                               [resourceInSelection]="resourceInSelection"
-                                               [formControlForText]="productForm?.controls?.Description"
-                                               resourceField="Description"
-                                               pathOnResource="Description"
-                                               (resourceUpdated)="updateResourceFromFieldValue($event.field, $event.value)">
-              </reactive-quill-editor-component>
-              <div class="form-row pt-3">
-                <div *ngIf="!readonly"
-                     class="form-group col-md-6">
-                  <label for="Note"
-                         translate>ADMIN.PRODUCT_EDIT.PRODUCT_MESSAGE</label>
-                  <input type="text"
-                         class="form-control"
-                         id="Note"
-                         showErrors
-                         aria-describedby="Note"
-                         maxlength="240"
-                         formControlName="Note"
-                         (input)="handleUpdateProduct($event, 'Product.xp.Note')"
-                         placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_PRODUCT_NOTE' | translate}}">
-                </div>
-                <div [ngClass]="{'col-md-6': !readonly, 'col-md-12': readonly}">
-                  <p class="font-weight-bold mb-0"
-                     translate>ADMIN.PRODUCT_EDIT.MESSAGE_PREVIEW</p>
-                  <div class="alert alert-info">
-                    <span translate>ADMIN.PRODUCT_EDIT.NOTE</span>: {{_superMarketplaceProductEditable?.Product?.xp?.Note}}
-                  </div>
-                </div>
+                <!-- / Product Preview -->
               </div>
             </div>
           </div>
-        </div>
-      </mat-tab>
-      <!-- / Product Description -->
-      <mat-tab label="{{'ADMIN.PRODUCT_EDIT.PRICING' | translate}}">
-        <product-pricing-component
-          [readonly]="readonly"
-          [productForm]="productForm"
-          [supplierCurrency]="supplierCurrency"
-          [sellerCurrency]="sellerCurrency"
-          [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
-          (updateProduct)="updateProductResource($event)"
-        >
-        </product-pricing-component>
-      </mat-tab>
-
-      <!-- / Product Details -->
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span [matTooltip]="isCreatingNew ? 'Optional' : ''"
-                translate>ADMIN.PRODUCT_EDIT.FILTERS</span>
         </ng-template>
-        <product-filters-component [readonly]="readonly"
-                                   (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
-                                   [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []"></product-filters-component>
-      </mat-tab>
-      <!-- Product Variations -->
-      <mat-tab [disabled]="!_superMarketplaceProductEditable?.Product?.ID">
-        <ng-template mat-tab-label>
-          <span matBadgeSize="medium"
-                matBadgeOverlap="false"
-                matBadgeDescription="{{'ADMIN.PRODUCT_EDIT.THIS_PRODUCT_HAS' | translate}} {{_superMarketplaceProductEditable?.Variants?.length}} {{'ADMIN.PRODUCT_EDIT.VARIANTS_LOWERCASE' | translate}}."
-                [matTooltip]="!_superMarketplaceProductEditable?.Product?.ID ? 'Product needs an ID' : ''"
-                [matBadge]="_superMarketplaceProductEditable?.Variants?.length || 0">Variants</span>
+      </li>
+      <!-- /Product Details -->
+      <!-- Buyer Visibility -->
+      <li [ngbNavItem]="1"
+          *ngIf="readonly"
+          id="1">
+        <a [fragment]="catalog-assignments"
+           class="text-muted"
+           ngbNavLink
+           translate>ADMIN.PRODUCT_EDIT.BUYER_VISIBILITY</a>
+        <ng-template ngbNavContent>
+          <product-visibility-assignments-component *ngIf="_superMarketplaceProductStatic?.Product?.ID"
+                                                    [product]="_superMarketplaceProductStatic.Product">
+          </product-visibility-assignments-component>
         </ng-template>
-        <product-variations-component [readonly]="readonly"
-                                      [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
-                                      [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
-                                      [areChanges]="areChanges"
-                                      [isCreatingNew]="isCreatingNew"
-                                      [checkForChanges]="checkForChanges"
-                                      [copyProductResource]="copyProductResource"
-                                      [myCurrency]="supplierCurrency"
-                                      (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
-                                      (variantsValidated)="validateVariants($event)">
-        </product-variations-component>
-      </mat-tab>
-      <!-- /Product Variations -->
-      <!-- Product Images & Documents-->
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span matBadgeSize="medium"
-                matBadgeOverlap="false"
-                matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Images?.length}} images and documents."
-                [matBadge]="_superMarketplaceProductEditable?.Images?.length + _superMarketplaceProductEditable?.Attachments?.length + imageFiles?.length + staticContentFiles?.length">Images & Documents</span>
-        </ng-template>
-        <div class="container-fluid">
-          <div class="row pt-3">
-            <div class="col-md-5">
-              <h5>Product Images</h5>
-              <p class="font-italic">Drag and Drop or upload your product images to display on the buyer site.</p>
-            </div>
-            <div class="col-md-7">
-              <!--droped image preview-->
-              <div class="d-flex justify-content-start align-items-center flex-wrap">
-                <div *ngFor="let image of images; let i = index"
-                     class="product-img-wrapper mr-2">
-                  <div class="product-img">
-                    <img [id]="i"
-                         [src]="image.Url"
-                         width="auto"
-                         height="100px">
-                    <span *ngIf="i === 0"
-                          class="badge badge-primary primary-badge position-absolute mt-1 ml-1">
-                      Primary
-                    </span>
-                  </div>
+      </li>
+      <!-- /Buyer Visibility -->
+      <!-- Description -->
+      <li [ngbNavItem]="2"
+          id="2">
+        <a [fragment]="description"
+           class="text-muted"
+           ngbNavLink
+           translate>ADMIN.PRODUCT_EDIT.DESCRIPTION</a>
+        <ng-template ngbNavContent>
+          <div class="container-fluid">
+            <div class="row pt-3">
+              <div class="col-12">
+                <reactive-quill-editor-component [readonly]="readonly"
+                                                 [resourceInSelection]="resourceInSelection"
+                                                 [formControlForText]="productForm?.controls?.Description"
+                                                 resourceField="Description"
+                                                 pathOnResource="Description"
+                                                 (resourceUpdated)="updateResourceFromFieldValue($event.field, $event.value)">
+                </reactive-quill-editor-component>
+                <div class="form-row pt-3">
                   <div *ngIf="!readonly"
-                       class="product-img-delete text-center">
-                    <button title="Delete photo"
-                            class="btn btn-light btn-group-item"
-                            data-ui="action-btn"
-                            data-action="delete"
-                            type="button"
-                            (click)="open(content)">
-
-                      <fa-icon [icon]="faTrash"></fa-icon>
-                    </button>
-                    <ng-template #content
-                                 let-modal
-                                 class="confirm-modal">
-                      <confirm-modal modalTitle="Delete Image?"
-                                     description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
-                        <button type="button"
-                                class="btn btn-link text-dark"
-                                (click)="modal.dismiss()">Cancel</button>
-                        <button type="button"
-                                class="btn brand-button--danger"
-                                (click)="removeFile(image)"
-                                (click)="modal.dismiss()">Yes, Delete</button>
-                      </confirm-modal>
-                    </ng-template>
+                       class="form-group col-md-6">
+                    <label for="Note"
+                           translate>ADMIN.PRODUCT_EDIT.PRODUCT_MESSAGE</label>
+                    <input type="text"
+                           class="form-control"
+                           id="Note"
+                           showErrors
+                           aria-describedby="Note"
+                           maxlength="240"
+                           formControlName="Note"
+                           (input)="handleUpdateProduct($event, 'Product.xp.Note')"
+                           placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_PRODUCT_NOTE' | translate}}">
+                  </div>
+                  <div [ngClass]="{'col-md-6': !readonly, 'col-md-12': readonly}">
+                    <p class="font-weight-bold mb-0"
+                       translate>ADMIN.PRODUCT_EDIT.MESSAGE_PREVIEW</p>
+                    <div class="alert alert-info">
+                      <span translate>ADMIN.PRODUCT_EDIT.NOTE</span>: {{_superMarketplaceProductEditable?.Product?.xp?.Note}}
+                    </div>
                   </div>
                 </div>
-                <div *ngFor="let image of imageFiles; let i = index"
-                     class="product-img-wrapper mr-2">
-                  <img class="product-img"
-                       [id]="i"
-                       [src]="image.URL"
-                       width="auto"
-                       height="100px">
-                  <div class="product-img-delete text-center">
-                    <button title="Un-stage photo"
-                            class="btn btn-light btn-group-item"
-                            data-ui="action-btn"
-                            data-action="unstageFile"
-                            (click)="unstageFile(i, 'image')">
-                      <fa-icon [icon]="faTimes"></fa-icon>
-                    </button>
-                  </div>
-                </div>
-                <label *ngIf="!readonly"
-                       class="rmpm dropzone"
-                       for="imageUpload"
-                       appDrag
-                       (files)="stageImages($event)">
-                </label>
-                <input [disabled]="readonly"
-                       class="d-none"
-                       id="imageUpload"
-                       type="file"
-                       (change)="manualFileUpload($event, 'image')"
-                       multiple>
               </div>
             </div>
           </div>
-          <div class="row pt-3 mt-5 border-top">
-            <div class="col-md-5">
-              <h5>Product Documents</h5>
-              <p class="font-italic">Name and upload your product documents to display and dowload on the buyer site.</p>
-            </div>
-            <div class="col-md-7">
-              <!--droped doc preview-->
-              <div class="d-flex justify-content-start align-items-center flex-wrap">
-                <div *ngIf="!readonly"
-                     class="input-group mb-3">
-                  <input type="text"
-                         required
-                         class="form-control"
-                         value="{{documentName}}"
-                         placeholder="Document Name"
-                         aria-label="Document Name"
-                         (keyup)="getDocumentName($event)"
-                         aria-describedby="document name">
-                  <div class="input-group-append">
-                    <label *ngIf="documentName?.length"
-                           class="btn btn-outline-primary"
-                           for="documentUpload"
-                           (files)="stageDocuments($event)">
-                      choose file
-                      <input id="documentUpload"
-                             class="d-none"
-                             type="file"
-                             (change)="manualFileUpload($event, 'staticContent')">
-                    </label>
-                  </div>
-                </div>
-                <div *ngFor="let file of staticContentFiles; let i = index"
-                     class="product-img-wrapper mr-2">
-                  <a class="text-link">{{file.Filename}}</a>
-                  <div *ngIf="!readonly"
-                       class="float-right float-middle">
-                    <button title="Un-stage file"
-                            class="btn btn-light btn-group-item"
-                            data-ui="action-btn"
-                            data-action="unstageFile"
-                            (click)="unstageFile(i, 'staticContent')">
-                      <fa-icon [icon]="faTimes"></fa-icon>
-                    </button>
-                  </div>
-                </div>
-                <table class="table table-sm bg-light"
-                       *ngIf="staticContent?.length > 0">
-                  <thead>
-                    <tr>
-                      <th>Documents</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let file of staticContent">
-                      <td>{{file.FileName}}</td>
-                      <td><a class="btn-link"
-                           href="{{file.Url}}"
-                           target="_blank"
-                           download="file.FileName">download</a></td>
-                      <td>
-                        <button title="Delete file"
-                                class="btn btn-light btn-group-item"
-                                data-ui="action-btn"
-                                data-action="delete"
-                                type="button"
-                                (click)="open(content)">
-                          <fa-icon [icon]="faTrash"></fa-icon>
-                        </button></td>
+        </ng-template>
+      </li>
+      <!-- /Description -->
+      <!-- Pricing -->
+      <li [ngbNavItem]="3"
+          id="3">
+        <a [fragment]="price"
+           class="text-muted"
+           ngbNavLink
+           translate>ADMIN.PRODUCT_EDIT.PRICING</a>
+        <ng-template ngbNavContent>
+          <product-pricing-component [readonly]="readonly"
+                                     [productForm]="productForm"
+                                     [supplierCurrency]="supplierCurrency"
+                                     [sellerCurrency]="sellerCurrency"
+                                     [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
+                                     (updateProduct)="updateProductResource($event)">
+          </product-pricing-component>
+        </ng-template>
+      </li>
+      <!-- /Pricing -->
+      <!-- Filters -->
+      <li [ngbNavItem]="4"
+          id="4">
+        <a [fragment]="filters"
+           class="text-muted"
+           ngbNavLink
+           translate>ADMIN.PRODUCT_EDIT.FILTERS</a>
+        <ng-template ngbNavContent>
+          <product-filters-component [readonly]="readonly"
+                                     (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
+                                     [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []">
+          </product-filters-component>
+        </ng-template>
+      </li>
+      <!-- /Filters -->
+      <!-- Varitaions -->
+      <li [ngbNavItem]="5"
+          [disabled]="!_superMarketplaceProductEditable?.Product?.ID"
+          id="5">
+        <a [fragment]="variants"
+           class="text-muted"
+           ngbNavLink>Variants <span class="badge badge-pill badge-info">{{_superMarketplaceProductEditable?.Variants?.length || 0}}</span></a>
+        <ng-template ngbNavContent>
+          <product-variations-component [readonly]="readonly"
+                                        [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
+                                        [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
+                                        [areChanges]="areChanges"
+                                        [isCreatingNew]="isCreatingNew"
+                                        [checkForChanges]="checkForChanges"
+                                        [copyProductResource]="copyProductResource"
+                                        [myCurrency]="supplierCurrency"
+                                        (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
+                                        (variantsValidated)="validateVariants($event)">
+          </product-variations-component>
+        </ng-template>
+      </li>
+      <!-- /Variations -->
+      <!-- Images & Documents -->
+      <li [ngbNavItem]="6"
+          id="6">
+        <a [fragment]="images-and-documents"
+           class="text-muted"
+           ngbNavLink>Images & Documents <span class="badge badge-pill badge-info">{{_superMarketplaceProductEditable?.Images?.length + _superMarketplaceProductEditable?.Attachments?.length + imageFiles?.length + staticContentFiles?.length}}</span></a>
+        <ng-template ngbNavContent>
+          <div class="container-fluid">
+            <div class="row pt-3">
+              <div class="col-md-5">
+                <h5>Product Images</h5>
+                <p class="font-italic">Drag and Drop or upload your product images to display on the buyer site.</p>
+              </div>
+              <div class="col-md-7">
+                <!--droped image preview-->
+                <div class="d-flex justify-content-start align-items-center flex-wrap">
+                  <div *ngFor="let image of images; let i = index"
+                       class="product-img-wrapper mr-2">
+                    <div class="product-img">
+                      <img [id]="i"
+                           [src]="image.Url"
+                           width="auto"
+                           height="100px">
+                      <span *ngIf="i === 0"
+                            class="badge badge-primary primary-badge position-absolute mt-1 ml-1">
+                        Primary
+                      </span>
+                    </div>
+                    <div *ngIf="!readonly"
+                         class="product-img-delete text-center">
+                      <button title="Delete photo"
+                              class="btn btn-light btn-group-item"
+                              data-ui="action-btn"
+                              data-action="delete"
+                              type="button"
+                              (click)="open(content)">
+
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                      </button>
                       <ng-template #content
                                    let-modal
                                    class="confirm-modal">
-                        <confirm-modal modalTitle="Delete Document?"
-                                       description="Deleting this document cannot be reversed.">
+                        <confirm-modal modalTitle="Delete Image?"
+                                       description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
                           <button type="button"
                                   class="btn btn-link text-dark"
                                   (click)="modal.dismiss()">Cancel</button>
                           <button type="button"
                                   class="btn brand-button--danger"
-                                  (click)="removeFile(file)"
+                                  (click)="removeFile(image)"
                                   (click)="modal.dismiss()">Yes, Delete</button>
                         </confirm-modal>
                       </ng-template>
-                    </tr>
-                  </tbody>
-                </table>
+                    </div>
+                  </div>
+                  <div *ngFor="let image of imageFiles; let i = index"
+                       class="product-img-wrapper mr-2">
+                    <img class="product-img"
+                         [id]="i"
+                         [src]="image.URL"
+                         width="auto"
+                         height="100px">
+                    <div class="product-img-delete text-center">
+                      <button title="Un-stage photo"
+                              class="btn btn-light btn-group-item"
+                              data-ui="action-btn"
+                              data-action="unstageFile"
+                              (click)="unstageFile(i, 'image')">
+                        <fa-icon [icon]="faTimes"></fa-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <label *ngIf="!readonly"
+                         class="rmpm dropzone"
+                         for="imageUpload"
+                         appDrag
+                         (files)="stageImages($event)">
+                  </label>
+                  <input [disabled]="readonly"
+                         class="d-none"
+                         id="imageUpload"
+                         type="file"
+                         (change)="manualFileUpload($event, 'image')"
+                         multiple>
+                </div>
+              </div>
+            </div>
+            <div class="row pt-3 mt-5 border-top">
+              <div class="col-md-5">
+                <h5>Product Documents</h5>
+                <p class="font-italic">Name and upload your product documents to display and dowload on the buyer site.</p>
+              </div>
+              <div class="col-md-7">
+                <!--droped doc preview-->
+                <div class="d-flex justify-content-start align-items-center flex-wrap">
+                  <div *ngIf="!readonly"
+                       class="input-group mb-3">
+                    <input type="text"
+                           required
+                           class="form-control"
+                           value="{{documentName}}"
+                           placeholder="Document Name"
+                           aria-label="Document Name"
+                           (keyup)="getDocumentName($event)"
+                           aria-describedby="document name">
+                    <div class="input-group-append">
+                      <label *ngIf="documentName?.length"
+                             class="btn btn-outline-primary"
+                             for="documentUpload"
+                             (files)="stageDocuments($event)">
+                        choose file
+                        <input id="documentUpload"
+                               class="d-none"
+                               type="file"
+                               (change)="manualFileUpload($event, 'staticContent')">
+                      </label>
+                    </div>
+                  </div>
+                  <div *ngFor="let file of staticContentFiles; let i = index"
+                       class="product-img-wrapper mr-2">
+                    <a class="text-link">{{file.Filename}}</a>
+                    <div *ngIf="!readonly"
+                         class="float-right float-middle">
+                      <button title="Un-stage file"
+                              class="btn btn-light btn-group-item"
+                              data-ui="action-btn"
+                              data-action="unstageFile"
+                              (click)="unstageFile(i, 'staticContent')">
+                        <fa-icon [icon]="faTimes"></fa-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <table class="table table-sm bg-light"
+                         *ngIf="staticContent?.length > 0">
+                    <thead>
+                      <tr>
+                        <th>Documents</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let file of staticContent">
+                        <td>{{file.FileName}}</td>
+                        <td><a class="btn-link"
+                             href="{{file.Url}}"
+                             target="_blank"
+                             download="file.FileName">download</a></td>
+                        <td>
+                          <button title="Delete file"
+                                  class="btn btn-light btn-group-item"
+                                  data-ui="action-btn"
+                                  data-action="delete"
+                                  type="button"
+                                  (click)="open(content)">
+                            <fa-icon [icon]="faTrash"></fa-icon>
+                          </button></td>
+                        <ng-template #content
+                                     let-modal
+                                     class="confirm-modal">
+                          <confirm-modal modalTitle="Delete Document?"
+                                         description="Deleting this document cannot be reversed.">
+                            <button type="button"
+                                    class="btn btn-link text-dark"
+                                    (click)="modal.dismiss()">Cancel</button>
+                            <button type="button"
+                                    class="btn brand-button--danger"
+                                    (click)="removeFile(file)"
+                                    (click)="modal.dismiss()">Yes, Delete</button>
+                          </confirm-modal>
+                        </ng-template>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </mat-tab>
-      <!-- /Product Images & Documents -->
-    </mat-tab-group>
+        </ng-template>
+      </li>
+      <!-- /Images & Documents -->
+    </ul>
+    <div [ngbNavOutlet]="nav"></div>
+    <!-- Variation Count badge for Variants tab & images/doc count for images tab-->
+    <!-- <span matBadgeSize="medium"
+              matBadgeOverlap="false"
+              matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Variants?.length}} variants."
+              [matTooltip]="!_superMarketplaceProductEditable?.Product?.ID ? 'Product needs an ID' : ''"
+              [matBadge]="_superMarketplaceProductEditable?.Variants?.length || 0">
+        </span>
+        <span matBadgeSize="medium"
+              matBadgeOverlap="false"
+              matBadgeDescription="This product has {{_superMarketplaceProductEditable?.Images?.length}} images and documents."
+              [matBadge]="_superMarketplaceProductEditable?.Images?.length + _superMarketplaceProductEditable?.Attachments?.length + imageFiles?.length + staticContentFiles?.length">
+        </span> -->
   </form>
   <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
   <div *ngIf="userContext?.UserType === 'SUPPLIER'"
