@@ -4,32 +4,36 @@
       <form [formGroup]="resourceForm">
         <div class="card py-2 px-3 mt-3 bg-white">
           <div class="d-flex justify-content-between align-items-center">
-            <h6 class="font-weight-medium">Discount Code</h6>
+            <h6 class="font-weight-medium"
+                translate>ADMIN.PROMOTIONS.DISCOUNT_CODE</h6>
             <h6 class="btn-link cursor-pointer"
-                (click)="generateRandomCode()">Generate random code</h6>
+                (click)="generateRandomCode()"
+                translate>ADMIN.PROMOTIONS.GENERATE_RANDOM_CODE</h6>
           </div>
           <input type="text"
                  class="form-control"
                  formControlName="Code"
                  [value]="_promotionEditable?.Code"
                  (input)="handleUpdatePromo($event, 'Code')"
-                 placeholder="e.g. SPRINGSALE20">
-          <small>Buyer users will use this code at checkout.</small>
+                 placeholder="{{'ADMIN.PROMOTIONS.PROMO_CODE_EXAMPLE' | translate}}">
+          <small translate>ADMIN.PROMOTIONS.PROMO_CODE_EXPLANATION</small>
         </div>
         <div class="card py-2 px-3 mt-3 bg-white">
-          <h6 class="font-weight-medium">Fine Print</h6>
+          <h6 class="font-weight-medium"
+              translate>ADMIN.PROMOTIONS.FINE_PRINT</h6>
           <textarea type="text"
                     class="form-control"
                     formControlName="FinePrint"
                     [value]="_promotionEditable?.FinePrint"
                     (input)="handleUpdatePromo($event, 'FinePrint')"
-                    placeholder="e.g. Cannot be combined with other offers"
+                    placeholder="{{'ADMIN.PROMOTIONS.FINE_PRINT_EXAMPLE' | translate}}"
                     rows="3"
                     maxLength="100"></textarea>
-          <small>This field may be used for display purposes on the storefront, limit 100 chars.</small>
+          <small translate>ADMIN.PROMOTIONS.FINE_PRINT_EXPLANATION</small>
         </div>
         <div class="card py-2 px-3 mt-3 bg-white">
-          <h6 class="font-weight-medium">Type</h6>
+          <h6 class="font-weight-medium"
+              translate>ADMIN.PROMOTIONS.TYPE</h6>
           <div class="form-check">
             <input class="form-check-input"
                    type="radio"
@@ -40,8 +44,9 @@
                    (change)="handleUpdatePromo($event, 'xp.Type')"
                    [checked]="promoTypeCheck('Percentage')">
             <label class="form-check-label"
-                   for="Percentage">
-              Percentage
+                   for="Percentage"
+                   translate>
+                   ADMIN.PROMOTIONS.PERCENTAGE
             </label>
           </div>
           <div class="form-check">
@@ -54,8 +59,9 @@
                    (change)="handleUpdatePromo($event, 'xp.Type')"
                    [checked]="promoTypeCheck('FixedAmount')">
             <label class="form-check-label"
-                   for="FixedAmount">
-              Fixed Amount
+                   for="FixedAmount"
+                   translate>
+                   ADMIN.PROMOTIONS.FIXED_AMOUNT
             </label>
           </div>
           <div class="form-check">
@@ -68,14 +74,16 @@
                    (change)="handleUpdatePromo($event, 'xp.Type')"
                    [checked]="promoTypeCheck('FreeShipping')">
             <label class="form-check-label"
-                   for="FreeShipping">
-              Free Shipping
+                   for="FreeShipping"
+                   translate>
+                   ADMIN.PROMOTIONS.FREE_SHIPPING
             </label>
           </div>
         </div>
         <div *ngIf="_promotionEditable?.xp?.Type !== 'FreeShipping'"
              class="card py-2 px-3 mt-3 bg-white">
-          <h6 class="font-weight-medium">Value</h6>
+          <h6 class="font-weight-medium"
+              translate>ADMIN.PROMOTIONS.VALUE</h6>
           <label for="Value"></label>
           <div class="input-group w-25">
             <div *ngIf="_promotionEditable?.xp?.Type === 'FixedAmount'"
@@ -92,10 +100,12 @@
             </div>
           </div>
           <hr />
-          <h6 class="font-weight-medium">Applies To</h6>
+          <h6 class="font-weight-medium"
+              translate>ADMIN.PROMOTIONS.APPLIES_TO</h6>
           <small>
             <fa-icon style="color: #cccccc"
-                     [icon]="faExclamationCircle"></fa-icon> All promotions are order-wide at this point.
+                     [icon]="faExclamationCircle"></fa-icon> 
+                     <span translate>ADMIN.PROMOTIONS.ALL_PROMOS_ORDERWIDE</span>
           </small>
           <div class="form-check">
             <input class="form-check-input"
@@ -107,16 +117,18 @@
                    (change)="handleUpdatePromo($event, 'xp.AppliesTo')"
                    [checked]="promoTypeCheck('EntireOrder')">
             <label class="form-check-label"
-                   for="EntireOrder">
-              Entire Order
+                   for="EntireOrder"
+                   translate>
+              ADMIN.PROMOTIONS.ENTIRE_ORDER
             </label>
           </div>
         </div>
         <div class="card py-2 px-3 mt-3 bg-white">
-          <h6 class="font-weight-medium">Minimum Requirements</h6>
+          <h6 class="font-weight-medium"
+              translate>ADMIN.PROMOTIONS.MINIMUM_REQUIREMENTS</h6>
           <small>
             <fa-icon style="color: #cccccc"
-                     [icon]="faExclamationCircle"></fa-icon> You can only select one minimum requirement at this time.
+                     [icon]="faExclamationCircle"></fa-icon> <span translate>ADMIN.PROMOTIONS.MINIMUM_REQUIREMENTS_EXPLANATION</span>
           </small>
           <div class="form-check">
             <input class="form-check-input"
@@ -128,8 +140,9 @@
                    (input)="handleClearMinReq()"
                    [checked]="!_promotionEditable?.xp?.MinReq?.Type">
             <label class="form-check-label"
-                   for="None">
-              None
+                   for="None"
+                   translate>
+                   ADMIN.PROMOTIONS.NONE
             </label>
           </div>
           <div class="form-check">
@@ -142,8 +155,9 @@
                    (input)="handleUpdatePromo($event, 'xp.MinReq.Type')"
                    [checked]="_promotionEditable?.xp?.MinReq?.Type === 'MinPurchase'">
             <label class="form-check-label"
-                   for="MinPurchase">
-              Minimum purchase amount
+                   for="MinPurchase"
+                   translate>
+                   ADMIN.PROMOTIONS.MINIMUM_PURCHASE_AMOUNT
             </label>
           </div>
           <div [hidden]="!_promotionEditable?.xp?.MinReq?.Type || _promotionEditable?.xp?.MinReq?.Type === 'MinItemQty'"
@@ -169,8 +183,9 @@
                    (input)="handleUpdatePromo($event, 'xp.MinReq.Type')"
                    [checked]="_promotionEditable?.xp?.MinReq?.Type === 'MinItemQty'">
             <label class="form-check-label"
-                   for="MinItemQty">
-              Minimum quantity of items
+                   for="MinItemQty"
+                   translate>
+                   ADMIN.PROMOTIONS.MINIMUM_QUANTITY_ITEMS
             </label>
           </div>
           <div [hidden]="!_promotionEditable?.xp?.MinReq?.Type || _promotionEditable?.xp?.MinReq?.Type === 'MinPurchase'"
@@ -183,12 +198,14 @@
                    formControlName="MinReqInt"
                    name="MinReqInt">
             <div class="input-group-append">
-              <span class="input-group-text">Items</span>
+              <span class="input-group-text"
+                    translate>ADMIN.PROMOTIONS.ITEMS</span>
             </div>
           </div>
           <span *ngIf="_promotionEditable?.xp?.MinReq?.Type">
             <hr />
-            <h6 class="font-weight-medium">Requirement Scope</h6>
+            <h6 class="font-weight-medium"
+                translate>ADMIN.PROMOTIONS.REQUIREMENT_SCOPE</h6>
             <div class="custom-control custom-checkbox">
               <input type="checkbox"
                      class="custom-control-input"
@@ -197,7 +214,8 @@
                      (input)="handleUpdatePromo($event, 'xp.ScopeToSupplier')"
                      id="ScopeToSupplier">
               <label class="custom-control-label"
-                     for="ScopeToSupplier">Limit requirement to one supplier's products</label>
+                     for="ScopeToSupplier"
+                     translate>ADMIN.PROMOTIONS.LIMIT_REQUIREMENT</label>
             </div>
           </span>
           <span *ngIf="_promotionEditable?.xp?.ScopeToSupplier && _promotionEditable?.xp?.MinReq?.Type">
@@ -229,7 +247,8 @@
                      [checked]="capShipCost"
                      id="MaxShipCost">
               <label class="custom-control-label"
-                     for="MaxShipCost">Exclude shipping rates over certain cost</label>
+                     for="MaxShipCost"
+                     translate>ADMIN.PROMOTIONS.EXCLUDE_SHIPPING_RATES</label>
             </div>
             <div [hidden]="!capShipCost"
                  class="input-group w-25">
@@ -247,10 +266,12 @@
           </ng-container>
         </div>
         <div class="card py-2 px-3 mt-3 bg-white">
-          <h6 class="font-weight-medium">Buyer Eligibility</h6>
+          <h6 class="font-weight-medium"
+              translate>ADMIN.PROMOTIONS.BUYER_ELIGIBILITY</h6>
           <small>
             <fa-icon style="color: #cccccc"
-                     [icon]="faExclamationCircle"></fa-icon> All promotions are eligible to all buyers at this time.
+                     [icon]="faExclamationCircle"></fa-icon> 
+                     <span translate>ADMIN.PROMOTIONS.ALL_PROMOTIONS_ELIGIBLE</span>
           </small>
           <div class="form-check">
             <input class="form-check-input"
@@ -262,8 +283,9 @@
                    (input)="handleUpdatePromo($event, 'AllowAllBuyers')"
                    [checked]="_promotionEditable?.AllowAllBuyers">
             <label class="form-check-label"
-                   for="AllowAllBuyers">
-              All buyers
+                   for="AllowAllBuyers"
+                   translate>
+              ADMIN.PROMOTIONS.ALL_BUYERS
             </label>
           </div>
           <!-- Placeholder for future functionality  -->
@@ -276,8 +298,9 @@
                    disabled
                    [checked]="false">
             <label class="form-check-label"
-                   for="SpecificBuyers">
-              Specific buyers
+                   for="SpecificBuyers"
+                   translate>
+              ADMIN.PROMOTIONS.SPECIFIC_BUYERS
             </label>
           </div>
           <div class="form-check">
@@ -289,13 +312,15 @@
                    disabled
                    [checked]="false">
             <label class="form-check-label"
-                   for="SpecificBuyerGroups">
-              Specific buyer groups
+                   for="SpecificBuyerGroups"
+                   translate>
+              ADMIN.PROMOTIONS.SPECIFIC_BUYER_GROUPS
             </label>
           </div>
         </div>
         <div class="card py-2 px-3 mt-3 bg-white">
-          <h6 class="font-weight-medium">Usage Limits</h6>
+          <h6 class="font-weight-medium"
+              translate>ADMIN.PROMOTIONS.USAGE_LIMITS</h6>
           <div class="custom-control custom-checkbox">
             <input type="checkbox"
                    class="custom-control-input"
@@ -304,7 +329,8 @@
                    (input)="handleUpdatePromo($event, 'CanCombine')"
                    id="CanCombine">
             <label class="custom-control-label"
-                   for="CanCombine">Can combine with other promotions</label>
+                   for="CanCombine"
+                   translate>ADMIN.PROMOTIONS.CAN_COMBINE</label>
           </div>
           <div class="custom-control custom-checkbox">
             <input type="checkbox"
@@ -313,7 +339,8 @@
                    (input)="toggleHasRedemptionLimit()"
                    id="HasRedemptionLimit">
             <label class="custom-control-label"
-                   for="HasRedemptionLimit">Limit the total number of times this discount can be used</label>
+                   for="HasRedemptionLimit"
+                   translate>ADMIN.PROMOTIONS.LIMIT_TIMES_DISCOUNT</label>
           </div>
           <input [hidden]="!hasRedemptionLimit"
                  class="form-control w-25"
@@ -330,7 +357,8 @@
                    (input)="toggleLimitPerUser()"
                    id="LimitPerUser">
             <label class="custom-control-label"
-                   for="LimitPerUser">Limit the number of times one user can redeem this promotion</label>
+                   for="LimitPerUser"
+                   translate>ADMIN.PROMOTIONS.LIMIT_TIMES_REDEEM</label>
           </div>
           <input [hidden]="!limitPerUser"
                  class="form-control w-25"
@@ -342,9 +370,11 @@
                  name="RedemptionLimitPerUser">
         </div>
         <div class="card py-2 px-3 mt-3 bg-white">
-          <h6 class="font-weight-medium">Active Dates</h6>
+          <h6 class="font-weight-medium"
+              translate>ADMIN.PROMOTIONS.ACTIVE_DATES</h6>
           <div class="form-group">
-            <label for="StartDate">Start Date & Time (UTC) <small>
+            <label for="StartDate"
+                   translate>ADMIN.PROMOTIONS.START_DATE_TIME<small>
                 <fa-icon style="color: #cccccc"
                          [icon]="faQuestionCircle"
                          autoClose="outside"
@@ -353,7 +383,7 @@
                          #popover="ngbPopover"></fa-icon>
               </small></label>
             <ng-template #utcinfo>
-              <p>Coordinated Universal Time (UTC) is the primary time standard by which the world regulates clocks and time. To get accurate Start and End times, convert your desired local time to UTC and enter the UTC time into the form.</p>
+              <p translate>ADMIN.PROMOTIONS.UTC_EXPLANATION</p>
             </ng-template>
             <input class="form-control col-6"
                    type="datetime-local"
@@ -371,11 +401,13 @@
                    [checked]="hasExpiration"
                    id="HasExpiration">
             <label class="custom-control-label"
-                   for="HasExpiration">Set Expiration Date</label>
+                   for="HasExpiration"
+                   translate>ADMIN.PROMOTIONS.SET_EXPIRATION_DATE</label>
           </div>
           <div *ngIf="hasExpiration"
                class="form-group mt-3">
-            <label for="StartDate">Expiration Date & Time (UTC) <small>
+            <label for="StartDate"
+                   translate>ADMIN.PROMOTIONS.EXPIRATION_DATE_TIME<small>
                 <fa-icon style="color: #cccccc"
                          [icon]="faQuestionCircle"
                          autoClose="outside"
@@ -396,29 +428,35 @@
     </div>
     <div class="col-md-5">
       <div class="card py-2 px-3 mt-3 bg-white">
-        <h6 class="font-weight-medium">Summary</h6>
+        <h6 class="font-weight-medium"
+            translate>ADMIN.PROMOTIONS.SUMMARY</h6>
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="font-weight-bold">{{_promotionEditable?.Code}}</h5>
           <span *ngIf="!isCreatingNew"
                 class="badge badge-pill"
-                [ngClass]="{'badge-success': !isExpired, 'badge-light': isExpired}">{{isExpired ? 'Expired' : 'Active'}}</span>
+                [ngClass]="{'badge-success': !isExpired, 'badge-light': isExpired}"
+                translate>
+                {{isExpired ? 'ADMIN.PROMOTIONS.EXPIRED' : 'ADMIN.PROMOTIONS.ACTIVE'}}
+          </span>
         </div>
-        <p *ngIf="!_promotionEditable?.Code && !_promotionEditable?.xp?.Value">No information entered yet.</p>
+        <p *ngIf="!_promotionEditable?.Code && !_promotionEditable?.xp?.Value"
+            translate>ADMIN.PROMOTIONS.NO_INFO_ENTERED</p>
         <ng-container *ngIf="_promotionEditable?.xp?.Value || _promotionEditable?.xp?.Type === 'FreeShipping'">
           <ul>
             <li>{{getValueDisplay()}}</li>
             <li *ngIf="_promotionEditable?.StartDate && _promotionEditable?.ExpirationDate">{{getDateRangeDisplay()}}</li>
-            <li *ngIf="_promotionEditable?.xp?.MaxShipCost">Applies to shipping rates under {{_promotionEditable?.xp?.MaxShipCost | currency}}</li>
+            <li *ngIf="_promotionEditable?.xp?.MaxShipCost"
+                 translate>ADMIN.PROMOTIONS.APPLIES_TO_RATES {{_promotionEditable?.xp?.MaxShipCost | currency}}</li>
             <li>{{getEligibilityDisplay()}}</li>
             <li *ngIf="_promotionEditable?.RedemptionLimit || _promotionEditable?.RedemptionLimitPerUser">{{getUsageLimitDisplay()}}</li>
-            <li>{{_promotionEditable?.CanCombine ? 'Can be combined with other promotions' : 'Cannot be combined with other promotions'}}</li>
+            <li translate>{{_promotionEditable?.CanCombine ? 'ADMIN.PROMOTIONS.CAN_BE_COMBINED' : 'ADMIN.PROMOTIONS.CANNOT_BE_COMBINED'}}</li>
           </ul>
         </ng-container>
         <ng-container *ngIf="!isCreatingNew && _promotionStatic.ID">
           <hr>
-          <h6>Performance</h6>
+          <h6 translate>ADMIN.PROMOTIONS.PERFORMANCE</h6>
           <ul>
-            <li>{{this._promotionStatic?.RedemptionCount}} used</li>
+            <li>{{this._promotionStatic?.RedemptionCount}} {{'ADMIN.PROMOTIONS.USED' | translate}}</li>
           </ul>
         </ng-container>
       </div>
@@ -441,7 +479,8 @@
                     (click)="handleSave()">{{getSaveBtnText()}}</button>
             <button class="btn brand-button ml-3"
                     (click)="handleDiscardChanges()"
-                    *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+                    *ngIf="areChanges && !isCreatingNew"
+                    translate>ADMIN.PROMOTIONS.DISCARD_CHANGES</button>
           </div>
         </div>
       </div>
