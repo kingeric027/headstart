@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <user-group-assignments *ngIf="selectedResource.ID && !isCreatingNew"
+  <user-group-assignments *ngIf="selectedResource?.ID && !isCreatingNew"
                           [isCreatingNew]="isCreatingNew"
                           userGroupType="UserPermissions"
                           [user]="selectedResource"
