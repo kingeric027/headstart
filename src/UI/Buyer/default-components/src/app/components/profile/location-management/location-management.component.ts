@@ -6,7 +6,7 @@ import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import {
   MarketplaceAddressBuyer,
   TaxCertificate,
-} from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+} from '@ordercloud/headstart-sdk';
 import { CertificateFormOutput } from '../certificate-form/certificate-form.component';
 import { GeographyConfig } from '../../../config/geography.class';
 import { downloadBase64String } from 'src/app/services/download.helper';
