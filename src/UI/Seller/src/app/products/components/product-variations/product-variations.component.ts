@@ -5,7 +5,7 @@ import { ProductService } from '@app-seller/products/product.service';
 import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from 'src/environments/environment';
 import { AppAuthService } from '@app-seller/auth';
@@ -304,7 +304,7 @@ export class ProductVariations {
     // Queue up image/content requests, then send them all at aonce
     // TODO: optimize this so we aren't having to update all images, just 'changed' ones
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    const requests = this.superProductEditable.Images.map(i => MarketplaceSDK.Assets.Update(i.ID, i, accessToken));
+    const requests = this.superProductEditable.Images.map(i => HeadStartSDK.Assets.Update(i.ID, i, accessToken));
     await Promise.all(requests);
     // Ensure there is no mistaken change detection
     Object.assign(this.superProductStatic.Images, this.superProductEditable.Images);

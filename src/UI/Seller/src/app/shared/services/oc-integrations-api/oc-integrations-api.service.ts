@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OcTokenService, Order } from '@ordercloud/angular-sdk';
-import { SuperMarketplaceProduct, ListPage } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, ListPage } from '@ordercloud/headstart-sdk';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 
 @Injectable({

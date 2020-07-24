@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { MarketplaceUserGroup, MarketplaceCatalog } from 'marketplace-javascript-sdk';
+import { MarketplaceUserGroup, MarketplaceCatalog } from '@ordercloud/headstart-sdk';
 import { Router } from '@angular/router';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';

@@ -11,7 +11,7 @@ import {
   CategoryProductAssignment,
 } from '@ordercloud/angular-sdk';
 import { ProductService } from '@app-seller/products/product.service';
-import { MarketplaceBuyer, MarketplaceProduct } from 'marketplace-javascript-sdk';
+import { MarketplaceBuyer, MarketplaceProduct } from '@ordercloud/headstart-sdk';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
 
 @Component({

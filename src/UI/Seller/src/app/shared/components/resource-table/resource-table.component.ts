@@ -20,7 +20,7 @@ import { faCalendar, faChevronLeft, faFilter, faHome, faTimes } from '@fortaweso
 import { NgbDateStruct, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { singular } from 'pluralize';
 import { filter, takeWhile } from 'rxjs/operators';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
 import { pipe } from 'rxjs';
