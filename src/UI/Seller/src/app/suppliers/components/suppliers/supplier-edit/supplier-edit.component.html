@@ -82,25 +82,42 @@
               <span class="slider round cursor-pointer"></span>
             </label>
           </div>
-          
-          <div class="form-group col-md-6" formGroupName="ProductTypes">
+
+          <div class="form-group col-md-6"
+               formGroupName="ProductTypes">
             <div>
               <label>Product Type (Select at least 1)</label>
             </div>
             <div class="d-flex justify-content-between align-items-center">
-              <mat-checkbox color="primary" 
-                aria-describedby="Standard" 
-                formControlName="Standard"
-                (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Standard')">Standard</mat-checkbox>
-              <mat-checkbox color="primary" 
-                aria-describedby="Quote" 
-                formControlName="Quote"
-                (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Quote')">Quote</mat-checkbox>
-              <mat-checkbox color="primary" 
-                aria-describedby="PurchaseOrder" 
-                formControlName="PurchaseOrder"
-                (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.PurchaseOrder')">Purchase Order</mat-checkbox>
+              <mat-checkbox color="primary"
+                            aria-describedby="Standard"
+                            formControlName="Standard"
+                            (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Standard')">Standard</mat-checkbox>
+              <mat-checkbox color="primary"
+                            aria-describedby="Quote"
+                            formControlName="Quote"
+                            (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Quote')">Quote</mat-checkbox>
+              <mat-checkbox color="primary"
+                            aria-describedby="PurchaseOrder"
+                            formControlName="PurchaseOrder"
+                            (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.PurchaseOrder')">Purchase Order</mat-checkbox>
             </div>
+            <ng-container *ngIf="countriesServicingOptions.length">
+              <div>
+                <div class="mt-4 w-100">
+                  <label>Countries To Service</label>
+                </div>
+                <div class="d-flex justify-content-start">
+                  <ng-container *ngFor="let country of countriesServicingOptions">
+                    <mat-checkbox class="mr-2"
+                                  color="primary"
+                                  [checked]="getCountryCheckbox(country.Value)"
+                                  (change)="updateCountriesServicing($event.checked, country.Value)">{{country.Text}}</mat-checkbox>
+                  </ng-container>
+                </div>
+              </div>
+            </ng-container>
+
 
           </div>
         </div>
