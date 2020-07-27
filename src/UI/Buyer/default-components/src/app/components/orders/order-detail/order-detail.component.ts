@@ -74,10 +74,12 @@ export class OCMOrderDetails implements OnInit {
 
   toggleRequestReturn(): void {
     this.showRequestReturn = !this.showRequestReturn;
+    if(this.showRequestReturn) this.showRequestCancel = false;
   }
 
   toggleRequestCancel(): void {
     this.showRequestCancel = !this.showRequestCancel;
+    if(this.showRequestCancel) this.showRequestReturn = false;
   }
 
   toShipments(): void {

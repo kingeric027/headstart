@@ -21,12 +21,10 @@ export class OCMOrderReturnTable {
   returnReasons: CancelReturnReason[];
   lineItems: FormArray;
   columnsToDisplay: string[] = returnColumns;
-  itemsHaveShipped: boolean;
+  _action: string;
   
   @Input() set liGroup(value: MarketplaceLineItem[]) {
     this._liGroup = value; 
-    this.itemsHaveShipped = lineItemHasBeenShipped(value[0]);
-    this.returnReasons = this.itemsHaveShipped ? ReturnReasons : CancelReasons;
     // this.columnsToDisplay = lineItemHasBeenShipped(value[0]) ? 
     // returnColumns : cancelColumns;
     // console.log(this.columnsToDisplay)
@@ -35,6 +33,10 @@ export class OCMOrderReturnTable {
   @Input() set liGroupForm(value: FormGroup) {
     this.lineItems = value.controls.lineItems as FormArray;
     this.dataSource = new MatTableDataSource<any>(this.lineItems.controls);
+  }
+  @Input() set action(value: string) {
+    this._action = value;
+    this.returnReasons = value === 'return' ? ReturnReasons : CancelReasons;
   }
   @Output()
   quantitiesToReturnEvent = new EventEmitter<number>();

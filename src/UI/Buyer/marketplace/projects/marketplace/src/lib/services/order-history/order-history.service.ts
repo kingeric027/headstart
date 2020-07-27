@@ -88,11 +88,11 @@ export class OrderHistoryService {
   }
 
   //  How to handle ClaimStatus ? should I put it within OrderReturnInfo / OrderCancelInfo?
-  async returnOrCancelOrder(orderID: string, returnOrder: boolean, cancelOrder: boolean): Promise<MarketplaceOrder> {
+  async returnOrder(orderID: string): Promise<MarketplaceOrder> {
     const order = await Orders.Patch('Outgoing', orderID, {
       xp: {
         OrderReturnInfo: {
-          HasReturn: returnOrder,
+          HasReturn: true,
           Resolved: false,
         },
         ClaimStatus: ClaimStatus.Pending

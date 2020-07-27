@@ -26,11 +26,12 @@ export class OCMOrderReturn {
     this.order = value.Order;
     this.lineItems = value.LineItems;
     //  Need to group lineitems by shipping address and by whether it has been shipped for return/cancel distinction.
-    const liGroups = _groupBy(this.lineItems, li => (li.ShipFromAddressID + lineItemHasBeenShipped(li)));
+    const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(liGroups);
     this.setSupplierInfo(this.liGroupedByShipFrom);
     this.setRequestReturnForm();
   }
+  @Input() action: string
   @Output()
   viewReturnFormEvent = new EventEmitter<boolean>();
 
@@ -50,27 +51,45 @@ export class OCMOrderReturn {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(liGroups);
   }
 
-  //  if there are lineitems selected that have not been shipped, request cancelation, else request return.
-  async onSubmit(): Promise<void> {
-    this.isSaving = true;
-    const orderID = this.requestReturnForm.value.orderID;
-    await this.context.orderHistory.returnOrder(orderID);
-    const lineItemsToReturn = [];
-    const lineItemsToCancel = [];
+  async updateOrder(orderID: string): Promise<void> {
+    if(this.action === 'return') {
+      await this.context.orderHistory.returnOrder(orderID)
+    } else {
+      await this.context.orderHistory.cancelOrder(orderID)
+    }
+  }
+
+  async updateLineItems(orderID: string): Promise<void> {
+    const lineItemsToUpdate: Promise<MarketplaceLineItem>[] = [];
     this.requestReturnForm.value.liGroups.forEach(liGroup =>
       liGroup.lineItems
         .filter(lineItem => lineItem.selected === true)
-        .forEach(lineItem => lineItemHasBeenShipped(lineItem) ? lineItemsToReturn.push(lineItem) : lineItemsToCancel.push(lineItem))
+        .forEach(li => {
+          const newSumToReturn = (li.lineItem?.xp?.LineItemReturnInfo?.QuantityToReturn || 0) + li.quantityToReturn;
+          lineItemsToUpdate.push(
+            this.action === 'return' ?
+            this.context.orderHistory.returnLineItem(
+              orderID,
+              li.id,
+              newSumToReturn,
+              li.returnReason
+          ) : this.context.orderHistory.cancelLineItem(
+              orderID,
+              li.id,
+              newSumToReturn,
+              li.returnReason
+          ))
+        }
+      )
     );
-    for (const lineItem of lineItemsToReturn) {
-        const newSumToReturn = (lineItem.lineItem?.xp?.LineItemReturnInfo?.QuantityToReturn || 0) + lineItem.quantityToReturn;
-        await this.context.orderHistory.returnLineItem(
-          orderID,
-          lineItem.id,
-          newSumToReturn,
-          lineItem.returnReason
-        )
-     }
+    await Promise.all(lineItemsToUpdate);
+  }
+
+  async onSubmit(): Promise<void> {
+    this.isSaving = true;
+    const orderID = this.requestReturnForm.value.orderID;
+    await this.updateOrder(orderID)
+    await this.updateLineItems(orderID)
     this.isSaving = false;
     this.viewReturnFormEvent.emit(false);
   }

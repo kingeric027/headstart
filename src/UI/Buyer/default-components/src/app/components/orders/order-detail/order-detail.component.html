@@ -155,6 +155,6 @@
                     (viewReturnFormEvent)="toggleShowRequestForm($event.detail)"
                     [isOrderToApprove]="isOrderToApprove"
                     [orderDetails]="orderDetails"
-                    [lineItems]="lineItems?.Items">
+                    [action]="showRequestReturn ? 'return' : 'cancel'">
   </ocm-order-return>
 </div>
