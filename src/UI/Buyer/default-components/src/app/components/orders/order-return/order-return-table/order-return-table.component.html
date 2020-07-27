@@ -16,7 +16,6 @@
         <mat-checkbox
           (change)="$event ? toggle(row) : null"
           [checked]="selection.isSelected(row)"
-          formControlName="selected"
           [aria-label]="checkboxLabel(i, row)"
         >
         </mat-checkbox>

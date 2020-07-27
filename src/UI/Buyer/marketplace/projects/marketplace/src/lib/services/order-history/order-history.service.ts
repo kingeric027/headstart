@@ -87,11 +87,25 @@ export class OrderHistoryService {
       .toPromise();
   }
 
-  async returnOrder(orderID: string): Promise<MarketplaceOrder> {
+  //  How to handle ClaimStatus ? should I put it within OrderReturnInfo / OrderCancelInfo?
+  async returnOrCancelOrder(orderID: string, returnOrder: boolean, cancelOrder: boolean): Promise<MarketplaceOrder> {
     const order = await Orders.Patch('Outgoing', orderID, {
       xp: {
         OrderReturnInfo: {
-          HasReturn: true,
+          HasReturn: returnOrder,
+          Resolved: false,
+        },
+        ClaimStatus: ClaimStatus.Pending
+      },
+    });
+    return order as MarketplaceOrder;
+  }
+
+  async cancelOrder(orderID: string): Promise<MarketplaceOrder> {
+    const order = await Orders.Patch('Outgoing', orderID, {
+      xp: {
+        OrderCancelInfo: {
+          HasCancel: true,
           Resolved: false,
         },
         ClaimStatus: ClaimStatus.Pending
@@ -120,4 +134,27 @@ export class OrderHistoryService {
     await MarketplaceSDK.Orders.RequestReturnEmail(orderID);
     return line;
   }
+
+  async cancelLineItem(
+    orderID: string,
+    lineItemID: string,
+    quantityToCancel: number,
+    cancelReason: string
+  ): Promise<MarketplaceLineItem> {
+    const patch = {
+      xp: {
+        LineItemCancelInfo: {
+          QuantityToCancel: quantityToCancel,
+          CancelReason: cancelReason,
+          Resolved: false,
+        },
+        LineItemStatus: LineItemStatus.CancelRequested
+      },
+    };
+    const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
+    await MarketplaceSDK.Orders.RequestReturnEmail(orderID);
+    return line;
+  }
+
+
 }

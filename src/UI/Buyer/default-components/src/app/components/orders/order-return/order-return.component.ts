@@ -7,6 +7,7 @@ import {MarketplaceOrder, MarketplaceLineItem, OrderDetails} from 'marketplace-j
 import { groupBy as _groupBy } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model';
+import { lineItemHasBeenShipped } from 'src/app/services/orderType.helper';
 
 @Component({
   templateUrl: './order-return.component.html',
@@ -18,23 +19,14 @@ export class OCMOrderReturn {
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
   quantitiesToReturn: number[] = [];
-  displayedColumns: string[] = [
-    'select',
-    'product',
-    'id',
-    'price',
-    'quantityOrdered',
-    'quantityReturned',
-    'quantityToReturn',
-    'returnReason'
-  ];
   requestReturnForm: FormGroup;
   groupedLineItemsToReturn: FormArray;
   isSaving = false;
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.Order;
     this.lineItems = value.LineItems;
-    const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
+    //  Need to group lineitems by shipping address and by whether it has been shipped for return/cancel distinction.
+    const liGroups = _groupBy(this.lineItems, li => (li.ShipFromAddressID + lineItemHasBeenShipped(li)));
     this.liGroupedByShipFrom = Object.values(liGroups);
     this.setSupplierInfo(this.liGroupedByShipFrom);
     this.setRequestReturnForm();
@@ -58,15 +50,17 @@ export class OCMOrderReturn {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(liGroups);
   }
 
+  //  if there are lineitems selected that have not been shipped, request cancelation, else request return.
   async onSubmit(): Promise<void> {
     this.isSaving = true;
     const orderID = this.requestReturnForm.value.orderID;
     await this.context.orderHistory.returnOrder(orderID);
     const lineItemsToReturn = [];
+    const lineItemsToCancel = [];
     this.requestReturnForm.value.liGroups.forEach(liGroup =>
       liGroup.lineItems
         .filter(lineItem => lineItem.selected === true)
-        .forEach(lineItem => lineItemsToReturn.push(lineItem))
+        .forEach(lineItem => lineItemHasBeenShipped(lineItem) ? lineItemsToReturn.push(lineItem) : lineItemsToCancel.push(lineItem))
     );
     for (const lineItem of lineItemsToReturn) {
         const newSumToReturn = (lineItem.lineItem?.xp?.LineItemReturnInfo?.QuantityToReturn || 0) + lineItem.quantityToReturn;

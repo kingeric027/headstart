@@ -4,7 +4,7 @@ import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
-import { ReturnReason } from '../../orders/order-return/order-return-table/return-reason-enum';
+import { CancelReturnReason } from '../../orders/order-return/order-return-table/return-reason-enum';
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 
 @Component({
@@ -92,6 +92,6 @@ export class OCMLineitemTable {
   }
 
   getReturnReason(reasonCode: string): string {
-    return ReturnReason[reasonCode];
+    return CancelReturnReason[reasonCode];
   }
 }

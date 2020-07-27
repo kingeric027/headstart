@@ -6,7 +6,8 @@ import { ShopperContextService, LineItemStatus } from 'marketplace';
 import { Supplier } from 'ordercloud-javascript-sdk'
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { FormGroup, FormArray } from '@angular/forms';
-import { ReturnReason } from './return-reason-enum';
+import { ReturnReasons, CancelReasons, returnColumns, cancelColumns, CancelReturnReason } from './return-reason-enum';
+import { lineItemHasBeenShipped } from 'src/app/services/orderType.helper';
 
 @Component({
   templateUrl: './order-return-table.component.html',
@@ -17,26 +18,19 @@ export class OCMOrderReturnTable {
   selection = new SelectionModel<FormGroup>(true, []);
   _liGroup: MarketplaceLineItem[];
   quantitiesToReturn: number[] = [];
-  returnReasons: ReturnReason[] = [
-    ReturnReason.IncorrectSizeOrStyle, 
-    ReturnReason.IncorrectShipment, 
-    ReturnReason.DoesNotMatchDescription, 
-    ReturnReason.ProductDefective, 
-    ReturnReason.PackagingDamaged, 
-    ReturnReason.ReceivedExtraProduct, 
-    ReturnReason.ArrivedLate, 
-    ReturnReason.PurchaseMistake, 
-    ReturnReason.NotNeeded, 
-    ReturnReason.NotApproved, 
-    ReturnReason.UnappliedDiscount, 
-    ReturnReason.ProductMissing
-  ];
+  returnReasons: CancelReturnReason[];
   lineItems: FormArray;
+  columnsToDisplay: string[] = returnColumns;
+  itemsHaveShipped: boolean;
   
   @Input() set liGroup(value: MarketplaceLineItem[]) {
-    this._liGroup = value;
+    this._liGroup = value; 
+    this.itemsHaveShipped = lineItemHasBeenShipped(value[0]);
+    this.returnReasons = this.itemsHaveShipped ? ReturnReasons : CancelReasons;
+    // this.columnsToDisplay = lineItemHasBeenShipped(value[0]) ? 
+    // returnColumns : cancelColumns;
+    // console.log(this.columnsToDisplay)
   }
-  @Input() columnsToDisplay: string[];
   @Input() supplier: Supplier;
   @Input() set liGroupForm(value: FormGroup) {
     this.lineItems = value.controls.lineItems as FormArray;
@@ -55,8 +49,8 @@ export class OCMOrderReturnTable {
     this.context.router.toProductDetails(productID);
   }
 
-  getReasonCode(reason: ReturnReason): string {
-    const reasonCode = Object.keys(ReturnReason).find(key => ReturnReason[key] === reason);
+  getReasonCode(reason: CancelReturnReason): string {
+    const reasonCode = Object.keys(CancelReturnReason).find(key => CancelReturnReason[key] === reason);
     return reasonCode;
   }
 

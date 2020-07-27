@@ -19,6 +19,7 @@ export class OCMOrderDetails implements OnInit {
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
   showRequestReturn = false;
+  showRequestCancel = false;
   isQuoteOrder = isQuoteOrder;
   constructor(private context: ShopperContextService, private modalService: NgbModal) {}
 
@@ -59,6 +60,13 @@ export class OCMOrderDetails implements OnInit {
     );
   }
 
+  canRequestCancel(): boolean {
+    return (
+      this.order.Status !== 'Unsubmitted' &&
+      this.order.xp.ShippingStatus !== ShippingStatus.Shipped
+    );
+  }
+
   toggleFavorite(order: MarketplaceOrder): void {
     const newValue = !this.isFavorite(order.ID);
     this.context.currentUser.setIsFavoriteOrder(newValue, order.ID);
@@ -66,6 +74,10 @@ export class OCMOrderDetails implements OnInit {
 
   toggleRequestReturn(): void {
     this.showRequestReturn = !this.showRequestReturn;
+  }
+
+  toggleRequestCancel(): void {
+    this.showRequestCancel = !this.showRequestCancel;
   }
 
   toShipments(): void {
