@@ -13,6 +13,7 @@ import {
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -45,7 +46,7 @@ export class ProductService extends ResourceCrudService<Product> {
         HasVariants: false,
         Note: '',
         Tax: {
-          Category: null,
+          Category: 'P0000000', // SEB-827 default tax category to TPP
           Code: null,
           Description: null,
         },
@@ -93,8 +94,13 @@ export class ProductService extends ResourceCrudService<Product> {
   async updateProductCatalogAssignments(
     add: ProductAssignment[],
     del: ProductAssignment[],
-    buyerID: string
+    buyerID: string,
+    priceScheduleID: string
   ): Promise<void> {
+    add = add.map(a => {
+      a.PriceScheduleID = priceScheduleID;
+      return a;
+    });
     const addRequests = add.map(newAssignment => this.ocProductsService.SaveAssignment(newAssignment).toPromise());
     const deleteRequests = del.map(assignmentToRemove =>
       this.ocProductsService

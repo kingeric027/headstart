@@ -7,6 +7,7 @@ import {
   ListPage,
   Payment,
   BuyerCreditCard,
+  OrderPromotion,
 } from 'ordercloud-javascript-sdk';
 import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
@@ -23,6 +24,7 @@ export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
   isAnon: boolean;
   order: MarketplaceOrder;
+  orderPromotions: OrderPromotion[] = [];
   lineItems: ListPage<MarketplaceLineItem>;
   orderSummaryMeta: OrderSummaryMeta;
   payments: ListPage<Payment>;
@@ -64,7 +66,7 @@ export class OCMCheckout implements OnInit {
     this.isAnon = this.context.currentUser.isAnonymous();
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
     this.reIDLineItems();
-    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.lineItems.Items, this.currentPanel)
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.currentPanel)
     this.setValidation('login', !this.isAnon);
   }
 
@@ -158,7 +160,7 @@ export class OCMCheckout implements OnInit {
   }
 
   toSection(id: string): void {
-    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.lineItems.Items, id)
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, id)
     const prevIdx = Math.max(this.sections.findIndex(x => x.id === id) - 1, 0);
     
     // set validation to true on all previous sections
@@ -185,5 +187,10 @@ export class OCMCheckout implements OnInit {
       }
     }
     this.currentPanel = $event.panelId;
+  }
+
+  updateOrderMeta(): void {
+    this.orderPromotions = this.context.order.promos.get().Items;
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.currentPanel)
   }
 }

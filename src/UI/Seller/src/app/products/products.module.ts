@@ -13,13 +13,17 @@ import { ProductFilters } from './components/product-filters/product-filters.com
 import { BuyerVisibilityConfiguration } from './components/buyer-visibility/buyer-visibility-configuration/buyer-visibility-configuration.component';
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
 import { MatIconModule } from '@angular/material/icon';
-import { MatChipTrailingIcon, MatChipsModule } from '@angular/material/chips';
+import { MatChipsModule } from '@angular/material/chips';
+import { ProductPricingComponent } from './components/product-pricing/product-pricing.component';
+import { PriceBreakEditor } from './components/price-break-editor/price-break-editor.component';
 
 @NgModule({
   imports: [SharedModule, ProductsRoutingModule, PerfectScrollbarModule, MatIconModule, MatChipsModule],
   declarations: [
     ProductTableComponent,
     ProductEditComponent,
+    ProductPricingComponent,
+    PriceBreakEditor,
     ProductVisibilityAssignments,
     BuyerVisibilityConfiguration,
     ProductCategoryAssignment,

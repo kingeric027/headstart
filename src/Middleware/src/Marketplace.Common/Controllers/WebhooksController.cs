@@ -83,7 +83,7 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("newuser")] // TO DO: send email to mp manager
         [OrderCloudWebhookAuth]
-        public async void HandleNewUser([FromBody] WebhookPayloads.Users.Create payload)
+        public async void HandleNewUser([FromBody] MessageNotification<PasswordResetEventBody> payload)
         {
             await _sendgridService.SendNewUserEmail(payload);
         }

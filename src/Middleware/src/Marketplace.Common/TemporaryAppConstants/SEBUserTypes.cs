@@ -65,7 +65,7 @@ namespace Marketplace.Common.TemporaryAppConstants
                     UserGroupIDSuffix = UserGroupSuffix.OrderApprover.ToString(),
                     CustomRoles = new List<CustomRole>
                     {
-                        CustomRole.MPLocationApprovalRuleAdmin,
+                        CustomRole.MPLocationOrderApprover,
                     }
                 },
                 new MarketplaceUserType {

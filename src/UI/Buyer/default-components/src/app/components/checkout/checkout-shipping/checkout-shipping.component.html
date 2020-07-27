@@ -1,7 +1,8 @@
 <div *ngIf="_shipEstimates">
   <div *ngFor="let shipEstimate of _shipEstimates; let i = index">
     <ocm-lineitem-table [lineItems]="_lineItemsByShipEstimate[i]"
-                        [readOnly]="true">
+                        [readOnly]="true"
+                        [hideStatus]="true">
       <ocm-shipping-selection-form [shipEstimate]="shipEstimate"
                                    [supplierID]="getSupplierID(shipEstimate)"
                                    [shipFromAddressID]="getShipFromAddressID(shipEstimate)"

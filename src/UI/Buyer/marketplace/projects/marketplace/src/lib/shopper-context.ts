@@ -16,6 +16,31 @@ import {
   MarketplaceAddressBuyer,
 } from 'marketplace-javascript-sdk';
 
+// todo replace with sdk
+export interface SupplierFilterConfigDocument extends Document {
+  Doc: SupplierFilterConfig;
+}
+
+export interface SupplierFilterConfig {
+  Display: string;
+  Path: string;
+  Items: Filter[];
+  AllowSupplierEdit: boolean;
+  AllowSellerEdit: boolean;
+  BuyerAppFilterType: BuyerAppFilterType;
+}
+
+export enum BuyerAppFilterType {
+  SelectOption = 'SelectOption',
+  NonUI = 'NonUI',
+}
+
+export interface Filter {
+  Text: string;
+  Value: string;
+}
+// end todo replace with sdk
+
 export interface LineItemGroupSupplier {
   supplier: Supplier;
   shipFrom: Address;
@@ -193,7 +218,7 @@ export class AppConfig {
   /**
    * base path to middleware
    */
-
+  translateBlobUrl: string;
   ordercloudEnv: OrdercloudEnv;
   avalaraCompanyId: number;
   middlewareUrl: string;

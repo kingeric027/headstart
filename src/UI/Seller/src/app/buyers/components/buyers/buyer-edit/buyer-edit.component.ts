@@ -21,6 +21,8 @@ export class BuyerEditComponent {
   _superBuyerEditable: SuperMarketplaceBuyer;
 
   @Input()
+  labelSingular: string;
+  @Input()
   set orderCloudBuyer(buyer: MarketplaceBuyer) {
     if (buyer.ID) {
       this.handleSelectedBuyerChange(buyer);

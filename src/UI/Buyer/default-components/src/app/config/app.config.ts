@@ -9,6 +9,7 @@ export const ocAppConfig: AppConfig = {
   baseUrl: environment.baseUrl,
   middlewareUrl: environment.middlewareUrl,
   ssoLink: environment.ssoLink,
+  translateBlobUrl: environment.translateBlobUrl,
   ordercloudEnv: environment.ordercloudEnv,
   anonymousShoppingEnabled: false,
   avalaraCompanyId: 280411,

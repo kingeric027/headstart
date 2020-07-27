@@ -34,7 +34,7 @@ namespace Marketplace.Common.Commands.SupplierSync
             {
                 var oc = new OrderCloudClient(new OrderCloudClientConfig()
                 {
-                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    AuthUrl = _settings.OrderCloudSettings.ApiUrl,
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                     ClientId = user.ClientID
                 });

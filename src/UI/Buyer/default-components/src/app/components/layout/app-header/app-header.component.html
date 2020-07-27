@@ -38,7 +38,7 @@
              [ngClass]="{ active: activePath === '/suppliers' }"
              (click)="isCollapsed = !isCollapsed"
              (click)="context.router.toSupplierList()"
-             translate>LAYOUT.APP_HEADER.SUPPLIERS</a>
+             translate>ALIAS.SUPPLIERS</a>
         </li>
         <!-- Mobile Profile Menu Items -->
         <div *ngIf="screenSize === 'xs' || screenSize === 'sm'">
@@ -209,7 +209,7 @@
     </button>
 
     <ocm-search class="ml-3 mr-3 w-100"
-                [placeholderText]="'Search Products...'"
+                [placeholderText]="'Products'"
                 [searchTermInput]="searchTermForProducts"
                 (searched)="searchProducts($event.detail)">
     </ocm-search>

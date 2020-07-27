@@ -1,6 +1,8 @@
-<h5 class="mt-4">Categories</h5>
+<h5 class="mt-4"
+    translate>ADMIN.PRODUCT_EDIT.CATEGORIES</h5>
 <p *ngIf="!highLevelOptions.length"
-   class="alert alert-info font-weight-bold mb-0 p-3 shadow-sm">There are no categories for this buyer currently.</p>
+   class="alert alert-info font-weight-bold mb-0 p-3 shadow-sm"
+   translate>ADMIN.PRODUCT_EDIT.NO_CATEGORIES</p>
 <ng-container *ngIf="highLevelOptions.length">
   <div class="card shadow-sm p-4 my-3">
     <div class="row">
@@ -8,7 +10,7 @@
         <div class="row">
           <div class="col-md-6">
             <mat-form-field class="w-100">
-              <mat-label>High Level Category</mat-label>
+              <mat-label><span translate>ADMIN.PRODUCT_EDIT.HIGH_LEVEL_CATEGORY</span></mat-label>
               <mat-select (selectionChange)="selectHighLevelCategory($event)">
                 <mat-option *ngFor="let category of highLevelOptions"
                             [value]="category.ID">
@@ -19,11 +21,12 @@
             <ng-container *ngIf="midLevelOptions.length && !showMidLevel && highLevelSelection">
               <button class="btn btn-sm btn-medium"
                       type="submit"
-                      (click)="showMidLevel = true">Browse Subcategories</button>
+                      (click)="showMidLevel = true"
+                      translate>ADMIN.PRODUCT_EDIT.BROWSE_SUBCATEGORIES</button>
             </ng-container>
             <div *ngIf="showMidLevel">
               <mat-form-field class="w-100">
-                <mat-label>Mid Level Category</mat-label>
+                <mat-label><span translate>ADMIN.PRODUCT_EDIT.MID_LEVEL_CATEGORY</span></mat-label>
                 <mat-select (selectionChange)="selectMidLevelCategory($event)">
                   <mat-option *ngFor="let category of midLevelOptions"
                               [value]="category.ID">
@@ -35,11 +38,12 @@
             <ng-container *ngIf="lowLevelOptions.length && !showLowLevel && midLevelSelection">
               <button class="btn btn-sm btn-medium"
                       type="submit"
-                      (click)="showLowLevel = true">Browse Subcategories</button>
+                      (click)="showLowLevel = true"
+                      translate>ADMIN.PRODUCT_EDIT.BROWSE_SUBCATEGORIES</button>
             </ng-container>
             <div *ngIf="showLowLevel">
               <mat-form-field class="w-100">
-                <mat-label>Low Level Category</mat-label>
+                <mat-label><span translate>ADMIN.PRODUCT_EDIT.LOW_LEVEL_CATEGORY</span></mat-label>
                 <mat-select (selectionChange)="selectLowLevelCategory($event)">
                   <mat-option *ngFor="let category of lowLevelOptions"
                               [value]="category.ID">
@@ -53,9 +57,11 @@
             <button class="btn btn-block btn-outline-primary mt-3 mt-md-0"
                     type="submit"
                     (click)="addAssignment()"
-                    [disabled]="!highLevelSelection">Add Assignment</button>
-            <small class="d-block font-italic mt-2">
-              You may assign the product at this level or get more specific with subcategories
+                    [disabled]="!highLevelSelection"
+                    translate>ADMIN.PRODUCT_EDIT.ADD_ASSIGNMENT</button>
+            <small class="d-block font-italic mt-2"
+                   translate>
+                   ADMIN.PRODUCT_EDIT.YOU_MAY_ASSIGN
             </small>
           </div>
         </div>

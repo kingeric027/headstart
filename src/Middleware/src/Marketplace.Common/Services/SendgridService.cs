@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Dynamitey;
@@ -8,6 +9,7 @@ using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.freightpop;
 using OrderCloud.SDK;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -21,7 +23,7 @@ namespace Marketplace.Common.Services
         Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData);
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
         Task SendReturnRequestedEmail(string orderID);
-        Task SendNewUserEmail(WebhookPayloads.Users.Create payload);
+        Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
         Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
@@ -73,7 +75,9 @@ namespace Marketplace.Common.Services
             var templateData = new
             {
                 messageNotification.Recipient.FirstName,
-                messageNotification.Recipient.LastName
+                messageNotification.Recipient.LastName,
+                messageNotification.EventBody.PasswordRenewalAccessToken,
+                messageNotification.EventBody.PasswordRenewalUrl
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
         }
@@ -96,15 +100,28 @@ namespace Marketplace.Common.Services
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, ORDER_REQUIRES_APPROVAL_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendNewUserEmail(WebhookPayloads.Users.Create payload)
+        public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
         {
+            string BaseAppURL = _settings.UI.BaseAdminUrl;
+            var jwt = messageNotification.EventBody.PasswordRenewalAccessToken;
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwt);
+            var cid = token.Claims.FirstOrDefault(c => c.Type == "cid");
+            var apiClient = await _oc.ApiClients.GetAsync(cid.Value);
+            // Overwrite with the buyer base url if token appname contans 'buyer'
+            if (apiClient.AppName.ToLower().Contains("buyer"))
+            {
+                BaseAppURL = _settings.UI.BaseBuyerUrl;
+            }
             var templateData = new
             {
-                payload.Response.Body.FirstName,
-                payload.Response.Body.LastName,
-                payload.Response.Body.Username
+                messageNotification.Recipient.FirstName,
+                messageNotification.Recipient.LastName,
+                messageNotification.EventBody.PasswordRenewalAccessToken,
+                BaseAppURL,
+                messageNotification.EventBody.Username
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload)
@@ -142,17 +159,17 @@ namespace Marketplace.Common.Services
         {
             MarketplaceOrder order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID);
-            var productsList = lineItems.Items.Select(MapReturnedLineItemToProduct);
+            var productsList = MapLineItemsToProducts(lineItems);
             var dynamicTemplateData = new {
-            order.FromUser.FirstName,
-            order.FromUser.LastName,
-            order.ID,
-            DateSubmitted = order.DateSubmitted.ToString(),
-            ReturnID = order.xp.OrderReturnInfo.RMANumber,
-            Products = productsList
+                order.FromUser.FirstName,
+                order.FromUser.LastName,
+                order.ID,
+                DateSubmitted = order.DateSubmitted.ToString(),
+                ReturnID = order.xp.OrderReturnInfo.RMANumber,
+                order.Comments,
+                Products = productsList
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, order.FromUser.Email, BUYER_REFUND_REQUESTED_TEMPLATE_ID, dynamicTemplateData);
-            // TODO: Get Seller's info for return requested email
         }
 
         public async Task SendSupplierOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
@@ -233,6 +250,22 @@ namespace Marketplace.Common.Services
                 order.Total
             };
         }
+        private List<object> MapLineItemsToProducts(ListPage<MarketplaceLineItem> lineItems)
+        {
+            List<object> products = new List<object>();
+
+            foreach(var lineItem in lineItems.Items)
+            {
+                if (lineItem.xp.LineItemReturnInfo != null)
+                {
+                    products.Add(MapReturnedLineItemToProduct(lineItem));
+                } else
+                {
+                    products.Add(MapLineItemToProduct(lineItem));
+                }
+            }
+            return products;
+        }
 
         private object MapReturnedLineItemToProduct(MarketplaceLineItem lineItem) =>
         new
@@ -243,7 +276,7 @@ namespace Marketplace.Common.Services
             lineItem.Quantity,
             lineItem.LineTotal,
             ReturnQuantity = lineItem.xp.LineItemReturnInfo.QuantityToReturn,
-            Comments = lineItem.xp.LineItemReturnInfo.ReturnReason
+            lineItem.xp.LineItemReturnInfo.ReturnReason
         };
 
         private object MapLineItemToProduct(MarketplaceLineItem lineItem) =>
@@ -255,6 +288,8 @@ namespace Marketplace.Common.Services
               lineItem.Quantity,
               lineItem.LineTotal,
           };
+        
+
 
         private object GetShippingAddress(IList<MarketplaceLineItem> lineItems) =>
           new

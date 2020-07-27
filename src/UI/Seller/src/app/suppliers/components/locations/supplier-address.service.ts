@@ -76,7 +76,7 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
     Zip: '',
     Country: '',
     Phone: '',
-    AddressName: 'Your new supplier location',
+    AddressName: '',
     xp: null,
   };
 }

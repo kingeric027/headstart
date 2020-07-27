@@ -1,7 +1,8 @@
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
-import { Component, Input, OnInit } from '@angular/core';
-import { MarketplaceMeProduct, ShopperContextService } from 'marketplace';
-import { Me } from 'ordercloud-javascript-sdk';
+import { Component, OnInit } from '@angular/core';
+import { ShopperContextService, MarketplaceMeProduct } from 'marketplace';
+import { BuyerProduct } from 'ordercloud-javascript-sdk';
+import { ProductXp } from 'marketplace-javascript-sdk';
 
 @Component({
   templateUrl: './home.component.html',
@@ -29,7 +30,7 @@ export class OCMHomePage implements OnInit {
   constructor(private context: ShopperContextService) {}
 
   async ngOnInit(): Promise<void> {
-    const products = await Me.ListProducts({ filters: { 'xp.Featured': true } });
+    const products = await this.context.tempSdk.listMeProducts({ filters: { 'xp.Featured': true } });
     this.featuredProducts = products.Items;
   }
 

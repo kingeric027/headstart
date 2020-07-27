@@ -1,4 +1,4 @@
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem, OrderPromotion } from 'marketplace-javascript-sdk';
 
 export interface OrderSummaryMeta {
   StandardLineItems: MarketplaceLineItem[];
@@ -14,6 +14,7 @@ export interface OrderSummaryMeta {
   ShippingCost: number;
   TaxCost: number;
   CreditCardTotal: number;
+  DiscountTotal: number;
 
   POTotal: number;
   OrderTotal: number;
@@ -41,16 +42,17 @@ const getOverrideText = (checkoutPanel: string): string => {
   }
 }
 
-const getCreditCardTotal = (subTotal: number, shippingCost: number, taxCost: number, shouldHideShippingAndText: boolean): number => {
+const getCreditCardTotal = (subTotal: number, shippingCost: number, taxCost: number, shouldHideShippingAndText: boolean, discountTotal: number): number => {
   if(shouldHideShippingAndText) {
-    return subTotal;
+    return subTotal - discountTotal;
   } else {
-    return subTotal + shippingCost + taxCost;
+    return (subTotal + shippingCost + taxCost) - discountTotal;
   }
 }
 
 export const getOrderSummaryMeta = (
   order: MarketplaceOrder, 
+  orderPromos: OrderPromotion[],
   lineItems: MarketplaceLineItem[], 
   checkoutPanel: string, 
 ): OrderSummaryMeta => {
@@ -62,7 +64,8 @@ export const getOrderSummaryMeta = (
   const shouldHideShippingAndText = !!ShippingAndTaxOverrideText;
 
   const CreditCardDisplaySubtotal = StandardLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
-  const CreditCardTotal = getCreditCardTotal(CreditCardDisplaySubtotal, order.ShippingCost, order.TaxCost, shouldHideShippingAndText);
+  const DiscountTotal = orderPromos.reduce((accumulator, promo) => (promo.Amount) + accumulator, 0);
+  const CreditCardTotal = getCreditCardTotal(CreditCardDisplaySubtotal, order.ShippingCost, order.TaxCost, shouldHideShippingAndText, DiscountTotal);
 
   const POTotal = POLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
   const OrderTotal = POTotal + CreditCardTotal;
@@ -79,6 +82,7 @@ export const getOrderSummaryMeta = (
     TaxCost: order.TaxCost, 
     POTotal, 
     CreditCardTotal, 
+    DiscountTotal,
     OrderTotal 
   };
 }

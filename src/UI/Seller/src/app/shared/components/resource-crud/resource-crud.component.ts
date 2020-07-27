@@ -7,6 +7,7 @@ import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { ListPage } from 'marketplace-javascript-sdk';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -18,6 +19,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   resourceInSelection = {} as ResourceType;
   resourceForm: FormGroup;
   isMyResource = false;
+  isSupplierUser = false;
 
   // form setting defined in component implementing this component
   createForm: (resource: any) => FormGroup;
@@ -72,6 +74,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   async determineViewingContext(): Promise<void> {
     this.isMyResource = this.router.url.startsWith('/my-');
+    this.isSupplierUser = await this.ocService.isSupplierUser(); 
     if (this.isMyResource) {
       const myResource = await this.ocService.getMyResource();
       const shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');

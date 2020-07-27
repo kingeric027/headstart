@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Mappers;
 using Marketplace.Models;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
@@ -14,11 +13,16 @@ namespace Marketplace.Common.Commands.Crud
 	public interface IMarketplaceProductCommand
 	{
 		Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user);
-		Task<SuperMarketplaceProduct> MeGet(string id, VerifiedUserContext user);
 		Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
 		Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct product, VerifiedUserContext user);
 		Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct product, VerifiedUserContext user);
 		Task Delete(string id, VerifiedUserContext user);
+		Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, VerifiedUserContext user);
+		Task DeletePricingOverride(string id, string buyerID, VerifiedUserContext user);
+		Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
+		Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
+		Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user);
+		Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user);
 	}
 
 	public class DefaultOptionSpecAssignment
@@ -37,34 +41,83 @@ namespace Marketplace.Common.Commands.Crud
 			_assets = assets;
 			_oc = elevatedOc;
 		}
-		private async Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user)
+
+		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, VerifiedUserContext user)
+		{
+			var priceScheduleID = $"{id}-{buyerID}";
+			var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(priceScheduleID);
+			return priceSchedule;
+		}
+		
+		public async Task DeletePricingOverride(string id, string buyerID, VerifiedUserContext user)
+		{
+			/* must remove the price schedule from the visibility assignments
+			* deleting a price schedule with active visibility assignments removes the visbility
+			* assignment completely, we want those product to usergroup catalog assignments to remain
+		    * just without the override */
+			var priceScheduleID = $"{id}-{buyerID}";
+			await RemovePriceScheduleAssignmentFromProductCatalogAssignments(id, buyerID, priceScheduleID);
+			await _oc.PriceSchedules.DeleteAsync(priceScheduleID);
+		}
+
+		public async Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule priceSchedule, VerifiedUserContext user)
+		{
+			/* must add the price schedule to the visibility assignments */
+			var priceScheduleID = $"{id}-{buyerID}";
+			priceSchedule.ID = priceScheduleID;
+			var newPriceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(priceScheduleID, priceSchedule);
+			await AddPriceScheduleAssignmentToProductCatalogAssignments(id, buyerID, priceScheduleID);
+			return newPriceSchedule;
+		}
+		
+		public async Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule priceSchedule, VerifiedUserContext user)
+		{
+			var priceScheduleID = $"{id}-{buyerID}";
+			var newPriceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(priceScheduleID, priceSchedule);
+			return newPriceSchedule;
+		}
+
+		public async Task RemovePriceScheduleAssignmentFromProductCatalogAssignments(string productID, string buyerID, string priceScheduleID)
+		{
+			var relatedProductCatalogAssignments = await _oc.Products.ListAssignmentsAsync(productID: productID, buyerID: buyerID, pageSize: 100);
+			await Throttler.RunAsync(relatedProductCatalogAssignments.Items, 100, 5, assignment =>
+			{
+				return _oc.Products.SaveAssignmentAsync(new ProductAssignment
+				{
+					BuyerID = buyerID,
+					PriceScheduleID = null,
+					ProductID = productID,
+					UserGroupID = assignment.UserGroupID
+				});
+			});
+		}
+
+		public async Task AddPriceScheduleAssignmentToProductCatalogAssignments(string productID, string buyerID, string priceScheduleID)
+		{
+			var relatedProductCatalogAssignments = await _oc.Products.ListAssignmentsAsync(productID: productID, buyerID: buyerID, pageSize: 100);
+			await Throttler.RunAsync(relatedProductCatalogAssignments.Items, 100, 5, assignment =>
+			{
+				return _oc.Products.SaveAssignmentAsync(new ProductAssignment
+				{
+					BuyerID = buyerID,
+					PriceScheduleID = priceScheduleID,
+					ProductID = productID,
+					UserGroupID = assignment.UserGroupID
+				});
+			});
+		}
+
+		public async Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user)
 		{
 			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
 			var images = assets.Where(a => a.Type == AssetType.Image).ToList();
 			return images;
 		}
-		private async Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user)
+		public async Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user)
 		{
 			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
 			var attachments = assets.Where(a => a.Type == AssetType.Attachment).ToList();
 			return attachments;
-		}
-		public async Task<SuperMarketplaceProduct> MeGet(string id, VerifiedUserContext user)
-		{
-			var _product = _oc.Me.GetProductAsync<BuyerProduct<ProductXp, PriceSchedule>>(id, user.AccessToken);
-			var _specs = _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
-			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null);
-			var _images = GetProductImages(id, user);
-			var _attachments =  GetProductAttachments(id, user);
-			return new SuperMarketplaceProduct
-			{
-				Product = ProductMapper.MeProductToProduct(await _product),
-				PriceSchedule = (await _product).PriceSchedule,
-				Specs = (await _specs).Items,
-				Variants =(await _variants).Items,
-				Images = await _images,
-				Attachments = await _attachments
-			};
 		}
 
 		public async Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user)

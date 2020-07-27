@@ -3,7 +3,8 @@
     <tr>
       <th *ngFor="let header of headers"
           nowrap
-          scope="col">
+          scope="col"
+          translate>
           {{header.header}}
           <button *ngIf="header.sortable"
                   type="button"
@@ -23,7 +24,8 @@
         [ngClass]="{'selected-resource':selectedIndex === index}"
         select="table-body-row">
       <td class="align-middle" *ngFor="let cell of row.cells">
-        <span *ngIf="cell.type === 'BOOLEAN'">
+        <span *ngIf="cell.type === 'BOOLEAN'"
+               translate>
           {{cell.value | yesNo}}
         </span>
         <span *ngIf="cell.type === 'BASIC_STRING'">

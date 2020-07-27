@@ -4,7 +4,7 @@
          class="row pt-3">
       <div class="col-md-5">
         <h5>Address Details</h5>
-        <p>These are the details of this Supplier Location</p>
+        <p>These are the details of this {{'ALIAS.SUPPLIER_LOCATION' | translate | lowercase}}.</p>
       </div>
       <div class="col-md-7 form-group">
         <div class="form-group">
@@ -18,7 +18,7 @@
                  [resourceForm]="resourceForm"
                  formControlName="AddressName"
                  (input)="updateResourceFromEvent($event, 'AddressName')"
-                 placeholder="Enter Address Name">
+                 placeholder="Enter {{'ALIAS.SUPPLIER_LOCATION' | translate}} Address">
         </div>
         <div class="form-group">
           <label for="Company Name">Company Name</label>

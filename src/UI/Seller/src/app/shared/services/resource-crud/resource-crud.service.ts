@@ -32,7 +32,7 @@ export abstract class ResourceCrudService<ResourceType> {
   primaryResourceLevel = '';
   // example: for supplier user service the primary is supplier and the secondary is users
   secondaryResourceLevel = '';
-  subResourceList: string[];
+  subResourceList: any[];
   emptyResource: any = {};
 
   private itemsPerPage = 100;
@@ -44,7 +44,7 @@ export abstract class ResourceCrudService<ResourceType> {
     public currentUserService: CurrentUserService,
     route: string,
     primaryResourceLevel: string,
-    subResourceList: string[] = [],
+    subResourceList: any[] = [],
     secondaryResourceLevel = '',
     myRoute = '',
   ) {
@@ -143,6 +143,10 @@ export abstract class ResourceCrudService<ResourceType> {
       // for secondary resources list there is a parent ID
       return !!parentResourceID && this.router.url.includes(this.secondaryResourceLevel);
     }
+  }
+
+  async isSupplierUser(): Promise<boolean> {
+    return await this.currentUserService.isSupplierUser();
   }
 
   async constructResourceURLs(resourceID = ''): Promise<string[]> {
@@ -249,11 +253,15 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async updateResource(originalID: string, resource: any): Promise<any> {
     const args = await this.createListArgs([originalID, resource]);
-    const newResource = await this.ocService.Save(...args).toPromise();
+    const newResource =  await this.ocService.Save(...args).toPromise()
+    this.updateResourceSubject(newResource);
+    return newResource;
+  }
+
+  updateResourceSubject(newResource: any): void {
     const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
     this.resourceSubject.value.Items[resourceIndex] = newResource;
     this.resourceSubject.next(this.resourceSubject.value);
-    return newResource;
   }
 
   async deleteResource(resourceID: string): Promise<null> {
@@ -300,7 +308,8 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   sortBy(field: string): void {
-    this.patchFilterState({ sortBy: field || undefined });
+    // temporarily as any until changed to latest oc sdk
+    this.patchFilterState({ sortBy: field || undefined } as any);
   }
 
   searchBy(searchTerm: string): void {
@@ -398,7 +407,7 @@ export abstract class ResourceCrudService<ResourceType> {
     const isOnSubResource =
       this.subResourceList &&
       this.subResourceList.some(subResource => {
-        return this.router.url.includes(`/${subResource}`);
+        return this.router.url.includes(`/${subResource.route}`);
       });
     const isOnBaseRoute = this.router.url.includes(this.route);
     const isOnRelatedSubResource = this.router.url.includes(`/${this.secondaryResourceLevel}`);
@@ -414,8 +423,8 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
 
-  getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resoruceToUpdate: T): T {
-    const updatedResourceCopy: any = this.copyResource(resoruceToUpdate);
+  getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resourceToUpdate: T): T {
+    const updatedResourceCopy: any = this.copyResource(resourceToUpdate);
     const update = _set(updatedResourceCopy, resourceUpdate.field, resourceUpdate.value);
     if(resourceUpdate.field === 'Product.Inventory.Enabled' && resourceUpdate.value === false) {
       update.Product.Inventory.QuantityAvailable = null 
