@@ -8,6 +8,7 @@ using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Commands.Zoho;
+using Marketplace.Common.Controllers.ChiliPublish;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
@@ -101,6 +102,7 @@ namespace Marketplace.API
 				.Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
+                .Inject<IChiliPublishCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
                     ApiUrl = "https://books.zoho.com/api/v3",
                     AccessToken = _settings.ZohoSettings.AccessToken,
