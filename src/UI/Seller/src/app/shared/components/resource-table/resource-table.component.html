@@ -190,7 +190,7 @@
                                          [ocService]="_ocService">
           </full-resource-table-component>
           <request-status [requestStatus]="requestStatus"
-                          [subResourceName]="_currentResourceNamePlural || ''"
+                          [subResourceName]="(labelPlural | translate) || ''"
                           [selectedParentResouceName]="selectedParentResourceName">
           </request-status>
         </perfect-scrollbar>
@@ -240,7 +240,7 @@
 
             </table>
             <request-status [requestStatus]="requestStatus"
-                            [subResourceName]="_currentResourceNamePlural || ''"
+                            [subResourceName]="(labelPlural | translate) || ''"
                             [selectedParentResouceName]="selectedParentResourceName">
             </request-status>
           </perfect-scrollbar>
@@ -256,13 +256,8 @@
                   </fa-icon>
                 </div>
               </div>
-              <!-- <button class="btn btn-link"
-                      (click)="handleSelectResource({})">
-                <fa-icon [icon]="faChevronLeft"></fa-icon>
-                {{_currentResourceNamePlural | titlecase}}
-              </button> -->
               <h3 *ngIf="isCreatingNew"
-                  class="d-inline-block ml-1 mb-0">New {{_currentResourceNameSingular}}</h3>
+                  class="d-inline-block ml-1 mb-0">New {{labelSingular | translate}}</h3>
               <h3 *ngIf="!isCreatingNew"
                   class="d-inline-block ml-1 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>
@@ -305,9 +300,9 @@
             </delete-confirm-modal-component>
             <div *ngIf="!canBeDeleted">
               <button class="btn btn-link text-muted"
-                      ngbTooltip="This {{_currentResourceNameSingular}} is in use and cannot be deleted."
+                      ngbTooltip="This {{labelSingular | translate}} is in use and cannot be deleted."
                       placement="top">
-                Delete {{_currentResourceNameSingular | titlecase}}
+                Delete {{labelSingular | translate | titlecase}}
               </button>
             </div>
             <div>
