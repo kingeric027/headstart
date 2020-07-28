@@ -3,7 +3,6 @@
 // Third party libraries
 @import 'oc-theme/oc-bootstrap-variables';
 @import 'vendor/_bootstrap.scss';
-@import 'vendor/_material.scss';
 // bs4 alert styled design (uses bs4 variables)
 @import '~ngx-toastr/toastr-bs4-alert';
 
@@ -314,7 +313,7 @@ body > [uib-modal-window]:not([modal-render]) {
   padding: 0 10px 0 12px;
   margin: 5px;
   font-size: 14px;
-  border-radius: 16px;
+  border-radius: 5px;
   color: $primary-dark;
   font-weight: 500;
   -webkit-transition: all 150ms ease-in-out;
@@ -323,6 +322,11 @@ body > [uib-modal-window]:not([modal-render]) {
   -o-transition: all 150ms ease-in-out;
   transition: all 100ms ease-in-out;
   cursor: default;
+  &.chip-sm {
+    height: 22px;
+    line-height: 22px;
+    font-size: 12px;
+  }
   &.readonly {
     &.active {
       background: $primary-dark;

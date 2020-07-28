@@ -7,7 +7,7 @@
              pull="right"></fa-icon>
     <span *ngIf="_facet?.Name === 'Supplier'"
            translate>ALIAS.SUPPLIER</span>
-    <span *ngIf="_facet?.Name !== 'Supplier'">{{_facet?.Name}}</span>
+    <span *ngIf="_facet?.Name !== 'Supplier'">{{_facet?.Name | titlecase}}</span>
   </h4>
 
   <!-- Facet Values -->

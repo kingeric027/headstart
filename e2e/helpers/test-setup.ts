@@ -37,8 +37,8 @@ export function setStagingUrl() {
 
 export async function loginTestSetup(authToken: string) {
 	await t.maximizeWindow()
-	const user: OrderCloudSDK.User = await createUser(authToken, '0007')
-	await saveUserAssignment(user.ID, '0007-0001', '0007', authToken)
+	const user: OrderCloudSDK.User = await createUser(authToken, '0005')
+	await saveUserAssignment(user.ID, '0005-0001', '0005', authToken)
 	return user
 }
 

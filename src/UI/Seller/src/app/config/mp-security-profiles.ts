@@ -230,6 +230,10 @@ const MPReportReader: MPRole = {
   RoleName: MPRoles.MPReportReader,
   OrderCloudRoles: [],
 };
+const MPStoreFrontAdmin: MPRole = {
+  RoleName: MPRoles.MPStoreFrontAdmin,
+  OrderCloudRoles: [OrderCloudRoles.ProductFacetAdmin, OrderCloudRoles.ProductFacetReader],
+}
 
 interface UserType {
   Name: string;
@@ -246,6 +250,7 @@ const MarketPlaceManager = {
     MPSellerAdmin,
     MPSupplierAdmin,
     MPMeSupplierAdmin,
+    MPStoreFrontAdmin
   ],
 };
 

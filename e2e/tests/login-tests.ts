@@ -26,7 +26,7 @@ test
 	.after(async t => {
 		await loginTestCleanup(
 			t.ctx.testUser.ID,
-			'0007',
+			'0005',
 			t.fixtureCtx.adminClientAuth
 		)
 	})('Log In And Out With New User | 19700', async t => {
