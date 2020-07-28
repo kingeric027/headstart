@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 import { Supplier } from 'ordercloud-javascript-sdk';
 import { SupplierFilterConfig, BuyerAppFilterType } from '../shopper-context';
 import { TempSdk } from '../services/temp-sdk/temp-sdk.service';

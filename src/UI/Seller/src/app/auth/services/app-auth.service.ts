@@ -13,7 +13,7 @@ import { AppStateService } from '@app-seller/shared/services/app-state/app-state
 import * as jwtDecode from 'jwt-decode';
 import { DecodedOrderCloudToken } from '@app-seller/shared';
 import { SELLER, SUPPLIER, OrderCloudUserType } from '@app-seller/shared/models/ordercloud-user.types';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 
 export const TokenRefreshAttemptNotPossible = 'Token refresh attempt not possible';
 @Injectable({
@@ -118,7 +118,7 @@ export class AppAuthService {
 
   logout(): Observable<any> {
     const cookiePrefix = this.appConfig.appname.replace(/ /g, '_').toLowerCase();
-    MarketplaceSDK.Tokens.RemoveAccessToken();
+    HeadStartSDK.Tokens.RemoveAccessToken();
     const appCookieNames = _keys(this.cookieService.getAll());
     appCookieNames.forEach(cookieName => {
       if (cookieName.includes(cookiePrefix)) {

@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { listAll } from '../../functions/listAll';
-import { MarketplaceLineItem, MarketplaceOrder, MarketplaceSDK, ListPage } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem, MarketplaceOrder, HeadStartSDK, ListPage } from '@ordercloud/headstart-sdk';
 
 @Injectable({
   providedIn: 'root',

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { ListPage, HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { ExchangeRates } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
 
@@ -18,7 +18,7 @@ export class ExchangeRatesService {
 
   async reset(): Promise<void> {
     const me = this.currentUser.get();
-    this.exchangeRates = await MarketplaceSDK.ExchangeRates.Get(me.Currency);
+    this.exchangeRates = await HeadStartSDK.ExchangeRates.Get(me.Currency);
   }
 
   private get exchangeRates(): ListPage<ExchangeRates> {

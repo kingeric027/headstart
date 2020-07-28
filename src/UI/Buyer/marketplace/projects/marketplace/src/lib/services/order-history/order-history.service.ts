@@ -9,8 +9,8 @@ import {
   MarketplaceLineItem,
   OrderDetails,
   MarketplaceShipmentWithItems,
-  MarketplaceSDK,
-} from 'marketplace-javascript-sdk';
+  HeadStartSDK,
+} from '@ordercloud/headstart-sdk';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { ClaimStatus, LineItemStatus } from '../../../lib/shopper-context';
 @Injectable({
@@ -60,7 +60,7 @@ export class OrderHistoryService {
   }
 
   async getOrderDetails(orderID: string = this.activeOrderID): Promise<OrderDetails> {
-    return await MarketplaceSDK.Orders.GetOrderDetails(orderID);
+    return await HeadStartSDK.Orders.GetOrderDetails(orderID);
   }
 
   async getLineItemSuppliers(liGroups: MarketplaceLineItem[][]): Promise<LineItemGroupSupplier[]> {
@@ -94,7 +94,7 @@ export class OrderHistoryService {
           HasReturn: true,
           Resolved: false,
         },
-        ClaimStatus: ClaimStatus.Pending
+        ClaimStatus: ClaimStatus.Pending,
       },
     });
     return order as MarketplaceOrder;
@@ -113,11 +113,11 @@ export class OrderHistoryService {
           ReturnReason: returnReason,
           Resolved: false,
         },
-        LineItemStatus: LineItemStatus.ReturnRequested
+        LineItemStatus: LineItemStatus.ReturnRequested,
       },
     };
     const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
-    await MarketplaceSDK.Orders.RequestReturnEmail(orderID);
+    await HeadStartSDK.Orders.RequestReturnEmail(orderID);
     return line;
   }
 }

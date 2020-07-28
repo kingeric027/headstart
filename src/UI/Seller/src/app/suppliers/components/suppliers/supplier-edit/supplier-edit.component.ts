@@ -2,13 +2,14 @@ import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, O
 import { get as _get } from 'lodash';
 import { FormGroup } from '@angular/forms';
 import { SupportedRates, SupportedCurrencies } from '@app-seller/shared/models/supported-rates.interface';
+import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 import { SupplierService } from '../supplier.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import {
   MiddlewareAPIService,
   SupplierFilterConfigDocument,
 } from '@app-seller/shared/services/middleware-api/middleware-api.service';
-import { ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
@@ -28,6 +29,7 @@ export class SupplierEditComponent implements OnInit {
   isSupplierUser: boolean;
   countriesServicingOptions = [];
   constructor(
+    public ocIntegrations: OcIntegrationsAPIService,
     public supplierService: SupplierService,
     private currentUserService: CurrentUserService
   ) {
@@ -35,7 +37,7 @@ export class SupplierEditComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.availableCurrencies = (await MarketplaceSDK.ExchangeRates.GetRateList()).Items
+    this.availableCurrencies = await this.ocIntegrations.getAvailableCurrencies();
     this.availableCurrencies = this.availableCurrencies.filter(c =>
       Object.values(SupportedCurrencies).includes(SupportedCurrencies[c.Currency])
     );

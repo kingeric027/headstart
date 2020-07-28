@@ -3,7 +3,7 @@ import { Spec, PriceSchedule, ListPage } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService } from 'marketplace';
 import { SpecFormService, GridSpecOption } from '../spec-form/spec-form.service';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
-import { MarketplaceLineItem, SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 
 @Component({
     templateUrl: `./grid-spec-form.component.html`,
