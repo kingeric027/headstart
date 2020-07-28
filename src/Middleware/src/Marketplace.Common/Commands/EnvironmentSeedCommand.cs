@@ -157,6 +157,7 @@ namespace Marketplace.Common.Commands
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.ServiceCategory" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.VendorLevel" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "SyncFreightPop" },       
+			new XpIndex { ThingType = XpThingType.Company, Key = "CountriesServicing" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "OrderType" },       
