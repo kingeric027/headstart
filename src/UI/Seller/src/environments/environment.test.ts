@@ -4,13 +4,13 @@
 
 export const environment = {
   hostedApp: true,
-  clientID: 'AAADD078-E169-4610-816A-C760205D1365',
+  clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
   middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
   ocMiddlewareUrl: 'https://ordercloud-middleware-test.azurewebsites.net',
-  appname: 'Storefront Print Marketplace Admin Staging',
-  marketplaceID: 'storefront',
-  cmsUrl: 'https://marktplacestaging.blob.core.windows.net',
+  appname: 'Marketplace Admin Test',
+  marketplaceID: 'SEB',
+  cmsUrl: 'https://marktplacetest.blob.core.windows.net',
+  translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
-  orderCloudAuthUrl: 'https://stagingauth.ordercloud.io/oauth/token',
   orderCloudApiVersion: 'v1',
 };
