@@ -47,8 +47,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.fre
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Npoi.Mapper", "..\..\..\..\Users\SteveD\Documents\Npoi.Mapper\Npoi.Mapper\src\Npoi.Mapper\Npoi.Mapper.csproj", "{B511D998-9330-49C3-B114-01625146907B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,10 +125,6 @@ Global
 		{B8F5F373-6B30-4A81-BE56-E7387344AA80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8F5F373-6B30-4A81-BE56-E7387344AA80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8F5F373-6B30-4A81-BE56-E7387344AA80}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B511D998-9330-49C3-B114-01625146907B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B511D998-9330-49C3-B114-01625146907B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B511D998-9330-49C3-B114-01625146907B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B511D998-9330-49C3-B114-01625146907B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,7 +145,6 @@ Global
 		{CDC067B9-27B3-47B8-9E82-442D79156AE5} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{AE99A3FF-0999-4F96-B7BD-4F367D3CE723} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{B8F5F373-6B30-4A81-BE56-E7387344AA80} = {CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}
-		{B511D998-9330-49C3-B114-01625146907B} = {914CFF67-B4A4-464F-B3DB-23A8B09F88E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D28C7C46-780F-4A68-80B8-9789997A37F7}
