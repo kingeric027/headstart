@@ -61,14 +61,14 @@ export class OCMOrderDetails implements OnInit {
   }
 
   canRequestCancel(): boolean {
-    // let qtyCanceled = 0;
-    // let total = 0;
-    // this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
-    //   if (li.xp?.LineItemReturnInfo) qtyCanceled += li.xp.LineItemCancelInfo.QuantityToCancel;
-    //   total += li.Quantity;
-    // });
+    let qtyCanceled = 0;
+    let total = 0;
+    this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
+      if (li.xp?.LineItemReturnInfo) qtyCanceled += li.xp.LineItemCancelInfo.QuantityToCancel;
+      total += li.Quantity;
+    });
     return (
-     // qtyCanceled !== total &&
+      qtyCanceled !== total &&
       this.order.Status !== 'Unsubmitted' &&
       this.order.xp.ShippingStatus !== ShippingStatus.Shipped
     );

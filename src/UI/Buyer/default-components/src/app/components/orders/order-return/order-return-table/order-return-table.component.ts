@@ -34,34 +34,25 @@ export class OCMOrderReturnTable {
   _action: string;
   
   @Input() set liGroup(value: MarketplaceLineItem[]) {
-    debugger;
     this._liGroup = value; 
-    // this.columnsToDisplay = lineItemHasBeenShipped(value[0]) ? 
-    // returnColumns : cancelColumns;
-    // console.log(this.columnsToDisplay)
   }
   @Input() supplier: Supplier;
   @Input() set liGroupForm(value: FormGroup) {
-    debugger;
     this.lineItems = value.controls.lineItems as FormArray;
     this.dataSource = new MatTableDataSource<any>(this.lineItems.controls);
   }
   @Input() set action(value: string) {
     this._action = value;
-    console.log(value)
-    debugger;
     if(value === 'return') {
       this.translationData = {
         Headers: returnHeaders,
         AvailableReasons: returnReasons
       }
-      debugger; 
     } else {
       this.translationData = {
         Headers: returnHeaders,
         AvailableReasons: cancelReasons
       }
-      debugger;
     }
   }
   @Output()

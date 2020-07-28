@@ -1,5 +1,6 @@
 import { FormControl, Validators } from '@angular/forms';
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { lineItemHasBeenShipped } from 'src/app/services/orderType.helper';
 
 export class LineItemForm {
     id = new FormControl();
@@ -12,7 +13,10 @@ export class LineItemForm {
         if (lineItem.ID) this.id.setValue(lineItem.ID);
         this.lineItem = lineItem;
         this.selected.setValue(false);
-        if (lineItem.Quantity === lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || lineItem.QuantityShipped !== lineItem.Quantity) this.selected.disable();
+        if (lineItem.Quantity === lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || 
+            lineItem.Quantity === lineItem.xp?.LineItemCancelInfo?.QuantityToCancel){
+            this.selected.disable();
+        } 
         this.quantityToReturn.disable();
         this.quantityToReturn.setValidators([
             Validators.required,
