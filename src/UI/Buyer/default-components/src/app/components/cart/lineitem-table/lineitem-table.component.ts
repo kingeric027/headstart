@@ -4,8 +4,8 @@ import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
-import { CancelReturnReason } from '../../orders/order-return/order-return-table/return-reason-enum';
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
+import { CancelReturnReason } from '../../orders/order-return/order-return-table/models/cancel-return-translations.enum';
 
 @Component({
   templateUrl: './lineitem-table.component.html',

@@ -2,12 +2,13 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ShopperContextService, LineItemStatus } from 'marketplace';
+import { ShopperContextService } from 'marketplace';
 import { Supplier } from 'ordercloud-javascript-sdk'
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { FormGroup, FormArray } from '@angular/forms';
-import { ReturnReasons, CancelReasons, returnColumns, cancelColumns, CancelReturnReason } from './return-reason-enum';
-import { lineItemHasBeenShipped } from 'src/app/services/orderType.helper';
+import { CancelReturnTranslations } from './models/cancel-return-translations.model';
+import { returnHeaders, returnReasons, cancelReasons } from './constants/cancel-return-table.constants';
+import { CancelReturnReason } from './models/cancel-return-translations.enum';
 
 @Component({
   templateUrl: './order-return-table.component.html',
@@ -18,12 +19,22 @@ export class OCMOrderReturnTable {
   selection = new SelectionModel<FormGroup>(true, []);
   _liGroup: MarketplaceLineItem[];
   quantitiesToReturn: number[] = [];
-  returnReasons: CancelReturnReason[];
+  translationData: CancelReturnTranslations;
   lineItems: FormArray;
-  columnsToDisplay: string[] = returnColumns;
+  columnsToDisplay: string[] = [
+    'select',
+    'product',
+    'id',
+    'price',
+    'quantityOrdered',
+    'quantityReturned',
+    'quantityToReturn',
+    'returnReason' 
+];
   _action: string;
   
   @Input() set liGroup(value: MarketplaceLineItem[]) {
+    debugger;
     this._liGroup = value; 
     // this.columnsToDisplay = lineItemHasBeenShipped(value[0]) ? 
     // returnColumns : cancelColumns;
@@ -31,12 +42,27 @@ export class OCMOrderReturnTable {
   }
   @Input() supplier: Supplier;
   @Input() set liGroupForm(value: FormGroup) {
+    debugger;
     this.lineItems = value.controls.lineItems as FormArray;
     this.dataSource = new MatTableDataSource<any>(this.lineItems.controls);
   }
   @Input() set action(value: string) {
     this._action = value;
-    this.returnReasons = value === 'return' ? ReturnReasons : CancelReasons;
+    console.log(value)
+    debugger;
+    if(value === 'return') {
+      this.translationData = {
+        Headers: returnHeaders,
+        AvailableReasons: returnReasons
+      }
+      debugger; 
+    } else {
+      this.translationData = {
+        Headers: returnHeaders,
+        AvailableReasons: cancelReasons
+      }
+      debugger;
+    }
   }
   @Output()
   quantitiesToReturnEvent = new EventEmitter<number>();
@@ -72,7 +98,8 @@ export class OCMOrderReturnTable {
   }
 
   isRowEnabled(row: FormGroup): boolean {
-    return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToReturn && row.controls.lineItem.value.QuantityShipped === row.controls.lineItem.value.Quantity;
+    return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToReturn && 
+    row.controls.lineItem.value.QuantityShipped === row.controls.lineItem.value.Quantity;
 
   }
 

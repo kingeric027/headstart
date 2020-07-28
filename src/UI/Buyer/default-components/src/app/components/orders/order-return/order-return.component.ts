@@ -7,7 +7,6 @@ import {MarketplaceOrder, MarketplaceLineItem, OrderDetails} from 'marketplace-j
 import { groupBy as _groupBy } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model';
-import { lineItemHasBeenShipped } from 'src/app/services/orderType.helper';
 
 @Component({
   templateUrl: './order-return.component.html',
@@ -88,8 +87,7 @@ export class OCMOrderReturn {
   async onSubmit(): Promise<void> {
     this.isSaving = true;
     const orderID = this.requestReturnForm.value.orderID;
-    await this.updateOrder(orderID)
-    await this.updateLineItems(orderID)
+    await Promise.all([this.updateOrder(orderID), this.updateLineItems(orderID)])
     this.isSaving = false;
     this.viewReturnFormEvent.emit(false);
   }

@@ -61,6 +61,12 @@
                 translate>
           ORDERS.DETAIL.CANCEL_RETURN_REQUEST
         </button>
+        <button *ngIf="showRequestCancel && !isQuoteOrder(order) && order.Status !== 'Unsubmitted'"
+                class="btn btn-secondary float-right mr-2"
+                (click)="toggleRequestCancel()"
+                translate>
+          ORDERS.DETAIL.CANCEL_RETURN_REQUEST
+        </button>
         <button *ngIf="!approvalVersion && !isQuoteOrder(order) && order.Status === 'Unsubmitted'"
                 class="btn btn-secondary float-right mr-2"
                 (click)="open(updateOrderModal)"
@@ -146,7 +152,7 @@
     </li>
   </ul>
   <ocm-order-historical class="col-md-6"
-                        *ngIf="orderDetails && showDetails() && !showRequestReturn"
+                        *ngIf="orderDetails && showDetails() && (!showRequestReturn && !showRequestCancel)"
                         [isOrderToApprove]="isOrderToApprove"
                         [orderDetails]="orderDetails"></ocm-order-historical>
   <ocm-order-shipments *ngIf="showShipments() && !showRequestReturn"></ocm-order-shipments>
