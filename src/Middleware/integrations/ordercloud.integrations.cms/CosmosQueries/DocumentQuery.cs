@@ -24,7 +24,7 @@ namespace ordercloud.integrations.cms
 		Task<Document> GetByInternalID(string documentID); // real id
 		Task<Document> GetByInternalSchemaID(string schemaID, string documentInteropID, VerifiedUserContext user);
 		Task<Document> Create(string schemaInteropID, Document document, VerifiedUserContext user);
-		Task<TDoc> Create<TDoc>(string schemaInteropID, Document document, VerifiedUserContext user) where TDoc : Document;
+		Task<TDoc> CreateWrapper<TDoc>(string schemaInteropID, TDoc document, VerifiedUserContext user) where TDoc : Document;
 		Task<Document> Update(string schemaInteropID, string documentInteropID, Document document, VerifiedUserContext user);
 		Task<TDoc> Update<TDoc>(string schemaInteropID, string documentInteropID, Document document, VerifiedUserContext user) where TDoc : Document;
 		Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
@@ -92,7 +92,7 @@ namespace ordercloud.integrations.cms
 			return document;
 		}
 
-		public async Task<TDoc> Create<TDoc>(string schemaInteropID, Document document, VerifiedUserContext user) where TDoc : Document
+		public async Task<TDoc> CreateWrapper<TDoc>(string schemaInteropID, TDoc document, VerifiedUserContext user) where TDoc : Document
 		{
 			var createResponse = await Create(schemaInteropID, document, user);
 			return createResponse.Reserialize<TDoc>();

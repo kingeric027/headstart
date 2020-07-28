@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cosmonaut.Extensions;
 using Marketplace.Common.Models.Marketplace;
 using Marketplace.Models;
 using ordercloud.integrations.cms;
@@ -14,8 +15,8 @@ namespace Marketplace.Common.Commands.Crud
     {
         Task<MarketplaceKitProduct> Get(string id, VerifiedUserContext user);
         Task<ListPage<MarketplaceKitProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
-        Task<MarketplaceKitProduct> Post(MarketplaceKitProductDocument kitDoc, MarketplaceKitProduct product, VerifiedUserContext user);
-        Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProductDocument kitDoc, MarketplaceKitProduct product, VerifiedUserContext user);
+        Task<MarketplaceKitProduct> Post(MarketplaceKitProduct kitProduct, VerifiedUserContext user);
+        Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, KitProductDocument kitDoc, VerifiedUserContext user);
         Task Delete(string id, VerifiedUserContext user);
         Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user);
         Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user);
@@ -48,7 +49,6 @@ namespace Marketplace.Common.Commands.Crud
             var attachments = assets.Where(a => a.Type == AssetType.Attachment).ToList();
             return attachments;
         }
-
         public async Task<MarketplaceKitProduct> Get(string id, VerifiedUserContext user)
         {
             var _product = await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
@@ -94,10 +94,13 @@ namespace Marketplace.Common.Commands.Crud
                 Items = _kitProductList
             };
         }
-        public async Task<MarketplaceKitProduct> Post(MarketplaceKitProductDocument kitDoc, MarketplaceKitProduct kitProduct, VerifiedUserContext user)
+        public async Task<MarketplaceKitProduct> Post(MarketplaceKitProduct kitProduct, VerifiedUserContext user)
         {
             var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(kitProduct.Product, user.AccessToken);
-            var _productAssignments = await _query.Create<KitProductDocument>("KitProduct", kitDoc, user);
+            var kitProductDoc = new KitProductDocument();
+            kitProductDoc.InteropID = _product.ID;
+            kitProductDoc.Doc = kitProduct.ProductAssignments;
+            var _productAssignments = await _query.CreateWrapper("KitProduct", kitProductDoc, user);
             return new MarketplaceKitProduct
             {
                 Product = _product,
@@ -107,15 +110,16 @@ namespace Marketplace.Common.Commands.Crud
             };
         }
 
-        public async Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProductDocument kitDoc, MarketplaceKitProduct kitProduct, VerifiedUserContext user)
+        public async Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, KitProductDocument kitDoc, VerifiedUserContext user)
         {
             // Update the Product itself
             var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(kitProduct.Product.ID, kitProduct.Product, user.AccessToken);
+            // Update Product Assignments
+            var _productAssignments = await _query.Update<KitProductDocument>("KitProduct", _updatedProduct.ID, kitDoc, user);
             // List Product Images
             var _images = await GetProductImages(_updatedProduct.ID, user);
             // List Product Attachments
             var _attachments = await GetProductAttachments(_updatedProduct.ID, user);
-            var _productAssignments = await _query.Update<KitProductDocument>("KitProduct", _updatedProduct.ID, kitDoc, user);
             return new MarketplaceKitProduct
             {
                 Product = _updatedProduct,
@@ -130,7 +134,7 @@ namespace Marketplace.Common.Commands.Crud
             var product = await _oc.Products.GetAsync(id); // This is temporary to accommodate bad data where product.ID != product.DefaultPriceScheduleID
             var _images = await GetProductImages(id, user);
             var _attachments = await GetProductAttachments(id, user);
-            // Delete images and attachments associated with the requested product
+            // Delete images, attachments, and assignments associated with the requested product
             await Task.WhenAll(
                 Throttler.RunAsync(_images, 100, 5, i => _assets.Delete(i.InteropID, user)),
                 Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.InteropID, user)),

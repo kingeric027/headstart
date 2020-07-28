@@ -7,8 +7,6 @@ namespace Marketplace.Common.Models.Marketplace
 {
     [SwaggerModel]
     public class KitProductDocument : Document<KitProduct> { }
-    [SwaggerModel]
-    public class MarketplaceKitProductDocument : Document<MarketplaceKitProduct> { }
 
     [SwaggerModel]
     public class MarketplaceKitProduct

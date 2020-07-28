@@ -21,28 +21,28 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("GET Kit Product")]
-        [HttpGet, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
+        [HttpGet, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceKitProduct> Get(string id)
         {
             return await _command.Get(id, VerifiedUserContext);
         }
         [DocName("POST Kit Product")]
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceKitProduct> Post([FromBody] MarketplaceKitProductDocument doc, MarketplaceKitProduct kit)
+        public async Task<MarketplaceKitProduct> Post([FromBody] MarketplaceKitProduct kitProduct)
         {
-            return await _command.Post(doc, kit, VerifiedUserContext);
+            return await _command.Post(kitProduct, VerifiedUserContext);
         }
         [DocName("LIST Kit Product")]
-        [HttpGet, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
+        [HttpGet, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<MarketplaceProduct> args)
         {
             return await _command.List(args, VerifiedUserContext);
         }
         [DocName("PUT Kit Product")]
         [HttpPut, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceKitProduct> Put([FromBody] MarketplaceKitProductDocument doc, MarketplaceKitProduct obj, string id)
+        public async Task<MarketplaceKitProduct> Put([FromBody] MarketplaceKitProduct kitProduct, KitProductDocument kitDoc, string id)
         {
-            return await _command.Put(id, doc, obj, VerifiedUserContext);
+            return await _command.Put(id, kitProduct, kitDoc, VerifiedUserContext);
         }
 
         [DocName("DELETE Kit Product")]
