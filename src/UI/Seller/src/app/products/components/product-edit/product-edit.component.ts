@@ -92,6 +92,7 @@ export class ProductEditComponent implements OnInit {
   newPriceBreakQty = 2;
   newProductPriceBreaks = [];
   availableProductTypes = [];
+  active: number;
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
@@ -122,12 +123,13 @@ export class ProductEditComponent implements OnInit {
 
   setProductEditTab(): void {
     const productDetailSection = this.router.url.split('/')[3];
-    this.selectedTabIndex = setProductEditTab(productDetailSection, this.readonly);
+    this.active = setProductEditTab(productDetailSection);
   }
 
   tabChanged(event: any, productID: string): void {
+    const nextIndex = Number(event.nextId);
     if (productID === null) return;
-    const newLocation = event.index === 0 ? `products/${productID}` : `products/${productID}/${TabIndexMapper[this.readonly ? event.index : event.index + 1]}`;
+    const newLocation = nextIndex === 0 ? `products/${productID}` : `products/${productID}/${TabIndexMapper[nextIndex]}`;
     this.location.replaceState(newLocation);
   }
 
@@ -285,7 +287,7 @@ export class ProductEditComponent implements OnInit {
       field,
       value:
         ['Product.Active', 'Product.xp.IsResale', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed'].includes(field)
-          ? event.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
+          ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
   }

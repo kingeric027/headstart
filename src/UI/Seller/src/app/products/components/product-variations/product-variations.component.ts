@@ -67,7 +67,7 @@ export class ProductVariations {
   variantInSelection: Variant;
   imageInSelection: Asset;
 
-  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private _snackBar: MatSnackBar, private ocProductService: OcProductService, private appAuthService: AppAuthService,) {}
+  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private ocProductService: OcProductService, private appAuthService: AppAuthService,) {}
   getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
@@ -327,35 +327,25 @@ export class ProductVariations {
     if (Number(event.target.value) === this.variantInSelection[field]) return;
     const value = Number(event.target.value);
     switch(field) {
-      case "ShipWeight": 
+      case 'ShipWeight': 
         partialVariant = { ShipWeight: value}
         break;
-      case "ShipHeight":
+      case 'ShipHeight':
         partialVariant = { ShipHeight: value}
         break;
-      case "ShipWidth":
+      case 'ShipWidth':
         partialVariant = { ShipWidth: value }
         break;
-      case "ShipLength":
+      case 'ShipLength':
         partialVariant = { ShipLength: value }
         break;
     }
     try {
       await this.ocProductService.PatchVariant(this.superProductEditable.Product?.ID, this.variantInSelection.ID, partialVariant).toPromise();
-      this._snackBar.open("Shipping dimensions updated", "OK", {
-        duration: 2000,
-      });
+      this.toasterService.success('Shipping dimensions updated', 'OK');
     } catch (err) {
       console.log(err)
-      this._snackBar.open("Something went wrong", "OK", {
-        duration: 2000,
-      });
+      this.toasterService.error('Something went wrong', 'Error');
     }
-  }
-
-  openSnackBar(message: string, action: string) {
-    this._snackBar.open(message, action, {
-      duration: 2000,
-    });
   }
 }

@@ -47,11 +47,10 @@ namespace Marketplace.Common.Commands
 
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
-                ApiUrl = "https://api.ordercloud.io", // _settings.OrderCloudSettings.ApiUrl,
-                AuthUrl = "https://auth.orderloud.io", // _settings.OrderCloudSettings.AuthUrl,
+                ApiUrl = "https://stagingapi.ordercloud.io", // _settings.OrderCloudSettings.ApiUrl,
+                AuthUrl = "https://stagingauth.orderloud.io", // _settings.OrderCloudSettings.AuthUrl,
                 ClientId = wi.ClientId
             });
-
 
             var type = Type.GetType($"{ASSEMBLY}{wi.RecordType}SyncCommand", true);
             var command = (IWorkItemCommand) Activator.CreateInstance(type, new object[] {_settings, _log, _oc});

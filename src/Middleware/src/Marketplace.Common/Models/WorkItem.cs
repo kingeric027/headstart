@@ -84,7 +84,7 @@ namespace Marketplace.Common.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum RecordType
     {
-        Product, PriceSchedule, Spec, SpecOption, SpecProductAssignment, ProductFacet,
+        HydratedProduct, Product, PriceSchedule, Spec, SpecOption, SpecProductAssignment, ProductFacet,
         Buyer, User, UserGroup, Address, CostCenter, UserGroupAssignment, AddressAssignment, 
         CatalogAssignment, Catalog, Supplier, Order
     }
