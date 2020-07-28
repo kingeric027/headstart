@@ -10,7 +10,6 @@ import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interf
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 import { SupportedCountries, GeographyConfig } from '@app-seller/shared/models/supported-countries.interface';
 @Component({
   selector: 'app-buyer-location-edit',
@@ -51,10 +50,9 @@ export class BuyerLocationEditComponent implements OnInit {
     private router: Router,
     private middleware: MiddlewareAPIService,
     private currentUserService: CurrentUserService,
-    private ocIntegrations: OcIntegrationsAPIService
   ) {this.countryOptions = GeographyConfig.getCountries();}
 
-  async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {
+  refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation): void {
     this.buyerLocationEditable = buyerLocation;
     this.buyerLocationStatic = buyerLocation;
     this.createBuyerLocationForm(buyerLocation);
@@ -62,11 +60,11 @@ export class BuyerLocationEditComponent implements OnInit {
     this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
   }
 
-  createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation) {
+  createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation): void {
     this.resourceForm = new FormGroup({
       ID: new FormControl(buyerLocation.Address.ID),
       LocationName: new FormControl(buyerLocation.UserGroup.Name, Validators.required),

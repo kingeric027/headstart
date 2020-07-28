@@ -38,22 +38,6 @@ export class MiddlewareAPIService {
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
-  async uploadStaticContent(file: File, productID: string, fileName: string): Promise<SuperMarketplaceProduct> {
-    const form = new FormData();
-    form.append('file', file);
-    const url = `${this.appConfig.middlewareUrl}/${
-      this.appConfig.marketplaceID
-    }/static-content/${productID}/${fileName}`;
-    return await this.http.post<SuperMarketplaceProduct>(url, form, this.headers).toPromise();
-  }
-
-  async deleteStaticContent(fileName: string, productID: string): Promise<SuperMarketplaceProduct> {
-    const url = `${this.appConfig.middlewareUrl}/${
-      this.appConfig.marketplaceID
-    }/static-content/${productID}/${fileName}`;
-    return await this.http.delete<SuperMarketplaceProduct>(url, this.headers).toPromise();
-  }
-
   async acknowledgeQuoteOrder(orderID: string): Promise<Order> {
     const url = `${this.appConfig.middlewareUrl}/order/acknowledgequote/${orderID}`;
     return await this.http.post<Order>(url, this.headers).toPromise();

@@ -102,11 +102,11 @@ namespace Marketplace.Common.Commands
 						SecurityProfileID = sellerCustomRole.ToString()
 					}, token);
 			}
-			
+			var defaultAdminUser = (await _oc.AdminUsers.ListAsync(accessToken: token)).Items.First(u => u.Username == "Default_Admin");
 			await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-			{ 
+			{
 				SecurityProfileID = "DefaultContext",
-				UserID = "Default_Admin"
+				UserID = defaultAdminUser.ID
 			}, token);
 		}
 
@@ -128,7 +128,6 @@ namespace Marketplace.Common.Commands
 			var request = await _dev.PostOrganization(org, token);
 			return request;
 		}
-
 
 		private async Task CreateBuyers(VerifiedUserContext user, string token) {
 			foreach (var buyer in _seed.Buyers)
@@ -285,13 +284,12 @@ namespace Marketplace.Common.Commands
 			{
 				await _oc.SecurityProfiles.CreateAsync(profile, accessToken);
 			}
-
 			await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
 			{
 				Roles = new List<ApiRole> { ApiRole.FullAccess },
 				Name = "DefaultContext",
 				ID = "Defaultcontext"
-			});
+			}, accessToken);
 		}
 
 		public async Task DeleteAllWebhooks(string token)

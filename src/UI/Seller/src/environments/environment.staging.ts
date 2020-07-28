@@ -6,11 +6,8 @@ export const environment = {
   hostedApp: true,
   clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
-  ocMiddlewareUrl: 'https://ordercloud-middleware-test.azurewebsites.net',
   appname: 'Marketplace Admin Staging',
-  marketplaceID: 'SEB',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  cmsUrl: 'https://marktplacestaging.blob.core.windows.net',
   orderCloudApiUrl: 'https://api.ordercloud.io',
   orderCloudApiVersion: 'v1',
 };
