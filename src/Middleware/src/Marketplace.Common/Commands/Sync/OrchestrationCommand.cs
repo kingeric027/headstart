@@ -35,13 +35,13 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _blobQueue = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
             {
-                ConnectionString = settings.BlobSettings.ConnectionString,
+                ConnectionString = settings.Env == AppEnvironment.Prod ? settings.BlobSettings.ConnectionString : "UseDevelopmentStorage=true",
                 Container = settings.BlobSettings.QueueName
             });
 
             _blobCache = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
             {
-                ConnectionString = settings.BlobSettings.ConnectionString,
+                ConnectionString = settings.Env == AppEnvironment.Prod ? settings.BlobSettings.ConnectionString : "UseDevelopmentStorage=true",
                 Container = settings.BlobSettings.CacheName
             });
             _log = log;
@@ -137,7 +137,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                return await Task.FromResult(wi.Diff);
+                return await Task.FromResult(wi.Current.Diff(wi.Cache));
             }
             catch (Exception ex)
             {

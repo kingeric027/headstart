@@ -20,6 +20,14 @@ namespace Marketplace.Common.Controllers
             _command = command;
         }
 
+        [DocName("POST SuperProduct")]
+        [HttpPost, Route("hydrated"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
+        public async Task<SuperMarketplaceProduct> PostHydratedProduct([FromBody] SuperMarketplaceProduct obj,
+            string clientId)
+        {
+            return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID, clientId);
+        }
+
         [DocName("POST Catalog")]
         [HttpPost, Route("catalog"), OrderCloudIntegrationsAuth(ApiRole.CatalogAdmin)]
         public async Task<MarketplaceCatalog> PostCatalog([FromBody] MarketplaceCatalog obj, string clientId)
