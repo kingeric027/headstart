@@ -8,7 +8,7 @@ using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Commands.Zoho;
-using Marketplace.Common.Controllers.ChiliPublish;
+using Marketplace.Common.Controllers;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
@@ -80,6 +80,7 @@ namespace Marketplace.API
 				.InjectCosmosStore<DocumentAssignment, DocumentAssignment>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
+                .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()
@@ -101,7 +102,8 @@ namespace Marketplace.API
 				.Inject<IDocumentSchemaQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
-                .Inject<IChiliPublishCommand>()
+                .Inject<IChiliTemplateCommand>()
+                .Inject<IChiliConfigCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
                     ApiUrl = "https://books.zoho.com/api/v3",
                     AccessToken = _settings.ZohoSettings.AccessToken,

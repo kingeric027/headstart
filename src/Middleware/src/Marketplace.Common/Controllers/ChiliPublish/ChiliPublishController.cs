@@ -1,24 +1,123 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Common.Controllers.ChiliPublish;
-using Marketplace.Models;
-using ordercloud.integrations.cms;
-using IDocumentQuery = ordercloud.integrations.cms.IDocumentQuery;
+using Marketplace.Common.Commands;
 
 namespace Marketplace.Common.Controllers
 {
+    [DocComments("\"Integration\" represents a Chili Template Spec Option")]
+    [MarketplaceSection.Content(ListOrder = 3)]
+    [Route("chili/specs/{specID}/options")]
+    public class ChiliSpecOptionsController : BaseController
+    {
+        private readonly IChiliSpecOptionCommand _command;
+        private readonly AppSettings _settings;
+
+        public ChiliSpecOptionsController(AppSettings settings, IChiliSpecOptionCommand command) : base(settings)
+        {
+            _command = command;
+            _settings = settings;
+        }
+
+        [DocName("Get a Chili Spec Option")]
+        [HttpGet, Route("{specOptionID}"), OrderCloudIntegrationsAuth]
+        public async Task<ChiliSpecOption> Get(string specID, string specOptionID)
+        {
+            return await _command.Get(specID, specOptionID);
+        }
+
+        [DocName("List Chili Spec Options")]
+        [HttpGet, OrderCloudIntegrationsAuth]
+        public async Task<ListPage<ChiliSpecOption>> List(string specID, ListArgs<ChiliSpecOption> args)
+        {
+            return await _command.List(specID, args);
+        }
+
+        [DocName("Create a Chili Spec Option")]
+        [DocIgnore]
+        [HttpPost, Route(""), OrderCloudIntegrationsAuth]
+        public async Task<ChiliSpecOption> Create(string specID, [FromBody] ChiliSpecOption specOption)
+        {
+            return await _command.Create(specID, specOption);
+        }
+
+        [DocName("Update a Chili Spec Option")]
+        [HttpPut, Route("{specOptionID}"), OrderCloudIntegrationsAuth]
+        public async Task<ChiliSpecOption> Update(string specID, string specOptionID, [FromBody] ChiliSpecOption spec)
+        {
+            return await _command.Update(specID, specOptionID, spec);
+        }
+
+        [DocName("Delete a Chili Spec")]
+        [HttpDelete, Route("{specOptionID}"), OrderCloudIntegrationsAuth]
+        public async Task Delete(string specID, string specOptionID)
+        {
+            await _command.Delete(specID, specOptionID);
+        }
+    }
+
+    [DocComments("\"Integration\" represents a Chili Template Spec")]
+    [MarketplaceSection.Content(ListOrder = 3)]
+    [Route("chili/specs")]
+    public class ChiliSpecController : BaseController
+    {
+        private readonly IChiliSpecCommand _command;
+        private readonly AppSettings _settings;
+        public ChiliSpecController(AppSettings settings, IChiliSpecCommand command) : base(settings)
+        {
+            _command = command;
+            _settings = settings;
+        }
+
+        [DocName("Get a Chili Spec")]
+        [HttpGet, Route("{specID}"), OrderCloudIntegrationsAuth]
+        public async Task<ChiliSpec> Get(string specID)
+        {
+            return await _command.Get(specID);
+        }
+
+        [DocName("List Chili Specs")]
+        [HttpGet, OrderCloudIntegrationsAuth]
+        public async Task<ListPage<ChiliSpec>> List(ListArgs<ChiliSpec> args)
+        {
+            return await _command.List(args);
+        }
+
+        [DocName("Create a Chili Spec")]
+        [DocIgnore]
+        [HttpPost, Route(""), OrderCloudIntegrationsAuth]
+        public async Task<ChiliSpec> Create([FromBody] ChiliSpec spec)
+        {
+            return await _command.Create(spec);
+        }
+
+        [DocName("Update a Chili Spec")]
+        [HttpPut, Route("{specID}"), OrderCloudIntegrationsAuth]
+        public async Task<ChiliSpec> Update(string specID, [FromBody] ChiliSpec spec)
+        {
+            return await _command.Update(specID, spec);
+        }
+
+        [DocName("Delete a Chili Spec")]
+        [HttpDelete, Route("{specID}"), OrderCloudIntegrationsAuth]
+        public async Task Delete(string specID)
+        {
+            await _command.Delete(specID);
+        }
+    }
+
     [DocComments("\"Integration\" represents a Chili Template Product")]
     [MarketplaceSection.Content(ListOrder = 3)]
-    [Route("print/chilitemplate")]
+    [Route("chili/template")]
     public class ChiliTemplateController : BaseController
     {
-        private readonly IChiliPublishCommand _command;
+        private readonly IChiliTemplateCommand _command;
         private readonly AppSettings _settings;
-        public ChiliTemplateController(AppSettings settings, IChiliPublishCommand command) : base(settings)
+        public ChiliTemplateController(AppSettings settings, IChiliTemplateCommand command) : base(settings)
         {
             _command = command;
             _settings = settings;
@@ -33,66 +132,52 @@ namespace Marketplace.Common.Controllers
         }
     }
 
-    public class ChiliTemplate
-    {
-        public SuperMarketplaceProduct Product { get; set; }
-        public List<MarketplaceSpec> Specs { get; set; } = new List<MarketplaceSpec>();
-        public string ChiliTemplateID { get; set; }
-    }
-
-    public class ChiliConfig
-    {
-        public string SupplierProductID { get; set; }
-        public string ChiliTemplateID { get; set; }
-        public List<string> Specs { get; set; }
-    } 
-
     [DocComments("\"Integration\" represents Chili Template Configurations")]
     [MarketplaceSection.Content(ListOrder = 3)]
-    [Route("print/{schemaID}/chiliassignment")]
+    [Route("chili/config")]
     public class ChiliConfigController : BaseController
     {
-        private readonly IDocumentQuery _documents;
+        private readonly IChiliConfigCommand _command;
 
-        public ChiliConfigController(AppSettings settings, IDocumentQuery schemas) : base(settings)
+        public ChiliConfigController(AppSettings settings, IChiliConfigCommand command) : base(settings)
         {
-            _documents = schemas;
+            _command = command;
         }
 
         [DocName("Get a Chili Assignment")]
-        [HttpGet, Route("{documentID}"), OrderCloudIntegrationsAuth]
-        public async Task<Document> Get(string schemaID, string documentID)
+        [HttpGet, Route("{configID}"), OrderCloudIntegrationsAuth]
+        public async Task<ChiliConfig> Get(string configID)
         {
-            return await _documents.Get(schemaID, documentID, VerifiedUserContext);
+            return await _command.Get(configID);
         }
 
         [DocName("List Chili Assignment")]
         [HttpGet, Route(""), OrderCloudIntegrationsAuth]
-        public async Task<ListPage<Document>> List(string schemaID, ListArgs<Document> args)
+        public async Task<ListPage<ChiliConfig>> List(ListArgs<ChiliConfig> args)
         {
-            return await _documents.List(schemaID, args, VerifiedUserContext);
+            return await _command.List(args);
         }
 
 		[DocName("Create a Chili Assignment")]
-        [DocIgnore] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
+        [DocIgnore]
         [HttpPost, Route(""), OrderCloudIntegrationsAuth]
-        public async Task<Document> Create(string schemaID, [FromBody] Document document)
+        public async Task<ChiliConfig> Create([FromBody] ChiliConfig config)
         {
-            return await _documents.Create(schemaID, document, VerifiedUserContext);
+            return await _command.Save(config);
         }
 
         [DocName("Update a Chili Assignment")]
         [HttpPut, Route("{documentID}"), OrderCloudIntegrationsAuth]
-        public async Task<Document> Update(string schemaID, string documentID, [FromBody] Document document)
+        public async Task<ChiliConfig> Update([FromBody] ChiliConfig config)
         {
-            return await _documents.Update(schemaID, documentID, document, VerifiedUserContext);
+            return await _command.Save(config);
         }
 
         [DocName("Delete a Chili Assignment")]
         [HttpDelete, Route("{documentID}"), OrderCloudIntegrationsAuth]
-        public async Task Delete(string schemaID, string documentID)
+        public async Task Delete(string configID)
         {
-            await _documents.Delete(schemaID, documentID, VerifiedUserContext);
+            await _command.Delete(configID);
         }
 	}
 }

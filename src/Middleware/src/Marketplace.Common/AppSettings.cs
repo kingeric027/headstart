@@ -30,6 +30,7 @@ namespace Marketplace.Common
 		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
         public ExchangeRatesSettings ExchangeRatesSettings { get; set; }
         public string SendgridApiKey { get; set; }
+        public ChiliPublishSettings ChiliPublishSettings { get; set; } = new ChiliPublishSettings();
     }
 
     public class UI
@@ -80,4 +81,10 @@ namespace Marketplace.Common
 		public string LicenseKey { get; set; }
 		public string CompanyCode { get; set; }
 	}
+
+    public class ChiliPublishSettings
+    {
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+    }
 }
