@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import { MarketplaceBuyer } from 'marketplace-javascript-sdk';
+import { MarketplaceBuyer } from '@ordercloud/headstart-sdk';
 
 // WHOPLE FILE TO BE REPLACED BY SDK
 

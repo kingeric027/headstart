@@ -3,7 +3,7 @@ import { Buyer } from '@ordercloud/angular-sdk';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BuyerService } from '../buyer.service';
-import { MarketplaceBuyer } from 'marketplace-javascript-sdk';
+import { MarketplaceBuyer } from '@ordercloud/headstart-sdk';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({

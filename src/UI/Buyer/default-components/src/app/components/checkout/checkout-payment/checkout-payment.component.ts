@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
 import { BuyerCreditCard, ListPage, OrderPromotion } from 'ordercloud-javascript-sdk';
 import { MarketplaceBuyerCreditCard, ShopperContextService } from 'marketplace';
-import { OrderCloudIntegrationsCreditCardToken, MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { OrderCloudIntegrationsCreditCardToken, MarketplaceOrder } from '@ordercloud/headstart-sdk';
 import { OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 import { FormGroup, FormControl } from '@angular/forms';
 import { groupBy as _groupBy } from 'lodash';

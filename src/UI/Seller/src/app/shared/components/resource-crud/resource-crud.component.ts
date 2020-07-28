@@ -6,7 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {

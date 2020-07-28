@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MarketplaceMeProduct, LineItemWithProduct } from '../shopper-context';
 import { CurrentOrderService } from '../services/order/order.service';
-import { MarketplaceOrder, ListPage, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, ListPage, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { Me } from 'ordercloud-javascript-sdk';
 
 @Component({

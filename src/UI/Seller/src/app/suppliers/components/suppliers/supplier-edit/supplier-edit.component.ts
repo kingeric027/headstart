@@ -9,7 +9,7 @@ import {
   MiddlewareAPIService,
   SupplierFilterConfigDocument,
 } from '@app-seller/shared/services/middleware-api/middleware-api.service';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',

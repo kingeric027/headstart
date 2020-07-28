@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
-import { SuperMarketplaceProduct, ListPage, TaxProperties } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, ListPage, TaxProperties } from '@ordercloud/headstart-sdk';
 
 @Component({
   selector: 'product-tax-code-select-dropdown',

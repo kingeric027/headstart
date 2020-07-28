@@ -7,7 +7,7 @@ import { PromotionService } from '@app-seller/promotions/promotion.service';
 import { PromotionXp, MarketplacePromoType, MarketplacePromoEligibility } from '@app-seller/shared/models/marketplace-promo.interface';
 import * as moment from 'moment';
 import { Router } from '@angular/router';
-import { MarketplaceSupplier } from 'marketplace-javascript-sdk';
+import { MarketplaceSupplier } from '@ordercloud/headstart-sdk';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-promotion-edit',

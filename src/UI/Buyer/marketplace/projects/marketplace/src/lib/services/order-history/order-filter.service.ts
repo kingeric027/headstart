@@ -6,8 +6,8 @@ import { CurrentUserService } from '../current-user/current-user.service';
 import { Me, Sortable } from 'ordercloud-javascript-sdk';
 import { filter } from 'rxjs/operators';
 import { RouteService } from '../route/route.service';
-import { MarketplaceSDK, ListPage, MarketplaceOrder } from 'marketplace-javascript-sdk';
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { HeadStartSDK, ListPage, MarketplaceOrder } from '@ordercloud/headstart-sdk';
+import { ListArgs } from '@ordercloud/headstart-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -92,7 +92,7 @@ export class OrderFilterService {
 
   async ListLocationOrders(): Promise<ListPage<MarketplaceOrder>> {
     const locationID = this.activeFiltersSubject.value.location;
-    return await MarketplaceSDK.Orders.ListLocationOrders(locationID, this.createListOptions() as any);
+    return await HeadStartSDK.Orders.ListLocationOrders(locationID, this.createListOptions() as any);
   }
 
   async listApprovableOrders(): Promise<ListPage<MarketplaceOrder>> {

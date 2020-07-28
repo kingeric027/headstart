@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { LineItemWithProduct, ShopperContextService } from 'marketplace';
 import { ListPage, OrderPromotion, Orders } from 'ordercloud-javascript-sdk';
-import { MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder } from '@ordercloud/headstart-sdk';
 import { OrderSummaryMeta, getOrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 
 @Component({

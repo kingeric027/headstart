@@ -14,7 +14,7 @@ import {
 } from './resource-crud.types';
 import { BuyerAddress, ListBuyerAddress, ListAddress, Address } from '@ordercloud/angular-sdk';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { set as _set } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';

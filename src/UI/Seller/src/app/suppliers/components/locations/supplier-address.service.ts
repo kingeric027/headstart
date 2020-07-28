@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { OcSupplierAddressService, Address, ListAddress, Supplier } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 @Injectable({
@@ -36,7 +36,7 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
     const newID = this.getIncrementedID(parentResourceID, existingAddresses);
     resource.ID = newID;
 
-    const newResource = await MarketplaceSDK.ValidatedAddresses.CreateSupplierAddress(
+    const newResource = await HeadStartSDK.ValidatedAddresses.CreateSupplierAddress(
       parentResourceID,
       resource
     );
@@ -47,7 +47,7 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
 
   async updateResource(originalID: string, resource: any): Promise<any> {
     const parentResourceID = await this.getParentResourceID();
-    const newResource = await MarketplaceSDK.ValidatedAddresses.SaveSupplierAddress(
+    const newResource = await HeadStartSDK.ValidatedAddresses.SaveSupplierAddress(
       parentResourceID,
       originalID,
       resource

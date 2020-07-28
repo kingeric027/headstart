@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OcBuyerService } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { OrchestrationLog, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { OrchestrationLog, ListPage, HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
@@ -25,6 +25,6 @@ export class OrchestrationLogsService extends ResourceCrudService<OrchestrationL
   async list(args: any[]): Promise<ListPage<OrchestrationLog>> {
     const listArgs = args[0];
     listArgs.sortBy = listArgs.sortBy || '!timeStamp';
-    return await MarketplaceSDK.OrchestrationLogs.List(listArgs);
+    return await HeadStartSDK.OrchestrationLogs.List(listArgs);
   }
 }
