@@ -8,10 +8,10 @@
       <p class="font-italic mb-0"
          translate>{{readonly ? 'ADMIN.PRODUCT_EDIT.PRODUCT_VARIETIES_DEFINED' : 'ADMIN.PRODUCT_EDIT.DOES_YOUR_PRODUCT'}}</p>
       <p class="mb-0"
-         *ngIf="variants"><span translate>ADMIN.PRODUCT_EDIT.THIS_PRODUCT_HAS </span> 
-                          <span [ngClass]="{'text-danger': !variantsValid}"
-                                class="font-weight-bold">{{variants?.length}}</span> 
-                          <span translate> ADMIN.PRODUCT_EDIT.VARIANTS_LIMIT_100</span></p>
+         *ngIf="variants"><span translate>ADMIN.PRODUCT_EDIT.THIS_PRODUCT_HAS </span>
+        <span [ngClass]="{'text-danger': !variantsValid}"
+              class="font-weight-bold">{{variants?.length}}</span>
+        <span translate> ADMIN.PRODUCT_EDIT.VARIANTS_LIMIT_100</span></p>
       <p *ngIf="!variantsValid"
          class="text-danger">
         <fa-icon [icon]="faExclamationCircle"></fa-icon> <span translate>ADMIN.PRODUCT_EDIT.THIS_PRODUCT_EXCEEDS</span>
@@ -157,7 +157,7 @@
     <div class="variant-overlay"
          *ngIf="editSpecs">
       <span *ngIf="specsWithoutVariations?.length || specsWithVariations?.length"
-             translate>ADMIN.PRODUCT_EDIT.PENDING_VARIATION_CHANGES</span>
+            translate>ADMIN.PRODUCT_EDIT.PENDING_VARIATION_CHANGES</span>
     </div>
     <div class="variant-overlay"
          *ngIf="assignVariantImages">
@@ -234,39 +234,47 @@
                          style="max-width: 50px"
                          [src]="img.Url"
                          alt="" />
-                    <div class="d-flex justify-content-between align-items-center">
-                      <mat-form-field appearance="standard">
-                        <mat-label><span translate>ADMIN.PRODUCT_EDIT.SHIP_WIDTH</span></mat-label>
-                        <input matInput
+                    <div class="form-row">
+                      <div class="form-group col-3">
+                        <label for="shipWidth"
+                               translate>ADMIN.PRODUCT_EDIT.SHIP_WIDTH</label>
+                        <input class="form-control input-sm"
+                               id="shipWidth"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipWidth"
                                (focusout)="variantShippingDimensionUpdate($event, 'ShipWidth')"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.WIDTH' | translate}}">
-                      </mat-form-field>
-                      <mat-form-field appearance="standard">
-                        <mat-label><span translate>ADMIN.PRODUCT_EDIT.SHIP_HEIGHT</span></mat-label>
-                        <input matInput
+                      </div>
+                      <div class="form-group col-3">
+                        <label for="shipHeight"
+                               translate>ADMIN.PRODUCT_EDIT.SHIP_HEIGHT</label>
+                        <input class="form-control input-sm"
+                               id="shipHeight"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipHeight"
                                (focusout)="variantShippingDimensionUpdate($event, 'ShipHeight')"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.HEIGHT' | translate}}">
-                      </mat-form-field>
-                      <mat-form-field appearance="standard">
-                        <mat-label><span translate>ADMIN.PRODUCT_EDIT.SHIP_LENGTH</span></mat-label>
-                        <input matInput
+                      </div>
+                      <div class="form-group col-3">
+                        <label for="shipLength"
+                               translate>ADMIN.PRODUCT_EDIT.SHIP_LENGTH</label>
+                        <input class="form-control input-sm"
+                               id="shipLength"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipLength"
                                (focusout)="variantShippingDimensionUpdate($event, 'ShipLength')"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.LENGTH' | translate}}">
-                      </mat-form-field>
-                      <mat-form-field appearance="standard">
-                        <mat-label><span translate>ADMIN.PRODUCT_EDIT.SHIP_WEIGHT</span></mat-label>
-                        <input matInput
+                      </div>
+                      <div class="form-group col-3">
+                        <label for="shipWeight"
+                               translate>ADMIN.PRODUCT_EDIT.SHIP_WEIGHT</label>
+                        <input class="form-control input-sm"
+                               id="shipWeight"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipWeight"
                                (focusout)="variantShippingDimensionUpdate($event, 'ShipWeight')"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.WEIGHT' | translate}}">
-                      </mat-form-field>
+                      </div>
                     </div>
                   </td>
                 </tr>

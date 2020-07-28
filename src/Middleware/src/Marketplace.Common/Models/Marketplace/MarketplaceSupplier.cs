@@ -23,5 +23,6 @@ namespace Marketplace.Models.Models.Marketplace
 		[JsonConverter(typeof(StringEnumConverter))]
 		public CurrencySymbol? Currency { get; set; } = null;
         public List<ProductType> ProductTypes { get; set; }
+        public List<string> CountriesServicing { get; set; }
     }
 }

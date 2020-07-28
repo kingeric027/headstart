@@ -29,6 +29,7 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     xp: {
       Description: '',
       Currency: null,
+      CountriesServicing: [],
       Images: [{ URL: '', Tag: null }],
       SupportContact: { Name: '', Email: '', Phone: '' },
       SyncFrieghtPop: false

@@ -25,7 +25,7 @@
   <div class="row base-layout-item">
     <div class="col-md-12">
       <div class="py-3">
-        <h1 class ="resource-name mb-0"
+        <h1 class="resource-name mb-0"
             translate>{{
           getTitle(isMyResource, _currentResourceNamePlural, selectedParentResouceName)}}</h1>
       </div>
@@ -34,7 +34,8 @@
   </div>
   <!-- /Page Title -->
   <!-- Filter Bar -->
-  <div *ngIf="!isMyResource || (_currentResourceNamePlural !== 'suppliers')" class="row additional-item-edit-resource additional-item-table">
+  <div *ngIf="!isMyResource || (_currentResourceNamePlural !== 'suppliers')"
+       class="row additional-item-edit-resource additional-item-table">
     <div *ngIf="parentResourceService && !isMyResource"
          class="col-lg-3 col-md-4 col-sm-5 parent-resources">
       <!-- parent resource dropdown -->
@@ -55,8 +56,8 @@
              class="w-100">
           <button ngbDropdownItem
                   *ngFor="let subResource of parentResourceService.subResourceList">
-                    <a routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{subResource.route}}" 
-                       translate>
+            <a routerLink="/{{_ocService.primaryResourceLevel}}/{{selectedParentResourceID}}/{{subResource.route}}"
+               translate>
               {{subResource.display}}
             </a></button>
         </div>
@@ -127,7 +128,7 @@
               <div *ngIf="shouldFilterDisplay(filter)">
                 <label translate>{{filter.Display}}</label>
                 <select class="form-control input-sm"
-                        *ngIf="filter.Type === 'Dropdown'"
+                        *ngIf="filter?.Type === 'Dropdown' || filter?.BuyerAppFilterType === 'SelectOption' || filter?.BuyerAppFilterType === 'NonUI'"
                         type="select"
                         required
                         [formControlName]="filter.Path">
@@ -141,7 +142,7 @@
                   </ng-container>
                 </select>
                 <div class="input-group"
-                     *ngIf="filter.Type === 'DateFilter'">
+                     *ngIf="filter?.Type === 'DateFilter'">
                   <input class="form-control"
                          placeholder="yyyy-mm-dd"
                          value="{{filter.Path === 'from' ? fromDate : toDate}}"
@@ -189,7 +190,7 @@
                                          [ocService]="_ocService">
           </full-resource-table-component>
           <request-status [requestStatus]="requestStatus"
-                          [subResourceName]="_currentResourceNamePlural || ''"
+                          [subResourceName]="(labelPlural | translate) || ''"
                           [selectedParentResouceName]="selectedParentResourceName">
           </request-status>
         </perfect-scrollbar>
@@ -239,26 +240,30 @@
 
             </table>
             <request-status [requestStatus]="requestStatus"
-                            [subResourceName]="_currentResourceNamePlural || ''"
+                            [subResourceName]="(labelPlural | translate) || ''"
                             [selectedParentResouceName]="selectedParentResourceName">
             </request-status>
           </perfect-scrollbar>
         </div>
-        <div class="col-md-9 col-sm-12 contents">
-          <div class="pt-3 pb-3 border-bottom d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
-            <span class="d-flex flex-row justify-content-start">
-              <button class="btn btn-link"
-                      (click)="handleSelectResource({})">
-                <fa-icon [icon]="faChevronLeft"></fa-icon>
-                {{labelPlural | translate}}
-              </button>
+        <div class="col-md-9 col-sm-12 bg-light contents">
+          <div class="py-1 d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
+            <span class="d-flex flex-row justify-content-start align-items-center">
+              <div class="icon-button ripple hover-btn"
+                   (click)="handleSelectResource({})">
+                <div class="icon-wrapper">
+                  <fa-icon class="text-dark"
+                           [icon]="faChevronLeft">
+                  </fa-icon>
+                </div>
+              </div>
               <h3 *ngIf="isCreatingNew"
-                  class="d-inline-block ml-5 mb-0">{{'ADMIN.COMMON.NEW' | translate}} {{labelSingular | translate}}</h3>
+                  class="d-inline-block ml-1 mb-0">New {{labelSingular | translate}}</h3>
               <h3 *ngIf="!isCreatingNew"
-                  class="d-inline-block ml-5 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
+                  class="d-inline-block ml-1 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>
-            <span *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length && !isCreatingNew">
-              <a class="btn brand-button ml-3"
+            <span class="d-flex align-items-center"
+                  *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length && !isCreatingNew">
+              <a class="btn btn-outline-info ml-3"
                  *ngFor="let subResource of _ocService.subResourceList"
                  [routerLink]="[subResource.route]">
                 {{subResource.display | translate }}
@@ -279,7 +284,7 @@
         <div *ngTemplateOutlet="editUnwrapped"></div>
       </ng-container>
       <ng-template #editUnwrapped>
-        <div>
+        <div class="bg-light">
           <perfect-scrollbar style="width: 100%;"
                              id="resource-edit-scroll"
                              [ngStyle]="{'height.px': editResourceHeight}">
@@ -295,9 +300,9 @@
             </delete-confirm-modal-component>
             <div *ngIf="!canBeDeleted">
               <button class="btn btn-link text-muted"
-                      ngbTooltip="This {{_currentResourceNameSingular}} is in use and cannot be deleted."
+                      ngbTooltip="This {{labelSingular | translate}} is in use and cannot be deleted."
                       placement="top">
-                Delete {{_currentResourceNameSingular | titlecase}}
+                Delete {{labelSingular | translate | titlecase}}
               </button>
             </div>
             <div>
