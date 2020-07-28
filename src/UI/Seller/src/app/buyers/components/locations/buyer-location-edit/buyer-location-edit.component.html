@@ -35,21 +35,6 @@
                    value="{{buyerLocationEditable.Address.ID}}"
                    disabled>
           </div>
-
-          <!-- COMMENTING OUT - GOOD REFERENCE IF WE SWITCH THESE FIELDS TO ANGULAR MATERIAL -->
-          <!-- <div class="form-group col-md-6">
-            <mat-form-field appearance="outline">
-              <mat-label>Currency</mat-label>
-              <mat-select [disabled]="!isCreatingNew"
-                          (selectionChange)="handleUpdateBuyerLocation({target: { value: $event.value }}, 'UserGroup.xp.Currency')"
-                          formControlName="Currency">
-                <mat-option *ngFor="let currency of availableCurrencies"
-                            [value]="currency.Currency"><img [src]="currency.Icon"> {{currency.Name}}</mat-option>
-              </mat-select>
-              <mat-error>You must select a currency.</mat-error>
-            </mat-form-field>
-          </div> -->
-
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
@@ -162,36 +147,36 @@
           </div>
         </div>
         <div class="form-row">
-         <div class="form-group col-md-6">
-          <label for="Country">Country</label>
-          <select *ngIf="countryOptions.length !== 0"
-                  type="dropdown"
-                  class="form-control"
-                  formControlName="Country"
-                  id="Country"
-                  showErrors
-                  aria-describedby="Country"
-                  (change)="handleUpdateBuyerLocation($event, 'Address.Country')">
-            <option [ngValue]="''"
-                    disabled>Select a Country</option>
-            <option *ngFor="let country of countryOptions"
-                    [value]="country.abbreviation">{{ country.label }}</option>
-          </select>
-          <input *ngIf="countryOptions.length === 0"
-                 type="text"
-                 class="form-control"
-                 id="Country"
-                 showErrors
-                 aria-describedby="Country"
-                 maxlength="2"
-                 [resourceForm]="resourceForm"
-                 formControlName="Country"
-                 (input)="handleUpdateBuyerLocation($event, 'Address.Country')"
-                 placeholder="Enter Country Code">
-         </div>
-         <div class="form-group col-md-6">
-          <label for="Currency">Currency</label>
-          <input type="text"
+          <div class="form-group col-md-6">
+            <label for="Country">Country</label>
+            <select *ngIf="countryOptions.length !== 0"
+                    type="dropdown"
+                    class="form-control"
+                    formControlName="Country"
+                    id="Country"
+                    showErrors
+                    aria-describedby="Country"
+                    (change)="handleUpdateBuyerLocation($event, 'Address.Country')">
+              <option [ngValue]="''"
+                      disabled>Select a Country</option>
+              <option *ngFor="let country of countryOptions"
+                      [value]="country.abbreviation">{{ country.label }}</option>
+            </select>
+            <input *ngIf="countryOptions.length === 0"
+                   type="text"
+                   class="form-control"
+                   id="Country"
+                   showErrors
+                   aria-describedby="Country"
+                   maxlength="2"
+                   [resourceForm]="resourceForm"
+                   formControlName="Country"
+                   (input)="handleUpdateBuyerLocation($event, 'Address.Country')"
+                   placeholder="Enter Country Code">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="Currency">Currency</label>
+            <input type="text"
                    class="form-control"
                    id="Currency"
                    showErrors
@@ -199,7 +184,7 @@
                    disabled
                    [resourceForm]="resourceForm"
                    formControlName="Currency">
-         </div>
+          </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">

@@ -80,11 +80,19 @@
     margin: auto;
 }
 // STICK THE TAB LABELS TO TOP ON SCROLL
-:host ::ng-deep .mat-tab-header {
+.nav-pills {
     position: sticky;
     top: 0;
     background-color: white;
     z-index: 1050;
+    .nav-link {
+        &.active {
+            background-color: white !important;
+            color: $dark !important;
+            border-radius: 0px !important;
+            border-bottom: 2px solid $primary;
+        }
+    }
 }
 
 .center-checkbox {
