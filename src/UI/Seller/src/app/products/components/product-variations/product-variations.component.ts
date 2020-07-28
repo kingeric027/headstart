@@ -6,7 +6,6 @@ import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models'
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HeadStartSDK } from '@ordercloud/headstart-sdk';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from 'src/environments/environment';
 import { AppAuthService } from '@app-seller/auth';
 import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
