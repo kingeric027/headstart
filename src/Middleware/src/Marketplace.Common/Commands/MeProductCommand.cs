@@ -138,7 +138,7 @@ namespace Marketplace.Common.Commands
 			var buyer = await _marketplaceBuyerCommand.Get(user.BuyerID);
 
 			// must convert markup to decimal before division to prevent rouding error
-			var markupPercent = (decimal)((decimal)buyer.Markup.Percent / 100);
+			var markupPercent = (decimal)buyer.Markup.Percent / 100;
 			var markupMultiplier = markupPercent + 1;
 			return markupMultiplier;
 		}
