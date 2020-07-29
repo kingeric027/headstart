@@ -3,11 +3,11 @@ export enum TableHeader {
     price = 'ORDERS.RETURNS.PRICE',
     quantityOrdered = 'ORDERS.RETURNS.ORDERED',
     quantityReturned = 'ORDERS.RETURNS.RETURNED',
-    //  quantityCanceled
+    quantityCanceled = 'ORDERS.RETURNS.CANCELED',
     quantityToReturn = 'ORDERS.RETURNS.QTY_TO_RETURN',
-    //  quantityToCancel
+    quantityToCancel = 'ORDERS.RETURNS.QTY_TO_CANCEL',
     returnReason = 'ORDERS.RETURNS.RETURN_REASON',
-    //  cancelReason
+    cancelReason = 'ORDERS.RETURNS.CANCEL_REASON',
     selectReason = 'ORDERS.RETURNS.SELECT_RETURN_REASON'
 }
 
@@ -24,6 +24,6 @@ export enum CancelReturnReason {
     NotApproved = 'ORDERS.RETURN_REASONS.PURCHASE_NOT_APPROVED',
     UnappliedDiscount = 'ORDERS.RETURN_REASONS.DISCOUNT_NOT_APPLIED',
     ProductMissing = 'ORDERS.RETURN_REASONS.PRODUCT_MISSING',
-    //  Found different product,
-    //  Product took too long to fulfill
+    FoundDifferentProduct = 'ORDERS.RETURN_REASONS.FOUND_DIFFERENT_PRODUCT',
+    FulfillmentTooLong = 'ORDERS.RETURN_REASONS.FULFILLMENT_TOO_LONG'
 }

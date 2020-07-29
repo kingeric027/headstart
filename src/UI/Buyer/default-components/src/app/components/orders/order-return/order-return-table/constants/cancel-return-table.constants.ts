@@ -6,7 +6,7 @@ export const returnHeaders: CancelReturnTableHeaders = {
         productDetails: TableHeader.productDetails,
         price: TableHeader.price,
         quantityOrdered: TableHeader.quantityOrdered,
-        quantityReturnedCanceled: TableHeader.quantityToReturn,
+        quantityReturnedCanceled: TableHeader.quantityReturned,
         quantityAvailableForAction: TableHeader.quantityToReturn,
         returnCancelReason: TableHeader.returnReason,
         selectReason: TableHeader.selectReason
@@ -16,9 +16,9 @@ export const cancelHeaders: CancelReturnTableHeaders = {
         productDetails: TableHeader.productDetails,
         price: TableHeader.price,
         quantityOrdered: TableHeader.quantityOrdered,
-        quantityReturnedCanceled: TableHeader.quantityToReturn,
-        quantityAvailableForAction: TableHeader.quantityToReturn,
-        returnCancelReason: TableHeader.returnReason,
+        quantityReturnedCanceled: TableHeader.quantityCanceled,
+        quantityAvailableForAction: TableHeader.quantityToCancel,
+        returnCancelReason: TableHeader.cancelReason,
         selectReason: TableHeader.selectReason
 }
 
@@ -43,6 +43,6 @@ export const cancelReasons: CancelReturnReason[] = [
     CancelReturnReason.NotNeeded,
     CancelReturnReason.NotApproved,
     CancelReturnReason.UnappliedDiscount,
-    //  Found different product,
-    //  Product took too long to fulfill
+    CancelReturnReason.FoundDifferentProduct,
+    CancelReturnReason.FulfillmentTooLong
 ]
