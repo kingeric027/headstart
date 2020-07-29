@@ -7,6 +7,7 @@ using Marketplace.Models.Attributes;
 using System.Collections.Generic;
 using ordercloud.integrations.library;
 using Marketplace.Models.Models.Marketplace;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Controllers
 {
@@ -69,6 +70,14 @@ namespace Marketplace.Common.Controllers
         public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode)
         {
             return await _command.AddPromotion(orderID, promoCode, VerifiedUserContext);
+        }
+
+
+        [DocName("Set Line Item Status On Order")]
+        [HttpPost, Route("{orderID}/lineitem/{lineItemID}/status/{lineItemStatus}"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
+        public async Task UpdateLineItemStatusWithNotification(string orderID, string lineItemID, LineItemStatus lineItemStatus)
+        {
+            await _command.UpdateLineItemStatusWithNotification(orderID, lineItemID, lineItemStatus, VerifiedUserContext);
         }
     }
 }
