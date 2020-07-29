@@ -56,7 +56,7 @@ export class OCMAppHeader implements OnInit {
   faBoxOpen = faBoxOpen;
   flagIcon: string;
 
-  constructor(public context: ShopperContextService, private appConfig: AppConfig) {
+  constructor(public context: ShopperContextService, public appConfig: AppConfig) {
     this.profileRoutes = context.router.getProfileRoutes();
     this.orderRoutes = context.router.getOrderRoutes();
   }
