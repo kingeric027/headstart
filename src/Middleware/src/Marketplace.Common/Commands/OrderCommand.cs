@@ -25,6 +25,7 @@ namespace Marketplace.Common.Commands
         Task PatchOrderCanceledStatus(string orderID);
         Task PatchOrderRequiresApprovalStatus(string orderID);
         Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus);
+        Task UpdateLineItemStatusWithNotification(string orderID, string lineItemID, LineItemStatus lineItemStatus, VerifiedUserContext verifiedUser);
     }
 
     public class OrderCommand : IOrderCommand
@@ -50,6 +51,37 @@ namespace Marketplace.Common.Commands
             string buyerOrderID = orderID.Substring(0, index);
             await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
             return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+        }
+
+        public async Task UpdateLineItemStatusWithNotification(string orderID, string lineItemID, LineItemStatus lineItemStatus, VerifiedUserContext verifiedUser)
+        {
+            var lineItemPreviousState = await _oc.LineItems.GetAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, lineItemID, verifiedUser.AccessToken);
+            Require.That(IsValidLineItemStatusChange(lineItemPreviousState, lineItemStatus), new ErrorCode("Invalid LineItem Status Change", 400, $"Cannot change LineItem Status from {lineItemPreviousState.xp.LineItemStatus} to {lineItemStatus}"));
+            var newPartialLineItem = new PartialLineItem() {
+                xp = new
+                {
+                    LineItemStatus = lineItemStatus
+                }
+            };
+            var updatedLineItem = await _oc.LineItems.PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, lineItemID, newPartialLineItem, verifiedUser.AccessToken);
+            await HandleLineItemStatusChangeNotification(orderID, updatedLineItem, lineItemStatus);
+        }
+
+        private bool IsValidLineItemStatusChange(MarketplaceLineItem lineItem, LineItemStatus lineItemStatus)
+        {
+            /* current logic for valid change
+             * If changing to Canceled: must be Submitted or Backordered
+             * If changing to Backordered: must be Submitted
+             */
+            return lineItem.xp.LineItemStatus == LineItemStatus.Submitted || lineItemStatus == LineItemStatus.Canceled && lineItem.xp.LineItemStatus == LineItemStatus.Backordered;
+        }
+
+        private async Task HandleLineItemStatusChangeNotification(string orderID, MarketplaceLineItem lineItem, LineItemStatus lineItemStatus)
+        {
+            if(lineItemStatus == LineItemStatus.Backordered || lineItemStatus == LineItemStatus.Canceled)
+            {
+                await _sendgridService.SendLineItemStatusChangeEmails(orderID, lineItem, lineItemStatus);
+            } 
         }
 
         public async Task RequestReturnEmail(string orderID)
