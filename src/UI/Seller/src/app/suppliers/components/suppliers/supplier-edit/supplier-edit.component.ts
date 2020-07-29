@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit } from '@angular/core';
 import { get as _get } from 'lodash';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { SupportedRates, SupportedCurrencies } from '@app-seller/shared/models/supported-rates.interface';
 import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 import { SupplierService } from '../supplier.service';
@@ -9,7 +9,7 @@ import {
   MiddlewareAPIService,
   SupplierFilterConfigDocument,
 } from '@app-seller/shared/services/middleware-api/middleware-api.service';
-import { ListPage } from '@ordercloud/headstart-sdk';
+import { ListPage, MarketplaceSupplier } from '@ordercloud/headstart-sdk';
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
@@ -22,12 +22,21 @@ export class SupplierEditComponent implements OnInit {
   filterConfig;
   @Output()
   updateResource = new EventEmitter<any>();
-  @Input()
-  supplierEditable;
+  @Input() set supplierEditable(value: MarketplaceSupplier) {
+    this._supplierEditable = value;
+
+    // called here so that the form updates on supplier change, 
+    // otherwise stale values remain
+    this.setUpSupplierCountrySelectIfNeeded();
+  }
+
+  _supplierEditable: MarketplaceSupplier;
   availableCurrencies: SupportedRates[] = [];
   isCreatingNew: boolean;
   isSupplierUser: boolean;
   countriesServicingOptions = [];
+  countriesServicingForm:  FormGroup;
+
   constructor(
     public ocIntegrations: OcIntegrationsAPIService,
     public supplierService: SupplierService,
@@ -51,16 +60,17 @@ export class SupplierEditComponent implements OnInit {
     );
     if (indexOfCountriesServicingConfig > -1) {
       this.countriesServicingOptions = this.filterConfig.Filters[indexOfCountriesServicingConfig].Items;
+      const formGroupCountriesServicing = {};
+      this.countriesServicingOptions.forEach(option => {
+        formGroupCountriesServicing[option.Value] = new FormControl((this._supplierEditable as any).xp?.CountriesServicing?.includes(option.Value) || false);
+      });
+      this.countriesServicingForm = new FormGroup(formGroupCountriesServicing);
     }
   }
 
-  getCountryCheckbox(country: string): string {
-    const isIncluded = this.supplierEditable?.xp?.CountriesServicing?.includes(country);
-    return isIncluded;
-  }
-
-  updateCountriesServicing(checked: boolean, country: string): void {
-    let newCountriesSupported = this.supplierEditable.xp.CountriesServicing || [];
+  updateCountriesServicing(event: any, country: string): void {
+    const checked = event.target.checked;
+    let newCountriesSupported = (this._supplierEditable as any).xp.CountriesServicing || [];
     const isCountryInExistingValue = newCountriesSupported.includes(country);
     if (checked && !isCountryInExistingValue) {
       newCountriesSupported = [...newCountriesSupported, country];
