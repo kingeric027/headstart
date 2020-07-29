@@ -21,6 +21,7 @@ export class OCMOrderReturn {
   requestReturnForm: FormGroup;
   groupedLineItemsToReturn: FormArray;
   isSaving = false;
+  _action: string;
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.Order;
     this.lineItems = value.LineItems;
@@ -28,9 +29,12 @@ export class OCMOrderReturn {
     const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(liGroups);
     this.setSupplierInfo(this.liGroupedByShipFrom);
-    this.setRequestReturnForm();
+    //  this.setRequestReturnForm();
   }
-  @Input() action: string
+  @Input() set action(value: string) {
+    this._action = value;
+    this.setRequestReturnForm(value)
+  }
   @Output()
   viewReturnFormEvent = new EventEmitter<boolean>();
 
@@ -42,8 +46,8 @@ export class OCMOrderReturn {
     return !!selectedItem;
   }
 
-  setRequestReturnForm(): void  {
-    this.requestReturnForm = this.fb.group(new ReturnRequestForm(this.fb, this.order.ID, this.liGroupedByShipFrom, this.action));
+  setRequestReturnForm(action: string): void  {
+    this.requestReturnForm = this.fb.group(new ReturnRequestForm(this.fb, this.order.ID, this.liGroupedByShipFrom, action));
   }
 
   async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
