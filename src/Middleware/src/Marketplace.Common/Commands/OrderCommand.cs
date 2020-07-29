@@ -57,6 +57,7 @@ namespace Marketplace.Common.Commands
         {
             var lineItemPreviousState = await _oc.LineItems.GetAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, lineItemID, verifiedUser.AccessToken);
             Require.That(IsValidLineItemStatusChange(lineItemPreviousState, lineItemStatus), new ErrorCode("Invalid LineItem Status Change", 400, $"Cannot change LineItem Status from {lineItemPreviousState.xp.LineItemStatus} to {lineItemStatus}"));
+            Require.That(lineItemStatus == LineItemStatus.Backordered || lineItemStatus == LineItemStatus.Canceled, new ErrorCode("Invalid Change", 400, "This function is only configured for Backordered and Cancelled orders currently"));
             var newPartialLineItem = new PartialLineItem() {
                 xp = new
                 {

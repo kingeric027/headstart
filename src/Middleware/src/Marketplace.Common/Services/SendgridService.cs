@@ -29,13 +29,15 @@ namespace Marketplace.Common.Services
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload);
         Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload);
+        Task SendLineItemStatusChangeEmails(string orderID, MarketplaceLineItem lineItem, LineItemStatus lineItemStatus);
     }
     public class SendgridService : ISendgridService
     {
-        private readonly AppSettings _settings;
+        private readonly AppSettings _settings; 
         private readonly IOrderCloudClient _oc;
         private const string NO_REPLY_EMAIL_ADDRESS = "noreply@four51.com";
         private const string BUYER_ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
+        private const string LINE_ITEM_STATUS_CHANGE = "d-4ca85250efaa4d3f8a2e3144d4373f8c";
         private const string SUPPLIER_ORDER_SUBMIT_TEMPLATE_ID = "d-777af54b1e414b0b853f983697889267";
         private const string BUYER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
         private const string SUPPLIER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-5776a6c57b344aeda605444c96ff39e8";
@@ -46,6 +48,7 @@ namespace Marketplace.Common.Services
         private const string BUYER_ORDER_DECLINED_TEMPLATE_ID = "d-3b6167f40d6b407b95759d1cb01fff30";
         private const string ORDER_REQUIRES_APPROVAL_TEMPLATE_ID = "d-fbe9f4e9fabd4a37ba2364201d238316";
         private const string BUYER_REFUND_REQUESTED_TEMPLATE_ID = "d-e7327df33cd4412abaa2fa76a67f0f3e";
+
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
             _oc = ocClient;
@@ -81,6 +84,40 @@ namespace Marketplace.Common.Services
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
         }
+
+        public async Task SendLineItemStatusChangeEmails(string orderID, MarketplaceLineItem lineItem, LineItemStatus lineItemStatus)
+        {
+            var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID.Split('-')[0]);
+            var templateDataBuyerEmail = new
+            {
+                buyerOrder.FromUser.FirstName,
+                buyerOrder.FromUser.LastName,
+                ProductName = lineItem.Product.Name,
+                ProductID = lineItem.Product.ID,
+                lineItem.Quantity,
+                lineItem.LineTotal,
+                EmailSubject = lineItemStatus == LineItemStatus.Backordered ? "Item backordered on an order your recently submitted": "Item can no longer be fulfilled on an order your recently submitted",
+                StatusChangeDetail = lineItemStatus == LineItemStatus.Backordered ? "The supplier of an item from your order has indicated that one of the items on your order is backordered": "The supplier of an item from your order has indicated that one of the items on your order can no longer be fulfilled. You will receive a refund for this item",
+                StatusChangeDetail2 = lineItemStatus == LineItemStatus.Backordered ? "The following item is backordered": "The following item will no longer be fulfilled"
+            };
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, marketplaceBuyerOrder.FromUser.Email, LINE_ITEM_STATUS_CHANGE, templateDataBuyerEmail);
+
+            var templateDataSellerEmail = new
+            {
+                FirstName = "SellerFirstNameHolder",
+                LastName = "SellerLastNameHolder",
+                ProductName = lineItem.Product.Name,
+                ProductID = lineItem.Product.ID,
+                lineItem.Quantity,
+                lineItem.LineTotal,
+                EmailSubject = lineItemStatus == LineItemStatus.Backordered ? "Item backordered on an order" : "Item cancelled on an recent order",
+                StatusChangeDetail = lineItemStatus == LineItemStatus.Backordered ? "A supplier has marked a line item as backordered" : "A supplier has marked a line item as cancelled, a refund must be processed for the buyer",
+                StatusChangeDetail2 = lineItemStatus == LineItemStatus.Backordered ? "The following item is backordered" : "The following item will no longer be fulfilled"
+
+            };
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, "bhickey@four51.com", LINE_ITEM_STATUS_CHANGE, templateDataSellerEmail);
+        }
+
 
         public async Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
