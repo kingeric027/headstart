@@ -5,10 +5,10 @@ import { OcTokenService, Order, CatalogAssignment } from '@ordercloud/angular-sd
 import {
   SuperMarketplaceProduct,
   MarketplaceCatalog,
-  MarketplaceSDK,
+  HeadStartSDK,
   ListPage,
   MarketplacePriceSchedule,
-} from 'marketplace-javascript-sdk';
+} from '@ordercloud/headstart-sdk';
 
 // WHOPLE FILE TO BE REPLACED BY SDK
 

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
 import { Me, BuyerAddress } from 'ordercloud-javascript-sdk';
 import { AddressService } from '../services/addresses/address.service';
-import { ListPage, MarketplaceAddressBuyer } from 'marketplace-javascript-sdk';
+import { ListPage, MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk';
 
 @Injectable()
 export class MeListAddressResolver implements Resolve<ListPage<BuyerAddress>> {

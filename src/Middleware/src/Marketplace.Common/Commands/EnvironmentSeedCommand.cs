@@ -27,7 +27,18 @@ namespace Marketplace.Common.Commands
 		private EnvironmentSeed _seed;
 		private readonly IMarketplaceSupplierCommand _supplierCommand;
 		private readonly IMarketplaceBuyerCommand _buyerCommand;
+
+		private readonly string _orgName = $"Head Start {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}";
 		private readonly string _localWebhookUrl = "https://marketplaceteam.ngrok.io";
+		private readonly string _defaultBuyerID = "Default_HeadStart_Buyer";
+		private readonly string _defaultBuyerName = "Default HeadStart Buyer";
+		private readonly string _buyerApiClientName = "Default HeadStart Buyer UI";
+		private readonly string _sellerApiClientName = "Default HeadStart Admin UI";
+		private readonly string _integrationsApiClientName = "Middleware Integrations";
+		private readonly string _sellerUserName = "Default_Admin";
+		private readonly string _buyerUserName = "Default_Buyer";
+		private readonly string _defaultPassword = "Four51Yet!";
+		private readonly string _fullAccessSecurityProfile = "DefaultContext";
 		private readonly string _allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		private static string _adminUIApiClientID;
 		private static string _buyerUIApiClientID;
@@ -102,11 +113,11 @@ namespace Marketplace.Common.Commands
 						SecurityProfileID = sellerCustomRole.ToString()
 					}, token);
 			}
-			
+			var defaultAdminUser = (await _oc.AdminUsers.ListAsync(accessToken: token)).Items.First(u => u.Username == _sellerUserName);
 			await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-			{ 
-				SecurityProfileID = "DefaultContext",
-				UserID = "Default_Admin"
+			{
+				SecurityProfileID = _fullAccessSecurityProfile,
+				UserID = defaultAdminUser.ID
 			}, token);
 		}
 
@@ -114,21 +125,20 @@ namespace Marketplace.Common.Commands
 		{
 			var org = new Organization()
 			{
-				Name = $"Marketplace.Print {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}",
+				Name = _orgName,
 				Active = true,
-				BuyerID = "Default_Marketplace_Buyer",
-				BuyerApiClientName = $"Default Marketplace Buyer UI",
-				BuyerName = $"Default Marketplace Buyer",
-				BuyerUserName = $"Default_Buyer",
-				BuyerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-				SellerApiClientName = $"Default Marketplace Admin UI",
-				SellerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-				SellerUserName = $"Default_Admin"
+				BuyerID = _defaultBuyerID,
+				BuyerApiClientName = _buyerApiClientName,
+				BuyerName = _defaultBuyerName,
+				BuyerUserName = _buyerUserName,
+				BuyerPassword = _defaultPassword,
+				SellerApiClientName = _sellerApiClientName,
+				SellerPassword = _defaultPassword,
+				SellerUserName = _sellerUserName
 			};
 			var request = await _dev.PostOrganization(org, token);
 			return request;
 		}
-
 
 		private async Task CreateBuyers(VerifiedUserContext user, string token) {
 			foreach (var buyer in _seed.Buyers)
@@ -157,6 +167,7 @@ namespace Marketplace.Common.Commands
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.ServiceCategory" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.VendorLevel" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "SyncFreightPop" },       
+			new XpIndex { ThingType = XpThingType.Company, Key = "CountriesServicing" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "OrderType" },       
@@ -189,9 +200,9 @@ namespace Marketplace.Common.Commands
 		private async Task SetApiClientIDs(string token)
 		{
 			var list = await _oc.ApiClients.ListAsync(accessToken: token);
-			_adminUIApiClientID = list.Items.First(a => a.AppName == "Default Marketplace Admin UI").ID;
-			_buyerUIApiClientID = list.Items.First(a => a.AppName == "Default Marketplace Buyer UI").ID;
-			_middlewareApiClientID = list.Items.First(a => a.AppName == "Middleware Integrations").ID;
+			_adminUIApiClientID = list.Items.First(a => a.AppName == _sellerApiClientName).ID;
+			_buyerUIApiClientID = list.Items.First(a => a.AppName == _buyerApiClientName).ID;
+			_middlewareApiClientID = list.Items.First(a => a.AppName == _integrationsApiClientName).ID;
 		}
 
 		private async Task PatchDefaultApiClients(string token)
@@ -208,9 +219,9 @@ namespace Marketplace.Common.Commands
 			var admin = _oc.ApiClients.PatchAsync(_adminUIApiClientID, new PartialApiClient()
 			{
 				Active = true,
-				AllowAnyBuyer = true,
-				AllowAnySupplier = false,
-				AllowSeller = false,
+				AllowAnyBuyer = false,
+				AllowAnySupplier = true,
+				AllowSeller = true,
 				AccessTokenDuration = 600,
 				RefreshTokenDuration = 43200,
 			}, accessToken: token);
@@ -222,14 +233,14 @@ namespace Marketplace.Common.Commands
 			var clientSecret = RandomGen.GetString(_allowedChars, 60);
 			var integrationsClient = new PartialApiClient()
 			{
-				AppName = "Middleware Integrations",
+				AppName = _integrationsApiClientName,
 				Active = true,
 				AllowAnyBuyer = false,
 				AllowAnySupplier = false,
 				AllowSeller = true,
 				AccessTokenDuration = 600,
 				RefreshTokenDuration = 43200,
-				DefaultContextUserName = "Default_Admin",
+				DefaultContextUserName = _sellerUserName,
 				ClientSecret = clientSecret
 			};
 			await _oc.ApiClients.CreateAsync(integrationsClient, token);
@@ -285,13 +296,17 @@ namespace Marketplace.Common.Commands
 			{
 				await _oc.SecurityProfiles.CreateAsync(profile, accessToken);
 			}
-
+			await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+			{
+				BuyerID = _defaultBuyerID,
+				SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
+			}, accessToken);
 			await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
 			{
 				Roles = new List<ApiRole> { ApiRole.FullAccess },
-				Name = "DefaultContext",
-				ID = "Defaultcontext"
-			});
+				Name = _fullAccessSecurityProfile,
+				ID = _fullAccessSecurityProfile
+			}, accessToken);
 		}
 
 		public async Task DeleteAllWebhooks(string token)

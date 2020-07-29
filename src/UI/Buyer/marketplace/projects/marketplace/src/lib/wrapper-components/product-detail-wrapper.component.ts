@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CurrentUserService } from '../services/current-user/current-user.service';
-import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 
 @Component({
   template: `

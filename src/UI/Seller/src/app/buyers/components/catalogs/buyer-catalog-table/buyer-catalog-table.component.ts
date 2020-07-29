@@ -5,7 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { BuyerService } from '../../buyers/buyer.service';
 import { BuyerCatalogService } from '../buyer-catalog.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MarketplaceUserGroup } from 'marketplace-javascript-sdk';
+import { MarketplaceUserGroup } from '@ordercloud/headstart-sdk';
 
 function createBuyerCatalogForm(userGroup: MarketplaceUserGroup) {
   return new FormGroup({
