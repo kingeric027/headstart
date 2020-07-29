@@ -152,7 +152,7 @@ export class OrderHistoryService {
       },
     };
     const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
-    await MarketplaceSDK.Orders.RequestReturnEmail(orderID);
+    await HeadStartSDK.Orders.RequestReturnEmail(orderID);
     return line;
   }
 

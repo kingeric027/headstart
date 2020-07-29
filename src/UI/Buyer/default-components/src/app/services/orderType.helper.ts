@@ -1,5 +1,5 @@
 import { OrderType } from 'marketplace';
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 
 export const isQuoteOrder = (order?: MarketplaceOrder): boolean => {
   return order.xp.OrderType === OrderType.Quote;
