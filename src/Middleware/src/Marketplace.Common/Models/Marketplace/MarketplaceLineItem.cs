@@ -12,6 +12,7 @@ namespace Marketplace.Models.Models.Marketplace
     {
         public LineItemStatus LineItemStatus { get; set; }
         public LineItemReturnInfo LineItemReturnInfo { get; set; }
+        public LineItemCancelInfo LineItemCancelInfo { get; set; }
         public string LineItemImageUrl { get; set; }
     }
 
@@ -20,6 +21,15 @@ namespace Marketplace.Models.Models.Marketplace
     {
         public int QuantityToReturn { get; set; }
         public string ReturnReason { get; set; }
+        public string Comment { get; set; }
+        public bool Resolved { get; set; }
+    }
+
+    [SwaggerModel]
+    public class LineItemCancelInfo
+    {
+        public int QuantityToCancel { get; set; }
+        public string CancelReason { get; set; }
         public string Comment { get; set; }
         public bool Resolved { get; set; }
     }

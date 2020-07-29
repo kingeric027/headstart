@@ -24,6 +24,7 @@ namespace Marketplace.Models
         public OrderType? OrderType { get; set; }
         public QuoteOrderInfo QuoteOrderInfo { get; set; }
         public OrderReturnInfo OrderReturnInfo { get; set; }
+        public OrderCancelInfo OrderCancelInfo { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
 		public CurrencySymbol? Currency { get; set; } = null;
         public ShippingStatus ShippingStatus { get; set; }
@@ -54,7 +55,14 @@ namespace Marketplace.Models
         public string RMANumber { get; set; }
         public bool Resolved { get; set; }
     }
-    
+
+    [SwaggerModel]
+    public class OrderCancelInfo
+    {
+        public bool HasCancel { get; set; }
+        public string RMANumber { get; set; }
+        public bool Resolved { get; set; }
+    }
     public class MarketplaceOrderSubmitPayload
     {
         public MarketplaceOrderSubmitPayloadResponse Response { get; set; }
