@@ -43,7 +43,7 @@ namespace Marketplace.Common.Commands.Zoho
             });
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
-                AuthUrl = settings.OrderCloudSettings.AuthUrl,
+                AuthUrl = settings.OrderCloudSettings.ApiUrl,
                 ApiUrl = settings.OrderCloudSettings.ApiUrl,
                 ClientId = settings.OrderCloudSettings.ClientID,
                 ClientSecret = settings.OrderCloudSettings.ClientSecret,

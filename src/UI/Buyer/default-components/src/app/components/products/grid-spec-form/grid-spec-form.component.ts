@@ -3,7 +3,7 @@ import { Spec, PriceSchedule, ListPage } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService } from 'marketplace';
 import { SpecFormService, GridSpecOption } from '../spec-form/spec-form.service';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem, SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
 
 @Component({
     templateUrl: `./grid-spec-form.component.html`,
@@ -12,6 +12,7 @@ export class OCMGridSpecForm {
     @Input() priceSchedule: PriceSchedule;
     _specs: ListPage<Spec>;
     _product: MarketplaceMeProduct;
+    _superProduct: SuperMarketplaceProduct;
     specOptions: string[];
     lineItems: MarketplaceLineItem[] = [];
     lineTotals: number[] = [];
@@ -19,6 +20,9 @@ export class OCMGridSpecForm {
     isAddingToCart = false;
 
     constructor(private specFormService: SpecFormService, private context: ShopperContextService) { }
+    @Input() set superProduct(value: SuperMarketplaceProduct) {
+        this._superProduct = value;
+    }
     @Input() set product(value: MarketplaceMeProduct) {
         this._product = value;
     }
@@ -32,8 +36,9 @@ export class OCMGridSpecForm {
         const obj = {};
         for (const spec of specs.Items) {
             for (const option of spec.Options) {
-                const name = spec.Name.replace(/ /g, '')
-                obj[name] = obj[name] ? obj[name].push(option.Value) : [option.Value];
+                const name = spec.Name.replace(/ /g, '');
+                if (obj[name]) obj[name].push(option.Value);
+                else obj[name] = [option.Value];
             }
         }
         this.specOptions = this.getAllSpecCombinations(obj);
@@ -69,7 +74,10 @@ export class OCMGridSpecForm {
             Quantity: event.qty,
             Product: this._product,
             ProductID: this._product.ID,
-            Specs: this.specFormService.getGridLineItemSpecs(this._specs, specArray)
+            Specs: this.specFormService.getGridLineItemSpecs(this._specs, specArray),
+            xp: {
+                LineItemImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
+            }
         };
         const i = this.lineItems.findIndex(li => JSON.stringify(li.Specs) === JSON.stringify(item.Specs));
         if (i === -1) this.lineItems.push(item);

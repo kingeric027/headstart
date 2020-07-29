@@ -63,5 +63,12 @@ namespace Marketplace.Common.Controllers
         {
             return await _command.UpsertLineItem(orderID, li, VerifiedUserContext);
         }
+
+        [DocName("Apply a promotion to an order")]
+        [HttpPost, Route("{orderID}/promotions/{promoCode}")]
+        public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode)
+        {
+            return await _command.AddPromotion(orderID, promoCode, VerifiedUserContext);
+        }
     }
 }

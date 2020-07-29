@@ -9,6 +9,7 @@ using Marketplace.Models.Models.Marketplace;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Commands
 {
@@ -19,7 +20,11 @@ namespace Marketplace.Common.Commands
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
+        Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
         Task RequestReturnEmail(string OrderID);
+        Task PatchOrderCanceledStatus(string orderID);
+        Task PatchOrderRequiresApprovalStatus(string orderID);
+        Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus);
     }
 
     public class OrderCommand : IOrderCommand
@@ -28,14 +33,15 @@ namespace Marketplace.Common.Commands
 		private readonly IExchangeRatesCommand _exchangeRates;
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
+        private readonly IMeProductCommand _meProductCommand;
         
-        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IOrderCloudClient oc)
+        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand)
         {
 			_oc = oc;
             _sendgridService = sendgridService;
             _locationPermissionCommand = locationPermissionCommand;
 			_exchangeRates = exchangeRates;
-
+            _meProductCommand = meProductCommand;
 		}
 
         public async Task<Order> AcknowledgeQuoteOrder(string orderID)
@@ -49,6 +55,33 @@ namespace Marketplace.Common.Commands
         public async Task RequestReturnEmail(string orderID)
         {
             await _sendgridService.SendReturnRequestedEmail(orderID);
+        }
+
+        public async Task PatchOrderCanceledStatus(string orderID)
+        {
+                await PatchOrderStatus(orderID, ShippingStatus.Canceled, ClaimStatus.NoClaim);
+                await PatchLineItemStatus(orderID, LineItemStatus.Canceled);
+        }
+        public async Task PatchOrderRequiresApprovalStatus(string orderID)
+        {
+                await PatchOrderStatus(orderID, ShippingStatus.Processing, ClaimStatus.NoClaim);
+        }
+        public async Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus)
+        {
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
+            var partialLi = new PartialLineItem { xp = new { LineItemStatus = lineItemStatus } };
+            List<Task> lineItemsToPatch = new List<Task>();
+            foreach (var li in lineItems.Items)
+            {
+                lineItemsToPatch.Add(_oc.LineItems.PatchAsync(OrderDirection.Incoming, orderID, li.ID, partialLi));
+            }
+            await Task.WhenAll(lineItemsToPatch);
+        }
+
+        private async Task PatchOrderStatus(string orderID, ShippingStatus shippingStatus, ClaimStatus claimStatus)
+        {
+            var partialOrder = new PartialOrder { xp = new { ShippingStatus = shippingStatus, ClaimStatus = claimStatus } };
+            await _oc.Orders.PatchAsync(OrderDirection.Incoming, orderID, partialOrder);
         }
 
         public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
@@ -114,28 +147,46 @@ namespace Marketplace.Common.Commands
 
         public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem liReq, VerifiedUserContext user)
         {
-            var existingLineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, null, user.AccessToken);
-            // New a line item
+            // get me product with markedup prices correct currency and the existing line items in parellel
+            var productRequest = _meProductCommand.Get(liReq.ProductID, user);
+            var existingLineItemsRequest = _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, null, user.AccessToken);
+
+            var existingLineItems = await existingLineItemsRequest;
             var li = new MarketplaceLineItem();
+
             // If line item exists, update quantity, else create
             var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
             if (preExistingLi != null)
             {
-                // Delete the Li
                 await _oc.LineItems.DeleteAsync(OrderDirection.Outgoing, orderID, preExistingLi.ID, user.AccessToken);
             }
-            // Create the new Li
-            li = await _oc.LineItems.CreateAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, liReq, user.AccessToken);
-            // Get the order, for the order.xp.Currency value
-            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing, orderID, user.AccessToken);
-            // Exchange the li.UnitPrice from li.Product.xp.Currency => li.xp.OrderCurrency
-            var exchangedUnitPrice = await ExchangeUnitPrice(li, order);
-            // PATCH the Line Item with exchanged Unit Price & add ProductUnitPrice to xp (OrderDirection.Incoming due to use of elevated token)
+            
+            var product = await productRequest;
+            var markedUpPrice = GetLineItemUnitCost(product, liReq);
+            liReq.UnitPrice = markedUpPrice;
+            liReq.xp.LineItemStatus = LineItemStatus.Open;
             li = await _oc.LineItems
-                .PatchAsync<MarketplaceLineItem>
-                (OrderDirection.Incoming, orderID, li.ID, 
-                new PartialLineItem { UnitPrice = exchangedUnitPrice, xp = new LineItemXp { UnitPriceInProductCurrency = li.UnitPrice, LineItemImageUrl = li.xp.LineItemImageUrl } });
+                .CreateAsync<MarketplaceLineItem>
+                (OrderDirection.Incoming, orderID, liReq);
             return li;
+        }
+
+        private decimal GetLineItemUnitCost(SuperMarketplaceMeProduct product, MarketplaceLineItem li)
+        {
+            var markedUpBasePrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= li.Quantity).Price;
+            var totalSpecMarkup = li.Specs.Aggregate(0M, (accumulator, spec) =>
+            {
+                var relatedProductSpec = product.Specs.First(productSpec => productSpec.ID == spec.SpecID);
+                var relatedSpecMarkup = relatedProductSpec.Options.First(option => option.ID == spec.OptionID).PriceMarkup;
+                return accumulator + (relatedSpecMarkup ?? 0M);
+            });
+            return totalSpecMarkup + markedUpBasePrice;
+        }
+
+        public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser)
+        {
+            var orderPromo = await _oc.Orders.AddPromotionAsync(OrderDirection.Incoming, orderID, promoCode);
+            return await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
         }
 
         private bool LineItemsMatch(LineItem li1, LineItem li2)

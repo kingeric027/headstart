@@ -21,7 +21,9 @@ export class UserGroupAssignments implements OnChanges {
   @Input() userGroupType: string;
   @Input() isCreatingNew: boolean;
   @Input() userPermissionsService: IUserPermissionsService;
+  @Input() homeCountry: string;
   @Output() assignmentsToAdd = new EventEmitter<AssignmentsToAddUpdate>();
+  @Output() hasAssignments = new EventEmitter<boolean>();
 
   userOrgID: string;
   userID: string;
@@ -43,6 +45,7 @@ export class UserGroupAssignments implements OnChanges {
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
     this.updateForUserGroupAssignmentType();
     this.userOrgID = await this.userPermissionsService.getParentResourceID();
+    await this.getUserGroups(this.userOrgID);
     if (changes.user?.currentValue.ID && !this.userID) {
       this.userID = this.user.ID
       if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
@@ -52,9 +55,6 @@ export class UserGroupAssignments implements OnChanges {
     if (this.userID && changes.user?.currentValue?.ID !== changes.user?.previousValue?.ID) {
       this.userID = this.user.ID
       this.getUserGroupAssignments(this.user.ID, this.userOrgID);
-    }
-    if(this.isCreatingNew) {
-      this.getUserGroups(this.userOrgID);
     }
   }
 
@@ -69,13 +69,17 @@ export class UserGroupAssignments implements OnChanges {
 
   async getUserGroups(ID: string): Promise<void> {
     const groups = await this.userPermissionsService.getUserGroups(ID, this.options);
-    this.userGroups = groups.Items;
+    const groupsInHomeCountry = groups.Items.filter(group => 
+    this.isCreatingNew ? group.xp?.Country === this.homeCountry : group.xp?.Country === this.user.xp?.Country);
+    this.userGroups = groupsInHomeCountry;
   }
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
     const userGroupAssignments = await this.userPermissionsService.listUserAssignments(userID, userOrgID);
     this._userUserGroupAssignmentsStatic = userGroupAssignments.Items;
     this._userUserGroupAssignmentsEditable = userGroupAssignments.Items;
+    const match = this._userUserGroupAssignmentsStatic.some(assignedUG => this.userGroups.find(ug => ug.ID === assignedUG.UserGroupID));
+    this.hasAssignments.emit(match);
   }
 
   toggleUserUserGroupAssignment(userGroup: UserGroup): void {

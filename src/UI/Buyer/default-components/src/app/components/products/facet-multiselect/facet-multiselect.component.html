@@ -5,7 +5,9 @@
     <fa-icon class="text-muted"
              [icon]="isCollapsed ?  faPlusSquare : faMinusSquare"
              pull="right"></fa-icon>
-    {{ _facet?.Name }}
+    <span *ngIf="_facet?.Name === 'Supplier'"
+           translate>ALIAS.SUPPLIER</span>
+    <span *ngIf="_facet?.Name !== 'Supplier'">{{_facet?.Name | titlecase}}</span>
   </h4>
 
   <!-- Facet Values -->

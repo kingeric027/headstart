@@ -13,7 +13,9 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [labelSingular]="'ADMIN.NAV.PRODUCT'"
+                          [labelPlural]="'ADMIN.NAV.PRODUCTS'">
   <!-- <app-product-view *ngIf="userContext?.UserType === 'SELLER'"
                     class="resource-edit"
                     [orderCloudProduct]="resourceInSelection">

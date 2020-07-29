@@ -106,61 +106,7 @@
           <span class="float-right">-{{payment.Amount | currency}}</span>
           <hr>
         </div>
-        <div *ngIf="_order.xp?.OrderReturnInfo?.Comment && isSellerUser">
-         <div class="lead"
-             *ngIf="orderDirection === 'Incoming'">
-          <b>Returns</b>
-        </div>
-        <div class="mb-4">
-          <span>
-            <strong>
-              Comment
-            </strong>
-          </span>
-          <span class="float-right">{{_order.xp.OrderReturnInfo.Comment}}</span>
-          <hr>
-        </div>
       </div>
-      </div>
-
-      <!-- TO-DO - Break the return section into its own component when this section is expanded on. -->
-      <div *ngIf="_order?.xp?.OrderReturnInfo?.HasReturn && orderDirection ==='Incoming' && isSellerUser"
-            class="mt-2 col-12 d-print-none">
-        <button *ngIf="!processReturn" 
-              class="ml-2 btn btn-outline-primary float-right"
-              (click)="toggleProcessReturn()"><fa-icon [icon]="faUndo"></fa-icon> Process Return
-        </button>
-        <div *ngIf="processReturn">
-          <form (ngSubmit)="onReturnFormSubmit()"
-                novalidate
-                [formGroup]="returnForm"
-                name="ReturnForm">
-          <div class="form-row">
-            <div class="col-6"></div>
-            <div class="form-group col-6">
-              <label for="Comment">Return Comment</label>
-              <input type="text"
-                     class="form-control"
-                     id="Comment"
-                     showErrors
-                     aria-describedby="Comment"
-                     maxlength="150"
-                     formControlName="Comment"
-                     placeholder="Enter return comment">
-              <span class="d-flex flex-row justify-content-start">
-                <button class="btn brand-button mt-3 w-25 mr-3"
-                        (click)="toggleProcessReturn()">Cancel</button>
-               <button type="submit"
-                        id="submitBtn"
-                        [disabled]="!returnForm.value.Comment || isSaving"
-                       class="btn btn-primary mt-3 w-25">Save</button>
-              </span>
-            </div>
-          </div>
-          </form>
-        </div>
-      </div>
-
 
       <!--DISPLAY FOR QUOTE ORDERS-->
       <div class="col-6"
@@ -225,6 +171,7 @@
                 <th>Product</th>
                 <th>Description</th>
                 <th>Quantity</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -237,6 +184,7 @@
                       </h6>
                     </div>
                   </div>
+                </td>
                 <td class="align-middle">
                   <div class="d-flex align-items-center justify-content-center">
                     <img [id]="i"
@@ -264,8 +212,21 @@
                 <td class="align-middle text-center">
                   {{ li.Quantity }}
                 </td>
+                <td class="align-middle">
+                  <span>Status: {{ li.xp.LineItemStatus === "ReturnRequested" ? "Return Requested" : li.xp.LineItemStatus }}</span>
+                  <div *ngIf="li.xp.LineItemReturnInfo?.QuantityToReturn > 0">
+                    <div class="d-flex flex-column">
+                      <small>Qty Returned: {{ li.xp.LineItemReturnInfo?.QuantityToReturn }}</small>
+                      <small>Reason: {{ getReturnReason(li.xp.LineItemReturnInfo?.ReturnReason) }}</small>
+                      <small *ngIf="li.xp.LineItemReturnInfo.Comment">Comment: {{li.xp.LineItemReturnInfo.Comment}}</small>
+                    </div>
+                  </div>
+                  <return-form *ngIf="li.xp.LineItemStatus === 'ReturnRequested' && isSellerUser"
+                               [order]="_order"
+                               (lineItemUpdate)="handleLineItemUpdate()"
+                               [lineItem]="li"></return-form>
+                </td>
               </tr>
-
             </tbody>
           </table>
         </div>

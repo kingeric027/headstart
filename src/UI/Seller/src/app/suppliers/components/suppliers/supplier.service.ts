@@ -12,8 +12,11 @@ import {
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { MarketplaceSDK } from 'marketplace-javascript-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
-export const SUPPLIER_SUB_RESOURCE_LIST = ['users', 'locations'];
+export const SUPPLIER_SUB_RESOURCE_LIST = [{route: 'users', display: 'ADMIN.NAV.USERS'},
+                                           {route: 'locations', display: 'ALIAS.SUPPLIER_LOCATIONS'}];
+
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',
@@ -26,6 +29,7 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     xp: {
       Description: '',
       Currency: null,
+      CountriesServicing: [],
       Images: [{ URL: '', Tag: null }],
       SupportContact: { Name: '', Email: '', Phone: '' },
       SyncFrieghtPop: false
@@ -38,7 +42,8 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     ocSupplierService: OcSupplierService,
     private ocSupplierUserGroupService: OcSupplierUserGroupService,
     private ocMeService: OcMeService,
-    public currentUserService: CurrentUserService
+    public currentUserService: CurrentUserService,
+    private middleware: MiddlewareAPIService,
   ) {
     super(router, activatedRoute, ocSupplierService, currentUserService, '/suppliers', 'suppliers', SUPPLIER_SUB_RESOURCE_LIST);
     this.ocSupplierService = ocSupplierService;
@@ -51,5 +56,12 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newSupplier];
     this.resourceSubject.next(this.resourceSubject.value);
     return newSupplier;
+  }
+
+  async updateResource(originalID: string, resource: any): Promise<any> {
+    //  if supplier user updating supplier need to call route in middleware because they dont have required role.
+    const newResource = await this.middleware.updateSupplier(originalID, resource);
+    this.updateResourceSubject(newResource)
+    return newResource;
   }
 }

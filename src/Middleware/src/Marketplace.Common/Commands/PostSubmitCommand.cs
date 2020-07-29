@@ -15,6 +15,7 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using Newtonsoft.Json.Converters;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Commands
 {
@@ -35,8 +36,9 @@ namespace Marketplace.Common.Commands
 		private readonly IExchangeRatesCommand _exchangeRates;
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
+        private readonly IOrderCommand _orderCommand;
         
-        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService, IOrderCommand orderCommand)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
@@ -46,6 +48,7 @@ namespace Marketplace.Common.Commands
             _ocSandboxService = orderCloudSandboxService;
             _locationPermissionCommand = locationPermissionCommand;
 			_exchangeRates = exchangeRates;
+            _orderCommand = orderCommand;
 
 		}
 
@@ -264,37 +267,43 @@ namespace Marketplace.Common.Commands
                 var supplierID = supplierOrder.ToCompanyID;
                 supplierIDs.Add(supplierID);
                 var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierID)).ToList();
+                var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID);
                 var supplierOrderPatch = new PartialOrder()
                 {
                     ID = $"{buyerOrder.ID}-{supplierID}",
-                    xp = GetNewOrderXP(buyerOrder, supplierID, shipFromAddressIDsForSupplierOrder)
+                    xp = GetNewOrderXP(buyerOrder, supplier, shipFromAddressIDsForSupplierOrder)
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
+
+            await _orderCommand.PatchLineItemStatus(buyerOrder.ID, LineItemStatus.Submitted);
 
             var buyerOrderPatch = new PartialOrder()
             {
                 xp = new
                 {
                     ShipFromAddressIDs = shipFromAddressIDs,
-                    SupplierIDs = supplierIDs
+                    SupplierIDs = supplierIDs,
+                    ClaimStatus = ClaimStatus.NoClaim,
+                    ShippingStatus = ShippingStatus.Processing
                 }
             };
+            
             await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, buyerOrderPatch);
             return updatedSupplierOrders;
         }
 
-        private OrderXp GetNewOrderXP(MarketplaceOrder buyerOrder, string supplierID, List<string> shipFromAddressIDsForSupplierOrder)
+        private OrderXp GetNewOrderXP(MarketplaceOrder buyerOrder, MarketplaceSupplier supplier, List<string> shipFromAddressIDsForSupplierOrder)
         {
             var supplierOrderXp = new OrderXp()
             {
                 ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
-                SupplierIDs = new List<string>() { supplierID },
+                SupplierIDs = new List<string>() { supplier.ID },
                 StopShipSync = false,
                 OrderType = buyerOrder.xp.OrderType,
                 QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
-				Currency = buyerOrder.xp.Currency
+				Currency = supplier.xp.Currency
             };
             return supplierOrderXp;
         }

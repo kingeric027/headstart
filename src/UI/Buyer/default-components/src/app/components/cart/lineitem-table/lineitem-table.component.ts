@@ -5,6 +5,7 @@ import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketp
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
 import { ReturnReason } from '../../orders/order-return/order-return-table/return-reason-enum';
+import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
@@ -17,10 +18,12 @@ export class OCMLineitemTable {
     this.sortLineItems(this._lineItems);
     const liGroups = _groupBy(value, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(liGroups);
+    this.sortLineItemGroups(this.liGroupedByShipFrom);
     this.setSupplierInfo(this.liGroupedByShipFrom);
   }
   @Input() orderType: OrderType;
   @Input() readOnly: boolean;
+  @Input() hideStatus = false;
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
   updatingLiIDs: string[] = [];
@@ -50,7 +53,7 @@ export class OCMLineitemTable {
       const { ProductID, Specs, Quantity, xp } = li;
       //ACTIVATE SPINNER/DISABLE INPUT IF QTY BEING UPDATED
       this.updatingLiIDs.push(lineItemID);
-      await this.context.order.cart.add({ProductID, Specs, Quantity, xp});
+      await this.context.order.cart.setQuantity({ProductID, Specs, Quantity, xp});
       //REMOVE SPINNER/ENABLE INPUT IF QTY NO LONGER BEING UPDATED
       this.updatingLiIDs.splice(this.updatingLiIDs.indexOf(lineItemID), 1);
     }
@@ -61,8 +64,7 @@ export class OCMLineitemTable {
   }
 
   getImageUrl(lineItemID: string): string {
-    const li = this.getLineItem(lineItemID);
-    return li.xp.LineItemImageUrl;
+    return getPrimaryLineItemImage(lineItemID, this._lineItems)
   }
 
   getLineItem(lineItemID: string): MarketplaceLineItem {
@@ -73,15 +75,16 @@ export class OCMLineitemTable {
     this._lineItems = lineItems.sort((a, b) => {
       let nameA = a.Product.Name.toUpperCase(); // ignore upper and lowercase
       let nameB = b.Product.Name.toUpperCase(); // ignore upper and lowercase
-      if (nameA < nameB) {
-        return -1;
-      }
-      if (nameA > nameB) {
-        return 1;
-      }
-      // names must be equal
-      return 0;
+      return nameA.localeCompare(nameB);
     });
+  }
+
+  sortLineItemGroups(liGroups: MarketplaceLineItem[][]): void {
+    this.liGroupedByShipFrom = liGroups.sort((a, b) => {
+      let nameA = a[0].ShipFromAddressID.toUpperCase(); // ignore upper and lowercase
+      let nameB = b[0].ShipFromAddressID.toUpperCase(); // ignore upper and lowercase
+      return nameA.localeCompare(nameB);
+    })
   }
 
   hasReturnInfo(): boolean {

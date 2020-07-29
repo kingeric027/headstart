@@ -13,7 +13,6 @@ namespace Marketplace.Models.Models.Marketplace
         public LineItemStatus LineItemStatus { get; set; }
         public LineItemReturnInfo LineItemReturnInfo { get; set; }
         public string LineItemImageUrl { get; set; }
-        public decimal? UnitPriceInProductCurrency { get; set; }
     }
 
 	[SwaggerModel]
@@ -21,6 +20,7 @@ namespace Marketplace.Models.Models.Marketplace
     {
         public int QuantityToReturn { get; set; }
         public string ReturnReason { get; set; }
+        public string Comment { get; set; }
         public bool Resolved { get; set; }
     }
 }

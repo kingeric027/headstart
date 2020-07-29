@@ -12,6 +12,7 @@ import {
 } from '@ordercloud/angular-sdk';
 import { ProductService } from '@app-seller/products/product.service';
 import { MarketplaceBuyer, MarketplaceProduct } from 'marketplace-javascript-sdk';
+import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
 
 @Component({
   selector: 'buyer-visibility-configuration-component',
@@ -64,14 +65,14 @@ export class BuyerVisibilityConfiguration {
     private ocCatalogService: OcCatalogService,
     private ocUserGroupService: OcUserGroupService,
     private ocProductService: OcProductService,
-    private productService: ProductService
+    private productService: ProductService,
+    public catalogsTempService: CatalogsTempService
   ) {}
 
   async fetchData(): Promise<void> {
-    if (Object.keys(this._product) && Object.keys(this._buyer)) {
+    if (Object.keys(this._product) && Object.keys(this._buyer) && this._buyer.ID) {
       this.isFetching = true;
       this.isEditing = false;
-      await this.getCatalogAssignments();
       await this.getCatalogs();
       await this.getCatalogAssignments();
       await this.getCategoryAssignments();
@@ -196,10 +197,12 @@ export class BuyerVisibilityConfiguration {
 
   async executeProductCatalogAssignmentRequests(): Promise<void> {
     await this.assignToCatalogIfNecessary();
+    const priceScheduleID = await this.getRelatedPriceScheduleID();
     await this.productService.updateProductCatalogAssignments(
       this.addCatalogAssignments,
       this.delCatalogAssignments,
-      this._buyer.ID
+      this._buyer.ID,
+      priceScheduleID
     );
     await this.productService.updateProductCategoryAssignments(
       this.addCategoryAssignments,
@@ -211,6 +214,19 @@ export class BuyerVisibilityConfiguration {
     this.resetCategoryAssignments(this.assignedCategoriesEditable);
     this.checkForProductCatalogAssignmentChanges();
     this.checkForCategoryAssignmentChanges();
+  }
+
+  async getRelatedPriceScheduleID(): Promise<string> {
+    // pricing overrides are set at the buyer level but need
+    // to be applied through the product catalog (usergroup)
+    // assignments, we are ensuring that the assignment is done
+    // with the price schedule if one is present
+    try {
+      const priceSchedule = await this.catalogsTempService.GetPricingOverride(this._product.ID, this._buyer.ID);
+      return priceSchedule.ID;
+    } catch (ex) {
+      return null;
+    }
   }
 
   checkForProductCatalogAssignmentChanges(): void {

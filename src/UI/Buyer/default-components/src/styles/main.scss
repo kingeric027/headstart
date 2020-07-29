@@ -1,7 +1,7 @@
 @charset 'UTF-8';
 
 // Theme Variables - must come before vendor
-@import 'themes/four51/variables.scss';
+@import 'themes/waxing-the-city/variables.scss';
 
 // Vendors
 @import 'vendor/bootstrap', 'vendor/normalize', 'vendor/ngx-toastr';
@@ -25,7 +25,7 @@
 @import '_shame';
 
 // Theme Styles
-@import 'themes/four51/styles';
+@import 'themes/waxing-the-city/styles';
 
 //@import '../app/ocm-default-components/shared.scss';
 

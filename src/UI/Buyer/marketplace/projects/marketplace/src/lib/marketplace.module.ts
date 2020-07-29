@@ -43,6 +43,7 @@ import { LocationManagementWrapperComponent } from './wrapper-components/locatio
 import { ExchangeRatesService } from './services/exchange-rates/exchange-rates.service';
 import { OrderHistoryWrapperComponent } from './wrapper-components/order-history-wrapper-component';
 import { OrdercloudEnv } from './shopper-context';
+import { TempSdk } from './services/temp-sdk/temp-sdk.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -58,6 +59,7 @@ import { OrdercloudEnv } from './shopper-context';
     ExchangeRatesService,
     OrderHistoryService,
     OrdersToApproveStateService,
+    TempSdk,
     PaymentHelperService,
     ProductFilterService,
     ReorderHelperService,
@@ -99,34 +101,24 @@ export class MarketplaceModule {
   }
 
   private getOrdercloudSDKConfig(config: AppConfig): SdkConfiguration {
+    const version = 'v1';
+    const apiUrl = this.getApiUrl(config.ordercloudEnv);
     return {
-      baseApiUrl: this.getApiUrl(config.ordercloudEnv),
-      baseAuthUrl: this.getAuthUrl(config.ordercloudEnv),
+      baseApiUrl: `${apiUrl}/${version}`,
+      baseAuthUrl: `${apiUrl}/oauth/token`,
       clientID: config.clientID,
       cookieOptions: { prefix: config.appname.replace(/ /g, '_').toLowerCase() },
     };
   }
 
   private getApiUrl(env: OrdercloudEnv): string {
-    const version = 'v1';
     switch (env) {
       case OrdercloudEnv.Sandbox:
-        return `https://sandboxapi.ordercloud.io/${version}`;
+        return `https://sandboxapi.ordercloud.io`;
       case OrdercloudEnv.Staging:
-        return `https://stagingapi.ordercloud.io/${version}`;
+        return `https://stagingapi.ordercloud.io`;
       case OrdercloudEnv.Production:
-        return `https://api.ordercloud.io/${version}`;
-    }
-  }
-
-  private getAuthUrl(env: OrdercloudEnv): string {
-    switch (env) {
-      case OrdercloudEnv.Sandbox:
-        return `https://sandboxauth.ordercloud.io/oauth/token`;
-      case OrdercloudEnv.Staging:
-        return `https://stagingauth.ordercloud.io/oauth/token`;
-      case OrdercloudEnv.Production:
-        return `https://auth.ordercloud.io/oauth/token`;
+        return `https://api.ordercloud.io`;
     }
   }
 }

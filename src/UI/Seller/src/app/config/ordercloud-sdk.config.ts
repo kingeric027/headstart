@@ -4,7 +4,7 @@ import { environment } from '../../environments/environment';
 export const OcSDKConfig = (): Configuration => {
   return new Configuration({
     basePath: `${environment.orderCloudApiUrl}/${environment.orderCloudApiVersion}`,
-    authPath: `${environment.orderCloudAuthUrl}`,
+    authPath: `${environment.orderCloudApiUrl}/oauth/token`,
     cookiePrefix: environment.appname.replace(/ /g, '_').toLowerCase(),
   });
 };

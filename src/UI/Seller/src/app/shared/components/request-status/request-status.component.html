@@ -78,7 +78,7 @@
           </svg>
           <div *ngIf="requestStatus === 'SUCCESSFUL_NO_ITEMS_NO_FILTERS'">
             <p class="h5"
-               *ngIf="selectedParentResouceName">There are no {{subResourceName}} for {{selectedParentResouceName}}.</p>
+               *ngIf="selectedParentResouceName">There are no {{subResourceName | lowercase}} for {{selectedParentResouceName}}.</p>
             <p class="h5"
                *ngIf="!selectedParentResouceName">There are no {{subResourceName}}.</p>
           </div>

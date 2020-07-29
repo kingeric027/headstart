@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Cosmonaut.Attributes;
 using Microsoft.Azure.Documents;
@@ -8,6 +9,7 @@ using Newtonsoft.Json;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
 using OrderCloud.SDK;
+using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
 namespace ordercloud.integrations.cms
 {
@@ -19,8 +21,9 @@ namespace ordercloud.integrations.cms
 	{
 		[JsonProperty("ID"), CosmosInteropID]
 		public string InteropID { get; set; }
-		[Required, ApiIgnore, CosmosPartitionKey]
+		[ApiIgnore, CosmosPartitionKey]
 		public string ContainerID { get; set; } // real id, not interop. Don't need to set or return.
+		[MaxLength(100)]
 		public string Title { get; set; }
 		public bool Active { get; set; } = false;
 		public string Url { get; set; } // Generated if not set. 
@@ -34,7 +37,7 @@ namespace ordercloud.integrations.cms
 		{
 			return new Collection<UniqueKey>
 			{
-				new UniqueKey() { Paths = new Collection<string> { "/InteropID" }}
+				new UniqueKey() { Paths = new Collection<string> { "/InteropID", "/ContainerID" }}
 			};
 		}
 	}

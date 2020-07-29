@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceSpec>();
+            var obj = wi.Current.ToObject<ChiliSpec>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -62,7 +62,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceSpec>(OrchestrationSerializer.Serializer);
+            var obj = wi.Current.ToObject<ChiliSpec>(OrchestrationSerializer.Serializer);
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;

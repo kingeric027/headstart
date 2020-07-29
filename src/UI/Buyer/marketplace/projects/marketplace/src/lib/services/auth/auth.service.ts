@@ -13,6 +13,7 @@ import {
   ForgottenPassword,
   PasswordReset,
   AccessTokenBasic,
+  TokenPasswordReset,
 } from 'ordercloud-javascript-sdk';
 // import { CookieService } from '@gorniv/ngx-universal';
 import { CookieService } from 'ngx-cookie';
@@ -149,8 +150,9 @@ export class AuthService {
     await Me.ResetPasswordByToken({ NewPassword: newPassword });
   }
 
-  async resetPassword(code: string, config: PasswordReset): Promise<void> {
-    await ForgottenPassword.ResetPasswordByVerificationCode(code, config);
+  async resetPassword(token: string, config: TokenPasswordReset): Promise<void> {
+    await Me.ResetPasswordByToken(config, { accessToken: token });
+    // await ForgottenPassword.ResetPasswordByVerificationCode(code, config);
   }
 
   setRememberMeStatus(status: boolean): void {

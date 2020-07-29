@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Marketplace.Models;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Npoi.Mapper;
-using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
@@ -34,7 +30,7 @@ namespace Marketplace.Common.Commands.SupplierSync
             {
                 var oc = new OrderCloudClient(new OrderCloudClientConfig()
                 {
-                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    AuthUrl = _settings.OrderCloudSettings.ApiUrl,
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                     ClientId = user.ClientID
                 });

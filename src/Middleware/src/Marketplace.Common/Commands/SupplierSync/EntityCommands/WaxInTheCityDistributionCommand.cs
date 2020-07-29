@@ -24,7 +24,7 @@ namespace Marketplace.Common.Commands.SupplierSync
             _ocSeller = new OrderCloudClient(new OrderCloudClientConfig
             {
                 ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                AuthUrl = _settings.OrderCloudSettings.ApiUrl,
                 ClientId = _settings.OrderCloudSettings.ClientID,
                 ClientSecret = _settings.OrderCloudSettings.ClientSecret,
                 Roles = new[]

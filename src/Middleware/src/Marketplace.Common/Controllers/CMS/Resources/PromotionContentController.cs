@@ -12,11 +12,14 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 	public class PromotionContentController : BaseController
 	{
 		private readonly IAssetedResourceQuery _assetedResources;
+		private readonly IDocumentAssignmentQuery _documentAssignments;
+
 		private ResourceType type { get; } = ResourceType.Promotions;
 
-		public PromotionContentController(AppSettings settings, IAssetedResourceQuery assetedResources) : base(settings)
+		public PromotionContentController(AppSettings settings, IAssetedResourceQuery assetedResources, IDocumentAssignmentQuery documentAssignments) : base(settings)
 		{
 			_assetedResources = assetedResources;
+			_documentAssignments = documentAssignments;
 		}
 
 		// Content Delivery
@@ -65,6 +68,30 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 		{
 			var resource = new Resource(type, promotionID);
 			await _assetedResources.MoveAssignment(resource, assetID, listOrderWithinType, VerifiedUserContext);
+		}
+
+		[DocName("Get Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
+		[HttpGet, Route("schemas/{schemaID}/documents")]
+		public async Task<ListPage<Document>> ListDocuments(string promotionID, string schemaID, ListArgs<Document> args)
+		{
+			var resource = new Resource(type, promotionID);
+			return await _documentAssignments.ListDocuments(schemaID, resource, args, VerifiedUserContext);
+		}
+
+		[DocName("Assign Document to Resource"), OrderCloudIntegrationsAuth]
+		[HttpPost, Route("schemas/{schemaID}/documents/{documentID}/assignments")]
+		public async Task SaveDocumentAssignment(string promotionID, string schemaID, string documentID)
+		{
+			var resource = new Resource(type, promotionID);
+			await _documentAssignments.SaveAssignment(promotionID, documentID, resource, VerifiedUserContext);
+		}
+
+		[DocName("Remove Document from Resource"), OrderCloudIntegrationsAuth]
+		[HttpDelete, Route("schemas/{schemaID}/documents/{documentID}/assignments")]
+		public async Task DeleteDocumentAssignment(string promotionID, string schemaID, string documentID)
+		{
+			var resource = new Resource(type, promotionID);
+			await _documentAssignments.DeleteAssignment(schemaID, documentID, resource, VerifiedUserContext);
 		}
 	}
 }

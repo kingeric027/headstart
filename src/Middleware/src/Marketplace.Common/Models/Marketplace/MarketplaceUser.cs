@@ -11,5 +11,6 @@ namespace Marketplace.Models
     [SwaggerModel]
     public class UserXp
     {
+    public string Country { get; set; }
     }
 }

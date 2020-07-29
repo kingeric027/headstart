@@ -121,8 +121,7 @@ namespace Marketplace.Common.Commands
             var obj = wi.Diff.ToObject<SuperMarketplaceProduct>(OrchestrationSerializer.Serializer);
             try
             {
-                //TODO: handle partials
-                var response = await _oc.Products.PatchAsync(wi.RecordId, new PartialProduct(), wi.Token);
+                var response = await _oc.Products.PatchAsync(wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)

@@ -3,13 +3,15 @@
         [formGroup]="resourceForm">
     <div class="row pt-3">
       <div class="col-md-5">
-        <h5>Product Facet Information</h5>
-        <p class="font-italic">Information about product facet.</p>
+        <h5 translate>ADMIN.FACETS.PRODUCT_FACET_INFO</h5>
+        <p class="font-italic"
+           translate>ADMIN.FACETS.INFO_ABOUT_FACET</p>
       </div>
       <div class="col-md-7 form-group">
         <div class="form-group"
              *ngIf="isCreatingNew">
-          <label for="ID">Facet ID</label>
+          <label for="ID"
+                 translate>ADMIN.FACETS.FACET_ID</label>
           <input type="text"
                  class="form-control"
                  id="ID"
@@ -19,17 +21,19 @@
                  [resourceForm]="resourceForm"
                  formControlName="ID"
                  (input)="updateResourceFromEvent($event, 'ID')"
-                 placeholder="Enter Facet ID">
+                 placeholder="{{'ADMIN.FACETS.ENTER_FACET_ID' | translate}}">
         </div>
         <div class="form-group"
              *ngIf="!isCreatingNew">
-          <label for="ID">Facet ID</label>
+          <label for="ID"
+                 translate>ADMIN.FACETS.FACET_ID</label>
           <input class="form-control"
                  formControlName="ID"
                  disabled>
         </div>
         <div class="form-group">
-          <label for="Name">Name</label>
+          <label for="Name"
+                 translate>ADMIN.FACETS.NAME</label>
           <input type="text"
                  class="form-control"
                  id="Name"
@@ -37,33 +41,35 @@
                  aria-describedby="Name"
                  formControlName="Name"
                  (input)="updateResourceFromEvent($event, 'Name')"
-                 placeholder="Enter Facet Name">
+                 placeholder="{{'ADMIN.FACETS.ENTER_FACET_NAME' | translate}}">
         </div>
       </div>
     </div>
     <div class="row pt-3">
       <div class="col-md-5">
-        <h5>Facet Options</h5>
-        <p class="font-italic">What options are available for this facet? Limit 25.</p>
+        <h5 translate>ADMIN.FACETS.FACET_OPTIONS</h5>
+        <p class="font-italic"
+           translate>ADMIN.FACETS.WHAT_OPTIONS_AVAILABLE</p>
       </div>
       <div class="col-md-7 form-group">
         <div class="form-group">
           <label [ngClass]="{'font-weight-bold': facetOptionLimitReached()}"
-                 for="addFacetOption">{{updatedResource?.xp?.Options?.length || 0}} / 25 Options</label>
+                 for="addFacetOption">{{updatedResource?.xp?.Options?.length || 0}} / 25 {{'ADMIN.FACETS.OPTIONS' | translate}}</label>
           <div class="input-group w-50">
             <input class="form-control"
                    type="text"
-                   placeholder="Add a facet option"
+                   placeholder="{{'ADMIN.FACETS.ADD_FACET_OPTION' | translate}}"
                    id="newFacetOption" />
             <div class="input-group-append">
               <button class="btn btn-dark"
                       type="submit"
                       [disabled]="facetOptionLimitReached()"
                       (click)="addFacetOption()"
-                      [attr.title]="facetOptionLimitReached() ? 'Limit of 25 options reached.' : null"
+                      [attr.title]="facetOptionLimitReached() ? ('ADMIN.FACETS.LIMIT_OF_25' | translate) : null"
                       data-toggle="tooltip"
-                      data-placement="bottom">
-                Add
+                      data-placement="bottom"
+                      translate>
+                ADMIN.FACETS.ADD
               </button>
             </div>
           </div>
