@@ -7,19 +7,21 @@ export const returnHeaders: CancelReturnTableHeaders = {
         price: TableHeader.price,
         quantityOrdered: TableHeader.quantityOrdered,
         quantityReturnedCanceled: TableHeader.quantityReturned,
-        quantityAvailableForAction: TableHeader.quantityToReturn,
+        //  quantityAvailableToReturnCancel: TableHeader.returnQuantityAvailable,
+        quantityToReturnCancel: TableHeader.quantityToReturn,
         returnCancelReason: TableHeader.returnReason,
-        selectReason: TableHeader.selectReason
+        selectReason: TableHeader.selectReturnReason
 }
 
-export const cancelHeaders: CancelReturnTableHeaders = {
+export const cancelHeaders: CancelReturnTableHeaders = { 
         productDetails: TableHeader.productDetails,
         price: TableHeader.price,
         quantityOrdered: TableHeader.quantityOrdered,
         quantityReturnedCanceled: TableHeader.quantityCanceled,
-        quantityAvailableForAction: TableHeader.quantityToCancel,
+        //  quantityAvailableToReturnCancel: TableHeader.cancelQuantityAvailable,
+        quantityToReturnCancel: TableHeader.quantityToCancel,
         returnCancelReason: TableHeader.cancelReason,
-        selectReason: TableHeader.selectReason
+        selectReason: TableHeader.selectCancelReason
 }
 
 export const returnReasons: CancelReturnReason[] = [

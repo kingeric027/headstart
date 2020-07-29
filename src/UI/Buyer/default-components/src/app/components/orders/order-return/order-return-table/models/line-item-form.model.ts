@@ -9,7 +9,7 @@ export class LineItemForm {
     returnReason = new FormControl();
     lineItem: MarketplaceLineItem;
 
-    constructor(lineItem: MarketplaceLineItem) {
+    constructor(lineItem: MarketplaceLineItem, action: string) {
         if (lineItem.ID) this.id.setValue(lineItem.ID);
         this.lineItem = lineItem;
         this.selected.setValue(false);
@@ -21,7 +21,11 @@ export class LineItemForm {
         this.quantityToReturn.setValidators([
             Validators.required,
             Validators.min(1),
-            Validators.max(lineItem.Quantity - (lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || 0))
+            Validators.max( 
+                action === 'return' ?
+                (lineItem.QuantityShipped - (lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || 0)) : 
+                (lineItem.Quantity - lineItem.QuantityShipped - (lineItem.xp?.LineItemCancelInfo?.QuantityToCancel || 0))
+            )
         ]);
         this.returnReason.disable();
         this.returnReason.setValidators([Validators.required]);

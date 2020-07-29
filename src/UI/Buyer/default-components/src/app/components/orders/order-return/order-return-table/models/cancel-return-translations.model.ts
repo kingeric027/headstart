@@ -5,7 +5,7 @@ export class CancelReturnTableHeaders {
     price: TableHeader;
     quantityOrdered: TableHeader;
     quantityReturnedCanceled: TableHeader;
-    quantityAvailableForAction: TableHeader;
+    quantityToReturnCancel: TableHeader;
     returnCancelReason: TableHeader;
     selectReason: TableHeader;
 }

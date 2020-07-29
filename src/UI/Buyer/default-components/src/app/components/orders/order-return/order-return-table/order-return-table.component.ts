@@ -7,7 +7,7 @@ import { Supplier } from 'ordercloud-javascript-sdk'
 import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
 import { FormGroup, FormArray } from '@angular/forms';
 import { CancelReturnTranslations } from './models/cancel-return-translations.model';
-import { returnHeaders, returnReasons, cancelReasons } from './constants/cancel-return-table.constants';
+import { returnHeaders, returnReasons, cancelReasons, cancelHeaders } from './constants/cancel-return-table.constants';
 import { CancelReturnReason } from './models/cancel-return-translations.enum';
 
 @Component({
@@ -50,7 +50,7 @@ export class OCMOrderReturnTable {
       }
     } else {
       this.translationData = {
-        Headers: returnHeaders,
+        Headers: cancelHeaders,
         AvailableReasons: cancelReasons
       }
     }

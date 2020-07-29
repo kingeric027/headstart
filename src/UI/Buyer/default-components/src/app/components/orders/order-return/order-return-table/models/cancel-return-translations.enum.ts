@@ -8,7 +8,8 @@ export enum TableHeader {
     quantityToCancel = 'ORDERS.RETURNS.QTY_TO_CANCEL',
     returnReason = 'ORDERS.RETURNS.RETURN_REASON',
     cancelReason = 'ORDERS.RETURNS.CANCEL_REASON',
-    selectReason = 'ORDERS.RETURNS.SELECT_RETURN_REASON'
+    selectReturnReason = 'ORDERS.RETURNS.SELECT_RETURN_REASON',
+    selectCancelReason = 'ORDERS.RETURNS.SELECT_CANCEL_REASON'
 }
 
 export enum CancelReturnReason {

@@ -18,13 +18,13 @@
       </h2>
     </div>
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{ order.Status }}</div>
         <div><span translate>ORDERS.DETAIL.SHIPPING_STATUS</span>: <ocm-order-status-icon [status]="order.xp.ShippingStatus"></ocm-order-status-icon> {{ order.xp.ShippingStatus | orderStatusDisplay}}</div>
         <div><span translate>ORDERS.DETAIL.CLAIM_STATUS</span>: <ocm-order-status-icon [status]="order.xp.ClaimStatus"></ocm-order-status-icon> {{ order.xp.ClaimStatus | orderStatusDisplay}}</div>
         <small class="float-left"><span translate>ORDERS.DETAIL.SUBMITTED</span> {{ order.DateSubmitted | date: 'short' }}</small>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-8"> 
         <ocm-order-approval *ngIf="approvalVersion"
                             class="float-right"
                             [orderID]="order.ID"></ocm-order-approval>
@@ -43,30 +43,31 @@
                 translate>
           ORDERS.DETAIL.REORDER
         </button>
-        <button *ngIf="!showRequestReturn && canRequestReturn() && !approvalVersion && !isQuoteOrder(order)"
+        <button *ngIf="!showRequestReturn && !showRequestCancel && canRequestReturn() && !approvalVersion && !isQuoteOrder(order)"
                 class="btn btn-secondary float-right mr-2"
                 (click)="toggleRequestReturn()"
                 translate>
           ORDERS.DETAIL.REQUEST_A_RETURN
-        </button>
-        <button *ngIf="!showRequestCancel && canRequestCancel() && !approvalVersion && !isQuoteOrder(order)"
-                class="btn btn-secondary float-right mr-2"
-                (click)="toggleRequestCancel()"
-                translate>
-          ORDERS.DETAIL.REQUEST_A_RETURN
-        </button>
-        <button *ngIf="showRequestReturn && !isQuoteOrder(order) && order.Status !== 'Unsubmitted'"
-                class="btn btn-secondary float-right mr-2"
-                (click)="toggleRequestReturn()"
-                translate>
-          ORDERS.DETAIL.CANCEL_RETURN_REQUEST
         </button>
         <button *ngIf="showRequestCancel && !isQuoteOrder(order) && order.Status !== 'Unsubmitted'"
                 class="btn btn-secondary float-right mr-2"
                 (click)="toggleRequestCancel()"
                 translate>
-          ORDERS.DETAIL.CANCEL_RETURN_REQUEST
+          ORDERS.DETAIL.DISCARD_CANCEL_REQUEST
         </button>
+        <button *ngIf="!showRequestCancel && !showRequestReturn && canRequestCancel() && !approvalVersion && !isQuoteOrder(order)"
+                class="btn btn-secondary float-right mr-2"
+                (click)="toggleRequestCancel()"
+                translate>
+          ORDERS.DETAIL.REQUEST_A_CANCEL
+        </button>
+        <button *ngIf="showRequestReturn && !isQuoteOrder(order) && order.Status !== 'Unsubmitted'"
+                class="btn btn-secondary float-right mr-2"
+                (click)="toggleRequestReturn()"
+                translate>
+          ORDERS.DETAIL.DISCARD_RETURN_REQUEST
+        </button>
+        
         <button *ngIf="!approvalVersion && !isQuoteOrder(order) && order.Status === 'Unsubmitted'"
                 class="btn btn-secondary float-right mr-2"
                 (click)="open(updateOrderModal)"

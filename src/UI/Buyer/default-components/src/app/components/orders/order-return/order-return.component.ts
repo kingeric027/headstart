@@ -43,7 +43,7 @@ export class OCMOrderReturn {
   }
 
   setRequestReturnForm(): void  {
-    this.requestReturnForm = this.fb.group(new ReturnRequestForm(this.fb, this.order.ID, this.liGroupedByShipFrom));
+    this.requestReturnForm = this.fb.group(new ReturnRequestForm(this.fb, this.order.ID, this.liGroupedByShipFrom, this.action));
   }
 
   async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
