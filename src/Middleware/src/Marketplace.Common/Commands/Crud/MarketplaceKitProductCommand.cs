@@ -54,7 +54,7 @@ namespace Marketplace.Common.Commands.Crud
             var _product = await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
             var _images = GetProductImages(id, user);
             var _attachments = GetProductAttachments(id, user);
-            var _productAssignments = await _query.Get<KitProductDocument>("KitProduct", _product.ID, user);
+            var _productAssignments = await _query.Get<KitProduct>("KitProduct", _product.ID, user);
             return new MarketplaceKitProduct
             {
                 Product = _product,
@@ -72,20 +72,20 @@ namespace Marketplace.Common.Commands.Crud
                 pageSize: args.PageSize,
                 page: args.Page,
                 accessToken: user.AccessToken);
+            var _kitProducts = await _query.List<KitProduct>("KitProduct", args, user);
+            var _kitProductList = new List<MarketplaceKitProduct>();
 
-            var _kitProductList = new List<MarketplaceKitProduct> { };
-
-            await Throttler.RunAsync(_productsList.Items, 100, 10, async product =>
+            await Throttler.RunAsync(_kitProducts.Items, 100, 10, async product =>
             {
-                var _productAssignments = await _query.Get<KitProductDocument>("KitProduct", product.ID, user);
-                var _images = GetProductImages(product.ID, user);
-                var _attachments = GetProductAttachments(product.ID, user);
+                var parentProduct = await _oc.Products.GetAsync(product.InteropID);
+                var _images = GetProductImages(product.InteropID, user);
+                var _attachments = GetProductAttachments(product.InteropID, user);
                 _kitProductList.Add(new MarketplaceKitProduct
                 {
-                    Product = product,
+                    Product = parentProduct,
                     Images = await _images,
                     Attachments = await _attachments,
-                    ProductAssignments = _productAssignments.Doc
+                    ProductAssignments = product.Doc
                 });
             });
             return new ListPage<MarketplaceKitProduct>
@@ -100,7 +100,7 @@ namespace Marketplace.Common.Commands.Crud
             var kitProductDoc = new KitProductDocument();
             kitProductDoc.InteropID = _product.ID;
             kitProductDoc.Doc = kitProduct.ProductAssignments;
-            var _productAssignments = await _query.CreateWrapper("KitProduct", kitProductDoc, user);
+            var _productAssignments = await _query.Create<KitProduct>("KitProduct", kitProductDoc, user);
             return new MarketplaceKitProduct
             {
                 Product = _product,
@@ -112,13 +112,9 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, KitProductDocument kitDoc, VerifiedUserContext user)
         {
-            // Update the Product itself
             var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(kitProduct.Product.ID, kitProduct.Product, user.AccessToken);
-            // Update Product Assignments
-            var _productAssignments = await _query.Update<KitProductDocument>("KitProduct", _updatedProduct.ID, kitDoc, user);
-            // List Product Images
+            var _productAssignments = await _query.Update<KitProduct>("KitProduct", _updatedProduct.ID, kitDoc, user);
             var _images = await GetProductImages(_updatedProduct.ID, user);
-            // List Product Attachments
             var _attachments = await GetProductAttachments(_updatedProduct.ID, user);
             return new MarketplaceKitProduct
             {
@@ -138,7 +134,7 @@ namespace Marketplace.Common.Commands.Crud
             await Task.WhenAll(
                 Throttler.RunAsync(_images, 100, 5, i => _assets.Delete(i.InteropID, user)),
                 Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.InteropID, user)),
-                _query.Delete<KitProductDocument>("KitProduct", product.ID, user),
+                _query.Delete<KitProduct>("KitProduct", product.ID, user),
             _oc.Products.DeleteAsync(id, user.AccessToken)
             );
         }
