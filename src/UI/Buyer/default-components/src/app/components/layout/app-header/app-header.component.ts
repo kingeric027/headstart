@@ -14,7 +14,7 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Category } from 'ordercloud-javascript-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { ProductFilters, ShopperContextService, AppConfig } from 'marketplace';
-import { MarketplaceOrder, MarketplaceLineItem} from 'marketplace-javascript-sdk'
+import { MarketplaceOrder, MarketplaceLineItem} from '@ordercloud/headstart-sdk'
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
 import { CurrentUser } from 'marketplace';

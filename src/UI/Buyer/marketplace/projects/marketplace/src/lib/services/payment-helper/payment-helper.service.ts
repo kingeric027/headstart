@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Payment, Payments, Me } from 'ordercloud-javascript-sdk';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 
 @Injectable({
   providedIn: 'root',

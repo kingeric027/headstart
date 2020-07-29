@@ -4,7 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ShopperContextService } from 'marketplace';
 import { Supplier } from 'ordercloud-javascript-sdk'
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { FormGroup, FormArray } from '@angular/forms';
 import { CancelReturnTranslations } from './models/cancel-return-translations.model';
 import { returnHeaders, returnReasons, cancelReasons, cancelHeaders } from './constants/cancel-return-table.constants';

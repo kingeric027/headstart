@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 import { CancelReturnReason } from '../../orders/order-return/order-return-table/models/cancel-return-translations.enum';

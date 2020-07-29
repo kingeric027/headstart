@@ -39,6 +39,7 @@ export class FacetEditComponent implements OnInit {
       }
 
     updateResourceFromEvent(event: any, field: string): void {
+        if (field === 'ID') event.target.value = event.target.value.toLowerCase(); //Facet IDs must be in lowercase
         field === 'Active'
         ? this.updateResource.emit({ value: event.target.checked, field })
         : this.updateResource.emit({ value: event.target.value, field });

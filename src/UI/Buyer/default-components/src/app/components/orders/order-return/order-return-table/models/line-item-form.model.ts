@@ -1,6 +1,5 @@
 import { FormControl, Validators } from '@angular/forms';
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
-import { lineItemHasBeenShipped } from 'src/app/services/orderType.helper';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 
 export class LineItemForm {
     id = new FormControl();

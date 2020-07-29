@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Marketplace.Models.Extended
@@ -11,6 +11,7 @@ namespace Marketplace.Models.Extended
         Open,
         Backordered,
         Canceled,
+        CancelRequested,
         Returned,
         ReturnRequested
     }

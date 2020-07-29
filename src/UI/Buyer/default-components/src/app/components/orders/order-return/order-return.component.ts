@@ -3,7 +3,7 @@ import {
   ShopperContextService,
   LineItemGroupSupplier,
 } from 'marketplace';
-import {MarketplaceOrder, MarketplaceLineItem, OrderDetails} from 'marketplace-javascript-sdk';
+import {MarketplaceOrder, MarketplaceLineItem, OrderDetails} from '@ordercloud/headstart-sdk';
 import { groupBy as _groupBy } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model';

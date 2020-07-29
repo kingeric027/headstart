@@ -57,15 +57,15 @@
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <mat-form-field appearance="outline">
-              <mat-label>Currency</mat-label>
-              <mat-select formControlName="Currency"
-                          (selectionChange)="updateResourceFromEvent({target: { value: $event.value }}, 'xp.Currency')">
-                <mat-option *ngFor="let currency of availableCurrencies"
-                            [value]="currency.Currency"><img [src]="currency.Icon"> {{currency.Name}}</mat-option>
-              </mat-select>
-              <mat-error>You must select a currency.</mat-error>
-            </mat-form-field>
+            <label for="Currency">Currency <small *ngIf="isCreatingNew"
+                     class="text-danger font-weight-bolder">*</small></label>
+            <select class="form-control"
+                    id="Currency"
+                    formControlName="Currency"
+                    (change)="updateResourceFromEvent({target: { value: $event.value }}, 'xp.Currency')">
+              <option *ngFor="let currency of availableCurrencies"
+                      [value]="currency.Currency"><img [src]="currency.Icon"> {{currency.Name}}</option>
+            </select>
           </div>
           <div class="form-group col-md-6">
             <p class="mb-1">Use FreightPOP for Shipping</p>
@@ -83,43 +83,71 @@
             </label>
           </div>
 
-          <div class="form-group col-md-6"
+          <div class="form-group col-md-12"
                formGroupName="ProductTypes">
-            <div>
-              <label>Product Type (Select at least 1)</label>
-            </div>
-            <div class="d-flex justify-content-between align-items-center">
-              <mat-checkbox color="primary"
-                            aria-describedby="Standard"
-                            formControlName="Standard"
-                            (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Standard')">Standard</mat-checkbox>
-              <mat-checkbox color="primary"
-                            aria-describedby="Quote"
-                            formControlName="Quote"
-                            (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Quote')">Quote</mat-checkbox>
-              <mat-checkbox color="primary"
-                            aria-describedby="PurchaseOrder"
-                            formControlName="PurchaseOrder"
-                            (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.PurchaseOrder')">Purchase Order</mat-checkbox>
-            </div>
-            <ng-container *ngIf="countriesServicingOptions.length">
-              <div>
-                <div class="mt-4 w-100">
-                  <label>Countries To Service</label>
-                </div>
-                <div class="d-flex justify-content-start">
-                  <ng-container *ngFor="let country of countriesServicingOptions">
-                    <mat-checkbox class="mr-2"
-                                  color="primary"
-                                  [checked]="getCountryCheckbox(country.Value)"
-                                  (change)="updateCountriesServicing($event.checked, country.Value)">{{country.Text}}</mat-checkbox>
-                  </ng-container>
-                </div>
+            <label>Product Types</label>
+            <div class="d-flex justify-content-start align-items-center">
+              <div class="custom-control custom-checkbox mr-3">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       [resourceForm]="resourceForm"
+                       formControlName="Standard"
+                       (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Standard')"
+                       id="Standard">
+                <label class="custom-control-label"
+                       for="Standard">Standard</label>
               </div>
-            </ng-container>
-
-
+              <div class="custom-control custom-checkbox mr-3">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       [resourceForm]="resourceForm"
+                       formControlName="Quote"
+                       (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Quote')"
+                       id="Quote">
+                <label class="custom-control-label"
+                       for="Quote">Quote</label>
+              </div>
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       [resourceForm]="resourceForm"
+                       formControlName="PurchaseOrder"
+                       (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.PurchaseOrder')"
+                       id="PurchaseOrder">
+                <label class="custom-control-label"
+                       for="PurchaseOrder">Purchase Order</label>
+              </div>
+            </div>
+            <small id="productTypesHelp"
+                   class="form-text text-muted">
+              What types of products is this supplier able to sell? Check at least one.
+            </small>
           </div>
+
+          <div *ngIf="countriesServicingOptions.length"
+               [formGroup]="countriesServicingForm"
+               class="form-group col-md-12">
+            <label>Countries to Service</label>
+            <div class="d-flex justify-content-start align-items-center">
+              <div *ngFor="let country of countriesServicingOptions"
+                   class="mr-3
+                   custom-control
+                   custom-checkbox">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       [formControlName]="country.Value"
+                       (change)="updateCountriesServicing($event, country.Value)"
+                       id="{{country.Value}}">
+                <label class="custom-control-label"
+                       for="{{country.Value}}">{{country.Text}}</label>
+              </div>
+            </div>
+            <small id="productTypesHelp"
+                   class="form-text text-muted">
+              Which countries will you provide products to?
+            </small>
+          </div>
+
         </div>
       </div>
     </div>

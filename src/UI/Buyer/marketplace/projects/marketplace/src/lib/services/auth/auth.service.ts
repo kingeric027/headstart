@@ -20,7 +20,7 @@ import { CookieService } from 'ngx-cookie';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { AppConfig } from '../../shopper-context';
 import { CurrentOrderService } from '../order/order.service';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service';
 
 @Injectable({
@@ -102,7 +102,7 @@ export class AuthService {
 
   async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
     const creds = await Auth.Login(userName, password, this.appConfig.clientID, this.appConfig.scope);
-    MarketplaceSDK.Tokens.SetAccessToken(creds.access_token);
+    HeadStartSDK.Tokens.SetAccessToken(creds.access_token);
     this.setToken(creds.access_token);
     if (rememberMe && creds.refresh_token) {
       /**
@@ -122,7 +122,7 @@ export class AuthService {
   async anonymousLogin(): Promise<AccessToken> {
     try {
       const creds = await Auth.Anonymous(this.appConfig.clientID, this.appConfig.scope);
-      MarketplaceSDK.Tokens.SetAccessToken(creds.access_token);
+      HeadStartSDK.Tokens.SetAccessToken(creds.access_token);
       this.setToken(creds.access_token);
       return creds;
     } catch (err) {
@@ -133,7 +133,7 @@ export class AuthService {
 
   async logout(): Promise<void> {
     Tokens.RemoveAccessToken();
-    MarketplaceSDK.Tokens.RemoveAccessToken();
+    HeadStartSDK.Tokens.RemoveAccessToken();
     this.isLoggedIn = false;
     if (this.appConfig.anonymousShoppingEnabled) {
       this.router.navigate(['/home']);

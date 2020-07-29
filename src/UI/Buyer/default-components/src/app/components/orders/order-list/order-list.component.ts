@@ -4,7 +4,7 @@ import { OrderListColumn } from '../../../models/order-list-column';
 import { ShopperContextService, OrderViewContext } from 'marketplace';
 import { ListPage } from 'ordercloud-javascript-sdk';
 import { isQuoteOrder } from '../../../services/orderType.helper';
-import { MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './order-list.component.html',

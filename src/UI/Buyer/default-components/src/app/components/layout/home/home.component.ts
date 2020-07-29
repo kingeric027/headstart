@@ -2,7 +2,7 @@ import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
 import { Component, OnInit } from '@angular/core';
 import { ShopperContextService, MarketplaceMeProduct } from 'marketplace';
 import { BuyerProduct } from 'ordercloud-javascript-sdk';
-import { ProductXp } from 'marketplace-javascript-sdk';
+import { ProductXp } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './home.component.html',

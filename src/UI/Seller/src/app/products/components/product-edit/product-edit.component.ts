@@ -18,7 +18,7 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { faTrash, faTimes, faCircle, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct, ListPage, MarketplaceSDK, SpecOption } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption } from '@ordercloud/headstart-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper';
@@ -26,7 +26,6 @@ import { AppAuthService } from '@app-seller/auth';
 import { environment } from 'src/environments/environment';
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
 import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
-import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { ValidateMinMax } from '../../../validators/validators';
@@ -92,6 +91,7 @@ export class ProductEditComponent implements OnInit {
   newPriceBreakQty = 2;
   newProductPriceBreaks = [];
   availableProductTypes = [];
+  active: number;
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
@@ -104,7 +104,6 @@ export class ProductEditComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private modalService: NgbModal,
     private middleware: MiddlewareAPIService,
-    private ocIntegrations: OcIntegrationsAPIService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) { }
@@ -122,12 +121,13 @@ export class ProductEditComponent implements OnInit {
 
   setProductEditTab(): void {
     const productDetailSection = this.router.url.split('/')[3];
-    this.selectedTabIndex = setProductEditTab(productDetailSection, this.readonly);
+    this.active = setProductEditTab(productDetailSection);
   }
 
   tabChanged(event: any, productID: string): void {
+    const nextIndex = Number(event.nextId);
     if (productID === null) return;
-    const newLocation = event.index === 0 ? `products/${productID}` : `products/${productID}/${TabIndexMapper[this.readonly ? event.index : event.index + 1]}`;
+    const newLocation = nextIndex === 0 ? `products/${productID}` : `products/${productID}/${TabIndexMapper[nextIndex]}`;
     this.location.replaceState(newLocation);
   }
 
@@ -229,7 +229,7 @@ export class ProductEditComponent implements OnInit {
 
   async handleDelete(): Promise<void> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    await MarketplaceSDK.Products.Delete(this._superMarketplaceProductStatic.Product.ID, accessToken);
+    await HeadStartSDK.Products.Delete(this._superMarketplaceProductStatic.Product.ID, accessToken);
     this.router.navigateByUrl('/products');
   }
 
@@ -285,7 +285,7 @@ export class ProductEditComponent implements OnInit {
       field,
       value:
         ['Product.Active', 'Product.xp.IsResale', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed'].includes(field)
-          ? event.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
+          ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
   }
@@ -344,9 +344,9 @@ export class ProductEditComponent implements OnInit {
       Type: (assetType as AssetUpload['Type']),
       FileName: file.Filename
     }
-    const newAsset: Asset = await MarketplaceSDK.Upload.UploadAsset(asset, accessToken);
-    await MarketplaceSDK.ProductContents.SaveAssetAssignment(productID, newAsset.ID, accessToken);
-    return await MarketplaceSDK.Products.Get(productID, accessToken);
+    const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
+    await HeadStartSDK.ProductContents.SaveAssetAssignment(productID, newAsset.ID, accessToken);
+    return await HeadStartSDK.Products.Get(productID, accessToken);
   }
 
   async addDocuments(files: FileHandle[], productID: string): Promise<void> {
@@ -373,7 +373,7 @@ export class ProductEditComponent implements OnInit {
 
   async removeFile(file: Asset): Promise<void> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    await MarketplaceSDK.Assets.Delete(file.ID, accessToken);
+    await HeadStartSDK.Assets.Delete(file.ID, accessToken);
     if (file.Type === 'Image') {
       this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(i => i.ID !== file.ID); 
     } else {
@@ -468,27 +468,27 @@ export class ProductEditComponent implements OnInit {
     superMarketplaceProduct.Product.xp.Currency = supplier?.xp?.Currency;
     superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
-    return await MarketplaceSDK.Products.Post(superMarketplaceProduct);
+    return await HeadStartSDK.Products.Post(superMarketplaceProduct);
   }
 
   async updateMarketplaceProduct(superMarketplaceProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
     // TODO: Temporary while Product set doesn't reflect the current strongly typed Xp
     superMarketplaceProduct.Product.xp.Status = 'Draft';
-    return await MarketplaceSDK.Products.Put(superMarketplaceProduct.Product.ID, superMarketplaceProduct);
+    return await HeadStartSDK.Products.Put(superMarketplaceProduct.Product.ID, superMarketplaceProduct);
   };
 
   async handleSelectedProductChange(product: Product): Promise<void> {
-    this._exchangeRates = await this.ocIntegrations.getAvailableCurrencies();
+    this._exchangeRates = (await HeadStartSDK.ExchangeRates.GetRateList()).Items;
     const currencyOnProduct = product.xp.Currency;
     this.supplierCurrency = this._exchangeRates?.find(r => r.Currency === currencyOnProduct);
     this.sellerCurrency = this._exchangeRates?.find(r => r.Currency === 'USD');
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    const marketplaceProduct = await MarketplaceSDK.Products.Get(product.ID, accessToken);
+    const marketplaceProduct = await HeadStartSDK.Products.Get(product.ID, accessToken);
     this.refreshProductData(marketplaceProduct);
   }
 
   async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
-    return await MarketplaceSDK.Avalaras.ListTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
+    return await HeadStartSDK.Avalaras.ListTaxCodes({ filters: { Category: taxCategory }, search, page, pageSize });
   }
 
   getTotalMarkup = (specOptions: SpecOption[]): number => {
