@@ -10,7 +10,6 @@ import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interf
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
 import { HeadStartSDK } from '@ordercloud/headstart-sdk';
-import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 import { SupportedCountries, GeographyConfig } from '@app-seller/shared/models/supported-countries.interface';
 @Component({
   selector: 'app-buyer-location-edit',
@@ -51,7 +50,6 @@ export class BuyerLocationEditComponent implements OnInit {
     private router: Router,
     private middleware: MiddlewareAPIService,
     private currentUserService: CurrentUserService,
-    private ocIntegrations: OcIntegrationsAPIService
   ) {this.countryOptions = GeographyConfig.getCountries();}
 
   async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {

@@ -13,7 +13,9 @@
     "serve-test": "ng serve --configuration=test",
     "build-test": "ng build --configuration=test",
     "serve-staging": "ng serve --configuration=staging",
-    "build-staging": "ng build --configuration=staging"
+    "build-staging": "ng build --configuration=staging",
+    "serve-production": "ng serve --configuration=production",
+    "build-production": "ng build --configuration=production"
   },
   "private": true,
   "dependencies": {

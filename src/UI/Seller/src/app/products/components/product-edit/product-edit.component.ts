@@ -478,7 +478,7 @@ export class ProductEditComponent implements OnInit {
   };
 
   async handleSelectedProductChange(product: Product): Promise<void> {
-    this._exchangeRates = (await MarketplaceSDK.ExchangeRates.GetRateList()).Items;
+    this._exchangeRates = (await HeadStartSDK.ExchangeRates.GetRateList()).Items;
     const currencyOnProduct = product.xp.Currency;
     this.supplierCurrency = this._exchangeRates?.find(r => r.Currency === currencyOnProduct);
     this.sellerCurrency = this._exchangeRates?.find(r => r.Currency === 'USD');

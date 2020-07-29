@@ -4,8 +4,8 @@
 // TODO: Change oc integration middleware url to staging URL when one exists
 export const environment = {
   hostedApp: true,
-  clientID: '023EA192-AC82-4881-8464-11CBCF1185FF',
-  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  clientID: 'C1D92C43-C7AF-467B-B3DF-D4751D70CAE6',
+  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   appname: 'Self Esteem Brands',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   orderCloudApiUrl: 'https://api.ordercloud.io',
