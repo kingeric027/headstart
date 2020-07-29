@@ -55,7 +55,7 @@ export class OCMOrderReturn {
   }
 
   async updateOrder(orderID: string): Promise<void> {
-    if(this.action === 'return') {
+    if(this._action === 'return') {
       await this.context.orderHistory.returnOrder(orderID)
     } else {
       await this.context.orderHistory.cancelOrder(orderID)
@@ -68,20 +68,22 @@ export class OCMOrderReturn {
       liGroup.lineItems
         .filter(lineItem => lineItem.selected === true)
         .forEach(li => {
-          const newSumToReturn = (li.lineItem?.xp?.LineItemReturnInfo?.QuantityToReturn || 0) + li.quantityToReturn;
-          lineItemsToUpdate.push(
-            this.action === 'return' ?
-            this.context.orderHistory.returnLineItem(
+          const newSumToReturn = (li.lineItem?.xp?.LineItemReturnInfo?.QuantityToReturn || 0) + li.quantityToReturnOrCancel;
+          const newSumToCancel = (li.lineItem?.xp?.LineItemCancelInfo?.QuantityToCancel || 0) + li.quantityToReturnOrCancel;
+          if(this._action === 'return') {
+            lineItemsToUpdate.push(this.context.orderHistory.returnLineItem(
               orderID,
               li.id,
               newSumToReturn,
               li.returnReason
-          ) : this.context.orderHistory.cancelLineItem(
+            ))
+          } else {
+            lineItemsToUpdate.push(this.context.orderHistory.cancelLineItem(
               orderID,
               li.id,
-              newSumToReturn,
-              li.returnReason
-          ))
+              newSumToCancel,
+              li.returnReason))
+          }
         }
       )
     );

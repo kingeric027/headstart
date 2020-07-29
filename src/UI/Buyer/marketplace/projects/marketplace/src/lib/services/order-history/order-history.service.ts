@@ -13,6 +13,7 @@ import {
 } from '@ordercloud/headstart-sdk';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { ClaimStatus, LineItemStatus } from '../../../lib/shopper-context';
+import { TempSdk } from '../temp-sdk/temp-sdk.service';
 @Injectable({
   providedIn: 'root',
 })
@@ -23,7 +24,8 @@ export class OrderHistoryService {
     public filters: OrderFilterService,
     private reorderHelper: ReorderHelperService,
     private httpClient: HttpClient,
-    private appConfig: AppConfig
+    private appConfig: AppConfig,
+    private tempSdk: TempSdk
   ) {}
 
   async getLocationsUserCanView(): Promise<MarketplaceAddressBuyer[]> {
@@ -152,7 +154,8 @@ export class OrderHistoryService {
       },
     };
     const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
-    await HeadStartSDK.Orders.RequestReturnEmail(orderID);
+    //  await HeadStartSDK.Orders.RequestReturnEmail(orderID);
+    await this.tempSdk.sendCancelEmail(orderID);
     return line;
   }
 

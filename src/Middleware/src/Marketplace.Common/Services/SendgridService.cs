@@ -280,7 +280,7 @@ namespace Marketplace.Common.Services
                 {
                     products.Add(MapReturnedLineItemToProduct(lineItem));
                 }
-                else if (lineItem.xp.LineItemReturnInfo != null && actionType == "cancel")
+                else if (lineItem.xp.LineItemCancelInfo != null && actionType == "cancel")
                 {
                     products.Add(MapCanceledLineItemToProduct(lineItem));
                 }

@@ -28,7 +28,7 @@ export class OCMOrderReturnTable {
     'price',
     'quantityOrdered',
     'quantityReturned',
-    'quantityToReturn',
+    'quantityToReturnOrCancel',
     'returnReason' 
 ];
   _action: string;
@@ -89,27 +89,20 @@ export class OCMOrderReturnTable {
   }
 
   isRowEnabled(row: FormGroup): boolean {
-    if(this._action === 'return') {
-      return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToReturn && 
+      return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToCancel && 
       row.controls.lineItem.value.QuantityShipped === row.controls.lineItem.value.Quantity;
-    } else {
-      // return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToCancel && 
-      // row.controls.lineItem.value.QuantityShipped === row.controls.lineItem.value.Quantity;
-      return true;
     }
-
-  }
 
   selectRow(row: FormGroup): void {
     this.selection.select(row);
-    row.controls.quantityToReturn.enable();
+    row.controls.quantityToReturnOrCancel.enable();
     row.controls.returnReason.enable();
     row.controls.selected.setValue(true);
   }
 
   deselectRow(row: FormGroup): void {
     this.selection.deselect(row);
-    row.controls.quantityToReturn.disable();
+    row.controls.quantityToReturnOrCancel.disable();
     row.controls.returnReason.disable();
     row.controls.selected.setValue(false);
   }

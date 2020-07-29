@@ -50,7 +50,7 @@ export class OCMOrderDetails implements OnInit {
     let total = 0;
     this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
       if (li.xp?.LineItemReturnInfo) qtyReturned += li.xp.LineItemReturnInfo.QuantityToReturn;
-      total += li.Quantity;
+      total += li.QuantityShipped;
     });
     return (
       qtyReturned !== total &&
@@ -65,10 +65,10 @@ export class OCMOrderDetails implements OnInit {
     let total = 0;
     this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
       if (li.xp?.LineItemCancelInfo) qtyCanceled += li.xp?.LineItemCancelInfo?.QuantityToCancel;
-      total += li.Quantity;
+      total += (li.Quantity - li.QuantityShipped);
     });
     return (
-      qtyCanceled !== total &&
+      qtyCanceled < total &&
       this.order.Status !== 'Unsubmitted' &&
       this.order.xp.ShippingStatus !== ShippingStatus.Shipped
     );

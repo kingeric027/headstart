@@ -5,6 +5,6 @@ export const returnColumns = [
     'price',
     'quantityOrdered',
     'quantityReturned',
-    'quantityToReturn',
+    'quantityToReturnOrCancel',
     'returnReason' 
 ]

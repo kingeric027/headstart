@@ -4,7 +4,7 @@ import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 export class LineItemForm {
     id = new FormControl();
     selected = new FormControl();
-    quantityToReturn = new FormControl();
+    quantityToReturnOrCancel = new FormControl();
     returnReason = new FormControl();
     lineItem: MarketplaceLineItem;
 
@@ -16,8 +16,8 @@ export class LineItemForm {
             lineItem.Quantity === lineItem.xp?.LineItemCancelInfo?.QuantityToCancel){
             this.selected.disable();
         } 
-        this.quantityToReturn.disable();
-        this.quantityToReturn.setValidators([
+        this.quantityToReturnOrCancel.disable();
+        this.quantityToReturnOrCancel.setValidators([
             Validators.required,
             Validators.min(1),
             Validators.max( 
