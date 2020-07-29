@@ -64,7 +64,7 @@ export class OCMOrderDetails implements OnInit {
     let qtyCanceled = 0;
     let total = 0;
     this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
-      if (li.xp?.LineItemReturnInfo) qtyCanceled += li.xp.LineItemCancelInfo.QuantityToCancel;
+      if (li.xp?.LineItemCancelInfo) qtyCanceled += li.xp?.LineItemCancelInfo?.QuantityToCancel;
       total += li.Quantity;
     });
     return (
@@ -146,5 +146,6 @@ export class OCMOrderDetails implements OnInit {
   toggleShowRequestForm(showRequestReturn: boolean): void {
     this.ngOnInit();
     this.showRequestReturn = showRequestReturn;
+    this.showRequestCancel = showRequestReturn;
   }
 }
