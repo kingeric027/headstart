@@ -30,8 +30,7 @@ namespace Orchestration.Tests
             {
                 OrderCloudSettings = new OrderCloudSettings()
                 {
-                    ApiUrl = "api",
-                    AuthUrl = "auth"
+                    ApiUrl = "api"
                 }
             };
             _command = new SyncCommand(_settings, new OrderCloudClient(),  Substitute.For<LogQuery>(Substitute.For<ICosmosStore<OrchestrationLog>>()));
@@ -46,7 +45,10 @@ namespace Orchestration.Tests
 
             var wi = new WorkItem("fourover/guid/hydratedproduct/guid")
             {
-                Action = Action.Create, ClientId = "clientid", RecordType = RecordType.HydratedProduct, Current = current["Model"] as JObject,
+                Action = Action.Create, 
+                ClientId = "clientid", 
+                RecordType = RecordType.HydratedProduct, 
+                Current = current["Model"] as JObject,
                 Token = current["Token"].ToString()
             };
             try
