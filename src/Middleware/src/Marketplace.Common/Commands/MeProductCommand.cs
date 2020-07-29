@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands.Crud;
@@ -136,7 +136,7 @@ namespace Marketplace.Common.Commands
 		private async Task<decimal> GetDefaultMarkupMultiplier(VerifiedUserContext user)
 		{
 			var buyer = await _marketplaceBuyerCommand.Get(user.BuyerID);
-			var markupPercent = (decimal)(buyer.Markup.Percent / 100);
+			var markupPercent = (decimal)((decimal)buyer.Markup.Percent / 100);
 			var markupMultiplier = markupPercent + 1;
 			return markupMultiplier;
 		}
