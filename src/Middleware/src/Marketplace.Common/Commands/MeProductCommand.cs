@@ -83,7 +83,8 @@ namespace Marketplace.Common.Commands
 
 		public async Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user)
 		{
-			var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), accessToken: user.AccessToken);
+			var searchText = args.Search ?? "";
+			var meProductsRequest = searchText.Length > 0 ? _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), search: searchText, accessToken: user.AccessToken) : _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), accessToken: user.AccessToken);
 
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 			var exchangeRatesRequest = GetExchangeRates(user);
