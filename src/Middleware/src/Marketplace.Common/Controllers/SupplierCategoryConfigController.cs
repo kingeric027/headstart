@@ -7,6 +7,7 @@ using Marketplace.Models.Extended;
 using ordercloud.integrations.library;
 using ordercloud.integrations.cms;
 using Marketplace.Models;
+using Newtonsoft.Json.Linq;
 
 namespace Marketplace.Common.Controllers
 {
@@ -23,7 +24,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("GET SupplierCategoryConfig")]
         [HttpGet, Route("/supplierfilterconfig"), OrderCloudIntegrationsAuth(ApiRole.Shopper, ApiRole.SupplierReader)]
-        public async Task<ListPage<SupplierFilterConfigDocument>> Get()
+        public async Task<ListPage<Document<SupplierFilterConfigDocument>>> Get()
         {
                 return await _query.List<SupplierFilterConfigDocument>("SupplierFilterConfig", new ListArgs<dynamic>(), VerifiedUserContext);
         }

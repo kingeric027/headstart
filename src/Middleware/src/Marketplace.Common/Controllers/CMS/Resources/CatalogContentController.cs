@@ -4,6 +4,7 @@ using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
+using Newtonsoft.Json.Linq;
 
 namespace Marketplace.Common.Controllers.CMS.Resources
 {
@@ -72,10 +73,10 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 
 		[DocName("Get Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
 		[HttpGet, Route("schemas/{schemaID}/documents")]
-		public async Task<ListPage<Document>> ListDocuments(string catalogID, string schemaID, ListArgs<Document> args)
+		public async Task<ListPage<Document<JObject>>> ListDocuments(string catalogID, string schemaID, ListArgs<Document<JObject>> args)
 		{
 			var resource = new Resource(type, catalogID);
-			return await _documentAssignments.ListDocuments(schemaID, resource, args, VerifiedUserContext);
+			return await _documentAssignments.ListDocuments<JObject>(schemaID, resource, args, VerifiedUserContext);
 		}
 
 		[DocName("Assign Document to Resource"), OrderCloudIntegrationsAuth]
@@ -83,7 +84,7 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 		public async Task SaveDocumentAssignment(string catalogID, string schemaID, string documentID)
 		{
 			var resource = new Resource(type, catalogID);
-			await _documentAssignments.SaveAssignment(schemaID, documentID, resource, VerifiedUserContext);
+			await _documentAssignments.SaveAssignment<JObject>(schemaID, documentID, resource, VerifiedUserContext);
 		}
 
 		[DocName("Remove Document from Resource"), OrderCloudIntegrationsAuth]
@@ -91,7 +92,7 @@ namespace Marketplace.Common.Controllers.CMS.Resources
 		public async Task DeleteDocumentAssignment(string catalogID, string schemaID, string documentID)
 		{
 			var resource = new Resource(type, catalogID);
-			await _documentAssignments.DeleteAssignment(schemaID, documentID, resource, VerifiedUserContext);
+			await _documentAssignments.DeleteAssignment<JObject>(schemaID, documentID, resource, VerifiedUserContext);
 		}
 	}
 }
