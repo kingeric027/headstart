@@ -9,6 +9,8 @@
     "build-test": "ng build --configuration=test",
     "serve-staging": "ng serve --configuration=staging",
     "build-staging": "ng build --configuration=staging",
+    "serve-production": "ng serve --configuration=production",
+    "build-production": "ng build --configuration=production",
     "preinstall": "npm run build-marketplace",
     "lint": "eslint src/**/*.ts --quiet",
     "build-marketplace": "cd ../marketplace && npm run build"

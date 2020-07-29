@@ -26,7 +26,6 @@ import { AppAuthService } from '@app-seller/auth';
 import { environment } from 'src/environments/environment';
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
 import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
-import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { ValidateMinMax } from '../../../validators/validators';
@@ -105,7 +104,6 @@ export class ProductEditComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private modalService: NgbModal,
     private middleware: MiddlewareAPIService,
-    private ocIntegrations: OcIntegrationsAPIService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) { }
@@ -480,7 +478,7 @@ export class ProductEditComponent implements OnInit {
   };
 
   async handleSelectedProductChange(product: Product): Promise<void> {
-    this._exchangeRates = await this.ocIntegrations.getAvailableCurrencies();
+    this._exchangeRates = (await HeadStartSDK.ExchangeRates.GetRateList()).Items;
     const currencyOnProduct = product.xp.Currency;
     this.supplierCurrency = this._exchangeRates?.find(r => r.Currency === currencyOnProduct);
     this.sellerCurrency = this._exchangeRates?.find(r => r.Currency === 'USD');
