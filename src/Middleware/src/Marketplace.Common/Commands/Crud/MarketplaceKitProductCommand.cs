@@ -127,7 +127,7 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task Delete(string id, VerifiedUserContext user)
         {
-            var product = await _oc.Products.GetAsync(id); // This is temporary to accommodate bad data where product.ID != product.DefaultPriceScheduleID
+            var product = await _oc.Products.GetAsync(id);
             var _images = await GetProductImages(id, user);
             var _attachments = await GetProductAttachments(id, user);
             // Delete images, attachments, and assignments associated with the requested product
