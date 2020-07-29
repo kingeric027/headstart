@@ -89,8 +89,14 @@ export class OCMOrderReturnTable {
   }
 
   isRowEnabled(row: FormGroup): boolean {
-    return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToReturn && 
-    row.controls.lineItem.value.QuantityShipped === row.controls.lineItem.value.Quantity;
+    if(this._action === 'return') {
+      return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToReturn && 
+      row.controls.lineItem.value.QuantityShipped === row.controls.lineItem.value.Quantity;
+    } else {
+      // return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToCancel && 
+      // row.controls.lineItem.value.QuantityShipped === row.controls.lineItem.value.Quantity;
+      return true;
+    }
 
   }
 
