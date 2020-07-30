@@ -89,9 +89,21 @@ export class OCMOrderReturnTable {
   }
 
   isRowEnabled(row: FormGroup): boolean {
-      return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToCancel && 
-      row.controls.lineItem.value.QuantityShipped === row.controls.lineItem.value.Quantity;
-    }
+    return (this._action === 'return') ? 
+      // if quantity shipped greater than quantity already returned  
+      row.controls.lineItem.value.QuantityShipped > 
+      (row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToReturn || 0) : 
+      // if quantity NOT shipped greater than quantity already canceled
+      (row.controls.lineItem.value.Quantity - row.controls.lineItem.value.QuantityShipped) > 
+      (row.controls.lineItem.value.xp?.LineItemCancelInfo?.QuantityToCancel || 0);
+
+  }
+
+  getQuantityReturnedCanceled(lineItem: MarketplaceLineItem): number {
+    return (this._action === 'return') ? 
+      (lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || 0) : 
+      (lineItem.xp?.LineItemCancelInfo?.QuantityToCancel || 0);
+  }
 
   selectRow(row: FormGroup): void {
     this.selection.select(row);

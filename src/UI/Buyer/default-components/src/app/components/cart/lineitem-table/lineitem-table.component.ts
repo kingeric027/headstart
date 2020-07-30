@@ -91,6 +91,10 @@ export class OCMLineitemTable {
     return this._lineItems.some(li => !!li.xp?.LineItemReturnInfo);
   }
 
+  hasCancelInfo(): boolean {
+    return this._lineItems.some(li => !!li.xp?.LineItemCancelInfo);
+  }
+
   getReturnReason(reasonCode: string): string {
     return CancelReturnReason[reasonCode];
   }
