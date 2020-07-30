@@ -61,7 +61,9 @@ namespace ordercloud.integrations.cms
 			var list = await query.WithPagination(arguments.Page, arguments.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var assignments = list.ToListPage(arguments.Page, arguments.PageSize, count);
-			return DocumentAssignmentMapper.MapTo(assignments);
+			var documentIDs = assignments.Items.Select(assign => assign.DocID);
+			var documents = await _documents.ListByInternalIDs(documentIDs);
+			return DocumentAssignmentMapper.MapTo(assignments, documents);
 		}
 
 		public async Task SaveAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user)
@@ -69,7 +71,7 @@ namespace ordercloud.integrations.cms
 			var resource = assignment.MapToResource();
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
-			if (!isValidAssignment(schema.RestrictedAssignmentTypes, resource.Type))
+			if (!isValidAssignment(schema.RestrictedAssignmentTypes, resource.ResourceType ?? 0))
 			{
 				throw new InvalidAssignmentException(schema.RestrictedAssignmentTypes);
 			}
@@ -78,7 +80,7 @@ namespace ordercloud.integrations.cms
 			{
 				RsrcID = assignment.ResourceID,
 				ParentRsrcID = assignment.ParentResourceID,
-				RsrcType = resource.Type,
+				RsrcType = resource.ResourceType ?? 0,
 				ClientID = user.ClientID,
 				SchemaID = schema.id,
 				DocID = document.id

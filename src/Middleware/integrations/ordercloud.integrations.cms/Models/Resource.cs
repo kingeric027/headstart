@@ -10,6 +10,7 @@ namespace ordercloud.integrations.cms
 	[SwaggerModel]
 	public class Resource
 	{
+		public Resource() { }
 		public Resource(ResourceType type, string id, string parentID = null)
 		{
 			ResourceType = type;

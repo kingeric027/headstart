@@ -9,14 +9,14 @@ namespace ordercloud.integrations.cms.Mappers
 {
 	public static class DocumentAssignmentMapper
 	{
-		public static DocumentAssignment MapTo(DocumentAssignmentDO assignment)
+		public static DocumentAssignment MapTo(DocumentAssignmentDO assignment, DocumentDO doc)
 		{
 			return new DocumentAssignment()
 			{
 				ResourceID = assignment.RsrcID,
 				ResourceType = assignment.RsrcType,
 				ParentResourceID = assignment.ParentRsrcID,
-				DocumentID = assignment.DocID
+				DocumentID = doc.InteropID
 			};
 		}
 
@@ -32,17 +32,18 @@ namespace ordercloud.integrations.cms.Mappers
 			return new Resource(resourceType, assignment.ResourceID, assignment.ParentResourceID);
 		}
 
-		public static IEnumerable<DocumentAssignment> MapTo(IEnumerable<DocumentAssignmentDO> assignments)
+		public static IEnumerable<DocumentAssignment> MapTo(IEnumerable<DocumentAssignmentDO> assignments, IEnumerable<DocumentDO> docs)
 		{
-			return assignments.Select(assignment => MapTo(assignment));
+			var docLookup = docs.ToDictionary(doc => doc.id);
+			return assignments.Select(assignment => MapTo(assignment, docLookup[assignment.DocID]));
 		}
 
-		public static ListPage<DocumentAssignment> MapTo(ListPage<DocumentAssignmentDO> listPage)
+		public static ListPage<DocumentAssignment> MapTo(ListPage<DocumentAssignmentDO> listPage, IEnumerable<DocumentDO> docs)
 		{
 			return new ListPage<DocumentAssignment>
 			{
 				Meta = listPage.Meta,
-				Items = MapTo(listPage.Items).ToList()
+				Items = MapTo(listPage.Items, docs).ToList()
 			};
 		}
 
@@ -53,7 +54,6 @@ namespace ordercloud.integrations.cms.Mappers
 				{"ResourceID", "RsrcID" },
 				{"ParentResourceID", "ParentRsrcID" },
 				{"ResourceType", "RsrcType" },
-				{"DocumentID", "DocID" },
 			});
 		}
 	}
