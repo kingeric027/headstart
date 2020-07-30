@@ -99,7 +99,7 @@ namespace ordercloud.integrations.cms
 			existingDocument.Doc = document.Doc;
 			existingDocument = SchemaHelper.ValidateDocumentAgainstSchema(schema, existingDocument);
 			var updatedDocument = await _store.UpdateAsync(existingDocument.Reserialize<Document<JObject>>());
-			return updatedDocument.Reserialize<Document<TDoc>>();
+			return updatedDocument.Entity.Reserialize<Document<TDoc>>();
 		}
 
 		public async Task Delete<TDoc>(string schemaInteropID, string documentInteropID, VerifiedUserContext user)

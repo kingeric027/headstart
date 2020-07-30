@@ -40,9 +40,9 @@ namespace Marketplace.Common.Controllers
         }
         [DocName("PUT Kit Product")]
         [HttpPut, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceKitProduct> Put([FromBody] MarketplaceKitProduct kitProduct, KitProductDocument kitDoc, string id)
+        public async Task<MarketplaceKitProduct> Put([FromBody] MarketplaceKitProduct kitProduct, string id)
         {
-            return await _command.Put(id, kitProduct, kitDoc, VerifiedUserContext);
+            return await _command.Put(id, kitProduct, VerifiedUserContext);
         }
 
         [DocName("DELETE Kit Product")]
