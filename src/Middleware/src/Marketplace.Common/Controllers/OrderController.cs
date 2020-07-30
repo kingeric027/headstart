@@ -18,9 +18,11 @@ namespace Marketplace.Common.Controllers
     {
         
         private readonly IOrderCommand _command;
-        public OrderController(IOrderCommand command, AppSettings settings) : base(settings)
+        private readonly ILineItemCommand _lineItemCommand;
+        public OrderController(IOrderCommand command, ILineItemCommand lineItemCommand, AppSettings settings) : base(settings)
         {
             _command = command;
+            _lineItemCommand = lineItemCommand;
         }
 
         [DocName("POST Acknowledge Quote Order")]
@@ -62,7 +64,7 @@ namespace Marketplace.Common.Controllers
         [HttpPut, Route("{orderID}/lineitems"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, [FromBody] MarketplaceLineItem li)
         {
-            return await _command.UpsertLineItem(orderID, li, VerifiedUserContext);
+            return await _lineItemCommand.UpsertLineItem(orderID, li, VerifiedUserContext);
         }
 
         [DocName("Apply a promotion to an order")]
@@ -73,11 +75,18 @@ namespace Marketplace.Common.Controllers
         }
 
 
-        [DocName("Set Line Item Status On Order")]
-        [HttpPost, Route("{orderID}/lineitem/{lineItemID}/status/{lineItemStatus}"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
-        public async Task UpdateLineItemStatusWithNotification(string orderID, string lineItemID, LineItemStatus lineItemStatus)
+        [DocName("Seller or Supplier Set Line Item Statuses On Order with Related Notification")]
+        [HttpPost, Route("{orderID}/{orderDirection}/lineitem/status"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
+        public async Task<List<MarketplaceLineItem>> SellerSupplierUpdateLineItemStatusesWithNotification(string orderID, OrderDirection orderDirection, [FromBody] LineItemStatusChange lineItemStatusChange)
         {
-            await _command.UpdateLineItemStatusWithNotification(orderID, lineItemID, lineItemStatus, VerifiedUserContext);
+            return await _lineItemCommand.UpdateLineItemStatusesWithNotification(orderDirection, orderID, lineItemStatusChange, VerifiedUserContext);
+        }
+
+        [DocName("Buyer Set Line Item Statuses On Order with Related Notification")]
+        [HttpPost, Route("{orderID}/lineitem/status"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task<List<MarketplaceLineItem>> BuyerUpdateLineItemStatusesWithNotification(string orderID, [FromBody] LineItemStatusChange lineItemStatusChange)
+        {
+            return await _lineItemCommand.UpdateLineItemStatusesWithNotification(OrderDirection.Outgoing, orderID, lineItemStatusChange, VerifiedUserContext);
         }
     }
 }

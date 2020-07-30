@@ -19,13 +19,10 @@ namespace Marketplace.Common.Commands
         Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
-        Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
         Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
         Task RequestReturnEmail(string OrderID);
         Task PatchOrderCanceledStatus(string orderID);
         Task PatchOrderRequiresApprovalStatus(string orderID);
-        Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus);
-        Task UpdateLineItemStatusWithNotification(string orderID, string lineItemID, LineItemStatus lineItemStatus, VerifiedUserContext verifiedUser);
     }
 
     public class OrderCommand : IOrderCommand
@@ -51,38 +48,6 @@ namespace Marketplace.Common.Commands
             string buyerOrderID = orderID.Substring(0, index);
             await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
             return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
-        }
-
-        public async Task UpdateLineItemStatusWithNotification(string orderID, string lineItemID, LineItemStatus lineItemStatus, VerifiedUserContext verifiedUser)
-        {
-            var lineItemPreviousState = await _oc.LineItems.GetAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, lineItemID, verifiedUser.AccessToken);
-            Require.That(IsValidLineItemStatusChange(lineItemPreviousState, lineItemStatus), new ErrorCode("Invalid LineItem Status Change", 400, $"Cannot change LineItem Status from {lineItemPreviousState.xp.LineItemStatus} to {lineItemStatus}"));
-            Require.That(lineItemStatus == LineItemStatus.Backordered || lineItemStatus == LineItemStatus.Canceled, new ErrorCode("Invalid Change", 400, "This function is only configured for Backordered and Cancelled orders currently"));
-            var newPartialLineItem = new PartialLineItem() {
-                xp = new
-                {
-                    LineItemStatus = lineItemStatus
-                }
-            };
-            var updatedLineItem = await _oc.LineItems.PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, lineItemID, newPartialLineItem, verifiedUser.AccessToken);
-            await HandleLineItemStatusChangeNotification(orderID, updatedLineItem, lineItemStatus);
-        }
-
-        private bool IsValidLineItemStatusChange(MarketplaceLineItem lineItem, LineItemStatus lineItemStatus)
-        {
-            /* current logic for valid change
-             * If changing to Canceled: must be Submitted or Backordered
-             * If changing to Backordered: must be Submitted
-             */
-            return lineItem.xp.LineItemStatus == LineItemStatus.Submitted || lineItemStatus == LineItemStatus.Canceled && lineItem.xp.LineItemStatus == LineItemStatus.Backordered;
-        }
-
-        private async Task HandleLineItemStatusChangeNotification(string orderID, MarketplaceLineItem lineItem, LineItemStatus lineItemStatus)
-        {
-            if(lineItemStatus == LineItemStatus.Backordered || lineItemStatus == LineItemStatus.Canceled)
-            {
-                await _sendgridService.SendLineItemStatusChangeEmails(orderID, lineItem, lineItemStatus);
-            } 
         }
 
         public async Task RequestReturnEmail(string orderID)
@@ -178,65 +143,10 @@ namespace Marketplace.Common.Commands
             return shipment;
         }
 
-        public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem liReq, VerifiedUserContext user)
-        {
-            // get me product with markedup prices correct currency and the existing line items in parellel
-            var productRequest = _meProductCommand.Get(liReq.ProductID, user);
-            var existingLineItemsRequest = _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, null, user.AccessToken);
-
-            var existingLineItems = await existingLineItemsRequest;
-            var li = new MarketplaceLineItem();
-
-            // If line item exists, update quantity, else create
-            var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
-            if (preExistingLi != null)
-            {
-                await _oc.LineItems.DeleteAsync(OrderDirection.Outgoing, orderID, preExistingLi.ID, user.AccessToken);
-            }
-            
-            var product = await productRequest;
-            var markedUpPrice = GetLineItemUnitCost(product, liReq);
-            liReq.UnitPrice = markedUpPrice;
-            liReq.xp.LineItemStatus = LineItemStatus.Open;
-            li = await _oc.LineItems
-                .CreateAsync<MarketplaceLineItem>
-                (OrderDirection.Incoming, orderID, liReq);
-            return li;
-        }
-
-        private decimal GetLineItemUnitCost(SuperMarketplaceMeProduct product, MarketplaceLineItem li)
-        {
-            var markedUpBasePrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= li.Quantity).Price;
-            var totalSpecMarkup = li.Specs.Aggregate(0M, (accumulator, spec) =>
-            {
-                var relatedProductSpec = product.Specs.First(productSpec => productSpec.ID == spec.SpecID);
-                var relatedSpecMarkup = relatedProductSpec.Options.First(option => option.ID == spec.OptionID).PriceMarkup;
-                return accumulator + (relatedSpecMarkup ?? 0M);
-            });
-            return totalSpecMarkup + markedUpBasePrice;
-        }
-
         public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser)
         {
             var orderPromo = await _oc.Orders.AddPromotionAsync(OrderDirection.Incoming, orderID, promoCode);
             return await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
-        }
-
-        private bool LineItemsMatch(LineItem li1, LineItem li2)
-        {
-            if (li1.ProductID != li2.ProductID) return false;
-            foreach (var spec1 in li1.Specs) {
-                var spec2 = (li2.Specs as List<LineItemSpec>)?.Find(s => s.SpecID == spec1.SpecID);
-                if (spec1?.Value != spec2?.Value) return false;
-            }
-            return true;
-        }
-
-        private async Task<decimal?> ExchangeUnitPrice(MarketplaceLineItem li, MarketplaceOrder order)
-        {
-			var supplierCurrency = li.Product?.xp?.Currency ?? CurrencySymbol.USD; // Temporary default to work around bad data.
-			var buyerCurrency = order.xp.Currency ?? CurrencySymbol.USD;
-			return (decimal) await _exchangeRates.ConvertCurrency(supplierCurrency, buyerCurrency, (double)li.UnitPrice);
         }
 
         private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser, string overrideErrorMessage = "")

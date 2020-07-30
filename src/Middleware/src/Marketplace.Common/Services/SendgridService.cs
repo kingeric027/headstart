@@ -29,7 +29,7 @@ namespace Marketplace.Common.Services
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload);
         Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload);
-        Task SendLineItemStatusChangeEmails(string orderID, MarketplaceLineItem lineItem, LineItemStatus lineItemStatus);
+        Task SendLineItemStatusChangeEmail(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText);
     }
     public class SendgridService : ISendgridService
     {
@@ -85,37 +85,20 @@ namespace Marketplace.Common.Services
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendLineItemStatusChangeEmails(string orderID, MarketplaceLineItem lineItem, LineItemStatus lineItemStatus)
+        public async Task SendLineItemStatusChangeEmail(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText)
         {
-            var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID.Split('-')[0]);
-            var templateDataBuyerEmail = new
-            {
-                buyerOrder.FromUser.FirstName,
-                buyerOrder.FromUser.LastName,
-                ProductName = lineItem.Product.Name,
-                ProductID = lineItem.Product.ID,
-                lineItem.Quantity,
-                lineItem.LineTotal,
-                EmailSubject = lineItemStatus == LineItemStatus.Backordered ? "Item backordered on an order your recently submitted": "Item can no longer be fulfilled on an order your recently submitted",
-                StatusChangeDetail = lineItemStatus == LineItemStatus.Backordered ? "The supplier of an item from your order has indicated that one of the items on your order is backordered": "The supplier of an item from your order has indicated that one of the items on your order can no longer be fulfilled. You will receive a refund for this item",
-                StatusChangeDetail2 = lineItemStatus == LineItemStatus.Backordered ? "The following item is backordered": "The following item will no longer be fulfilled"
-            };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, marketplaceBuyerOrder.FromUser.Email, LINE_ITEM_STATUS_CHANGE, templateDataBuyerEmail);
+           var productsList = lineItems.Select(MapLineItemToProduct);
 
-            var templateDataSellerEmail = new
+            var templateData = new
             {
-                FirstName = "SellerFirstNameHolder",
-                LastName = "SellerLastNameHolder",
-                ProductName = lineItem.Product.Name,
-                ProductID = lineItem.Product.ID,
-                lineItem.Quantity,
-                lineItem.LineTotal,
-                EmailSubject = lineItemStatus == LineItemStatus.Backordered ? "Item backordered on an order" : "Item cancelled on an recent order",
-                StatusChangeDetail = lineItemStatus == LineItemStatus.Backordered ? "A supplier has marked a line item as backordered" : "A supplier has marked a line item as cancelled, a refund must be processed for the buyer",
-                StatusChangeDetail2 = lineItemStatus == LineItemStatus.Backordered ? "The following item is backordered" : "The following item will no longer be fulfilled"
-
+                FirstName = firstName,
+                LastName = lastName,
+                Products = productsList,
+                lineItemEmailDisplayText.EmailSubject,
+                lineItemEmailDisplayText.StatusChangeDetail,
+                lineItemEmailDisplayText.StatusChangeDetail2
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, "bhickey@four51.com", LINE_ITEM_STATUS_CHANGE, templateDataSellerEmail);
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
         }
 
 
