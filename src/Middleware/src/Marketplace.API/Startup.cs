@@ -153,9 +153,8 @@ namespace Marketplace.API
         public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.OrderCloudIntegrationsConfigureWebApp(env, "v1")
-                .UseSwagger()
                 .UseSwaggerUI(c => {
-                    c.SwaggerEndpoint($"/swagger/v1/swagger.json", $"API v1");
+                    c.SwaggerEndpoint($"/swagger", $"API v1");
                     c.RoutePrefix = string.Empty;
                 });
         }
