@@ -10,8 +10,8 @@
     </div>
     <input type="search"
            class="form-control"
-           placeholder="{{placeholderText || 'Search...'}}"
-           aria-label="Product search"
+           placeholder="{{('ADMIN.COMMON.SEARCH' | translate) + ' ' + (placeholderText | translate) + '...'}}"
+           aria-label="search"
            id="search-addon"
            formControlName="search"
            (keyup.enter)="search()">

@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { ShopperContextService } from 'marketplace';
 import { UserGroup, UserGroupAssignment } from 'ordercloud-javascript-sdk';
-import { MarketplaceUser } from 'marketplace-javascript-sdk/';
+import { MarketplaceUser } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './order-approval-permissions.component.html',

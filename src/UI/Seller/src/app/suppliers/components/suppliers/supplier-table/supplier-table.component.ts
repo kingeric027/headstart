@@ -13,7 +13,8 @@ import {
 } from '@app-seller/validators/validators';
 import { SupplierService } from '../supplier.service';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { MarketplaceSupplier, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { MarketplaceSupplier, HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 export interface SupplierCategoryConfigFilters {
   Display: string;
   Path: string;
@@ -69,14 +70,21 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
     router: Router,
     activatedroute: ActivatedRoute,
     ngZone: NgZone,
+    private middleWareApiService: MiddlewareAPIService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     super(changeDetectorRef, supplierService, router, activatedroute, ngZone, createSupplierForm);
     this.router = router;
-    this.buildFilterConfig()
+    this.setUpfilter()
+  }
+
+  async setUpfilter(): Promise<void> {
+    await this.buildFilterConfig();
   }
 
   async buildFilterConfig(): Promise<void> {
-    this.filterConfig = await MarketplaceSDK.SupplierCategoryConfigs.Get(this.appConfig.marketplaceID);
+    const supplierFilterConfig = await this.middleWareApiService.getSupplierFilterConfig();
+    const filterConfig = { Filters: supplierFilterConfig.Items.map(filter => filter.Doc)};
+    this.filterConfig = filterConfig;
   }
 }

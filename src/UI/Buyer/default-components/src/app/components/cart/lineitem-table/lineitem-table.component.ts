@@ -2,9 +2,10 @@ import { Component, Input } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
 import { ReturnReason } from '../../orders/order-return/order-return-table/return-reason-enum';
+import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
@@ -22,6 +23,7 @@ export class OCMLineitemTable {
   }
   @Input() orderType: OrderType;
   @Input() readOnly: boolean;
+  @Input() hideStatus = false;
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
   updatingLiIDs: string[] = [];
@@ -62,8 +64,7 @@ export class OCMLineitemTable {
   }
 
   getImageUrl(lineItemID: string): string {
-    const li = this.getLineItem(lineItemID);
-    return li.xp.LineItemImageUrl;
+    return getPrimaryLineItemImage(lineItemID, this._lineItems)
   }
 
   getLineItem(lineItemID: string): MarketplaceLineItem {

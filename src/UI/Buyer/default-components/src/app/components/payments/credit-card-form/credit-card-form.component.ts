@@ -3,7 +3,7 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe';
 import { ValidateCreditCard, ValidateUSZip } from 'src/app/validators/validators';
 import { removeSpacesFrom } from 'src/app/services/card-validation.helper';
-import { OrderCloudIntegrationsCreditCardToken } from 'marketplace-javascript-sdk';
+import { OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk';
 import { GeographyConfig } from 'src/app/config/geography.class';
 
 export interface CreditCardFormOutput {

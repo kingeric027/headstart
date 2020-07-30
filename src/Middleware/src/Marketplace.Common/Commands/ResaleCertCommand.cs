@@ -12,7 +12,6 @@ namespace Marketplace.Common.Commands
         Task<TaxCertificate> GetAsync(int companyID, string locationID, VerifiedUserContext verifiedUser);
         Task<TaxCertificate> CreateAsync(int companyID, string locationID, TaxCertificate cert, VerifiedUserContext verifiedUser);
         Task<TaxCertificate> UpdateAsync(int companyID, string locationID, TaxCertificate cert, VerifiedUserContext verifiedUser);
-        Task<byte[]> DownloadPDFAsync(int companyID, string locationID, VerifiedUserContext verifiedUser);
     }
 
     public class ResaleCertCommand : IResaleCertCommand
@@ -66,20 +65,6 @@ namespace Marketplace.Common.Commands
             await EnsureCertIDMatchesAddressXPForAuthenticatedLocation(locationID, cert);
             var updatedCert = await _avalara.UpdateCertificateAsync(companyID, cert.ID, cert);
             return updatedCert;
-        }
-        public async Task<byte[]> DownloadPDFAsync(int companyID, string locationID, VerifiedUserContext verifiedUser)
-        {
-            await EnsureUserCanManageLocationResaleCert(locationID, verifiedUser);
-            var buyerID = locationID.Split('-')[0];
-            var address = await _oc.Addresses.GetAsync<MarketplaceAddressBuyer>(buyerID, locationID);
-            if (address.xp.AvalaraCertificateID != null)
-            {
-                return await _avalara.DownloadCertificatePdfAsync(companyID, (int)address.xp.AvalaraCertificateID);
-            }
-            else
-            {
-                return new byte[] { };
-            }
         }
 
         private async Task EnsureCertIDMatchesAddressXPForAuthenticatedLocation(string locationID, TaxCertificate cert)

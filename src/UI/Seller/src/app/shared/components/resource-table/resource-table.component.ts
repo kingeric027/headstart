@@ -20,10 +20,11 @@ import { faCalendar, faChevronLeft, faFilter, faHome, faTimes } from '@fortaweso
 import { NgbDateStruct, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { singular } from 'pluralize';
 import { filter, takeWhile } from 'rxjs/operators';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
 import { pipe } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 interface BreadCrumb {
   displayText: string;
@@ -79,6 +80,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
+    private translate: TranslateService,
     ngZone: NgZone
   ) {}
 
@@ -133,6 +135,10 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   dataIsSaving = false;
   @Input()
   canBeDeleted = true;
+  @Input()
+  labelSingular: string;
+  @Input()
+  labelPlural: string;
 
   async ngOnInit(): Promise<void> {
     await this.determineViewingContext();
@@ -142,17 +148,19 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   getTitle(isMyResource: boolean, resourceName: string, selectedParentResourceName: string): string {
+    const translatedResourceName = this.translate.instant(this.labelPlural);
     if(isMyResource) {
       if(resourceName === 'suppliers') {
-        return 'My Profile'
+        return this.translate.instant('ADMIN.NAV.MY_PROFILE');
       } else {
-        return resourceName;
+        return translatedResourceName;
       }
     } else {
-      if(selectedParentResourceName) {
-        return resourceName + ' - ' + selectedParentResourceName;
-      } else {
-        return resourceName;
+        if(selectedParentResourceName) {
+          return translatedResourceName + ' - ' + selectedParentResourceName;
+      } 
+      else {
+        return translatedResourceName;
       }
     } 
   }

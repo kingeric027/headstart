@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { SuperMarketplaceProduct, ListPage, TaxProperties } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, ListPage, TaxProperties } from '@ordercloud/headstart-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 
 @Component({

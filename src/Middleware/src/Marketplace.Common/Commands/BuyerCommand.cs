@@ -99,6 +99,13 @@ namespace Marketplace.Common.Commands
             await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor" });
             await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" });
 
+            await _oc.Catalogs.SaveAssignmentAsync(new CatalogAssignment()
+            {
+                BuyerID = ocBuyer.ID,
+                CatalogID = ocBuyer.ID,
+                ViewAllCategories = true,
+                ViewAllProducts = false
+            });
             return buyer;
         }
 

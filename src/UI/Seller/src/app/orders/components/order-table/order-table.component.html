@@ -13,7 +13,9 @@
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)"
-                          [shouldShowResourceActions]="false">
+                          [shouldShowResourceActions]="false"
+                          [labelSingular]="'ADMIN.NAV.ORDER'"
+                          [labelPlural]="'ADMIN.NAV.ORDERS'">
   <div class="actionBar btn-group w-50"
        *ngIf="shouldShowOrderToggle"
        role="group"
@@ -21,11 +23,13 @@
     <button type="button"
             class="btn btn-outline-primary btn-sm"
             [ngClass]="{'active': activeOrderDirectionButton === 'Incoming'}"
-            (click)="setOrderDirection('Incoming')">Sales Orders</button>
+            (click)="setOrderDirection('Incoming')"
+            translate>ADMIN.NAV.SALES_ORDERS</button>
     <button type="button"
             class="btn btn-outline-primary btn-sm"
             [ngClass]="{'active': activeOrderDirectionButton === 'Outgoing'}"
-            (click)="setOrderDirection('Outgoing')">Purchase Orders</button>
+            (click)="setOrderDirection('Outgoing')"
+            translate>ADMIN.NAV.PURCHASE_ORDERS</button>
   </div>
   <app-order-details class="resource-edit"
                      [order]="resourceInSelection">

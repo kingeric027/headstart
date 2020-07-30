@@ -5,9 +5,9 @@
     <fa-icon class="text-muted"
              [icon]="isCollapsed ?  faPlusSquare : faMinusSquare"
              pull="right"></fa-icon>
-    <!-- TO-DO: Always display {{_facet?.Name}} after 7/14/20 demo. -->
-    <span *ngIf="_facet?.Name === 'Supplier'">Vendor</span>
-    <span *ngIf="_facet?.Name !== 'Supplier'">{{_facet?.Name}}</span>
+    <span *ngIf="_facet?.Name === 'Supplier'"
+           translate>ALIAS.SUPPLIER</span>
+    <span *ngIf="_facet?.Name !== 'Supplier'">{{_facet?.Name | titlecase}}</span>
   </h4>
 
   <!-- Facet Values -->

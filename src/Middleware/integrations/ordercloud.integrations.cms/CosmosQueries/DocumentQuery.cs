@@ -2,6 +2,7 @@
 using Cosmonaut.Extensions;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -16,6 +17,7 @@ namespace ordercloud.integrations.cms
 	public interface IDocumentQuery
 	{
 		Task<ListPage<DocumentDO>> List(string schemaInteropID, IListArgs args, VerifiedUserContext user);
+		Task<ListPage<TDoc>> List<TDoc>(string schemaInteropID, IListArgs args, VerifiedUserContext user) where TDoc : Document;
 		Task<List<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs);
 		Task<DocumentDO> Get(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 		Task<DocumentDO> GetByInternalID(string documentID); // real id
@@ -44,6 +46,11 @@ namespace ordercloud.integrations.cms
 			return documents.ToList();
 		}
 
+		public async Task<ListPage<TDoc>> List<TDoc>(string schemaInteropID, IListArgs args, VerifiedUserContext user) where TDoc : Document
+		{
+			var listResponse = await List(schemaInteropID, args, user);
+			return listResponse.Reserialize<ListPage<TDoc>>();
+		}
 		public async Task<ListPage<DocumentDO>> List(string schemaInteropID, IListArgs args, VerifiedUserContext user)
 		{
 			var schema = await _schemas.Get(schemaInteropID, user);

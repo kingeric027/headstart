@@ -2,13 +2,12 @@
   <div class="row">
     <div class="col-md-12">
       <div>
-        <!-- TO-DO - Change back to translation (SUPPLIERS.LIST.SUPPLIERS) -->
-        <h1 translate>Vendors</h1>
+        <h1 translate>ALIAS.SUPPLIERS</h1>
       </div>
       <div class="d-flex justify-content-between align-items-center">
         <form class="d-flex">
           <ocm-search class="mr-3 w-100"
-                      [placeholderText]="'Search Vendors...'"
+                      [placeholderText]="'ALIAS.SUPPLIERS'"
                       [searchTermInput]="searchTermForSuppliers"
                       (searched)="searchSuppliers($event.detail)">
           </ocm-search>
@@ -16,21 +15,23 @@
         <div class="d-flex align-items-center justify-content-start">
           <ng-template #filters>
             <div>
-              <div *ngIf="_supplierCategoryConfig">
+              <div *ngIf="_supplierFilterConfig">
                 <form class="d-flex flex-column"
                       [formGroup]="filterForm">
-                  <div *ngFor="let filter of _supplierCategoryConfig.Filters"
-                       class="group">
-                    <select class="form-control input-sm"
-                            type="select"
-                            required
-                            [formControlName]="filter.Path">
-                      <option *ngFor="let option of filter.Items"
-                              value="{{option.Value}}">{{option.Text}}</option>
-                    </select>
-                    <span class="highlight"></span>
-                    <label>{{filter.Display}}</label>
-                  </div>
+                  <ng-container *ngFor="let filter of _supplierFilterConfig">
+                    <div *ngIf="filter.BuyerAppFilterType === 'SelectOption'"
+                         class="group">
+                      <select class="form-control input-sm"
+                              type="select"
+                              required
+                              [formControlName]="filter.Path">
+                        <option *ngFor="let option of filter.Items"
+                                value="{{option.Value}}">{{option.Text}}</option>
+                      </select>
+                      <span class="highlight"></span>
+                      <label>{{filter.Display}}</label>
+                    </div>
+                  </ng-container>
                 </form>
               </div>
               <div class="d-flex justify-content-between align-items-center">

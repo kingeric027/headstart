@@ -8,6 +8,7 @@ using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Commands.Zoho;
+using Marketplace.Common.Controllers;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
@@ -75,13 +76,13 @@ namespace Marketplace.API
             services
                 .OrderCloudIntegrationsConfigureWebApiServices(_settings, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-                .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
                 .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
 				.InjectCosmosStore<DocumentSchemaDO, DocumentSchemaDO>(cosmosConfig)
 				.InjectCosmosStore<DocumentDO, DocumentDO>(cosmosConfig)
 				.InjectCosmosStore<DocumentAssignmentDO, DocumentAssignmentDO>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
+                .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()
@@ -101,9 +102,10 @@ namespace Marketplace.API
 				.Inject<IDocumentQuery>()
 				.Inject<IBlobStorage>()
 				.Inject<IDocumentSchemaQuery>()
-				.Inject<ISupplierCategoryConfigQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
+                .Inject<IChiliTemplateCommand>()
+                .Inject<IChiliConfigCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
                     ApiUrl = "https://books.zoho.com/api/v3",
                     AccessToken = _settings.ZohoSettings.AccessToken,

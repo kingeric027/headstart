@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MarketplaceOrder, ListPage } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, ListPage } from '@ordercloud/headstart-sdk';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { OrderFilterService } from '../services/order-history/order-filter.service';
 import { ActivatedRoute } from '@angular/router';

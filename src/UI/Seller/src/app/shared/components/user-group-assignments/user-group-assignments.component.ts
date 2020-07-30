@@ -43,7 +43,6 @@ export class UserGroupAssignments implements OnChanges {
   ) {}
   
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
-    this._userUserGroupAssignmentsEditable = [];
     this.updateForUserGroupAssignmentType();
     this.userOrgID = await this.userPermissionsService.getParentResourceID();
     await this.getUserGroups(this.userOrgID);

@@ -1,10 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
+import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ShopperContextService, LineItemStatus } from 'marketplace';
 import { Supplier } from 'ordercloud-javascript-sdk'
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { FormGroup, FormArray } from '@angular/forms';
 import { ReturnReason } from './return-reason-enum';
 
@@ -48,16 +48,11 @@ export class OCMOrderReturnTable {
   constructor(private context: ShopperContextService) { }
 
   getImageUrl(lineItemID: string): string {
-    const li = this.getLineItem(lineItemID);
-    return getPrimaryImageUrl(li?.Product);
+    return getPrimaryLineItemImage(lineItemID, this._liGroup)
   }
 
   toProductDetails(productID: string): void {
     this.context.router.toProductDetails(productID);
-  }
-
-  getLineItem(lineItemID: string): MarketplaceLineItem {
-    return this._liGroup.find(li => li.ID === lineItemID);
   }
 
   getReasonCode(reason: ReturnReason): string {

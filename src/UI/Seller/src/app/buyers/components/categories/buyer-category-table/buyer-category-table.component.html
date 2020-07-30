@@ -11,7 +11,9 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [labelSingular]="'ADMIN.NAV.CATEGORY'"
+                          [labelPlural]="'ADMIN.NAV.CATEGORIES'">
     <div class="resource-edit">
         <app-buyer-category-edit (updateCategory)="updateResource($event)"
                                  [resource]="updatedResource">

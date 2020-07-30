@@ -4,7 +4,7 @@ import { Router, Params, ActivatedRoute } from '@angular/router';
 import { transform as _transform, pickBy as _pickBy } from 'lodash';
 import { SupplierFilters } from '../../shopper-context';
 import { Suppliers, Supplier, Sortable } from 'ordercloud-javascript-sdk';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -14,6 +14,7 @@ export class SupplierFilterService {
   public activeFiltersSubject: BehaviorSubject<SupplierFilters> = new BehaviorSubject<SupplierFilters>(
     this.getDefaultParms()
   );
+  public activeHiddenFilters: any = {};
 
   private readonly nonFilterQueryParams = ['page', 'sortBy', 'search'];
 
@@ -35,12 +36,17 @@ export class SupplierFilterService {
 
   async listSuppliers(): Promise<ListPage<Supplier>> {
     const { page, sortBy, search, supplierID, activeFilters } = this.activeFiltersSubject.value;
+    const allFilters = { ...activeFilters, ...this.activeHiddenFilters };
     return await Suppliers.List({
       page,
       search,
       sortBy,
-      filters: this.createFilters(activeFilters, supplierID),
+      filters: this.createFilters(allFilters, supplierID),
     });
+  }
+
+  setNonURLFilter(key: string, value: string): void {
+    this.activeHiddenFilters = { ...this.activeHiddenFilters, [key]: value };
   }
 
   toSupplier(supplierID: string): void {
@@ -63,6 +69,9 @@ export class SupplierFilterService {
     const newActiveFilters = { ...activeFilters, ...filter };
     this.patchFilterState({ activeFilters: newActiveFilters, page: undefined });
   }
+
+  addHiddenFilter(filter: any): void {}
+
   searchBy(searchTerm: string): void {
     this.patchFilterState({ search: searchTerm || undefined, page: undefined });
   }

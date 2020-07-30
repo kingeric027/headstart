@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
 using ordercloud.integrations.cms.Mappers;
-using ordercloud.integrations.cms.Models;
 using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.cms
@@ -54,7 +53,7 @@ namespace ordercloud.integrations.cms
 			var assetedResource = await GetExisting(resource);
 			if (assetedResource?.ImageAssetIDs == null || assetedResource.ImageAssetIDs.Count == 0)
 			{
-				return GetPlaceholderImageUrl(resource.Type);
+				return GetPlaceholderImageUrl(resource.ResourceType ?? 0);
 			}
 			var asset = await _assets.GetByInternalID(assetedResource.ImageAssetIDs.First());
 			return asset.Url;
@@ -93,10 +92,10 @@ namespace ordercloud.integrations.cms
 		private async Task<AssetedResourceDO> GetExistingOrDefault(Resource resource)
 		{
 			return await GetExisting(resource) ?? new AssetedResourceDO() { 
-				ResourceID = resource.ID, 
-				ResourceParentID = resource.ParentID, 
-				ResourceType = resource.Type 
-			};
+				ResourceID = resource.ResourceID, 
+				ResourceParentID = resource.ParentResourceID, 
+				ResourceType = resource.ResourceType ?? 0 // "Required" validation should prevent null ResourceType
+		};
 		}
 
 		private async Task<AssetedResourceDO> GetExisting(Resource resource)

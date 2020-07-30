@@ -2,8 +2,8 @@
   <form [formGroup]="resourceForm">
     <div class="row pt-3">
       <div class="col-md-5">
-        <h5>Buyer Details</h5>
-        <p>Basic details of the buyer.</p>
+        <h5>{{'ALIAS.BUYER' | translate}} Details</h5>
+        <p>Basic details of the {{'ALIAS.BUYER' | translate | lowercase}}.</p>
       </div>
       <div class="col-md-7 form-group">
         <div class="form-group">
@@ -55,10 +55,11 @@
     [dataIsSaving]="dataIsSaving"
     [areChanges]="areChanges"  
     [allowDiscard]="true"
-    [isDeleteable]="true"
+    [isDeletable]="true"
     [allowDelete]="!isCreatingNew"
     [requireConfirmation]="true"
     [disableSave]="dataIsSaving || !areChanges"
+    [labelSingular]="labelSingular"
     (executeSaveAction)="handleSave()"
     (executeDiscardAction)="discardChanges()"
 ></action-menu-component>  

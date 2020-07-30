@@ -2,7 +2,7 @@ import { find as _find, sortBy as _sortBy } from 'lodash';
 import { SpecFormEvent } from './spec-form-values.interface';
 import { SpecOption, Spec, LineItemSpec, ListPage, PriceBreak } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
-import { SuperMarketplaceProduct, AssetForDelivery } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, AssetForDelivery } from '@ordercloud/headstart-sdk';
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Injectable({
@@ -74,8 +74,8 @@ export class SpecFormService {
   }
 
   public getLineItemImageUrl(product: SuperMarketplaceProduct): string {
-    const image = product.Images.find(img => this.isImageMatchingSpecs(img, product));
-    return image ? image.Url : getPrimaryImageUrl(product.Product);
+    const image = product.Images?.find(img => this.isImageMatchingSpecs(img, product));
+    return image?.Url;
   }
 
   private isImageMatchingSpecs(image: AssetForDelivery, product: SuperMarketplaceProduct): boolean {

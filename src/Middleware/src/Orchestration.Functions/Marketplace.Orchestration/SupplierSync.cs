@@ -18,13 +18,29 @@ namespace Marketplace.Orchestration
     {
         private readonly IOrderCloudIntegrationsFunctionToken _token;
         private readonly ISupplierSyncCommand _supplier;
+        private readonly IProductTemplateCommand _product;
         private readonly AppSettings _settings;
 
-        public SupplierSync(AppSettings settings, IOrderCloudIntegrationsFunctionToken token, ISupplierSyncCommand supplier)
+        public SupplierSync(AppSettings settings, IOrderCloudIntegrationsFunctionToken token, ISupplierSyncCommand supplier, IProductTemplateCommand product)
         {
             _settings = settings;
             _token = token;
             _supplier = supplier;
+            _product = product;
+        }
+
+        [FunctionName("UploadProductTemplate")]
+        public async Task<IActionResult> UploadProductTemplate(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "{supplierId}")]
+            HttpRequest req, string supplierId, ILogger log)
+        {
+            var user = await _token.Authorize(req, new[] { ApiRole.OrderAdmin, ApiRole.OrderReader });
+            Require.That(user.SupplierID == supplierId, new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
+
+            var form = await req.ReadFormAsync();
+            var result = await _product.ParseProductTemplate(form.Files.GetFile("file"), user);
+            
+            return await Task.FromResult(new OkObjectResult(result));
         }
 
         [FunctionName("GetSupplierOrder")]

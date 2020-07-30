@@ -11,6 +11,7 @@ import { takeWhile } from 'rxjs/operators';
 })
 export class OCMFacetMultiSelect implements OnDestroy {
   _facet: ListFacet;
+  facetID: string;
   alive = true;
   checkboxArray: { facet: ListFacetValue; checked: boolean }[] = [];
   visibleFacetLength = 5;
@@ -24,6 +25,7 @@ export class OCMFacetMultiSelect implements OnDestroy {
 
   @Input() set facet(value: ListFacet) {
     this._facet = value;
+    this.facetID = this._facet.XpPath.split('.')[1];
     this.context.productFilters.activeFiltersSubject
       .pipe(takeWhile(() => this.alive))
       .subscribe(this.handleFiltersChange);
@@ -49,7 +51,7 @@ export class OCMFacetMultiSelect implements OnDestroy {
   }
 
   private handleFiltersChange = (filters: ProductFilters): void => {
-    const activeFacet = _get(filters.activeFacets, this._facet.Name, null);
+    const activeFacet = _get(filters.activeFacets, this.facetID, null);
     this.activeFacetValues = activeFacet ? activeFacet.split('|') : [];
     this.updateCheckBoxes(this.activeFacetValues);
   };
@@ -66,6 +68,6 @@ export class OCMFacetMultiSelect implements OnDestroy {
     // TODO - maybe all this joining and spliting should be done in the service?
     // Abstract out the way the filters work under the hood?
     const values = activeFacetValues.join('|');
-    this.context.productFilters.filterByFacet(this._facet.Name, values);
+    this.context.productFilters.filterByFacet(this.facetID, values);
   }
 }

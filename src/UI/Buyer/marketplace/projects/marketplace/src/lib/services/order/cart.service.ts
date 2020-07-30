@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { listAll } from '../../functions/listAll';
-import { MarketplaceLineItem, MarketplaceOrder, MarketplaceSDK, ListPage } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem, MarketplaceOrder, HeadStartSDK, ListPage } from '@ordercloud/headstart-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -100,7 +100,7 @@ export class CartService {
 
   private async upsertLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     try {
-      return await MarketplaceSDK.Orders.UpsertLineItem(this.order?.ID, lineItem);
+      return await HeadStartSDK.Orders.UpsertLineItem(this.order?.ID, lineItem);
     } finally {
       await this.state.reset();
     }

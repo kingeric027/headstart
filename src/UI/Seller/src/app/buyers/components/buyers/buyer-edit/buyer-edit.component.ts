@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { BuyerTempService, SuperMarketplaceBuyer } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
-import { MarketplaceBuyer } from 'marketplace-javascript-sdk';
+import { MarketplaceBuyer } from '@ordercloud/headstart-sdk';
 import { BuyerService } from '../buyer.service';
 import { AppAuthService } from '@app-seller/auth';
 import { Router } from '@angular/router';
@@ -20,6 +20,8 @@ export class BuyerEditComponent {
   _superBuyerStatic: SuperMarketplaceBuyer;
   _superBuyerEditable: SuperMarketplaceBuyer;
 
+  @Input()
+  labelSingular: string;
   @Input()
   set orderCloudBuyer(buyer: MarketplaceBuyer) {
     if (buyer.ID) {

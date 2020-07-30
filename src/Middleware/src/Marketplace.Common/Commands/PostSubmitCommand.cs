@@ -267,7 +267,7 @@ namespace Marketplace.Common.Commands
                 var supplierID = supplierOrder.ToCompanyID;
                 supplierIDs.Add(supplierID);
                 var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierID)).ToList();
-                var supplier = await _oc.Suppliers.GetAsync(supplierID);
+                var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID);
                 var supplierOrderPatch = new PartialOrder()
                 {
                     ID = $"{buyerOrder.ID}-{supplierID}",
@@ -294,7 +294,7 @@ namespace Marketplace.Common.Commands
             return updatedSupplierOrders;
         }
 
-        private OrderXp GetNewOrderXP(MarketplaceOrder buyerOrder, Supplier supplier, List<string> shipFromAddressIDsForSupplierOrder)
+        private OrderXp GetNewOrderXP(MarketplaceOrder buyerOrder, MarketplaceSupplier supplier, List<string> shipFromAddressIDsForSupplierOrder)
         {
             var supplierOrderXp = new OrderXp()
             {

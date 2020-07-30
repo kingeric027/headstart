@@ -1,8 +1,9 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ListPageWithFacets, Tokens } from 'ordercloud-javascript-sdk';
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
-import { AppConfig, MarketplaceMeProduct } from '../../shopper-context';
+import { ListArgs } from '@ordercloud/headstart-sdk';
+import { AppConfig, MarketplaceMeProduct, SupplierFilterConfigDocument } from '../../shopper-context';
+import { ListPage } from '@ordercloud/headstart-sdk';
 
 // WHOPLE FILE TO BE REPLACED BY SDK
 
@@ -43,6 +44,15 @@ export class TempSdk {
       .get<ListPageWithFacets<MarketplaceMeProduct>>(url, {
         headers: this.buildHeaders(),
         params: this.createHttpParams(args),
+      })
+      .toPromise();
+  }
+
+  async getSupplierFilterConfig(): Promise<ListPage<SupplierFilterConfigDocument>> {
+    const url = `${this.appConfig.middlewareUrl}/supplierfilterconfig`;
+    return await this.http
+      .get<ListPage<SupplierFilterConfigDocument>>(url, {
+        headers: this.buildHeaders(),
       })
       .toPromise();
   }

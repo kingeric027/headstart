@@ -45,20 +45,8 @@ import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { YesNoFormatPipe } from './pipes/yes-no-format.pipe';
 import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component';
 import { LocationIDInputDirective } from './directives/location-id-input.directive';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatButtonModule } from '@angular/material/button';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule, MatSelect } from '@angular/material/select';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { ActionMenuComponent } from './components/action-menu/action-menu.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -79,20 +67,6 @@ import { ActionMenuComponent } from './components/action-menu/action-menu.compon
     NgbModalModule,
     NgbDatepickerModule,
     NgbTooltipModule,
-    // @angular/material
-    MatTabsModule,
-    MatChipsModule,
-    MatTooltipModule,
-    MatButtonModule,
-    MatBadgeModule,
-    MatSlideToggleModule,
-    MatCheckboxModule,
-    MatIconModule,
-    MatInputModule,
-    MatSnackBarModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
 
     // Quill
     QuillModule.forRoot(),
@@ -108,20 +82,7 @@ import { ActionMenuComponent } from './components/action-menu/action-menu.compon
     NgbPaginationModule,
     NgbTabsetModule,
     NgbDropdownModule,
-    // @angular/material
-    MatTabsModule,
-    MatChipsModule,
-    MatTooltipModule,
-    MatButtonModule,
-    MatBadgeModule,
-    MatSlideToggleModule,
-    MatCheckboxModule,
-    MatIconModule,
-    MatInputModule,
-    MatSnackBarModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatSelectModule,
+
     // app components
     SearchComponent,
     SortColumnComponent,
@@ -150,6 +111,7 @@ import { ActionMenuComponent } from './components/action-menu/action-menu.compon
     ActionMenuComponent,
     ConfirmModal,
     UserGroupAssignments,
+    TranslateModule
   ],
   declarations: [
     SearchComponent,
