@@ -67,7 +67,10 @@ namespace Marketplace.Common.Commands
             var supplierIDs = lineItems.Select(li => li.SupplierID).Distinct().ToList();
             var suppliers = await Throttler.RunAsync(supplierIDs, 100, 5, supplierID => _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID));
 
-            foreach (KeyValuePair<VerifiedUserType, LineItemEmailDisplayText> entry in StatusChangeEmailText[lineItemStatusChange.LineItemStatus]) {
+            // currently the only place supplier name is used is when there should be lineitems from only one supplier included on the change, so we can just take the first supplier
+            var statusChangeTextDictionary = GetStatusChangeEmailText(suppliers.First().Name);
+
+            foreach (KeyValuePair<VerifiedUserType, LineItemEmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChange.LineItemStatus]) {
                 var userType = entry.Key;
                 var emailText = entry.Value;
 
@@ -80,7 +83,6 @@ namespace Marketplace.Common.Commands
                     firstName = buyerOrder.FromUser.FirstName;
                     lastName = buyerOrder.FromUser.LastName;
                     email = buyerOrder.FromUser.Email;
-                    email = "bhickey@four51.com";
                     await _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChange, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
                 }
                 else if (userType == VerifiedUserType.admin) {
@@ -101,8 +103,7 @@ namespace Marketplace.Common.Commands
                         {
                             firstName = supplier.xp.SupportContact.Name;
                             lastName = "";
-                            //email = supplier.xp.SupportContact.Email;
-                            email = "bhickey@four51.com";
+                            email = supplier.xp.SupportContact.Email;
                             return _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChange, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
                         });
                     }
@@ -153,120 +154,122 @@ namespace Marketplace.Common.Commands
             { LineItemStatus.Canceled, new List<LineItemStatus>() { LineItemStatus.CancelRequested, LineItemStatus.Submitted, LineItemStatus.Backordered } },
         };
 
-       
-        private static Dictionary<LineItemStatus, Dictionary<VerifiedUserType, LineItemEmailDisplayText>> StatusChangeEmailText = new Dictionary<LineItemStatus, Dictionary<VerifiedUserType, LineItemEmailDisplayText>>()
+        private Dictionary<LineItemStatus, Dictionary<VerifiedUserType, LineItemEmailDisplayText>> GetStatusChangeEmailText(string supplierName)
         {
-            { LineItemStatus.Complete, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Items on your order have shipped",
-                    StatusChangeDetail = "A supplier has shipped items from your order",
-                    StatusChangeDetail2 = "The following items are on there way"
-                } }
-            } },
-            { LineItemStatus.ReturnRequested, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Return request has been submitted on your order",
-                    StatusChangeDetail = "You will be updated when this return is processed",
-                    StatusChangeDetail2 = "The following items have been request for return"
+            return new Dictionary<LineItemStatus, Dictionary<VerifiedUserType, LineItemEmailDisplayText>>()
+            {
+                { LineItemStatus.Complete, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
+                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "Items on your order have shipped",
+                        StatusChangeDetail = $"{supplierName} has shipped items from your order",
+                        StatusChangeDetail2 = "The following items are on there way"
+                    } }
                 } },
-                { VerifiedUserType.admin, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "A buyer has submitted a return on their order",
-                    StatusChangeDetail = "Return request needs to be processed, communication with supplier handled and RMA created.",
-                    StatusChangeDetail2 = "The following items have been request for return"
+                { LineItemStatus.ReturnRequested, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
+                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "A return request has been submitted on your order",
+                        StatusChangeDetail = "You will be updated when this return is processed",
+                        StatusChangeDetail2 = "The following items have been requested for return"
+                    } },
+                    { VerifiedUserType.admin, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "A buyer has submitted a return on their order",
+                        StatusChangeDetail = "Return request needs to be processed, communication with supplier handled and RMA created.",
+                        StatusChangeDetail2 = "The following items have been request for return"
+                    } },
+                    { VerifiedUserType.supplier, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "A buyer has submitted a return on their order",
+                        StatusChangeDetail = "Return request needs to be processed, communication with supplier handled and RMA created.",
+                        StatusChangeDetail2 = "The following items have been requested for return"
+                    } }
                 } },
-                { VerifiedUserType.supplier, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "A buyer has submitted a return on their order",
-                    StatusChangeDetail = "Return request needs to be processed, communication with supplier handled and RMA created.",
-                    StatusChangeDetail2 = "The following items have been request for return"
-                } }
-            } },
-              { LineItemStatus.Returned, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Return has been processed for your order",
-                    StatusChangeDetail = "You will be refunded for the proper amount",
-                    StatusChangeDetail2 = "The following items have had returns processed"
+                  { LineItemStatus.Returned, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
+                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "A return has been processed for your order",
+                        StatusChangeDetail = "You will be refunded for the proper amount",
+                        StatusChangeDetail2 = "The following items have had returns processed"
+                    } },
+                    { VerifiedUserType.admin, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "A return has been process for a buyer order",
+                        StatusChangeDetail = "Ensure that the full return process is complete",
+                        StatusChangeDetail2 = "The following items have been marked as returned"
+                    } },
+                    { VerifiedUserType.supplier , new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "A return has been process for a buyer order",
+                        StatusChangeDetail = "Ensure that the full return process is complete",
+                        StatusChangeDetail2 = "The following items have been marked as returned"
+                    } }
                 } },
-                { VerifiedUserType.admin, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Return has been process for a buyer order",
-                    StatusChangeDetail = "Ensure that the full return process is complete",
-                    StatusChangeDetail2 = "The following items have been marked as returned"
-                } },
-                { VerifiedUserType.supplier , new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Return has been process for a buyer order",
-                    StatusChangeDetail = "Ensure that the full return process is complete",
-                    StatusChangeDetail2 = "The following items have been marked as returned"
-                } }
-            } },
-                { LineItemStatus.Backordered, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Item on your order has been backordered by supplier",
-                    StatusChangeDetail = "You will be updated on the status of the order when more information is known",
-                    StatusChangeDetail2 = "The following items have been marked as backordered"
-                } },
-                { VerifiedUserType.admin, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Supplier has marked items on an order as backordered",
-                    StatusChangeDetail = "You will be updated on the status of the order when more information is known",
-                    StatusChangeDetail2 = "The following items have been marked as backordered"
-                } },
-                { VerifiedUserType.supplier, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Items on order have been marked as backordered",
-                    StatusChangeDetail = "Keep the buyer updated on the status of these items when you know more information",
-                    StatusChangeDetail2 = "The following items have been marked as backordered"
-                } },
-               } },
-               { LineItemStatus.CancelRequested, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Your request for cancelation has been submitted",
-                    StatusChangeDetail = "You will be updated on the status of the order when more information is known",
-                    StatusChangeDetail2 = "The following items have had cancellation requested"
-                } },
-                { VerifiedUserType.admin, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Buyer has requested cancelation of lineitems for an order",
-                    StatusChangeDetail = "The supplier will look into the feasibility of this cancellation",
-                    StatusChangeDetail2 = "The following items have had cancellation requested"
-                } },
-                { VerifiedUserType.supplier, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Buyer has requested cancelation of lineitems for an order",
-                    StatusChangeDetail = "Look into the feasibility of this cancellation",
-                    StatusChangeDetail2 = "The following items have had cancellation requested"
-                } },
+                    { LineItemStatus.Backordered, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
+                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "Item(s) on your order have been backordered by supplier",
+                        StatusChangeDetail = "You will be updated on the status of the order when more information is known",
+                        StatusChangeDetail2 = "The following items have been marked as backordered"
+                    } },
+                    { VerifiedUserType.admin, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = $"{supplierName} has marked items on an order as backordered",
+                        StatusChangeDetail = "You will be updated on the status of the order when more information is known",
+                        StatusChangeDetail2 = "The following items have been marked as backordered"
+                    } },
+                    { VerifiedUserType.supplier, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "Item(s) on order have been marked as backordered",
+                        StatusChangeDetail = "Keep the buyer updated on the status of these items when you know more information",
+                        StatusChangeDetail2 = "The following items have been marked as backordered"
+                    } },
+                   } },
+                   { LineItemStatus.CancelRequested, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
+                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "Your request for cancelation has been submitted",
+                        StatusChangeDetail = "You will be updated on the status of the order when more information is known",
+                        StatusChangeDetail2 = "The following items have had cancellation requested"
+                    } },
+                    { VerifiedUserType.admin, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "Buyer has requested cancelation on an order",
+                        StatusChangeDetail = "The supplier will look into the feasibility of this cancellation",
+                        StatusChangeDetail2 = "The following items have had cancellation requested"
+                    } },
+                    { VerifiedUserType.supplier, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "Buyer has requested cancelation of lineitems for an order",
+                        StatusChangeDetail = "Review the items below to see if any can be cancelled before they ship",
+                        StatusChangeDetail2 = "The following items have had cancellation requested"
+                    } },
 
-            } },
-             { LineItemStatus.Canceled, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Items on your order have been cancelled",
-                    StatusChangeDetail = "You will be refunded for the cost of these items",
-                    StatusChangeDetail2 = "The following items have been cancelled"
                 } },
-                { VerifiedUserType.admin, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Items on an order have been cancelled",
-                    StatusChangeDetail = "The buyer should be refunded for the proper amount",
-                    StatusChangeDetail2 = "The following items have been cancelled"
-                } },
-                { VerifiedUserType.supplier, new LineItemEmailDisplayText()
-                {
-                    EmailSubject = "Items on an order have been cancelled",
-                    StatusChangeDetail = "The buyer should be refunded for the proper amount",
-                    StatusChangeDetail2 = "The following items have been cancelled"
-                } },
+                 { LineItemStatus.Canceled, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
+                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "Items on your order have been cancelled",
+                        StatusChangeDetail = "You will be refunded for the cost of these items",
+                        StatusChangeDetail2 = "The following items have been cancelled"
+                    } },
+                    { VerifiedUserType.admin, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "Item(s) on an order have been cancelled",
+                        StatusChangeDetail = "The buyer should be refunded for the proper amount",
+                        StatusChangeDetail2 = "The following items have been cancelled"
+                    } },
+                    { VerifiedUserType.supplier, new LineItemEmailDisplayText()
+                    {
+                        EmailSubject = "Item(s) on an order have been cancelled",
+                        StatusChangeDetail = "The buyer should be refunded for the proper amount",
+                        StatusChangeDetail2 = "The following items have been cancelled"
+                    } },
 
-            } }
-        };
+                } }
+            };
+        }
 
         private void ValidateLineItemStatusChange(List<MarketplaceLineItem> previousLineItemStates, LineItemStatusChange lineItemStatusChange, VerifiedUserType userType)
         {
