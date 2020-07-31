@@ -241,23 +241,23 @@ export class PromotionEditComponent implements OnInit {
   }
 
   buildEligibleExpression(): void {
-    let eligibleExpression: string = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? `item.SupplierID = '${this.selectedSupplier?.ID}'` : `Order`;
+    let eligibleExpression: string = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? `item.SupplierID = '${this.selectedSupplier?.ID}'` : `true`;
     switch (this._promotionEditable.xp?.MinReq?.Type) {
       case 'MinPurchase':
         eligibleExpression = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 
         `${eligibleExpression} and items.total(SupplierID = '${this.selectedSupplier?.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
           :
-        `${eligibleExpression}.Subtotal >= ${this._promotionEditable.xp?.MinReq?.Int}`;
+        `Order.Subtotal >= ${this._promotionEditable.xp?.MinReq?.Int}`;
         break;
       case 'MinItemQty':
         eligibleExpression = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 
         `${eligibleExpression} and items.Quantity(SupplierID = '${this.selectedSupplier?.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
           :
-        `${eligibleExpression}.LineItemCount >= ${this._promotionEditable.xp?.MinReq?.Int}`
+        `Order.LineItemCount >= ${this._promotionEditable.xp?.MinReq?.Int}`
         break;
     }
     if (this._promotionEditable.xp?.MaxShipCost) {
-      this._promotionEditable.xp?.MinReq?.Type ? eligibleExpression = `${eligibleExpression} and Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
+      this._promotionEditable.xp?.MinReq?.Type ? eligibleExpression = `Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
       :
       eligibleExpression = `Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
     }
