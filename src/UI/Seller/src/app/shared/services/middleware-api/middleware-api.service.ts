@@ -15,6 +15,18 @@ export interface SupplierFilterConfig {
   AllowSellerEdit: boolean;
   BuyerAppFilterType: BuyerAppFilterType;
 }
+export interface KitProductDocument extends Document {
+  Doc: KitProduct;
+}
+export interface KitProduct {
+  ProductsInKit: ProductInKit[];
+}
+export interface ProductInKit {
+  ID: string;
+  Required: boolean;
+  MinQty: number;
+  MaxQty: number;
+}
 export declare enum BuyerAppFilterType {
   SelectOption = 'SelectOption',
   NonUI = 'NonUI',
@@ -36,7 +48,7 @@ export class MiddlewareAPIService {
     private ocTokenService: OcTokenService,
     private http: HttpClient,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  ) { }
 
   async acknowledgeQuoteOrder(orderID: string): Promise<Order> {
     const url = `${this.appConfig.middlewareUrl}/order/acknowledgequote/${orderID}`;
@@ -56,5 +68,10 @@ export class MiddlewareAPIService {
   async getSupplierFilterConfig(): Promise<ListPage<SupplierFilterConfigDocument>> {
     const url = `${this.appConfig.middlewareUrl}/supplierfilterconfig`;
     return await this.http.get<ListPage<SupplierFilterConfigDocument>>(url, this.headers).toPromise();
+  }
+
+  async getKitProducts(): Promise<ListPage<KitProductDocument>> {
+    const url = `${this.appConfig.middlewareUrl}/kitproducts`;
+    return await this.http.get<ListPage<KitProductDocument>>(url, this.headers).toPromise();
   }
 }
