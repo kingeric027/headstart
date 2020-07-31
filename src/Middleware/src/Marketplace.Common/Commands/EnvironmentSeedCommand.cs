@@ -488,6 +488,22 @@ namespace Marketplace.Common.Commands
 							MainContent = "ForgottenPassword"
 						}
 				}
+			},
+			new MessageSender()
+			{
+				Name = "New User Registration",
+				MessageTypes = new[] { MessageType.NewUserInvitation },
+				URL = "/newuser",
+				SharedKey = "wkaWSxPBBAABaxEp", // Where does this come from? Should it live somewhere else?
+				xp = new {
+						MessageTypeConfig = new {
+							MessageType = "NewUserInvitation",
+							FromEmail = "noreply@ordercloud.io",
+							Subject = "New User Registration",
+							TemplateName = "ForgottenPassword",
+							MainContent = "NewUserInvitation"
+						}
+				}
 			}
 		};
 		
