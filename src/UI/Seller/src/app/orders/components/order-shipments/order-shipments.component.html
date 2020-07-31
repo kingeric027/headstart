@@ -200,11 +200,16 @@
   </div>
   <hr/>
   <h5 class="mt-4 mb-3 font-weight-bold inline-header">2) Set Quantity to Ship</h5>
-  <mat-checkbox class="align-right"
-                aria-describedby="shipAllItems"
-                color="primary"
-                aria-checked="shipAllItems"
-                (change)="toggleShipAllItems()">Ship All Items</mat-checkbox>
+  <div class="custom-control custom-checkbox align-right">
+    <input type="checkbox"
+        class="custom-control-input"
+        id="shipAllItems"
+        [checked]="shipAllItems"
+        aria-describedby="shipAllItems"
+        (input)="toggleShipAllItems()">
+    <label class="custom-control-label"
+            for="shipAllItems">Ship All Items</label>
+  </div>
   <div *ngFor="let li of lineItems; let i = index" formGroupName="Quantities">
     <div *ngIf="li.Quantity !== li.QuantityShipped" 
           class="mt-5 row align-items-center">
