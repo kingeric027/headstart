@@ -12,7 +12,7 @@ namespace ordercloud.integrations.cms
 {
 	[SwaggerModel]
 	[CosmosCollection("documents")]
-	public class Document: CosmosObject
+	public class Document<TDoc>: CosmosObject
 	{
 		[JsonProperty("ID"), CosmosInteropID, Required]
 		public string InteropID { get; set; }
@@ -23,7 +23,7 @@ namespace ordercloud.integrations.cms
 		[CosmosPartitionKey, ApiIgnore]
 		public string OwnerClientID { get; set; }
 		[Required]
-		public JObject Doc { get; set; }
+		public TDoc Doc { get; set; }
 
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{
@@ -32,12 +32,5 @@ namespace ordercloud.integrations.cms
 				new UniqueKey() { Paths = new Collection<string> { "/InteropID", "/SchemaID", "/OwnerClientID" }}
 			};
 		}
-	}
-
-	[SwaggerModel]
-	public class Document<TDoc> : Document
-	{
-		public new TDoc Doc { get; set; }
-
 	}
 }

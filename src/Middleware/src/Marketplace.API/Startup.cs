@@ -26,7 +26,7 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
-using Document = ordercloud.integrations.cms.Document;
+using Newtonsoft.Json.Linq;
 
 namespace Marketplace.API
 {
@@ -76,7 +76,7 @@ namespace Marketplace.API
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
 				.InjectCosmosStore<DocumentSchema, DocumentSchema>(cosmosConfig)
-				.InjectCosmosStore<Document, Document>(cosmosConfig)
+				.InjectCosmosStore<Document<JObject>, Document<JObject>>(cosmosConfig)
 				.InjectCosmosStore<DocumentAssignment, DocumentAssignment>(cosmosConfig)
 				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
