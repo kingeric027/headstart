@@ -19,12 +19,10 @@ namespace Marketplace.Common.Commands
         Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
-        Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
         Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
         Task RequestReturnEmail(string OrderID);
         Task PatchOrderCanceledStatus(string orderID);
         Task PatchOrderRequiresApprovalStatus(string orderID);
-        Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus);
     }
 
     public class OrderCommand : IOrderCommand
@@ -145,65 +143,10 @@ namespace Marketplace.Common.Commands
             return shipment;
         }
 
-        public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem liReq, VerifiedUserContext user)
-        {
-            // get me product with markedup prices correct currency and the existing line items in parellel
-            var productRequest = _meProductCommand.Get(liReq.ProductID, user);
-            var existingLineItemsRequest = _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, null, user.AccessToken);
-
-            var existingLineItems = await existingLineItemsRequest;
-            var li = new MarketplaceLineItem();
-
-            // If line item exists, update quantity, else create
-            var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
-            if (preExistingLi != null)
-            {
-                await _oc.LineItems.DeleteAsync(OrderDirection.Outgoing, orderID, preExistingLi.ID, user.AccessToken);
-            }
-            
-            var product = await productRequest;
-            var markedUpPrice = GetLineItemUnitCost(product, liReq);
-            liReq.UnitPrice = markedUpPrice;
-            liReq.xp.LineItemStatus = LineItemStatus.Open;
-            li = await _oc.LineItems
-                .CreateAsync<MarketplaceLineItem>
-                (OrderDirection.Incoming, orderID, liReq);
-            return li;
-        }
-
-        private decimal GetLineItemUnitCost(SuperMarketplaceMeProduct product, MarketplaceLineItem li)
-        {
-            var markedUpBasePrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= li.Quantity).Price;
-            var totalSpecMarkup = li.Specs.Aggregate(0M, (accumulator, spec) =>
-            {
-                var relatedProductSpec = product.Specs.First(productSpec => productSpec.ID == spec.SpecID);
-                var relatedSpecMarkup = relatedProductSpec.Options.First(option => option.ID == spec.OptionID).PriceMarkup;
-                return accumulator + (relatedSpecMarkup ?? 0M);
-            });
-            return totalSpecMarkup + markedUpBasePrice;
-        }
-
         public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser)
         {
             var orderPromo = await _oc.Orders.AddPromotionAsync(OrderDirection.Incoming, orderID, promoCode);
             return await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
-        }
-
-        private bool LineItemsMatch(LineItem li1, LineItem li2)
-        {
-            if (li1.ProductID != li2.ProductID) return false;
-            foreach (var spec1 in li1.Specs) {
-                var spec2 = (li2.Specs as List<LineItemSpec>)?.Find(s => s.SpecID == spec1.SpecID);
-                if (spec1?.Value != spec2?.Value) return false;
-            }
-            return true;
-        }
-
-        private async Task<decimal?> ExchangeUnitPrice(MarketplaceLineItem li, MarketplaceOrder order)
-        {
-			var supplierCurrency = li.Product?.xp?.Currency ?? CurrencySymbol.USD; // Temporary default to work around bad data.
-			var buyerCurrency = order.xp.Currency ?? CurrencySymbol.USD;
-			return (decimal) await _exchangeRates.ConvertCurrency(supplierCurrency, buyerCurrency, (double)li.UnitPrice);
         }
 
         private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser, string overrideErrorMessage = "")

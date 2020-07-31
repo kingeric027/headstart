@@ -29,13 +29,15 @@ namespace Marketplace.Common.Services
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload);
         Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload);
+        Task SendLineItemStatusChangeEmail(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText);
     }
     public class SendgridService : ISendgridService
     {
-        private readonly AppSettings _settings;
+        private readonly AppSettings _settings; 
         private readonly IOrderCloudClient _oc;
         private const string NO_REPLY_EMAIL_ADDRESS = "noreply@four51.com";
         private const string BUYER_ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
+        private const string LINE_ITEM_STATUS_CHANGE = "d-4ca85250efaa4d3f8a2e3144d4373f8c";
         private const string SUPPLIER_ORDER_SUBMIT_TEMPLATE_ID = "d-777af54b1e414b0b853f983697889267";
         private const string BUYER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
         private const string SUPPLIER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-5776a6c57b344aeda605444c96ff39e8";
@@ -46,6 +48,7 @@ namespace Marketplace.Common.Services
         private const string BUYER_ORDER_DECLINED_TEMPLATE_ID = "d-3b6167f40d6b407b95759d1cb01fff30";
         private const string ORDER_REQUIRES_APPROVAL_TEMPLATE_ID = "d-fbe9f4e9fabd4a37ba2364201d238316";
         private const string BUYER_REFUND_REQUESTED_TEMPLATE_ID = "d-e7327df33cd4412abaa2fa76a67f0f3e";
+
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
             _oc = ocClient;
@@ -81,6 +84,23 @@ namespace Marketplace.Common.Services
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
         }
+
+        public async Task SendLineItemStatusChangeEmail(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText)
+        {
+           var productsList = lineItems.Select(MapLineItemToProduct);
+
+            var templateData = new
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Products = productsList,
+                lineItemEmailDisplayText.EmailSubject,
+                lineItemEmailDisplayText.StatusChangeDetail,
+                lineItemEmailDisplayText.StatusChangeDetail2
+            };
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
+        }
+
 
         public async Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
