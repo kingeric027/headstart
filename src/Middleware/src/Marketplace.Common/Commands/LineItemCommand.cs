@@ -176,13 +176,13 @@ namespace Marketplace.Common.Commands
                     { VerifiedUserType.admin, new LineItemEmailDisplayText()
                     {
                         EmailSubject = "A buyer has submitted a return on their order",
-                        StatusChangeDetail = "Return request needs to be processed, communication with supplier handled and RMA created.",
-                        StatusChangeDetail2 = "The following items have been request for return"
+                        StatusChangeDetail = "Contact the Supplier to process the return request.",
+                        StatusChangeDetail2 = "The following items have been requested for return"
                     } },
                     { VerifiedUserType.supplier, new LineItemEmailDisplayText()
                     {
                         EmailSubject = "A buyer has submitted a return on their order",
-                        StatusChangeDetail = "Return request needs to be processed, communication with supplier handled and RMA created.",
+                        StatusChangeDetail = "The seller will contact you to process the return request",
                         StatusChangeDetail2 = "The following items have been requested for return"
                     } }
                 } },
@@ -195,13 +195,13 @@ namespace Marketplace.Common.Commands
                     } },
                     { VerifiedUserType.admin, new LineItemEmailDisplayText()
                     {
-                        EmailSubject = "A return has been process for a buyer order",
-                        StatusChangeDetail = "Ensure that the full return process is complete",
+                        EmailSubject = "The supplier has processed a return",
+                        StatusChangeDetail = "Ensure that the full return process is complete, and the customer was refunded",
                         StatusChangeDetail2 = "The following items have been marked as returned"
                     } },
                     { VerifiedUserType.supplier , new LineItemEmailDisplayText()
                     {
-                        EmailSubject = "A return has been process for a buyer order",
+                        EmailSubject = "The seller has processed a return",
                         StatusChangeDetail = "Ensure that the full return process is complete",
                         StatusChangeDetail2 = "The following items have been marked as returned"
                     } }
@@ -229,21 +229,21 @@ namespace Marketplace.Common.Commands
                    { LineItemStatus.CancelRequested, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
                     { VerifiedUserType.buyer, new LineItemEmailDisplayText()
                     {
-                        EmailSubject = "Your request for cancelation has been submitted",
-                        StatusChangeDetail = "You will be updated on the status of the order when more information is known",
+                        EmailSubject = "Your request for cancellation has been submitted",
+                        StatusChangeDetail = "You will be updated on the status of the cancellation when more information is known",
                         StatusChangeDetail2 = "The following items have had cancellation requested"
                     } },
                     { VerifiedUserType.admin, new LineItemEmailDisplayText()
                     {
-                        EmailSubject = "Buyer has requested cancelation on an order",
+                        EmailSubject = "A buyer has requested cancellation of line items on an order",
                         StatusChangeDetail = "The supplier will look into the feasibility of this cancellation",
-                        StatusChangeDetail2 = "The following items have had cancellation requested"
+                        StatusChangeDetail2 = "The following items have been requested for cancellation"
                     } },
                     { VerifiedUserType.supplier, new LineItemEmailDisplayText()
                     {
-                        EmailSubject = "Buyer has requested cancelation of lineitems for an order",
+                        EmailSubject = "A buyer has requested cancelation of line items on an order",
                         StatusChangeDetail = "Review the items below to see if any can be cancelled before they ship",
-                        StatusChangeDetail2 = "The following items have had cancellation requested"
+                        StatusChangeDetail2 = "The following items have have been requested for cancellation"
                     } },
 
                 } },
@@ -257,19 +257,20 @@ namespace Marketplace.Common.Commands
                     { VerifiedUserType.admin, new LineItemEmailDisplayText()
                     {
                         EmailSubject = "Item(s) on an order have been cancelled",
-                        StatusChangeDetail = "The buyer should be refunded for the proper amount",
+                        StatusChangeDetail = "Ensure the buyer is refunded for the proper amount",
                         StatusChangeDetail2 = "The following items have been cancelled"
                     } },
                     { VerifiedUserType.supplier, new LineItemEmailDisplayText()
                     {
                         EmailSubject = "Item(s) on an order have been cancelled",
-                        StatusChangeDetail = "The buyer should be refunded for the proper amount",
+                        StatusChangeDetail = "The seller will refund the buyer for the proper amount",
                         StatusChangeDetail2 = "The following items have been cancelled"
                     } },
 
                 } }
             };
         }
+
 
         private void ValidateLineItemStatusChange(List<MarketplaceLineItem> previousLineItemStates, LineItemStatusChange lineItemStatusChange, VerifiedUserType userType)
         {
