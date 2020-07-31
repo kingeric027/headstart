@@ -97,7 +97,7 @@
                                     [orderPromos]="orderPromotions"
                                     [cards]="cards"
                                     [orderSummaryMeta]="orderSummaryMeta"
-                                    (promosChanged)="updateOrderMeta()"
+                                    (promosChanged)="updateOrderMeta($event)"
                                     (cardSelected)="onCardSelected($event.detail)"
                                     (continue)="onAcknowledgePurchaseOrder()">
               </ocm-checkout-payment>
