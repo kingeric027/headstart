@@ -28,14 +28,14 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("List Documents")]
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<ListPage<DocumentDO>> List(string schemaID, ListArgs<DocumentDO> args)
+		public async Task<ListPage<Document>> List(string schemaID, ListArgs<Document> args)
 		{
 			return await _documents.List(schemaID, args, VerifiedUserContext);
 		}
 
 		[DocName("Get a Document")]
 		[HttpGet, Route("{documentID}"), OrderCloudIntegrationsAuth]
-		public async Task<DocumentDO> Get(string schemaID, string documentID)
+		public async Task<Document> Get(string schemaID, string documentID)
 		{
 			return await _documents.Get(schemaID, documentID, VerifiedUserContext);
 		}
@@ -43,14 +43,14 @@ namespace Marketplace.Common.Controllers.CMS
 		[DocName("Create a Document")]
 		[DocIgnore] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<DocumentDO> Create(string schemaID, [FromBody] DocumentDO document)
+		public async Task<Document> Create(string schemaID, [FromBody] Document document)
 		{
 			return await _documents.Create(schemaID, document, VerifiedUserContext);
 		}
 
 		[DocName("Update a Document")]
 		[HttpPut, Route("{documentID}"), OrderCloudIntegrationsAuth]
-		public async Task<DocumentDO> Update(string schemaID, string documentID, [FromBody] DocumentDO document)
+		public async Task<Document> Update(string schemaID, string documentID, [FromBody] Document document)
 		{
 			return await _documents.Update(schemaID, documentID, document, VerifiedUserContext);
 		}
@@ -85,7 +85,7 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("List Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
 		[HttpGet, Route("resource")]
-		public async Task<List<DocumentDO>> ListDocuments(string schemaID, [FromQuery] Resource resource)
+		public async Task<List<Document>> ListDocuments(string schemaID, [FromQuery] Resource resource)
 		{
 			return await _assignments.ListDocuments(schemaID, resource, VerifiedUserContext);
 		}

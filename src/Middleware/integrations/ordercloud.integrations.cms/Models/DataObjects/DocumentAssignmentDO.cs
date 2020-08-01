@@ -8,7 +8,6 @@ using System.Text;
 
 namespace ordercloud.integrations.cms
 {
-
 	[CosmosCollection("documentassignments")]
 	public class DocumentAssignmentDO : CosmosObject
 	{

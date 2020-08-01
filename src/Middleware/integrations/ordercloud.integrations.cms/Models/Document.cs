@@ -1,19 +1,16 @@
-﻿using Cosmonaut.Attributes;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
-using Microsoft.Azure.Documents;
 using Newtonsoft.Json;
 using ordercloud.integrations.library.Cosmos;
-using System.Collections.ObjectModel;
 using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
-namespace ordercloud.integrations.cms.Models
+namespace ordercloud.integrations.cms
 {
 	[SwaggerModel]
 	public class Document
 	{
-		[Required]
+		[CosmosInteropID]
 		public string ID { get; set; }
 		[Required]
 		public JObject Doc { get; set; }
@@ -29,5 +26,4 @@ namespace ordercloud.integrations.cms.Models
 		public new TDoc Doc { get; set; }
 
 	}
-
 }

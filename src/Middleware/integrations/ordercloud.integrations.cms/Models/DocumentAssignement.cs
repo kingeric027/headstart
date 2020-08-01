@@ -1,6 +1,7 @@
 ﻿using Cosmonaut.Attributes;
 using Microsoft.Azure.Documents;
 using ordercloud.integrations.library;
+using ordercloud.integrations.library.Cosmos;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,13 +13,12 @@ namespace ordercloud.integrations.cms
 	[SwaggerModel]
 	public class DocumentAssignment
 	{
-		[Required]
+		[CosmosInteropID]
 		public string ResourceID { get; set; }
 		[Required]
 		public ResourceType? ResourceType { get; set; } // nullable so the required validation works
-		public string ParentResourceID { get; set; } = null;
-		// NOTE - Cannot filter on DocumentID
+		public string ParentResourceID { get; set; } = null;		
 		[Required]
-		public string DocumentID { get; set; } 
+		public string DocumentID { get; set; }  // NOTE - Cannot filter on DocumentID
 	}
 }

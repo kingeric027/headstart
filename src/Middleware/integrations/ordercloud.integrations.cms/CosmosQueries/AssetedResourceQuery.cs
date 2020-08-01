@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
-using ordercloud.integrations.cms.Mappers;
 using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.cms

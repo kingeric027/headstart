@@ -16,34 +16,31 @@ namespace ordercloud.integrations.cms
 {
 	public interface IDocumentQuery
 	{
-		Task<ListPage<DocumentDO>> List(string schemaInteropID, IListArgs args, VerifiedUserContext user);
+		Task<ListPage<Document>> List(string schemaInteropID, IListArgs args, VerifiedUserContext user);
 		Task<ListPage<TDoc>> List<TDoc>(string schemaInteropID, IListArgs args, VerifiedUserContext user) where TDoc : Document;
 		Task<List<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs);
-		Task<DocumentDO> Get(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
-		Task<DocumentDO> GetByInternalID(string documentID); // real id
-		Task<DocumentDO> GetByInternalSchemaID(string schemaID, string documentInteropID, VerifiedUserContext user);
-		Task<DocumentDO> Create(string schemaInteropID, DocumentDO document, VerifiedUserContext user);
-		Task<DocumentDO> Update(string schemaInteropID, string documentInteropID, DocumentDO document, VerifiedUserContext user);
+		Task<Document> Get(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
+		Task<DocumentDO> GetDOByInternalID(string documentID); // real id
+		Task<DocumentDO> GetDOByInternalSchemaID(string schemaID, string documentInteropID, VerifiedUserContext user);
+		Task<Document> Create(string schemaInteropID, Document document, VerifiedUserContext user);
+		Task<Document> Update(string schemaInteropID, string documentInteropID, Document document, VerifiedUserContext user);
 		Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 	}
 
 	public class DocumentQuery: IDocumentQuery
 	{
-		private readonly IDocumentSchemaQuery _schemas;
+		private readonly ISchemaQuery _schemas;
 		private readonly ICosmosStore<DocumentDO> _store;
-		private readonly CMSConfig _settings;
 
-		public DocumentQuery(ICosmosStore<DocumentDO> schemaStore, CMSConfig settings, IDocumentSchemaQuery schemas)
+		public DocumentQuery(ICosmosStore<DocumentDO> schemaStore, ISchemaQuery schemas)
 		{
 			_store = schemaStore;
-			_settings = settings;
 			_schemas = schemas;
 		}
 
 		public async Task<List<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs)
 		{
-			var documents = await _store.FindMultipleAsync(documentIDs);
-			return documents.ToList();
+			return (await _store.FindMultipleAsync(documentIDs)).ToList();
 		}
 
 		public async Task<ListPage<TDoc>> List<TDoc>(string schemaInteropID, IListArgs args, VerifiedUserContext user) where TDoc : Document
@@ -51,9 +48,10 @@ namespace ordercloud.integrations.cms
 			var listResponse = await List(schemaInteropID, args, user);
 			return listResponse.Reserialize<ListPage<TDoc>>();
 		}
-		public async Task<ListPage<DocumentDO>> List(string schemaInteropID, IListArgs args, VerifiedUserContext user)
+
+		public async Task<ListPage<Document>> List(string schemaInteropID, IListArgs args, VerifiedUserContext user)
 		{
-			var schema = await _schemas.Get(schemaInteropID, user);
+			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var query = _store.Query(GetFeedOptions(user.ClientID))
 				.Search(args)
 				.Filter(args)
@@ -61,67 +59,75 @@ namespace ordercloud.integrations.cms
 				.Where(doc => doc.SchemaID == schema.id);
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
-			return list.ToListPage(args.Page, args.PageSize, count);
+			var documents = list.ToListPage(args.Page, args.PageSize, count);
+			return DocumentMapper.MapTo(documents);
 		}
 
-		public async Task<DocumentDO> Get(string schemaInteropID, string documentInteropID, VerifiedUserContext user)
+		public async Task<Document> Get(string schemaInteropID, string documentInteropID, VerifiedUserContext user)
 		{
-			var schema = await _schemas.Get(schemaInteropID, user);
-			return await GetByInternalSchemaID(schema.id, documentInteropID, user);
+			return DocumentMapper.MapTo(await GetDO(schemaInteropID, documentInteropID, user));
 		}
 
-		public async Task<DocumentDO> GetByInternalID(string documentID) // real id
+		public async Task<DocumentDO> GetDO(string schemaInteropID, string documentInteropID, VerifiedUserContext user)
 		{
-			var doc = await _store.Query($"select top 1 * from c where c.id = @id", new { id = documentID }).FirstOrDefaultAsync();
+			var schema = await _schemas.GetDO(schemaInteropID, user);
+			return await GetDOByInternalSchemaID(schema.id, documentInteropID, user);
+		}
+
+		public async Task<DocumentDO> GetDOByInternalID(string documentID) // real id
+		{
+			var doc = await _store.FindAsync(documentID);
 			return doc;
 		}
 
-		public async Task<DocumentDO> GetByInternalSchemaID(string schemaID, string documentInteropID, VerifiedUserContext user)
+		public async Task<DocumentDO> GetDOByInternalSchemaID(string schemaID, string documentInteropID, VerifiedUserContext user)
 		{
 			var document = await GetWithoutExceptions(schemaID, documentInteropID, user);
 			if (document == null) throw new OrderCloudIntegrationException.NotFoundException("Document", documentInteropID);
 			return document;
 		}
 
-		public async Task<DocumentDO> Create(string schemaInteropID, DocumentDO document, VerifiedUserContext user)
+		public async Task<Document> Create(string schemaInteropID, Document document, VerifiedUserContext user)
 		{
-			var schema = await _schemas.Get(schemaInteropID, user);
-			var matchingID = await GetWithoutExceptions(schema.id, document.InteropID, user);
+			DocumentDO dataObject = DocumentMapper.MapTo(document);
+			var schema = await _schemas.GetDO(schemaInteropID, user);
+			var matchingID = await GetWithoutExceptions(schema.id, dataObject.InteropID, user);
 			if (matchingID != null) throw new DuplicateIDException();
-			document = SchemaHelper.ValidateDocumentAgainstSchema(schema, document);
-			document.OwnerClientID = user.ClientID;
-			document.SchemaID = schema.id;
-			document.SchemaSpecUrl = schema.Schema.GetValue("$id").ToString();
-			document.History = HistoryBuilder.OnCreate(user);
-			var newDocument = await _store.AddAsync(document);
-			return newDocument;
+			dataObject = SchemaHelper.ValidateDocumentAgainstSchema(schema, dataObject);
+			dataObject.OwnerClientID = user.ClientID;
+			dataObject.SchemaID = schema.id;
+			dataObject.SchemaSpecUrl = schema.Schema.GetValue("$id").ToString();
+			dataObject.History = HistoryBuilder.OnCreate(user);
+			var newDocument = await _store.AddAsync(dataObject);
+			return DocumentMapper.MapTo(newDocument);
 		}
 
-		public async Task<DocumentDO> Update(string schemaInteropID, string documentInteropID, DocumentDO document, VerifiedUserContext user)
+		public async Task<Document> Update(string schemaInteropID, string documentInteropID, Document document, VerifiedUserContext user)
 		{
-			var schema = await _schemas.Get(schemaInteropID, user);
-			var existingDocument = await GetByInternalSchemaID(schema.id, documentInteropID, user);
-			existingDocument.InteropID = document.InteropID;
+			var schema = await _schemas.GetDO(schemaInteropID, user);
+			var existingDocument = await GetDOByInternalSchemaID(schema.id, documentInteropID, user);
+			existingDocument.InteropID = document.ID;
 			existingDocument.Doc = document.Doc;
 			existingDocument = SchemaHelper.ValidateDocumentAgainstSchema(schema, existingDocument);
 			existingDocument.History = HistoryBuilder.OnUpdate(existingDocument.History, user);
 
 			var updatedDocument = await _store.UpdateAsync(existingDocument);
-			return updatedDocument;
+			return DocumentMapper.MapTo(updatedDocument);
 		}
 
 		public async Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user)
 		{
-			var schema = await _schemas.Get(schemaInteropID, user);
-			var document = await GetByInternalSchemaID(schema.id, documentInteropID, user);
+			var schema = await _schemas.GetDO(schemaInteropID, user);
+			var document = await GetDOByInternalSchemaID(schema.id, documentInteropID, user);
 			await _store.RemoveByIdAsync(document.id, schema.OwnerClientID);
 		}
 
 		private async Task<DocumentDO> GetWithoutExceptions(string schemaID, string documentInteropID, VerifiedUserContext user)
 		{
-			var query = $"select top 1 * from c where c.InteropID = @id and c.SchemaID = @schemaID";
-			var schema = await _store.Query(query, new { id = documentInteropID, schemaID = schemaID }, GetFeedOptions(user.ClientID)).FirstOrDefaultAsync();
-			return schema;
+			var document = await _store
+				.Query(GetFeedOptions(user.ClientID))
+				.FirstOrDefaultAsync(d => d.InteropID == documentInteropID && d.SchemaID == schemaID);
+			return document;
 		}
 
 		private FeedOptions GetFeedOptions(string apiClientID) => new FeedOptions() { PartitionKey = new PartitionKey(apiClientID) };
