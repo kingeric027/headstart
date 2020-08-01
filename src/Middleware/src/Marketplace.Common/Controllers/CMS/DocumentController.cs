@@ -41,7 +41,6 @@ namespace Marketplace.Common.Controllers.CMS
 		}
 
 		[DocName("Create a Document")]
-		[DocIgnore] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
 		public async Task<Document> Create(string schemaID, [FromBody] Document document)
 		{

@@ -38,7 +38,6 @@ namespace Marketplace.Common.Controllers.CMS
 		}
 
 		[DocName("Create a Document Schema")]
-		[DocIgnore]
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
 		public async Task<DocSchema> Create([FromBody] DocSchema schema)
 		{
