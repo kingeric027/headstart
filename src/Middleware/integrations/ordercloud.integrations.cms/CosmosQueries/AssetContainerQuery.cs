@@ -87,7 +87,7 @@ namespace ordercloud.integrations.cms
 
 		private async Task<AssetContainerDO> GetWithoutExceptions(string interopID)
 		{
-			return await _store.Query($"select top 1 * from c where c.InteropID = @id", new { id = interopID }).FirstOrDefaultAsync();
+			return await _store.Query().FirstOrDefaultAsync(c => c.InteropID == interopID);
 		}
 	}
 }

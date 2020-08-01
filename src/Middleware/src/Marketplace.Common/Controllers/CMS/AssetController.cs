@@ -25,14 +25,14 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("List Assets")]
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<ListPage<AssetDO>> List(ListArgs<AssetDO> args)
+		public async Task<ListPage<Asset>> List(ListArgs<Asset> args)
 		{
 			return await _assets.List(args, VerifiedUserContext);
 		}
 
 		[DocName("Get an Asset")]
 		[HttpGet, Route("{assetID}"), OrderCloudIntegrationsAuth]
-		public async Task<AssetDO> Get(string assetID)
+		public async Task<Asset> Get(string assetID)
 		{
 			return await _assets.Get(assetID, VerifiedUserContext);
 		}
@@ -40,14 +40,14 @@ namespace Marketplace.CMS.Controllers
 		[DocName("Upload an Asset")]
 		[DocIgnore] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<AssetDO> Create([FromForm] AssetUpload form)
+		public async Task<Asset> Create([FromForm] AssetUpload form)
 		{
 			return await _assets.Create(form, VerifiedUserContext);
 		}
 
 		[DocName("Update an Asset")]
 		[HttpPut, Route("{assetID}"), OrderCloudIntegrationsAuth]
-		public async Task<AssetDO> Update(string assetID, [FromBody] AssetDO asset)
+		public async Task<Asset> Update(string assetID, [FromBody] Asset asset)
 		{
 			return await _assets.Update(assetID, asset, VerifiedUserContext);
 		}

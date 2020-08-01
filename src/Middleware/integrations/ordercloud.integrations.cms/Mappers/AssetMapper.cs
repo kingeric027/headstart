@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using ordercloud.integrations.library.Cosmos;
+using OrderCloud.SDK;
 
 namespace ordercloud.integrations.cms
 {
@@ -73,6 +74,36 @@ namespace ordercloud.integrations.cms
 
 				// TODO - potentially image resizing?
 			}
+		}
+
+		public static Asset MapTo(AssetDO asset)
+		{
+			return new Asset()
+			{
+				ID = asset.InteropID,
+				Title = asset.Title,
+				Active = asset.Active,
+				Url = asset.Url,
+				Type = asset.Type,
+				Tags = asset.Tags,
+				FileName = asset.FileName,
+				Metadata = asset.Metadata,
+				History = asset.History
+			};
+		}
+
+		public static IEnumerable<Asset> MapTo(IEnumerable<AssetDO> assets)
+		{
+			return assets.Select(asset => MapTo(asset));
+		}
+
+		public static ListPage<Asset> MapTo(ListPage<AssetDO> listPage)
+		{
+			return new ListPage<Asset>
+			{
+				Meta = listPage.Meta,
+				Items = MapTo(listPage.Items).ToList()
+			};
 		}
 	}
 }

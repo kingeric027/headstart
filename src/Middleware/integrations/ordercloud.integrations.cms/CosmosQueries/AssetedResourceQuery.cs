@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
+using Cosmonaut.Extensions;
 using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.cms
@@ -62,7 +63,7 @@ namespace ordercloud.integrations.cms
 		{
 			var resource = assignment.MapToResource();
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assignment.AssetID, user);
+			var asset = await _assets.GetDO(assignment.AssetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).UniqueAdd(asset.id); 
 			await _store.UpsertAsync(assetedResource);
@@ -72,7 +73,7 @@ namespace ordercloud.integrations.cms
 		{
 			var resource = assignment.MapToResource();
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assignment.AssetID, user);
+			var asset = await _assets.GetDO(assignment.AssetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).Remove(asset.id);
 			await _store.UpdateAsync(assetedResource);
@@ -82,7 +83,7 @@ namespace ordercloud.integrations.cms
 		{
 			var resource = assignment.MapToResource();
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assignment.AssetID, user);
+			var asset = await _assets.GetDO(assignment.AssetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).MoveTo(asset.id, listOrderWithinType);
 			await _store.UpdateAsync(assetedResource);
@@ -99,8 +100,10 @@ namespace ordercloud.integrations.cms
 
 		private async Task<AssetedResourceDO> GetExisting(Resource resource)
 		{
-			var query = $"select top 1 * from c where c.Resource.Type = @Type AND c.Resource.ID = @ID AND c.Resource.ParentID = @ParentID";
-			var assetedResource = await _store.QuerySingleAsync(query, resource);
+			var assetedResource = await _store.Query().FirstOrDefaultAsync(
+				a => a.ResourceType == resource.ResourceType && 
+				a.ResourceID == resource.ResourceID && 
+				a.ResourceParentID == resource.ParentResourceID);
 			return assetedResource;
 		}
 
