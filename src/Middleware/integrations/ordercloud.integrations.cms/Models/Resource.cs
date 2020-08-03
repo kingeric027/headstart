@@ -26,6 +26,21 @@ namespace ordercloud.integrations.cms
 
 	public enum ResourceType
 	{
-		Products, Categories, Catalogs, Promotions, Suppliers, Buyers, ProductFacets
+		Products, 
+		Categories, 
+		Catalogs, 
+		Promotions, 
+		Suppliers, 
+		Buyers, 
+		ProductFacets,
+		Users, 
+		SupplierUsers, 
+		AdminUsers, 
+		Addresses, 
+		SupplierAddresses, 
+		AdminAddresses,
+		UserGroups,
+		SupplierUserGroups,
+		AdminUserGroups
 	}
 }
