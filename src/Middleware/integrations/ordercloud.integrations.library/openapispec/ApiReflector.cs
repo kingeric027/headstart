@@ -165,8 +165,8 @@ namespace ordercloud.integrations.library
                              HttpVerb = verb,
                              PathArgs = GetArgs<TController>(requestType ?? responseType, m, route, true).ToList(),
                              QueryArgs = GetArgs<TController>(requestType ?? responseType, m, route, false).ToList(),
-                             RequestModel = GetModelFromType(requestType, false, true),
-                             ResponseModel = GetModelFromType(responseType, true, false),
+                             RequestModel = GetModelFromType(requestType, m, false, true),
+                             ResponseModel = GetModelFromType(responseType, m, true, false),
                              HttpStatus = responseType.HttpStatusCode(verb),
                              RequiredRoles = GetRequiredRoles<TAttribute>(m),
                              IsList = responseType.UnwrapGeneric(typeof(Task<>)).IsListPage(),
@@ -260,6 +260,34 @@ namespace ordercloud.integrations.library
         {
             foreach (var param in methodInfo.GetParameters())
             {
+                if (param.HasAttribute<FromQueryAttribute>() && !inPath)
+				{
+                    if (param.ParameterType.IsModelType())
+                    {
+                        foreach (var prop in param.ParameterType.GetProperties())
+                        {
+                            yield return new ApiParameter
+                            {
+                                ParamInfo = param,
+                                Name = prop.Name,
+                                Required = prop.HasAttribute<RequiredAttribute>(),
+                                SimpleType = prop.PropertyType.ParameterSimpleName()
+                            };
+                        }
+
+                    }
+                    else
+                    {
+                        yield return new ApiParameter
+                        {
+                            ParamInfo = param,
+                            Name = param.Name,
+                            Required = !param.IsOptional,
+                            SimpleType = param.ParameterType.ParameterSimpleName()
+                        };
+                    }
+                }
+
                 if ((param.ParameterType.IsModelType()))
                     continue;
 
@@ -338,10 +366,19 @@ namespace ordercloud.integrations.library
                 CacheCustomTypes(prop.PropertyType, nestedInPartial);
         }
 
+        private static ApiModel GetModelFromType(Type type, MethodInfo method, bool includeReadOnly, bool includeWriteOnly)
+		{
+            var parameter = method.GetParameters().FirstOrDefault(m => m.ParameterType == type);
+            if (parameter != null && parameter.HasAttribute<FromQueryAttribute>())
+                return null;
+            return GetModelFromType(type, includeReadOnly, includeWriteOnly);
+        }
+
         private static ApiModel GetModelFromType(Type type, bool includeReadOnly, bool includeWriteOnly)
         {
             if (type == null || type == typeof(void))
                 return null;
+            
 
             CacheCustomTypes(type);
 
