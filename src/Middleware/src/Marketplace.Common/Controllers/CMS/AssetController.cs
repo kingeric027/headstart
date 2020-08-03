@@ -6,6 +6,7 @@ using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
+using System.Collections.Generic;
 
 namespace Marketplace.CMS.Controllers
 {
@@ -83,12 +84,9 @@ namespace Marketplace.CMS.Controllers
 		// TODO - add list page and list args
 		[DocName("List Assets Assigned to Resource")]
 		[HttpGet, Route("resource"), OrderCloudIntegrationsAuth]
-		public async Task<ListPage<AssetForDelivery>> ListAssets([FromQuery] Resource resource, ListArgs<AssetForDelivery> args)
+		public async Task<List<AssetForDelivery>> ListAssets([FromQuery] Resource resource)
 		{
-			return new ListPage<AssetForDelivery>
-			{
-				Items = await _assetedResources.ListAssets(resource, VerifiedUserContext)
-			};
+			return await _assetedResources.ListAssets(resource, VerifiedUserContext);
 		}
 
 		[DocName("Get a Resource's primary image")]
