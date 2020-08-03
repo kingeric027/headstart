@@ -6,6 +6,7 @@ using System.Text;
 
 namespace ordercloud.integrations.cms
 {
+	[SwaggerModel]
 	public class History
 	{
 		public DateTimeOffset DateCreated { get; set; }

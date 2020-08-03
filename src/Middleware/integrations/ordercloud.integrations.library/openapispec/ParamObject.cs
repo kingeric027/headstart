@@ -13,6 +13,11 @@ namespace ordercloud.integrations.library
         private readonly List<Tuple<string, JRaw>> _param;
         public ParamObject(ApiResource resource, ApiEndpoint endpoint, ApiMetaData data)
         {
+            if (endpoint.Name == "GetFirstImage")
+			{
+                var a = "true";
+			}
+
             _param = new List<Tuple<string, JRaw>>();
             if (endpoint.SubResource != null)
                 // Used to get correct enumerables on query params such as sortBy and searchOn for the Me resource
