@@ -18,15 +18,14 @@ namespace ordercloud.integrations.cms
 	{
 		[CosmosPartitionKey]
 		public string SinglePartitionID => AssetContainerQuery.SinglePartitionID; // TODO - is there a better way to indicate there should only be one partition?
-		[CosmosInteropID]
-		public string InteropID { get; set; }
-		public string Name { get; set; }
-		public History History { get; set; }
+		public string SellerID { get; set; }
+		public string BuyerID { get; set; }
+		public string SupplierID { get; set; }
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{
 			return new Collection<UniqueKey>
 			{
-				new UniqueKey() { Paths = new Collection<string> { "/InteropID" }}
+				new UniqueKey() { Paths = new Collection<string> { "/SellerID", "/BuyerID", "/SupplierID" }}
 			};
 		}
 	}

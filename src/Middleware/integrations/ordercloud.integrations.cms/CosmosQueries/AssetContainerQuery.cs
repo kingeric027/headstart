@@ -10,11 +10,6 @@ namespace ordercloud.integrations.cms
 	public interface IAssetContainerQuery
 	{
 		Task<AssetContainerDO> CreateDefaultIfNotExists(VerifiedUserContext user);
-		Task<ListPage<AssetContainerDO>> List(IListArgs args);
-		Task<AssetContainerDO> Get(string interopID);
-		Task<AssetContainerDO> Create(AssetContainerDO container, VerifiedUserContext user);
-		Task<AssetContainerDO> Update(string interopID, AssetContainerDO container, VerifiedUserContext user);
-		Task Delete(string interopID);
 	}
 
 	public class AssetContainerQuery: IAssetContainerQuery
@@ -29,65 +24,18 @@ namespace ordercloud.integrations.cms
 			_blob = blob;
 		}
 
-		public async Task<ListPage<AssetContainerDO>> List(IListArgs args)
-		{
-			var query = _store.Query(new FeedOptions() { EnableCrossPartitionQuery = false })
-				.Search(args)
-				.Filter(args)
-				.Sort(args);
-			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
-			var count = await query.CountAsync();
-			return list.ToListPage(args.Page, args.PageSize, count);
-		}
-
-		public async Task<AssetContainerDO> Get(string interopID)
-		{
-			var container = await GetWithoutExceptions(interopID);
-			if (container == null) throw new OrderCloudIntegrationException.NotFoundException("AssetContainer", interopID);
-			return container;
-		}
-
 		public async Task<AssetContainerDO> CreateDefaultIfNotExists(VerifiedUserContext user)
 		{
-			var defaultContainer = new AssetContainerDO()
+			var existingContainer = await _store.Query().FirstOrDefaultAsync(c =>
+				c.SellerID == user.SellerID &&
+				c.BuyerID == user.BuyerID &&
+				c.SupplierID == user.SupplierID);
+			return existingContainer ?? await _store.AddAsync(new AssetContainerDO()
 			{
-				InteropID = user.ClientID,
-				Name = $"Container for API Client with ID {user.ClientID}"
-			};
-			var existingContainer = await GetWithoutExceptions(defaultContainer.InteropID);
-			return existingContainer ?? await Create(defaultContainer, user);
-		}
-
-		public async Task<AssetContainerDO> Create(AssetContainerDO container, VerifiedUserContext user)
-		{
-			var matchingID = await GetWithoutExceptions(container.InteropID);
-			if (matchingID != null) throw new DuplicateIDException();
-			container.History = HistoryBuilder.OnCreate(user);
-			var newContainer = await _store.AddAsync(container);
-			return newContainer;
-		}
-
-		public async Task<AssetContainerDO> Update(string interopID, AssetContainerDO container, VerifiedUserContext user)
-		{
-			var existingContainer = await Get(interopID);
-			existingContainer.InteropID = container.InteropID;
-			existingContainer.Name = container.Name;
-			existingContainer.History = HistoryBuilder.OnUpdate(container.History, user);
-			var updatedContainer = await _store.UpdateAsync(existingContainer);
-			return updatedContainer;
-		}
-
-		public async Task Delete(string interopID)
-		{
-			var container = await Get(interopID);
-			await _blob.OnContainerDeleted(container);
-			await _store.RemoveByIdAsync(container.id, SinglePartitionID);
-			// TODO - delete all the asset records in cosmos?
-		}
-
-		private async Task<AssetContainerDO> GetWithoutExceptions(string interopID)
-		{
-			return await _store.Query().FirstOrDefaultAsync(c => c.InteropID == interopID);
+				SellerID = user.SellerID,
+				BuyerID = user.BuyerID,
+				SupplierID = user.SupplierID
+			});
 		}
 	}
 }

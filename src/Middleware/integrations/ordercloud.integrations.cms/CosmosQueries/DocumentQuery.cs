@@ -114,7 +114,7 @@ namespace ordercloud.integrations.cms
 		{
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var document = await GetDOByInternalSchemaID(schema.id, documentInteropID, user);
-			await _store.RemoveByIdAsync(document.id, schema.OwnerClientID);
+			await _store.RemoveByIdAsync(document.id, schema.SellerOrgID);
 		}
 
 		private async Task<DocumentDO> GetWithoutExceptions(string schemaID, string documentInteropID, VerifiedUserContext user)

@@ -32,7 +32,7 @@ namespace ordercloud.integrations.cms
 			}
 			catch (Exception ex)
 			{
-				throw new StorageConnectionException(container.InteropID, ex);
+				throw new StorageConnectionException(container.id, ex);
 			}
 		}
 
@@ -44,7 +44,7 @@ namespace ordercloud.integrations.cms
 			}
 			catch (Exception ex)
 			{
-				throw new StorageConnectionException(container.InteropID, ex);
+				throw new StorageConnectionException(container.id, ex);
 			}
 		}
 
@@ -56,7 +56,7 @@ namespace ordercloud.integrations.cms
 			}
 			catch (Exception ex)
 			{
-				throw new StorageConnectionException(container.InteropID, ex);
+				throw new StorageConnectionException(container.id, ex);
 			}
 		}
 
@@ -65,7 +65,7 @@ namespace ordercloud.integrations.cms
 			return new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
 			{
 				ConnectionString = Config.BlobStorageConnectionString,
-				Container = $"assets-{container.id}",
+				Container = $"assets-{container.id}", // SellerOrgID can contain "_", an illegal character for blob containers.
 				AccessType = BlobContainerPublicAccessType.Container
 			});
 		}

@@ -32,7 +32,7 @@ namespace ordercloud.integrations.cms
 
 		public async Task<ListPage<DocSchema>> List(IListArgs args, VerifiedUserContext user)
 		{
-			var query = _store.Query(GetFeedOptions(user.ClientID))
+			var query = _store.Query(GetFeedOptions(user.SellerID))
 				.Search(args)
 				.Filter(args)
 				.Sort(args);
@@ -66,7 +66,7 @@ namespace ordercloud.integrations.cms
 			DocSchemaDO dataObject = SchemaMapper.MapTo(schema);
 			var matchingID = await GetWithoutExceptions(dataObject.InteropID, user);
 			if (matchingID != null) throw new DuplicateIDException();
-			dataObject.OwnerClientID = user.ClientID;
+			dataObject.SellerOrgID = user.SellerID;
 			dataObject.History = HistoryBuilder.OnCreate(user);
 			dataObject = Validate(dataObject);
 			var newSchema = await _store.AddAsync(dataObject);
@@ -88,7 +88,7 @@ namespace ordercloud.integrations.cms
 		public async Task Delete(string schemaInteropID, VerifiedUserContext user)
 		{
 			var schema = await GetDO(schemaInteropID, user);
-			await _store.RemoveByIdAsync(schema.id, schema.OwnerClientID);
+			await _store.RemoveByIdAsync(schema.id, schema.SellerOrgID);
 		}
 
 		private DocSchemaDO Validate(DocSchemaDO schema)
@@ -100,11 +100,11 @@ namespace ordercloud.integrations.cms
 
 		private async Task<DocSchemaDO> GetWithoutExceptions(string schemaInteropID, VerifiedUserContext user)
 		{
-			var schema = await _store.Query(GetFeedOptions(user.ClientID)).FirstOrDefaultAsync(s => s.InteropID == schemaInteropID);
+			var schema = await _store.Query(GetFeedOptions(user.SellerID)).FirstOrDefaultAsync(s => s.InteropID == schemaInteropID);
 			return schema;
 		}
 
-		private FeedOptions GetFeedOptions(string apiClientID) => new FeedOptions() { PartitionKey = new PartitionKey(apiClientID) };
+		private FeedOptions GetFeedOptions(string sellerOrgID) => new FeedOptions() { PartitionKey = new PartitionKey(sellerOrgID) };
 
 	}
 }

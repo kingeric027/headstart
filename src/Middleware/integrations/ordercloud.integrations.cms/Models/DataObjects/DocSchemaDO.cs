@@ -12,7 +12,7 @@ namespace ordercloud.integrations.cms
 	{
 		public string InteropID { get; set; }
 		[CosmosPartitionKey]
-		public string OwnerClientID { get; set; }
+		public string SellerOrgID { get; set; }
 		public List<ResourceType> RestrictedAssignmentTypes { get; set; } = new List<ResourceType>(); // empty means no restrictions
 		public JObject Schema { get; set; }
 		public History History { get; set; }
