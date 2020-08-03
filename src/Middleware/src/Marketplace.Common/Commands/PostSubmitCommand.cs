@@ -37,8 +37,9 @@ namespace Marketplace.Common.Commands
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
         private readonly IOrderCommand _orderCommand;
+        private readonly ILineItemCommand _lineItemCommand;
         
-        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService, IOrderCommand orderCommand)
+        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService, IOrderCommand orderCommand, ILineItemCommand lineItemCommand)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
@@ -49,8 +50,8 @@ namespace Marketplace.Common.Commands
             _locationPermissionCommand = locationPermissionCommand;
 			_exchangeRates = exchangeRates;
             _orderCommand = orderCommand;
-
-		}
+            _lineItemCommand = lineItemCommand;
+        }
 
         private class PostSubmitErrorResponse
         {
@@ -277,7 +278,7 @@ namespace Marketplace.Common.Commands
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
 
-            await _orderCommand.PatchLineItemStatus(buyerOrder.ID, LineItemStatus.Submitted);
+            await _lineItemCommand.PatchLineItemStatus(buyerOrder.ID, LineItemStatus.Submitted);
 
             var buyerOrderPatch = new PartialOrder()
             {

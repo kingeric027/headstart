@@ -121,9 +121,9 @@ shared-address-display {
 // Icon Buttons
 
 .icon-button {
-  padding: .75rem;
+  padding: 0.75rem;
   border-radius: 180px;
-  transition: background-color .25s;
+  transition: background-color 0.25s;
   &:hover {
     background-color: rgba($gray-900, 0.1);
     cursor: pointer;
@@ -144,7 +144,7 @@ shared-address-display {
 }
 
 .ripple:after {
-  content: "";
+  content: '';
   display: block;
   position: absolute;
   width: 100%;
@@ -157,12 +157,12 @@ shared-address-display {
   background-position: 50%;
   transform: scale(10, 10);
   opacity: 0;
-  transition: transform .5s, opacity 1s;
+  transition: transform 0.5s, opacity 1s;
 }
 
 .ripple:active:after {
   transform: scale(0, 0);
-  opacity: .3;
+  opacity: 0.3;
   transition: 0s;
 }
 

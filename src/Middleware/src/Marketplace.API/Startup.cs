@@ -26,7 +26,6 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
-using DocumentDO = ordercloud.integrations.cms.DocumentDO;
 
 namespace Marketplace.API
 {
@@ -95,6 +94,7 @@ namespace Marketplace.API
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IOrderCloudSandboxService>()
                 .Inject<IMarketplaceProductCommand>()
+                .Inject<ILineItemCommand>()
                 .Inject<IMeProductCommand>()
                 .Inject<IMarketplaceCatalogCommand>()
                 .Inject<ISendgridService>()
@@ -155,9 +155,8 @@ namespace Marketplace.API
         public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.OrderCloudIntegrationsConfigureWebApp(env, "v1")
-                .UseSwagger()
                 .UseSwaggerUI(c => {
-                    c.SwaggerEndpoint($"/swagger/v1/swagger.json", $"API v1");
+                    c.SwaggerEndpoint($"/swagger", $"API v1");
                     c.RoutePrefix = string.Empty;
                 });
         }
