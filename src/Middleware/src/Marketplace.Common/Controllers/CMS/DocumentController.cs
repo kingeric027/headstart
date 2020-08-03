@@ -59,7 +59,7 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpDelete, Route("{documentID}"), OrderCloudIntegrationsAuth]
 		public async Task Delete(string schemaID, string documentID)
 		{
-			await _documents.Delete<JObject>(schemaID, documentID, VerifiedUserContext);
+			await _documents.Delete(schemaID, documentID, VerifiedUserContext);
 		}
 
 		[DocName("List Document Assignments")]
@@ -85,9 +85,9 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("List Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
 		[HttpGet, Route("resource")]
-		public async Task<List<Document>> ListDocuments(string schemaID, [FromQuery] Resource resource)
+		public async Task<List<Document<JObject>>> ListDocuments(string schemaID, [FromQuery] Resource resource)
 		{
-			return await _assignments.ListDocuments(schemaID, resource, VerifiedUserContext);
+			return await _assignments.ListDocuments<JObject>(schemaID, resource, VerifiedUserContext);
 		}
 	}
 }

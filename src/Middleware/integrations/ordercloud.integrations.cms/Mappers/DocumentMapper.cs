@@ -1,4 +1,6 @@
-﻿using OrderCloud.SDK;
+﻿using Newtonsoft.Json.Linq;
+using ordercloud.integrations.library;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,39 +10,39 @@ namespace ordercloud.integrations.cms
 {
 	public static class DocumentMapper
 	{
-		public static Document MapTo(DocumentDO doc)
+		public static Document<T> MapTo<T>(DocumentDO doc)
 		{
-			return new Document()
+			return new Document<T>()
 			{
 				ID = doc.InteropID,
-				Doc = doc.Doc,
+				Doc = doc.Doc.ToObject<T>(),
 				SchemaSpecUrl = doc.SchemaSpecUrl,
 				History = doc.History
 			};
 		}
 
-		public static DocumentDO MapTo(Document doc)
+		public static DocumentDO MapTo<T>(Document<T> doc)
 		{
 			return new DocumentDO()
 			{
 				InteropID = doc.ID,
-				Doc = doc.Doc,
+				Doc = JObject.FromObject(doc.Doc),
 				SchemaSpecUrl = doc.SchemaSpecUrl,
 				History = doc.History
 			};
 		}
 
-		public static IEnumerable<Document> MapTo(IEnumerable<DocumentDO> docs)
+		public static IEnumerable<Document<T>> MapTo<T>(IEnumerable<DocumentDO> docs)
 		{
-			return docs.Select(doc => MapTo(doc));
+			return docs.Select(doc => MapTo<T>(doc));
 		}
 
-		public static ListPage<Document> MapTo(ListPage<DocumentDO> listPage)
+		public static ListPage<Document<T>> MapTo<T>(ListPage<DocumentDO> listPage)
 		{
-			return new ListPage<Document>
+			return new ListPage<Document<T>>
 			{
 				Meta = listPage.Meta,
-				Items = MapTo(listPage.Items).ToList()
+				Items = MapTo<T>(listPage.Items).ToList()
 			};
 		}
 	}

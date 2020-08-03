@@ -8,22 +8,15 @@ using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribut
 namespace ordercloud.integrations.cms
 {
 	[SwaggerModel]
-	public class Document
+	public class Document<T>
 	{
 		[CosmosInteropID]
 		public string ID { get; set; }
 		[Required]
-		public JObject Doc { get; set; }
+		public T Doc { get; set; }
 		[ApiReadOnly]
 		public string SchemaSpecUrl { get; set; }
 		[ApiReadOnly]
 		public History History { get; set; }
-	}
-
-	[SwaggerModel]
-	public class Document<TDoc> : Document
-	{
-		public new TDoc Doc { get; set; }
-
 	}
 }

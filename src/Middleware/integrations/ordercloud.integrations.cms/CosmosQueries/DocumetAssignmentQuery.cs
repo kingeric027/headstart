@@ -12,7 +12,7 @@ namespace ordercloud.integrations.cms
 {
 	public interface IDocumentAssignmentQuery
 	{
-		Task<List<Document>> ListDocuments(string schemaInteropID, Resource resource, VerifiedUserContext user);
+		Task<List<Document<T>>> ListDocuments<T>(string schemaInteropID, Resource resource, VerifiedUserContext user);
 		Task<ListPage<DocumentAssignment>> ListAssignments(string schemaInteropID, ListArgs<DocumentAssignment> args, VerifiedUserContext user);
 		Task SaveAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user);
@@ -31,7 +31,7 @@ namespace ordercloud.integrations.cms
 			_schemas = schemas;
 		}
 
-		public async Task<List<Document>> ListDocuments(string schemaInteropID, Resource resource, VerifiedUserContext user) 
+		public async Task<List<Document<T>>> ListDocuments<T>(string schemaInteropID, Resource resource, VerifiedUserContext user) 
 		{
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
@@ -44,7 +44,7 @@ namespace ordercloud.integrations.cms
 					doc.RsrcType== resource.ResourceType
 				).ToListAsync();
 			var documentIDs = assignments.Select(assign => assign.DocID);
-			var documents = DocumentMapper.MapTo(await _documents.ListByInternalIDs(documentIDs));
+			var documents = DocumentMapper.MapTo<T>(await _documents.ListByInternalIDs(documentIDs));
 			return documents.ToList();
 		}
 

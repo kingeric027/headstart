@@ -16,15 +16,15 @@ namespace ordercloud.integrations.cms
 {
 	public interface IDocumentQuery
 	{
-		Task<ListPage<Document>> List(string schemaInteropID, IListArgs args, VerifiedUserContext user);
-		Task<ListPage<TDoc>> List<TDoc>(string schemaInteropID, IListArgs args, VerifiedUserContext user) where TDoc : Document;
+		Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user);
+		Task<Document<T>> Get<T>(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
+		Task<Document<T>> Create<T>(string schemaInteropID, Document<T> document, VerifiedUserContext user);
+		Task<Document<T>> Update<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user);
+		Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
+
 		Task<List<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs);
-		Task<Document> Get(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 		Task<DocumentDO> GetDOByInternalID(string documentID); // real id
 		Task<DocumentDO> GetDOByInternalSchemaID(string schemaID, string documentInteropID, VerifiedUserContext user);
-		Task<Document> Create(string schemaInteropID, Document document, VerifiedUserContext user);
-		Task<Document> Update(string schemaInteropID, string documentInteropID, Document document, VerifiedUserContext user);
-		Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 	}
 
 	public class DocumentQuery: IDocumentQuery
@@ -43,13 +43,8 @@ namespace ordercloud.integrations.cms
 			return (await _store.FindMultipleAsync(documentIDs)).ToList();
 		}
 
-		public async Task<ListPage<TDoc>> List<TDoc>(string schemaInteropID, IListArgs args, VerifiedUserContext user) where TDoc : Document
-		{
-			var listResponse = await List(schemaInteropID, args, user);
-			return listResponse.Reserialize<ListPage<TDoc>>();
-		}
 
-		public async Task<ListPage<Document>> List(string schemaInteropID, IListArgs args, VerifiedUserContext user)
+		public async Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user)
 		{
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var query = _store.Query(GetFeedOptions(user.ClientID))
@@ -60,12 +55,12 @@ namespace ordercloud.integrations.cms
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var documents = list.ToListPage(args.Page, args.PageSize, count);
-			return DocumentMapper.MapTo(documents);
+			return DocumentMapper.MapTo<T>(documents);
 		}
 
-		public async Task<Document> Get(string schemaInteropID, string documentInteropID, VerifiedUserContext user)
+		public async Task<Document<T>> Get<T>(string schemaInteropID, string documentInteropID, VerifiedUserContext user)
 		{
-			return DocumentMapper.MapTo(await GetDO(schemaInteropID, documentInteropID, user));
+			return DocumentMapper.MapTo<T>(await GetDO(schemaInteropID, documentInteropID, user));
 		}
 
 		public async Task<DocumentDO> GetDO(string schemaInteropID, string documentInteropID, VerifiedUserContext user)
@@ -87,7 +82,7 @@ namespace ordercloud.integrations.cms
 			return document;
 		}
 
-		public async Task<Document> Create(string schemaInteropID, Document document, VerifiedUserContext user)
+		public async Task<Document<T>> Create<T>(string schemaInteropID, Document<T> document, VerifiedUserContext user)
 		{
 			DocumentDO dataObject = DocumentMapper.MapTo(document);
 			var schema = await _schemas.GetDO(schemaInteropID, user);
@@ -99,20 +94,20 @@ namespace ordercloud.integrations.cms
 			dataObject.SchemaSpecUrl = schema.Schema.GetValue("$id").ToString();
 			dataObject.History = HistoryBuilder.OnCreate(user);
 			var newDocument = await _store.AddAsync(dataObject);
-			return DocumentMapper.MapTo(newDocument);
+			return DocumentMapper.MapTo<T>(newDocument);
 		}
 
-		public async Task<Document> Update(string schemaInteropID, string documentInteropID, Document document, VerifiedUserContext user)
+		public async Task<Document<T>> Update<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user)
 		{
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var existingDocument = await GetDOByInternalSchemaID(schema.id, documentInteropID, user);
 			existingDocument.InteropID = document.ID;
-			existingDocument.Doc = document.Doc;
+			existingDocument.Doc = JObject.FromObject(document.Doc);
 			existingDocument = SchemaHelper.ValidateDocumentAgainstSchema(schema, existingDocument);
 			existingDocument.History = HistoryBuilder.OnUpdate(existingDocument.History, user);
 
 			var updatedDocument = await _store.UpdateAsync(existingDocument);
-			return DocumentMapper.MapTo(updatedDocument);
+			return DocumentMapper.MapTo<T>(updatedDocument);
 		}
 
 		public async Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user)
