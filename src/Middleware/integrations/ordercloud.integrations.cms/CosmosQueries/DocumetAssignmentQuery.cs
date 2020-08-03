@@ -12,9 +12,9 @@ namespace ordercloud.integrations.cms
 {
 	public interface IDocumentAssignmentQuery
 	{
-		Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, IListArgs args, VerifiedUserContext user);
-		Task SaveAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user);
-		Task DeleteAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user);
+		Task<ListPage<Document<TDoc>>> ListDocuments<TDoc>(string schemaInteropID, Resource resource, IListArgs args, VerifiedUserContext user);
+		Task SaveAssignment<TDoc>(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user);
+		Task DeleteAssignment<TDoc>(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user);
 	}
 
 	public class DocumentAssignmentQuery : IDocumentAssignmentQuery
@@ -31,7 +31,7 @@ namespace ordercloud.integrations.cms
 			_schemas = schemas;
 		}
 
-		public async Task<ListPage<Document>> ListDocuments(string schemaInteropID, Resource resource, IListArgs args, VerifiedUserContext user) 
+		public async Task<ListPage<Document<TDoc>>> ListDocuments<TDoc>(string schemaInteropID, Resource resource, IListArgs args, VerifiedUserContext user) 
 		{
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
@@ -50,15 +50,15 @@ namespace ordercloud.integrations.cms
 			var count = await query.CountAsync();
 			var assignments = list.ToListPage(args.Page, args.PageSize, count);
 			var documentIDs = assignments.Items.Select(assign => assign.DocID);
-			var documents = await _documents.ListByInternalIDs(documentIDs);
-			return new ListPage<Document>()
+			var documents = await _documents.ListByInternalIDs<TDoc>(documentIDs);
+			return new ListPage<Document<TDoc>>()
 			{
 				Items = documents,
 				Meta = assignments.Meta
 			};
 		}
 
-		public async Task SaveAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user)
+		public async Task SaveAssignment<TDoc>(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user)
 		{
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
@@ -66,7 +66,7 @@ namespace ordercloud.integrations.cms
 			{
 				throw new InvalidAssignmentException(schema.RestrictedAssignmentTypes);
 			}
-			var document = await _documents.GetByInternalSchemaID(schema.id, documentInteropID, user);
+			var document = await _documents.GetByInternalSchemaID<TDoc>(schema.id, documentInteropID, user);
 			await _store.UpsertAsync(new DocumentAssignment()
 			{
 				RsrcID = resource.ID,
@@ -83,11 +83,11 @@ namespace ordercloud.integrations.cms
 			return restrictedAssignmentTypes.Count == 0 || restrictedAssignmentTypes.Contains(thisType);
 		}
 
-		public async Task DeleteAssignment(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user)
+		public async Task DeleteAssignment<TDoc>(string schemaInteropID, string documentInteropID, Resource resource, VerifiedUserContext user)
 		{
 			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var schema = await _schemas.Get(schemaInteropID, user);
-			var document = await _documents.GetByInternalSchemaID(schema.id, documentInteropID, user);
+			var document = await _documents.GetByInternalSchemaID<TDoc>(schema.id, documentInteropID, user);
 			// TODO - what is the correct way to handle delete that doesn't exist?
 			await _store.RemoveAsync(assign =>
 				assign.RsrcID == resource.ID &&

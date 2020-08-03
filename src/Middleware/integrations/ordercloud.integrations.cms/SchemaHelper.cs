@@ -19,10 +19,11 @@ namespace ordercloud.integrations.cms
 			return schema;
 		}
 
-		public static Document ValidateDocumentAgainstSchema(DocumentSchema schema, Document document)
+		public static Document<TDoc> ValidateDocumentAgainstSchema<TDoc>(DocumentSchema schema, Document<TDoc> document)
 		{
 			IList<string> errors;
-			var isValid = document.Doc.IsValid(JSchema.Parse(schema.Schema.ToString()), out errors);
+			var doc = JObject.FromObject(document.Doc);
+			var isValid = doc.IsValid(JSchema.Parse(schema.Schema.ToString()), out errors);
 			if (!isValid) throw new DocumentNotValidException(schema.InteropID, errors);
 			return document;
 		}

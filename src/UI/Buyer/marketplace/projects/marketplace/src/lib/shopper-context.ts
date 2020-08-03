@@ -193,6 +193,10 @@ export enum OrdercloudEnv {
   Sandbox = 'Sandbox',
 }
 
+export interface Theme {
+  logoSrc: string;
+}
+
 export class AppConfig {
   /**
    * A short name for your app. It will be used as a
@@ -234,6 +238,7 @@ export class AppConfig {
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
   scope: ApiRole[];
+  theme: Theme;
 }
 
 export interface DecodedOCToken {
