@@ -13,7 +13,7 @@ export class LineItemForm {
         this.lineItem = lineItem;
         this.selected.setValue(false);
         if (lineItem.Quantity === lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || 
-            lineItem.Quantity === lineItem.xp?.LineItemCancelInfo?.QuantityToCancel){
+            lineItem.Quantity === (lineItem.xp as any)?.LineItemCancelInfo?.QuantityToCancel){
             this.selected.disable();
         } 
         this.quantityToReturnOrCancel.disable();
@@ -23,7 +23,7 @@ export class LineItemForm {
             Validators.max( 
                 action === 'return' ?
                 (lineItem.QuantityShipped - (lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || 0)) : 
-                (lineItem.Quantity - lineItem.QuantityShipped - (lineItem.xp?.LineItemCancelInfo?.QuantityToCancel || 0))
+                (lineItem.Quantity - lineItem.QuantityShipped - ((lineItem.xp as any)?.LineItemCancelInfo?.QuantityToCancel || 0))
             )
         ]);
         this.returnReason.disable();

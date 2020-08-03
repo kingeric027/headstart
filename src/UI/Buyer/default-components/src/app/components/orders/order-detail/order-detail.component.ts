@@ -64,7 +64,7 @@ export class OCMOrderDetails implements OnInit {
     let qtyCanceled = 0;
     let total = 0;
     this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
-      if (li.xp?.LineItemCancelInfo) qtyCanceled += li.xp?.LineItemCancelInfo?.QuantityToCancel;
+      if ((li.xp as any)?.LineItemCancelInfo) qtyCanceled += (li.xp as any)?.LineItemCancelInfo?.QuantityToCancel;
       total += (li.Quantity - li.QuantityShipped);
     });
     return (

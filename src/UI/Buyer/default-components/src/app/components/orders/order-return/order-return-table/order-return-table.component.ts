@@ -102,7 +102,7 @@ export class OCMOrderReturnTable {
   getQuantityReturnedCanceled(lineItem: MarketplaceLineItem): number {
     return (this._action === 'return') ? 
       (lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || 0) : 
-      (lineItem.xp?.LineItemCancelInfo?.QuantityToCancel || 0);
+      ((lineItem.xp as any)?.LineItemCancelInfo?.QuantityToCancel || 0);
   }
 
   selectRow(row: FormGroup): void {
