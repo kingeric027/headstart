@@ -21,6 +21,7 @@ namespace Marketplace.Common.Commands
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
         Task RequestReturnEmail(string OrderID);
+        Task RequestCancelEmail(string OrderID);
         Task PatchOrderCanceledStatus(string orderID);
         Task PatchOrderRequiresApprovalStatus(string orderID);
     }
@@ -53,6 +54,11 @@ namespace Marketplace.Common.Commands
         public async Task RequestReturnEmail(string orderID)
         {
             await _sendgridService.SendReturnRequestedEmail(orderID);
+        }
+
+        public async Task RequestCancelEmail(string orderID)
+        {
+            await _sendgridService.SendCancelRequestedEmail(orderID);
         }
 
         public async Task PatchOrderCanceledStatus(string orderID)
