@@ -346,7 +346,7 @@ export class ProductEditComponent implements OnInit {
       FileName: file.Filename
     }
     const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
-    await HeadStartSDK.ProductContents.SaveAssetAssignment(productID, newAsset.ID, accessToken);
+    await HeadStartSDK.Assets.SaveAssetAssignment({ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken)
     return await HeadStartSDK.Products.Get(productID, accessToken);
   }
 
