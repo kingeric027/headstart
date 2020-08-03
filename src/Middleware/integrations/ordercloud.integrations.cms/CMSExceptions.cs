@@ -41,4 +41,9 @@ namespace ordercloud.integrations.cms
 		public InvalidAssignmentException(List<ResourceType> allowed) : 
 			base("Invalid Assignment", $"This type of document can only be assigned the following resources. This is set on the schema.", allowed.Select(r => Enum.GetName(r.GetType(), r))) { }
 	}
+
+	public class InvalidPropertyException : OrderCloudIntegrationException
+	{
+		public InvalidPropertyException(string model, string error) : base("Invalid Query Param", $"{model} does not contain this property.", error) { }
+	}
 }

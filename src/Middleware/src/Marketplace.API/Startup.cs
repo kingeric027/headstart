@@ -26,7 +26,6 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
-using Newtonsoft.Json.Linq;
 
 namespace Marketplace.API
 {
@@ -43,9 +42,11 @@ namespace Marketplace.API
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            //var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
+            //    _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
             var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
-                _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
-			var avalaraConfig = new AvalaraConfig()
+                "https://127.0.0.1:8081/", "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==");
+            var avalaraConfig = new AvalaraConfig()
 			{
 				Env = _settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox,
 				AccountID = _settings.AvalaraSettings.AccountID,
@@ -74,12 +75,12 @@ namespace Marketplace.API
             services
                 .OrderCloudIntegrationsConfigureWebApiServices(_settings, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-                .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
-				.InjectCosmosStore<DocumentSchema, DocumentSchema>(cosmosConfig)
-				.InjectCosmosStore<Document<JObject>, Document<JObject>>(cosmosConfig)
-				.InjectCosmosStore<DocumentAssignment, DocumentAssignment>(cosmosConfig)
-				.InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
-                .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
+                .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
+				.InjectCosmosStore<DocSchemaDO, DocSchemaDO>(cosmosConfig)
+				.InjectCosmosStore<DocumentDO, DocumentDO>(cosmosConfig)
+				.InjectCosmosStore<DocumentAssignmentDO, DocumentAssignmentDO>(cosmosConfig)
+				.InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
+                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
                 .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
@@ -100,7 +101,7 @@ namespace Marketplace.API
                 .Inject<IAssetQuery>()
 				.Inject<IDocumentQuery>()
 				.Inject<IBlobStorage>()
-				.Inject<IDocumentSchemaQuery>()
+				.Inject<ISchemaQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
                 .Inject<IChiliTemplateCommand>()

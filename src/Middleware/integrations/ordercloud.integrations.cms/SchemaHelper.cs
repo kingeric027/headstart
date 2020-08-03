@@ -11,7 +11,7 @@ namespace ordercloud.integrations.cms
 	{
 		// For for details see https://www.newtonsoft.com/jsonschema
 
-		public static DocumentSchema ValidateSchema(DocumentSchema schema)
+		public static DocSchemaDO ValidateSchema(DocSchemaDO schema)
 		{
 			IList<string> errors;
 			var isValid = schema.Schema.IsValid(JSchema.Parse(SchemaForSchemas.JSON), out errors);
@@ -19,11 +19,10 @@ namespace ordercloud.integrations.cms
 			return schema;
 		}
 
-		public static Document<TDoc> ValidateDocumentAgainstSchema<TDoc>(DocumentSchema schema, Document<TDoc> document)
+		public static DocumentDO ValidateDocumentAgainstSchema(DocSchemaDO schema, DocumentDO document)
 		{
 			IList<string> errors;
-			var doc = JObject.FromObject(document.Doc);
-			var isValid = doc.IsValid(JSchema.Parse(schema.Schema.ToString()), out errors);
+			var isValid = document.Doc.IsValid(JSchema.Parse(schema.Schema.ToString()), out errors);
 			if (!isValid) throw new DocumentNotValidException(schema.InteropID, errors);
 			return document;
 		}

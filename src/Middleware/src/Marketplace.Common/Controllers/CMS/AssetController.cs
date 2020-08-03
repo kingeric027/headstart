@@ -6,6 +6,7 @@ using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
+using System.Collections.Generic;
 
 namespace Marketplace.CMS.Controllers
 {
@@ -57,6 +58,43 @@ namespace Marketplace.CMS.Controllers
 		public async Task Delete(string assetID)
 		{
 			await _assets.Delete(assetID, VerifiedUserContext);
+		}
+
+		[DocName("Create Asset Assignment")]
+		[HttpPost, Route("assignments"), OrderCloudIntegrationsAuth]
+		public async Task SaveAssetAssignment([FromBody] AssetAssignment assignment)
+		{
+			await _assetedResources.SaveAssignment(assignment, VerifiedUserContext);
+		}
+
+		[DocName("Delete Asset Assignment"), OrderCloudIntegrationsAuth]
+		[HttpDelete, Route("assignments")]
+		public async Task DeleteAssetAssignment([FromQuery] AssetAssignment assignment)
+		{
+			await _assetedResources.DeleteAssignment(assignment, VerifiedUserContext);
+		}
+
+		[DocName("Reorder Asset Assignment"), OrderCloudIntegrationsAuth]
+		[HttpPost, Route("assignments/moveto/{listOrderWithinType}")]
+		public async Task ReorderAssetAssignment(int listOrderWithinType, [FromBody] AssetAssignment assignment)
+		{
+			await _assetedResources.MoveAssignment(assignment, listOrderWithinType, VerifiedUserContext);
+		}
+
+		// TODO - add list page and list args
+		[DocName("List Assets Assigned to Resource")]
+		[HttpGet, Route("resource"), OrderCloudIntegrationsAuth]
+		public async Task<List<AssetForDelivery>> ListAssets([FromQuery] Resource resource)
+		{
+			return await _assetedResources.ListAssets(resource, VerifiedUserContext);
+		}
+
+		[DocName("Get a Resource's primary image")]
+		[HttpGet, Route("resource/primary-image")] // No auth
+		public async Task GetFirstImage([FromQuery] Resource resource)
+		{
+			var url = await _assetedResources.GetFirstImage(resource, VerifiedUserContext);
+			Response.Redirect(url);
 		}
 	}
 }

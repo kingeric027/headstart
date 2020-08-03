@@ -77,9 +77,9 @@ namespace Marketplace.Common.Commands.Crud
 
             await Throttler.RunAsync(_kitProducts.Items, 100, 10, async product =>
             {
-                var parentProduct = await _oc.Products.GetAsync(product.InteropID);
-                var _images = GetProductImages(product.InteropID, user);
-                var _attachments = GetProductAttachments(product.InteropID, user);
+                var parentProduct = await _oc.Products.GetAsync(product.ID);
+                var _images = GetProductImages(product.ID, user);
+                var _attachments = GetProductAttachments(product.ID, user);
                 _kitProductList.Add(new MarketplaceKitProduct
                 {
                     Product = parentProduct,
@@ -98,7 +98,7 @@ namespace Marketplace.Common.Commands.Crud
         {
             var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(kitProduct.Product, user.AccessToken);
             var kitProductDoc = new KitProductDocument();
-            kitProductDoc.InteropID = _product.ID;
+            kitProductDoc.ID = _product.ID;
             kitProductDoc.Doc = kitProduct.ProductAssignments;
             var _productAssignments = await _query.Create<KitProduct>("KitProduct", kitProductDoc, user);
             return new MarketplaceKitProduct
@@ -114,7 +114,7 @@ namespace Marketplace.Common.Commands.Crud
         {
             var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(kitProduct.Product.ID, kitProduct.Product, user.AccessToken);
             var kitProductDoc = new KitProductDocument();
-            kitProductDoc.InteropID = _updatedProduct.ID;
+            kitProductDoc.ID = _updatedProduct.ID;
             kitProductDoc.Doc = kitProduct.ProductAssignments;
             var _productAssignments = await _query.Update<KitProduct>("KitProduct", _updatedProduct.ID, kitProductDoc, user);
             var _images = await GetProductImages(_updatedProduct.ID, user);
@@ -135,9 +135,9 @@ namespace Marketplace.Common.Commands.Crud
             var _attachments = await GetProductAttachments(id, user);
             // Delete images, attachments, and assignments associated with the requested product
             await Task.WhenAll(
-                Throttler.RunAsync(_images, 100, 5, i => _assets.Delete(i.InteropID, user)),
-                Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.InteropID, user)),
-                _query.Delete<KitProduct>("KitProduct", product.ID, user),
+                Throttler.RunAsync(_images, 100, 5, i => _assets.Delete(i.ID, user)),
+                Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.ID, user)),
+                _query.Delete("KitProduct", product.ID, user),
             _oc.Products.DeleteAsync(id, user.AccessToken)
             );
         }

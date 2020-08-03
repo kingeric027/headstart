@@ -21,7 +21,7 @@ namespace ordercloud.integrations.library
         {
             var _oc = new OrderCloudClient(config);
             var auth = await _oc.AuthenticateAsync();
-            var user = await new OrderCloudClientWithContext(auth.AccessToken).Me.GetAsync();
+            var user = await new OrderCloudClientWithContext(auth.AccessToken).GetMeWithSellerID(auth.AccessToken);
             var jwt = new JwtSecurityToken(auth.AccessToken);
 
             var cid = new ClaimsIdentity("OrderCloudIntegrations");
@@ -33,6 +33,7 @@ namespace ordercloud.integrations.library
             cid.AddClaim(new Claim("email", user.Email ?? ""));
             cid.AddClaim(new Claim("buyer", user.Buyer?.ID ?? ""));
             cid.AddClaim(new Claim("supplier", user.Supplier?.ID ?? ""));
+            cid.AddClaim(new Claim("seller", user.Seller?.ID ?? ""));
             cid.AddClaims(user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)));
             var roles = user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)).ToList();
             roles.Add(new Claim(ClaimTypes.Role, "BaseUserRole"));
@@ -78,6 +79,11 @@ namespace ordercloud.integrations.library
         public string BuyerID
         {
             get { return Principal.Claims.First(c => c.Type == "buyer").Value; }
+        }
+
+        public string SellerID
+        {
+            get { return Principal.Claims.First(c => c.Type == "seller").Value; }
         }
 
         public string AccessToken

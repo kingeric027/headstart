@@ -1,23 +1,21 @@
 ﻿using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
-using OrderCloud.SDK;
-using Newtonsoft.Json;
 using ordercloud.integrations.library.Cosmos;
-using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
+using OrderCloud.SDK;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ordercloud.integrations.cms
 {
 	[SwaggerModel]
-	public class JDocument : Document<JObject> { }
-
-	public class Document<T>
+	public class DocSchema
 	{
 		[CosmosInteropID]
 		public string ID { get; set; }
+		public List<ResourceType> RestrictedAssignmentTypes { get; set; } = new List<ResourceType>(); // empty means no restrictions
 		[Required]
-		public T Doc { get; set; }
-		[ApiReadOnly]
-		public string SchemaSpecUrl { get; set; }
+		public JObject Schema { get; set; }
 		[ApiReadOnly]
 		public History History { get; set; }
 	}
