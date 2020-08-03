@@ -276,16 +276,6 @@ namespace ordercloud.integrations.library
                         }
 
                     }
-                    else
-                    {
-                        yield return new ApiParameter
-                        {
-                            ParamInfo = param,
-                            Name = param.Name,
-                            Required = !param.IsOptional,
-                            SimpleType = param.ParameterType.ParameterSimpleName()
-                        };
-                    }
                 }
 
                 if ((param.ParameterType.IsModelType()))
