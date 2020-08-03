@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ordercloud.integrations.cms;
 using IDocumentQuery = ordercloud.integrations.cms.IDocumentQuery;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Marketplace.Common.Controllers.CMS
 {
@@ -29,30 +30,34 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("List Documents")]
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<ListPage<Document<JObject>>> List(string schemaID, ListArgs<Document<JObject>> args)
+		public async Task<ListPage<JDocument>> List(string schemaID, ListArgs<Document<JObject>> args)
 		{
-			return await _documents.List<JObject>(schemaID, args, VerifiedUserContext);
+			var docs = await _documents.List<JObject>(schemaID, args, VerifiedUserContext);
+			return docs.Reserialize<ListPage<JDocument>>();
 		}
 
 		[DocName("Get a Document")]
 		[HttpGet, Route("{documentID}"), OrderCloudIntegrationsAuth]
-		public async Task<Document<JObject>> Get(string schemaID, string documentID)
+		public async Task<JDocument> Get(string schemaID, string documentID)
 		{
-			return await _documents.Get<JObject>(schemaID, documentID, VerifiedUserContext);
+			var doc = await _documents.Get<JObject>(schemaID, documentID, VerifiedUserContext);
+			return doc.Reserialize<JDocument>();
 		}
 
 		[DocName("Create a Document")]
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<Document<JObject>> Create(string schemaID, [FromBody] Document<JObject> document)
+		public async Task<JDocument> Create(string schemaID, [FromBody] JDocument document)
 		{
-			return await _documents.Create(schemaID, document, VerifiedUserContext);
+			var doc = await _documents.Create(schemaID, document, VerifiedUserContext);
+			return doc.Reserialize<JDocument>();
 		}
 
 		[DocName("Update a Document")]
 		[HttpPut, Route("{documentID}"), OrderCloudIntegrationsAuth]
-		public async Task<Document<JObject>> Update(string schemaID, string documentID, [FromBody] Document<JObject> document)
+		public async Task<JDocument> Update(string schemaID, string documentID, [FromBody] JDocument document)
 		{
-			return await _documents.Update(schemaID, documentID, document, VerifiedUserContext);
+			var doc =  await _documents.Update(schemaID, documentID, document, VerifiedUserContext);
+			return doc.Reserialize<JDocument>();
 		}
 
 		[DocName("Delete a Document")]
@@ -85,9 +90,10 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("List Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
 		[HttpGet, Route("resource")]
-		public async Task<List<Document<JObject>>> ListDocuments(string schemaID, [FromQuery] Resource resource)
+		public async Task<List<JDocument>> ListDocuments(string schemaID, [FromQuery] Resource resource)
 		{
-			return await _assignments.ListDocuments<JObject>(schemaID, resource, VerifiedUserContext);
+			var docs = await _assignments.ListDocuments<JObject>(schemaID, resource, VerifiedUserContext);
+			return docs.Reserialize<List<JDocument>>();
 		}
 	}
 }

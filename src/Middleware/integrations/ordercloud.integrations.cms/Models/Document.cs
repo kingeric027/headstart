@@ -8,6 +8,8 @@ using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribut
 namespace ordercloud.integrations.cms
 {
 	[SwaggerModel]
+	public class JDocument : Document<JObject> { }
+
 	public class Document<T>
 	{
 		[CosmosInteropID]
