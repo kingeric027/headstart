@@ -14,7 +14,7 @@ namespace ordercloud.integrations.cms
 		public string SchemaID { get; set; } // real id, not interop. Don't need to set or return.
 		public string SchemaSpecUrl { get; set; }
 		[CosmosPartitionKey]
-		public string OwnerClientID { get; set; }
+		public string SellerOrgID { get; set; }
 		public JObject Doc { get; set; }
 		public History History { get; set; }
 

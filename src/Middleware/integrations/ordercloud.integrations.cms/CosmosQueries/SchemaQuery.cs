@@ -12,11 +12,12 @@ namespace ordercloud.integrations.cms
 	{
 		Task<ListPage<DocSchema>> List(IListArgs args, VerifiedUserContext user);
 		Task<DocSchema> Get(string schemaInteropID, VerifiedUserContext user);
-		Task<DocSchema> GetByInternalID(string schemaID);
-		Task<DocSchemaDO> GetDO(string schemaInteropID, VerifiedUserContext user);
 		Task<DocSchema> Create(DocSchema schema, VerifiedUserContext user);
 		Task<DocSchema> Update(string schemaInteropID, DocSchema schema, VerifiedUserContext user);
 		Task Delete(string schemaInteropID, VerifiedUserContext user);
+
+		Task<DocSchema> GetByInternalID(string schemaID);
+		Task<DocSchemaDO> GetDO(string schemaInteropID, VerifiedUserContext user);
 	}
 
 	public class SchemaQuery : ISchemaQuery
