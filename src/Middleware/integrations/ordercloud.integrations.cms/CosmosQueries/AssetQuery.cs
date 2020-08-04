@@ -16,14 +16,14 @@ namespace ordercloud.integrations.cms
 	public interface IAssetQuery
 	{
 		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
-		Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs);
 		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
-		Task<AssetDO> GetDO(string assetInteropID, VerifiedUserContext user);
-
-		Task<AssetDO> GetByInternalID(string assetID); // real id
 		Task<Asset> Create(AssetUpload form, VerifiedUserContext user);
 		Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user);
 		Task Delete(string assetInteropID, VerifiedUserContext user);
+
+		Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs);
+		Task<AssetDO> GetDO(string assetInteropID, VerifiedUserContext user);
+		Task<AssetDO> GetByInternalID(string assetID); // real id
 	}
 
 	public class AssetQuery : IAssetQuery

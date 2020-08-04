@@ -199,7 +199,7 @@ namespace Marketplace.Common.Commands
 
 		private async Task SetApiClientIDs(string token)
 		{
-			var list = await _oc.ApiClients.ListAsync(accessToken: token);
+			var list = await _oc.ApiClients.ListAsync(pageSize: 100, accessToken: token);
 			_adminUIApiClientID = list.Items.First(a => a.AppName == _sellerApiClientName).ID;
 			_buyerUIApiClientID = list.Items.First(a => a.AppName == _buyerApiClientName).ID;
 			_middlewareApiClientID = list.Items.First(a => a.AppName == _integrationsApiClientName).ID;

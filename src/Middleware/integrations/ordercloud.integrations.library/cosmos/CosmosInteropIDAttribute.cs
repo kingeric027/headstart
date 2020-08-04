@@ -30,16 +30,8 @@ namespace ordercloud.integrations.library.Cosmos
             // if model is sent with a null or empty ID, generate one
             if (string.IsNullOrEmpty(value as string) && AutoGen)
             {
-                var partial = (IPartial)ctx.ObjectInstance;
-                if (partial != null)
-                {
-                    partial.Values[ctx.MemberName] = JToken.FromObject(CosmosInteropID.New());
-                }
-                else
-                {
-                    var idProp = ctx.ObjectType.GetProperty(ctx.MemberName);
-                    idProp.SetValue(ctx.ObjectInstance, CosmosInteropID.New());
-                }
+                var idProp = ctx.ObjectType.GetProperty(ctx.MemberName);
+                idProp.SetValue(ctx.ObjectInstance, CosmosInteropID.New());
                 return null;
             }
             return base.IsValid(value, ctx);

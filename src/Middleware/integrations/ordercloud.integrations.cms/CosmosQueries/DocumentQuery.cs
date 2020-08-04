@@ -47,7 +47,7 @@ namespace ordercloud.integrations.cms
 		public async Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user)
 		{
 			var schema = await _schemas.GetDO(schemaInteropID, user);
-			var query = _store.Query(GetFeedOptions(user.ClientID))
+			var query = _store.Query(GetFeedOptions(user))
 				.Search(args)
 				.Filter(args)
 				.Sort(args)
@@ -89,7 +89,7 @@ namespace ordercloud.integrations.cms
 			var matchingID = await GetWithoutExceptions(schema.id, dataObject.InteropID, user);
 			if (matchingID != null) throw new DuplicateIDException();
 			dataObject = SchemaHelper.ValidateDocumentAgainstSchema(schema, dataObject);
-			dataObject.OwnerClientID = user.ClientID;
+			dataObject.SellerOrgID = user.SellerID;
 			dataObject.SchemaID = schema.id;
 			dataObject.SchemaSpecUrl = schema.Schema.GetValue("$id").ToString();
 			dataObject.History = HistoryBuilder.OnCreate(user);
@@ -120,11 +120,11 @@ namespace ordercloud.integrations.cms
 		private async Task<DocumentDO> GetWithoutExceptions(string schemaID, string documentInteropID, VerifiedUserContext user)
 		{
 			var document = await _store
-				.Query(GetFeedOptions(user.ClientID))
+				.Query(GetFeedOptions(user))
 				.FirstOrDefaultAsync(d => d.InteropID == documentInteropID && d.SchemaID == schemaID);
 			return document;
 		}
 
-		private FeedOptions GetFeedOptions(string apiClientID) => new FeedOptions() { PartitionKey = new PartitionKey(apiClientID) };
+		private FeedOptions GetFeedOptions(VerifiedUserContext user) => new FeedOptions() { PartitionKey = new PartitionKey(user.SellerID) };
 	}
 }
