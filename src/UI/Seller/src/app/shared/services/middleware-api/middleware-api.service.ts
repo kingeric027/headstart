@@ -1,8 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { OcTokenService, Order } from '@ordercloud/angular-sdk';
+import { OcTokenService, Order, Product } from '@ordercloud/angular-sdk';
 import { SuperMarketplaceProduct, MarketplaceSupplier, ListPage } from '@ordercloud/headstart-sdk';
+import { AssetForDelivery } from 'marketplace-javascript-sdk';
 
 export interface SupplierFilterConfigDocument extends Document {
   Doc: SupplierFilterConfig;
@@ -14,18 +15,6 @@ export interface SupplierFilterConfig {
   AllowSupplierEdit: boolean;
   AllowSellerEdit: boolean;
   BuyerAppFilterType: BuyerAppFilterType;
-}
-export interface KitProductDocument extends Document {
-  Doc: KitProduct;
-}
-export interface KitProduct {
-  ProductsInKit: ProductInKit[];
-}
-export interface ProductInKit {
-  ID: string;
-  Required: boolean;
-  MinQty: number;
-  MaxQty: number;
 }
 export declare enum BuyerAppFilterType {
   SelectOption = 'SelectOption',
@@ -68,10 +57,5 @@ export class MiddlewareAPIService {
   async getSupplierFilterConfig(): Promise<ListPage<SupplierFilterConfigDocument>> {
     const url = `${this.appConfig.middlewareUrl}/supplierfilterconfig`;
     return await this.http.get<ListPage<SupplierFilterConfigDocument>>(url, this.headers).toPromise();
-  }
-
-  async getKitProducts(): Promise<ListPage<KitProductDocument>> {
-    const url = `${this.appConfig.middlewareUrl}/kitproducts`;
-    return await this.http.get<ListPage<KitProductDocument>>(url, this.headers).toPromise();
   }
 }

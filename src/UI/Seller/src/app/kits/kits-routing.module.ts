@@ -5,6 +5,7 @@ import { KitsTableComponent } from './components/kits-table/kits-table.component
 
 const routes: Routes = [
     { path: '', component: KitsTableComponent },
+    { path: ':kitproductID', component: KitsTableComponent, pathMatch: 'full' }
 ];
 @NgModule({
     imports: [RouterModule.forChild(routes)],

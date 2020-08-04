@@ -21,7 +21,6 @@ const routes: Routes = [
   { path: ':productID/filters', component: ProductTableComponent, pathMatch: 'full' },
   { path: ':productID/variants', component: ProductTableComponent, pathMatch: 'full' },
   { path: ':productID/images-and-documents', component: ProductTableComponent, pathMatch: 'full' },
-  { path: 'kitproducts', component: ProductTableComponent, pathMatch: 'full' }
 ];
 
 @NgModule({

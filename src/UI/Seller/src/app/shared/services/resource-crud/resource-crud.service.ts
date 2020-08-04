@@ -218,7 +218,8 @@ export abstract class ResourceCrudService<ResourceType> {
   async getResourceById(resourceID: string): Promise<any> {
     const orderDirection = this.optionsSubject.value.OrderDirection;
     const args = await this.createListArgs([resourceID], orderDirection);
-    return this.ocService.Get(...args).toPromise();
+    if (this.primaryResourceLevel === 'kitproducts') return this.ocService.Get(resourceID);
+    else return this.ocService.Get(...args).toPromise();
   }
 
   async createListArgs(options: any[], orderDirection = ''): Promise<any[]> {
@@ -394,7 +395,9 @@ export abstract class ResourceCrudService<ResourceType> {
     try {
       this.resourceRequestStatus.next(this.getFetchStatus(options));
       const args = await this.createListArgs([options], orderDirection);
-      const resourceResponse = await this.list(args);
+      let resourceResponse;
+      if (this.primaryResourceLevel === 'kitproducts') { resourceResponse = await this.ocService.List(); }
+      else { resourceResponse = await this.list(args); }
       this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
       return resourceResponse;
     } catch (error) {

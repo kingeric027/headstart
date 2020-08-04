@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { OcPromotionService, Product } from '@ordercloud/angular-sdk';
+import { OcPromotionService, Product, OcProductService } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { MarketplaceKitProduct, MiddlewareKitService } from '../shared/services/middleware-api/middleware-kit.service';
 
 @Injectable({
     providedIn: 'root',
 })
-export class KitService extends ResourceCrudService<Product> {
+export class KitService extends ResourceCrudService<MarketplaceKitProduct> {
     emptyResource = {
         Product: {
             OwnerID: '',
@@ -69,9 +70,9 @@ export class KitService extends ResourceCrudService<Product> {
     constructor(
         router: Router,
         activatedRoute: ActivatedRoute,
-        ocPromotionService: OcPromotionService,
+        middlewareKitService: MiddlewareKitService,
         currentUserService: CurrentUserService
     ) {
-        super(router, activatedRoute, ocPromotionService, currentUserService, '/kitproducts', 'kitproducts');
+        super(router, activatedRoute, middlewareKitService, currentUserService, '/kitproducts', 'kitproducts');
     }
 }
