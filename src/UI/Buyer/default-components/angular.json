@@ -151,7 +151,7 @@
             },
             "test": {
               "stylePreprocessorOptions": {
-                "includePaths": ["src/styles/themes/basecamp"]
+                "includePaths": ["src/styles/themes/waxing-the-city"]
               },
               "fileReplacements": [
                 {
@@ -186,6 +186,9 @@
                   "with": "src/environments/environment.staging.ts"
                 }
               ],
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/styles/themes/waxing-the-city"]
+              },
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -213,6 +216,9 @@
                   "with": "src/environments/environment.production.ts"
                 }
               ],
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/styles/themes/waxing-the-city"]
+              },
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
