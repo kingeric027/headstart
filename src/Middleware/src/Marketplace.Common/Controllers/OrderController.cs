@@ -39,6 +39,13 @@ namespace Marketplace.Common.Controllers
             await _command.RequestReturnEmail(orderID);
         }
 
+        [DocName("Send cancel requested email")]
+        [HttpPost, Route("requestcancel/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task RequestCancelEmail(string orderID)
+        {
+            await _command.RequestCancelEmail(orderID);
+        }
+
         [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
         [HttpGet, Route("location/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<ListPage<Order>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)

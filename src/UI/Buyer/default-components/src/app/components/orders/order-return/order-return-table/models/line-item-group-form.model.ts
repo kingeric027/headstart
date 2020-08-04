@@ -7,11 +7,11 @@ export class LineItemGroupForm {
   lineItems = new FormArray([]);
   liGroup: MarketplaceLineItem[];
 
-  constructor(private fb: FormBuilder, liGroup: MarketplaceLineItem[]) {
+  constructor(private fb: FormBuilder, liGroup: MarketplaceLineItem[], action: string) {
     if (liGroup && liGroup[0].ShipFromAddressID) {
-      this.shipFromAddressID.setValue(liGroup[0].ShipFromAddressID);
+      this.shipFromAddressID.setValue(liGroup[0].ShipFromAddressID); 
     }
-    liGroup.forEach(li => this.lineItems.push(this.fb.group(new LineItemForm(li))));
+    liGroup.forEach(li => this.lineItems.push(this.fb.group(new LineItemForm(li, action))));
     this.liGroup = liGroup;
   }
 }
