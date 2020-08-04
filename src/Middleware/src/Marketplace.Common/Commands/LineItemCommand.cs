@@ -10,15 +10,14 @@ using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
 using Marketplace.Models.Extended;
+using Marketplace.Common.Constants;
 
 namespace Marketplace.Common.Commands
 {
     public interface ILineItemCommand
     {
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
-        Task RequestReturnEmail(string OrderID);
-        Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus);
-        Task<List<MarketplaceLineItem>> UpdateLineItemStatusesWithNotification(OrderDirection orderDirection, string orderID, LineItemStatusChange lineItemStatusChange, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceLineItem>> UpdateLineItemStatusesWithNotification(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser);
     }
 
     public class LineItemCommand : ILineItemCommand
@@ -35,42 +34,172 @@ namespace Marketplace.Common.Commands
             _meProductCommand = meProductCommand;
         }
 
-        public async Task<List<MarketplaceLineItem>> UpdateLineItemStatusesWithNotification(OrderDirection orderDirection, string orderID, LineItemStatusChange lineItemStatusChange, VerifiedUserContext verifiedUser = null)
+        /// <summary>
+        /// Validates LineItemStatus Change, Updates Line Item Statuses, Updates Order Statuses, Sends Necessary Emails
+        /// </summary>
+  
+        // all line item status changes should go through here
+        public async Task<List<MarketplaceLineItem>> UpdateLineItemStatusesWithNotification(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null)
         {
             var userType = verifiedUser?.UsrType ?? "noUser";
             var verifiedUserType = userType.Reserialize<VerifiedUserType>();
 
             var previousLineItemsStates = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID);
-            var newPartialLineItem = new PartialLineItem()
+
+            ValidateLineItemStatusChange(previousLineItemsStates.Items.ToList(), lineItemStatusChanges, verifiedUserType);
+            var updatedLineItems = await Throttler.RunAsync(lineItemStatusChanges.LineItemChanges, 100, 5, (lineItemStatusChange) =>
             {
-                xp = new
-                {
-                    lineItemStatusChange.LineItemStatus
-                }
-            };
-            ValidateLineItemStatusChange(previousLineItemsStates.Items.ToList(), lineItemStatusChange, verifiedUserType);
-            
-            var updatedLineItems = await Throttler.RunAsync(lineItemStatusChange.LineItemIDs, 100, 5, (lineItemID) =>
-            {
+                var newPartialLineItem = BuildNewPartialLineItem(lineItemStatusChange, previousLineItemsStates.Items.ToList(), lineItemStatusChanges.LineItemStatus);
                // if there is no verified user passed in it has been called from somewhere else in the code base and will be done with the client grant access
-               return verifiedUser != null ? _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemID, newPartialLineItem, verifiedUser.AccessToken) : _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemID, newPartialLineItem);
+               return verifiedUser != null ? _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.LineItemID, newPartialLineItem, verifiedUser.AccessToken) : _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.LineItemID, newPartialLineItem);
             });
 
-            await HandleLineItemStatusChangeNotification(verifiedUserType, orderID, lineItemStatusChange, previousLineItemsStates.Items.ToList());
+            var statusSync = SyncOrderStatuses(orderDirection, orderID);
+            var notifictionSender = HandleLineItemStatusChangeNotification(verifiedUserType, orderID, lineItemStatusChanges, previousLineItemsStates.Items.ToList());
+            
+            await statusSync;
+            await notifictionSender;
+
             return updatedLineItems.ToList();
         }
 
-        private async Task HandleLineItemStatusChangeNotification(VerifiedUserType setterUserType, string orderID, LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> lineItems)
+        private async Task SyncOrderStatuses(OrderDirection orderDirection, string orderID)
+        {
+            var buyerOrderID = orderID.Split('-')[0];
+            var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, buyerOrderID);
+            var relatedSupplierOrderIDs = buyerOrder.xp.SupplierIDs.Select(supplierID => $"{buyerOrderID}-{supplierID}");
+
+            await SyncOrderStatus(OrderDirection.Incoming, buyerOrderID);
+
+            foreach(var supplierOrderID in relatedSupplierOrderIDs) {
+                await SyncOrderStatus(OrderDirection.Outgoing, supplierOrderID);
+            }
+        }
+
+        private async Task SyncOrderStatus(OrderDirection orderDirection, string orderID)
+        {
+            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(orderDirection, orderID);
+            var (SubmittedOrderStatus, ShippingStatus, ClaimStatus) = LineItemStatusConstants.GetOrderStatuses(lineItems.Items.ToList());
+            var partialOrder = new PartialOrder()
+            {
+                xp = new
+                {
+                    SubmittedOrderStatus,
+                    ShippingStatus,
+                    ClaimStatus
+                }
+            };
+            await _oc.Orders.PatchAsync(orderDirection, orderID, partialOrder);
+        }
+
+        private PartialLineItem BuildNewPartialLineItem(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> previousLineItemStates, LineItemStatus newLineItemStatus)
+        {
+            var existingLineItem = previousLineItemStates.First(li => li.ID == lineItemStatusChange.LineItemID);
+            var quantitySetting = GetQuantityBeingChanged(lineItemStatusChange.PreviousQuantities);
+            var LineItemStatusByQuantity = BuildNewLineItemStatusByQuantity(lineItemStatusChange, existingLineItem, newLineItemStatus);
+            if (newLineItemStatus == LineItemStatus.ReturnRequested || newLineItemStatus == LineItemStatus.Returned)
+            {
+                var returnRequests = existingLineItem.xp.Returns ?? new List<LineItemClaim>();
+                return new PartialLineItem()
+                {
+                    xp = new
+                    {
+                        ReturnRequests = GetUpdatedChangeRequests(returnRequests, lineItemStatusChange, quantitySetting, newLineItemStatus, LineItemStatusByQuantity),
+                        LineItemStatusByQuantity 
+                    }
+                };
+            } else if(newLineItemStatus == LineItemStatus.CancelRequested || newLineItemStatus == LineItemStatus.Canceled)
+            {
+                var cancelRequests = existingLineItem.xp.Cancelations ?? new List<LineItemClaim>();
+                return new PartialLineItem()
+                {
+                    xp = new
+                    {
+                        CancelationRequests = GetUpdatedChangeRequests(cancelRequests, lineItemStatusChange, quantitySetting, newLineItemStatus, LineItemStatusByQuantity),
+                        LineItemStatusByQuantity
+                    }
+                };
+            } else
+            {
+                return new PartialLineItem()
+                {
+                    xp = new
+                    {
+                        LineItemStatusByQuantity
+                    }
+                };
+            }
+        }
+
+        private List<LineItemClaim> GetUpdatedChangeRequests(List<LineItemClaim> existinglineItemStatusChangeRequests, LineItemStatusChange lineItemStatusChange, int QuantitySetting, LineItemStatus newLineItemStatus, Dictionary<LineItemStatus, int> lineItemStatuses)
+        {
+            if(newLineItemStatus == LineItemStatus.Returned || newLineItemStatus == LineItemStatus.Canceled) 
+            {
+                // go through the return requests and resolve each request until there aren't enough returned or canceled items 
+                // to resolve an additional request
+                var numberReturnedOrCanceled = lineItemStatuses[newLineItemStatus];
+                var currentClaimIndex = 0;
+                while (numberReturnedOrCanceled > 0 && currentClaimIndex < existinglineItemStatusChangeRequests.Count()) { 
+                    if(existinglineItemStatusChangeRequests[currentClaimIndex].Quantity <= numberReturnedOrCanceled)
+                    {
+                        existinglineItemStatusChangeRequests[currentClaimIndex].IsResolved = true;
+                        currentClaimIndex++;
+                        numberReturnedOrCanceled -= existinglineItemStatusChangeRequests[currentClaimIndex].Quantity;
+                    } else
+                    {
+                        currentClaimIndex++;
+                    }
+                }
+            } else
+            {
+                existinglineItemStatusChangeRequests.Add(new LineItemClaim()
+                {
+                    Comment = lineItemStatusChange.Comment,
+                    Reason = lineItemStatusChange.Reason,
+                    IsResolved = false,
+                    Quantity = QuantitySetting
+                });
+
+            }
+            
+            return existinglineItemStatusChangeRequests;
+        }
+
+        private int GetQuantityBeingChanged(Dictionary<LineItemStatus, int> previousQuantities)
+        {
+            return previousQuantities.Aggregate(0, (currentCount, previousQuantity) =>
+            {
+                var value = previousQuantity.Value;
+                return currentCount + value;
+            });
+        }
+
+        private Dictionary<LineItemStatus, int> BuildNewLineItemStatusByQuantity(LineItemStatusChange lineItemStatusChange, MarketplaceLineItem existingLineItem, LineItemStatus newLineItemStatus)
+        {
+            var quantitySetting = GetQuantityBeingChanged(lineItemStatusChange.PreviousQuantities);
+
+            var newStatusDictionary = new Dictionary<LineItemStatus, int>();
+            foreach (KeyValuePair<LineItemStatus, int> entry in lineItemStatusChange.PreviousQuantities)
+            {
+                // decrement the quantity by the quantity changed
+                newStatusDictionary[entry.Key] = existingLineItem.xp.StatusByQuantity[entry.Key] - entry.Value;
+            }
+
+            newStatusDictionary.Add(newLineItemStatus, quantitySetting);
+            return newStatusDictionary;
+        }
+
+        private async Task HandleLineItemStatusChangeNotification(VerifiedUserType setterUserType, string orderID, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems)
         {
             var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID.Split('-')[0]);
-            var lineItemsChanged = lineItems.Where(li => lineItemStatusChange.LineItemIDs.Contains(li.ID));
+            var lineItemsChanged = lineItems.Where(li => lineItemStatusChanges.LineItemChanges.Select(li => li.LineItemID).Contains(li.ID));
             var supplierIDs = lineItems.Select(li => li.SupplierID).Distinct().ToList();
             var suppliers = await Throttler.RunAsync(supplierIDs, 100, 5, supplierID => _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID));
 
             // currently the only place supplier name is used is when there should be lineitems from only one supplier included on the change, so we can just take the first supplier
-            var statusChangeTextDictionary = GetStatusChangeEmailText(suppliers.First().Name);
+            var statusChangeTextDictionary = LineItemStatusConstants.GetStatusChangeEmailText(suppliers.First().Name);
 
-            foreach (KeyValuePair<VerifiedUserType, LineItemEmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChange.LineItemStatus]) {
+            foreach (KeyValuePair<VerifiedUserType, LineItemEmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChanges.LineItemStatus]) {
                 var userType = entry.Key;
                 var emailText = entry.Value;
 
@@ -83,20 +212,20 @@ namespace Marketplace.Common.Commands
                     firstName = buyerOrder.FromUser.FirstName;
                     lastName = buyerOrder.FromUser.LastName;
                     email = buyerOrder.FromUser.Email;
-                    await _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChange, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
+                    await _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
                 }
                 else if (userType == VerifiedUserType.admin) {
                     firstName = "PlaceHolderFirstName";
                     lastName = "PlaceHolderLastName";
                     email = "bhickey@four51.com";
-                    var shouldNotify = !(LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChange.LineItemStatus) && setterUserType == VerifiedUserType.admin);
+                    var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.LineItemStatus) && setterUserType == VerifiedUserType.admin);
                     if (shouldNotify)
                     {
-                        await _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChange, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
+                        await _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
                     }
                 } else
                 {
-                    var shouldNotify = !(LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChange.LineItemStatus) && setterUserType == VerifiedUserType.supplier);
+                    var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.LineItemStatus) && setterUserType == VerifiedUserType.supplier);
                     if (shouldNotify)
                     {
                         await Throttler.RunAsync(suppliers, 100, 5, supplier =>
@@ -104,201 +233,80 @@ namespace Marketplace.Common.Commands
                             firstName = supplier.xp.SupportContact.Name;
                             lastName = "";
                             email = supplier.xp.SupportContact.Email;
-                            return _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChange, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
+                            return _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
                         });
                     }
                 }
             }
         }
 
-        // these statuses can be set by either the supplier or the seller, but when this user modifies the 
-        // line item status we do not want to notify themselves
-        private static List<LineItemStatus> LineItemStatusChangesDontNotifySetter = new List<LineItemStatus>()
+        private void ValidateLineItemStatusChange(List<MarketplaceLineItem> previousLineItemStates, LineItemStatusChanges lineItemStatusChanges, VerifiedUserType userType)
         {
-            LineItemStatus.Returned,
-            LineItemStatus.Backordered,
-            LineItemStatus.Canceled
-        };
+            /* need to validate 3 things on a lineitem status change
+             * 
+             * 1) user making the request has the ability to make that line item change based on usertype
+             * 2) there are sufficient amount of the previous quantities for each lineitem
+             * 3) the previous values are valid for the new values being set
+             */
 
-        // defining seller and supplier together as the current logic is the 
-        // seller should be able to do about anything a supplier can do
-        private static List<LineItemStatus> ValidSellerOrSupplierLineItemStatuses = new List<LineItemStatus>()
-        {
-            LineItemStatus.Returned, LineItemStatus.Backordered, LineItemStatus.Canceled
-        };
+            // 1) 
+            var allowedLineItemStatuses = LineItemStatusConstants.ValidLineItemStatusSetByUserType[userType];
+            Require.That(allowedLineItemStatuses.Contains(lineItemStatusChanges.LineItemStatus), new ErrorCode("Not authorized to set this status on a lineItem", 400, $"Not authorized to set line items to {lineItemStatusChanges.LineItemStatus}"));
 
-        // definitions of which user contexts can can set which lineItemStatuses
-        private static Dictionary<VerifiedUserType, List<LineItemStatus>> ValidLineItemStatusSetByUserType = new Dictionary<VerifiedUserType, List<LineItemStatus>>()
-        {
-            { VerifiedUserType.admin, ValidSellerOrSupplierLineItemStatuses },
-            { VerifiedUserType.supplier, ValidSellerOrSupplierLineItemStatuses },
-            { VerifiedUserType.buyer, new List<LineItemStatus>{ LineItemStatus.ReturnRequested, LineItemStatus.CancelRequested} },
-
-            // requests that are not directly made to modify lineItem status, derivatives of order submit or shipping,
-            // these should not be set without those trigger actions (order submit or shipping)
-            { VerifiedUserType.noUser, new List<LineItemStatus>{ LineItemStatus.Submitted, LineItemStatus.Complete } }
-        };
-
-        // definitions to control which line item status changes are allowed
-        // for example cannot change a completed line item to anything but returned or return requested
-        private static Dictionary<LineItemStatus, List<LineItemStatus>> ValidPreviousStateLineItemChangeMap = new Dictionary<LineItemStatus, List<LineItemStatus>>()
-        {
-            // no previous states for submitted
-            { LineItemStatus.Submitted, new List<LineItemStatus>() { } },
-
-            { LineItemStatus.Complete, new List<LineItemStatus>() { LineItemStatus.Submitted, LineItemStatus.Backordered } },
-            { LineItemStatus.ReturnRequested, new List<LineItemStatus>() { LineItemStatus.Complete } },
-            { LineItemStatus.Returned, new List<LineItemStatus>() { LineItemStatus.ReturnRequested, LineItemStatus.Complete } },
-            { LineItemStatus.Backordered, new List<LineItemStatus>() { LineItemStatus.Submitted } },
-            { LineItemStatus.CancelRequested, new List<LineItemStatus>() { LineItemStatus.Submitted, LineItemStatus.Backordered } },
-            { LineItemStatus.Canceled, new List<LineItemStatus>() { LineItemStatus.CancelRequested, LineItemStatus.Submitted, LineItemStatus.Backordered } },
-        };
-
-        private Dictionary<LineItemStatus, Dictionary<VerifiedUserType, LineItemEmailDisplayText>> GetStatusChangeEmailText(string supplierName)
-        {
-            return new Dictionary<LineItemStatus, Dictionary<VerifiedUserType, LineItemEmailDisplayText>>()
+            // 2)
+            var areCurrentQuantitiesToSupportChange = lineItemStatusChanges.LineItemChanges.All(lineItemChange =>
             {
-                { LineItemStatus.Complete, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "Items on your order have shipped",
-                        StatusChangeDetail = $"{supplierName} has shipped items from your order",
-                        StatusChangeDetail2 = "The following items are on there way"
-                    } }
-                } },
-                { LineItemStatus.ReturnRequested, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "A return request has been submitted on your order",
-                        StatusChangeDetail = "You will be updated when this return is processed",
-                        StatusChangeDetail2 = "The following items have been requested for return"
-                    } },
-                    { VerifiedUserType.admin, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "A buyer has submitted a return on their order",
-                        StatusChangeDetail = "Contact the Supplier to process the return request.",
-                        StatusChangeDetail2 = "The following items have been requested for return"
-                    } },
-                    { VerifiedUserType.supplier, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "A buyer has submitted a return on their order",
-                        StatusChangeDetail = "The seller will contact you to process the return request",
-                        StatusChangeDetail2 = "The following items have been requested for return"
-                    } }
-                } },
-                  { LineItemStatus.Returned, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "A return has been processed for your order",
-                        StatusChangeDetail = "You will be refunded for the proper amount",
-                        StatusChangeDetail2 = "The following items have had returns processed"
-                    } },
-                    { VerifiedUserType.admin, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "The supplier has processed a return",
-                        StatusChangeDetail = "Ensure that the full return process is complete, and the customer was refunded",
-                        StatusChangeDetail2 = "The following items have been marked as returned"
-                    } },
-                    { VerifiedUserType.supplier , new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "The seller has processed a return",
-                        StatusChangeDetail = "Ensure that the full return process is complete",
-                        StatusChangeDetail2 = "The following items have been marked as returned"
-                    } }
-                } },
-                    { LineItemStatus.Backordered, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "Item(s) on your order have been backordered by supplier",
-                        StatusChangeDetail = "You will be updated on the status of the order when more information is known",
-                        StatusChangeDetail2 = "The following items have been marked as backordered"
-                    } },
-                    { VerifiedUserType.admin, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = $"{supplierName} has marked items on an order as backordered",
-                        StatusChangeDetail = "You will be updated on the status of the order when more information is known",
-                        StatusChangeDetail2 = "The following items have been marked as backordered"
-                    } },
-                    { VerifiedUserType.supplier, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "Item(s) on order have been marked as backordered",
-                        StatusChangeDetail = "Keep the buyer updated on the status of these items when you know more information",
-                        StatusChangeDetail2 = "The following items have been marked as backordered"
-                    } },
-                   } },
-                   { LineItemStatus.CancelRequested, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "Your request for cancellation has been submitted",
-                        StatusChangeDetail = "You will be updated on the status of the cancellation when more information is known",
-                        StatusChangeDetail2 = "The following items have had cancellation requested"
-                    } },
-                    { VerifiedUserType.admin, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "A buyer has requested cancellation of line items on an order",
-                        StatusChangeDetail = "The supplier will look into the feasibility of this cancellation",
-                        StatusChangeDetail2 = "The following items have been requested for cancellation"
-                    } },
-                    { VerifiedUserType.supplier, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "A buyer has requested cancelation of line items on an order",
-                        StatusChangeDetail = "Review the items below to see if any can be cancelled before they ship",
-                        StatusChangeDetail2 = "The following items have have been requested for cancellation"
-                    } },
+                var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemChange.LineItemID);
+                if (relatedLineItems.Count() != 1)
+                {
+                    // if the lineitem is not found on the order, invalid change
+                    return false;
+                }
+                if (lineItemChange.PreviousQuantities == null)
+                {
+                    return false;
+                }
 
-                } },
-                 { LineItemStatus.Canceled, new Dictionary<VerifiedUserType, LineItemEmailDisplayText>() {
-                    { VerifiedUserType.buyer, new LineItemEmailDisplayText()
+                var existingLineItem = relatedLineItems.First();
+                foreach (KeyValuePair<LineItemStatus, int> entry in lineItemChange.PreviousQuantities)
+                {
+                    var lineItemChangeStatus = entry.Key;
+                    var lineItemChangeQuantity = entry.Value;
+
+                    if (existingLineItem.xp.StatusByQuantity == null || !existingLineItem.xp.StatusByQuantity.ContainsKey(lineItemChangeStatus))
                     {
-                        EmailSubject = "Items on your order have been cancelled",
-                        StatusChangeDetail = "You will be refunded for the cost of these items",
-                        StatusChangeDetail2 = "The following items have been cancelled"
-                    } },
-                    { VerifiedUserType.admin, new LineItemEmailDisplayText()
+                        return false;
+                    }
+
+                    var existingQuantity = existingLineItem.xp.StatusByQuantity[lineItemChangeStatus];
+                    if(existingQuantity < lineItemChangeQuantity)
                     {
-                        EmailSubject = "Item(s) on an order have been cancelled",
-                        StatusChangeDetail = "Ensure the buyer is refunded for the proper amount",
-                        StatusChangeDetail2 = "The following items have been cancelled"
-                    } },
-                    { VerifiedUserType.supplier, new LineItemEmailDisplayText()
-                    {
-                        EmailSubject = "Item(s) on an order have been cancelled",
-                        StatusChangeDetail = "The seller will refund the buyer for the proper amount",
-                        StatusChangeDetail2 = "The following items have been cancelled"
-                    } },
+                        return false;
+                    }
+                }
+                return true;
+            });
+            Require.That(areCurrentQuantitiesToSupportChange, new ErrorCode("Invalid lineItem status change", 400, $"Current lineitem quantity status on the order are not sufficient to support the requested change"));
 
-                } }
-            };
-        }
-
-
-        private void ValidateLineItemStatusChange(List<MarketplaceLineItem> previousLineItemStates, LineItemStatusChange lineItemStatusChange, VerifiedUserType userType)
-        {
-            var allowedLineItemStatuses = ValidLineItemStatusSetByUserType[userType];
-
-            Require.That(allowedLineItemStatuses.Contains(lineItemStatusChange.LineItemStatus), new ErrorCode("Not authorized to set this status on a lineItem", 400, $"Not authorized to set line items to {lineItemStatusChange.LineItemStatus}"));
-
-            var validPreviousStates = ValidPreviousStateLineItemChangeMap[lineItemStatusChange.LineItemStatus];
-            var invalidPreviousStates = previousLineItemStates.Where(p => !validPreviousStates.Contains(p.xp.LineItemStatus)).Select(p => p.ID); ;
-
-            Require.That(invalidPreviousStates.Count() == 0, new ErrorCode("Invalid lineItem status change", 400, $"The following lineItems cannot be set to {lineItemStatusChange.LineItemStatus} given their current status: {String.Join(" ,", invalidPreviousStates)}"));
-        }
-
-        public async Task RequestReturnEmail(string orderID)
-        {
-            await _sendgridService.SendReturnRequestedEmail(orderID);
-        }
-  
-        public async Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus)
-        {
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
-            var partialLi = new PartialLineItem { xp = new { LineItemStatus = lineItemStatus } };
-            List<Task> lineItemsToPatch = new List<Task>();
-            foreach (var li in lineItems.Items)
+            // 3)
+            var areValidPreviousStates = lineItemStatusChanges.LineItemChanges.All(lineItemChange =>
             {
-                lineItemsToPatch.Add(_oc.LineItems.PatchAsync(OrderDirection.Incoming, orderID, li.ID, partialLi));
-            }
-            await Task.WhenAll(lineItemsToPatch);
+                var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemChange.LineItemID);
+                var validPreviousStates = LineItemStatusConstants.ValidPreviousStateLineItemChangeMap[lineItemStatusChanges.LineItemStatus];
+                var existingLineItem = relatedLineItems.First();
+                foreach (KeyValuePair<LineItemStatus, int> entry in lineItemChange.PreviousQuantities)
+                {
+                    var lineItemChangeStatus = entry.Key;
+                    var lineItemChangeQuantity = entry.Value;
+
+                    if (!validPreviousStates.Contains(lineItemChangeStatus))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            });
+            Require.That(areValidPreviousStates, new ErrorCode("Invalid lineItem status change", 400, $"The previous line item statuses you are attempting to change cannot all be changed to the new Line Item Status"));
         }
 
         public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem liReq, VerifiedUserContext user)
@@ -320,7 +328,9 @@ namespace Marketplace.Common.Commands
             var product = await productRequest;
             var markedUpPrice = GetLineItemUnitCost(product, liReq);
             liReq.UnitPrice = markedUpPrice;
-            liReq.xp.LineItemStatus = LineItemStatus.Open;
+
+            // should be among the only line item status changes not handled by the updatelineitemstatuswithnotification function
+            liReq.xp.StatusByQuantity.Add(LineItemStatus.Open, liReq.Quantity);
             li = await _oc.LineItems
                 .CreateAsync<MarketplaceLineItem>
                 (OrderDirection.Incoming, orderID, liReq);
