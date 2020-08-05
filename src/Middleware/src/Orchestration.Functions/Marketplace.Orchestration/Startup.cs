@@ -32,8 +32,7 @@ namespace Marketplace.Orchestration
                 .Inject<IFlurlClient>()
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
-                    ApiUrl = settings.OrderCloudSettings.ApiUrl,
-                    AuthUrl = settings.OrderCloudSettings.AuthUrl
+                    ApiUrl = settings.OrderCloudSettings.ApiUrl
                 })
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
