@@ -37,6 +37,7 @@ namespace Marketplace.Orchestration
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()
+                .Inject<IProductTemplateCommand>()
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(new CosmosConfig(
                         settings.CosmosSettings.DatabaseName, 
                         settings.CosmosSettings.EndpointUri, 

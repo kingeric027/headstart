@@ -38,7 +38,7 @@ namespace Marketplace.Orchestration
             Require.That(user.SupplierID == supplierId, new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
 
             var form = await req.ReadFormAsync();
-            var result = await _product.ParseProductTemplate(form.Files.GetFile("file"), user);
+            var result = await _product.ParseProductTemplateFlat(form.Files.GetFile("file"), user);
             
             return await Task.FromResult(new OkObjectResult(result));
         }
