@@ -14,10 +14,8 @@ namespace Marketplace.Models.Misc
         {
             //Master list of all filters that can be used with Admin reports.  May want to break up into subsets for each report?
             public List<string> BuyerID { get; set; }
-            public List<string> BuyerLocationID { get; set; }
-            public List<string> City { get; set; }
             public List<string> State { get; set; }
-            public List<string> Zip { get; set; }
+            public List<string> Country { get; set; }
         }
     }
 }

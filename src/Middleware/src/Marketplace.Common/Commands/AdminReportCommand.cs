@@ -1,17 +1,9 @@
-﻿using Marketplace.Common.TemporaryAppConstants;
-using Marketplace.Models;
+﻿using Marketplace.Models;
 using Marketplace.Models.Misc;
 using OrderCloud.SDK;
-using System.Linq;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using System.Collections.Generic;
-using NPOI.HPSF;
-using System;
-using Newtonsoft.Json;
-using System.Reflection;
-using Microsoft.CodeAnalysis;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Marketplace.Common.Commands
 {
@@ -33,50 +25,34 @@ namespace Marketplace.Common.Commands
 
         public async Task<List<MarketplaceAddressBuyer>> BuyerLocationReport(MarketplaceReportFilter filters, VerifiedUserContext user)
         {
-            //TO-DO - HOW TO HANDLE REQUESTS WITH MORE THAN 100 ITEMS NEEDING TO BE RETURNED?
-
-            //Need to get locations for all Buyer IDs provided.  In this example, filters contains 0002, 0003, and 0005.
-            //Loop through each of the filters.BuyerIDs.  For each buyer ID, run the ListAsync call.  Results of that call (items) must push into allBuyerLocations variable.
+            //Loop through each of the filters.BuyerIDs.  For each buyer ID, run the ListAsync call.  Results of that call (items) push into allBuyerLocations variable.
             var allBuyerLocations = new List<MarketplaceAddressBuyer>();
             foreach (var buyerID in filters.Filters.BuyerID)
             {
-                var buyerLocationsForBuyerID = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(buyerID, accessToken: user.AccessToken, pageSize: 100);
+                var buyerLocationsForBuyerID = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(buyerID, accessToken: user.AccessToken, page: 1, pageSize: 100);
                 allBuyerLocations.AddRange(buyerLocationsForBuyerID.Items);
+                if (buyerLocationsForBuyerID.Meta.TotalPages > 1)
+                {
+                    for (int i = 2; i <= buyerLocationsForBuyerID.Meta.TotalPages; i++)
+                    {
+                        var excessBuyerLocationsForBuyerID = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(buyerID, accessToken: user.AccessToken, page: i, pageSize: 100);
+                        allBuyerLocations.AddRange(excessBuyerLocationsForBuyerID.Items);
+                    }
+                }
             }
 
-            //When we have allBuyerLocations, we must push the ones that pass the remaining filter tests into filteredBuyerLocations variable.
+            //When we have allBuyerLocations, push the ones that pass the remaining filter tests into filteredBuyerLocations variable.
             var filteredBuyerLocations = new List<MarketplaceAddressBuyer>();
             foreach (var location in allBuyerLocations)
             {
-                // slow performance, use array for filters, tighter code
-                //var locationProperty = typeof(MarketplaceAddressBuyer).GetProperty("City").GetValue(location);
-                
-                // faster performance, more code
-                if (CityFilter(location, filters))  { continue; }
-                if (StateFilter(location, filters)) { continue; }
-                if (ZipFilter(location, filters)) { continue; }
+                if (BuyerStateFilter(location, filters)) { continue; }
+                if (BuyerCountryFilter(location, filters)) { continue; }
                 filteredBuyerLocations.Add(location);
             }
-
-            //We must return filtered buyer locations
-            //var buyerLocations = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>("0003", accessToken: user.AccessToken, pageSize: 100);
-
             return filteredBuyerLocations;
         }
 
-        public bool CityFilter(MarketplaceAddressBuyer location, MarketplaceReportFilter filters)
-        {
-            if (filters.Filters.City != null)
-            {
-                if (location.City == null || !filters.Filters.City.Contains(location.City))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public bool StateFilter(MarketplaceAddressBuyer location, MarketplaceReportFilter filters)
+        public bool BuyerStateFilter(MarketplaceAddressBuyer location, MarketplaceReportFilter filters)
         {
             if (filters.Filters.State != null)
             {
@@ -88,11 +64,11 @@ namespace Marketplace.Common.Commands
             return false;
         }
 
-        public bool ZipFilter(MarketplaceAddressBuyer location, MarketplaceReportFilter filters)
+        public bool BuyerCountryFilter(MarketplaceAddressBuyer location, MarketplaceReportFilter filters)
         {
-            if (filters.Filters.Zip != null)
+            if (filters.Filters.Country != null)
             {
-                if (location.Zip == null || !filters.Filters.Zip.Contains(location.Zip))
+                if (location.Country == null || !filters.Filters.Country.Contains(location.Country))
                 {
                     return true;
                 }
@@ -100,6 +76,4 @@ namespace Marketplace.Common.Commands
             return false;
         }
     }
-
-
 }
