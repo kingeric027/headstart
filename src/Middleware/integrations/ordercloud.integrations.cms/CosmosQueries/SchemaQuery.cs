@@ -13,7 +13,7 @@ namespace ordercloud.integrations.cms
 		Task<ListPage<DocSchema>> List(IListArgs args, VerifiedUserContext user);
 		Task<DocSchema> Get(string schemaInteropID, VerifiedUserContext user);
 		Task<DocSchema> Create(DocSchema schema, VerifiedUserContext user);
-		Task<DocSchema> Update(string schemaInteropID, DocSchema schema, VerifiedUserContext user);
+		Task<DocSchema> Save(string schemaInteropID, DocSchema schema, VerifiedUserContext user);
 		Task Delete(string schemaInteropID, VerifiedUserContext user);
 
 		Task<DocSchema> GetByInternalID(string schemaID);
@@ -64,26 +64,26 @@ namespace ordercloud.integrations.cms
 
 		public async Task<DocSchema> Create(DocSchema schema, VerifiedUserContext user)
 		{
-			DocSchemaDO dataObject = SchemaMapper.MapTo(schema);
-			var matchingID = await GetWithoutExceptions(dataObject.InteropID, user);
-			if (matchingID != null) throw new DuplicateIDException();
-			dataObject.SellerOrgID = user.SellerID;
-			dataObject.History = HistoryBuilder.OnCreate(user);
+			var dataObject = SchemaMapper.MapTo(schema);
+			var existing = await GetWithoutExceptions(dataObject.InteropID, user);
+			if (existing != null) throw new DuplicateIDException();
+			dataObject = Init(dataObject, user);
 			dataObject = Validate(dataObject);
 			var newSchema = await _store.AddAsync(dataObject);
 			return SchemaMapper.MapTo(newSchema);
 		}
 
-		public async Task<DocSchema> Update(string schemaInteropID, DocSchema schema, VerifiedUserContext user)
+		public async Task<DocSchema> Save(string schemaInteropID, DocSchema schema, VerifiedUserContext user)
 		{
-			var existingSchema = await GetDO(schemaInteropID, user);
+			var existingSchema = await GetWithoutExceptions(schemaInteropID, user);
+			if (existingSchema == null) existingSchema = Init(new DocSchemaDO(), user);
 			existingSchema.InteropID = schema.ID;
 			existingSchema.RestrictedAssignmentTypes = schema.RestrictedAssignmentTypes;
 			existingSchema.Schema = schema.Schema;
+			existingSchema.History = HistoryBuilder.OnUpdate(schema.History, user);
 			existingSchema = Validate(existingSchema);
-			existingSchema.History = HistoryBuilder.OnUpdate(existingSchema.History, user);
-			var updatedSchema = await _store.UpdateAsync(existingSchema);
-			return SchemaMapper.MapTo(updatedSchema);
+			var newSchema = await _store.UpsertAsync(existingSchema);
+			return SchemaMapper.MapTo(newSchema);
 		}
 
 		public async Task Delete(string schemaInteropID, VerifiedUserContext user)
@@ -102,6 +102,13 @@ namespace ordercloud.integrations.cms
 		private async Task<DocSchemaDO> GetWithoutExceptions(string schemaInteropID, VerifiedUserContext user)
 		{
 			var schema = await _store.Query(GetFeedOptions(user.SellerID)).FirstOrDefaultAsync(s => s.InteropID == schemaInteropID);
+			return schema;
+		}
+
+		private DocSchemaDO Init(DocSchemaDO schema, VerifiedUserContext user)
+		{
+			schema.SellerOrgID = user.SellerID;
+			schema.History = HistoryBuilder.OnCreate(user);
 			return schema;
 		}
 

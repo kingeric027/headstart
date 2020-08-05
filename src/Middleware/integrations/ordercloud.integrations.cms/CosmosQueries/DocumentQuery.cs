@@ -88,11 +88,8 @@ namespace ordercloud.integrations.cms
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var matchingID = await GetWithoutExceptions(schema.id, dataObject.InteropID, user);
 			if (matchingID != null) throw new DuplicateIDException();
+			dataObject = Init(dataObject, schema, user);
 			dataObject = SchemaHelper.ValidateDocumentAgainstSchema(schema, dataObject);
-			dataObject.SellerOrgID = user.SellerID;
-			dataObject.SchemaID = schema.id;
-			dataObject.SchemaSpecUrl = schema.Schema.GetValue("$id").ToString();
-			dataObject.History = HistoryBuilder.OnCreate(user);
 			var newDocument = await _store.AddAsync(dataObject);
 			return DocumentMapper.MapTo<T>(newDocument);
 		}
@@ -100,13 +97,13 @@ namespace ordercloud.integrations.cms
 		public async Task<Document<T>> Update<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user)
 		{
 			var schema = await _schemas.GetDO(schemaInteropID, user);
-			var existingDocument = await GetDOByInternalSchemaID(schema.id, documentInteropID, user);
+			var existingDocument = await GetWithoutExceptions(schema.id, documentInteropID, user);
+			if (existingDocument == null) existingDocument = Init(new DocumentDO(), schema, user);
 			existingDocument.InteropID = document.ID;
 			existingDocument.Doc = JObject.FromObject(document.Doc);
+			existingDocument.History = HistoryBuilder.OnUpdate(document.History, user);
 			existingDocument = SchemaHelper.ValidateDocumentAgainstSchema(schema, existingDocument);
-			existingDocument.History = HistoryBuilder.OnUpdate(existingDocument.History, user);
-
-			var updatedDocument = await _store.UpdateAsync(existingDocument);
+			var updatedDocument = await _store.UpsertAsync(existingDocument);
 			return DocumentMapper.MapTo<T>(updatedDocument);
 		}
 
@@ -123,6 +120,15 @@ namespace ordercloud.integrations.cms
 				.Query(GetFeedOptions(user))
 				.FirstOrDefaultAsync(d => d.InteropID == documentInteropID && d.SchemaID == schemaID);
 			return document;
+		}
+
+		private DocumentDO Init(DocumentDO doc, DocSchemaDO schema, VerifiedUserContext user)
+		{
+			doc.SellerOrgID = user.SellerID;
+			doc.SchemaID = schema.id;
+			doc.SchemaSpecUrl = schema.Schema.GetValue("$id").ToString();
+			doc.History = HistoryBuilder.OnCreate(user);
+			return doc;
 		}
 
 		private FeedOptions GetFeedOptions(VerifiedUserContext user) => new FeedOptions() { PartitionKey = new PartitionKey(user.SellerID) };

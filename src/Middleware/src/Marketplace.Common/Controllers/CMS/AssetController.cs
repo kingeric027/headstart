@@ -48,9 +48,9 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("Update an Asset")]
 		[HttpPut, Route("{assetID}"), OrderCloudIntegrationsAuth]
-		public async Task<Asset> Update(string assetID, [FromBody] Asset asset)
+		public async Task<Asset> Save(string assetID, [FromBody] Asset asset)
 		{
-			return await _assets.Update(assetID, asset, VerifiedUserContext);
+			return await _assets.Save(assetID, asset, VerifiedUserContext);
 		}
 
 		[DocName("Delete an Asset")]

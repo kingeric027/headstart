@@ -21,9 +21,9 @@ namespace ordercloud.integrations.cms
 		public new static Collection<UniqueKey> GetUniqueKeys()
 		{
 			return new Collection<UniqueKey>
-		{
-			new UniqueKey() { Paths = new Collection<string> { "/InteropID", "/SchemaID", "/OwnerClientID" }}
-		};
+			{
+				new UniqueKey() { Paths = new Collection<string> { "/InteropID", "/SchemaID", "/OwnerClientID" }}
+			};
 		}
 	}
 }

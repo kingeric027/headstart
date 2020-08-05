@@ -46,9 +46,9 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("Update a Document Schema")]
 		[HttpPut, Route("{schemaID}"), OrderCloudIntegrationsAuth]
-		public async Task<DocSchema> Update(string schemaID, [FromBody] DocSchema schema)
+		public async Task<DocSchema> Save(string schemaID, [FromBody] DocSchema schema)
 		{
-			return await _schemas.Update(schemaID, schema, VerifiedUserContext);
+			return await _schemas.Save(schemaID, schema, VerifiedUserContext);
 		}
 
 		[DocName("Delete a Document Schema")]

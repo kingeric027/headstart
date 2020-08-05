@@ -18,7 +18,7 @@ namespace ordercloud.integrations.cms
 		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
 		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
 		Task<Asset> Create(AssetUpload form, VerifiedUserContext user);
-		Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user);
+		Task<Asset> Save(string assetInteropID, Asset asset, VerifiedUserContext user);
 		Task Delete(string assetInteropID, VerifiedUserContext user);
 
 		Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs);
@@ -79,11 +79,19 @@ namespace ordercloud.integrations.cms
 			return AssetMapper.MapTo(newAsset);
 		}
 
-		public async Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user)
+		public async Task<Asset> Save(string assetInteropID, Asset asset, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
-			if (existingAsset == null) throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID);
+			if (existingAsset == null) {
+				if (asset.Url == null) throw new AssetCreateValidationException("Must include a Url");
+				existingAsset = new AssetDO()
+				{
+					ContainerID = container.id,
+					History = HistoryBuilder.OnCreate(user),
+					Metadata = new AssetMetadata() { IsUrlOverridden = true  }
+				};
+			}
 			existingAsset.InteropID = asset.ID;
 			existingAsset.Title = asset.Title;
 			existingAsset.Active = asset.Active;
