@@ -66,12 +66,6 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
         {
-            var _productsList = await _oc.Products.ListAsync<MarketplaceProduct>(
-                filters: args.ToFilterString(),
-                search: args.Search,
-                pageSize: args.PageSize,
-                page: args.Page,
-                accessToken: user.AccessToken);
             var _kitProducts = await _query.List<KitProduct>("KitProduct", args, user);
             var _kitProductList = new List<MarketplaceKitProduct>();
 
@@ -90,7 +84,7 @@ namespace Marketplace.Common.Commands.Crud
             });
             return new ListPage<MarketplaceKitProduct>
             {
-                Meta = _productsList.Meta,
+                Meta = _kitProducts.Meta,
                 Items = _kitProductList
             };
         }
