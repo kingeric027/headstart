@@ -16,7 +16,7 @@ namespace Marketplace.Common.Constants
 
             foreach(var lineItem in lineItems)
             {
-                foreach(var status in lineItem.xp.LineItemStatusByQuantity)
+                foreach(var status in lineItem.xp.StatusByQuantity)
                 {
                     if(status.Value > 0)
                     {

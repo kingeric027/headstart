@@ -46,42 +46,11 @@ namespace Marketplace.Common.Commands
             await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
             return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
         }
-
-        //public async Task RequestReturnEmail(string orderID)
-        //{
-        //    await _sendgridService.SendReturnRequestedEmail(orderID);
-        //}
-
-        //public async Task RequestCancelEmail(string orderID)
-        //{
-        //    await _sendgridService.SendCancelRequestedEmail(orderID);
-        //}
-
-        //public async Task PatchOrderCanceledStatus(string orderID)
-        //{
-        //        await PatchOrderStatus(orderID, ShippingStatus.Canceled, ClaimStatus.NoClaim);
-        //        await PatchLineItemStatus(orderID, LineItemStatus.Canceled);
-        //}
-        //public async Task PatchOrderCanceledStatus(string orderID)
-        //{
-                //await PatchOrderStatus(orderID, ShippingStatus.Canceled, ClaimStatus.NoClaim);
-                //await PatchLineItemStatus(orderID, LineItemStatus.Canceled);
-        //}
+       
         public async Task PatchOrderRequiresApprovalStatus(string orderID)
         {
                 await PatchOrderStatus(orderID, ShippingStatus.Processing, ClaimStatus.NoClaim);
         }
-        //public async Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus)
-        //{
-        //    var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
-        //    var partialLi = new PartialLineItem { xp = new { LineItemStatus = lineItemStatus } };
-        //    List<Task> lineItemsToPatch = new List<Task>();
-        //    foreach (var li in lineItems.Items)
-        //    {
-        //        lineItemsToPatch.Add(_oc.LineItems.PatchAsync(OrderDirection.Incoming, orderID, li.ID, partialLi));
-        //    }
-        //    await Task.WhenAll(lineItemsToPatch);
-        //}
 
         private async Task PatchOrderStatus(string orderID, ShippingStatus shippingStatus, ClaimStatus claimStatus)
         {

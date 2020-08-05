@@ -47,15 +47,22 @@ namespace Marketplace.Common.Commands
             var previousLineItemsStates = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID);
 
             ValidateLineItemStatusChange(previousLineItemsStates.Items.ToList(), lineItemStatusChanges, verifiedUserType);
-            var updatedLineItems = await Throttler.RunAsync(lineItemStatusChanges.LineItemChanges, 100, 5, (lineItemStatusChange) =>
+            var updatedLineItems = await Throttler.RunAsync(lineItemStatusChanges.Changes, 100, 5, (lineItemStatusChange) =>
             {
-                var newPartialLineItem = BuildNewPartialLineItem(lineItemStatusChange, previousLineItemsStates.Items.ToList(), lineItemStatusChanges.LineItemStatus);
+                var newPartialLineItem = BuildNewPartialLineItem(lineItemStatusChange, previousLineItemsStates.Items.ToList(), lineItemStatusChanges.Status);
                // if there is no verified user passed in it has been called from somewhere else in the code base and will be done with the client grant access
                return verifiedUser != null ? _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.LineItemID, newPartialLineItem, verifiedUser.AccessToken) : _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.LineItemID, newPartialLineItem);
             });
 
-            var statusSync = SyncOrderStatuses(orderDirection, orderID);
-            var notifictionSender = HandleLineItemStatusChangeNotification(verifiedUserType, orderID, lineItemStatusChanges, previousLineItemsStates.Items.ToList());
+            var buyerOrderID = orderID.Split('-')[0];
+            var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, buyerOrderID);
+            var allLineItemsForOrder = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrderID);
+            var lineItemsChanged = allLineItemsForOrder.Items.Where(li => lineItemStatusChanges.Changes.Select(li => li.LineItemID).Contains(li.ID)).ToList();
+            var supplierIDsRelatingToChange = lineItemsChanged.Select(li => li.SupplierID).Distinct().ToList();
+            var relatedSupplierOrderIDs = supplierIDsRelatingToChange.Select(supplierID => $"{buyerOrderID}-{supplierID}").ToList();
+
+            var statusSync = SyncOrderStatuses(buyerOrder, relatedSupplierOrderIDs, allLineItemsForOrder.Items.ToList());
+            var notifictionSender = HandleLineItemStatusChangeNotification(verifiedUserType, buyerOrder, supplierIDsRelatingToChange, lineItemsChanged, lineItemStatusChanges);
             
             await statusSync;
             await notifictionSender;
@@ -63,23 +70,20 @@ namespace Marketplace.Common.Commands
             return updatedLineItems.ToList();
         }
 
-        private async Task SyncOrderStatuses(OrderDirection orderDirection, string orderID)
+        private async Task SyncOrderStatuses(MarketplaceOrder buyerOrder, List<string> relatedSupplierOrderIDs, List<MarketplaceLineItem> allOrderLineItems)
         {
-            var buyerOrderID = orderID.Split('-')[0];
-            var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, buyerOrderID);
-            var relatedSupplierOrderIDs = buyerOrder.xp.SupplierIDs.Select(supplierID => $"{buyerOrderID}-{supplierID}");
-
-            await SyncOrderStatus(OrderDirection.Incoming, buyerOrderID);
+            await SyncOrderStatus(OrderDirection.Incoming, buyerOrder.ID, allOrderLineItems);
 
             foreach(var supplierOrderID in relatedSupplierOrderIDs) {
-                await SyncOrderStatus(OrderDirection.Outgoing, supplierOrderID);
+                var supplierID = supplierOrderID.Split('-')[1];
+                var allOrderLineItemsForSupplierOrder = allOrderLineItems.Where(li => li.SupplierID == supplierID).ToList();
+                await SyncOrderStatus(OrderDirection.Outgoing, supplierOrderID, allOrderLineItemsForSupplierOrder);
             }
         }
 
-        private async Task SyncOrderStatus(OrderDirection orderDirection, string orderID)
+        private async Task SyncOrderStatus(OrderDirection orderDirection, string orderID, List<MarketplaceLineItem> changedLineItems)
         {
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(orderDirection, orderID);
-            var (SubmittedOrderStatus, ShippingStatus, ClaimStatus) = LineItemStatusConstants.GetOrderStatuses(lineItems.Items.ToList());
+            var (SubmittedOrderStatus, ShippingStatus, ClaimStatus) = LineItemStatusConstants.GetOrderStatuses(changedLineItems);
             var partialOrder = new PartialOrder()
             {
                 xp = new
@@ -96,7 +100,7 @@ namespace Marketplace.Common.Commands
         {
             var existingLineItem = previousLineItemStates.First(li => li.ID == lineItemStatusChange.LineItemID);
             var quantitySetting = GetQuantityBeingChanged(lineItemStatusChange.PreviousQuantities);
-            var LineItemStatusByQuantity = BuildNewLineItemStatusByQuantity(lineItemStatusChange, existingLineItem, newLineItemStatus);
+            var StatusByQuantity = BuildNewLineItemStatusByQuantity(lineItemStatusChange, existingLineItem, newLineItemStatus);
             if (newLineItemStatus == LineItemStatus.ReturnRequested || newLineItemStatus == LineItemStatus.Returned)
             {
                 var returnRequests = existingLineItem.xp.Returns ?? new List<LineItemClaim>();
@@ -104,8 +108,8 @@ namespace Marketplace.Common.Commands
                 {
                     xp = new
                     {
-                        ReturnRequests = GetUpdatedChangeRequests(returnRequests, lineItemStatusChange, quantitySetting, newLineItemStatus, LineItemStatusByQuantity),
-                        LineItemStatusByQuantity 
+                        Returns = GetUpdatedChangeRequests(returnRequests, lineItemStatusChange, quantitySetting, newLineItemStatus, StatusByQuantity),
+                        StatusByQuantity
                     }
                 };
             } else if(newLineItemStatus == LineItemStatus.CancelRequested || newLineItemStatus == LineItemStatus.Canceled)
@@ -115,8 +119,8 @@ namespace Marketplace.Common.Commands
                 {
                     xp = new
                     {
-                        CancelationRequests = GetUpdatedChangeRequests(cancelRequests, lineItemStatusChange, quantitySetting, newLineItemStatus, LineItemStatusByQuantity),
-                        LineItemStatusByQuantity
+                        Cancelations = GetUpdatedChangeRequests(cancelRequests, lineItemStatusChange, quantitySetting, newLineItemStatus, StatusByQuantity),
+                        StatusByQuantity
                     }
                 };
             } else
@@ -125,7 +129,7 @@ namespace Marketplace.Common.Commands
                 {
                     xp = new
                     {
-                        LineItemStatusByQuantity
+                        StatusByQuantity
                     }
                 };
             }
@@ -189,17 +193,14 @@ namespace Marketplace.Common.Commands
             return newStatusDictionary;
         }
 
-        private async Task HandleLineItemStatusChangeNotification(VerifiedUserType setterUserType, string orderID, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems)
+        private async Task HandleLineItemStatusChangeNotification(VerifiedUserType setterUserType, MarketplaceOrder buyerOrder, List<string> supplierIDsRelatedToChange, List<MarketplaceLineItem> lineItemsChanged, LineItemStatusChanges lineItemStatusChanges)
         {
-            var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID.Split('-')[0]);
-            var lineItemsChanged = lineItems.Where(li => lineItemStatusChanges.LineItemChanges.Select(li => li.LineItemID).Contains(li.ID));
-            var supplierIDs = lineItems.Select(li => li.SupplierID).Distinct().ToList();
-            var suppliers = await Throttler.RunAsync(supplierIDs, 100, 5, supplierID => _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID));
+            var suppliers = await Throttler.RunAsync(supplierIDsRelatedToChange, 100, 5, supplierID => _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID));
 
             // currently the only place supplier name is used is when there should be lineitems from only one supplier included on the change, so we can just take the first supplier
             var statusChangeTextDictionary = LineItemStatusConstants.GetStatusChangeEmailText(suppliers.First().Name);
 
-            foreach (KeyValuePair<VerifiedUserType, LineItemEmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChanges.LineItemStatus]) {
+            foreach (KeyValuePair<VerifiedUserType, LineItemEmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChanges.Status]) {
                 var userType = entry.Key;
                 var emailText = entry.Value;
 
@@ -212,20 +213,20 @@ namespace Marketplace.Common.Commands
                     firstName = buyerOrder.FromUser.FirstName;
                     lastName = buyerOrder.FromUser.LastName;
                     email = buyerOrder.FromUser.Email;
-                    await _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
+                    await _sendgridService.SendLineItemStatusChangeEmail(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
                 }
                 else if (userType == VerifiedUserType.admin) {
                     firstName = "PlaceHolderFirstName";
                     lastName = "PlaceHolderLastName";
                     email = "bhickey@four51.com";
-                    var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.LineItemStatus) && setterUserType == VerifiedUserType.admin);
+                    var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.Status) && setterUserType == VerifiedUserType.admin);
                     if (shouldNotify)
                     {
-                        await _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
+                        await _sendgridService.SendLineItemStatusChangeEmail(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
                     }
                 } else
                 {
-                    var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.LineItemStatus) && setterUserType == VerifiedUserType.supplier);
+                    var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.Status) && setterUserType == VerifiedUserType.supplier);
                     if (shouldNotify)
                     {
                         await Throttler.RunAsync(suppliers, 100, 5, supplier =>
@@ -233,7 +234,9 @@ namespace Marketplace.Common.Commands
                             firstName = supplier.xp.SupportContact.Name;
                             lastName = "";
                             email = supplier.xp.SupportContact.Email;
-                            return _sendgridService.SendLineItemStatusChangeEmail(lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
+
+                            // todo consider getting the supplierOrder or modifying orderID in here
+                            return _sendgridService.SendLineItemStatusChangeEmail(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
                         });
                     }
                 }
@@ -251,10 +254,10 @@ namespace Marketplace.Common.Commands
 
             // 1) 
             var allowedLineItemStatuses = LineItemStatusConstants.ValidLineItemStatusSetByUserType[userType];
-            Require.That(allowedLineItemStatuses.Contains(lineItemStatusChanges.LineItemStatus), new ErrorCode("Not authorized to set this status on a lineItem", 400, $"Not authorized to set line items to {lineItemStatusChanges.LineItemStatus}"));
+            Require.That(allowedLineItemStatuses.Contains(lineItemStatusChanges.Status), new ErrorCode("Not authorized to set this status on a lineItem", 400, $"Not authorized to set line items to {lineItemStatusChanges.Status}"));
 
             // 2)
-            var areCurrentQuantitiesToSupportChange = lineItemStatusChanges.LineItemChanges.All(lineItemChange =>
+            var areCurrentQuantitiesToSupportChange = lineItemStatusChanges.Changes.All(lineItemChange =>
             {
                 var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemChange.LineItemID);
                 if (relatedLineItems.Count() != 1)
@@ -286,13 +289,13 @@ namespace Marketplace.Common.Commands
                 }
                 return true;
             });
-            Require.That(areCurrentQuantitiesToSupportChange, new ErrorCode("Invalid lineItem status change", 400, $"Current lineitem quantity status on the order are not sufficient to support the requested change"));
+            Require.That(areCurrentQuantitiesToSupportChange, new ErrorCode("Invalid lineItem status change", 400, $"Current lineitem quantity statuses on the order are not sufficient to support the requested change"));
 
             // 3)
-            var areValidPreviousStates = lineItemStatusChanges.LineItemChanges.All(lineItemChange =>
+            var areValidPreviousStates = lineItemStatusChanges.Changes.All(lineItemChange =>
             {
                 var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemChange.LineItemID);
-                var validPreviousStates = LineItemStatusConstants.ValidPreviousStateLineItemChangeMap[lineItemStatusChanges.LineItemStatus];
+                var validPreviousStates = LineItemStatusConstants.ValidPreviousStateLineItemChangeMap[lineItemStatusChanges.Status];
                 var existingLineItem = relatedLineItems.First();
                 foreach (KeyValuePair<LineItemStatus, int> entry in lineItemChange.PreviousQuantities)
                 {

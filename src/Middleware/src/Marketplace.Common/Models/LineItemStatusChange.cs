@@ -15,14 +15,14 @@ namespace Marketplace.Models.Models.Marketplace
 	[SwaggerModel]
 	public class LineItemStatusChanges
 	{
-		public LineItemStatus LineItemStatus { get; set; }
-		public List<LineItemStatusChange> LineItemChanges { get; set; }
+		public LineItemStatus Status { get; set; }
+		public List<LineItemStatusChange> Changes { get; set; }
 	}
 
 	[SwaggerModel]
 	public class LineItemStatusChange
 	{
-		public string LineItemID { get; set; }
+		public string ID { get; set; }
 		public Dictionary<LineItemStatus, int> PreviousQuantities { get; set; }
 		
 		// reason and comment are optional, only apply to return and canelation request

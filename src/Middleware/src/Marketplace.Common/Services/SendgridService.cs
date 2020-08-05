@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 using Dynamitey;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
-using Marketplace.Models.Extended;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
-using ordercloud.integrations.freightpop;
 using OrderCloud.SDK;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -22,15 +20,13 @@ namespace Marketplace.Common.Services
         Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData);
         Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData);
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
-        //Task SendReturnRequestedEmail(string orderID);
-        //Task SendCancelRequestedEmail(string orderID);
         Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
         Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload);
         Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload);
-        Task SendLineItemStatusChangeEmail(LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText);
+        Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText);
     }
     public class SendgridService : ISendgridService
     {
@@ -48,8 +44,6 @@ namespace Marketplace.Common.Services
         private const string BUYER_ORDER_APPROVED_TEMPLATE_ID = "d-2f3b92b95b7b45ea8f8fb94c8ac928e0";
         private const string BUYER_ORDER_DECLINED_TEMPLATE_ID = "d-3b6167f40d6b407b95759d1cb01fff30";
         private const string ORDER_REQUIRES_APPROVAL_TEMPLATE_ID = "d-fbe9f4e9fabd4a37ba2364201d238316";
-        //private const string BUYER_REFUND_REQUESTED_TEMPLATE_ID = "d-e7327df33cd4412abaa2fa76a67f0f3e";
-        //private const string BUYER_CANCEL_REQUESTED_TEMPLATE_ID = "d-ea3f3120faf14d38959163f877e2e0f4";
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
             _oc = ocClient;
@@ -90,7 +84,7 @@ namespace Marketplace.Common.Services
         {
             return lineItems.Select(lineItem =>
             {
-                var lineItemStatusChange = lineItemStatusChanges.LineItemChanges.First(li => li.LineItemID == lineItem.ID);
+                var lineItemStatusChange = lineItemStatusChanges.Changes.First(li => li.ID == lineItem.ID);
                 return MapToTemplateProduct(lineItem, lineItemStatusChange);
             }).ToList();
         }
@@ -110,7 +104,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText)
         {
-           var productsList = CreateTemplateProductList(lineItems, lineItemStatusChanges);
+            var productsList = CreateTemplateProductList(lineItems, lineItemStatusChanges);
 
             var templateData = new
             {
@@ -198,40 +192,22 @@ namespace Marketplace.Common.Services
                 await SendSupplierOrderSubmitEmail(orderWorksheet);
             }
         }
-        //public async Task SendReturnRequestedEmail(string orderID)
-        //{
-        //    MarketplaceOrder order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
-        //    var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID);
-        //    var productsList = MapLineItemsToProducts(lineItems, "return");
-        //    var dynamicTemplateData = new {
-        //        order.FromUser.FirstName,
-        //        order.FromUser.LastName,
-        //        order.ID,
-        //        DateSubmitted = order.DateSubmitted.ToString(),
-        //        ReturnID = order.xp.OrderReturnInfo.RMANumber,
-        //        order.Comments,
-        //        Products = productsList
-        //    };
-        //    await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, order.FromUser.Email, BUYER_REFUND_REQUESTED_TEMPLATE_ID, dynamicTemplateData);
-        //}
 
-        //public async Task SendCancelRequestedEmail(string orderID)
-        //{
-        //    MarketplaceOrder order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
-        //    var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID);
-        //    var productsList = MapLineItemsToProducts(lineItems, "cancel");
-        //    var dynamicTemplateData = new
-        //    {
-        //        order.FromUser.FirstName,
-        //        order.FromUser.LastName,
-        //        order.ID,
-        //        DateSubmitted = order.DateSubmitted.ToString(),
-        //        CancelID = order.xp.OrderCancelInfo.RMANumber,
-        //        order.Comments,
-        //        Products = productsList
-        //    };
-        //    await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, order.FromUser.Email, BUYER_CANCEL_REQUESTED_TEMPLATE_ID, dynamicTemplateData);
-        //}
+        public async Task SendLineItemStatusChangeEmail(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText)
+        {
+            var productsList = lineItems.Select(MapLineItemToProduct);
+
+            var templateData = new
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Products = productsList,
+                lineItemEmailDisplayText.EmailSubject,
+                lineItemEmailDisplayText.StatusChangeDetail,
+                lineItemEmailDisplayText.StatusChangeDetail2
+            };
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
+        }
 
         public async Task SendSupplierOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
         {
@@ -352,8 +328,6 @@ namespace Marketplace.Common.Services
             lineItem.ProductID,
             lineItem.Quantity,
             lineItem.LineTotal,
-            //ReturnQuantity = lineItem.xp.Returns,
-            //lineItem.xp.LineItemReturnInfo.ReturnReason
         };
 
         private object MapCanceledLineItemToProduct(MarketplaceLineItem lineItem) =>
@@ -364,8 +338,6 @@ namespace Marketplace.Common.Services
             lineItem.ProductID,
             lineItem.Quantity,
             lineItem.LineTotal,
-            //ReturnQuantity = lineItem.xp.LineItemCancelInfo.QuantityToCancel,
-            //lineItem.xp.LineItemCancelInfo.CancelReason
         };
 
         private object MapLineItemToProduct(MarketplaceLineItem lineItem) =>
