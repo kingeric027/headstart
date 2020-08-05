@@ -1,5 +1,4 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { Product } from '@ordercloud/angular-sdk';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { KitService } from '@app-seller/kits/kits.service';
@@ -12,7 +11,7 @@ import { MarketplaceKitProduct } from '../../../shared/services/middleware-api/m
 })
 export class KitsTableComponent extends ResourceCrudComponent<MarketplaceKitProduct> {
     constructor(
-        private kitService: KitService,
+        kitService: KitService,
         changeDetectorRef: ChangeDetectorRef,
         router: Router,
         activatedRoute: ActivatedRoute,

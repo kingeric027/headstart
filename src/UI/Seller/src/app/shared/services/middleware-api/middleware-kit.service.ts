@@ -9,7 +9,7 @@ export interface MarketplaceKitProduct {
     Product: Product;
     Images: AssetForDelivery;
     Attachments: AssetForDelivery;
-    ProductAttachments: KitProduct;
+    ProductAssignments: KitProduct;
 }
 export interface KitProductDocument extends Document {
     Doc: KitProduct;
@@ -46,5 +46,13 @@ export class MiddlewareKitService {
     async Get(kitProductID: string): Promise<any> {
         const url = `${this.appConfig.middlewareUrl}/kitproducts/${kitProductID}`;
         return await this.http.get<MarketplaceKitProduct>(url, this.headers).toPromise();
+    }
+    async Update(product: MarketplaceKitProduct) {
+        const url = `${this.appConfig.middlewareUrl}/kitproducts/${product.Product.ID}`;
+        return await this.http.put<MarketplaceKitProduct>(url, product, this.headers).toPromise();
+    }
+    async Delete(productID: string) {
+        const url = `${this.appConfig.middlewareUrl}/kitproducts/${productID}`;
+        return await this.http.delete<MarketplaceKitProduct>(url, this.headers).toPromise();
     }
 }

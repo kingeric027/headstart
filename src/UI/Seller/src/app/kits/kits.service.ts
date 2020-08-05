@@ -4,7 +4,7 @@ import { OcPromotionService, Product, OcProductService } from '@ordercloud/angul
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { MarketplaceKitProduct, MiddlewareKitService } from '../shared/services/middleware-api/middleware-kit.service';
-
+import { AssetForDelivery } from '@ordercloud/headstart-sdk';
 @Injectable({
     providedIn: 'root',
 })
@@ -47,8 +47,8 @@ export class KitService extends ResourceCrudService<MarketplaceKitProduct> {
                 StaticContent: null,
             },
         },
-        Images: [],
-        Attachments: [],
+        Images: null,
+        Attachments: null,
         ProductAssignments: {
             ProductsInKit: [
                 {
