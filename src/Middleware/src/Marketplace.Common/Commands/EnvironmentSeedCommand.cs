@@ -290,7 +290,7 @@ namespace Marketplace.Common.Commands
 		public async Task CreateMarketPlaceRoles(string accessToken)
 		{
 			var profiles = DefaultSecurityProfiles.Select(p =>
-				new SecurityProfile() { Name = p.CustomRole.ToString(), ID = p.CustomRole.ToString(), CustomRoles = { p.CustomRole.ToString() }, Roles = p.Roles });
+				new SecurityProfile() { Name = p.CustomRole.ToString(), ID = p.CustomRole.ToString(), CustomRoles = { p.CustomRoles.Append(p.CustomRole).Select(r => r.ToString() }, Roles = p.Roles });
 
 			foreach (var profile in profiles)
 			{
@@ -515,6 +515,7 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin, ApiRole.AdminAddressReader, ApiRole.PriceScheduleAdmin  } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.CatalogReader, ApiRole.ProductFacetReader} },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPPromotionAdmin, Roles = new[] { ApiRole.PromotionAdmin } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPContentAdmin, CustomRoles = new[] { CustomRole.AssetAdmin, CustomRole.SchemaAdmin, CustomRole.DocumentAdmin, } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPPromotionReader, Roles = new[] { ApiRole.PromotionReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPStoreFrontAdmin, Roles = new[] { ApiRole.ProductFacetAdmin, ApiRole.ProductFacetReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCategoryAdmin, Roles = new[] { ApiRole.CategoryAdmin } },
@@ -560,7 +561,8 @@ namespace Marketplace.Common.Commands
 			CustomRole.MPSellerAdmin,
 			CustomRole.MPSupplierAdmin,
 			CustomRole.MPSupplierUserGroupAdmin,
-			CustomRole.MPReportReader
+			CustomRole.MPReportReader,
+			CustomRole.MPContentAdmin
 		};
 	}
 }

@@ -9,6 +9,7 @@ namespace Marketplace.Models.Misc
 		MeProductAdmin,
 		MPProductReader,
 		MPPromotionReader,
+		MPContentAdmin,
 		MPPromotionAdmin,
 		MPCategoryAdmin,
 		MPCategoryReader, 
